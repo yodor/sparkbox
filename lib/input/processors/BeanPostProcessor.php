@@ -24,7 +24,9 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 	debug("Data source is null or not from expected class DBTableBean nothing to do in beforeCommit");
 	return;
       }
-      
+      if ($data_source->getTableName() == $transactor->getBean()->getTableName()) {
+	  throw new Exception("Field transact error for field: '".$field->getName()."'. Data source bean and main transaction bean are the same - '".get_class($data_source)."'");
+      }
       
       $source_key = $data_source->getPrKey();
       $lastID = $transactor->getLastID();

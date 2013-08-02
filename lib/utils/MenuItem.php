@@ -19,7 +19,7 @@ class MenuItem
 
     protected $childNodes = array();
 
-    public static $icon_path = "../images/admin/menu_icons/";
+    public static $icon_path = "../images/admin/spark_icons/";
     
     public function __construct($title, $href="", $icon="")
     {

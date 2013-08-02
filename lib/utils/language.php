@@ -11,14 +11,11 @@ include_once("lib/utils/Session.php");
 
 //TODO: check usage when this file is included from js.php files that include the main/top session.php
 
-debug("---------------Language.php start");
 $g_sp = new SiteTextsBean();	
 $g_stu = new SiteTextUsageBean();
 $g_lb = new LanguagesBean();
 $g_tr = new TranslationPhrasesBean();
 $g_bt = new TranslationBeansBean();
-debug("---------------Language.php finish");
-
 
 function setLanguageString($str, $page_dir="LTR")
 {
@@ -76,14 +73,14 @@ function setLanguage($str, $langID,$page_dir)
 //sane defaults
 if (!Session::contains("language") || !Session::contains("langID"))
 {
-	if (Session::haveCookie("langID")) {
-	  $langID = Session::cookie("langID");
-	  setLanguageID($langID);
-	}
-	else {
-	  //set default language
-	  setLanguageString(DEFAULT_LANGUAGE);
-	}
+    if (Session::haveCookie("langID")) {
+      $langID = Session::cookie("langID");
+      setLanguageID($langID);
+    }
+    else {
+      //set default language
+      setLanguageString(DEFAULT_LANGUAGE);
+    }
 }
 
 
@@ -123,11 +120,6 @@ $left = Session::get("left");
 $right = Session::get("right");
 $language = Session::get("language");
 $languageID = Session::get("langID");
-
-
-
-
-
 
 function getActiveLanguageID()
 {

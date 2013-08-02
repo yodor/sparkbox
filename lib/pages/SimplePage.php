@@ -10,8 +10,8 @@ include_once("lib/panels/MessageDialog.php");
 class SimplePage extends SitePage
 {
 
-	protected $auth;
-	protected $login_url;
+	protected $auth = NULL;
+	protected $login_url = "";
 	protected $preferred_title = "";
 
 	protected $page_title = "";
@@ -25,6 +25,15 @@ class SimplePage extends SitePage
 	{
 	    parent::dumpMetaTags();
 
+	    echo '<meta name="audience" content="All">';
+	    echo '<meta name="page-topic" content="">';
+	    echo '<meta name="revisit-after" content="1 days">';
+	    echo '<meta name="author" content="">';
+
+	    echo '<meta name="robots" content="index, follow">';
+	    echo '<meta http-equiv="imagetoolbar" content="no">';
+
+	
 	    if (DB_ENABLED) {
 	      $config = ConfigBean::factory();
 	      $config->setSection("seo");
@@ -49,6 +58,8 @@ class SimplePage extends SitePage
 		    
 	    }
 	    $this->head_components = $hcmp_merged;
+	    
+	    echo "<link rel='shortcut icon' href='".SITE_URL."/favicon.ico'>";
 
         }
         protected function headStart() 

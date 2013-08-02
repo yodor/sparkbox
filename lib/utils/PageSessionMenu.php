@@ -103,7 +103,7 @@ class PageSessionMenu extends MainMenu {
 	  // check any of the submenus currently added
 	  $position = $this->findMenuIndex(MainMenu::FIND_INDEX_PATHCHECK);
 
-	  debug("Position: $position");
+	  debug("LocationPath::findMenuIndex Index: $position");
 	  
 	}
 	

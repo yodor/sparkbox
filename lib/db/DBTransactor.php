@@ -5,6 +5,8 @@ class DBTransactor  {
 
   protected $transact_values = NULL;
   
+  protected $transaction_bean = NULL;
+  protected $editID = -1;
   
   //external assigned 
   protected $insert_values = NULL;
@@ -13,12 +15,21 @@ class DBTransactor  {
   protected $lastID = -1;
   protected $form = NULL;
   
+  
   public function __construct()
   {
       $this->transact_values = array();
       $this->insert_values = array();
       $this->update_values = array();
       
+  }
+  public function getEditID()
+  {
+      return $this->editID;
+  }
+  public function getBean()
+  {
+      return $this->transaction_bean;
   }
   public function getLastID()
   {
@@ -142,6 +153,10 @@ class DBTransactor  {
   
   public function processBean(DBTableBean $bean, $editID)
   {
+  
+      $this->transaction_bean = $bean;
+      $this->editID = $editID;
+      
       debug("DBTransactor::processBean | DBTableBean: ".get_class($bean));
 
       $db=DBDriver::factory();

@@ -1,12 +1,10 @@
 <?php
-
 error_reporting(E_ALL);
 ini_set("display_errors","1");
 ini_set("display_startup_errors","1");
 ini_set("auto_detect_line_endings","1");
-ini_set("session.cookie_lifetime","0");
-
-ini_set("session.use_only_cookies","0");
+ini_set("session.cookie_lifetime", "0");
+ini_set("session.use_only_cookies", "0");
 
 // ini_set("session.cookie_lifetime","7200");
 // ini_set("session.gc_maxlifetime","36000");
@@ -26,4 +24,5 @@ ini_set("date.timezone","Europe/Sofia");
 //<Directory "/srv/http/acw">
 //  AllowOverride Options
 //</Directory>
+
 ?>

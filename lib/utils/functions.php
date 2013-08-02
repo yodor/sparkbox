@@ -1,5 +1,23 @@
 <?php
 
+function KMG(&$umf)
+{
+  if (strpos($umf,"M")!==FALSE) {
+	str_replace("M","", $umf);
+	$umf = (int)$umf * 1024 * 1024;
+  }
+  else if (strpos($umf,"K")!==FALSE) {
+	str_replace("K","", $umf);
+	$umf = (int)$umf * 1024;
+  }
+}
+
+function file_size($size)
+{
+    $filesizename = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB");
+    return $size ? round($size/pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i] : '0 Bytes';
+}
+
 function startsWith($haystack, $needle)
 {
     return !strncmp($haystack, $needle, strlen($needle));
