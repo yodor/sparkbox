@@ -1,0 +1,67 @@
+.CalendarPopup {
+  background:white;
+  border-collapse:collapse;
+  border:1px solid gray;
+  
+}
+.CalendarPopup .Day {
+  width:30px;height:25px;
+  border-bottom:1px solid gray;
+  border-right:1px solid gray;
+  cursor:pointer;
+  color:#4989b7;
+  font-weight:normal;
+}
+.CalendarPopup .Day.PrevMonth {
+  width:30px;height:25px;
+  border-bottom:1px solid gray;
+  border-right:1px solid gray;
+  cursor:pointer;
+  color:#cccccc;
+  font-weight:normal;
+  background:#f0f0f0;
+}
+.CalendarPopup .Day.NextMonth {
+  width:30px;height:25px;
+  border-bottom:1px solid gray;
+  border-right:1px solid gray;
+  cursor:pointer;
+  color:#cccccc;
+  font-weight:normal;
+  background:#f0f0f0;
+}
+.CalendarPopup .Button  {
+  margin-left:5px;
+  margin-right:5px;
+  display:inline-block;
+  font-weight:bold;
+  font-size:24px;
+  text-decoration:none;
+  color:#4989b7;
+}
+.CalendarPopup .Day.Selected {
+  width:30px;height:25px;
+  border-bottom:1px solid gray;
+  border-right:1px solid gray;
+  cursor:pointer;
+  color:#4989b7;
+  font-weight:bold;
+  background:#DCE5ED;
+}
+.CalendarPopup .WeekdayName {
+  width:30px;height:25px;
+  border-top:1px solid gray;
+  border-bottom:1px solid gray;
+  border-right:1px solid gray;
+  background:#a1b5b4;
+  text-align:center;
+  font-weight:bold;
+  color:black;
+  padding-left:3px;padding-right:3px;min-width:30px;
+}
+.CalendarPopup .MonthYearCaption {
+  
+  height:25px;
+  text-align:center;
+  font-weight:bold;
+}

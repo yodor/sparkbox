@@ -1,0 +1,59 @@
+.ActionRenderer {
+  color:#50a9f9;
+  text-decoration:none;
+}
+.ActionRenderer[action="PipeSeparator"] {
+  color:#cccccc;
+}
+.ActionRenderer[action="RowSeparator"] {
+  display:block;
+}
+
+.ActionRenderer[action="Edit"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_edit.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+}
+.ActionRenderer[action="Delete"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_delete.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+}
+.ActionRenderer[action="Translate"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_edit.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+}
+.ActionRenderer[action="Clear"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_delete.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+}
+.ActionRenderer[action="First"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_first.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+}
+.ActionRenderer[action="Last"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_last.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+}
+.ActionRenderer[action="Previous"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_prev.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+}
+.ActionRenderer[action="Next"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_next.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+}

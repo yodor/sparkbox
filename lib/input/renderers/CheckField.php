@@ -1,0 +1,57 @@
+<?php
+include_once("lib/input/renderers/DataSourceField.php");
+include_once("lib/input/renderers/DataSourceItem.php");
+
+class CheckItem extends DataSourceItem 
+{
+
+    public function renderImpl()
+    {
+
+	echo "<input type='checkbox' value='{$this->value}' name='{$this->name}' id='{$this->id}' ";
+	if ($this->isSelected()) echo "CHECKED";
+	
+	echo ">";
+	echo "<span>{$this->label}</span>";
+    }
+
+}
+
+
+class CheckField extends DataSourceField
+{
+ 
+  public function __construct()
+  {
+      parent::__construct();
+      $this->setItemRenderer(new CheckItem());
+
+  }
+
+  public function renderImpl()
+  {
+      $field_values = $this->field->getValue();
+     
+      
+      $field_name = $this->field->getName();
+
+      parent::renderImpl();
+      
+      if (! ($this->data_bean instanceof IDataBean) ) {
+      
+	  $item = clone $this->item;
+	  
+	  $item->setValue(1);
+	  $item->setLabel($this->caption);
+	  $item->setName($field_name);
+
+	  $item->setSelected($field_values);
+	  
+	  echo "<div class='FieldElements'>";
+	  $item->render();
+	  echo "</div>";
+      }
+      
+  }
+}
+?>

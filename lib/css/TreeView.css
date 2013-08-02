@@ -1,0 +1,140 @@
+.TreeView {
+  display:inline-block;
+/*   max-width:220px; */
+}
+
+.TreeView .NodeChilds {
+  list-style:none;
+  padding:0px;
+  margin:0px;
+
+}
+.TreeView .NodeChilds .NodeOuter {
+
+}
+.TreeView .NodeChilds .NodeChilds {
+  margin-left:21px;
+
+}
+.TreeView .Node {
+  display:table;
+  width:100%;
+  border-spacing:3px;
+  border-collapse:separate;
+}
+.TreeView .Node:hover {
+  background-color:#f3f6fb;
+}
+.TreeView .Node .Handle
+{
+  display:table-cell;
+
+  cursor:pointer;
+
+  vertical-align:middle;
+  text-align:left;
+
+  width:16px;
+  
+}
+
+
+.TreeView .Node .Handle .Button {
+  border:1px solid #cccccc;
+  text-align:left;
+  text-align:center;
+  font-family: "Consolas","Mono";
+
+  width:16px;
+  height:16px;
+
+  display:block;
+
+  color:gray;
+
+
+}
+.TreeView .Node[branch_type='opened'] + .NodeChilds {
+  display:auto;
+}
+.TreeView .Node[branch_type='closed'] + .NodeChilds {
+  display:none;
+}
+
+/*.TreeView .NodeOuter .Node .Handle[branch_type='opened'] .Button {*/
+.TreeView .Node[branch_type='opened'] .Handle .Button {
+  background-image:url('../images/tree_node_close.png');
+
+  display:block;
+
+  background-repeat:no-repeat;
+  background-position:50% 50%;
+}
+.TreeView .Node[branch_type='closed'] .Handle .Button {
+  background-image:url('../images/tree_node_open.png');
+  display:block;
+
+  background-repeat:no-repeat;
+  background-position:50% 50%;
+}
+.TreeView .Node[branch_type='leaf'] .Handle .Button {
+  background-image:url('../images/tree_node_leaf.png');
+  display:block;
+
+  background-repeat:no-repeat;
+  background-position:50% 50%;
+}
+
+.TreeView .Node .ActionRenderer[action='TextTreeItemAction']
+{
+  display:table-cell;
+  vertical-align:middle;
+
+  text-decoration:none;
+  color:black;
+
+  text-align:left;
+  
+/*   margin-left:25px; */
+/*   margin-top:1px; */
+  
+}
+.TreeView .Node[active="1"] .ActionRenderer[action='TextTreeItemAction']
+{
+
+  text-decoration:underline;
+  font-weight:bold;
+}
+
+.TreeView .node_actions {
+  display:table-cell;
+
+  vertical-align:middle;
+  text-align:right;
+
+}
+.TreeView .node_actions A {
+
+  display:inline-block;
+  margin-left:5px;
+  color:#50a9f9;
+  text-decoration:none;
+
+}
+
+
+
+
+.TreeView .Node .Control
+{
+  display:block;
+
+  cursor:pointer;
+
+  vertical-align:middle;
+  text-align:left;
+  float:left;
+  
+  width:16px;
+  height:16px;
+}

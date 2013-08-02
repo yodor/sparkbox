@@ -1,0 +1,71 @@
+<?php
+include_once("lib/components/Component.php");
+include_once("lib/input/renderers/IDataSourceItem.php");
+
+abstract class DataSourceItem extends Component implements IDataSourceItem
+{
+    protected $data_row = array();
+    protected $index = -1;
+    protected $label = "";
+    protected $value = "";
+    protected $id = "";
+    protected $name = "";
+    
+    public function setIndex($index)
+    {
+	$this->index = $index;
+    }
+    public function setLabel($label)
+    {
+	$this->label = $label;
+    }
+    public function setDataRow($data_row)
+    {
+	$this->data_row = $data_row;
+    }
+    public function setID($id)
+    {
+	//source model id
+	$this->id = $id;
+    }
+    public function setValue($value)
+    {
+	$this->value = $value;
+    }
+    public function setName($name)
+    {
+	$this->name = $name;
+    }
+    
+    public function __construct()
+    {
+	parent::__construct();
+	$this->component_class="";
+    }
+    
+    public function startRender()
+    {
+      //row index in the data source values
+      echo "<div class='".get_class($this)."' ";
+      if ($this->index>-1) {
+	echo " index='{$this->index}' ";
+      }
+      echo ">";
+
+    }
+    public function finishRender()
+    {
+      echo "</div>";
+    }
+
+    public function setSelected($mode)
+    {
+      $this->selected = ($mode) ? TRUE : FALSE;
+    }
+    public function isSelected()
+    {
+	return $this->selected;
+    }
+}
+
+?>

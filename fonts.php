@@ -1,0 +1,53 @@
+<?php
+include_once("session.php");
+
+include_once("class/pages/DemoPage.php");
+
+
+
+$page = new DemoPage();
+
+function dumpCSS()
+{
+  echo '<link rel="stylesheet" href="'.SITE_ROOT.'css/fonts.css" type="text/css">';
+  echo "\n";
+}
+$page->beginPage();
+
+
+echo "<div class='demo_arial'>";
+drawSampleText();
+echo "</div>";	
+
+echo "<HR>";
+
+echo "<div class='demo_custom'>";
+drawSampleText();
+echo "</div>";	
+
+echo "<HR>";
+
+echo "<div class='demo_gothic_normal'>";
+drawSampleText();
+echo "</div>";	
+echo "<HR>";
+
+
+$page->finishPage();
+
+function drawSampleText()
+{
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+
+}
+
+?>

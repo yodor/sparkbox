@@ -1,0 +1,43 @@
+
+.BeanTranslationDialog .Inner {
+  min-width:400px;
+}
+.BeanTranslationDialog .Inner .AjaxProgress {
+  display:inline-block;
+  width:20px;
+  height:20px;
+
+}
+.BeanTranslationDialog .Inner .original_text {
+  border:1px solid purple;
+  background:white;
+  color:black;
+  overflow:visible;
+  width:100%;
+    box-sizing:border-box;
+  -moz-box-sizing:border-box;
+}
+.BeanTranslationDialog .Inner .InputComponent[field="langID"] {
+  float:right;
+}
+.BeanTranslationDialog .Inner .InputComponent[field="langID"] .InputLabel {
+  display:inline-block;
+}
+.BeanTranslationDialog .Inner .InputComponent[field="langID"] .InputField {
+  display:inline-block;
+}
+.BeanTranslationDialog .Inner textarea[name='translation'] {
+  width:100%;
+   box-sizing:border-box;
+  -moz-box-sizing:border-box;
+}
+.BeanTranslationDialog .Inner .buttons_bar {
+  display:block;
+  width: 100%
+}
+.BeanTranslationDialog .Inner .buttons_bar [action='Translate'] {
+  float:left;
+}
+.BeanTranslationDialog .Inner .buttons_bar [action='Close'] {
+  float:right;
+}

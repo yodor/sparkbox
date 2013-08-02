@@ -1,0 +1,37 @@
+@import url("ActionRenderer.css");
+
+.FormRenderer[field_layout="HBox"] .ArrayContents:empty {
+  display:none;
+}
+.FormRenderer[field_layout="HBox"] .ArrayContents {
+  display:inline-block;
+}
+.FormRenderer[field_layout="HBox"] .ArrayContents .Element {
+  display:table-row;
+}
+.FormRenderer[field_layout="HBox"] .ArrayContents .Element .InputField {
+  display:table-cell;
+  vertical-align:middle;
+}
+.FormRenderer[field_layout="HBox"] .ArrayContents .Element .Controls {
+  display:table-cell;
+  vertical-align:middle;
+  
+}
+
+.ArrayContents {
+  border-spacing:2px;
+  position:relative;
+
+}
+.ArrayContents .Element .Controls .ActionRenderer[action="Remove"] {
+  padding-left:12px;
+  background-image:url("../images/list_actions/item_delete.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+  cursor:pointer;
+}
+
+.InputField .ElementSource {
+  display:none;
+}

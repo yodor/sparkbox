@@ -1,0 +1,39 @@
+.PhraseTranslationDialog .Inner {
+
+  width:400px;
+
+}
+.PhraseTranslationDialog .Inner .AjaxProgress {
+  display:inline-block;
+  width:20px;
+  height:20px;
+  float:right;
+
+}
+.PhraseTranslationDialog .Inner .original_text {
+  border:1px solid purple;
+  background:white;
+  color:black;
+  overflow:visible;
+  width:100%;
+    box-sizing:border-box;
+  -moz-box-sizing:border-box;
+}
+.PhraseTranslationDialog .Inner textarea[name='translation'] {
+  width:100%;
+   box-sizing:border-box;
+  -moz-box-sizing:border-box;
+}
+
+
+.PhraseTranslationDialog .Inner .buttons_bar {
+  display:block;
+  width:100%;
+
+}
+.PhraseTranslationDialog .Inner .buttons_bar [action='Translate'] {
+  float:left;
+}
+.PhraseTranslationDialog .Inner .buttons_bar [action='Close'] {
+  float:right;
+}

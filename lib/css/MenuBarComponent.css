@@ -1,0 +1,90 @@
+.MenuBarComponent {
+  display:table;
+  background-color:white;
+}
+.MenuBarComponent .MenuBarItemRenderer {
+  display:table-cell;
+  height:30px;
+  vertical-align:middle;
+  padding-left:5px;
+  padding-right:5px;
+  cursor:pointer;
+}
+.MenuBarComponent .MenuBarItemRenderer .MenuItemLink {
+  
+  color:black;
+  display:inline-block;
+  text-decoration:none;
+  
+  
+}
+.MenuBarComponent .MenuSeparator {
+  display:table-cell;
+  vertical-align:middle;
+  width:0px;
+  border-left:1px dotted black;
+}
+
+.MenuBarComponent .MenuBarItemRenderer.Hover {
+  background-color:black;
+  color:white;
+}
+.MenuBarComponent .MenuBarItemRenderer.Hover .MenuItemLink {
+  color:white;
+}
+
+.MenuBarComponent .MenuBarItemRenderer[active="1"] .MenuItemLink  {
+  border-bottom:2px solid black;
+}
+.MenuBarComponent .MenuBarItemRenderer[active="1"].Hover .MenuItemLink  {
+  border-bottom:2px solid white;
+}
+
+.SubmenuRenderer {
+  display:none;
+  z-index:100;
+}
+.SubmenuRenderer {
+  background-color:white;
+  padding-top:5px;
+  padding-bottom:5px;
+  border:1px solid black;
+  text-align:left;
+  
+}
+.SubmenuItemRenderer {
+
+  color:black;
+}
+.SubmenuItemRenderer>.SubmenuItemOuter {
+  padding:5px;
+  padding-right:0px;
+  
+}
+.SubmenuItemRenderer>.SubmenuItemOuter .SubmenuItemLink {
+  color:black;
+  text-decoration:none;
+  padding-right:5px;
+}
+.SubmenuItemRenderer>.SubmenuItemOuter .RightPart {
+  text-align:right;
+  display:inline-block;
+  color:black;
+  padding-left:5px;
+  padding-right:5px;
+ 
+}
+.SubmenuItemRenderer.Hover>.SubmenuItemOuter {
+  padding-top:5px;
+  padding-bottom:5px;
+  background-color:black;
+  color:white;
+}
+.SubmenuItemRenderer.Hover>.SubmenuItemOuter .SubmenuItemLink {
+  color:white;
+
+}
+.SubmenuItemRenderer.Hover>.SubmenuItemOuter .RightPart {
+  color:white;
+}
+

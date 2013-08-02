@@ -1,0 +1,232 @@
+<?php
+include_once("lib/components/Component.php");
+include_once("lib/components/ListView.php");
+include_once("lib/components/renderers/IActionsRenderer.php");
+include_once("lib/components/renderers/IItemRenderer.php");
+include_once("lib/components/renderers/IPhotoRenderer.php");
+include_once("lib/components/renderers/ActionRenderer.php");
+
+class GalleryViewItemRenderer extends Component implements IItemRenderer, IActionsRenderer, IPhotoRenderer, IHeadRenderer
+{
+
+	protected $gallery_view;
+
+	protected $actions;
+
+	protected $width = 128;
+	protected $height = -1;
+	protected $render_mode = IPhotoRenderer::RENDER_CROP;
+	protected $item = NULL;
+
+	public function setItem($item) {
+		$this->item = $item;
+	}
+	public function getItem() {
+		return $this->item;
+	}
+	public function setThumbnailSize($width, $height)
+	{
+		$this->width=$width;
+		$this->height=$height;
+	}
+	public function setRenderMode($mode) {
+		$this->render_mode = $mode;
+	}
+	public function getRenderMode() {
+		return $this->render_mode;
+	}
+	public function getThumbnailWidth() {
+		return $this->width;
+	}	
+	public function getThumbnailHeight() {
+		return $this->height;
+	}
+
+	public function addAction(Action $a)
+	{
+		$this->actions[$a->getTitle()] = $a;
+	}
+	public function setActions(array $actions)
+	{
+		$this->actions = $actions;
+	}
+	public function getActions()
+	{
+		return $this->actions;
+	}
+	public function __construct(GalleryView $view)
+	{
+		parent::__construct();
+		$this->gallery_view = $view;
+
+	}
+	
+    public function renderScript()
+    {
+    
+    }
+    public function renderStyle()
+    {
+	  echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/ActionRenderer.css' type='text/css' >";
+	  echo "\n";
+    }
+
+	public function startRender()
+	{
+
+if (isset($this->item["position"])) {
+  $this->setAttribute("position", $this->item["position"]);
+} 
+	
+		$photos_bean = $this->gallery_view->getBean();
+		$photos_prkey = $photos_bean->getPrKey();
+		$photoID = $this->item[$photos_prkey];
+		$this->setAttribute("itemID", $photoID);
+
+		$refID = $this->gallery_view->getRefVal();
+		$ref_key = $this->gallery_view->getRefKey();
+
+if ($ref_key) {
+  $this->setAttribute("ref_key", "$ref_key");
+  $this->setAttribute("ref_id", "$refID");
+}
+
+		$all_attr = $this->prepareAttributes();
+		echo "<div $all_attr >";
+
+	}
+	public function finishRender()
+	{
+		echo "</div>";
+	}
+	public function renderImpl()
+	{
+		
+	
+		$row = $this->item;
+
+		
+
+		
+		$refID = $this->gallery_view->getRefVal();
+		$ref_key = $this->gallery_view->getRefKey();
+	
+		$photos_bean = $this->gallery_view->getBean();
+		$photos_prkey = $photos_bean->getPrKey();
+
+		
+		$photoID = $row[$photos_prkey];
+
+		if ($this->render_mode == IPhotoRenderer::RENDER_THUMB) {
+		  $size = max($this->width, $this->height);
+		  
+		  $thumb_href = SITE_ROOT."storage.php?cmd=image_thumb&size=$size&width=$size&id=$photoID&class=".get_class($photos_bean);
+		}
+		else {
+		  $thumb_href = SITE_ROOT."storage.php?cmd=image_crop&width={$this->width}&height={$this->height}&id=$photoID&class=".get_class($photos_bean);
+	
+		}
+		$image_href = SITE_ROOT."storage.php?cmd=gallery_photo&id=$photoID&class=".get_class($photos_bean);
+		
+		echo "<div class='header_row'>";
+		
+		
+		if (isset($row["position"])) {
+		    echo "<div class='item_position'>";
+
+		    echo "<label>".tr("Position").": </label><span>".$row["position"]."</span>";
+		  
+		    echo "</div>";
+		
+		}
+	    
+		    $this->renderActions($row);
+	    
+		    echo "<div class=clear></div>";
+		    
+		echo "</div>";
+		
+		
+		$tooltip = tr("Caption").": ".$row["caption"]."<BR>";
+		$tooltip.= tr("Upload Date").": ".dateFormat($row["date_upload"],true);
+		
+		
+		echo "<div class='image_slot'>";
+		
+		$named_link = get_class($this->gallery_view->getBean()).".".$this->item["position"];
+		$rel = get_class($this->gallery_view->getBean());
+		
+		echo "<a class='image_popup' href='$image_href' name='$named_link' rel='".get_class($this->gallery_view->getBean())."'>";
+		echo "<img src='$thumb_href' tooltip='$tooltip'>";
+		echo "</a>";
+		
+		if ($this->actions["First"]) {
+		    
+		    $this->renderRepositionAction($this->actions["First"], $row);
+		    
+		}
+		if ($this->actions["Last"]) {
+		    
+		    $this->renderRepositionAction($this->actions["Last"], $row);
+		    
+		}
+		if ($this->actions["Previous"]) {
+		    
+		    $this->renderRepositionAction($this->actions["Previous"], $row);
+		    
+		}
+		if ($this->actions["Next"]) {
+		    
+		    $this->renderRepositionAction($this->actions["Next"], $row);
+		    
+		}
+		
+		echo "</div>";
+		
+		
+
+		
+
+
+	}
+	public function renderRepositionAction($act, &$row) 
+	{
+	    $act = new ActionRenderer($act, $row);
+	    $act->setClassName("reposition_action");
+	    $act->render_title = false;
+	    $act->render();
+
+	    
+	}
+	public function renderActions(array &$row)
+	{
+	    
+		    echo "<div class='item_actions'>";
+		    
+		    if (isset($this->actions["Edit"])) {
+		    
+		      $act = new ActionRenderer($this->actions["Edit"], $row);
+		      $act->render();
+
+
+		    }
+		    
+		    $act = new ActionRenderer(new PipeSeparatorAction(), null);
+		    $act->render();
+		    
+		    if (isset($this->actions["Delete"])) {	
+		      $act = new ActionRenderer($this->actions["Delete"], $row);
+		      $act->render();
+
+
+		    }
+		    
+		    echo "</div>";
+	  
+	    
+	  
+	}
+	public function renderSeparator($idx_curr, $items_total) {
+
+	}
+}

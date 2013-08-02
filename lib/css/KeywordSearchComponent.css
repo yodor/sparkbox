@@ -1,0 +1,25 @@
+
+.KeywordSearchComponent {
+  display:table;
+  border-collapse:collapse;
+}
+.KeywordSearchComponent .fields {
+  display:table-cell;
+  vertical-align:bottom;
+  padding:0px;
+}
+.KeywordSearchComponent .buttons {
+  display:table-cell;
+  vertical-align:bottom;
+  padding:0px;
+}
+.KeywordSearchComponent .buttons * {
+  margin-bottom:0px;
+}
+
+.KeywordSearchComponent+.TableView {
+  margin-top:10px;
+}
+.KeywordSearchComponent+.ListView {
+  margin-top:10px;
+}

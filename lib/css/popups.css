@@ -1,0 +1,108 @@
+.ModalPane {
+  background-image:url('../images/modal_back.png');
+  position:fixed;
+  left:0px;
+  top:0px;
+  width:100%;
+  height:100%;
+  display:block;
+  z-Index:100;
+}
+
+
+.AjaxLoader {
+  display:block;
+  width:100%;
+  height:100%;
+  background-image:url("../images/ajax-loader.gif");
+  background-repeat:no-repeat;
+  background-position:center center;
+}
+
+
+.TooltipPanel {
+  background-color:black;
+  padding:5px;
+
+  position:absolute;
+  left:0px;
+  top:0px;
+  color:white;
+  font-size:10px;
+  font-weight:bold;
+  background-color: #0c2226;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  behavior: url(./pie/PIE.htc);
+  z-Index:100;
+  
+  display:none;
+}
+
+
+
+.ImagePopupPanel {
+/*   border:1px dotted red; */
+}
+
+.ImagePopupPanel .Contents {
+  position:relative;
+  background:white;
+  padding:5px;
+  z-Index:0;
+
+  text-align:center;
+  display:block;
+  vertical-align:middle;
+}
+.ImagePopupPanel .Contents[working="1"] * {
+  display:none;
+}
+
+.ImagePopupPanel .Contents .ImagePart {
+  display:block;
+}
+.ImagePopupPanel .Button {
+  display:block;position:absolute;
+  z-Index:1;
+  background-color:transparent;
+  text-decoration:none;
+  text-align:center;
+  vertical-align:middle;
+  visibility:hidden;
+
+  background-repeat:no-repeat;
+  color:gray;
+  height:44px;
+  width:22px;
+  top:50%;
+  margin-top:-22px;
+  cursor:pointer;
+}
+
+.ImagePopupPanel .Button[action="PrevImage"] {
+  left:-32px;
+/*   margin-left:-44px; */
+/*   background-image:url('../images/arrow_left.png'); */
+  background-image:url("../images/gallery_left.png");
+  
+}
+.ImagePopupPanel .Button[action="NextImage"] {
+  left:100%;
+  margin-left:10px;
+  
+/*   margin-left:-70px; */
+/*   background-image:url('../images/arrow_right.png'); */
+  background-image:url("../images/gallery_right.png");
+}
+
+
+
+
+
+
+
+
+
+
