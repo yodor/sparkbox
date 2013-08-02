@@ -38,6 +38,7 @@ class MessageDialog extends Component implements IFinalRenderer, IHeadRenderer
 	      $btn_ok->setButtonType(StyledButton::TYPE_BUTTON);
 	      $btn_ok->setText("OK");
 	      $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
+	      $btn_ok->setAttribute("default_action", 1);
 
 	      $this->buttons[MessageDialog::BUTTON_ACTION_CONFIRM] = $btn_ok;
 

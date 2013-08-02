@@ -22,7 +22,9 @@ class ConfirmMessageDialog extends MessageDialog
 		$btn_cancel = StyledButton::DefaultButton();
 		$btn_cancel->setButtonType(StyledButton::TYPE_BUTTON);
 		$btn_cancel->setText("Cancel");
+		
 		$btn_cancel->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
+		$btn_cancel->setAttribute("default_action", 1);
 		$this->buttons[MessageDialog::BUTTON_ACTION_CANCEL] = $btn_cancel;
 	}
 	

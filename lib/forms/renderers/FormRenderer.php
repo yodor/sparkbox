@@ -29,6 +29,7 @@ class FormRenderer extends Component implements IFormRenderer, IHeadRenderer
       
 
       $this->submit_button = StyledButton::DefaultButton();
+      $this->submit_button->setAttribute("action", "form_submit");
       $this->submit_button->setName("submit_item");
       $this->submit_button->setText("Submit Form");
       $this->submit_button->setValue("submit");
@@ -133,12 +134,16 @@ class FormRenderer extends Component implements IFormRenderer, IHeadRenderer
 	echo "</div>";
 	
 	echo "<div class='Buttons'>";
-	$this->submit_button->render();
+	
 
 	foreach($this->buttons as $href=>$btn) {
 	    $btn->render();
 
 	}
+	
+	$this->submit_button->render();
+	
+	
 	echo "</div>";
 	    
       echo "</div>";
