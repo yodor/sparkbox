@@ -2,18 +2,20 @@
 include_once("lib/input/renderers/SelectField.php");
 include_once("lib/beans/NestedSetBean.php");
 
+
+
 class NestedSelectField extends SelectField 
 {
 
 
   public $rootParent = 0;
   public $node_order = "";
-
+  
   
   public function __construct()
   {
       parent::__construct();
-
+      
   }
 
   public function renderImpl()
@@ -28,7 +30,63 @@ class NestedSelectField extends SelectField
   
   protected function renderItems()
   {
-      $this->listChildsSelect($this->rootParent, 0);
+//       $this->listChildsSelect($this->rootParent, 0);
+     
+      $field_values = $this->field->getValue();
+      $field_name = $this->field->getName();
+      
+	global $g_db;
+
+	$sel = $this->data_bean->listTreeSelect();
+
+	
+	$res = $g_db->query($sel->getSQL());
+
+	$path=array();
+
+	$source_key = $this->data_bean->getPrKey();
+	
+	
+	
+	while ($row = $g_db->fetch($res)) {
+
+	  $lft = $row["lft"];
+	  $rgt = $row["rgt"];
+	  $nodeID = $row[$source_key];
+
+	  trbean($nodeID, $this->list_label, $row, $this->data_bean);
+
+	  $value = $row[$this->list_key];
+	  $label = $row[$this->list_label];
+
+	  
+	  
+	  while (count($path)>0 && $lft > $path[count($path)-1] ) {
+	      array_pop($path);
+	  }
+	  
+	  $path[] = $rgt;
+
+	  $path_len = count($path);
+
+	  $margin = 3 * ($path_len);
+	  $label = implode('',array_fill(0, $margin, '&nbsp;')).$label;
+      
+	  $selected = $this->isModelSelected($value, $field_values);
+      
+	  $item = clone $this->item;
+	  $item->setID($nodeID);
+	  $item->setValue($value);
+
+	  $item->setLabel($label);
+	  $item->setName($field_name."[]");
+	  
+	  $item->setSelected($selected);
+	  
+	  $item->render();
+
+	}
+
   }
 
 

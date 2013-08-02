@@ -23,8 +23,8 @@ class MySQLDriver extends DBDriver
 	    if (mysql_select_db($conn->database,$this->connection)!==TRUE) {
 		throw new Exception("Unable to select database: ".mysql_error($this->connection));
 	    }
-	    mysql_query("SET AUTOCOMMIT = 0;",$this->connection);
-	    mysql_query("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ",$this->connection);
+	    mysql_query("SET autocommit = 0; ",$this->connection);
+	    mysql_query("SET names 'UTF8' COLLATE 'utf8_general_ci'; ",$this->connection);
 	    mysql_query("SET foreign_key_checks = 1;",$this->connection);
 // 			mysql_query("SET max_connections = 151;",$this->connection);
 
@@ -131,16 +131,35 @@ class MySQLDriver extends DBDriver
     }
     public function commit(){
 	    $ret=mysql_query("COMMIT",$this->connection)  or $this->error=mysql_error($this->connection);
+	    $this->in_transaction = false;
 	    return $ret;
     }
     public function rollback(){
 	    $ret=mysql_query("ROLLBACK",$this->connection)  or $this->error=mysql_error($this->connection);
-    return $ret;
+	    $this->in_transaction = false;
+	    return $ret;
     }
-    public function transaction(){
-	    $ret=mysql_query("START TRANSACTION",$this->connection)  or $this->error=mysql_error($this->connection);
-    $ret=mysql_query("BEGIN",$this->connection)  or $this->error=mysql_error($this->connection);
-    return $ret;
+    public function isTransaction()
+    {
+	return $this->in_transaction;
+    }
+    
+    // The correct way to use LOCK TABLES and UNLOCK TABLES with transactional tables, such as InnoDB tables, is to begin a transaction with SET autocommit = 0 (not START TRANSACTION) followed by LOCK TABLES, and to not call UNLOCK TABLES until you commit the transaction explicitly. For example, if you need to write to table t1 and read from table t2, you can do this:
+    // 
+    // SET autocommit=0;
+    // LOCK TABLES t1 WRITE, t2 READ, ...;... do something with tables t1 and t2 here ...
+    // COMMIT;
+    // UNLOCK TABLES;
+    // When you call LOCK TABLES, InnoDB internally takes its own table lock, and MySQL takes its own table lock. InnoDB releases its internal table lock at the next commit, but for MySQL to release its table lock, you have to call UNLOCK TABLES. You should not have autocommit = 1, because then InnoDB releases its internal table lock immediately after the call of LOCK TABLES, and deadlocks can very easily happen. InnoDB does not acquire the internal table lock at all if autocommit = 1, to help old applications avoid unnecessary deadlocks.
+    // 
+    // ROLLBACK does not release table locks.
+    public function transaction()
+    {
+	$ret=mysql_query("START TRANSACTION",$this->connection)  or $this->error=mysql_error($this->connection);
+	$ret=mysql_query("BEGIN",$this->connection)  or $this->error=mysql_error($this->connection);
+	$this->in_transaction = true;
+	
+	return $ret;
     }
     public function escapeString($data)
     {

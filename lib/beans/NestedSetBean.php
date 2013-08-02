@@ -40,8 +40,8 @@ $sel->fields="*";
 
 $psel = new SelectQuery();
 $psel->fields="";
-$psel->where = " parentID=$parentID ";
-$psel->order_by = " lft ";
+$psel->where = " parentID=$parentID  ";
+$psel->order_by = "  {$this->prkey} ASC , lft ASC ";
 $sel = $sel->combineWith($psel);
 
 		$res = $db->query($sel->getSQL());
