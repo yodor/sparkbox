@@ -19,7 +19,8 @@ abstract class DBTableBean implements IDataBean
 
     protected $iterator = NULL;
 
-
+    protected static $instances = array();
+    
     public function __construct($table_name, $dbdriver=NULL)
     {
 	$this->table=$table_name;
@@ -32,11 +33,25 @@ abstract class DBTableBean implements IDataBean
 	    $this->db = $g_db;
 	}
 
-	if (!$this->db)throw new Exception("DBTableBean::".get_class($this)."::CTOR | Could not attach with DBDriver");
+	$bclass = get_class($this);
+	
+	if (!$this->db)throw new Exception("DBTableBean::$bclass - CTOR | Could not attach with DBDriver");
 	
 	$this->initFields();
+	
+	
+	
+	if (!isset(self::$instances[$bclass])) {
+	    self::$instances[$bclass] = $this;
+	}
     }
-
+    public static function instance($class)
+    {
+	if (isset(self::$instances[$class])) {
+	  return self::$instances[$class];
+	}
+	return new $class();
+    }
     public function __destruct()
     {
 	if(is_resource($this->iterator))$this->db->free($this->iterator);
@@ -293,7 +308,7 @@ abstract class DBTableBean implements IDataBean
 
 	$refkey = $this->db->escapeString($refkey);
 	$refid = (int)$refid;
-	$sql = "SELECT * FROM {$this->table} WHERE $refkey=$refid LIMIT 1";
+	$sql = "SELECT * FROM {$this->table} WHERE $refkey='$refid' LIMIT 1";
 	$ret = $this->db->query($sql);
 	if (!$ret){
 	    throw new Exception("DBError: ".$this->db->getError());
@@ -364,22 +379,51 @@ abstract class DBTableBean implements IDataBean
     
     public function toggleField($id, $field)
     {
-	if (!in_array($field,$this->fields))return;
-	$this->db->transaction();
-	$this->db->query("UPDATE {$this->table} SET $field = NOT $field WHERE {$this->prkey}=$id ");
-	$this->db->commit();
+	if (!in_array($field, $this->fields)) throw new Exception("DBTableBean::toggleField Field '$field' not found in this bean");
+	
+	$id = (int)$id;
+	
+	$db = DBDriver::factory();
+	$field = $db->escapeString($field);
+	
+	try {
+	
+	  $db->transaction();
+	
+	  if (!$db->query("UPDATE {$this->table} SET `$field` = NOT `$field` WHERE {$this->prkey}=$id "))throw new Exception("DBTableBean::toggleField DB Error: ".$db->getError());
+	
+	  $db->commit();
+	}
+	catch (Exception $e) {
+	  $db->rollback();
+	  throw $e;
+	}
     }
 
     public function findFieldValue($field_name, $field_value)
     {
-	    $db = DBDriver::factory();
+	    $field_name = $this->db->escapeString($field_name);
 	    
-	    $res = $db->query("SELECT {$this->prkey}, $field_name FROM {$this->table} WHERE $field_name='$field_value' LIMIT 1");
-	    if (!$res) throw new Exception($db->getError());
+	    $res = $this->db->query("SELECT {$this->prkey}, $field_name FROM {$this->table} WHERE $field_name='$field_value' LIMIT 1");
+	    if (!$res) throw new Exception("DBTableBean::findFieldValue DB Error: ".$this->db->getError());
 	    
-	    return $db->fetch($res);
+	    return $this->db->fetch($res);
     }
-	
+    public function fieldValue($id, $field_name)
+    {
+	    $id = (int)$id;
+
+	    $field_name = $this->db->escapeString($field_name);
+
+	    $res = $this->db->query("SELECT {$this->prkey}, `$field_name` FROM {$this->table} WHERE {$this->prkey}=$id ");
+	    if (!$res) throw new Exception("DBTableBean::fieldValue DB Error: ".$this->db->getError());
+
+	    if ($row = $this->db->fetch($res)) {
+		return $row[$field_name];
+	    }
+
+	    return NULL;
+    }
     public function needQuotes($key)
     {
 	$storage_type = $this->storage_types[$key];
@@ -405,7 +449,7 @@ abstract class DBTableBean implements IDataBean
 
 	$sql = "INSERT INTO {$this->table} (".implode(",",array_keys($values)).") VALUES (".implode(",", $values).")";
 
-// 	debug(get_class($this)." INSERT SQL: $sql");
+	debug(get_class($this)." INSERT SQL: $sql");
 	
 	$ret = $db->query($sql);
 

@@ -10,14 +10,12 @@ class TableHeaderCellRenderer extends Component implements ICellRenderer
   protected $tooltip_field = "";
   protected $tooltip_text = "";
 
-
+  protected $sort_field = "";
+  
   public function __construct($is_sortable=true)
   {
 	  parent::__construct();
-
 	  $this->is_sortable = $is_sortable;
-
-
   }
   public function startRender()
   {
@@ -29,9 +27,10 @@ class TableHeaderCellRenderer extends Component implements ICellRenderer
   {
 	  echo "</th>";
   }
-	protected function processAttributes($row, TableColumn $tc)
+  
+  protected function processAttributes($row, TableColumn $tc)
   {
-			$this->setAttribute("column", $tc->getFieldName());
+	$this->setAttribute("column", $tc->getFieldName());
   }
 
   public function isSortable()
@@ -42,46 +41,55 @@ class TableHeaderCellRenderer extends Component implements ICellRenderer
   {
 	  $this->is_sortable = ($mode>0);
   }
+  public function setSortField($sort_field)
+  {
+      $this->sort_field = $sort_field;
+  }
   protected function renderImpl()
   {
 
   }
 
-  public function renderCell($row, TableColumn $tc) {
+  public function renderCell($row, TableColumn $tc) 
+  {
 
-		$this->processAttributes($row, $tc);
+	  $this->processAttributes($row, $tc);
 
 	  $this->startRender();
 
 	  if ($this->isSortable()) {
-			  $qry = $_GET;
+	      $qry = $_GET;
 
-			  $odir="ASC";
-			  if (isset($qry["orderdir"]) && ( isset($qry["orderby"]) && strcmp( $qry["orderby"],$tc->getFieldName() )==0 ) ){
-				  if (strcmp($qry["orderdir"],"ASC")==0){
-					  $odir="DESC";
-				  }
-				  else {
-					  $odir="ASC";
-				  }
-			  }
-			  $qry["orderby"]=$tc->getFieldName();
-			  $qry["orderdir"]=$odir;
-			  $qrystr = queryString($qry);
+	      $odir="ASC";
+	      
+	      $sort_field = $tc->getFieldName();
+	      if ($this->sort_field) {
+		$sort_field = $this->sort_field;
+	      }
+	      if (isset($qry["orderdir"]) && ( isset($qry["orderby"]) && strcmp( $qry["orderby"], $sort_field )==0 ) ){
+		  if (strcmp($qry["orderdir"],"ASC")==0){
+		      $odir="DESC";
+		  }
+		  else {
+		      $odir="ASC";
+		  }
+	      }
+	      
+	      $qry["orderby"]=$sort_field;
+	      $qry["orderdir"]=$odir;
+	      $qrystr = queryString($qry);
 
-// 	&darr;
-
-			  echo "<a href='$qrystr'>".tr($tc->getLabel())."</a>";
-$arr = "&darr;";
-if (isset($_GET["orderdir"]) && strcmp($_GET["orderdir"],"DESC")==0) {
-  $arr="&uarr;";
-}
-if (isset($_GET["orderby"]) && strcmp($_GET["orderby"],$tc->getFieldName())==0) {
-  echo "<span style='font-weight:bold;margin-left:5px;font-size:14px;'>$arr</span>";
-}
+	      echo "<a href='$qrystr'>".tr($tc->getLabel())."</a>";
+	      $arr = "&darr;";
+	      if (isset($_GET["orderdir"]) && strcmp($_GET["orderdir"],"DESC")==0) {
+		$arr="&uarr;";
+	      }
+	      if (isset($_GET["orderby"]) && strcmp($_GET["orderby"],$sort_field)==0) {
+		echo "<span style='font-weight:bold;margin-left:5px;font-size:14px;'>$arr</span>";
+	      }
 	  }
 	  else {
-			  echo "<span>".tr($tc->getLabel())."</span>";
+	      echo "<span>".tr($tc->getLabel())."</span>";
 	  }
 
 	  $this->finishRender();

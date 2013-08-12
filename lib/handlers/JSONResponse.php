@@ -28,7 +28,7 @@ class JSONResponse {
   {
 	  header("Pragma: no-cache");
 	  header("Expires: 0");
-	  echo json_encode(get_object_vars($this), JSON_HEX_QUOT | JSON_HEX_TAG);
+	  echo json_encode(get_object_vars($this));
   }
 
 

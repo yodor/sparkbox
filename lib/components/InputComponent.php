@@ -83,8 +83,11 @@ class InputComponent extends Component implements IHeadRenderer
       }
       else if ($this->render_mode === InputComponent::RENDER_VALUE) {
 
+	  if ($field->getRenderer() instanceof HiddenField) {}
+	  else {
 	  $renderer->renderValue($field);
-
+	  }
+	  
       }
 
 

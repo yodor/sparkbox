@@ -2,15 +2,27 @@
 include_once("lib/components/Component.php");
 include_once("lib/forms/KeywordSearchForm.php");
 include_once("lib/utils/IQueryFilter.php");
+include_once("lib/forms/renderers/FormRenderer.php");
 
 class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryFilter
 {
 
-	private $sform = false;
+	protected $sform = false;
 
 	public $form_append = "";
 	public $form_prepend = "";
 	
+	protected $buttons = array();
+	
+	const ACTION_SEARCH = "search";
+	const ACTION_CLEAR = "clear";
+	
+	
+	public function getButton($action)
+	{
+	  return $this->buttons[$action];
+	  
+	}
 	public function __construct($table_fields)
 	{
 	  parent::__construct();
@@ -31,6 +43,25 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	  $this->sform->loadPostData($_REQUEST);
 	  $this->sform->validate();
 	  
+	  
+	  $submit_search = StyledButton::DefaultButton();
+	  $submit_search->setType(StyledButton::TYPE_SUBMIT);
+	  $submit_search->setText("Search");
+	  $submit_search->setName("filter");
+	  $submit_search->setValue("search");
+	  $submit_search->setAttribute("action", "search");
+	  $this->buttons[KeywordSearchComponent::ACTION_SEARCH] = $submit_search;
+	  
+	  $submit_clear = StyledButton::DefaultButton();
+	  $submit_clear->setType(StyledButton::TYPE_SUBMIT);
+	  $submit_clear->setText("Clear");
+	  $submit_clear->setName("clear");
+	  $submit_clear->setValue("search");
+	  $submit_clear->setAttribute("action", "clear");
+	  $this->buttons[KeywordSearchComponent::ACTION_CLEAR] = $submit_clear;
+	  
+	  $this->sform->setRenderer(new FormRenderer());
+	  
 	}
 	public function renderScript()
 	{}
@@ -44,13 +75,14 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	public function startRender()
 	{
 		parent::startRender();
-		echo "<form method=get>";
+		$this->sform->getRenderer()->startRender();
+		
 		echo $this->form_prepend;
 	}
 	public function finishRender()
 	{
 		echo $this->form_append;
-		echo "</form>";
+		$this->sform->getRenderer()->finishRender();
 		
 		parent::finishRender();
 	}
@@ -66,29 +98,15 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 		$field->getLabelRenderer()->renderLabel($field);
 
 		$field->getRenderer()->renderField($field);
-// 		echo "<BR>";
-
-// 		$this->sform->getField("keyword")->getLabel()."<br>";
-// 		$this->sform->getField("keyword")->getRenderer()->setStyleAttribute("width","100%");
-// 		$this->sform->getField("keyword")->getRenderer()->render();
 
 		echo "</div>";
 		
 		echo "<div class='buttons'>";
-		$submit_search = StyledButton::DefaultButton();
-		$submit_search->setType(StyledButton::TYPE_SUBMIT);
-		$submit_search->setText("Search");
-		$submit_search->setName("filter");
-		$submit_search->setValue("search");
-		$submit_search->setAttribute("action", "search");
+		
+		$submit_search = $this->buttons[KeywordSearchComponent::ACTION_SEARCH];
 		$submit_search->render();
 		
-		$submit_clear = StyledButton::DefaultButton();
-		$submit_clear->setType(StyledButton::TYPE_SUBMIT);
-		$submit_clear->setText("Clear");
-		$submit_clear->setName("clear");
-		$submit_clear->setValue("search");
-		$submit_clear->setAttribute("action", "clear");
+		$submit_clear = $this->buttons[KeywordSearchComponent::ACTION_CLEAR];
 		$submit_clear->render();
 		
 		

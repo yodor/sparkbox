@@ -190,10 +190,10 @@ class MCEImageBrowserAjaxHandler extends UploadControlAjaxHandler implements ISt
 	$class_loaded = class_exists($auth, false);
 	if (!$class_loaded) throw new Exception("Unable to load the stored authenticator");
 	
-	$authenticated = $auth::checkAuthState();
+	$authenticated = $auth->checkAuthState();
 	if (!$authenticated) throw new Exception("The requested resource is protected with authenticator");
 	
-	$lastID = $auth::lastID;
+	$lastID = $auth->getLastAuthenticatedID();
 	
 	if ($ownerID>0 && $lastID!=$ownerID) throw new Exception("The requested resource is protected with owner authenticator");
 	

@@ -14,8 +14,10 @@ abstract class Authenticator
 	$opad = str_repeat(chr(0x5c), $blocksize);
 	return $hash(($key^$opad) . pack('H*', $hash(($key^$ipad) . $data)));
     }
-
-
+    public static function getLastAuthenticatedID()
+    {
+      return self::$lastID;
+    }
     public static function generateRandomAuth($length=32)
     {
 	// Generate random 32 charecter string

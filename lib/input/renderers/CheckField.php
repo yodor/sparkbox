@@ -53,5 +53,23 @@ class CheckField extends DataSourceField
       }
       
   }
+  public function renderValueImpl()
+  {
+      $field_value = $this->field->getValue();
+      
+      if (! ($this->data_bean instanceof IDataBean) ) {
+	  
+	  if ($field_value>0) {
+	    echo tr("Yes");
+	  }
+	  else {
+	    echo tr("No");
+	  }
+
+      }
+      else {
+	  parent::renderValueImpl();
+      }
+  }
 }
 ?>

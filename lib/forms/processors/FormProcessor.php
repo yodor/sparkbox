@@ -4,8 +4,6 @@ include_once("lib/forms/processors/IFormProcessor.php");
 class FormProcessor implements IFormProcessor 
 {
 
-
-
   protected $status = IFormProcessor::STATUS_NOT_PROCESSED;
 
   protected $message = "";
@@ -95,6 +93,9 @@ class FormProcessor implements IFormProcessor
 
       }
       else {
+      
+	  $this->status = IFormProcessor::STATUS_OK;
+	  
 	  debug("FormProcessor::processImpl: ".get_class($form)." does not have fields with errors. STATUS_FORM_OK");
 
       }

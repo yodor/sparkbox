@@ -221,3 +221,7 @@ IMG {
 .InputFormView .FormRenderer .InputField.MCETextArea TEXTAREA {
   height:350px;
 }
+
+.TableView[name='SiteTexts'] TD[column='value'] {
+  text-align:left;
+}

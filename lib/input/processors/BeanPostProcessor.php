@@ -10,6 +10,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
   
   protected $source_loaded_keys = array();
   
+  //foreign keys are posted in the order or values, if true will process them. used in direct mapping between fields.
   public $process_datasource_foreign_keys = false;
   
   public function __construct()
@@ -52,6 +53,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 	    debug("BeanPostProcessor::beforeCommit | Merging updated values ...");
 
 	    //TODO:try to update data source found in source_loaded_values. Delete removed values. Keep order of loaded
+	    //TODO: !!! merging is not really possible if there are unique constraints on the primary key and the foreign key as it tries to update before deleting the old key
+	    
 	    $processed_ids = array();
 	    
 	    foreach ($field->getValue() as $idx=>$value) {
@@ -64,18 +67,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 		
 		$dbrow[$field_name] = $value;
 
-		  //
-		$sourceID = array_shift($this->source_loaded_keys);
-		if ($sourceID>0) {
-		  debug("DataSourceID: ".$sourceID);
-		  
-		  if (!$data_source->updateRecord($sourceID, $dbrow, $db)) throw new Exception("Unable to update  data source bean. Error: ".$db->getError());
-		  $processed_ids[] = $sourceID;
-		}
-		else {
-		
-		  //append posted foreign keys
-		  if ($this->process_datasource_foreign_keys) {
+		//process posted foreign keys and assign them
+		if ($this->process_datasource_foreign_keys) {
 		    if (isset($_REQUEST["fk_$field_name"][$idx])) {
 			$fks = $_REQUEST["fk_$field_name"][$idx];
 			$fk_pairs = explode("|", $fks);
@@ -84,7 +77,18 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 			    $dbrow[$fk_name] = $fk_value;
 			}
 		    }
-		  }
+		    
+		}
+		
+		$sourceID = array_shift($this->source_loaded_keys);
+		if ($sourceID>0) {
+		  debug("DataSourceID: ".$sourceID);
+
+		  if (!$data_source->updateRecord($sourceID, $dbrow, $db)) throw new Exception("Unable to update  data source bean. Error: ".$db->getError());
+		  $processed_ids[] = $sourceID;
+		}
+		else {
+
 		  $refID = $data_source->insertRecord($dbrow, $db);
 		  if ($refID<1) throw new Exception("Unable to insert into data source bean. Error: ".$db->getError());
 		  $processed_ids[] = $refID;
@@ -311,6 +315,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 		debug("DataSourceLoadID: $source_key=>".$row[$source_key]);
 		
 		$source_values[] = $this->processRowData($field, $row, $source_key);
+// 		$source_values[$row[$source_key]] = $this->processRowData($field, $row, $source_key);
 
 	    }
 

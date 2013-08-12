@@ -52,7 +52,7 @@ class ArrayField extends Component implements IArrayFieldRenderer, IHeadRenderer
       
       echo "<div class='ArrayControls' field='".$this->field->getName()."'>";
 
-	  $add_text = tr("Add")." ".$this->field->getLabel();
+	  $add_text = tr("Add")." ".tr($this->field->getLabel());
 	  
 	  $button_add = StyledButton::DefaultButton();	
 	  $button_add->setType(StyledButton::TYPE_BUTTON);

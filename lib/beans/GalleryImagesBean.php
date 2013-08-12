@@ -37,6 +37,8 @@ class GalleryImagesBean extends ArrayDataBean
       $files = array();
       
       $dh  = opendir($dir);
+      if (!is_resource($dh)) throw new Exception("Could not open '$dir'");
+      
       while (false !== ($filename = readdir($dh))) {
 	  if (is_dir($filename)) continue;
 	  if (strcmp($filename, ".")==0)continue;

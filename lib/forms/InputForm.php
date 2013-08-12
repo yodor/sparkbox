@@ -259,30 +259,37 @@ class InputForm {
 	}
 	public function serializeXML()
 	{
-		ob_start();
-echo "<?xml version='1.0' encoding='utf-8'?>";
-echo "<document>";
-foreach ($this->fields as $field_name=>$field) {
-  echo "<$field_name>".$field->getValue()."</$field_name>";
-}
-echo "</document>";
-
-
-		$xml = ob_get_contents();
-		ob_end_clean();
-		return $xml;
+	    ob_start();
+	    echo "<?xml version='1.0' encoding='utf-8'?>";
+	    echo "<inputform class='".get_class($this)."'>";
+	    echo "<fields>";
+	    foreach ($this->fields as $field_name=>$field) {
+	      echo "<field>";
+		echo "<name>$field_name</name>";
+		echo "<value>".$field->getValue()."</value>";
+	      echo "</field>";
+	    }
+	    echo "</fields>";
+	    echo "</inputform>";
+	    $xml = ob_get_contents();
+	    ob_end_clean();
+	    return $xml;
 	}
 	public function unserializeXML($xml_string)
 	{
-		$xml = @simplexml_load_string($xml_string);
-		if (!$xml) throw new Exception("Unable to parse input as XML");
-		$xml_array=object2array($xml);
+	    $inputform = @simplexml_load_string($xml_string);
+	    if (!$inputform) throw new Exception("Unable to parse input as XML");
+	    
+	    foreach ($inputform->fields->field as $field) {
+		$name = (string)$field->name;
+		$value = (string)$field->value;
+// 		echo $name."=>".$value;
+		if (!$this->haveField($name)) continue;
+		
+		$this->getField($name)->setValue($value);
+	    }
 
-		foreach($xml_array as $key=>$val)  {
-		  if ($this->fieldExists($key)) {
-			  $this->getField($key)->setValue($val);
-		  }
-		}
+	    
 	}
 	public function dumpErrors()
 	{

@@ -213,7 +213,10 @@ var right = "<?php echo $right;?>";
 	{
 		$this->preferred_title = $page_title;
 	}
-
+	public function getPreferredTitle()
+	{
+		return $this->preferred_title;
+	}
 	public function obCallback($buffer)
 	{
 // 		if (strlen($this->preferred_title)>0) {
@@ -272,7 +275,7 @@ var right = "<?php echo $right;?>";
 ?>
 <script type='text/javascript' >
 addLoadEvent(function(){
-    showAlert(<?php echo json_string($alert);?>);
+    showAlert(<?php echo json_encode($alert);?>);
 });
 </script>
 <?php

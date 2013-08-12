@@ -87,6 +87,10 @@ class InputFactory
 			$field->setRenderer(new TextField());
 
 			break;
+		case InputFactory::EMAIL:
+			$field->setRenderer(new TextField());
+			$field->setValidator(new EmailValidator());
+			break;
 		case InputFactory::TEXTAREA:
 			$field->setRenderer(new TextArea());
 			break;

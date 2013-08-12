@@ -177,11 +177,18 @@ abstract class InputRenderer extends Component
      
       $user_data = $this->field->getUserData();
       if (strlen($user_data)>0) {
-	    echo "<div class='UserData'>";
-	    echo $user_data;
-	    echo "</div>";
+	  echo "<div class='UserData'>";
+	  echo $user_data;
+	  echo "</div>";
       }
-    
+      
+      
+      if ($this->addon_content) {
+	echo "<div class='addon_content'>";
+	echo $this->addon_content;
+	echo "</div>";
+      }
+      
       parent::finishRender();
   }
 
@@ -191,7 +198,7 @@ abstract class InputRenderer extends Component
   {
       $field_value = $this->field->getValue();
 
-      if (strlen($field_value)<1) echo $this->value_na;
+      if (strlen($field_value)<1) echo self::$value_na;
 
       else {
 
@@ -208,6 +215,10 @@ abstract class InputRenderer extends Component
 	      }
 	  }
 	  else {
+		  $field_value = $this->field->getValue();
+		  
+		  $field_value=htmlentities(mysql_real_unescape_string($field_value),ENT_QUOTES,"UTF-8");
+		  $field_value = str_replace("\n", "<BR>", $field_value);
 		  echo $field_value;
 	  }
       }

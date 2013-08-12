@@ -19,20 +19,19 @@ class PaginatorSortField
 class Paginator
 {
 
-	protected $ipp;
-	protected $total_rows;
+	protected $ipp = 10;
+	protected $total_rows = 0;
 
-	protected $show_next;
-	protected $show_prev;
+	protected $show_next = true;
+	protected $show_prev = true;
 
-	protected $total_pages;
-	protected $page;
+	protected $total_pages = 0;
+	protected $page = 0;
 
-	protected $page_list_end;
-	protected $page_list_start;
+	protected $page_list_end = 0;
+	protected $page_list_start = 0;
 	
 	public $max_page_list = 7;
-
 
 
 	public static $page_filter_only = false;
@@ -86,8 +85,11 @@ class Paginator
 	      }
 
 	    }
+	    
 	    if (count($this->sort_fields)>0) {
-		return array_shift(array_values($this->sort_fields));
+		$values = array_values($this->sort_fields);
+		$sf = array_shift($values);
+		return $sf;
 	    }
 	    else {
 		return NULL;

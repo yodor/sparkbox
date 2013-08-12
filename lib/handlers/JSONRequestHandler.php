@@ -44,32 +44,29 @@ abstract class JSONRequestHandler extends RequestHandler
       
       debug(get_class($this)."::parseParams: content_type requested: ".$this->content_type);
   }
+  public function shutdown()
+  {
+      $err = error_get_last();
 
+      if (is_array($err)) {
+      
+	  ob_end_clean();
+	  $ret = new JSONResponse(get_class($this)."Response");
+	  $ret->status = JSONResponse::STATUS_ERROR;
+	  $ret->message = "Error: ".$err["type"]." - ".$err["message"]."<BR>File: ".$err["file"]." Line: ".$err["line"];
+	  $ret->response();
+	  $ret->contents = "";
+	  exit;
+
+      }
+  }
   protected function process()
   {
       $ret = new JSONResponse(get_class($this)."Response");
       
       ob_start();
       
-      register_shutdown_function(function() {
-	  
-	  
-	  
-	  $err = error_get_last();
-
-	  if (is_array($err)) {
-	  
-	      ob_end_clean();
-	      $ret = new JSONResponse(get_class($this)."Response");
-	      $ret->status = JSONResponse::STATUS_ERROR;
-	      $ret->message = "Error: ".$err["type"]." - ".$err["message"]."<BR>File: ".$err["file"]." Line: ".$err["line"];
-	      $ret->response();
-	      $ret->contents = "";
-	      exit;
-
-	  }
-	
-      });
+      register_shutdown_function(array($this, "shutdown"));
 
 
       try {

@@ -49,8 +49,13 @@ function constructSiteTitle($path)
 {
     $path = array_reverse($path);
     $title = array();
-    foreach($path as $key=>$menu_item) {
-      $title[]=$menu_item->getTitle();
+    foreach($path as $key=>$item) {
+      if ($item instanceof MenuItem) {
+	$title[]=tr($item->getTitle());
+      }
+      else {
+	$title[]=tr($item);
+      }
     }
     return implode(TITLE_PATH_SEPARATOR, $title);
 }
@@ -250,13 +255,13 @@ function safeVal($val, $accepted_tags=NULL)
 
 function json_string($text)
 {
-//   return json_encode($text,JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+  return json_encode($text, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
 //   return json_encode($text);
   
 //   $text = str_replace("'", "&#x0027", $text);
 //   $text = str_replace("\"", "&#x0022", $text);
 //   
- return json_encode(utf8_encode($text));
+//  return json_encode($text);
 }
 function listFiles($dir, $callback)
 {

@@ -10,6 +10,7 @@ abstract class DataSourceItem extends Component implements IDataSourceItem
     protected $value = "";
     protected $id = "";
     protected $name = "";
+    protected $key_name = "";
     
     public function setIndex($index)
     {
@@ -27,6 +28,10 @@ abstract class DataSourceItem extends Component implements IDataSourceItem
     {
 	//source model id
 	$this->id = $id;
+    }
+    public function setKeyName($key_name)
+    {
+	$this->key_name = $key_name;
     }
     public function setValue($value)
     {
