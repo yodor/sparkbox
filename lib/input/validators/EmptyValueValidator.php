@@ -4,6 +4,9 @@ include_once("lib/input/InputField.php");
 
 class EmptyValueValidator implements IInputValidator
 {
+  public $require_array_value = false;
+  
+  
   public function validateInput(InputField $field)
   {
 
@@ -13,7 +16,12 @@ class EmptyValueValidator implements IInputValidator
 	  if (is_array($value)) {
 
 	      if ($field->isRequired()) {
-		      if (count($value)<1) throw new Exception("Input value ");
+		    if (count($value)<1) throw new Exception("Input value ");
+		    $empty_count = 0;
+		    foreach($value as $idx => $val) {
+			if (strlen(trim($val)) == 0 && $this->require_array_value) $empty_count++;
+		    }
+		    if ($empty_count == count($value))throw new Exception("Input value ");
 	      }
 
 	  }

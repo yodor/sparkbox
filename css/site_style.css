@@ -1,12 +1,13 @@
 * {
   font-family:"Arial", "sans";
-  font-size:12px;
+
 }
 
 body {
 
   padding:0px;
   margin:0px;
+  font-size:12px;
 
 }
 html {

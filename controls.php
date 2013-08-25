@@ -85,6 +85,22 @@ $f11->setValidator(new EmptyValueValidator());
 $f11->setProcessor(new BeanPostProcessor());
 $form->addField($f11);
 
+$aw = new ArraySelector(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"),"item_id", "item_value");
+
+$f11 = new InputField("field11_req", "Checkbox DataSource<BR><small>Require array value</small>", 1);
+
+$r11 = new CheckField();
+$r11->setSource($aw);
+$r11->list_key = "item_value";
+$r11->list_label = "item_value";
+
+$f11->setRenderer($r11);
+$validator = new EmptyValueValidator();
+$validator->require_array_value = true;
+$f11->setValidator($validator);
+$f11->setProcessor(new BeanPostProcessor());
+$form->addField($f11);
+
 
 
 $aw1 = new ArraySelector(array("RadioItem1", "RadioItem2", "RadioItem3"),"item_id", "item_value");

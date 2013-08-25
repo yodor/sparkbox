@@ -10,6 +10,7 @@ include_once ("class/beans/ProductPhotosBean.php");
 include_once ("class/beans/ClassAttributeValuesBean.php");
 
 include_once ("class/input/renderers/ClassAttributeField.php");
+include_once ("lib/input/transactors/CustomFieldTransactor.php");
 
 class ProductInputForm extends InputForm
 {

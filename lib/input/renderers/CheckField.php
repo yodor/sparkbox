@@ -8,6 +8,9 @@ class CheckItem extends DataSourceItem
     public function renderImpl()
     {
 
+	//hackish! - force submit of unchecked checkbox
+	echo "<input type='hidden' name='{$this->name}' value=''>";
+	
 	echo "<input type='checkbox' value='{$this->value}' name='{$this->name}' id='{$this->id}' ";
 	if ($this->isSelected()) echo "CHECKED";
 	

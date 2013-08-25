@@ -51,7 +51,7 @@ function constructSiteTitle($path)
     $title = array();
     foreach($path as $key=>$item) {
       if ($item instanceof MenuItem) {
-	$title[]=tr($item->getTitle());
+	$title[]=tr(strip_tags($item->getTitle()));
       }
       else {
 	$title[]=tr($item);

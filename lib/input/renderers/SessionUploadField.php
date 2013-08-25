@@ -38,7 +38,10 @@ abstract class SessionUploadField extends InputRenderer implements IArrayFieldRe
        
   }
   
-  public abstract function renderArrayContents();
+  public  function renderArrayContents()
+  {
+  
+  }
   
   public function renderControls()
   {

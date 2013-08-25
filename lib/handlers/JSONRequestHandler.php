@@ -9,6 +9,7 @@ abstract class JSONRequestHandler extends RequestHandler
 
   protected $supported_content = NULL;
   protected $content_type = "";
+  protected $response_send = false;
   
   public function __construct($cmd)
   {
@@ -48,17 +49,26 @@ abstract class JSONRequestHandler extends RequestHandler
   {
       $err = error_get_last();
 
+      
+      
       if (is_array($err)) {
       
-	  ob_end_clean();
-	  $ret = new JSONResponse(get_class($this)."Response");
-	  $ret->status = JSONResponse::STATUS_ERROR;
-	  $ret->message = "Error: ".$err["type"]." - ".$err["message"]."<BR>File: ".$err["file"]." Line: ".$err["line"];
-	  $ret->response();
-	  $ret->contents = "";
-	  exit;
+	  if ($this->response_send) {
+	      debugArray("JSONRequestHandler::shutdown => Error Found after response: ", $err);
+	  }
+	  else {
+	      @ob_end_clean();
+	      $ret = new JSONResponse(get_class($this)."Response");
+	      $ret->status = JSONResponse::STATUS_ERROR;
+	      $ret->message = "Error: ".$err["type"]." - ".$err["message"]."<BR>File: ".$err["file"]." Line: ".$err["line"];
+	      $ret->response();
+	      $ret->contents = "";
+	      
+	  }
+	  
 
       }
+      exit;
   }
   protected function process()
   {
@@ -86,7 +96,7 @@ abstract class JSONRequestHandler extends RequestHandler
       }
       catch (Exception $e) {
 
-	  debug(get_class($this)."::process: Error:".$e->getMessage());
+	  debugOutput(get_class($this)."::process: Error:".$e->getMessage());
 	  
 	  $ret->contents = "";
 	  $ret->status = JSONResponse::STATUS_ERROR;
@@ -96,7 +106,8 @@ abstract class JSONRequestHandler extends RequestHandler
 
       ob_end_clean();
       $ret->response();
-
+      $this->response_send = true;
+      
   }
 
 }

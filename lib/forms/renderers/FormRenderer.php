@@ -2,7 +2,22 @@
 include_once("lib/components/Component.php");
 include_once("lib/forms/renderers/IFormRenderer.php");
 include_once("lib/components/InputComponent.php");
-
+class FieldSet extends Component
+{
+  protected $fields = array();
+  public function startRender()
+  {
+      echo "<fieldset>";
+  }
+  public function finishRender()
+  {
+      echo "</fieldset>";
+  }
+  public function renderImpl()
+  {
+  
+  }
+}
 
 class FormRenderer extends Component implements IFormRenderer, IHeadRenderer
 {
