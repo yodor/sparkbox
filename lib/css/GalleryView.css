@@ -1,8 +1,9 @@
+
+
 .GalleryViewItemRenderer {
   
-/*   border:1px dotted #cacaca; */
-  
-  
+  vertical-align:top;
+  border:1px dotted #efefef;
   
   display:inline-block;
   
@@ -35,15 +36,17 @@
 
 .GalleryViewItemRenderer .image_slot {
   position:relative;
-  display:inline-block;
+/*   display:inline-block; */
+  display:table-cell;
+  text-align:center;
+  vertical-align:middle;
 }
 .GalleryViewItemRenderer .image_slot .image_popup {
   position:relative;
-  float:left;
-  display:block;
+  display:inline-block;
 }
 .GalleryViewItemRenderer .image_slot .image_popup IMG {
-  display:block;
+  display:inline-block;
 }
 
 .GalleryViewItemRenderer .image_slot .reposition_action {

@@ -133,7 +133,7 @@ class Paginator
 		$this->ipp = $ipp;
 		$this->total_rows = $total_rows;
 
-
+if ($ipp>0) {
 		$total_pages = $this->total_rows / $this->ipp;
 
 
@@ -171,7 +171,15 @@ class Paginator
 			$this->show_prev=true;
 
 		}
-
+}
+else {
+  $page=0;
+  $cend = 1;
+  $cstart = 1;
+  $total_pages = 1;
+  $this->show_prev=false;
+  $this->show_next=false;
+}
 		$this->page = $page;
 		$this->page_list_end = $cend;
 		$this->page_list_start = $cstart;
@@ -233,12 +241,12 @@ class Paginator
 		$this->order_direction = $order_direction;
 		
 		if ($ipp>0) {
-		  $limit = " ".($page*$ipp).", $ipp";
+		    $filter->limit = " ".($page*$ipp).", $ipp";
 		}
 
 
 
-		$filter->limit = $limit;
+		
 
 		return $filter;
 	}

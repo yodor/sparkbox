@@ -71,15 +71,16 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
       $width = $this->width;
       $height = $this->height;
 
-
+      $blob_field = $tc->getFieldName();
+      
       if ($this->render_mode == IPhotoRenderer::RENDER_CROP) {
-	  $img_tag = "<img src='".SITE_ROOT."storage.php?cmd=image_crop&height=$height&width=$width&class=".get_class($this->bean)."&id=$photoID'>";
+	  $img_tag = "<img src='".SITE_ROOT."storage.php?cmd=image_crop&height=$height&width=$width&class=".get_class($this->bean)."&id=$photoID&blob_field=$blob_field'>";
       }
       else if ($this->render_mode == IPhotoRenderer::RENDER_THUMB) {
 
 	  $size = max($width, $height);
 	  
-	  $img_tag = "<img src='".SITE_ROOT."storage.php?cmd=image_thumb&size=$size&class=".get_class($this->bean)."&id=$photoID'>";
+	  $img_tag = "<img src='".SITE_ROOT."storage.php?cmd=image_thumb&size=$size&class=".get_class($this->bean)."&id=$photoID&blob_field=$blob_field'>";
       }
 
       if ($this->action instanceof EmptyAction) {
@@ -92,7 +93,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 	  }
 	  else {
 
-	    echo "<a class='image_popup' href='".SITE_ROOT."storage.php?cmd=gallery_photo&class=".get_class($this->bean)."&id=$photoID'  >";
+	    echo "<a class='image_popup' href='".SITE_ROOT."storage.php?cmd=gallery_photo&class=".get_class($this->bean)."&id=$photoID&blob_field=$blob_field'  >";
 	    echo $img_tag;
 	    echo "</a>";
 	  }

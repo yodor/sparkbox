@@ -155,7 +155,10 @@ function changeSort(sel)
 
 		$a=$this->paginator->getPageListStart();
 
-
+		if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
+		  echo tr("Page").": ";
+		}
+		
 		if ($this->paginator->havePreviousPage())
 		{
 			$qry["page"]=0;

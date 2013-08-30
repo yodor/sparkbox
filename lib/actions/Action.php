@@ -150,7 +150,17 @@ class Action {
 		Paginator::clearPageFilter($params);
 	  }
 
-	  return $script_name.queryString($params);
+	  $ret = $script_name.queryString($params);
+	  if (is_array($row)) {
+	    foreach($row as $param_name=>$value)  {
+	      $ret = str_replace("%".$param_name."%", $value, $ret);
+	    }
+	  }
+	  if (strrpos($ret,"&")===strlen($ret)-1) {
+	    $ret = substr_replace($ret ,"",-1);
+	  }
+	  
+	  return $ret;
 
   }
 	public function setTitle($title) {

@@ -31,7 +31,7 @@ class PaginatorBottomComponent extends PaginatorComponent
 		echo "</div>";
 
 		echo "<div class='cell page_navigation long'>";
-		  echo tr("Page").": ";
+		  
 		  $this->renderPageSelector();
 		echo "</div>";
 
