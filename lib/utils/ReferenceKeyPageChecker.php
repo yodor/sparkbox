@@ -19,20 +19,22 @@ class ReferenceKeyPageChecker
 	  $ref_id = (int)$_GET[$ref_key];
 
 	  $ref_row = $ref_bean->getByID($ref_id);
+	  
+	  $arr=$_GET;
+
+	  if (isset($arr[$ref_key]))unset($arr[$ref_key]);
+	  $this->qrystr = queryString($arr, $ref_key."=".$ref_id);
+	  $this->ref_key = $ref_key;
+	  $this->ref_id = $ref_id;
+	  $this->ref_row = $ref_row;
 	}
 	catch (Exception $e) {
-	  Session::set("alert", $ref_key.":$ref_id Not Found");
+	  Session::set("alert", "Reference ".$this->ref_key."=".$this->ref_id." of ".get_class($ref_bean)." was not found.");
 	  header("Location: $redirect_fail");
 	  exit;
 	}
 
-	$arr=$_GET;
-
-	if (isset($arr[$ref_key]))unset($arr[$ref_key]);
-	$this->qrystr = queryString($arr, $ref_key."=".$ref_id);
-	$this->ref_key = $ref_key;
-	$this->ref_id = $ref_id;
-	$this->ref_row = $ref_row;
+	
   }
 
 

@@ -9,7 +9,8 @@ class ImageUploadValidator extends UploadDataValidator
 
   private $resize_width=0;
   private $resize_height=0;
-
+  private $resize_enabled = true;
+  
   public function __construct()
   {
 	  parent::__construct();
@@ -30,7 +31,10 @@ class ImageUploadValidator extends UploadDataValidator
 	  $this->resize_width=$width;
 	  $this->resize_height=$height;
   }
-
+  public function setResizeEnabled($mode)
+  {
+      $this->resize_enabled = ((int)$mode>0)?true:false;
+  }
   protected function processUploadData(InputField $field)
   {
 
@@ -51,57 +55,66 @@ class ImageUploadValidator extends UploadDataValidator
       debug("ImageUploadValidator::processImage: UID: ".$image_storage->getUID());
 
 
-      $dst_width = $this->resize_width;
-      $dst_height = $this->resize_height;
+      
 
       $scale = 1;
 
-      if ($dst_width>0 || $dst_height>0) {
-
-	if ($dst_width>0 && $dst_height>0) {
-	
-	  debug("Resize Width Requested: ($dst_width, $dst_height)");
-
-	}
-	else if ($dst_width>0) {
-	
-	    $ratio = (float)$image_storage->getWidth() / $dst_width;
-	    debug("Autofit for Width Ratio: $ratio ");
-	    $dst_height = $image_storage->getHeight() / $ratio;
-	    debug("Autofit for Width: ($dst_width, $dst_height)");
-
-	}
-	else if ($dst_height>0) {
-	
-	    $ratio = (float)$image_storage->getHeight() / $dst_height;
-	    debug("Autofit for Height Ratio: $ratio ");
-	    
-	    $dst_width = $image_storage->getWidth() / $ratio;
-	    debug("Autofit for Height: ($dst_width, $dst_height)");
-	}
-	
-	$scale = min( $dst_width/$image_storage->getWidth(), $dst_height/$image_storage->getHeight() );
-	
-      }
-      else if (IMAGE_UPLOAD_DEFAULT_WIDTH>0 && IMAGE_UPLOAD_DEFAULT_HEIGHT>0) {
+      if ($this->resize_enabled) {
       
-	debug("DEFAULT_UPLOAD Size Requested: (".IMAGE_UPLOAD_DEFAULT_WIDTH.",".IMAGE_UPLOAD_DEFAULT_HEIGHT.")");
-	
-	$scale = min( IMAGE_UPLOAD_DEFAULT_WIDTH/$image_storage->getWidth(), IMAGE_UPLOAD_DEFAULT_HEIGHT/$image_storage->getHeight() );
+	$dst_width = $this->resize_width;
+	$dst_height = $this->resize_height;
+      
+	if ($dst_width>0 || $dst_height>0) {
 
-	
-      }
+	  if ($dst_width>0 && $dst_height>0) {
+	  
+	    debug("Resize Width Requested: ($dst_width, $dst_height)");
 
-      if ($scale > 1 ) {
-	  if (IMAGE_UPLOAD_UPSCALE_ENABLED) {
-	    debug("UPSCALE_ENABLED");
-	    $scale = 1;
 	  }
-	  else {
-	    debug("UPSCALE_DISABLED");
-	  }
-      }
+	  else if ($dst_width>0) {
+	  
+	      $ratio = (float)$image_storage->getWidth() / $dst_width;
+	      debug("Autofit for Width Ratio: $ratio ");
+	      $dst_height = $image_storage->getHeight() / $ratio;
+	      debug("Autofit for Width: ($dst_width, $dst_height)");
 
+	  }
+	  else if ($dst_height>0) {
+	  
+	      $ratio = (float)$image_storage->getHeight() / $dst_height;
+	      debug("Autofit for Height Ratio: $ratio ");
+	      
+	      $dst_width = $image_storage->getWidth() / $ratio;
+	      debug("Autofit for Height: ($dst_width, $dst_height)");
+	  }
+	  
+	  $scale = min( $dst_width/$image_storage->getWidth(), $dst_height/$image_storage->getHeight() );
+	  
+	}
+	else if (IMAGE_UPLOAD_DEFAULT_WIDTH>0 && IMAGE_UPLOAD_DEFAULT_HEIGHT>0) {
+	
+	  debug("DEFAULT_UPLOAD Size Requested: (".IMAGE_UPLOAD_DEFAULT_WIDTH.",".IMAGE_UPLOAD_DEFAULT_HEIGHT.")");
+	  
+	  $scale = min( IMAGE_UPLOAD_DEFAULT_WIDTH/$image_storage->getWidth(), IMAGE_UPLOAD_DEFAULT_HEIGHT/$image_storage->getHeight() );
+
+	  
+	}
+
+	if ($scale > 1 ) {
+	    if (IMAGE_UPLOAD_UPSCALE_ENABLED) {
+	      debug("UPSCALE_ENABLED");
+	      $scale = 1;
+	    }
+	    else {
+	      debug("UPSCALE_DISABLED");
+	    }
+	}
+
+      }//resize_enabled
+      else {
+	  debug("ImageUploadValidator::Resizing is disabled for this validator");
+      }
+      
       $n_width = $image_storage->getWidth() * $scale;
       $n_height = $image_storage->getHeight() * $scale;
 	      

@@ -30,7 +30,13 @@ class Globals
 	  define($key, $val);
       }
   }
-
+  public function dump()
+  {
+	foreach($this->defines as $key=>$val) {
+	  echo $key."=>".$val;
+	  echo "<BR>";
+	}
+  }
 }
 
 ?>

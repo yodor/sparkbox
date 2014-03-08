@@ -41,21 +41,24 @@ protected $createString = "CREATE TABLE `admin_users` (
 
 	}
 	
+	//email
+	public function emailExists($email)
+	{
+	    return $this->findFieldValue("email", $email);
+	}
+	
 	public function email($userID)
 	{
-		$user_row = $this->getByID((int)$userID);
-		return $user_row["email"];
+	    return $this->fieldValue($userID, "email");
 	}
 	
 	public function email2id($email)
-	{	
-		$db = DBDriver::factory();
-		$email = $db->escapeString($email);
-		$n = $this->startIterator(" WHERE email LIKE '$email' LIMIT 1");
-		if ($this->fetchNext($urow)){
-			return (int)$urow["userID"];
-		}
-		return -1;
+	{
+	
+	    $row = $this->findFieldValue("email", $email);
+	    if (!$row) return -1;
+	    return $row[$this->getPrKey()];
+		
 	}
 
 }

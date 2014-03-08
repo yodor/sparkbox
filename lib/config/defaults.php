@@ -23,6 +23,10 @@ define("LIB_ROOT", $lib_root."/");
 
 
 ini_set("include_path",".".PATH_SEPARATOR.INSTALL_PATH);
+if (isset($local_include_path)) {
+  ini_set("include_path",ini_get("include_path").PATH_SEPARATOR.$local_include_path);
+  
+}
 include_once("lib/config/ini_setup.php");
 
 
@@ -51,6 +55,7 @@ $defines->set("STORAGE_HREF", SITE_ROOT."storage.php");
 $defines->set("IMAGE_UPLOAD_DEFAULT_WIDTH", 1024);
 $defines->set("IMAGE_UPLOAD_DEFAULT_HEIGHT", 768);
 $defines->set("IMAGE_UPLOAD_UPSCALE_ENABLED", false);
+
 
 $site_domain = $_SERVER["HTTP_HOST"];
 

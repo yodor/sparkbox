@@ -21,6 +21,14 @@ class SimplePage extends SitePage
 	protected $final_components = array();
 	protected $head_components = array();
 	
+	protected $opengraph_tags = array();
+	
+	public function addOGTag($tag_name, $tag_content)
+	{
+		$this->opengraph_tags[$tag_name] = $tag_content;
+	  
+	}
+	
 	protected function dumpMetaTags() 
 	{
 	    parent::dumpMetaTags();
@@ -51,6 +59,12 @@ class SimplePage extends SitePage
 	      }
 	    }
 	    
+	    foreach($this->opengraph_tags as $tag_name=>$tag_content)
+	    {
+			echo "<meta property='og:$tag_name' content='".attributeValue($tag_content)."' />\n";
+
+	    }
+	    
 	    $hcmp_merged = array();
 	    
 	    foreach ($this->head_components as $idx=>$cmp) {
@@ -68,6 +82,27 @@ class SimplePage extends SitePage
 	    
 	   
         }
+        protected function headEnd()
+        {
+	    if (DB_ENABLED) {
+	      $config = ConfigBean::factory();
+	      $config->setSection("seo");
+
+	      $google_analytics = $config->getValue("google_analytics");
+	      if ($google_analytics) {
+		
+		echo "<script type='text/javascript'>\n";
+		$google_analytics = mysql_real_unescape_string($google_analytics);
+		$google_analytics = str_replace("\r", "", $google_analytics);
+		$google_analytics = str_replace("\n", "", $google_analytics);
+		echo $google_analytics;
+		echo "\n";
+		echo "</script>\n";
+	      }
+	    }
+	    parent::headEnd();
+	}
+	
         public function addFinalComponent(IFinalRenderer $cmp)
         {	
 	    $this->final_components[] = $cmp;
@@ -153,6 +188,8 @@ var right = "<?php echo $right;?>";
 		echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/input.js'></script>";
 		echo "\n";
 
+		echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/purl.js'></script>";
+		echo "\n";
 // 		
 		foreach ($this->head_components as $idx=>$cmp) {
 		    $cmp->renderScript();

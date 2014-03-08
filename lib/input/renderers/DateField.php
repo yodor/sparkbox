@@ -64,11 +64,11 @@ class DateField extends InputRenderer implements IHeadRenderer
 
 
       if ($this->y_start==-1){
-	      $this->y_start = date("Y") - 20;
-	      $this->y_end = date("Y") + 20;
+	      $this->y_start = date("Y") - 30;
+	      $this->y_end = date("Y") + 30;
       }
       if ($this->y_end==-1){
-	      $this->y_end=$this->y_start + 15;
+	      $this->y_end=$this->y_start + 30;
       }
 
 

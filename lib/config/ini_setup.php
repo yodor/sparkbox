@@ -6,6 +6,8 @@ ini_set("auto_detect_line_endings","1");
 ini_set("session.cookie_lifetime", "0");
 ini_set("session.use_only_cookies", "0");
 
+ini_set("zlib.output_compression", "0");
+
 // ini_set("session.cookie_lifetime","7200");
 // ini_set("session.gc_maxlifetime","36000");
 

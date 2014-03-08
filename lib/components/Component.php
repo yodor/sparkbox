@@ -158,12 +158,15 @@ abstract class Component implements IRenderer
 	  
 
 		  if (strlen($value)<1)continue;
+		  
+		  $attribute_value = attributeValue($value);
+		  
 		  if (in_array($attribute_name, $this->json_attributes)) {
-			$attribute_value = htmlentities(mysql_real_unescape_string($value),ENT_QUOTES,"UTF-8");
+			
 			$attributes[] = $attribute_name."=".json_string($attribute_value);
 		  }
 		  else {
-			$attribute_value = htmlentities(mysql_real_unescape_string($value),ENT_QUOTES,"UTF-8");
+			
 			$attributes[] = $attribute_name."='".$attribute_value."'";
 		  }
 	  }

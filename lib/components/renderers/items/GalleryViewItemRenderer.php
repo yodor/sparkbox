@@ -153,11 +153,13 @@ if ($ref_key) {
 		
 		echo "<div class='image_slot'>";
 		
-		$named_link = get_class($this->gallery_view->getBean()).".".$this->item["position"];
+// 		$named_link = get_class($this->gallery_view->getBean()).".".$this->item["position"];
+		$named_link = get_class($this->gallery_view->getBean()).".".$photoID;
+
 		$rel = get_class($this->gallery_view->getBean());
 		
 		echo "<a class='image_popup' href='$image_href' name='$named_link' rel='".get_class($this->gallery_view->getBean())."'>";
-		echo "<img src='$thumb_href' tooltip='$tooltip'>";
+		echo "<img src='$thumb_href' tooltip='".attributeValue($tooltip)."'>";
 		echo "</a>";
 		
 		if ($this->actions["First"]) {

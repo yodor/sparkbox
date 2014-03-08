@@ -107,6 +107,8 @@ class DemoPage extends SimplePage
     public function finishPage()
     {
 
+	  echo phpversion();
+	  
 	  echo "</div>"; //main_content
 	echo "</div>"; //align=center
 

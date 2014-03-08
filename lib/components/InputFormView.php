@@ -40,9 +40,7 @@ class InputFormView extends Component
 	    $this->bean = $bean;
 	    $this->form = $form;
 
-	    if ($this->bean instanceof DBTableBean) {
-		$this->attributes["bean"]=get_class($this->bean);
-	    }
+	    
 
 	    $this->form_render = new FormRenderer();
 
@@ -50,6 +48,11 @@ class InputFormView extends Component
 		$this->form_render->setForm($form);
 	    }
 
+	    if ($this->bean instanceof DBTableBean) {
+		$this->attributes["bean"]=get_class($this->bean);
+		$this->form_render->setName(get_class($this->bean));
+	    }
+	    
 	    $this->processor = new FormProcessor();
 	    
 

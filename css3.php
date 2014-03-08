@@ -49,6 +49,8 @@ $(document).ready(function() {
 
 </script>
 <?php
+
+
 $page->finishPage();
 
 function drawSampleText()

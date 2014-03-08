@@ -79,6 +79,10 @@ class ArrayInputValidator implements IInputValidator
 
 
   }
+  public function getValidatorPrivate()
+  {
+    return $this->validator_private;
+  }
 //   public function validateFinal(InputField $field) 
 //   {
 //        $this->validator_private->validateFinal($field);

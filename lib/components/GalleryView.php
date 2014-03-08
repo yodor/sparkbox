@@ -153,7 +153,11 @@ class GalleryView extends Component implements IHeadRenderer
 	    $act->addAction(new RowSeparatorAction());
 	    $act->addAction(new RowSeparatorAction());
 
-	    $repos_param = array(new ActionParameter("item_id",$bkey));
+	    $repos_param = array(
+	      new ActionParameter("item_id",$bkey), 
+	      new ActionParameter("#".get_class($this->photos_bean).".%$bkey%","", true)
+	    );
+
 	    if (strlen($this->refkey>0))$repos_param[] = $ref_param;
 
 	    $act->addAction(new Action("First", "?cmd=reposition&type=first", $repos_param) ); 

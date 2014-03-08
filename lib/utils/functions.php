@@ -252,7 +252,10 @@ function safeVal($val, $accepted_tags=NULL)
 	return $ret;
 
 }
-
+function attributeValue($value)
+{
+  return htmlentities(mysql_real_unescape_string($value),ENT_QUOTES,"UTF-8");
+}
 function json_string($text)
 {
   return json_encode($text, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
@@ -262,6 +265,7 @@ function json_string($text)
 //   $text = str_replace("\"", "&#x0022", $text);
 //   
 //  return json_encode($text);
+// return json_encode(utf8_encode($text));
 }
 function listFiles($dir, $callback)
 {
