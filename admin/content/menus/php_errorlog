@@ -1,0 +1,10 @@
+[24-Jan-2014 14:52:14 Europe/Sofia] MySQLDriver::__construct: Unable to set timezone: Unknown or incorrect time zone: 'Europe/Sofia'
+[24-Jan-2014 14:52:14 Europe/Sofia] MySQLDriver::__construct: Unable to set timezone: Unknown or incorrect time zone: 'Europe/Sofia'
+[24-Jan-2014 14:52:14 Europe/Sofia] MenuItem::selectActiveMenus: Flattened menu length: 18
+[24-Jan-2014 14:52:14 Europe/Sofia] Current selected: 'Menu Items' - Loose Match with requestURI: 1
+[24-Jan-2014 14:52:14 Europe/Sofia] Clearing child nodes of current selected menu
+[24-Jan-2014 14:53:33 Europe/Sofia] MySQLDriver::__construct: Unable to set timezone: Unknown or incorrect time zone: 'Europe/Sofia'
+[24-Jan-2014 14:53:33 Europe/Sofia] MySQLDriver::__construct: Unable to set timezone: Unknown or incorrect time zone: 'Europe/Sofia'
+[24-Jan-2014 14:53:33 Europe/Sofia] MenuItem::selectActiveMenus: Flattened menu length: 19
+[24-Jan-2014 14:53:33 Europe/Sofia] Current selected: 'Menu Items' - Loose Match with requestURI: 1
+[24-Jan-2014 14:53:33 Europe/Sofia] Clearing child nodes of current selected menu
