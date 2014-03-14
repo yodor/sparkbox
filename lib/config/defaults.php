@@ -12,12 +12,12 @@ define ("INSTALL_PATH", $install_path);
 $lib_path = $install_path."/lib";
 define ("LIB_PATH" , $lib_path);
 
-$site_root = str_replace($_SERVER["DOCUMENT_ROOT"], "", $install_path);
+$site_root = str_replace($install_path, "", $install_path);
 //app/site deployment - HTTP accessible
 define ("SITE_ROOT", $site_root."/");
 
 //framework location - HTTP accessible
-$lib_root = str_replace($_SERVER["DOCUMENT_ROOT"], "", $lib_path);
+$lib_root = str_replace($install_path, "", $lib_path);
 define("LIB_ROOT", $lib_root."/");
 
 

@@ -23,6 +23,9 @@ class SimplePage extends SitePage
 	
 	protected $opengraph_tags = array();
 	
+	public $description = "";
+	public $keywords = "";
+	
 	public function addOGTag($tag_name, $tag_content)
 	{
 		$this->opengraph_tags[$tag_name] = $tag_content;
@@ -33,32 +36,24 @@ class SimplePage extends SitePage
 	{
 	    parent::dumpMetaTags();
 
-	    echo '<meta name="audience" content="All">';
-	    echo '<meta name="page-topic" content="">';
+	   
 	    echo '<meta name="revisit-after" content="1 days">';
-	    echo '<meta name="author" content="">';
+	    echo "\n";
 
 	    echo '<meta name="robots" content="index, follow">';
-	    echo '<meta http-equiv="imagetoolbar" content="no">';
-
-	
-	    if (DB_ENABLED) {
-	      $config = ConfigBean::factory();
-	      $config->setSection("seo");
-
-	      $keywords = $config->getValue("meta_keywords");
-	      if ($keywords) {
-		echo "<meta name='keywords' content='$keywords'>";
-		echo "\n";
-	      }
-
-	      $description = $config->getValue("meta_description");
-	      if ($description) {
-		echo "<meta name='description' content='$description'>";
-		echo "\n";
-	      }
-	    }
+	    echo "\n";
 	    
+	    
+	    
+	      
+	    
+	    echo "<meta name='keywords' content='%meta_keywords%'>";
+	    echo "\n";
+	
+	    echo "<meta name='description' content='%meta_description%'>";
+	    echo "\n";
+	  
+	      
 	    foreach($this->opengraph_tags as $tag_name=>$tag_content)
 	    {
 			echo "<meta property='og:$tag_name' content='".attributeValue($tag_content)."' />\n";
@@ -74,6 +69,9 @@ class SimplePage extends SitePage
 	    $this->head_components = $hcmp_merged;
 	    
 	    echo "<link rel='shortcut icon' href='".SITE_URL."/favicon.ico'>";
+	    echo "\n";
+	    echo '<meta http-equiv="imagetoolbar" content="no">';
+	    echo "\n";
 
         }
         protected function headStart() 
@@ -256,12 +254,28 @@ var right = "<?php echo $right;?>";
 	}
 	public function obCallback($buffer)
 	{
-// 		if (strlen($this->preferred_title)>0) {
 
-		$buffer = preg_replace('#(<title.*?>).*?(</title>)#', "<title>".$this->preferred_title.TITLE_PATH_SEPARATOR.SITE_TITLE."</title>", $buffer);
 
-// 		}
-		return $buffer;
+	    $buffer = preg_replace('#(<title.*?>).*?(</title>)#', "<title>".$this->preferred_title.TITLE_PATH_SEPARATOR.SITE_TITLE."</title>", $buffer);
+
+	    $keywords_config = "";
+	    $description_config = "";
+	      
+	    if (DB_ENABLED) {
+	      $config = ConfigBean::factory();
+	      $config->setSection("seo");
+
+	      $keywords_config = $config->getValue("meta_keywords");
+	      $description_config = $config->getValue("meta_description");
+
+	    }
+	    
+	    $keywords = $keywords_config." ".$this->keywords;
+	    $description = $description_config." ".$this->description;
+	    $buffer = str_replace("%meta_keywords%", $keywords, $buffer);
+	    $buffer = str_replace("%meta_description%", $description, $buffer);
+
+	    return $buffer;
 	}
 
 	public function beginPage()
