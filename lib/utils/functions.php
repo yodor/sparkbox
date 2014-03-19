@@ -258,14 +258,12 @@ function attributeValue($value)
 }
 function json_string($text)
 {
-  return json_encode($text, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
-//   return json_encode($text);
-  
-//   $text = str_replace("'", "&#x0027", $text);
-//   $text = str_replace("\"", "&#x0022", $text);
-//   
-//  return json_encode($text);
-// return json_encode(utf8_encode($text));
+  if (defined("JSON_UNESCAPED_UNICODE")) {
+    return json_encode($text, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+  }
+  else {
+    return json_encode(utf8_encode($text));
+  }
 }
 function listFiles($dir, $callback)
 {
