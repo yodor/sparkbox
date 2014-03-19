@@ -49,7 +49,12 @@ class SubmenuItemRenderer extends MenuItemRenderer
 	  echo "\n";
 	  
 	  echo "<a class='SubmenuItemLink' href='$href' $target >";
-	  echo tr($title);
+	  
+	  if ($this->getMenuItem()->needTranslation()) {
+	    $title = tr($title);
+	  }
+	  echo $title;
+	  
 	  echo "</a>";
 
 	  if (count($this->getMenuItem()->getSubmenu())>0) {

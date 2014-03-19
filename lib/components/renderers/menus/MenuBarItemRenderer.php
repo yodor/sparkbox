@@ -77,7 +77,10 @@ class MenuBarItemRenderer extends MenuItemRenderer
 	  $this->renderIcon();
       }
 
-      echo tr($title);
+      if ($this->getMenuItem()->needTranslate()) {
+	$title = tr($title);
+      }
+      echo $title;
 
       echo "</a>";
 

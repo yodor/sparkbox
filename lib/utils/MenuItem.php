@@ -18,6 +18,8 @@ class MenuItem
     protected $target = "";
 
     protected $childNodes = array();
+    
+    protected $need_translate = true;
 
     public static $icon_path = "../images/admin/spark_icons/";
     
@@ -26,9 +28,18 @@ class MenuItem
 	$this->title=$title;
 	$this->href=$href;
 	$this->icon=$icon;
-
+	$this->need_translate = true;
     }
-    
+    //flag for renderers to handle the title translation themselves - enableTranslation(true) - default - uses tr($title)
+    //enableTranslation(false) -  title is already translated translation in MainMenu::constructMenuItems 
+    public function enableTranslation($mode)
+    {
+	$this->need_translate = (($mode>0) ?  true : false);
+    }
+    public function needTranslate()
+    {
+	return $this->need_translate;
+    }
     public function setDisabled($mode)
     {
 	$this->disabled = (($mode>0) ?  true : false);

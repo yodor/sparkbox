@@ -96,6 +96,7 @@ class MainMenu
 	    
 		    $menuID = (int)$row[$key];
 
+		    trbean($menuID, $title, $row, $this->bean);
 
 		    $link = "";
 		    if (strlen($this->prefix_root)>0) {
@@ -116,6 +117,7 @@ class MainMenu
 		    }
 		    
 		    $item = new MenuItem($row[$title], $link);
+		    $item->enableTranslation(false);
 // 		    $item->setMenuID($menuID);
 		    if ($parentID==0) {
 			$arr_menu[]=$item;
