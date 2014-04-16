@@ -496,37 +496,47 @@ abstract class DBTableBean implements IDataBean
 	return $id;
     }
 	
+    
     protected function prepareValues(&$row, &$values, $for_update)
     {
-	$keys = array();
+		$keys = array();
 
-	foreach ($row as $key=>$val) {
-	  //drop keys that are not fields from 'this' table
-	  if (!in_array($key, $this->fields)) continue;
-	  $keys[] = $key;
-	}
+		foreach ($row as $key=>$val) {
+		  //drop keys that are not fields from 'this' table
+		  if (!in_array($key, $this->fields)) continue;
+		  $keys[] = $key;
+		}
 
-	$values = array();
+		$values = array();
 
-	foreach ($keys as $idx=>$key) {
-	  $value = $row[$key];
-// 	  debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value));
-	  
-	  if (is_null($value) || strlen($value)<1) {
-	      $values[$key] = "NULL";
-	  }
-	  else {
-	      if ($this->needQuotes($key)===true) {
-		$values[$key] = "'".$row[$key]."'";
-	      }
-	      else {
-		$values[$key] = $row[$key];
-	      }
-	  }
-	  if ($for_update===true) {
-	    $values[$key]="$key=".$values[$key];
-	  }
-	}
+		foreach ($keys as $idx=>$key) {
+		  $value = $row[$key];
+	// 	  debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value));
+
+		  if (is_array($value)) {
+			
+			  if (count($value)<1)continue;
+			  $value = $value[0];
+			
+		  }
+		  
+		  if (is_null($value)) {
+			  $values[$key] = "NULL";
+		  }
+		  
+		  else {
+			  if ($this->needQuotes($key)===true) {
+				  $values[$key] = "'".$value."'";
+			  }
+			  else {
+				  $values[$key] = $value;
+			  }
+		  }
+		  
+		  if ($for_update===true) {
+			$values[$key]="$key=".$value;
+		  }
+		}
     }
     
     protected function prepareInsertValues(&$row, &$values)
