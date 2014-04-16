@@ -534,7 +534,7 @@ abstract class DBTableBean implements IDataBean
 		  }
 		  
 		  if ($for_update===true) {
-			$values[$key]="$key=".$value;
+			$values[$key]="$key=".$values[$key];//already quoted
 		  }
 		}
     }
