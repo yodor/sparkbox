@@ -156,7 +156,7 @@ if ($this->id == -1) {
   if (is_callable($funcname)) {
 
 	$funcname($this->row);
-
+	
   }
   else throw new Exception("No default value for this class");
 
@@ -164,6 +164,8 @@ if ($this->id == -1) {
 else {
 	  $this->row = $this->bean->getByID($this->id);
 }
+
+
 	  $this->checkPermissions();
 
 	  $this->checkCache();
@@ -174,22 +176,34 @@ else {
 		  $blob_field = $_GET["blob_field"];
 
 	  }
+	  
+	  $stypes = $this->bean->getStorageTypes();
 
-	  else {
-
-		  if (!isset($this->row[$blob_field])) {
-			  //search blob_field
-			  $stypes = $this->bean->getStorageTypes();
-			  foreach($stypes as $field_name => $field_type) {
-
-				  if (strpos($field_type,"blob")!==false) {
-					  $blob_field = $field_name;
-					  break;
-				  }
-			  }
-		  }
-
+	  if (!array_key_exists($blob_field, $stypes)) {
+		throw new Exception("No such blob field found");
 	  }
+
+	  if (!isset($this->row[$blob_field])) {
+		throw new Exception("No data for this blob field");
+	  }
+	  
+// 		  //search blob_field
+// 		  $stypes = $this->bean->getStorageTypes();
+// 		  foreach($stypes as $field_name => $field_type) {
+// 
+// 			  if (strpos($field_type,"blob")!==false) {
+// 				  $blob_field = $field_name;
+// 				  break;
+// 			  }
+// 		  }
+	  
+  
+// 	  if (!isset($this->row[$blob_field])) {
+// 		throw new Exception ("No blob field found in this bean class.");
+// 	  }
+	  
+	  $this->blob_field = $blob_field;
+	  
 	  $storage_object = @unserialize($this->row[$blob_field]);
 
 	  if ($storage_object instanceof StorageObject) {
@@ -202,7 +216,7 @@ else {
 // 		  }
 		  
 		  $this->row = array();
-		  $storage_object->deconstruct($this->row, "photo", false);
+		  $storage_object->deconstruct($this->row, $blob_field, false);
 
 // 		  if ($date_upload_row) {
 // 		    $this->row["date_upload"] = $date_upload_row;
@@ -230,12 +244,12 @@ else {
 
 	  $session = new Session();
 
-	  include_once("lib/AdminAuthenticator.php");
+	  include_once("lib/auth/AdminAuthenticator.php");
 	  if (AdminAuthenticator::checkAuthState()) return;
 
 
-	  @include_once("class/".$this->row["auth_context"].".php");
-	  @include_once("lib/".$this->row["auth_context"].".php");
+	  @include_once("class/auth/".$this->row["auth_context"].".php");
+	  @include_once("lib/auth/".$this->row["auth_context"].".php");
 	  $auth = new $this->row["auth_context"];
 	  if (!$auth->checkAuthState(true)) throw new Exception("This resource is protected. Please login first.");
 

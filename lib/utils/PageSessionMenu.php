@@ -64,18 +64,18 @@ class PageSessionMenu extends MainMenu {
 		debug("Current selected: '".$last_selected->getTitle()."' - Loose Match with requestURI: ".$match);
 	    }
 	    if (!$match) {
-	      debug("Appending dynamic menu item from this request");
-	      
-	      global $page;
-	      $action_title = "Action Page";
-	      if ($page && $page->getCaption()) {
-		$action_title = $page->getCaption();
-	      } 
-	      $action_item = new MenuItem($action_title , $_SERVER['REQUEST_URI']);
-	      $action_item->setSelected(true);
-	      
-	      $last_selected->addMenuItem($action_item);
-	      $last_selected = $action_item;
+// 	      debug("Appending dynamic menu item from this request");
+// 	      
+// 	      global $page;
+// 	      $action_title = "Action Page";
+// 	      if ($page && $page->getCaption()) {
+// 		$action_title = $page->getCaption();
+// 	      } 
+// 	      $action_item = new MenuItem($action_title , $_SERVER['REQUEST_URI']);
+// 	      $action_item->setSelected(true);
+// 	      
+// 	      $last_selected->addMenuItem($action_item);
+// 	      $last_selected = $action_item;
 	    }
 	    else {
 		debug("Clearing child nodes of current selected menu");

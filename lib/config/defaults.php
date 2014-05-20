@@ -101,9 +101,9 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
   $g_res = $g_db->query('SELECT @@max_allowed_packet as packet_size');
   $mrow = $g_db->fetch($g_res);
 		
-  $defines->get("MAX_PACKET_SIZE", $mrow["packet_size"]);
+  $defines->set("MAX_PACKET_SIZE", $mrow["packet_size"]);
   $g_db->free($g_res);
-
+  $defines->export();
 }
 
 
