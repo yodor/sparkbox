@@ -424,11 +424,16 @@ abstract class DBTableBean implements IDataBean
 
 	    return NULL;
     }
-    public function needQuotes($key)
+    public function needQuotes($key, &$value="")
     {
-	$storage_type = $this->storage_types[$key];
-	if (strpos($storage_type,"char")!==false || strpos($storage_type,"text")!==false || strpos($storage_type,"blob")!==false  || strpos($storage_type,"date")!==false || strpos($storage_type,"timestamp")!==false || strpos($storage_type,"enum")!==false	) return true;
-	return false;
+	  $storage_type = $this->storage_types[$key];
+	  if (strpos($storage_type,"char")!==false || strpos($storage_type,"text")!==false || strpos($storage_type,"blob")!==false  ||  strpos($storage_type,"enum")!==false	) return true;
+	  
+	  if (strpos($storage_type,"date")!==false || strpos($storage_type,"timestamp")!==false) {
+		  if (endsWith($value , "()")) return false;
+		  return true;
+	  }
+	  return false;
     }
 
     public function insertRecord(&$row, &$db=false)
@@ -449,7 +454,9 @@ abstract class DBTableBean implements IDataBean
 
 	$sql = "INSERT INTO {$this->table} (".implode(",",array_keys($values)).") VALUES (".implode(",", $values).")";
 
-	debug(get_class($this)." INSERT SQL: $sql");
+	if (defined("DEBUG_DBTABLEBEAN_DUMP_SQL")) {
+	  debug(get_class($this)." INSERT SQL: $sql");
+	}
 	
 	$ret = $db->query($sql);
 
@@ -482,7 +489,9 @@ abstract class DBTableBean implements IDataBean
 
 	$sql = "UPDATE {$this->table} SET ".implode(",",$values)." WHERE {$this->prkey}=$id";
 
-	debug(get_class($this)." UPDATE SQL: $sql");
+	if (defined("DEBUG_DBTABLEBEAN_DUMP_SQL")) {
+	  debug(get_class($this)." UPDATE SQL: $sql");
+	}
 	
 	$ret = $db->query($sql);
 
@@ -496,7 +505,6 @@ abstract class DBTableBean implements IDataBean
 	return $id;
     }
 	
-    
     protected function prepareValues(&$row, &$values, $for_update)
     {
 		$keys = array();
@@ -525,7 +533,7 @@ abstract class DBTableBean implements IDataBean
 		  }
 		  
 		  else {
-			  if ($this->needQuotes($key)===true) {
+			  if ($this->needQuotes($key, $value)===true) {
 				  $values[$key] = "'".$value."'";
 			  }
 			  else {
@@ -534,7 +542,9 @@ abstract class DBTableBean implements IDataBean
 		  }
 		  
 		  if ($for_update===true) {
-			$values[$key]="$key=".$values[$key];//already quoted
+			
+			  $values[$key]="$key=".$values[$key];//already quoted
+			
 		  }
 		}
     }
