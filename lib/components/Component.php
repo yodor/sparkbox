@@ -132,6 +132,12 @@ abstract class Component implements IRenderer
 	  $this->attributes[$name]=$value;
 	  return $this;
   }
+  public function clearAttribute($name)
+  {
+	  if (isset($this->attributes[$name])) {
+		unset($this->attributes[$name]);
+	  }
+  }
   public function getAttribute($name)
   {
 	  return $this->attributes[$name];
@@ -157,17 +163,23 @@ abstract class Component implements IRenderer
 		  if (!$this->render_tooltip && strcmp($attribute_name,"tooltip")==0)continue;
 	  
 
-		  if (strlen($value)<1)continue;
-		  
-		  $attribute_value = attributeValue($value);
-		  
-		  if (in_array($attribute_name, $this->json_attributes)) {
+		  if (is_null($value) || strlen($value)<1) {
 			
-			$attributes[] = $attribute_name."=".json_string($attribute_value);
+			$attributes[] = $attribute_name;
+			
 		  }
 		  else {
+		  
+			$attribute_value = attributeValue($value);
 			
-			$attributes[] = $attribute_name."='".$attribute_value."'";
+			if (in_array($attribute_name, $this->json_attributes)) {
+			  
+			  $attributes[] = $attribute_name."=".json_string($attribute_value);
+			}
+			else {
+			  
+			  $attributes[] = $attribute_name."='".$attribute_value."'";
+			}
 		  }
 	  }
 
