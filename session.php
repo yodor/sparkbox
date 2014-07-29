@@ -8,4 +8,7 @@
 
 include_once("lib/config/defaults.php");
 // include_once("global_beans.php");
+
+// $defines->dump();
+
 ?>
