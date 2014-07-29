@@ -427,13 +427,17 @@ abstract class DBTableBean implements IDataBean
     public function needQuotes($key, &$value="")
     {
 	  $storage_type = $this->storage_types[$key];
-	  if (strpos($storage_type,"char")!==false || strpos($storage_type,"text")!==false || strpos($storage_type,"blob")!==false  ||  strpos($storage_type,"enum")!==false	) return true;
-	  
+// 	  if (strpos($storage_type,"char")!==false || strpos($storage_type,"text")!==false || strpos($storage_type,"blob")!==false  ||  strpos($storage_type,"enum")!==false) {
+// 		return true;
+// 	  }
+// 	  if (strpos($storage_type, "bool")!==false) {
+// 		return true;
+// 	  }
 	  if (strpos($storage_type,"date")!==false || strpos($storage_type,"timestamp")!==false) {
 		  if (endsWith($value , "()")) return false;
 		  return true;
 	  }
-	  return false;
+	  return true;
     }
 
     public function insertRecord(&$row, &$db=false)

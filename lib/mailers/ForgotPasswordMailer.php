@@ -2,7 +2,7 @@
 include_once("lib/mailers/Mailer.php");
 
 
-class ForgotAdminPasswordMailer extends Mailer {
+class ForgotPasswordMailer extends Mailer {
 
 
 

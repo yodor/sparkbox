@@ -18,7 +18,7 @@ class GalleryPhotosBean extends  OrderedDataBean
  `caption` text CHARACTER SET utf8 COLLATE utf8_unicode_ci,
  `position` int(11) NOT NULL,
  PRIMARY KEY (`gpID`)
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8";
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
     
     public function __construct() 
     {

@@ -9,8 +9,9 @@ class ProductPhotosBean extends DBTableBean
  `photo` longblob NOT NULL,
  `prodID` int(11) unsigned NOT NULL,
  PRIMARY KEY (`ppID`),
- KEY `prodID` (`prodID`)
-) ENGINE=InnoDB AUTO_INCREMENT=341 DEFAULT CHARSET=utf8";
+ KEY `prodID` (`prodID`),
+ CONSTRAINT `product_photos_ibfk_1` FOREIGN KEY (`prodID`) REFERENCES `products` (`prodID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
     
     public function __construct() 
     {

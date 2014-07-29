@@ -1,14 +1,13 @@
 <?php
 include_once("session.php");
 include_once("lib/input/InputFactory.php");
-
 include_once("lib/pages/AdminLoginPage.php");
 
+include_once("lib/input/validators/EmailValidator.php");
 include_once("lib/beans/AdminUsersBean.php");
 
-include_once("lib/mailers/ForgotAdminPasswordMailer.php");
 
-include_once("lib/auth/Authenticator.php");
+include_once("lib/mailers/ForgotPasswordMailer.php");
 
 $page = new AdminLoginPage();
 
@@ -20,12 +19,12 @@ $ic->setField($fp);
 
 if (isset($_POST["request_password"])) {
 	
-   $fp->loadPostData($_POST);
-   $fp->validate();
+  $fp->loadPostData($_POST);
+  $fp->validate();
 
   if (!$fp->haveError()) {
 
-	  if (!$ub->emailExists($fp->getValue())) {
+	  if (!$ub->usernameExists($fp->getValue())) {
 		  $fp->setError(tr("This email is not registered with us."));
 	  }
   }
@@ -34,14 +33,14 @@ if (isset($_POST["request_password"])) {
 	  $users = new AdminUsersBean();
 	  
 	  $random_pass = Authenticator::generateRandomAuth(8);
-	  $fpm = new ForgotAdminPasswordMailer($fp->getValue(), $random_pass, SITE_DOMAIN.SITE_ROOT."admin/login.php");
+	  $fpm = new ForgotPasswordMailer($fp->getValue(), $random_pass, SITE_DOMAIN.SITE_ROOT."admin/login.php");
 	  $db = DBDriver::factory();
 	  try {
 			$db->transaction();
 			 
 			$fpm->send();
 
-			$userID = $users->email2id($fp->getValue());
+			$userID = $users->username2id($fp->getValue());
 			$update_row["password"] = md5($random_pass);
 			if (!$users->updateRecord($userID, $update_row, $db)) throw new Exception("Unable to update records: ".$db->getError());
 
@@ -60,41 +59,26 @@ if (isset($_POST["request_password"])) {
 $page->beginPage();
 
 
-$page->setPreferredTitle("Forgot Password");
+$page->heading="Forgot Password Page";
 
-echo "<div class='login_component'>";
+echo "<div align=center>";
 
-//   echo "<div style='float:left'>";
-//   echo "<img src='".SITE_ROOT."admin/pics/admin_logo.png'>";
-//   echo "</div>";
+echo "<div style='width:420px;'>";
 
-  echo "<span class='inner'>";
+echo "<BR><BR>";
+echo tr("Input the email you have used on the time of registration");
+echo "<BR><BR>";
 
-  echo "<span class='caption'>DTI Training CMS</span>";
-  
-  echo "<BR><BR>";
-  echo tr("Input the email you have used on the time of registration");
-  echo "<BR><BR>";
+echo "<form method=post>";
+$ic->render();
 
-  echo "<form method=post>";
+StyledButton::DefaultButton()->drawSubmit("Send");
 
 
-  $ic->render();
+echo "<input type=hidden value='1' name='request_password'>";
 
-  echo "<a class='DefaultButton ' href='".SITE_ROOT."admin/login.php'>Back</a>";
-  echo "<button type=submit class='DefaultButton admin_button orange'>Send</button>";
-  /*
-  StyledButton::DefaultButton()->drawSubmit("Send");*/
-
-  echo "<input type=hidden value='1' name='request_password'>";
-
-  echo "</form>";
-  echo "</span>";
-
-
-echo "</div>";
-
-
+echo "</form>";
+echo "</div></div>";
 
 $page->finishPage();
 ?>

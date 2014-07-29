@@ -149,23 +149,25 @@ if (isset($_GET["gray_filter"])) {
 	  else {
 		throw new Exception("Bean class not found: ".$this->className);
 	  }
+	  
 	  $this->bean = new $this->className();
 
-if ($this->id == -1) {
-  $funcname = "Default_".$this->className;
-  if (is_callable($funcname)) {
+	  
+	  if ($this->id == -1) {
+		$funcname = "Default_".$this->className;
+		if (is_callable($funcname)) {
 
-	$funcname($this->row);
-	
-  }
-  else throw new Exception("No default value for this class");
+		  $funcname($this->row);
 
-}
-else {
-	  $this->row = $this->bean->getByID($this->id);
-}
+		}
+		else throw new Exception("No default value for this class");
 
-
+	  }
+	  else {
+			$this->row = $this->bean->getByID($this->id);
+	  }
+	  
+	  
 	  $this->checkPermissions();
 
 	  $this->checkCache();
@@ -176,7 +178,7 @@ else {
 		  $blob_field = $_GET["blob_field"];
 
 	  }
-	  
+
 	  $stypes = $this->bean->getStorageTypes();
 
 	  if (!array_key_exists($blob_field, $stypes)) {
@@ -187,40 +189,18 @@ else {
 		throw new Exception("No data for this blob field");
 	  }
 	  
-// 		  //search blob_field
-// 		  $stypes = $this->bean->getStorageTypes();
-// 		  foreach($stypes as $field_name => $field_type) {
-// 
-// 			  if (strpos($field_type,"blob")!==false) {
-// 				  $blob_field = $field_name;
-// 				  break;
-// 			  }
-// 		  }
-	  
-  
-// 	  if (!isset($this->row[$blob_field])) {
-// 		throw new Exception ("No blob field found in this bean class.");
-// 	  }
-	  
+
 	  $this->blob_field = $blob_field;
 	  
 	  $storage_object = @unserialize($this->row[$blob_field]);
 
 	  if ($storage_object instanceof StorageObject) {
 	  
-		  
-// 		  $date_upload_row = false;
-// 		  
-// 		  if (isset($this->row["date_upload"])) {
-// 		    $date_upload_row = $this->row["date_upload"];
-// 		  }
-		  
+
 		  $this->row = array();
 		  $storage_object->deconstruct($this->row, $blob_field, false);
 
-// 		  if ($date_upload_row) {
-// 		    $this->row["date_upload"] = $date_upload_row;
-// 		  }
+
 		  $this->cache_hash.="|".$blob_field;
 		  
 		  $this->checkCache();
@@ -244,12 +224,12 @@ else {
 
 	  $session = new Session();
 
-	  include_once("lib/auth/AdminAuthenticator.php");
+	  include_once("lib/AdminAuthenticator.php");
 	  if (AdminAuthenticator::checkAuthState()) return;
 
 
-	  @include_once("class/auth/".$this->row["auth_context"].".php");
-	  @include_once("lib/auth/".$this->row["auth_context"].".php");
+	  @include_once("class/".$this->row["auth_context"].".php");
+	  @include_once("lib/".$this->row["auth_context"].".php");
 	  $auth = new $this->row["auth_context"];
 	  if (!$auth->checkAuthState(true)) throw new Exception("This resource is protected. Please login first.");
 
@@ -257,24 +237,27 @@ else {
   protected function checkCache()
   {
 
-$last_modified = date("D, d M Y H:i:s T");
+ 	  $last_modified = gmdate("D, d M Y H:i:s T");
 
 
-
+	  header("Storage-Date: now");
+	  
 	  if (isset($this->row["date_upload"])) {
-		$last_modified = date("D, d M Y H:i:s T", strtotime($this->row["date_upload"]));
+		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_upload"]));
+		header("Storage-Date: date_upload");
 	  }
 	  else if (isset($this->row["date_updated"])) {
-		$last_modified = date("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
+		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
+		header("Storage-Date: date_updated");
 	  }
-	  else if (isset($this->row["item_date"])) {
-		$last_modified = date("D, d M Y H:i:s T", strtotime($this->row["item_date"]));
-	  }
+// 	  else if (isset($this->row["item_date"])) {
+// 		$last_modified = date("D, d M Y H:i:s T", strtotime($this->row["item_date"]));
+// 	  }
 
 
 
 	  //always keep one year ahead from request time
-	  $expire = date("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
+	  $expire = gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
 
 	  $etag = md5($this->cache_hash."-".$last_modified);
 
@@ -288,45 +271,51 @@ $last_modified = date("D, d M Y H:i:s T");
 	  // requested file. If so, return 304 header and exit.
 	  if (!$this->skip_cache) {
 
-		if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
-		{
 
-// 			error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
 
-			if (strcmp(str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])),$etag)==0)
-			{
-				header("HTTP/1.1 304 Not Modified");
-				header("Expires: $expire");
-
-				header("Cache-Control: public, must-revalidate");
-// 				header("Pragma: ".$this->headers["etag"]);
-
-				header("Last-Modified: $last_modified");
-				header("ETag: $etag");
-
-				exit;
-			}
-		}
-
-		else if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+		
+		$send_cache = false;
+		
+		if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
 		{
 // 			error_log("Storage::checkCache HTTP_IF_MODIFIED_SINCE: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
 
 			if (strcmp($_SERVER['HTTP_IF_MODIFIED_SINCE'],$last_modified)==0)
 			{
-				header('HTTP/1.1 304 Not Modified');
-				header("Expires: $expire");
-
-				header("Cache-Control: public, must-revalidate");
-// 				header("Pragma: $etag");
-
-				header("Last-Modified: $last_modified");
-				header("ETag: $etag");
-
-				exit;
+				$send_cache = true;
+			}
+			else {
+				$send_cache = false;
 			}
 		}
+// 		if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
+// 		{
+// 
+// // 			error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
+// 
+// 			if (strcmp(str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])),$etag)==0)
+// 			{
+// 				$send_cache = true;
+// 			}
+// 			else {
+// 				$send_cache = false;
+// 			}
+// 		}
+		
+		if ($send_cache) {
+				
+				
+				
+				header("HTTP/1.1 304 Not Modified");
+				header("Last-Modified: $last_modified");
+				header("Cache-Control: no-cache, must-revalidate");
+// 				header("Pragma: ".$this->headers["etag"]);
 
+				
+// 				header("ETag: $etag");
+
+				exit;
+		}
 	  }
 
 	  $this->headers["etag"]=$etag;
@@ -345,11 +334,11 @@ $last_modified = date("D, d M Y H:i:s T");
 
 	  header("Content-Type: $mime");
 	  header("Last-Modified: ".$this->headers["last_modified"]);
-	  header('ETag: "'.$this->headers["etag"].'"');
+	  header("ETag: '".$this->headers["etag"]."'");
 
 
-	  header("Cache-Control: must-revalidate");
-// 	  header("Pragma: ".$this->headers["etag"]);
+	  header("Cache-Control: no-cache, must-revalidate");
+	  header("Pragma: ".$this->headers["etag"]);
 
 	  header("Expires: ".$this->headers["expire"]);
 	  header("Content-Length: " . $this->row["size"]);
