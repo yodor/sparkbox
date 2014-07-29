@@ -27,4 +27,5 @@ ini_set("date.timezone","Europe/Sofia");
 //  AllowOverride Options
 //</Directory>
 
+$_REQUEST = array_merge($_GET, $_POST);
 ?>
