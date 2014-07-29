@@ -43,7 +43,13 @@ class DemoPage extends SimplePage
 	$item->addMenuItem($item1);
 	
 	$arr[] = new MenuItem("MCE Image Browser", SITE_ROOT."mce_browser.php");
-	$arr[] = new MenuItem("Menus", SITE_ROOT."menu.php");
+	
+	$menus = new MenuItem("Menus", SITE_ROOT."menu.php");
+	$arr[] = $menus;
+	
+	$db_menu = new MenuItem("DB Menu", SITE_ROOT."db_menu.php");
+	$menus->addMenuItem($db_menu);
+	
 	$item = new MenuItem("Tree View", SITE_ROOT."tree.php");
 	$arr[] = $item;
 	$item1 = new MenuItem("Aggregate Tree", SITE_ROOT."related_tree.php");
@@ -108,12 +114,12 @@ class DemoPage extends SimplePage
     {
 
 	  echo "<div class='version_label'>";
-		echo "<label>";
-		echo "PHP: ".phpversion();
-		echo " | ";
-		echo "MySQL: C.".mysql_get_client_info();
-		echo "/S.".mysql_get_server_info();
-		echo "</label>";
+	  echo "<label>";
+	  echo "PHP: ".phpversion();
+	  echo " | ";
+	  echo "MySQL: C.".mysql_get_client_info();
+	  echo "/S.".mysql_get_server_info();
+	  echo "</label>";
 	  echo "</div>";
 	  
 	  echo "</div>"; //main_content

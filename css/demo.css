@@ -35,3 +35,33 @@ body {
   text-align:right;
   
 }
+.DynamicPagesBean {
+  display:block;
+  overflow:hidden;
+}
+.DynamicPagesBean .photo {
+  
+  display:block;
+}
+.DynamicPagesBean .photo IMG {
+/*   height:160px; */
+  display:block;
+  width:100%;
+}
+.DynamicPagesBean .PagePhotos {
+  max-height:80px;
+  display:block;
+}
+.DynamicPagesBean .PagePhotos IMG {
+  height:80px;
+  display:inline-block;
+}
+.DynamicPagesBean .item_title {
+  font-size:18px;
+  display:block;
+  padding-top:15px;
+
+}.DynamicPagesBean .content {
+  padding-top:10px;
+  padding-bottom:10px;
+}
