@@ -107,7 +107,14 @@ class DemoPage extends SimplePage
     public function finishPage()
     {
 
-	  echo phpversion();
+	  echo "<div class='version_label'>";
+		echo "<label>";
+		echo "PHP: ".phpversion();
+		echo " | ";
+		echo "MySQL: C.".mysql_get_client_info();
+		echo "/S.".mysql_get_server_info();
+		echo "</label>";
+	  echo "</div>";
 	  
 	  echo "</div>"; //main_content
 	echo "</div>"; //align=center

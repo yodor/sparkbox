@@ -30,3 +30,8 @@ body {
 .column.categories {
   max-width:180px;
 }
+
+.main_content .version_label {
+  text-align:right;
+  
+}
