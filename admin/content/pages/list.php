@@ -37,7 +37,7 @@ $view->setCaption("Dynamic Pages List");
 $view->setDefaultOrder(" position ASC ");
 // $view->search_filter = " ORDER BY day_num ASC ";
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
-$view->addColumn(new TableColumn("item_photo","Photo"));
+$view->addColumn(new TableColumn("photo","Photo"));
 $view->addColumn(new TableColumn("item_title","Title"));
 // $view->addColumn(new TableColumn("subtitle","Subtitle"));
 
@@ -51,8 +51,8 @@ $view->addColumn(new TableColumn("actions","Actions"));
 
 $view->getColumn("visible")->setCellRenderer(new BooleanFieldCellRenderer("Yes","No"));
 
-$view->getColumn("item_photo")->setCellRenderer(new TableImageCellRenderer(new DynamicPagesBean(), IPhotoRenderer::RENDER_CROP, -1,55));
-$view->getColumn("item_photo")->getHeaderCellRenderer()->setSortable(false);
+$view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new DynamicPagesBean(), IPhotoRenderer::RENDER_CROP, -1,55));
+$view->getColumn("photo")->getHeaderCellRenderer()->setSortable(false);
 
 
 $act = new ActionsTableCellRenderer();

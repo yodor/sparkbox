@@ -96,7 +96,7 @@ abstract class JSONRequestHandler extends RequestHandler
       }
       catch (Exception $e) {
 
-	  debugOutput(get_class($this)."::process: Error:".$e->getMessage());
+	  debug(get_class($this)."::process: Error:".$e->getMessage());
 	  
 	  $ret->contents = "";
 	  $ret->status = JSONResponse::STATUS_ERROR;

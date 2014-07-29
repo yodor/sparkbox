@@ -1,5 +1,8 @@
 <?php
-
+function quoteArray(&$item, $key, $user_data="")
+{
+  $item = "'".$item."'";
+}
 function KMG(&$umf)
 {
   if (strpos($umf,"M")!==FALSE) {
