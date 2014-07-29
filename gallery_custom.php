@@ -38,7 +38,7 @@ echo "<div class='custom_gallery GalleryTape'>";
     echo "<div class='slot'>";
     $itemID = $row[$bean->getPrKey()];
 
-    $img_href = SITE_ROOT."storage.php?cmd=image_crop&width=-1&height=160&class=GalleryPhotosBean&id=$itemID&skip_cache=1";
+    $img_href = SITE_ROOT."storage.php?cmd=image_crop&width=-1&height=160&class=GalleryPhotosBean&id=$itemID";//&skip_cache=1
     $popup_href = SITE_ROOT."storage.php?cmd=gallery_photo&class=GalleryPhotosBean&id=$itemID";
 
     echo "<a class='image_popup' href='$popup_href' rel='collection1'>";

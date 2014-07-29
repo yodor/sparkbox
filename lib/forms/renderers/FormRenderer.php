@@ -36,7 +36,7 @@ class FormRenderer extends Component implements IFormRenderer, IHeadRenderer
 
   protected $field_renderer = NULL;
   
-  public function __construct()
+  public function __construct($field_layout=FormRenderer::FIELD_HBOX)
   {
       parent::__construct();
       $this->attributes["method"]="post";
@@ -53,7 +53,7 @@ class FormRenderer extends Component implements IFormRenderer, IHeadRenderer
 
       $this->field_renderer = new InputComponent();
 
-      $this->setFieldLayout(FormRenderer::FIELD_HBOX);
+      $this->setFieldLayout($field_layout);
 
   }
   public function renderScript()
@@ -145,21 +145,21 @@ class FormRenderer extends Component implements IFormRenderer, IHeadRenderer
   {
       echo "<div class='SubmitLine'>";
 	    
-	echo "<div class='TextSpace'>";
-	echo "</div>";
-	
-	echo "<div class='Buttons'>";
-	
+		echo "<div class='TextSpace'>";
+		echo "</div>";
+		
+		echo "<div class='Buttons'>";
+		
 
-	foreach($this->buttons as $href=>$btn) {
-	    $btn->render();
+		foreach($this->buttons as $href=>$btn) {
+			$btn->render();
 
-	}
-	
-	$this->submit_button->render();
-	
-	
-	echo "</div>";
+		}
+		
+		$this->submit_button->render();
+		
+		
+		echo "</div>";
 	    
       echo "</div>";
   }
@@ -171,18 +171,18 @@ class FormRenderer extends Component implements IFormRenderer, IHeadRenderer
 
       $callback_rendered = false;
       if ($this->render_field_callback) {
-	  if (is_callable($this->render_field_callback)) {
-	    $callback_rendered = call_user_func($this->render_field_callback, $field, $this);
-	  }
-	  else {
-	    //TODO: Check if exception throwing is more appropriate here
-	    debug("callback set but callback render function not callable");
-	    
-	  }
+		if (is_callable($this->render_field_callback)) {
+		  $callback_rendered = call_user_func($this->render_field_callback, $field, $this);
+		}
+		else {
+		  //TODO: Check if exception throwing is more appropriate here
+		  debug("callback set but callback render function not callable");
+		  
+		}
       }
       if (!$callback_rendered) {
-	  $this->field_renderer->setField($field);
-	  $this->field_renderer->render();
+		$this->field_renderer->setField($field);
+		$this->field_renderer->render();
       }
 
   }

@@ -19,7 +19,7 @@ $handler->setSection("mce_image_demo", "text");
 $handler->setOwnerID(-1);
 			
 
-$form_render = new FormRenderer();
+$form_render = new FormRenderer(FormRenderer::FIELD_VBOX);
 $form->setRenderer($form_render);
 $form->setProcessor(new FormProcessor());
 $form->getProcessor()->processForm($form);

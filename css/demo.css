@@ -35,6 +35,8 @@ body {
   text-align:right;
   
 }
+
+/* DynamicPages - content/index.php */
 .DynamicPagesBean {
   display:block;
   overflow:hidden;
@@ -65,3 +67,27 @@ body {
   padding-top:10px;
   padding-bottom:10px;
 }
+/* --DynamicPages - content/index.php */
+
+/* mce_browser */
+body.mce_browser .FormRenderer {
+  width:100%;
+  display:block;
+}
+body.mce_browser .FormRenderer .InputComponent {
+  display:block;
+  width:100%;
+}
+body.mce_browser .FormRenderer .SubmitLine {
+  display:block;
+  width:100%;
+  text-align:right;
+}
+body.mce_browser .FormRenderer .SubmitLine .TextSpace {
+  display:inline-block;
+  
+}
+body.mce_browser .FormRenderer .SubmitLine .Buttons {
+  display:inline-block;
+}
+
