@@ -131,7 +131,7 @@ if (isset($_GET["gray_filter"])) {
 	  }
 	  catch (ImageResizerException $e1) {
 	    debug("ImageResizerException: ".$_SERVER["REQUEST_URI"]);
-	    $this->sendNotFound();
+	    $this->sendError($e1);
 	  }
 	  catch (Exception $e) {
 	    $this->sendError($e);
@@ -178,7 +178,12 @@ if (isset($_GET["gray_filter"])) {
 		  $blob_field = $_GET["blob_field"];
 
 	  }
+	  else if (isset($_GET["bean_field"])) {
+		  $blob_field = $_GET["bean_field"];
 
+	  }
+	 
+	  
 	  $stypes = $this->bean->getStorageTypes();
 
 	  if (!array_key_exists($blob_field, $stypes)) {
@@ -190,7 +195,7 @@ if (isset($_GET["gray_filter"])) {
 	  }
 	  
 
-	  $this->blob_field = $blob_field;
+	  
 	  
 	  $storage_object = @unserialize($this->row[$blob_field]);
 
@@ -198,9 +203,10 @@ if (isset($_GET["gray_filter"])) {
 	  
 
 		  $this->row = array();
-		  $storage_object->deconstruct($this->row, $blob_field, false);
-
-
+		  //image resizer expects row["photo"]
+		  $storage_object->deconstruct($this->row, "photo", false);
+		  
+	  
 		  $this->cache_hash.="|".$blob_field;
 		  
 		  $this->checkCache();
@@ -240,15 +246,15 @@ if (isset($_GET["gray_filter"])) {
  	  $last_modified = gmdate("D, d M Y H:i:s T");
 
 
-	  header("Storage-Date: now");
+// 	  header("Storage-Date: now");
 	  
 	  if (isset($this->row["date_upload"])) {
 		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_upload"]));
-		header("Storage-Date: date_upload");
+// 		header("Storage-Date: date_upload");
 	  }
 	  else if (isset($this->row["date_updated"])) {
 		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
-		header("Storage-Date: date_updated");
+// 		header("Storage-Date: date_updated");
 	  }
 // 	  else if (isset($this->row["item_date"])) {
 // 		$last_modified = date("D, d M Y H:i:s T", strtotime($this->row["item_date"]));
