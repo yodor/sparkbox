@@ -118,13 +118,30 @@ include_once ("lib/utils/SelectQuery.php");
 		  try {
 			$db->transaction();
 			
-			$new_parent_row = $this->getByID($new_parentID, $db);
+			$parent_rgt = -1;
+			if ($new_parentID>0) {
+				$parent_row = $this->getByID($new_parentID, $db);
+				$parent_rgt = $parent_row["rgt"];
+			}
+			else {
+				//reparent to top
+				$sql = "SELECT MAX(rgt) as max_rgt FROM {$this->table}";
+				if ($this->filter) {
+					$sql.=" AND {$this->filter} ";
+				}
+				$res = $db->query($sql);
+				if (!$res) throw new Exception($db->getError());
+				if ($parent_row = $db->fetch($res)) {
+				  $parent_rgt = $parent_row["max_rgt"]+1;
+				}
+				
+			}
 
 			$lft = (int)$old_row["lft"];
 			$rgt = (int)$old_row["rgt"];
 			$width = $rgt - $lft;
 			
-			$new_lft = (int)$new_parent_row["rgt"];
+			$new_lft = $parent_rgt;
 			$new_rgt = $new_lft + $width;
 			
 			//width
