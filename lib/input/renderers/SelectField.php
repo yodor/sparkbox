@@ -169,4 +169,29 @@ class SelectField extends DataSourceField
   }
 }
 
+class SelectMultipleField extends SelectField
+{
+	public function __construct()
+	{
+		parent::__construct();
+		
+		$this->setFieldAttribute("multiple", "");
+		$this->addClassName("SelectField");
+	}
+	public function startRender()
+	{
+		DataSourceField::startRender();
+
+		$this->setFieldAttribute("name", $this->field->getName()."[]");
+		
+		echo "<div class='FieldElements'>";
+		$attrs = $this->prepareFieldAttributes();
+		
+		
+		echo "<select $attrs  >";
+	}
+	
+
+}
+
 ?>

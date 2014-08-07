@@ -41,6 +41,17 @@ $f4->setRenderer($scmp);
 $form->addField($f4);
 
 
+$f4m = new InputField("field4m", "Select Multi", 1);
+$scmp = new SelectMultipleField();
+$scmp->setSource($aw2);
+$scmp->list_key = "item_id";
+$scmp->list_label = "item_value";
+
+$f4m->setRenderer($scmp);
+$form->addField($f4m);
+
+
+
 $f5 = new InputField("field5", "Text Area", 1);
 $f5->setRenderer(new TextArea());
 $form->addField($f5);

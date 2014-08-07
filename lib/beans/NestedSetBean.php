@@ -5,11 +5,86 @@ include_once ("lib/utils/SelectQuery.php");
  class NestedSetBean extends DBTableBean
 {
 
+// CREATE TABLE `menu_items` (
+//  `menuID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+//  `menu_title` varchar(255) NOT NULL,
+//  `link` varchar(255) NOT NULL,
+//  `parentID` int(10) unsigned NOT NULL DEFAULT '0',
+//  `lft` int(10) unsigned NOT NULL,
+//  `rgt` int(10) unsigned NOT NULL,
+//  PRIMARY KEY (`menuID`)
+// ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
 	public function __construct($table_name){
 		parent::__construct($table_name);
 	}
-
+	
 	public function insertRecord(&$row, &$db=false)
+	{
+		$lastid = -1;
+		
+		if (!$db) {
+			$db = DBDriver::factory();
+		}
+		$prkey = $this->prkey;
+		
+		$parentID = (int)$row["parentID"];
+		
+		try {
+			$db->transaction();
+			
+			if ($parentID>0) {
+			
+			  $lft = $this->fieldValue($parentID, "lft");
+			  $rgt = $this->fieldValue($parentID, "rgt");
+			  $row["lft"]=$rgt;
+			  $row["rgt"]=$rgt+1;
+			  
+			  $sql = "UPDATE {$this->table} SET rgt=rgt+2 WHERE rgt>=$rgt";
+			  if ($this->filter) {
+				  $sql.=" AND {$this->filter} ";
+			  }
+			  $res = $db->query($sql);
+			  if (!$res)throw new Exception($db->getError());
+			  
+			  $sql = "UPDATE {$this->table} SET lft=lft+2 WHERE lft>$rgt";
+			  if ($this->filter) {
+				  $sql.=" AND {$this->filter} ";
+			  }
+			  $res = $db->query($sql);
+			  if (!$res)throw new Exception($db->getError());
+			  
+			  $lastid = parent::insertRecord($row,$db);
+					  
+			}
+			else {
+
+			  $sql = "SELECT MAX(rgt) as max_rgt FROM {$this->table}";
+			  if ($this->filter) {
+				  $sql.=" AND {$this->filter} ";
+			  }
+			  $res = $db->query($sql);
+			  if (!$res) throw new Exception($db->getError());
+			  
+			  if ($rr = $db->fetch($res)) {
+				  $max_rgt = (int)$rr["max_rgt"];
+				  $lft = $max_rgt+1;
+				  $row["lft"] = $lft;
+				  $row["rgt"] = $lft+1;
+				  $lastid = parent::insertRecord($row, $db);
+			  }
+
+			}
+			$db->commit();
+		}
+		catch (Exception $e) {
+		  $db->rollback();
+		  throw $e;
+		}
+		return $lastid;
+	}
+	
+	public function insertRecord2(&$row, &$db=false)
 	{
 		$lastid = parent::insertRecord($row, $db);
 
@@ -20,13 +95,167 @@ include_once ("lib/utils/SelectQuery.php");
 	public function updateRecord($id, &$row, &$db=false)
 	{
 
-		$lastid = parent::updateRecord($id, $row, $db);
+		if (!$db) {
+			$db = DBDriver::factory();
+		}
+		$prkey = $this->prkey;
 
-		$this->reconstructNestedSet($db);
+		$old_row = $this->getByID($id, $db);
+		
+		$old_parentID = (int)$old_row["parentID"];
+		$new_parentID = (int)$row["parentID"];
+		
+		
+		if ($old_parentID == $new_parentID) {
+		
+		  return parent::updateRecord($id, $row, $db);
+		  
+		}
+		else {
+		
+		  $lastid = -1;
+		  
+		  try {
+			$db->transaction();
+			
+			$new_parent_row = $this->getByID($new_parentID, $db);
 
-		return $lastid;
+			$lft = (int)$old_row["lft"];
+			$rgt = (int)$old_row["rgt"];
+			$width = $rgt - $lft;
+			
+			$new_lft = (int)$new_parent_row["rgt"];
+			$new_rgt = $new_lft + $width;
+			
+			//width
+			$extent = $width + 1;
+			
+			$distance = $new_lft - $lft;
+			$tmppos = $lft;
+			
+			if ($distance < 0) {
+				$distance -= $extent;
+				$tmppos += $extent;
+			}
+			
+			//make space
+			$sql = "UPDATE {$this->table} SET lft = lft + $extent WHERE lft >= $new_lft";
+			if ($this->filter) {
+				$sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+			
+			$sql = "UPDATE {$this->table} SET rgt = rgt + $extent WHERE rgt >= $new_lft";
+			if ($this->filter) {
+				$sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+			
+			
+			//move into new space
+			$sql = "UPDATE {$this->table} SET lft = lft + $distance, rgt = rgt + $distance WHERE lft >= $tmppos AND rgt < $tmppos + $extent";
+			if ($this->filter) {
+				$sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+			
+			
+// 			//remove old space
+			$sql = "UPDATE {$this->table} SET lft = lft - $extent WHERE lft > $rgt";
+			if ($this->filter) {
+				$sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+			
+			$sql = "UPDATE {$this->table} SET rgt = rgt - $extent WHERE rgt > $rgt";
+			if ($this->filter) {
+				$sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+		  
+			
+			$lastid = parent::updateRecord($id, $row, $db);
+			
+			$db->commit();
+			
+			return $lastid;
+		  }
+		  catch (Exception $e) {
+			$db->rollback();
+			throw $e;
+		  }
+			
+		}
+		
+
+		
 	}
+	public function deleteID($id, $db=false)
+	{
+		
 
+		if (!$db) {
+		    $db = DBDriver::factory();
+		}
+
+		$prow = $this->getByID($id, $db);
+
+		$parentID = (int)$prow["parentID"];
+
+		$lft = $prow["lft"];
+		$rgt = $prow["rgt"];
+		
+		try {
+			$db->transaction();
+			
+			$res = parent::deleteID($id, $db);
+			if (!$res) throw new Exception($db->getError());
+			
+			
+			$sql = "UPDATE {$this->table} SET lft=lft-1, rgt=rgt-1 WHERE lft BETWEEN $lft AND $rgt";
+			if ($this->filter) {
+				$sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+			
+			
+			$sql = "UPDATE {$this->table} SET rgt = rgt - 2 WHERE rgt > $rgt";
+			if ($this->filter) {
+				$sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+			
+			$sql = "UPDATE {$this->table} SET lft = lft - 2 WHERE lft > $rgt";
+			if ($this->filter) {
+				$sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+
+
+			$sql = "UPDATE {$this->table} SET parentID=$parentID WHERE parentID=$id";
+			if ($this->filter) {
+			  $sql.=" AND {$this->filter} ";
+			}
+			$res = $db->query($sql);
+			if (!$res)throw new Exception($db->getError());
+			
+			$db->commit();
+		}
+		catch (Exception $e) {
+			$db->rollback();
+			throw $e;
+		}
+		return $res;
+
+	}
 	public function reconstructNestedSet(&$db=false, &$lft=-1, &$cnt=0, $parentID=0 )
 	{
 
@@ -53,7 +282,8 @@ $sel = $sel->combineWith($psel);
 			$lft++;
 			$db->transaction();
 
-			$usql = "UPDATE {$this->table} set lft=$lft, rgt=$cnt WHERE $prkey=$catID";
+			$usql = "UPDATE {$this->table} set lft=$lft, rgt=$cnt WHERE $prkey=$catID ";
+			
 			$db->query($usql);
 			$db->commit();
 			$cnt++;
@@ -70,13 +300,10 @@ $sel = $sel->combineWith($psel);
 
 	protected function getIDLeft($lft)
 	{
-
-
-
 		$sql = "SELECT {$this->prkey} FROM {$this->table} WHERE lft = '$lft' ";
-if ($this->filter) {
-  $sql.=" AND {$this->filter} ";
-}
+		if ($this->filter) {
+		  $sql.=" AND {$this->filter} ";
+		}
 		$res = $this->db->query($sql);
 
 		if (!$res) throw new Exception("NestedSetBean::getIDLeft($lft) - Error: ".$this->db->getError());
@@ -90,9 +317,9 @@ if ($this->filter) {
 
 
 		$sql = "SELECT {$this->prkey} FROM {$this->table} WHERE rgt = '$rgt' ";
-if ($this->filter) {
-  $sql.=" AND {$this->filter} ";
-}
+		if ($this->filter) {
+		  $sql.=" AND {$this->filter} ";
+		}
 		$res = $this->db->query($sql);
 		if (!$res) throw new Exception("NestedSetBean::getIDRight($rgt) - Error: ".$this->db->getError());
 		$row = $this->db->fetch($res);
@@ -156,6 +383,7 @@ if ($this->filter) {
 			if (!$res) throw new Exception("NestedSetBean::moveLeft($id) - Error: ".$db->getError());
 			$db->commit();
 
+			
 		}
 		catch (Exception $e) {
 			$db->rollback();
@@ -227,39 +455,7 @@ if ($this->filter) {
 		return true;
 	}
 
-	public function deleteID($id, $db=false)
-	{
-		$need_commit = false;
-
-		if (!$db) {
-		    $db = DBDriver::factory();
-		    $db->transaction();
-		    $need_commit = true;
-		}
-
-		$prow = $this->getByID($id);
-
-		$parentID = (int)$prow["parentID"];
-
-		$res = parent::deleteID($id,  $db);
-		if (!$res)return $res;
-
-		$sql = "UPDATE {$this->table} SET parentID=$parentID where parentID=$id";
-if ($this->filter) {
-  $sql.=" AND {$this->filter} ";
-}
-		$db->query($sql);
-
-		if ($need_commit) {
-			  $db->commit();
-		}
-
-
-		$this->reconstructNestedSet($db);
-
-		return $res;
-
-	}
+	
 
 	////
 	public function parentCategories($catID, $field_name="")

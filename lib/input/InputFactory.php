@@ -98,6 +98,10 @@ class InputFactory
 		case InputFactory::SELECT:
 			$field->setRenderer(new SelectField());
 			break;
+			
+		case InputFactory::SELECT_MULTI:
+			$field->setRenderer(new SelectMultipleField());
+			break;
 
 		case InputFactory::TEXTFIELD_PASSWORD:
 			$field->setRenderer(new PasswordField());
