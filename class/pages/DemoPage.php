@@ -116,9 +116,9 @@ class DemoPage extends SimplePage
 	  echo "<div class='version_label'>";
 	  echo "<label>";
 	  echo "PHP: ".phpversion();
-	  echo " | ";
-	  echo "MySQL: C.".mysql_get_client_info();
-	  echo "/S.".mysql_get_server_info();
+// 	  echo " | ";
+// 	  echo "MySQL: C.".mysql_get_client_info();
+// 	  echo "/S.".mysql_get_server_info();
 	  echo "</label>";
 	  echo "</div>";
 	  

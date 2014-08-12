@@ -35,8 +35,10 @@ include_once ("lib/utils/SelectQuery.php");
 			
 			if ($parentID>0) {
 			
-			  $lft = $this->fieldValue($parentID, "lft");
-			  $rgt = $this->fieldValue($parentID, "rgt");
+			  $parent_row = $this->getByID($parentID);
+			  
+			  $lft = $parent_row["lft"];
+			  $rgt = $parent_row["rgt"];
 			  $row["lft"]=$rgt;
 			  $row["rgt"]=$rgt+1;
 			  
