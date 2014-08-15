@@ -16,7 +16,7 @@ function constructSubmenu($item, $level, $max_items, $max_level)
     if ($level>$max_level)return;
     
     for ($b=0;$b<$max_items;$b++) {
-      $sitem = new MenuItem("SubmenuItem $b/$level","menu.php");
+      $sitem = new MenuItem("SubmenuItem $b/$level","menu.php?branch=$b&level=$level");
       $item->addMenuItem($sitem);
       constructSubmenu($sitem, $level, $max_items, $max_level);
       
@@ -32,7 +32,7 @@ $menu = new MainMenu();
 $menu->setName("ConstructedMenu");
 
 $arr = array();
-for ($a=0;$a<5;$a++) {
+for ($a=0;$a<1;$a++) {
     $item =  new MenuItem("MenuItem ".($a+1), "menu.php");
     
     if ($a<2) {
@@ -60,13 +60,15 @@ $menu_bar1->setName("ProductCategoriesBean");
 $page->beginPage();
 
 
-echo "<div style='float:left;'>";
+// echo "<div style='float:left;'>";
 $menu_bar->render();
-echo "</div>";
+// echo "</div>";
 
-echo "<div style='float:left;margin-left:40px;'>";
+echo "<BR><BR><BR><BR><BR><BR><BR><BR>";
+
+// echo "<div style='float:left;margin-left:40px;'>";
 $menu_bar1->render();
-echo "</div>";
+// echo "</div>";
 
 
 

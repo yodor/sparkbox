@@ -41,12 +41,16 @@ class ProductInputForm extends InputForm
 	$this->addField($field);
 
 	
-	$field = InputFactory::CreateField(InputFactory::SELECT, "gender", "Gender", 1);
+	$field = InputFactory::CreateField(InputFactory::SELECT, "gender", "Gender", 0);
 	$rend = $field->getRenderer();
 	$rend->setSource(new GendersBean());
 	$rend->list_key="gender_title";
 	$rend->list_label="gender_title";
 	$this->addField($field);
+	
+	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "weight", "Weight", 0);
+	$this->addField($field);
+
 	
 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "buy_price", "Buy Price", 1);
 	$this->addField($field);
@@ -72,8 +76,11 @@ class ProductInputForm extends InputForm
 	$input->getValueTransactor()->max_slots = 4;
 	$this->addField($input);
 	
+	$field = InputFactory::CreateField(InputFactory::MCE_TEXTAREA, "product_summary", "Product Summary", 1);
+	$this->addField($field);
 	
-	$field = InputFactory::CreateField(InputFactory::TEXTAREA, "product_description", "Product Description", 1);
+	
+	$field = InputFactory::CreateField(InputFactory::MCE_TEXTAREA, "product_description", "Product Description", 1);
 	$this->addField($field);
 
 	
