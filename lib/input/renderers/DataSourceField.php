@@ -75,6 +75,7 @@ abstract class DataSourceField extends InputRenderer
 	  $item->setName($field_name."[]");
 	  $item->setIndex($index);
 	  $item->setSelected($selected);
+	  $item->setDataRow($data_row);
 	  
 	  $item->render();
     
