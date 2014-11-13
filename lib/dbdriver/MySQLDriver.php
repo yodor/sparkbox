@@ -29,14 +29,14 @@ class MySQLDriver extends DBDriver
 	    mysql_query("SET foreign_key_checks = 1 ",$this->connection);
 
 
-	    try {
-		if (! mysql_query("SET time_zone='".ini_get("date.timezone")."'", $this->connection)) throw new Exception(mysql_error($this->connection));
-
-		
-	    }
-	    catch (Exception $e) {
-		debug("MySQLDriver::__construct: Unable to set timezone: ".$e->getMessage());
-	    }
+// 	    try {
+// 		if (! mysql_query("SET time_zone='".ini_get("date.timezone")."'", $this->connection)) throw new Exception(mysql_error($this->connection));
+// 
+// 		
+// 	    }
+// 	    catch (Exception $e) {
+// 		debug("MySQLDriver::__construct: Unable to set timezone: ".$e->getMessage());
+// 	    }
 
 	    $retry = false;
 	}

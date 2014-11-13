@@ -30,6 +30,8 @@ class MainMenu
 	
 	public $uri_match_variable = "REQUEST_URI";
 	
+	protected $link_page = NULL;
+	
 	public function __construct()
 	{
 	    $this->bean_class = NULL;
@@ -68,11 +70,12 @@ class MainMenu
 	    $this->selected_item = $item;
 	}
 
-	public function setMenuBeanClass($menu_items_class, $prefix_root="")
+	public function setMenuBeanClass($menu_items_class, $prefix_root="", $link_page="")
 	{
 	    $this->bean_class = $menu_items_class;
 	    $this->bean = new $this->bean_class();
 	    $this->prefix_root = $prefix_root;
+	    $this->link_page = $link_page;
 
 	}
 	public function getMenuBeanClass()
@@ -103,19 +106,21 @@ class MainMenu
 		      $link.=$this->prefix_root;
 		    }
 
+		    $menu_link = "";
 		    if(isset($row["link"])) {
 			$menu_link = $row["link"];
-			if (strpos($menu_link,"/")===0) {
+		    }
+		    else if (strlen($this->link_page)>0) {
+			$menu_link = $this->link_page."?".$key."=".$menuID;
+			
+		    }
+		    if (strpos($menu_link,"/")===0) {
 			  if (strcmp(SITE_ROOT,"/")!==0) {
 				  $menu_link = SITE_ROOT.$menu_link;
 			  }
-			}
-			$link.=$menu_link;
 		    }
-		    else {
-
-		    }
-		    
+		    $link.=$menu_link;
+			
 		    $item = new MenuItem($row[$title], $link);
 		    $item->enableTranslation(false);
 // 		    $item->setMenuID($menuID);
