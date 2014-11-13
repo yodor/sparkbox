@@ -34,7 +34,6 @@
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px;
-  behavior: url(./pie/PIE.htc);
   z-Index:100;
   
   display:none;

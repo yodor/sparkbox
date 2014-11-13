@@ -16,8 +16,6 @@
   background: -ms-linear-gradient(#7c99a9, #53788a);
   background: -o-linear-gradient(#7c99a9, #53788a);
   background: linear-gradient(#7c99a9, #53788a);
-  -pie-background: linear-gradient(#7c99a9, #53788a);
-  behavior: url(/PIE.htc);
   
   outline:none;
   
@@ -38,7 +36,6 @@
   background: -ms-linear-gradient(#f9a541, #f78f14);
   background: -o-linear-gradient(#f9a541, #f78f14);
   background: linear-gradient(#f9a541, #f78f14);
-  -pie-background: linear-gradient(#f9a541, #f78f14);
 }
 
 
@@ -54,5 +51,4 @@
   background: -ms-linear-gradient(#f9a541, #f78f14);
   background: -o-linear-gradient(#f9a541, #f78f14);
   background: linear-gradient(#f9a541, #f78f14);
-  -pie-background: linear-gradient(#f9a541, #f78f14);
 }
