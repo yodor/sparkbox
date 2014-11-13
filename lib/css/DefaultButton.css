@@ -55,8 +55,6 @@ input[type="submit"]:focus, input[type="button"]:focus, A
   background: -ms-linear-gradient(#667d85, #0c2226);
   background: -o-linear-gradient(#667d85, #0c2226);
   background: linear-gradient(#667d85, #0c2226);
-  -pie-background: linear-gradient(#667d85, #0c2226);
-  behavior: url(/lib/css/pie/PIE.htc);
 /*-webkit-box-shadow: #888 0px 2px 5px;
 -moz-box-shadow: #888 0px 2px 5px;
 box-shadow: #888 0px 2px 5px;*/
@@ -73,7 +71,6 @@ box-shadow: #888 0px 2px 5px;*/
 color: #fff;
 
 
-behavior: url(/lib/css/pie/PIE.htc);
 -moz-box-shadow: 0 0 1px 1px #667d85;
 -webkit-box-shadow: 0 0 1px 1px #667d85;
 box-shadow: 0 0 1px 1px #667d85;
@@ -84,7 +81,6 @@ box-shadow: 0 0 1px 1px #667d85;
 .DefaultButton:active {
 color: #fff;
 
-behavior: url(/lib/css/pie/PIE.htc);
 -webkit-box-shadow: inset 0 0 1px 1px #0c2226 ;
 -moz-box-shadow: inset 0 0 1px 1px #0c2226;
 box-shadow: inset 0 0 1px 1px #0c2226;

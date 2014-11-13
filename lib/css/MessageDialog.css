@@ -19,8 +19,6 @@
   background: -ms-linear-gradient(#EEEEEE, #CCCCCC);
   background: -o-linear-gradient(#EEEEEE, #CCCCCC);
   background: linear-gradient(#EEEEEE, #CCCCCC);
-  -pie-background: linear-gradient(#EEEEEE, #CCCCCC);
-  behavior: url(/lib/css/pie/PIE.htc);
 
   -webkit-box-shadow: #666 0px 2px 3px;
   -moz-box-shadow: #666 0px 2px 3px;
@@ -63,8 +61,6 @@
   background: -ms-linear-gradient(#525252, #000000);
   background: -o-linear-gradient(#525252, #000000);
   background: linear-gradient(#525252, #000000);
-  -pie-background: linear-gradient(#525252, #000000);
-  behavior: url("/PIE.php");
   
   cursor:move;
 }
