@@ -97,6 +97,7 @@ class InputFactory
 
 		case InputFactory::SELECT:
 			$field->setRenderer(new SelectField());
+			$field->getProcessor()->transact_empty_string_as_null = true;
 			break;
 			
 		case InputFactory::SELECT_MULTI:

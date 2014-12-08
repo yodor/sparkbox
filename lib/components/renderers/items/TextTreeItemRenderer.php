@@ -19,7 +19,7 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsRend
 	      $this->actions = array();
 	      $this->attribute_actions = array();
 		
-	      $this->text_action = new Action("Text Action", "", array());
+	     
 		
 	      $this->action_renderer = new ActionRenderer(NULL, NULL);
 

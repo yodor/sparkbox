@@ -100,7 +100,7 @@ class ImportIvona extends CSVTemplateLoader
 		  {
 			  $cat_name = $category_branch[$a];
 			  
-			  if ((int)$a<1) {
+			  if ($a<1) {
 				$num = $this->pc->startIterator("WHERE category_name LIKE '%$cat_name%' AND parentID='0' LIMIT 1");
 				if ($num<1) {
 				  $cat_row = array("category_name"=>$cat_name, "parentID"=>0);

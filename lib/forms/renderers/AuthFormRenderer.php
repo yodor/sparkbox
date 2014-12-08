@@ -10,6 +10,7 @@ class AuthFormRenderer extends FormRenderer implements IHeadRenderer
 	protected $username;
 	protected $password;
 
+	public $forgot_password_url = "";
 
 	public $fbLoginEnabled = false;
 
@@ -76,9 +77,13 @@ addLoadEvent(function(){
 		echo "<div class='submit_line'>";
 
 		echo "<div class='forgot_password'>";
-		echo "<span>".tr("Forgotten Your Password ?")."</span>";
+		echo "<span>".tr("Забравена Парола ?")."</span>";
 		echo "<br>";
-		echo "<a href='forgot_password.php'>".tr("Click Here")."</a>";
+		$forgot_link = "forgot_password.php";
+		if (strlen($this->forgot_password_url)>0) {
+		  $forgot_link = $this->forgot_password_url;
+		}
+		echo "<a href='$forgot_link'>".tr("Натисни Тук")."</a>";
 		echo "</div>";
 
 		$this->submit_button->render();

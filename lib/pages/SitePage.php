@@ -32,7 +32,7 @@ abstract class SitePage
 // 		echo "<meta http-equiv='X-UA-Compatible' content='IE=9' >\n";
 // 		echo "<meta http-equiv='X-UA-Compatible' content='IE=8' >\n";
 
-		echo "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n";
+		
 		
 		echo "\n";
 	}

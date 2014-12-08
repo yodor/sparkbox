@@ -9,12 +9,12 @@ class UserAuthenticator extends Authenticator
 
     public static function checkAuthState($skip_cookie_check=false)
     {
-	$ret = parent::checkAuthStateImpl(CONTEXT_USER, $skip_cookie_check);
-	if ($ret) {
-	    $userID = $_SESSION[CONTEXT_USER]["id"];
-	    self::updateLastSeen($userID);
-	}
-	return $ret;
+	  $ret = parent::checkAuthStateImpl(CONTEXT_USER, $skip_cookie_check);
+	  if ($ret) {
+		  $userID = $_SESSION[CONTEXT_USER]["id"];
+		  self::updateLastSeen($userID);
+	  }
+	  return $ret;
     }
     
     public static function logout()

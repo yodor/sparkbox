@@ -13,6 +13,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
   //foreign keys are posted in the order or values, if true will process them. used in direct mapping between fields.
   public $process_datasource_foreign_keys = false;
   
+  public $transact_empty_string_as_null = false;
+  
   public function __construct()
   {
     
@@ -176,7 +178,16 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
   {
       switch ($field->transact_mode) {
 	case InputField::TRANSACT_VALUE:
-	  $transactor->appendValue($field->getName(), $field->getValue());
+	  $value = $field->getValue();
+	  
+	  if (!is_array($value)) {
+	    if (strlen($value)==0 && $this->transact_empty_string_as_null) {
+	      $value = NULL;
+	    }
+	  }
+	  
+	  $transactor->appendValue($field->getName(), $value);
+	  
 	  break;
 	case InputField::TRANSACT_DBROW:
 	  throw new Exception("Unsupported TRANSACT_DBROW for input field['".$field->getName()."']");

@@ -1,5 +1,4 @@
 <?php
-define("DEBUG_OUTPUT", 1); //enable debugging output using error_log
 
 if (!isset($install_path)) {
   $install_path = $_SERVER["DOCUMENT_ROOT"];

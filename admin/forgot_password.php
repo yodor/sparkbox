@@ -24,7 +24,7 @@ if (isset($_POST["request_password"])) {
 
   if (!$fp->haveError()) {
 
-	  if (!$ub->usernameExists($fp->getValue())) {
+	  if (!$ub->emailExists($fp->getValue())) {
 		  $fp->setError(tr("This email is not registered with us."));
 	  }
   }
@@ -40,12 +40,14 @@ if (isset($_POST["request_password"])) {
 			 
 			$fpm->send();
 
-			$userID = $users->username2id($fp->getValue());
+			$userID = $users->email2id($fp->getValue());
 			$update_row["password"] = md5($random_pass);
 			if (!$users->updateRecord($userID, $update_row, $db)) throw new Exception("Unable to update records: ".$db->getError());
 
 			$db->commit();
 			Session::set("alert", tr("Your new password was sent to this email").": ".$fp->getValue());
+			header("Location: login.php");
+			exit;
 	  }
 	  catch (Exception $e) {
 		  $db->rollback();

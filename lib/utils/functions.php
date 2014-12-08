@@ -80,7 +80,7 @@ function debugArray($str, array $arr)
 }
 function debug($str)
 {
-  if (defined("DEBUG_OUTPUT")) {
+  if (defined("DEBUG_OUTPUT") && strcmp(DEBUG_OUTPUT, "1")==0) {
     error_log($str);
   }
 }

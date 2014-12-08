@@ -181,6 +181,7 @@ class InputForm {
 	    $this->setEditBean($bean);
 	    $this->setEditID($editID);
 
+	    $item_row = array();
 	    
 	    if ($editID>0) {
 	      debug("InputForm::loadBeanData: Edit/Update mode ");
@@ -203,7 +204,7 @@ class InputForm {
 	    else {
 	      debug("InputForm::loadBeanData: Add/Insert mode ");
 	    }
-
+	    return $item_row;
 	}
 
 	public  function searchFilterArray()

@@ -74,6 +74,7 @@ class SimplePage extends SitePage
 	    echo "\n";
 
         }
+        
         protected function headStart() 
         {
 	    parent::headStart();

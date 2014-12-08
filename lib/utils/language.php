@@ -137,7 +137,7 @@ function getActiveLanguageID()
 	else {
 		//language not in database. return default text
 		//return $str;
-		updateLanguage(DEFAULT_LANGUAGE);
+		setLanguageString(DEFAULT_LANGUAGE);
 		throw new Exception("Language not in database: $lang");
 	}
 	return $langID;

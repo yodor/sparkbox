@@ -15,19 +15,22 @@ class EmailValidator implements IInputValidator
 	{
 		$ret = "";
 
-		$value = $field->getValue();
+		$value = trim($field->getValue());
 
-		if ( strlen(trim($value)) == 0 ) throw new Exception("Input value");
+		if ( strlen($value) == 0 ) throw new Exception("Input value");
 
+		
+// $regexp="/^[a-z0-9]+([_\\.-][a-z0-9]+)*@([a-z0-9]+([\.-][a-z0-9]+)*)+\\.[a-z]{2,}$/i";
+// 
+// 		if( !preg_match($regexp, $value) )
+// 		{
 
+		if (filter_var($value, FILTER_VALIDATE_EMAIL)===FALSE) {
 
-$regexp="/^[a-z0-9]+([_\\.-][a-z0-9]+)*@([a-z0-9]+([\.-][a-z0-9]+)*)+\\.[a-z]{2,}$/i";
-
-		if( !preg_match($regexp, $value) )
-		{
 			throw new Exception("Incorrect email syntax");
 		}
 
+		
 
 		if ($this->domain_check_enabled) {
 		  

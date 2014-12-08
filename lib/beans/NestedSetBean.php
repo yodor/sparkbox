@@ -510,6 +510,31 @@ if ($this->filter) {
 		return $ret;
 	}
 
+	public function constructPathField($catID, $field_name)
+	{
+
+	    $sqry = new SelectQuery();
+	    $sqry->fields = " parent.catID, parent.$field_name ";
+	    $sqry->from = " {$this->table} AS node, {$this->table} AS parent ";
+	    $sqry->where = " (node.lft BETWEEN parent.lft AND parent.rgt) AND node.catID = $catID ";
+	    $sqry->order_by = " parent.lft ";
+	    
+	    global $g_db;
+
+	    $res = $g_db->query($sqry->getSQL());
+
+	    if (!$res) throw new Exception("NestedSetBean::constructPath Error: ".$g_db->getError());
+
+	    $path = array();
+    
+	    while ($row = $g_db->fetch($res)) {
+		  $path[] = $row[$field_name];
+	    }
+	    
+	    $g_db->free($res);
+
+	    return $path;
+	}
 	
 	public function constructPath($catID)
 	{
