@@ -115,7 +115,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
     
     public function processFilters()
     {
-	global $g_db;
+	
 	
 	$source_prkey = $this->data_source->getPrKey();
 	
@@ -134,7 +134,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 
 	    }
 	    else if (isset($_GET[$filter_key])) {
-		$this->filter_values[$filter_key] = $g_db->escapeString($_GET[$filter_key]);
+		$this->filter_values[$filter_key] = DBDriver::get()->escapeString($_GET[$filter_key]);
 	    }
 	}
 
@@ -272,11 +272,11 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	    }
 	}
 
-	global $g_db;
+	$db = DBDriver::get();
 
 	$sql = $this->select_qry->getSQL();
 
-	$res = $g_db->query($sql);
+	$res = $db->query($sql);
 
 	$path=array();
 
@@ -286,7 +286,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	
 	echo "<ul class='NodeChilds'>";
 	
-	while ($row = $g_db->fetch($res)) {
+	while ($row = $db->fetch($res)) {
 
 	  $lft = $row["lft"];
 	  $rgt = $row["rgt"];

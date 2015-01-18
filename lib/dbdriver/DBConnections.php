@@ -47,16 +47,7 @@ class DBConnections {
 	  return self::$available_connections[$connection_name];
 
   }
-//   public static function openConnection($connection_name)
-//   {
-// 		  $db = DBDriver::factory($connection_name);
-//
-// 		  if (array_key_exists($connection_name, self::$active_connectionsself)) {
-//
-// 		  }
-//
-// 		  if (self::$active_connectionsself::$active_connections[$connection_name]
-//   }
+
 }
 
 ?>

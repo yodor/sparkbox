@@ -13,7 +13,7 @@ $content = new AdminPage("Raw SQL");
 $content->beginPage($menu);
 
 
-$db = DBDriver::factory();
+$db = DBDriver::get();
 
 $sql="";
 if (isset($_POST["sql"]))

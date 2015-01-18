@@ -21,7 +21,8 @@ CREATE TABLE `languages` (
 	public function id4language($lng_name)
 	{
 		
-		$db = DBDriver::factory();
+		$db = $this->db;
+		
 		$lng_name = $db->escapeString($lng_name);
 
 		$q = "SELECT langID from {$this->table} WHERE language='$lng_name'";
@@ -36,7 +37,7 @@ CREATE TABLE `languages` (
 	protected function createTable()
 	{
 			parent::createTable();
-			$db = DBDriver::factory();
+			$db = $this->db;
 			$db->transaction();
 			$db->query("INSERT INTO languages (language, lang_code) values ('".DEFAULT_LANGUAGE."','".DEFAULT_LANGUAGE_ISO3."');");
 			$db->commit();

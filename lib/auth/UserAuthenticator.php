@@ -53,7 +53,7 @@ class UserAuthenticator extends Authenticator
 	$authstore["fbID"]=(int)$urow["fb_userID"];
 
 	$s1="UPDATE users SET counter=counter+1 , last_active=CURRENT_TIMESTAMP, oauth_token='$oauth_token' WHERE ".$bean->getPrKey()."='$userID'";
-	$db = DBDriver::factory();
+	$db = DBDriver::get();
 
 	$db->transaction();
 	$ret = $db->query($s1);
@@ -71,7 +71,7 @@ class UserAuthenticator extends Authenticator
 
 	$found = false;
 
-	$db = DBDriver::factory();
+	$db = DBDriver::get();
 
 	$bean = new UsersBean();
 
@@ -153,12 +153,12 @@ class UserAuthenticator extends Authenticator
     {
 	if (!$userID)throw new Exception("userID required");
 
-	global $g_db;
-	$g_db->transaction();
-	$res = $g_db->query("UPDATE users set last_active=CURRENT_TIMESTAMP where userID=$userID");
-	if (!$res)throw $g_db->getError();
+	$db = DBDriver::get();
+	$db->transaction();
+	$res = $db->query("UPDATE users set last_active=CURRENT_TIMESTAMP where userID=$userID");
+	if (!$res)throw $db->getError();
 
-	$g_db->commit();
+	$db->commit();
 
     }
 }

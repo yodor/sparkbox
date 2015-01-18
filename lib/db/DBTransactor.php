@@ -159,7 +159,7 @@ class DBTransactor  {
       
       debug("DBTransactor::processBean | DBTableBean: ".get_class($bean));
 
-      $db=DBDriver::factory();
+      $db=DBDriver::get();
 
       try {
 	  $db->transaction();

@@ -21,12 +21,11 @@ class DBEnumSelector extends ArrayDataBean
   }
   protected function initValues() 
   {
-	global $g_db;
-	if (! ($g_db instanceof DBDriver))throw new Exception("Global database connection not accessible");
 	
+	$db = DBDriver::get();
 	
-	$ret = $g_db->fieldType($this->table_name, $this->table_field);
-	$ret = $g_db->enum2array($ret);
+	$ret = $db->fieldType($this->table_name, $this->table_field);
+	$ret = $db->enum2array($ret);
 
 	$this->values = array();
 	foreach ($ret as $key=>$val)

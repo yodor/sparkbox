@@ -22,7 +22,7 @@ class KeywordSearchForm extends InputForm
 	
 	protected  function searchFilterForKey($key,$val)
 	{
-	    $db = DBDriver::factory();
+	    $db = DBDriver::get();
 	    $val=$db->escapeString($val);
 	    if (strcmp($key,"keyword")==0){
 		    $allwords = explode(" ",$val);

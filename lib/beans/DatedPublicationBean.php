@@ -59,7 +59,6 @@ class DatedPublicationBean extends DBTableBean
 	}
 
 // 	public function pastEventsBefore($year, $month, $limit=1){
-// 			//$db = DBDriver::factory();
 // 			$select = "SELECT SQL_CALC_FOUND_ROWS *, MONTH({$this->datefield}) AS month, YEAR({$this->datefield}) AS year FROM {$this->table} WHERE {$this->filter} AND ( MONTH({$this->datefield})<$month and YEAR({$this->datefield})=$year) OR  YEAR({$this->datefield})<$year ORDER BY {$this->datefield} DESC LIMIT $limit";
 // 			$total = -1;
 // 			$this->iterator = $this->createIterator($select, $total);
@@ -73,7 +72,6 @@ class DatedPublicationBean extends DBTableBean
 // 
 // 	}
 // 	public function futureEventsAfter($year, $month, $limit=1){
-// 			//$db = DBDriver::factory();
 // 			$select = "SELECT SQL_CALC_FOUND_ROWS *, MONTH({$this->datefield}) AS month, YEAR({$this->datefield}) AS year FROM {$this->table} WHERE {$this->filter} AND ( MONTH({$this->datefield})>$month AND YEAR({$this->datefield})=$year) OR YEAR({$this->datefield})>$year ORDER BY {$this->datefield} ASC LIMIT $limit";
 // 			$total = -1;
 // 			$this->iterator = $this->createIterator($select, $total);

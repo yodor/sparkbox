@@ -31,7 +31,7 @@ class AdminAuthenticator extends Authenticator
 
 
 
-		$db = DBDriver::factory();
+		$db = DBDriver::get();
 
 		$bean = new AdminUsersBean();
 
@@ -87,7 +87,7 @@ class AdminAuthenticator extends Authenticator
 	{
 		if (!$userID)throw new Exception("userID required");
 
-		$db = DBDriver::factory();
+		$db = DBDriver::get();
 		$db->transaction();
 		$db->query("UPDATE admin_users set last_active=CURRENT_TIMESTAMP where userID=$userID");
 		$db->commit();

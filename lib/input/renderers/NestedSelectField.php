@@ -35,12 +35,12 @@ class NestedSelectField extends SelectField
       $field_values = $this->field->getValue();
       $field_name = $this->field->getName();
       
-	global $g_db;
+	$db = DBDriver::get();
 
 	$sel = $this->data_bean->listTreeSelect();
 
 	
-	$res = $g_db->query($sel->getSQL());
+	$res = $db->query($sel->getSQL());
 
 	$path=array();
 
@@ -48,7 +48,7 @@ class NestedSelectField extends SelectField
 	
 	
 	
-	while ($row = $g_db->fetch($res)) {
+	while ($row = $db->fetch($res)) {
 
 	  $lft = $row["lft"];
 	  $rgt = $row["rgt"];

@@ -27,9 +27,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
   {
   
       parent::parseParams();
-      
-      global $g_db;
-  
+
       if (!isset($_GET["langID"])) throw new Exception("langID not passed");
       $this->langID = (int)$_GET["langID"];
       
@@ -37,7 +35,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
       $this->beanID = (int)$_GET["beanID"];
 
       if (!isset($_GET["field_name"])) throw new Exception("field_name not passed");
-      $this->field_name = $g_db->escapeString($_GET["field_name"]);
+      $this->field_name = DBDriver::get()->escapeString($_GET["field_name"]);
       
 
       if (!isset($_GET["bean_class"])) throw new Exception("bean_class not passed");
@@ -58,7 +56,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
   protected function _store(JSONResponse $ret)
   {
 
-      global $g_db, $g_bt;
+      global $g_bt;
       $trow = array();
 
       $g_bt->startIterator(" WHERE table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' LIMIT 1");
@@ -69,7 +67,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
 	  $btID = $trow[$g_bt->getPrKey()];
       }
       
-      $trow["translated"] = $g_db->escapeString(trim($_REQUEST["translation"]));
+      $trow["translated"] = DBDriver::get()->escapeString(trim($_REQUEST["translation"]));
       if (strlen($trow["translated"])<1) throw new Exception(tr("Input a text to be used as translation"));
       
       $trow["langID"] = $this->langID;
@@ -95,7 +93,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
   {
 
 
-      global $g_db, $g_bt;
+      global $g_bt;
 
       $sql = " WHERE table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' LIMIT 1";
       
@@ -115,7 +113,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
   protected function _clear(JSONResponse $ret)
   {
 
-      global $g_db, $g_bt;
+      global $g_bt;
 
       $sql = " WHERE table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' LIMIT 1";
       

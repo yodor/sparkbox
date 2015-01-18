@@ -5,6 +5,17 @@ abstract class DBDriver {
 
 	protected $error="";
 
+	protected static $g_db = NULL;
+	
+	public static function get()
+	{
+	  return self::$g_db;
+	}
+	public static function set(DBDriver $connection)
+	{
+	  self::$g_db = $connection;
+	}
+	
 	public abstract function __construct(DBConnectionProperties $conn, $open_new=true);
 
 	public function __destruct()
@@ -22,33 +33,42 @@ abstract class DBDriver {
 
 	abstract public function dateTime($add_days=0, $interval_type=" DAY ");
 
-	public static function factory($conn_name="default", $open_new=true)
+	//return default connection to database
+	public static function factory($open_new=true, $use_persistent=false, $conn_name="default")
 	{
 // 			if (self::$currDriver) return self::$currDriver;
 
-			$conn = DBConnections::getConnection($conn_name);
+			//DBConnectionProperties
+			$conn_props = DBConnections::getConnection($conn_name);
 
 
 
 			$currDriver = false;
-			switch ($conn->driver)
+			switch ($conn_props->driver)
 			{
 				case "MySQLi":
 						include_once("lib/dbdriver/MySQLiDriver.php");
-						$currDriver = new MySQLiDriver($conn, $open_new);
+						$currDriver = new MySQLiDriver($conn_props, $open_new, $use_persistent);
 						break;
 
 				case "MySQL":
 						include_once("lib/dbdriver/MySQLDriver.php");
-						$currDriver = new MySQLDriver($conn, $open_new);
+						$currDriver = new MySQLDriver($conn_props, $open_new, $use_persistent);
 						break;
 				case "PGSQL":
 						include_once("lib/dbdriver/PGSQLDriver.php");
-						$currDriver = new PGSQLDriver($conn, $open_new);
+						$currDriver = new PGSQLDriver($conn_props, $open_new, $use_persistent);
 						break;
 			}
 			return $currDriver;
 	}
+	
+	public static function create($open_new=true, $use_persistent=false, $conn_name="default")
+	{
+		$g_db = DBDriver::factory($open_new, $use_persistent, $conn_name);
+		DBDriver::set($g_db);
+	}
+	
 	public function getError(){
 		return $this->error;
 	}

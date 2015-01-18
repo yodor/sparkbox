@@ -14,7 +14,7 @@ abstract class OrderedDataBean extends DBTableBean
 	public function deleteID($id, $db=false){
         $docommit=false;
         if (!$db) {
-            $db = DBDriver::factory();
+            $db = $this->db;
             $db->transaction();
             $docommit=true;
         }
@@ -40,7 +40,7 @@ abstract class OrderedDataBean extends DBTableBean
 	}
 	public function reorderFixed($id, $new_pos)
 	{
-		$db = DBDriver::factory();
+		$db = $this->db;
 		$db->transaction();
 
 		$row = $this->getByID($id);
@@ -62,7 +62,7 @@ abstract class OrderedDataBean extends DBTableBean
 	{
 		
 
-		$db = DBDriver::factory();
+		$db = $this->db;
 		$db->transaction();
 
 		$row = $this->getByID($id);
@@ -84,7 +84,7 @@ abstract class OrderedDataBean extends DBTableBean
 	{
 		
 
-		$db = DBDriver::factory();
+		$db = $this->db;
 		$db->transaction();
 		$maxp = $this->getMaxPosition();
 
@@ -107,7 +107,7 @@ abstract class OrderedDataBean extends DBTableBean
 	{
 		
 
-		$db = DBDriver::factory();
+		$db = $this->db;
 		$db->transaction();
 
 		$row = $this->getByID($id);
@@ -133,7 +133,7 @@ abstract class OrderedDataBean extends DBTableBean
 	}
 	public function reorderDown($id)
 	{
-		$db = DBDriver::factory();
+		$db = $this->db;
 		$db->transaction();
 
 		$row = $this->getByID($id);
@@ -157,7 +157,7 @@ abstract class OrderedDataBean extends DBTableBean
 		}
 	}
 	public function getMaxPosition(){
-		$db = DBDriver::factory();
+		$db = $this->db;
 		$sql = "";
 
 		$sql = "SELECT max(position)  FROM {$this->table} WHERE ".$this->appendFilter(false);

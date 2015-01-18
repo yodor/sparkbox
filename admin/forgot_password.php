@@ -34,7 +34,7 @@ if (isset($_POST["request_password"])) {
 	  
 	  $random_pass = Authenticator::generateRandomAuth(8);
 	  $fpm = new ForgotPasswordMailer($fp->getValue(), $random_pass, SITE_DOMAIN.SITE_ROOT."admin/login.php");
-	  $db = DBDriver::factory();
+	  $db = DBDriver::get();
 	  try {
 			$db->transaction();
 			 

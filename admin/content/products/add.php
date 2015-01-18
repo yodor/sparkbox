@@ -14,7 +14,7 @@ $page->checkAccess(ROLE_CONTENT_MENU);
 
 $view = new InputFormView(new ProductsBean(), new ProductInputForm());
 
-$view->getTransactor()->assignInsertValue("insert_date", $g_db->dateTime());
+$view->getTransactor()->assignInsertValue("insert_date", DBDriver::get()->dateTime());
 
 $view->processInput();
 

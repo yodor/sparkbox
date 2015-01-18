@@ -5,8 +5,9 @@ include_once("lib/dbdriver/DBDriver.php");
 class MySQLDriver extends DBDriver
 {
     private $connection = NULL;
-
-    public function __construct(DBConnectionProperties $conn, $open_new = true)
+	protected $is_persistent = false;
+	
+    public function __construct(DBConnectionProperties $conn, $open_new = true, $use_persistent=false)
     {
       $retry = true;
       
@@ -15,56 +16,66 @@ class MySQLDriver extends DBDriver
 
       while ($retry) {
       
-	try {
-	    @$this->connection = mysql_connect($conn->host.":".$conn->port, $conn->user, $conn->pass,$open_new);
+		try {
+			if ($use_persistent) {
+			  @$this->connection = mysql_pconnect($conn->host.":".$conn->port, $conn->user, $conn->pass);
+			  error_log("using persistent connection: ".$this->connection." for request: ".$_SERVER["REQUEST_URI"]);
+			}
+			else {
+			  @$this->connection = mysql_connect($conn->host.":".$conn->port, $conn->user, $conn->pass,$open_new);
+			  error_log("opening new connection: ".$this->connection." for request: ".$_SERVER["REQUEST_URI"]);
+			}
+			
+			if (!is_resource($this->connection)) throw new Exception("Unable to connect to database server: ".mysql_error());
 
-	    if (!is_resource($this->connection)) throw new Exception("Unable to connect to database server: ".mysql_error());
-
-	    if (mysql_select_db($conn->database,$this->connection)!==TRUE) {
-		throw new Exception("Unable to select database: ".mysql_error($this->connection));
-	    }
-	    
-	    mysql_query("SET AUTOCOMMIT = 0 ",$this->connection);
-	    mysql_query("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ",$this->connection);
-	    mysql_query("SET foreign_key_checks = 1 ",$this->connection);
+			if (mysql_select_db($conn->database,$this->connection)!==TRUE) {
+			  throw new Exception("Unable to select database: ".mysql_error($this->connection));
+			}
+			
+			mysql_query("SET AUTOCOMMIT = 0 ",$this->connection);
+			mysql_query("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ",$this->connection);
+			mysql_query("SET foreign_key_checks = 1 ",$this->connection);
 
 
-// 	    try {
-// 		if (! mysql_query("SET time_zone='".ini_get("date.timezone")."'", $this->connection)) throw new Exception(mysql_error($this->connection));
-// 
-// 		
-// 	    }
-// 	    catch (Exception $e) {
-// 		debug("MySQLDriver::__construct: Unable to set timezone: ".$e->getMessage());
-// 	    }
+	// 	    try {
+	// 		if (! mysql_query("SET time_zone='".ini_get("date.timezone")."'", $this->connection)) throw new Exception(mysql_error($this->connection));
+	// 
+	// 		
+	// 	    }
+	// 	    catch (Exception $e) {
+	// 		debug("MySQLDriver::__construct: Unable to set timezone: ".$e->getMessage());
+	// 	    }
 
-	    $retry = false;
-	}
-	catch (Exception $e) {
-	    if ($retry_count<$retry_max) {
-		$retry_count++;
-		$retry = true;
-		sleep(1);
-	    }
-	    else {
-		$retry = false;
-		throw new Exception("Error during mysql init: ".$e->getTraceAsString().mysql_error());
-	    }
-	}
+			$vars = $conn->getVariables();
+			foreach($vars as $dbvar=>$phpvar) {
+				global $$phpvar;
+				debug("Connection  @$dbvar = ".$$phpvar);
+				if (!mysql_query("SET @$dbvar = '".$$phpvar."';",$this->connection)) {
+				  debug("Unable to set @$dbvar variable to value: ".$$phpvar);
+				}
+				else {
+				  debug("@$dbvar variable is now set to value: ".$$phpvar);
+				}
+			}
+			$retry = false;
+			$this->is_persistent = $use_persistent;
+		}
+		catch (Exception $e) {
+			if ($retry_count<$retry_max) {
+			  $retry_count++;
+			  sleep(1);
+			}
+			else {
+			  $retry = false;
+			  throw new Exception("Error during mysql init: ".mysql_error().$e->getTraceAsString());
+			}
+		}
 
-	$vars = $conn->getVariables();
-	foreach($vars as $dbvar=>$phpvar) {
-	    global $$phpvar;
-	    debug("Connection  @$dbvar = ".$$phpvar);
-	    if (!mysql_query("SET @$dbvar = '".$$phpvar."';",$this->connection)) {
-		debug("Unable to set @$dbvar variable to value: ".$$phpvar);
-	    }
-	    else {
-		debug("@$dbvar variable is now set to value: ".$$phpvar);
-	    }
-	}
+
 
       }//while
+      
+      		
     }
 
     public function dateTime($add_days=0, $interval_type=" DAY ")
@@ -188,7 +199,13 @@ class MySQLDriver extends DBDriver
     
     public function shutdown()
     {
-	mysql_close($this->connection);
+	  if (!$this->is_persistent) {
+		
+		$is_closed = mysql_close($this->connection);
+		error_log("Closing non-persistent connection: ".$this->connection." Success: ".$is_closed);
+// 		error_log("Closed connection: ".$this->connection);
+	  }
+	  
     }
 
     public function queryFields($table)
