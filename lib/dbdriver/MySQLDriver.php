@@ -19,11 +19,11 @@ class MySQLDriver extends DBDriver
 		try {
 			if ($use_persistent) {
 			  @$this->connection = mysql_pconnect($conn->host.":".$conn->port, $conn->user, $conn->pass);
-			  error_log("using persistent connection: ".$this->connection." for request: ".$_SERVER["REQUEST_URI"]);
+			  //error_log("using persistent connection: ".$this->connection." for request: ".$_SERVER["REQUEST_URI"]);
 			}
 			else {
 			  @$this->connection = mysql_connect($conn->host.":".$conn->port, $conn->user, $conn->pass,$open_new);
-			  error_log("opening new connection: ".$this->connection." for request: ".$_SERVER["REQUEST_URI"]);
+			  //error_log("opening new connection: ".$this->connection." for request: ".$_SERVER["REQUEST_URI"]);
 			}
 			
 			if (!is_resource($this->connection)) throw new Exception("Unable to connect to database server: ".mysql_error());
