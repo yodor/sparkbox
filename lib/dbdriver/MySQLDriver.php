@@ -202,8 +202,8 @@ class MySQLDriver extends DBDriver
 	  if (!$this->is_persistent) {
 		
 		$is_closed = mysql_close($this->connection);
-		error_log("Closing non-persistent connection: ".$this->connection." Success: ".$is_closed);
-// 		error_log("Closed connection: ".$this->connection);
+// 		error_log("Closing non-persistent connection: ".$this->connection." Success: ".$is_closed);
+
 	  }
 	  
     }
