@@ -87,21 +87,30 @@ if (!defined("SKIP_SESSION")) {
 
 }
 
+
 //
-//define SKIP_DB to skip creating a global DB connection $g_db
+//define SKIP_DB to skip creating a connection to DB
 if (DB_ENABLED && !defined("SKIP_DB")) {
 
   include_once("lib/dbdriver/DBConnections.php");
   include_once("config/dbconfig.php");
   include_once("lib/dbdriver/DBDriver.php");
 
-  $g_db = DBDriver::factory();
+  if (defined("PERSISTENT_DB")) {
+	DBDriver::create(true, true, "default");
+	
+  }
+  else {
+	DBDriver::create();
 
-  $g_res = $g_db->query('SELECT @@max_allowed_packet as packet_size');
-  $mrow = $g_db->fetch($g_res);
+  }
+  
+  
+  $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');
+  $mrow = DBDriver::get()->fetch($g_res);
 		
   $defines->set("MAX_PACKET_SIZE", $mrow["packet_size"]);
-  $g_db->free($g_res);
+  DBDriver::get()->free($g_res);
   $defines->export();
 }
 

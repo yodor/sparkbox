@@ -87,7 +87,8 @@ function debug($str)
 
 function keywordFilterSQL($keywords_text, $search_fields, $inner_glue=" OR ", $outer_glue=" AND ", $split_string="/[,;]/")
 {
-  global $g_db;
+  $db = DBDriver::get();
+  
   if (strlen($keywords_text)<1) throw new Exception("keywords_text parameter empty");
   if (!is_array($search_fields) && strlen($search_fields)<1) throw new Exception("search_fields parameter empty");
   if (is_array($search_fields) && count($search_fields)<1) throw new Exception("search_fields parameter empty");
@@ -95,7 +96,7 @@ function keywordFilterSQL($keywords_text, $search_fields, $inner_glue=" OR ", $o
   $keywords = preg_split($split_string, $keywords_text);
   $kwsearch = array();
   foreach($keywords as $key=>$word) {
-      $word = $g_db->escapeString(trim($word));
+      $word = $db->escapeString(trim($word));
       if (!is_array($search_fields)) {
 	$search_fields = array($search_fields);
       }
@@ -248,11 +249,7 @@ function safeVal($val, $accepted_tags=NULL)
 
 	$ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
-	global $g_db;
-	if ($g_db) {
-		$ret = $g_db->escapeString($ret);
-	}
-	return $ret;
+	return DBDriver::get()->escapeString($ret);
 
 }
 function attributeValue($value)
@@ -601,7 +598,7 @@ header("Expires: 0");
         fputcsv($filehandler, $vals); // add parameters if you want
     }
 
-	$db = DBDriver::factory();
+	$db = DBDriver::get();
 	// Gets the data from the database
 	$result = $db->query($sql_query);
 	$fields_cnt = $db->numFields($result);
@@ -632,7 +629,7 @@ function exportMysqlToCsv($sql_query,$filename = 'export.csv')
 	$csv_escaped = "\\";
 //     $sql_query = "select * from $table";
 
-	$db = DBDriver::factory();
+	$db = DBDriver::get();
 	// Gets the data from the database
 	$result = $db->query($sql_query);
 	$fields_cnt = $db->numFields($result);

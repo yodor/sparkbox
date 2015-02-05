@@ -9,9 +9,6 @@ include_once("lib/panels/PhraseTranslationDialog.php");
 include_once("lib/iterators/SQLResultIterator.php");
 
 
-
-$db=DBDriver::factory();
-
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONFIG_MENU);
 

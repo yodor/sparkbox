@@ -12,7 +12,7 @@ abstract class SearchPopupRequestHandler extends RequestHandler
 
   protected function parseParams() 
   {
-	    $db = DBDriver::factory();
+	    $db = DBDriver::get();
 
 	  if (!isset($_REQUEST["field_id"])) throw new Exception("field_id not passed");
 	  $this->field_id = $_REQUEST["field_id"];
@@ -31,7 +31,7 @@ abstract class SearchPopupRequestHandler extends RequestHandler
 	  $success=false;
 
 	 
-	  $db = DBDriver::factory();
+	  $db = DBDriver::get();
 
 	  try {
 		  $field_id = $this->field_id;

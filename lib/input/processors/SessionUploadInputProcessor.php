@@ -153,9 +153,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
   
   public function transactValue(InputField $field, DBTransactor $transactor)
   {	
-      global $g_db;
-      if (!$g_db instanceof DBDriver) throw new Exception("Global db driver g_db can not be accessed");
-      
+   
      
       $values = $field->getValue();
       $field_name = $field->getName();
@@ -227,7 +225,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 	      }
 	      else {
 		debug("Transacting StorageObject UID: $uid serialized to the main transaction row");
-		$value = $g_db->escapeString(serialize($storage_object));
+		$value = DBDriver::get()->escapeString(serialize($storage_object));
 		$transactor->appendValue($field_name, $value);
 	      }
 	      break;

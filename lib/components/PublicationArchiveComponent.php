@@ -48,12 +48,10 @@ class PublicationArchiveComponent extends Component implements IHeadRenderer {
 
   protected function processRequest()
   {
-		global $g_db;
-		
 
 	    if (isset($_GET["year"]) && isset($_GET["month"])) {
 		$this->archive_year = (int)$_GET["year"];
-		$this->archive_month = $g_db->escapeString($_GET["month"]);
+		$this->archive_month = DBDriver::get()->escapeString($_GET["month"]);
 		$this->have_selection = true;
 	    }
 	    else if (isset($_GET[$this->bean->getPrKey()])) {

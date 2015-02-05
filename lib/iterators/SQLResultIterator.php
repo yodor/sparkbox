@@ -15,7 +15,8 @@ class SQLResultIterator implements SQLIterator {
 
 		$this->select = $select;
 		
-		$this->db = DBDriver::factory();
+		$this->db = DBDriver::get();
+		
 		$this->prkey=$prkey;
 		$this->fields=$select->fields;
 

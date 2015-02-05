@@ -123,12 +123,12 @@ $languageID = Session::get("langID");
 
 function getActiveLanguageID()
 {
-	global $g_lb,$g_db;
+	global $g_lb;
 
 	$langID=1;
 
 	$lang_session = Session::get("language",DEFAULT_LANGUAGE);
-	$lang = $g_db->escapeString($lang_session);
+	$lang = DBDriver::get()->escapeString($lang_session);
 
 	$num = $g_lb->startIterator("WHERE language='$lang'");
 	if ($g_lb->fetchNext($lrow)){
@@ -145,7 +145,7 @@ function getActiveLanguageID()
 function trbean($id, $field_name, &$row, DBTableBean $bean)
 {
 	$lang_session = Session::get("language",DEFAULT_LANGUAGE);
-	global $g_db, $g_bt;
+	global $g_bt;
 
 	try {
 	  $langID = getActiveLanguageID();
@@ -174,10 +174,10 @@ function tr($str_original)
 
 	
 
-	global $g_db, $g_sp, $g_stu, $g_tr, $g_lb;
+	global $g_sp, $g_stu, $g_tr, $g_lb;
 
 
-	$str = $g_db->escapeString($str_original);
+	$str = DBDriver::get()->escapeString($str_original);
 
 	try {
 

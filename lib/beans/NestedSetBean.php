@@ -24,7 +24,7 @@ include_once ("lib/utils/SelectQuery.php");
 		$lastid = -1;
 		
 		if (!$db) {
-			$db = DBDriver::factory();
+			$db = $this->db;
 		}
 		$prkey = $this->prkey;
 		
@@ -98,7 +98,7 @@ include_once ("lib/utils/SelectQuery.php");
 	{
 
 		if (!$db) {
-			$db = DBDriver::factory();
+			$db = $this->db;
 		}
 		$prkey = $this->prkey;
 
@@ -220,7 +220,7 @@ include_once ("lib/utils/SelectQuery.php");
 		
 
 		if (!$db) {
-		    $db = DBDriver::factory();
+		    $db = $this->db;
 		}
 
 		$prow = $this->getByID($id, $db);
@@ -280,7 +280,7 @@ include_once ("lib/utils/SelectQuery.php");
 	{
 
 		if (!$db) {
-			$db = DBDriver::factory();
+			$db = $this->db;
 		}
 		$prkey = $this->prkey;
 
@@ -520,19 +520,19 @@ if ($this->filter) {
 	    $sqry->where = " (node.lft BETWEEN parent.lft AND parent.rgt) AND node.catID = $catID ";
 	    $sqry->order_by = " parent.lft ";
 	    
-	    global $g_db;
+	    
 
-	    $res = $g_db->query($sqry->getSQL());
+	    $res = $this->db->query($sqry->getSQL());
 
-	    if (!$res) throw new Exception("NestedSetBean::constructPath Error: ".$g_db->getError());
+	    if (!$res) throw new Exception("NestedSetBean::constructPath Error: ".$this->db->getError());
 
 	    $path = array();
     
-	    while ($row = $g_db->fetch($res)) {
+	    while ($row = $this->db->fetch($res)) {
 		  $path[] = $row[$field_name];
 	    }
 	    
-	    $g_db->free($res);
+	    $this->db->free($res);
 
 	    return $path;
 	}
@@ -545,20 +545,18 @@ if ($this->filter) {
 	    $sqry->from = " {$this->table} AS node, {$this->table} AS parent ";
 	    $sqry->where = " (node.lft BETWEEN parent.lft AND parent.rgt) AND node.catID = $catID ";
 	    $sqry->order_by = " parent.lft ";
-	    
-	    global $g_db;
 
-	    $res = $g_db->query($sqry->getSQL());
+	    $res = $this->db->query($sqry->getSQL());
 
-	    if (!$res) throw new Exception("NestedSetBean::constructPath Error: ".$g_db->getError());
+	    if (!$res) throw new Exception("NestedSetBean::constructPath Error: ".$this->db->getError());
 
 	    $path = array();
     
-	    while ($row = $g_db->fetch($res)) {
+	    while ($row = $this->db->fetch($res)) {
 		$path[] = $row["catID"];
 	    }
 	    
-	    $g_db->free($res);
+	    $this->db->free($res);
 
 	    return $path;
 	}

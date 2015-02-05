@@ -34,10 +34,10 @@ class TranslatePhraseAjaxHandler extends JSONRequestHandler
 
   protected function _store(JSONResponse $ret)
   {
-      global $g_db, $g_tr;
+      global $g_tr;
       $trrow = array();
 
-      $trrow["translated"]=$g_db->escapeString(trim($_REQUEST["translation"]));
+      $trrow["translated"]=DBDriver::get()->escapeString(trim($_REQUEST["translation"]));
       if (strlen($trrow["translated"])<1) throw new Exception(tr("Input a text to be used as translation"));
       
       if ($this->trID<1) {

@@ -82,7 +82,7 @@ CREATE TABLE `translation_phrases` (
 			}
 		}
 		else {
-			$db = DBDriver::factory();
+			$db = $this->db;
 			
 			$trow["translated"]=$db->escapeString($translated);
 			$trow["textID"]=(int)$textID;

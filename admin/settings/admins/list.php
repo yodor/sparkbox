@@ -16,8 +16,6 @@ $page->checkAccess(ROLE_ADMIN_USERS_MENU);
 
 
 
-$db = DBDriver::factory();
-
 $bean = new AdminUsersBean();
 $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);

@@ -24,12 +24,12 @@ CREATE TABLE `site_texts` (
 	{
 		$textID = -1;
 
-		global $g_db;
+		
 		
 		$str = html_entity_decode(stripslashes(trim($str)));
 
 
-		$strdb = $g_db->escapeString($str);
+		$strdb = $this->db->escapeString($str);
 
 		$num = $this->startIterator("WHERE hash_value = md5('$strdb') LIMIT 1");
 		

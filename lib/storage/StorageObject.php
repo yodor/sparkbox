@@ -55,9 +55,8 @@ class StorageObject {
   }
   public function serializeDB()
   {
-	  global $g_db;
 
-	  return $g_db->escapeString(serialize($this));
+	  return DBDriver::get()->escapeString(serialize($this));
 
   }
   public function getUID()
@@ -74,10 +73,10 @@ class StorageObject {
 	  $row[$data_key]=$this->data;
 
 	  if ($doEscape) {
-		global $g_db;
-		if ($g_db) {
-		  $row[$data_key] = $g_db->escapeString($this->data);
-		}
+		
+		
+		  $row[$data_key] = DBDriver::get()->escapeString($this->data);
+		
 	  }
 	  $row["size"]=$this->length;
 	  $row["date_upload"]=$this->timestamp;

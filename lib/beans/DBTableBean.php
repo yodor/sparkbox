@@ -29,8 +29,8 @@ abstract class DBTableBean implements IDataBean
 	    $this->db = $dbdriver;
 	}
 	else {
-	    global $g_db;
-	    $this->db = $g_db;
+	   
+	    $this->db = DBDriver::get();
 	}
 
 	$bclass = get_class($this);
@@ -379,25 +379,25 @@ abstract class DBTableBean implements IDataBean
     
     public function toggleField($id, $field)
     {
-	if (!in_array($field, $this->fields)) throw new Exception("DBTableBean::toggleField Field '$field' not found in this bean");
-	
-	$id = (int)$id;
-	
-	$db = DBDriver::factory();
-	$field = $db->escapeString($field);
-	
-	try {
-	
-	  $db->transaction();
-	
-	  if (!$db->query("UPDATE {$this->table} SET `$field` = NOT `$field` WHERE {$this->prkey}=$id "))throw new Exception("DBTableBean::toggleField DB Error: ".$db->getError());
-	
-	  $db->commit();
-	}
-	catch (Exception $e) {
-	  $db->rollback();
-	  throw $e;
-	}
+		if (!in_array($field, $this->fields)) throw new Exception("DBTableBean::toggleField Field '$field' not found in this bean");
+		
+		$id = (int)$id;
+		
+		
+		$field = $this->db->escapeString($field);
+		
+		try {
+		
+		  $this->db->transaction();
+		
+		  if (! $this->db->query("UPDATE {$this->table} SET `$field` = NOT `$field` WHERE {$this->prkey}=$id "))throw new Exception("DBTableBean::toggleField DB Error: ". $this->db->getError());
+		
+		  $this->db->commit();
+		}
+		catch (Exception $e) {
+		  $this->db->rollback();
+		  throw $e;
+		}
     }
 
     public function findFieldValue($field_name, $field_value)

@@ -32,7 +32,7 @@ class ImportIvona extends CSVTemplateLoader
 		$this->prods = new ProductsBean();
 		$this->brands = new BrandsBean();
 		$this->pc = new ProductCategoriesBean();
-		$this->db = DBDriver::factory();
+		$this->db = DBDriver::get();
 		$this->pc->setDB($this->db);
 		$this->brands->setDB($this->db);
 		$this->prods->setDB($this->db);

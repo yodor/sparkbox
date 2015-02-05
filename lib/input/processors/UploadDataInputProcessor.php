@@ -70,9 +70,9 @@ class UploadDataInputProcessor extends BeanPostProcessor
 	    $file_storage->setMIME($file['type']);
 
 
-	    global $g_db;
-	    if ($g_db) {
-	      $file_storage->setTimestamp($g_db->dateTime());
+	    
+	    if (DB_ENABLED) {
+	      $file_storage->setTimestamp(DBDriver::get()->dateTime());
 	    }
 	    else {
 	      $file_storage->setTimestamp(date("Y-m-d H:m:i"));
