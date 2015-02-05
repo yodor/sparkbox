@@ -31,6 +31,8 @@ class InputFormView extends Component
 	 
 	protected $error = false;
 	
+	public $reload_request = true;
+	
 	public function __construct(DBTableBean $bean=NULL, InputForm $form=NULL)
 	{
 	
@@ -177,11 +179,13 @@ class InputFormView extends Component
 		      Session::set("alert", $this->item_updated_message);
 		    }
 
-		    debug("InputFormView::processInput: finished redirection following ...");
-		    debug("-------------------------------------");
-		    //TODO: remove reload requirement here? session upload files might transact to dbrows changing UID of storage objects
-		    header("Location: ".$_SERVER["REQUEST_URI"]);
-		    exit;
+		    if ($this->reload_request === true) {
+			  debug("InputFormView::processInput: finished redirection following ...");
+			  debug("-------------------------------------");
+			  //TODO: remove reload requirement here? session upload files might transact to dbrows changing UID of storage objects
+			  header("Location: ".$_SERVER["REQUEST_URI"]);
+			  exit;
+			}
 		      
 		    debug("InputFormView::processInput: Successfull ");
 

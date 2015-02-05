@@ -107,6 +107,7 @@ include_once ("lib/utils/SelectQuery.php");
 		$old_parentID = (int)$old_row["parentID"];
 		$new_parentID = (int)$row["parentID"];
 		
+		if ($new_parentID == $id) throw new Exception("Can not reparent to self");
 		
 		if ($old_parentID == $new_parentID) {
 		

@@ -60,5 +60,16 @@ class MenuItemInputForm extends InputForm
       }
 
   }
+  public function validate()
+  {
+	  $ret = parent::validate();
+	  $editID = $this->getEditID();
+	  if ($editID>0) {
+		$parentID = $this->getField("parentID")->getValue();
+		if ($parentID == $editID) {
+		  $this->getField("parentID")->setError("Can not reparent to self");
+		}
+	  }
+  }
 }
 ?>

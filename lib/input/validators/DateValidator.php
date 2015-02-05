@@ -28,7 +28,19 @@ class DateValidator implements IInputValidator
 		return $ret;
 	}
 
+	public static function getTimestamp($field_value)
+	{
+		$ret = 0;
+		if (DateValidator::isValidDate($field_value)) {
+		  $pieces = explode("-",$field_value);
+		  $year = $pieces[0];
+		  $month = $pieces[1];
+		  $day = $pieces[2];
+		  $ret = strtotime("$year-$month-$day");
+		}
+		return $ret;
 
+	}
 
 
 	protected static function validate($year, $month, $day)

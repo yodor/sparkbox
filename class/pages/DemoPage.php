@@ -87,6 +87,13 @@ class DemoPage extends SimplePage
 	echo "\n";
     }
 
+    protected function dumpMetaTags()
+	{
+		parent::dumpMetaTags();
+		echo "\n\n";
+		echo "<meta name='viewport' content='width=960, initial-scale=0.45'>\n";
+		echo "\n\n";
+	}
 
     public function beginPage()
     {
