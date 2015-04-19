@@ -32,6 +32,12 @@ class MainMenu
 	
 	protected $link_page = NULL;
 	
+	protected $last_match_value = "";
+	
+	public function getLastMatchValue()
+	{
+		return $this->last_match_value;
+	}
 	public function __construct()
 	{
 	    $this->bean_class = NULL;
@@ -235,6 +241,9 @@ class MainMenu
 		$match = @levenshtein($request, $href);
 		
 	    }
+	    
+	    $this->last_match_value = $request;
+	    
 // 	    debug("matchItem Result: ".(int)$match);
 	    return $match;
 	}

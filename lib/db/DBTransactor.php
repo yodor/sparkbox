@@ -204,6 +204,7 @@ class DBTransactor  {
       }
       else {
 	  $values = array_merge($this->transact_values, $this->insert_values);
+	  debugArray("Merged Values: ", $values);
 	  
 	  $this->lastID = $bean->insertRecord($values, $db);
 	  if ($this->lastID<1) throw new Exception("Unable to insert: ".$db->getError());

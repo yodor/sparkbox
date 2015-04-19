@@ -12,8 +12,10 @@ class ReferenceKeyPageChecker
   public function __construct(DBTableBean $ref_bean, $redirect_fail)
   {
 	
+	
 	try {
 	  $ref_key = $ref_bean->getPrKey();
+	  $this->ref_key = $ref_key;
 
 	  if (!isset($_GET[$ref_key]))throw new Exception($ref_key." not passed");
 	  $ref_id = (int)$_GET[$ref_key];
@@ -29,7 +31,7 @@ class ReferenceKeyPageChecker
 	  $this->ref_row = $ref_row;
 	}
 	catch (Exception $e) {
-	  Session::set("alert", "Reference ".$this->ref_key."=".$this->ref_id." of ".get_class($ref_bean)." was not found.");
+	  Session::set("alert", "Required parameter ".$this->ref_key." of ".get_class($ref_bean)." was not found.");
 	  header("Location: $redirect_fail");
 	  exit;
 	}

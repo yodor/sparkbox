@@ -48,21 +48,21 @@ class ProductInputForm extends InputForm
 	$rend->list_label="gender_title";
 	$this->addField($field);
 	
+	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "price", "Price", 0);
+	$this->addField($field);
+	
+	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "buy_price", "Buy Price", 0);
+	$this->addField($field);
+
+	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "old_price", "Old Price", 0);
+	$this->addField($field);
+	
 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "weight", "Weight", 0);
 	$this->addField($field);
 
 	
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "buy_price", "Buy Price", 1);
-	$this->addField($field);
-
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "sell_price", "Sell Price", 1);
-	$this->addField($field);
-	
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "old_price", "Old Price", 0);
-	$this->addField($field);
-	
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "stock_amount", "Stock Amount", 1);
-	$this->addField($field);
+// 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "stock_amount", "Stock Amount", 1);
+// 	$this->addField($field);
 	
 	$field = InputFactory::CreateField(InputFactory::CHECKBOX, "visible", "Visible (On Sale)", 0);
 	$this->addField($field);

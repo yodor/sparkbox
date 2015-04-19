@@ -257,7 +257,9 @@ var right = "<?php echo $right;?>";
 	{
 
 
-	    $buffer = preg_replace('#(<title.*?>).*?(</title>)#', "<title>".$this->preferred_title.TITLE_PATH_SEPARATOR.SITE_TITLE."</title>", $buffer);
+		$title = $this->preferred_title.TITLE_PATH_SEPARATOR.SITE_TITLE;
+		
+	    $buffer = preg_replace('#(<title.*?>).*?(</title>)#', "<title>".strip_tags($title)."</title>", $buffer);
 
 	    $keywords_config = "";
 	    $description_config = "";
@@ -271,10 +273,25 @@ var right = "<?php echo $right;?>";
 
 	    }
 	    
-	    $keywords = $keywords_config." ".$this->keywords;
-	    $description = $description_config." ".$this->description;
-	    $buffer = str_replace("%meta_keywords%", $keywords, $buffer);
-	    $buffer = str_replace("%meta_description%", $description, $buffer);
+		$meta_keywords = "";
+	    $meta_description = "";
+	    
+	    if ($this->keywords) {
+		  $meta_keywords = $this->keywords;
+	    }
+	    else {
+		  $meta_keywords = $keywords_config;
+	    }
+	    if ($this->description) {
+		  $meta_description = $this->description;
+	    }
+	    else {
+		  $meta_description = $description_config;
+	    }
+	    
+
+	    $buffer = str_replace("%meta_keywords%", strip_tags($meta_keywords), $buffer);
+	    $buffer = str_replace("%meta_description%", strip_tags($meta_description), $buffer);
 
 	    return $buffer;
 	}

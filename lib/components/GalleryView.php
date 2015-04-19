@@ -26,6 +26,9 @@ class GalleryView extends Component implements IHeadRenderer
 
     protected $view_mode = GalleryView::MODE_UNINITIALIZED;
 
+    
+    public $blob_field = "item_photo";
+    
     public function getViewMode()
     {
 	return $this->view_mode;
@@ -69,7 +72,7 @@ class GalleryView extends Component implements IHeadRenderer
 	    if ($this->photos_bean instanceof OrderedDataBean) {
 		    $view->addColumn(new TableColumn("position","Position"));
 	    }
-	    $view->addColumn(new TableColumn("item_photo","Photo"));
+	    $view->addColumn(new TableColumn($this->blob_field,"Photo"));
 	    $view->addColumn(new TableColumn("caption","Caption"));
 	    $view->addColumn(new TableColumn("date_upload","Date Upload"));
 
@@ -78,8 +81,8 @@ class GalleryView extends Component implements IHeadRenderer
 
 	    $renderer = new TableImageCellRenderer($photos_bean, IPhotoRenderer::RENDER_THUMB, 64,64);
 
-	    $view->getColumn("item_photo")->setCellRenderer($renderer);
-	    $view->getColumn("item_photo")->getHeaderCellRenderer()->setSortable(false);
+	    $view->getColumn($this->blob_field)->setCellRenderer($renderer);
+	    $view->getColumn($this->blob_field)->getHeaderCellRenderer()->setSortable(false);
 
 	    $view->addColumn(new TableColumn("actions","Actions"));
 

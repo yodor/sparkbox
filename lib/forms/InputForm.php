@@ -155,10 +155,10 @@ class InputForm {
 	public function loadPostData(array $arr)
 	{
 	    foreach ($this->fields as $field_name=>$field) {
-		if ($field->isEditable()) {
-		  $field->loadPostData($arr);
+		  if ($field->isEditable()) {
+			$field->loadPostData($arr);
 
-		}
+		  }
 	    }
 
 	}

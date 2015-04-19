@@ -225,3 +225,22 @@ IMG {
 .TableView[name='SiteTexts'] TD[column='value'] {
   text-align:left;
 }
+
+
+.InputFormView[bean='ProductInventoryBean'] .caption {
+  color: #656565;
+  font-size: 20px;
+  /* font-weight: bold; */
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  
+}
+
+.page_area.products.list .TableView .viewport .TableCellImageList {
+/*   max-width:120px; */
+    display:inline-block;
+}
+.page_area.products.list .TableView .viewport .TableCellImageItem {
+  display:inline-block;
+}

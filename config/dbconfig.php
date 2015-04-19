@@ -5,7 +5,7 @@ $prop = new DBConnectionProperties();
 $prop->driver = "MySQL";
 
 $prop->database="demo";
-$prop->user="demo";
+$prop->user="demo1";
 $prop->pass="d3m0d3m0";
 $prop->host="localhost";
 $prop->port="3306";

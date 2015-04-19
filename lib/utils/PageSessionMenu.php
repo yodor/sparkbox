@@ -78,8 +78,9 @@ class PageSessionMenu extends MainMenu {
 // 	      $last_selected = $action_item;
 	    }
 	    else {
-		debug("Clearing child nodes of current selected menu");
-		$last_selected->clearChildNodes();
+		  debug("Clearing child nodes of current selected menu");
+		  $last_selected->clearChildNodes();
+		  $last_selected->setHref($this->getLastMatchValue());
 	    }
 
 	    foreach($arr_menu as $key=>$subitem) {
@@ -91,7 +92,15 @@ class PageSessionMenu extends MainMenu {
 		      $subitem->setHref( dirname($_SERVER['PHP_SELF']). "/".$subitem->getHref());
 		    }
 
-		    $last_selected->addMenuItem($subitem);
+			if (strcmp($last_selected->getHref(), $subitem->getHref())===0) {
+				$last_selected->clearChildNodes();
+				$last_selected->setSelected(false);
+				break;
+// 				continue;
+			}
+			else {
+				$last_selected->addMenuItem($subitem);
+			}
 
 	    }
 	    

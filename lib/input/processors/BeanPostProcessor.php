@@ -59,48 +59,53 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 	    
 	    $processed_ids = array();
 	    
+	    debug("BeanPostProcessor::beforeCommit | field values count: ".count($field->getValue()));
+// 	    debugArray("Post Values: ", $_POST);
+	    
 	    foreach ($field->getValue() as $idx=>$value) {
 	    
-		$dbrow = array();
-		$dbrow[$item_key] = $transactor->getLastID();
-		
-		if (is_array($value))throw new Exception("Could not transact value of type Array using transact mode TRANSACT_VALUE to data_source");
-		if ($value instanceof StorageObject) throw new Exception("Could not transact value of type StorageObject using transact mode TRANSACT_VALUE to data_source");
-		
-		$dbrow[$field_name] = $value;
+			$dbrow = array();
+			$dbrow[$item_key] = $transactor->getLastID();
+			
+			if (is_array($value))throw new Exception("Could not transact value of type Array using transact mode TRANSACT_VALUE to data_source");
+			if ($value instanceof StorageObject) throw new Exception("Could not transact value of type StorageObject using transact mode TRANSACT_VALUE to data_source");
+			
+			$dbrow[$field_name] = $value;
 
-		//process posted foreign keys and assign them
-		if ($this->process_datasource_foreign_keys) {
-		    if (isset($_REQUEST["fk_$field_name"][$idx])) {
-			$fks = $_REQUEST["fk_$field_name"][$idx];
-			$fk_pairs = explode("|", $fks);
-			foreach($fk_pairs as $fk_idx=>$fk_pair) {
-			    list($fk_name, $fk_value) = explode(":",$fk_pair);
-			    $dbrow[$fk_name] = $fk_value;
+			//process posted foreign keys and assign them
+			if ($this->process_datasource_foreign_keys) {
+				if (isset($_REQUEST["fk_$field_name"][$idx])) {
+				  $fks = $_REQUEST["fk_$field_name"][$idx];
+				  $fk_pairs = explode("|", $fks);
+				  foreach($fk_pairs as $fk_idx=>$fk_pair) {
+					  list($fk_name, $fk_value) = explode(":",$fk_pair);
+					  $dbrow[$fk_name] = $fk_value;
+				  }
+				}
+				
 			}
-		    }
-		    
-		}
-		
-		$sourceID = array_shift($this->source_loaded_keys);
-		if ($sourceID>0) {
-		  debug("DataSourceID: ".$sourceID);
+			
+			$sourceID = array_shift($this->source_loaded_keys);
+			if ($sourceID>0) {
+			  debug("DataSourceID: ".$sourceID);
 
-		  if (!$data_source->updateRecord($sourceID, $dbrow, $db)) throw new Exception("Unable to update  data source bean. Error: ".$db->getError());
-		  $processed_ids[] = $sourceID;
-		}
-		else {
+			  if (!$data_source->updateRecord($sourceID, $dbrow, $db)) throw new Exception("Unable to update  data source bean. Error: ".$db->getError());
+			  $processed_ids[] = $sourceID;
+			}
+			else {
 
-		  $refID = $data_source->insertRecord($dbrow, $db);
-		  if ($refID<1) throw new Exception("Unable to insert into data source bean. Error: ".$db->getError());
-		  $processed_ids[] = $refID;
-		}
-		$foreign_transacted++;
+			  $refID = $data_source->insertRecord($dbrow, $db);
+			  if ($refID<1) throw new Exception("Unable to insert into data source bean. Error: ".$db->getError());
+			  $processed_ids[] = $refID;
+			}
+			$foreign_transacted++;
 
 	    }
 
 	    //TODO:duplicate keys might get triggered
-	     $data_source->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
+		$data_source->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
+		
+		
       }
       else  {
       
@@ -283,6 +288,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 	    $value = $object;
 	  }
 	  
+	  //TODO: InputField::TRANSACT_OBJECT can be array ? 
 	  if ($field instanceof ArrayInputField) {
 	    $values = array($value);
 	    
@@ -357,6 +363,9 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
 	      $field->setValue($value);
 
+	  }
+	  else {
+		  $field->clear();
 	  }
 
     }
