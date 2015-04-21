@@ -41,10 +41,12 @@ class ListView extends AbstractResultView implements IHeadRenderer
 
 	  echo "<div class='viewport'>";
 	  
+	  if (!$this->paginators_enabled) {
 	  if (strlen($this->caption)>0) {
 		  echo "<div class='caption'>";
 		  echo $this->caption;
 		  echo "</div>";
+	  }
 	  }
 	  
   }

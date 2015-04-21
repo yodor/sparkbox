@@ -91,3 +91,72 @@ body.mce_browser .FormRenderer .SubmitLine .Buttons {
   display:inline-block;
 }
 
+
+
+body.products.list .ProductListItem {
+  display:inline-block;
+  margin:10px;
+  border:1px dotted gray;
+ 
+}
+body.products.list .ProductListItem A {
+ text-decoration:none;
+}
+
+body.products.details .column.details {
+  display:block;
+}
+body.products.details .images {
+  display:inline-block;
+  max-width:400px;
+  border:1px dotted gray;
+  vertical-align:top;
+  
+}
+body.products.details .images .image_big {
+  display:block;
+}
+body.products.details .images .image_gallery {
+  display:block;
+}
+
+body.products.details .images .image_gallery .list {
+  display:none;
+}
+/*body.products.details .images .image_gallery .list:first-child {
+  display:block;
+}*/
+
+body.products.details .images .image_gallery .list .item {
+  display:inline-block;
+  border:1px solid transparent;
+}
+body.products.details .images .image_gallery .list .item[active='1'] {
+  border:1px solid red;
+}
+body.products.details .images .image_gallery .list .item IMG {
+  display:block;
+}
+body.products.details .product_details {
+  display:inline-block;
+  max-width:400px;
+  border:1px dotted gray;
+  vertical-align:top;
+  text-align:left;
+  float:right;
+}
+body.products.details .color_chooser {
+  display:block;
+  vertical-align:top;
+}
+body.products.details .color_chooser .color_button {
+  display:inline-block;
+  border:1px dotted gray;
+  margin-right:5px;
+}
+body.products.details .color_chooser .color_button[active="1"] {
+  border:1px solid red;
+}
+body.products.details .color_chooser .color_button IMG {
+  display:block;
+}

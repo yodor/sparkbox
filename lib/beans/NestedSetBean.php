@@ -561,7 +561,9 @@ if ($this->filter) {
 	    return $path;
 	}
 
-	public function listTreeRelatedSelect(DBTableBean $related_source)
+	
+	
+	public function listTreeRelatedSelect(DBTableBean $related_source, $count_field="")
 	{		
 	    $prkey = $this->prkey;
 
@@ -569,12 +571,19 @@ if ($this->filter) {
 
 	    if (!in_array($prkey, $fields)) throw new Exception("Could not find relation by primary key with this related source bean");
 
+	    
+	    
 	    $related_table =  $related_source->getTableName();
 	    $related_prkey = $related_source->getPrKey();
+	    
 
+
+ 	    if (!$count_field) {
+		  $count_field = "COUNT( $related_table.$related_prkey ) ";
+ 		}
 	    //aggregate relation query
 	    $sqry = new SelectQuery();
-	    $sqry->fields = "  parent.*, COUNT( $related_table.$related_prkey ) as related_count ";
+	    $sqry->fields = "  parent.*, $count_field as related_count ";
 	    $sqry->from = "  {$this->table} AS node, {$this->table} AS parent, $related_table ";
 	    $sqry->where = "  (node.lft BETWEEN parent.lft AND parent.rgt) AND node.$prkey = $related_table.$prkey ";
 	    $sqry->group_by = " parent.$prkey ";

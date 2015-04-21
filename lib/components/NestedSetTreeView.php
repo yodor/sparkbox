@@ -244,10 +244,11 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 
 	
     }
-    public function setRelatedSource(DBTableBean $related_source)
+    //related count calculated on $count_field default counting on the prkey of the $related_source
+    public function setRelatedSource(DBTableBean $related_source, $count_field="")
     {
 
-	$sqry = $this->data_source->listTreeRelatedSelect($related_source);
+	$sqry = $this->data_source->listTreeRelatedSelect($related_source, $count_field);
 	
 	$this->setSelectQuery($sqry);
 
