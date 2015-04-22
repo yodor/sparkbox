@@ -115,23 +115,86 @@ body.mce_browser .FormRenderer .SubmitLine .Buttons {
 
 body.products.list .ProductListItem {
   display:inline-block;
-  margin:10px;
-  border:1px dotted gray;
+  
+  outline:1px dotted gray;
   max-width:22%;
   width:22%;
   min-width:202px;
   box-sizing:border-box;
   vertical-align:top;
+  
+  height:285px;
+  
+  
+  margin:5px;
 }
-body.products.list .ProductListItem .product_title {
+body.products.list .ProductListItem .wrap {
+  
+  float:left;
   display:block;
-  max-height:50px;
-  height:50px;
+  position:relative;
+  background-color:white;
+  min-height:285px;
+  width:100%;
+}
+body.products.list .ProductListItem .product_detail {
+  display:block;
+  /*max-height:50px;
+  height:50px;*/
+
+ 
+  padding:5px;
+}
+body.products.list .ProductListItem .product_detail .colors_container {
+  border-bottom:1px dotted #a6a6a6;
+  display:block;
+  min-height:20px;
+  padding-bottom:5px;
+}
+body.products.list .ProductListItem:hover .product_detail .colors {
+  display:none;
+}
+body.products.list .ProductListItem .product_detail .colors {
+  font-weight:bold;
+  color:#777777;
+  margin: 0 0 5px 0;
+}
+
+body.products.list .ProductListItem:hover .product_detail .product_name {
+  white-space: normal;
+}
+
+body.products.list .ProductListItem .product_detail .product_name {
+   width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top:5px;
+  margin-bottom:5px;
+}
+body.products.list .ProductListItem .product_detail .sell_price {
+  font-size:13px;
+  font-weight:normal;
+  text-align:right;
 }
 body.products.list .ProductListItem A {
  text-decoration:none;
 }
+
 body.products.list .ProductListItem .color_chips  {
+  display:none;
+  text-align:center;
+}
+body.products.list .ProductListItem:hover .wrap {
+  -webkit-box-shadow: 0px 0px 24px 1px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 0px 24px 1px rgba(0,0,0,0.75);
+box-shadow: 0px 0px 24px 1px rgba(0,0,0,0.75);
+z-index:1;
+}
+body.products.list .ProductListItem:hover .color_chips  {
   display:block;
 }
 body.products.list .ProductListItem .color_chips  A {
@@ -147,7 +210,7 @@ body.products.details .column.details {
 body.products.details .images {
   display:inline-block;
 /*   max-width:400px; */
-  border:1px dotted gray;
+  outline:1px dotted gray;
   vertical-align:top;
   
 }
@@ -171,10 +234,10 @@ body.products.details .images .image_gallery .list {
 
 body.products.details .images .image_gallery .list .item {
   display:block;
-  border:1px solid transparent;
+  
 }
 body.products.details .images .image_gallery .list .item[active='1'] {
-  border:1px solid red;
+  outline:1px solid red;
 }
 body.products.details .images .image_gallery .list .item IMG {
   display:block;
@@ -182,7 +245,7 @@ body.products.details .images .image_gallery .list .item IMG {
 body.products.details .product_details {
   display:inline-block;
   max-width:400px;
-  border:1px dotted gray;
+  outline:1px dotted gray;
   vertical-align:top;
   text-align:left;
   float:right;
@@ -201,12 +264,24 @@ body.products.details .color_chooser {
 
 body.products.details .color_chooser .color_button {
   display:inline-block;
-  border:1px dotted gray;
+  outline:1px dotted gray;
   margin-right:5px;
 }
 body.products.details .color_chooser .color_button[active="1"] {
-  border:1px solid red;
+  outline:1px solid red;
 }
 body.products.details .color_chooser .color_button IMG {
   display:block;
 }
+
+/* You can use the clearfix to do "layout preserving" the same way overflow: hidden does */
+/* add class="clearfix" class to the parent, and remove overflow: hidden; */
+.clearfix:before,
+.clearfix:after {
+    content: ".";    
+    display: block;    
+    height: 0;    
+    overflow: hidden; 
+}
+.clearfix:after { clear: both; }
+.clearfix { zoom: 1; } /* IE < 8 */

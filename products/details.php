@@ -118,18 +118,17 @@ foreach ($sellable as $pos=>$row) {
 	
 	//pids from the same color
 	$color_pids[$pclrID] = array();
-// 	if ($row["pids"]) {
-	  $color_pids[$pclrID] = $row["pids"] ? explode("|", $row["pids"]) : array($piID);
-	  if (in_array($piID, $color_pids[$pclrID])) {
-		$piID = $color_pids[$pclrID][0];
-	  }
-// 	}
+
+	$color_pids[$pclrID] = $row["pids"] ? explode("|", $row["pids"]) : array($piID);
+	if (in_array($piID, $color_pids[$pclrID])) {
+	  $piID = $color_pids[$pclrID][0];
+	}
+
 	
 	
 	
 	
-	
-	$sizes[$pclrID] = $row["size_values"] ? explode("|", $row["size_values"]) : array($row["size_value"]);
+	$sizes[$pclrID] = $row["size_values"] ? explode("|", $row["size_values"]) :  array($row["size_value"]);
 	$prices[$pclrID] = $row["sell_prices"] ? explode("|", $row["sell_prices"]) : array($row["sell_price"]);
 	
 	//construct photo galleries
