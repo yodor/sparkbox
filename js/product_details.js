@@ -13,15 +13,26 @@ function changeColor(pclrID)
   piID = color_button.attr("piID");
   
   var size_values = color_button.attr("size_values");
-  var sizes = size_values.split("|");
+  var sizes = size_values ? size_values.split("|") : Array();
+  
 //   console.log(sizes);
+//   console.log(sizes.length);
   
   var size_chooser = $(".size_chooser .product_size");
+  size_chooser.parent().css("visibility", "hidden");
   size_chooser.empty();
+
   for (var a=0;a<sizes.length;a++) {
 	size_chooser.append("<option>"+sizes[a]+"</option>");
   }
+  
+  if (sizes.length>0) {
+	size_chooser.parent().css("visibility", "visible");
+	
+  }
+  
 
+  
   //hide other galleries
   $(".image_gallery .list").css("display", "none");
   var active_gallery = $(".image_gallery .list[pclrID='"+pclrID+"']");
@@ -71,13 +82,17 @@ function updatePrice()
   var index = size_chooser.prop("selectedIndex");
   
   console.log("selected index: " + index);
-  console.log("selected price: " + sell_prices[index]);
-  $(".price_panel .sell_price").html(parseFloat(sell_prices[index]).toFixed(2));
+  if (index>-1) {
+	console.log("selected price: " + sell_prices[index]);
+	$(".price_panel .sell_price").html(parseFloat(sell_prices[index]).toFixed(2));
+	
+	var pid = pids[index];
+	console.log("selected piD: " + pid);
+	
+	$(".price_panel .sell_price").attr("pid", pid);
+  }
   
-  var pid = pids[index];
-  console.log("selected piD: " + pid);
   
-  $(".price_panel .sell_price").attr("pid", pid);
   
   
 }

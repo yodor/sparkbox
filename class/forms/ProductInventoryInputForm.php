@@ -7,11 +7,15 @@ include_once ("class/beans/ProductSizesBean.php");
 class ProductInventoryInputForm extends InputForm
 {
 
+	protected $prodID = -1;
+
     public function __construct()
     {
 
 		$field = InputFactory::CreateField(InputFactory::SELECT, "pclrID", "Color", 0);
 		$field->getRenderer()->setSource(new ProductColorsBean());
+		
+
 		$field->getRenderer()->list_key = "pclrID";
 		$field->getRenderer()->list_label = "color";		
 		$this->addField($field);
@@ -19,6 +23,8 @@ class ProductInventoryInputForm extends InputForm
 
 		$field = InputFactory::CreateField(InputFactory::SELECT, "pszID", "Size", 0);
 		$field->getRenderer()->setSource(new ProductSizesBean());
+		
+		
 		$field->getRenderer()->list_key = "pszID";
 		$field->getRenderer()->list_label = "size_value";
 		$this->addField($field);
@@ -39,6 +45,12 @@ class ProductInventoryInputForm extends InputForm
 		$this->addField($field);
 	
   }
-
+  public function setProductID($prodID)
+  {
+	  $this->prodID = $prodID;
+	  
+	  $this->getField("pclrID")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
+	  $this->getField("pszID")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
+  }
 }
 ?>

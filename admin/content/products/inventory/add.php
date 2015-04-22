@@ -14,11 +14,16 @@ $page->checkAccess(ROLE_CONTENT_MENU);
 
 
 $ensure_product = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
+$prodID = (int)$ensure_product->ref_id;
 
-$view = new InputFormView(new ProductInventoryBean(), new ProductInventoryInputForm());
+$form = new ProductInventoryInputForm();
+$form->setProductID($prodID);
+
+$view = new InputFormView(new ProductInventoryBean(), $form);
 
 // $view->getTransactor()->assignInsertValue("insert_date", DBDriver::get()->dateTime());
-$view->getTransactor()->appendValue("prodID", $ensure_product->ref_id);
+$view->getTransactor()->appendValue("prodID", $prodID);
+
 
 $view->setCaption("Product Name: ".$ensure_product->ref_row["product_name"]);
 

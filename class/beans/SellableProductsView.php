@@ -15,7 +15,7 @@ class SellableProductsView extends DBViewBean {
 // (SELECT group_concat(sp1.piID SEPARATOR '|') FROM sellable_products sp1 WHERE sp1.pclrID = si.pclrID ) as pids ,
 // cc.pi_ids as color_pids, cc.colors, cc.color_photos, cc.have_chips, cc.color_ids, cc.product_photos,
 // si.*
-// FROM sellable_products si LEFT JOIN color_chips cc ON cc.prodID = si.prodID GROUP BY si.pclrID)
+// FROM sellable_products si LEFT JOIN color_chips cc ON cc.prodID = si.prodID GROUP BY si.prodID, si.pclrID)
 
     public function __construct() 
     {

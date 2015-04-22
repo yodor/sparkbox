@@ -15,14 +15,22 @@ include_once("class/beans/ProductsBean.php");
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-$rc = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
+$menu = array();
 
+$prodID = -1;
 
-$menu=array(
-    new MenuItem("Add Inventory", "add.php".$rc->qrystr, "list-add.png"),
+try {
 
-);
+  $rc = new ReferenceKeyPageChecker(new ProductsBean(), false);
+  $menu=array(
+	  new MenuItem("Add Inventory", "add.php".$rc->qrystr, "list-add.png"),
+  );
+  $prodID = (int)$rc->ref_id;
+  
+}
+catch (Exception $e) {
 
+}
 
 $bean = new ProductInventoryBean();
 
@@ -36,9 +44,15 @@ RequestController::addRequestHandler($h_delete);
 $select_inventory = $bean->getSelectQuery();
 $select_inventory->fields = " pi.*, pclr.color, psz.size_value, p.product_name, p.product_code  ";
 $select_inventory->from = " product_inventory pi LEFT JOIN product_colors pclr ON pclr.pclrID = pi.pclrID LEFT JOIN product_sizes psz ON psz.pszID=pi.pszID LEFT JOIN products p ON p.prodID = pi.prodID ";
-$select_inventory->where = " pi.prodID = ".$rc->ref_id."   ";
+if ($prodID>0) {
+  $select_inventory->where = " pi.prodID = '$prodID' ";
+  $list_caption = $rc->ref_row["product_name"];
+}
+else {
+  $list_caption = "All Products Inventory";
+}
 
-$list_caption = $rc->ref_row["product_name"];
+
 
 
 // $ksc->processSearch($select_products);
@@ -51,7 +65,7 @@ $view->setCaption($list_caption);
 // $view->search_filter = " ORDER BY day_num ASC ";
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
 
-
+$view->addColumn(new TableColumn("prodID","prodID"));
 // $view->addColumn(new TableColumn("photo","Photo"));
 
 // $view->addColumn(new TableColumn("color_photo","Color Photo"));

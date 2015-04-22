@@ -4,11 +4,11 @@ include_once("lib/beans/DBTableBean.php");
 //TODO:Check Usage
 class ReferenceKeyPageChecker
 {
-  public $ref_key=false;
-  public $ref_id=false;
+  public $ref_key=null;
+  public $ref_id=-1;
   public $ref_row=array();
   public $qrystr="";
-  
+
   public function __construct(DBTableBean $ref_bean, $redirect_fail)
   {
 	
@@ -29,11 +29,19 @@ class ReferenceKeyPageChecker
 	  $this->ref_key = $ref_key;
 	  $this->ref_id = $ref_id;
 	  $this->ref_row = $ref_row;
+	  
+	 
 	}
 	catch (Exception $e) {
-	  Session::set("alert", "Required parameter ".$this->ref_key." of ".get_class($ref_bean)." was not found.");
-	  header("Location: $redirect_fail");
-	  exit;
+	
+	  if ($redirect_fail) {
+		Session::set("alert", "Required parameter ".$this->ref_key." of ".get_class($ref_bean)." was not found.");
+		header("Location: $redirect_fail");
+		exit;
+	  }
+	  else {
+		  throw $e;
+	  }
 	}
 
 	

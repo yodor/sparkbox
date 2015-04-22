@@ -40,17 +40,21 @@ class ProductListItem extends ItemRendererImpl {
 // 		print_r(array_keys($this->item));
 // 		echo "<HR>";
 
-		$photos_bean = "ProductColorPhotosBean";
+		$photos_bean = ProductColorPhotosBean::class;
 		if ($this->item["color_gallery"]) {
 		  $photos = explode("|", $this->item["color_gallery"]);
 		}
 		else {
-		  $photos_bean = "ProductPhotosBean";
+		  $photos_bean = ProductPhotosBean::class;
 		  $photos = explode("|", $this->item["product_photos"]);
 		}
 		$same_color_pids = explode("|", $this->item["pids"]);
 		
-		$colors = explode("|", $this->item["colors"]);
+		
+		$colors = array();
+		if ($this->item["colors"]) {
+		  $colors = explode("|", $this->item["colors"]);
+		}
 		
 		$have_chips = explode("|", $this->item["have_chips"]);
 		$color_ids = explode("|", $this->item["color_ids"]);
@@ -83,34 +87,36 @@ class ProductListItem extends ItemRendererImpl {
 
 // 		echo "<div><label>color:</label>".$this->item["color"]."</div>";
 
-		
-		echo "<div><label>Colors: </label>".implode(", ",$colors)."</div>";
-		
-		echo "<div class='color_chips'>";
-		foreach ($colors as $key=>$color) {
-		  //use the chip image
-		  if ($have_chips[$key]>0) {
-			$chip_class = "ProductColorsBean&bean_field=color_photo";
-			$chip_id = $color_ids[$key];
-		  }
-		  //use first image from the color photos gallery
-		  else if (isset($color_photo_ids[$key]) && $color_photo_ids[$key]>0) {
-			$chip_class = "ProductColorPhotosBean";
-			$chip_id = $color_photo_ids[$key];
-		  }
-		  //use the first image of the product photos as color_chip
-		  else {
-			$chip_class = "ProductPhotossBean";
-			$chip_id = $product_photo_ids[$key];
-		  }
-		  $href = STORAGE_HREF."?cmd=image_crop&width=24&height=24&class=$chip_class&id=$chip_id";
-		  $item_href_color = $item_href.$color_pids[$key];
-		  echo "<a href='$item_href_color' class='item'>";
-		  echo "<img src='$href' title='{$colors[$key]}'>";
-		  echo "</a>";
+		if (count($colors)>0) {
+		  echo "<div><label>Colors: </label>".implode(", ",$colors)."</div>";
+		  
+		  echo "<div class='color_chips'>";
+			foreach ($colors as $key=>$color) {
+			  //use the chip image
+			  if ($have_chips[$key]>0) {
+				$chip_class = ProductColorsBean::class."&bean_field=color_photo";
+				$chip_id = $color_ids[$key];
+			  }
+			  //use first image from the color photos gallery
+			  else if (isset($color_photo_ids[$key]) && $color_photo_ids[$key]>0) {
+				$chip_class = ProductColorPhotosBean::class;
+				$chip_id = $color_photo_ids[$key];
+			  }
+			  //use the first image of the product photos as color_chip
+			  else {
+				$chip_class = "ProductPhotossBean";
+				$chip_id = $product_photo_ids[$key];
+			  }
+			  $href = STORAGE_HREF."?cmd=image_crop&width=24&height=24&class=$chip_class&id=$chip_id";
+			  $item_href_color = $item_href.$color_pids[$key];
+			  echo "<a href='$item_href_color' class='item'>";
+			  echo "<img src='$href' title='{$colors[$key]}'>";
+			  echo "</a>";
+			}
+		  echo "</div>";
 		}
 		
-		echo "</div>";
+		
 
 		echo "<div><label>sell_price:</label><span class='sell_price'>".$this->item["sell_price"]."</div>";
 
