@@ -112,8 +112,10 @@ class DemoPage extends SimplePage
 
 	echo "<div align=center>";
 
+	  echo "<div class='MenuBar'>";
 	  $this->menu_bar->render();
-
+	  echo "</div>";
+	  
 	  echo "<div class=clear></div>";
 
 	  echo "<div class='main_content'>"; //inner contents
@@ -124,14 +126,14 @@ class DemoPage extends SimplePage
     public function finishPage()
     {
 
-	  echo "<div class='version_label'>";
-	  echo "<label>";
-	  echo "PHP: ".phpversion();
-// 	  echo " | ";
-// 	  echo "MySQL: C.".mysql_get_client_info();
-// 	  echo "/S.".mysql_get_server_info();
-	  echo "</label>";
-	  echo "</div>";
+// 	  echo "<div class='version_label'>";
+// 	  echo "<label>";
+// 	  echo "PHP: ".phpversion();
+// // 	  echo " | ";
+// // 	  echo "MySQL: C.".mysql_get_client_info();
+// // 	  echo "/S.".mysql_get_server_info();
+// 	  echo "</label>";
+// 	  echo "</div>";
 	  
 	  echo "</div>"; //main_content
 	echo "</div>"; //align=center

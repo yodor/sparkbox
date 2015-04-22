@@ -1,15 +1,15 @@
 body {
-  background-color:#b9b3a3;
+  background-color:#ababab;
   margin-bottom:20px;
 }
 
 .main_content {
   
-  width:960px;
+/*   width:960px; */
 
   text-align:left;
   
-  display: block; 
+  display: inline-block; 
   margin: 20px auto; 
   background: #eee; 
   border-radius: 10px; 
@@ -18,17 +18,37 @@ body {
   box-sizing:border-box;
   -moz-box-sizing:border-box;
   
-  max-width:960px;
+  max-width:1200px;
   
 }
-
+.MenuBar {
+  background-color:white;
+}
+.MenuBar .MenuBarComponent {
+  display:inline-block;
+  
+}
+.MenuBar .MenuBarComponent .MenuBarItemRenderer {
+  display:inline-block;
+  height:auto;
+  padding-top:5px;
+  padding-bottom:5px;
+  font-size:14px;
+}
+.MenuBar .MenuBarComponent .MenuSeparator {
+  display:inline-block;
+}
 .column {
   display:inline-block;
   vertical-align:top;
-  
+  box-sizing:border-box;
 }
 .column.categories {
   max-width:180px;
+}
+
+.column.product_list {
+  max-width:900px;
 }
 
 .main_content .version_label {
@@ -97,27 +117,48 @@ body.products.list .ProductListItem {
   display:inline-block;
   margin:10px;
   border:1px dotted gray;
- 
+  max-width:22%;
+  width:22%;
+  min-width:202px;
+  box-sizing:border-box;
+  vertical-align:top;
+}
+body.products.list .ProductListItem .product_title {
+  display:block;
+  max-height:50px;
+  height:50px;
 }
 body.products.list .ProductListItem A {
  text-decoration:none;
 }
-
+body.products.list .ProductListItem .color_chips  {
+  display:block;
+}
+body.products.list .ProductListItem .color_chips  A {
+  display:inline-block;
+  margin-right:5px;
+}
+body.products.list .ProductListItem .color_chips  A IMG {
+  display:block;
+}
 body.products.details .column.details {
   display:block;
 }
 body.products.details .images {
   display:inline-block;
-  max-width:400px;
+/*   max-width:400px; */
   border:1px dotted gray;
   vertical-align:top;
   
 }
 body.products.details .images .image_big {
   display:block;
+  float:right;
+  margin-left:10px;
 }
 body.products.details .images .image_gallery {
   display:block;
+  float:left;
 }
 
 body.products.details .images .image_gallery .list {
@@ -128,7 +169,7 @@ body.products.details .images .image_gallery .list {
 }*/
 
 body.products.details .images .image_gallery .list .item {
-  display:inline-block;
+  display:block;
   border:1px solid transparent;
 }
 body.products.details .images .image_gallery .list .item[active='1'] {

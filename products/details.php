@@ -19,6 +19,20 @@ include_once("class/beans/SellableProductsView.php");
 include_once("class/components/renderers/items/ProductListItem.php");
 
 
+//cart list
+// SELECT 
+// (select pp.ppID FROM product_photos pp WHERE pp.prodID=sp.prodID ORDER BY position ASC LIMIT 1) as product_photo,
+// (select pcp.pclrpID FROM product_color_photos pcp WHERE pcp.pclrID=sp.pclrID ORDER BY position ASC LIMIT 1) as color_photo,
+// sp.*
+// FROM `sellable_products` sp 
+
+function dumpJS()
+{
+  echo "<script type='text/javascript' src='".SITE_ROOT."js/product_details.js'></script>";
+  echo "\n";
+}
+$sp = new SellableProductsBean();
+
 $page = new DemoPage();
 
 $prodID = -1;
@@ -31,19 +45,28 @@ if (isset($_GET["piID"])) {
 }
 
 
-$sp = new SellableProductsBean();
-$sellable = array();
+
 try {
-  $sp->startIterator("WHERE piID='$piID' LIMIT 1");
-  if ($sp->fetchNext($sellable)) {
-	 $prodID = $sellable["prodID"];
+
+  //select first piID and redirect;
+  if ($piID<1) {
+	  $num = $sp->startIterator("WHERE prodID='$prodID' LIMIT 1");
+	  if ($sp->fetchNext($irow)) {
+		  $piID = $irow["piID"];
+	  }
+	  else {
+		  throw new Exception("Product Not Found.");
+	  }
   }
-  else {
-	throw new Exception("Unaccessible product");
+
+  $num = $sp->startIterator("WHERE piID='$piID' AND prodID='$prodID' LIMIT 1");
+  if ($num<1) {
+	throw new Exception("Product Not Found.");
   }
+  
 }
 catch (Exception $e) {
-  Session::set("alert", "This product is currently unaccessible.");
+  Session::set("alert", "This product is currently unaccessible. Error: ".$e->getMessage());
   header("Location: list.php");
   exit;
 }
@@ -51,7 +74,7 @@ catch (Exception $e) {
 $sel = new SelectQuery();
 $sel->fields = " * ";
 $sel->from = " sellable_products_view ";
-$sel->where = " prodID = $prodID ";
+$sel->where = " prodID = '$prodID'   ";
 
 
 
@@ -60,48 +83,86 @@ $db = DBDriver::get();
 $res = $db->query($sel->getSQL());
 if (!$res) throw new Exception($db->getError());
 
-$color_thumbs = array();
-$color_gallery = array();
-$color_sizes = array();
-$color_prices = array();
+//chips for all colors
+$chips = array();
+
+//color names
+$colors = array();
+
+//per pclrID items
+$galleries = array();
+$sizes = array();
+$prices = array();
 $color_pids = array();
 
-while ($row = $db->fetch($res)) {
-	
-	$pids = explode("|", $row["pids"]);
-	$color_name = $row["color"];
-	$pclrID = $row["pclrID"];
-	
-	$color_pids[$pclrID] = explode("|", $row["pids"]);
-	
-	$color_sizes[$pclrID] = explode("|", $row["size_values"]);
-	
-	$color_prices[$pclrID] = explode("|", $row["sell_prices"]);
-	
-	if ($row["color_gallery"]) {
-	  $photos = explode("|", $row["color_gallery"]);
-	  foreach ($photos as $key=>$pclrpID) {
-		$item = array("id"=>$pclrpID, "class"=>"ProductColorPhotosBean", "piID"=>$pids[$key], "prodID"=>$prodID, "color_name"=>$color_name);
-		if (!isset($color_thumbs[$pclrID])) {
-		  $color_thumbs[$pclrID] = $item;
-		}
-		$color_gallery[$pclrID][] = $item;
 
-	  }
+$process_color_chips = true;
+
+$sellable = array();
+
+while ($sellable = $db->fetch($res)) {
+
+	$color_name = $sellable["color"];
+	$pclrID = $sellable["pclrID"];
+	
+	//pids from the same color
+	$color_pids[$pclrID] = explode("|", $sellable["pids"]);
+	
+	if (in_array($piID, $color_pids[$pclrID])) {
+	  $piID = $color_pids[$pclrID][0];
+	}
+	$sizes[$pclrID] = explode("|", $sellable["size_values"]);
+	$prices[$pclrID] = explode("|", $sellable["sell_prices"]);
+	
+	//construct photo galleries
+	$item_class = "";
+	$photos = array();
+	if ($sellable["color_gallery"]) {
+	  $photos = explode("|", $sellable["color_gallery"]);
+	  $item_class = "ProductColorPhotosBean";
 	}
 	else {
-	  $photos = explode("|", $row["product_photos"]);
-	  foreach ($photos as $key=>$ppID) {
-		$item = array("id"=>$ppID, "class"=>"ProductPhotosBean", "piID"=>$pids[$key], "prodID"=>$prodID, "color_name"=>$color_name);
-		if (!isset($color_thumbs[$pclrID])) {
-		  $color_thumbs[$pclrID] = $item;
-		}
-		$color_gallery[$pclrID][] = $item;
-
+	  $photos = explode("|", $sellable["product_photos"]);
+	  $item_class = "ProductPhotosBean";
+	}
+	foreach ($photos as $idx=>$id) {
+		$item = array("id"=>$id, "class"=>$item_class);
+		$galleries[$pclrID][] = $item;
+	}
+	//
+	  
+	if ($process_color_chips) {
+	  $colors = explode("|", $sellable["colors"]);
+	  $have_chips = explode("|", $sellable["have_chips"]);
+	  $color_ids = explode("|", $sellable["color_ids"]);
+	  $color_photo_ids = explode("|", $sellable["color_photos"]);
+	  $product_photo_ids = explode("|", $sellable["product_photos"]);
+	  $same_color_pids = explode("|", $sellable["color_pids"]);
+	  
+	  foreach ($colors as $idx=>$color) {
+		  $pclrID = $color_ids[$idx];
+		  //use the chip image
+		  if ($have_chips[$idx]>0) {
+			$chip_class = "ProductColorsBean&bean_field=color_photo";
+			$chip_id = $color_ids[$idx];
+		  }
+		  //use first image from the color photos gallery
+		  else if (isset($color_photo_ids[$idx]) && $color_photo_ids[$idx]>0) {
+			$chip_class = "ProductColorPhotosBean";
+			$chip_id = $color_photo_ids[$idx];
+		  }
+		  //use the first image of the product photos as color_chip
+		  else {
+			$chip_class = "ProductPhotossBean";
+			$chip_id = $product_photo_ids[$idx];
+		  }
+		  
+		  $item = array("id"=>$chip_id, "class"=>$chip_class, "piID"=>$same_color_pids[$idx], "prodID"=>$prodID, "color_name"=>$color);
+		  $chips[$pclrID] = $item;
 	  }
+	  $process_color_chips = false;
 	}
 }
-
 
 
 
@@ -111,56 +172,59 @@ echo "<h1>".$sellable["product_name"]."</h1>";
 echo "<div class='column details'>";
 
   echo "<div class='images'>";
+  
+	//main image
 	$gallery_href = STORAGE_HREF."?cmd=image_crop&width=400&height=-1";
 	$big_href = STORAGE_HREF."?cmd=gallery_photo";
 	echo "<div class='image_big' source='$gallery_href' >";
-	foreach ($color_gallery as $pclrID=>$gallery) {
-	  
-	  foreach ($gallery as $key=>$item) {
-		$href = $gallery_href."&class=".$item["class"]."&id=".$item["id"];
-		
-		echo "<a class='image_popup' href='$href' source='$big_href'><img src=''></a>";
-		break;
-	  }
-	  break;
-	}
+	echo "<a class='image_popup' href='' source='$big_href'><img src=''></a>";
 	echo "</div>";
+	
+	//photo galleries per color
 	echo "<div class='image_gallery'>";
-	foreach ($color_gallery as $pclrID=>$gallery) {
-	  echo "<div class='list' pclrID='$pclrID'>";
-	  foreach ($gallery as $key=>$item) {
-		$href_source = STORAGE_HREF."?cmd=image_crop&width=-1&height=128";
-		$href=$href_source."&class=".$item["class"]."&id=".$item["id"];
-		echo "<div class='item' bean='{$item["class"]}' itemID='{$item["id"]}' source='$href_source' onClick='javascript:changeImage(this)'>";
-		echo "<img src='$href' >";
-		echo "</div>";
+	  foreach ($galleries as $pclrID=>$gallery) {
+		echo "<div class='list' pclrID='$pclrID'>";
+		  foreach ($gallery as $key=>$item) {
+			$href_source = STORAGE_HREF."?cmd=image_crop&width=110&height=110";
+			$href=$href_source."&class=".$item["class"]."&id=".$item["id"];
+			echo "<div class='item' bean='{$item["class"]}' itemID='{$item["id"]}' source='$href_source' onClick='javascript:changeImage(this)'>";
+			echo "<img src='$href' >";
+			echo "</div>";
+		  }
+		echo "</div>";//list
 	  }
-	  echo "</div>";
-	}
-	echo "</div>";
-  echo "</div>";
+	echo "</div>";//image_gallery
+	
+  echo "</div>"; // images
   
   echo "<div class='product_details'>";
   
 	echo "<div class='price_panel'>";
-	echo "<label for='sell_price'>Price:</label>";
-	echo "<span class='sell_price'></span>";
+	  echo "<label for='sell_price'>Price:</label>";
+	  echo "<span class='sell_price'></span>";
 	echo "</div>";
 	
 	echo "<HR>";
 	
-	echo "Colors:<BR>";
-	echo "<div class='color_chooser'>";
-	foreach ($color_thumbs as $key=>$item) {
-	  $href = STORAGE_HREF."?cmd=image_crop&width=48&height=48&class=".$item["class"]."&id=".$item["id"];
-	  $size_values = implode("|", $color_sizes[$key]);
-	  $pid_values = implode("|", $color_pids[$key]);
-	  $sell_prices = implode("|", $color_prices[$key]);
-	  echo "<div class='color_button' pclrID='$key' piID='{$pid_values[0]}' size_values='$size_values' sell_prices='$sell_prices' pids='$pid_values' onClick='javascript:changeColor($key)'>";
-	  echo "<img src='$href' title='{$item["color_name"]}'>";
-	  echo "</div>";
-	}
-	echo "</div>";
+	echo "<div class='colors_panel'>";
+	  echo "Color:<span class='current_color'></span>";
+	  echo "<div class='color_chooser'>";
+	  foreach ($chips as $pclrID=>$item) {
+		$href = STORAGE_HREF."?cmd=image_crop&width=48&height=48&class=".$item["class"]."&id=".$item["id"];
+		$size_values = implode("|", $sizes[$pclrID]);
+		$pid_values = implode("|", $color_pids[$pclrID]);
+		$sell_prices = implode("|", $prices[$pclrID]);
+		$chip_piID = $color_pids[$pclrID][0];
+		$chip_colorName = $item["color_name"];
+		
+		//sizing pids = $pid_values
+		echo "<div class='color_button' pclrID='$pclrID' piID='$chip_piID' size_values='$size_values' sell_prices='$sell_prices' pids='$pid_values' color_name='$chip_colorName'
+				   onClick='javascript:changeColor($pclrID)'>";
+		echo "<img src='$href' title='$chip_colorName'>";
+		echo "</div>";
+	  }
+	  echo "</div>";//color_chooser
+	echo "</div>";//colors_panel
 	
 	echo "<HR>";
 	
@@ -178,6 +242,9 @@ echo "<div class='column details'>";
   
 echo "</div>";
 
+
+
+
 ?>
 
 <script type='text/javascript'>
@@ -191,96 +258,10 @@ addLoadEvent(function(){
   var pclrID = $(".color_chooser .color_button[piID='"+piID+"']").attr("pclrID");
   changeColor(pclrID);
   
-  
-  
 });
-function changeColor(pclrID) 
-{
-  $(".image_gallery .list .item").attr("active", "0");
-  $(".color_chooser .color_button").attr("active", "0");
-  
-  var color_button = $(".color_chooser .color_button[pclrID='"+pclrID+"']");
-  color_button.attr("active", "1");
-  piID = color_button.attr("piID");
-  
-  var size_values = color_button.attr("size_values");
-  
-  var sizes = size_values.split("|");
-  
-//   console.log(sizes);
-  var size_chooser = $(".size_chooser .product_size");
-  size_chooser.empty();
-  for (var a=0;a<sizes.length;a++) {
-// 	console.log(sizes[a]);
-	size_chooser.append("<option val='"+sizes[a]+"'>"+sizes[a]+"</option>");
-  }
-  
-  
-  
-  $(".image_gallery .list").css("display", "none");
-  $(".image_gallery .list[pclrID='"+pclrID+"']").css("display", "block");
-  
-  var first_item = $(".image_gallery .list[pclrID='"+pclrID+"'] .item").first();
-  
-  first_item.attr("active", "1");
-  
-  var bean = first_item.attr("bean");
-  var id = first_item.attr("itemID");
-  var href_big = $(".image_big").attr("source");
-  
-  
-//   href_big+="&class="+bean+"&id="+id;
-//   $(".image_big IMG").attr("src", href_big);
-  changeImage(first_item);
-  
 
-  updatePrice();
-  
-}
-function changeImage(elm)
-{
-  $(".image_gallery .list .item").attr("active", "0");
-  
-  var bean = $(elm).attr("bean");
-  var id = $(elm).attr("itemID");
-  
-  var href_big = $(".image_big").attr("source");
-  href_big += "&class="+bean+"&id="+id;
-  
-  $(".image_big IMG").attr("src", href_big);
-  
-  $(".image_gallery .list .item[itemID='"+$(elm).attr("itemID")+"']").attr("active", "1");
-  
-  var href_popup = $(".image_big A").attr("source");
-  $(".image_big A").attr("href", href_popup+"&class="+bean+"&id="+id);
-}
-function updatePrice()
-{
-  console.log("Update Price");
-  
-  var color_chooser = $(".color_chooser .color_button[active='1']");
-  var prices = color_chooser.attr("sell_prices");
-  var sell_prices = prices.split("|");
-  var pid_values = color_chooser.attr("pids");
-  var pids = pid_values.split("|");
-  
-  console.log("Prices Length" + sell_prices);
-  
-  var size_chooser = $(".size_chooser .product_size");
-  var index = size_chooser.prop("selectedIndex");
-  
-  console.log("SZ Index" + index);
-  console.log("Price:" + sell_prices[index]);
-  $(".price_panel .sell_price").html(parseFloat(sell_prices[index]).toFixed(2));
-  
-  var pid = pids[index];
-  console.log("PID:" + pid);
-  
-  $(".price_panel .sell_price").attr("pid", pid);
-  
-}
 </script>
+
 <?php
 $page->finishPage();
-
 ?>

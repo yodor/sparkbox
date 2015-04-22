@@ -58,7 +58,7 @@ $have_filter = $tv->processFilters();
 //
 $tree_query = $tv->getSelectQuery();
 // echo $tree_query->getSQL();
-echo "<HR>";
+
 
 
 $product_selector = $tv->getRelationSelect();
@@ -105,7 +105,7 @@ $tv->render();
 
 echo "</div>";
 
-echo "<div class='column'>";
+echo "<div class='column product_list'>";
 
 $ksc->render();
 $view->render();

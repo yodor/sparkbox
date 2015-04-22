@@ -6,8 +6,8 @@ class SellableProductsView extends DBViewBean {
 	
 	
 // create view sellable_products_view as (SELECT 
-// (SELECT group_concat(pp.ppID SEPARATOR '|') FROM product_photos pp WHERE pp.prodID = si.prodID) as product_gallery, 
-// (SELECT group_concat(pcp1.pclrpID ORDER BY pcp1.position SEPARATOR '|') FROM product_color_photos pcp1 WHERE pcp1.pclrID = si.pclrID ) as color_gallery, 
+// (SELECT group_concat(pp.ppID ORDER BY pp.ppID ASC SEPARATOR '|') FROM product_photos pp WHERE pp.prodID = si.prodID) as product_gallery, 
+// (SELECT group_concat(pcp.pclrpID ORDER BY pcp.position SEPARATOR '|') FROM product_color_photos pcp WHERE pcp.pclrID = si.pclrID ) as color_gallery, 
 // (SELECT group_concat(sp1.size_value SEPARATOR '|') FROM sellable_products sp1 WHERE sp1.pclrID = si.pclrID ) as size_values, 
 // (SELECT group_concat(sp1.sell_price SEPARATOR '|') FROM sellable_products sp1 WHERE sp1.pclrID = si.pclrID ) as sell_prices, 
 // (SELECT group_concat(sp1.old_price SEPARATOR '|') FROM sellable_products sp1 WHERE sp1.pclrID = si.pclrID ) as old_prices, 

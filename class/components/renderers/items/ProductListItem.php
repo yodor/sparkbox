@@ -63,18 +63,19 @@ class ProductListItem extends ItemRendererImpl {
 		$item_href = SITE_ROOT."products/details.php?prodID={$this->item["prodID"]}&piID=";
 		
 		$item_href_main = $item_href.$this->item["piID"];
-		echo "<a href='$item_href_main'>";
+		echo "<a href='$item_href_main' class='product_link'>";
 // 		$img_href = STORAGE_HREF."?cmd=image_crop&width=120&height=100&class=ProductPhotosBean&id=".$this->item["ppID"];
 
 // 		if ($this->item["pclrpID"]>0) {
-		  $img_href = STORAGE_HREF."?cmd=image_crop&width=120&height=100&class=$photos_bean&id=".$photos[0];
+		  $img_href = STORAGE_HREF."?cmd=image_crop&width=202&height=202&class=$photos_bean&id=".$photos[0];
 // 		}
   
 		
 		
-
-		echo "<div><label>product_name:</label>".$this->item["product_name"]."</div>";
+		echo "<div class='product_title'>";
+		echo "<div class='product_name'>".$this->item["product_name"]."</div>";
 		echo "<div><label>product_code:</label>".$this->item["product_code"]."</div>";
+		echo "</div>";
 		
 		echo "<img src='$img_href'>";
 
@@ -105,7 +106,7 @@ class ProductListItem extends ItemRendererImpl {
 		  $href = STORAGE_HREF."?cmd=image_crop&width=24&height=24&class=$chip_class&id=$chip_id";
 		  $item_href_color = $item_href.$color_pids[$key];
 		  echo "<a href='$item_href_color' class='item'>";
-		  echo "<img src='$href'>";
+		  echo "<img src='$href' title='{$colors[$key]}'>";
 		  echo "</a>";
 		}
 		
