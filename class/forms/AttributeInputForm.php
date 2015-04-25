@@ -11,7 +11,7 @@ class AttributeInputForm extends InputForm
 	$field->setRenderer(new TextField());
 	$this->addField($field);
 
-	$field = new InputField("unit", "Attribute Unit", 1);
+	$field = new InputField("unit", "Attribute Unit", 0);
 	$field->setRenderer(new TextField());
 	$this->addField($field);
     }

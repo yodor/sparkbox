@@ -12,10 +12,13 @@ include_once("lib/components/KeywordSearchComponent.php");
 include_once("lib/iterators/SQLResultIterator.php");
 
 $menu=array(
+	new MenuItem("Attributes", "attributes/list.php", "list-add.png"),
+	new MenuItem("Classes", "classes/list.php", "list-add.png"),
     new MenuItem("Categories", "categories/list.php", "list-add.png"),
-    new MenuItem("Colors", "colors/list.php?prodID", "list-add.png"),
+    new MenuItem("Colors", "colors/list.php", "list-add.png"),
     new MenuItem("Sizes", "sizes/list.php?prodID", "list-add.png"),
     new MenuItem("Inventory", "inventory/list.php?prodID", "list-add.png"),
+    new MenuItem("Color Gallery", "color_gallery/list.php", "list-add.png"),
     new MenuItem("Add Product", "add.php", "list-add.png"),
     
 );
@@ -36,15 +39,19 @@ $select_products = $bean->getSelectQuery();
 // group_concat(color SEPARATOR ';' ) as colors, group_concat(size SEPARATOR ';') as sizes,
 // min(weight) as weight_min, max(weight) as weight_max
 // ";
-$select_products->fields = " p.*, pc.category_name, 
-(SELECT group_concat(color) FROM product_colors pclr WHERE pclr.prodID=p.prodID) as colors,
-(SELECT group_concat(size_value) FROM product_sizes psz WHERE psz.prodID=p.prodID) as sizes,
-(SELECT SUM(stock_amount) FROM product_inventory pinv WHERE pinv.prodID=p.prodID) as stock_amount";
 
-$select_products->from = " products p LEFT JOIN product_categories pc ON pc.catID=p.catID ";
-$select_products->group_by = "  prodID ";
+$select_products->fields = " 
+(SELECT group_concat(color SEPARATOR '<BR>') FROM product_colors pclr WHERE pclr.prodID=pi.prodID) as colors, 
+SUM(pi.stock_amount) as stock_amount,
+min(pi.price) as price_min, max(pi.price) as price_max,
+group_concat(distinct(size_value) SEPARATOR '<BR>') as sizes, 
+p.prodID, p.product_name, p.brand_name, p.gender, pc.category_name, p.product_code, p.visible, p.promotion, 
+p.price, p.old_price, p.buy_price
+";
+
+$select_products->from = " product_inventory pi JOIN products p ON p.prodID = pi.prodID LEFT JOIN product_categories pc ON pc.catID=p.catID ";
+$select_products->group_by = "  pi.prodID ";
 $ksc->processSearch($select_products);
-
 
 
 $view = new TableView(new SQLResultIterator($select_products, $bean->getPrKey()));
@@ -63,11 +70,11 @@ $view->addColumn(new TableColumn("product_name","Product Name"));
 $view->addColumn(new TableColumn("gender","Gender"));
 
 // $view->addColumn(new TableColumn("buy_price","Buy Price"));
-// $view->addColumn(new TableColumn("price_min","Price Min"));
-// $view->addColumn(new TableColumn("price_max","Price Max"));
+$view->addColumn(new TableColumn("price_min","Price Min"));
+$view->addColumn(new TableColumn("price_max","Price Max"));
 // $view->addColumn(new TableColumn("old_price","Old Price"));
 
-$view->addColumn(new TableColumn("colors", "Colors"));
+$view->addColumn(new TableColumn("colors", "Color Gallery"));
 $view->addColumn(new TableColumn("sizes", "Sizes"));
 
 // $view->addColumn(new TableColumn("weight_min", "Weight Min"));
@@ -77,8 +84,7 @@ $view->addColumn(new TableColumn("visible", "Visible"));
 
 $view->addColumn(new TableColumn("promotion", "Promotion"));
 
-$view->addColumn(new TableColumn("view_counter", "View Counter"));
-$view->addColumn(new TableColumn("order_counter", "Order Counter"));
+
 
 $view->addColumn(new TableColumn("stock_amount", "Stock Amount"));
 
@@ -103,14 +109,10 @@ $act->addAction( $h_delete->createAction() );
 $act->addAction(  new RowSeparatorAction() );
 
 $act->addAction(
-  new Action("Colors", "colors/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
+  new Action("Color Gallery", "color_gallery/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
 );
 
-$act->addAction(  new PipeSeparatorAction() );
 
-$act->addAction(
-  new Action("Sizes", "sizes/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
-);
 
 $act->addAction(  new RowSeparatorAction() );
 

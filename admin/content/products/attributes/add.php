@@ -1,8 +1,9 @@
 <?php
 include_once("session.php");
 include_once("class/pages/AdminPage.php");
-include_once("class/forms/StoreColorInputForm.php");
-include_once("class/beans/StoreColorsBean.php");
+include_once("class/forms/AttributeInputForm.php");
+include_once("class/beans/AttributesBean.php");
+
 
 $menu=array(
 
@@ -11,8 +12,7 @@ $menu=array(
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-$view = new InputFormView(new StoreColorsBean(), new StoreColorInputForm());
-
+$view = new InputFormView(new AttributesBean(), new AttributeInputForm());
 
 $view->processInput();
 

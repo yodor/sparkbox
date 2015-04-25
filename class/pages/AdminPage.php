@@ -8,8 +8,9 @@ include_once("lib/components/renderers/cells/BooleanFieldCellRenderer.php");
 
 class AdminPage extends AdminPageLib
 {
+	public $caption = "";
 
-
+	
     protected function dumpCSS()
     {
 	parent::dumpCSS();
@@ -37,7 +38,15 @@ class AdminPage extends AdminPageLib
 	
     }
 
-
+	public function renderPageCaption($str=null)
+    {
+		if ($this->caption) {
+		  parent::renderPageCaption($this->caption);
+		}
+		else {
+		  parent::renderPageCaption($str);
+		}
+    }
 
 }
 

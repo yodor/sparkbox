@@ -227,7 +227,7 @@ IMG {
 }
 
 
-.InputFormView[bean='ProductInventoryBean'] .caption {
+.InputFormView .caption {
   color: #656565;
   font-size: 20px;
   /* font-weight: bold; */

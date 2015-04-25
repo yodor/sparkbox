@@ -1,16 +1,19 @@
 body {
   background-color:#ababab;
   margin-bottom:20px;
+ 
 }
 
 .main_content {
-  
+
 /*   width:960px; */
 
   text-align:left;
   
   display: inline-block; 
-  margin: 20px auto; 
+  margin: 20px ;
+  margin-top:10px;
+  
   background: #eee; 
   border-radius: 10px; 
   padding: 15px; 
@@ -23,7 +26,12 @@ body {
 }
 .MenuBar {
   background-color:white;
+ 
+  z-index:10;
+  
 }
+
+
 .MenuBar .MenuBarComponent {
   display:inline-block;
   
@@ -38,6 +46,36 @@ body {
 .MenuBar .MenuBarComponent .MenuSeparator {
   display:inline-block;
 }
+
+/* Menu */
+
+.MenuBar {
+
+text-align: center;
+margin: 0 auto;
+padding: 0;
+display:block;
+}
+
+/* Default Style */
+
+.MenuBar.default {
+
+}
+
+
+/* CSS3 position: fixed */
+.MenuBar.fixed {
+position: fixed;
+
+width: 100%;
+box-shadow: 0 0 40px #222;
+-webkit-box-shadow: 0 0 40px #222;
+-moz-box-shadow: 0 0 40px #222;
+}
+
+
+
 .column {
   display:inline-block;
   vertical-align:top;
@@ -193,6 +231,7 @@ body.products.list .ProductListItem:hover .wrap {
 -moz-box-shadow: 0px 0px 24px 1px rgba(0,0,0,0.75);
 box-shadow: 0px 0px 24px 1px rgba(0,0,0,0.75);
 z-index:1;
+
 }
 body.products.list .ProductListItem:hover .color_chips  {
   display:block;
@@ -285,3 +324,5 @@ body.products.details .color_chooser .color_button IMG {
 }
 .clearfix:after { clear: both; }
 .clearfix { zoom: 1; } /* IE < 8 */
+
+

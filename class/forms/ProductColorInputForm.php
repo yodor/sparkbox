@@ -2,7 +2,7 @@
 include_once ("lib/forms/InputForm.php");
 include_once ("lib/input/InputFactory.php");
 include_once ("class/beans/ProductColorPhotosBean.php");
-
+include_once ("class/beans/StoreColorsBean.php");
 // include_once ("class/beans/BrandsBean.php");
 // include_once ("class/beans/GendersBean.php");
 // include_once ("class/beans/ProductCategoriesBean.php");
@@ -22,12 +22,18 @@ class ProductColorInputForm extends InputForm
 
    
 
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "color", "Color Name", 1);
+	$field = InputFactory::CreateField(InputFactory::SELECT, "color", "Gallery Color", 1);
+	
+	$rend = $field->getRenderer();
+	$rend->setSource(new StoreColorsBean());
+	$rend->list_label = "color";
+	$rend->list_key = "color";
+	$rend->addon_content = "<a class='ActionRenderer' href='".ADMIN_ROOT."content/products/colors/add.php'>New Color</a>";
 	$this->addField($field);
-	$field->enableTranslator(true);
+// 	$field->enableTranslator(true);
 
 
-	$input = InputFactory::CreateField(InputFactory::SESSION_IMAGE, "color_photo","Color Photo", 0);
+	$input = InputFactory::CreateField(InputFactory::SESSION_IMAGE, "color_photo","Color Chip", 0);
 // 	$input->setSource(new ProductPhotosBean());
 // 	$input->transact_mode = InputField::TRANSACT_OBJECT;
 // 	$input->getValueTransactor()->max_slots = 10;

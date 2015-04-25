@@ -15,6 +15,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
   
   public $transact_empty_string_as_null = false;
   
+  public $bean_copy_fields = array();
+  
   public function __construct()
   {
     
@@ -83,6 +85,16 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 				  }
 				}
 				
+			}
+			
+			//process bean copy fields
+			if (is_array($this->bean_copy_fields) && count($this->bean_copy_fields)>0) {
+				$bean_fields = $transactor->getTransactionValues();
+				foreach ($bean_fields as $key=>$val) {
+					if (in_array($key, $this->bean_copy_fields)) {
+					  $dbrow[$key] = $val;
+					}
+				}
 			}
 			
 			$sourceID = array_shift($this->source_loaded_keys);

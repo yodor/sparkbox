@@ -112,7 +112,7 @@ class DemoPage extends SimplePage
 
 	echo "<div align=center>";
 
-	  echo "<div class='MenuBar'>";
+	  echo "<div class='MenuBar default'>";
 	  $this->menu_bar->render();
 	  echo "</div>";
 	  
@@ -138,6 +138,33 @@ class DemoPage extends SimplePage
 	  echo "</div>"; //main_content
 	echo "</div>"; //align=center
 
+	?>
+<script type='text/javascript'>
+addLoadEvent(function(){
+
+
+	var menu = $('.MenuBar'),
+		pos = menu.offset();
+		
+		$(window).scroll(function(){
+			if($(this).scrollTop() > pos.top+menu.height() && menu.hasClass('default')){
+// 				menu.fadeOut('fast', function(){
+// 					$(this).removeClass('default').addClass('fixed').fadeIn('fast');
+// 				});
+				menu.removeClass('default').addClass('fixed').fadeIn('fast');
+			} else if($(this).scrollTop() <= pos.top && menu.hasClass('fixed')){
+// 				menu.fadeOut('fast', function(){
+// 					$(this).removeClass('fixed').addClass('default').fadeIn('fast');
+// 				});
+				menu.removeClass('fixed').addClass('default').fadeIn('fast');
+			}
+		});
+
+
+
+});
+</script>
+<?php
 	echo "\n";
 	echo "\n<!--finishPage DemoPage-->\n";
 

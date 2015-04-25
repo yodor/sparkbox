@@ -4,13 +4,17 @@ include_once ("lib/input/InputFactory.php");
 
 include_once ("class/beans/BrandsBean.php");
 include_once ("class/beans/GendersBean.php");
+
+include_once ("class/beans/ProductClassesBean.php");
 include_once ("class/beans/ProductCategoriesBean.php");
 include_once ("class/beans/ProductFeaturesBean.php");
 include_once ("class/beans/ProductPhotosBean.php");
-include_once ("class/beans/ClassAttributeValuesBean.php");
 
+include_once ("class/beans/ClassAttributeValuesBean.php");
 include_once ("class/input/renderers/ClassAttributeField.php");
 include_once ("lib/input/transactors/CustomFieldTransactor.php");
+
+
 
 class ProductInputForm extends InputForm
 {
@@ -34,6 +38,14 @@ class ProductInputForm extends InputForm
 	$rend->list_label="brand_name";
 	$this->addField($field);
 
+	$field = InputFactory::CreateField(InputFactory::SELECT, "class_name", "Product Class", 0);
+	$rend = $field->getRenderer();
+	$rend->setSource(new ProductClassesBean());
+	$rend->list_key="class_name";
+	$rend->list_label="class_name";
+	$this->addField($field);
+	
+	
 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "product_code", "Product Code", 1);
 	$this->addField($field);
 
@@ -70,7 +82,7 @@ class ProductInputForm extends InputForm
 	$field = InputFactory::CreateField(InputFactory::CHECKBOX, "promotion", "Promotion", 0);
 	$this->addField($field);
 	
-	$input = InputFactory::CreateField(InputFactory::SESSION_IMAGE, "photo","Photo", 1);
+	$input = InputFactory::CreateField(InputFactory::SESSION_IMAGE, "photo","Photo", 0);
 	$input->setSource(new ProductPhotosBean());
 	$input->transact_mode = InputField::TRANSACT_OBJECT;
 	$input->getValueTransactor()->max_slots = 4;
@@ -105,18 +117,18 @@ class ProductInputForm extends InputForm
 	$this->addField($field1);
 
 
-	$field = new ArrayInputField("value", "Optional Attributes", 0);
-	$field->allow_dynamic_addition = false;
-	$field->source_label_visible = true;
-	$field->getValueTransactor()->process_datasource_foreign_keys = true;
-
-	$bean1 = new ClassAttributeValuesBean();
-	$field->setSource($bean1);
-
-	$rend = new ClassAttributeField();
-	$field->setRenderer($rend);
-
-	$this->addField($field);
+// 	$field = new ArrayInputField("value", "Optional Attributes", 0);
+// 	$field->allow_dynamic_addition = false;
+// 	$field->source_label_visible = true;
+// 	$field->getValueTransactor()->process_datasource_foreign_keys = true;
+// 
+// 	$bean1 = new ClassAttributeValuesBean();
+// 	$field->setSource($bean1);
+// 
+// 	$rend = new ClassAttributeField();
+// 	$field->setRenderer($rend);
+// 
+// 	$this->addField($field);
 
 
   }
@@ -125,17 +137,17 @@ class ProductInputForm extends InputForm
 
       parent::loadBeanData($editID,  $bean);
 
-      $renderer = $this->getField("value")->getRenderer();
-      $renderer->setCategoryID($this->getField("catID")->getValue());
-      $renderer->setProductID($editID);
+//       $renderer = $this->getField("value")->getRenderer();
+//       $renderer->setCategoryID($this->getField("catID")->getValue());
+//       $renderer->setProductID($editID);
 
   }
   public function loadPostData(array $arr)
   {
       parent::loadPostData($arr);
       
-      $renderer = $this->getField("value")->getRenderer();
-      $renderer->setCategoryID($arr["catID"]);
+//       $renderer = $this->getField("value")->getRenderer();
+//       $renderer->setCategoryID($arr["catID"]);
 
   }
 }

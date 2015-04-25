@@ -37,7 +37,10 @@
 /*.ArrayContents .InputField[error="1"] {
   border:1px dotted red;
 }*/
-
+.InputField .addon_content {
+  display:inline-block;
+  margin-left:10px;
+}
 
 
 

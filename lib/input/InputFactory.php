@@ -17,6 +17,8 @@ include_once("lib/input/renderers/FileField.php");
 include_once("lib/input/renderers/SliderField.php");
 include_once("lib/input/renderers/SessionImageField.php");
 include_once("lib/input/renderers/SessionFileField.php");
+include_once("lib/input/renderers/ColorCodeField.php");
+
 
 include_once("lib/input/validators/EmailValidator.php");
 include_once("lib/input/validators/DateValidator.php");
@@ -65,6 +67,7 @@ class InputFactory
   const DYNAMIC_PAGE=18;
   const SESSION_IMAGE=19;
   const SESSION_FILE=20;
+  const COLORCODE=21;
   
   const HIDDEN_ARRAY=100;
   const TEXTFIELD_ARRAY=101;
@@ -85,6 +88,10 @@ class InputFactory
 
 		case InputFactory::TEXTFIELD:
 			$field->setRenderer(new TextField());
+
+			break;
+		case InputFactory::COLORCODE:
+			$field->setRenderer(new ColorCodeField());
 
 			break;
 		case InputFactory::EMAIL:

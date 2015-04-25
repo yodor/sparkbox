@@ -42,14 +42,14 @@ RequestController::addRequestHandler($h_delete);
 // $ksc = new KeywordSearchComponent($search_fields);
 
 $select_inventory = $bean->getSelectQuery();
-$select_inventory->fields = " pi.*, pclr.color, psz.size_value, p.product_name, p.product_code  ";
-$select_inventory->from = " product_inventory pi LEFT JOIN product_colors pclr ON pclr.pclrID = pi.pclrID LEFT JOIN product_sizes psz ON psz.pszID=pi.pszID LEFT JOIN products p ON p.prodID = pi.prodID ";
+$select_inventory->fields = " pi.*, pclr.color, sc.color_code, pi.size_value, p.product_name, p.product_code  ";
+$select_inventory->from = " product_inventory pi LEFT JOIN product_colors pclr ON pclr.pclrID = pi.pclrID LEFT JOIN store_colors sc ON sc.color=pclr.color LEFT JOIN products p ON p.prodID = pi.prodID ";
 if ($prodID>0) {
   $select_inventory->where = " pi.prodID = '$prodID' ";
-  $list_caption = $rc->ref_row["product_name"];
+  $page->caption = tr("Inventory").": ".$rc->ref_row["product_name"];
 }
 else {
-  $list_caption = "All Products Inventory";
+  $page->caption = tr("All Products Inventory");
 }
 
 
@@ -60,24 +60,22 @@ else {
 
 
 $view = new TableView(new SQLResultIterator($select_inventory, $bean->getPrKey()));
-$view->setCaption($list_caption);
+$view->setCaption("Inventory List");
 // $view->setDefaultOrder(" ORDER BY item_date DESC ");
 // $view->search_filter = " ORDER BY day_num ASC ";
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
 
+if ($prodID<1) {
 $view->addColumn(new TableColumn("prodID","prodID"));
-// $view->addColumn(new TableColumn("photo","Photo"));
-
-// $view->addColumn(new TableColumn("color_photo","Color Photo"));
 $view->addColumn(new TableColumn("product_name", "Product Name"));
 $view->addColumn(new TableColumn("product_code", "Product Code"));
-
-$view->addColumn(new TableColumn("color", "Color"));
+}
+$view->addColumn(new TableColumn("color", "Color Gallery"));
+$view->addColumn(new TableColumn("color_code", "Color Code"));
 $view->addColumn(new TableColumn("size_value","Size"));
 $view->addColumn(new TableColumn("stock_amount","Stock Amount"));
 
 
-// 
 $view->addColumn(new TableColumn("price","Price"));
 $view->addColumn(new TableColumn("buy_price","Buy Price"));
 $view->addColumn(new TableColumn("old_price","Old Price"));

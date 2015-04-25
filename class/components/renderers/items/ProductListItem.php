@@ -1,5 +1,5 @@
 <?php
-include_once("class/beans/SellableProductsBean.php");
+// include_once("class/beans/SellableProductsBean.php");
 include_once("lib/components/renderers/items/ItemRendererImpl.php");
 include_once("class/beans/ProductColorsBean.php");
 

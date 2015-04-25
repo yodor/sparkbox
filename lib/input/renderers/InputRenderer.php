@@ -70,9 +70,10 @@ abstract class InputRenderer extends Component
       return $this->freetext_value;
   }
 
-  public function setFilter($filter)
+  public function setFilter($data_filter, $data_fields=" * ")
   {
-      $this->data_filter = $filter;
+      $this->data_filter = $data_filter;
+      $this->data_fields = $data_fields;
   }
   
   public function setSource(IDataBean $data_bean)
