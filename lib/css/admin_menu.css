@@ -58,6 +58,9 @@
   color:#666666;
   padding-left:2px;
 }
+.admin_menu .SubmenuRenderer .SubmenuItemLink .MenuIcon {
+  display:none;
+}
 .admin_menu .SubmenuRenderer .SubmenuItemOuter {
   padding:5px;
   margin-left:15px;

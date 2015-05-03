@@ -3,7 +3,7 @@ include_once ("lib/forms/InputForm.php");
 include_once ("lib/input/InputFactory.php");
 
 
-class ProductSizeInputForm extends InputForm
+class StoreSizeInputForm extends InputForm
 {
 
     public function __construct()

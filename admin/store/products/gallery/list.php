@@ -2,27 +2,35 @@
 include_once("session.php");
 include_once("class/pages/AdminPage.php");
 
-include_once("class/beans/ProductColorPhotosBean.php");
-include_once("class/beans/ProductColorsBean.php");
+include_once("class/beans/ProductPhotosBean.php");
+include_once("class/beans/ProductsBean.php");
 
 
 include_once("lib/components/GalleryView.php");
 
 
 
-$rc = new ReferenceKeyPageChecker(new ProductColorsBean(), "../list.php");
+$rc = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
 
-
+$menu = array();
 $menu=array(
-    new MenuItem("Add Photo","add.php".$rc->qrystr, "list-add.png")
+    new MenuItem("Photo Gallery","list.php".$rc->qrystr, "list-add.png")
 );
 
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
-$page->setCaption("Product Color Photo Gallery");
+// $page->setCaption("Product Photo Gallery");
 
-$bean = new ProductColorPhotosBean();
+
+$action_add = new Action("", "add.php", array());
+$action_add->setAttribute("action", "add");
+$action_add->setAttribute("title", "Add Photo To Product Gallery");
+$page->addAction($action_add);
+
+$page->setCaption( tr("Product Gallery").": ".$rc->ref_row["product_name"] );
+
+$bean = new ProductPhotosBean();
 $bean->setFilter($rc->ref_key."='".$rc->ref_id."'");
 
 
@@ -38,7 +46,7 @@ $gv->blob_field = "photo";
 $gv->initView($bean, "add.php", $rc->ref_key, $rc->ref_id);
 
 $page->beginPage($menu);
-
+$page->renderPageCaption();
 
 $gv->render();
 

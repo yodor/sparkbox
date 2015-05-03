@@ -28,7 +28,7 @@ class ProductColorInputForm extends InputForm
 	$rend->setSource(new StoreColorsBean());
 	$rend->list_label = "color";
 	$rend->list_key = "color";
-	$rend->addon_content = "<a class='ActionRenderer' href='".ADMIN_ROOT."content/products/colors/add.php'>New Color</a>";
+	$rend->addon_content = "<a class='ActionRenderer' href='../../colors/add.php'>".tr("New Store Color")."</a>";
 	$this->addField($field);
 // 	$field->enableTranslator(true);
 

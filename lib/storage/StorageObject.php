@@ -8,6 +8,9 @@ class StorageObject {
   protected $uid = -1;
   protected $upload_status = NULL;
 
+  public $itemID = -1;
+  public $itemClass = "";
+  
   public function __construct()
   {
 	  $this->data = NULL;

@@ -73,7 +73,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 
 	}
 
-// 	//apply other plain filters
+	//apply other plain filters
 // 	foreach ($this->related_filters as $filter_name=>$filter_key) {
 // 
 // 	    if (strcmp_isset("filter", $filter_name)) {
@@ -115,86 +115,85 @@ class NestedSetTreeView extends Component implements IHeadRenderer
     
     public function processFilters()
     {
-	
-	
-	$source_prkey = $this->data_source->getPrKey();
-	
-	if ( isset($_GET[$source_prkey]) ) {
-	
-	  $this->selected_nodeID = (int)$_GET[$source_prkey];
-	  $this->selection_path = $this->data_source->constructPath($this->selected_nodeID);
 
-	}
+		$source_prkey = $this->data_source->getPrKey();
 
-	$have_filter = false;
-	
-	//parse plain filters 
-	foreach ($this->related_filters as $filter_name=>$filter_key) {
-	    if ($filter_key instanceof IQueryFilter) {
+		if ( isset($_GET[$source_prkey]) ) {
 
-	    }
-	    else if (isset($_GET[$filter_key])) {
-		$this->filter_values[$filter_key] = DBDriver::get()->escapeString($_GET[$filter_key]);
-	    }
-	}
+		  $this->selected_nodeID = (int)$_GET[$source_prkey];
+		  $this->selection_path = $this->data_source->constructPath($this->selected_nodeID);
+
+		}
+
+		$have_filter = false;
+
+		//parse plain filters 
+		foreach ($this->related_filters as $filter_name=>$filter_key) {
+			if ($filter_key instanceof IQueryFilter) {
+
+			}
+			else if (isset($_GET[$filter_key])) {
+			  $this->filter_values[$filter_key] = DBDriver::get()->escapeString($_GET[$filter_key]);
+			}
+		}
 
 
-	$text_action = $this->getItemRenderer()->getTextAction();
-	
-	if ( isset($_GET["filter"]) && isset($this->related_filters[$_GET["filter"]])) {
-	
-	    $requested_filter = $_GET["filter"];
-	    
-	    $have_filter = true;
-	    $this->open_all = true;
+		$text_action = $this->getItemRenderer()->getTextAction();
 
-	    $filter_key = $this->related_filters[$requested_filter];
+		if ( isset($_GET["filter"]) && isset($this->related_filters[$_GET["filter"]])) {
 
-	    if ($filter_key instanceof IQueryFilter) {
+			$requested_filter = $_GET["filter"];
+			
+			$have_filter = true;
+			$this->open_all = true;
 
-		$this->filter_select = $filter_key->getQueryFilter();
-		
-	    }
-	    else if ($this->related_source instanceof DBTableBean) {
+			$filter_key = $this->related_filters[$requested_filter];
 
-		$related_table =  $this->related_source->getTableName();
-		$related_prkey = $this->related_source->getPrKey();
+			if ($filter_key instanceof IQueryFilter) {
 
-		if (isset($this->filter_values[$filter_key])) {
-		
-		    $filter_value = $this->filter_values[$filter_key];
-		    
-		    $sel = new SelectQuery();
-		    $sel->fields = "";
-		    $sel->from = "";
-		    $sel->where = " $related_table.$filter_key='$filter_value' ";
-		    
-		    $this->filter_select = $sel;
-		    
+				$this->filter_select = $filter_key->getQueryFilter();
+			
+			}
+			else if ($this->related_source instanceof DBTableBean) {
+
+				$related_table =  $this->related_source->getTableName();
+				$related_prkey = $this->related_source->getPrKey();
+
+				if (isset($this->filter_values[$filter_key])) {
+				
+					$filter_value = $this->filter_values[$filter_key];
+					
+					$sel = new SelectQuery();
+					$sel->fields = "";
+					$sel->from = "";
+					$sel->where = " $related_table.$filter_key='$filter_value' ";
+					
+					$this->filter_select = $sel;
+					
+				}
+				else {
+				  debug("NestedSetTreeView::processFilters: filter requested without corresponding key value");
+				}
+			}
+			
+			if ($this->filter_select) {
+
+			  $this->select_qry = $this->select_qry->combineWith($this->filter_select);
+			
+			}
+
+			$text_action->addParameter(new ActionParameter($source_prkey, $source_prkey));
+
 		}
 		else {
-		  debug("NestedSetTreeView::processFilters: filter requested without corresponding key value");
+
+		  $text_action->prependRequestParams(false);
+		  $text_action->addParameter(new ActionParameter("filter", "self", true));
+		  $text_action->addParameter(new ActionParameter($source_prkey, $source_prkey));
+		  
 		}
-	    }
-	    
-	    if ($this->filter_select) {
 
-		$this->select_qry = $this->select_qry->combineWith($this->filter_select);
-		
-	    }
-
-	    $text_action->addParameter(new ActionParameter($source_prkey, $source_prkey));
-
-	}
-	else {
-	
-	  $text_action->prependRequestParams(false);
-	  $text_action->addParameter(new ActionParameter("filter", "self", true));
-	  $text_action->addParameter(new ActionParameter($source_prkey, $source_prkey));
-	  
-	}
-
-	return $have_filter;
+		return $have_filter;
     }
     
     

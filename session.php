@@ -1,5 +1,5 @@
 <?php
-define("DEBUG_OUTPUT", 0); //enable debugging output using error_log
+// define("DEBUG_OUTPUT", 0); //enable debugging output using error_log
 
 //uncomment below if deploying in a subfolder of document root
 // $install_path = dirname(__FILE__);

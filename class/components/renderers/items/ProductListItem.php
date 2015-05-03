@@ -61,7 +61,13 @@ class ProductListItem extends ItemRendererImpl {
 		
 		$have_chips = explode("|", $this->item["have_chips"]);
 		$color_ids = explode("|", $this->item["color_ids"]);
+		
 		$color_photo_ids = explode("|", $this->item["color_photos"]);
+		
+		foreach ($have_chips as $key=>$val) {
+		
+		}
+		
 		$product_photo_ids = explode("|", $this->item["product_photos"]);
 		
 		$color_pids = explode("|", $this->item["color_pids"]);
@@ -110,8 +116,8 @@ class ProductListItem extends ItemRendererImpl {
 				  }
 				  //use the first image of the product photos as color_chip
 				  else {
-					$chip_class = "ProductPhotossBean";
-					$chip_id = $product_photo_ids[$key];
+					$chip_class = ProductPhotosBean::class;
+					$chip_id = $product_photo_ids[0];
 				  }
 				  $href = STORAGE_HREF."?cmd=image_crop&width=48&height=48&class=$chip_class&id=$chip_id";
 				  $item_href_color = $item_href.$color_pids[$key];

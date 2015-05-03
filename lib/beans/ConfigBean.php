@@ -43,21 +43,23 @@ protected $createString = "CREATE TABLE `config` (
 	public function getValue($key, $def_value="")
 	{
 		
-		$s_key = $this->db->escapeString($key);
+		$db = DBDriver::get();
+		
+		$s_key = $db->escapeString($key);
 
 		$sql = "SELECT config_val FROM {$this->table} WHERE config_key='$s_key'";
 		if ($this->section) {
 			$sql.= " AND section='{$this->section}' ";
 		}
 
-		$res = $this->db->query($sql);
-		if (!$res)throw new Exception("Config::getValue SELECT error: ".$this->db->getError());
+		$res = $db->query($sql);
+		if (!$res)throw new Exception("Config::getValue SELECT error: ".$db->getError());
 
-		$num_rows = $this->db->fetchTotalRows();
+		$num_rows = $db->fetchTotalRows();
 
 		$result = $def_value;
 
-		while ($row=$this->db->fetch($res))
+		while ($row=$db->fetch($res))
 		{
 			$val = $row["config_val"];
 			$serial = @unserialize($val);
@@ -73,8 +75,10 @@ protected $createString = "CREATE TABLE `config` (
 	}
     public function clearValue($key)
     {
+	  
+		$db = DBDriver::get();
 
-        $s_key = $this->db->escapeString($key);
+        $s_key = $db->escapeString($key);
 
 		$sql = "DELETE FROM {$this->table} WHERE config_key='$s_key' ";
 		if ($this->section) {
@@ -82,21 +86,23 @@ protected $createString = "CREATE TABLE `config` (
 		}
 
 		try {
-			$this->db->transaction();
-			$res = $this->db->query($sql);
-			if (!$res) throw new Exception("Config::clearValue DELETE error:".$this->db->getError());
-			$this->db->commit();
+			$db->transaction();
+			$res = $db->query($sql);
+			if (!$res) throw new Exception("Config::clearValue DELETE error:".$db->getError());
+			$db->commit();
 		}
 		catch (Exception $e)
 		{
-			$this->db->rollback();
+			$db->rollback();
 			throw $e;
 		}
     }
 	public function setValue($key,$val)
 	{
 
-		$s_key = $this->db->escapeString($key);
+		$db = DBDriver::get();
+		
+		$s_key = $db->escapeString($key);
 
 		$delete_sql = "DELETE FROM {$this->table} WHERE config_key='$s_key' ";
 		if ($this->section) {
@@ -104,11 +110,11 @@ protected $createString = "CREATE TABLE `config` (
 		}
 
 		try {
-			$this->db->transaction();
+			$db->transaction();
 
 			$vals = array();
 			if (!is_array($val)) {
-				$this->db->query($delete_sql);
+				$db->query($delete_sql);
 				$vals[] = $val;
 			}
 			else {
@@ -131,7 +137,7 @@ protected $createString = "CREATE TABLE `config` (
 
 					$row["config_val"] = $value->serializeDB();
 
-					$this->db->query($delete_sql);
+					$db->query($delete_sql);
 
 
 				}
@@ -141,20 +147,20 @@ protected $createString = "CREATE TABLE `config` (
 
 			  }
 			  else {
-				  $row["config_val"] = $this->db->escapeString($value);
+				  $row["config_val"] = $db->escapeString($value);
 			  }
 
-			  $cfgID = $this->insertRecord($row, $this->db);
+			  $cfgID = $this->insertRecord($row, $db);
 			  
 
-			  if ($cfgID<1) throw new Exception("Config::setValue insert error:".$this->db->getError());
+			  if ($cfgID<1) throw new Exception("Config::setValue insert error:".$db->getError());
 		  }
 
-		  $this->db->commit();	
+		  $db->commit();	
 			
 		}
 		catch (Exception $e) {
-			$this->db->rollback();
+			$db->rollback();
 			throw $e;
 		}
 		

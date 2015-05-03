@@ -45,16 +45,18 @@ IMG {
   color:white;
   background-image:url("../images/admin/admin_header.png");
 
+  padding:5px;
 }
 
 .admin_header .welcome {
   float:right;
+  text-align:right;
 }
 .admin_header .welcome .text_admin {
-  font-size:28px;
-  letter-spacing:3px;
+  font-size:24px;
+/*   letter-spacing:3px; */
   color:#8f8f8f;
-  
+  display:block;
 }
 .admin_header .admin_logo {
   background-image:url("../images/admin/sparkbox.png");
@@ -66,8 +68,7 @@ IMG {
 
 }
 .admin_header .LocationPath {
-  float:right;
-  clear:right;
+  display:inline-block;
 }
 .admin_header .LocationPath LABEL {
   font-weight:bold;
@@ -146,9 +147,22 @@ IMG {
   margin-bottom:10px;
 }
 
-
-
-
+.page_caption .page_actions {
+  display:inline-block;
+  margin-right:10px;
+  height:30px;
+}
+.page_caption .page_actions .ActionRenderer {
+  display:inline-block;
+  width:30px;
+  height:100%;
+  background-size:cover;
+  margin-bottom:-7px;
+}
+.page_caption .page_actions .ActionRenderer[action='add'] {
+  background-image:url("../images/page_actions/green_plus.png");
+  background-repeat:no-repeat;
+}
 
 
 .AdminLoginPage {

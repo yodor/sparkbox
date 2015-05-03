@@ -6,7 +6,7 @@ class SellableProductsView extends DBViewBean {
 	
 // create view sellable_products as (
 //     SELECT 
-// 
+// min(si.sell_price) as price_min, max(si.sell_price) as price_max,
 // (SELECT group_concat(pcp.pclrpID ORDER BY pcp.position SEPARATOR '|') FROM product_color_photos pcp WHERE pcp.pclrID = si.pclrID ) as color_gallery, 
 // 
 // group_concat(si.piID SEPARATOR '|')  as pids ,

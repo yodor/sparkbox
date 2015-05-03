@@ -113,9 +113,7 @@ class Action {
 	  $href = array();
 	  $params = array();
 	  
-	  if ($this->prepend_request_params) {
-	    $params = $_GET;
-	  }
+	  
 
 	  $script_name = $this->href;
 	  $script_params = "";
@@ -123,17 +121,7 @@ class Action {
 		list($script_name, $script_params) = explode("?", $script_name);
 	  }
 
-	  $static_pairs = explode("&", $script_params);
-	  foreach($static_pairs as $pos=>$pair) {
-		  $param_name=$pair;
-		  $param_value="";
-		  if (strpos($pair, "=")!==false) {
-			  list($param_name, $param_value) = explode("=", $pair);
-		  }
-		  if (strlen($param_name)>0) {
-			  $params[$param_name]=$param_value;
-		  }
-	  }
+	  
 
 	  foreach ($this->parameters as $pos=>$act_param)
 	  {
@@ -145,6 +133,21 @@ class Action {
 		}
 	  }
 
+	  if ($this->prepend_request_params) {
+	    $params = array_merge($params, $_GET);
+	  }
+	  
+	  $static_pairs = explode("&", $script_params);
+	  foreach($static_pairs as $pos=>$pair) {
+		  $param_name=$pair;
+		  $param_value="";
+		  if (strpos($pair, "=")!==false) {
+			  list($param_name, $param_value) = explode("=", $pair);
+		  }
+		  if (strlen($param_name)>0) {
+			  $params[$param_name]=$param_value;
+		  }
+	  }
 
 	  if (strlen($script_name)>0) {
 		Paginator::clearPageFilter($params);

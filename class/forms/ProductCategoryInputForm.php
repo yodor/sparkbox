@@ -31,21 +31,21 @@ class ProductCategoryInputForm extends InputForm
 	  $field = InputFactory::CreateField(InputFactory::SESSION_IMAGE, "photo", "Photo", 0);
 	  $this->addField($field);
 
-	  $field1 = new ArrayInputField("maID", "Attribute", 0);
-	  $field1->allow_dynamic_addition=true;
-	  $field1->setSource(new ClassAttributesBean());
-	  
-	  $attribs = new AttributesBean();
-
-	  $rend = new SelectField();
-	  $rend->setSource($attribs);
-	  $rend->list_key="maID";
-	  $rend->list_label="name";
-
-	  $field1->setValidator(new EmptyValueValidator());
-	  
-	  $field1->setRenderer($rend);
-	  $this->addField($field1);
+// 	  $field1 = new ArrayInputField("maID", "Attribute", 0);
+// 	  $field1->allow_dynamic_addition=true;
+// 	  $field1->setSource(new ClassAttributesBean());
+// 	  
+// 	  $attribs = new AttributesBean();
+// 
+// 	  $rend = new SelectField();
+// 	  $rend->setSource($attribs);
+// 	  $rend->list_key="maID";
+// 	  $rend->list_label="name";
+// 
+// 	  $field1->setValidator(new EmptyValueValidator());
+// 	  
+// 	  $field1->setRenderer($rend);
+// 	  $this->addField($field1);
 	  
 	  
 	  $this->getField("category_name")->enableTranslator(true);

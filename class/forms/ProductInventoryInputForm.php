@@ -4,7 +4,7 @@ include_once ("lib/input/InputFactory.php");
 include_once ("class/beans/ProductsBean.php");
 include_once ("class/beans/ClassAttributesBean.php");
 include_once ("class/beans/ProductColorsBean.php");
-include_once ("class/beans/ProductSizesBean.php");
+include_once ("class/beans/StoreSizesBean.php");
 include_once ("class/beans/InventoryAttributeValuesBean.php");
 
 include_once ("class/input/renderers/ClassAttributeField.php");
@@ -26,16 +26,16 @@ class ProductInventoryInputForm extends InputForm
 
 		$field->getRenderer()->list_key = "pclrID";
 		$field->getRenderer()->list_label = "color";
-		
+		$field->getValueTransactor()->renderer_source_copy_fields = array("color");
 		$this->addField($field);
 	
 
 		$field = InputFactory::CreateField(InputFactory::SELECT, "size_value", "Size", 0);
-		$field->getRenderer()->setSource(new ProductSizesBean());
+		$field->getRenderer()->setSource(new StoreSizesBean());
 		$field->getRenderer()->list_key = "size_value";
 		$field->getRenderer()->list_label = "size_value";
 		
-		$field->getRenderer()->addon_content = "<a class='ActionRenderer' href='".ADMIN_ROOT."content/products/sizes/add.php'>".tr("New Size")."</a>";
+		$field->getRenderer()->addon_content = "<a class='ActionRenderer' href='../../sizes/add.php'>".tr("New Store Size")."</a>";
 		
 		$this->addField($field);
 
@@ -81,7 +81,7 @@ class ProductInventoryInputForm extends InputForm
 	  
 	  $this->getField("pclrID")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
 	  
-	  $this->getField("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' href='".ADMIN_ROOT."content/products/color_gallery/add.php?prodID={$this->prodID}'>".tr("New Color Gallery")."</a>";
+	  $this->getField("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' href='../color_gallery/add.php?prodID={$this->prodID}'>".tr("New Color Gallery")."</a>";
 	  
 // 	  $this->getField("size_value")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
 

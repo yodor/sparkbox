@@ -3,7 +3,7 @@ include_once("session.php");
 include_once("class/pages/AdminPage.php");
 
 
-include_once("class/beans/ProductSizesBean.php");
+include_once("class/beans/StoreSizesBean.php");
 
 
 include_once("lib/components/TableView.php");
@@ -23,7 +23,7 @@ $menu=array(
     new MenuItem("Add Size", "add.php", "list-add.png"),
 );
 
-$bean = new ProductSizesBean();
+$bean = new StoreSizesBean();
 
 
 $h_delete = new DeleteItemRequestHandler($bean);
@@ -35,7 +35,7 @@ RequestController::addRequestHandler($h_delete);
 
 
 $view = new TableView(new BeanResultIterator($bean));
-$view->setCaption("Product Sizing List");
+$view->setCaption("Store Sizing List");
 // $view->setDefaultOrder(" ORDER BY item_date DESC ");
 // $view->search_filter = " ORDER BY day_num ASC ";
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));

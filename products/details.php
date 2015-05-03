@@ -169,13 +169,13 @@ foreach ($sellable as $pos=>$row) {
 		  }
 		  //use first image from the color photos gallery
 		  else if (isset($color_photo_ids[$idx]) && $color_photo_ids[$idx]>0) {
-			$chip_class = "ProductColorPhotosBean";
+			$chip_class = ProductColorPhotosBean::class;
 			$chip_id = $color_photo_ids[$idx];
 		  }
 		  //use the first image of the product photos as color_chip
 		  else {
-			$chip_class = "ProductPhotosBean";
-			$chip_id = $product_photo_ids[$idx];
+			$chip_class = ProductPhotosBean::class;
+			$chip_id = $product_photo_ids[0];
 		  }
 		  
 		  $item = array("id"=>$chip_id, "class"=>$chip_class, "piID"=>$same_color_pids[$idx], "prodID"=>$prodID, "color_name"=>$color);

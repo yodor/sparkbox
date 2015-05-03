@@ -15,7 +15,10 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
   
   public $transact_empty_string_as_null = false;
   
+  //field source copy fields
   public $bean_copy_fields = array();
+  
+  public $renderer_source_copy_fields = array();
   
   public function __construct()
   {
@@ -205,6 +208,34 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 	  
 	  $transactor->appendValue($field->getName(), $value);
 	  
+	  //transacts additional values from renderer data source
+	  //matching by 'this' field name and its value posted
+	  if (is_array($this->renderer_source_copy_fields) && count($this->renderer_source_copy_fields)>0) {
+		  debug("BeanPostProcessor::transactValue[".$field->getName()."] Renderer copy fields requested ... ");
+		  $renderer = $field->getRenderer();
+		  $renderer_source = $renderer->getSource();
+		  if (!$renderer_source instanceof DBTableBean) throw new Exception("Renderer copy fields requested without DBTableBean renderer source");
+		  $source_fields = $renderer_source->getFields();
+
+		  debug("BeanPostProcessor::transactValue[".$field->getName()."] Renderer source: ".get_class($renderer_source)." | List key: [{$renderer->list_key}] | List label: [{$renderer->list_label}]");
+		  
+		  if (!in_array($renderer->list_key, $source_fields)) throw new Exception("List Key '{$renderer->list_key}' not found in renderer source fields");
+		  if (!in_array($renderer->list_label, $source_fields)) throw new Exception("List Label '{$renderer->list_label}' not found in renderer source fields");
+
+		  $row = $renderer_source->getByRef($renderer->list_key, $value);
+		  if (!$row) throw new Exception("Unable to query renderer source data");
+		  foreach ($this->renderer_source_copy_fields as $idx=>$field_name) {
+			debug("BeanPostProcessor::transactValue[".$field->getName()."] | Doing copy for source field [$field_name]");
+			if (isset($row[$field_name])) {
+			  $transactor->appendValue($field_name, $row[$field_name]);
+			  debug("BeanPostProcessor::transactValue[".$field->getName()."] | source field [$field_name] value transacted to main transaction");
+			}
+			else {
+			  throw new Exception("Requested copy field [$field_name] not found in data row");
+			}
+		  }
+	  }
+	  
 	  break;
 	case InputField::TRANSACT_DBROW:
 	  throw new Exception("Unsupported TRANSACT_DBROW for input field['".$field->getName()."']");
@@ -248,6 +279,11 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 	  $storage_object = @unserialize($value);
 	  if ($storage_object !== false ) {
 	      if (!($storage_object instanceof StorageObject)) throw new Exception("Deserialized object is not a StorageObject.");
+	      
+	      //tag with id and class
+	      $storage_object->itemID=$item_row[$source_key];
+		  $storage_object->itemClass=get_class($field->getSource());
+	      
 	      $value = $storage_object;
 	      
 	      $uid = $value->getUID();
@@ -289,14 +325,24 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 	    if (!is_null($value)) {
 	      $storage_object = @unserialize($value);
 	      if ($storage_object !== false ) {
-		  if (!($storage_object instanceof StorageObject)) throw new Exception("Deserialized object is not a StorageObject.");
-		  $value = $storage_object;
+			if (!($storage_object instanceof StorageObject)) throw new Exception("Deserialized object is not a StorageObject.");
+			//
+			
+			//tag with id and class
+			$storage_object->itemID=$item_row[$bean->getPrKey()];
+			$storage_object->itemClass=get_class($bean);
+			
+			$value = $storage_object;
 	      }
 	    }
 	  }
 	  else if ($field->transact_mode == InputField::TRANSACT_DBROW){
 	    $object = StorageObject::reconstruct($item_row, $field_name);
 	    $uid = $object->getUID();
+	    
+	    $object->itemID=$item_row[$bean->getPrKey()];
+		$object->itemClass=get_class($bean);
+	    
 	    $value = $object;
 	  }
 	  

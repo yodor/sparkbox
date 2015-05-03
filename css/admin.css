@@ -1,0 +1,43 @@
+.AdminPage .left_menu {
+  font-size:14px;
+ 
+}
+
+.AdminPage.inventory.list .TableView TD[column='size_value'] {
+  white-space:nowrap;
+  
+}
+.AdminPage.products.list .TableView TD[column='sizes'] {
+  white-space:nowrap;
+  
+}
+.admin_menu .SubmenuRenderer {
+  font-weight:normal !important;
+}
+.admin_menu .SubmenuItemRenderer[selected='1'] > .SubmenuItemOuter .SubmenuItemLink {
+  font-weight:bold !important;
+}
+.admin_menu .SubmenuRenderer .SubmenuItemLink .MenuIcon {
+  display:inline-block;
+  background-size:cover;
+  border:1px dotted transparent;
+  margin-right:5px;
+  display:none;
+}
+
+.admin_menu .SubmenuRenderer .SubmenuItemLink .MenuIcon.store {
+/*  width:24px;
+  height:24px;*/
+}
+
+.MenuIcon.store.sizes {
+  background-image:url("../images/admin/menu_icons/icon_size.png");
+  
+}
+
+.MenuIcon.store.products {
+  background-image:url("../images/admin/menu_icons/icon_product.png");
+  
+}
+
+

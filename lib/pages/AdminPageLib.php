@@ -20,16 +20,40 @@ include_once("lib/components/TableView.php");
 
 include_once("lib/utils/PageSessionMenu.php");
 
-abstract class AdminPageLib extends SimplePage
+class AdminPageLib extends SimplePage
 {
 
-
-    protected $authstore;
+	public $caption = "";
+	
+    protected $authstore = NULL;
     protected $roles = array();
 
     protected $menu_bar = NULL;
 
-    abstract protected function initMainMenu();
+    protected $actions = array();
+    
+    public function addAction(Action $action)
+    {
+	  $this->actions[] = $action;
+    }
+    
+    protected function initMainMenu()
+    {
+		global $admin_menu;
+		if (!isset($admin_menu)) {
+		
+		  $admin_menu = array();
+
+		  
+
+		  $admin_menu[] = new MenuItem("Content", ADMIN_ROOT."content/index.php", "class:icon_content");
+
+		  $admin_menu[] = new MenuItem("Settings", ADMIN_ROOT."settings/index.php", "class:icon_settings");
+
+		  
+		}
+		return $admin_menu;
+    }
     
 
     public function getAdminID()
@@ -56,29 +80,48 @@ abstract class AdminPageLib extends SimplePage
 
     public function renderPageCaption($str=null)
     {
+    
+	  $caption = "";
+
       
       $dynmenu = $this->menu_bar->getMainMenu();
-      
       $arr = $dynmenu->getSelectedPath();
-      $caption = "";
       
-      if ($str) {
-	$caption = $str;
+      
+      //default caption of page from MenuItem
+      if (count($arr)>1) {
+		$arr = array_reverse($arr);
+		$item = $arr[0];
+		if ($item instanceof MenuItem) {
+		  $caption = $item->getTitle();
+		}
       }
-      else if (count($arr)>1) {
-	$arr = array_reverse($arr);
-	$item = $arr[0];
-	if ($item instanceof MenuItem) {
-	  $caption = $item->getTitle();
-	}
+      
+      	  
+	  //property caption
+	  if ($this->caption) {
+		  $caption = $this->caption;
+	  }
+      else if ($str) {
+		  $caption = $str;
       }
+      
       
       if ($caption) {
-	echo "<div class='page_caption'>";
-	echo $caption;
-	echo "</div>";
+		  echo "<div class='page_caption'>";
+		  if (count($this->actions)>0) {
+			$renderer = new ActionRenderer();
+			echo "<div class='page_actions'>";
+			$renderer->renderActions($this->actions);
+			echo "</div>";
+		  }
+		  echo $caption;
+		  echo "</div>";
       }
     }
+    
+    
+    
     public function __construct() {
 
 	$this->setAuthenticator(new AdminAuthenticator(), SITE_ROOT."admin/login.php");
@@ -119,6 +162,31 @@ abstract class AdminPageLib extends SimplePage
 	return $ret;
     }
 
+    public function renderAdminHeader()
+    {
+			$dynmenu = $this->menu_bar->getMainMenu();
+			
+// 			echo "<div class='admin_logo'></div>";
+			
+	    $arr = $dynmenu->getSelectedPath();
+	    if (count($arr)>0) {
+			echo "<div class='LocationPath'>";
+			  echo "<label>".tr("Location").": </label>";
+			  $act = new ActionRenderer();
+			  $act->enableSeparator(true);
+			  $act->renderActions($dynmenu->getSelectedPath());
+			echo "</div>";
+		}
+			
+			echo "<div class='welcome'>";
+			  echo "<span class='text_admin'>Welcome, {$this->authstore["fullname"]}</span>";
+			  $btn = StyledButton::DefaultButton();
+			  $btn->drawButton("Logout", ADMIN_ROOT."logout.php");
+			echo "</div>";
+
+
+			
+    }
     public function beginPage($arr_menu=array())
     {
 	//allow processing of ajax handlers first
@@ -136,28 +204,11 @@ abstract class AdminPageLib extends SimplePage
 
 	  echo "<tr>";
 	  
-	      echo "<td class='admin_header' colspan=2 >";
+		echo "<td class='admin_header' colspan=2>";
 
-		echo "<div class='admin_logo'></div>";
-	      
-		echo "<div class='welcome'>";
-		  echo "<span class='text_admin'>ADMIN</span>";
-		  echo "<BR>";
+		$this->renderAdminHeader();	
 
-		  $btn = StyledButton::DefaultButton();
-		  $btn->drawButton("Logout", ADMIN_ROOT."logout.php");
-	      
-		echo "</div>";
-
-
-		echo "<div class='LocationPath'>";
-		echo "<label>".tr("Location").": </label>";
-		$act = new ActionRenderer();
-		$act->renderActions($dynmenu->getSelectedPath());
-
-		echo "</div>";
-
-	      echo "</td>";
+		echo "</td>";
 	  
 	  echo "</tr>";
 
@@ -179,6 +230,8 @@ abstract class AdminPageLib extends SimplePage
 
 	    echo "<td class='page_area ".$this->getPageClass()."'>";
 	    echo "\n\n";
+	    
+
     }
 
     public function finishPage()

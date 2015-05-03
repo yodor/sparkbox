@@ -129,7 +129,7 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	      $select_query->having = $search_query->where;
 
 	}
-	public function getQueryFilter()
+	public function getQueryFilter($source, $value=NULL)
 	{
 	    return $this->sform->searchFilterQuery();
 	}

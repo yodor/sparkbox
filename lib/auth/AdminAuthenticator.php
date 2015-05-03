@@ -56,7 +56,8 @@ class AdminAuthenticator extends Authenticator
 
 
 						$authstore["id"]=(int)$row["userID"];
-
+						$authstore["fullname"] = $row["fullname"];
+						
 						$s1="UPDATE admin_users SET counter=counter+1 WHERE userID='".$row["userID"]."'";
 
 						$db->transaction();

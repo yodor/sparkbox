@@ -30,6 +30,19 @@ class SubmenuItemRenderer extends MenuItemRenderer
 	  }
   }
 
+  public function renderIcon()
+  {
+	  parent::renderIcon();
+// 	  $icon = $this->getMenuItem()->getIcon();
+// 	  if (strpos($icon, "class")!==false){
+// 	      list($a, $icon_class) = explode(":", $icon);
+// 	      echo "<div class='MenuIcon $icon_class'></div>";
+// 	  }
+// 	  else {
+// 	      echo "<img border=0 class='MenuIcon' src='".MenuItem::$icon_path."".$icon."'>";
+// 	  }
+  }
+  
   public function renderImpl()
   {
 
@@ -48,8 +61,14 @@ class SubmenuItemRenderer extends MenuItemRenderer
 	  
 	  echo "\n";
 	  
+	  
+      
 	  echo "<a class='SubmenuItemLink' href='$href' $target >";
 	  
+	  if ($this->getMenuItem()->getIcon()) {
+		$this->renderIcon();
+      }
+      
 	  if ($this->getMenuItem()->needTranslate()) {
 	    $title = tr($title);
 	  }

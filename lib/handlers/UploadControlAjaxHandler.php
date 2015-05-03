@@ -78,8 +78,10 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
 	ob_start();
 	if ($value_current instanceof ImageStorageObject) {
 	  $image_data = "data:$mime;base64,".base64_encode($value_current->getData());
-	  echo "<div class='Element' tooltip='$filename'>";
-	    echo "<img class='thumbnail' src='$image_data'>";
+	  $itemID = $value_current->itemID;
+	  $itemClass = $value_current->itemClass;
+	  echo "<div class='Element' tooltip='$filename' itemID='$itemID' itemClass='$itemClass'>";
+	    echo "<a target='_itemGallery' href='".SITE_ROOT."storage.php?cmd=gallery_photo&class=$itemClass&id=$itemID'><img class='thumbnail' src='$image_data'></a>";
 	    echo "<span class='remove_button' action='Remove'>X</span>";
 	    echo "<input type=hidden name='uid_{$field_name}[]' value='$uid' >";
 	  echo "</div>";

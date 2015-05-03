@@ -16,8 +16,7 @@ $menu=array(
 
 
 	new MenuItem("Dynamic Pages", "pages/list.php", "view-financial-list.png"),
-	new MenuItem("Products", "products/list.php", "view-documents-finances.png"),
-// 	
+
 
 // 	new MenuItem("Videos", "videos/list.php", "application-vnd.rn-realmedia.png"),
 	new MenuItem("News", "news/list.php", "view-financial-list.png"),

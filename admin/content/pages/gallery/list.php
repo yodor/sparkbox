@@ -33,6 +33,8 @@ RequestController::addRequestHandler($h_repos);
 
 
 $gv = new GalleryView();
+$gv->blob_field = "photo";
+
 $gv->initView($bean, "add.php", $rc->ref_key, $rc->ref_id);
 
 $page->beginPage($menu);

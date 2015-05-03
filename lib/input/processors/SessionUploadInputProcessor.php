@@ -26,21 +26,28 @@ class SessionUploadInputProcessor extends BeanPostProcessor
       
       //trying to load field that does not have corresponding value in table. reset the value to empty array
       if (is_null($values)) {
-	$values = array();
+		  $values = array();
       }
       
       foreach ($values as $idx=>$storage_object)
       {
 
-	  //non required fields holdings storage objects can load NULL values, remove them as they dont need presentation
-	  if (is_null($storage_object)) {
-	      unset($values[$idx]);
-	      continue;
-	  }
+		//non required fields holdings storage objects can load NULL values, remove them as they dont need presentation
+		if (is_null($storage_object)) {
+			unset($values[$idx]);
+			continue;
+		}
+		
+		$uid = $storage_object->getUID();
+		$this->loaded_uids[$uid] = 1;
 	  
-	  $uid = $storage_object->getUID();
-	  $this->loaded_uids[$uid] = 1;
-
+		//TODO: clickable link for imageuploadfield
+// 		if (isset($this->source_loaded_uids[$uid])) {
+// 		  $storage_object->itemID = $this->source_loaded_uids[$uid];
+// 		  $storage_object->itemClass = get_class($field->getSource());
+// 		}
+		
+		
       }
       
       $values = array_values($values);
@@ -220,6 +227,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 	  foreach ($values as $idx=>$storage_object) {
 	      $uid = $storage_object->getUID();
 
+	      
 	      if (array_key_exists($uid, $this->loaded_uids)) {
 		debug("StorageObject UID: $uid is the same UID as the bean loaded one. Not transacting this object to the main transaction row.");
 	      }

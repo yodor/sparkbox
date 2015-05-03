@@ -41,35 +41,39 @@ class PageSessionMenu extends MainMenu {
 // 	$this->dumpMenu();
 
 	$this->selectActiveMenus(MainMenu::FIND_INDEX_PATHCHECK);
-// 	$this->path = $m->getSelectedPath();
 	
-// 	debug("LocationPath::pathUpdate: Current path after PATHCHECK: ");
-// 	$this->dumpPath();
+	
+	debug("LocationPath::pathUpdate: Current path after PATHCHECK: ");
+	$this->dumpPath();
 
 	if (count($this->selected_path)>0) {
 	
 	    $last_selected = $this->selected_path[0];
 
+// 	    echo $last_selected->getTitle();
 	    
 	    $last_submenu = $last_selected->getSubmenu();
 
 	    $match = $this->matchItem(MainMenu::FIND_INDEX_LOOSE, $last_selected);
+		debug("Current selected: '".$last_selected->getTitle()."' - FIND_INDEX_LOOSE with requestURI: ".$match);
+		  
+		
 	    
-	    debug("Current selected: '".$last_selected->getTitle()."' - Loose Match with requestURI: ".$match);
-	    
-	    //same submenu
+// 	    $match = $this->matchItem(MainMenu::FIND_INDEX_PATHCHECK, $last_selected);
+// 	    
 	    if (!$match) {
-		$match = $this->matchItem(MainMenu::FIND_INDEX_LOOSE_REVERSE, $last_selected);
-	    
-		debug("Current selected: '".$last_selected->getTitle()."' - Loose Match with requestURI: ".$match);
+		  $match = $this->matchItem(MainMenu::FIND_INDEX_LOOSE_REVERSE, $last_selected);
+		  debug("Current selected: '".$last_selected->getTitle()."' - FIND_INDEX_LOOSE_REVERSE with requestURI: ".$match);
 	    }
+
+	    
 	    if (!$match) {
 // 	      debug("Appending dynamic menu item from this request");
 // 	      
 // 	      global $page;
 // 	      $action_title = "Action Page";
 // 	      if ($page && $page->getCaption()) {
-// 		$action_title = $page->getCaption();
+// 			  $action_title = $page->getCaption();
 // 	      } 
 // 	      $action_item = new MenuItem($action_title , $_SERVER['REQUEST_URI']);
 // 	      $action_item->setSelected(true);
@@ -78,27 +82,35 @@ class PageSessionMenu extends MainMenu {
 // 	      $last_selected = $action_item;
 	    }
 	    else {
-		  debug("Clearing child nodes of current selected menu");
-		  $last_selected->clearChildNodes();
-		  $last_selected->setHref($this->getLastMatchValue());
+		  debug("Updating href of last selected menu with last matched value");
+// 		  $last_selected->setHref($this->getLastMatchValue());
+		  $last_selected->setHref($_SERVER["REQUEST_URI"]);
 	    }
 
+	    debug("Clearing child nodes of current selected menu");
+	    $last_selected->clearChildNodes();
+	    
+	    // add passed menu array as submenu items to the current selected item
 	    foreach($arr_menu as $key=>$subitem) {
 
 		    if (strpos("javascript:",$subitem->getHref())===0) {
 
 		    }
 		    else {
+			  //update relative path of submenu items passed from page
 		      $subitem->setHref( dirname($_SERVER['PHP_SELF']). "/".$subitem->getHref());
+		      
 		    }
 
 			if (strcmp($last_selected->getHref(), $subitem->getHref())===0) {
-				$last_selected->clearChildNodes();
-				$last_selected->setSelected(false);
+
+				$last_selected->setSelected(true);
+// 				$this->selected_path[] = $last_selected;
 				break;
-// 				continue;
+
 			}
 			else {
+				
 				$last_selected->addMenuItem($subitem);
 			}
 
@@ -116,7 +128,7 @@ class PageSessionMenu extends MainMenu {
 	  
 	}
 	
-
+	
 	$this->selected_path = array_reverse($this->selected_path);
 
 	$_SESSION[$this->context]["Menu"] = serialize($this->main_menu);
@@ -131,7 +143,7 @@ class PageSessionMenu extends MainMenu {
     public function dumpPath()
     {
 	debug("DumpPath Start");
-	foreach($this->path as $index=>$item) {
+	foreach($this->selected_path as $index=>$item) {
 	    debug("[$index]=>".$item->getTitle()." | ".$item->getHref());
 	}
 	debug("DumpPath End");

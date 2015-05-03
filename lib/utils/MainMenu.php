@@ -199,12 +199,12 @@ class MainMenu
 	    }
 
 	    if ($match_min < PHP_INT_MAX && $closest) {
-		$this->selected_item = $closest;
+		  $this->selected_item = $closest;
 	    }
 	    if ($find_mode===MainMenu::FIND_INDEX_PATHCHECK) {
-		if ($position>-1) {
-		  $this->selected_item = $find_arr[$position];
-		}
+		  if ($position>-1) {
+			$this->selected_item = $find_arr[$position];
+		  }
 	    }
 	    return $position;
 
@@ -217,7 +217,7 @@ class MainMenu
 
 	    $match = (strcmp( $request , $href ) == 0);
 
-// 	    debug("matchItem  Mode: $find_mode | Request: $request Mathing With MenuItem: $href");
+	    debug("matchItem  Mode: $find_mode | Request: $request Mathing With MenuItem: $href");
 	    
 	    if ($find_mode === MainMenu::FIND_INDEX_LOOSE) {
 		$match = ( strpos(  $request, $href ) !== false );
@@ -230,21 +230,33 @@ class MainMenu
 
 	    }
 	    else if ($find_mode === MainMenu::FIND_INDEX_PATHCHECK) {
-		$breq = dirname($request);
-		if (endsWith($request, "/")===true) {
-		  $breq = $request;
-		}
-		
-		$hreq = dirname($href);
-		if (strpos($breq, $hreq)===false) return false;
-		
-		$match = @levenshtein($request, $href);
+	    
+		  $href = explode("?", $href);
+		  if (is_array($href) && count($href)>0) {
+			$href=$href[0];
+		  }
+		  $request = explode("?", $request);
+		  if (is_array($request) && count($request)>0) {
+			$request = $request[0];
+		  }
+		  $this->last_match_value = $request;
+		  if (strcmp($request, $href)==0) return true;
+		  
+		  $breq = dirname($request);
+		  if (endsWith($request, "/")===true) {
+			$breq = $request;
+		  }
+		  
+		  $hreq = dirname($href);
+		  if (strpos($breq, $hreq)===false) return false;
+		  
+		  $match = @levenshtein($request, $href);
 		
 	    }
 	    
 	    $this->last_match_value = $request;
 	    
-// 	    debug("matchItem Result: ".(int)$match);
+	    debug("matchItem Result: ".(int)$match);
 	    return $match;
 	}
 

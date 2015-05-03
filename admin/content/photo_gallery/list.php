@@ -28,6 +28,7 @@ RequestController::addRequestHandler($h_repos);
 
 
 $gv = new GalleryView();
+$gv->blob_field = "photo";
 $gv->setCaption("Sample Photo Gallery Items");
 $gv->initView($bean, "add.php");
 

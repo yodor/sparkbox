@@ -4,7 +4,7 @@ include_once("class/pages/AdminPage.php");
 
 include_once("class/beans/ProductsBean.php");
 include_once("class/beans/ProductColorsBean.php");
-include_once("class/beans/ProductSizesBean.php");
+
 include_once("class/beans/ProductInventoryBean.php");
 include_once("class/beans/ProductColorPhotosBean.php");
 
@@ -22,11 +22,19 @@ $page->checkAccess(ROLE_CONTENT_MENU);
 
 $rc = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
 
+
+
+
 $menu=array(
-   new MenuItem("Photos", "gallery/list.php".$rc->qrystr, "list-add.png"),
-   new MenuItem("Add Gallery", "add.php".$rc->qrystr, "list-add.png")
+   new MenuItem("Color Gallery", "list.php".$rc->qrystr, "list-add.png"),
+//    new MenuItem("Add Gallery", "add.php".$rc->qrystr, "list-add.png")
 );
 
+$action_add = new Action("", "add.php", array());
+$action_add->setAttribute("action", "add");
+$action_add->setAttribute("title", "Add Color Gallery");
+$page->addAction($action_add);
+  
 
 $bean = new ProductColorsBean();
 
@@ -43,7 +51,9 @@ $select_colors->from = " product_colors pclr LEFT JOIN products p ON p.prodID = 
 $select_colors->where = " pclr.prodID = ".$rc->ref_id;
 
 
-$list_caption = $rc->ref_row["product_name"];
+
+$page->setCaption( tr("Color Gallery").": ".$rc->ref_row["product_name"] );
+
 
 
 
@@ -53,7 +63,7 @@ $list_caption = $rc->ref_row["product_name"];
 
 
 $view = new TableView(new SQLResultIterator($select_colors, $bean->getPrKey()));
-$view->setCaption($list_caption);
+$view->setCaption("Color Gallery List");
 // $view->setDefaultOrder(" ORDER BY item_date DESC ");
 // $view->search_filter = " ORDER BY day_num ASC ";
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
@@ -66,13 +76,15 @@ $view->addColumn(new TableColumn("photo","Photo"));
 
 $view->addColumn(new TableColumn("color", "Color"));
 
-$view->addColumn(new TableColumn("color_photo","Color Photo"));
+$view->addColumn(new TableColumn("color_photo","Color Chip"));
 
 
 $view->addColumn(new TableColumn("actions","Actions"));
 
 
 $view->getColumn("color_photo")->setCellRenderer(new TableImageCellRenderer(new ProductColorsBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+$view->getColumn("color_photo")->getCellRenderer()->setBlobField("color_photo");
+
 $view->getColumn("color_photo")->getHeaderCellRenderer()->setSortable(false);
 
 $view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
@@ -90,7 +102,7 @@ $act->addAction( $h_delete->createAction() );
 $act->addAction(  new RowSeparatorAction() );
 
 $act->addAction(
-      new Action("Gallery", "gallery/list.php", 
+      new Action("Photos", "gallery/list.php", 
 		array(
 		  new ActionParameter($bean->getPrKey(), $bean->getPrKey())
 		)

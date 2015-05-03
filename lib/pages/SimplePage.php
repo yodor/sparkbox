@@ -26,6 +26,9 @@ class SimplePage extends SitePage
 	public $description = "";
 	public $keywords = "";
 	
+	protected $config_description = "";
+	protected $config_keywords = "";
+	
 	public function addOGTag($tag_name, $tag_content)
 	{
 		$this->opengraph_tags[$tag_name] = $tag_content;
@@ -263,16 +266,7 @@ var right = "<?php echo $right;?>";
 
 	    $keywords_config = "";
 	    $description_config = "";
-	      
-	    if (DB_ENABLED) {
-	      $config = ConfigBean::factory();
-	      $config->setSection("seo");
 
-	      $keywords_config = $config->getValue("meta_keywords");
-	      $description_config = $config->getValue("meta_description");
-
-	    }
-	    
 		$meta_keywords = "";
 	    $meta_description = "";
 	    
@@ -280,13 +274,13 @@ var right = "<?php echo $right;?>";
 		  $meta_keywords = $this->keywords;
 	    }
 	    else {
-		  $meta_keywords = $keywords_config;
+		  $meta_keywords = $this->config_keywords;
 	    }
 	    if ($this->description) {
 		  $meta_description = $this->description;
 	    }
 	    else {
-		  $meta_description = $description_config;
+		  $meta_description = $this->config_description;
 	    }
 	    
 
@@ -300,6 +294,25 @@ var right = "<?php echo $right;?>";
 	{
 		RequestController::processAjaxHandlers();
 
+		try {
+		  if (DB_ENABLED) {
+			$config = ConfigBean::factory();
+			$config->setSection("seo");
+
+			$this->config_keywords = $config->getValue("meta_keywords");
+			$this->config_description = $config->getValue("meta_description");
+
+		  }
+	    }
+	    catch (Exception $e) {
+		  error_log("Unable to access seo config section: ".$e->getMessage()." | URI: ".$_SERVER["REQUEST_URI"]);
+		  ob_start();
+		  var_dump($e->getTrace());
+		  $trace = ob_get_contents();
+		  ob_end_clean();
+		  error_log($trace);
+	    }
+	    
 		ob_start(array($this, 'obCallback'));
 
 		$this->htmlStart();

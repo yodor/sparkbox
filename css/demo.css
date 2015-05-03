@@ -150,6 +150,41 @@ body.mce_browser .FormRenderer .SubmitLine .Buttons {
 }
 
 
+body.products .column.left {
+  margin-right:10px;
+}
+
+body.products .filters {
+  display:inline-block;
+}
+body.products .filters FORM {
+  display:inline-block;
+}
+body.products .filters .InputComponent {
+  margin-top:10px;
+}
+body.products .filters .InputField {
+  display:inline-block;
+}
+
+body.products .filters .label {
+  display:block;
+}
+
+body.products .filters .InputComponent.Slider .label  {
+  display:inline-block;
+}
+body.products .filters .InputComponent.Slider .value {
+  display:inline-block;
+  margin-left:5px;
+}
+body.products .filters .InputComponent.Slider .InputField {
+  display:block;
+  margin-top:10px;
+}
+body.products .filters BUTTON {
+  margin-top:20px;
+}
 
 body.products.list .ProductListItem {
   display:inline-block;

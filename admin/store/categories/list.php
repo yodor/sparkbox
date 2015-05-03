@@ -7,7 +7,7 @@ include_once("lib/components/renderers/items/TextTreeItemRenderer.php");
 
 
 $menu=array(
-    new MenuItem("Attributes", "attributes/list.php", "list-add.png"),
+
     new MenuItem("Add Category", "add.php", "list-add.png")
 );
 

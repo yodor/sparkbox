@@ -20,11 +20,25 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
   protected $list_limit = 0;
   
+  protected $blob_field = "";
+  
+  protected $source_key = NULL;
+  
+  public function setSourceIteratorKey($source_key)
+  {
+	  $source_fields = $this->bean->getFields();
+	  if (!in_array($source_key, $source_fields))throw new Exception("Source fields does not contain interation key '$source_key'");
+	  $this->source_key = $source_key;
+  }
+  
   public function setListLimit($num)
   {
 	  $this->list_limit = (int)$num;
   }
-  
+  public function setBlobField($blob_field)
+  {
+	  $this->blob_field = $blob_field;
+  }
   public function setThumbnailSize($width, $height)
   {
 	  $this->width=$width;
@@ -55,6 +69,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
   {
 	  parent::__construct();
 
+	  //source 
 	  $this->bean = $bean;
 	  $this->width = $width;
 	  $this->height = $height;
@@ -63,13 +78,17 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
   }
 
 
-  
+  //default rendering fetch from source linking with current 'view' prkey
   public function renderCell($row, TableColumn $tc)
   {
       $this->processAttributes($row, $tc);
 
       $this->startRender();
-      $prkey = $tc->getView()->getIterator()->getPrKey();
+      
+      $bean_class = get_class($this->bean);
+      $source_fields = $this->bean->getFields();
+      
+      
 
       $photoID = -1;
 	
@@ -89,12 +108,66 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 		$order_by = " ORDER BY position ASC ";
       }
       
+      $blob_field = "";
+
+      if ($this->blob_field) {
+		$blob_field = "blob_field=".$this->blob_field;
+      }
+
       
-      $num = $this->bean->startIterator("WHERE $prkey=".$row[$prkey]." ".$order_by." ".$limit);
-//       echo $this->bean->getLastIteratorSQL();
-      
+      $num = 0;
+      try {
+		//iterate source based on view's prkey
+		$prkey = $tc->getView()->getIterator()->getPrKey();	
+		if (in_array($prkey, $source_fields)) {
+			$num = $this->bean->startIterator("WHERE $prkey=".$row[$prkey]." ".$order_by." ".$limit);
+		}
+		else {
+		  //check sources' prkey with row
+		  $prkey = $this->bean->getPrKey();
+		  if ($this->source_key) {
+			$prkey = $this->source_key;
+			
+		  }
+		  
+		  $row_fields = array_keys($row);
+		  if (in_array($prkey, $row_fields)) {
+			$value = (int)$row[$prkey];
+			$num = $this->bean->startIterator("WHERE $prkey=$value ".$order_by." ".$limit);
+		  }
+		  else {
+			//check assigned column value. this might be array also try exploding first
+			$row_value = $row[$tc->getFieldName()];
+			
+			if ($row_value) {
+			  $value = explode("|", $row_value);
+			}
+			else {
+			  $value = (int)$row_value;
+			  
+			}
+			if (is_array($value) && count($value)>0) {
+			  $num = $this->bean->startIterator("WHERE $prkey IN (".implode(",", $value).") ".$order_by." ".$limit);
+			}
+			else {
+			  $num = $this->bean->startIterator("WHERE $prkey=$value ".$order_by." ".$limit);
+			}
+			
+		  }
+		}
+	  }
+	  catch (Exception $e) {
+		  echo $e->getMessage();
+		echo $this->bean->getLastIteratorSQL();
+
+	  }
+
+      if ($num < 1) {
+// 		echo "N/A";
+
+      }
       if ($num>1) {
-		echo "<div class='TableCellImageList' $prkey='".$row[$prkey]."' count='$num'>";
+		echo "<div class='TableCellImageList'  count='$num'>";
       }
       while ($this->bean->fetchNext($pfrow)) {
 		  $photoID=$pfrow[$this->bean->getPrKey()];
@@ -105,18 +178,18 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 		  $width = $this->width;
 		  $height = $this->height;
 
-		  $blob_field = $tc->getFieldName();
-
-		  echo "<div class='TableCellImageItem' photoID='$photoID'>";
+		  
+		  
+		  echo "<div class='TableCellImageItem' itemID='$photoID' itemClass='$bean_class'>";
 
 		  if ($this->render_mode == IPhotoRenderer::RENDER_CROP) {
-			$img_tag = "<img src='".SITE_ROOT."storage.php?cmd=image_crop&height=$height&width=$width&class=".get_class($this->bean)."&id=$photoID&blob_field=$blob_field'>";
+			$img_tag = "<img src='".SITE_ROOT."storage.php?cmd=image_crop&height=$height&width=$width&class=$bean_class&id=$photoID&$blob_field'>";
 		  }
 		  else if ($this->render_mode == IPhotoRenderer::RENDER_THUMB) {
 
 			$size = max($width, $height);
 			
-			$img_tag = "<img src='".SITE_ROOT."storage.php?cmd=image_thumb&size=$size&class=".get_class($this->bean)."&id=$photoID&blob_field=$blob_field'>";
+			$img_tag = "<img src='".SITE_ROOT."storage.php?cmd=image_thumb&size=$size&class=$bean_class&id=$photoID&$blob_field'>";
 		  }
 
 		  if ($this->action instanceof EmptyAction) {
@@ -129,7 +202,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 			  }
 			  else {
 
-				echo "<a class='image_popup' href='".SITE_ROOT."storage.php?cmd=gallery_photo&class=".get_class($this->bean)."&id=$photoID&blob_field=$blob_field'  >";
+				echo "<a class='image_popup' href='".SITE_ROOT."storage.php?cmd=gallery_photo&class=$bean_class&id=$photoID&$blob_field'  >";
 				echo $img_tag;
 				echo "</a>";
 			  }

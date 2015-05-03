@@ -1,8 +1,8 @@
 <?php
 include_once("session.php");
 include_once("class/pages/AdminPage.php");
-include_once("class/forms/ProductSizeInputForm.php");
-include_once("class/beans/ProductSizesBean.php");
+include_once("class/forms/StoreSizeInputForm.php");
+include_once("class/beans/StoreSizesBean.php");
 include_once("class/beans/ProductsBean.php");
 
 $menu=array(
@@ -14,7 +14,7 @@ $page->checkAccess(ROLE_CONTENT_MENU);
 
 
 
-$view = new InputFormView(new ProductSizesBean(), new ProductSizeInputForm());
+$view = new InputFormView(new StoreSizesBean(), new StoreSizeInputForm());
 
 // $view->getTransactor()->assignInsertValue("insert_date", DBDriver::get()->dateTime());
 // $view->getTransactor()->appendValue("prodID", $ensure_product->ref_id);
