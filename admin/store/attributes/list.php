@@ -6,13 +6,15 @@ include_once("lib/components/TableView.php");
 
 $menu=array(
 
-    new MenuItem("Add Attribute", "add.php", "list-add.png")
 );
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-
+$action_add = new Action("", "add.php", array());
+$action_add->setAttribute("action", "add");
+$action_add->setAttribute("title", "Add Attribute");
+$page->addAction($action_add);
 
 
 
@@ -23,9 +25,9 @@ RequestController::addRequestHandler($h_delete);
 
 
 $view = new TableView(new BeanResultIterator($bean));
-$view->setCaption("Global Attributes List");
-// $view->setDefaultOrder(" ORDER BY item_date DESC ");
-// $view->search_filter = " ORDER BY day_num ASC ";
+$view->setCaption("Store Attributes List");
+$view->setDefaultOrder(" name ASC ");
+
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
 $view->addColumn(new TableColumn("name","Name"));
 $view->addColumn(new TableColumn("unit","Unit"));

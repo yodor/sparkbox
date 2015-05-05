@@ -7,18 +7,29 @@ include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 
 $menu = array();
 
-if (!isset($_GET["chooser"])) {
-  $menu[] = new MenuItem("Add Page","add.php", "list-add.png");
 
-  $page = new AdminPage("Dynamic Pages");
-}
-else {
-  $page = new AdminPage("Choose Page to Link");
-
-}
-
+$page = new AdminPage();
 
 $page->checkAccess(ROLE_CONTENT_MENU);
+
+
+if (!isset($_GET["chooser"])) {
+  
+  $page->setCaption("Dynamic Pages");
+  
+  $action_add = new Action("", "add.php", array());
+  $action_add->setAttribute("action", "add");
+  $action_add->setAttribute("title", "Add Page");
+  $page->addAction($action_add);
+  
+}
+else {
+  $page->setCaption("Choose Page to Link");
+
+}
+
+$page->setAccessibleTitle("Dynamic Pages");
+
 
 $bean = new DynamicPagesBean();
 

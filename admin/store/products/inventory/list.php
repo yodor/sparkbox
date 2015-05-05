@@ -71,8 +71,8 @@ else {
 
 $view = new TableView(new SQLResultIterator($select_inventory, "piID"));
 $view->setCaption("Inventory List");
-// $view->setDefaultOrder(" ORDER BY item_date DESC ");
-// $view->search_filter = " ORDER BY day_num ASC ";
+$view->setDefaultOrder(" piID DESC ");
+
 $view->addColumn(new TableColumn("piID","ID"));
 
 

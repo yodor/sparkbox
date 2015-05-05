@@ -365,7 +365,7 @@ var right = "<?php echo $right;?>";
 	{
 	    if (Session::get("alert",false)) {
 	      $alert = Session::get("alert");
-	      $alert = json_encode($alret);
+	      $alert = json_encode($alert);
 ?>
 <script type='text/javascript' >
 var alert = <?php echo $alert;?>;

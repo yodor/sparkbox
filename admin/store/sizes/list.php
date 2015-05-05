@@ -10,18 +10,21 @@ include_once("lib/components/TableView.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 include_once("lib/components/KeywordSearchComponent.php");
 include_once("lib/iterators/SQLResultIterator.php");
-// include_once("class/beans/ProductInventoryPhotosBean.php");
 
 
 
+$menu=array(
+    
+);
 
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-$menu=array(
-    new MenuItem("Add Size", "add.php", "list-add.png"),
-);
+$action_add = new Action("", "add.php", array());
+$action_add->setAttribute("action", "add");
+$action_add->setAttribute("title", "Add Size");
+$page->addAction($action_add);
 
 $bean = new StoreSizesBean();
 
@@ -29,24 +32,15 @@ $bean = new StoreSizesBean();
 $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
-// $search_fields = array("prodID", "product_code", "product_name", "color", "size");
-// $ksc = new KeywordSearchComponent($search_fields);
-
-
 
 $view = new TableView(new BeanResultIterator($bean));
 $view->setCaption("Store Sizing List");
-// $view->setDefaultOrder(" ORDER BY item_date DESC ");
-// $view->search_filter = " ORDER BY day_num ASC ";
+$view->setDefaultOrder(" size_value ASC ");
+
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
-
-
-
 $view->addColumn(new TableColumn("size_value","Size"));
 
-
 $view->addColumn(new TableColumn("actions","Actions"));
-
 
 $act = new ActionsTableCellRenderer();
 $act->addAction(
@@ -54,23 +48,14 @@ $act->addAction(
 ); 
 $act->addAction(  new PipeSeparatorAction() );
 $act->addAction( $h_delete->createAction() );
-
-
     
 $view->getColumn("actions")->setCellRenderer($act);
-
-
 
 $page->beginPage($menu);
 
 $page->renderPageCaption();
 
-// $ksc->render();
 $view->render();
 
 $page->finishPage();
-
-
-
-
 ?>

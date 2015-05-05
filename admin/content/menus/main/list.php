@@ -8,12 +8,16 @@ include_once("lib/components/NestedSetTreeView.php");
 include_once("lib/components/renderers/items/TextTreeItemRenderer.php");
 
 $menu=array(
-    new MenuItem("Add Item","add.php", "list-add.png")
+    
 );
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
+$action_add = new Action("", "add.php", array());
+$action_add->setAttribute("action", "add");
+$action_add->setAttribute("title", "Add Menu Item");
+$page->addAction($action_add);
 
 $bean = new MenuItemsBean();
 

@@ -14,13 +14,19 @@ $rc = new ReferenceKeyPageChecker(new DynamicPagesBean(), "../list.php");
 
 
 $menu=array(
-    new MenuItem("Add Photo","add.php".$rc->qrystr, "list-add.png")
+//     new MenuItem("Add Photo","add.php".$rc->qrystr, "list-add.png")
 );
 
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
-$page->setCaption("Photo Gallery");
+$page->setCaption("Dynamic Page Photo Gallery");
+$page->setAccessibleTitle("Photo Gallery");
+
+$action_add = new Action("", "add.php".$rc->qrystr, array());
+$action_add->setAttribute("action", "add");
+$action_add->setAttribute("title", "Add Photo");
+$page->addAction($action_add);
 
 $bean = new DynamicPagePhotosBean();
 $bean->setFilter($rc->ref_key."='".$rc->ref_id."'");
@@ -39,6 +45,7 @@ $gv->initView($bean, "add.php", $rc->ref_key, $rc->ref_id);
 
 $page->beginPage($menu);
 
+$page->renderPageCaption();
 
 $gv->render();
 

@@ -13,15 +13,21 @@ include_once("lib/iterators/SQLResultIterator.php");
 // include_once("class/beans/ProductInventoryPhotosBean.php");
 
 
-
+$menu=array(
+    
+);
 
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-$menu=array(
-    new MenuItem("Add Class", "add.php", "list-add.png"),
-);
+
+
+$action_add = new Action("", "add.php", array());
+$action_add->setAttribute("action", "add");
+$action_add->setAttribute("title", "Add Class");
+$page->addAction($action_add);
+
 
 $bean = new ProductClassesBean();
 
@@ -29,24 +35,15 @@ $bean = new ProductClassesBean();
 $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
-// $search_fields = array("prodID", "product_code", "product_name", "color", "size");
-// $ksc = new KeywordSearchComponent($search_fields);
-
-
 
 $view = new TableView(new BeanResultIterator($bean));
 $view->setCaption("Product Classes List");
-// $view->setDefaultOrder(" ORDER BY item_date DESC ");
-// $view->search_filter = " ORDER BY day_num ASC ";
+$view->setDefaultOrder($bean->getPrKey()." DESC ");
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
-
-
-
 $view->addColumn(new TableColumn("class_name","Class Name"));
 
 
 $view->addColumn(new TableColumn("actions","Actions"));
-
 
 $act = new ActionsTableCellRenderer();
 $act->addAction(
@@ -55,8 +52,6 @@ $act->addAction(
 $act->addAction(  new PipeSeparatorAction() );
 $act->addAction( $h_delete->createAction() );
 
-
-    
 $view->getColumn("actions")->setCellRenderer($act);
 
 
@@ -65,12 +60,7 @@ $page->beginPage($menu);
 
 $page->renderPageCaption();
 
-// $ksc->render();
 $view->render();
 
 $page->finishPage();
-
-
-
-
 ?>
