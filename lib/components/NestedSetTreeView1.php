@@ -254,7 +254,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 		}
 		else {
 
-		  $text_action->prependRequestParams(false);
+		  $text_action->prependRequestParams(true);
 		  $text_action->addParameter(new ActionParameter("filter", "self", true));
 		  $text_action->addParameter(new ActionParameter($source_prkey, $source_prkey));
 		  

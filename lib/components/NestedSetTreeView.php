@@ -332,6 +332,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	    }
 	    $item->setLabel($item_label);
 
+	    
 	    $item->render();
 
 	    echo "<ul class='NodeChilds'>";

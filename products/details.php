@@ -159,9 +159,11 @@ foreach ($sellable as $pos=>$row) {
 	  $color_photo_ids = explode("|", $row["color_photos"]);
 	  $product_photo_ids = explode("|", $row["product_photos"]);
 	  $same_color_pids = explode("|", $row["color_pids"]);
+	  $color_codes = explode("|", $row["color_codes"]);
 	  
 	  foreach ($colors as $idx=>$color) {
 		  $pclrID = $color_ids[$idx];
+		  $color_code = "";
 		  //use the chip image
 		  if ($have_chips[$idx]>0) {
 			$chip_class = "ProductColorsBean&bean_field=color_photo";
@@ -176,9 +178,10 @@ foreach ($sellable as $pos=>$row) {
 		  else {
 			$chip_class = ProductPhotosBean::class;
 			$chip_id = $product_photo_ids[0];
+			$color_code = $color_codes[$idx];
 		  }
-		  
-		  $item = array("id"=>$chip_id, "class"=>$chip_class, "piID"=>$same_color_pids[$idx], "prodID"=>$prodID, "color_name"=>$color);
+
+		  $item = array("id"=>$chip_id, "class"=>$chip_class, "piID"=>$same_color_pids[$idx], "prodID"=>$prodID, "color_name"=>$color, "color_code"=>$color_code);
 		  $chips[$pclrID] = $item;
 	  }
 	  $process_color_chips = false;
@@ -214,10 +217,11 @@ echo "<div class='column details'>";
 		echo "<div class='list' pclrID='$pclrID'>";
 		  foreach ($gallery as $key=>$item) {
 			$href_source = STORAGE_HREF."?cmd=image_crop&width=110&height=110";
-			$href=$href_source."&class=".$item["class"]."&id=".$item["id"];
 			echo "<div class='item' bean='{$item["class"]}' itemID='{$item["id"]}' source='$href_source' onClick='javascript:changeImage(this)'>";
+			$href=$href_source."&class=".$item["class"]."&id=".$item["id"];
 			echo "<img src='$href' >";
 			echo "</div>";
+			
 		  }
 		echo "</div>";//list
 	  }
@@ -250,11 +254,19 @@ echo "<div class='column details'>";
 		$chip_piID = isset($color_pids[$pclrID][0]) ? $color_pids[$pclrID][0] : $piID;
 
 		$chip_colorName = $item["color_name"];
+		$chip_colorCode = $item["color_code"];
 		
 		//sizing pids = $pid_values
 		echo "<div class='color_button' pclrID='$pclrID' piID='$chip_piID' size_values='$size_values' sell_prices='$sell_prices' pids='$pid_values' color_name='$chip_colorName'
-				   onClick='javascript:changeColor($pclrID)'>";
-		echo "<img src='$href' title='$chip_colorName'>";
+				   onClick='javascript:changeColor($pclrID)' title='$chip_colorName'>";
+	   			
+// 			if ($chip_colorCode) {
+// 			  echo "<div class='color_code' style='display:block;background-color:$chip_colorCode;width:48px;height:48px;'></div>";
+// 			}
+// 			else {
+			  echo "<img src='$href' >";
+// 			}
+			
 		echo "</div>";
 	  }
 	  echo "</div>";//color_chooser

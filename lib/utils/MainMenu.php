@@ -219,9 +219,11 @@ class MainMenu
 
 	    debug("matchItem  Mode: $find_mode | Request: $request Mathing With MenuItem: $href");
 	    
+	    //href is found inside request
 	    if ($find_mode === MainMenu::FIND_INDEX_LOOSE) {
 		$match = ( strpos(  $request, $href ) !== false );
 	    }
+	    //request is found inside href
 	    else if ($find_mode === MainMenu::FIND_INDEX_LOOSE_REVERSE) {
 		$match = ( strpos( $href,  $request ) !== false );
 	    }
@@ -281,26 +283,26 @@ class MainMenu
 
 	    foreach($arr as $index=>$sub)
 	    {	
-		$sub->setSelected(false);
+		  $sub->setSelected(false);
 	    }
 	
 	    if ($this->selected_item) {
 
-		$this->selected_item->setSelected(true);
+		  $this->selected_item->setSelected(true);
 
-		$current = $this->selected_item;
+		  $current = $this->selected_item;
 
-		$this->selected_path[] = $current;
+		  $this->selected_path[] = $current;
 
-		while ($current->getParent()) {
+		  while ($current->getParent()) {
 
-		    $parent = $current->getParent();
-		    $parent->setSelected(true);
+			  $parent = $current->getParent();
+			  $parent->setSelected(true);
 
-		    $current = $parent;
+			  $current = $parent;
 
-		    $this->selected_path[] = $current;
-		}
+			  $this->selected_path[] = $current;
+		  }
 
 	    }
 
@@ -310,15 +312,17 @@ class MainMenu
 	    return $this->selected_path;
 	}
 	
-	public function findSelectedPath(&$path, $search_items=false)
+	public static function findSelectedPath(&$path, $menu_items)
 	{
-	    if (!$search_items) $search_items = $this->main_menu;
+// 	    if (!$search_items) $search_items = $this->main_menu;
 	    
-	    foreach($search_items as $key=>$item) {
+	    foreach($menu_items as $key=>$item) {
 	      if ($item->isSelected()) {
-		$path[] = $item;
-		
-		$this->findSelectedPath($path, $item->getSubmenu());
+			$path[] = $item;
+			$subitems = $item->getSubmenu();
+			if (count($subitems)>0) {
+			  MainMenu::findSelectedPath($path, $subitems);
+			}
 	      }
 	    }
 	}

@@ -22,7 +22,8 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsRend
 	     
 		
 	      $this->action_renderer = new ActionRenderer(NULL, NULL);
-
+	      
+		  $this->action_renderer->enableTextTranslation(false);
 	}
 	
 

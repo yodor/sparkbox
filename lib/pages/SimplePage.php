@@ -29,12 +29,23 @@ class SimplePage extends SitePage
 	protected $config_description = "";
 	protected $config_keywords = "";
 	
+	protected $accessible_title = "";
+	protected $accessible_parent = "";
+	
 	public function addOGTag($tag_name, $tag_content)
 	{
 		$this->opengraph_tags[$tag_name] = $tag_content;
 	  
 	}
 	
+	public function getAccessibleTitle()
+	{
+		return $this->accessible_title;
+	}
+	public function setAccessibleTitle($menu_title)
+	{
+		$this->accessible_title = $menu_title;
+	}
 	protected function dumpMetaTags() 
 	{
 	    parent::dumpMetaTags();
@@ -354,17 +365,19 @@ var right = "<?php echo $right;?>";
 	{
 	    if (Session::get("alert",false)) {
 	      $alert = Session::get("alert");
+	      $alert = json_encode($alret);
 ?>
 <script type='text/javascript' >
+var alert = <?php echo $alert;?>;
 addLoadEvent(function(){
-    showAlert(<?php echo json_encode($alert);?>);
+    showAlert(alert);
 });
 </script>
 <?php
 	      Session::clear("alert");
 	      
 	    }
-	    echo "</div>";
+	    
 	}
 
 }

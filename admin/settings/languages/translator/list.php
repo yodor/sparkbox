@@ -4,7 +4,7 @@ include_once("class/pages/AdminPage.php");
 include_once("lib/beans/LanguagesBean.php");
 include_once("lib/beans/SiteTextsBean.php");
 
-$page = new AdminPage("Translator");
+$page = new AdminPage();
 $page->checkAccess(ROLE_CONFIG_MENU);
 
 
@@ -44,6 +44,8 @@ $view->setCaption("Available Site Phrases");
 
 
 $page->beginPage($menu);
+$page->renderPageCaption();
+
 $view->render();
 $page->finishPage();
 

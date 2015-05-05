@@ -278,6 +278,9 @@ body.products.list .ProductListItem .color_chips  A {
 body.products.list .ProductListItem .color_chips  A IMG {
   display:block;
 }
+body.products.list .ProductListItem .color_chips  A DIV {
+  display:block;
+}
 body.products.details .column.details {
   display:block;
 }

@@ -141,13 +141,16 @@ function queryString($qryarr=0, $append="")
 			}
 		}
 		$ret = "?".implode("&",$qrypair);
-$append = str_replace("?","",$append);
-		$ret.="&".$append;
+		if (strlen($append)>0) {
+		  $append = str_replace("?","",$append);
+		  $ret.="&".$append;
+		}
 	}
 	else if (strlen($append)>0) {
 	  $append = str_replace("?","",$append);
 	  $ret.="?".$append;
 	}
+
 
 	return $ret;
 

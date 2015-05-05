@@ -26,7 +26,7 @@ $rc = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
 
 
 $menu=array(
-   new MenuItem("Color Gallery", "list.php".$rc->qrystr, "list-add.png"),
+//    new MenuItem("Color Gallery", "list.php".$rc->qrystr, "list-add.png"),
 //    new MenuItem("Add Gallery", "add.php".$rc->qrystr, "list-add.png")
 );
 
@@ -34,7 +34,8 @@ $action_add = new Action("", "add.php", array());
 $action_add->setAttribute("action", "add");
 $action_add->setAttribute("title", "Add Color Gallery");
 $page->addAction($action_add);
-  
+
+$page->setAccessibleTitle("Color Gallery");
 
 $bean = new ProductColorsBean();
 

@@ -13,9 +13,6 @@ include_once("lib/components/GalleryView.php");
 $rc = new ReferenceKeyPageChecker(new ProductColorsBean(), "../list.php".queryString($_GET));
 
 $menu=array();
-$menu=array(
-    new MenuItem("Photos","list.php".$rc->qrystr, "list-add.png")
-);
 
 
 $page = new AdminPage();
@@ -25,6 +22,7 @@ $action_add = new Action("", "add.php", array());
 $action_add->setAttribute("action", "add");
 $action_add->setAttribute("title", "Add Photo To Color Gallery");
 $page->addAction($action_add);
+$page->setAccessibleTitle("Photos");
 
 $page->setCaption( tr("Color Gallery").": ".$rc->ref_row["color"] );
 

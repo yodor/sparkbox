@@ -121,22 +121,18 @@ class Action {
 		list($script_name, $script_params) = explode("?", $script_name);
 	  }
 
-	  
-
-	  foreach ($this->parameters as $pos=>$act_param)
-	  {
-		if ($act_param->is_value_param===TRUE) {
-			$params[$act_param->param_name] = $act_param->field_name;
-		}
-		else if (isset($row[$act_param->field_name])) {
-		  $params[$act_param->param_name] = $row[$act_param->field_name];
-		}
-	  }
-
+	  //TODO: Check order of parameters
+	  //1. parameters from current URL
 	  if ($this->prepend_request_params) {
-	    $params = array_merge($params, $_GET);
+		foreach ($_GET as $key=>$param) {
+		  if (!isset($params[$key])) {
+			$params[$key]=$param;
+		  }
+		}
+// 	    $params = array_merge($params, $_GET);
 	  }
-	  
+
+	  //2. static parameters from action href
 	  $static_pairs = explode("&", $script_params);
 	  foreach($static_pairs as $pos=>$pair) {
 		  $param_name=$pair;
@@ -149,6 +145,17 @@ class Action {
 		  }
 	  }
 
+	  //3. parameters passed in the CTOR array 'parameters'
+	  foreach ($this->parameters as $pos=>$act_param)
+	  {
+		if ($act_param->is_value_param===TRUE) {
+			$params[$act_param->param_name] = $act_param->field_name;
+		}
+		else if (isset($row[$act_param->field_name])) {
+		  $params[$act_param->param_name] = $row[$act_param->field_name];
+		}
+	  }
+	  
 	  if (strlen($script_name)>0) {
 		Paginator::clearPageFilter($params);
 	  }

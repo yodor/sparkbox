@@ -12,6 +12,8 @@ class ActionRenderer extends Component implements IHeadRenderer
   
   protected $separator_enabled = false;
   
+  protected $text_translation_enabled = true;
+  
   public function __construct(Action $action=null, $result_row=null)
   {
 	parent::__construct();
@@ -30,7 +32,10 @@ class ActionRenderer extends Component implements IHeadRenderer
   {
 	$this->action_from_label = ($mode) ? true : false;
   }
-  
+  public function enableTextTranslation($mode)
+  {
+	$this->text_translation_enabled = ($mode) ? true : false;
+  }
   public function renderScript()
   {}
   
@@ -92,7 +97,12 @@ class ActionRenderer extends Component implements IHeadRenderer
 	}
 	else {
 	  if ($this->render_title) {
-		echo tr($this->action->getTitle());
+		if ($this->text_translation_enabled) {
+		  echo tr($this->action->getTitle());
+		}
+		else {
+		  echo $this->action->getTitle();
+		}
 	  }
 	}
   }

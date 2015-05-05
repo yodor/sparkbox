@@ -123,26 +123,29 @@ $product_selector = $tv->getRelationSelect();
 // echo $product_selector->getSQL();
 
 
-
-
-
-
-$view = new ListView(new SQLResultIterator($product_selector, "piID"));
+if (strcmp_isset("view", "list", $_GET)) {
+  $view = new TableView(new SQLResultIterator($product_selector, "piID"));
+  $view->addColumn(new TableColumn("piID","ID"));
+  $view->addColumn(new TableColumn("product_code","Product Code"));
+  $view->addColumn(new TableColumn("product_name","Product Name"));
+  $view->addColumn(new TableColumn("brand_name","Brand Name"));
+  $view->addColumn(new TableColumn("category_name","Category Name"));
+  // $view->addColumn(new TableColumn("catID","Category"));
+  // $view->getColumn("catID")->getHeaderCellRenderer()->setSortField("products.catID");
+//   $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(false);
+//   $view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+}
+else {
+  $view = new ListView(new SQLResultIterator($product_selector, "piID"));
+  $view->setItemRenderer(new ProductListItem());
+}
 $view->setCaption("Products List");
+$view->getTopPaginator()->view_modes_enabled = true;
 
 $view->setDefaultOrder(" piID DESC ");
-// $view->addColumn(new TableColumn($prods->getPrKey(),"ID"));
-// $view->addColumn(new TableColumn("photo","Photo"));
-// $view->addColumn(new TableColumn("product_code","Product Code"));
-// $view->addColumn(new TableColumn("product_name","Product Name"));
-// $view->addColumn(new TableColumn("brand_name","Brand Name"));
-// $view->addColumn(new TableColumn("category_name","Category Name"));
-// // $view->addColumn(new TableColumn("catID","Category"));
-// // $view->getColumn("catID")->getHeaderCellRenderer()->setSortField("products.catID");
-// $view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
-// $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(false);
 
-$view->setItemRenderer(new ProductListItem());
+
+
 
 $page->beginPage();
 

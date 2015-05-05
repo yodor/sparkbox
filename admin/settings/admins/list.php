@@ -8,13 +8,16 @@ include_once("lib/handlers/DeleteItemRequestHandler.php");
 include_once("lib/handlers/ToggleFieldRequestHandler.php");
 
 $menu=array(
-  new MenuItem("Add Admin","add.php", "list-add.png"),
+
 );
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_ADMIN_USERS_MENU);
 
-
+$action_add = new Action("", "add.php", array());
+$action_add->setAttribute("action", "add");
+$action_add->setAttribute("title", "Add Admin");
+$page->addAction($action_add);
 
 $bean = new AdminUsersBean();
 $h_delete = new DeleteItemRequestHandler($bean);
@@ -26,7 +29,7 @@ RequestController::addRequestHandler($h_toggle);
 
 
 $view = new TableView(new BeanResultIterator($bean));
-// $view->search_filter = " ORDER BY day_num ASC ";
+
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
 $view->addColumn(new TableColumn("email","Email"));
 $view->addColumn(new TableColumn("fullname","Full Name"));
@@ -82,9 +85,7 @@ $view->setCaption("Admin Users List");
 
 $page->beginPage($menu);
 
-echo "<div class='page_caption'>";
-echo tr("Administrative Users");
-echo "</div>";
+$page->renderPageCaption();
 
 $view->render();
 

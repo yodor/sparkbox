@@ -8,25 +8,20 @@ include_once("class/beans/ProductsBean.php");
 
 include_once("lib/components/GalleryView.php");
 
+$menu = array();
 
 
 $rc = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
 
-$menu = array();
-$menu=array(
-    new MenuItem("Photo Gallery","list.php".$rc->qrystr, "list-add.png")
-);
-
-
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
-// $page->setCaption("Product Photo Gallery");
-
+$page->setAccessibleTitle("Photo Gallery");
 
 $action_add = new Action("", "add.php", array());
 $action_add->setAttribute("action", "add");
 $action_add->setAttribute("title", "Add Photo To Product Gallery");
 $page->addAction($action_add);
+
 
 $page->setCaption( tr("Product Gallery").": ".$rc->ref_row["product_name"] );
 
