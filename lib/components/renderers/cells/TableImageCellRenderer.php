@@ -3,6 +3,12 @@ include_once ("lib/components/renderers/cells/TableCellRenderer.php");
 include_once ("lib/components/renderers/IPhotoRenderer.php");
 include_once ("lib/components/TableColumn.php");
 
+class ImageItem
+{
+  public $item_id = -1;
+  public $item_class = "";
+}
+
 class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 {
 
@@ -23,6 +29,8 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
   protected $blob_field = "";
   
   protected $source_key = NULL;
+  
+  protected $items = array();
   
   public function setSourceIteratorKey($source_key)
   {
@@ -65,7 +73,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
   
   
   
-  public function __construct(DBTableBean $bean, $render_mode=IPhotoRenderer::RENDER_CROP, $width=48, $height=-1)
+  public function __construct($bean, $render_mode=IPhotoRenderer::RENDER_CROP, $width=48, $height=-1)
   {
 	  parent::__construct();
 
@@ -77,18 +85,12 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 	  $this->list_limit = 1;
   }
 
-
-  //default rendering fetch from source linking with current 'view' prkey
-  public function renderCell($row, TableColumn $tc)
+  protected function constructItems($row, TableColumn $tc)
   {
-      $this->processAttributes($row, $tc);
-
-      $this->startRender();
-      
-      $bean_class = get_class($this->bean);
+	  $this->items = array();
+	  
+	  $bean_class = get_class($this->bean);
       $source_fields = $this->bean->getFields();
-      
-      
 
       $photoID = -1;
 	
@@ -107,14 +109,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
       if ($this->bean->haveField("position")) {
 		$order_by = " ORDER BY position ASC ";
       }
-      
-      $blob_field = "";
 
-      if ($this->blob_field) {
-		$blob_field = "blob_field=".$this->blob_field;
-      }
-
-      
       $num = 0;
       try {
 		//iterate source based on view's prkey
@@ -158,28 +153,46 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 	  }
 	  catch (Exception $e) {
 		  echo $e->getMessage();
-		echo $this->bean->getLastIteratorSQL();
+		  echo $this->bean->getLastIteratorSQL();
 
 	  }
+	  
+	  while ($this->bean->fetchNext($pfrow)) {
+		  $photoID=$pfrow[$this->bean->getPrKey()];
+		  $item = new ImageItem();
+		  $item->item_id = $photoID;
+		  $item->item_class = get_class($this->bean);
+		  $this->items[] = $item;
+	  }
+  }
+  protected function renderImageItems()
+  {
+	  $num = count($this->items);
 
-      if ($num < 1) {
+	  if ($num < 1) {
 // 		echo "N/A";
 
       }
       if ($num>1) {
 		echo "<div class='TableCellImageList'  count='$num'>";
       }
-      while ($this->bean->fetchNext($pfrow)) {
-		  $photoID=$pfrow[$this->bean->getPrKey()];
       
+      $blob_field = "";
+
+      if ($this->blob_field) {
+		$blob_field = "blob_field=".$this->blob_field;
+      }
+      
+      foreach ($this->items as $idx=>$item) {
+      
+		  $photoID = $item->item_id;
+		  $bean_class = $item->item_class;
 
 		  $img_tag = "";
 
 		  $width = $this->width;
 		  $height = $this->height;
 
-		  
-		  
 		  echo "<div class='TableCellImageItem' itemID='$photoID' itemClass='$bean_class'>";
 
 		  if ($this->render_mode == IPhotoRenderer::RENDER_CROP) {
@@ -216,9 +229,26 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 	  if ($num>1) {
 		  echo "</div>"; //TableCellImageList
 	  }
+  }
+  //default rendering fetch from source linking with current 'view' prkey
+  public function renderCell($row, TableColumn $tc)
+  {
+      $this->processAttributes($row, $tc);
+
+      $this->startRender();
+      
+      try {
+		$this->constructItems($row, $tc);
+		$this->renderImageItems($row, $tc);
+	  }
+	  catch (Exception $e) {
+		echo $e->getMessage();
+	  }
 
       $this->finishRender();
   }
+  
+  
 }
 
 ?>

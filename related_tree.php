@@ -11,8 +11,33 @@ include_once("lib/components/TableView.php");
 include_once("lib/components/KeywordSearchComponent.php");
 include_once("lib/iterators/SQLResultIterator.php");
 include_once("lib/utils/RelatedSourceFilterProcessor.php");
+include_once("class/beans/ProductColorPhotosBean.php");
 
-
+class ProductPhotoCellRenderer extends TableImageCellRenderer
+{
+	public function __construct($render_mode=IPhotoRenderer::RENDER_CROP, $width=48, $height=-1)
+	{
+		parent::__construct(NULL, $render_mode, $width, $height);
+		
+	}
+	protected function constructItems($row, TableColumn $tc)
+	{
+		$this->items = array();
+		
+		if (isset($row["pclrpID"]) && $row["pclrpID"]>0) {
+			  $item = new ImageItem();
+			  $item->item_id = (int)$row["pclrpID"];
+			  $item->item_class = ProductColorPhotosBean::class;
+			  $this->items[] = $item;
+		}
+		else if (isset($row["ppID"]) && $row["ppID"]>0){
+			  $item = new ImageItem();
+			  $item->item_id = (int)$row["ppID"];
+			  $item->item_class = ProductPhotosBean::class;
+			  $this->items[] = $item;
+		}	
+	}
+}
 class ColorFilter implements IQueryFilter
 {
   public function getQueryFilter($view=NULL, $value = NULL)
@@ -106,15 +131,25 @@ $product_selector->fields = "  ";
 
 //color/size/price filters need not grouping! in the derived table
 $derived_table = "SELECT 
-pc.catID, pc.category_name, 
+ pc.catID, pc.category_name, 
 (SELECT GROUP_CONCAT(DISTINCT(pi1.size_value) SEPARATOR '|') FROM product_inventory pi1 WHERE pi1.prodID=pi.prodID AND (pi1.pclrID = pi.pclrID OR pi.pclrID IS NULL) GROUP BY pi.pclrID ) as size_values, 
+(SELECT GROUP_CONCAT(DISTINCT(pi2.color) SEPARATOR '|') FROM product_inventory pi2 WHERE pi2.prodID=pi.prodID  ) as colors, 
+(SELECT GROUP_CONCAT(DISTINCT(pi3.pclrID) SEPARATOR '|') FROM product_inventory pi3 WHERE pi3.prodID=pi.prodID  ) as color_ids, 
+
+(SELECT ppID FROM product_photos pp WHERE pp.prodID=pi.prodID ORDER BY position ASC LIMIT 1) as ppID,
+(SELECT pclrpID FROM product_color_photos pcp WHERE pcp.pclrID=pi.pclrID ORDER BY position ASC LIMIT 1) as pclrpID,
+
 pi.price - (pi.price * (coalesce(sp.discount_percent,0)) / 100.0) AS sell_price, 
 pi.piID, pi.size_value, pi.color, pi.pclrID, p.brand_name, pi.prodID, 
 p.product_code, p.product_name, p.product_description, p.keywords 
+
 FROM product_inventory pi 
+
 JOIN products p ON (p.prodID = pi.prodID AND p.visible=1) 
 JOIN product_categories pc ON pc.catID=p.catID 
-LEFT JOIN store_promos sp ON (sp.targetID = p.catID AND sp.target='Category' AND sp.start_date <= NOW() AND sp.end_date >= NOW())";
+LEFT JOIN store_promos sp ON (sp.targetID = p.catID AND sp.target='Category' AND sp.start_date <= NOW() AND sp.end_date >= NOW())
+
+";
 
 $product_selector->from = " (  $derived_table GROUP BY pi.prodID, pi.color ) as relation ";
 
@@ -172,15 +207,17 @@ $view->setCaption("Products List");
 
 // $view->addColumn(new TableColumn("piID","ID"));
 // $view->addColumn(new TableColumn("prodID","ID"));
-$view->addColumn(new TableColumn("photo","Photo"));
+$view->addColumn(new TableColumn("pclrpID","Photo"));
 $view->addColumn(new TableColumn("product_code","Product Code"));
 $view->addColumn(new TableColumn("product_name","Product Name"));
 $view->addColumn(new TableColumn("brand_name","Brand Name"));
 $view->addColumn(new TableColumn("category_name","Category Name"));
 $view->addColumn(new TableColumn("color","Color"));
-$view->addColumn(new TableColumn("size_values","Sizing"));
-$view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
-$view->getColumn("photo")->getHeaderCellRenderer()->setSortable(false);
+// $view->addColumn(new TableColumn("size_values","Sizing"));
+// $view->addColumn(new TableColumn("colors","Colors"));
+// $view->addColumn(new TableColumn("color_ids","Colors"));
+$view->getColumn("pclrpID")->setCellRenderer(new ProductPhotoCellRenderer(TableImageCellRenderer::RENDER_THUMB, -1, 48));
+$view->getColumn("pclrpID")->getHeaderCellRenderer()->setSortable(false);
 
 
 
