@@ -17,12 +17,13 @@ class SellableProductsView extends DBViewBean {
 // 
 // cc.pi_ids as color_pids, cc.colors, cc.color_photos, cc.have_chips, cc.color_ids, cc.product_photos, cc.color_codes,
 // si.piID, si.stock_amount, si.price as i_price, si.old_price as i_old_price, si.buy_price as i_buy_price, si.weight as i_weight, si.size_value, si.pclrID, si.color, si.color_code, si.have_chip, si.pclrpID, si.ppID,
-// si.discount_amount, si.sell_price,
+// si.discount_amount, si.sell_price, si.insert_date as inventory_date,
 // p.*
 // 
 // FROM inventory si JOIN products p ON p.prodID = si.prodID LEFT JOIN color_chips cc ON cc.prodID = si.prodID 
 // WHERE p.visible = 1 
-// GROUP BY  si.prodID, si.pclrID )
+// GROUP BY  si.prodID, si.pclrID 
+// )
 
 
     public function __construct() 

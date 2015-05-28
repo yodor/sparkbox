@@ -562,7 +562,25 @@ if ($this->filter) {
 	}
 
 	
-	
+	public function listTreeRelation(SelectQuery $relation, $relation_table, $relation_prkey, $count_field = "")
+	{		
+	    $prkey = $this->prkey;
+
+		if (!$count_field) {
+			$count_field = " COUNT ($relation_table.$relation_prkey) ";
+		}
+	    //aggregate relation query
+	    $sqry = new SelectQuery();
+
+	    $sqry->fields = "  parent.*, $count_field ";
+	    $sqry->from = "  {$this->table} AS node, {$this->table} AS parent ";
+	    $sqry->where = " (node.lft BETWEEN parent.lft AND parent.rgt)  AND node.catID = $relation_table.catID ";
+	    $sqry->group_by = " parent.$prkey ";
+	    $sqry->order_by = " parent.lft ";
+	    
+	    return $sqry->combineWith($relation);
+
+	}
 	public function listTreeRelatedSelect(DBTableBean $related_source, $count_field="")
 	{		
 	    $prkey = $this->prkey;

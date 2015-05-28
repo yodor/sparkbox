@@ -91,7 +91,7 @@ class DemoPage extends SimplePage
 	parent::dumpJS();
 	
 	echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
-	
+	echo "<script src='".SITE_ROOT."lib/js/URI.js'></script>";
 	echo "\n";
     }
 

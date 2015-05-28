@@ -9,14 +9,13 @@ class SourceAttributeItem extends DataSourceItem
     public function renderImpl()
     {
 
-		echo "<label data='attribute_name'>".$this->label."</label>";
+		echo "<label class='SourceAttributeName' data='attribute_name'>".$this->label."</label>";
 		
-		echo "<input data='attribute_value' type='text' value='{$this->value}' name='{$this->name}[]'>";
+		echo "<input class='SourceAttributeValue' data='attribute_value' type='text' value='{$this->value}' name='{$this->name}[]'>";
 		
 		echo "<input data='foreign_key' type='hidden' name='fk_{$this->name}[]' value='caID:{$this->id}'>";
 
-		
-		echo "<label data='attribute_unit'>".$this->data_row["attribute_unit"]."</label>";
+		echo "<label class='SourceAttributeUnit' data='attribute_unit'>".$this->data_row["attribute_unit"]."</label>";
     }
 
 }
@@ -77,9 +76,8 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer,
 	  
 // 	  if (!in_array($this->list_label, $source_fields)) throw new Exception("List Label '{$this->list_label}' not found in data source fields");
 
-
-
 	  $num = $this->data_bean->startIterator($this->data_filter, $this->data_fields);
+//   echo $this->data_bean->getLastIteratorSQL();
   
 	  if ($num<1) {
 	    echo "Selected source does not provide optional attributes";
@@ -94,18 +92,6 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer,
 
   }
 
-  public function finishRender()
-  {
-    parent::finishRender();
-    ?>
-<script type='text/javascript'>
-addLoadEvent(function() {
-
-});
-</script>
-<?php
-  }
-  
 
   protected function renderItems()
   {
@@ -114,7 +100,7 @@ addLoadEvent(function() {
       $field_name = $this->field->getName();
 
       if (!is_array($field_values)) {
-	$field_values = array($field_values);
+		$field_values = array($field_values);
       }
       
       $prkey = $this->data_bean->getPrKey();
@@ -123,25 +109,25 @@ addLoadEvent(function() {
       while ($this->data_bean->fetchNext($data_row))
       {
 
-	  $id = $data_row[$this->getSource()->getPrKey()];
+// 		$id = $data_row[$this->getSource()->getPrKey()];
+		$id = $data_row[$prkey];
 
+		$value = isset($data_row[$field_name]) ? $data_row[$field_name] : "";
+		$label = $data_row[$this->list_label];
 
-	  $value = isset($data_row[$field_name]) ? $data_row[$field_name] : "";
-	  $label = $data_row[$this->list_label];
+		
+		$item = clone $this->item;
+		$item->setID($id);
+		$item->setValue($value);
+		$item->setLabel($label);
+		$item->setName($field_name);
+		$item->setIndex($index);
 
+		$item->setDataRow($data_row);
+		
+		$item->render();
 	  
-	  $item = clone $this->item;
-	  $item->setID($id);
-	  $item->setValue($value);
-	  $item->setLabel($label);
-	  $item->setName($field_name);
-	  $item->setIndex($index);
-
-	  $item->setDataRow($data_row);
-	  
-	  $item->render();
-    
-	  $index++;
+		$index++;
       }
   }
 }

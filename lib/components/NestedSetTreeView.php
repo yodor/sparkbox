@@ -4,6 +4,7 @@ include_once("lib/components/renderers/items/NestedSetItemRenderer.php");
 include_once("lib/beans/NestedSetBean.php");
 include_once("lib/utils/SelectQuery.php");
 include_once("lib/utils/IQueryFilter.php");
+include_once("lib/utils/ISelectSource.php");
 
 class NestedSetTreeView extends Component implements IHeadRenderer
 {

@@ -22,6 +22,7 @@ abstract class NestedSetItemRenderer extends Component implements INestedSetSour
 	protected $branch_type = NestedSetItemRenderer::BRANCH_LEAF;
 	
 	
+	
 	public function setDataRow($data_row)
 	{
 	    $this->data_row = $data_row;

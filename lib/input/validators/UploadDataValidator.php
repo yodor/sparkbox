@@ -12,7 +12,8 @@ abstract class UploadDataValidator implements IInputValidator
   //in ArrayInputField case Processors get called only once, but valdators are called for each array value
   public function __construct()
   {
-  
+//TODO check upload of zip for chrome in windows
+// 	  $this->accept_mimes[] = "application/octet-stream";
   }
 
   public function setAcceptMimes($accept_mimes)

@@ -111,13 +111,11 @@ class ProductInventoryInputForm extends InputForm
 
 	  $rend = $this->getField("value")->getRenderer();
 	  
-	  $data_filter = " ca LEFT JOIN inventory_attribute_values iav ON iav.caID = ca.caID LEFT JOIN attributes attr ON attr.name = ca.attribute_name WHERE ca.class_name='{$this->product["class_name"]}' ";
+	  $data_filter = " ca LEFT JOIN inventory_attribute_values iav ON iav.caID = ca.caID AND iav.piID=$editID LEFT JOIN attributes attr ON attr.name = ca.attribute_name WHERE ca.class_name='{$this->product["class_name"]}' ";
 	  $data_fields = " ca.*, iav.value, attr.unit as attribute_unit, attr.type attribute_type ";
 	  
       $rend->setFilter($data_filter, $data_fields);
-      
-      //$renderer->setCategoryID($this->product["class_name"]);
-//       $renderer->setProductID($editID);
+
 
   }
   public function loadPostData(array $arr)

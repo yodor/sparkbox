@@ -1,7 +1,7 @@
 body {
   background-color:#ababab;
   margin-bottom:20px;
- 
+  font-size:14px;
 }
 
 .main_content {
@@ -83,6 +83,7 @@ box-shadow: 0 0 40px #222;
 }
 .column.categories {
   max-width:180px;
+  margin-right:20px;
 }
 
 .column.product_list {
@@ -148,6 +149,25 @@ body.mce_browser .FormRenderer .SubmitLine .TextSpace {
 body.mce_browser .FormRenderer .SubmitLine .Buttons {
   display:inline-block;
 }
+
+body.related_tree .KeywordSearchComponent {
+  float:right;
+}
+
+body.related_tree .KeywordSearchComponent .buttons [name='clear'] {
+  display:none;
+}
+
+body.related_tree .InputComponent {
+  margin-bottom:10px;
+  
+}
+body.related_tree .InputComponent.Slider .InputField {
+  margin-top:5px;
+}
+
+
+
 
 
 body.products .column.left {
@@ -277,6 +297,8 @@ body.products.list .ProductListItem .color_chips  A {
 }
 body.products.list .ProductListItem .color_chips  A IMG {
   display:block;
+  max-width:24px;
+  max-height:24px;
 }
 body.products.list .ProductListItem .color_chips  A DIV {
   display:block;

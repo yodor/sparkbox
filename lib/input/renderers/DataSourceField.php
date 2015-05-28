@@ -52,9 +52,11 @@ abstract class DataSourceField extends InputRenderer
   {
       $field_values = $this->field->getValue();
       $field_name = $this->field->getName();
+      
       if (!is_array($field_values)) {
-	$field_values = array($field_values);
+		$field_values = array($field_values);
       }
+      
       $prkey = $this->data_bean->getPrKey();
       $index = 0;
 

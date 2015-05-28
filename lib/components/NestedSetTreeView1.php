@@ -29,6 +29,21 @@ class NestedSetTreeView extends Component implements IHeadRenderer
     
     protected $combining_filters = array();
     
+    protected $filters_applied = array();
+    
+    public function combiningFilterValue($name)
+    {
+		if (isset($this->filters_applied[$name])) {
+			return $this->filters_applied[$name];
+		}
+		else {
+			return NULL;
+		}
+    }
+    public function appliedFilterValues()
+    {
+		return $this->filters_applied;
+    }
     public function __construct()
     {
 	parent::__construct();
@@ -140,6 +155,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 					if ($sel) {
 					  $combining_filter = $combining_filter->combineWith($sel);
 					  $have_filter = true;
+					  $this->filters_applied[$name] = $sel;
 					}
 				  }
 				  else {
@@ -149,7 +165,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 					$sel->where = " $related_table.$name='$filter_value' ";
 					$combining_filter = $combining_filter->combineWith($sel);
 					$have_filter = true;
-					
+					$this->filters_applied[$name] = $sel;
 					
 				  }
 				  $text_action->addParameter(new ActionParameter($name, $filter_value, true));
@@ -340,8 +356,8 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	if ($this->related_source) {
 	    $related_prkey = $this->related_source->getPrKey();
 	    if (isset($_GET[$related_prkey])) {
-		$request_source = $_GET[$related_prkey];
-		unset($_GET[$related_prkey]);
+		  $request_source = $_GET[$related_prkey];
+		  unset($_GET[$related_prkey]);
 	    }
 	}
 
@@ -379,9 +395,9 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	      array_pop($path);
 
 	      if ($open_tags>=1) {
-		echo "</ul>";
-		echo "</li>";
-		$open_tags-=2;
+			  echo "</ul>";
+			  echo "</li>";
+			  $open_tags-=2;
 	      }
 
 	  }

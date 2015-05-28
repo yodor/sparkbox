@@ -85,8 +85,9 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsRend
 // 	    echo "<input type='checkbox'>";
 // 	    echo "</div> ";
 
-	    $this->text_action->setTitle($this->label);
-	    
+
+		$this->text_action->setTitle($this->label);
+	  
 	    $this->action_renderer->setAction($this->text_action);
 	    $this->action_renderer->enableActionFromLabel(false);
 	    $this->action_renderer->setAttribute("action", "TextTreeItemAction");

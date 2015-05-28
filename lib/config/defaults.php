@@ -106,11 +106,13 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
   }
   
   
-  $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');
-  $mrow = DBDriver::get()->fetch($g_res);
-		
-  $defines->set("MAX_PACKET_SIZE", $mrow["packet_size"]);
-  DBDriver::get()->free($g_res);
+//   $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');
+//   $mrow = DBDriver::get()->fetch($g_res);
+//   DBDriver::get()->free($g_res);	  
+
+//   echo $mrow["packet_size"];//33554432
+  
+  $defines->set("MAX_PACKET_SIZE", "33554432"); 
   $defines->export();
 }
 

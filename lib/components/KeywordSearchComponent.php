@@ -17,6 +17,8 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	const ACTION_SEARCH = "search";
 	const ACTION_CLEAR = "clear";
 	
+	protected $table_name = "";
+	protected $table_fields = "";
 	
 	public function getButton($action)
 	{
@@ -27,7 +29,9 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	{
 	  parent::__construct();
 
-	  $this->sform = new KeywordSearchForm($table_fields);
+	  $this->table_fields = $table_fields;
+
+	  $this->sform = new KeywordSearchForm($this->table_fields);
 	  
 	  $qry = $_REQUEST;
 	  
@@ -129,7 +133,7 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	      $select_query->having = $search_query->where;
 
 	}
-	public function getQueryFilter($source, $value=NULL)
+	public function getQueryFilter($source=NULL, $value=NULL)
 	{
 	    return $this->sform->searchFilterQuery();
 	}

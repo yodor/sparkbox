@@ -4,7 +4,7 @@ include_once("class/pages/AdminPage.php");
 
 include_once("lib/beans/MenuItemsBean.php");
 
-include_once("lib/components/NestedSetTreeView.php");
+include_once("lib/components/NestedSetTreeView2.php");
 include_once("lib/components/renderers/items/TextTreeItemRenderer.php");
 
 $menu=array(

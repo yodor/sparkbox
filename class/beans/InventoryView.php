@@ -4,8 +4,9 @@ include_once ("lib/beans/DBViewBean.php");
 class InventoryView extends DBViewBean {
     protected $createString = "";
 	
-// create view inventory as (select 
-// pi.piID, pi.prodID, pi.stock_amount, pi.price, pi.old_price, pi.buy_price, pi.weight, pi.size_value, pi.pclrID, pi.color, sc.color_code, 
+// create view inventory as (
+// select 
+// pi.piID, pi.prodID, pi.stock_amount, pi.insert_date, pi.price, pi.old_price, pi.buy_price, pi.weight, pi.size_value, pi.pclrID, pi.color, sc.color_code, 
 // coalesce(length(pclr.color_photo)>0, 0) as have_chip, 
 // (select pcp.pclrpID FROM product_color_photos pcp WHERE pcp.pclrID = pi.pclrID ORDER BY pcp.position ASC LIMIT 1) as pclrpID, 
 // (select pp.ppID FROM product_photos pp WHERE pp.prodID = pi.prodID ORDER BY pp.position ASC LIMIT 1) as ppID, coalesce(sp.discount_percent,0) as discount_amount , 

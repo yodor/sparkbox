@@ -50,14 +50,16 @@ $search_fields = array("product_code", "product_name", "prodID", "product_descri
 $ksc = new KeywordSearchComponent($search_fields);
 $ksc->getForm()->getRenderer()->setAttribute("method","get");
 
+//process if filter=search only
 $tv->addRelatedFilter("search",$ksc);
 
+//process always
 $tv->addCombiningFilter("brand_name","brand_name");
 $tv->addCombiningFilter("color","color");
 
-class SizingFilter implements IQueryFilter
+class ColorFilter implements IQueryFilter
 {
-  public function getQueryFilter($view, $value = NULL)
+  public function getQueryFilter($view=NULL, $value = NULL)
   {
 	$sel = NULL;
 	$related_table =  $view->getRelatedSource()->getTableName();
@@ -68,20 +70,50 @@ class SizingFilter implements IQueryFilter
 	  $sel->fields = "";
 	  $sel->from = "";
 	  if (strcmp($value, "N/A")==0 || strcmp($value, "NULL")==0) {
-		$sel->where = " $related_table.size_values IS NULL ";
+		$sel->where = " $related_table.color IS NULL ";
 	  }
 	  else {
-		$sel->where = " ($related_table.size_values LIKE '%$value|%' OR $related_table.size_values LIKE '%|$value%' OR $related_table.size_values='$value') ";
+		$sel->where = " $related_table.color='$value' ";
 	  }
 	}
+	
 	return $sel;
   }
 }
-$tv->addCombiningFilter("size_values", new SizingFilter());
+$tv->addCombiningFilter("color", new ColorFilter());
+
+class SizingFilter implements IQueryFilter
+{
+
+  public function getQueryFilter($view=NULL, $value = NULL)
+  {
+	$sel = NULL;
+	$related_table =  $view->getRelatedSource()->getTableName();
+	$related_prkey = $view->getRelatedSource()->getPrKey();
+	
+	
+	
+	if ($value) {
+	  $sel = new SelectQuery();
+	  $sel->fields = "";
+	  $sel->from = "";
+	  if (strcmp($value, "N/A")==0 || strcmp($value, "NULL")==0) {
+		$sel->where = " $related_table.size_value IS NULL ";
+	  }
+	  else {
+		$sel->where = " ($related_table.size_values LIKE '%$value|%' OR $related_table.size_values LIKE '%|$value%' OR $related_table.size_values='$value') ";
+// 		$sel->where = " $related_table.size_value='$value' ";
+	  }
+	}
+	
+	return $sel;
+  }
+}
+$tv->addCombiningFilter("size_value", new SizingFilter());
 
 class PricingFilter implements IQueryFilter
 {
-  public function getQueryFilter($view, $value = NULL)
+  public function getQueryFilter($view=NULL, $value = NULL)
   {
 	$sel = NULL;
 	$related_table =  $view->getRelatedSource()->getTableName();
@@ -97,7 +129,7 @@ class PricingFilter implements IQueryFilter
 		  $price_min = (float)$price_range[0];
 		  $price_max = (float)$price_range[1];
 		  
-		  $sel->where = " ($related_table.price_min >= $price_min AND $related_table.price_max <= $price_max) ";
+		  $sel->where = " ($related_table.sell_price >= $price_min AND $related_table.sell_price <= $price_max) ";
 	  }
 	  
 	}
@@ -105,9 +137,6 @@ class PricingFilter implements IQueryFilter
   }
 }
 $tv->addCombiningFilter("price_range", new PricingFilter());
-// $tv->addCombiningFilter("catID", "catID");
-
-
 
 
 $have_filter = $tv->processFilters();
@@ -139,6 +168,12 @@ else {
   $view = new ListView(new SQLResultIterator($product_selector, "piID"));
   $view->setItemRenderer(new ProductListItem());
 }
+
+$sort_price = new PaginatorSortField("sellable_products.sell_price", "Price");
+$view->getPaginator()->addSortField($sort_price);
+$sort_prod = new PaginatorSortField("sellable_products.prodID", "Date");
+$view->getPaginator()->addSortField($sort_prod);
+
 $view->setCaption("Products List");
 $view->getTopPaginator()->view_modes_enabled = true;
 
@@ -173,10 +208,37 @@ echo "</div>";
 // 	echo "<input type='hidden' name='filter' value='self'>";
 // 	echo "<input type='hidden' name='catID' value='".$_GET["catID"]."'>";
 //   }
+function applyFilters(&$sel)
+{
+  global $tv, $bean;
+  $filters = $tv->appliedFilterValues();
+  foreach($filters as $name=>$value)
+  {
+	$sel = $sel->combineWith($value);
+  }
+  
+  if (isset($_GET["catID"])) {
+	  $catID = (int)$_GET["catID"];
+	  $sel->where = " sellable_products.catID=child.catID ";
+	  $sel = $bean->childNodesWith($sel, $catID);
+  }
+
+}
+  $spqry = " (SELECT product_categories.catID, product_categories.category_name, piID, (select group_concat(distinct(size_value) SEPARATOR '|') FROM product_inventory pi WHERE pi.prodID=product_inventory.prodID) as size_values, product_inventory.price - (product_inventory.price * (coalesce(sp.discount_percent,0)) / 100.0) as sell_price, size_value, color, brand_name, product_inventory.prodID, product_code, product_name, product_description, keywords FROM product_inventory JOIN products ON products.prodID = product_inventory.prodID JOIN product_categories ON product_categories.catID=products.catID LEFT JOIN store_promos sp ON (sp.targetID = products.catID AND sp.target='Category' AND sp.start_date < NOW() AND sp.end_date > NOW()) WHERE products.visible=1 ) as sellable_products ";
+//   $spqry = " sellable_products ";
+  
   echo "<div class='InputComponent'>";
 	echo "<span class='label'>".tr("Brand").": </span>";
 	$db = DBDriver::get();
-	$res = $db->query("SELECT brand_name FROM sellable_products GROUP BY brand_name");
+	$sel = new SelectQuery();
+	$sel->fields = " brand_name ";
+	$sel->from = " $spqry ";
+	$sel->group_by = " brand_name ";
+	applyFilters($sel);
+	
+	
+	
+	$res = $db->query($sel->getSQL());
 	if (!$res) throw new Exception ($db->getError());
 	$arr_brands = array();
 	while ($row = $db->fetch($res)) {
@@ -199,19 +261,34 @@ echo "</div>";
   
   echo "<div class='InputComponent'>";
 	echo "<span class='label'>".tr("Color").": </span>";
-	$res = $db->query("SELECT distinct(color) as color FROM sellable_products WHERE color IS NOT NULL GROUP BY color");
+
+	
+	$sel = new SelectQuery();
+	$sel->fields = " color ";
+	$sel->from = " $spqry ";
+	$sel->where = "  ";
+	$sel->order_by = " color ";
+	$sel->group_by = " color ";
+	applyFilters($sel);
+
+	$res = $db->query($sel->getSQL());
+	
 	if (!$res) throw new Exception ($db->getError());
 	$arr_colors = array();
 	while ($row = $db->fetch($res)) {
-	  
-	  $arr_colors[] = $row["color"];
+	  if (is_null($row["color"])) {
+		$arr_colors["NULL"] = "Без Цвят";
+	  }
+	  else {
+		$arr_colors[$row["color"]] = $row["color"];
+	  }
 	}
 	$sel1 = new ArraySelector($arr_colors);
 	
 	$field = InputFactory::CreateField(InputFactory::SELECT, "color", "Color", 0);
 	$rend = $field->getRenderer();
 	$rend->setSource($sel1);
-	$rend->list_key = "arr_val";
+	$rend->list_key = "arr_id";
 	$rend->list_label = "arr_val";
 	if (isset($_GET["color"])) {
 	  $field->setValue($db->escapeString($_GET["color"]));
@@ -222,28 +299,52 @@ echo "</div>";
   
   echo "<div class='InputComponent'>";
 	echo "<span class='label'>".tr("Size").": </span>";
-	$res = $db->query("SELECT distinct(i.size_value) as size_value FROM inventory i JOIN products p ON p.prodID = i.prodID WHERE i.size_value IS NOT NULL AND p.visible = 1");
+	$sel = new SelectQuery();
+	$sel->fields = " size_value ";
+	$sel->from = " $spqry ";
+// 	$sel->from = "  ";
+	$sel->where = "  ";
+	$sel->group_by = " size_value ";
+	$sel->order_by = " prodID ";
+
+	applyFilters($sel);
+
+// 	echo $sel->getSQL();
+	
+	$res = $db->query($sel->getSQL());
 	if (!$res) throw new Exception ($db->getError());
 	$arr_sizes = array();
 	while ($row = $db->fetch($res)) {
-	  $arr_sizes[] = $row["size_value"];
+	  if (is_null($row["size_value"])) {
+		$arr_sizes["NULL"] = "Без Размер";
+	  }
+	  else {
+		$arr_sizes[$row["size_value"]] = $row["size_value"];
+	  }
 	}
+	
 	$sel2 = new ArraySelector($arr_sizes);
 	
-	$field = InputFactory::CreateField(InputFactory::SELECT, "size_values", "Size Values", 0);
+	$field = InputFactory::CreateField(InputFactory::SELECT, "size_value", "Size", 0);
 	$rend = $field->getRenderer();
 	$rend->setSource($sel2);
-	$rend->list_key = "arr_val";
+	$rend->list_key = "arr_id";
 	$rend->list_label = "arr_val";
-	if (isset($_GET["size_values"])) {
-	  $field->setValue($db->escapeString($_GET["size_values"]));
+	if (isset($_GET["size_value"])) {
+	  $field->setValue($db->escapeString($_GET["size_value"]));
 	}
 	$rend->renderField($field);
 	$db->free($res);
   echo "</div>";
   
+	$sel = new SelectQuery();
+	$sel->fields = " min(sell_price) as price_min, max(sell_price) as price_max ";
+	$sel->from = " $spqry ";
+	applyFilters($sel);
   
-	$res = $db->query("SELECT min(price_min) as price_min, max(price_max) as price_max FROM sellable_products");
+// 	echo $sel->getSQL();
+	
+	$res = $db->query($sel->getSQL());
 	if (!$res) throw new Exception ($db->getError());
 	if ($row = $db->fetch($res)) {
 		$price_min = $row["price_min"];
@@ -267,7 +368,7 @@ echo "</div>";
 		  echo "</div>";
 		echo "</div>";
 	}
-	
+	$db->free($res);
   
   ?>
 <script type='text/javascript'>
@@ -306,13 +407,19 @@ addLoadEvent(function() {
 	
 	$(".drag").slider( "option", "values", [ value_min, value_max ] );
 	
-	$(".drag").parents(".Slider").children(".value").html( value_min + " - " + value_max );
+	$(".drag").parents(".Slider").children(".value").html( min + " - " + max );
 	
 });
 </script>
   <?php
+  if (isset($_GET["catID"])) {
+	$catID = (int)$_GET["catID"];
+	echo "<input type='hidden' name='filter' value='self'>";
+	echo "<input type='hidden' name='catID' value='$catID'>";
+  }
   echo "<div class='InputComponent'>";
   echo "<input type='submit' class='DefaultButton' value='Apply'>";
+  
   echo "<BR>";
   echo "<a class='DefaultButton' href='list.php'>Clear</a>";
   echo "</div>";

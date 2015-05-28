@@ -15,6 +15,7 @@ class DBTransactor  {
   protected $lastID = -1;
   protected $form = NULL;
   
+  protected $values = NULL;
   
   public function __construct()
   {
@@ -108,17 +109,17 @@ class DBTransactor  {
       foreach($this->form->getFields() as $field_name=>$field){
 
 	
-	$field_transactor = $field->getValueTransactor();
-		
-	if ($field_transactor instanceof IDBFieldTransactor) {
-	  debug("DBTransactor::beforeCommit: field['$field_name'] Using transactor: ".get_class($field_transactor));
-	  $field->getValueTransactor()->beforeCommit($field, $this, $db, $bean->getPrKey());
-	  debug("DBTransactor::beforeCommit: field['$field_name'] finished");
-	}
-	else {
-	  
-	  debug("DBTransactor::transactValues: field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
-	}
+		$field_transactor = $field->getValueTransactor();
+			
+		if ($field_transactor instanceof IDBFieldTransactor) {
+		  debug("DBTransactor::beforeCommit: field['$field_name'] Using transactor: ".get_class($field_transactor));
+		  $field->getValueTransactor()->beforeCommit($field, $this, $db, $bean->getPrKey());
+		  debug("DBTransactor::beforeCommit: field['$field_name'] finished");
+		}
+		else {
+		  
+		  debug("DBTransactor::transactValues: field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
+		}
 	
       }
      
@@ -133,16 +134,16 @@ class DBTransactor  {
       foreach($this->form->getFields() as $field_name=>$field)
       {
 
-	  $field_transactor = $field->getValueTransactor();
-		  
-	  if ($field_transactor instanceof IDBFieldTransactor) {
-	    debug("DBTransactor::afterCommit: field['$field_name'] Using transactor: ".get_class($field_transactor));
-	    $field->getValueTransactor()->afterCommit($field, $this);
-	    debug("DBTransactor::afterCommit: field['$field_name'] finished");
-	  }
-	  else {
-	    debug("DBTransactor::afterCommit: field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
-	  }
+		  $field_transactor = $field->getValueTransactor();
+			  
+		  if ($field_transactor instanceof IDBFieldTransactor) {
+			debug("DBTransactor::afterCommit: field['$field_name'] Using transactor: ".get_class($field_transactor));
+			$field->getValueTransactor()->afterCommit($field, $this);
+			debug("DBTransactor::afterCommit: field['$field_name'] finished");
+		  }
+		  else {
+			debug("DBTransactor::afterCommit: field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
+		  }
 	  
       }
       
@@ -170,11 +171,19 @@ class DBTransactor  {
 
 	  $this->beforeCommit($bean, $db);
 	  
+	  if (is_callable("DBTransactor_onBeforeCommit")) {
+		  call_user_func("DBTransactor_onBeforeCommit", $bean, $db, $this->lastID, $this->values);
+	  }
+	  
 	  $db->commit();
 	  
 	  debug("DBTransactor::processImpl | Transaction Committed");
 	  
 	  $this->afterCommit($bean);
+	  
+	  if (is_callable("DBTransactor_onAfterCommit")) {
+		  call_user_func("DBTransactor_onAfterCommit", $bean, $db, $this->lastID, $this->values);
+	  }
 	  
 	  debug("DBTransactor::processImpl | STATUS_OK");
 	  //keypoint
@@ -196,20 +205,23 @@ class DBTransactor  {
   {
       debug("DBTransactor::processBeanTransaction | DBTableBean: ".get_class($bean)." | EditID: $editID");
       
+      $values = array();
+      
       if ($editID>0) {
-	  $values = array_merge($this->transact_values, $this->update_values);
-	  
-	  if (!$bean->updateRecord($editID, $values, $db)) throw new Exception("Unable to update: ".$db->getError());
-	  $this->lastID = $editID;
+		$values = array_merge($this->transact_values, $this->update_values);
+		
+		if (!$bean->updateRecord($editID, $values, $db)) throw new Exception("Unable to update: ".$db->getError());
+		$this->lastID = $editID;
       }
       else {
-	  $values = array_merge($this->transact_values, $this->insert_values);
-	  debugArray("Merged Values: ", $values);
-	  
-	  $this->lastID = $bean->insertRecord($values, $db);
-	  if ($this->lastID<1) throw new Exception("Unable to insert: ".$db->getError());
+		$values = array_merge($this->transact_values, $this->insert_values);
+		debugArray("Merged Values: ", $values);
+		
+		$this->lastID = $bean->insertRecord($values, $db);
+		if ($this->lastID<1) throw new Exception("Unable to insert: ".$db->getError());
       }
-
+      
+	  $this->values = $values;
   }
 }
 ?>
