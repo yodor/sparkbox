@@ -55,9 +55,7 @@ class DemoPage extends SimplePage
 	
 	$item1 = new MenuItem("Aggregate Tree", SITE_ROOT."related_tree.php");
 	$item->addMenuItem($item1);
-	
-	$item2 = new MenuItem("Products List", SITE_ROOT."products/list.php");
-	$item->addMenuItem($item2);
+
 	
 	$arr[] = new MenuItem("Fonts", SITE_ROOT."fonts.php");
 	$arr[] = new MenuItem("CSS3", SITE_ROOT."css3.php");

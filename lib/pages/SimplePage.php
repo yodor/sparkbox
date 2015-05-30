@@ -349,6 +349,8 @@ var right = "<?php echo $right;?>";
 
 		echo "\n<!--finishPage SimplePage-->\n";
 
+		
+		
 		$this->htmlEnd();
 
 		ob_end_flush();
@@ -363,6 +365,7 @@ var right = "<?php echo $right;?>";
 	}
 	protected function processMessages()
 	{
+
 	    if (Session::get("alert",false)) {
 	      $alert = Session::get("alert");
 	      $alert = json_encode($alert);

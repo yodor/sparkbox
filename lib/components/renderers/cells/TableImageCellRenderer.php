@@ -89,6 +89,8 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
   {
 	  $this->items = array();
 	  
+	  if (!$this->bean instanceof DBTableBean) throw new Exception("bean is not instance of DBTableBean");
+	  
 	  $bean_class = get_class($this->bean);
       $source_fields = $this->bean->getFields();
 

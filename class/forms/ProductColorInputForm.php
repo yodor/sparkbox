@@ -16,7 +16,7 @@ include_once ("class/beans/StoreColorsBean.php");
 class ProductColorInputForm extends InputForm
 {
 
-    public function __construct()
+    public function __construct($prodID)
     {
 
 
@@ -44,7 +44,10 @@ class ProductColorInputForm extends InputForm
 
 
 	$input = InputFactory::CreateField(InputFactory::SESSION_IMAGE, "photo","Photos", 0);
-	$input->setSource(new ProductColorPhotosBean());
+	$bean = new ProductColorPhotosBean();
+	
+	$input->setSource($bean);
+	
 	$input->transact_mode = InputField::TRANSACT_OBJECT;
 	$input->getValueTransactor()->max_slots = 10;
 
@@ -68,14 +71,16 @@ class ProductColorInputForm extends InputForm
   public function loadBeanData($editID, DBTableBean $bean)
   {
 
-      parent::loadBeanData($editID,  $bean);
-
+      $item_row = parent::loadBeanData($editID,  $bean);
+      $pclrID = $item_row["pclrID"];
+      $this->getField("photo")->getSource()->setFilter(" pclrID ='$pclrID' ");
 
   }
   public function loadPostData(array $arr)
   {
       parent::loadPostData($arr);
-      
+      $pclrID = -1;
+      $this->getField("photo")->getSource()->setFilter(" pclrID ='$pclrID' ");
 
   }
 }

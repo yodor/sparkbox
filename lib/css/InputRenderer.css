@@ -164,6 +164,7 @@
   padding:3px;
   outline:0;
   margin:0px;
+  font-size:1em;
 }
 
 .InputField.SelectField .SelectOption {
@@ -262,6 +263,7 @@
   outline: 0;
   margin:0px;
   margin-right:2px;
+  font-size:1em;
 }
 
 .InputField.DateField .CalendarControl {
@@ -324,6 +326,7 @@
   outline: 0;
   margin:0px;
   margin-right:2px;
+  font-size:1em;
 }
 
 

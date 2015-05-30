@@ -8,14 +8,19 @@ class SelectQuery extends SQLQuery {
 
 	  $this->type="SELECT ";
   }
-  public function getSQL($where_only=false)
+  public function getSQL($where_only=false, $add_calc=true)
   {
 	  $sql = "";
 
 	  if ($where_only) {
 	  }
 	  else {
-		  $sql.=$this->type." SQL_CALC_FOUND_ROWS {$this->fields} FROM {$this->from} ";
+		  if ($add_calc) {
+			$sql.=$this->type." SQL_CALC_FOUND_ROWS {$this->fields} FROM {$this->from} ";
+		  }
+		  else {
+			$sql.=$this->type."  {$this->fields} FROM {$this->from} ";
+		  }
 	  }
 
 	  if (strlen(trim($this->where))>0) {

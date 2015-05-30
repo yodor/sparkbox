@@ -1,8 +1,8 @@
 body {
   background-color:#ababab;
   margin-bottom:20px;
-  font-size:14px;
-  font-size:1.2vw;
+/*  font-size:14px;
+  font-size:1.01vw;*/
 }
 
 .main_content {
@@ -42,7 +42,7 @@ body {
   height:auto;
   padding-top:5px;
   padding-bottom:5px;
-  font-size:14px;
+  font-size:1.2em;
 }
 .MenuBar .MenuBarComponent .MenuSeparator {
   display:inline-block;
@@ -151,228 +151,7 @@ body.mce_browser .FormRenderer .SubmitLine .Buttons {
   display:inline-block;
 }
 
-body.related_tree .KeywordSearchComponent {
-  float:right;
-}
 
-body.related_tree .KeywordSearchComponent .buttons [name='clear'] {
-  display:none;
-}
-
-body.related_tree .InputComponent {
-  margin-bottom:10px;
-  
-}
-body.related_tree .InputComponent.Slider .InputField {
-  margin-top:5px;
-}
-
-
-
-
-
-body.products .column.left {
-  margin-right:10px;
-}
-
-body.products .filters {
-  display:inline-block;
-}
-body.products .filters FORM {
-  display:inline-block;
-}
-body.products .filters .InputComponent {
-  margin-top:10px;
-}
-body.products .filters .InputField {
-  display:inline-block;
-}
-
-body.products .filters .label {
-  display:block;
-}
-
-body.products .filters .InputComponent.Slider .label  {
-  display:inline-block;
-}
-body.products .filters .InputComponent.Slider .value {
-  display:inline-block;
-  margin-left:5px;
-}
-body.products .filters .InputComponent.Slider .InputField {
-  display:block;
-  margin-top:10px;
-}
-body.products .filters BUTTON {
-  margin-top:20px;
-}
-
-body.products.list .ProductListItem {
-  display:inline-block;
-  
-  outline:1px dotted gray;
-  max-width:22%;
-  width:22%;
-  min-width:202px;
-  box-sizing:border-box;
-  vertical-align:top;
-  
-  height:285px;
-  
-  
-  margin:5px;
-}
-body.products.list .ProductListItem .wrap {
-  
-  float:left;
-  display:block;
-  position:relative;
-  background-color:white;
-  min-height:285px;
-  width:100%;
-}
-body.products.list .ProductListItem .product_detail {
-  display:block;
-  /*max-height:50px;
-  height:50px;*/
-
- 
-  padding:5px;
-}
-body.products.list .ProductListItem .product_detail .colors_container {
-  border-bottom:1px dotted #a6a6a6;
-  display:block;
-  min-height:20px;
-  padding-bottom:5px;
-}
-body.products.list .ProductListItem:hover .product_detail .colors {
-  display:none;
-}
-body.products.list .ProductListItem .product_detail .colors {
-  font-weight:bold;
-  color:#777777;
-  margin: 0 0 5px 0;
-}
-
-body.products.list .ProductListItem:hover .product_detail .product_name {
-  white-space: normal;
-}
-
-body.products.list .ProductListItem .product_detail .product_name {
-   width: 100%;
-  font-size: 14px;
-  font-weight: bold;
-  color: #000;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top:5px;
-  margin-bottom:5px;
-}
-body.products.list .ProductListItem .product_detail .sell_price {
-  font-size:13px;
-  font-weight:normal;
-  text-align:right;
-}
-body.products.list .ProductListItem A {
- text-decoration:none;
-}
-
-body.products.list .ProductListItem .color_chips  {
-  display:none;
-  text-align:center;
-}
-body.products.list .ProductListItem:hover .wrap {
-  -webkit-box-shadow: 0px 0px 24px 1px rgba(0,0,0,0.75);
--moz-box-shadow: 0px 0px 24px 1px rgba(0,0,0,0.75);
-box-shadow: 0px 0px 24px 1px rgba(0,0,0,0.75);
-z-index:1;
-
-}
-body.products.list .ProductListItem:hover .color_chips  {
-  display:block;
-}
-body.products.list .ProductListItem .color_chips  A {
-  display:inline-block;
-  margin-right:5px;
-}
-body.products.list .ProductListItem .color_chips  A IMG {
-  display:block;
-  max-width:24px;
-  max-height:24px;
-}
-body.products.list .ProductListItem .color_chips  A DIV {
-  display:block;
-}
-body.products.details .column.details {
-  display:block;
-}
-body.products.details .images {
-  display:inline-block;
-/*   max-width:400px; */
-  outline:1px dotted gray;
-  vertical-align:top;
-  
-}
-body.products.details .images .image_big {
-  display:block;
-  float:right;
-  margin-left:10px;
-
-}
-body.products.details .images .image_gallery {
-  display:block;
-  float:left;
-}
-
-body.products.details .images .image_gallery .list {
-  display:none;
-}
-/*body.products.details .images .image_gallery .list:first-child {
-  display:block;
-}*/
-
-body.products.details .images .image_gallery .list .item {
-  display:block;
-  
-}
-body.products.details .images .image_gallery .list .item[active='1'] {
-  outline:1px solid red;
-}
-body.products.details .images .image_gallery .list .item IMG {
-  display:block;
-}
-body.products.details .product_details {
-  display:inline-block;
-  max-width:400px;
-  outline:1px dotted gray;
-  vertical-align:top;
-  text-align:left;
-  float:right;
-  margin-left:20px;
-}
-body.products.details .size_chooser {
-  visibility:hidden;
-}
-body.products.details .size_chooser .product_size {
-  display:block;
-}
-body.products.details .color_chooser {
-  display:block;
-  vertical-align:top;
-}
-
-body.products.details .color_chooser .color_button {
-  display:inline-block;
-  outline:1px dotted gray;
-  margin-right:5px;
-}
-body.products.details .color_chooser .color_button[active="1"] {
-  outline:1px solid red;
-}
-body.products.details .color_chooser .color_button IMG {
-  display:block;
-}
 
 /* You can use the clearfix to do "layout preserving" the same way overflow: hidden does */
 /* add class="clearfix" class to the parent, and remove overflow: hidden; */

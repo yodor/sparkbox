@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: 25 апр 2015 в 16:42
+-- Generation Time: 30 май 2015 в 18:29
 -- Версия на сървъра: 5.5.25a
 -- PHP Version: 5.3.27
 
@@ -31,7 +31,6 @@ SET time_zone = "+00:00";
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `admin_access`;
 CREATE TABLE IF NOT EXISTS `admin_access` (
   `aclID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `userID` int(11) unsigned NOT NULL,
@@ -48,7 +47,6 @@ CREATE TABLE IF NOT EXISTS `admin_access` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `admin_users`;
 CREATE TABLE IF NOT EXISTS `admin_users` (
   `userID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(255) CHARACTER SET ascii NOT NULL,
@@ -75,7 +73,6 @@ CREATE TABLE IF NOT EXISTS `admin_users` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `attributes`;
 CREATE TABLE IF NOT EXISTS `attributes` (
   `maID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -83,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `attributes` (
   `type` int(11) DEFAULT NULL,
   PRIMARY KEY (`maID`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
 
 -- --------------------------------------------------------
 
@@ -93,7 +90,6 @@ CREATE TABLE IF NOT EXISTS `attributes` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `brands`;
 CREATE TABLE IF NOT EXISTS `brands` (
   `brandID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `brand_name` varchar(255) NOT NULL,
@@ -112,7 +108,6 @@ CREATE TABLE IF NOT EXISTS `brands` (
 -- Създаване: 24 апр 2015 в 17:59
 --
 
-DROP TABLE IF EXISTS `class_attributes`;
 CREATE TABLE IF NOT EXISTS `class_attributes` (
   `caID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `pclsID` int(11) unsigned NOT NULL,
@@ -124,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `class_attributes` (
   KEY `attribute_name` (`attribute_name`),
   KEY `class_name` (`class_name`),
   KEY `pclsID` (`pclsID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
 
 -- --------------------------------------------------------
 
@@ -134,7 +129,6 @@ CREATE TABLE IF NOT EXISTS `class_attributes` (
 -- Създаване: 23 апр 2015 в 21:37
 --
 
-DROP TABLE IF EXISTS `class_attribute_values`;
 CREATE TABLE IF NOT EXISTS `class_attribute_values` (
   `cavID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `prodID` int(11) unsigned NOT NULL,
@@ -151,11 +145,11 @@ CREATE TABLE IF NOT EXISTS `class_attribute_values` (
 --
 -- Stand-in structure for view `color_chips`
 --
-DROP VIEW IF EXISTS `color_chips`;
 CREATE TABLE IF NOT EXISTS `color_chips` (
 `prodID` int(11) unsigned
 ,`pi_ids` text
 ,`colors` text
+,`color_codes` text
 ,`color_photos` text
 ,`have_chips` text
 ,`color_ids` text
@@ -169,7 +163,6 @@ CREATE TABLE IF NOT EXISTS `color_chips` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `config`;
 CREATE TABLE IF NOT EXISTS `config` (
   `cfgID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `config_key` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -188,7 +181,6 @@ CREATE TABLE IF NOT EXISTS `config` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `dynamic_pages`;
 CREATE TABLE IF NOT EXISTS `dynamic_pages` (
   `dpID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `item_title` varchar(255) NOT NULL DEFAULT '',
@@ -209,7 +201,6 @@ CREATE TABLE IF NOT EXISTS `dynamic_pages` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `faq_items`;
 CREATE TABLE IF NOT EXISTS `faq_items` (
   `fID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `section` enum('General','Orders','Returns','Credit Limit','Territories','Shipping','Contact') NOT NULL DEFAULT 'General',
@@ -226,7 +217,6 @@ CREATE TABLE IF NOT EXISTS `faq_items` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `gallery_photos`;
 CREATE TABLE IF NOT EXISTS `gallery_photos` (
   `gpID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `filename` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
@@ -250,7 +240,6 @@ CREATE TABLE IF NOT EXISTS `gallery_photos` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `genders`;
 CREATE TABLE IF NOT EXISTS `genders` (
   `gnID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `gender_title` varchar(32) NOT NULL,
@@ -263,11 +252,11 @@ CREATE TABLE IF NOT EXISTS `genders` (
 --
 -- Stand-in structure for view `inventory`
 --
-DROP VIEW IF EXISTS `inventory`;
 CREATE TABLE IF NOT EXISTS `inventory` (
 `piID` int(11) unsigned
 ,`prodID` int(11) unsigned
 ,`stock_amount` int(11)
+,`insert_date` timestamp
 ,`price` decimal(10,2)
 ,`old_price` decimal(10,2)
 ,`buy_price` decimal(10,2)
@@ -290,7 +279,6 @@ CREATE TABLE IF NOT EXISTS `inventory` (
 -- Създаване: 25 апр 2015 в 09:42
 --
 
-DROP TABLE IF EXISTS `inventory_attribute_values`;
 CREATE TABLE IF NOT EXISTS `inventory_attribute_values` (
   `cavID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `piID` int(11) unsigned NOT NULL,
@@ -300,14 +288,13 @@ CREATE TABLE IF NOT EXISTS `inventory_attribute_values` (
   UNIQUE KEY `inventory_attributes` (`piID`,`caID`),
   KEY `caID` (`caID`),
   KEY `piID` (`piID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
 
 -- --------------------------------------------------------
 
 --
 -- Stand-in structure for view `inventory_colors`
 --
-DROP VIEW IF EXISTS `inventory_colors`;
 CREATE TABLE IF NOT EXISTS `inventory_colors` (
 `color` varchar(255)
 ,`pclrID` int(11) unsigned
@@ -316,6 +303,7 @@ CREATE TABLE IF NOT EXISTS `inventory_colors` (
 ,`have_chip` int(1)
 ,`pclrpID` bigint(11) unsigned
 ,`ppID` bigint(11) unsigned
+,`color_code` varchar(10)
 );
 -- --------------------------------------------------------
 
@@ -325,7 +313,6 @@ CREATE TABLE IF NOT EXISTS `inventory_colors` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `languages`;
 CREATE TABLE IF NOT EXISTS `languages` (
   `langID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `language` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -343,7 +330,6 @@ CREATE TABLE IF NOT EXISTS `languages` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `mce_images`;
 CREATE TABLE IF NOT EXISTS `mce_images` (
   `imageID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `section` varchar(255) NOT NULL,
@@ -363,7 +349,6 @@ CREATE TABLE IF NOT EXISTS `mce_images` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `menu_items`;
 CREATE TABLE IF NOT EXISTS `menu_items` (
   `menuID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `menu_title` varchar(255) NOT NULL,
@@ -382,7 +367,6 @@ CREATE TABLE IF NOT EXISTS `menu_items` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `news_items`;
 CREATE TABLE IF NOT EXISTS `news_items` (
   `newsID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `item_title` varchar(255) NOT NULL,
@@ -400,7 +384,6 @@ CREATE TABLE IF NOT EXISTS `news_items` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `page_photos`;
 CREATE TABLE IF NOT EXISTS `page_photos` (
   `ppID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `filename` varchar(255) NOT NULL DEFAULT '',
@@ -425,7 +408,6 @@ CREATE TABLE IF NOT EXISTS `page_photos` (
 -- Създаване: 24 апр 2015 в 16:09
 --
 
-DROP TABLE IF EXISTS `products`;
 CREATE TABLE IF NOT EXISTS `products` (
   `prodID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `class_name` varchar(255) DEFAULT NULL,
@@ -458,7 +440,7 @@ CREATE TABLE IF NOT EXISTS `products` (
   KEY `promotion` (`promotion`),
   KEY `visible` (`visible`),
   KEY `class_name` (`class_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
 
 -- --------------------------------------------------------
 
@@ -468,7 +450,6 @@ CREATE TABLE IF NOT EXISTS `products` (
 -- Създаване: 12 авг 2014 в 19:18
 --
 
-DROP TABLE IF EXISTS `product_categories`;
 CREATE TABLE IF NOT EXISTS `product_categories` (
   `catID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `category_name` varchar(50) NOT NULL,
@@ -482,7 +463,7 @@ CREATE TABLE IF NOT EXISTS `product_categories` (
   KEY `parentID` (`parentID`),
   KEY `lft` (`lft`),
   KEY `rgt` (`rgt`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4234 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4242 ;
 
 -- --------------------------------------------------------
 
@@ -492,7 +473,6 @@ CREATE TABLE IF NOT EXISTS `product_categories` (
 -- Създаване: 24 апр 2015 в 14:09
 --
 
-DROP TABLE IF EXISTS `product_classes`;
 CREATE TABLE IF NOT EXISTS `product_classes` (
   `pclsID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `class_name` varchar(255) NOT NULL,
@@ -505,10 +485,9 @@ CREATE TABLE IF NOT EXISTS `product_classes` (
 --
 -- Структура на таблица `product_colors`
 --
--- Създаване: 25 апр 2015 в 11:22
+-- Създаване:  3 май 2015 в 09:12
 --
 
-DROP TABLE IF EXISTS `product_colors`;
 CREATE TABLE IF NOT EXISTS `product_colors` (
   `pclrID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `color` varchar(255) NOT NULL,
@@ -518,7 +497,7 @@ CREATE TABLE IF NOT EXISTS `product_colors` (
   UNIQUE KEY `color_gallery` (`color`,`prodID`),
   KEY `prodID` (`prodID`),
   KEY `color` (`color`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=18 ;
 
 -- --------------------------------------------------------
 
@@ -528,7 +507,6 @@ CREATE TABLE IF NOT EXISTS `product_colors` (
 -- Създаване: 21 апр 2015 в 00:17
 --
 
-DROP TABLE IF EXISTS `product_color_photos`;
 CREATE TABLE IF NOT EXISTS `product_color_photos` (
   `pclrpID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `photo` longblob NOT NULL,
@@ -538,7 +516,7 @@ CREATE TABLE IF NOT EXISTS `product_color_photos` (
   `caption` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`pclrpID`),
   KEY `pclrID` (`pclrID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
 
 -- --------------------------------------------------------
 
@@ -548,7 +526,6 @@ CREATE TABLE IF NOT EXISTS `product_color_photos` (
 -- Създаване: 29 юли 2014 в 11:04
 --
 
-DROP TABLE IF EXISTS `product_features`;
 CREATE TABLE IF NOT EXISTS `product_features` (
   `pfID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `feature` varchar(255) NOT NULL,
@@ -562,70 +539,57 @@ CREATE TABLE IF NOT EXISTS `product_features` (
 --
 -- Структура на таблица `product_inventory`
 --
--- Създаване: 25 апр 2015 в 11:27
+-- Създаване: 27 май 2015 в 14:31
 --
 
-DROP TABLE IF EXISTS `product_inventory`;
 CREATE TABLE IF NOT EXISTS `product_inventory` (
   `piID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `prodID` int(11) unsigned NOT NULL,
   `pclrID` int(11) unsigned DEFAULT NULL,
+  `color` varchar(255) DEFAULT NULL,
   `size_value` varchar(255) DEFAULT NULL,
   `stock_amount` int(11) NOT NULL DEFAULT '0',
   `price` decimal(10,2) NOT NULL DEFAULT '0.00',
   `buy_price` decimal(10,2) NOT NULL DEFAULT '0.00',
   `old_price` decimal(10,2) NOT NULL DEFAULT '0.00',
   `weight` decimal(10,3) unsigned NOT NULL DEFAULT '0.000',
+  `insert_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`piID`),
+  UNIQUE KEY `prodID_2` (`prodID`,`pclrID`,`size_value`),
   KEY `prodID` (`prodID`),
   KEY `pclrID` (`pclrID`),
-  KEY `size_value` (`size_value`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=18 ;
+  KEY `size_value` (`size_value`),
+  KEY `color` (`color`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=30 ;
 
 -- --------------------------------------------------------
 
 --
 -- Структура на таблица `product_photos`
 --
--- Създаване: 19 апр 2015 в 10:51
+-- Създаване: 25 апр 2015 в 22:40
 --
 
-DROP TABLE IF EXISTS `product_photos`;
 CREATE TABLE IF NOT EXISTS `product_photos` (
   `ppID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `photo` longblob NOT NULL,
   `prodID` int(11) unsigned NOT NULL,
   `date_upload` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `caption` varchar(255) DEFAULT NULL,
-  `position` int(11) unsigned NOT NULL DEFAULT '0',
+  `position` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ppID`),
   KEY `prodID` (`prodID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
-
--- --------------------------------------------------------
-
---
--- Структура на таблица `product_sizes`
---
--- Създаване: 23 апр 2015 в 23:02
---
-
-DROP TABLE IF EXISTS `product_sizes`;
-CREATE TABLE IF NOT EXISTS `product_sizes` (
-  `pszID` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `size_value` varchar(255) NOT NULL,
-  PRIMARY KEY (`pszID`),
-  UNIQUE KEY `size_value` (`size_value`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
 
 -- --------------------------------------------------------
 
 --
 -- Stand-in structure for view `sellable_products`
 --
-DROP VIEW IF EXISTS `sellable_products`;
 CREATE TABLE IF NOT EXISTS `sellable_products` (
-`color_gallery` varchar(256)
+`price_min` decimal(26,6)
+,`price_max` decimal(26,6)
+,`color_gallery` varchar(256)
 ,`pids` text
 ,`size_values` text
 ,`sell_prices` text
@@ -637,6 +601,7 @@ CREATE TABLE IF NOT EXISTS `sellable_products` (
 ,`have_chips` text
 ,`color_ids` text
 ,`product_photos` varchar(256)
+,`color_codes` text
 ,`piID` int(11) unsigned
 ,`stock_amount` int(11)
 ,`i_price` decimal(10,2)
@@ -652,6 +617,7 @@ CREATE TABLE IF NOT EXISTS `sellable_products` (
 ,`ppID` bigint(11) unsigned
 ,`discount_amount` bigint(11)
 ,`sell_price` decimal(26,6)
+,`inventory_date` timestamp
 ,`prodID` int(11) unsigned
 ,`class_name` varchar(255)
 ,`brand_name` varchar(255)
@@ -682,14 +648,13 @@ CREATE TABLE IF NOT EXISTS `sellable_products` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `site_texts`;
 CREATE TABLE IF NOT EXISTS `site_texts` (
   `textID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `value` text COLLATE utf8_unicode_ci NOT NULL,
   `hash_value` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`textID`),
   UNIQUE KEY `hash_value` (`hash_value`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=809 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1097 ;
 
 -- --------------------------------------------------------
 
@@ -699,7 +664,6 @@ CREATE TABLE IF NOT EXISTS `site_texts` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `site_text_usage`;
 CREATE TABLE IF NOT EXISTS `site_text_usage` (
   `stuID` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `textID` int(10) unsigned NOT NULL,
@@ -719,24 +683,22 @@ CREATE TABLE IF NOT EXISTS `site_text_usage` (
 -- Създаване: 23 апр 2015 в 22:31
 --
 
-DROP TABLE IF EXISTS `store_colors`;
 CREATE TABLE IF NOT EXISTS `store_colors` (
   `sclrID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `color` varchar(255) NOT NULL,
   `color_code` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`sclrID`),
   UNIQUE KEY `color` (`color`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
 
 -- --------------------------------------------------------
 
 --
 -- Структура на таблица `store_promos`
 --
--- Създаване: 18 апр 2015 в 13:40
+-- Създаване: 19 май 2015 в 10:39
 --
 
-DROP TABLE IF EXISTS `store_promos`;
 CREATE TABLE IF NOT EXISTS `store_promos` (
   `spID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `start_date` date NOT NULL,
@@ -744,8 +706,26 @@ CREATE TABLE IF NOT EXISTS `store_promos` (
   `target` enum('Product','Category') NOT NULL,
   `targetID` int(11) unsigned NOT NULL,
   `discount_percent` int(11) NOT NULL,
-  PRIMARY KEY (`spID`)
+  PRIMARY KEY (`spID`),
+  KEY `start_date` (`start_date`),
+  KEY `end_date` (`end_date`),
+  KEY `targetID` (`targetID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+-- --------------------------------------------------------
+
+--
+-- Структура на таблица `store_sizes`
+--
+-- Създаване: 27 апр 2015 в 14:42
+--
+
+CREATE TABLE IF NOT EXISTS `store_sizes` (
+  `pszID` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `size_value` varchar(255) NOT NULL,
+  PRIMARY KEY (`pszID`),
+  UNIQUE KEY `size_value` (`size_value`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
 
 -- --------------------------------------------------------
 
@@ -755,7 +735,6 @@ CREATE TABLE IF NOT EXISTS `store_promos` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `translation_beans`;
 CREATE TABLE IF NOT EXISTS `translation_beans` (
   `btID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `table_name` varchar(50) CHARACTER SET utf8 NOT NULL,
@@ -776,7 +755,6 @@ CREATE TABLE IF NOT EXISTS `translation_beans` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `translation_phrases`;
 CREATE TABLE IF NOT EXISTS `translation_phrases` (
   `trID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `langID` int(11) unsigned NOT NULL,
@@ -796,7 +774,6 @@ CREATE TABLE IF NOT EXISTS `translation_phrases` (
 -- Създаване: 24 яну 2014 в 12:15
 --
 
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `userID` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `fullname` varchar(255) NOT NULL,
@@ -819,7 +796,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 DROP TABLE IF EXISTS `color_chips`;
 
-CREATE   DEFINER VIEW `color_chips` AS (select `i`.`prodID` AS `prodID`,group_concat(`ic`.`piID` separator '|') AS `pi_ids`,group_concat(`ic`.`color` separator '|') AS `colors`,group_concat(`ic`.`pclrpID` separator '|') AS `color_photos`,group_concat(`ic`.`have_chip` separator '|') AS `have_chips`,group_concat(`ic`.`pclrID` separator '|') AS `color_ids`,(select group_concat(`pp`.`ppID` separator '|') from `product_photos` `pp` where (`pp`.`prodID` = `i`.`prodID`) order by `pp`.`position`) AS `product_photos` from (`inventory` `i` left join `inventory_colors` `ic` on((`i`.`piID` = `ic`.`piID`))) group by `i`.`prodID`);
+CREATE ALGORITHM=UNDEFINED DEFINER=`demo1`@`localhost` SQL SECURITY DEFINER VIEW `color_chips` AS (select `i`.`prodID` AS `prodID`,group_concat(`ic`.`piID` separator '|') AS `pi_ids`,group_concat(`ic`.`color` separator '|') AS `colors`,group_concat(`ic`.`color_code` separator '|') AS `color_codes`,group_concat((select group_concat(coalesce(`ic1`.`pclrpID`,0) separator ',') from `inventory_colors` `ic1` where (`ic1`.`piID` = `i`.`piID`)) separator '|') AS `color_photos`,group_concat(`ic`.`have_chip` separator '|') AS `have_chips`,group_concat(`ic`.`pclrID` separator '|') AS `color_ids`,(select group_concat(`pp`.`ppID` separator '|') from `product_photos` `pp` where (`pp`.`prodID` = `i`.`prodID`) order by `pp`.`position`) AS `product_photos` from (`inventory` `i` left join `inventory_colors` `ic` on((`ic`.`piID` = `i`.`piID`))) group by `i`.`prodID`);
 
 -- --------------------------------------------------------
 
@@ -828,7 +805,7 @@ CREATE   DEFINER VIEW `color_chips` AS (select `i`.`prodID` AS `prodID`,group_co
 --
 DROP TABLE IF EXISTS `inventory`;
 
-CREATE   DEFINER VIEW `inventory` AS (select `pi`.`piID` AS `piID`,`pi`.`prodID` AS `prodID`,`pi`.`stock_amount` AS `stock_amount`,`pi`.`price` AS `price`,`pi`.`old_price` AS `old_price`,`pi`.`buy_price` AS `buy_price`,`pi`.`weight` AS `weight`,`pi`.`size_value` AS `size_value`,`pclr`.`pclrID` AS `pclrID`,`pclr`.`color` AS `color`,`sc`.`color_code` AS `color_code`,coalesce((length(`pclr`.`color_photo`) > 0),0) AS `have_chip`,(select `pcp`.`pclrpID` from `product_color_photos` `pcp` where (`pcp`.`pclrID` = `pi`.`pclrID`) order by `pcp`.`position` limit 1) AS `pclrpID`,(select `pp`.`ppID` from `product_photos` `pp` where (`pp`.`prodID` = `pi`.`prodID`) order by `pp`.`position` limit 1) AS `ppID`,coalesce(`sp`.`discount_percent`,0) AS `discount_amount`,(`pi`.`price` - ((`pi`.`price` * coalesce(`sp`.`discount_percent`,0)) / 100.0)) AS `sell_price` from ((((`product_inventory` `pi` left join `product_colors` `pclr` on((`pclr`.`pclrID` = `pi`.`pclrID`))) left join `store_colors` `sc` on((`sc`.`color` = `pclr`.`color`))) left join `products` `p` on((`p`.`prodID` = `pi`.`prodID`))) left join `store_promos` `sp` on(((`sp`.`targetID` = `p`.`catID`) and (`sp`.`target` = 'Category') and (`sp`.`start_date` < now()) and (`sp`.`end_date` > now())))));
+CREATE ALGORITHM=UNDEFINED DEFINER=`demo1`@`localhost` SQL SECURITY DEFINER VIEW `inventory` AS (select `pi`.`piID` AS `piID`,`pi`.`prodID` AS `prodID`,`pi`.`stock_amount` AS `stock_amount`,`pi`.`insert_date` AS `insert_date`,`pi`.`price` AS `price`,`pi`.`old_price` AS `old_price`,`pi`.`buy_price` AS `buy_price`,`pi`.`weight` AS `weight`,`pi`.`size_value` AS `size_value`,`pi`.`pclrID` AS `pclrID`,`pi`.`color` AS `color`,`sc`.`color_code` AS `color_code`,coalesce((length(`pclr`.`color_photo`) > 0),0) AS `have_chip`,(select `pcp`.`pclrpID` from `product_color_photos` `pcp` where (`pcp`.`pclrID` = `pi`.`pclrID`) order by `pcp`.`position` limit 1) AS `pclrpID`,(select `pp`.`ppID` from `product_photos` `pp` where (`pp`.`prodID` = `pi`.`prodID`) order by `pp`.`position` limit 1) AS `ppID`,coalesce(`sp`.`discount_percent`,0) AS `discount_amount`,(`pi`.`price` - ((`pi`.`price` * coalesce(`sp`.`discount_percent`,0)) / 100.0)) AS `sell_price` from ((((`product_inventory` `pi` left join `product_colors` `pclr` on((`pclr`.`pclrID` = `pi`.`pclrID`))) left join `store_colors` `sc` on((`sc`.`color` = `pclr`.`color`))) left join `products` `p` on((`p`.`prodID` = `pi`.`prodID`))) left join `store_promos` `sp` on(((`sp`.`targetID` = `p`.`catID`) and (`sp`.`target` = 'Category') and (`sp`.`start_date` < now()) and (`sp`.`end_date` > now())))));
 
 -- --------------------------------------------------------
 
@@ -837,7 +814,7 @@ CREATE   DEFINER VIEW `inventory` AS (select `pi`.`piID` AS `piID`,`pi`.`prodID`
 --
 DROP TABLE IF EXISTS `inventory_colors`;
 
-CREATE   DEFINER VIEW `inventory_colors` AS (select `si`.`color` AS `color`,`si`.`pclrID` AS `pclrID`,`si`.`piID` AS `piID`,`si`.`prodID` AS `prodID`,`si`.`have_chip` AS `have_chip`,`si`.`pclrpID` AS `pclrpID`,`si`.`ppID` AS `ppID` from `inventory` `si` where (`si`.`pclrID` is not null) group by `si`.`pclrID`);
+CREATE ALGORITHM=UNDEFINED DEFINER=`demo1`@`localhost` SQL SECURITY DEFINER VIEW `inventory_colors` AS (select `si`.`color` AS `color`,`si`.`pclrID` AS `pclrID`,`si`.`piID` AS `piID`,`si`.`prodID` AS `prodID`,`si`.`have_chip` AS `have_chip`,`si`.`pclrpID` AS `pclrpID`,`si`.`ppID` AS `ppID`,`sc`.`color_code` AS `color_code` from (`inventory` `si` join `store_colors` `sc` on((`sc`.`color` = `si`.`color`))) where (`si`.`pclrID` is not null) group by `si`.`pclrID`);
 
 -- --------------------------------------------------------
 
@@ -846,7 +823,7 @@ CREATE   DEFINER VIEW `inventory_colors` AS (select `si`.`color` AS `color`,`si`
 --
 DROP TABLE IF EXISTS `sellable_products`;
 
-CREATE   DEFINER VIEW `sellable_products` AS (select (select group_concat(`pcp`.`pclrpID` order by `pcp`.`position` ASC separator '|') from `product_color_photos` `pcp` where (`pcp`.`pclrID` = `si`.`pclrID`)) AS `color_gallery`,group_concat(`si`.`piID` separator '|') AS `pids`,group_concat(`si`.`size_value` separator '|') AS `size_values`,group_concat(`si`.`sell_price` separator '|') AS `sell_prices`,group_concat(`si`.`stock_amount` separator '|') AS `stock_amounts`,group_concat(`si`.`old_price` separator '|') AS `old_prices`,`cc`.`pi_ids` AS `color_pids`,`cc`.`colors` AS `colors`,`cc`.`color_photos` AS `color_photos`,`cc`.`have_chips` AS `have_chips`,`cc`.`color_ids` AS `color_ids`,`cc`.`product_photos` AS `product_photos`,`si`.`piID` AS `piID`,`si`.`stock_amount` AS `stock_amount`,`si`.`price` AS `i_price`,`si`.`old_price` AS `i_old_price`,`si`.`buy_price` AS `i_buy_price`,`si`.`weight` AS `i_weight`,`si`.`size_value` AS `size_value`,`si`.`pclrID` AS `pclrID`,`si`.`color` AS `color`,`si`.`color_code` AS `color_code`,`si`.`have_chip` AS `have_chip`,`si`.`pclrpID` AS `pclrpID`,`si`.`ppID` AS `ppID`,`si`.`discount_amount` AS `discount_amount`,`si`.`sell_price` AS `sell_price`,`p`.`prodID` AS `prodID`,`p`.`class_name` AS `class_name`,`p`.`brand_name` AS `brand_name`,`p`.`product_code` AS `product_code`,`p`.`product_name` AS `product_name`,`p`.`product_summary` AS `product_summary`,`p`.`product_description` AS `product_description`,`p`.`keywords` AS `keywords`,`p`.`gender` AS `gender`,`p`.`buy_price` AS `buy_price`,`p`.`price` AS `price`,`p`.`weight` AS `weight`,`p`.`catID` AS `catID`,`p`.`old_price` AS `old_price`,`p`.`view_counter` AS `view_counter`,`p`.`order_counter` AS `order_counter`,`p`.`visible` AS `visible`,`p`.`promotion` AS `promotion`,`p`.`importID` AS `importID`,`p`.`update_date` AS `update_date`,`p`.`insert_date` AS `insert_date` from ((`inventory` `si` join `products` `p` on((`p`.`prodID` = `si`.`prodID`))) left join `color_chips` `cc` on((`cc`.`prodID` = `si`.`prodID`))) where (`p`.`visible` = 1) group by `si`.`prodID`,`si`.`pclrID`);
+CREATE ALGORITHM=UNDEFINED DEFINER=`demo1`@`localhost` SQL SECURITY DEFINER VIEW `sellable_products` AS (select min(`si`.`sell_price`) AS `price_min`,max(`si`.`sell_price`) AS `price_max`,(select group_concat(`pcp`.`pclrpID` order by `pcp`.`position` ASC separator '|') from `product_color_photos` `pcp` where (`pcp`.`pclrID` = `si`.`pclrID`)) AS `color_gallery`,group_concat(`si`.`piID` separator '|') AS `pids`,group_concat(`si`.`size_value` separator '|') AS `size_values`,group_concat(`si`.`sell_price` separator '|') AS `sell_prices`,group_concat(`si`.`stock_amount` separator '|') AS `stock_amounts`,group_concat(`si`.`old_price` separator '|') AS `old_prices`,`cc`.`pi_ids` AS `color_pids`,`cc`.`colors` AS `colors`,`cc`.`color_photos` AS `color_photos`,`cc`.`have_chips` AS `have_chips`,`cc`.`color_ids` AS `color_ids`,`cc`.`product_photos` AS `product_photos`,`cc`.`color_codes` AS `color_codes`,`si`.`piID` AS `piID`,`si`.`stock_amount` AS `stock_amount`,`si`.`price` AS `i_price`,`si`.`old_price` AS `i_old_price`,`si`.`buy_price` AS `i_buy_price`,`si`.`weight` AS `i_weight`,`si`.`size_value` AS `size_value`,`si`.`pclrID` AS `pclrID`,`si`.`color` AS `color`,`si`.`color_code` AS `color_code`,`si`.`have_chip` AS `have_chip`,`si`.`pclrpID` AS `pclrpID`,`si`.`ppID` AS `ppID`,`si`.`discount_amount` AS `discount_amount`,`si`.`sell_price` AS `sell_price`,`si`.`insert_date` AS `inventory_date`,`p`.`prodID` AS `prodID`,`p`.`class_name` AS `class_name`,`p`.`brand_name` AS `brand_name`,`p`.`product_code` AS `product_code`,`p`.`product_name` AS `product_name`,`p`.`product_summary` AS `product_summary`,`p`.`product_description` AS `product_description`,`p`.`keywords` AS `keywords`,`p`.`gender` AS `gender`,`p`.`buy_price` AS `buy_price`,`p`.`price` AS `price`,`p`.`weight` AS `weight`,`p`.`catID` AS `catID`,`p`.`old_price` AS `old_price`,`p`.`view_counter` AS `view_counter`,`p`.`order_counter` AS `order_counter`,`p`.`visible` AS `visible`,`p`.`promotion` AS `promotion`,`p`.`importID` AS `importID`,`p`.`update_date` AS `update_date`,`p`.`insert_date` AS `insert_date` from ((`inventory` `si` join `products` `p` on((`p`.`prodID` = `si`.`prodID`))) left join `color_chips` `cc` on((`cc`.`prodID` = `si`.`prodID`))) where (`p`.`visible` = 1) group by `si`.`prodID`,`si`.`pclrID`);
 
 --
 -- Ограничения за дъмпнати таблици
@@ -906,8 +883,8 @@ ALTER TABLE `products`
 -- Ограничения за таблица `product_colors`
 --
 ALTER TABLE `product_colors`
-  ADD CONSTRAINT `product_colors_ibfk_1` FOREIGN KEY (`prodID`) REFERENCES `products` (`prodID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `product_colors_ibfk_2` FOREIGN KEY (`color`) REFERENCES `store_colors` (`color`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `product_colors_ibfk_2` FOREIGN KEY (`color`) REFERENCES `store_colors` (`color`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `product_colors_ibfk_1` FOREIGN KEY (`prodID`) REFERENCES `products` (`prodID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения за таблица `product_color_photos`
@@ -926,8 +903,9 @@ ALTER TABLE `product_features`
 --
 ALTER TABLE `product_inventory`
   ADD CONSTRAINT `product_inventory_ibfk_1` FOREIGN KEY (`prodID`) REFERENCES `products` (`prodID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `product_inventory_ibfk_3` FOREIGN KEY (`size_value`) REFERENCES `product_sizes` (`size_value`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `product_inventory_ibfk_4` FOREIGN KEY (`pclrID`) REFERENCES `product_colors` (`pclrID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `product_inventory_ibfk_3` FOREIGN KEY (`size_value`) REFERENCES `store_sizes` (`size_value`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `product_inventory_ibfk_4` FOREIGN KEY (`pclrID`) REFERENCES `product_colors` (`pclrID`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `product_inventory_ibfk_5` FOREIGN KEY (`color`) REFERENCES `store_colors` (`color`) ON UPDATE CASCADE;
 
 --
 -- Ограничения за таблица `product_photos`

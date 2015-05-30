@@ -40,9 +40,9 @@ input[type="submit"]:focus, input[type="button"]:focus, A
   text-decoration: none;
 
   outline: none;
-  font-size:12px;
+  font-size:1em;
 
-  font-family:"arial";
+ 
   font-weight:bold;
 /* 	height:20px;line-height:20px; */
   min-width:80px;

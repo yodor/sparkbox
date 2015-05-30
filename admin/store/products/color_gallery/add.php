@@ -15,10 +15,12 @@ $page->checkAccess(ROLE_CONTENT_MENU);
 
 $ensure_product = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
 
-$view = new InputFormView(new ProductColorsBean(), new ProductColorInputForm());
+$view = new InputFormView(new ProductColorsBean(), new ProductColorInputForm($ensure_product->ref_id));
+
 
 // $view->getTransactor()->assignInsertValue("insert_date", DBDriver::get()->dateTime());
 $view->getTransactor()->appendValue("prodID", $ensure_product->ref_id);
+
 
 $view->setCaption("Color Gallery: ".$ensure_product->ref_row["product_name"]);
 

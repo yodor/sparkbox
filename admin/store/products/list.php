@@ -59,7 +59,7 @@ $ksc->processSearch($select_products);
 
 $view = new TableView(new SQLResultIterator($select_products, "prodID"));
 $view->setCaption("Product Inventory List");
-$view->setDefaultOrder("  insert_date DESC  ");
+$view->setDefaultOrder("  p.insert_date DESC  ");
 // $view->search_filter = " ORDER BY day_num ASC ";
 $view->addColumn(new TableColumn("prodID","ID"));
 

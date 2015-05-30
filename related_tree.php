@@ -1,6 +1,7 @@
 <?php
 include_once("session.php");
-include_once("class/pages/DemoPage.php");
+
+include_once("class/pages/ProductsPage.php");
 
 include_once("lib/components/NestedSetTreeView2.php");
 include_once("lib/components/renderers/items/TextTreeItemRenderer.php");
@@ -12,107 +13,21 @@ include_once("lib/components/KeywordSearchComponent.php");
 include_once("lib/iterators/SQLResultIterator.php");
 include_once("lib/utils/RelatedSourceFilterProcessor.php");
 include_once("class/beans/ProductColorPhotosBean.php");
+include_once("class/utils/filters/ProductFilters.php");
 
-class ProductPhotoCellRenderer extends TableImageCellRenderer
+include_once("class/components/renderers/items/ProductListItem.php");
+include_once("class/components/renderers/cells/ProductPhotoCellRenderer.php");
+
+function dumpCSS()
 {
-	public function __construct($render_mode=IPhotoRenderer::RENDER_CROP, $width=48, $height=-1)
-	{
-		parent::__construct(NULL, $render_mode, $width, $height);
-		
-	}
-	protected function constructItems($row, TableColumn $tc)
-	{
-		$this->items = array();
-		
-		if (isset($row["pclrpID"]) && $row["pclrpID"]>0) {
-			  $item = new ImageItem();
-			  $item->item_id = (int)$row["pclrpID"];
-			  $item->item_class = ProductColorPhotosBean::class;
-			  $this->items[] = $item;
-		}
-		else if (isset($row["ppID"]) && $row["ppID"]>0){
-			  $item = new ImageItem();
-			  $item->item_id = (int)$row["ppID"];
-			  $item->item_class = ProductPhotosBean::class;
-			  $this->items[] = $item;
-		}	
-	}
-}
-class ColorFilter implements IQueryFilter
-{
-  public function getQueryFilter($view=NULL, $value = NULL)
-  {
-	$sel = NULL;
-
-	if ($value) {
-	  $sel = new SelectQuery();
-	  $sel->fields = "";
-	  $sel->from = "";
-	  if (strcmp($value, "N/A")==0 || strcmp($value, "NULL")==0) {
-		$sel->where = " relation.color IS NULL ";
-	  }
-	  else {
-		$sel->where = " relation.color='$value' ";
-	  }
-	}
-	
-	return $sel;
-  }
-}
-
-class SizingFilter implements IQueryFilter
-{
-
-  public function getQueryFilter($view=NULL, $value = NULL)
-  {
-	$sel = NULL;
-	
-	if ($value) {
-	  $sel = new SelectQuery();
-	  $sel->fields = "";
-	  $sel->from = "";
-	  if (strcmp($value, "N/A")==0 || strcmp($value, "NULL")==0) {
-		$sel->where = " relation.size_value IS NULL ";
-	  }
-	  else {
-		$sel->where = " (relation.size_values LIKE '%$value|%' OR relation.size_values LIKE '%|$value%' OR relation.size_values='$value') ";
-// 		$sel->where = " $related_table.size_value='$value' ";
-	  }
-	}
-	
-	return $sel;
-  }
+  echo "<link rel='stylesheet' href='".SITE_ROOT."css/related_tree.css' type='text/css'>";
+  echo "\n";
 }
 
 
-class PricingFilter implements IQueryFilter
-{
-  public function getQueryFilter($view=NULL, $value = NULL)
-  {
-	$sel = NULL;
-
-	if ($value) {
-	  $sel = new SelectQuery();
-	  $sel->fields = "";
-	  $sel->from = "";
-	  
-	  $price_range = explode("|", $value);
-	  if (count($price_range)==2) {
-		  $price_min = (float)$price_range[0];
-		  $price_max = (float)$price_range[1];
-		  
-		  $sel->where = " (relation.sell_price >= $price_min AND relation.sell_price <= $price_max) ";
-	  }
-	  
-	}
-	return $sel;
-  }
-}
-
-$page = new DemoPage();
+$page = new ProductsPage();
 
 $bean = new ProductCategoriesBean();
-
 
 //construct tree view from the source bean and set tree text label field
 $treeView = new NestedSetTreeView();
@@ -129,30 +44,16 @@ $treeView->setItemRenderer($ir);
 $product_selector = new SelectQuery();
 $product_selector->fields = "  ";
 
-//color/size/price filters need not grouping! in the derived table
-$derived_table = "SELECT 
- pc.catID, pc.category_name, 
-(SELECT GROUP_CONCAT(DISTINCT(pi1.size_value) SEPARATOR '|') FROM product_inventory pi1 WHERE pi1.prodID=pi.prodID AND (pi1.pclrID = pi.pclrID OR pi.pclrID IS NULL) GROUP BY pi.pclrID ) as size_values, 
-(SELECT GROUP_CONCAT(DISTINCT(pi2.color) SEPARATOR '|') FROM product_inventory pi2 WHERE pi2.prodID=pi.prodID  ) as colors, 
-(SELECT GROUP_CONCAT(DISTINCT(pi3.pclrID) SEPARATOR '|') FROM product_inventory pi3 WHERE pi3.prodID=pi.prodID  ) as color_ids, 
 
-(SELECT ppID FROM product_photos pp WHERE pp.prodID=pi.prodID ORDER BY position ASC LIMIT 1) as ppID,
-(SELECT pclrpID FROM product_color_photos pcp WHERE pcp.pclrID=pi.pclrID ORDER BY position ASC LIMIT 1) as pclrpID,
+//color/size/price filters need NOT grouping! in the derived table
+$derived = $page->derived;
 
-pi.price - (pi.price * (coalesce(sp.discount_percent,0)) / 100.0) AS sell_price, 
-pi.piID, pi.size_value, pi.color, pi.pclrID, p.brand_name, pi.prodID, 
-p.product_code, p.product_name, p.product_description, p.keywords 
+$derived_table = $derived->getSQL(false, false);
 
-FROM product_inventory pi 
+$derived->group_by = " pi.prodID, pi.color ";
 
-JOIN products p ON (p.prodID = pi.prodID AND p.visible=1) 
-JOIN product_categories pc ON pc.catID=p.catID 
-LEFT JOIN store_promos sp ON (sp.targetID = p.catID AND sp.target='Category' AND sp.start_date <= NOW() AND sp.end_date >= NOW())
-
-";
-
-$product_selector->from = " (  $derived_table GROUP BY pi.prodID, pi.color ) as relation ";
-
+// $product_selector->from = " (  $derived_table GROUP BY pi.prodID, pi.color ) as relation ";
+$product_selector->from = " ( ".$derived->getSQL(false, false)." ) as relation ";
 $product_selector->where = "  ";
 
 
@@ -202,23 +103,36 @@ $product_selector->group_by = " prodID, color ";
 // echo $product_selector->getSQL();
 
 
-$view = new TableView(new SQLResultIterator($product_selector, "prodID"));
-$view->setCaption("Products List");
 
-// $view->addColumn(new TableColumn("piID","ID"));
-// $view->addColumn(new TableColumn("prodID","ID"));
-$view->addColumn(new TableColumn("pclrpID","Photo"));
-$view->addColumn(new TableColumn("product_code","Product Code"));
-$view->addColumn(new TableColumn("product_name","Product Name"));
-$view->addColumn(new TableColumn("brand_name","Brand Name"));
-$view->addColumn(new TableColumn("category_name","Category Name"));
-$view->addColumn(new TableColumn("color","Color"));
-// $view->addColumn(new TableColumn("size_values","Sizing"));
-// $view->addColumn(new TableColumn("colors","Colors"));
-// $view->addColumn(new TableColumn("color_ids","Colors"));
-$view->getColumn("pclrpID")->setCellRenderer(new ProductPhotoCellRenderer(TableImageCellRenderer::RENDER_THUMB, -1, 48));
-$view->getColumn("pclrpID")->getHeaderCellRenderer()->setSortable(false);
+if (strcmp_isset("view", "list", $_GET)) {
+  $view = new TableView(new SQLResultIterator($product_selector, "piID"));
+  // $view->addColumn(new TableColumn("piID","ID"));
+  // $view->addColumn(new TableColumn("prodID","ID"));
+  $view->addColumn(new TableColumn("pclrpID","Photo"));
+  $view->addColumn(new TableColumn("product_code","Product Code"));
+  $view->addColumn(new TableColumn("product_name","Product Name"));
+  $view->addColumn(new TableColumn("brand_name","Brand Name"));
+  // $view->addColumn(new TableColumn("category_name","Category Name"));
+  $view->addColumn(new TableColumn("color","Color"));
+  $view->addColumn(new TableColumn("sell_price","Price"));
+  // $view->addColumn(new TableColumn("size_values","Sizing"));
+  $view->addColumn(new TableColumn("colors","Colors"));
+  $view->addColumn(new TableColumn("color_ids","Colors"));
+  
+  $view->getColumn("pclrpID")->setCellRenderer(new ProductPhotoCellRenderer(TableImageCellRenderer::RENDER_THUMB, -1, 48));
+  $view->getColumn("pclrpID")->getHeaderCellRenderer()->setSortable(false);
+}
+else {
+  $view = new ListView(new SQLResultIterator($product_selector, "piID"));
+  $view->setItemRenderer(new ProductListItem());
+}
 
+$sort_price = new PaginatorSortField("relation.sell_price", "Price");
+$view->getPaginator()->addSortField($sort_price);
+$sort_prod = new PaginatorSortField("relation.prodID", "Auto");
+$view->getPaginator()->addSortField($sort_prod);
+$view->getTopPaginator()->view_modes_enabled = true;
+// $view->setCaption("Products List");
 
 
 $brand_select = new SelectQuery();
@@ -282,7 +196,7 @@ echo "<div class='column categories'>";
   echo "</div>";
   
   echo "<div class='filters'>";
-
+	echo "<form name='filters' autocomplete='off'>";
 	echo "<div class='InputComponent'>";
 	  echo "<span class='label'>".tr("Brand").": </span>";
 	
@@ -336,12 +250,17 @@ echo "<div class='column categories'>";
 		  }
 	  }
 	 
+	 $value_min = sprintf("%1.2f", $value_min);
+	 $value_max = sprintf("%1.2f", $value_max);
+	 
 	  echo "<span class='value' id='amount'>$value_min - $value_max</span>";
 	  echo "<div class='InputField'>";
 		echo "<div class='drag' min='{$price_info["min"]}' max='{$price_info["max"]}'></div>";
 		echo "<input type='hidden' name='price_range' value='$value_min|$value_max'>";
 	  echo "</div>";
 	echo "</div>";//InputComponent
+	
+	echo "</form>";
 	
 	echo "<button class='DefaultButton' onClick='javascript:clearFilters()'>Clear Refinements</button>";
 	
@@ -352,6 +271,7 @@ echo "</div>"; //column categories
 echo "<div class='column product_list'>";
 
   $ksc->render();
+  echo "<div class='clear'></div>";
   $view->render();
 
 echo "</div>";
@@ -363,7 +283,7 @@ echo "</div>";
 function clearFilters()
 {
   var uri = new URI(document.location.href);
-  
+//   console.log(uri.filename());
   document.location.href = uri.filename(); 
 }
 function filterChanged(elm, filter_name)
@@ -390,11 +310,15 @@ addLoadEvent(function() {
       max: 100,
       values: [ 0, 100 ],
       slide: function( event, ui ) {
-		$(this).parents(".Slider").children(".value").html(  ui.values[ 0 ] + " - " + ui.values[ 1 ] );
-		$(this).parent().children("[name='price_range']").attr("value", ui.values[0] + "|" + ui.values[1]);
+		var min = parseFloat(ui.values[0]).toFixed(2);
+		var max = parseFloat(ui.values[1]).toFixed(2);
+		$(this).parents(".Slider").children(".value").html( min + " - " + max );
+		$(this).parent().children("[name='price_range']").attr("value", min + "|" + max);
       },
       stop: function(event, ui) {
-		$(this).val(ui.values[0] + "|" + ui.values[1]);
+		var min = parseFloat(ui.values[0]).toFixed(2);
+		var max = parseFloat(ui.values[1]).toFixed(2);
+		$(this).val(min + "|" + max);
 		filterChanged(this, "price_range");
 		
 	  }

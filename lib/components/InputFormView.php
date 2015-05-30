@@ -180,6 +180,7 @@ class InputFormView extends Component
 		    }
 
 		    if ($this->reload_request === true) {
+// 			  Session::set("replace_history", 1);
 			  debug("InputFormView::processInput: finished redirection following ...");
 			  debug("-------------------------------------");
 			  //TODO: remove reload requirement here? session upload files might transact to dbrows changing UID of storage objects

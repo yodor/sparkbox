@@ -20,6 +20,17 @@ $view->processInput();
 
 $page->beginPage($menu);
 
+// if (!Session::get("referer",0)) {
+//   Session::set("referer", $_SERVER['HTTP_REFERER']);
+// }
+// 
+// $href = Session::get("referer");
+//   
+// echo "<a href='$href'>back</a>";
+  
+
+$page->renderPageCaption();
+
 $view->render();
 
 $page->finishPage();

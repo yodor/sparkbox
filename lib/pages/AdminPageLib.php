@@ -109,6 +109,10 @@ class AdminPageLib extends SimplePage
       
       if ($caption) {
 		  echo "<div class='page_caption'>";
+		  
+		  
+		 
+		  
 		  if (count($this->actions)>0) {
 			$renderer = new ActionRenderer();
 			echo "<div class='page_actions'>";
