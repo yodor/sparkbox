@@ -90,6 +90,18 @@ function updatePrice()
 	console.log("selected piD: " + pid);
 	
 	$(".price_panel .sell_price").attr("pid", pid);
+	
+	var attrib = attributes[pid];
+	
+	var html = "";
+	for(var idx = 0 ; idx<attrib.length; idx++) {
+	  var obj = attrib[idx];
+	  html+= "<div class='item'><span class='name'>"+obj.name+ ": </span><span class='value'>" + obj.value + "</span></div>";
+// 	  console.log(obj.name + "=>" + obj.value);
+	}
+	$(".inventory_attributes").html(html);
+	
+	
   }
   
   

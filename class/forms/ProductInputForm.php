@@ -60,17 +60,17 @@ class ProductInputForm extends InputForm
 	$rend->list_label="gender_title";
 	$this->addField($field);
 	
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "price", "Price", 0);
-	$this->addField($field);
-	
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "buy_price", "Buy Price", 0);
-	$this->addField($field);
-
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "old_price", "Old Price", 0);
-	$this->addField($field);
-	
-	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "weight", "Weight", 0);
-	$this->addField($field);
+// 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "price", "Price", 0);
+// 	$this->addField($field);
+// 	
+// 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "buy_price", "Buy Price", 0);
+// 	$this->addField($field);
+// 
+// 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "old_price", "Old Price", 0);
+// 	$this->addField($field);
+// 	
+// 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "weight", "Weight", 0);
+// 	$this->addField($field);
 
 	
 // 	$field = InputFactory::CreateField(InputFactory::TEXTFIELD, "stock_amount", "Stock Amount", 1);
@@ -88,15 +88,15 @@ class ProductInputForm extends InputForm
 	$input->getValueTransactor()->max_slots = 4;
 	$this->addField($input);
 	
-	$field = InputFactory::CreateField(InputFactory::MCE_TEXTAREA, "product_summary", "Product Summary", 1);
+	$field = InputFactory::CreateField(InputFactory::MCE_TEXTAREA, "product_summary", "Product Summary", 0);
 	$this->addField($field);
 	
 	
-	$field = InputFactory::CreateField(InputFactory::MCE_TEXTAREA, "product_description", "Product Description", 1);
+	$field = InputFactory::CreateField(InputFactory::MCE_TEXTAREA, "product_description", "Product Description", 0);
 	$this->addField($field);
 
 	
-	$field = InputFactory::CreateField(InputFactory::TEXTAREA, "keywords", "Keywords", 1);
+	$field = InputFactory::CreateField(InputFactory::TEXTAREA, "keywords", "Keywords", 0);
 	$this->addField($field);
 
 	

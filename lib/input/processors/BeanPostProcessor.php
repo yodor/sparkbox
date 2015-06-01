@@ -209,8 +209,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 	  $transactor->appendValue($field->getName(), $value);
 	  
 	  //transacts additional values from renderer data source
-	  //matching by 'this' field name and its value posted
-	  if (is_array($this->renderer_source_copy_fields) && count($this->renderer_source_copy_fields)>0) {
+	  //matching by 'this' field name and its value posted. do not copy on empty 'value'
+	  if (is_array($this->renderer_source_copy_fields) && count($this->renderer_source_copy_fields)>0 && $value) {
 		  debug("BeanPostProcessor::transactValue[".$field->getName()."] Renderer copy fields requested ... ");
 		  $renderer = $field->getRenderer();
 		  $renderer_source = $renderer->getSource();
@@ -223,7 +223,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 		  if (!in_array($renderer->list_label, $source_fields)) throw new Exception("List Label '{$renderer->list_label}' not found in renderer source fields");
 
 		  $row = $renderer_source->getByRef($renderer->list_key, $value);
-		  if (!$row) throw new Exception("Unable to query renderer source data");
+		  if (!$row) throw new Exception("Unable to query renderer source data for field: ".$field->getName());
 		  foreach ($this->renderer_source_copy_fields as $idx=>$field_name) {
 			debug("BeanPostProcessor::transactValue[".$field->getName()."] | Doing copy for source field [$field_name]");
 			if (isset($row[$field_name])) {

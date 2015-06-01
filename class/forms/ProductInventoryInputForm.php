@@ -57,6 +57,7 @@ class ProductInventoryInputForm extends InputForm
 	$field = new ArrayInputField("value", "Class Attributes", 0);
 	$field->allow_dynamic_addition = false;
 	$field->source_label_visible = true;
+	
 	$field->getValueTransactor()->process_datasource_foreign_keys = true;
 
 	$bean1 = new InventoryAttributeValuesBean();

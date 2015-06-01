@@ -72,15 +72,15 @@ class ProductColorInputForm extends InputForm
   {
 
       $item_row = parent::loadBeanData($editID,  $bean);
-      $pclrID = $item_row["pclrID"];
-      $this->getField("photo")->getSource()->setFilter(" pclrID ='$pclrID' ");
+//       $pclrID = (int)$item_row["pclrID"];
+//       $this->getField("photo")->getSource()->setFilter(" pclrID ='$pclrID' ");
 
   }
   public function loadPostData(array $arr)
   {
       parent::loadPostData($arr);
-      $pclrID = -1;
-      $this->getField("photo")->getSource()->setFilter(" pclrID ='$pclrID' ");
+//       $pclrID = -1;
+//       $this->getField("photo")->getSource()->setFilter(" pclrID ='$pclrID' ");
 
   }
 }

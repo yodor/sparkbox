@@ -44,17 +44,17 @@ $treeView->setItemRenderer($ir);
 $product_selector = new SelectQuery();
 $product_selector->fields = "  ";
 
+$inventory_selector = new SelectQuery();
+$inventory_selector->fields = "  ";
 
 //color/size/price filters need NOT grouping! in the derived table
-$derived = $page->derived;
-
-$derived_table = $derived->getSQL(false, false);
-
+$derived = clone $page->derived;
 $derived->group_by = " pi.prodID, pi.color ";
 
 // $product_selector->from = " (  $derived_table GROUP BY pi.prodID, pi.color ) as relation ";
 $product_selector->from = " ( ".$derived->getSQL(false, false)." ) as relation ";
 $product_selector->where = "  ";
+
 
 
 //process get filters
@@ -71,19 +71,24 @@ $proc->addFilter("brand_name", "brand_name");
 $proc->addFilter("color", new ColorFilter());
 $proc->addFilter("size_value", new SizingFilter());
 $proc->addFilter("price_range", new PricingFilter());
+$proc->addFilter("ia", new InventoryAttributeFilter());
 
 //process filters before tree select ctor
 $proc->process($treeView);
 
 $num_filters = $proc->numFilters();
 
-//apply all filter sql to the relation
+//apply all filter sql to the relation 
 if ($num_filters) {
   $filter = $proc->getFilterAll();
 //   echo "Num Filters: $num_filters";
-//   echo $filter->getSQL();
+  
   $product_selector = $product_selector->combineWith($filter);
+
   $treeView->open_all = true;
+  
+//   $inventory_selector = $inventory_selector->combineWith($filter);
+  
 }
 // 
 
@@ -96,11 +101,10 @@ $treeView->setSelectQuery($tree_selector);
 
 $nodeID = $treeView->getSelectedID();
 
-$product_selector->fields = " relation.* ";
+$product_selector->fields = " relation.* "; //TODO list only needed fields here?
 $product_selector = $bean->childNodesWith($product_selector, $nodeID);
 $product_selector->where.= " AND relation.catID = child.catID ";
-$product_selector->group_by = " prodID, color ";
-// echo $product_selector->getSQL();
+$product_selector->group_by = " relation.prodID, relation.color ";
 
 
 
@@ -126,6 +130,7 @@ else {
   $view = new ListView(new SQLResultIterator($product_selector, "piID"));
   $view->setItemRenderer(new ProductListItem());
 }
+$view->items_per_page = 12;
 
 $sort_price = new PaginatorSortField("relation.sell_price", "Price");
 $view->getPaginator()->addSortField($sort_price);
@@ -134,6 +139,9 @@ $view->getPaginator()->addSortField($sort_prod);
 $view->getTopPaginator()->view_modes_enabled = true;
 // $view->setCaption("Products List");
 
+$derived = clone $page->derived;
+
+$derived_table = $derived->getSQL(false,false);
 
 $brand_select = new SelectQuery();
 	  $brand_select->fields = " brand_name ";
@@ -165,6 +173,8 @@ $price_select = new SelectQuery();
 	  //apply the other filters but skip self - slider shows always min-max of all products
 	  $price_info["price_range"] = $proc->applyFiltersOn($price_select, "price_range", true);
 	  
+
+	  
 	  $db = DBDriver::get();
 	  $res = $db->query($price_select->getSQL());
 	  if (!$res) throw new Exception ($db->getError());
@@ -173,10 +183,54 @@ $price_select = new SelectQuery();
 		$price_info["max"] = $row["price_max"];
 	  }
 	  $db->free($res);
+
+//dinamic filters
+	  $dyn_filters = array();
+	  try {
+
+		$ia_name_select = new SelectQuery(); //clone $inventory_selector;
+		$ia_name_select->fields = "  ";
+		$ia_name_select->from = " ($derived_table) as relation  ";
+		$ia_name_select->where = "   ";
+		
+		$proc->applyFiltersOn($ia_name_select, "ia", true);
+		
+		$ia_name_select->fields = " distinct(relation.ia_name) as ia_name ";
+		$ia_name_select->combineSection("where", "  relation.ia_name  IS NOT NULL");
+// 		echo $ia_name_select->getSQL();
+// // 
+		$res = $db->query($ia_name_select->getSQL());
+		if (!$res) throw new Exception ("Unable to query inventory attributes: ".$db->getError());
+		while ($row = $db->fetch($res)) {
+		  $name = $row["ia_name"];
+		  $sel = new SelectQuery();
+		  $sel->fields = "  ";
+		  $sel->from = " ($derived_table) as relation  ";
+		 
+		  $value = $proc->applyFiltersOn($sel, "ia", true);
+		  
+		  $sel->fields = " distinct(relation.ia_value) as ia_value ";
+		  $sel->combineSection("where", "  relation.ia_name = '$name' AND relation.ia_value > ''");
+		  $sel->order_by = " CAST(relation.ia_value AS DECIMAL(10,2)) ";
+		  
+// 		  echo $sel->getSQL()."<HR>";
+		  
+		  $dyn_filters[$name] = array("select"=>$sel, "value"=>$value);
+		}
+	  }
+	  catch (Exception $e) {
+// 		echo $ia_name_select->getSQL();
+// 		echo $product_selector->getSQL();
+		
+	  }
+	  if (is_resource($res)) $db->free($res);
+
 	  
 $page->beginPage();
+// 
 
 // echo $product_selector->getSQL();
+// echo $attributes_select->getSQL();
 // echo "<HR>";
 
 echo "<div class='column categories'>";
@@ -260,6 +314,30 @@ echo "<div class='column categories'>";
 	  echo "</div>";
 	echo "</div>";//InputComponent
 	
+	try {
+	  foreach($dyn_filters as $name=>$item) {
+		echo "<div class='InputComponent'>";
+		  echo "<span class='label'>".tr($name).": </span>";
+		  $field = InputFactory::CreateField(InputFactory::SELECT, "$name", "$name", 0);
+		  $rend = $field->getRenderer();
+		  $sel = $item["select"];
+  // 		echo $sel->getSQL();
+		  $rend->setSource(ArraySelector::FromSelect($item["select"], "ia_value", "ia_value"));
+		  $rend->list_key = "ia_value";
+		  $rend->list_label = "ia_value";
+		  $rend->setFieldAttribute("onChange", "javascript:filterChanged(this, 'ia', true)");
+		  $rend->setFieldAttribute("filter_group", "ia");
+		  $field->setValue($item["value"]);
+		  
+		  $rend->renderField($field);
+		echo "</div>";//InputComponent
+	  }
+	}
+	catch (Exception $e) {
+	  echo $e;
+	}
+	
+	
 	echo "</form>";
 	
 	echo "<button class='DefaultButton' onClick='javascript:clearFilters()'>Clear Refinements</button>";
@@ -286,7 +364,7 @@ function clearFilters()
 //   console.log(uri.filename());
   document.location.href = uri.filename(); 
 }
-function filterChanged(elm, filter_name)
+function filterChanged(elm, filter_name, is_combined)
 {
   var elm = $(elm);
   
@@ -296,6 +374,10 @@ function filterChanged(elm, filter_name)
   
   console.log(name+"=>"+value);
  
+  if (is_combined) {
+	value = elm.attr("name")+":"+value;
+  }
+  
   var uri = new URI(document.location.href);
   uri.removeSearch(name);
   uri.addSearch(name, value);

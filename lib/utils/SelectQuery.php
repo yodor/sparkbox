@@ -23,6 +23,8 @@ class SelectQuery extends SQLQuery {
 		  }
 	  }
 
+	  
+	  
 	  if (strlen(trim($this->where))>0) {
 		 $sql.= " WHERE ".$this->where." ";
 	  }
@@ -57,11 +59,26 @@ class SelectQuery extends SQLQuery {
 
 	  }
 
-
 	  if (strlen(trim($other->from))>0) {
-			$csql->from.=" , ".$other->from;
+		  $check = strtolower(trim($other->from));
+		  if (strpos($check,"join")===0 || strpos($check,"left join")===0 || strpos($check,"right join")===0 || strpos($check,"inner join")===0) {
+			if (strlen(trim($csql->from))) {
+			  $csql->from.= $other->from;
+			}
+			else {
+			  $csql = $other->from;
+			}
+		  }
+		  else {
+			if (strlen(trim($csql->from))) {
+			  $csql->from.=" , ".$other->from;
+			}
+			else {
+			  $csql->from = $other->from;
+			}
+		  }
 	  }
-
+	  
 
 	  if (strlen(trim($csql->where))>0) {
 		  if (strlen(trim($other->where))>0) {

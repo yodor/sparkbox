@@ -94,10 +94,13 @@ $galleries = array();
 
 $prices = array();
 
+$attributes = array();
+
 $pos = 0;
 
 
 foreach ($sellable as $pos=>$row) {
+
 
 // 	echo $pos++;
 
@@ -105,6 +108,8 @@ foreach ($sellable as $pos=>$row) {
 	$pclrID = (int)$row["pclrID"];
 
 
+	$attributes[$row["piID"]][] = array("name"=>$row["ia_name"], "value"=>$row["ia_value"]);
+	
 	$prices[$pclrID][$row["size_value"]][$row["piID"]] = $row["sell_price"];
 	
 	$color_names[$pclrID] = $row["color"];
@@ -148,7 +153,7 @@ foreach ($sellable as $pos=>$row) {
 
 $page->beginPage();
 
-
+// var_dump($attributes);
 
 
 $sellable_variation = $sellable[0];
@@ -248,6 +253,13 @@ echo "<div class='column details'>";
 	  echo "</select>";
 	echo "</div>";
 	
+	echo "<HR>";
+	
+// 	echo "<label for='inventory_attributes'>".tr("Inventory Attributes")."</label>";
+	echo "<div class='inventory_attributes'>";
+	  
+	echo "</div>";
+	
   echo "</div>";
   
   
@@ -262,6 +274,7 @@ echo "</div>";
 <script type='text/javascript'>
 var piID = <?php echo $piID;?>;
 
+var attributes = <?php echo json_encode($attributes);?>
 
 addLoadEvent(function(){
   
