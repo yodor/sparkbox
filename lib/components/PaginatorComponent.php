@@ -153,13 +153,15 @@ function changeSort(sel)
 	{
 		$qry = $_GET;
 
-		$a=$this->paginator->getPageListStart();
+		$a = $this->paginator->getPageListStart();
 
 		if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
 		  echo tr("Page").": ";
 		}
 		
-		if ($this->paginator->havePreviousPage())
+		
+		
+		if ($this->paginator->getCurrentPage()>0)
 		{
 			$qry["page"]=0;
 			$q=queryString($qry);
@@ -170,7 +172,6 @@ function changeSort(sel)
 			echo "<a   href='$q'> << ".tr("Prev")." </a>";
 			
 		}
-
 
 		while ($a<$this->paginator->getPageListEnd())
 		{
@@ -189,8 +190,10 @@ function changeSort(sel)
 			$a++;
 		}
 
-		if ($this->paginator->haveNextPage())
+		if (($this->paginator->getCurrentPage()+1)<$this->paginator->getPagesTotal())
 		{
+// 		if ($this->paginator->haveNextPage())
+// 		{
 			$qry["page"]=($this->paginator->getCurrentPage()+1);
 			$q=queryString($qry);
 			echo "<a  href='$q'>".tr("Next")." >> </a>";

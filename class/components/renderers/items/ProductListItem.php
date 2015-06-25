@@ -84,7 +84,7 @@ class ProductListItem extends ItemRendererImpl {
 		$item_href_main = $item_href.$this->item["piID"];
 		echo "<a href='$item_href_main' class='product_link'>";
 		if ($this->photo) {
-			$img_href = $this->photo->hrefCrop(202,202);
+			$img_href = $this->photo->hrefCrop(210,210);
 			echo "<img src='$img_href'>";
 		}
 		echo "</a>";

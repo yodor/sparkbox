@@ -1,243 +1,227 @@
 <?php
+
 include_once("lib/dbdriver/DBDriver.php");
-
-class MySQLiResult  {
-
-	private static $num_res = 0;
-
-	private $result;
-
-    public function __construct(mysqli_result $result) {
-        $this->result = $result;
-		MySQLiResult::$num_res++;
-
-// echo "Num Results Created: ".MySQLiResult::$num_res;
-    }
-
-    public function __call($name, $arguments) {
-        return call_user_func_array(array($this->result, $name), $arguments);
-    }
-
-    public function __set($name, $value) {
-        $this->result->$name = $value;
-    }
-
-    public function __get($name) {
-
-
-        return $this->result->$name;
-    }
-	public function __destruct()
-	{
-
-		@$this->result->free();
-		MySQLiResult::$num_res--;
-// echo "Num Results Free: ".MySQLiResult::$num_res;
-	}
-}
 
 class MySQLiDriver extends DBDriver
 {
-	private $dbobj;
+    private $connection = NULL;
+    
+	public static $conn_count = 0;
+	
+    public function __construct(DBConnectionProperties $conn, $open_new = true, $need_persistent=false)
+    {
+     
+// 		$retry = 0;
+// 		$retry_max = 5;
+// 		$ex = NULL;
+// 		while ($retry < $retry_max) {
+// 		
+// 		  try {
+				if ($need_persistent) {
+				  $this->connection = mysqli_connect("p:".$conn->host, $conn->user, $conn->pass, $conn->database, $conn->port);
+				}
+				else {
+				  $this->connection = mysqli_connect($conn->host, $conn->user, $conn->pass, $conn->database, $conn->port);
+				}
+	
+				if (mysqli_connect_errno())
+				{
+					throw new Exception("Unable to connect to database server(".MySQLiDriver::$conn_count."): ".mysqli_connect_error());
+				}
 
-	protected function init()
-	{
-
-		//defined in config/config.php
-		global $db_name, $db_user, $db_pass, $db_host, $db_port;
-
-//  		echo "Connection parameters: <br>DB_HOST - $db_host:$db_port<br>DB_USER - $db_user<br>DP_PASS - $db_pass<br>DB_NAME - $db_name ";
-		
-		
-		$retry = true;
-		$retry_max = 3;
-		$retry_count = 0;
-
-
-		while ($retry) {
-		  try {
-
-			
-			 $dbobj = mysqli_connect($db_host, $db_user, $db_pass, $db_name, $db_port);
-
-			  if (mysqli_connect_errno()) {
-				  throw new Exception("MySQLi Connect Error (".mysqli_connect_errno().") ".mysqli_connect_error());
-			  }
-			  
-			  $dbobj->set_charset("utf8");
-			
-			
-			  $retry = false;
-
-			  $this->dbobj = $dbobj;
-		  }
-		  catch (Exception $e) {
-			if ($retry_count<$retry_max) {
-			    $retry_count++;
-				$retry = true;
-			    sleep(1);
+				mysqli_autocommit( $this->connection, false );
+				mysqli_set_charset( $this->connection , "utf8" );
 				
-			}
-			else {
-			  $retry = false;
-			  throw new Exception($e->getMessage()."<HR>".$e->getTraceAsString());
-			}  
-		  }
-		}
-		
-		
+// 				mysqli_query("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ",$this->connection);
+// 				mysqli_query("SET foreign_key_checks = 1;",$this->connection);
 
-       
-		
+			  // 	$vars = $conn->getVariables();
+			  // 	foreach($vars as $dbvar=>$phpvar) {
+			  // 	    global $$phpvar;
+			  // 	    debug("Connection  @$dbvar = ".$$phpvar);
+			  // 	    if (!mysql_query("SET @$dbvar = '".$$phpvar."';",$this->connection)) {
+			  // 		debug("Unable to set @$dbvar variable to value: ".$$phpvar);
+			  // 	    }
+			  // 	    else {
+			  // 		debug("@$dbvar variable is now set to value: ".$$phpvar);
+			  // 	    }
+			  // 	}
+			  
+			  MySQLiDriver::$conn_count++;
+			  $ex= NULL;
+// 			  break;
+// 		  }
+// 		  catch (Exception $e) {
+// 			  $retry++;
+// 			  sleep(2);
+// 			  $ex = $e;
+// 		  }
+/*		  
+		}
+		if ($ex) throw $ex;*/
+      
     }
-	
-	public function query($str, $resultmode = NULL) {
-
-		if (is_null($resultmode))$resultmode = MYSQLI_STORE_RESULT;
-		$res = $this->dbobj->query($str, $resultmode);
-		
-		if ($res instanceof mysqli_result) {
-			
-			return new MySQLiResult($res);
-			
-		}
-		
-		if ($res === TRUE ) return $res;
-
-		$this->error = $this->dbobj->error;
-		return FALSE;
-
-		
-	}
-	public function free($res) {
-		$res->free();
-	}
-
-	public function transaction() {
-		$ret = $this->dbobj->autocommit(false);
-		$this->transaction_in_progress = true;
-		register_shutdown_function(array($this, "__shutdown_check"));
-	}
-
-	public function __shutdown_check() {
-		if ($this->transaction_in_progress) {
-		  $this->rollback();
-		}
-	}
-
-	public function commit() {
-		$ret = $this->dbobj->commit();
-		$this->transaction_in_progress = false;
-	}
-
-	public function rollback() {
-		$ret = $this->dbobj->rollback();
-		$this->transaction_in_progress = false;
+    
+	public function __destruct()
+	{
+		$this->shutdown();
 	}
 	
-
-
-	public function dateTime($add_days=0, $interval_type=" DAY ")
-	{
-		
-		$res = $this->query("SELECT DATE_ADD(now(), INTERVAL $add_days $interval_type) as datetime");
-		$row = $this->fetch($res);
-		return $row["datetime"];
-	}
-	
-	public function numRows($res)
-	{
-		return $res->num_rows;
-	}
-
-	public function numFields($res)
-	{
-		return $res->field_count;
-	}
-
-	public function fieldName($res, $pos)
-	{
-		$finfo = $this->dbobj->fetch_field_direct($pos);
-		return $finfo->name;
-	}
-
-	public function fetch($res)
-	{
-
-		return $res->fetch_assoc();
-
-
-	}
-
-	public function fetchArray($res)
-	{
-		return $res->fetch_assoc();
-	}
-
-	public function fetchRow($res)
-	{
-		return $res->fetch_row();
-	}
-	
-	public function lastID()
-	{
-			return $this->dbobj->insert_id;
-	}
-	
-	public function escapeString(&$data)
-	{
-		return $this->dbobj->escape_string($data);
-	}
 	public function shutdown()
-	{
+    {
+		if (is_resource($this->connection)) mysqli_close($this->connection);
 
-		$this->dbobj->close();
+    }
+    
+    public function dateTime($add_days=0, $interval_type=" DAY ")
+    {
+	    $res = $this->query("SELECT DATE_ADD(now(), INTERVAL $add_days $interval_type) as datetime");
+	    $row = $this->fetch($res);
+	    return $row["datetime"];
+    }
+    
+    public function timestamp() 
+    {
+	    $res = $this->query("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP) as datetime");
+	    $row = $this->fetch($res);
+	    return $row["datetime"];
+    }
+    
+    public function query($str) 
+    {
+	    $res = mysqli_query($this->connection, $str);
 
+	    if (!$res) $this->error = mysqli_error($this->connection);
 
-	}
-	public function queryFields($table)
-	{
+	    return $res;
+    }
+    
+    public function numRows($res)
+    {
+	    return mysqli_num_rows($res);
+    }
+    
+    public function numFields($res)
+    {
+	    return mysqli_num_fields($res);
+    }
+    
+    public function fieldName($res,$pos)
+    {
+	    $arr =  mysqli_fetch_fields($res);
+	    return $arr[$pos];
+    }
+    
+    public function fetch($res)
+    {
+	    if (! ($res instanceof mysqli_result)) throw new Exception("No valid result  passed");
+
+	    $ret = mysqli_fetch_assoc($res) or $this->error = mysqli_error($this->connection);
+
+	    return $ret;
+    }
+    
+    public function fetchArray($res)
+    {
+		if (! ($res instanceof mysqli_result)) throw new Exception("No valid result  passed");
 		
-		return $this->query("show fields from $table");
-		
-	}
-	public function fieldType($table, $field_name)
-	{
-		  $found = false;
-		  $ret = false;
-		  $res = $this->queryFields($table);
-		  while ($row = $this->fetch($res)) {
-			  if (strcmp($row["Field"],$field_name)==0) {
-				  $ret = $row["Type"];
-				  $found=true;
-				  break;
-			  }
-		  }
-		  $res->free();
+	    $ret = mysqli_fetch_array($res) or $this->error = mysqli_error($this->connection);
 
-		  if (!$found) throw new Exception("Field $field_name does not exist in table: $table");
-		  return $ret;
-	}
-//enum('T1','TIR','CIM')
-	public static function enum2array($enum_str)
-	{
-		$enum_str = str_replace("enum(","",$enum_str);
-		$enum_str = str_replace(")","",$enum_str);
-		$enum_str = str_replace("'","",$enum_str);
+	    return $ret;
+    }
 
-		return explode(",", $enum_str);
-	}
-	public function tableExists($table)
-	{
-		$ret = FALSE;
+    public function fetchRow($res)
+    {
+	    if (! ($res instanceof mysqli_result)) throw new Exception("No valid result  passed");
 
-		$res = $this->query("show tables like '$table' ");
-		$row = $res->fetch_row();
+	    $ret = mysqli_fetch_row($res) or $this->error = mysqli_error($this->connection);
 
-		$ret = (is_array($row) && strcmp($row[0],$table)==0) ? TRUE : FALSE;
-
+	    return $ret;
+    }
+    
+    public function free($res) 
+    {
+		if ($res instanceof mysqli_result) {
+		  @mysqli_free_result($res);
+		}
+    }
+    
+    public function lastID()
+    {
+		return mysqli_insert_id($this->connection);
+    }
+    
+    public function commit()
+    {
+	    $ret = mysqli_query($this->connection, "COMMIT")  or $this->error=mysqli_error($this->connection);
+	    return $ret;
+    }
+    
+    public function rollback()
+    {
+	    $ret = mysqli_query($this->connection, "ROLLBACK") or $this->error = mysqli_error($this->connection);
 		return $ret;
-	}
+    }
+    
+    public function transaction()
+    {
+		
+	    $ret = mysqli_query($this->connection, "START TRANSACTION") or $this->error = mysqli_error($this->connection);
+		$ret = mysqli_query($this->connection, "BEGIN") or $this->error = mysqli_error($this->connection);
+		return $ret;
+    }
+    
+    public function escapeString($data)
+    {
+	    return mysqli_real_escape_string($this->connection, $data);
+    }
+
+    public function queryFields($table)
+    {
+	    return $this->query("show fields from $table");
+    }
+    
+    public function fieldType($table, $field_name)
+    {
+		$found = false;
+		$ret = false;
+		$res = $this->queryFields($table);
+		while ($row = $this->fetch($res)) {
+			if (strcmp($row["Field"],$field_name)==0) {
+				$ret = $row["Type"];
+				$found=true;
+				break;
+			}
+		}
+		$this->free($res);
+		if (!$found) throw new Exception("Field [$field_name] does not exist in table: $table");
+		return $ret;
+    }
+    //enum('T1','TIR','CIM')
+    public static function enum2array($enum_str)
+    {
+	    $enum_str = str_replace("enum(","",$enum_str);
+	    $enum_str = str_replace(")","",$enum_str);
+	    $enum_str = str_replace("'","",$enum_str);
+
+	    return explode(",", $enum_str);
+    }
+    
+    public function tableExists($table)
+    {
+	    $ret = $this->query("show tables like '$table'");
+	    $num = $this->numRows($ret);
+	    if ($num<1) return FALSE;
+	    return TRUE;
+    }
+    
+    public function fetchTotalRows()
+    {
+		$ret = $this->query("SELECT FOUND_ROWS() as total");
+		if (!$ret) throw new Exception("Unable to fecth found_rows(): ".$this->getError());
+		$row = $this->fetch($ret);
+		return $row["total"];
+    }
 }
 
 ?>

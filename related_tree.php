@@ -207,14 +207,30 @@ $price_select = new SelectQuery();
 		  $sel->fields = "  ";
 		  $sel->from = " ($derived_table) as relation  ";
 		 
-		  $value = $proc->applyFiltersOn($sel, "ia", true);
+		  $value = $proc->applyFiltersOn($sel, "ia");
 		  
 		  $sel->fields = " distinct(relation.ia_value) as ia_value ";
 		  $sel->combineSection("where", "  relation.ia_name = '$name' AND relation.ia_value > ''");
 		  $sel->order_by = " CAST(relation.ia_value AS DECIMAL(10,2)) ";
 		  
 // 		  echo $sel->getSQL()."<HR>";
-		  
+
+		  //parse value into name pairs - ia=Материал:1|Години:1
+		  if ($value) {
+			$ia_values = explode("|", $value);
+			if (count($ia_values)>0) {
+			  foreach ($ia_values as $pos=>$filter_value) {
+				  if (!$filter_value) continue;
+				  $group = explode(":", $filter_value);
+				  if (is_array($group) && count($group)==2) {
+					if (strcmp($name,$group[0])==0) {
+						$value = $group[1];
+					}
+				  }
+				  
+			  }
+			}
+		  }
 		  $dyn_filters[$name] = array("select"=>$sel, "value"=>$value);
 		}
 	  }
@@ -244,10 +260,10 @@ echo "<div class='column categories'>";
 
   echo "<BR>";
   
-  echo "<div>";
-  echo tr("Refine By");
-  echo "<HR>";
-  echo "</div>";
+//   echo "<div>";
+//   echo tr("Refine By");
+//   echo "<HR>";
+//   echo "</div>";
   
   echo "<div class='filters'>";
 	echo "<form name='filters' autocomplete='off'>";
@@ -350,6 +366,7 @@ echo "<div class='column product_list'>";
 
   $ksc->render();
   echo "<div class='clear'></div>";
+//   $view->enablePaginators(false);
   $view->render();
 
 echo "</div>";
@@ -374,8 +391,16 @@ function filterChanged(elm, filter_name, is_combined)
   
   console.log(name+"=>"+value);
  
+  
+  
   if (is_combined) {
 	value = elm.attr("name")+":"+value;
+	$("[filter_group='"+filter_name).each(function(idx){
+		var val = $(this).val();
+		if (val) {
+		  value+="|"+$(this).attr("name")+":"+val;
+		}
+	});
   }
   
   var uri = new URI(document.location.href);

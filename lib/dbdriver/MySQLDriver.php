@@ -122,11 +122,11 @@ class MySQLDriver extends DBDriver
     
     public function fetch($str)
     {
-	if (!is_resource($str)) throw new Exception("No valid resource passed");
+		if (!is_resource($str)) throw new Exception("No valid resource passed");
 
-	$ret = mysql_fetch_assoc($str) or $this->error=mysql_error($this->connection);
+		$ret = mysql_fetch_assoc($str) or $this->error=mysql_error($this->connection);
 
-	return $ret;
+		return $ret;
     }
     
     public function fetchArray($str)
@@ -147,7 +147,9 @@ class MySQLDriver extends DBDriver
 
     public function free($res) 
     {
-	return mysql_free_result($res);
+	  if (is_resource($res)) {
+		mysql_free_result($res);
+	  }
     }
     
     public function lastID()

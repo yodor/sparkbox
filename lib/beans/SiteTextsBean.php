@@ -24,10 +24,7 @@ CREATE TABLE `site_texts` (
 	{
 		$textID = -1;
 
-		
-		
 		$str = html_entity_decode(stripslashes(trim($str)));
-
 
 		$strdb = $this->db->escapeString($str);
 

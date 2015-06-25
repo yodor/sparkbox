@@ -6,13 +6,15 @@ class PaginatorSortField
   public $value;
   public $label;
   public $extended_sort_sql;
-
-  public function __construct($value, $label, $extended_sort_sql="")
+  public $order_direction;
+  
+  public function __construct($value, $label, $extended_sort_sql="", $order_direction="DESC")
   {
 
 	$this->value = $value;
 	$this->label = $label;
 	$this->extended_sort_sql = $extended_sort_sql;
+	$this->order_direction = $order_direction;
   }
 }
 
@@ -87,12 +89,12 @@ class Paginator
 	    }
 	    
 	    if (count($this->sort_fields)>0) {
-		$values = array_values($this->sort_fields);
-		$sf = array_shift($values);
-		return $sf;
+		  $values = array_values($this->sort_fields);
+		  $sf = array_shift($values);
+		  return $sf;
 	    }
 	    else {
-		return NULL;
+		  return NULL;
 	    }
 	}
 	public function getItemsPerPage()
@@ -204,15 +206,21 @@ else {
 		
 		$order_field = NULL;
 		$order_direction = $this->default_order_direction;
-
 		$orderby = $default_order;
 		
+		if (endsWith(trim($default_order), "ASC")) {
+		  $order_direction = "ASC";
+		}
+		else if (endsWith(trim($default_order), "DESC")) {
+		  $order_direction = "DESC";
+		}
+		
 		if (isset($_GET["orderby"])){
-		    $order_field = $_GET["orderby"];
+		    $order_field = DBDriver::get()->escapeString($_GET["orderby"]);
 		    $this->order_field = $order_field;
 		}
 		if (isset($_GET["orderdir"])){
-		    $order_direction = $_GET["orderdir"];
+		    $order_direction = DBDriver::get()->escapeString($_GET["orderdir"]);
 		}
 
 		if ($order_field) {
@@ -221,13 +229,13 @@ else {
 		else {
 		    $order_field = $this->getSelectedSortField();
 		    if ($order_field) {
-			if ($order_field->extended_sort_sql) {
-			    $orderby = $order_field->extended_sort_sql;
-			}
-			else {
-			    $orderby = $order_field->value." ".$order_direction;
-			    $this->order_field = $order_field->value;
-			}
+			  if ($order_field->extended_sort_sql) {
+				  $orderby = $order_field->extended_sort_sql;
+			  }
+			  else {
+				  $orderby = $order_field->value." ".$order_direction;
+				  $this->order_field = $order_field->value;
+			  }
 		    }
 		}
 		

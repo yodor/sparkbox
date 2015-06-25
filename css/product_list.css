@@ -38,8 +38,8 @@ body.products.list .ProductListItem {
   display:inline-block;
   
   outline:1px dotted gray;
-  max-width:22%;
-  width:22%;
+  max-width:25%;
+  width:25%;
   min-width:202px;
   box-sizing:border-box;
   vertical-align:top;

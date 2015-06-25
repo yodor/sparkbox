@@ -81,6 +81,7 @@ class DemoPage extends SimplePage
 
 	echo "<link rel='stylesheet' href='".SITE_ROOT."css/demo.css' type='text/css'>";
 	echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
+	echo "<link rel='stylesheet' href='".SITE_ROOT."css/mobile.css'>";
 	echo "\n";
 
     }
@@ -97,7 +98,7 @@ class DemoPage extends SimplePage
 	{
 		parent::dumpMetaTags();
 		echo "\n\n";
-		echo "<meta name='viewport' content='width=960, initial-scale=0.45'>\n";
+		echo "<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'>\n";
 		echo "\n\n";
 	}
 
@@ -114,8 +115,9 @@ class DemoPage extends SimplePage
 
 	echo "<div align=center>";
 
-	  echo "<div class='MenuBar default'>";
+	  echo "<div class='MenuBar'>";
 	  $this->menu_bar->render();
+	  echo "<a class='toggle' onClick='javascript:toggleMenu(this)'>".tr("Menu")."</a>";
 	  echo "</div>";
 	  
 	  echo "<div class=clear></div>";
@@ -142,25 +144,36 @@ class DemoPage extends SimplePage
 
 	?>
 <script type='text/javascript'>
+function toggleMenu(elm)
+{
+  if ($(".MenuBar").hasClass("normal")) {
+	$(".MenuBar").removeClass("normal");
+	var instance = $(".MenuBar .MenuBarComponent[name='DemoPage']").data("menu_instance");
+	instance.leaveAll();
+  }
+  else {
+	$(".MenuBar").addClass("normal");
+  }
+}
 addLoadEvent(function(){
 
 
-	var menu = $('.MenuBar'),
-		pos = menu.offset();
-		
-		$(window).scroll(function(){
-			if($(this).scrollTop() > pos.top+menu.height() && menu.hasClass('default')){
-// 				menu.fadeOut('fast', function(){
-// 					$(this).removeClass('default').addClass('fixed').fadeIn('fast');
-// 				});
-				menu.removeClass('default').addClass('fixed').fadeIn('fast');
-			} else if($(this).scrollTop() <= pos.top && menu.hasClass('fixed')){
-// 				menu.fadeOut('fast', function(){
-// 					$(this).removeClass('fixed').addClass('default').fadeIn('fast');
-// 				});
-				menu.removeClass('fixed').addClass('default').fadeIn('fast');
-			}
-		});
+// 	var menu = $('.MenuBar'),
+// 		pos = menu.offset();
+// 		
+// 		$(window).scroll(function(){
+// 			if($(this).scrollTop() > pos.top+menu.height() && menu.hasClass('default')){
+// // 				menu.fadeOut('fast', function(){
+// // 					$(this).removeClass('default').addClass('fixed').fadeIn('fast');
+// // 				});
+// 				menu.removeClass('default').addClass('fixed').fadeIn('fast');
+// 			} else if($(this).scrollTop() <= pos.top && menu.hasClass('fixed')){
+// // 				menu.fadeOut('fast', function(){
+// // 					$(this).removeClass('fixed').addClass('default').fadeIn('fast');
+// // 				});
+// 				menu.removeClass('fixed').addClass('default').fadeIn('fast');
+// 			}
+// 		});
 
 
 

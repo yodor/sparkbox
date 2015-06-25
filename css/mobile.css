@@ -1,0 +1,4 @@
+@import url("hdpi.css") screen and (-webkit-min-device-pixel-ratio: 2);
+@import url("ldpi.css") screen and (-webkit-min-device-pixel-ratio: 0.75);
+@import url("mdpi.css") screen and (-webkit-min-device-pixel-ratio: 1);
+@import url("hdpi.css") screen and (-webkit-min-device-pixel-ratio: 1.5);

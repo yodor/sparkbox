@@ -40,6 +40,10 @@
   border-bottom:2px solid white;
 }
 
+.MenuBarComponent .MenuBarItemRenderer .handle{
+  display:none;
+  
+}
 .SubmenuRenderer {
   display:none;
   z-index:100;

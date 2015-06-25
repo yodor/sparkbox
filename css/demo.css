@@ -1,6 +1,9 @@
 body {
   background-color:#ababab;
   margin-bottom:20px;
+  
+
+  
 /*  font-size:14px;
   font-size:1.01vw;*/
 }
@@ -16,13 +19,14 @@ body {
   margin-top:10px;
   
   background: #eee; 
-  border-radius: 10px; 
+  border-radius: 5px; 
   padding: 15px; 
 
   box-sizing:border-box;
   -moz-box-sizing:border-box;
   
-  max-width:1200px;
+  margin-top:40px;
+
   
 }
 .MenuBar {
@@ -52,6 +56,8 @@ body {
 
 .MenuBar {
 
+width: 100%;
+
 text-align: center;
 margin: 0 auto;
 padding: 0;
@@ -64,10 +70,14 @@ display:block;
 
 }
 
+.MenuBar .toggle {
+display:none;
+}
+
 
 /* CSS3 position: fixed */
 .MenuBar.fixed {
-position: fixed;
+
 
 width: 100%;
 box-shadow: 0 0 40px #222;

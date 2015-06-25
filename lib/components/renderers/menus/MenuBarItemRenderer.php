@@ -74,21 +74,27 @@ class MenuBarItemRenderer extends MenuItemRenderer
       echo "\n<a class='MenuItemLink' href='$href'  $target>";
 
       if ($this->getMenuItem()->getIcon()) {
-	  $this->renderIcon();
+		  $this->renderIcon();
       }
 
       if ($this->getMenuItem()->needTranslate()) {
-	$title = tr($title);
+		  $title = tr($title);
       }
       echo $title;
 
+      
       echo "</a>";
 
       if (count($this->item->getSubmenu())>0) {
-	  if ($this->ir_submenu){
-	      $this->ir_submenu->setMenuItem($this->item);
-	      $this->ir_submenu->render();
-	  }
+		  if ($this->ir_submenu){
+			  echo "<div class='handle'></div>";
+			  
+			  $this->ir_submenu->setMenuItem($this->item);
+			  $this->ir_submenu->render();
+			  
+			  
+		  }
+		  
       }
   }
 

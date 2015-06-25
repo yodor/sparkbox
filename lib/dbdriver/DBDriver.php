@@ -36,12 +36,8 @@ abstract class DBDriver {
 	//return default connection to database
 	public static function factory($open_new=true, $use_persistent=false, $conn_name="default")
 	{
-// 			if (self::$currDriver) return self::$currDriver;
-
 			//DBConnectionProperties
 			$conn_props = DBConnections::getConnection($conn_name);
-
-
 
 			$currDriver = false;
 			switch ($conn_props->driver)
@@ -55,10 +51,7 @@ abstract class DBDriver {
 						include_once("lib/dbdriver/MySQLDriver.php");
 						$currDriver = new MySQLDriver($conn_props, $open_new, $use_persistent);
 						break;
-				case "PGSQL":
-						include_once("lib/dbdriver/PGSQLDriver.php");
-						$currDriver = new PGSQLDriver($conn_props, $open_new, $use_persistent);
-						break;
+
 			}
 			return $currDriver;
 	}
@@ -69,7 +62,8 @@ abstract class DBDriver {
 		DBDriver::set($g_db);
 	}
 	
-	public function getError(){
+	public function getError()
+	{
 		return $this->error;
 	}
 	abstract public function lastID();
