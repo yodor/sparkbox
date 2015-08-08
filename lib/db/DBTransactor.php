@@ -201,27 +201,40 @@ class DBTransactor  {
 
   }
   
+  
   protected function processBeanTransaction(DBTableBean $bean, DBDriver $db, $editID)
   {
       debug("DBTransactor::processBeanTransaction | DBTableBean: ".get_class($bean)." | EditID: $editID");
       
-      $values = array();
+      $values = $this->mergeBeanValues($bean, $db, $editID);
       
       if ($editID>0) {
-		$values = array_merge($this->transact_values, $this->update_values);
-		
 		if (!$bean->updateRecord($editID, $values, $db)) throw new Exception("Unable to update: ".$db->getError());
 		$this->lastID = $editID;
       }
-      else {
-		$values = array_merge($this->transact_values, $this->insert_values);
-		debugArray("Merged Values: ", $values);
-		
+      else {	
 		$this->lastID = $bean->insertRecord($values, $db);
 		if ($this->lastID<1) throw new Exception("Unable to insert: ".$db->getError());
       }
       
 	  $this->values = $values;
+  }
+  protected function mergeBeanValues(DBTableBean $bean, DBDriver $db, $editID)
+  {
+	  $values = array();
+	  if ($editID>0) {
+		$values = array_merge($this->transact_values, $this->update_values);
+	  }
+	  else {
+		$values = array_merge($this->transact_values, $this->insert_values);
+	  }
+	  
+	  if (is_callable("DBTransactor_onMergeBeanValues")) {
+		  call_user_func_array("DBTransactor_onMergeBeanValues", array(&$values));
+		  
+	  }
+// 	  debugArray("Merged Values: ", $values);
+	  return $values;
   }
 }
 ?>

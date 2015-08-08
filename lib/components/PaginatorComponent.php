@@ -167,7 +167,7 @@ function changeSort(sel)
 			$q=queryString($qry);
 			echo "<a  href='$q'> < ".tr("First")." </a>";
 
-			$qry["page"]=$a-1;
+			$qry["page"]=$this->paginator->getCurrentPage()-1;
 			$q=queryString($qry);
 			echo "<a   href='$q'> << ".tr("Prev")." </a>";
 			

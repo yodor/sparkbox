@@ -144,7 +144,7 @@ if ($ipp>0) {
 		$page=0;
 		if (isset($_GET["page"]))
 		{
-			$page=$_GET["page"];
+			$page=(int)$_GET["page"];
 		}
 
 		if ($page>$total_pages)$page=$total_pages-1;
@@ -182,10 +182,10 @@ else {
   $this->show_prev=false;
   $this->show_next=false;
 }
-		$this->page = $page;
-		$this->page_list_end = $cend;
-		$this->page_list_start = $cstart;
-		$this->total_pages = $total_pages;
+		$this->page = (int)$page;
+		$this->page_list_end = (int)$cend;
+		$this->page_list_start = (int)$cstart;
+		$this->total_pages = (int)$total_pages;
 	}
 	public static function clearPageFilter(&$arr)
 	{
