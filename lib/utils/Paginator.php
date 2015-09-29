@@ -136,8 +136,11 @@ class Paginator
 		$this->total_rows = $total_rows;
 
 if ($ipp>0) {
-		$total_pages = $this->total_rows / $this->ipp;
-
+		$total_pages = (float)$this->total_rows / (float)$this->ipp;
+		
+		if ($total_pages != (int)$total_pages) {
+		  $total_pages = (int)$total_pages + 1;
+		}
 
 		$qry = $_GET;
 

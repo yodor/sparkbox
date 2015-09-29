@@ -626,7 +626,8 @@ if ($this->filter) {
 	public function childNodesWith(SelectQuery $other, $nodeID = -1)
 	{
 	    $pcsql = new SelectQuery();
-	    $pcsql->fields = " child.* ";
+// 	    $pcsql->fields = " child.* ";
+	    $pcsql->fields = " child.{$this->prkey} ";
 	    $pcsql->from = " {$this->table} AS node , {$this->table} AS child ";
 	    $pcsql->where = " (child.lft>= node.lft AND child.rgt <=node.rgt) ";
 	    if ($nodeID>0) {
@@ -639,7 +640,7 @@ if ($this->filter) {
 	public function parentNodesWith(SelectQuery $other, $nodeID = -1)
 	{
 	    $pcsql = new SelectQuery();
-	    $pcsql->fields = " parent.* ";
+	    $pcsql->fields = " parent.{$this->prkey} ";
 	    $pcsql->from = " {$this->table} AS node, {$this->table} AS parent ";
 	    $pcsql->where = " (node.lft BETWEEN parent.lft AND parent.rgt) ";
 	    if ($nodeID>0) {

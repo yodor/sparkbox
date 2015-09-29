@@ -64,6 +64,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 
 	$sqry = new SelectQuery();
 	$sqry->fields = " $related_table.* ";
+
 	$sqry->from = "  $related_table ";
 	$sqry->where = " $related_table.$source_prkey = child.$source_prkey ";
 	$sqry->group_by = " $related_table.$related_prkey ";
