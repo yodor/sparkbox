@@ -151,11 +151,61 @@ class ImageResizer
 
 	ImageResizer::$max_width=$size;
 	ImageResizer::$max_height=$size;
-	ImageResizer::autoCrop($row);
-	
+	//ImageResizer::autoCrop($row);
+	ImageResizer::thumbnailOld($row);
 	
   }
+ public static function thumbnailOld(&$row)
+  {
 
+                $size = ImageResizer::$max_width;
+                
+		@$src_img = imagecreatefromstring($row["photo"]);
+		if ($src_img===FALSE){
+			throw new Exception("Unrecognized Image File");
+		}
+
+		$width = imagesx($src_img);
+		$height = imagesy($src_img);
+
+// 		if ($width <= $size) {
+// 			$new_w = $width;
+// 			$new_h = $height;
+// 		} else {
+// 			$new_w = $size;
+// 			$new_h = abs($new_w * $aspect_ratio);
+// 		}
+		$dstx=0;
+		$dsty=0;
+
+		if ($width>$height){
+			$aspect_ratio = $width/$height;
+			$new_h = $size;
+			$new_w = abs($new_h * $aspect_ratio);
+			$dstx= ($size-$new_w)/2;
+		}
+		else {
+			$aspect_ratio = $height/$width;
+			$new_w = $size;
+			$new_h = abs($new_w * $aspect_ratio);
+		}
+
+
+		$img = imagecreatetruecolor($size,$size);
+		imagecopyresampled($img,$src_img,$dstx,$dsty,0,0,$new_w,$new_h,$width,$height);
+		imagedestroy($src_img);
+
+		ob_start();
+		if (ImageResizer::$gray_filter) {
+		  imagefilter($img, IMG_FILTER_GRAYSCALE);
+		}
+		imagejpeg($img,NULL, 95);
+		$row["photo"] = ob_get_contents();
+		$row["size"] = ob_get_length();
+		ob_end_clean();
+		imagedestroy($img);
+
+  }
     public static function autoCrop(&$row)
     {
 	ImageResizer::clampDimension();

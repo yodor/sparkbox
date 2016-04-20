@@ -84,7 +84,7 @@ class ProductListItem extends ItemRendererImpl {
 		$item_href_main = $item_href.$this->item["piID"];
 		echo "<a href='$item_href_main' class='product_link'>";
 		if ($this->photo) {
-			$img_href = $this->photo->hrefCrop(210,210);
+			$img_href = $this->photo->hrefThumb(210,210);
 			echo "<img src='$img_href'>";
 		}
 		echo "</a>";
@@ -138,7 +138,7 @@ class ProductListItem extends ItemRendererImpl {
 						echo "<div class='color_code' style='background-color:$color_code;width:48px;height:48px;' title='{$prow["color"]}'></div>";
 					  }
 					  else {
-						$href = STORAGE_HREF."?cmd=image_crop&width=48&height=48&class=$chip_class&id=$chip_id";
+						$href = STORAGE_HREF."?cmd=image_thumb&width=48&height=48&class=$chip_class&id=$chip_id";
 						
 						echo "<img src='$href' >";
 					  }

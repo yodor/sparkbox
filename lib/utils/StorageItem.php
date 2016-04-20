@@ -15,7 +15,7 @@ class StorageItem {
   }
   public function hrefThumb($width)
   {
-	  return STORAGE_HREF."?cmd=image_thumb&width=$width&height=-1&id={$this->itemID}&class={$this->itemClass}";
+	  return STORAGE_HREF."?cmd=image_thumb&width=$width&height=$width&id={$this->itemID}&class={$this->itemClass}";
   }
   public function hrefFile()
   {

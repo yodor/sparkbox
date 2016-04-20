@@ -18,7 +18,9 @@ class URLValidator implements IInputValidator
 			
 		}
 		else {
+                    if ($field->isRequired()) {
 			throw new Exception("HTTP or HTTPS :// required");
+                    }
 		}
 		
 	}

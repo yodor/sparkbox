@@ -204,7 +204,14 @@ if (isset($_GET["gray_filter"])) {
 
 		  $this->row = array();
 		  //image resizer expects row["photo"]
-		  $storage_object->deconstruct($this->row, "photo", false);
+		  $row_field = "photo";
+		  if ($storage_object instanceof ImageStorageObject) {
+                    $row_field = "photo";
+		  }
+		  else if ($storage_object instanceof FileStorageObject) {
+                    $row_field="data";
+		  }
+                  $storage_object->deconstruct($this->row, $row_field, false);
 		  
 	  
 		  $this->cache_hash.="|".$blob_field;
@@ -213,7 +220,9 @@ if (isset($_GET["gray_filter"])) {
 		  
 	  }
 	  else {
-
+                if (isset($_GET["blob_field"])) {
+                    throw new Exception("Incorrect request received");
+                }
 		  //
 
 		  

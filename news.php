@@ -110,7 +110,7 @@ function drawLatestNews($num, $selected_year=false, $selected_month=false)
     echo "<a class='item' newsID='$itemID' href='".SITE_ROOT."news.php?newsID=$itemID'>";
     
       echo "<div class='cell image'>";
-      $img_href = SITE_ROOT."storage.php?cmd=image_crop&width=48&height=48&class=NewsItemsBean&id=$itemID";
+      $img_href = SITE_ROOT."storage.php?cmd=image_thumb&width=48&height=48&class=NewsItemsBean&id=$itemID";
       echo "<div class='panel'><img src='$img_href'></div>";
       echo "</div>";
       

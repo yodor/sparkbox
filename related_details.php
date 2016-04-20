@@ -177,7 +177,7 @@ echo "<div class='column details'>";
 	  foreach ($galleries as $pclrID=>$gallery) {
 		echo "<div class='list' pclrID='$pclrID'>";
 		  foreach ($gallery as $key=>$item) {
-			$href_source = STORAGE_HREF."?cmd=image_crop&width=110&height=110";
+			$href_source = STORAGE_HREF."?cmd=image_thumb&width=110&height=110";
 			echo "<div class='item' bean='{$item["class"]}' itemID='{$item["id"]}' source='$href_source' onClick='javascript:changeImage(this)'>";
 			$href=$href_source."&class=".$item["class"]."&id=".$item["id"];
 			echo "<img src='$href' >";
@@ -208,7 +208,7 @@ echo "<div class='column details'>";
 	  foreach ($color_chips as $pclrID=>$item) {
 		$pclrID = (int)$pclrID;
 		
-		$href = STORAGE_HREF."?cmd=image_crop&width=48&height=48&class=".$item["class"]."&id=".$item["id"];
+		$href = STORAGE_HREF."?cmd=image_thumb&width=48&height=48&class=".$item["class"]."&id=".$item["id"];
 
 		$chip_colorName = $color_names[$pclrID];
 

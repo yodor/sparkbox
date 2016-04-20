@@ -1,5 +1,8 @@
-User-agent: Google
-Disallow:
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
 
 User-agent: *
-Disallow: /
+Crawl-delay: 10
