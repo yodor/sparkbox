@@ -1,4 +1,13 @@
 <?php
+function normalize($str)
+{
+    $content = htmlentities($str, null, 'utf-8');
+    $content = str_replace("&nbsp;", " ", $content);
+    $content = str_replace("\r\n", "<BR>", $content);
+    
+    $content = html_entity_decode($content);
+    return $content;
+}
 function quoteArray(&$item, $key, $user_data="")
 {
   $item = "'".$item."'";

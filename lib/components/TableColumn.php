@@ -1,6 +1,5 @@
 <?php
 include_once ("lib/components/Component.php");
-include_once ("lib/components/TableView.php");
 include_once ("lib/components/renderers/cells/TableCellRenderer.php");
 include_once ("lib/components/renderers/cells/TableHeaderCellRenderer.php");
 
