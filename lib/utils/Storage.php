@@ -13,7 +13,8 @@ class Storage
   protected $headers;
   protected $row;
   protected $blob_field = "photo";
-  protected $cache_hash = "";
+  
+  protected $etag_parts = array();
   
   //network cache
   protected $skip_cache = false;
@@ -33,7 +34,7 @@ class Storage
 
 		if (!isset($_GET["cmd"]))
 		{
-			throw new Exception("No command passed.");
+                    throw new Exception("No command passed.");
 
 		}
 		$this->cmd = $_GET["cmd"];
@@ -48,23 +49,25 @@ class Storage
 		$this->id=(int)$_GET["id"];
 		$this->className = $_GET["class"];
 
-		$this->cache_hash = $this->className."-".$this->id;
+		$this->etag_parts[] = $this->className;
+		$this->etag_parts[] = $this->id;
 
-if (isset($_GET["max-width"])) {
-  ImageResizer::$max_width=(int)$_GET["max-width"];
-}
-if (isset($_GET["max-height"])) {
-  ImageResizer::$max_height=(int)$_GET["max-height"];
-}
+		$this->etag_parts[] = $this->cmd;
+		
+		
+                if (isset($_GET["max-width"])) {
+                    ImageResizer::$max_width=(int)$_GET["max-width"];
+                }
+                if (isset($_GET["max-height"])) {
+                    ImageResizer::$max_height=(int)$_GET["max-height"];
+                }
 
 
-ImageResizer::$gray_filter=false;
-
-if (isset($_GET["gray_filter"])) {
-  ImageResizer::$gray_filter=true;
-
-  $this->cache_hash = $this->className."-".$this->id."-gray";
-}
+                ImageResizer::$gray_filter=false;
+                if (isset($_GET["gray_filter"])) {
+                    ImageResizer::$gray_filter=true;
+                    $this->etag_parts[] = "gray";
+                }
 
 
 // debug("Storage::processRequest: ".$_SERVER["REQUEST_URI"]);
@@ -83,13 +86,16 @@ if (isset($_GET["gray_filter"])) {
 			if (ImageResizer::$max_width>0 && ImageResizer::$max_height>0) {
 			    $size_w = (int)$_GET["max-width"];
 			    $size_h = (int)$_GET["max-height"];
-			    $this->cache_hash.=$size_w."-".$size_h;
+			    
+			    $this->etag_parts[] = $size_w.";".$size_h;
+			    
 			}
 
+			
 			$this->blob_field = "photo";
 			$this->loadBeanClass();
 
-			$this->checkCache($this->headers["etag"]);
+			$this->checkCache();
 			
 			if (ImageResizer::$max_width>0 && ImageResizer::$max_height>0) {
 			  ImageResizer::autoCrop($this->row);
@@ -100,16 +106,17 @@ if (isset($_GET["gray_filter"])) {
 			if (!isset($_GET["width"]) || !isset($_GET["height"])) throw new Exception("Width parameter missing");
 			$size_w = (int)$_GET["width"];
 			$size_h = (int)$_GET["height"];
-			// $this->skip_cache=true;
-			$this->cache_hash.=$size_w."-".$size_h;
-			$this->blob_field = "photo";
-			$this->loadBeanClass();
-			
-                        $this->checkCache($this->headers["etag"]);
-			
 			ImageResizer::$max_width = $size_w;
 			ImageResizer::$max_height = $size_h;
 			
+			// $this->skip_cache=true;
+			$this->etag_parts[] = $size_w.";".$size_h;
+
+			$this->blob_field = "photo";
+			$this->loadBeanClass();
+			
+                        $this->checkCache();
+
 			ImageResizer::crop($this->row);
 		}
 		else if (strcmp($this->cmd, "image_thumb")==0) {
@@ -123,13 +130,13 @@ if (isset($_GET["gray_filter"])) {
 			  $size = (int)$_GET["size"];
 			}
 			if ($size<1) throw new Exception("Width/Size parameter missing");
-			$this->cache_hash.="-".$size;
+			$this->etag_parts[] = $size;
 
 			$this->blob_field = "photo";
 
 			$this->loadBeanClass();
 
-			$this->checkCache($this->headers["etag"]);
+			$this->checkCache();
 			
 			ImageResizer::thumbnail($this->row, $size);
 		}
@@ -188,6 +195,7 @@ if (isset($_GET["gray_filter"])) {
                 $blob_field = $_GET["bean_field"];
 	  }
 	 
+          
 	  
 	  $stypes = $this->bean->getStorageTypes();
 
@@ -200,6 +208,7 @@ if (isset($_GET["gray_filter"])) {
 	  }
 	  
 
+	  $this->etag_parts[] = $blob_field;
 	  
 	  
 	  $storage_object = @unserialize($this->row[$blob_field]);
@@ -219,7 +228,7 @@ if (isset($_GET["gray_filter"])) {
                   $storage_object->deconstruct($this->row, $row_field, false);
 		  
 	  
-		  $this->cache_hash.="|".$blob_field;
+		  
 		  
 		  
 		  
@@ -246,19 +255,13 @@ if (isset($_GET["gray_filter"])) {
 		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
 	  }
 
+	  $this->headers["etag"]=md5(implode("|", $this->etag_parts)."-".$last_modified);
 	  //always keep one year ahead from request time
-	  $expire = gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
-
-	  $etag = md5($this->cache_hash."-".$last_modified);
-
-
-	  $this->headers["etag"]=$etag;
-	  $this->headers["expire"]=$expire;
+	  $this->headers["expire"]=gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
 	  $this->headers["last_modified"]=$last_modified;
-	  
-          
-          
+
   }
+
   protected function checkPermissions()
   {
 
@@ -277,11 +280,15 @@ if (isset($_GET["gray_filter"])) {
 	  if (!$auth->checkAuthState(true)) throw new Exception("This resource is protected. Please login first.");
 
   }
-  protected function checkCache($etag)
+  protected function checkCache()
   {
 
+        $etag = $this->headers["etag"];
+        
         if ($this->skip_cache) return false;
 
+        if (strlen($etag)<1) return false;
+        
         // error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
 
         // check if the last modified date sent by the client is the the same as
@@ -328,6 +335,7 @@ if (isset($_GET["gray_filter"])) {
         }
 
         
+        //current etag is different from request etag
         //check disk cache - skip server side image resizing 
         $cache_folder = $this->getCacheFolder();  //"../spark_cache/{$this->className}/{$this->id}/"; //etag.bin
         if (!file_exists($cache_folder)) {
@@ -344,7 +352,7 @@ if (isset($_GET["gray_filter"])) {
         fclose($handle);
 
         $this->row["size"] = filesize($cache_file);
-        $this->sendResponse(true);
+        $this->sendResponse(true);//response is from cache
         //exit
         
         return false;
@@ -353,12 +361,16 @@ if (isset($_GET["gray_filter"])) {
   
   protected function getCacheFolder()
   {
+        if (strlen($this->className)<1 || strlen($this->id)<1) throw new Exception("Empty className or ID");
         return "../spark_cache/".$this->className."/".$this->id."/";
   }
   
   protected function getCacheFile()
   {
-        return $this->headers["etag"].".bin";
+        $etag = $this->headers["etag"];
+        if (strlen($etag)<1) throw new Exception("Empty etag header");
+        
+        return $etag.".bin";
   }
   
   protected function sendResponse($is_cache_data=false)
@@ -405,7 +417,10 @@ if (isset($_GET["gray_filter"])) {
             fclose($handle);
 
         }
+        else {
         
+            header("X-Tag: disc_cache");
+        }
         print($this->row[$this->blob_field]);
 
         exit;
