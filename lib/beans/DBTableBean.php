@@ -336,6 +336,9 @@ abstract class DBTableBean implements IDataBean
 		}
 
 		if ($docommit) $db->commit();
+		
+		$this->manageCache($id);
+		
 		return $res;
     }
 	
@@ -366,6 +369,8 @@ abstract class DBTableBean implements IDataBean
 		
 		if ($docommit) $db->commit();
 
+		$this->manageCache($refval);
+		
 		return $res;
     }
 
@@ -467,6 +472,8 @@ abstract class DBTableBean implements IDataBean
 
 		if ($docommit) $db->commit();
 
+		$this->manageCache($last_insert);
+		
 		return $last_insert;
     }
 	
@@ -498,10 +505,16 @@ abstract class DBTableBean implements IDataBean
 		}
 
 		if ($docommit) $db->commit();
+		
+		$this->manageCache($id);
 
 		return $id;
     }
-	
+    protected function manageCache($id)
+    {
+        $cache_file = "../spark_cache/".get_class($this)."/".$id;
+        deleteDir($cache_file);
+    }
     protected function prepareValues(&$row, &$values, $for_update)
     {
 		$keys = array();

@@ -14,7 +14,10 @@ class Storage
   protected $row;
   protected $blob_field = "photo";
   protected $cache_hash = "";
+  
+  //network cache
   protected $skip_cache = false;
+  
   protected $disposition = "inline";
   protected $gray_filter = false;
   protected $use_storage = false;
@@ -86,6 +89,8 @@ if (isset($_GET["gray_filter"])) {
 			$this->blob_field = "photo";
 			$this->loadBeanClass();
 
+			$this->checkCache($this->headers["etag"]);
+			
 			if (ImageResizer::$max_width>0 && ImageResizer::$max_height>0) {
 			  ImageResizer::autoCrop($this->row);
 			  debug("Storage::gallery_photo: ID:{$this->id} Fit Rectangle: ".$size_w."x".$size_h);
@@ -98,9 +103,10 @@ if (isset($_GET["gray_filter"])) {
 			// $this->skip_cache=true;
 			$this->cache_hash.=$size_w."-".$size_h;
 			$this->blob_field = "photo";
-
 			$this->loadBeanClass();
-
+			
+                        $this->checkCache($this->headers["etag"]);
+			
 			ImageResizer::$max_width = $size_w;
 			ImageResizer::$max_height = $size_h;
 			
@@ -123,6 +129,8 @@ if (isset($_GET["gray_filter"])) {
 
 			$this->loadBeanClass();
 
+			$this->checkCache($this->headers["etag"]);
+			
 			ImageResizer::thumbnail($this->row, $size);
 		}
 		
@@ -164,23 +172,20 @@ if (isset($_GET["gray_filter"])) {
 
 	  }
 	  else {
-			$this->row = $this->bean->getByID($this->id);
+		$this->row = $this->bean->getByID($this->id);
 	  }
 	  
 	  
 	  $this->checkPermissions();
 
-	  $this->checkCache();
 
 	  $blob_field = $this->blob_field;
 
 	  if (isset($_GET["blob_field"])) {
-		  $blob_field = $_GET["blob_field"];
-
+                $blob_field = $_GET["blob_field"];
 	  }
 	  else if (isset($_GET["bean_field"])) {
-		  $blob_field = $_GET["bean_field"];
-
+                $blob_field = $_GET["bean_field"];
 	  }
 	 
 	  
@@ -216,20 +221,43 @@ if (isset($_GET["gray_filter"])) {
 	  
 		  $this->cache_hash.="|".$blob_field;
 		  
-		  $this->checkCache();
+		  
 		  
 	  }
 	  else {
-                if (isset($_GET["blob_field"])) {
-                    throw new Exception("Incorrect request received");
+                
+                //request received using blob_field but object is not of type storage object.
+                if (isset($_GET["blob_field"]) || isset($_GET["bean_field"])) {
+                    throw new Exception("Incorrect request received. Source data type is not StorageObject.");
                 }
-		  //
+                //continue as object is tranacted to db as dbrow
 
 		  
 	  }
 
+	  // set headers and etag
+	  
+	  $last_modified = gmdate("D, d M Y H:i:s T");
+
+	  if (isset($this->row["date_upload"])) {
+		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_upload"]));
+	  }
+	  else if (isset($this->row["date_updated"])) {
+		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
+	  }
+
+	  //always keep one year ahead from request time
+	  $expire = gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
+
+	  $etag = md5($this->cache_hash."-".$last_modified);
 
 
+	  $this->headers["etag"]=$etag;
+	  $this->headers["expire"]=$expire;
+	  $this->headers["last_modified"]=$last_modified;
+	  
+          
+          
   }
   protected function checkPermissions()
   {
@@ -249,129 +277,139 @@ if (isset($_GET["gray_filter"])) {
 	  if (!$auth->checkAuthState(true)) throw new Exception("This resource is protected. Please login first.");
 
   }
-  protected function checkCache()
+  protected function checkCache($etag)
   {
 
- 	  $last_modified = gmdate("D, d M Y H:i:s T");
+        if ($this->skip_cache) return false;
 
+        // error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
 
-// 	  header("Storage-Date: now");
+        // check if the last modified date sent by the client is the the same as
+        // the last modified date of the requested file. If so, return 304 header
+        // and exit.
+        // check if the Etag sent by the client is the same as the Etag of the
+        // requested file. If so, return 304 header and exit.
+
+        $send_cache = false;
+
+//         if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+//         {
+//             //error_log("Storage::checkCache HTTP_IF_MODIFIED_SINCE: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
+// 
+//             if (strcmp($_SERVER['HTTP_IF_MODIFIED_SINCE'],$last_modified)==0)
+//             {
+//                     $send_cache = true;
+//             }
+//             else {
+//                     $send_cache = false;
+//             }
+//         }
+        
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
+        {
+            //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
+            $pos = (int)strpos($_SERVER['HTTP_IF_NONE_MATCH'], $etag);
+            if ($pos>0)
+            {
+                $send_cache = true;
+            }
+            
+        }
+
+        if ($send_cache) {
+            //cache response headers - use current datetime
+            $last_modified = gmdate("D, d M Y H:i:s T");
+            header("HTTP/1.1 304 Not Modified");
+            header("Last-Modified: $last_modified");
+            header("Cache-Control: no-cache, must-revalidate");
+            //header("Pragma: ".$this->headers["etag"]);
+            //header("ETag: $etag");
+            exit;
+        }
+
+        
+        //check disk cache - skip server side image resizing 
+        $cache_folder = $this->getCacheFolder();  //"../spark_cache/{$this->className}/{$this->id}/"; //etag.bin
+        if (!file_exists($cache_folder)) {
+            return false;
+        }
+        $cache_file = $cache_folder."/".$this->getCacheFile();    
+        if (!file_exists($cache_file)) {
+            return false;
+        }
+        $handle = fopen($cache_file,'r');
+        flock($handle, LOCK_SH);
+        $this->row[$this->blob_field] = file_get_contents($cache_file);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+
+        $this->row["size"] = filesize($cache_file);
+        $this->sendResponse(true);
+        //exit
+        
+        return false;
 	  
-	  if (isset($this->row["date_upload"])) {
-		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_upload"]));
-// 		header("Storage-Date: date_upload");
-	  }
-	  else if (isset($this->row["date_updated"])) {
-		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
-// 		header("Storage-Date: date_updated");
-	  }
-// 	  else if (isset($this->row["item_date"])) {
-// 		$last_modified = date("D, d M Y H:i:s T", strtotime($this->row["item_date"]));
-// 	  }
-
-
-
-	  //always keep one year ahead from request time
-	  $expire = gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
-
-	  $etag = md5($this->cache_hash."-".$last_modified);
-
-
-// 	  error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
-
-	  // check if the last modified date sent by the client is the the same as
-	  // the last modified date of the requested file. If so, return 304 header
-	  // and exit.
-	  // check if the Etag sent by the client is the same as the Etag of the
-	  // requested file. If so, return 304 header and exit.
-	  if (!$this->skip_cache) {
-
-
-
-		
-		$send_cache = false;
-		
-		if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
-		{
-// 			error_log("Storage::checkCache HTTP_IF_MODIFIED_SINCE: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
-
-			if (strcmp($_SERVER['HTTP_IF_MODIFIED_SINCE'],$last_modified)==0)
-			{
-				$send_cache = true;
-			}
-			else {
-				$send_cache = false;
-			}
-		}
-// 		if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
-// 		{
-// 
-// // 			error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
-// 
-// 			if (strcmp(str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])),$etag)==0)
-// 			{
-// 				$send_cache = true;
-// 			}
-// 			else {
-// 				$send_cache = false;
-// 			}
-// 		}
-		
-		if ($send_cache) {
-				
-				
-				
-				header("HTTP/1.1 304 Not Modified");
-				header("Last-Modified: $last_modified");
-				header("Cache-Control: no-cache, must-revalidate");
-// 				header("Pragma: ".$this->headers["etag"]);
-
-				
-// 				header("ETag: $etag");
-
-				exit;
-		}
-	  }
-
-	  $this->headers["etag"]=$etag;
-	  $this->headers["expire"]=$expire;
-	  $this->headers["last_modified"]=$last_modified;
-	  return false;
   }
-  protected function sendResponse()
+  
+  protected function getCacheFolder()
+  {
+        return "../spark_cache/".$this->className."/".$this->id."/";
+  }
+  
+  protected function getCacheFile()
+  {
+        return $this->headers["etag"].".bin";
+  }
+  
+  protected function sendResponse($is_cache_data=false)
   {
 
-	  $mime = "application/octetsream";
-	  if (isset($this->row["mime"])) {
-		  $mime = $this->row["mime"];
+        $mime = "application/octetsream";
+        if (isset($this->row["mime"])) {
+            $mime = $this->row["mime"];
+        }
 
-	  }
+        header("Content-Type: $mime");
+        header("Last-Modified: ".$this->headers["last_modified"]);
+        header("ETag: \"".$this->headers["etag"]."\"");
 
-	  header("Content-Type: $mime");
-	  header("Last-Modified: ".$this->headers["last_modified"]);
-	  header("ETag: '".$this->headers["etag"]."'");
+        header("Cache-Control: no-cache, must-revalidate");
+        //header("Pragma: ".$this->headers["etag"]);
 
+        header("Expires: ".$this->headers["expire"]);
+        header("Content-Length: " . $this->row["size"]);
 
-	  header("Cache-Control: no-cache, must-revalidate");
-	  header("Pragma: ".$this->headers["etag"]);
+        $filename = $this->headers["etag"];
+        if (isset($this->row["filename"])) {
+            $filename = $this->row["filename"];
+        }
 
-	  header("Expires: ".$this->headers["expire"]);
-	  header("Content-Length: " . $this->row["size"]);
+        if (strcmp($this->disposition,"attachment")==0) {
+            header("Content-Disposition: ".$this->disposition."; filename=$filename");
+        }
+        header("Content-Transfer-Encoding: binary");
 
-	  $filename = $this->headers["etag"];
-	  if (isset($this->row["filename"])) {
-		  $filename = $this->row["filename"];
-	  }
+        if (!$is_cache_data) {
+                    
+            $cache_folder = $this->getCacheFolder();  
+            if (!file_exists($cache_folder)) {
+                mkdir($cache_folder, 0777, true);
+            }
+            
+            $cache_file = $cache_folder."/".$this->getCacheFile();
+            $handle = fopen($cache_file,'c');
+            flock($handle, LOCK_EX);
+            ftruncate($handle, 0);
+            file_put_contents($cache_file, $this->row[$this->blob_field]);
+            flock($handle, LOCK_UN);
+            fclose($handle);
 
-	if (strcmp($this->disposition,"attachment")==0) {
-	  header("Content-Disposition: ".$this->disposition."; filename=$filename");
-	}
-	  header("Content-Transfer-Encoding: binary");
+        }
+        
+        print($this->row[$this->blob_field]);
 
-
-	  print($this->row[$this->blob_field]);
-
-	  exit;
+        exit;
+        
   }
   protected function sendError(Exception $e)
   {
