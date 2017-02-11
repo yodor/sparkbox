@@ -308,8 +308,8 @@ if (isset($_GET["gray_filter"])) {
         if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
         {
             //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
-            $pos = (int)strpos($_SERVER['HTTP_IF_NONE_MATCH'], $etag);
-            if ($pos>0)
+            $pos = strpos($_SERVER['HTTP_IF_NONE_MATCH'], $etag);
+            if ($pos!==FALSE)
             {
                 $send_cache = true;
             }
