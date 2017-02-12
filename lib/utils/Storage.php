@@ -362,7 +362,7 @@ class Storage
   protected function getCacheFolder()
   {
         if (strlen($this->className)<1 || strlen($this->id)<1) throw new Exception("Empty className or ID");
-        return "../spark_cache/".$this->className."/".$this->id."/";
+        return CACHE_ROOT."/".$this->className."/".$this->id."/";
   }
   
   protected function getCacheFile()

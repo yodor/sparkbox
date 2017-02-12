@@ -20,6 +20,8 @@ $lib_root = str_replace($install_path, "", $lib_path);
 define("LIB_ROOT", $lib_root."/");
 
 
+define("CACHE_ROOT", realpath($install_path."/../spark_cache/"));
+
 
 ini_set("include_path",".".PATH_SEPARATOR.INSTALL_PATH);
 if (isset($local_include_path)) {

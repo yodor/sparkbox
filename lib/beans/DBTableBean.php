@@ -512,7 +512,7 @@ abstract class DBTableBean implements IDataBean
     }
     protected function manageCache($id)
     {
-        $cache_file = "../spark_cache/".get_class($this)."/".$id;
+        $cache_file = CACHE_ROOT."/".get_class($this)."/".$id;
         deleteDir($cache_file);
     }
     protected function prepareValues(&$row, &$values, $for_update)
