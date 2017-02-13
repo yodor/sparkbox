@@ -513,7 +513,13 @@ abstract class DBTableBean implements IDataBean
     protected function manageCache($id)
     {
         $cache_file = CACHE_ROOT."/".get_class($this)."/".$id;
-        deleteDir($cache_file);
+        if (!is_dir($cache_file)) return;
+        try {
+            @deleteDir($cache_file);
+        }
+        catch (Exception $e) {
+            //
+        }
     }
     protected function prepareValues(&$row, &$values, $for_update)
     {
