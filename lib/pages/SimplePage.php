@@ -177,8 +177,12 @@ var right = "<?php echo $right;?>";
 <?php
 
 
+
 		echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/jquery-1.8.0.min.js'></script>";
 		echo "\n";
+
+// 		echo "<script type='text/javascript' src='http://code.jquery.com/jquery-1.8.3.min.js'></script>";
+// 		echo "\n";
 
 		echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/utils.js'></script>";
 		echo "\n";

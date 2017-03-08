@@ -74,10 +74,21 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
 	$mime = $value_current->getMIME();
 	
 	$uid = $value_current->getUID();
-	  
+        
+        
+        
+        
+        $row["photo"] = $value_current->getData();
+        ImageResizer::$max_width = 64;
+        ImageResizer::$max_height = -1;
+        ImageResizer::autoCrop($row);
+        
+        
 	ob_start();
 	if ($value_current instanceof ImageStorageObject) {
-	  $image_data = "data:$mime;base64,".base64_encode($value_current->getData());
+	  $image_data = "data:$mime;base64,".base64_encode($row["photo"]);
+	  unset($row["photo"]);
+	  
 	  $itemID = $value_current->itemID;
 	  $itemClass = $value_current->itemClass;
 	  echo "<div class='Element' tooltip='$filename' itemID='$itemID' itemClass='$itemClass'>";

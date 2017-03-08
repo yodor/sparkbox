@@ -11,7 +11,7 @@
 // $full_url  = "${protocol}://${domain}${disp_port}${base_url}"; # Ex: 'http://example.com', 'https://example.com/mywebsite', etc.
 
 if (!isset($install_path)) {
-  $install_path = realpath(__DIR__."/../../");
+  $install_path = realpath(__DIR__."../../");
 }
 
 //app/site deployment (server path)

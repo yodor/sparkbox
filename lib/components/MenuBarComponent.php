@@ -25,7 +25,8 @@ class MenuBarComponent extends Component implements IHeadRenderer
 	}
 	public function renderStyle()
 	{
-	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/MenuBarComponent.css' type='text/css' >";
+            //append dump query string to the href to force reload of file ex. MenuBarComponent.css?ver=1.1
+	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/MenuBarComponent.css' type='text/css' >"; 
 	    echo "\n";
 
 	}
