@@ -77,17 +77,18 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
         
         
         
-        
+        $row = array();
         $row["photo"] = $value_current->getData();
         ImageResizer::$max_width = 64;
         ImageResizer::$max_height = -1;
         ImageResizer::autoCrop($row);
         
+        gc_collect_cycles();
         
 	ob_start();
 	if ($value_current instanceof ImageStorageObject) {
 	  $image_data = "data:$mime;base64,".base64_encode($row["photo"]);
-	  unset($row["photo"]);
+	  unset($row);
 	  
 	  $itemID = $value_current->itemID;
 	  $itemClass = $value_current->itemClass;
@@ -111,7 +112,7 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
 	  echo "</div>";
 	}
 	$html = ob_get_contents();
-
+        
 	ob_end_clean();
 
 	return array(

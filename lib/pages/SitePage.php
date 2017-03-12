@@ -9,6 +9,8 @@ abstract class SitePage
 	  return self::$instance;
 	}
 
+	protected $page_class = "";
+	
 	public function __construct()
 	{
 	    self::$instance =  $this;
@@ -100,11 +102,17 @@ abstract class SitePage
 	public abstract function finishPage();
 
 
+	public function setPageClass($cls)
+	{
+            $this->page_class = $cls;
+	}
 	public function getPageClass()
 	{
-	  $sname = str_replace(".php","",basename($_SERVER["SCRIPT_NAME"]));
-	  $pname = basename(dirname($_SERVER["SCRIPT_NAME"]));
-	  return get_class($this)." ".$pname." ".$sname;
+            if ($this->page_class) return $this->page_class;
+            
+            $sname = str_replace(".php","",basename($_SERVER["SCRIPT_NAME"]));
+            $pname = basename(dirname($_SERVER["SCRIPT_NAME"]));
+            return get_class($this)." ".$pname." ".$sname;
 	}
 
 }
