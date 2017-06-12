@@ -87,7 +87,9 @@ $defines->set("TRANSLATOR_ENABLED", FALSE);
 $defines->set("DB_ENABLED", FALSE);
 
 $defines->set("DEFAULT_LANGUAGE", "english");
-$defines->set("DEFAULT_CURRENCY", "USD");
+$defines->set("DEFAULT_LANGUAGE_ISO3", "eng");
+
+$defines->set("DEFAULT_CURRENCY", "EUR");
 
 
 include_once("config/defaults.php");

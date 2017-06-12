@@ -267,7 +267,7 @@ class InputForm {
 	    foreach ($this->fields as $field_name=>$field) {
 	      echo "<field>";
 		echo "<name>$field_name</name>";
-		echo "<value>".$field->getValue()."</value>";
+		echo "<value><![CDATA[".$field->getValue()."]]></value>";
 	      echo "</field>";
 	    }
 	    echo "</fields>";
@@ -276,10 +276,14 @@ class InputForm {
 	    ob_end_clean();
 	    return $xml;
 	}
+	
 	public function unserializeXML($xml_string)
 	{
-	    $inputform = @simplexml_load_string($xml_string);
-	    if (!$inputform) throw new Exception("Unable to parse input as XML");
+            ob_start();
+	    $inputform = simplexml_load_string($xml_string);
+	    $err = ob_get_contents();
+	    ob_end_clean();
+	    if (!$inputform) throw new Exception("Unable to parse input as XML: [$err]");
 	    
 	    foreach ($inputform->fields->field as $field) {
 		$name = (string)$field->name;
@@ -292,6 +296,7 @@ class InputForm {
 
 	    
 	}
+	
 	public function dumpErrors()
 	{
 		foreach ($this->fields as $field_name=>$field) {
