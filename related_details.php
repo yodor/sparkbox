@@ -123,7 +123,7 @@ foreach ($sellable as $pos=>$row) {
 		if (!$res) throw new Exception("Unable to query color gallery: ".$db->getError());
 		if ($db->numRows($res)<1) $use_photos = true;
 		while ($grow = $db->fetch($res)) {
-		  $item = array("id"=>$grow["pclrpID"], "class"=>ProductColorPhotosBean::class);
+		  $item = array("id"=>$grow["pclrpID"], "class"=>"ProductColorPhotosBean");
 		  $galleries[$pclrID][] = $item;
 		}
 		$db->free($res);
@@ -134,17 +134,19 @@ foreach ($sellable as $pos=>$row) {
 		$res = $db->query("SELECT ppID FROM product_photos WHERE prodID=$prodID ORDER BY position ASC");
 		if (!$res) throw new Exception("Unable to query product gallery: ".$db->getError());
 		while ($grow = $db->fetch($res)) {
-		  $item = array("id"=>$grow["ppID"], "class"=>ProductPhotosBean::class);
+		  $item = array("id"=>$grow["ppID"], "class"=>"ProductPhotosBean");
 		  $galleries[$pclrID][] = $item;
 		}
 		$db->free($res);
 	  }
 	}
 	
-	$color_chips[$pclrID] = $galleries[$pclrID][0];
-	if ($row["have_chip"]) {
-	  $item = array("id"=>$pclrID, "class"=>ProductColorPhotosBean::class."&bean_field=color_photo");
-	  $color_chips[$pclrID] = $item;
+	if (isset($galleries[$pclrID][0])) {
+            $color_chips[$pclrID] = $galleries[$pclrID][0];
+            if ($row["have_chip"]) {
+            $item = array("id"=>$pclrID, "class"=>"ProductColorPhotosBean&bean_field=color_photo");
+            $color_chips[$pclrID] = $item;
+            }
 	}
 	
 }
@@ -199,17 +201,30 @@ echo "<div class='column details'>";
 	
 	echo "<HR>";
 	
+	$chooser_visibility = "";
 	
+	if ($pclrID == 0 && count($color_names)==1) {
+            //no colors setup
+            $chooser_visibility = "style='display:none'";
+	}
 	
-	
-	echo "<div class='colors_panel'>";
+	echo "<div class='colors_panel' $chooser_visibility>";
 	  echo tr("Color").":<span class='current_color'></span>";
 	  echo "<div class='color_chooser'>";
+	  
+	  if (count($color_chips)<1) {
+            foreach($color_names as $pclrID=>$color_name) {
+                $color_chips[$pclrID] = array("id"=>$pclrID);
+            }
+            
+	  }
 	  foreach ($color_chips as $pclrID=>$item) {
 		$pclrID = (int)$pclrID;
 		
-		$href = STORAGE_HREF."?cmd=image_thumb&width=48&height=48&class=".$item["class"]."&id=".$item["id"];
-
+		if (isset($item["class"])) {
+                    $href = STORAGE_HREF."?cmd=image_thumb&width=48&height=48&class=".$item["class"]."&id=".$item["id"];
+                }
+                
 		$chip_colorName = $color_names[$pclrID];
 
 		$sizes = $prices[$pclrID];
@@ -230,15 +245,23 @@ echo "<div class='column details'>";
 		echo "<div class='color_button' pclrID='$pclrID' piID='$cpiID' size_values='$size_values' sell_prices='$sell_prices' pids='$pids' color_name='$chip_colorName'
 				   onClick='javascript:changeColor($pclrID)' title='$chip_colorName'>";
 	   			
+                        if (isset($href)) {
+                             echo "<img src='$href' >";
+                        }
+                        else {
+                            
+                            echo "<span class='simple_color'>$chip_colorName</span>";
+                        }
 // 			if ($chip_colorCode) {
 // 			  echo "<div class='color_code' style='display:block;background-color:$chip_colorCode;width:48px;height:48px;'></div>";
 // 			}
 // 			else {
-			  echo "<img src='$href' >";
+			 
 // 			}
 			
 		echo "</div>";
 	  }
+
 	  echo "</div>";//color_chooser
 	echo "</div>";//colors_panel
 	
@@ -280,10 +303,14 @@ addLoadEvent(function(){
   
 //   var first_color = $(".color_chooser .color_button").first();
 //   changeColor(first_color.attr("pclrID"));
-  var pclrID = $(".color_chooser .color_button[piID='"+piID+"']").attr("pclrID");
-//   console.log(piID+"=>"+pclrID);
 
-  changeColor(pclrID);
+    var firstColorButton = $(".color_chooser .color_button[piID='"+piID+"']");
+    if (firstColorButton) {
+        var pclrID = firstColorButton.attr("pclrID");
+        changeColor(pclrID);
+        //   console.log(piID+"=>"+pclrID);
+    }
+  
 
   
 });

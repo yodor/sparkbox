@@ -17,6 +17,7 @@ class MySQLiDriver extends DBDriver
 // 		while ($retry < $retry_max) {
 // 		
 // 		  try {
+                                // in php 5.3 and up only
 				if ($need_persistent) {
 				  $this->connection = mysqli_connect("p:".$conn->host, $conn->user, $conn->pass, $conn->database, $conn->port);
 				}

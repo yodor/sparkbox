@@ -1,7 +1,7 @@
 <?php
 include_once("session.php");
 include_once("class/pages/AdminPage.php");
-include_once("class/beans/AttributesBean.php");
+include_once("class/beans/BrandsBean.php");
 include_once("lib/components/TableView.php");
 
 $menu=array(
@@ -13,25 +13,26 @@ $page->checkAccess(ROLE_CONTENT_MENU);
 
 $action_add = new Action("", "add.php", array());
 $action_add->setAttribute("action", "add");
-$action_add->setAttribute("title", "Add Attribute");
+$action_add->setAttribute("title", "Add Brand");
 $page->addAction($action_add);
 
 
 
-$bean = new AttributesBean();
+$bean = new BrandsBean();
 
 $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
 $view = new TableView(new BeanResultIterator($bean));
-$view->setCaption("Store Attributes List");
-$view->setDefaultOrder(" name ASC ");
+$view->setCaption("Brands List");
+$view->setDefaultOrder(" brand_name ASC ");
 
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
-$view->addColumn(new TableColumn("name","Name"));
-$view->addColumn(new TableColumn("unit","Unit"));
-$view->addColumn(new TableColumn("type","Type"));
+$view->addColumn(new TableColumn("brand_name","Name"));
+$view->addColumn(new TableColumn("summary","Summary"));
+$view->addColumn(new TableColumn("url","URL"));
+
 
 $view->addColumn(new TableColumn("actions","Actions"));
 
@@ -47,7 +48,7 @@ $act->addAction( $h_delete->createAction() );
 
 $view->getColumn("actions")->setCellRenderer($act);
 
-Session::set("attributes.list", $page->getPageURL());
+Session::set("brands.list", $page->getPageURL());
 
 $page->beginPage($menu);
 $page->renderPageCaption();

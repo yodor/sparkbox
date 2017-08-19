@@ -77,7 +77,12 @@ class ActionRenderer extends Component implements IHeadRenderer
 	}
 	else {
 	  $this->appendAttributes($this->action->getAttributes());
-	  $this->setAttribute("href", $this->action->getHref($this->result_row));
+	  if ($this->result_row) {
+            $this->setAttribute("href", $this->action->getHref($this->result_row));
+	  }
+	  else {
+            $this->setAttribute("href", $this->action->getHrefClean());
+	  }
 	  $attrs = $this->prepareAttributes();
 	  echo "<a $attrs>";
 	}

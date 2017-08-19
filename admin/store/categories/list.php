@@ -43,6 +43,7 @@ $tv->setName("ProductCategores");
 $tv->setItemRenderer($ir);
 
 
+Session::set("categories.list", $page->getPageURL());
 
 $page->beginPage($menu);
 $page->renderPageCaption();

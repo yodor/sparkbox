@@ -19,6 +19,11 @@ $menu=array(
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
+$action_back = new Action("", Session::get("color_scheme.photos"), array());
+$action_back->setAttribute("action", "back");
+$action_back->setAttribute("title", "Back to Color Scheme Photos");
+$page->addAction($action_back);
+
 $photos = new ProductColorPhotosBean();
 $photos->setFilter("$ref_key='$ref_id'");
 
@@ -32,6 +37,8 @@ $view->getTransactor()->appendValue($ref_key, $ref_id);
 $view->processInput();
 
 $page->beginPage($menu);
+
+$page->renderPageCaption();
 
 $view->render();
 

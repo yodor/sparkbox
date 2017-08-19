@@ -11,6 +11,17 @@ abstract class DataSourceItem extends Component implements IDataSourceItem
     protected $id = "";
     protected $name = "";
     protected $key_name = "";
+    //render html attributes from data_row
+    protected $data_row_attributes = array();
+    
+    public function addDataRowAttribute($name)
+    {
+        $this->data_row_attributes[] = $name;
+    }
+    public function getDataRowAttributes()
+    {
+        return $this->data_row_attributes;
+    }
     
     public function setIndex($index)
     {
@@ -23,6 +34,11 @@ abstract class DataSourceItem extends Component implements IDataSourceItem
     public function setDataRow($data_row)
     {
 	$this->data_row = $data_row;
+	foreach($this->data_row_attributes as $idx=>$name) {
+            if (isset($this->data_row[$name])) {
+                $this->setAttribute($name, $this->data_row[$name]);
+            }
+        }
     }
     public function setID($id)
     {

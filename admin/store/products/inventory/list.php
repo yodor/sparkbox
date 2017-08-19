@@ -19,7 +19,10 @@ $page->checkAccess(ROLE_CONTENT_MENU);
 
 $menu = array();
 
-
+$action_back = new Action("", Session::get("products.list"), array());
+$action_back->setAttribute("action", "back");
+$action_back->setAttribute("title", "Back to Products");
+$page->addAction($action_back);
 
 $prodID = -1;
 
@@ -31,7 +34,7 @@ try {
 //   );
   $prodID = (int)$rc->ref_id;
   
-  $action_add = new Action("", "add.php", array());
+  $action_add = new Action("", "add.php?prodID=$prodID", array());
   $action_add->setAttribute("action", "add");
   $action_add->setAttribute("title", "Add Inventory");
   $page->addAction($action_add);
@@ -133,7 +136,7 @@ $act->addAction( $h_delete->createAction() );
 //     
 $view->getColumn("actions")->setCellRenderer($act);
 
-
+Session::set("products.inventory", $page->getPageURL());
 
 $page->beginPage($menu);
 

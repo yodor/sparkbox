@@ -18,12 +18,12 @@ class ProductPhotoCellRenderer extends TableImageCellRenderer
 		if (isset($row["pclrpID"]) && $row["pclrpID"]>0) {
 			  $item = new ImageItem();
 			  $item->item_id = (int)$row["pclrpID"];
-			  $item->item_class = ProductColorPhotosBean::class;
+			  $item->item_class = "ProductColorPhotosBean";
 		}
 		else if (isset($row["ppID"]) && $row["ppID"]>0){
 			  $item = new ImageItem();
 			  $item->item_id = (int)$row["ppID"];
-			  $item->item_class = ProductPhotosBean::class;
+			  $item->item_class = "ProductPhotosBean";
 		}	
 		
 		$this->items[] = $item;

@@ -12,7 +12,10 @@ $menu=array(
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-
+$action_back = new Action("", Session::get("sizing.list"), array());
+$action_back->setAttribute("action", "back");
+$action_back->setAttribute("title", "Back to Products");
+$page->addAction($action_back);
 
 $view = new InputFormView(new StoreSizesBean(), new StoreSizeInputForm());
 
@@ -24,6 +27,8 @@ $view = new InputFormView(new StoreSizesBean(), new StoreSizeInputForm());
 $view->processInput();
 
 $page->beginPage($menu);
+
+$page->renderPageCaption();
 
 $view->render();
 

@@ -71,7 +71,7 @@ class DemoPage extends SimplePage
 
 // 	$this->menu_bar->getItemRenderer()->disableSubmenuRenderer();
 	
-
+        $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
     }
 
 
@@ -95,12 +95,10 @@ class DemoPage extends SimplePage
     }
 
     protected function dumpMetaTags()
-	{
-		parent::dumpMetaTags();
-		echo "\n\n";
-		echo "<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'>\n";
-		echo "\n\n";
-	}
+    {
+            parent::dumpMetaTags();
+
+    }
 
     public function beginPage()
     {

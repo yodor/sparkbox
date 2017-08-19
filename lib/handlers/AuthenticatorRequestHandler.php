@@ -46,25 +46,25 @@ class AuthenticatorRequestHandler extends RequestHandler
   protected function process()
   {
 
-	  $success = false;
-try {
-	  //throws exception on login error
+        $success = false;
+        try {
 
-	  $success = $this->auth->authenticate($this->username, $this->pass, $this->randsalt, $this->remember);
+            //throws exception on login error
+            $success = $this->auth->authenticate($this->username, $this->pass, $this->randsalt, $this->remember);
 
-	  unset($_SESSION[$this->auth->getAuthContext()]["rand"]);
+            unset($_SESSION[$this->auth->getAuthContext()]["rand"]);
 
-//debug
-// echo "Loging success";
-// exit;
+            //debug
+            // echo "Loging success";
+            // exit;
 
-}
-catch (Exception $e) {
-  sleep(1);
-  throw $e;
-}
+        }
+        catch (Exception $e) {
+            sleep(1);
+            throw $e;
+        }
 
-	  return $success;
+        return $success;
 
   }
 

@@ -1,5 +1,5 @@
 <?php
-define("DEBUG_OUTPUT", 1); //enable debugging output using error_log
+// define("DEBUG_OUTPUT", 1); //enable debugging output using error_log
 
 // $base_dir  = __DIR__; // Absolute path to your installation, ex: /var/www/mywebsite
 // $doc_root  = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', $_SERVER['SCRIPT_FILENAME']); # ex: /var/www
@@ -13,7 +13,7 @@ define("DEBUG_OUTPUT", 1); //enable debugging output using error_log
 // define("DEBUG_OUTPUT", 0); //enable debugging output using error_log
 
 //uncomment below if deploying in a subfolder of document root
-$install_path = __DIR__;
+$install_path = dirname(__FILE__);
 
 //additional folders to add to the include_path if doucument root is different from visible exported web space ie  ~username/ 
 //$local_include_path = dirname(__FILE__);

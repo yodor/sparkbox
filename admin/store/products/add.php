@@ -12,7 +12,18 @@ $menu=array(
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
+$action_back = new Action("", Session::get("products.list"), array());
+$action_back->setAttribute("action", "back");
+$action_back->setAttribute("title", "Back to Products");
+$page->addAction($action_back);
+
 $view = new InputFormView(new ProductsBean(), new ProductInputForm());
+
+//shortcuts for new ...
+Session::set("categories.list", $page->getPageURL());
+Session::set("brands.list", $page->getPageURL());
+Session::set("classes.list", $page->getPageURL());
+
 
 $view->getTransactor()->assignInsertValue("insert_date", DBDriver::get()->dateTime());
 
@@ -20,20 +31,10 @@ $view->processInput();
 
 $page->beginPage($menu);
 
-// if (!Session::get("referer",0)) {
-//   Session::set("referer", $_SERVER['HTTP_REFERER']);
-// }
-// 
-// $href = Session::get("referer");
-//   
-// echo "<a href='$href'>back</a>";
-  
-
 $page->renderPageCaption();
 
 $view->render();
 
 $page->finishPage();
-
 
 ?>

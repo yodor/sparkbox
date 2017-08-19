@@ -23,19 +23,14 @@ include_once("lib/utils/PageSessionMenu.php");
 class AdminPageLib extends SimplePage
 {
 
-	public $caption = "";
+    public $caption = "";
 	
     protected $authstore = NULL;
     protected $roles = array();
 
     protected $menu_bar = NULL;
 
-    protected $actions = array();
     
-    public function addAction(Action $action)
-    {
-	  $this->actions[] = $action;
-    }
     
     protected function initMainMenu()
     {

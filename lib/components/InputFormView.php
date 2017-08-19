@@ -33,6 +33,9 @@ class InputFormView extends Component
 	
 	public $reload_request = true;
 	
+	//transfer to this URL on processing finished
+	public $reload_url = "";
+	
 	public function __construct(DBTableBean $bean=NULL, InputForm $form=NULL)
 	{
 	
@@ -183,10 +186,25 @@ class InputFormView extends Component
 // 			  Session::set("replace_history", 1);
 			  debug("InputFormView::processInput: finished redirection following ...");
 			  debug("-------------------------------------");
+			  
 			  //TODO: remove reload requirement here? session upload files might transact to dbrows changing UID of storage objects
-			  header("Location: ".$_SERVER["REQUEST_URI"]);
+			  if ($this->reload_url) {
+                            header("Location: ".$this->reload_url);
+			  }
+			  else {
+                            $page = SitePage::getInstance();
+                            
+                            $back_action = $page->getAction("back");
+                            if (!is_null($back_action)) {
+                                header("Location: ".$back_action->getHrefClean());
+                            }
+                            else {
+                                header("Location: ".$_SERVER["REQUEST_URI"]);
+                            }
+			  }
+			  
 			  exit;
-			}
+                    }
 		      
 		    debug("InputFormView::processInput: Successfull ");
 

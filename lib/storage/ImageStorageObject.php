@@ -12,13 +12,17 @@ class ImageStorageObject extends FileStorageObject
 	  parent::__construct();
 	  if ($file_storage) {
 		  
-		  $this->setData($file_storage->getData());
+		  
 		  $this->setUploadStatus($file_storage->getUploadStatus());
 		  $this->setMIME($file_storage->getMIME());
 		  $this->setTimestamp($file_storage->getTimestamp());
 		  $this->setTempName($file_storage->getTempName());
 		  $this->setFilename($file_storage->getFilename());
 		  $this->setUID($file_storage->getUID());
+		  
+		  //!set this last as we process tempName in set data when data is zero for uploaded files
+		  $this->setData($file_storage->getData());
+		  
 // 		  $this->setPurged($file_storage->isPurged());
 		  debug("ImageStorageObject::CTOR: copying FileStorageObject UID: ".$file_storage->getUID());
 	  }
@@ -42,25 +46,62 @@ class ImageStorageObject extends FileStorageObject
   }
   public function setData($data)
   {
+        debug(get_class($this)."::setData() Query image dimensions: Data Length: ".strlen($data));
+        
+        $source = false;
+        
+        //data is empty for during upload to limit memory usage. Use temp file name
+        if (strlen($data)==0) {
+            
+            if (strlen($this->getTempName())==0) {
+                debug(get_class($this)."::setData() Empty Data and TempName!");
+                throw new Exception("TempName and Data are empty");
+            }
+            
+            debug(get_class($this)."::setData() Data is empty. Trying uploaded file: ".$this->getTempName());
+            
+            $source = $this->imageFromTemp();
+            
+        }
+        else {
+        
+            $source = @imagecreatefromstring($data);
+            if (!$source){
+                throw new Exception("Data is not holding image");
+            }
+            
+        }
+        
+        $this->width = imagesx($source);
+        $this->height = imagesy($source);
 
-	@$src_img = imagecreatefromstring($data);
-	if ($src_img===FALSE){
-		throw new Exception("Data is not holding image");
-	}
+        @imagedestroy($source);
 
-	$this->width = imagesx($src_img);
-	$this->height = imagesy($src_img);
-
-	@imagedestroy($src_img);
-
-	if ($this->width<1 || $this->height<1){
-		throw new Exception("Invalid image dimensions from data");
-	}
-
+        debug(get_class($this)."::setData() Dimensions WIDTH:{$this->width} HEIGHT:{$this->height}");
+        
+        if ($this->width<1 || $this->height<1){
+            throw new Exception("Invalid image dimensions from data");
+        }
 	parent::setData($data);
 
   }
+  public function imageFromTemp()
+  {
+        if (!is_uploaded_file($this->getTempName())) throw new Exception("Not an uploaded file: ".$this->getTempName());
+                
+        debug(get_class($this)."::imageFromTemp() File: ".$this->getTempName()." is valid uploaded file");
+        
+        debug("Memory Info - memory_limit: ".ini_get("memory_limit")." | memory_usage: ".memory_get_usage());
 
+        debug(get_class($this)."::imageFromTemp() Trying JPEG ...");
+        $source = @imagecreatefromjpeg($this->getTempName());
+        if (!$source){
+            debug(get_class($this)."::imageFromTemp() Trying PNG ...");
+            $source = @imagecreatefrompng($this->getTempName());
+            if (!$source) throw new Exception("Data is not holding JPEG or PNG image");
+        }
+        return $source;
+  }
   public function deconstruct(array &$row, $data_key="data", $doEscape=true)
   {
 	parent::deconstruct($row, $data_key, $doEscape);

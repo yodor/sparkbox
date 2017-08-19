@@ -32,6 +32,37 @@ class SimplePage extends SitePage
 	protected $accessible_title = "";
 	protected $accessible_parent = "";
 	
+	protected $meta = array();
+	
+	protected $actions = array();
+	
+	public function addMeta($name, $content)
+	{
+            $this->meta[$name] = $content;
+	}
+	public function getMeta($name)
+	{
+            return isset($this->meta[$name]) ? $this->meta[$name] : "";
+	}
+	
+	
+    
+        public function addAction(Action $action)
+        {
+            $this->actions[$action->getAttribute("action")] = $action;
+        }
+        public function getAction($action_name)
+        {
+            if (isset($this->actions[$action_name])) {
+                return $this->actions[$action_name];
+            }
+            return NULL;
+        }
+        public function getActions()
+        {
+            return $this->actions;
+        }
+        
 	public function addOGTag($tag_name, $tag_content)
 	{
 		$this->opengraph_tags[$tag_name] = $tag_content;
@@ -86,6 +117,11 @@ class SimplePage extends SitePage
 	    echo "\n";
 	    echo '<meta http-equiv="imagetoolbar" content="no">';
 	    echo "\n";
+	    
+	    foreach ($this->meta as $name=>$content) {
+                echo "<meta name='".htmlentities($name)."' content='".htmlentities($content)."'>";
+                echo "\n";
+	    }
 
         }
         

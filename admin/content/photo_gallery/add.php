@@ -1,4 +1,5 @@
 <?php
+define("DEBUG_OUTPUT", 1);
 include_once("session.php");
 include_once("class/pages/AdminPage.php");
 include_once("class/beans/GalleryPhotosBean.php");

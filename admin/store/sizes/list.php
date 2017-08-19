@@ -36,7 +36,7 @@ RequestController::addRequestHandler($h_delete);
 $view = new TableView(new BeanResultIterator($bean));
 $view->items_per_page = 100;
 
-$view->setCaption("Store Sizing List");
+$view->setCaption("Sizing Codes List");
 $view->setDefaultOrder(" size_value ASC ");
 
 $view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
@@ -52,6 +52,8 @@ $act->addAction(  new PipeSeparatorAction() );
 $act->addAction( $h_delete->createAction() );
     
 $view->getColumn("actions")->setCellRenderer($act);
+
+Session::set("sizing.list", $page->getPageURL());
 
 $page->beginPage($menu);
 

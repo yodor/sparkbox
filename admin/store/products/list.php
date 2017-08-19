@@ -53,7 +53,7 @@ p.price, p.old_price, p.buy_price, cc.pi_ids, replace(cc.colors, '|','<BR>') as 
 ";
 
 $select_products->from = " products p LEFT JOIN product_inventory pi ON pi.prodID = p.prodID LEFT JOIN color_chips cc ON cc.prodID = p.prodID JOIN product_categories pc ON pc.catID=p.catID ";
-$select_products->group_by = "  pi.prodID ";
+$select_products->group_by = "  p.prodID, pi.prodID ";
 $ksc->processSearch($select_products);
 
 
@@ -119,7 +119,7 @@ $act->addAction( $h_delete->createAction() );
 $act->addAction(  new RowSeparatorAction() );
 
 $act->addAction(
-  new Action("Color Gallery", "color_gallery/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
+  new Action("Color Scheme", "color_gallery/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
 );
 $act->addAction(  new PipeSeparatorAction() );
 $act->addAction(
@@ -134,7 +134,10 @@ $act->addAction(
 
 $view->getColumn("actions")->setCellRenderer($act);
 
+//TODO: store page query to session and restore on confirm product add or insert
 
+
+Session::set("products.list", $page->getPageURL());
 
 $page->beginPage($menu);
 
@@ -142,6 +145,7 @@ $page->renderPageCaption();
 
 $ksc->render();
 $view->render();
+
 
 $page->finishPage();
 

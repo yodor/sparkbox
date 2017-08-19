@@ -72,11 +72,10 @@ abstract class UploadDataValidator implements IInputValidator
 
       //UploadDataInputProcessor always created one FileStroageObject with error_status UPLOAD_ERR_NO_FILE
       $file_storage = $field->getValue();
-      debug("UploadDataValidator::validateInput: field['".$field->getName()."'] - class: ".get_class($file_storage));
-      
+
       $upload_status = $file_storage->getUploadStatus();
       
-      debug("UploadDataValidator::validateInput: field['".$field->getName()."'] - UploadStatus: ".UploadDataValidator::errString($upload_status));
+      debug("UploadDataValidator::validateInput() field['".$field->getName()."'] | class: ".get_class($file_storage)." | UploadStatus: ".UploadDataValidator::errString($upload_status));
       
       if ($upload_status===UPLOAD_ERR_NO_FILE) {
 	if ($field->isRequired()) {

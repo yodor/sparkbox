@@ -5,6 +5,8 @@ include_once("lib/utils/MenuItem.php");
 class MainMenu
 {
 
+        protected $debug_matching = false;
+        
 	protected $bean_class = NULL;
 	protected $prefix_root = "";
 
@@ -217,8 +219,10 @@ class MainMenu
 
 	    $match = (strcmp( $request , $href ) == 0);
 
-	    debug("matchItem  Mode: $find_mode | Request: $request Mathing With MenuItem: $href");
-	    
+            if ($this->debug_matching) {
+                debug("matchItem  Mode: $find_mode | Request: $request Mathing With MenuItem: $href");
+            }
+            
 	    //href is found inside request
 	    if ($find_mode === MainMenu::FIND_INDEX_LOOSE) {
 		$match = ( strpos(  $request, $href ) !== false );
@@ -258,7 +262,9 @@ class MainMenu
 	    
 	    $this->last_match_value = $request;
 	    
-	    debug("matchItem Result: ".(int)$match);
+	    if ($this->debug_matching) {
+                debug("matchItem Result: ".(int)$match);
+	    }
 	    return $match;
 	}
 

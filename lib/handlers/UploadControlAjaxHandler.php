@@ -64,7 +64,7 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
       
   }
 
-    public function createUploadContents(StorageObject $value_current, $field_name)
+    public function createUploadContents(StorageObject &$value_current, $field_name)
     {
     
 	//TODO:prepare other style contents for files. render files as alternating rows icon, filename , type, size, X
@@ -83,7 +83,7 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
         ImageResizer::$max_height = -1;
         ImageResizer::autoCrop($row);
         
-        gc_collect_cycles();
+        //gc_collect_cycles();
         
 	ob_start();
 	if ($value_current instanceof ImageStorageObject) {
@@ -139,6 +139,8 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
 	  throw new Exception("Unrecognized validator requested");
 	}
 
+	debug(get_class($this)."::createValidator() Current Validator = ".get_class($validator));
+	
 	return $validator;
 	
     }
@@ -161,7 +163,7 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
 
       $upload_object = $input->getValue();
       
-      //TODO:multiple uploaded files can be processed
+      //TODO:multiple uploaded files can be processed?
       $num_files = 0;
       
       if ($input->haveError()) {
@@ -172,22 +174,23 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
       $this->assignUploadObjects($resp, $upload_object);
 
   }
-  protected function assignUploadObjects(JSONResponse $resp, $upload_object)
+  protected function assignUploadObjects(JSONResponse $resp, &$upload_object)
   {
       $resp->objects[] = $this->createUploadContents($upload_object, $this->field_name);
       
       //storage the original file in the session array
       $file_storage = new FileStorageObject();
       $file_storage->setUploadStatus(UPLOAD_ERR_OK);
-      $file_storage->setTempName($upload_object->getTempName());
+//       $file_storage->setTempName($upload_object->getTempName());
       $file_storage->setTimestamp($upload_object->getTimestamp());
       $file_storage->setUID($upload_object->getUID());
+
       $file_storage->setData(file_get_contents($upload_object->getTempName()));
       $file_storage->setFilename($upload_object->getFileName());
       $file_storage->setMIME($upload_object->getMIME());
 		  
       $_SESSION["upload_control"][$this->field_name][(string)$upload_object->getUID()] = serialize($file_storage);
-      debug("UploadControlAjaxHandler::_upload | Storing file UID: ".$upload_object->getUID()." for field['".$this->field_name."']");
+      debug("UploadControlAjaxHandler::_upload | Session storing file UID: ".$upload_object->getUID()." for field['".$this->field_name."']");
 
 //       $num_files++;
 

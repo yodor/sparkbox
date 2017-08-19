@@ -54,7 +54,7 @@ $act->addAction( $h_delete->createAction() );
 
 $view->getColumn("actions")->setCellRenderer($act);
 
-
+Session::set("classes.list", $page->getPageURL());
 
 $page->beginPage($menu);
 

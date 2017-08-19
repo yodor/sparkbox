@@ -65,7 +65,7 @@ $act->addAction(  new RowSeparatorAction() );
     
 $view->getColumn("actions")->setCellRenderer($act);
 
-
+Session::set("color_codes.list", $page->getPageURL());
 
 $page->beginPage($menu);
 

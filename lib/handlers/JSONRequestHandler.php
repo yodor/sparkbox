@@ -28,7 +28,7 @@ abstract class JSONRequestHandler extends RequestHandler
 	  }
       }
       
-      	    debugArray("JSONRequestHandler::CTOR for: ".get_class($this)." SupportedContent: ", $this->supported_content);
+      	    debugArray(get_class($this)."::() [Supported Content]: ", $this->supported_content);
 
   }
 
@@ -43,7 +43,7 @@ abstract class JSONRequestHandler extends RequestHandler
 
       $this->content_type = $content_type;
       
-      debug(get_class($this)."::parseParams: content_type requested: ".$this->content_type);
+      debug(get_class($this)."::parseParams() [Content Type] requested: ".$this->content_type);
   }
   public function shutdown()
   {
@@ -52,18 +52,22 @@ abstract class JSONRequestHandler extends RequestHandler
       
       
       if (is_array($err)) {
-      
+
+          debugArray(get_class($this)."::shutdown() => Error Found after response: ", $err);
+
 	  if ($this->response_send) {
-	      debugArray("JSONRequestHandler::shutdown => Error Found after response: ", $err);
+	      debug(get_class($this)."::shutdown() => response_send = true");
 	  }
 	  else {
 	      @ob_end_clean();
+              
+              debug(get_class($this)."::shutdown() => response_send = false");
+              
 	      $ret = new JSONResponse(get_class($this)."Response");
 	      $ret->status = JSONResponse::STATUS_ERROR;
 	      $ret->message = "Error: ".$err["type"]." - ".$err["message"]."<BR>File: ".$err["file"]." Line: ".$err["line"];
 	      $ret->response();
 	      $ret->contents = "";
-	      
 	  }
 	  
 
@@ -72,9 +76,14 @@ abstract class JSONRequestHandler extends RequestHandler
   }
   protected function process()
   {
+        
+      
+        
       $ret = new JSONResponse(get_class($this)."Response");
       
       ob_start();
+      
+      
       
       register_shutdown_function(array($this, "shutdown"));
 

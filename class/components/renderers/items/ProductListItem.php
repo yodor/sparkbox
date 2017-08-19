@@ -55,12 +55,12 @@ class ProductListItem extends ItemRendererImpl {
 		if (isset($item["pclrpID"]) && $item["pclrpID"]>0) {
 			  $photo = new StorageItem();
 			  $photo->itemID = (int)$item["pclrpID"];
-			  $photo->itemClass = ProductColorPhotosBean::class;
+			  $photo->itemClass = "ProductColorPhotosBean";//ProductColorPhotosBean::class;
 		}
 		else if (isset($item["ppID"]) && $item["ppID"]>0){
 			  $photo = new StorageItem();
 			  $photo->itemID = (int)$item["ppID"];
-			  $photo->itemClass = ProductPhotosBean::class;
+			  $photo->itemClass = "ProductPhotosBean";//ProductPhotosBean::class;
 		}
 		if ($photo) {
 		  $this->photo = $photo;
@@ -118,16 +118,16 @@ class ProductListItem extends ItemRendererImpl {
 					  
 					  //use color chip if any
 					  if ($prow["have_chip"]>0) {
-	  					$chip_class = ProductColorsBean::class."&bean_field=color_photo";
+	  					$chip_class = "ProductColorsBean&bean_field=color_photo";
 	  					$chip_id = $pclrID;
 	  				  }
 	  				  //use the product photo if no color photo is set
 	  				  else if ($prow["pclrpID"]<1 && $prow["ppID"]>0) {
-						$chip_class = ProductPhotosBean::class;
+						$chip_class = "ProductPhotosBean";
 						$chip_id = $prow["ppID"];
 	  				  }
 	  				  else {
-						$chip_class = ProductColorPhotosBean::class;
+						$chip_class = "ProductColorPhotosBean";
 						$chip_id = $prow["pclrpID"];
 	  				  }
 					  
@@ -152,7 +152,8 @@ class ProductListItem extends ItemRendererImpl {
 			}
 			echo "</div>"; //colors_container
 			
-			echo "<div class='product_name'>".$this->item["product_name"]."</div>";
+
+			echo "<a class='product_name' href='$item_href_main' >".$this->item["product_name"]."</a>";
 	// 		echo "<div class='product_code'><label>product_code:</label>".$this->item["product_code"]."</div>";
 			
 

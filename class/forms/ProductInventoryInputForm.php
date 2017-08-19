@@ -20,7 +20,7 @@ class ProductInventoryInputForm extends InputForm
     public function __construct()
     {
 
-		$field = InputFactory::CreateField(InputFactory::SELECT, "pclrID", "Color Gallery", 0);
+		$field = InputFactory::CreateField(InputFactory::SELECT, "pclrID", "Color Scheme", 0);
 		$field->getRenderer()->setSource(new ProductColorsBean());
 		
 
@@ -30,12 +30,12 @@ class ProductInventoryInputForm extends InputForm
 		$this->addField($field);
 	
 
-		$field = InputFactory::CreateField(InputFactory::SELECT, "size_value", "Size", 0);
+		$field = InputFactory::CreateField(InputFactory::SELECT, "size_value", "Sizing", 0);
 		$field->getRenderer()->setSource(new StoreSizesBean());
 		$field->getRenderer()->list_key = "size_value";
 		$field->getRenderer()->list_label = "size_value";
 		
-		$field->getRenderer()->addon_content = "<a class='ActionRenderer' href='../../sizes/add.php'>".tr("New Store Size")."</a>";
+		$field->getRenderer()->addon_content = "<a class='ActionRenderer' href='../../sizes/add.php'>".tr("+ New Sizing Code")."</a>";
 		
 		$this->addField($field);
 
@@ -82,7 +82,7 @@ class ProductInventoryInputForm extends InputForm
 	  
 	  $this->getField("pclrID")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
 	  
-	  $this->getField("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' href='../color_gallery/add.php?prodID={$this->prodID}'>".tr("New Color Gallery")."</a>";
+	  $this->getField("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' href='../color_gallery/add.php?prodID={$this->prodID}'>".tr("+ New Color Scheme")."</a>";
 	  
 // 	  $this->getField("size_value")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
 

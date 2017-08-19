@@ -4,9 +4,9 @@
 $prop = new DBConnectionProperties();
 $prop->driver = "MySQLi";
 
-$prop->database="demo";
-$prop->user="demo1";
-$prop->pass="d3m0d3m0";
+$prop->database="store_demo";
+$prop->user="store_demo";
+$prop->pass="store_demo";
 $prop->host="localhost";
 $prop->port="3306";
 

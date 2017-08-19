@@ -38,6 +38,9 @@ class ImageUploadValidator extends UploadDataValidator
   protected function processUploadData(InputField $field)
   {
 
+          debug(get_class($this)."::processUploadData() field[".$field->getName()."]");
+          
+          
 	  $image_storage = new ImageStorageObject($field->getValue());
 
 	  $this->processImage($image_storage);
@@ -50,9 +53,9 @@ class ImageUploadValidator extends UploadDataValidator
   {
 
       
-      debug("----------------------------------------------------------------------");
+      debug("---------".get_class($this)."::processImage()");
       
-      debug("ImageUploadValidator::processImage: UID: ".$image_storage->getUID());
+      debug("UID: ".$image_storage->getUID());
 
 
       
@@ -101,18 +104,19 @@ class ImageUploadValidator extends UploadDataValidator
 	}
 
 	if ($scale > 1 ) {
-	    if (IMAGE_UPLOAD_UPSCALE_ENABLED) {
-	      debug("UPSCALE_ENABLED");
-	      $scale = 1;
+	    if (IMAGE_UPLOAD_UPSCALE) {
+	      debug("IMAGE_UPLOAD_UPSCALE is true. Upscaling is enabled.");
 	    }
 	    else {
-	      debug("UPSCALE_DISABLED");
+	      debug("IMAGE_UPLOAD_UPSCALE is false. Upscaling is disabled.");
+	      //force 1:1 scale
+	      $scale = 1;
 	    }
 	}
 
       }//resize_enabled
       else {
-	  debug("ImageUploadValidator::Resizing is disabled for this validator");
+	  debug("Scaling/Resizing is disabled for 'this' validator");
       }
       
       $n_width = $image_storage->getWidth() * $scale;
@@ -121,14 +125,27 @@ class ImageUploadValidator extends UploadDataValidator
       if ($n_width<1)$n_width=1;
       if ($n_height<1)$n_height=1;
 
-      debug("ImageUploadValidator::Original Image Size:(".$image_storage->getWidth().",".$image_storage->getHeight().")");
-      debug("ImageUploadValidator::MIME: ".$image_storage->getMIME());
-      debug("ImageUploadValidator::Scale: ".$scale);
-      debug("ImageUploadValidator::New Image Size:($n_width, $n_height) | ".memory_get_usage(true));
+      debug("Original Image Size:(".$image_storage->getWidth().",".$image_storage->getHeight().")");
+      debug("MIME: ".$image_storage->getMIME());
+      debug("Scale: ".$scale);
+      debug("New Image Size:($n_width, $n_height) | Memory Usage: ".memory_get_usage(true));
 
-      $source = imagecreatefromstring($image_storage->getData());
-      if (!is_resource($source))throw new Exception("source parameter is not an image resource");
+      debug("Data Size: ".$image_storage->getLength());
+      
+      $source = false;
+      
+      if ($image_storage->haveData()) {
+        $source = imagecreatefromstring($image_storage->getData());
+      }
+      else {
+        $source = $image_storage->imageFromTemp();
+      }
+      
+//       
+      
+      if (!is_resource($source))throw new Exception("Source parameter is not an image resource");
 
+      //resize if needed
       if ($n_width!= $image_storage->getWidth() || $n_height != $image_storage->getHeight()) {
 	$photo = imagecreatetruecolor($n_width, $n_height);
 	imagealphablending($photo, false);
@@ -137,16 +154,20 @@ class ImageUploadValidator extends UploadDataValidator
 	// Resize
 	imagecopyresampled($photo, $source, 0, 0, 0, 0, $n_width, $n_height, $image_storage->getWidth(), $image_storage->getHeight());
 	@imagedestroy($source);
+	
+	//not a copy but reference assignment
 	$source = $photo;
 	
       }
 
+      debug("Processing image data to output buffer ...");
+      
       ob_start();
 
       if (strcmp(strtolower($image_storage->getMIME()),ImageResizer::TYPE_PNG)===0) {
 	$image_storage->setMIME(ImageResizer::TYPE_PNG);
 	
-	debug("ImageUploadValidator:: Output Format is PNG");
+	debug("Output Format is PNG");
 	
 	imagesavealpha($source, true);
 
@@ -156,20 +177,19 @@ class ImageUploadValidator extends UploadDataValidator
       else {
 	$image_storage->setMIME(ImageResizer::TYPE_JPEG);
 	
-	debug("ImageUploadValidator:: Default Output Format set to JPEG");
+	debug("Output Format is JPEG");
 	imagejpeg($source, NULL, 95);
 	
       }
       
       // pass output to image_storage
+      debug("Setting output buffer result as image data ...");
       $image_storage->setData(ob_get_contents());
-      
-
-      // end capture
+    
       ob_end_clean();
 
       @imagedestroy($source);
-//       @imagedestroy($photo);
+
       
       debug("----------------------------------------------------------------------");
   }

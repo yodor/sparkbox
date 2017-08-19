@@ -11,7 +11,7 @@
 // $full_url  = "${protocol}://${domain}${disp_port}${base_url}"; # Ex: 'http://example.com', 'https://example.com/mywebsite', etc.
 
 if (!isset($install_path)) {
-  $install_path = realpath(__DIR__."/../../");
+  $install_path = realpath(dirname(__FILE__)."/../../");
 }
 
 //app/site deployment (server path)
@@ -66,9 +66,9 @@ $defines->set("CONTEXT_ADMIN", "context_admin");
 $defines->set("ADMIN_ROOT", SITE_ROOT."admin/");
 $defines->set("STORAGE_HREF", SITE_ROOT."storage.php");
 
-$defines->set("IMAGE_UPLOAD_DEFAULT_WIDTH", 1024);
-$defines->set("IMAGE_UPLOAD_DEFAULT_HEIGHT", 768);
-$defines->set("IMAGE_UPLOAD_UPSCALE_ENABLED", false);
+$defines->set("IMAGE_UPLOAD_DEFAULT_WIDTH", 1280);
+$defines->set("IMAGE_UPLOAD_DEFAULT_HEIGHT", 720);
+$defines->set("IMAGE_UPLOAD_UPSCALE", false);
 
 
 $site_domain = $_SERVER["HTTP_HOST"];
@@ -113,14 +113,32 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
   include_once("config/dbconfig.php");
   include_once("lib/dbdriver/DBDriver.php");
 
-  if (defined("PERSISTENT_DB")) {
-	DBDriver::create(true, true, "default");
-	
-  }
-  else {
-	DBDriver::create();
-
-  }
+  //TODO:check persistent connections with mysql. Introduced in php 5.3
+  
+//   if (defined("PERSISTENT_DB")) {
+//   
+//         try {
+//             DBDriver::create(true, true, "default");
+// 	}
+// 	catch (Exception $e) {
+//             
+//             Session::set("alert", "Unable to open persistent connection to DB: ".$e->getMessage());
+//             
+// 	}
+// 	
+//   }
+//   else {
+  
+        try {
+        
+            DBDriver::create();
+            
+        }
+        catch (Exception $e) {
+            Session::set("alert", "Unable to open connection to DB: ".$e->getMessage());
+        }
+        
+//   }
   
   
 //   $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');

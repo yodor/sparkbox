@@ -22,13 +22,17 @@ class ProductColorInputForm extends InputForm
 
    
 
-	$field = InputFactory::CreateField(InputFactory::SELECT, "color", "Gallery Color", 1);
+	$field = InputFactory::CreateField(InputFactory::SELECT, "color", "Color Code", 1);
 	
 	$rend = $field->getRenderer();
 	$rend->setSource(new StoreColorsBean());
 	$rend->list_label = "color";
 	$rend->list_key = "color";
-	$rend->addon_content = "<a class='ActionRenderer' href='../../colors/add.php'>".tr("New Store Color")."</a>";
+	$rend->addon_content = "<a class='ActionRenderer' action='new' href='../../colors/add.php'>".tr("New Color Code")."</a>";
+	
+	$opt = $rend->getItemRenderer();
+	$opt->addDataRowAttribute("color_code");
+	
 	$this->addField($field);
 // 	$field->enableTranslator(true);
 

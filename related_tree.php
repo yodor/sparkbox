@@ -132,10 +132,11 @@ else {
 }
 $view->items_per_page = 12;
 
-$sort_price = new PaginatorSortField("relation.sell_price", "Price");
-$view->getPaginator()->addSortField($sort_price);
 $sort_prod = new PaginatorSortField("relation.prodID", "Auto");
 $view->getPaginator()->addSortField($sort_prod);
+$sort_price = new PaginatorSortField("relation.sell_price", "Price");
+$view->getPaginator()->addSortField($sort_price);
+
 $view->getTopPaginator()->view_modes_enabled = true;
 // $view->setCaption("Products List");
 

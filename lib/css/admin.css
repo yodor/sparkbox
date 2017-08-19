@@ -158,9 +158,15 @@ IMG {
   height:100%;
   background-size:cover;
   margin-bottom:-7px;
+  margin-left:2px;
+  margin-right:3px;
 }
 .page_caption .page_actions .ActionRenderer[action='add'] {
   background-image:url("../images/page_actions/green_plus.png");
+  background-repeat:no-repeat;
+}
+.page_caption .page_actions .ActionRenderer[action='back'] {
+  background-image:url("../images/page_actions/green_left.png");
   background-repeat:no-repeat;
 }
 

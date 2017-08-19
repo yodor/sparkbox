@@ -29,6 +29,7 @@ class ProductInputForm extends InputForm
 	$rend->setSource($bean1);
 	$rend->list_key="catID";
 	$rend->list_label="category_name";
+            
 	$this->addField($field);
 
 	$field = InputFactory::CreateField(InputFactory::SELECT, "brand_name", "Brand", 1);

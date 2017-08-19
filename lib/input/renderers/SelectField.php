@@ -24,8 +24,9 @@ class SelectOption extends DataSourceItem
   }
   public function startRender()
   {
-  
-      echo "<option value='{$this->value}' ";
+      $attribs = $this->prepareAttributes();
+      
+      echo "<option value='{$this->value}' $attribs ";
       if ($this->isSelected()) echo "SELECTED";
       echo ">";
   }

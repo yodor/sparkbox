@@ -114,6 +114,10 @@ abstract class SitePage
             $pname = basename(dirname($_SERVER["SCRIPT_NAME"]));
             return get_class($this)." ".$pname." ".$sname;
 	}
+	public function getPageURL()
+	{
+            return $_SERVER["SCRIPT_NAME"]."?".$_SERVER["QUERY_STRING"];
+	}
 
 }
 

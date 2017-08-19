@@ -80,7 +80,7 @@ class MCEImageBrowserAjaxHandler extends UploadControlAjaxHandler implements ISt
 
   }
 
-    public function createUploadContents(StorageObject $object, $field_name)
+    public function createUploadContents(StorageObject &$object, $field_name)
     {
   
 	
@@ -138,7 +138,7 @@ class MCEImageBrowserAjaxHandler extends UploadControlAjaxHandler implements ISt
    }
    
 
-    protected function assignUploadObjects(JSONResponse $resp, $upload_object)
+    protected function assignUploadObjects(JSONResponse $resp, &$upload_object)
     {
 	debug("MCEImageBrowserAjaxHandler::assignUploadObjects");
 	

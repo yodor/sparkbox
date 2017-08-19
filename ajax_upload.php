@@ -1,4 +1,6 @@
 <?php
+define("DEBUG_OUTPUT", 1);
+
 include_once("session.php");
 include_once("class/pages/DemoPage.php");
 include_once("lib/forms/InputForm.php");

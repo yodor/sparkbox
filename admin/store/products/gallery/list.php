@@ -10,16 +10,22 @@ include_once("lib/components/GalleryView.php");
 
 $menu = array();
 
-
-$rc = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
-
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 $page->setAccessibleTitle("Photo Gallery");
 
-$action_add = new Action("", "add.php", array());
+$action_back = new Action("", Session::get("products.list"), array());
+$action_back->setAttribute("action", "back");
+$action_back->setAttribute("title", "Back to Products");
+$page->addAction($action_back);
+
+$rc = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
+
+
+
+$action_add = new Action("", "add.php?".$rc->ref_key."=".$rc->ref_id, array());
 $action_add->setAttribute("action", "add");
-$action_add->setAttribute("title", "Add Photo To Product Gallery");
+$action_add->setAttribute("title", "Add Photo");
 $page->addAction($action_add);
 
 
@@ -39,6 +45,8 @@ $gv = new GalleryView();
 $gv->blob_field = "photo";
 
 $gv->initView($bean, "add.php", $rc->ref_key, $rc->ref_id);
+
+Session::set("products.gallery", $page->getPageURL());
 
 $page->beginPage($menu);
 $page->renderPageCaption();

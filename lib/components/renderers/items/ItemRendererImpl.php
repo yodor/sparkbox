@@ -41,7 +41,7 @@ abstract class ItemRendererImpl extends Component implements IItemRenderer
   }
 
 
-  abstract public function renderSeparator($idx_curr, $items_total);
+  //abstract public function renderSeparator($idx_curr, $items_total);
 
 }
 
