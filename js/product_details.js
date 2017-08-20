@@ -94,6 +94,7 @@ function updatePrice()
   else {
       
         var pid = parseInt($(".price_panel .sell_price").attr("piID"));
+        $(".price_panel .sell_price").html(parseFloat(sell_prices).toFixed(2));
   }
   
     var attrib = attributes[pid];

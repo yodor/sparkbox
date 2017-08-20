@@ -46,7 +46,7 @@ class ImageStorageObject extends FileStorageObject
   }
   public function setData($data)
   {
-        debug(get_class($this)."::setData() Query image dimensions: Data Length: ".strlen($data));
+        debug("ImageStorageObject::setData() Query image dimensions: Data Length: ".strlen($data));
         
         $source = false;
         
@@ -54,11 +54,11 @@ class ImageStorageObject extends FileStorageObject
         if (strlen($data)==0) {
             
             if (strlen($this->getTempName())==0) {
-                debug(get_class($this)."::setData() Empty Data and TempName!");
+                debug("ImageStorageObject::setData() Empty Data and TempName!");
                 throw new Exception("TempName and Data are empty");
             }
             
-            debug(get_class($this)."::setData() Data is empty. Trying uploaded file: ".$this->getTempName());
+            debug("ImageStorageObject::setData() Data is empty. Trying uploaded file: ".$this->getTempName());
             
             $source = $this->imageFromTemp();
             
@@ -77,7 +77,7 @@ class ImageStorageObject extends FileStorageObject
 
         @imagedestroy($source);
 
-        debug(get_class($this)."::setData() Dimensions WIDTH:{$this->width} HEIGHT:{$this->height}");
+        debug("ImageStorageObject::setData() Dimensions WIDTH:{$this->width} HEIGHT:{$this->height}");
         
         if ($this->width<1 || $this->height<1){
             throw new Exception("Invalid image dimensions from data");
@@ -89,14 +89,14 @@ class ImageStorageObject extends FileStorageObject
   {
         if (!is_uploaded_file($this->getTempName())) throw new Exception("Not an uploaded file: ".$this->getTempName());
                 
-        debug(get_class($this)."::imageFromTemp() File: ".$this->getTempName()." is valid uploaded file");
+        debug("ImageStorageObject::imageFromTemp() File: ".$this->getTempName()." is valid uploaded file");
         
         debug("Memory Info - memory_limit: ".ini_get("memory_limit")." | memory_usage: ".memory_get_usage());
 
-        debug(get_class($this)."::imageFromTemp() Trying JPEG ...");
+        debug("ImageStorageObject::imageFromTemp() Trying JPEG ...");
         $source = @imagecreatefromjpeg($this->getTempName());
         if (!$source){
-            debug(get_class($this)."::imageFromTemp() Trying PNG ...");
+            debug("ImageStorageObject::imageFromTemp() Trying PNG ...");
             $source = @imagecreatefrompng($this->getTempName());
             if (!$source) throw new Exception("Data is not holding JPEG or PNG image");
         }

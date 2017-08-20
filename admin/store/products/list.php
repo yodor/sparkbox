@@ -119,24 +119,25 @@ $act->addAction( $h_delete->createAction() );
 $act->addAction(  new RowSeparatorAction() );
 
 $act->addAction(
+  new Action("Inventory", "inventory/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
+);
+$act->addAction(  new RowSeparatorAction() );
+$act->addAction(
   new Action("Color Scheme", "color_gallery/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
 );
-$act->addAction(  new PipeSeparatorAction() );
+$act->addAction(  new RowSeparatorAction() );
+
 $act->addAction(
   new Action("Photo Gallery", "gallery/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
 );
 
-$act->addAction(  new RowSeparatorAction() );
 
-$act->addAction(
-  new Action("Inventory", "inventory/list.php", array(new ActionParameter("prodID",$bean->getPrKey()))  )
-);
+
+
 
 $view->getColumn("actions")->setCellRenderer($act);
 
-//TODO: store page query to session and restore on confirm product add or insert
-
-
+//store page URL to session and restore on confirm product add or insert
 Session::set("products.list", $page->getPageURL());
 
 $page->beginPage($menu);

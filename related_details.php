@@ -114,6 +114,8 @@ foreach ($sellable as $pos=>$row) {
 	
 	$color_names[$pclrID] = $row["color"];
 
+        $color_codes[$pclrID] = $row["color_code"];
+        
 	if (!isset($galleries[$pclrID])) {
 	  $galleries[$pclrID] = array();
 	  $use_photos = false;
@@ -140,22 +142,14 @@ foreach ($sellable as $pos=>$row) {
 		$db->free($res);
 	  }
 	}
-	
-	if (isset($galleries[$pclrID][0])) {
-            $color_chips[$pclrID] = $galleries[$pclrID][0];
-            if ($row["have_chip"]) {
-            $item = array("id"=>$pclrID, "class"=>"ProductColorPhotosBean&bean_field=color_photo");
-            $color_chips[$pclrID] = $item;
-            }
-	}
-	
+
 }
 
 
 
 $page->beginPage();
 
-// var_dump($attributes);
+// print_r($galleries);
 
 
 $sellable_variation = $sellable[0];
@@ -245,12 +239,12 @@ echo "<div class='column details'>";
 		echo "<div class='color_button' pclrID='$pclrID' piID='$cpiID' size_values='$size_values' sell_prices='$sell_prices' pids='$pids' color_name='$chip_colorName'
 				   onClick='javascript:changeColor($pclrID)' title='$chip_colorName'>";
 	   			
-                        if (isset($href)) {
+                        if (isset($item["class"])) {
                              echo "<img src='$href' >";
                         }
                         else {
                             
-                            echo "<span class='simple_color'>$chip_colorName</span>";
+                            echo "<span class='simple_color' style='background-color:{$color_codes[$pclrID]};'></span>";
                         }
 // 			if ($chip_colorCode) {
 // 			  echo "<div class='color_code' style='display:block;background-color:$chip_colorCode;width:48px;height:48px;'></div>";

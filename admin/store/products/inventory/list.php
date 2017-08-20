@@ -81,16 +81,16 @@ $view->addColumn(new TableColumn("piID","ID"));
 
 $view->addColumn(new TableColumn("prodID","ProdID"));
 
-$view->addColumn(new TableColumn("product_photo","Product Photo"));
+// $view->addColumn(new TableColumn("product_photo","Product Photo"));
 
 $view->addColumn(new TableColumn("product_name", "Product Name"));
 $view->addColumn(new TableColumn("product_code", "Product Code"));
 
 
 
-$view->addColumn(new TableColumn("pclrID", "Color Photo"));
+$view->addColumn(new TableColumn("pclrID", "Color Scheme"));
 
-$view->addColumn(new TableColumn("color", "Color"));
+$view->addColumn(new TableColumn("color", "Color Name"));
 $view->addColumn(new TableColumn("color_code", "Color Code"));
 $view->addColumn(new TableColumn("size_value","Size"));
 $view->addColumn(new TableColumn("stock_amount","Stock Amount"));
@@ -104,9 +104,9 @@ $view->addColumn(new TableColumn("weight","Weight"));
 
 $view->addColumn(new TableColumn("actions","Actions"));
 
-$view->getColumn("product_photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
-$view->getColumn("product_photo")->getCellRenderer()->setSourceIteratorKey("prodID");
-$view->getColumn("product_photo")->getHeaderCellRenderer()->setSortable(false);
+// $view->getColumn("product_photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+// $view->getColumn("product_photo")->getCellRenderer()->setSourceIteratorKey("prodID");
+// $view->getColumn("product_photo")->getHeaderCellRenderer()->setSortable(false);
 
 $view->getColumn("pclrID")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
 $view->getColumn("pclrID")->getCellRenderer()->setSourceIteratorKey("pclrID");

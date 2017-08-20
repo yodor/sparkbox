@@ -129,10 +129,14 @@ class ProductListItem extends ItemRendererImpl {
 	  				  else {
 						$chip_class = "ProductColorPhotosBean";
 						$chip_id = $prow["pclrpID"];
+						if ((int)$chip_id==0) {
+                                                    $use_color_code = true;
+						}
 	  				  }
 					  
 					  $item_href_color = $item_href.$prow["piID"];
-					  echo "<a href='$item_href_color' class='item' title='{$prow["color"]}'>";
+					  $color_code = $prow["color_code"];
+					  echo "<a href='$item_href_color' class='item' color_code='$color_code' title='{$prow["color"]}'>";
 					  if ($use_color_code) {
 						$color_code = $prow["color_code"];
 						echo "<div class='color_code' style='background-color:$color_code;width:48px;height:48px;' title='{$prow["color"]}'></div>";

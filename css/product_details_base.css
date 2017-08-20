@@ -60,10 +60,18 @@
   display:inline-block;
   outline:1px dotted gray;
   margin-right:5px;
+  
 }
  .color_chooser .color_button[active="1"] {
   outline:1px solid red;
 }
  .color_chooser .color_button IMG {
   display:block;
+}
+ .color_chooser .color_button SPAN {
+  cursor:pointer;
+  vertical-align:top;
+  display:inline-block;
+  width:48px;
+  height:48px;
 }
