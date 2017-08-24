@@ -81,7 +81,7 @@ class DemoPage extends SimplePage
 
 	echo "<link rel='stylesheet' href='".SITE_ROOT."css/demo.css' type='text/css'>";
 	echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
-	echo "<link rel='stylesheet' href='".SITE_ROOT."css/mobile.css'>";
+
 	echo "\n";
 
     }
@@ -113,9 +113,9 @@ class DemoPage extends SimplePage
 
 	echo "<div align=center>";
 
-	  echo "<div class='MenuBar'>";
+// 	  echo "<div class='MenuBar'>";
 	  $this->menu_bar->render();
-	  echo "<a class='toggle' onClick='javascript:toggleMenu(this)'>".tr("Menu")."</a>";
+// 	  echo "<a class='toggle' onClick='javascript:toggleMenu(this)' title='".tr($this->menu_bar->getName())."'></a>";
 	  echo "</div>";
 	  
 	  echo "<div class=clear></div>";
@@ -141,16 +141,18 @@ class DemoPage extends SimplePage
 	echo "</div>"; //align=center
 
 	?>
+	
 <script type='text/javascript'>
+// TODO move to menubar
 function toggleMenu(elm)
 {
-  if ($(".MenuBar").hasClass("normal")) {
-	$(".MenuBar").removeClass("normal");
-	var instance = $(".MenuBar .MenuBarComponent[name='DemoPage']").data("menu_instance");
+  if ($(".MenuBar[name='DemoPage']").hasClass("normal")) {
+	$(".MenuBar[name='DemoPage']").removeClass("normal");
+	var instance = $(".MenuBar[name='DemoPage'] .MenuBarComponent[name='DemoPage']").data("menu_instance");
 	instance.leaveAll();
   }
   else {
-	$(".MenuBar").addClass("normal");
+	$(".MenuBar[name='DemoPage']").addClass("normal");
   }
 }
 addLoadEvent(function(){

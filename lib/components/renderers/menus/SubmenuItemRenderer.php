@@ -77,12 +77,10 @@ class SubmenuItemRenderer extends MenuItemRenderer
 	  echo "</a>";
 
 	  if (count($this->getMenuItem()->getSubmenu())>0) {
-	      echo "<div class='RightPart'>";
-	      echo " > ";
-	      echo "</div>";
+	      echo "<div class='handle' data-line=''></div>";
 	  }
 	  
-	  echo "</div>";
+	  echo "</div>"; //SubmenuItemOuter
 
 	  
 

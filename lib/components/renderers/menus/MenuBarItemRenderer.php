@@ -2,29 +2,30 @@
 include_once("lib/components/renderers/menus/MenuItemRenderer.php");
 include_once("lib/components/renderers/menus/SubmenuRenderer.php");
 
+
 class MenuBarItemRenderer extends MenuItemRenderer
 {
 
-
   protected $ir_submenu = NULL;
-
-
 
   public function __construct()
   {
 	  parent::__construct();
 
 	  $this->ir_submenu = new SubmenuRenderer();
+	  
   }
 
   public function setSubmenuRenderer(IMenuItemRenderer $ir_submenu)
   {
 	  $this->ir_submenu = $ir_submenu;
   }
+  
   public function disableSubmenuRenderer()
   {
 	  $this->ir_submenu = NULL;
   }
+  
   public function setMenuItem(MenuItem $item)
   {
 
@@ -54,6 +55,7 @@ class MenuBarItemRenderer extends MenuItemRenderer
       $attrs = $this->prepareAttributes();
       echo "<div $attrs>";
   }
+  
   public function finishRender()
   {
       echo "</div>";
@@ -61,6 +63,9 @@ class MenuBarItemRenderer extends MenuItemRenderer
 
   public function renderImpl()
   {
+  
+//       
+      
       $href = $this->item->getHref();
       $title = $this->item->getTitle();
 
@@ -71,6 +76,7 @@ class MenuBarItemRenderer extends MenuItemRenderer
 
       }
 
+      echo "<div class='MenuItemOuter'>";
       echo "\n<a class='MenuItemLink' href='$href'  $target>";
 
       if ($this->getMenuItem()->getIcon()) {
@@ -86,8 +92,13 @@ class MenuBarItemRenderer extends MenuItemRenderer
       echo "</a>";
 
       if (count($this->item->getSubmenu())>0) {
+        echo "<div class='handle'></div>";
+      }
+      echo "</div>";
+      
+      if (count($this->item->getSubmenu())>0) {
 		  if ($this->ir_submenu){
-			  echo "<div class='handle'></div>";
+			  
 			  
 			  $this->ir_submenu->setMenuItem($this->item);
 			  $this->ir_submenu->render();
@@ -96,6 +107,8 @@ class MenuBarItemRenderer extends MenuItemRenderer
 		  }
 		  
       }
+
+      
   }
 
 

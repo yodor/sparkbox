@@ -35,7 +35,7 @@ class ProductInventoryInputForm extends InputForm
 		$field->getRenderer()->list_key = "size_value";
 		$field->getRenderer()->list_label = "size_value";
 		
-		$field->getRenderer()->addon_content = "<a class='ActionRenderer' href='../../sizes/add.php'>".tr("+ New Sizing Code")."</a>";
+		$field->getRenderer()->addon_content = "<a class='ActionRenderer' action='inline-new' href='../../sizes/add.php'>".tr("New Sizing Code")."</a>";
 		
 		$this->addField($field);
 
@@ -58,17 +58,18 @@ class ProductInventoryInputForm extends InputForm
 	$field->allow_dynamic_addition = false;
 	$field->source_label_visible = true;
 	
+	
 	$field->getValueTransactor()->process_datasource_foreign_keys = true;
 
 	$bean1 = new InventoryAttributeValuesBean();
 	$field->setSource($bean1);
 
+	
 	$rend = new SourceRelatedField();
+
 	
 	$rend->setSource(new ClassAttributesBean());
-	
-	
-      
+
 	$rend->list_key = "caID";
 	$rend->list_label = "attribute_name";
       
@@ -82,14 +83,17 @@ class ProductInventoryInputForm extends InputForm
 	  
 	  $this->getField("pclrID")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
 	  
-	  $this->getField("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' href='../color_gallery/add.php?prodID={$this->prodID}'>".tr("+ New Color Scheme")."</a>";
+	  $this->getField("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' action='inline-new' href='../color_gallery/add.php?prodID={$this->prodID}'>".tr("New Color Scheme")."</a>";
 	  
 // 	  $this->getField("size_value")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
 
 	  $prods = new ProductsBean();
 	  $this->product = $prods->getByID($this->prodID);
 	  
+	  
 	  $rend = $this->getField("value")->getRenderer();
+	  
+	  $rend->setCaption(tr("Product Class").": ".$this->product["class_name"]);
 	  
 	  $data_filter = " ca LEFT JOIN attributes attr ON attr.name = ca.attribute_name WHERE ca.class_name='{$this->product["class_name"]}' ";
 	  $data_fields = " ca.*, attr.unit as attribute_unit, attr.type attribute_type ";
@@ -116,6 +120,8 @@ class ProductInventoryInputForm extends InputForm
 	  $data_fields = " ca.*, iav.value, attr.unit as attribute_unit, attr.type attribute_type ";
 	  
       $rend->setFilter($data_filter, $data_fields);
+      
+      
 
 
   }

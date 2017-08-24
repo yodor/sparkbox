@@ -152,7 +152,7 @@
 }
 .InputField.UploadControl .ArrayContents .Element {
   display:inline-block !important;
-  vertical-align:middle;
+  vertical-align:top;
   position:relative;
   margin-left:10px;
 }

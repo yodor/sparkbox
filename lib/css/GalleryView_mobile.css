@@ -1,0 +1,9 @@
+@media (max-width: 1000px) {
+    .GalleryViewItemRenderer {
+        margin-right:0px;
+        display:block;
+    }
+    .GalleryViewItemRenderer .image_slot .image_popup IMG {
+        width:100%;
+    }
+}

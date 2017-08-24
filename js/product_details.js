@@ -1,6 +1,8 @@
 
 function changeColor(pclrID) 
 {
+  console.log("Changeing color to: " + pclrID);
+  
   //unselect all items
   $(".image_gallery .list .item").attr("active", "0");
   $(".color_chooser .color_button").attr("active", "0");
@@ -8,6 +10,9 @@ function changeColor(pclrID)
   
   var color_button = $(".color_chooser .color_button[pclrID='"+pclrID+"']");
   color_button.attr("active", "1");
+  
+  var color_name = color_button.attr("color_name");
+  $(".colors_panel .current_color").html(color_name);
   
   //available pids from this color
   piID = color_button.attr("piID");

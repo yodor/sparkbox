@@ -18,7 +18,7 @@ $action_back->setAttribute("title", "Back To Inventory List");
 $page->addAction($action_back);
 
 Session::set("sizing.list", $page->getPageURL());
-Session::set("inventory.colors", $page->getPageURL());
+Session::set("product.color_scheme", $page->getPageURL());
 
 $ensure_product = new ReferenceKeyPageChecker(new ProductsBean(), "../list.php");
 $prodID = (int)$ensure_product->ref_id;
@@ -36,7 +36,10 @@ $view->getTransactor()->appendValue("prodID", $prodID);
 
 $page->setCaption("Inventory: ".$ensure_product->ref_row["product_name"]);
 
+
 $view->processInput();
+
+
 
 $page->beginPage($menu);
 

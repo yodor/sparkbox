@@ -3,6 +3,8 @@ include_once("lib/dbdriver/DBConnections.php");
 
 abstract class DBDriver {
 
+        public $PDO = false;
+        
 	protected $error="";
 
 	protected static $g_db = NULL;
@@ -36,6 +38,7 @@ abstract class DBDriver {
 	//return default connection to database
 	public static function factory($open_new=true, $use_persistent=false, $conn_name="default")
 	{
+                try {
 			//DBConnectionProperties
 			$conn_props = DBConnections::getConnection($conn_name);
 
@@ -51,9 +54,17 @@ abstract class DBDriver {
 						include_once("lib/dbdriver/MySQLDriver.php");
 						$currDriver = new MySQLDriver($conn_props, $open_new, $use_persistent);
 						break;
+                                case "PDOMySQL":
+                                                include_once("lib/dbdriver/PDOMySQLDriver.php");
+						$currDriver = new PDOMySQLDriver($conn_props, $open_new, $use_persistent);
+						break;
 
 			}
 			return $currDriver;
+                }
+                catch (Exception $e) {
+                    echo "DBDriver::factory() Unable to connect to database: ".$e->getMessage();
+                }
 	}
 	
 	public static function create($open_new=true, $use_persistent=false, $conn_name="default")

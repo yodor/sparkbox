@@ -26,7 +26,7 @@ class AdminPage extends AdminPageLib
     {
         parent::dumpCSS();
         echo '<link rel="stylesheet" href="'.SITE_ROOT.'css/admin.css" type="text/css">';
-        echo '<link rel="stylesheet" href="'.SITE_ROOT.'css/admin_mobile.css" type="text/css">';
+        
     }
 
 }

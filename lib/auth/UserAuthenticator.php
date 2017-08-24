@@ -116,7 +116,7 @@ class UserAuthenticator extends Authenticator
 		      }
 		      if (!$check_password_only) {
 			  $userID = (int)$row[$bean->getPrKey()];
-			  $authstore = static::fillAuthStore($row, $bean);
+			  $authstore = self::fillAuthStore($row, $bean);
 
 			  $s1="UPDATE users SET counter=counter+1 , last_active=CURRENT_TIMESTAMP WHERE ".$bean->getPrKey()."='$userID'";
 			  $db->transaction();

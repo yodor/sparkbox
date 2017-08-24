@@ -14,7 +14,7 @@ $page->checkAccess(ROLE_CONTENT_MENU);
 
 $action_back = new Action("", Session::get("sizing.list"), array());
 $action_back->setAttribute("action", "back");
-$action_back->setAttribute("title", "Back to Products");
+$action_back->setAttribute("title", "Back");
 $page->addAction($action_back);
 
 $view = new InputFormView(new StoreSizesBean(), new StoreSizeInputForm());

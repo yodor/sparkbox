@@ -26,6 +26,8 @@ $view = new InputFormView(new ProductClassesBean(), new ProductClassInputForm())
 
 $view->processInput();
 
+Session::set("attributes.list", $page->getPageURL());
+
 $page->beginPage($menu);
 
 $page->renderPageCaption();

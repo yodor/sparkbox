@@ -1,4 +1,5 @@
 <?php
+// define("DEBUG_OUTPUT", 1);
 include_once("session.php");
 
 
@@ -49,7 +50,11 @@ $res = NULL;
 try {
 
   $relation = $page->derived;
+  
   $relation->where = " pi.prodID = $prodID ";
+  $relation->group_by = " pi.piID ";
+  
+//   echo $relation->getSQL();
   
   $res = $db->query($relation->getSQL());
   if (!$res) throw new Exception("Product Not Found: ".$db->getError());
@@ -83,7 +88,7 @@ catch (Exception $e) {
 }
 
 
-//per pclrID items
+//per pclrID items used for color button images
 $color_chips = array();
 
 //per pclrID color names
@@ -98,7 +103,8 @@ $attributes = array();
 
 $pos = 0;
 
-
+//product_colors => product color scheme
+//product_color_photos => product color scheme photos
 foreach ($sellable as $pos=>$row) {
 
 
@@ -141,6 +147,24 @@ foreach ($sellable as $pos=>$row) {
 		}
 		$db->free($res);
 	  }
+	}
+	
+	
+	//use the color chip from product color scheme
+	if ((int)$row["have_chip"]>0) {
+	   $item = array("id"=>$pclrID, "class"=>"ProductColorsBean&bean_field=color_photo");
+	   $color_chips[$pclrID] = $item;
+	}
+	else {
+            //no chip assigned - use first image from the gallery if there is atleast one coloring scheme setup 
+            if (isset($galleries[$pclrID][0])) {
+                $color_chips[$pclrID] = $galleries[$pclrID][0];
+            }
+            else {
+                //use the color code as color button
+                $item = array("id"=>$pclrID);
+                $color_chips[$pclrID] = $item; 
+            }
 	}
 
 }
@@ -189,29 +213,26 @@ echo "<div class='column details'>";
   echo "<div class='product_details'>";
   
 	echo "<div class='price_panel'>";
-	  echo "<label for='sell_price'>Price:</label>";
+	  echo "<label for='sell_price'>".tr("Price").":</label>";
 	  echo "<span class='sell_price' piID='$piID'>{$sellable_variation["sell_price"]}</span>";
 	echo "</div>";
 	
-	echo "<HR>";
+	//echo "<HR>";
 	
 	$chooser_visibility = "";
 	
-	if ($pclrID == 0 && count($color_names)==1) {
-            //no colors setup
-            $chooser_visibility = "style='display:none'";
-	}
+	//hide color chooser for single color or color schemeless products
+// 	if ($pclrID == 0 || count($color_names)==1) {
+//             //no colors setup
+//             $chooser_visibility = "style='display:none'";
+// 	}
 	
 	echo "<div class='colors_panel' $chooser_visibility>";
-	  echo tr("Color").":<span class='current_color'></span>";
+          echo "<label for='current_color'>".tr("Color Scheme").":</label>";
+	  echo "<span class='current_color'></span>";
 	  echo "<div class='color_chooser'>";
 	  
-	  if (count($color_chips)<1) {
-            foreach($color_names as $pclrID=>$color_name) {
-                $color_chips[$pclrID] = array("id"=>$pclrID);
-            }
-            
-	  }
+
 	  foreach ($color_chips as $pclrID=>$item) {
 		$pclrID = (int)$pclrID;
 		
@@ -246,12 +267,7 @@ echo "<div class='column details'>";
                             
                             echo "<span class='simple_color' style='background-color:{$color_codes[$pclrID]};'></span>";
                         }
-// 			if ($chip_colorCode) {
-// 			  echo "<div class='color_code' style='display:block;background-color:$chip_colorCode;width:48px;height:48px;'></div>";
-// 			}
-// 			else {
-			 
-// 			}
+
 			
 		echo "</div>";
 	  }
@@ -260,7 +276,7 @@ echo "<div class='column details'>";
 	echo "</div>";//colors_panel
 	
 	
-	echo "<HR>";
+// 	echo "<HR>";
 	
 	
 	//default hidden
@@ -270,7 +286,7 @@ echo "<div class='column details'>";
 	  echo "</select>";
 	echo "</div>";
 	
-	echo "<HR>";
+// 	echo "<HR>";
 	
 // 	echo "<label for='inventory_attributes'>".tr("Inventory Attributes")."</label>";
 	echo "<div class='inventory_attributes'>";

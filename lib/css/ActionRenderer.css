@@ -56,4 +56,15 @@
   background-image:url("../images/list_actions/item_next.png");
   background-repeat:no-repeat;
   background-position:left center;
+  
+}
+.ActionRenderer[action='inline-new'] {
+  padding-left:13px;
+  background-image:url("../images/list_actions/inline-new.png");
+  background-repeat:no-repeat;
+  background-position:left center;
+  
+}
+.DefaultButton + .ActionRenderer[action='inline-new'] {
+  margin-left:5px;
 }

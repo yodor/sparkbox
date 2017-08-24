@@ -21,6 +21,8 @@ abstract class DBTableBean implements IDataBean
 
     protected static $instances = array();
     
+    protected static $use_prepared_statement = false;
+    
     public function __construct($table_name, $dbdriver=NULL)
     {
 		$this->table=$table_name;
@@ -152,20 +154,22 @@ abstract class DBTableBean implements IDataBean
     public function getCount()
     {
 
-		$ret = $this->db->query("SELECT count(*) as cnt from {$this->table} ");
-		$row = $this->db->fetch($ret);
-		return (int)$row["cnt"];
+        $ret = $this->db->query("SELECT count(*) as cnt from {$this->table} ");
+        $row = $this->db->fetch($ret);
+        return (int)$row["cnt"];
 
     }
 	
     public function containsValue($key, $val)
     {
-		$total=0;
-		$val = $this->db->escapeString($val);
-		$sql = "SELECT SQL_CALC_FOUND_ROWS * from {$this->table} WHERE $key LIKE '$val' LIMIT 1";
-		$itr = $this->createIterator($sql, $total);
-		$this->db->free($itr);
-		return ($total>0);
+
+        $total=0;
+        $val = $this->db->escapeString($val);
+        $sql = "SELECT SQL_CALC_FOUND_ROWS * from {$this->table} WHERE $key LIKE '$val' LIMIT 1";
+        $itr = $this->createIterator($sql, $total);
+        $this->db->free($itr);
+        return ($total>0);
+    
     }
 
     public function haveField($field_name)
@@ -213,7 +217,7 @@ abstract class DBTableBean implements IDataBean
 
     public function createIterator($sql, &$total)
     {
-		$this->db->free($this->iterator);
+                if ($this->iterator) $this->db->free($this->iterator);
 		
 		$this->last_iterator_sql=$sql;
 
@@ -322,80 +326,80 @@ abstract class DBTableBean implements IDataBean
 
         if (!$db) {
             $db = $this->db;
-			$db->transaction();
+            $db->transaction();
             $docommit=true;
         }
 
         $qry = "DELETE FROM {$this->table} WHERE {$this->prkey}=$id";
 
-		$res = $db->query($qry);
-		
-		if (!$res) {
-		  if ($docommit) $db->rollback();
-		  throw new Exception("DBError: ".$db->getError());
-		}
+        $res = $db->query($qry);
+        
+        if (!$res) {
+            if ($docommit) $db->rollback();
+            throw new Exception("DBError: ".$db->getError());
+        }
 
-		if ($docommit) $db->commit();
-		
-		$this->manageCache($id);
-		
-		return $res;
+        if ($docommit) $db->commit();
+        
+        $this->manageCache($id);
+        
+        return $res;
     }
 	
     public function deleteRef($refkey, $refval, $db=false, $keep_ids=array())
     {
-		$docommit=false;
-		if (!$db) {
-			$db = $this->db;
-			$db->transaction();
-			$docommit=true;
-		}
-		
-		$sql = "DELETE FROM {$this->table} WHERE $refkey='$refval'";
+        $docommit=false;
+        if (!$db) {
+                $db = $this->db;
+                $db->transaction();
+                $docommit=true;
+        }
+        
+        $sql = "DELETE FROM {$this->table} WHERE $refkey='$refval'";
 
-		if (count($keep_ids)>0) {
-		  $keep_list_ids = implode(",", $keep_ids);
-		  $sql.= " AND ({$this->prkey} NOT IN ($keep_list_ids)) ";
-		}
+        if (count($keep_ids)>0) {
+            $keep_list_ids = implode(",", $keep_ids);
+            $sql.= " AND ({$this->prkey} NOT IN ($keep_list_ids)) ";
+        }
 
-		debug("DBTableBean::deleteRef: Executing SQL: $sql");
+        debug("DBTableBean::deleteRef: Executing SQL: $sql");
 
-		$res = $db->query($sql);
+        $res = $db->query($sql);
 
-		if (!$res) {
-		  if ($docommit) $db->rollback();
-		  throw new Exception("DBError: ".$db->getError());
-		}
-		
-		if ($docommit) $db->commit();
+        if (!$res) {
+            if ($docommit) $db->rollback();
+            throw new Exception("DBError: ".$db->getError());
+        }
+        
+        if ($docommit) $db->commit();
 
-		$this->manageCache($refval);
-		
-		return $res;
+        $this->manageCache($refval);
+        
+        return $res;
     }
 
     
     public function toggleField($id, $field)
     {
-		if (!in_array($field, $this->fields)) throw new Exception("DBTableBean::toggleField Field '$field' not found in this bean");
-		
-		$id = (int)$id;
-		
-		
-		$field = $this->db->escapeString($field);
-		
-		try {
-		
-		  $this->db->transaction();
-		
-		  if (! $this->db->query("UPDATE {$this->table} SET `$field` = NOT `$field` WHERE {$this->prkey}=$id "))throw new Exception("DBTableBean::toggleField DB Error: ". $this->db->getError());
-		
-		  $this->db->commit();
-		}
-		catch (Exception $e) {
-		  $this->db->rollback();
-		  throw $e;
-		}
+        if (!in_array($field, $this->fields)) throw new Exception("DBTableBean::toggleField Field '$field' not found in this bean");
+        
+        $id = (int)$id;
+        
+        
+        $field = $this->db->escapeString($field);
+        
+        try {
+        
+            $this->db->transaction();
+        
+            if (! $this->db->query("UPDATE {$this->table} SET `$field` = NOT `$field` WHERE {$this->prkey}=$id "))throw new Exception("DBTableBean::toggleField DB Error: ". $this->db->getError());
+        
+            $this->db->commit();
+        }
+        catch (Exception $e) {
+            $this->db->rollback();
+            throw $e;
+        }
     }
 
     public function findFieldValue($field_name, $field_value)
@@ -441,75 +445,76 @@ abstract class DBTableBean implements IDataBean
     public function insertRecord(&$row, &$db=false)
     {
     
-		$last_insert=-1;
+        $last_insert=-1;
 
-		$docommit=false;
+        $docommit=false;
 
-		if (!$db) {
-		  $db = $this->db;
-		  $db->transaction();
-		  $docommit=true;
-		}
+        if (!$db) {
+            $db = $this->db;
+            $db->transaction();
+            $docommit=true;
+        }
 
-		$values = array();
-		$this->prepareInsertValues($row, $values);
+        $values = array();
+        $this->prepareInsertValues($row, $values);
 
-		$sql = "INSERT INTO {$this->table} (".implode(",",array_keys($values)).") VALUES (".implode(",", $values).")";
+        $sql = "INSERT INTO {$this->table} (".implode(",",array_keys($values)).") VALUES (".implode(",", $values).")";
 
-		if (defined("DEBUG_DBTABLEBEAN_DUMP_SQL")) {
-		  debug(get_class($this)." INSERT SQL: $sql");
-		}
-		
-		$ret = $db->query($sql);
+        if (defined("DEBUG_DBTABLEBEAN_DUMP_SQL")) {
+            debug(get_class($this)." INSERT SQL: $sql");
+        }
+        
+        $ret = $db->query($sql);
 
-		if ($ret === false) {
-		  if ($docommit) $db->rollback();
-		  return -1;
-		}
+        if ($ret === false) {
+            if ($docommit) $db->rollback();
+            return -1;
+        }
 
-		//NOTE!!! lastID return the first auto_increment of a multi insert transaction
-		$last_insert = $db->lastID();
+        //NOTE!!! lastID return the first auto_increment of a multi insert transaction
+        $last_insert = $db->lastID();
 
-		if ($docommit) $db->commit();
+        if ($docommit) $db->commit();
 
-		$this->manageCache($last_insert);
-		
-		return $last_insert;
+        $this->manageCache($last_insert);
+        
+        return $last_insert;
     }
 	
     public function updateRecord($id, &$row, &$db=false)
     {
 
-		$docommit = false;
+        $docommit = false;
 
-		if (!$db) {
-		  $db = $this->db;
-		  $db->transaction();
-		  $docommit=true;
-		}
+        if (!$db) {
+            $db = $this->db;
+            $db->transaction();
+            $docommit=true;
+        }
 
-		$values = array();
-		$this->prepareUpdateValues($row, $values);
+        $values = array();
+        $this->prepareUpdateValues($row, $values);
 
-		$sql = "UPDATE {$this->table} SET ".implode(",",$values)." WHERE {$this->prkey}=$id";
+        $sql = "UPDATE {$this->table} SET ".implode(",",$values)." WHERE {$this->prkey}=$id";
 
-		if (defined("DEBUG_DBTABLEBEAN_DUMP_SQL")) {
-		  debug(get_class($this)." UPDATE SQL: $sql");
-		}
-		
-		$ret = $db->query($sql);
+        if (defined("DEBUG_DBTABLEBEAN_DUMP_SQL")) {
+            debug(get_class($this)." UPDATE SQL: $sql");
+        }
+        
+        $ret = $db->query($sql);
 
-		if ($ret === false) {
-		  if ($docommit) $db->rollback();
-		  return false;
-		}
+        if ($ret === false) {
+            if ($docommit) $db->rollback();
+            return false;
+        }
 
-		if ($docommit) $db->commit();
-		
-		$this->manageCache($id);
+        if ($docommit) $db->commit();
+        
+        $this->manageCache($id);
 
-		return $id;
+        return $id;
     }
+    
     protected function manageCache($id)
     {
         $cache_file = CACHE_ROOT."/".get_class($this)."/".$id;
@@ -521,58 +526,59 @@ abstract class DBTableBean implements IDataBean
             //
         }
     }
+    
     protected function prepareValues(&$row, &$values, $for_update)
     {
-		$keys = array();
+        $keys = array();
 
-		foreach ($row as $key=>$val) {
-		  //drop keys that are not fields from 'this' table
-		  if (!in_array($key, $this->fields)) continue;
-		  $keys[] = $key;
-		}
+        foreach ($row as $key=>$val) {
+            //drop keys that are not fields from 'this' table
+            if (!in_array($key, $this->fields)) continue;
+            $keys[] = $key;
+        }
 
-		$values = array();
+        $values = array();
 
-		foreach ($keys as $idx=>$key) {
-		  $value = $row[$key];
-	// 	  debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value));
+        foreach ($keys as $idx=>$key) {
+            $value = $row[$key];
+// 	  debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value));
 
-		  if (is_array($value)) {
-			
-			  if (count($value)<1)continue;
-			  $value = $value[0];
-			
-		  }
-		  
-		  if (is_null($value)) {
-			  $values[$key] = "NULL";
-		  }
-		  
-		  else {
-			  if ($this->needQuotes($key, $value)===true) {
-				  $values[$key] = "'".$value."'";
-			  }
-			  else {
-				  $values[$key] = $value;
-			  }
-		  }
-		  
-		  if ($for_update===true) {
-			
-			  $values[$key]="$key=".$values[$key];//already quoted
-			
-		  }
-		}
+            if (is_array($value)) {
+                
+                    if (count($value)<1)continue;
+                    $value = $value[0];
+                
+            }
+            
+            if (is_null($value)) {
+                    $values[$key] = "NULL";
+            }
+            
+            else {
+                    if ($this->needQuotes($key, $value)===true) {
+                            $values[$key] = "'".$value."'";
+                    }
+                    else {
+                            $values[$key] = $value;
+                    }
+            }
+            
+            if ($for_update===true) {
+                
+                    $values[$key]="$key=".$values[$key];//already quoted
+                
+            }
+        }
     }
     
     protected function prepareInsertValues(&$row, &$values)
     {
-		$this->prepareValues($row, $values, false);
+        $this->prepareValues($row, $values, false);
     }
     
     protected function prepareUpdateValues(&$row, &$values)
     {
-		$this->prepareValues($row, $values, true);
+        $this->prepareValues($row, $values, true);
     }
 
 }

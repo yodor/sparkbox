@@ -6,7 +6,7 @@ class MySQLiDriver extends DBDriver
 {
     private $connection = NULL;
     
-	public static $conn_count = 0;
+    public static $conn_count = 0;
 	
     public function __construct(DBConnectionProperties $conn, $open_new = true, $need_persistent=false)
     {

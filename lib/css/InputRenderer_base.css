@@ -1,0 +1,372 @@
+.InputField.TextField {
+  display:inline-block;
+}
+.InputField.TextArea {
+  display:inline-block;
+}
+
+
+
+.InputLabel  {
+  
+}
+.InputLabel .required {
+  color:red;
+  font-weight:bold;
+  font-size:10px;
+  font-family:"Mono", "Consolas";
+}
+.InputLabel[error="1"] {
+  color:red;
+}
+
+
+
+.InputField {
+
+  
+}
+
+.InputField .FieldElements {
+  display:inline-block;
+}
+.InputField[error="1"] .FieldElements {
+  border:1px dotted red;
+  padding:1px;
+}
+/*.ArrayContents .InputField[error="1"] {
+  border:1px dotted red;
+}*/
+.InputField .addon_content {
+  display:inline-block;
+  margin-left:10px;
+}
+
+
+
+
+
+
+.InputField.TextField {
+  
+    min-width:200px;
+     
+    background:url("../images/input_white_back.gif");
+    background-repeat:no-repeat;
+
+    border-top:1px solid #b7b7b7; border-left:1px solid #b7b7b7;
+    border-right:1px solid #dcdcdc;border-bottom:1px solid #dcdcdc;
+
+    margin:0;padding:0;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    font-size:14px;
+    padding:3px;
+}
+.InputField.TextField[error="1"] {
+  border:1px dotted red;
+}
+
+.InputField.TextField input[type='text']
+{
+  width:100%;
+  height:100%;
+  border:0px;
+  background-color:transparent;
+  outline: 0;
+
+}
+
+
+.InputField.TextArea {
+
+    background:url("../images/input_white_back.gif");
+    background-repeat:no-repeat;
+
+    border-top:1px solid #b7b7b7; border-left:1px solid #b7b7b7;
+    border-right:1px solid #dcdcdc;border-bottom:1px solid #dcdcdc;
+
+    font-size:14px;
+
+    
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    margin:0;
+    padding:3px;
+
+    padding-bottom:0px;
+
+    
+}
+.InputField.TextArea[error="1"] {
+  border:1px dotted red;
+}
+.InputField.TextArea TEXTAREA {
+  background-color:transparent;
+  width:100%;
+  height:100%;
+  border:0px;
+  border-spacing:0px;
+  
+  -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    
+  outline: 0;
+  
+  resize:vertical;
+}
+.InputField.MCETextArea[error="1"] {
+  border:1px dotted red;
+}
+
+
+.InputField.PasswordField {
+    background:url("../images/input_white_back.gif");
+    background-repeat:no-repeat;
+
+    border-top:1px solid #b7b7b7; border-left:1px solid #b7b7b7;
+    border-right:1px solid #dcdcdc;border-bottom:1px solid #dcdcdc;
+
+    margin:0;padding:0;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    font-size:14px;
+    padding:3px;
+}
+.InputField.PasswordField[error="1"] {
+  border:1px dotted red;
+}
+.InputField.PasswordField input[type='password']
+{
+  width:100%;
+  height:100%;
+  border:0px;
+  background-color:transparent;
+  outline: 0;
+}
+
+
+
+.InputField.SelectField {
+  
+}
+
+.InputField.SelectField SELECT {
+  padding:3px;
+  outline:0;
+  margin:0px;
+  font-size:1em;
+}
+
+.InputField.SelectField .SelectOption {
+	
+}
+
+
+.InputField.NestedSelectField {
+  
+}
+
+.InputField.NestedSelectField SELECT {
+  padding:3px;
+  outline: 0;
+  margin:0px;
+}
+
+.InputField.NestedSelectField .SelectOption {
+	
+}
+
+
+
+
+
+.InputField.CheckField[error="1"] .FieldElements {
+  padding:2px;
+}
+
+.InputField.CheckField .CheckItem {
+  display:inline-block;
+  vertical-align:middle;
+  padding-right:7px;
+}
+.InputField.CheckField .CheckItem INPUT[type='checkbox'] {
+
+  display:inline-block;
+  vertical-align:middle;
+  padding:0px;
+  margin:0px;
+  
+  margin-right:2px;
+}
+
+.InputField.CheckField .CheckItem SPAN {
+  display:inline-block;
+  vertical-align:middle;
+  padding:0px;
+  margin:0px;
+  
+}
+
+
+.InputField.RadioField[error="1"] .FieldElements {
+  padding:2px;
+}
+
+.InputField.RadioField .RadioItem {
+
+  display:inline-block;
+  vertical-align:middle;
+  padding-right:7px;
+  
+}
+
+.InputField.RadioField .RadioItem INPUT[type='radio'] {
+  display:inline-block;
+  vertical-align:middle;
+  padding:0px;
+  margin:0px;
+  
+   margin-right:2px;
+}
+
+
+.InputField.RadioField .RadioItem SPAN {
+  display:inline-block;
+  vertical-align:middle;
+  padding:0px;
+  margin:0px;
+}
+
+
+
+
+.InputField.DateField {
+  display:inline-block;
+
+}
+
+
+.InputField.DateField .DatePart {
+  display:inline-block;
+  vertical-align:middle;
+  padding:3px;
+  outline: 0;
+  margin:0px;
+  margin-right:2px;
+  font-size:1em;
+}
+
+.InputField.DateField .CalendarControl {
+
+  position:relative;
+  cursor:pointer;
+  display:inline-block;
+  vertical-align:middle;
+
+}
+
+
+
+.InputField.PhoneField {
+
+
+}
+.InputField.PhoneField .PhonePart[type='text'] {
+    
+    background:url("../images/input_white_back.gif");
+    background-repeat:no-repeat;
+
+    border-top:1px solid #b7b7b7; border-left:1px solid #b7b7b7;
+    border-right:1px solid #dcdcdc;border-bottom:1px solid #dcdcdc;
+
+    margin:0;padding:0;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    font-size:14px;
+    padding:5px;
+    outline: 0;
+}
+.InputField.PhoneField .PhonePart.CountryCode {
+  width:60px !important;
+  min-width:60px !important;
+  display:inline !important;
+}
+.InputField.PhoneField .PhonePart.CityCode {
+  width:60px  !important;
+  min-width:60px !important;
+  display:inline  !important;
+}
+.PhoneField .PhonePart.PhoneNumber {
+  width:160px  !important;
+  min-width:160px  !important;
+  display:inline  !important;
+}
+
+
+.InputField.TimeField {
+  
+
+}
+.InputField.TimeField .TimePart {
+  display:inline-block;
+  padding:3px;
+  outline: 0;
+  margin:0px;
+  margin-right:2px;
+  font-size:1em;
+}
+
+
+
+
+
+.slider_field_wrapper {
+  padding:10px;
+}
+
+
+
+.FreetextWrapper {
+	display:block;
+}
+.FreetextWrapper .TextField {
+	width:auto;
+}
+
+
+
+
+
+
+
+.InputField .ActionRenderer.BeanTranslationLink {
+/*   margin-top:10px; */
+  display:inline-block;
+  
+}
+
+.InputField + .Controls {
+    padding-left:5px;
+}
+
+.InputField > .caption:first-child {
+    
+    background-color:#EEEEEE;
+    color:black;
+    font-weight:bold;
+    padding:5px;
+    
+}

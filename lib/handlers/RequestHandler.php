@@ -17,6 +17,7 @@ abstract class RequestHandler implements IRequestProcessor
   public function __construct($cmd)
   {
       $this->cmd=$cmd;
+      debug("JSONRequestHandler::CTOR | Command: $cmd");
 
   }
   public function setNeedConfirm($mode)

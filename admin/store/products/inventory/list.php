@@ -55,7 +55,7 @@ RequestController::addRequestHandler($h_delete);
 // $ksc = new KeywordSearchComponent($search_fields);
 
 $select_inventory = $bean->getSelectQuery();
-$select_inventory->fields = " pi.*, pi.prodID as product_photo, pclr.pclrID, pclr.color, sc.color_code, pi.size_value, p.product_name, p.product_code  ";
+$select_inventory->fields = " pi.*, pi.prodID as product_photo, pclr.pclrID,  sc.color_code, pi.size_value, p.product_name, p.product_code  ";
 $select_inventory->from = " product_inventory pi LEFT JOIN product_colors pclr ON pclr.pclrID = pi.pclrID LEFT JOIN store_colors sc ON sc.color=pclr.color LEFT JOIN products p ON p.prodID = pi.prodID JOIN color_chips cc ON cc.prodID = p.prodID LEFT JOIN product_photos pp ON pp.prodID = pi.prodID ";
 if ($prodID>0) {
   $select_inventory->where = " pi.prodID = '$prodID' ";

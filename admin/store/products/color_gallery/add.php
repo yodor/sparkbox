@@ -12,7 +12,7 @@ $menu=array(
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-$action_back = new Action("", Session::get("inventory.color_scheme"), array());
+$action_back = new Action("", Session::get("product.color_scheme"), array());
 $action_back->setAttribute("action", "back");
 $action_back->setAttribute("title", "Back to Colors List");
 $page->addAction($action_back);

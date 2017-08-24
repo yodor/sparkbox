@@ -1,5 +1,5 @@
 <?php
-define("DEBUG_OUTPUT", 1);
+// define("DEBUG_OUTPUT", 1);
 
 include_once("session.php");
 include_once("class/pages/DemoPage.php");

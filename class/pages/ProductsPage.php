@@ -31,8 +31,9 @@ class ProductsPage extends DemoPage
 (SELECT pclrpID FROM product_color_photos pcp WHERE pcp.pclrID=pi.pclrID ORDER BY position ASC LIMIT 1) as pclrpID,
 
 pi.price - (pi.price * (coalesce(sp.discount_percent,0)) / 100.0) AS sell_price, 
-pi.piID, pi.size_value, pi.color, pi.pclrID, p.brand_name, pi.prodID, 
-p.product_code, p.product_name, p.product_description, p.keywords 
+pi.piID, pi.size_value, pi.color, pi.pclrID, pi.prodID, 
+p.product_code, p.product_name, p.brand_name, p.product_summary, p.product_description, p.keywords,
+p.promotion, p.visible, p.class_name, p.gender, p.old_price, p.insert_date, p.update_date
 ";
 		$derived->from = " product_inventory pi 
 

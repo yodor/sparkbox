@@ -36,7 +36,7 @@ class RequestController {
     public static function processAjaxHandlers()
     {
 	if (self::$working===true) {
-	    debug("RequestController::processAjaxHandlers: Skip processing - Handler already working");
+	    debug("RequestController::processAjaxHandlers() Skip processing - Handler already working");
 	    return;
 	}
 
@@ -48,12 +48,12 @@ class RequestController {
 	    $processed = false;
 
 	    foreach(self::$ajax_handlers as $key=>$handler) {
-	      debug("CheckingHandler: $key=>".get_class($handler));
+	      debug("RequestController::CheckingHandler() $key=>".get_class($handler));
 	      if ($handler->shouldProcess()) {
 
 		  $ret = new JSONResponse("AjaxHandler");
 		  try {
-		      debug("RequestController::processAjaxHandlers: Processing Handler: ".get_class($handler));
+		      debug("RequestController::processAjaxHandlers() Processing Handler: ".get_class($handler));
 		      $handler->processHandler();
 		  }
 		  catch (Exception $e) {

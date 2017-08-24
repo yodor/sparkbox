@@ -16,8 +16,6 @@ $action_add->setAttribute("action", "add");
 $action_add->setAttribute("title", "Add Attribute");
 $page->addAction($action_add);
 
-
-
 $bean = new AttributesBean();
 
 $h_delete = new DeleteItemRequestHandler($bean);
@@ -35,7 +33,6 @@ $view->addColumn(new TableColumn("type","Type"));
 
 $view->addColumn(new TableColumn("actions","Actions"));
 
-
 $act = new ActionsTableCellRenderer();
 $act->addAction(
   new Action("Edit", "add.php", array(new ActionParameter("editID",$bean->getPrKey()))  )
@@ -43,9 +40,8 @@ $act->addAction(
 $act->addAction(  new PipeSeparatorAction() );
 $act->addAction( $h_delete->createAction() );
 
-
-
 $view->getColumn("actions")->setCellRenderer($act);
+
 
 Session::set("attributes.list", $page->getPageURL());
 

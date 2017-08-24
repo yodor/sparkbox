@@ -16,7 +16,7 @@ function constructSubmenu($item, $level, $max_items, $max_level)
     if ($level>$max_level)return;
     
     for ($b=0;$b<$max_items;$b++) {
-      $sitem = new MenuItem("SubmenuItem $b/$level","menu.php?branch=$b&level=$level");
+      $sitem = new MenuItem("$b.MenuItem (Level: $level)","menu.php?branch=$b&level=$level");
       $item->addMenuItem($sitem);
       constructSubmenu($sitem, $level, $max_items, $max_level);
       

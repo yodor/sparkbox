@@ -60,16 +60,18 @@ class AdminPageLib extends SimplePage
     {
 	parent::dumpCSS();
 	
-	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin.css" type="text/css">';
-	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin_menu.css" type="text/css">';
-	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin_buttons.css" type="text/css">';
+	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin.css" type="text/css">';echo "\n";
+	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin_menu.css" type="text/css">';echo "\n";
+	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin_buttons.css" type="text/css">';echo "\n";
 
     }
     protected function dumpJS()
     {
 	parent::dumpJS();
 	
-	
+	echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/cookies.js'></script>";
+        echo "\n";
+
 
     }
 
@@ -214,8 +216,11 @@ class AdminPageLib extends SimplePage
 	  echo "<tr>";
 	  
 	    echo "<td class='left_menu'>";
-
-	    $this->menu_bar->render();
+	    
+            echo "<div class='MenuBar'>";
+                $this->menu_bar->render();
+                echo "<a class='toggle' onClick='javascript:toggleMenu(this)'>".tr("Menu")."</a>";
+            echo "</div>";
 
 	    if(is_callable("drawMenuPrivate")) {
 	      call_user_func("drawMenuPrivate", $this);
@@ -242,15 +247,49 @@ class AdminPageLib extends SimplePage
 	echo "<tr><td colspan=2 class='admin_footer'>";
 
 	  echo "<span class='copy'>Copyright &copy; ".date("Y")." ".SITE_TITLE.". All Rights Reserved.</span>";
-	  echo "<img class='spark_logo' align=right height=24 src='".SITE_ROOT."lib/images/admin/sparkbox.png'>";
+	  echo "<img class='logo' src='".SITE_ROOT."lib/images/admin/sparkbox.png'>";
 
 	echo "</td></tr>";
 	echo "</table>";
 
 	echo "\n<!--finishPage AdminPage-->\n";
-
-
-
+?>
+<script type='text/javascript'>
+function toggleMenu(elm)
+{
+  if ($(".MenuBar").hasClass("normal")) {
+        $(".MenuBar").removeClass("normal");
+	docCookies.setItem("MenuBar.visibility",0);
+        
+	var instance = $(".MenuBar .MenuBarComponent.admin_menu").data("menu_instance");
+	if (instance) instance.leaveAll();
+	
+  }
+  else {
+        
+	$(".MenuBar").addClass("normal");
+	docCookies.setItem("MenuBar.visibility", 1);
+  }
+}
+addLoadEvent(function(){
+    if (docCookies.hasItem("MenuBar.visibility")) {
+        var menu_visible = parseInt(docCookies.getItem("MenuBar.visibility"));
+        //default is menu is visible
+        if ( menu_visible == 0) {
+            if ($(".MenuBar").hasClass("normal")) {
+                $(".MenuBar").removeClass("normal");
+            }
+        }
+        else if (menu_visible == 1) {
+            
+            $(".MenuBar").addClass("normal");
+          
+        }
+    }
+    
+});
+</script>
+<?php
 	parent::finishPage();
     }
 

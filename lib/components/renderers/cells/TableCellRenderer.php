@@ -45,6 +45,8 @@ class TableCellRenderer extends Component implements ICellRenderer
   protected function processAttributes($row, TableColumn $tc)
   {
       $this->setAttribute("column", $tc->getFieldName());
+      $this->setAttribute("title", tr($tc->getLabel()));
+      
       foreach ($this->value_attributes as $idx=>$field) {
 	if (isset($row[$field])) {
 	  $this->setAttribute($field,$row[$field]);

@@ -66,8 +66,16 @@ $defines->set("CONTEXT_ADMIN", "context_admin");
 $defines->set("ADMIN_ROOT", SITE_ROOT."admin/");
 $defines->set("STORAGE_HREF", SITE_ROOT."storage.php");
 
+//base size for all uploaded images
 $defines->set("IMAGE_UPLOAD_DEFAULT_WIDTH", 1280);
 $defines->set("IMAGE_UPLOAD_DEFAULT_HEIGHT", 720);
+
+//IMAGE_UPLOAD_DOWNSCALE = true  | uploaded images are downscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
+//IMAGE_UPLOAD_DOWNSCALE = false | uploaded images are not downscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
+$defines->set("IMAGE_UPLOAD_DOWNSCALE", true);
+
+//IMAGE_UPLOAD_UPSCALE = true  | uploaded images width different size from 'base size' are upscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
+//IMAGE_UPLOAD_UPSCALE = false | uploaded images are not upscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 $defines->set("IMAGE_UPLOAD_UPSCALE", false);
 
 
@@ -114,21 +122,29 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
   include_once("lib/dbdriver/DBDriver.php");
 
   //TODO:check persistent connections with mysql. Introduced in php 5.3
+  $create_regular = false;
   
-//   if (defined("PERSISTENT_DB")) {
-//   
-//         try {
-//             DBDriver::create(true, true, "default");
-// 	}
-// 	catch (Exception $e) {
-//             
-//             Session::set("alert", "Unable to open persistent connection to DB: ".$e->getMessage());
-//             
-// 	}
-// 	
-//   }
-//   else {
+  if (!defined("PERSISTENT_DB")) {
+    $create_regular = true;
+  }
+  else {
+        if (!DBConnections::getConnection("default")->is_pdo || !startsWith(phpversion(),"5.3")) {
+            $create_regular = true;
+        }
+        else {
+            try {
+                DBDriver::create(true, true, "default");
+            }
+            catch (Exception $e) {
+                
+                Session::set("alert", "Unable to open persistent connection to DB: ".$e->getMessage());
+                
+            }
+	}
+	
+  }
   
+  if ($create_regular) {
         try {
         
             DBDriver::create();
@@ -137,8 +153,8 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
         catch (Exception $e) {
             Session::set("alert", "Unable to open connection to DB: ".$e->getMessage());
         }
-        
-//   }
+  }
+  
   
   
 //   $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');

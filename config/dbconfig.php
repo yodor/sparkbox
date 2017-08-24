@@ -3,13 +3,14 @@
 
 $prop = new DBConnectionProperties();
 $prop->driver = "MySQLi";
+// $prop->driver = "PDOMySQL";
 
 $prop->database="store_demo";
 $prop->user="store_demo";
 $prop->pass="store_demo";
 $prop->host="localhost";
 $prop->port="3306";
-
+$prop->is_pdo = false;
 
 
 $prop->setConnectionName("default");

@@ -153,11 +153,16 @@ abstract class InputRenderer extends Component
   
   public function renderField(InputField $field)
   {
-      $this->setField($field);
-      
-      $this->startRender();
-      $this->renderImpl();
-      $this->finishRender();
+        $this->setField($field);
+
+        $this->startRender();
+        if (strlen($this->caption)>0) {
+            echo "<div class='caption'>";
+            echo $this->caption;
+            echo "</div>";
+        }
+        $this->renderImpl();
+        $this->finishRender();
   }
   
   public function renderValue(InputField $field, $render_index=-1)

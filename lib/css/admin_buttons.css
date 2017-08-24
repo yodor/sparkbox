@@ -7,7 +7,7 @@
   -moz-border-radius: 5px 5px 5px 5px;
   border-radius: 5px 5px 5px 5px;
   
-  border: 1px solid #7c99a9;
+/*   border: 1px solid #7c99a9; */
    
   background-color: #667d85;
   background: -webkit-gradient(linear, 0 0, 0 bottom, from(#7c99a9), to(#53788a));
@@ -24,7 +24,7 @@
   text-transform:uppercase;
   font-size:11px;
   font-weight:bold;
-  min-width:100px;
+/*   min-width:100px; */
 
 }
 .orange {

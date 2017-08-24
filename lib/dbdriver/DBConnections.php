@@ -8,7 +8,10 @@ class DBConnectionProperties
   public $pass="";
   public $host="";
   public $port="";
-	protected $variables = array();
+  protected $variables = array();
+  
+  public $is_pdo = false;
+  
   protected $connectionName = "default";
 
   public function setVariables($arr)

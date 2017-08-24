@@ -7,10 +7,12 @@
   text-align:center;
   position:relative;
   width:100%;
+  table-layout:fixed;
   
 }
 .GalleryTape .viewport {
   display:table-cell;
+  overflow:hidden;
 }
 
  .GalleryTape .button {
@@ -20,6 +22,8 @@
   vertical-align:middle;
   cursor:pointer;
   position:relative;
+  min-width:22px;
+  
 }
  .GalleryTape .button.left {
   background-image:url("../images/gallery_tape_left.png");
@@ -35,11 +39,10 @@
 }
 
  .GalleryTape .slots {
-  display:inline-block;
+  display:block;
   vertical-align:top;
   position:relative;
   overflow:hidden;
-  width:850px;
   height:174px;
   max-height:174px;
   white-space:nowrap;

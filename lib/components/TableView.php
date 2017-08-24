@@ -88,13 +88,13 @@ class TableView extends AbstractResultView implements IHeadRenderer
 
 	  echo "<table class='viewport' >";
 	  if ($this->header_cells_enabled) {
-		  echo "<tr>";
+		  echo "<tr class='sort'>";
 
 		  foreach ($this->columns as $pos=>$tc) {
 
 			$tc->getHeaderCellRenderer()->renderCell(false, $tc);
 		  }
-
+                  
 		  echo "</tr>";
 	  }
 
@@ -116,7 +116,7 @@ class TableView extends AbstractResultView implements IHeadRenderer
 
 		  $cls = $v->value();
 
-		  echo "<tr>";
+		  echo "<tr class='$cls'>";
 
 		  foreach ($this->columns as $pos=>$tc) {
 			$cellr = $tc->getCellRenderer();

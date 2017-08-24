@@ -20,14 +20,14 @@ $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
 
-$action_back = new Action("", Session::get("inventory.color_scheme"), array());
+$action_back = new Action("", Session::get("product.color_scheme"), array());
 $action_back->setAttribute("action", "back");
-$action_back->setAttribute("title", "Back to Color Scheme");
+$action_back->setAttribute("title", "Back");
 $page->addAction($action_back);
 
 $action_add = new Action("", "add.php?".$rc->ref_key."=".$rc->ref_id, array());
 $action_add->setAttribute("action", "add");
-$action_add->setAttribute("title", "Add Color Scheme Photo");
+$action_add->setAttribute("title", "Add Photo");
 $page->addAction($action_add);
 
 // $action_add = new Action("", "add.php", array());

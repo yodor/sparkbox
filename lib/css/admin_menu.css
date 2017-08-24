@@ -1,3 +1,6 @@
+.MenuBar .toggle {
+    display:none;
+}
 .admin_menu {
 /*   border:1px dotted blue; */
   min-width:180px;

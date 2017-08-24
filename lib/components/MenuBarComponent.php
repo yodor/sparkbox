@@ -2,12 +2,15 @@
 include_once("lib/components/Component.php");
 include_once("lib/utils/MainMenu.php");
 include_once("lib/components/renderers/menus/MenuBarItemRenderer.php");
+include_once("lib/components/MLTagComponent.php");
 
 class MenuBarComponent extends Component implements IHeadRenderer
 {
 	protected $main_menu;
 	protected $ir_baritem;
-
+        protected $bar;
+        public $toggle_first = false;
+        
 	public function __construct(MainMenu $menu)
 	{
 	    parent::__construct();
@@ -22,6 +25,15 @@ class MenuBarComponent extends Component implements IHeadRenderer
 	      $this->setAttribute("source", $bean_name);
 	    }
 
+	    $this->bar = new MLTagComponent("DIV");
+	    $this->bar->setClassName("MenuBar");
+	    
+	    $this->toggle = new MLTagComponent("A");
+	    $this->toggle->setClassName("toggle");
+
+
+
+            
 	}
 	public function renderStyle()
 	{
@@ -49,6 +61,24 @@ class MenuBarComponent extends Component implements IHeadRenderer
 	    return $this->ir_baritem;
 	}
 
+	public function setName($name)
+        {
+            parent::setName($name);
+            $this->bar->setName($name);
+            $this->toggle->setAttribute("title",$name);
+        }
+  
+        public function startRender()
+        {
+            $this->bar->startRender();
+            if ($this->toggle_first) {
+                $this->toggle->render();
+            }
+            parent::startRender();
+            
+            
+        }
+ 
 	public function renderImpl()
 	{
 	    $menu_items = $this->main_menu->getMenuItems();
@@ -68,11 +98,16 @@ class MenuBarComponent extends Component implements IHeadRenderer
 	public function finishRender()
 	{
 	    parent::finishRender();
+	    if (!$this->toggle_first) {
+                $this->toggle->render();
+            }
+	    $this->bar->finishRender();
 	    ?>
 	    <script type='text/javascript'>
 	    addLoadEvent(function(){
 		var menu_bar = new MenuBarComponent();
 		menu_bar.attachWith("<?php echo $this->name;?>");
+		
 	    });
 	    </script>
 	    <?php

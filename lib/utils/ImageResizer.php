@@ -70,7 +70,7 @@ class ImageResizer
       ImageResizer::$src_height = imagesy($source);
       
       
-      debug("ImageResizer::crop: Original Image Size:(".ImageResizer::$src_width." x ".ImageResizer::$src_height.")");
+      debug("ImageResizer::crop() Original Image Size:(".ImageResizer::$src_width." x ".ImageResizer::$src_height.")");
       
       $scale = 1;
 
@@ -80,7 +80,7 @@ class ImageResizer
 
 	if ($dst_width>0 && $dst_height>0) {
 	
-	  debug("ImageResizer::crop: Requested Exact Fit Rectangle: ($dst_width x $dst_height)");
+	  debug("ImageResizer::crop() Requested Exact Fit Rectangle: ($dst_width x $dst_height)");
 	  $exact_fit = true;
 	  
 	  $scale = max( $dst_width/ImageResizer::$src_width, $dst_height/ImageResizer::$src_height );
@@ -91,7 +91,7 @@ class ImageResizer
 	
 	  $ratio = (float)ImageResizer::$src_width / $dst_width;
 	  $dst_height = ImageResizer::$src_height / $ratio;
-	  debug("ImageResizer::crop: Requested Fit to Width: ($dst_width, $dst_height) Ratio: $ratio");
+	  debug("ImageResizer::crop() Requested Fit to Width: ($dst_width, $dst_height) Ratio: $ratio");
 	  $scale = min( $dst_width/ImageResizer::$src_width, $dst_height/ImageResizer::$src_height );
 
 	}
@@ -99,7 +99,7 @@ class ImageResizer
 	
 	  $ratio = (float)ImageResizer::$src_height / $dst_height;
 	  $dst_width = ImageResizer::$src_width / $ratio;
-	  debug("ImageResizer::crop: Requested Fit to Height: ($dst_width, $dst_height) Ratio: $ratio");
+	  debug("ImageResizer::crop() Requested Fit to Height: ($dst_width, $dst_height) Ratio: $ratio");
 	  $scale = min( $dst_width/ImageResizer::$src_width, $dst_height/ImageResizer::$src_height );
 	  
 	}
@@ -120,14 +120,14 @@ class ImageResizer
       ImageResizer::$n_height = $n_height;
 
 
-      debug("ImageResizer::crop: Calculated Output Image Dimension ($n_width x $n_height) Scale: $scale");
-      
-      
-      ImageResizer::outputImage($row, $source);
-      
+      debug("ImageResizer::crop() Calculated Output Image Dimension ($n_width x $n_height) Scale: $scale");
+
+      //CHECK
       if ($exact_fit) {
+        
 	if (ImageResizer::$n_width != ImageResizer::$max_width || ImageResizer::$n_height != ImageResizer::$max_height) {
-	
+            
+            debug("ImageResizer::crop() Exact fit requested");
 	    
 	    ImageResizer::$n_width =  ImageResizer::$max_width;
 	    ImageResizer::$n_height =  ImageResizer::$max_height;
@@ -135,10 +135,15 @@ class ImageResizer
 	    ImageResizer::$src_width =  ImageResizer::$max_width;
 	    ImageResizer::$src_height = ImageResizer::$max_height;
 	    
-	    $source = ImageResizer::createSource($row);
+	    //@imagedestroy($source);
+	    
+	    //$source = ImageResizer::createSource($row);
 	    
 	    ImageResizer::outputImage($row, $source, true);
 	}
+      }
+      else {
+        ImageResizer::outputImage($row, $source);
       }
       
       @imagedestroy($source);
@@ -247,7 +252,7 @@ class ImageResizer
 	@imagedestroy($source);
 	
     }
-    protected static function outputImage(&$row, $source, $force_process=false)
+    protected static function outputImage(&$row, &$source, $force_process=false)
     {
 
 	$photo = NULL;
@@ -287,7 +292,6 @@ class ImageResizer
 	$row["size"] = ob_get_length();
 	ob_end_clean();
 
-	@imagedestroy($source);
     }
 }
 ?>

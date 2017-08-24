@@ -68,6 +68,7 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer,
   public function renderImpl()
   {
 
+        
       if ($this->data_bean instanceof IDataBean) {
 
 	  $source_fields = $this->data_bean->getFields();

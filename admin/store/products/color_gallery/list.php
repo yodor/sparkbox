@@ -119,7 +119,7 @@ $act->addAction(
     
 $view->getColumn("actions")->setCellRenderer($act);
 
-Session::set("inventory.color_scheme", $page->getPageURL());
+Session::set("product.color_scheme", $page->getPageURL());
 
 
 $page->beginPage($menu);

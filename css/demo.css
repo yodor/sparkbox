@@ -2,7 +2,7 @@ body {
   background-color:#ababab;
   margin-bottom:20px;
   
-
+  text-align:center;
   
 /*  font-size:14px;
   font-size:1.01vw;*/
@@ -37,17 +37,15 @@ body {
 }
 
 
-.MenuBar .MenuBarComponent {
-  display:inline-block;
-  
-}
 .MenuBar .MenuBarComponent .MenuBarItemRenderer {
   display:inline-block;
   height:auto;
-  padding-top:5px;
-  padding-bottom:5px;
+  
   font-size:1.2em;
 }
+
+
+
 .MenuBar .MenuBarComponent .MenuSeparator {
   display:inline-block;
 }
@@ -56,22 +54,12 @@ body {
 
 .MenuBar {
 
-width: 100%;
+    width: 100%;
 
-text-align: center;
-margin: 0 auto;
-padding: 0;
-display:block;
-}
-
-/* Default Style */
-
-.MenuBar.default {
-
-}
-
-.MenuBar .toggle {
-display:none;
+    text-align: center;
+    margin: 0 auto;
+    padding: 0;
+    display:block;
 }
 
 

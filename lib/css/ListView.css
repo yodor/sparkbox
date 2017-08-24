@@ -8,14 +8,14 @@
 }
 .ListView .PaginatorTopComponent {
   
-  border: 1px solid #aeaeae;
+/*   border: 1px solid #aeaeae; */
   background-color: #e7e7e7;
   white-space: nowrap;
   color: #537689;
 }
 .ListView .PaginatorBottomComponent {
   
-  border: 1px solid #aeaeae;
+/*   border: 1px solid #aeaeae; */
   background-color: #e7e7e7;
   white-space: nowrap;
   color: #537689;
