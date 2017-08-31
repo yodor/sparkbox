@@ -1,3 +1,281 @@
-@import url("admin_base.css");
-@import url("admin_mobile.css");
+HTML {
+  height:100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+BODY {
+  
+  color:black;
+  font-family:"Arial";
+  font-size:12px;
+
+  padding:0;
+  margin:0;
+
+  height:100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+
+  background-image:none;
+  background-color:white;
+
+}
+
+
+IMG {
+  border:0;
+}
+
+.clear {
+  
+  clear:both;
+}
+
+
+.admin_layout {
+  border-collapse:collapse;
+  width:100%;
+  height:100%;
+}
+.admin_layout .admin_header {
+  background-color:#464646;
+
+  color:white;
+  background-image:url("../images/admin/admin_header.png");
+
+  padding:5px;
+}
+
+.admin_layout .admin_header .welcome {
+  float:right;
+  text-align:right;
+}
+.admin_layout .admin_header .welcome .text_admin {
+  font-size:24px;
+/*   letter-spacing:3px; */
+  color:#8f8f8f;
+  display:block;
+}
+.admin_layout .admin_header .admin_logo {
+  background-image:url("../images/admin/sparkbox.png");
+  background-position:center center;
+  background-repeat:no-repeat;
+  height:68px;
+  width:185px;
+  float:left;
+
+}
+.admin_layout .admin_header .LocationPath {
+  display:inline-block;
+}
+.admin_layout .admin_header .LocationPath LABEL {
+  font-weight:bold;
+  color:#999999;
+}
+.admin_layout .admin_header .LocationPath .ActionRenderer {
+  color:white;
+}
+.admin_layout .left_menu {
+  height:100%;
+
+  background-image:url("../images/admin/menu_item_right_shadow.png");
+  background-position:right center;
+  background-repeat:repeat-y;
+  background-color:#ececec;
+  
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  
+  white-space:nowrap;
+  vertical-align:top;
+  padding:0px;
+  padding-right:1px;
+}
+.admin_layout .page_area {
+  width:100%;
+  
+  height:100%;
+ 
+  padding-top:25px;
+  padding-left:25px;
+  padding-right:20px;
+  padding-bottom:20px;
+  
+  vertical-align:top;
+  
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+/*   background-color:white; */
+
+}
+
+.admin_layout .admin_footer {
+  background-image:url("../images/admin/footer_back.png");
+/*  min-height:90px;
+  max-height:90px;
+  height:90px;*/
+  color:#9a9a9a;
+  padding-top:5px;
+  padding-bottom:5px;
+  vertical-align:middle;
+}
+
+.admin_layout .admin_footer .copy {
+    text-align:center;
+
+}
+.admin_layout .admin_footer .logo {
+    text-align:right;
+    float:right;
+    height:42px;
+}
+
+
+.admin_layout .page_area .page_caption {
+  color:#656565;
+  font-size:20px;
+/*   font-weight:bold; */
+  border-bottom:1px solid #cccccc;
+  padding-bottom:10px;
+  margin-bottom:10px;
+}
+
+.admin_layout .page_area .page_caption .page_actions {
+  display:inline-block;
+  margin-right:10px;
+  height:30px;
+}
+.admin_layout .page_area .page_caption .page_actions .ActionRenderer {
+  display:inline-block;
+  width:30px;
+  height:100%;
+  background-size:cover;
+  margin-bottom:-7px;
+  margin-left:2px;
+  margin-right:3px;
+}
+.admin_layout .page_area .page_caption .page_actions .ActionRenderer[action]:not([action='']) {
+  background-repeat:no-repeat;
+/*   content: attr(title) ": ";  */
+}
+
+.admin_layout .page_area .page_caption .page_actions .ActionRenderer[action='add'] {
+  background-image:url("../images/page_actions/green_plus.png");
+}
+
+.admin_layout .page_area .page_caption .page_actions .ActionRenderer[action='back'] {
+  background-image:url("../images/page_actions/green_left.png");
+}
+.admin_layout .page_area .page_area.products.list .TableView .viewport .TableCellImageList {
+/*   max-width:120px; */
+    display:inline-block;
+}
+.admin_layout .page_area .page_area.products.list .TableView .viewport .TableCellImageItem {
+  display:inline-block;
+}
+
+
+.AdminLoginPage {
+  background-image:url("../images/site_back.jpg");
+  background-repeat:repeat-x;
+}
+
+.login_component {
+  display:inline-block;
+  height:318px;
+  vertical-align:middle;
+  text-align:left;
+}
+.login_component .inner {
+  display:inline-block;border:1px solid #eaeaea; padding:20px; 
+ 
+}
+.login_component .inner .caption {
+  text-transform:uppercase;
+  color:#517789;
+  font-weight:bold;
+  font-size:24px;letter-spacing:2px;
+  border-bottom:1px solid #eaeaea;
+  margin-bottom:10px;
+  padding-bottom:10px;
+  display:inline-block;
+  
+}
+.AuthFormRenderer {
+  width:100%;
+}
+.AuthFormRenderer .InputComponent .TextField {
+  width:100%;
+}
+.AuthFormRenderer .InputComponent .PasswordField {
+  width:100%;
+}
+.AuthFormRenderer .submit_line {
+  display:block;
+  margin-top:20px;
+}
+.AuthFormRenderer .submit_line .forgot_password {
+  float:left;
+}
+.AuthFormRenderer .submit_line button {
+  float:right;
+}
+
+
+.InputFormView[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
+  display:block;
+}
+.InputFormView[bean='AdminUsersBean'] .InputComponent[field="password"] {
+  display:none;
+}
+.InputFormView[bean='AdminUsersBean'] .InputComponent[field="password1"] {
+  display:none;
+}
+
+
+.TranslationPhrases .original_text {
+  font-weight:bold;
+}
+
+.InputFormView[bean='MenuItemsBean'] .FormRenderer .InputField {
+  min-width:400px;
+  
+}
+
+.InputFormView .FormRenderer .InputField.MCETextArea TEXTAREA {
+  height:350px;
+}
+
+.TableView[name='SiteTexts'] TD[column='value'] {
+  text-align:left;
+}
+
+
+.InputFormView > .caption:first-child {
+  color: #656565;
+  font-size: 20px;
+  /* font-weight: bold; */
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  
+}
+.gallery_view_item .item_details {
+  display:inline;
+}
+.gallery_view_item .item_details .title {
+  font-size:12px;
+  border:0;
+  padding:0;
+  margin:0;
+  display:inline;
+}
+
+.orange {
+  color:#f9a541;
+}
 

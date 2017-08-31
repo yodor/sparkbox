@@ -39,7 +39,8 @@ class MCEImageBrowserDialog extends MessageDialog
 	}
 	public function renderScript()
 	{
-	
+	    echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/popups/MCEImageBrowserDialog.js'></script>";
+	    echo "\n";
 	}
 	public function renderStyle()
 	{

@@ -61,8 +61,8 @@ class AdminPageLib extends SimplePage
 	parent::dumpCSS();
 	
 	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin.css" type="text/css">';echo "\n";
-	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin_menu.css" type="text/css">';echo "\n";
 	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin_buttons.css" type="text/css">';echo "\n";
+	echo '<link rel="stylesheet" href="'.SITE_ROOT.'lib/css/admin_menu.css" type="text/css">';echo "\n";
 
     }
     protected function dumpJS()
@@ -143,7 +143,10 @@ class AdminPageLib extends SimplePage
 
 	
 	$this->menu_bar = new MenuBarComponent($dynmenu);
+	$this->menu_bar->toggle_first=false;
+	$this->menu_bar->setName("admin_menu");
 	$this->menu_bar->setClassName("admin_menu");
+	
 	$this->menu_bar->setAttribute("submenu_popup", "0");
     }
 
@@ -217,10 +220,9 @@ class AdminPageLib extends SimplePage
 	  
 	    echo "<td class='left_menu'>";
 	    
-            echo "<div class='MenuBar'>";
-                $this->menu_bar->render();
-                echo "<a class='toggle' onClick='javascript:toggleMenu(this)'>".tr("Menu")."</a>";
-            echo "</div>";
+
+            $this->menu_bar->render();
+
 
 	    if(is_callable("drawMenuPrivate")) {
 	      call_user_func("drawMenuPrivate", $this);
@@ -255,39 +257,24 @@ class AdminPageLib extends SimplePage
 	echo "\n<!--finishPage AdminPage-->\n";
 ?>
 <script type='text/javascript'>
-function toggleMenu(elm)
-{
-  if ($(".MenuBar").hasClass("normal")) {
-        $(".MenuBar").removeClass("normal");
-	docCookies.setItem("MenuBar.visibility",0);
-        
-	var instance = $(".MenuBar .MenuBarComponent.admin_menu").data("menu_instance");
-	if (instance) instance.leaveAll();
-	
-  }
-  else {
-        
-	$(".MenuBar").addClass("normal");
-	docCookies.setItem("MenuBar.visibility", 1);
-  }
-}
-addLoadEvent(function(){
-    if (docCookies.hasItem("MenuBar.visibility")) {
-        var menu_visible = parseInt(docCookies.getItem("MenuBar.visibility"));
-        //default is menu is visible
-        if ( menu_visible == 0) {
-            if ($(".MenuBar").hasClass("normal")) {
-                $(".MenuBar").removeClass("normal");
-            }
-        }
-        else if (menu_visible == 1) {
-            
-            $(".MenuBar").addClass("normal");
-          
-        }
-    }
-    
-});
+
+// addLoadEvent(function(){
+//     if (docCookies.hasItem("MenuBar.visibility")) {
+//         var menu_visible = parseInt(docCookies.getItem("MenuBar.visibility"));
+//         //default is menu is visible
+//         if ( menu_visible == 0) {
+//             if ($(".MenuBar").hasClass("normal")) {
+//                 $(".MenuBar").removeClass("normal");
+//             }
+//         }
+//         else if (menu_visible == 1) {
+//             
+//             $(".MenuBar").addClass("normal");
+//           
+//         }
+//     }
+//     
+// });
 </script>
 <?php
 	parent::finishPage();

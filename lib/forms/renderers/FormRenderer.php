@@ -56,6 +56,7 @@ class FormRenderer extends Component implements IFormRenderer, IHeadRenderer
       $this->setFieldLayout($field_layout);
 
   }
+
   public function renderScript()
   {}
   public function renderStyle()

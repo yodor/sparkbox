@@ -41,7 +41,6 @@ class SizingFilter implements IQueryFilter
 	  }
 	  else {
 		$sel->where = " (relation.size_values LIKE '%$value|%' OR relation.size_values LIKE '%|$value%' OR relation.size_values='$value') ";
-// 		$sel->where = " $related_table.size_value='$value' ";
 	  }
 	}
 	
@@ -79,17 +78,18 @@ class InventoryAttributeFilter implements IQueryFilter
 
   public function getQueryFilter($view=NULL, $value = NULL)
   {
-	$sel_all = NULL;
+	$sel = NULL;
 	
 	if ($value) {
 	  
-	  $sel_all = new SelectQuery();
-	  $sel_all->fields = "";
-	  $sel_all->from = "";
+	  $sel = new SelectQuery();
+	  $sel->fields = "";
+	  $sel->from = "";
 	  
-	  //?inventory_attributes=Материал:Пух|Години:10
+	  //?ia=Материал:Пух|Години:10
 	  $all_filters = explode("|", $value);
 // 	  var_dump($all_filters);
+	  
 	  
 	  foreach ($all_filters as $idx=>$filter) {
 		if (strlen($filter)<1)continue;
@@ -97,22 +97,22 @@ class InventoryAttributeFilter implements IQueryFilter
 		$name_value = explode(":", $filter);
 		if (!is_array($name_value) || count($name_value)!=2)continue;
 		
-		$sel = new SelectQuery();
-		$sel->fields = "";
-		$sel->from = "";
+		$sel_current = new SelectQuery();
+		$sel_current->fields = "";
+		$sel_current->from = "";
 	  
 		//TODO: handle multiple values inside $filter_value - comma separated
 		$ia_name = DBDriver::get()->escapeString($name_value[0]);
 		$ia_value = DBDriver::get()->escapeString($name_value[1]);
 		
-		$sel->where = " (relation.inventory_attributes_all LIKE '$ia_name:$ia_value|%' OR relation.inventory_attributes_all LIKE '%|$ia_name:$ia_value|%' OR relation.inventory_attributes_all LIKE '%|$ia_name:$ia_value' OR relation.inventory_attributes_all LIKE '$ia_name:$ia_value') ";
+		$sel_current->where = " (relation.inventory_attributes LIKE '$ia_name:$ia_value|%' OR relation.inventory_attributes LIKE '%|$ia_name:$ia_value|%' OR relation.inventory_attributes LIKE '%|$ia_name:$ia_value' OR relation.inventory_attributes LIKE '$ia_name:$ia_value') ";
 		
-		$sel_all = $sel_all->combineWith($sel);
+		$sel = $sel->combineWith($sel_current);
 	  }
 	 
 	}
-// 	echo $sel_all->getSQL();
-	return $sel_all;
+// 	echo $sel->getSQL();
+	return $sel;
   }
 }
 ?>

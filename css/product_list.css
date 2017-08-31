@@ -1,3 +1,9 @@
+body.products .main_content {
+    display:table;
+}
+body.products .column {
+    display:table-cell;
+}
 body.products .column.left {
   margin-right:10px;
 }

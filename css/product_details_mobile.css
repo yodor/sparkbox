@@ -4,9 +4,23 @@
         float:none;
         margin-left:0px;
         margin-top:10px;
+        max-width:inherit;
     }
 }
-
+@media (max-width: 591px) {
+    .column.details .images .image_big {
+        float:none;
+        margin-left:0px;
+    }
+    .column.details .image_gallery .list .item {
+        display:inline-block;
+        margin-right: 5px;
+    }
+    .column.details .image_gallery .list .item  {
+        width:55px;
+        height:55px;
+    }
+}
 @media (max-width: 551px) {
     .column.details .image_big {
         display:block;

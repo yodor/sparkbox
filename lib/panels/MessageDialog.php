@@ -42,7 +42,7 @@ class MessageDialog extends Component implements IFinalRenderer, IHeadRenderer
 
 	      $this->buttons[MessageDialog::BUTTON_ACTION_CONFIRM] = $btn_ok;
 
-	      $this->setClassName("PopupPanel SimplePanel");
+	      $this->setClassName("PopupPanel");
 
 
 	      $this->setDialogType(MessageDialog::TYPE_INFO);

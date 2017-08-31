@@ -1,0 +1,5 @@
+@import url("../lib/css/mobile/admin.css") (max-width: 1000px);
+@import url("../lib/css/mobile/MenuBarComponent.css") (max-width: 1000px);
+@import url("../lib/css/mobile/FormRenderer.css") (max-width: 1000px);
+@import url("../lib/css/mobile/TableView.css") (max-width: 1000px);
+@import url("../lib/css/mobile/InputRenderer.css") (max-width: 1000px);

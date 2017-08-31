@@ -15,23 +15,24 @@ function dumpCSS()
 $page->beginPage();
 
 
-echo "<div class='demo_arial'>";
+echo "<div class='container arial'>";
+drawSampleText();
+echo "</div>";	
+
+// echo "<HR>";
+
+echo "<div class='container custom'>";
+drawSampleText();
+echo "</div>";	
+
+// echo "<HR>";
+
+echo "<div class='container gothic'>";
 drawSampleText();
 echo "</div>";	
 
 echo "<HR>";
-
-echo "<div class='demo_custom'>";
-drawSampleText();
-echo "</div>";	
-
-echo "<HR>";
-
-echo "<div class='demo_gothic_normal'>";
-drawSampleText();
-echo "</div>";	
-echo "<HR>";
-
+echo "<div class='container'>";
 echo "<div class='dropshadow dropcnt'><div class='image boxshadow'></div>Печатни Рекламни материали</div>";
 echo "<div class='hr'></div>";
 echo "<div class='dropshadow dropcnt'>Екстериорни Рекламни елементи</div>";
@@ -42,16 +43,16 @@ $page->finishPage();
 
 function drawSampleText()
 {
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
-echo "The Quick Brown Fox Jumps Over The Lazy Dog";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
+echo "The Quick Brown Fox Jumps Over The Lazy Dog. ";
 
 }
 

@@ -46,8 +46,8 @@ class PaginatorTopComponent extends PaginatorComponent
 
 		echo "<div class='cell page_navigation short' nowrap>";
 		
-		  echo tr("Page");
-		  echo ": ";
+		  echo "<label>".tr("Page")."</label>";
+		  
 		  $page = 0;
 		  if ($this->paginator->getPagesTotal()>0) {
 			$page = $this->paginator->getCurrentPage()+1;

@@ -66,7 +66,7 @@ class UploadDataInputProcessor extends BeanPostProcessor
 	    $file_storage->setTempName($temp_name);
 
 	    //do not set data while tmp_name is valid to lower memory usage
-            //$file_storage->setData(file_get_contents($temp_name));
+            $file_storage->setData(file_get_contents($temp_name));
 
 	    $file_storage->setFilename($file['name']);
 	    $file_storage->setLength($file['size']);

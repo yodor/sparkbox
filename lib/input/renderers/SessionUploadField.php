@@ -20,7 +20,7 @@ abstract class SessionUploadField extends InputRenderer implements IArrayFieldRe
   {
       $this->ajax_handler = $handler;
   }
-  
+
   public function renderScript()
   {
       echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/jqplugins/jquery.form.js'></script>";

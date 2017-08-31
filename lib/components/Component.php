@@ -28,16 +28,19 @@ abstract class Component implements IRenderer
   {
       $this->component_class = get_class($this);
 
-      if (SitePage::getInstance() instanceof SimplePage) {
+      $page = SitePage::getInstance();
+      
+      if ($page instanceof SimplePage) {
 	  if ($this instanceof IFinalRenderer) {
-	    SitePage::getInstance()->addFinalComponent($this);
+	    $page->addFinalComponent($this);
 	  }
 	  if ($this instanceof IHeadRenderer) {
-	    SitePage::getInstance()->addHeadComponent($this);
+	    $page->addHeadComponent($this);
 	  }
       }
   }
   
+  //default class for all IHeadRenerers 
   public function getHeadClass()
   {
       return $this->component_class;

@@ -1,0 +1,14 @@
+@import url("../lib/css/mobile/MenuBarComponent.css") (max-width: 1000px);
+
+/*@media (max-width: 629px) {
+    .main_content {
+        display:block;
+    }
+    .main_content .columnn {
+        width:100%;
+        max-width:100%;
+        display:block;
+        box-sizing:border-box;
+    }
+
+}*/

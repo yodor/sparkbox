@@ -421,8 +421,45 @@ class Storage
         
             header("X-Tag: disc_cache");
         }
-        print($this->row[$this->blob_field]);
 
+        
+        
+        $do_print = false;
+        $fp = fopen("php://output", "wb");
+        $written = 0;
+        $fwrite = 0;
+        
+        if ($fp) {
+            
+            for ($written = 0; $written < (int)$this->row["size"]; $written += $fwrite) {
+                $fwrite = fwrite($fp, substr($this->row[$this->blob_field], $written, 4096));
+                //error writing
+                if ($fwrite === false) {
+                    debug("Storage::sendResponse(): error: written only $written of {$this->row["size"]} from $filename");
+                    break;
+                    
+                }
+                else {
+                    @fflush($fp);
+                }
+            }
+
+            @fclose($fp);
+        }
+        else {
+            $do_print = true;
+        }
+        
+        
+        if ($do_print) {
+            $written = -1;
+            debug("Storage::sendResponse(): Sending using 'print' | filename: $filename size: {$this->row["size"]}");
+            print($this->row[$this->blob_field]);
+        }
+        else {
+            debug("Storage::sendResponse(): filename='$filename' $written of {$this->row["size"]} bytes sent");
+        }
+        
         exit;
         
   }

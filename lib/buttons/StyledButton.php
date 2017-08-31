@@ -40,6 +40,7 @@ class StyledButton extends Component implements IHeadRenderer
 
 	return $d;
     }
+
     public function renderScript()
     {
     

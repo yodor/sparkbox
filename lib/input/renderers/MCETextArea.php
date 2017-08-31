@@ -5,14 +5,19 @@ include_once("lib/panels/MCEImageBrowserDialog.php");
 class MCETextArea extends InputRenderer implements IHeadRenderer 
 {
 
-  protected $image_browser = NULL;
+//   protected $image_browser = NULL;
+
+  protected static $image_browser = NULL;
 
   public function __construct()
   {
 
       parent::__construct();
 
-      $this->image_browser = new MCEImageBrowserDialog();
+      //force single instance of the dialog to all MCETextAreas to prevent double session upload
+      if (self::$image_browser === NULL) {
+        self::$image_browser = new MCEImageBrowserDialog();
+      }
 
       
   }
@@ -31,7 +36,7 @@ class MCETextArea extends InputRenderer implements IHeadRenderer
       echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/MCETextArea.js'></script>";
       echo "\n";
       
-      echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/tiny_mce/jquery.tinymce.js'></script>";
+      echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/tiny_mce/jquery.tinymce.min.js'></script>";
       echo "\n";
       
    
@@ -40,10 +45,12 @@ class MCETextArea extends InputRenderer implements IHeadRenderer
   public function setAttribute($name, $value)
   {
       $this->setFieldAttribute($name,$value);
+      self::$image_browser->setAttribute($name, $value);
   }
   public function getImageBrowser()
   {
-      return $this->image_browser;
+      return self::$image_browser;
+
   }
   public function renderImpl()
   {

@@ -12,7 +12,7 @@ abstract class UploadField extends InputRenderer implements IHeadRenderer
       $this->setFieldAttribute("type","file");
 
   }
-  
+
   public function renderScript()
   {
 

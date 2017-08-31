@@ -92,7 +92,7 @@ abstract class PaginatorComponent extends Component implements IHeadRenderer
 	    echo "<div class='cell sort_fields' nowrap>";
 
 	    echo "<label>";
-	    echo tr("Sort By").": ";
+	    echo tr("Sort By");
 	    echo "</label>";
 
 	    echo "<select name=orderby onChange='javascript:changeSort(this)'>";
@@ -156,13 +156,14 @@ function changeSort(sel)
 		$a = $this->paginator->getPageListStart();
 
 		if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
-		  echo tr("Page").": ";
+		  echo "<label>".tr("Page")."</label>";
 		}
 		
 		
 		
 		if ($this->paginator->getCurrentPage()>0)
 		{
+                        
 			$qry["page"]=0;
 			$q=queryString($qry);
 			echo "<a  href='$q'> < ".tr("First")." </a>";

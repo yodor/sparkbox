@@ -69,6 +69,7 @@ class DemoPage extends SimplePage
 
 	$this->menu_bar->setName("DemoPage");
 
+        
 // 	$this->menu_bar->getItemRenderer()->disableSubmenuRenderer();
 	
         $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
@@ -90,7 +91,7 @@ class DemoPage extends SimplePage
 	parent::dumpJS();
 	
 	echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
-	echo "<script src='".SITE_ROOT."lib/js/URI.js'></script>";
+	
 	echo "\n";
     }
 
@@ -113,15 +114,10 @@ class DemoPage extends SimplePage
 
 	echo "<div align=center>";
 
-// 	  echo "<div class='MenuBar'>";
-	  $this->menu_bar->render();
-// 	  echo "<a class='toggle' onClick='javascript:toggleMenu(this)' title='".tr($this->menu_bar->getName())."'></a>";
-	  echo "</div>";
+        $this->menu_bar->render();
 	  
-	  echo "<div class=clear></div>";
-
-	  echo "<div class='main_content'>"; //inner contents
-
+        echo "<div class='main_content'>"; //inner contents
+          
     }
 
 
@@ -131,8 +127,8 @@ class DemoPage extends SimplePage
 // 	  echo "<div class='version_label'>";
 // 	  echo "<label>";
 // 	  echo "PHP: ".phpversion();
-// // 	  echo " | ";
-// // 	  echo "MySQL: C.".mysql_get_client_info();
+// 	  echo " | ";
+// 	  echo "MySQL: C.".mysql_get_client_info();
 // // 	  echo "/S.".mysql_get_server_info();
 // 	  echo "</label>";
 // 	  echo "</div>";
@@ -143,37 +139,27 @@ class DemoPage extends SimplePage
 	?>
 	
 <script type='text/javascript'>
-// TODO move to menubar
-function toggleMenu(elm)
-{
-  if ($(".MenuBar[name='DemoPage']").hasClass("normal")) {
-	$(".MenuBar[name='DemoPage']").removeClass("normal");
-	var instance = $(".MenuBar[name='DemoPage'] .MenuBarComponent[name='DemoPage']").data("menu_instance");
-	instance.leaveAll();
-  }
-  else {
-	$(".MenuBar[name='DemoPage']").addClass("normal");
-  }
-}
+
 addLoadEvent(function(){
 
 
-// 	var menu = $('.MenuBar'),
-// 		pos = menu.offset();
-// 		
-// 		$(window).scroll(function(){
-// 			if($(this).scrollTop() > pos.top+menu.height() && menu.hasClass('default')){
-// // 				menu.fadeOut('fast', function(){
-// // 					$(this).removeClass('default').addClass('fixed').fadeIn('fast');
-// // 				});
-// 				menu.removeClass('default').addClass('fixed').fadeIn('fast');
-// 			} else if($(this).scrollTop() <= pos.top && menu.hasClass('fixed')){
-// // 				menu.fadeOut('fast', function(){
-// // 					$(this).removeClass('fixed').addClass('default').fadeIn('fast');
-// // 				});
-// 				menu.removeClass('fixed').addClass('default').fadeIn('fast');
-// 			}
-// 		});
+//     var menu = $(".MenuBar[name='DemoPage']");
+//     var pos = menu.offset();
+
+
+//     $(window).scroll(function(){
+//         if($(this).scrollTop() > pos.top+menu.height() && !menu.hasClass('fixed')){
+//         //menu.fadeOut('fast', function(){
+//         //  $(this).removeClass('default').addClass('fixed').fadeIn('fast');
+//         //});
+//         menu.removeClass('default').addClass('fixed').fadeIn('fast');
+//         } else if($(this).scrollTop() <= pos.top && menu.hasClass('fixed')){
+//         //menu.fadeOut('fast', function(){
+//         //  $(this).removeClass('fixed').addClass('default').fadeIn('fast');
+//         //});
+//         menu.removeClass('fixed').addClass('default').fadeIn('fast');
+//         }
+//     });
 
 
 

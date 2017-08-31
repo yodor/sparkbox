@@ -1,22 +1,27 @@
-.MenuBar .toggle {
-    display:none;
-}
 .admin_menu {
-/*   border:1px dotted blue; */
+
   min-width:180px;
   
   display:inline-block;
   background-color:transparent;
 }
+.admin_menu .toggle {
+    display:none;
+}
+.admin_menu .handle {
+    display:none !important;
+}
+.admin_menu .MenuItemOuter {
+    display:block !important;
+    padding-top:0px !important;
+    padding-bottom:0px !important;
+}
 
 .admin_menu .MenuBarItemRenderer {
-  display:block;
-  font-weight:Bold;
   display:block;
   height:auto;
   padding-left:0px;
   padding-right:0px;
-  
 }
 
 .admin_menu .MenuSeparator {
@@ -51,11 +56,11 @@
 .admin_menu .MenuBarItemRenderer[active="1"] .SubmenuRenderer {
   background:white;
   color:#b9b3a3;
-  margin-left:10px; 
+  
   display:block;
   position:relative;
   border:0px;
-  padding:0px;
+  padding-left:10px;
 }
 .admin_menu .SubmenuRenderer .SubmenuItemLink {
   color:#666666;
@@ -81,6 +86,7 @@
 }
 .admin_menu .SubmenuItemRenderer[selected="1"] > .SubmenuItemOuter .SubmenuItemLink {
   text-decoration:underline;
+  font-weight:bold;
 }
 
 .admin_menu .MenuBarItemRenderer[active="1"] .SubmenuItemRenderer .SubmenuRenderer {

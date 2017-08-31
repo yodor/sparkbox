@@ -16,8 +16,8 @@ class PaginatorBottomComponent extends PaginatorComponent
 		
 		echo "<div class='cell page_info'>";
 
-		  echo tr("Page");
-		  echo ": ";
+		  echo "<label>".tr("Page")."</label>";
+
 		  $page = 0;
 		  if ($this->paginator->getPagesTotal()>0) {
 		      $page = $this->paginator->getCurrentPage()+1;
@@ -37,7 +37,8 @@ class PaginatorBottomComponent extends PaginatorComponent
 		echo "</div>";
 
 		echo "<div class='cell results_info'>";
-		echo tr("Results").": ".$this->paginator->getResultsTotal();
+		echo "<label>".tr("Results")."</label>";
+		echo "<span>".$this->paginator->getResultsTotal()."</span>";
 		echo "</div>";
   
 		

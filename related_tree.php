@@ -1,7 +1,7 @@
 <?php
 include_once("session.php");
 
-include_once("class/pages/ProductsPage.php");
+include_once("class/pages/ProductListPage.php");
 
 include_once("lib/components/NestedSetTreeView2.php");
 include_once("lib/components/renderers/items/TextTreeItemRenderer.php");
@@ -18,14 +18,18 @@ include_once("class/utils/filters/ProductFilters.php");
 include_once("class/components/renderers/items/ProductListItem.php");
 include_once("class/components/renderers/cells/ProductPhotoCellRenderer.php");
 
-function dumpCSS()
-{
-  echo "<link rel='stylesheet' href='".SITE_ROOT."css/related_tree.css' type='text/css'>";
-  echo "\n";
-}
+// function dumpCSS()
+// {
+//   echo "<link rel='stylesheet' href='".SITE_ROOT."css/related_tree.css' type='text/css'>";
+//   echo "\n";
+// }
+// function dumpJS()
+// {
+//   echo "<script type='text/javascript' src='".SITE_ROOT."js/product_list.js?ver=1.0'></script>";
+//   echo "\n";
+// }
 
-
-$page = new ProductsPage();
+$page = new ProductListPage();
 
 $bean = new ProductCategoriesBean();
 
@@ -51,7 +55,7 @@ $inventory_selector->fields = "  ";
 $derived = clone $page->derived;
 $derived->group_by = " pi.prodID, pi.color ";
 
-// $product_selector->from = " (  $derived_table GROUP BY pi.prodID, pi.color ) as relation ";
+
 $product_selector->from = " ( ".$derived->getSQL(false, false)." ) as relation ";
 $product_selector->where = "  ";
 
@@ -62,6 +66,7 @@ $proc = new RelatedSourceFilterProcessor("prodID");
 
 //construct filters 
 $search_fields = array("relation.product_code", "relation.product_name", "relation.product_description", "relation.keywords");
+
 $ksc = new KeywordSearchComponent($search_fields, "relation");
 $ksc->getForm()->getRenderer()->setAttribute("method", "get");
 
@@ -144,6 +149,7 @@ $derived = clone $page->derived;
 
 $derived_table = $derived->getSQL(false,false);
 
+//prepare filter fields source data
 $brand_select = new SelectQuery();
 	  $brand_select->fields = " brand_name ";
 	  $brand_select->from = " ($derived_table) as relation ";
@@ -185,62 +191,62 @@ $price_select = new SelectQuery();
 	  }
 	  $db->free($res);
 
-//dinamic filters
-	  $dyn_filters = array();
-	  try {
+//dynamic filters from attributes
+$dyn_filters = array();
+try {
 
-		$ia_name_select = new SelectQuery(); //clone $inventory_selector;
-		$ia_name_select->fields = "  ";
-		$ia_name_select->from = " ($derived_table) as relation  ";
-		$ia_name_select->where = "   ";
-		
-		$proc->applyFiltersOn($ia_name_select, "ia", true);
-		
-		$ia_name_select->fields = " distinct(relation.ia_name) as ia_name ";
-		$ia_name_select->combineSection("where", "  relation.ia_name  IS NOT NULL");
+    $ia_name_select = new SelectQuery(); //clone $inventory_selector;
+    $ia_name_select->fields = "  ";
+    $ia_name_select->from = " ($derived_table) as relation  ";
+    $ia_name_select->where = "   ";
+    
+    $proc->applyFiltersOn($ia_name_select, "ia", true);
+    
+    $ia_name_select->fields = " distinct(relation.ia_name) as ia_name ";
+    $ia_name_select->combineSection("where", "  relation.ia_name  IS NOT NULL");
 // 		echo $ia_name_select->getSQL();
-// // 
-		$res = $db->query($ia_name_select->getSQL());
-		if (!$res) throw new Exception ("Unable to query inventory attributes: ".$db->getError());
-		while ($row = $db->fetch($res)) {
-		  $name = $row["ia_name"];
-		  $sel = new SelectQuery();
-		  $sel->fields = "  ";
-		  $sel->from = " ($derived_table) as relation  ";
-		 
-		  $value = $proc->applyFiltersOn($sel, "ia");
-		  
-		  $sel->fields = " distinct(relation.ia_value) as ia_value ";
-		  $sel->combineSection("where", "  relation.ia_name = '$name' AND relation.ia_value > ''");
-		  $sel->order_by = " CAST(relation.ia_value AS DECIMAL(10,2)) ";
-		  
+
+    $res = $db->query($ia_name_select->getSQL());
+    if (!$res) throw new Exception ("Unable to query inventory attributes: ".$db->getError());
+    while ($row = $db->fetch($res)) {
+        $name = $row["ia_name"];
+        $sel = new SelectQuery();
+        $sel->fields = "  ";
+        $sel->from = " ($derived_table) as relation  ";
+        
+        $value = $proc->applyFiltersOn($sel, "ia");
+        
+        $sel->fields = " distinct(relation.ia_value) as ia_value ";
+        $sel->combineSection("where", "  relation.ia_name = '$name' AND relation.ia_value > ''");
+// 		  $sel->order_by = " CAST(relation.ia_value AS DECIMAL(10,2)) ";
+        $sel->order_by = " relation.ia_value ASC ";
+        
 // 		  echo $sel->getSQL()."<HR>";
 
-		  //parse value into name pairs - ia=Материал:1|Години:1
-		  if ($value) {
-			$ia_values = explode("|", $value);
-			if (count($ia_values)>0) {
-			  foreach ($ia_values as $pos=>$filter_value) {
-				  if (!$filter_value) continue;
-				  $group = explode(":", $filter_value);
-				  if (is_array($group) && count($group)==2) {
-					if (strcmp($name,$group[0])==0) {
-						$value = $group[1];
-					}
-				  }
-				  
-			  }
-			}
-		  }
-		  $dyn_filters[$name] = array("select"=>$sel, "value"=>$value);
-		}
-	  }
-	  catch (Exception $e) {
+        //parse value into name pairs - ia=Материал:1|Години:1
+        if ($value) {
+            $ia_values = explode("|", $value);
+            if (count($ia_values)>0) {
+                foreach ($ia_values as $pos=>$filter_value) {
+                    if (!$filter_value) continue;
+                    $group = explode(":", $filter_value);
+                    if (is_array($group) && count($group)==2) {
+                        if (strcmp($name,$group[0])==0) {
+                            $value = $group[1];
+                        }
+                    }
+                }
+            }
+        }
+        $dyn_filters[$name] = array("select"=>$sel, "value"=>$value);
+    }
+}
+catch (Exception $e) {
 // 		echo $ia_name_select->getSQL();
 // 		echo $product_selector->getSQL();
-		
-	  }
-	  if (is_resource($res)) $db->free($res);
+    
+}
+if (is_resource($res)) $db->free($res);
 
 	  
 $page->beginPage();
@@ -250,16 +256,16 @@ $page->beginPage();
 // echo $attributes_select->getSQL();
 // echo "<HR>";
 
-echo "<div class='column categories'>";
+echo "<div class='column left'>";
 
-  echo "<div class='tree'>";
+  echo "<div class='categories'>";
 //   if ($num_filters>0) {
 // 	echo "<a class='ActionRenderer Clear' href='javascript:clearFilters()'>Show All Categories</a>";
 //   }
   $treeView->render();
   echo "</div>"; //tree
 
-  echo "<BR>";
+//   echo "<BR>";
   
 //   echo "<div>";
 //   echo tr("Refine By");
@@ -372,94 +378,6 @@ echo "<div class='column product_list'>";
 
 echo "</div>";
 
-
-
-  ?>
-<script type='text/javascript'>
-function clearFilters()
-{
-  var uri = new URI(document.location.href);
-//   console.log(uri.filename());
-  document.location.href = uri.filename(); 
-}
-function filterChanged(elm, filter_name, is_combined)
-{
-  var elm = $(elm);
-  
-  var name = (filter_name) ? filter_name : elm.attr("name");
-  
-  var value = elm.val();
-  
-  console.log(name+"=>"+value);
- 
-  
-  
-  if (is_combined) {
-	value = elm.attr("name")+":"+value;
-	$("[filter_group='"+filter_name).each(function(idx){
-		var val = $(this).val();
-		if (val) {
-		  value+="|"+$(this).attr("name")+":"+val;
-		}
-	});
-  }
-  
-  var uri = new URI(document.location.href);
-  uri.removeSearch(name);
-  uri.addSearch(name, value);
-  document.location.href = uri.toString();
-
-}
-addLoadEvent(function() {
-
-    $( ".drag" ).slider({
-      range: true,
-      min: 0,
-      max: 100,
-      values: [ 0, 100 ],
-      slide: function( event, ui ) {
-		var min = parseFloat(ui.values[0]).toFixed(2);
-		var max = parseFloat(ui.values[1]).toFixed(2);
-		$(this).parents(".Slider").children(".value").html( min + " - " + max );
-		$(this).parent().children("[name='price_range']").attr("value", min + "|" + max);
-      },
-      stop: function(event, ui) {
-		var min = parseFloat(ui.values[0]).toFixed(2);
-		var max = parseFloat(ui.values[1]).toFixed(2);
-		$(this).val(min + "|" + max);
-		filterChanged(this, "price_range");
-		
-	  }
-    });
-    
-    var min = Number.parseFloat($( ".drag" ).attr("min"));
-    var max = Number.parseFloat($( ".drag" ).attr("max"));
-    
-    var value_min = min;
-    var value_max = max;
-    
-    var price_range = $(".drag").parent().children("[name='price_range']").attr("value");
-	var price_range = price_range.split("|");
-
-	if (price_range.length==2) {
-	  value_min = Number.parseFloat(price_range[0]);
-	  value_max = Number.parseFloat(price_range[1]);
-    }
-//     console.log("value-min: "+value_min);
-//     console.log("value-min: "+value_max);
-    
-    $(".drag").slider( "option", "min",  min );
-	$(".drag").slider( "option", "max",  max );
-	
-	$(".drag").slider( "option", "values", [ value_min, value_max ] );
-	
-	$(".drag").parents(".Slider").children(".value").html( value_min + " - " + value_max );
-	
-});
-</script>
-  <?php
   
 $page->finishPage();
-
-
 ?>

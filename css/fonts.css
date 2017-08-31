@@ -24,19 +24,25 @@ src:url("../fonts/font1.woff") format("woff"),url("../fonts/font1.ttf") format("
 .main_content {
     background-color:#c5c7bd !important;
 }
-
-.demo_arial {
-  font-family:"sans";
-  font-size:18px;
+.container {
+    display:inline-block;
+    white-space:normal;
+    padding-bottom:5px;
+    padding-top:5px;
+    border-bottom:1px dashed black;
+}
+.container.arial {
+    font-family:"sans";
+    font-size:18px;
 }
 
-.demo_custom {
-  font-family:"neo-sans-intel";
-  font-size:18px;
+.container.custom {
+    font-family:"neo-sans-intel";
+    font-size:18px;
 }
-.demo_gothic_normal {
-  font-family:"tradegothicroman";
-  font-size:18px;
+.container.gothic {
+    font-family:"tradegothicroman";
+    font-size:18px;
 }
 
 .dropcnt {

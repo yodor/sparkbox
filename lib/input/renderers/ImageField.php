@@ -22,6 +22,7 @@ class ImageField extends UploadField implements IPhotoRenderer
       
   }
 
+
   public function setThumbnailSize($width, $height) 
   {
       $this->width=$width;

@@ -1,6 +1,6 @@
 
 
-.SimplePanel {
+/*.SimplePanel {
 
   position:relative;
   display:inline-block;
@@ -23,7 +23,7 @@
   -webkit-box-shadow: #666 0px 2px 3px;
   -moz-box-shadow: #666 0px 2px 3px;
   box-shadow: #666 0px 2px 3px;
-}
+}*/
 
 /* message dialog popups */
 .PopupPanel
@@ -33,12 +33,33 @@
   position:absolute;
   z-index:100;
   display:none;
+  
+
+  text-align:left;
+
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+
+  border:1px solid #eeeeee;
+
+  background-color: #EEEEEE;
+  background: -webkit-gradient(linear, 0 0, 0 bottom, from(#EEEEEE), to(#CCCCCC));
+  background: -webkit-linear-gradient(#EEEEEE, #CCCCCC);
+  background: -moz-linear-gradient(#EEEEEE, #CCCCCC);
+  background: -ms-linear-gradient(#EEEEEE, #CCCCCC);
+  background: -o-linear-gradient(#EEEEEE, #CCCCCC);
+  background: linear-gradient(#EEEEEE, #CCCCCC);
+
+  -webkit-box-shadow: #666 0px 2px 3px;
+  -moz-box-shadow: #666 0px 2px 3px;
+  box-shadow: #666 0px 2px 3px;
 }
 .PopupPanel .caption {
 
   position:relative;
   font-weight:bold;
-  font-size:20px;
+  font-size:1.3em;
 
 
   cursor:default;
@@ -98,22 +119,22 @@
 }
 
 .icon_close_popup {
-  background-image:url(../images/msgpopup/close.png);
+  background-image:url("../images/msgpopup/close.png");
   background-position:center center;
   background-repeat:no-repeat;
 }
 .icon_info {
-  background-image:url(../images/msgpopup/exclamation.png);
+  background-image:url("../images/msgpopup/exclamation.png");
   background-position:center center;
   background-repeat:no-repeat;
 }
 .icon_question {
-  background-image:url(../images/msgpopup/exclamation.png);
+  background-image:url("../images/msgpopup/exclamation.png");
   background-position:center center;
   background-repeat:no-repeat;
 }
 .icon_error {
-  background-image:url(../images/msgpopup/exclamation.png);
+  background-image:url("../images/msgpopup/exclamation.png");
   background-position:center center;
   background-repeat:no-repeat;
 }

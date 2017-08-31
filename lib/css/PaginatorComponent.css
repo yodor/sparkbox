@@ -1,6 +1,6 @@
 .PaginatorComponent {
 
-  display:table;
+  display:inline-table;
   
   border-spacing:5px;
   border-collapse:separate;
@@ -12,7 +12,10 @@
   vertical-align:middle;
 
 }
-
+.PaginatorComponent .cell label:after {
+    content: ":";
+    padding-right:5px;
+}
 .PaginatorTopComponent .view_mode {
   text-align:left;
   vertical-align:middle;

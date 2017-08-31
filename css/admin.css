@@ -1,4 +1,6 @@
-.AdminPage .left_menu {
+@import url("admin_mobile.css") (max-width: 1000px);
+
+/*.AdminPage .left_menu {
   font-size:14px;
  
 }
@@ -26,8 +28,7 @@
 }
 
 .admin_menu .SubmenuRenderer .SubmenuItemLink .MenuIcon.store {
-/*  width:24px;
-  height:24px;*/
+
 }
 
 .MenuIcon.store.sizes {
@@ -41,3 +42,7 @@
 }
 
 
+.MenuBar .MenuBarComponent .MenuBarItemRenderer .MenuItemOuter {
+    padding-top:0px;
+    padding-bottom:0px;
+}*/

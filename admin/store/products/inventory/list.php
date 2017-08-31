@@ -57,6 +57,7 @@ RequestController::addRequestHandler($h_delete);
 $select_inventory = $bean->getSelectQuery();
 $select_inventory->fields = " pi.*, pi.prodID as product_photo, pclr.pclrID,  sc.color_code, pi.size_value, p.product_name, p.product_code  ";
 $select_inventory->from = " product_inventory pi LEFT JOIN product_colors pclr ON pclr.pclrID = pi.pclrID LEFT JOIN store_colors sc ON sc.color=pclr.color LEFT JOIN products p ON p.prodID = pi.prodID JOIN color_chips cc ON cc.prodID = p.prodID LEFT JOIN product_photos pp ON pp.prodID = pi.prodID ";
+$select_inventory->group_by = " pi.piID ";
 if ($prodID>0) {
   $select_inventory->where = " pi.prodID = '$prodID' ";
   $page->caption = tr("Inventory").": ".$rc->ref_row["product_name"];
@@ -81,7 +82,7 @@ $view->addColumn(new TableColumn("piID","ID"));
 
 $view->addColumn(new TableColumn("prodID","ProdID"));
 
-// $view->addColumn(new TableColumn("product_photo","Product Photo"));
+$view->addColumn(new TableColumn("product_photo","Product Photo"));
 
 $view->addColumn(new TableColumn("product_name", "Product Name"));
 $view->addColumn(new TableColumn("product_code", "Product Code"));
@@ -104,9 +105,10 @@ $view->addColumn(new TableColumn("weight","Weight"));
 
 $view->addColumn(new TableColumn("actions","Actions"));
 
-// $view->getColumn("product_photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
-// $view->getColumn("product_photo")->getCellRenderer()->setSourceIteratorKey("prodID");
-// $view->getColumn("product_photo")->getHeaderCellRenderer()->setSortable(false);
+$view->getColumn("product_photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+$view->getColumn("product_photo")->getCellRenderer()->setSourceIteratorKey("prodID");
+$view->getColumn("product_photo")->getCellRenderer()->setListLimit(1);
+$view->getColumn("product_photo")->getHeaderCellRenderer()->setSortable(false);
 
 $view->getColumn("pclrID")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
 $view->getColumn("pclrID")->getCellRenderer()->setSourceIteratorKey("pclrID");

@@ -5,12 +5,12 @@
 }
 .KeywordSearchComponent .fields {
   display:table-cell;
-  vertical-align:bottom;
+  vertical-align:middle;
   padding:0px;
 }
 .KeywordSearchComponent .buttons {
   display:table-cell;
-  vertical-align:bottom;
+  vertical-align:middle;
   padding:0px;
 }
 .KeywordSearchComponent .buttons * {

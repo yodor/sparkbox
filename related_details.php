@@ -19,20 +19,20 @@ include_once("class/beans/SellableProductsView.php");
 
 include_once("class/components/renderers/items/ProductListItem.php");
 
-include_once("class/pages/ProductsPage.php");
+include_once("class/pages/ProductDetailsPage.php");
 
-function dumpJS()
-{
-  echo "<script type='text/javascript' src='".SITE_ROOT."js/product_details.js'></script>";
-  echo "\n";
-}
-function dumpCSS()
-{
-  echo "<link rel='stylesheet' href='".SITE_ROOT."css/product_details.css' type='text/css'>";
-  echo "\n";
-}
+// function dumpJS()
+// {
+//   echo "<script type='text/javascript' src='".SITE_ROOT."js/product_details.js'></script>";
+//   echo "\n";
+// }
+// function dumpCSS()
+// {
+//   echo "<link rel='stylesheet' href='".SITE_ROOT."css/product_details.css' type='text/css'>";
+//   echo "\n";
+// }
 
-$page = new ProductsPage();
+$page = new ProductDetailsPage();
 
 $prodID = -1;
 if (isset($_GET["prodID"])) {
@@ -99,6 +99,7 @@ $galleries = array();
 
 $prices = array();
 
+//per inventory ID
 $attributes = array();
 
 $pos = 0;
@@ -113,8 +114,15 @@ foreach ($sellable as $pos=>$row) {
 	//NULL color links all sizes goes to key 0
 	$pclrID = (int)$row["pclrID"];
 
-
-	$attributes[$row["piID"]][] = array("name"=>$row["ia_name"], "value"=>$row["ia_value"]);
+	$attr_list = explode("|", $row["inventory_attributes"]);
+	$attr_all = array();
+	foreach($attr_list as $idx=>$pair) {
+            $name_value = explode(":",$pair);
+            $attr_all[] = array("name"=>$name_value[0], "value"=>$name_value[1]);
+	}
+	
+	$attributes[$row["piID"]] = $attr_all;
+	
 	
 	$prices[$pclrID][$row["size_value"]][$row["piID"]] = $row["sell_price"];
 	
@@ -173,6 +181,7 @@ foreach ($sellable as $pos=>$row) {
 
 $page->beginPage();
 
+// var_dump($attributes);
 // print_r($galleries);
 
 
@@ -198,9 +207,11 @@ echo "<div class='column details'>";
 		echo "<div class='list' pclrID='$pclrID'>";
 		  foreach ($gallery as $key=>$item) {
 			$href_source = STORAGE_HREF."?cmd=image_thumb&width=110&height=110";
-			echo "<div class='item' bean='{$item["class"]}' itemID='{$item["id"]}' source='$href_source' onClick='javascript:changeImage(this)'>";
+			
 			$href=$href_source."&class=".$item["class"]."&id=".$item["id"];
-			echo "<img src='$href' >";
+			
+			echo "<div class='item' bean='{$item["class"]}' itemID='{$item["id"]}' source='$href_source' onClick='javascript:changeImage(this)' style='background-image:url($href)'>";
+// 			echo "<img src='$href' >";
 			echo "</div>";
 			
 		  }
@@ -212,13 +223,11 @@ echo "<div class='column details'>";
   
   echo "<div class='product_details'>";
   
-	echo "<div class='price_panel'>";
-	  echo "<label for='sell_price'>".tr("Price").":</label>";
-	  echo "<span class='sell_price' piID='$piID'>{$sellable_variation["sell_price"]}</span>";
+	echo "<div class='item sell_price'>";
+	  echo "<label>".tr("Price")."</label>";
+	  echo "<span class='value' piID='$piID'>{$sellable_variation["sell_price"]}</span>";
 	echo "</div>";
-	
-	//echo "<HR>";
-	
+
 	$chooser_visibility = "";
 	
 	//hide color chooser for single color or color schemeless products
@@ -227,71 +236,65 @@ echo "<div class='column details'>";
 //             $chooser_visibility = "style='display:none'";
 // 	}
 	
-	echo "<div class='colors_panel' $chooser_visibility>";
-          echo "<label for='current_color'>".tr("Color Scheme").":</label>";
-	  echo "<span class='current_color'></span>";
-	  echo "<div class='color_chooser'>";
-	  
+        echo "<div class='item current_color' $chooser_visibility>";
+            echo "<label>".tr("Color Scheme")."</label>";
+            echo "<span class='value'></span>";
+        echo "</div>";
 
-	  foreach ($color_chips as $pclrID=>$item) {
-		$pclrID = (int)$pclrID;
-		
-		if (isset($item["class"])) {
+        echo "<div class='item color_chooser' $chooser_visibility>";
+            echo "<label>".tr("Choose Color")."</label>";
+            echo "<span class='value'>";
+          
+            foreach ($color_chips as $pclrID=>$item) {
+                $pclrID = (int)$pclrID;
+                
+                if (isset($item["class"])) {
                     $href = STORAGE_HREF."?cmd=image_thumb&width=48&height=48&class=".$item["class"]."&id=".$item["id"];
                 }
                 
-		$chip_colorName = $color_names[$pclrID];
+                $chip_colorName = $color_names[$pclrID];
 
-		$sizes = $prices[$pclrID];
-		$pids = array();
-		$sell_prices = array();
-		foreach ($sizes as $size_value=>$arr) {
-		  foreach($arr as $cpiID=>$sell_price) {
-			$pids[] = $cpiID;
-			$sell_prices[] = $sell_price;
-		  }
-		}
-		$size_values = implode("|", array_keys($sizes));
-		$cpiID = $pids[0];
-		$pids = implode("|", $pids);
-		$sell_prices = implode("|", $sell_prices);
-		
-		//sizing pids = $pid_values
-		echo "<div class='color_button' pclrID='$pclrID' piID='$cpiID' size_values='$size_values' sell_prices='$sell_prices' pids='$pids' color_name='$chip_colorName'
-				   onClick='javascript:changeColor($pclrID)' title='$chip_colorName'>";
-	   			
-                        if (isset($item["class"])) {
-                             echo "<img src='$href' >";
-                        }
-                        else {
-                            
-                            echo "<span class='simple_color' style='background-color:{$color_codes[$pclrID]};'></span>";
-                        }
+                $sizes = $prices[$pclrID];
+                $pids = array();
+                $sell_prices = array();
+                foreach ($sizes as $size_value=>$arr) {
+                    foreach($arr as $cpiID=>$sell_price) {
+                        $pids[] = $cpiID;
+                        $sell_prices[] = $sell_price;
+                    }
+                }
+                $size_values = implode("|", array_keys($sizes));
+                $cpiID = $pids[0];
+                $pids = implode("|", $pids);
+                $sell_prices = implode("|", $sell_prices);
+                
+                //sizing pids = $pid_values
+                echo "<span class='color_button' pclrID='$pclrID' piID='$cpiID' size_values='$size_values' sell_prices='$sell_prices' pids='$pids' color_name='$chip_colorName' onClick='javascript:changeColor($pclrID)' title='$chip_colorName'>";
+                                
+                    if (isset($item["class"])) {
+                        echo "<img src='$href' >";
+                    }
+                    else {
+                        echo "<span class='simple_color' style='background-color:{$color_codes[$pclrID]};'></span>";
+                    }
 
-			
-		echo "</div>";
-	  }
+                echo "</span>";
+            }
 
-	  echo "</div>";//color_chooser
-	echo "</div>";//colors_panel
-	
-	
-// 	echo "<HR>";
-	
-	
+            echo "</span>";//value
+	echo "</div>";//color_chooser
+
 	//default hidden
-	echo "<div class='size_chooser'>";
-	  echo "<label for='product_size'>".tr("Size").":</label>";
-	  echo "<select class='product_size' onChange='javascript:updatePrice()'>";
-	  echo "</select>";
+	echo "<div class='item size_chooser'>";
+	  echo "<label>".tr("Size")."</label>";
+	  echo "<span class='value'>";
+            echo "<select class='product_size' onChange='javascript:updatePrice()'>";
+            echo "</select>";
+	  echo "</span>";
 	echo "</div>";
 	
-// 	echo "<HR>";
+        //attributes are listed from JS
 	
-// 	echo "<label for='inventory_attributes'>".tr("Inventory Attributes")."</label>";
-	echo "<div class='inventory_attributes'>";
-	  
-	echo "</div>";
 	
   echo "</div>";
   

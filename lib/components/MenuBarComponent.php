@@ -35,6 +35,7 @@ class MenuBarComponent extends Component implements IHeadRenderer
 
             
 	}
+	
 	public function renderStyle()
 	{
             //append dump query string to the href to force reload of file ex. MenuBarComponent.css?ver=1.1

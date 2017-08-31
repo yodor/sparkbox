@@ -95,6 +95,7 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
             $row["photo"] = file_get_contents($value_current->getTempName());
         }
 
+        //temporary resize for base64_encode returned in ajax response
         ImageResizer::$max_width = $this->getThumbnailWidth();
         ImageResizer::$max_height = $this->getThumbnailHeight();
         ImageResizer::crop($row);
@@ -214,7 +215,7 @@ class UploadControlAjaxHandler extends JSONRequestHandler implements IPhotoRende
         $file_storage->setTimestamp($upload_object->getTimestamp());
         $file_storage->setUID($upload_object->getUID());
 
-        //assign original contents of the uploaded file. it will be resized on confirm submit/validate of input
+        //assign original contents of the uploaded file. it will be resized depending on defaults on confirm submit/validate of input
         $file_storage->setData(file_get_contents($upload_object->getTempName()));
         $file_storage->setFilename($upload_object->getFileName());
         $file_storage->setMIME($upload_object->getMIME());

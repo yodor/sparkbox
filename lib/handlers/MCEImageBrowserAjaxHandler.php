@@ -57,7 +57,7 @@ class MCEImageBrowserAjaxHandler extends UploadControlAjaxHandler implements ISt
       $this->cmd = "mceImage";
       
       //do not require thumbnail. just create the imagestorage of the upload data
-      $this->setThumbnailSize(-1,-1);
+      $this->setThumbnailSize(64,-1);
   }
   public function setSection($section_name, $section_key)
   {
@@ -154,7 +154,10 @@ class MCEImageBrowserAjaxHandler extends UploadControlAjaxHandler implements ISt
 	if ($this->auth_context) {
 	  $bean_row["auth_context"] = get_class($this->auth_context);
 	}
-
+	
+        $temp_name = $upload_object->getTempName();
+        $upload_object->setData(file_get_contents($temp_name));
+            
 	$bean_row["photo"] = $upload_object->serializeDB();
 
 	$imageID = $bean->insertRecord($bean_row);
