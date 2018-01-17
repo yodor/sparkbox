@@ -11,7 +11,9 @@ class CheckItem extends DataSourceItem
 	//hackish! - force submit of unchecked checkbox
 	echo "<input type='hidden' name='{$this->name}' value=''>";
 	
-	echo "<input type='checkbox' value='{$this->value}' name='{$this->name}' id='{$this->id}' ";
+	
+	
+	echo "<input type='checkbox' value='{$this->value}' name='{$this->name}' id='{$this->id}' {$this->user_attributes}";
 	if ($this->isSelected()) echo "CHECKED";
 	
 	echo ">";
@@ -38,6 +40,9 @@ class CheckField extends DataSourceField
       
       $field_name = $this->field->getName();
 
+      $field_attr = $this->prepareFieldAttributes();
+      
+      
       parent::renderImpl();
       
       if (! ($this->data_bean instanceof IDataBean) ) {
@@ -49,6 +54,8 @@ class CheckField extends DataSourceField
 	  $item->setName($field_name);
 
 	  $item->setSelected($field_values);
+	  
+	  $item->setUserAttributes($field_attr);
 	  
 	  echo "<div class='FieldElements'>";
 	  $item->render();

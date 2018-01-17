@@ -300,24 +300,27 @@ abstract class DBTableBean implements IDataBean
 		return $row;
     }
     
-    public function getByRef($refkey, $refid)
+    public function getByRef($refkey, $refid, $db=false, $fields=" * ")
     {
 
-		$refkey = $this->db->escapeString($refkey);
-		$refid = (int)$refid;
-		$sql = "SELECT * FROM {$this->table} WHERE $refkey='$refid' LIMIT 1";
-		$ret = $this->db->query($sql);
-		if (!$ret){
-			throw new Exception("DBError: ".$this->db->getError());
-		}
-		$row = $this->db->fetch($ret);
+        if (!$db)$db=$this->db;
+        
+        $refkey = $db->escapeString($refkey);
+        $refid = (int)$refid;
+        $sql = "SELECT $fields FROM {$this->table} WHERE $refkey='$refid' LIMIT 1";
+        
+        $ret = $db->query($sql);
+        if (!$ret){
+                throw new Exception("DBError: ".$db->getError());
+        }
+        $row = $db->fetch($ret);
 
-		$this->db->free($ret);
+        $db->free($ret);
 
-		if (!$row) {
-			return false;
-		}
-		return $row;
+        if (!$row) {
+            return false;
+        }
+        return $row;
     }
 
     public function deleteID($id, $db=false)

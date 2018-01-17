@@ -23,7 +23,6 @@ define ("LIB_PATH" , $lib_path);
 
 $doc_root  = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', $_SERVER['SCRIPT_FILENAME']);
 $site_root = preg_replace("!^${doc_root}!", '', $install_path);
-//str_replace($_SERVER["DOCUMENT_ROOT"], "", $install_path);
 
 //app/site deployment - HTTP accessible
 define ("SITE_ROOT", $site_root."/");

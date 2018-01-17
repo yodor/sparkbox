@@ -61,26 +61,37 @@ if (isset($_POST["request_password"])) {
 $page->beginPage();
 
 
-$page->heading="Forgot Password Page";
+$page->setPreferredTitle("Forgot Password");
 
-echo "<div align=center>";
-
-echo "<div style='width:420px;'>";
-
-echo "<BR><BR>";
-echo tr("Input the email you have used on the time of registration");
-echo "<BR><BR>";
-
-echo "<form method=post>";
-$ic->render();
-
-StyledButton::DefaultButton()->drawSubmit("Send");
+echo "<div class='login_component'>";
 
 
-echo "<input type=hidden value='1' name='request_password'>";
+  echo "<span class='inner'>";
 
-echo "</form>";
-echo "</div></div>";
+  echo "<span class='caption'>Demo Administration</span>";
+  
+  
+        echo "<BR><BR>";
+        echo tr("Input the email you have used on the time of registration");
+        echo "<BR><BR>";
+
+        echo "<form method=post>";
+        $ic->render();
+
+        StyledButton::DefaultButton()->drawSubmit("Send");
+
+
+        echo "<input type=hidden value='1' name='request_password'>";
+
+        echo "</form>";
+  
+  echo "</span>";
+
+
+echo "</div>";
+
+
+
 
 $page->finishPage();
 ?>

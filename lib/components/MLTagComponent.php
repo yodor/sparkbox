@@ -17,12 +17,12 @@ class MLTagComponent extends Component {
     public function startRender()
     {
         $attrs = $this->prepareAttributes();
-        echo "<$this->tag $attrs>";
+        echo "<{$this->tag} $attrs>";
     }
 
     public function finishRender()
     {
-        echo "</$this->tag>";
+        echo "</{$this->tag}>";
     }
 }
 

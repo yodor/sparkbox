@@ -11,6 +11,9 @@ class SimplePage extends SitePage
 {
 
     protected $auth = NULL;
+    protected $is_auth = false;
+    protected $userID = -1;
+    
     protected $login_url = "";
     protected $preferred_title = "";
 
@@ -35,6 +38,16 @@ class SimplePage extends SitePage
     protected $meta = array();
     
     protected $actions = array();
+    
+    public function isAuthenticated()
+    {
+        return $this->is_auth;
+    }
+    
+    public function getUserID()
+    {
+        return $this->userID;
+    }
     
     public function addMeta($name, $content)
     {
@@ -241,8 +254,11 @@ var right = "<?php echo $right;?>";
         parent::__construct();
 
         if ($this->auth) {
+        
             $context = $this->auth->getAuthContext();
-            if (!$this->auth->checkAuthState())
+            $this->is_auth = $this->auth->checkAuthState();
+
+            if (!$this->is_auth)
             {
                 if (isset($_GET["ajax"])) {
                         throw new Exception("Your session is expired.");
@@ -259,6 +275,9 @@ var right = "<?php echo $right;?>";
                 header("Location: ".$this->login_url);
                 exit;
 
+            }
+            else {
+                $this->userID = (int)$_SESSION[$context]["id"];
             }
 
             if (isset($_SESSION[$context]["login_redirect"])) {

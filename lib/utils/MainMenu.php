@@ -215,7 +215,7 @@ class MainMenu
 	{
 	    $href = $item->getHref();
 
-	    $request = $_SERVER[$this->uri_match_variable];
+	    $request = urldecode($_SERVER[$this->uri_match_variable]);
 
 	    $match = (strcmp( $request , $href ) == 0);
 
@@ -225,11 +225,11 @@ class MainMenu
             
 	    //href is found inside request
 	    if ($find_mode === MainMenu::FIND_INDEX_LOOSE) {
-		$match = ( strpos(  $request, $href ) !== false );
+		$match = ( mb_strpos(  $request, $href ) !== false );
 	    }
 	    //request is found inside href
 	    else if ($find_mode === MainMenu::FIND_INDEX_LOOSE_REVERSE) {
-		$match = ( strpos( $href,  $request ) !== false );
+		$match = ( mb_strpos( $href,  $request ) !== false );
 	    }
 	    else if ($find_mode === MainMenu::FIND_INDEX_LEVENSHTEIN) {
 		$match = @levenshtein($request, $href);
@@ -254,7 +254,7 @@ class MainMenu
 		  }
 		  
 		  $hreq = dirname($href);
-		  if (strpos($breq, $hreq)===false) return false;
+		  if (mb_strpos($breq, $hreq)===false) return false;
 		  
 		  $match = @levenshtein($request, $href);
 		
@@ -270,7 +270,10 @@ class MainMenu
 
 	public function setUnselectedAll()
 	{
-	    foreach($this->arr as $index=>$sub)
+            $arr = array();
+	    $this->flattenMenu($arr, $this->main_menu);
+	    
+	    foreach($arr as $index=>$sub)
 	    {	
 		$sub->setSelected(false);
 	    }
@@ -287,32 +290,36 @@ class MainMenu
 	    
 	    $this->findMenuIndex($find_mode, $arr);
 
-	    foreach($arr as $index=>$sub)
-	    {	
-		  $sub->setSelected(false);
-	    }
+	    $this->setUnselectedAll();
 	
-	    if ($this->selected_item) {
-
-		  $this->selected_item->setSelected(true);
-
-		  $current = $this->selected_item;
-
-		  $this->selected_path[] = $current;
-
-		  while ($current->getParent()) {
-
-			  $parent = $current->getParent();
-			  $parent->setSelected(true);
-
-			  $current = $parent;
-
-			  $this->selected_path[] = $current;
-		  }
-
-	    }
+	    $this->updateSelectedMenu();
 
 	}
+	
+	public function updateSelectedMenu()
+	{
+            if ($this->selected_item) {
+
+                $this->selected_item->setSelected(true);
+
+                $current = $this->selected_item;
+
+                $this->selected_path[] = $current;
+
+                while ($current->getParent()) {
+
+                    $parent = $current->getParent();
+                    $parent->setSelected(true);
+
+                    $current = $parent;
+
+                    $this->selected_path[] = $current;
+                    
+                }
+
+	    }
+	}
+	
 	public function getSelectedPath()
 	{
 	    return $this->selected_path;

@@ -106,6 +106,10 @@ $treeView->setSelectQuery($tree_selector);
 
 $nodeID = $treeView->getSelectedID();
 
+
+
+
+
 $product_selector->fields = " relation.* "; //TODO list only needed fields here?
 $product_selector = $bean->childNodesWith($product_selector, $nodeID);
 $product_selector->where.= " AND relation.catID = child.catID ";
@@ -250,6 +254,8 @@ if (is_resource($res)) $db->free($res);
 
 	  
 $page->beginPage();
+
+
 // 
 
 // echo $product_selector->getSQL();
@@ -271,11 +277,12 @@ echo "<div class='column left'>";
 //   echo tr("Refine By");
 //   echo "<HR>";
 //   echo "</div>";
-  
+
+  //TODO: filters as links option
   echo "<div class='filters'>";
 	echo "<form name='filters' autocomplete='off'>";
 	echo "<div class='InputComponent'>";
-	  echo "<span class='label'>".tr("Brand").": </span>";
+	  echo "<span class='label'>".tr("Brand")."</span>";
 	
 	  $field = InputFactory::CreateField(InputFactory::SELECT, "brand_name", "Brands", 0);
 	  $rend = $field->getRenderer();
@@ -289,7 +296,7 @@ echo "<div class='column left'>";
 	echo "</div>";//InputComponent
 	
 	echo "<div class='InputComponent'>";
-	  echo "<span class='label'>".tr("Color").": </span>";
+	  echo "<span class='label'>".tr("Color")."</span>";
 	  $field = InputFactory::CreateField(InputFactory::SELECT, "color", "Colors", 0);
 	  $rend = $field->getRenderer();
 	  $rend->setSource(ArraySelector::FromSelect($color_select, "color", "color"));
@@ -302,7 +309,7 @@ echo "<div class='column left'>";
 	echo "</div>";//InputComponent
 	
 	echo "<div class='InputComponent'>";
-	  echo "<span class='label'>".tr("Sizing").": </span>";
+	  echo "<span class='label'>".tr("Sizing")."</span>";
 	  $field = InputFactory::CreateField(InputFactory::SELECT, "size_value", "Sizing", 0);
 	  $rend = $field->getRenderer();
 	  $rend->setSource(ArraySelector::FromSelect($size_select, "size_value", "size_value"));
@@ -315,7 +322,7 @@ echo "<div class='column left'>";
 	echo "</div>";//InputComponent
 	
 	echo "<div class='InputComponent Slider'>";
-	  echo "<span class='label'>".tr("Price").": </span>";
+	  echo "<span class='label'>".tr("Price")."</span>";
 	  $value_min = $price_info["min"];
 	  $value_max = $price_info["max"];
 	  
@@ -340,7 +347,7 @@ echo "<div class='column left'>";
 	try {
 	  foreach($dyn_filters as $name=>$item) {
 		echo "<div class='InputComponent'>";
-		  echo "<span class='label'>".tr($name).": </span>";
+		  echo "<span class='label'>".tr($name)."</span>";
 		  $field = InputFactory::CreateField(InputFactory::SELECT, "$name", "$name", 0);
 		  $rend = $field->getRenderer();
 		  $sel = $item["select"];
@@ -363,14 +370,16 @@ echo "<div class='column left'>";
 	
 	echo "</form>";
 	
-	echo "<button class='DefaultButton' onClick='javascript:clearFilters()'>Clear Refinements</button>";
+	echo "<button class='DefaultButton' onClick='javascript:clearFilters()'>".tr("Clear Refinements")."</button>";
 	
   echo "</div>";//filters
 
 echo "</div>"; //column categories
 
 echo "<div class='column product_list'>";
-
+    Session::set("search_home", false); 
+   $page->renderCategoryPath($nodeID);
+   
   $ksc->render();
   echo "<div class='clear'></div>";
 //   $view->enablePaginators(false);

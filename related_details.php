@@ -188,6 +188,9 @@ $page->beginPage();
 $sellable_variation = $sellable[0];
 // echo $sel->getSQL();
 
+
+$page->renderCategoryPath($sellable_variation["catID"]);
+
 echo "<h1>".$sellable_variation["product_name"]."</h1>";
 
 echo "<div class='column details'>";
@@ -228,7 +231,7 @@ echo "<div class='column details'>";
 	  echo "<span class='value' piID='$piID'>{$sellable_variation["sell_price"]}</span>";
 	echo "</div>";
 
-	$chooser_visibility = "";
+	
 	
 	//hide color chooser for single color or color schemeless products
 // 	if ($pclrID == 0 || count($color_names)==1) {
@@ -236,12 +239,12 @@ echo "<div class='column details'>";
 //             $chooser_visibility = "style='display:none'";
 // 	}
 	
-        echo "<div class='item current_color' $chooser_visibility>";
+        echo "<div class='item current_color'>";
             echo "<label>".tr("Color Scheme")."</label>";
             echo "<span class='value'></span>";
         echo "</div>";
 
-        echo "<div class='item color_chooser' $chooser_visibility>";
+        echo "<div class='item color_chooser'>";
             echo "<label>".tr("Choose Color")."</label>";
             echo "<span class='value'>";
           
@@ -294,6 +297,7 @@ echo "<div class='column details'>";
 	echo "</div>";
 	
         //attributes are listed from JS
+        //prefer initial listing here for SEO
 	
 	
   echo "</div>";

@@ -37,7 +37,11 @@ abstract class Mailer {
 
 	protected function templateMessage($message)
 	{
-	    $str = "<html><body>".$message."</body></html>";
+	    $str = "<html>";
+	    $str.= "<head>";
+	    $str.= "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+	    $str.= "<body>".$message."</body>";
+	    $str.= "</html>";
 	    return $str;
 	}
 }

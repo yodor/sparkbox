@@ -247,7 +247,8 @@ IMG {
 }
 
 .InputFormView .FormRenderer .InputField.MCETextArea TEXTAREA {
-  height:350px;
+  height:150px;
+/*   max-height:150px; */
 }
 
 .TableView[name='SiteTexts'] TD[column='value'] {

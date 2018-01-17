@@ -15,8 +15,9 @@ abstract class Component implements IRenderer
 
   protected $tooltip_text = "";
 
-  protected $json_attributes = array("tooltip");
-
+  protected $json_attributes = array();
+  protected $special_attributes = array("tooltip");
+  
   protected $component_class = "";
 
   public $render_tooltip = true;
@@ -176,12 +177,14 @@ abstract class Component implements IRenderer
 			$attribute_value = attributeValue($value);
 			
 			if (in_array($attribute_name, $this->json_attributes)) {
-			  
-			  $attributes[] = $attribute_name."=".json_string($attribute_value);
+                            $attributes[] = $attribute_name."=".json_string($attribute_value);
+			}
+			else if (in_array($attribute_name, $this->special_attributes)) {
+                            $attributes[] = $attribute_name."='".htmlspecialchars($attribute_value)."'";
 			}
 			else {
 			  
-			  $attributes[] = $attribute_name."='".$attribute_value."'";
+                            $attributes[] = $attribute_name."='".$attribute_value."'";
 			}
 		  }
 	  }

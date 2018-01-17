@@ -8,6 +8,7 @@ class UsersBean extends DBTableBean
 	protected $createString = "CREATE TABLE `users` (
  `userID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `email` varchar(255) NOT NULL,
+ `phone` varchar(32) NOT NULL DEFAULT '',
  `password` varchar(32) NOT NULL DEFAULT '',
  `last_active` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
  `counter` int(11) unsigned NOT NULL DEFAULT '0',

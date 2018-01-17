@@ -13,6 +13,7 @@ abstract class DataSourceItem extends Component implements IDataSourceItem
     protected $key_name = "";
     //render html attributes from data_row
     protected $data_row_attributes = array();
+    protected $user_attributes = "";
     
     public function addDataRowAttribute($name)
     {
@@ -22,7 +23,10 @@ abstract class DataSourceItem extends Component implements IDataSourceItem
     {
         return $this->data_row_attributes;
     }
-    
+    public function setUserAttributes($attr_text)
+    {
+        $this->user_attributes = $attr_text;
+    }
     public function setIndex($index)
     {
 	$this->index = $index;

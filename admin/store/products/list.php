@@ -83,7 +83,7 @@ $view->addColumn(new TableColumn("price_max","Price Max"));
 // $view->addColumn(new TableColumn("old_price","Old Price"));
 
 
-$view->addColumn(new TableColumn("sizes", "Sizes"));
+$view->addColumn(new TableColumn("sizes", "Sizing"));
 
 // $view->addColumn(new TableColumn("weight_min", "Weight Min"));
 // $view->addColumn(new TableColumn("weight_max", "Weight Max"));

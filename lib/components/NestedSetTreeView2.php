@@ -39,20 +39,31 @@ class NestedSetTreeView extends Component implements IHeadRenderer, ISelectSourc
 	  echo "\n";
     }
     
-	public function setSelectedID($nodeID)
+    public function setSelectedID($nodeID)
     {
-		$this->selected_nodeID = (int)$nodeID;
-		
-		$this->selection_path = $this->data_source->constructPath($this->selected_nodeID);
+        $this->selected_nodeID = (int)$nodeID;
+        
+        $this->selection_path = $this->data_source->constructPath($this->selected_nodeID);
     }
+    
+    public function getSelectionPath($nodeID=NULL)
+    {
+        if ($nodeID) {
+            return $this->data_source->constructPath($nodeID);
+        }
+        else {
+            return $this->selection_path;
+        }
+    }
+    
     public function getSelectedID()
     {
-		return $this->selected_nodeID;
+        return $this->selected_nodeID;
     }
 
     public function getSource()
     {
-	  return $this->data_source;
+        return $this->data_source;
     }
     public function getSelectQuery()
     {
@@ -100,81 +111,83 @@ class NestedSetTreeView extends Component implements IHeadRenderer, ISelectSourc
     public function renderImpl()
     {
 
-		if (! ($this->data_source instanceof NestedSetBean)) throw new Exception("No suitable data_source assigned");
-		if (! ($this->item_renderer instanceof NestedSetItemRenderer)) throw new Exception("No suitable item_renderer assigned"); 
+        if (! ($this->data_source instanceof NestedSetBean)) throw new Exception("No suitable data_source assigned");
+        if (! ($this->item_renderer instanceof NestedSetItemRenderer)) throw new Exception("No suitable item_renderer assigned"); 
 
-		$db = DBDriver::get();
+        $db = DBDriver::get();
 
-		$sql = $this->select_qry->getSQL();
+        $sql = $this->select_qry->getSQL();
 
-		$res = $db->query($sql);
+//         echo $sql;
+        
+        $res = $db->query($sql);
 
-		$path=array();
+        $path=array();
 
-		$source_key = $this->data_source->getPrKey();
+        $source_key = $this->data_source->getPrKey();
 
-		$open_tags = 0;
+        $open_tags = 0;
 
-		echo "<ul class='NodeChilds'>";
+        echo "<ul class='NodeChilds'>";
 
-		while ($row = $db->fetch($res)) {
+        while ($row = $db->fetch($res)) {
 
-		  $lft = $row["lft"];
-		  $rgt = $row["rgt"];
-		  $nodeID = $row[$source_key];
-		  
-		  $render_mode = NestedSetItemRenderer::BRANCH_CLOSED;
-		  if ($this->open_all) {
-			  $render_mode = NestedSetItemRenderer::BRANCH_OPENED;
-		  }
-		  if ($rgt == $lft+1) {
-			  $render_mode = NestedSetItemRenderer::BRANCH_LEAF;
-		  }
+            $lft = $row["lft"];
+            $rgt = $row["rgt"];
+            $nodeID = $row[$source_key];
+            
+            $render_mode = NestedSetItemRenderer::BRANCH_CLOSED;
+            if ($this->open_all) {
+                $render_mode = NestedSetItemRenderer::BRANCH_OPENED;
+            }
+            if ($rgt == $lft+1) {
+                $render_mode = NestedSetItemRenderer::BRANCH_LEAF;
+            }
 
-		  trbean($nodeID, $this->list_label, $row, $this->data_source);
+            trbean($nodeID, $this->list_label, $row, $this->data_source);
 
-		  while (count($path)>0 && $lft > $path[count($path)-1] ) {
-			  array_pop($path);
+            while (count($path)>0 && $lft > $path[count($path)-1] ) {
+                array_pop($path);
 
-			  if ($open_tags>=1) {
-				echo "</ul>";
-				echo "</li>";
-				$open_tags-=2;
-			  }
+                if ($open_tags>=1) {
+                    echo "</ul>";
+                    echo "</li>";
+                    $open_tags-=2;
+                }
+            }
+            
+            $path[] = $rgt;
 
-		  }
-		  $path[] = $rgt;
+            $path_len = count($path);
 
-		  $path_len = count($path);
+            echo "<li class='NodeOuter'>";
+            $open_tags++;
+            
+            $selected = ($nodeID == $this->selected_nodeID) ? true : false;
 
-		  echo "<li class='NodeOuter'>";
-		  $open_tags++;
-		  
-			$selected = ($nodeID == $this->selected_nodeID) ? true : false;
+            $item = clone $this->item_renderer;
+            $item->setID($nodeID);
+            $item->setDataRow($row);
+            $item->setBranchType($render_mode);
+            $item->setSelected($selected);
+            
+            if ($this->list_label) {
+                $item_label = $row[$this->list_label];
+                if (isset($row["related_count"])) {
+                    $item_label.=" (".$row["related_count"].")";
+                }
+                $item->setLabel($item_label);
+            }
+            
+            $item->render();
 
-			$item = clone $this->item_renderer;
-			$item->setID($nodeID);
-			$item->setDataRow($row);
-			$item->setBranchType($render_mode);
-			$item->setSelected($selected);
-			
-			if ($this->list_label) {
-			  $item_label = $row[$this->list_label];
-			  if (isset($row["related_count"])) {
-				$item_label.=" (".$row["related_count"].")";
-			  }
-			  $item->setLabel($item_label);
-			}
-			
+            
+            
+            echo "<ul class='NodeChilds'>";
+            $open_tags++;
+        }
 
-			
-			$item->render();
-
-			echo "<ul class='NodeChilds'>";
-			$open_tags++;
-		}
-
-		echo "</ul>";
+        echo "</ul>";
 	
     }
     
