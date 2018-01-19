@@ -33,8 +33,12 @@ class MySQLiDriver extends DBDriver
 				mysqli_autocommit( $this->connection, false );
 				mysqli_set_charset( $this->connection , "utf8" );
 				
-// 				mysqli_query("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ",$this->connection);
-// 				mysqli_query("SET foreign_key_checks = 1;",$this->connection);
+				mysqli_query($this->connection,"SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ");
+				mysqli_query($this->connection,"SET collation_connection = 'utf8_general_ci' ");
+				
+				mysqli_query($this->connection,"SET character_set_results = 'utf8'");
+				mysqli_query($this->connection,"SET character_set_connection = 'utf8'");
+				mysqli_query($this->connection,"SET character_set_client = 'utf8'");
 
 			  // 	$vars = $conn->getVariables();
 			  // 	foreach($vars as $dbvar=>$phpvar) {

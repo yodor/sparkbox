@@ -71,8 +71,8 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	{}
 	public function renderStyle()
 	{
-	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/InputRenderer.css' type='text/css' >";
-	    echo "\n";
+// 	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/InputRenderer.css' type='text/css' >";
+// 	    echo "\n";
 	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/KeywordSearchComponent.css' type='text/css' >";
 	    echo "\n";
 	}

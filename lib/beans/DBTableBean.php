@@ -71,9 +71,9 @@ abstract class DBTableBean implements IDataBean
 
       if (! $this->db->tableExists($this->table) ) throw new Exception("Table [{$this->table}] is not available in the active connection.");
 
-      $ret = $this->db->queryFields($this->table);
+      $res = $this->db->queryFields($this->table);
 
-      while ($row=$this->db->fetch($ret))
+      while ($row=$this->db->fetch($res))
       {
 		if (strcmp($row["Key"],"PRI")==0){
 			$this->prkey=$row["Field"];
@@ -85,6 +85,8 @@ abstract class DBTableBean implements IDataBean
 
 		$this->storage_types[$field_name]=$row["Type"];
       }
+      if ($res) $this->db->free($res);
+      
 
 //       debugArray("Storage Types for Bean: ".get_class($this), $this->storage_types);
 
@@ -154,8 +156,10 @@ abstract class DBTableBean implements IDataBean
     public function getCount()
     {
 
-        $ret = $this->db->query("SELECT count(*) as cnt from {$this->table} ");
-        $row = $this->db->fetch($ret);
+        $res = $this->db->query("SELECT count(*) as cnt from {$this->table} ");
+        if (!$res)throw new Exception("Unable to get count: ".$this->db->getError());
+        $row = $this->db->fetch($res);
+        $this->db->free($res);
         return (int)$row["cnt"];
 
     }
@@ -232,9 +236,9 @@ abstract class DBTableBean implements IDataBean
 			throw new Exception("Unable to create iterator: ".$this->db->getError());
 		}
 		
-		$ret = $this->db->query("SELECT FOUND_ROWS() as total");
-		$row = $this->db->fetch($ret);
-		$this->db->free($ret);
+		$res = $this->db->query("SELECT FOUND_ROWS() as total");
+		$row = $this->db->fetch($res);
+		$this->db->free($res);
 
 		$total = (int)$row["total"];
 		return $itr;
@@ -274,30 +278,31 @@ abstract class DBTableBean implements IDataBean
 
     private function fillDebug()
     {
-	    ob_start();
-	    $usedby = debug_backtrace();
-	    print_r($usedby);
-	    $trace = ob_get_contents();
-	    ob_end_clean();
-	    return $trace;
+        ob_start();
+        $usedby = debug_backtrace();
+        print_r($usedby);
+        $trace = ob_get_contents();
+        ob_end_clean();
+        return $trace;
     }
     
     public function getByID($id, $db=false, $fields=" * ")
     {
-		if (!$db)$db=$this->db;
+        if (!$db)$db=$this->db;
 
-		$sql = "SELECT $fields from {$this->table} WHERE {$this->prkey}='$id'";
-		$ret = $db->query($sql);
+        $sql = "SELECT $fields from {$this->table} WHERE {$this->prkey}='$id'";
+        $res = $db->query($sql);
 
-		if (!$ret) throw new Exception("DBTableBean::getByID DBError: ".$db->getError());
+        if (!$res) throw new Exception("DBTableBean::getByID DBError: ".$db->getError());
 
-		$row=$db->fetch($ret);
-		$db->free($ret);
+        $row=$db->fetch($res);
+        
+        $db->free($res);
 
-		if (!$row) {
-			throw new Exception("No such ID");
-		}
-		return $row;
+        if (!$row) {
+            throw new Exception("No such ID");
+        }
+        return $row;
     }
     
     public function getByRef($refkey, $refid, $db=false, $fields=" * ")
@@ -309,13 +314,13 @@ abstract class DBTableBean implements IDataBean
         $refid = (int)$refid;
         $sql = "SELECT $fields FROM {$this->table} WHERE $refkey='$refid' LIMIT 1";
         
-        $ret = $db->query($sql);
-        if (!$ret){
-                throw new Exception("DBError: ".$db->getError());
+        $res = $db->query($sql);
+        if (!$res){
+            throw new Exception("DBError: ".$db->getError());
         }
-        $row = $db->fetch($ret);
+        $row = $db->fetch($res);
 
-        $db->free($ret);
+        $db->free($res);
 
         if (!$row) {
             return false;
@@ -353,9 +358,9 @@ abstract class DBTableBean implements IDataBean
     {
         $docommit=false;
         if (!$db) {
-                $db = $this->db;
-                $db->transaction();
-                $docommit=true;
+            $db = $this->db;
+            $db->transaction();
+            $docommit=true;
         }
         
         $sql = "DELETE FROM {$this->table} WHERE $refkey='$refval'";
@@ -407,42 +412,47 @@ abstract class DBTableBean implements IDataBean
 
     public function findFieldValue($field_name, $field_value)
     {
-	    $field_name = $this->db->escapeString($field_name);
-	    
-	    $res = $this->db->query("SELECT {$this->prkey}, $field_name FROM {$this->table} WHERE $field_name='$field_value' LIMIT 1");
-	    if (!$res) throw new Exception("DBTableBean::findFieldValue DB Error: ".$this->db->getError());
-	    
-	    return $this->db->fetch($res);
+        $field_name = $this->db->escapeString($field_name);
+        
+        $res = $this->db->query("SELECT {$this->prkey}, $field_name FROM {$this->table} WHERE $field_name='$field_value' LIMIT 1");
+        if (!$res) throw new Exception("DBTableBean::findFieldValue DB Error: ".$this->db->getError());
+        
+        $result = $this->db->fetch($res);
+        $this->db->free($res);
+        return $result;
     }
+    
     public function fieldValue($id, $field_name)
     {
-	    $id = (int)$id;
+        $id = (int)$id;
 
-	    $field_name = $this->db->escapeString($field_name);
+        $field_name = $this->db->escapeString($field_name);
 
-	    $res = $this->db->query("SELECT {$this->prkey}, `$field_name` FROM {$this->table} WHERE {$this->prkey}=$id ");
-	    if (!$res) throw new Exception("DBTableBean::fieldValue DB Error: ".$this->db->getError());
+        $res = $this->db->query("SELECT {$this->prkey}, `$field_name` FROM {$this->table} WHERE {$this->prkey}=$id ");
+        if (!$res) throw new Exception("DBTableBean::fieldValue DB Error: ".$this->db->getError());
 
-	    if ($row = $this->db->fetch($res)) {
-		  return $row[$field_name];
-	    }
+        if ($row = $this->db->fetch($res)) {
+            $this->db->free($res);
+            return $row[$field_name];
+        }
 
-	    return NULL;
+        return NULL;
     }
+    
     public function needQuotes($key, &$value="")
     {
-	  $storage_type = $this->storage_types[$key];
+        $storage_type = $this->storage_types[$key];
 // 	  if (strpos($storage_type,"char")!==false || strpos($storage_type,"text")!==false || strpos($storage_type,"blob")!==false  ||  strpos($storage_type,"enum")!==false) {
 // 		return true;
 // 	  }
 // 	  if (strpos($storage_type, "bool")!==false) {
 // 		return true;
 // 	  }
-	  if (strpos($storage_type,"date")!==false || strpos($storage_type,"timestamp")!==false) {
-		  if (endsWith($value , "()")) return false;
-		  return true;
-	  }
-	  return true;
+        if (strpos($storage_type,"date")!==false || strpos($storage_type,"timestamp")!==false) {
+            if (endsWith($value , "()")) return false;
+            return true;
+        }
+        return true;
     }
 
     public function insertRecord(&$row, &$db=false)

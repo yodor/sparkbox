@@ -190,7 +190,7 @@ class SimplePage extends SitePage
         }       
         
         foreach ($hcmp_merged as $head_class => $cmp) {
-            echo "<!-- Head Component Class: $head_class -->";
+            echo "<!-- Head Component Class: $head_class | ".get_class($cmp)."-->";
             $cmp->renderStyle();
             echo "<!-- Head Component End -->";
         }

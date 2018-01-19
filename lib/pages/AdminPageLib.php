@@ -86,7 +86,7 @@ class AdminPageLib extends SimplePage
       
       
       //default caption of page from MenuItem
-      if (count($arr)>1) {
+      if (count($arr)>0) {
 		$arr = array_reverse($arr);
 		$item = $arr[0];
 		if ($item instanceof MenuItem) {
