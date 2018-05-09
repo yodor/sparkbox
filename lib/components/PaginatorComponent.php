@@ -123,10 +123,10 @@ abstract class PaginatorComponent extends Component implements IHeadRenderer
 	    
 	    $dir_qry = $_GET;
 	    $dir_qry["orderby"] = $this->paginator->getOrderField();
-	    $dir_label = "&uarr;";
+	    $dir_label = "&#11014;";
 	    $direction = "ASC";
 	    if (strcmp($order_direction, "ASC")==0) {
-		$dir_label = "&darr;";
+		$dir_label = "&#11015;";
 		$direction = "DESC";
 	    }
 	    $dir_qry["orderdir"] = $direction;

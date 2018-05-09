@@ -20,6 +20,8 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	protected $table_name = "";
 	protected $table_fields = "";
 	
+	protected $have_filter = false;
+	
 	public function getButton($action)
 	{
 	  return $this->buttons[$action];
@@ -66,9 +68,22 @@ class KeywordSearchComponent extends Component implements IHeadRenderer, IQueryF
 	  
 	  $this->sform->setRenderer(new FormRenderer());
 	  
+	  if (isset($_GET["filter"])) {
+		$this->sform->loadPostData($_GET);
+		$this->sform->validate();
+		$this->have_filter = true;
+	  }
+	  
 	}
+	
+	public function haveFilter()
+	{
+		return $this->have_filter;
+	}
+	
 	public function renderScript()
 	{}
+	
 	public function renderStyle()
 	{
 // 	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/InputRenderer.css' type='text/css' >";

@@ -5,8 +5,13 @@ class MLTagComponent extends Component {
 
     protected $tag = NULL;
     
-    public function __construct($tag_name="DIV") {
+    public function __construct($tag_name="DIV") 
+    {
+        
+        parent::__construct();
+        
         $this->tag = $tag_name;
+        
     }
 
     protected function renderImpl()

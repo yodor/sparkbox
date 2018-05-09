@@ -39,6 +39,9 @@ class SimplePage extends SitePage
     
     protected $actions = array();
     
+    protected $css_files = array();
+    protected $js_files = array();
+    
     public function isAuthenticated()
     {
         return $this->is_auth;
@@ -194,6 +197,25 @@ class SimplePage extends SitePage
             $cmp->renderStyle();
             echo "<!-- Head Component End -->";
         }
+        
+        echo "<!-- Page CSS Start -->";
+        foreach ($this->css_files as $file => $is_local) {
+            $href = $file;
+            if ($is_local) {
+                $href = SITE_ROOT."css/".$file;
+            }
+            echo "<link rel='stylesheet' href='$href' type='text/css' >";
+            echo "\n";
+        }
+        echo "<!-- Page CSS End -->";
+    }
+    
+    public function addCSS($filename, $is_local=true) {
+        $this->css_files[$filename] = $is_local;
+    }
+    
+    public function addJS($filename, $is_local=true) {
+        $this->js_files[$filename] = $is_local;
     }
     
     protected function dumpJS()
@@ -245,6 +267,18 @@ var right = "<?php echo $right;?>";
 // 		    echo "<!-- Head Components $idx: ".get_class($cmp)."-->";
         }
 // 		echo "<!-- Head Components End -->";
+
+
+        echo "<!-- Page JS Start -->";
+        foreach ($this->js_files as $file => $is_local) {
+            $href = $file;
+            if ($is_local) {
+                $href = SITE_ROOT."js/".$file;
+            }
+            echo "<script type='text/javascript' src='$href'></script>";
+            echo "\n";
+        }
+        echo "<!-- Page JS End -->";
  
     }
 

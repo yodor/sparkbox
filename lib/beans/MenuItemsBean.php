@@ -13,9 +13,9 @@ class MenuItemsBean extends NestedSetBean
  PRIMARY KEY (`menuID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-	public function __construct()
+	public function __construct($table_name="menu_items")
 	{
-		parent::__construct("menu_items");
+		parent::__construct($table_name);
 	}
 
 }

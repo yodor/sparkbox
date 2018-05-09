@@ -8,7 +8,7 @@
   height:20px;
 
 }
-.BeanTranslationDialog .Inner .original_text {
+.BeanTranslationDialog .Inner TEXTAREA.original_text {
   border:1px solid purple;
   background:white;
   color:black;
@@ -17,6 +17,18 @@
     box-sizing:border-box;
   -moz-box-sizing:border-box;
 }
+/*.BeanTranslationDialog .Inner DIV.original_text {
+  border:1px solid purple;
+  background:white;
+  color:black;
+  overflow:scroll;
+  width:500px;
+    box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  height:180px;
+  display:inline-block;
+}*/
+
 .BeanTranslationDialog .Inner .InputComponent[field="langID"] {
   float:right;
 }

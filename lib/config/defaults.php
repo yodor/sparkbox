@@ -65,15 +65,15 @@ $defines->set("CONTEXT_ADMIN", "context_admin");
 $defines->set("ADMIN_ROOT", SITE_ROOT."admin/");
 $defines->set("STORAGE_HREF", SITE_ROOT."storage.php");
 
-//base size for all uploaded images
+//'base size' for all uploaded images
 $defines->set("IMAGE_UPLOAD_DEFAULT_WIDTH", 1280);
 $defines->set("IMAGE_UPLOAD_DEFAULT_HEIGHT", 720);
 
-//IMAGE_UPLOAD_DOWNSCALE = true  | uploaded images are downscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
+//IMAGE_UPLOAD_DOWNSCALE = true  | uploaded images with different size from 'base size' are downscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 //IMAGE_UPLOAD_DOWNSCALE = false | uploaded images are not downscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 $defines->set("IMAGE_UPLOAD_DOWNSCALE", true);
 
-//IMAGE_UPLOAD_UPSCALE = true  | uploaded images width different size from 'base size' are upscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
+//IMAGE_UPLOAD_UPSCALE = true  | uploaded images with different size from 'base size' are upscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 //IMAGE_UPLOAD_UPSCALE = false | uploaded images are not upscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 $defines->set("IMAGE_UPLOAD_UPSCALE", false);
 

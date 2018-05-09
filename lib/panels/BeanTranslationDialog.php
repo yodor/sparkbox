@@ -36,12 +36,24 @@ class BeanTranslationDialog extends MessageDialog implements IFinalRenderer, IHe
 
 	    echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/popups/BeanTranslationDialog.js'></script>";
 	    echo "\n";
+	    
+	    //mcetext area translation support
+	    echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/MCETextArea.js'></script>";
+            echo "\n";
+            
+            echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/tiny_mce/jquery.tinymce.min.js'></script>";
+            echo "\n";
+	    
+	    
 	}
 	public function renderStyle()
 	{	
 
 	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/BeanTranslationDialog.css' type='text/css'>";
 	    echo "\n";
+	    //mcetext area translation support
+	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/MCETextArea.css' type='text/css' >";
+            echo "\n";
 	}
 	public function renderImpl()
 	{
@@ -49,7 +61,7 @@ class BeanTranslationDialog extends MessageDialog implements IFinalRenderer, IHe
 		
 		echo tr("Original Text").":<BR>";
 		
-		echo "<textarea class='original_text' rows=10 >";
+		echo "<textarea class='original_text' name='original_text' rows=10 readonly=true>";
 		echo "</textarea>";
 		echo "<br>";
 
@@ -82,7 +94,7 @@ class BeanTranslationDialog extends MessageDialog implements IFinalRenderer, IHe
 
 		echo "<form>";
 		
-		echo "<textarea name=translation rows=10 >";
+		echo "<textarea name='translation' rows=10 >";
 
 		echo "</textarea>";
 
@@ -94,10 +106,17 @@ addLoadEvent(function(){
   bean_translator.attachWith("bean_translator");
 
   $("BODY").find("[action='TranslateBeanField']").each(function(index){
-
+     
+     var is_mce = $(this).parent().children(".MCETextArea").length > 0;
+     console.log("is_mce="+is_mce);
+     
+    
+	
+     
      $(this).click(function(event){
 
-	  bean_translator.show($(this).attr("field"));
+	  bean_translator.show($(this).attr("field"), is_mce);
+
 
      });
   });
