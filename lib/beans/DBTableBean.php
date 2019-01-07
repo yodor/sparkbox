@@ -594,6 +594,11 @@ abstract class DBTableBean implements IDataBean
         $this->prepareValues($row, $values, true);
     }
 
+    public function getThumb($id, $width=100)
+    {
+        $cls = get_class($this);
+        return "<img src='".STORAGE_HREF."?cmd=image_thumb&width=$width&class=$cls&id=$id'>"; 
+    }
 }
 
 ?>

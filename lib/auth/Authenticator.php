@@ -106,7 +106,7 @@ abstract class Authenticator
     {
 	    throw new Exception("Not implemented");
     }
-    public  static function checkAuthState($skip_cookie_check=false)
+    public  static function checkAuthState($skip_cookie_check=false, $user_data=NULL)
     {
 	    throw new Exception("Not implemented");
     }

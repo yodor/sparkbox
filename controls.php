@@ -151,7 +151,8 @@ $f15->setRenderer(new HiddenField());
 $form->addField($f15);
 
 
-
+$f16 = InputFactory::CreateField(InputFactory::CAPTCHA, "captcha_field", "Captcha Code", 1);
+$form->addField($f16);
 
 $form_render = new FormRenderer();
 $form_render->setAttribute("name", "myform");

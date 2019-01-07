@@ -270,14 +270,14 @@ class Storage
 
 	  $session = new Session();
 
-	  include_once("lib/AdminAuthenticator.php");
+	  include_once("lib/auth/AdminAuthenticator.php");
 	  if (AdminAuthenticator::checkAuthState()) return;
 
 
-	  @include_once("class/".$this->row["auth_context"].".php");
-	  @include_once("lib/".$this->row["auth_context"].".php");
+	  @include_once("class/auth/".$this->row["auth_context"].".php");
+	  @include_once("lib/auth/".$this->row["auth_context"].".php");
 	  $auth = new $this->row["auth_context"];
-	  if (!$auth->checkAuthState(true)) throw new Exception("This resource is protected. Please login first.");
+	  if (!$auth->checkAuthState(true, $this->row)) throw new Exception("This resource is protected. Please login first.");
 
   }
   protected function checkCache()

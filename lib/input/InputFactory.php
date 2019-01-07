@@ -18,7 +18,7 @@ include_once("lib/input/renderers/SliderField.php");
 include_once("lib/input/renderers/SessionImageField.php");
 include_once("lib/input/renderers/SessionFileField.php");
 include_once("lib/input/renderers/ColorCodeField.php");
-
+include_once("lib/input/renderers/CaptchaInputRenderer.php");
 
 include_once("lib/input/validators/EmailValidator.php");
 include_once("lib/input/validators/DateValidator.php");
@@ -29,7 +29,7 @@ include_once("lib/input/validators/ArrayInputValidator.php");
 include_once("lib/input/validators/ImageUploadValidator.php");
 include_once("lib/input/validators/FileUploadValidator.php");
 include_once("lib/input/validators/EmptyValueValidator.php");
-
+include_once("lib/input/validators/CaptchaInputValidator.php");
 
 include_once("lib/input/processors/DateInputProcessor.php");
 include_once("lib/input/processors/TimeInputProcessor.php");
@@ -68,6 +68,8 @@ class InputFactory
   const SESSION_IMAGE=19;
   const SESSION_FILE=20;
   const COLORCODE=21;
+  
+  const CAPTCHA=22;
   
   const HIDDEN_ARRAY=100;
   const TEXTFIELD_ARRAY=101;
@@ -210,6 +212,13 @@ class InputFactory
 			$field->setValueTransactor($processor);
 			
 			break;
+                case InputFactory::CAPTCHA:
+                        
+                        $field = new InputField($name, $label, $required);
+                        $field->setRenderer(new CaptchaInputRenderer());
+                        $field->setValidator(new CaptchaInputValidator());
+                        break;
+                        
 		default:
 		  throw new Exception("Unknown field type: ".$type);
 		  break;

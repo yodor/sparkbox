@@ -8,7 +8,7 @@ class AdminAuthenticator extends Authenticator
 {
 
 		
-	public static function checkAuthState($skip_cookie_check=false)
+	public static function checkAuthState($skip_cookie_check=false, $user_data=NULL)
 	{
 		$ret = parent::checkAuthStateImpl(CONTEXT_ADMIN, $skip_cookie_check);
 		if ($ret){
