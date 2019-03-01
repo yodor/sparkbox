@@ -1,4 +1,6 @@
 <?php
+// define("DEBUG_OUTPUT", 1);
+
 include_once("lib/utils/ImageResizer.php");
 include_once("lib/utils/Session.php");
 include_once("lib/storage/StorageObject.php");
@@ -30,6 +32,8 @@ class Storage
   }
   public function processRequest()
   {
+            debug("Storage::processRequest()");
+            
 	  try {
 
 		if (!isset($_GET["cmd"]))
@@ -154,135 +158,168 @@ class Storage
   }
   protected function loadBeanClass()
   {
-	  $this->headers = array();
-	  if (file_exists("class/beans/".$this->className.".php")) {
-		  include_once("class/beans/".$this->className.".php");
-	  }
-	  else if (file_exists("lib/beans/".$this->className.".php")){
-		  include_once("lib/beans/".$this->className.".php");
-	  }
-	  else {
-		throw new Exception("Bean class not found: ".$this->className);
-	  }
-	  
-	  $this->bean = new $this->className();
+        debug("Storage::loadBeanClass()");
+            
+        $this->headers = array();
+        if (file_exists("class/beans/".$this->className.".php")) {
+                include_once("class/beans/".$this->className.".php");
+        }
+        else if (file_exists("lib/beans/".$this->className.".php")){
+                include_once("lib/beans/".$this->className.".php");
+        }
+        else {
+            throw new Exception("Bean class not found: ".$this->className);
+        }
 
-	  
-	  if ($this->id == -1) {
-		$funcname = "Default_".$this->className;
-		if (is_callable($funcname)) {
-
-		  $funcname($this->row);
-
-		}
-		else throw new Exception("No default value for this class");
-
-	  }
-	  else {
-		$this->row = $this->bean->getByID($this->id);
-	  }
-	  
-	  
-	  $this->checkPermissions();
+        $this->bean = new $this->className();
 
 
-	  $blob_field = $this->blob_field;
+        if ($this->id == -1) {
+            $funcname = "Default_".$this->className;
+            if (is_callable($funcname)) {
 
-	  if (isset($_GET["blob_field"])) {
-                $blob_field = $_GET["blob_field"];
-	  }
-	  else if (isset($_GET["bean_field"])) {
-                $blob_field = $_GET["bean_field"];
-	  }
-	 
-          
-	  
-	  $stypes = $this->bean->getStorageTypes();
+                $funcname($this->row);
 
-	  if (!array_key_exists($blob_field, $stypes)) {
-		throw new Exception("No such blob field found");
-	  }
+            }
+            else throw new Exception("No default value for this class");
 
-	  if (!isset($this->row[$blob_field])) {
-		throw new Exception("No data for this blob field");
-	  }
-	  
+        }
+        else {
+            $this->row = $this->bean->getByID($this->id);
+        }
 
-	  $this->etag_parts[] = $blob_field;
-	  
-	  
-	  $storage_object = @unserialize($this->row[$blob_field]);
 
-	  if ($storage_object instanceof StorageObject) {
-	  
+        $this->checkPermissions();
 
-		  $this->row = array();
-		  //image resizer expects row["photo"]
-		  $row_field = "photo";
-		  if ($storage_object instanceof ImageStorageObject) {
-                    $row_field = "photo";
-		  }
-		  else if ($storage_object instanceof FileStorageObject) {
-                    $row_field="data";
-		  }
-                  $storage_object->deconstruct($this->row, $row_field, false);
-		  
-	  
-		  
-		  
-		  
-		  
-	  }
-	  else {
-                
-                //request received using blob_field but object is not of type storage object.
-                if (isset($_GET["blob_field"]) || isset($_GET["bean_field"])) {
-                    throw new Exception("Incorrect request received. Source data type is not StorageObject.");
+
+        $blob_field = $this->blob_field;
+
+        if (isset($_GET["blob_field"])) {
+            $blob_field = $_GET["blob_field"];
+        }
+        else if (isset($_GET["bean_field"])) {
+            $blob_field = $_GET["bean_field"];
+        }
+
+
+
+        $stypes = $this->bean->getStorageTypes();
+
+        if (!array_key_exists($blob_field, $stypes)) {
+            throw new Exception("No such blob field found");
+        }
+
+        if (!isset($this->row[$blob_field])) {
+            throw new Exception("No data for this blob field");
+        }
+
+
+        $this->etag_parts[] = $blob_field;
+
+
+        $storage_object = @unserialize($this->row[$blob_field]);
+
+        if ($storage_object instanceof StorageObject) {
+
+
+                $this->row = array();
+                //image resizer expects row["photo"]
+                $row_field = "photo";
+                if ($storage_object instanceof ImageStorageObject) {
+                $row_field = "photo";
                 }
-                //continue as object is tranacted to db as dbrow
+                else if ($storage_object instanceof FileStorageObject) {
+                $row_field="data";
+                }
+                $storage_object->deconstruct($this->row, $row_field, false);
+                
 
-		  
-	  }
+                
+                
+                
+                
+        }
+        else {
+            
+            //request received using blob_field but object is not of type storage object.
+            if (isset($_GET["blob_field"]) || isset($_GET["bean_field"])) {
+                throw new Exception("Incorrect request received. Source data type is not StorageObject.");
+            }
+            //continue as object is tranacted to db as dbrow
 
-	  // set headers and etag
-	  
-	  $last_modified = gmdate("D, d M Y H:i:s T");
+                
+        }
 
-	  if (isset($this->row["date_upload"])) {
-		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_upload"]));
-	  }
-	  else if (isset($this->row["date_updated"])) {
-		$last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
-	  }
+        // set headers and etag
 
-	  $this->headers["etag"]=md5(implode("|", $this->etag_parts)."-".$last_modified);
-	  //always keep one year ahead from request time
-	  $this->headers["expire"]=gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
-	  $this->headers["last_modified"]=$last_modified;
+        $last_modified = gmdate("D, d M Y H:i:s T");
+
+        if (isset($this->row["date_upload"])) {
+            $last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_upload"]));
+        }
+        else if (isset($this->row["date_updated"])) {
+            $last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
+        }
+
+        $this->headers["etag"]=md5(implode("|", $this->etag_parts)."-".$last_modified);
+        //always keep one year ahead from request time
+        $this->headers["expire"]=gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
+        $this->headers["last_modified"]=$last_modified;
 
   }
 
   protected function checkPermissions()
   {
+        debug("Storage::checkPermissions()");
+            
 
-	  if (!isset($this->row["auth_context"])) return;
-	  if (strlen($this->row["auth_context"])<1)return;
+        if (!isset($this->row["auth_context"])) return;
+        if (strlen($this->row["auth_context"])<1)return;
 
-	  $session = new Session();
+        debug("Storage::checkPermissions() protected object requested ...");
 
-	  include_once("lib/auth/AdminAuthenticator.php");
-	  if (AdminAuthenticator::checkAuthState()) return;
+        $session = new Session();
 
+        include_once("lib/auth/AdminAuthenticator.php");
+        if (AdminAuthenticator::checkAuthState()) {
+            debug("Storage::checkPermissions() Admin authenticated");
+            return;
+        }
+        else {
+            debug("Storage::checkPermissions() Admin not authenticated ...");
+            
+        }
+        
+        $auth_class = "lib/auth/".$this->row["auth_context"].".php";
+        
+        if (file_exists($auth_class)) {
+            include_once($auth_class);
+        }
+        else {
+            $auth_class = "class/auth/".$this->row["auth_context"].".php";
+            if (file_exists($auth_class)) {
+                include_once($auth_class);
+            }
+            else {
+                throw new Exception("Unable to locate the authenticating class");
+            }
+        }
+        
+       
+        $auth = new $this->row["auth_context"];
 
-	  @include_once("class/auth/".$this->row["auth_context"].".php");
-	  @include_once("lib/auth/".$this->row["auth_context"].".php");
-	  $auth = new $this->row["auth_context"];
-	  if (!$auth->checkAuthState(true, $this->row)) throw new Exception("This resource is protected. Please login first.");
+        debug("Storage::checkPermissions() Authenticating ... ");
+        if (!$auth->checkAuthState(true, $this->row)) {
+            debug("Storage::checkPermissions() Unable to authenticate request ... ");
+            throw new Exception("This resource is protected. Please login first.");
+        }
 
   }
   protected function checkCache()
   {
 
+        debug("Storage::checkCache()");
+        
         $etag = $this->headers["etag"];
         
         if ($this->skip_cache) return false;
@@ -334,7 +371,7 @@ class Storage
             exit;
         }
 
-        
+        debug("Storage::checkCache() Loading disk cache ...");
         //current etag is different from request etag
         //check disk cache - skip server side image resizing 
         $cache_folder = $this->getCacheFolder();  //"../spark_cache/{$this->className}/{$this->id}/"; //etag.bin
@@ -376,6 +413,8 @@ class Storage
   protected function sendResponse($is_cache_data=false)
   {
 
+        
+        
         $mime = "application/octetsream";
         if (isset($this->row["mime"])) {
             $mime = $this->row["mime"];

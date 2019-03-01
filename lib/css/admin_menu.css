@@ -34,8 +34,9 @@
   display:block;
  
   
-  border-bottom:1px solid #cccccc;
-  border-top:1px solid #ffffff;
+/*   border-bottom:1px solid #cccccc; */
+  border-top:1px solid #cccccc;
+  
   padding-left:5px;
   padding-right:15px;
   

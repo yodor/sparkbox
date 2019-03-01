@@ -5,6 +5,11 @@ include_once ("lib/beans/IDataBean.php");
 abstract class DBTableBean implements IDataBean
 {
 
+    /**
+    * Base class to work with DB Tables
+    * 
+    */
+    
     protected $table = "";
 
     protected $createString = "";

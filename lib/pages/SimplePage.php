@@ -10,11 +10,43 @@ include_once("lib/panels/MessageDialog.php");
 class SimplePage extends SitePage
 {
 
+    /**
+     * SitePage base implementation. Reimplement this class 
+     * as needed.
+     * 
+     */
+     
+    /**
+    * Authentication support
+    * Set this to instance of Authenticator to make this page require authentication 
+    * to access the page contents 
+    */
     protected $auth = NULL;
+    
+    /**
+    * Authentication support
+    * @boolean True if authentication is successfull
+    *          False if no authentication is unsuccessfull or not done yet
+    */
     protected $is_auth = false;
+    
+    /**
+    * Authentication support
+    * The ID from the Authenticator
+    */
     protected $userID = -1;
     
+    /**
+    * Authentication support
+    * @string The URL to redirect to the login page to make authenticatoin.
+    * 
+    */
     protected $login_url = "";
+    
+    
+    /**
+    * The Preferred title of this page for rendering into the <TITLE></TITLE>
+    */
     protected $preferred_title = "";
 
     protected $page_title = "";
@@ -26,42 +58,92 @@ class SimplePage extends SitePage
     
     protected $opengraph_tags = array();
     
+    /**
+    * Meta tag 'Description' overload. If not empty is used insted of $config_description
+    */
     public $description = "";
+    
+    /**
+    * Meta tag 'Keywords' overload. If not empty is used insted of $config_keywords
+    */
     public $keywords = "";
     
+    /**
+    * Meta tag 'Description' as read from config table from DB
+    */
     protected $config_description = "";
+    
+    /**
+    * Meta tag 'Keywords' as read from config table from DB
+    */
     protected $config_keywords = "";
     
+    /**
+    * property used to connect the current page with menus
+    */
     protected $accessible_title = "";
+    
     protected $accessible_parent = "";
     
+    /**
+    * property array of key=>value strings used to render all meta tags of this page
+    */
     protected $meta = array();
     
+    /**
+    * property array of Action objects holding page action buttons
+    */
     protected $actions = array();
     
+    /**
+    * property 
+    * array of Strings representing URL of all css files used 
+    */
     protected $css_files = array();
+    
+    /**
+    * property 
+    * array of Strings representing URLs of all JavaScript that are used in this page
+    */
     protected $js_files = array();
     
+    /**
+    *  @return boolean True if authentication is successfull or false otherwise
+    */
     public function isAuthenticated()
     {
         return $this->is_auth;
     }
     
+    /**
+    *  @return int The numeric ID as from the Authenticator
+    */
     public function getUserID()
     {
         return $this->userID;
     }
     
+    /**
+    *  Add meta tag to be rendered into this page.
+    *  @param $name string The name attribute to add to the Meta collection
+    *  @param $content string The content attribute 
+    */
     public function addMeta($name, $content)
     {
         $this->meta[$name] = $content;
     }
     
+    /**
+    *  Get the content attribute of the meta
+    *  @param $name string The name attribute to 
+    *  @return string The content attribute as set to the $name
+    */
     public function getMeta($name)
     {
         return isset($this->meta[$name]) ? $this->meta[$name] : "";
     }
 
+    
     public function addAction(Action $action)
     {
         $this->actions[$action->getAttribute("action")] = $action;
@@ -85,16 +167,30 @@ class SimplePage extends SitePage
         $this->opengraph_tags[$tag_name] = $tag_content; 
     }
     
+    /**
+    * gets the accessible title
+    * 
+    * @return string the accessible title of this page object. Default none.
+    */
     public function getAccessibleTitle()
     {
         return $this->accessible_title;
     }
     
+    /**
+    * sets the accessible title of this page
+    * 
+    * @param $menu_title string Tht title to set
+    *
+    */
     public function setAccessibleTitle($menu_title)
     {
         $this->accessible_title = $menu_title;
     }
     
+    /**
+    * Render all meta tags for the HEAD section of the page
+    */
     protected function dumpMetaTags() 
     {
         parent::dumpMetaTags();
@@ -117,7 +213,7 @@ class SimplePage extends SitePage
         
 
         
-        echo "<link rel='shortcut icon' href='".SITE_URL."/favicon.ico'>";
+        echo "<link rel='shortcut icon' href='//".SITE_DOMAIN."/favicon.ico'>";
         echo "\n";
         echo '<meta http-equiv="imagetoolbar" content="no">';
         echo "\n";
@@ -128,11 +224,18 @@ class SimplePage extends SitePage
         }
     }
     
+    /**
+    * Start rendering of the HEAD section
+    */
     protected function headStart() 
     {
         parent::headStart();
     }
     
+    /**
+    * Finish rendering of the HEAD section
+    * This overload enables the google analytics script to be read from the config section from DB
+    */
     protected function headEnd()
     {
         if (DB_ENABLED) {
@@ -159,21 +262,35 @@ class SimplePage extends SitePage
         $this->final_components[] = $cmp;
     }
     
+    /**
+    * Add component implementing IHeadRenderer that want to render to the HEAD section of this page
+    */
     public function addHeadComponent(IHeadRenderer $cmp)
     {
         $this->head_components[] = $cmp;
     }
     
+    /**
+    * Sets the value of the $caption property
+    * @param string $caption
+    */
     public function setCaption($caption)
     {
         $this->caption = $caption;
     }
     
+    /**
+    * Gets the value of the $caption property
+    * @return string 
+    */
     public function getCaption()
     {
         return $this->caption;
     }
     
+    /** 
+    * Render all the CSS script for this page into the HEAD section
+    */
     protected function dumpCSS()
     {
         parent::dumpCSS();
@@ -210,14 +327,27 @@ class SimplePage extends SitePage
         echo "<!-- Page CSS End -->";
     }
     
+    /** 
+    * Adds a CSS file to this page CSS scipts collection
+    * @param string $filename The filename of the CSS script.
+    * @param boolean $is_local Set to true to prepend the filename with /css/ folder
+    */
     public function addCSS($filename, $is_local=true) {
         $this->css_files[$filename] = $is_local;
     }
     
+    /** 
+    * Adds a JavaScript file to page JavaScripts collection
+    * @param string $filename The filename of the CSS script.
+    * @param boolean $is_local Set to true to prepend the filename with /css/ folder
+    */
     public function addJS($filename, $is_local=true) {
         $this->js_files[$filename] = $is_local;
     }
     
+    /**
+    * Render all the JavaScripts 
+    */
     protected function dumpJS()
     {
         parent::dumpJS();
@@ -282,6 +412,11 @@ var right = "<?php echo $right;?>";
  
     }
 
+    /**
+    * Constructor
+    * Execut authentication if Authenticator object is assigned to the $auth property
+    * Initialize one empty MessageDialog to be used for Popup messages
+    */
     public function __construct()
     {
 
@@ -325,22 +460,40 @@ var right = "<?php echo $right;?>";
 
     }
 
+    /**
+    * Set the authenticator object for this page
+    * @param Authenticator $auth The object implementing the Authenticator interface
+    * @param string $login_url The url to redirect if this request is not authenticated yet.
+    */
     public function setAuthenticator(Authenticator $auth, $login_url)
     {
         $this->auth = $auth;
         $this->login_url = $login_url;
     }
 
+    /**
+    * Sets the $preferred_title property
+    * @param string $page_title 
+    */
     public function setPreferredTitle($page_title)
     {
         $this->preferred_title = $page_title;
     }
     
+    /**
+    * Gets the $preferred_title property
+    * @return string $page_title 
+    */
     public function getPreferredTitle()
     {
         return $this->preferred_title;
     }
     
+    /**
+    * Output buffering processing
+    * During beginPage/finishPage all output is buffered
+    * Here we can adjust the buffer before it is sent back to client
+    */
     public function obCallback($buffer)
     {
 
@@ -373,6 +526,16 @@ var right = "<?php echo $right;?>";
         return $buffer;
     }
 
+    
+    /**
+    * Start rendering of this page
+    *
+    * 1. RequestController processes all Ajax handlers attached to this page
+    * 2. Config section of DB is read to load meta_keywords/description
+    * 3. Output buffering is set up
+    * 4. All tags including the BODY tag are rendered to the output
+    * 5. RequestController processes all regular handlers(non-ajax) 
+    */
     public function beginPage()
     {
         RequestController::processAjaxHandlers();
@@ -409,7 +572,15 @@ var right = "<?php echo $right;?>";
         RequestController::processRequestHandlers();
     }
 
-
+    /**
+    * Finalize rendering of this page
+    *
+    * 1. Process messages if any
+    * 2. Process final components rendering ie all before the closing BODY tag
+    * 3. Render the closing BODY tag
+    * 4. Render the closing HTML tag
+    * 5. End output buffering and send to client
+    */
     public function finishPage()
     {
 
@@ -427,12 +598,21 @@ var right = "<?php echo $right;?>";
 
 
     }
+    
+    /**
+    * Render all component implementing the IFinalRenderer before closing the BODY
+    */
     protected function processFinalComponents()
     {
         foreach ($this->final_components as $idx=>$cmp) {
             $cmp->renderFinal();
         }
     }
+    
+    /**
+    * Show message as a popup if Session "alert" variable is set
+    * Clears the Session "alert" variable 
+    */
     protected function processMessages()
     {
 

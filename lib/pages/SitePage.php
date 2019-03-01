@@ -2,6 +2,11 @@
 
 abstract class SitePage
 {
+
+    /**
+    * Abstract class for rendering html pages
+    */
+    
     private static $instance = NULL;
     
     public static function getInstance()
@@ -36,8 +41,8 @@ abstract class SitePage
         echo "\n";
     }
 
-protected function headStart()
-{
+    protected function headStart()
+    {
 
         echo "<head>\n";
         echo "<title>".SITE_TITLE."</title>\n";
@@ -60,29 +65,30 @@ protected function headStart()
         }
         echo "<!-- callable js end -->";
         echo "\n";
-}
+    }
+
     protected function dumpCSS()
     {
-            echo "\n";
+        echo "\n";
     }
+    
     protected function dumpJS()
     {
-
-            echo "\n";
-
+        echo "\n";
     }
 
-    protected function headEnd() {
-            echo "</head>\n";
-            echo "\n";
+    protected function headEnd() 
+    {
+        echo "</head>\n";
+        echo "\n";
     }
 
     protected function bodyStart()
     {
 
 
-            echo "<body class='".$this->getPageClass()."' >\n";
-            echo "\n";
+        echo "<body class='".$this->getPageClass()."' >\n";
+        echo "\n";
 
     }
 
@@ -90,17 +96,17 @@ protected function headStart()
 
     protected function bodyEnd()
     {
-            echo "\n";
+        echo "\n";
 
 
-            echo "</body>\n";
-            echo "\n";
+        echo "</body>\n";
+        echo "\n";
     }
 
     protected function htmlEnd(){
-            echo "\n";
-            echo "</html>";
-            echo "\n";
+        echo "\n";
+        echo "</html>";
+        echo "\n";
     }
 
 
@@ -109,11 +115,25 @@ protected function headStart()
     public abstract function beginPage();
     public abstract function finishPage();
 
-
+    /**
+    * setPageClass
+    *
+    * Set the preferred CSS class name of this page
+    * 
+    */
+    
     public function setPageClass($cls)
     {
         $this->page_class = $cls;
     }
+    
+    /**
+    * getPageClass
+    *
+    * Return the page CSS class name is set. Otherways return multiple class names 
+    * corresponding to the php filename this page is running from
+    */
+    
     public function getPageClass()
     {
         if ($this->page_class) return $this->page_class;
@@ -122,6 +142,13 @@ protected function headStart()
         $pname = basename(dirname($_SERVER["SCRIPT_NAME"]));
         return get_class($this)." ".$pname." ".$sname;
     }
+    
+    /**
+    * getPageURL
+    *
+    * Return the full URL this page is running from 
+    */
+    
     public function getPageURL()
     {
         return $_SERVER["SCRIPT_NAME"]."?".$_SERVER["QUERY_STRING"];

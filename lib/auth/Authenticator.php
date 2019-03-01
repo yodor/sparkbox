@@ -2,6 +2,10 @@
 abstract class Authenticator
 {
 
+    /**
+    * Abstract class for doing authentication
+    * Reimplement to get context specific authenticator
+    */
     public static $lastID = -1;
     
     public static function hmac($key, $data, $hash = 'md5', $blocksize = 64)
@@ -14,10 +18,12 @@ abstract class Authenticator
 	$opad = str_repeat(chr(0x5c), $blocksize);
 	return $hash(($key^$opad) . pack('H*', $hash(($key^$ipad) . $data)));
     }
+    
     public static function getLastAuthenticatedID()
     {
       return self::$lastID;
     }
+    
     public static function generateRandomAuth($length=32)
     {
 	// Generate random 32 charecter string
@@ -38,7 +44,12 @@ abstract class Authenticator
 	throw new Exception("Not implemented");
     }
 
-
+    /**
+    * Perform checking of the authenticated state stored into the session
+    * @param string $auth_context The named context to check authentication state
+    * @param boolean $skip_cookie_check Authentication state is stored in session and into the COOKIE array.
+    *                Setting this parameter to false is skipping the checks with COOKIE
+    */
     protected static function checkAuthStateImpl($auth_context, $skip_cookie_check=false)
     {
 	self::$lastID = -1;
@@ -72,17 +83,26 @@ abstract class Authenticator
 	return false;
     }
     
+    /**
+    * Clear the authenticated state for this context
+    * @param string $context The named authentication context
+    */
     protected static function clearAuthState($context)
     {
 	setcookie($context."_id","",1,"/", COOKIE_DOMAIN);
 	setcookie($context."_auth","",1,"/", COOKIE_DOMAIN);
     }
     
+    /**
+    * Prepare the authentication context token with Session and COOKIE
+    * @param stirng $context The named context
+    * @param array $authstore The array of values to store into the authentication context 
+    */
     public static function prepareAuthState($context, $authstore)
     {
 	session_regenerate_id(true);
 
-	$expire = time() + 60 * 60 * 24 *  365; // set expire to two hours // one month = time()+60*60*24*30;
+	$expire = time() + 60 * 60 * 24 *  365; // set expiration duration to one year
 
 	$auth_token=Authenticator::generateRandomAuth();
 
