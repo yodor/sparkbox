@@ -38,14 +38,13 @@ class MenuBarComponent extends Component implements IHeadRenderer
 	
 	public function renderStyle()
 	{
-            //append dump query string to the href to force reload of file ex. MenuBarComponent.css?ver=1.1
-	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/MenuBarComponent.css' type='text/css' >"; 
+	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/MenuBarComponent.css?ver=1.1' type='text/css' >"; 
 	    echo "\n";
 
 	}
 	public function renderScript()
 	{
-	    echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/MenuBarComponent.js'></script>";
+	    echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/MenuBarComponent.js?ver=1.1'></script>";
 	    echo "\n";
 	}
 	public function getMainMenu()
