@@ -82,13 +82,13 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         $this->filters[$filter_name] = $filter_key;
     }
 
-    protected function processGetVars()
+    protected function processGetVars(NestedSetTreeView $view)
     {
-        parent::processGetVars();
-        $this->processCombiningFilters(); 
+        parent::processGetVars($view);
+        $this->processCombiningFilters($view); 
     }
     
-    public function processCombiningFilters()
+    public function processCombiningFilters(NestedSetTreeView $view)
     {
         $combining_filter = $this->filter_all;
 
@@ -101,7 +101,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
 
             $sel = new SelectQuery();
             if ($value instanceof IQueryFilter) {
-                $sel = $value->getQueryFilter($this->view, $filter_value);
+                $sel = $value->getQueryFilter($view, $filter_value);
             }
             else {
                 $sel->fields = "";
@@ -118,20 +118,20 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         $this->filter_all = $combining_filter;
     }
     
-    protected function processTextAction()
+    protected function processTextAction(NestedSetTreeView $view)
     {
-        parent::processTextAction();
+        parent::processTextAction($view);
 
-        $text_action = $this->view->getItemRenderer()->getTextAction();
+        $text_action = $view->getItemRenderer()->getTextAction();
         
         foreach ($this->filter_value as $name=>$value) {
             $text_action->addParameter(new ActionParameter($name, $value, true));
         }
     }
     
-    public function applyFiltersOn(&$sel, $filter_name, $skip_self=false)
+    public function applyFiltersOn(NestedSetTreeView $view, &$sel, $filter_name, $skip_self=false)
     {
-        if (!$this->view) throw new Exception("Filter processing not finished");
+        if (!$view) throw new Exception("Filter processing not finished");
         
         // $sel = $sel->combineWith($this->getFilterAll());
 
@@ -141,11 +141,11 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
             $sel = $sel->combineWith($qry);
         }
 
-        $nodeID = $this->view->getSelectedID();
+        $nodeID = $view->getSelectedID();
 
         if ($nodeID>0) {
             $sel->where = " relation.catID = child.catID ";
-            $sel = $this->view->getSource()->childNodesWith($sel, $nodeID);
+            $sel = $view->getSource()->childNodesWith($sel, $nodeID);
         }
         return $this->getFilterValue($filter_name);
     }

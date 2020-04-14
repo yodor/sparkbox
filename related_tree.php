@@ -42,6 +42,8 @@ $treeView->list_label = "category_name";
 
 //renderer for the tree view
 $ir = new TextTreeItemRenderer();
+$ir->setTextAction(new Action("Text Action", "related_tree.php?filter=self", array()));
+
 $treeView->setItemRenderer($ir);
 
 //construct initial relation query to aggregate with the tree view
@@ -158,7 +160,7 @@ $brand_select = new SelectQuery();
 	  $brand_select->fields = " brand_name ";
 	  $brand_select->from = " ($derived_table) as relation ";
 	  $brand_select->group_by = " brand_name ";
-	  $brand_value = $proc->applyFiltersOn($brand_select, "brand_name");
+	  $brand_value = $proc->applyFiltersOn($treeView, $brand_select, "brand_name");
 	  
 $color_select = new SelectQuery();
 	  $color_select->fields = " color ";
@@ -166,7 +168,7 @@ $color_select = new SelectQuery();
 	  $color_select->where = "  ";
 	  $color_select->order_by = " color ";
 	  $color_select->group_by = " color ";
-	  $color_value = $proc->applyFiltersOn($color_select, "color");
+	  $color_value = $proc->applyFiltersOn($treeView, $color_select, "color");
 
 $size_select = new SelectQuery();
 	  $size_select->fields = " size_value ";
@@ -174,7 +176,7 @@ $size_select = new SelectQuery();
 	  $size_select->where = "  ";
 	  $size_select->group_by = " size_value ";
 	  $size_select->order_by = " prodID ";
-	  $size_value = $proc->applyFiltersOn($size_select, "size_value");
+	  $size_value = $proc->applyFiltersOn($treeView, $size_select, "size_value");
 	  
 $price_info = array();
 $price_select = new SelectQuery();
@@ -182,7 +184,7 @@ $price_select = new SelectQuery();
 	  $price_select->from = " ($derived_table) as relation ";	  
 	  
 	  //apply the other filters but skip self - slider shows always min-max of all products
-	  $price_info["price_range"] = $proc->applyFiltersOn($price_select, "price_range", true);
+	  $price_info["price_range"] = $proc->applyFiltersOn($treeView, $price_select, "price_range", true);
 	  
 
 	  
@@ -204,7 +206,7 @@ try {
     $ia_name_select->from = " ($derived_table) as relation  ";
     $ia_name_select->where = "   ";
     
-    $proc->applyFiltersOn($ia_name_select, "ia", true);
+    $proc->applyFiltersOn($treeView, $ia_name_select, "ia", true);
     
     $ia_name_select->fields = " distinct(relation.ia_name) as ia_name ";
     $ia_name_select->combineSection("where", "  relation.ia_name  IS NOT NULL");
@@ -218,7 +220,7 @@ try {
         $sel->fields = "  ";
         $sel->from = " ($derived_table) as relation  ";
         
-        $value = $proc->applyFiltersOn($sel, "ia");
+        $value = $proc->applyFiltersOn($treeView, $sel, "ia");
         
         $sel->fields = " distinct(relation.ia_value) as ia_value ";
         $sel->combineSection("where", "  relation.ia_name = '$name' AND relation.ia_value > ''");

@@ -25,11 +25,36 @@ class Storage
   protected $gray_filter = false;
   protected $use_storage = false;
 
+  protected $server_time = "";
+  protected $request_start = "";
+  protected $request_last = "";
+
+  protected $request_uri = "";
+  
   public function __construct()
   {
-	  $this->headers = array();
-	  $this->row = array();
+        $this->headers = array();
+        $this->row = array();
+        
+        $this->request_uri = $_SERVER["REQUEST_URI"];
+        $this->request_start = microtime(true);
+        $this->request_last = $this->request_start;
+        
+        debug("Storage() request start: {$this->request_start} - Server time: {$this->server_time}");
   }
+
+  public function debugActiveTime($msg)
+  {
+        $current = microtime(true);
+        $elapsed_from_last = ($current - $this->request_last);
+        $elapsed_from_start = ($current - $this->request_start);
+        $elapsed_from_last = number_format($elapsed_from_last, 3);
+        $elapsed_from_start = number_format($elapsed_from_start, 3);
+
+        //error_log("Storage::$msg ({$this->request_uri}) - elapsed last: $elapsed_from_last | elapsed total: $elapsed_from_start");
+        $this->request_last = $current;
+  }
+  
   public function processRequest()
   {
             debug("Storage::processRequest()");
@@ -74,7 +99,7 @@ class Storage
                 }
 
 
-// debug("Storage::processRequest: ".$_SERVER["REQUEST_URI"]);
+                $this->debugActiveTime("start");
 
 
 		if (strcmp($this->cmd,"data_file")==0) {
@@ -99,7 +124,11 @@ class Storage
 			$this->blob_field = "photo";
 			$this->loadBeanClass();
 
+			
+			
 			$this->checkCache();
+			
+			
 			
 			if (ImageResizer::$max_width>0 && ImageResizer::$max_height>0) {
 			  ImageResizer::autoCrop($this->row);
@@ -143,6 +172,9 @@ class Storage
 			$this->checkCache();
 			
 			ImageResizer::thumbnail($this->row, $size);
+		}
+		else {
+                    $this->sendError(new Exception("Unknown Command"));
 		}
 		
 		$this->sendResponse();
@@ -266,6 +298,7 @@ class Storage
         $this->headers["expire"]=gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
         $this->headers["last_modified"]=$last_modified;
 
+        $this->debugActiveTime("bean loaded");
   }
 
   protected function checkPermissions()
@@ -314,6 +347,7 @@ class Storage
             throw new Exception("This resource is protected. Please login first.");
         }
 
+        $this->debugActiveTime("permissions checked");
   }
   protected function checkCache()
   {
@@ -361,6 +395,7 @@ class Storage
         }
 
         if ($send_cache) {
+            $this->debugActiveTime("exiting with cache headers");
             //cache response headers - use current datetime
             $last_modified = gmdate("D, d M Y H:i:s T");
             header("HTTP/1.1 304 Not Modified");
@@ -371,6 +406,7 @@ class Storage
             exit;
         }
 
+        $this->debugActiveTime("load disc cache start");
         debug("Storage::checkCache() Loading disk cache ...");
         //current etag is different from request etag
         //check disk cache - skip server side image resizing 
@@ -389,6 +425,9 @@ class Storage
         fclose($handle);
 
         $this->row["size"] = filesize($cache_file);
+        
+        $this->debugActiveTime("load disc cache finished");
+        
         $this->sendResponse(true);//response is from cache
         //exit
         
@@ -414,6 +453,7 @@ class Storage
   {
 
         
+        $this->debugActiveTime("start sendResponse");
         
         $mime = "application/octetsream";
         if (isset($this->row["mime"])) {
@@ -441,7 +481,9 @@ class Storage
         header("Content-Transfer-Encoding: binary");
 
         if (!$is_cache_data) {
-                    
+               
+            $this->debugActiveTime("reading disc cache");
+            
             $cache_folder = $this->getCacheFolder();  
             if (!file_exists($cache_folder)) {
                 mkdir($cache_folder, 0777, true);
@@ -455,6 +497,8 @@ class Storage
             flock($handle, LOCK_UN);
             fclose($handle);
 
+            $this->debugActiveTime("read disc cache finished");
+            
         }
         else {
         
@@ -462,6 +506,7 @@ class Storage
         }
 
         
+        $this->debugActiveTime("sending start");
         
         $do_print = false;
         $fp = fopen("php://output", "wb");
@@ -499,12 +544,16 @@ class Storage
             debug("Storage::sendResponse(): filename='$filename' $written of {$this->row["size"]} bytes sent");
         }
         
+        $this->debugActiveTime("finished response sent");
+        
         exit;
         
   }
   protected function sendError(Exception $e)
   {
 
+    $this->debugActiveTime("sendError");
+  
       // send the right headers
       header("Content-Type: text/html");
       header("Content-Length: ".strlen($e->getMessage()));

@@ -581,7 +581,7 @@ if ($this->filter) {
 	    return $sqry->combineWith($relation);
 
 	}
-	public function listTreeRelatedSelect(DBTableBean $related_source, $count_field="")
+	public function listTreeRelatedSelect(DBTableBean $related_source, $count_field="", $parent_fields=null)
 	{		
 	    $prkey = $this->prkey;
 
@@ -598,10 +598,21 @@ if ($this->filter) {
 
  	    if (!$count_field) {
 		  $count_field = "COUNT( $related_table.$related_prkey ) ";
- 		}
+            }
+            
+            //TODO. check listTreeSelect? and all "*"
+            $fieldlist = array("parent.$prkey", "parent.lft", "parent.rgt");
+            
+            if (is_array($parent_fields)) {
+                foreach ($parent_fields as $key=>$val) {
+                    $fieldlist[]="parent.$val";
+                }
+            }
+            $fields_sql = implode(",", $fieldlist);
+            
 	    //aggregate relation query
 	    $sqry = new SelectQuery();
-	    $sqry->fields = "  parent.*, $count_field as related_count ";
+	    $sqry->fields = "  $fields_sql, $count_field as related_count ";
 	    $sqry->from = "  {$this->table} AS node, {$this->table} AS parent, $related_table ";
 	    $sqry->where = "  (node.lft BETWEEN parent.lft AND parent.rgt) AND node.$prkey = $related_table.$prkey ";
 	    $sqry->group_by = " parent.$prkey ";

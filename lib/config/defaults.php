@@ -78,11 +78,14 @@ $defines->set("IMAGE_UPLOAD_DOWNSCALE", true);
 $defines->set("IMAGE_UPLOAD_UPSCALE", false);
 
 
-$site_domain = $_SERVER["HTTP_HOST"];
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+$defines->set("SITE_PROTOCOL", $protocol);
 
+$site_domain = $_SERVER["HTTP_HOST"];
 $defines->set("SITE_DOMAIN", $site_domain);
+
 //URL of this site without path and ending slash '/'
-$defines->set("SITE_URL","http://".$site_domain);
+$defines->set("SITE_URL", $protocol.$site_domain);
 $defines->set("TITLE_PATH_SEPARATOR", " :: ");
 $defines->set("COOKIE_DOMAIN", $site_domain); // or .domain.com
 

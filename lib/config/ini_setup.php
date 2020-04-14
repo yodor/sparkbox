@@ -9,7 +9,7 @@ ini_set("session.use_only_cookies", "0");
 
 ini_set("zlib.output_compression", "0");
 
-ini_set("mbstring.internal_encoding", "UTF-8");
+@ini_set("mbstring.internal_encoding", "UTF-8");
 
 // ini_set("session.cookie_lifetime","7200");
 // ini_set("session.gc_maxlifetime","36000");

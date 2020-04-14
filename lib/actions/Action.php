@@ -40,7 +40,8 @@ class Action {
     protected $href="";
     protected $check_code="return true;";
     protected $attributes=NULL;
-
+    protected $clear_page_param = false;
+    
     /**
     * CTOR
     *
@@ -59,7 +60,14 @@ class Action {
         $this->attributes = array();
         
         $this->prepend_request_params = true;
+        $this->clear_page_param = false;
 
+    }
+    
+    //remove paginator page=? parameter from this href
+    public function setClearPageParam($mode)
+    {
+        $this->clear_page_param = ($mode) ? true : false;
     }
 
     /**
@@ -197,7 +205,7 @@ class Action {
             }
         }
         
-        if (strlen($script_name)>0) {
+        if (strlen($script_name)>0 || $this->clear_page_param) {
             Paginator::clearPageFilter($params);
         }
 

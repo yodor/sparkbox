@@ -54,6 +54,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
     }
 
 
+    //used in the main list to fetch the matched products with category
     public function getRelationSelect()
     {
     
@@ -246,10 +247,13 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	
     }
     //related count calculated on $count_field default counting on the prkey of the $related_source
-    public function setRelatedSource(DBTableBean $related_source, $count_field="")
+    public function setRelatedSource(DBTableBean $related_source, $count_field="", $related_fields=null)
     {
 
-	$sqry = $this->data_source->listTreeRelatedSelect($related_source, $count_field);
+        if (!is_array($related_fields)) {
+            $related_fields = array($this->list_label);
+        }
+	$sqry = $this->data_source->listTreeRelatedSelect($related_source, $count_field, $related_fields);
 	
 	$this->setSelectQuery($sqry);
 
@@ -274,9 +278,16 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	    }
 	}
 
+	
+	
 	$db = DBDriver::get();
 
+// 	echo "<div style='display:none;' class='debug'>";
+// 	echo "QS:".microtime(true);
+	
 	$sql = $this->select_qry->getSQL();
+
+// 	echo "<div>$sql</div>";
 
 	$res = $db->query($sql);
 
@@ -286,10 +297,17 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	
 	$open_tags = 0;
 	
+	
+// 	echo "QF:".microtime(true);
+// 	echo "</div>";
+	
 	echo "<ul class='NodeChilds'>";
+	$ctr= 0;
+	
 	
 	while ($row = $db->fetch($res)) {
-
+            $ctr++;
+            
 	  $lft = $row["lft"];
 	  $rgt = $row["rgt"];
 	  $nodeID = $row[$source_key];
@@ -352,6 +370,7 @@ class NestedSetTreeView extends Component implements IHeadRenderer
 	    $_GET[$related_prkey] = $request_source;	
 	}
 
+	
     }
     
     public function finishRender()

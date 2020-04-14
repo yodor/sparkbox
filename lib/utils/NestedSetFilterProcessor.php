@@ -3,47 +3,65 @@ include_once("lib/components/NestedSetTreeView2.php");
 
 class NestedSetFilterProcessor
 {
-	protected $view = NULL;
+	
+	protected $item_clicked_action = NULL;
 	
 	public function __construct()
 	{
-		$this->view = NULL;
+            $this->item_clicked_action = NULL;
 	}
 
+        public function setItemClickedAction(Action $action)
+        {
+            $this->item_clicked_action = $action;
+        }
+        
 	public function process(NestedSetTreeView $view)
 	{
-		$this->view = $view;
-		
-		$this->processGetVars();
-		$this->processTextAction();
+
+		$this->processGetVars($view);
+		$this->processTextAction($view);
 		
 	}
-	protected function processGetVars()
+	
+	protected function processGetVars(NestedSetTreeView $view)
 	{
 		
-		$bean = $this->view->getSource();
+		$bean = $view->getSource();
 		$source_prkey = $bean->getPrKey();
 
 		if (isset($_GET[$source_prkey])) {
 		  $nodeID = (int)$_GET[$source_prkey];
-		  $this->view->setSelectedID($nodeID);
+		  $view->setSelectedID($nodeID);
 		}
 		  
 	}
-
-	protected function processTextAction()
-	{
-		$bean = $this->view->getSource();
-		$source_prkey = $bean->getPrKey();
-		
-		$tv_item_clicked = new Action(
-		  "TextItemClicked", "?filter=self",
+	
+        protected function createDefaultAction($bean)
+        {
+                $tv_item_clicked = new Action(
+		  "TextItemClicked", "",
 		  array(
 			new ActionParameter($bean->getPrKey(), $bean->getPrKey())
 		  )
 		);
+		
+		//clicking on this will clear the page parameter of the paginator from the href url
+		$tv_item_clicked->setClearPageParam(true);
+		
+		return $tv_item_clicked;
+        }
 
-		$this->view->getItemRenderer()->setTextAction($tv_item_clicked);
+	protected function processTextAction(NestedSetTreeView $view)
+	{
+		$bean = $view->getSource();
+		$source_prkey = $bean->getPrKey();
+		
+		if (!$this->item_clicked_action) {
+                    $this->item_clicked_action = $this->createDefaultAction($bean);
+                }
+
+		$view->getItemRenderer()->setTextAction($this->item_clicked_action);
 	}
 	
 
