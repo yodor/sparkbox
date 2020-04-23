@@ -55,15 +55,7 @@ class AuthenticatorRequestHandler extends RequestHandler
         try {
 
             //throws exception on login error
-            $this->auth->authenticate($this->username, $this->pass, $this->randsalt, $this->remember);
-
-            $success = true;
-
-            //unset($_SESSION[$this->auth->name()]["rand"]);
-
-            //debug
-            //            echo "Loging success";
-            //            exit;
+            $this->auth->login($this->username, $this->pass, $this->randsalt, $this->remember);
 
         }
         catch (Exception $e) {

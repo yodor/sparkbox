@@ -307,7 +307,7 @@ class Storage
 
         include_once("lib/auth/AdminAuthenticator.php");
         $auth_admin = new AdminAuthenticator();
-        if ($auth_admin->data()) {
+        if ($auth_admin->authorize()) {
             debug("Storage::checkPermissions() Admin authenticated");
             return;
         }
@@ -337,7 +337,7 @@ class Storage
         if ($auth instanceof Authenticator) {
             debug("Storage::checkPermissions() Authenticating ... ");
 
-            if (!$auth->validate(true, $this->row)) {
+            if (!$auth->authorize($this->row)) {
                 debug("Storage::checkPermissions() Unable to authenticate request ... ");
                 throw new Exception("This resource is protected. Please login first.");
             }

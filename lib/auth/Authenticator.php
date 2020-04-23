@@ -7,16 +7,15 @@
 abstract class Authenticator
 {
 
-    const CONTEXT_TOKEN = "token";
-    const CONTEXT_ID = "id";
-    const CONTEXT_DATA = "data";
+    const TOKEN_LENGTH = 32;
 
     protected $contextName = "";
     protected $loginURL = "";
 
-    public function __construct(string $contextName)
+    protected $bean = null;
+
+    public function __construct()
     {
-        $this->contextName = $contextName;
     }
 
     public static function HMAC($key, $data, $hash = 'md5', $blocksize = 64)
@@ -51,92 +50,12 @@ abstract class Authenticator
 
 
     /**
-     * Called from Login or after registration routines are complete to set the logged in state of the context
-     * Store authentication data in session and cookie for a named context '$name'
-     * @param int $id
-     * @param array $data
-     * @throws Exception
+     * Return the context name this class is handling
+     * @return string
      */
-    public function store(int $id, array $data)
+    public function name()
     {
-        debug(get_class($this) . " Storing authentication data ... ");
-
-        session_regenerate_id(true);
-
-        debug(get_class($this) . " SessionID regenerated ...");
-
-        $token = Authenticator::RandomToken();
-
-        $context = array();
-        $context[Authenticator::CONTEXT_TOKEN] = $token;
-        $context[Authenticator::CONTEXT_ID] = $id;
-        $context[Authenticator::CONTEXT_DATA] = $data;
-
-        Session::Set($this->contextName, $context);
-
-        setcookie($this->contextName . "_" . Authenticator::CONTEXT_TOKEN, $token, 0, "/");
-        setcookie($this->contextName . "_" . Authenticator::CONTEXT_ID, $id, 0, "/");
-
-        //        if (is_array($data)) {
-        //            foreach ($data as $key => $val) {
-        //                setcookie($this->contextName."_".Authenticator::CONTEXT_DATA."_".$key, $val, 0, "/");
-        //            }
-        //        }
-
-        debugArray(get_class($this) . " Context data: ", Session::Get($this->contextName));
-        debugArray(get_class($this) . " Cookie data: ", $_COOKIE);
-        // do not redirect below
-    }
-
-    /**
-     * Perform checking of the authenticated state stored into the session and cookies
-     * @param bool $skip_cookie_check
-     * @param array|null $user_data
-     * @return bool
-     */
-    public function validate(bool $skip_cookie_check = false, array $user_data = NULL)
-    {
-
-        debug(get_class($this) . " Validate authenticated state: skip_cookie_check: " . $skip_cookie_check);
-
-        if (!Session::Contains($this->contextName)) {
-            debug(get_class($this) . " Session array does not contain context name: " . $this->contextName);
-            return false;
-        }
-
-        $context = Session::Get($this->contextName);
-
-        debugArray(get_class($this) . " context name: " . $this->contextName . " Data: ", $context);
-
-        if (!isset($context[Authenticator::CONTEXT_TOKEN]) || !isset($context[Authenticator::CONTEXT_ID])) return false;
-
-        $session_token = $context[Authenticator::CONTEXT_TOKEN];
-        $session_id = $context[Authenticator::CONTEXT_ID];
-
-        if ($skip_cookie_check) {
-            return true;
-        }
-
-        debug(get_class($this) . " Validating cookie values");
-
-
-        //session expired
-        if (!isset($_COOKIE[$this->contextName . "_" . Authenticator::CONTEXT_TOKEN]) || !isset($_COOKIE[$this->contextName . "_" . Authenticator::CONTEXT_ID])) {
-            debug(get_class($this) . " Required cookies were not found");
-            return false;
-        }
-
-        $cookie_token = $_COOKIE[$this->contextName . "_" . Authenticator::CONTEXT_TOKEN];
-        $cookie_id = $_COOKIE[$this->contextName . "_" . Authenticator::CONTEXT_ID];
-
-        if (strcmp($session_token, $cookie_token) == 0 && strcmp($session_id, $cookie_id) == 0) {
-            debug(get_class($this) . " Cookie values matched successfully");
-            return true;
-        }
-
-        debug(get_class($this) . " Cookie values does not match session values");
-
-        return false;
+        return $this->contextName;
     }
 
     /**
@@ -147,62 +66,213 @@ abstract class Authenticator
         Session::Clear($this->contextName);
         foreach ($_COOKIE as $key => $val) {
             if (strpos($key, $this->contextName) === 0) {
-                setcookie($key, "", 1, "/", COOKIE_DOMAIN);
+                setcookie($key, "", 1, "/");
             }
         }
     }
 
-
-    /**
-     * Return the context name this class is handling
-     * @return string
-     */
-    public function name()
+    public function register(array $urow)
     {
-        return $this->contextName;
-    }
 
-    public function getLoginURL()
-    {
-        return $this->loginURL;
-    }
+        $userID = $this->bean->insert($urow);
+        if ($userID < 1) {
+            error_log("Authenticator::register() Error: ". $this->bean->getDB()->getError());
+            throw new Exception(tr("Error during registering. Please try again later."));
+        }
 
-    public function setLoginURL(string $url)
-    {
-        $this->loginURL = $url;
+        $data = $this->prepareAuthData($urow);
+
+        return $this->createContext($userID, $data);
     }
 
     /**
-     * @param bool $skip_cookie_check
+     * Validate authentication of this named context and return the AuthContext object or NULL
      * @param array|null $user_data
      * @return mixed|null
      */
-    public function data(bool $skip_cookie_check = false, array $user_data = NULL)
+    public function authorize(array $user_data = NULL)
     {
-        $context = NULL;
 
-        if ($this->validate($skip_cookie_check, $user_data)) {
-            $context = Session::Get($this->contextName, NULL);
+        if (!Session::Contains($this->contextName)) {
+            debug(get_class($this) . " Session array does not contain AuthContext with name: " . $this->contextName);
+            return NULL;
         }
 
-        return $context;
+        $authContext = @unserialize(Session::Get($this->contextName));
+
+        if ($authContext instanceof AuthContext) {
+            debug(get_class($this) . " Validating un-serialized AuthContext using name: ". $this->contextName);
+
+            if ($this->validate($authContext, $user_data) === TURE) {
+                debug(get_class($this) . " Validation success name: ". $this->contextName);
+                return $authContext;
+            }
+            else {
+                debug(get_class($this) . " AuthContext validation failed");
+            }
+        }
+        else {
+            debug(get_class($this) . " AuthContext un-serialize failed");
+        }
+
+        return NULL;
     }
 
     /**
-     * @param $username
-     * @param $pass
+     * Perform validation of the AuthContext. This method can be overloaded for authenticating the user_data
+     * @param AuthContext $context
+     * @param string $name
+     * @param array|null $user_data
+     * @return bool
+     */
+    protected function validate(AuthContext $context, string $name, array $user_data = NULL)
+    {
+        return $context->validate($name);
+    }
+
+    /**
+     * @param string $username
+     * @param string $pass
      * @param $rand
      * @param bool $remember_me
      * @param bool $check_password_only
      * @throws Exception
      */
-    abstract public function authenticate(string $username, string $pass, $rand, bool $remember_me = false, bool $check_password_only = false);
+    public function login(string $username, string $pass, string $rand, bool $remember_me = false, bool $check_password_only = false)
+    {
+
+        $db = DBDriver::Get();
+
+        $username = $db->escapeString($username);
+
+        $this->bean->startIterator("WHERE email='$username' LIMIT 1");
+
+        try {
+            $row = array();
+            if (!$this->bean->fetchNext($row)) throw new Exception("Username or password not recognized");
+
+            $userID = $row[$this->bean->key()];
+
+            $stored_user = $row["email"];
+            $stored_pass = Authenticator::HMAC($row["password"], $rand);
+
+            if (strcmp($stored_user, $username) !== 0 || strcmp($stored_pass, $pass) !== 0) {
+                throw new Exception(tr("Username or password not recognized"));
+            }
+
+            if (isset($row["confirmed"])) {
+                $is_confirmed = (int)$row["is_confirmed"];
+                if ($is_confirmed < 1) {
+                    $msg = tr("Your account is not confirmed yet.");
+                    if (defined(ACCOUNT_CONFIRM_URL)) {
+                        $link = ACCOUNT_CONFIRM_URL;
+                        $msg .= "<BR>";
+                        $msg .= tr("For more details visit the account confirmation page") . ": ";
+                        $msg .= "<a href='$link'>" . tr("here") . "</a>";
+                    }
+                    throw new Exception($msg);
+                }
+            }
+            if (isset($row["suspended"])) {
+                $is_suspended = (int)$row["suspended"];
+                throw new Exception(tr("Your account is temporary suspended."));
+            }
+
+
+            $data = $this->prepareAuthData($row);
+
+            $this->createContext($userID, $data);
+
+            $this->updateLastSeen($userID);
+
+        }
+        catch (Exception $e) {
+            sleep(3);
+            throw $e;
+        }
+    }
+
+    protected function updateLastSeen(int $userID)
+    {
+
+        $row = array();
+        $row["counter"] = "counter+1";
+        $row["last_active"] = "CURRENT_TIMESTAMP";
+
+        $this->bean->updateRecord($userID, $row);
+
+    }
 
     /**
-     * @param $userID
-     * @throws Exception
+     * Called from Login or after registration routines are complete to set the logged in state of the context
+     * Store authentication data in session and cookie for a named context '$name'
+     * @param int $id
+     * @param AuthData $data
+     * @return AuthContext
      */
-    abstract public function updateLastSeen($userID);
+    protected function createContext(int $id, AuthData $data)
+    {
+        debug(get_class($this) . " Creating new AuthContext ... ");
+
+        session_regenerate_id(true);
+
+        debug(get_class($this) . " SessionID regenerated ...");
+
+        $token = Authenticator::RandomToken(Authenticator::TOKEN_LENGTH);
+
+        $context = new AuthContext($id, $token, $data);
+
+        $context->store($this->contextName);
+
+        return $context;
+    }
+
+    protected function prepareAuthData(array $row)
+    {
+        $data = new AuthData();
+        if (isset($row[AuthData::DATA_EMAIL])) {
+            $data->set(AuthData::DATA_EMAIL, $row[AuthData::DATA_EMAIL]);
+        }
+        if (isset($row[AuthData::DATA_FULLNAME])) {
+            $data->set(AuthData::DATA_FULLNAME , $row[AuthData::DATA_FULLNAME]);
+        }
+        return $data;
+    }
+
+    public function fbAuthenticate($oauth_token)
+    {
+
+        $userID = -1;
+
+        $graph_url = "https://graph.facebook.com/me?access_token=$oauth_token";
+        $user_fb = json_decode(file_get_contents($graph_url));
+
+        $bean = new UsersBean();
+        $email = $user_fb->email;
+
+        $bean->startIterator("WHERE email='$email' LIMIT 1");
+        if (!$bean->fetchNext($urow)) throw new Exception("This email is not registered or not confirmed yet.");
+
+        $userID = (int)$urow[$bean->key()];
+
+        $authstore["id"] = $userID;
+        $authstore["fbID"] = (int)$urow["fb_userID"];
+
+        $s1 = "UPDATE users SET counter=counter+1 , last_active=CURRENT_TIMESTAMP, oauth_token='$oauth_token' WHERE " . $bean->key() . "='$userID'";
+        $db = DBDriver::Get();
+
+        $db->transaction();
+        $ret = $db->query($s1);
+        if (!$ret) throw new Exception($db->getError());
+        $db->commit();
+
+        $this->createContext($userID, $authstore);
+
+        $this->updateLastSeen($userID);
+
+        return $urow;
+
+    }
 }
 
 ?>

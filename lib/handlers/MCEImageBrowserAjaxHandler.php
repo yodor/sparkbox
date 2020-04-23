@@ -87,7 +87,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
     }
 
-    public function createUploadElement($imgrow)
+    public function createUploadElement(array $imgrow)
     {
         $id = $imgrow["imageID"];
 
@@ -138,7 +138,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
     }
 
 
-    protected function assignUploadObjects(JSONResponse $resp, $upload_object)
+    protected function assignUploadObjects(JSONResponse $resp, FileStorageObject $upload_object)
     {
         debug("MCEImageBrowserAjaxHandler::assignUploadObjects");
 

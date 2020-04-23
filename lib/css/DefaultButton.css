@@ -51,6 +51,8 @@ INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
     box-shadow: #888 0px 2px 5px;*/
 
     font-size: 100%;
+
+    vertical-align:bottom;
 }
 
 .DefaultButton:link {

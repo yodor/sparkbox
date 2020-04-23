@@ -53,7 +53,7 @@ abstract class InputField extends Component implements IDataSource, IFieldRender
 
     public function requiredStyle()
     {
-        return array(SITE_ROOT . "lib/css/InputRenderer.css");
+        return array(SITE_ROOT . "lib/css/InputField.css");
     }
 
     public function setFieldAttribute($name, $value)

@@ -10,32 +10,12 @@ include_once("lib/panels/MessageDialog.php");
 class SparkPage extends HTMLPage
 {
 
-    /**
-     * Authentication support
-     * Set this to instance of Authenticator to make this page require authentication
-     * to access the page contents
-     * @var Authenticator
-     */
-    protected $auth = NULL;
-
-    /**
-     * Authentication support
-     * @boolean True if authentication is validated
-     *          False if authentication is not done yet
-     */
-    protected $is_auth = false;
 
     /**
      * Authenticated context data array. is null if not authenticated yet
      * @var null
      */
     protected $context = NULL;
-
-    /**
-     * Authentication support. The authenticated user ID
-     * @var int
-     */
-    protected $userID = -1;
 
 
     /**
@@ -120,7 +100,10 @@ class SparkPage extends HTMLPage
      */
     public function getUserID()
     {
-        return $this->userID;
+        if ($this->context instanceof AuthContext) {
+            return $this->context->getID();
+        }
+        return -1;
     }
 
     /**
@@ -439,45 +422,37 @@ class SparkPage extends HTMLPage
 
     }
 
-    /**
-     * SimplePage constructor.
-     * Execute validation of the authentication if Authenticator object is assigned to the $auth property
-     * Initialize one empty MessageDialog to be used for Popup messages
-     * @param Authenticator|null $auth
-     * @throws Exception
-     */
-    public function __construct(Authenticator $auth = NULL)
+    public function __construct(Authenticator $auth = NULL, string $loginURL = "")
     {
 
         parent::__construct();
 
-        $this->auth = $auth;
+        if ($auth) {
 
-        $this->is_auth = false;
+            debug(get_class($this) . " Authenticator: " . get_class($auth));
 
-        if ($this->auth) {
+            $this->context = $auth->authorize();
 
-            debug(get_class($this) . " Authenticator: " . get_class($this->auth));
+            if ($this->context) {
 
-            $this->is_auth = $this->auth->validate();
-
-            if ($this->is_auth) {
-
-                debug(get_class($this) . " Authenticator validated session");
-                $this->context = $this->auth->data();
-                $this->userID = (int)$this->context[Authenticator::CONTEXT_ID];
+                debug(get_class($this) . " Authorization success");
 
             }
             else {
 
-                debug(get_class($this) . " no context data");
+                debug(get_class($this) . " Authorization failed");
 
                 if (isset($_GET["ajax"])) {
-                    throw new Exception("Your session is expired.");
+                    throw new Exception("Your session is expired");
                 }
 
-                header("Location: " . $this->auth->getLoginURL());
-                exit;
+                if (strlen($loginURL)>0) {
+                    header("Location: $loginURL");
+                    exit;
+                }
+
+                throw new Exception("Authorization failed");
+                //redirect routines
 
             }
 
@@ -487,43 +462,17 @@ class SparkPage extends HTMLPage
 
     }
 
-    /**
-     * Set the authenticator object for this page
-     * @param Authenticator $auth The object implementing the Authenticator interface
-     * @param string $login_url The url to redirect if this request is not authenticated yet.
-     */
-    public function setAuthenticator(Authenticator $auth, $login_url)
-    {
-        $this->auth = $auth;
-        $this->login_url = $login_url;
-    }
 
-    /**
-     * Sets the $preferred_title property
-     * @param string $page_title
-     */
-    public function setPreferredTitle($page_title)
+    public function setPreferredTitle(string $page_title)
     {
         $this->preferred_title = $page_title;
     }
 
-    /**
-     * Gets the $preferred_title property
-     * @return string $page_title
-     */
     public function getPreferredTitle()
     {
         return $this->preferred_title;
     }
 
-
-    /**
-     * Output buffering processing
-     * During beginPage/finishPage all output is buffered
-     * Here we can adjust the final buffer before it is sent back to client
-     * @param string $buffer
-     * @return string|string[]
-     */
     public function obCallback(string $buffer)
     {
 

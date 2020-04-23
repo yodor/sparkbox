@@ -85,7 +85,7 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
         debug("UploadControlAjaxHandler::_upload() finished");
     }
 
-    protected function assignUploadObjects(JSONResponse $resp, FileStorageObject &$uploadObject)
+    protected function assignUploadObjects(JSONResponse $resp, FileStorageObject $uploadObject)
     {
         debug("UploadControlAjaxHandler::assignUploadObjects() ...");
 

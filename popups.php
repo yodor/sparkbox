@@ -5,36 +5,26 @@ include_once("lib/panels/ConfirmMessageDialog.php");
 
 $page = new DemoPage();
 
-function dumpCSS()
-{
-    echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/InputRenderer.css' type='text/css' >";
-    echo "\n";
-}
-
 $dialog = new ConfirmMessageDialog();
+
+$field1 = DataInputFactory::CREATE(DataInputFactory::TEXTFIELD, "message1", "Message", false);
+$field1->setValue("Sample message text");
+
+$field2 = DataInputFactory::CREATE(DataInputFactory::TEXTAREA, "message2", "Confirmation Message", false);
+$field2->setValue("Sample confirmation message text");
 
 
 $page->startRender();
 
-echo "<div class='InputField TextField'>";
-echo "<input type=text  value='Sample Text Message'>";
-echo "</div>";
-
+$field1->getRenderer()->renderField($field1);
 echo "<BR>";
-
 StyledButton::DefaultButton()->renderButton("Show Message", "javascript:onShowMessage(this)");
 
 echo "<HR>";
 
-echo "<div class='InputField TextArea'>";
-echo "<textarea rows=5 cols=80>";
-echo "Text to show as confirm message";
-echo "</textarea>";
-echo "</div>";
-
+$field2->getRenderer()->renderField($field2);
 echo "<BR>";
 StyledButton::DefaultButton()->renderButton("Show Confirm", "javascript:onShowConfirm(this)");
-
 ?>
     <script type='text/javascript'>
         function onShowMessage() {

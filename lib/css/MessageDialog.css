@@ -34,9 +34,9 @@
 
     text-align: left;
 
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
+    -webkit-border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    border-radius: 0.3em;
 
     border: 1px solid #eeeeee;
 
@@ -57,18 +57,18 @@
 
     position: relative;
     font-weight: bold;
-    font-size: 1.3em;
+    font-size: 1.1em;
 
 
     cursor: default;
 
 
-    -webkit-border-radius: 10px 10px 0px 0px;
-    -moz-border-radius: 10px 10px 0px 0px;
-    border-radius: 10px 10px 0px 0px;
+    -webkit-border-radius: 0.3em 0.3em 0 0;
+    -moz-border-radius: 0.3em 0.3em 0 0;
+    border-radius: 0.3em 0.3em 0 0;
 
-    padding: 5px;
-    padding-left: 10px;
+    padding: 0.3em;
+    /*padding-left: 0.5em;*/
 
     color: white;
 
@@ -96,14 +96,14 @@
 }
 
 .PopupPanel .Inner {
-    padding: 5px;
+    padding: 0.5em;
 }
 
 .PopupPanel .message_text {
     display: inline-block;
     max-width: 100%;
     vertical-align: top;
-    margin: 10px;
+    margin: 0.5em;
 }
 
 .PopupPanel .message_icon {
@@ -113,11 +113,12 @@
     vertical-align: top;
 }
 
-
 .PopupPanel .buttons_bar {
     display: block;
 }
-
+.PopupPanel .buttons_bar>* {
+    margin-left:0.2em;
+}
 .icon_close_popup {
     background-image: url("../images/msgpopup/close.png");
     background-position: center center;

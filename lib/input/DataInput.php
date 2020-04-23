@@ -180,6 +180,9 @@ class DataInput implements IDataBeanSource
         $this->renderer = $renderer;
     }
 
+    /**
+     * @return IFieldRenderer
+     */
     public function getRenderer()
     {
         return $this->renderer;
