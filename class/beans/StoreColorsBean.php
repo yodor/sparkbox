@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 
 class StoreColorsBean extends DBTableBean
@@ -11,11 +11,12 @@ class StoreColorsBean extends DBTableBean
  PRIMARY KEY (`sclrID`),
  UNIQUE KEY `color` (`color`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("store_colors");
+        parent::__construct("store_colors");
     }
 
 }
+
 ?>

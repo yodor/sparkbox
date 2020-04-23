@@ -1,7 +1,7 @@
 <?php
 include_once("lib/pages/HTMLPage.php");
 include_once("lib/handlers/RequestController.php");
-include_once("lib/components/renderers/IHeadRenderer.php");
+include_once("lib/components/renderers/IHeadContents.php");
 include_once("lib/components/renderers/IFinalRenderer.php");
 include_once("lib/beans/ConfigBean.php");
 
@@ -35,7 +35,7 @@ class SparkPage extends HTMLPage
      * Authenticated context data array. is null if not authenticated yet
      * @var null
      */
-    protected $context = null;
+    protected $context = NULL;
 
     /**
      * Authentication support
@@ -253,11 +253,11 @@ class SparkPage extends HTMLPage
 
     /**
      * Add component implementing IHeadRenderer that want to render to the HEAD section of this page
-     * @param IHeadRenderer $cmp
+     * @param IHeadContents $cmp
      */
-    public function addHeadComponent(IHeadRenderer $cmp)
+    public function addHeadComponent(IHeadContents $cmp)
     {
-        $this->head_components[] = $cmp;
+        $this->head_components[get_class($cmp)] = $cmp;
     }
 
     /**
@@ -283,29 +283,48 @@ class SparkPage extends HTMLPage
      */
     protected function dumpCSS()
     {
+        echo "<!-- SparkPage CSS Start -->\n";
         parent::dumpCSS();
 
         echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/popups.css' type='text/css' >";
         echo "\n";
 
         //SparkPage default stylesheet
-        echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/SparkPage.css' type='text/css' >";
+        echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/SparkPage.css' type='text/css' >";
         echo "\n";
 
-        //merge all head components with same head class
-        //prevent duplication of css 
-        $hcmp_merged = array();
+        //prepare collection of unique IHeadRenderer components
+//        $components = array();
+//        foreach ($this->head_components as $idx => $cmp) {
+//            $components[get_class($cmp)] = $cmp;
+//        }
+
+        $css_array = array();
         foreach ($this->head_components as $idx => $cmp) {
-            $hcmp_merged[$cmp->getHeadClass()] = $cmp;
+            //dump used components in page
+            //echo "<!-- " . $idx . " -->\n";
+            $css_files = $cmp->requiredStyle();
+            foreach ($css_files as $key=>$url) {
+                $usedBy = array();
+                if (isset($css_array[$url])) {
+                    $usedBy = $css_array[$url];
+                }
+                $usedBy[get_class($cmp)] = 1;
+                $css_array[$url] = $usedBy;
+            }
         }
 
-        foreach ($hcmp_merged as $head_class => $cmp) {
-            echo "<!-- Head Component Class: $head_class | " . get_class($cmp) . "-->";
-            $cmp->renderStyle();
-            echo "<!-- Head Component End -->";
-        }
+        echo "<!-- Component CSS Files Start -->\n";
+        foreach($css_array as $url=>$usedBy) {
 
-        echo "<!-- Page CSS Start -->";
+            echo "<link rel='stylesheet' href='$url' type='text/css' >";
+            echo "<!-- Used by: ".implode("; ", array_keys($usedBy))." -->\n";
+        }
+        echo "<!-- Component CSS Files End -->\n";
+
+
+        echo "<!-- SparkPage CSS Files Start -->";
+        echo "\n";
         foreach ($this->css_files as $file => $is_local) {
             $href = $file;
             if ($is_local) {
@@ -314,7 +333,10 @@ class SparkPage extends HTMLPage
             echo "<link rel='stylesheet' href='$href' type='text/css' >";
             echo "\n";
         }
-        echo "<!-- Page CSS End -->";
+        echo "<!-- SparkPage CSS Files End -->";
+
+        echo "\n";
+        echo "<!-- SparkPage CSS End -->\n";
     }
 
     /**
@@ -342,6 +364,8 @@ class SparkPage extends HTMLPage
      */
     protected function dumpJS()
     {
+        echo "<!-- SparkPage JavaScript Start -->\n";
+
         parent::dumpJS();
         global $left, $right;
 
@@ -359,39 +383,46 @@ class SparkPage extends HTMLPage
 
         echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/utils.js'></script>";
         echo "\n";
-        echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/ajax.js'></script>";
-        echo "\n";
-        echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/JSONRequest.js'></script>";
 
-        echo "\n\n";
+        echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/JSONRequest.js'></script>";
+        echo "\n";
 
         echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/tooltip.js'></script>";
         echo "\n";
+
         echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/ModalPopup.js'></script>";
         echo "\n";
 
-//        echo "\n";
-//        echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/GalleryView.js'></script>";
-//        echo "\n";
-//
-//        echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/input.js'></script>";
-//        echo "\n";
-
-
-        //         echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/purl.js'></script>";
-        //         echo "\n";
-
-        echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/URI.js'></script>";
-        echo "\n";
         //
+
+        $js_array = array();
         foreach ($this->head_components as $idx => $cmp) {
-            $cmp->renderScript();
-            // 		    echo "<!-- Head Components $idx: ".get_class($cmp)."-->";
+            //dump used components in page
+            //echo "<!-- " . $idx . " -->\n";
+            $js_files = $cmp->requiredScript();
+            if (!is_array($js_files)) {
+                echo $js_files;
+                continue;
+            }
+            foreach ($js_files as $key=>$url) {
+                $usedBy = array();
+                if (isset($js_array[$url])) {
+                    $usedBy = $js_array[$url];
+                }
+                $usedBy[get_class($cmp)] = 1;
+                $js_array[$url] = $usedBy;
+            }
         }
-        // 		echo "<!-- Head Components End -->";
 
+        echo "<!-- Component JavaScript Files Start -->\n";
+        foreach($js_array as $url=>$usedBy) {
 
-        echo "<!-- Page JS Start -->";
+            echo "<script type='text/javascript' src='$url'></script>";
+            echo "<!-- Used by: ".implode("; ", array_keys($usedBy))." -->\n";
+        }
+        echo "<!-- Component JavaScript Files End -->\n";
+
+        echo "<!-- SparkPage JavaScript Files Start -->";
         foreach ($this->js_files as $file => $is_local) {
             $href = $file;
             if ($is_local) {
@@ -400,7 +431,10 @@ class SparkPage extends HTMLPage
             echo "<script type='text/javascript' src='$href'></script>";
             echo "\n";
         }
-        echo "<!-- Page JS End -->";
+        echo "<!-- SparkPage JavaScript Files End -->";
+
+        echo "\n";
+        echo "<!-- SparkPage JavaScript End -->\n";
 
     }
 
@@ -411,7 +445,7 @@ class SparkPage extends HTMLPage
      * @param Authenticator|null $auth
      * @throws Exception
      */
-    public function __construct(Authenticator $auth = null)
+    public function __construct(Authenticator $auth = NULL)
     {
 
         parent::__construct();
@@ -422,20 +456,20 @@ class SparkPage extends HTMLPage
 
         if ($this->auth) {
 
-            debug(get_class($this)." Authenticator: " . get_class($this->auth));
+            debug(get_class($this) . " Authenticator: " . get_class($this->auth));
 
             $this->is_auth = $this->auth->validate();
 
             if ($this->is_auth) {
 
-                debug(get_class($this)." Authenticator validated session");
+                debug(get_class($this) . " Authenticator validated session");
                 $this->context = $this->auth->data();
                 $this->userID = (int)$this->context[Authenticator::CONTEXT_ID];
 
             }
             else {
 
-                debug(get_class($this)." no context data");
+                debug(get_class($this) . " no context data");
 
                 if (isset($_GET["ajax"])) {
                     throw new Exception("Your session is expired.");

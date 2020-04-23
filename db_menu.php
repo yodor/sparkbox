@@ -6,11 +6,6 @@ include_once("lib/components/MenuBarComponent.php");
 include_once("lib/beans/MenuItemsBean.php");
 
 
-
-
-
-
-
 $page = new DemoPage();
 
 
@@ -22,9 +17,7 @@ $menu1->constructMenuItems(0, NULL, "menuID", "menu_title");
 $menu_bar1 = new MenuBarComponent($menu1);
 $menu_bar1->setName("MenuItemsBean");
 
-$page->beginPage();
-
-
+$page->startRender();
 
 
 echo "<div class='MenuBarWrapper'>";
@@ -32,15 +25,13 @@ $menu_bar1->render();
 echo "</div>";
 
 
-
-
-// 
+//
 // // echo "<div id=debug style='height:200px;overflow:scroll;'>Debug Area</div>";
 
 echo "<div class=clear></div>";
 
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

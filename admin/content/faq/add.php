@@ -5,9 +5,7 @@ include_once("class/forms/FAQItemInputForm.php");
 include_once("class/beans/FAQItemsBean.php");
 
 
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
@@ -17,11 +15,11 @@ $view = new InputFormView(new FAQItemsBean(), new FAQItemInputForm());
 
 $view->processInput();
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 $view->render();
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

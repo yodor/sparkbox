@@ -1,87 +1,97 @@
 .main_content {
-    display:inline-table;
-    box-sizing:border-box;
+    display: inline-table;
+    box-sizing: border-box;
 }
+
 .main_content .column {
-  display:table-cell;
-  vertical-align:top;
-  box-sizing:border-box;
+    display: table-cell;
+    vertical-align: top;
+    box-sizing: border-box;
 }
+
 .main_content .column.left {
-  max-width:180px;
-  padding-right:20px;
+    max-width: 180px;
+    padding-right: 20px;
 }
 
 .main_content .column.product_list {
-  max-width:900px;
+    max-width: 900px;
 }
 
 
 .product_list .KeywordSearchComponent {
-  float:right;
+    float: right;
 }
+
 .product_list .KeywordSearchComponent .InputLabel {
-  display:none;
+    display: none;
 }
+
 .product_list .KeywordSearchComponent .buttons {
-  vertical-align:bottom;
+    vertical-align: bottom;
 }
+
 .product_list .KeywordSearchComponent .buttons [name='clear'] {
-  display:none;
+    display: none;
 }
 
 FORM[name='filters'] {
-    
+
 }
 
 .filters {
-  display:inline-block;
+    display: inline-block;
 }
+
 .filters FORM {
-  display:block;
+    display: block;
 }
+
 .filters .InputComponent {
-  margin-top:10px;
-  text-align:left;
+    margin-top: 10px;
+    text-align: left;
 }
+
 .filters .InputField {
-  display:inline-block;
+    display: inline-block;
 }
 
 .filters .label {
-  display:block;
-  
+    display: block;
+
 }
 
-.filters .InputComponent.Slider .label  {
-  display:inline-block;
+.filters .InputComponent.Slider .label {
+    display: inline-block;
 }
+
 .filters .InputComponent.Slider .value {
-  display:inline-block;
-  margin-left:5px;
+    display: inline-block;
+    margin-left: 5px;
 }
-.filters .InputComponent.Slider .InputField {
-  display:block;
-/*   margin-top:10px; */
-}
-.filters BUTTON {
-  margin-top:20px;
-}
-.filters .label {
-  font-size:1.1em;
-  color: #1875ac;
 
-  font-family: 'Roboto Condensed', sans-serif;
-  
+.filters .InputComponent.Slider .InputField {
+    display: block;
+    /*   margin-top:10px; */
+}
+
+.filters BUTTON {
+    margin-top: 20px;
+}
+
+.filters .label {
+    font-size: 1.1em;
+    color: #1875ac;
+
+    font-family: 'Roboto Condensed', sans-serif;
+
 
 }
 
 .ListView .viewport {
-  margin-left:-5px;
-  margin-right:-5px;
+    margin-left: -5px;
+    margin-right: -5px;
 }
-
-
 
 
 /*.InputComponent {

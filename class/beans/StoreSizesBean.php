@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 
 class StoreSizesBean extends DBTableBean
@@ -10,11 +10,12 @@ class StoreSizesBean extends DBTableBean
  PRIMARY KEY (`pszID`),
  UNIQUE KEY `size_value` (`size_value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("store_sizes");
+        parent::__construct("store_sizes");
     }
 
 }
+
 ?>

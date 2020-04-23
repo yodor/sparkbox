@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/OrderedDataBean.php");
+include_once("lib/beans/OrderedDataBean.php");
 
 
 class ProductPhotosBean extends OrderedDataBean
@@ -15,11 +15,12 @@ class ProductPhotosBean extends OrderedDataBean
  KEY `prodID` (`prodID`),
  CONSTRAINT `product_photos_ibfk_1` FOREIGN KEY (`prodID`) REFERENCES `products` (`prodID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("product_photos");
+        parent::__construct("product_photos");
     }
 
 }
+
 ?>

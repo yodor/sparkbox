@@ -1,12 +1,12 @@
 <?php
-include_once("lib/input/InputField.php");
+include_once("lib/input/DataInput.php");
 
 interface ILabelRenderer
 {
 
-  public function renderLabel(InputField $field, $render_index=-1);
-
+    public function renderLabel(DataInput $field, int $render_index = -1);
 
 
 }
+
 ?>

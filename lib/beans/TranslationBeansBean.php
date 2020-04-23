@@ -4,7 +4,7 @@ include_once("lib/beans/DBTableBean.php");
 class TranslationBeansBean extends DBTableBean
 {
 
-protected $createString = "
+    protected $createString = "
 CREATE TABLE `translation_beans` (
  `btID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `table_name` varchar(50) CHARACTER SET utf8 NOT NULL,
@@ -19,13 +19,12 @@ CREATE TABLE `translation_beans` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 ";
 
-	public function __construct()
-	{
-		parent::__construct("translation_beans");
-	}
-	
-	
-	
+    public function __construct()
+    {
+        parent::__construct("translation_beans");
+    }
+
+
 }
 
 ?>

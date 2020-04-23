@@ -1,35 +1,40 @@
 .FormRenderer {
-    display:block;
-    border-spacing:inherit;
+    display: block;
+    border-spacing: inherit;
 }
+
 .FormRenderer[field_layout] .InputComponent {
-    display:block;
-    text-align:left;
-    margin-bottom:5px;
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
 }
+
 .FormRenderer[field_layout] .InputComponent .InputLabel {
-    display:block;
-    text-align:left;
-    padding:0px;
-    margin-bottom:2px;
+    display: block;
+    text-align: left;
+    padding: 0px;
+    margin-bottom: 2px;
 }
+
 .FormRenderer[field_layout] .InputComponent .InputField {
-    display:inline-block;
-    text-align:left;
-    padding:0px;
+    display: inline-block;
+    text-align: left;
+    padding: 0px;
 }
+
 .FormRenderer[field_layout] .InputComponent .InputField .addon_content {
-    display:block;
-    margin-left:0px;
-    padding-top:5px;
-    padding-bottom:5px;
+    display: block;
+    margin-left: 0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .FormRenderer .SubmitLine {
-    display:block;
-    
+    display: block;
+
 }
+
 .FormRenderer .SubmitLine .Buttons {
-    display:inherit;
+    display: inherit;
 }
 

@@ -5,14 +5,12 @@ include_once("class/forms/ProductInputForm.php");
 include_once("class/beans/ProductsBean.php");
 
 
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-$action_back = new Action("", Session::get("products.list"), array());
+$action_back = new Action("", Session::Get("products.list"), array());
 $action_back->setAttribute("action", "back");
 $action_back->setAttribute("title", "Back to Products");
 $page->addAction($action_back);
@@ -20,21 +18,21 @@ $page->addAction($action_back);
 $view = new InputFormView(new ProductsBean(), new ProductInputForm());
 
 //shortcuts for new ...
-Session::set("categories.list", $page->getPageURL());
-Session::set("brands.list", $page->getPageURL());
-Session::set("classes.list", $page->getPageURL());
+Session::Set("categories.list", $page->getPageURL());
+Session::Set("brands.list", $page->getPageURL());
+Session::Set("classes.list", $page->getPageURL());
 
 
-$view->getTransactor()->assignInsertValue("insert_date", DBDriver::get()->dateTime());
+$view->getTransactor()->assignInsertValue("insert_date", DBDriver::Get()->dateTime());
 
 $view->processInput();
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 $page->renderPageCaption();
 
 $view->render();
 
-$page->finishPage();
+$page->finishRender();
 
 ?>

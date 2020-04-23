@@ -5,9 +5,7 @@ include_once("lib/forms/DynamicPageInputForm.php");
 include_once("lib/beans/DynamicPagesBean.php");
 
 
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
@@ -20,11 +18,11 @@ $view = new InputFormView($bean, new DynamicPageInputForm());
 
 $view->processInput();
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 $view->render();
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

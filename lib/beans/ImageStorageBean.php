@@ -3,7 +3,7 @@ include_once("lib/beans/DBTableBean.php");
 
 class ImageStorageBean extends DBTableBean
 {
-	protected $createString = "CREATE TABLE `image_storage` (
+    protected $createString = "CREATE TABLE `image_storage` (
  `isID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `photo` longblob NOT NULL,
  `date_upload` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -11,11 +11,11 @@ class ImageStorageBean extends DBTableBean
  PRIMARY KEY (`isID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-	public function __construct()
-	{
-		parent::__construct("image_storage");
-	}
-	
+    public function __construct()
+    {
+        parent::__construct("image_storage");
+    }
+
 }
 
 ?>

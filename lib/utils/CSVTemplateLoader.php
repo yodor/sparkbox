@@ -1,130 +1,139 @@
 <?php
 
-class CSVTemplateLoader 
+class CSVTemplateLoader
 {
-	protected $zipfile = "";
-	protected $zip = NULL;
-	protected $temp_filename = "";
-	protected $currentRow = -1;
+    protected $zipfile = "";
+    protected $zip = NULL;
+    protected $temp_filename = "";
+    protected $currentRow = -1;
 
-	protected $errors = array();
-	protected $notices = array();
+    protected $errors = array();
+    protected $notices = array();
 
-	protected $success_rows = 0;
-	protected $error_rows = 0;
+    protected $success_rows = 0;
+    protected $error_rows = 0;
 
-	public function getSuccessRowCount()
-	{
-		return $this->success_rows;
-	}
-	public function getErrorRowCount()
-	{
-		return $this->error_rows;
-	}
-	public function getErrors()
-	{
-		return $this->errors;
-	}
-	public function getNotices()
-	{
-		return $this->notices;
-	}
-	public function __construct($zipfile)
-	{
-		if (strlen($zipfile)<1) throw new Exception("No file to import specified");
+    public function getSuccessRowCount()
+    {
+        return $this->success_rows;
+    }
 
-		$this->zipfile = $zipfile;
-		$this->zip = new ZipArchive;
+    public function getErrorRowCount()
+    {
+        return $this->error_rows;
+    }
 
-		$res = $this->zip->open($this->zipfile);
+    public function getErrors()
+    {
+        return $this->errors;
+    }
 
-		if ($res !== TRUE) {
-			throw new Exception("ZipOpen failed, code:$res");
-		}
-		$this->temp_filename = "/tmp/template_loader-".time()."-".rand().".tmp";
-	}	
-	public function __destruct()
-	{
-		$this->zip->close();
-		@unlink($this->temp_filename);
-	}
+    public function getNotices()
+    {
+        return $this->notices;
+    }
 
-// 	'template.csv'
-	public function processFile($csvfile)
-	{
-		$ret_tmp = $this->zip->statName($csvfile);
-		if ($ret_tmp===FALSE){
-			throw new Exception("'$csvfile' not found inside zip archive");
-		}
+    public function __construct($zipfile)
+    {
+        if (strlen($zipfile) < 1) throw new Exception("No file to import specified");
 
-		//unarchive in a temp folder
-		file_put_contents($this->temp_filename, $this->zip->getFromName($csvfile));
+        $this->zipfile = $zipfile;
+        $this->zip = new ZipArchive;
 
-		$handle = fopen($this->temp_filename,'r');
+        $res = $this->zip->open($this->zipfile);
 
-		$fields=array();
-		$fkeys=array();
+        if ($res !== TRUE) {
+            throw new Exception("ZipOpen failed, code:$res");
+        }
+        $this->temp_filename = "/tmp/template_loader-" . time() . "-" . rand() . ".tmp";
+    }
 
-		if (!$handle){
+    public function __destruct()
+    {
+        $this->zip->close();
+        @unlink($this->temp_filename);
+    }
 
-			throw new Exception("Error loading bundle. Could not open template temp file: $ftemp");
-		}
-		
-		$this->currentRow = 1;
+    // 	'template.csv'
+    public function processFile($csvfile)
+    {
+        $ret_tmp = $this->zip->statName($csvfile);
+        if ($ret_tmp === FALSE) {
+            throw new Exception("'$csvfile' not found inside zip archive");
+        }
 
-		$this->startLoad();
+        //unarchive in a temp folder
+        file_put_contents($this->temp_filename, $this->zip->getFromName($csvfile));
 
-		while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-			$num = count($data);
-			$this->errors[$this->currentRow] = "";
-			$this->notices[$this->currentRow] = "";
-			if ($this->currentRow===1) {
-				$this->processKeysRow($data);
-			}
-			else {
-				try {
-				  $this->processDataRow($data);
-				  $this->success_rows++;
-				}
-				catch (Exception $e) {
-				  $this->error_rows++;
-				  $this->errors[$this->currentRow]=$e->getMessage();
+        $handle = fopen($this->temp_filename, 'r');
 
-				}
-			}
-			$this->currentRow++;
-		}
-		$this->finishLoad();
-	}
-	//dummy output only function. actual functionality reimplemented in a subclass
-	public function startLoad()
-	{
-		echo "<table class='csv_template_loader'>";
-	}
-	//dummy output only function. actual functionality reimplemented in a subclass
-	public function finishLoad()
-	{
-		echo "</table>";
-	}
-	//dummy output only function. actual functionality reimplemented in a subclass
-	public function processKeysRow($row)
-	{
-		echo "<tr>";
-		foreach($row as $key=>$val) {
-			echo "<th>$val</th>";
-		}
-		echo "</tr>";
-	}
-	//dummy output only function. actual functionality reimplemented in a subclass
-	public function processDataRow($row)
-	{
-		
-		echo "<tr>";
-		foreach($row as $key=>$val) {
-			echo "<td>$val</td>";
-		}
-		echo "</tr>";
-	}
+        $fields = array();
+        $fkeys = array();
+
+        if (!$handle) {
+
+            throw new Exception("Error loading bundle. Could not open template temp file: {$this->temp_filename}");
+        }
+
+        $this->currentRow = 1;
+
+        $this->startLoad();
+
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            $num = count($data);
+            $this->errors[$this->currentRow] = "";
+            $this->notices[$this->currentRow] = "";
+            if ($this->currentRow === 1) {
+                $this->processKeysRow($data);
+            }
+            else {
+                try {
+                    $this->processDataRow($data);
+                    $this->success_rows++;
+                }
+                catch (Exception $e) {
+                    $this->error_rows++;
+                    $this->errors[$this->currentRow] = $e->getMessage();
+
+                }
+            }
+            $this->currentRow++;
+        }
+        $this->finishLoad();
+    }
+
+    //dummy output only function. actual functionality reimplemented in a subclass
+    public function startLoad()
+    {
+        echo "<table class='csv_template_loader'>";
+    }
+
+    //dummy output only function. actual functionality reimplemented in a subclass
+    public function finishLoad()
+    {
+        echo "</table>";
+    }
+
+    //dummy output only function. actual functionality reimplemented in a subclass
+    public function processKeysRow($row)
+    {
+        echo "<tr>";
+        foreach ($row as $key => $val) {
+            echo "<th>$val</th>";
+        }
+        echo "</tr>";
+    }
+
+    //dummy output only function. actual functionality reimplemented in a subclass
+    public function processDataRow($row)
+    {
+
+        echo "<tr>";
+        foreach ($row as $key => $val) {
+            echo "<td>$val</td>";
+        }
+        echo "</tr>";
+    }
 }
 
 ?>

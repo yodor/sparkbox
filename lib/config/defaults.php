@@ -11,34 +11,34 @@
 // $full_url  = "${protocol}://${domain}${disp_port}${base_url}"; # Ex: 'http://example.com', 'https://example.com/mywebsite', etc.
 
 if (!isset($install_path)) {
-  $install_path = realpath(dirname(__FILE__)."/../../");
+    $install_path = realpath(dirname(__FILE__) . "/../../");
 }
 
 //app/site deployment (server path)
-define ("INSTALL_PATH", $install_path);	
+define("INSTALL_PATH", $install_path);
 
 //framework location  (server path)
-$lib_path = $install_path."/lib";
-define ("LIB_PATH" , $lib_path);
+$lib_path = $install_path . "/lib";
+define("LIB_PATH", $lib_path);
 
-$doc_root  = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', $_SERVER['SCRIPT_FILENAME']);
+$doc_root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', $_SERVER['SCRIPT_FILENAME']);
 $site_root = preg_replace("!^${doc_root}!", '', $install_path);
 
 //app/site deployment - HTTP accessible
-define ("SITE_ROOT", $site_root."/");
+define("SITE_ROOT", $site_root . "/");
 
 //framework location - HTTP accessible
 $lib_root = str_replace($install_path, "", $lib_path);
-define("LIB_ROOT", $lib_root."/");
+define("LIB_ROOT", $lib_root . "/");
 
 
-define("CACHE_ROOT", realpath($doc_root."/../")."/spark_cache/");
+define("CACHE_ROOT", realpath($doc_root . "/../") . "/spark_cache/");
 
 
-ini_set("include_path",".".PATH_SEPARATOR.INSTALL_PATH);
+ini_set("include_path", "." . PATH_SEPARATOR . INSTALL_PATH);
 if (isset($local_include_path)) {
-  ini_set("include_path",ini_get("include_path").PATH_SEPARATOR.$local_include_path);
-  
+    ini_set("include_path", ini_get("include_path") . PATH_SEPARATOR . $local_include_path);
+
 }
 include_once("lib/config/ini_setup.php");
 
@@ -62,8 +62,8 @@ $defines->set("MEMORY_LIMIT", $ml);
 $defines->set("CONTEXT_USER", "context_user");
 $defines->set("CONTEXT_ADMIN", "context_admin");
 
-$defines->set("ADMIN_ROOT", SITE_ROOT."admin/");
-$defines->set("STORAGE_HREF", SITE_ROOT."storage.php");
+$defines->set("ADMIN_ROOT", SITE_ROOT . "admin/");
+$defines->set("STORAGE_HREF", SITE_ROOT . "storage.php");
 
 //'base size' for all uploaded images
 $defines->set("IMAGE_UPLOAD_DEFAULT_WIDTH", 1280);
@@ -85,13 +85,13 @@ $site_domain = $_SERVER["HTTP_HOST"];
 $defines->set("SITE_DOMAIN", $site_domain);
 
 //URL of this site without path and ending slash '/'
-$defines->set("SITE_URL", $protocol.$site_domain);
+$defines->set("SITE_URL", $protocol . $site_domain);
 $defines->set("TITLE_PATH_SEPARATOR", " :: ");
 $defines->set("COOKIE_DOMAIN", $site_domain); // or .domain.com
 
-$defines->set("DEFAULT_EMAIL_NAME", $site_domain." Administration");
-$defines->set("DEFAULT_EMAIL_ADDRESS", "info@".$site_domain);
-$defines->set("DEFAULT_SERVICE_EMAIL", "info@".$site_domain);
+$defines->set("DEFAULT_EMAIL_NAME", $site_domain . " Administration");
+$defines->set("DEFAULT_EMAIL_ADDRESS", "info@" . $site_domain);
+$defines->set("DEFAULT_SERVICE_EMAIL", "info@" . $site_domain);
 
 $defines->set("TRANSLATOR_ENABLED", FALSE);
 $defines->set("DB_ENABLED", FALSE);
@@ -109,8 +109,8 @@ $defines->export();
 ////
 //define SKIP_SESSION to skip starting session
 if (!defined("SKIP_SESSION")) {
-  include_once("lib/utils/Session.php");
-  $session = new Session();
+    include_once("lib/utils/Session.php");
+    Session::Start();
 
 }
 
@@ -119,18 +119,18 @@ if (!defined("SKIP_SESSION")) {
 //define SKIP_DB to skip creating a connection to DB
 if (DB_ENABLED && !defined("SKIP_DB")) {
 
-  include_once("lib/dbdriver/DBConnections.php");
-  include_once("config/dbconfig.php");
-  include_once("lib/dbdriver/DBDriver.php");
+    include_once("lib/dbdriver/DBConnections.php");
+    include_once("config/dbconfig.php");
+    include_once("lib/dbdriver/DBDriver.php");
 
-  //TODO:check persistent connections with mysql. Introduced in php 5.3
-  $create_regular = false;
-  
-  if (!defined("PERSISTENT_DB")) {
-    $create_regular = true;
-  }
-  else {
-        if (!DBConnections::getConnection("default")->is_pdo || !startsWith(phpversion(),"5.3")) {
+    //TODO:check persistent connections with mysql. Introduced in php 5.3
+    $create_regular = false;
+
+    if (!defined("PERSISTENT_DB")) {
+        $create_regular = true;
+    }
+    else {
+        if (!DBConnections::getConnection("default")->is_pdo || !startsWith(phpversion(), "5.3")) {
             $create_regular = true;
         }
         else {
@@ -138,43 +138,42 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
                 DBDriver::create(true, true, "default");
             }
             catch (Exception $e) {
-                
-                Session::set("alert", "Unable to open persistent connection to DB: ".$e->getMessage());
-                
+
+                Session::Set("alert", "Unable to open persistent connection to DB: " . $e->getMessage());
+
             }
-	}
-	
-  }
-  
-  if ($create_regular) {
+        }
+
+    }
+
+    if ($create_regular) {
         try {
-        
+
             DBDriver::create();
-            
+
         }
         catch (Exception $e) {
-            Session::set("alert", "Unable to open connection to DB: ".$e->getMessage());
+            Session::Set("alert", "Unable to open connection to DB: " . $e->getMessage());
         }
-  }
-  
-  
-  
-//   $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');
-//   $mrow = DBDriver::get()->fetch($g_res);
-//   DBDriver::get()->free($g_res);	  
+    }
 
-//   echo $mrow["packet_size"];//33554432
-  
-  $defines->set("MAX_PACKET_SIZE", "33554432"); 
-  $defines->export();
+
+    //   $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');
+    //   $mrow = DBDriver::get()->fetch($g_res);
+    //   DBDriver::get()->free($g_res);
+
+    //   echo $mrow["packet_size"];//33554432
+
+    $defines->set("MAX_PACKET_SIZE", "33554432");
+    $defines->export();
 }
 
 
 if (TRANSLATOR_ENABLED && !defined("SKIP_SESSION")) {
-  include_once("lib/utils/language.php");
+    include_once("lib/utils/language.php");
 }
 else {
-  include_once("lib/utils/language_notranslator.php");
+    include_once("lib/utils/language_notranslator.php");
 }
 
 

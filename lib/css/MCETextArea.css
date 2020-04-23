@@ -1,76 +1,79 @@
 .MCEImageBrowserDialog .InputComponent {
-  display:inline-block;
-  vertical-align:top;
-  margin-right:10px;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 10px;
 }
+
 .MCEImageBrowserDialog .ImageStorage {
-  display:inline-block;
-  max-width:640px;
-  max-height:310px;
-  overflow:auto;
+    display: inline-block;
+    max-width: 640px;
+    max-height: 310px;
+    overflow: auto;
 }
 
 .MCEImageBrowserDialog .Contents {
-  display:inline-block;
+    display: inline-block;
 }
 
 .MCEImageBrowserDialog .Contents .Element {
-  display:inline-block;
-  margin:10px;
-  padding:2px;
-  border-radius:4px 4px 4px 4px;
-  box-sizing:border-box;
-  border:1px solid transparent;
-  position:relative;
+    display: inline-block;
+    margin: 10px;
+    padding: 2px;
+    border-radius: 4px 4px 4px 4px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    position: relative;
 }
 
 .MCEImageBrowserDialog .Contents .Element IMG {
-  display:block;
+    display: block;
 }
+
 .MCEImageBrowserDialog .Contents .Element[selected] {
-  border:1px solid black;
-  
+    border: 1px solid black;
+
 }
 
 
 .MCEImageBrowserDialog .Contents .Element .remove_button {
-  color:white;
-  width:20px;
-  height:20px;
-  display:block;
-  border-radius: 20px;
-  background-color:black;
-  color:white;
-  border:2px solid white;
-  text-align:center;
-  text-decoration:none;
-  position:absolute;
-  
-  left:0px;
-  top:0px;
-  margin-left:-10px;
-  margin-top:-10px;
-  
-  box-sizing:border-box;
-  -moz-box-sizing:border-box; /* Firefox */
-  
-  padding-right:1px;
-  
-  font-size:12px;
-  font-family: "Consolas","Mono";
-  
-  font-weight:bold;
-  text-transform:lowercase;
-  
-  cursor:pointer;
+    color: white;
+    width: 20px;
+    height: 20px;
+    display: block;
+    border-radius: 20px;
+    background-color: black;
+    color: white;
+    border: 2px solid white;
+    text-align: center;
+    text-decoration: none;
+    position: absolute;
+
+    left: 0px;
+    top: 0px;
+    margin-left: -10px;
+    margin-top: -10px;
+
+    box-sizing: border-box;
+    -moz-box-sizing: border-box; /* Firefox */
+
+    padding-right: 1px;
+
+    font-size: 12px;
+    font-family: "Consolas", "Mono";
+
+    font-weight: bold;
+    text-transform: lowercase;
+
+    cursor: pointer;
 }
 
 
 .ImageDimensionComponent .preview {
-  display:inline-block;
-  vertical-align:top;
+    display: inline-block;
+    vertical-align: top;
 }
+
 .ImageDimensionComponent .dimension {
-  display:inline-block;
-  vertical-align:top;
+    display: inline-block;
+    vertical-align: top;
 }

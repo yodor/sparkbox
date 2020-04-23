@@ -5,339 +5,345 @@ include_once("lib/utils/MenuItem.php");
 class MainMenu
 {
 
-        protected $debug_matching = false;
-        
-	protected $bean_class = NULL;
-	protected $prefix_root = "";
+    protected $debug_matching = false;
 
-	protected $selected_item = NULL;
+    protected $bean_class = NULL;
+    protected $prefix_root = "";
 
-	protected $name = "";
-	
-	
-	const FIND_INDEX_NORMAL = 1;
-	const FIND_INDEX_LOOSE = 2;
-	const FIND_INDEX_LOOSE_REVERSE = 3;
-	const FIND_INDEX_LEVENSHTEIN = 4;
-	const FIND_INDEX_PATHCHECK = 5;
-	
-	protected $bean = NULL;
-	
-	protected $menu_map = array();
-	
-	protected $main_menu = array();
-	
-	protected $selected_path = array();
-	
-	
-	public $uri_match_variable = "REQUEST_URI";
-	
-	protected $link_page = NULL;
-	
-	protected $last_match_value = "";
-	
-	public function getLastMatchValue()
-	{
-		return $this->last_match_value;
-	}
-	public function __construct()
-	{
-	    $this->bean_class = NULL;
-	    $this->prefix_root = "";
-	}
-	
-	public function setName($name)
-	{
-	    $this->name = $name;
-	}
-	
-	public function getName()
-	{
-	    return $this->name;
-	}
-	
-	public function setMenuItems(array $arr_menu)
-	{
-	    $this->main_menu = $arr_menu;
+    protected $selected_item = NULL;
 
-	}
-
-	public function getMenuItems()
-	{
-	    return $this->main_menu;
-	}
-
-	public function getSelectedItem()
-	{
-	    return $this->selected_item;
-
-	}
-	
-	public function setSelectedItem(MenuItem $item)
-	{
-	    $this->selected_item = $item;
-	}
-
-	public function setMenuBeanClass($menu_items_class, $prefix_root="", $link_page="")
-	{
-	    $this->bean_class = $menu_items_class;
-	    $this->bean = new $this->bean_class();
-	    $this->prefix_root = $prefix_root;
-	    $this->link_page = $link_page;
-
-	}
-	public function getMenuBeanClass()
-	{
-	    return $this->bean_class;
-	}
-	public function constructMenuItems($parentID=0, MenuItem $parent_item = NULL, $key="menuID",$title="menu_title")
-	{
-	    $arr_menu = array();
-
-	    $total_items = 0;
-	    
-	    $sql = $this->bean->createIteratorSQL("WHERE parentID='$parentID' ORDER BY lft");
-	    
-	    $iterator = $this->bean->createIterator($sql, $total_items);
-
-	    if ($total_items<1) return;
+    protected $name = "";
 
 
-	    while ($this->bean->fetchNext($row, $iterator)) {
-	    
-		    $menuID = (int)$row[$key];
+    const FIND_INDEX_NORMAL = 1;
+    const FIND_INDEX_LOOSE = 2;
+    const FIND_INDEX_LOOSE_REVERSE = 3;
+    const FIND_INDEX_LEVENSHTEIN = 4;
+    const FIND_INDEX_PATHCHECK = 5;
 
-		    trbean($menuID, $title, $row, $this->bean);
+    /**
+     * @var IDataBean
+     */
+    protected $bean = NULL;
 
-		    $link = "";
-		    if (strlen($this->prefix_root)>0) {
-		      $link.=$this->prefix_root;
-		    }
+    protected $menu_map = array();
 
-		    $menu_link = "";
-		    if(isset($row["link"])) {
-			$menu_link = $row["link"];
-		    }
-		    else if (strlen($this->link_page)>0) {
-			$menu_link = $this->link_page."?".$key."=".$menuID;
-			
-		    }
-		    if (strpos($menu_link,"/")===0) {
-			  if (strcmp(SITE_ROOT,"/")!==0) {
-				  $menu_link = SITE_ROOT.$menu_link;
-			  }
-		    }
-		    $link.=$menu_link;
-			
-		    $item = new MenuItem($row[$title], $link);
-		    $item->enableTranslation(false);
-// 		    $item->setMenuID($menuID);
-		    if ($parentID==0) {
-			$arr_menu[]=$item;
-		    }
-		    if ($parent_item) {
-			$parent_item->addMenuItem($item);
-		    }
-		    $this->constructMenuItems($menuID, $item, $key, $title);
-	    }
+    protected $main_menu = array();
 
-	    if ($parentID==0) {
-		$this->main_menu = $arr_menu;
-	    }
-	    
-	    $db  = $this->bean->getDB();
-	    
-	    if (is_resource($iterator))$db->free($iterator);
-	}
+    protected $selected_path = array();
 
 
-	public function flattenMenu(&$arr, $current_menu)
-	{
-	    if (!$current_menu || count($current_menu)<1) return;
+    public $uri_match_variable = "REQUEST_URI";
 
-	    for ($a=0;$a<count($current_menu);$a++){
-		    $curr = $current_menu[$a];
-		    $arr[] = $curr;
-		    $this->flattenMenu($arr, $curr->getSubmenu());
-	    }
-	}
+    protected $link_page = NULL;
 
-	public function findMenuIndex($find_mode=MainMenu::FIND_INDEX_NORMAL, $find_arr=false)
-	{
-	    $this->selindex=-1;
+    protected $last_match_value = "";
 
-	    $match_min = PHP_INT_MAX;
-	    $closest = NULL;
+    public function getLastMatchValue()
+    {
+        return $this->last_match_value;
+    }
 
-	    if (!$find_arr) $find_arr = $this->main_menu;
+    public function __construct()
+    {
+        $this->bean_class = NULL;
+        $this->prefix_root = "";
+    }
 
-	    $position = -1;
-	    
-	    for ($a=0; $a<count($find_arr); $a++) {
-		$curr = $find_arr[$a];
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-		$match =  $this->matchItem($find_mode, $curr);
+    public function getName()
+    {
+        return $this->name;
+    }
 
-		if ( $match === true )
-		{
-		    $this->selected_item=$curr;
-		    $position = $a;
-		    break;
-		}
-		else if ($match !== false) {
-		    if ($match < $match_min) {
-			    $match_min = $match;
-			    $closest=$curr;
-			    $position = $a;
-		    }
-		    else if ($match == $match_min) {
-			    $match1 =  $this->matchItem(MainMenu::FIND_INDEX_LOOSE_REVERSE, $closest);
-			    $match2 =  $this->matchItem(MainMenu::FIND_INDEX_LOOSE_REVERSE, $curr);
-			    $closest = ($match1 ) ? $closest : $curr;
-			    $position = $a;
-		    }
+    public function setMenuItems(array $arr_menu)
+    {
+        $this->main_menu = $arr_menu;
 
-		}
-	    }
+    }
 
-	    if ($match_min < PHP_INT_MAX && $closest) {
-		  $this->selected_item = $closest;
-	    }
-	    if ($find_mode===MainMenu::FIND_INDEX_PATHCHECK) {
-		  if ($position>-1) {
-			$this->selected_item = $find_arr[$position];
-		  }
-	    }
-	    return $position;
+    public function getMenuItems()
+    {
+        return $this->main_menu;
+    }
 
-	}
-	public function matchItem($find_mode, MenuItem $item)
-	{
-	    $href = $item->getHref();
+    public function getSelectedItem()
+    {
+        return $this->selected_item;
 
-	    $request = urldecode($_SERVER[$this->uri_match_variable]);
+    }
 
-	    $match = (strcmp( $request , $href ) == 0);
+    public function setSelectedItem(MenuItem $item)
+    {
+        $this->selected_item = $item;
+    }
 
-            if ($this->debug_matching) {
-                debug("matchItem  Mode: $find_mode | Request: $request Mathing With MenuItem: $href");
+    public function setMenuBeanClass($menu_items_class, $prefix_root = "", $link_page = "")
+    {
+        $this->bean_class = $menu_items_class;
+        $this->bean = new $this->bean_class();
+        $this->prefix_root = $prefix_root;
+        $this->link_page = $link_page;
+
+    }
+
+    public function getMenuBeanClass()
+    {
+        return $this->bean_class;
+    }
+
+    public function constructMenuItems($parentID = 0, MenuItem $parent_item = NULL, $key = "menuID", $title = "menu_title")
+    {
+        $arr_menu = array();
+
+        $total_items = 0;
+
+        $sql = $this->bean->createIteratorSQL("WHERE parentID='$parentID' ORDER BY lft");
+
+        $iterator = $this->bean->createIterator($sql, $total_items);
+
+        if ($total_items < 1) return;
+
+
+        while ($this->bean->fetchNext($row, $iterator)) {
+
+            $menuID = (int)$row[$key];
+
+            trbean($menuID, $title, $row, $this->bean);
+
+            $link = "";
+            if (strlen($this->prefix_root) > 0) {
+                $link .= $this->prefix_root;
             }
-            
-	    //href is found inside request
-	    if ($find_mode === MainMenu::FIND_INDEX_LOOSE) {
-		$match = ( mb_strpos(  $request, $href ) !== false );
-	    }
-	    //request is found inside href
-	    else if ($find_mode === MainMenu::FIND_INDEX_LOOSE_REVERSE) {
-		$match = ( mb_strpos( $href,  $request ) !== false );
-	    }
-	    else if ($find_mode === MainMenu::FIND_INDEX_LEVENSHTEIN) {
-		$match = @levenshtein($request, $href);
 
-	    }
-	    else if ($find_mode === MainMenu::FIND_INDEX_PATHCHECK) {
-	    
-		  $href = explode("?", $href);
-		  if (is_array($href) && count($href)>0) {
-			$href=$href[0];
-		  }
-		  $request = explode("?", $request);
-		  if (is_array($request) && count($request)>0) {
-			$request = $request[0];
-		  }
-		  $this->last_match_value = $request;
-		  if (strcmp($request, $href)==0) return true;
-		  
-		  $breq = dirname($request);
-		  if (endsWith($request, "/")===true) {
-			$breq = $request;
-		  }
-		  
-		  $hreq = dirname($href);
-		  if (mb_strpos($breq, $hreq)===false) return false;
-		  
-		  $match = @levenshtein($request, $href);
-		
-	    }
-	    
-	    $this->last_match_value = $request;
-	    
-	    if ($this->debug_matching) {
-                debug("matchItem Result: ".(int)$match);
-	    }
-	    return $match;
-	}
+            $menu_link = "";
+            if (isset($row["link"])) {
+                $menu_link = $row["link"];
+            }
+            else if (strlen($this->link_page) > 0) {
+                $menu_link = $this->link_page . "?" . $key . "=" . $menuID;
 
-	public function setUnselectedAll()
-	{
-            $arr = array();
-	    $this->flattenMenu($arr, $this->main_menu);
-	    
-	    foreach($arr as $index=>$sub)
-	    {	
-		$sub->setSelected(false);
-	    }
-	}
-	
-	public function selectActiveMenus($find_mode = MainMenu::FIND_INDEX_LEVENSHTEIN)
-	{
-	    $this->selected_path = array();
-	    
-	    $arr = array();
-	    $this->flattenMenu($arr, $this->main_menu);
-	    
-	    debug("MenuItem::selectActiveMenus: Flattened menu length: ".count($arr));
-	    
-	    $this->findMenuIndex($find_mode, $arr);
+            }
+            if (strpos($menu_link, "/") === 0) {
+                if (strcmp(SITE_ROOT, "/") !== 0) {
+                    $menu_link = SITE_ROOT . $menu_link;
+                }
+            }
+            $link .= $menu_link;
 
-	    $this->setUnselectedAll();
-	
-	    $this->updateSelectedMenu();
+            $item = new MenuItem($row[$title], $link);
+            $item->enableTranslation(false);
+            // 		    $item->setMenuID($menuID);
+            if ($parentID == 0) {
+                $arr_menu[] = $item;
+            }
+            if ($parent_item) {
+                $parent_item->addMenuItem($item);
+            }
+            $this->constructMenuItems($menuID, $item, $key, $title);
+        }
 
-	}
-	
-	public function updateSelectedMenu()
-	{
-            if ($this->selected_item) {
+        if ($parentID == 0) {
+            $this->main_menu = $arr_menu;
+        }
 
-                $this->selected_item->setSelected(true);
+        $db = $this->bean->getDB();
 
-                $current = $this->selected_item;
+        if (is_resource($iterator)) $db->free($iterator);
+    }
+
+
+    public function flattenMenu(&$arr, $current_menu)
+    {
+        if (!$current_menu || count($current_menu) < 1) return;
+
+        for ($a = 0; $a < count($current_menu); $a++) {
+            $curr = $current_menu[$a];
+            $arr[] = $curr;
+            $this->flattenMenu($arr, $curr->getSubmenu());
+        }
+    }
+
+    public function findMenuIndex($find_mode = MainMenu::FIND_INDEX_NORMAL, $find_arr = false)
+    {
+        $this->selindex = -1;
+
+        $match_min = PHP_INT_MAX;
+        $closest = NULL;
+
+        if (!$find_arr) $find_arr = $this->main_menu;
+
+        $position = -1;
+
+        for ($a = 0; $a < count($find_arr); $a++) {
+            $curr = $find_arr[$a];
+
+            $match = $this->matchItem($find_mode, $curr);
+
+            if ($match === true) {
+                $this->selected_item = $curr;
+                $position = $a;
+                break;
+            }
+            else if ($match !== false) {
+                if ($match < $match_min) {
+                    $match_min = $match;
+                    $closest = $curr;
+                    $position = $a;
+                }
+                else if ($match == $match_min) {
+                    $match1 = $this->matchItem(MainMenu::FIND_INDEX_LOOSE_REVERSE, $closest);
+                    $match2 = $this->matchItem(MainMenu::FIND_INDEX_LOOSE_REVERSE, $curr);
+                    $closest = ($match1) ? $closest : $curr;
+                    $position = $a;
+                }
+
+            }
+        }
+
+        if ($match_min < PHP_INT_MAX && $closest) {
+            $this->selected_item = $closest;
+        }
+        if ($find_mode === MainMenu::FIND_INDEX_PATHCHECK) {
+            if ($position > -1) {
+                $this->selected_item = $find_arr[$position];
+            }
+        }
+        return $position;
+
+    }
+
+    public function matchItem($find_mode, MenuItem $item)
+    {
+        $href = $item->getHref();
+
+        $request = urldecode($_SERVER[$this->uri_match_variable]);
+
+        $match = (strcmp($request, $href) == 0);
+
+        if ($this->debug_matching) {
+            debug("matchItem  Mode: $find_mode | Request: $request Mathing With MenuItem: $href");
+        }
+
+        //href is found inside request
+        if ($find_mode === MainMenu::FIND_INDEX_LOOSE) {
+            $match = (mb_strpos($request, $href) !== false);
+        }
+        //request is found inside href
+        else if ($find_mode === MainMenu::FIND_INDEX_LOOSE_REVERSE) {
+            $match = (mb_strpos($href, $request) !== false);
+        }
+        else if ($find_mode === MainMenu::FIND_INDEX_LEVENSHTEIN) {
+            $match = @levenshtein($request, $href);
+
+        }
+        else if ($find_mode === MainMenu::FIND_INDEX_PATHCHECK) {
+
+            $href = explode("?", $href);
+            if (is_array($href) && count($href) > 0) {
+                $href = $href[0];
+            }
+            $request = explode("?", $request);
+            if (is_array($request) && count($request) > 0) {
+                $request = $request[0];
+            }
+            $this->last_match_value = $request;
+            if (strcmp($request, $href) == 0) return true;
+
+            $breq = dirname($request);
+            if (endsWith($request, "/") === true) {
+                $breq = $request;
+            }
+
+            $hreq = dirname($href);
+            if (mb_strpos($breq, $hreq) === false) return false;
+
+            $match = @levenshtein($request, $href);
+
+        }
+
+        $this->last_match_value = $request;
+
+        if ($this->debug_matching) {
+            debug("matchItem Result: " . (int)$match);
+        }
+        return $match;
+    }
+
+    public function setUnselectedAll()
+    {
+        $arr = array();
+        $this->flattenMenu($arr, $this->main_menu);
+
+        foreach ($arr as $index => $sub) {
+            $sub->setSelected(false);
+        }
+    }
+
+    public function selectActiveMenus($find_mode = MainMenu::FIND_INDEX_LEVENSHTEIN)
+    {
+        $this->selected_path = array();
+
+        $arr = array();
+        $this->flattenMenu($arr, $this->main_menu);
+
+        debug("MenuItem::selectActiveMenus: Flattened menu length: " . count($arr));
+
+        $this->findMenuIndex($find_mode, $arr);
+
+        $this->setUnselectedAll();
+
+        $this->updateSelectedMenu();
+
+    }
+
+    public function updateSelectedMenu()
+    {
+        if ($this->selected_item) {
+
+            $this->selected_item->setSelected(true);
+
+            $current = $this->selected_item;
+
+            $this->selected_path[] = $current;
+
+            while ($current->getParent()) {
+
+                $parent = $current->getParent();
+                $parent->setSelected(true);
+
+                $current = $parent;
 
                 $this->selected_path[] = $current;
 
-                while ($current->getParent()) {
+            }
 
-                    $parent = $current->getParent();
-                    $parent->setSelected(true);
+        }
+    }
 
-                    $current = $parent;
+    public function getSelectedPath()
+    {
+        return $this->selected_path;
+    }
 
-                    $this->selected_path[] = $current;
-                    
+    public static function findSelectedPath(&$path, $menu_items)
+    {
+        // 	    if (!$search_items) $search_items = $this->main_menu;
+
+        foreach ($menu_items as $key => $item) {
+            if ($item->isSelected()) {
+                $path[] = $item;
+                $subitems = $item->getSubmenu();
+                if (count($subitems) > 0) {
+                    MainMenu::findSelectedPath($path, $subitems);
                 }
-
-	    }
-	}
-	
-	public function getSelectedPath()
-	{
-	    return $this->selected_path;
-	}
-	
-	public static function findSelectedPath(&$path, $menu_items)
-	{
-// 	    if (!$search_items) $search_items = $this->main_menu;
-	    
-	    foreach($menu_items as $key=>$item) {
-	      if ($item->isSelected()) {
-			$path[] = $item;
-			$subitems = $item->getSubmenu();
-			if (count($subitems)>0) {
-			  MainMenu::findSelectedPath($path, $subitems);
-			}
-	      }
-	    }
-	}
+            }
+        }
+    }
 }
+
 ?>

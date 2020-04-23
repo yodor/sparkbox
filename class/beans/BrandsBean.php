@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 
 class BrandsBean extends DBTableBean
@@ -14,10 +14,10 @@ class BrandsBean extends DBTableBean
  PRIMARY KEY (`brandID`),
  UNIQUE KEY `brand_name` (`brand_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("brands");
+        parent::__construct("brands");
     }
 
 }

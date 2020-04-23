@@ -1,12 +1,16 @@
 <?php
-include_once("lib/input/InputField.php");
+include_once("lib/input/DataInput.php");
 
 interface IFieldRenderer
 {
-  public function setField(InputField $field);
-  public function getField();
-  public function renderValue(InputField $field);
-  public function renderField(InputField $field);
+    public function setField(DataInput $field);
+
+    public function getField();
+
+    public function renderValue(DataInput $field);
+
+    public function renderField(DataInput $field);
 
 }
+
 ?>

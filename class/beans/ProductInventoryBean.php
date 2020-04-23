@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 
 class ProductInventoryBean extends DBTableBean
@@ -23,10 +23,10 @@ class ProductInventoryBean extends DBTableBean
  CONSTRAINT `product_inventory_ibfk_3` FOREIGN KEY (`size_value`) REFERENCES `product_sizes` (`size_value`) ON DELETE CASCADE ON UPDATE CASCADE,
  CONSTRAINT `product_inventory_ibfk_4` FOREIGN KEY (`pclrID`) REFERENCES `product_colors` (`pclrID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("product_inventory");
+        parent::__construct("product_inventory");
     }
 
 }

@@ -6,72 +6,70 @@ include_once("class/beans/ProductsBean.php");
 include_once("class/Cart.php");
 
 $page = new CheckoutPage();
-$page->modify_enabled=true;
+$page->modify_enabled = true;
 
 
 $cart = new Cart();
 
 global $products;
 
-if (isset($_GET["addItem"])){
-	$prodID=-1;
-	if (isset($_GET["prodID"])){
-		$prodID=(int)$_GET["prodID"];
-	}
-	try {
-	  $item = $products->getByID($prodID);
-	  if ($item["stock_amount"]<1) {
-		Session::set("alert", tr("Съжаляваме в момента няма наличност от този продукт"));
-		header("Location: ".SITE_ROOT."details.php?prodID=".$prodID);
-		exit;
-	  }
-	  
-	  $cart->addItem($prodID);
-	  $_SESSION["last_added"]=$prodID;
-	}
-	catch (Exception $e) {
-	  
-	//incorrect product id
-	}
-	header("Location:cart.php");
-	exit;
-}
-if (isset($_GET["removeItem"])){
-	$prodID=-1;
-	if (isset($_GET["prodID"])){
-		$prodID=$_GET["prodID"];
-	}
-	try {
-	  $products->getByID($prodID);
-	  $cart->removeItem($prodID);
-	}
-	catch (Exception $e) {
+if (isset($_GET["addItem"])) {
+    $prodID = -1;
+    if (isset($_GET["prodID"])) {
+        $prodID = (int)$_GET["prodID"];
+    }
+    try {
+        $item = $products->getByID($prodID);
+        if ($item["stock_amount"] < 1) {
+            Session::Set("alert", tr("Съжаляваме в момента няма наличност от този продукт"));
+            header("Location: " . SITE_ROOT . "details.php?prodID=" . $prodID);
+            exit;
+        }
 
-	}
-	header("Location:cart.php");
-	exit;
+        $cart->addItem($prodID);
+        $_SESSION["last_added"] = $prodID;
+    }
+    catch (Exception $e) {
+
+        //incorrect product id
+    }
+    header("Location:cart.php");
+    exit;
 }
-if (isset($_GET["deleteAll"])){
-	$cart->clearCart();
-	if (isset($_SESSION["order_address"])) {
-	  unset($_SESSION["order_address"]);
-	}
-	header("Location:cart.php");
-	exit;
+if (isset($_GET["removeItem"])) {
+    $prodID = -1;
+    if (isset($_GET["prodID"])) {
+        $prodID = $_GET["prodID"];
+    }
+    try {
+        $products->getByID($prodID);
+        $cart->removeItem($prodID);
+    }
+    catch (Exception $e) {
+
+    }
+    header("Location:cart.php");
+    exit;
+}
+if (isset($_GET["deleteAll"])) {
+    $cart->clearCart();
+    if (isset($_SESSION["order_address"])) {
+        unset($_SESSION["order_address"]);
+    }
+    header("Location:cart.php");
+    exit;
 }
 else if (isset($_GET["continue_shopping"])) {
-  if (isset($_SESSION["last_added"])) {
-	$prodID = (int)$_SESSION["last_added"];
-	header("Location: ".SITE_ROOT."details.php?prodID=".$prodID);
-	exit;
-  }
+    if (isset($_SESSION["last_added"])) {
+        $prodID = (int)$_SESSION["last_added"];
+        header("Location: " . SITE_ROOT . "details.php?prodID=" . $prodID);
+        exit;
+    }
 }
 
-$page->beginPage();
+$page->startRender();
 
 $page->setPreferredTitle(tr("Shopping Cart Contents"));
-
-
 
 
 echo "<div class='caption'>";
@@ -92,41 +90,37 @@ $page->drawCartItems();
 // echo "<div class=hr></div>";
 
 
-
-
 if ($page->total) {
 
-   
-  $page->showShippingInfo();
 
-  echo "<div class='navigation'>";
-  
+    $page->showShippingInfo();
+
+    echo "<div class='navigation'>";
+
     echo "<div class='slot right'>";
-      echo "<a href='customer.php'>";
-	echo "<img src='".SITE_ROOT."images/cart_checkout.png'>";
-	echo "<div class='checkout_button'  >".tr("Checkout")."</div>";
-      echo "</a>";
-    echo "</div>";
-      
-   
-    
-    echo "<div class='slot left'>";
-      echo "<a href='cart.php?deleteAll'>";
-	echo "<img src='".SITE_ROOT."images/cart_clear.png'>";
-	echo "<div class='checkout_button'  >".tr("Empty Cart")."</div>";
-      echo "</a>";
+    echo "<a href='customer.php'>";
+    echo "<img src='" . SITE_ROOT . "images/cart_checkout.png'>";
+    echo "<div class='checkout_button'  >" . tr("Checkout") . "</div>";
+    echo "</a>";
     echo "</div>";
 
-     echo "<div class='slot center'>";
-    echo "<a class='DefaultButton' href='".SITE_ROOT."home.php'>";
+
+    echo "<div class='slot left'>";
+    echo "<a href='cart.php?deleteAll'>";
+    echo "<img src='" . SITE_ROOT . "images/cart_clear.png'>";
+    echo "<div class='checkout_button'  >" . tr("Empty Cart") . "</div>";
+    echo "</a>";
+    echo "</div>";
+
+    echo "<div class='slot center'>";
+    echo "<a class='DefaultButton' href='" . SITE_ROOT . "home.php'>";
     echo tr("Продължи пазаруването");
     echo "</a>";
     echo "</div>";
-    
-  echo "</div>";
+
+    echo "</div>";
 }
 
 
-
-$page->finishPage();
+$page->finishRender();
 ?>

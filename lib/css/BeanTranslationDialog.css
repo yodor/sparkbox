@@ -1,22 +1,25 @@
 
 .BeanTranslationDialog .Inner {
-  min-width:400px;
+    min-width: 400px;
 }
+
 .BeanTranslationDialog .Inner .AjaxProgress {
-  display:inline-block;
-  width:20px;
-  height:20px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
 
 }
+
 .BeanTranslationDialog .Inner TEXTAREA.original_text {
-  border:1px solid purple;
-  background:white;
-  color:black;
-  overflow:visible;
-  width:100%;
-    box-sizing:border-box;
-  -moz-box-sizing:border-box;
+    border: 1px solid purple;
+    background: white;
+    color: black;
+    overflow: visible;
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
+
 /*.BeanTranslationDialog .Inner DIV.original_text {
   border:1px solid purple;
   background:white;
@@ -30,26 +33,32 @@
 }*/
 
 .BeanTranslationDialog .Inner .InputComponent[field="langID"] {
-  float:right;
+    float: right;
 }
+
 .BeanTranslationDialog .Inner .InputComponent[field="langID"] .InputLabel {
-  display:inline-block;
+    display: inline-block;
 }
+
 .BeanTranslationDialog .Inner .InputComponent[field="langID"] .InputField {
-  display:inline-block;
+    display: inline-block;
 }
+
 .BeanTranslationDialog .Inner textarea[name='translation'] {
-  width:100%;
-   box-sizing:border-box;
-  -moz-box-sizing:border-box;
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
+
 .BeanTranslationDialog .Inner .buttons_bar {
-  display:block;
-  width: 100%
+    display: block;
+    width: 100%
 }
+
 .BeanTranslationDialog .Inner .buttons_bar [action='Translate'] {
-  float:left;
+    float: left;
 }
+
 .BeanTranslationDialog .Inner .buttons_bar [action='Close'] {
-  float:right;
+    float: right;
 }

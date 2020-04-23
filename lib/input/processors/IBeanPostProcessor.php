@@ -1,17 +1,14 @@
 <?php
 include_once("lib/beans/DBTableBean.php");
-include_once("lib/input/InputField.php");
-
+include_once("lib/input/DataInput.php");
 
 
 interface IBeanPostProcessor
 {
 
-  
-  public function loadBeanData($editID, DBTableBean $bean, InputField $field,  array $item_row);
-  public function loadPostData(InputField $field, array $arr);
- 
-  
+    public function loadBeanData(int $editID, DBTableBean $bean, DataInput $field, array $item_row);
+
+    public function loadPostData(DataInput $field, array $arr);
 
 }
 

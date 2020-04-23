@@ -1,115 +1,111 @@
 <?php
 include_once("lib/input/validators/IInputValidator.php");
-include_once("lib/input/InputField.php");
+include_once("lib/input/DataInput.php");
 
 class DateValidator implements IInputValidator
 {
 
-	public static function isValidDate($value)
-	{
-		$pieces = explode("-",$value);
+    public static function isValidDate($value)
+    {
+        $pieces = explode("-", $value);
 
-		if (count($pieces)!=3)  {
+        if (count($pieces) != 3) {
 
-			return false;
-		}
+            return false;
+        }
 
-		$ret = false;
-		try {
-			$year = $pieces[0];
-			$month = $pieces[1];
-			$day = $pieces[2];
-			DateValidator::validate($year, $month, $day);
-			$ret = true;
-		}
-		catch (Exception $e) {
+        $ret = false;
+        try {
+            $year = $pieces[0];
+            $month = $pieces[1];
+            $day = $pieces[2];
+            DateValidator::validate($year, $month, $day);
+            $ret = true;
+        }
+        catch (Exception $e) {
 
-		}
-		return $ret;
-	}
+        }
+        return $ret;
+    }
 
-	public static function getTimestamp($field_value)
-	{
-		$ret = 0;
-		if (DateValidator::isValidDate($field_value)) {
-		  $pieces = explode("-",$field_value);
-		  $year = $pieces[0];
-		  $month = $pieces[1];
-		  $day = $pieces[2];
-		  $ret = strtotime("$year-$month-$day");
-		}
-		return $ret;
+    public static function getTimestamp($field_value)
+    {
+        $ret = 0;
+        if (DateValidator::isValidDate($field_value)) {
+            $pieces = explode("-", $field_value);
+            $year = $pieces[0];
+            $month = $pieces[1];
+            $day = $pieces[2];
+            $ret = strtotime("$year-$month-$day");
+        }
+        return $ret;
 
-	}
-
-
-	protected static function validate($year, $month, $day)
-	{
-
-	  if ($year<1)
-	  {
-		  throw new Exception("Incorrect Date: Year");
-	  }
-
-	  if ($month<1 || $month>12)
-	  {
-		  throw new Exception("Incorrect Date: Month");
-
-	  }
-
-	  if ($day<1 || $day>31)
-	  {
-		  throw new Exception("Incorrect Date: Day");
-	  }
-
-	  $days_in_month = date("t", strtotime($year."-".$month."-"."01"));
-
-	  if ($day>$days_in_month) {
-		  throw new Exception("Incorrect Date: Day > $days_in_month");
-	  }
-
-	  $u_date = strtotime($year ."-". $month ."-". $day );
-	  if ($u_date===false)
-	  {
-		  throw new Exception("Incorrect Date");
-	  }
+    }
 
 
+    protected static function validate($year, $month, $day)
+    {
 
-	}
-	public function validateInput(InputField $field)
-	{
+        if ($year < 1) {
+            throw new Exception("Incorrect Date: Year");
+        }
 
-	
-		$pieces = explode("-", $field->getValue());
+        if ($month < 1 || $month > 12) {
+            throw new Exception("Incorrect Date: Month");
 
-		if (count($pieces)!=3)  {
-		    throw new Exception("Incorrect date (date format)");
-		}
+        }
 
+        if ($day < 1 || $day > 31) {
+            throw new Exception("Incorrect Date: Day");
+        }
 
-		$year = $pieces[0];
-		$month = $pieces[1];
-		$day = $pieces[2];
-		
-		
+        $days_in_month = date("t", strtotime($year . "-" . $month . "-" . "01"));
 
-		try {
-		  DateValidator::validate($year, $month, $day);
-		}
-		catch (Exception $e) {
-		  if (strlen($year)>0 || strlen($month)>0 || strlen($day)>0 || $field->isRequired()) {
-		    throw  $e;
-		  }
-		  else {
-		    if (!$field->isRequired()) {
-		      $field->clear();
-		    }
-		  }
-		}
+        if ($day > $days_in_month) {
+            throw new Exception("Incorrect Date: Day > $days_in_month");
+        }
+
+        $u_date = strtotime($year . "-" . $month . "-" . $day);
+        if ($u_date === false) {
+            throw new Exception("Incorrect Date");
+        }
 
 
-	}
+    }
+
+    public function validateInput(DataInput $field)
+    {
+
+
+        $pieces = explode("-", $field->getValue());
+
+        if (count($pieces) != 3) {
+            throw new Exception("Incorrect date (date format)");
+        }
+
+
+        $year = $pieces[0];
+        $month = $pieces[1];
+        $day = $pieces[2];
+
+
+        try {
+            DateValidator::validate($year, $month, $day);
+        }
+        catch (Exception $e) {
+            if (strlen($year) > 0 || strlen($month) > 0 || strlen($day) > 0 || $field->isRequired()) {
+                throw  $e;
+            }
+            else {
+                if (!$field->isRequired()) {
+                    $field->clear();
+                }
+            }
+        }
+
+
+    }
 
 }
+
 ?>

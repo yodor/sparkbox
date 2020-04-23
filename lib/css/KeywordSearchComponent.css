@@ -1,25 +1,29 @@
 
 .KeywordSearchComponent {
-  display:table;
-  border-collapse:collapse;
-}
-.KeywordSearchComponent .fields {
-  display:table-cell;
-  vertical-align:middle;
-  padding:0px;
-}
-.KeywordSearchComponent .buttons {
-  display:table-cell;
-  vertical-align:middle;
-  padding:0px;
-}
-.KeywordSearchComponent .buttons * {
-  margin-bottom:0px;
+    display: table;
+    border-collapse: collapse;
 }
 
-.KeywordSearchComponent+.TableView {
-  margin-top:10px;
+.KeywordSearchComponent .fields {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 0px;
 }
-.KeywordSearchComponent+.ListView {
-  margin-top:10px;
+
+.KeywordSearchComponent .buttons {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 0px;
+}
+
+.KeywordSearchComponent .buttons * {
+    margin-bottom: 0px;
+}
+
+.KeywordSearchComponent + .TableView {
+    margin-top: 10px;
+}
+
+.KeywordSearchComponent + .ListView {
+    margin-top: 10px;
 }

@@ -1,20 +1,25 @@
 <?php
-include_once("lib/input/InputField.php");
+include_once("lib/input/DataInput.php");
+include_once("lib/input/renderers/ArrayField.php");
 
-class ArrayInputField extends InputField
+class ArrayDataInput extends DataInput
 {
 
     public $allow_dynamic_addition = false;
 
+    /**
+     * @var IArrayFieldRenderer|null
+     */
     protected $array_renderer = NULL;
 
-    public function __construct($name, $label, $required)
+    public function __construct(string $name, string $label, bool $required)
     {
         parent::__construct($name, $label, $required);
 
-        $this->value=array();
-        $this->error=array();
+        $this->value = array();
+        $this->error = array();
 
+        $this->array_renderer = new ArrayField();
     }
 
     public function getArrayRenderer()
@@ -26,33 +31,33 @@ class ArrayInputField extends InputField
     {
         $this->array_renderer = $renderer;
     }
-  
+
     public function setValidator(IInputValidator $validator)
     {
         $this->validator = new ArrayInputValidator($validator);
     }
 
-    public function getValueAt($idx) 
+    public function getValueAt($idx)
     {
         return $this->value[$idx];
     }
 
-    public function setValueAt($idx, $value) 
+    public function setValueAt($idx, $value)
     {
-        $this->value[$idx]=$value;
+        $this->value[$idx] = $value;
     }
 
     public function getErrorAt($idx)
     {
         if (isset($this->error[$idx])) return $this->error[$idx];
-        return null;
+        return "";
     }
 
-    public function setErrorAt($idx,$err) 
+    public function setErrorAt($idx, $err)
     {
 
-        if (strlen($err)>0) {
-            $this->error[$idx]=$err;
+        if (strlen($err) > 0) {
+            $this->error[$idx] = $err;
         }
         else {
             if (isset($this->error[$idx])) {
@@ -70,7 +75,7 @@ class ArrayInputField extends InputField
     public function appendElement($val)
     {
 
-        $this->value[]=$val;
+        $this->value[] = $val;
     }
 
     public function removeElementAt($idx)
@@ -79,31 +84,31 @@ class ArrayInputField extends InputField
         if (isset($this->value[$idx])) {
             unset($this->value[$idx]);
             $new_vals = array();
-            foreach($this->value as $key=>$val) {
+            foreach ($this->value as $key => $val) {
                 $new_vals[] = $val;
             }
-            $this->value=$new_vals;
+            $this->value = $new_vals;
         }
 
         if (isset($this->error[$idx])) {
             unset($this->error[$idx]);
             $new_vals = array();
-            foreach($this->error as $key=>$val) {
+            foreach ($this->error as $key => $val) {
                 $new_vals[] = $val;
             }
-            $this->error=$new_vals;
+            $this->error = $new_vals;
         }
 
     }
 
-    public function haveError() 
+    public function haveError()
     {
 
         if (is_array($this->error)) {
-            if (count($this->error)>0) return true;
+            if (count($this->error) > 0) return true;
         }
         else {
-            if (strlen($this->error)>0) {
+            if (strlen($this->error) > 0) {
                 return true;
             }
         }
@@ -111,16 +116,17 @@ class ArrayInputField extends InputField
 
     }
 
-    public function haveErrorAt($idx) 
+    public function haveErrorAt($idx)
     {
         return isset($this->error[$idx]);
     }
 
     public function clear()
     {
-        $this->value=array();
-        $this->error=array();	
+        $this->value = array();
+        $this->error = array();
     }
 
 }
+
 ?>

@@ -9,42 +9,47 @@ include_once("lib/storage/ImageStorageObject.php");
 
 class Storage
 {
-  protected $className=false;
-  protected $id=-1;
-  protected $cmd=false;
-  protected $headers;
-  protected $row;
-  protected $blob_field = "photo";
-  
-  protected $etag_parts = array();
-  
-  //network cache
-  protected $skip_cache = false;
-  
-  protected $disposition = "inline";
-  protected $gray_filter = false;
-  protected $use_storage = false;
+    protected $className = false;
+    protected $id = -1;
+    protected $cmd = false;
+    protected $headers;
+    protected $row;
+    protected $blob_field = "photo";
 
-  protected $server_time = "";
-  protected $request_start = "";
-  protected $request_last = "";
+    protected $etag_parts = array();
 
-  protected $request_uri = "";
-  
-  public function __construct()
-  {
+    //network cache
+    protected $skip_cache = false;
+
+    protected $disposition = "inline";
+    protected $gray_filter = false;
+    protected $use_storage = false;
+
+    protected $server_time = "";
+    protected $request_start = "";
+    protected $request_last = "";
+
+    protected $request_uri = "";
+
+    /**
+     * @var DBTableBean
+     */
+    protected $bean = NULL;
+
+    public function __construct()
+    {
         $this->headers = array();
         $this->row = array();
-        
+
         $this->request_uri = $_SERVER["REQUEST_URI"];
         $this->request_start = microtime(true);
         $this->request_last = $this->request_start;
-        
-        debug("Storage() request start: {$this->request_start} - Server time: {$this->server_time}");
-  }
 
-  public function debugActiveTime($msg)
-  {
+        debug("Storage() request start: {$this->request_start} - Server time: {$this->server_time}");
+    }
+
+    public function debugActiveTime($msg)
+    {
         $current = microtime(true);
         $elapsed_from_last = ($current - $this->request_last);
         $elapsed_from_start = ($current - $this->request_start);
@@ -53,165 +58,157 @@ class Storage
 
         //error_log("Storage::$msg ({$this->request_uri}) - elapsed last: $elapsed_from_last | elapsed total: $elapsed_from_start");
         $this->request_last = $current;
-  }
-  
-  public function processRequest()
-  {
-            debug("Storage::processRequest()");
-            
-	  try {
+    }
 
-		if (!isset($_GET["cmd"]))
-		{
-                    throw new Exception("No command passed.");
+    public function processRequest()
+    {
+        debug("Storage::processRequest()");
 
-		}
-		$this->cmd = $_GET["cmd"];
-		if (!isset($_GET["id"]) || !isset($_GET["class"])) {
-			throw new Exception("id and class parameters required.");
-		}
+        try {
 
-		if (isset($_GET["skip_cache"])) {
-			$this->skip_cache=true;
-		}
+            if (!isset($_GET["cmd"])) {
+                throw new Exception("No command passed.");
+            }
 
-		$this->id=(int)$_GET["id"];
-		$this->className = $_GET["class"];
+            $this->cmd = $_GET["cmd"];
 
-		$this->etag_parts[] = $this->className;
-		$this->etag_parts[] = $this->id;
+            if (!isset($_GET["id"]) || !isset($_GET["class"])) {
+                throw new Exception("id and class parameters required.");
+            }
 
-		$this->etag_parts[] = $this->cmd;
-		
-		
-                if (isset($_GET["max-width"])) {
-                    ImageResizer::$max_width=(int)$_GET["max-width"];
+            if (isset($_GET["skip_cache"])) {
+                $this->skip_cache = true;
+            }
+
+            $this->id = (int)$_GET["id"];
+            $this->className = $_GET["class"];
+
+            $this->etag_parts[] = $this->className;
+            $this->etag_parts[] = $this->id;
+
+            $this->etag_parts[] = $this->cmd;
+
+
+            if (isset($_GET["max-width"])) {
+                ImageResizer::$max_width = (int)$_GET["max-width"];
+            }
+            if (isset($_GET["max-height"])) {
+                ImageResizer::$max_height = (int)$_GET["max-height"];
+            }
+
+            ImageResizer::$gray_filter = false;
+            if (isset($_GET["gray_filter"])) {
+                ImageResizer::$gray_filter = true;
+                $this->etag_parts[] = "gray";
+            }
+
+            $this->debugActiveTime("start");
+
+            if (strcmp($this->cmd, "data_file") == 0) {
+                $this->skip_cache = true;
+                $this->disposition = "attachment";
+                $this->blob_field = "data";
+                $this->loadBeanClass();
+            }
+            else if (strcmp($this->cmd, "gallery_photo") == 0) {
+
+                if (ImageResizer::$max_width > 0 && ImageResizer::$max_height > 0) {
+
+                    $this->etag_parts[] = ImageResizer::$max_width . ";" . ImageResizer::$max_height;
+
                 }
-                if (isset($_GET["max-height"])) {
-                    ImageResizer::$max_height=(int)$_GET["max-height"];
+
+                $this->blob_field = "photo";
+                $this->loadBeanClass();
+
+
+                $this->checkCache();
+
+
+                if (ImageResizer::$max_width > 0 && ImageResizer::$max_height > 0) {
+                    ImageResizer::autoCrop($this->row);
+                    debug("Storage::gallery_photo: ID:{$this->id} Fit Rectangle: " . ImageResizer::$max_width . "x" . ImageResizer::$max_height);
                 }
 
+            }
+            else if (strcmp($this->cmd, "image_crop") == 0) {
+                if (!isset($_GET["width"]) || !isset($_GET["height"])) throw new Exception("Width parameter missing");
+                $size_w = (int)$_GET["width"];
+                $size_h = (int)$_GET["height"];
+                ImageResizer::$max_width = $size_w;
+                ImageResizer::$max_height = $size_h;
 
-                ImageResizer::$gray_filter=false;
-                if (isset($_GET["gray_filter"])) {
-                    ImageResizer::$gray_filter=true;
-                    $this->etag_parts[] = "gray";
+                // $this->skip_cache=true;
+                $this->etag_parts[] = $size_w . ";" . $size_h;
+
+                $this->blob_field = "photo";
+                $this->loadBeanClass();
+
+                $this->checkCache();
+
+                ImageResizer::crop($this->row);
+            }
+            else if (strcmp($this->cmd, "image_thumb") == 0) {
+                // $this->skip_cache=true;
+                $size = -1;
+                if (isset($_GET["width"])) {
+                    $size = (int)$_GET["width"];
                 }
 
+                if (isset($_GET["size"])) {
+                    $size = (int)$_GET["size"];
+                }
+                if ($size < 1) throw new Exception("Width/Size parameter missing");
+                $this->etag_parts[] = $size;
 
-                $this->debugActiveTime("start");
+                $this->blob_field = "photo";
 
+                $this->loadBeanClass();
 
-		if (strcmp($this->cmd,"data_file")==0) {
-			$this->skip_cache=true;
-			$this->disposition = "attachment";
-			$this->blob_field = "data";
-			$this->loadBeanClass();
-		}
-		else if (strcmp($this->cmd, "gallery_photo")==0) {
-// 			$this->skip_cache=false;
+                $this->checkCache();
 
-			
-			if (ImageResizer::$max_width>0 && ImageResizer::$max_height>0) {
-			    $size_w = (int)$_GET["max-width"];
-			    $size_h = (int)$_GET["max-height"];
-			    
-			    $this->etag_parts[] = $size_w.";".$size_h;
-			    
-			}
+                ImageResizer::thumbnail($this->row, $size);
+            }
+            else {
+                $this->sendError(new Exception("Unknown Command"));
+            }
 
-			
-			$this->blob_field = "photo";
-			$this->loadBeanClass();
+            $this->sendResponse();
 
-			
-			
-			$this->checkCache();
-			
-			
-			
-			if (ImageResizer::$max_width>0 && ImageResizer::$max_height>0) {
-			  ImageResizer::autoCrop($this->row);
-			  debug("Storage::gallery_photo: ID:{$this->id} Fit Rectangle: ".$size_w."x".$size_h);
-			}
-		}
-		else if (strcmp($this->cmd, "image_crop")==0) {
-			if (!isset($_GET["width"]) || !isset($_GET["height"])) throw new Exception("Width parameter missing");
-			$size_w = (int)$_GET["width"];
-			$size_h = (int)$_GET["height"];
-			ImageResizer::$max_width = $size_w;
-			ImageResizer::$max_height = $size_h;
-			
-			// $this->skip_cache=true;
-			$this->etag_parts[] = $size_w.";".$size_h;
-
-			$this->blob_field = "photo";
-			$this->loadBeanClass();
-			
-                        $this->checkCache();
-
-			ImageResizer::crop($this->row);
-		}
-		else if (strcmp($this->cmd, "image_thumb")==0) {
-			// $this->skip_cache=true;
-			$size = -1;
-			if (isset($_GET["width"])) {
-			  $size = (int)$_GET["width"];
-			}
-			
-			if (isset($_GET["size"])) {
-			  $size = (int)$_GET["size"];
-			}
-			if ($size<1) throw new Exception("Width/Size parameter missing");
-			$this->etag_parts[] = $size;
-
-			$this->blob_field = "photo";
-
-			$this->loadBeanClass();
-
-			$this->checkCache();
-			
-			ImageResizer::thumbnail($this->row, $size);
-		}
-		else {
-                    $this->sendError(new Exception("Unknown Command"));
-		}
-		
-		$this->sendResponse();
-		
-	  }
-	  catch (ImageResizerException $e1) {
-	    debug("ImageResizerException: ".$_SERVER["REQUEST_URI"]);
-	    $this->sendError($e1);
-	  }
-	  catch (Exception $e) {
-	    $this->sendError($e);
-	  }
-  }
-  protected function loadBeanClass()
-  {
-        debug("Storage::loadBeanClass()");
-            
-        $this->headers = array();
-        if (file_exists("class/beans/".$this->className.".php")) {
-                include_once("class/beans/".$this->className.".php");
         }
-        else if (file_exists("lib/beans/".$this->className.".php")){
-                include_once("lib/beans/".$this->className.".php");
+        catch (ImageResizerException $e1) {
+            debug("ImageResizerException: " . $_SERVER["REQUEST_URI"]);
+            $this->sendError($e1);
+        }
+        catch (Exception $e) {
+            $this->sendError($e);
+        }
+    }
+
+    protected function loadBeanClass()
+    {
+        debug("Storage::loadBeanClass()");
+
+        $this->headers = array();
+
+        if (file_exists("class/beans/" . $this->className . ".php")) {
+            include_once("class/beans/" . $this->className . ".php");
+        }
+        else if (file_exists("lib/beans/" . $this->className . ".php")) {
+            include_once("lib/beans/" . $this->className . ".php");
         }
         else {
-            throw new Exception("Bean class not found: ".$this->className);
+            throw new Exception("Bean class not found: " . $this->className);
         }
 
         $this->bean = new $this->className();
 
-
         if ($this->id == -1) {
-            $funcname = "Default_".$this->className;
+
+            $funcname = "Default_" . $this->className;
+
             if (is_callable($funcname)) {
-
                 $funcname($this->row);
-
             }
             else throw new Exception("No default value for this class");
 
@@ -234,8 +231,7 @@ class Storage
         }
 
 
-
-        $stypes = $this->bean->getStorageTypes();
+        $stypes = $this->bean->storageTypes();
 
         if (!array_key_exists($blob_field, $stypes)) {
             throw new Exception("No such blob field found");
@@ -254,32 +250,28 @@ class Storage
         if ($storage_object instanceof StorageObject) {
 
 
-                $this->row = array();
-                //image resizer expects row["photo"]
+            $this->row = array();
+            //image resizer expects row["photo"]
+            $row_field = "photo";
+            if ($storage_object instanceof ImageStorageObject) {
                 $row_field = "photo";
-                if ($storage_object instanceof ImageStorageObject) {
-                $row_field = "photo";
-                }
-                else if ($storage_object instanceof FileStorageObject) {
-                $row_field="data";
-                }
-                $storage_object->deconstruct($this->row, $row_field, false);
-                
+            }
+            else if ($storage_object instanceof FileStorageObject) {
+                $row_field = "data";
+            }
+            $storage_object->deconstruct($this->row, $row_field, false);
 
-                
-                
-                
-                
+
         }
         else {
-            
+
             //request received using blob_field but object is not of type storage object.
             if (isset($_GET["blob_field"]) || isset($_GET["bean_field"])) {
                 throw new Exception("Incorrect request received. Source data type is not StorageObject.");
             }
             //continue as object is tranacted to db as dbrow
 
-                
+
         }
 
         // set headers and etag
@@ -293,43 +285,44 @@ class Storage
             $last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
         }
 
-        $this->headers["etag"]=md5(implode("|", $this->etag_parts)."-".$last_modified);
+        $this->headers["etag"] = md5(implode("|", $this->etag_parts) . "-" . $last_modified);
         //always keep one year ahead from request time
-        $this->headers["expire"]=gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
-        $this->headers["last_modified"]=$last_modified;
+        $this->headers["expire"] = gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified)));
+        $this->headers["last_modified"] = $last_modified;
 
         $this->debugActiveTime("bean loaded");
-  }
+    }
 
-  protected function checkPermissions()
-  {
+    protected function checkPermissions()
+    {
         debug("Storage::checkPermissions()");
-            
+
 
         if (!isset($this->row["auth_context"])) return;
-        if (strlen($this->row["auth_context"])<1)return;
+        if (strlen($this->row["auth_context"]) < 1) return;
 
         debug("Storage::checkPermissions() protected object requested ...");
 
-        $session = new Session();
+        Session::Start();
 
         include_once("lib/auth/AdminAuthenticator.php");
-        if (AdminAuthenticator::checkAuthState()) {
+        $auth_admin = new AdminAuthenticator();
+        if ($auth_admin->data()) {
             debug("Storage::checkPermissions() Admin authenticated");
             return;
         }
         else {
             debug("Storage::checkPermissions() Admin not authenticated ...");
-            
+
         }
-        
-        $auth_class = "lib/auth/".$this->row["auth_context"].".php";
-        
+
+        $auth_class = "lib/auth/" . $this->row["auth_context"] . ".php";
+
         if (file_exists($auth_class)) {
             include_once($auth_class);
         }
         else {
-            $auth_class = "class/auth/".$this->row["auth_context"].".php";
+            $auth_class = "class/auth/" . $this->row["auth_context"] . ".php";
             if (file_exists($auth_class)) {
                 include_once($auth_class);
             }
@@ -337,29 +330,37 @@ class Storage
                 throw new Exception("Unable to locate the authenticating class");
             }
         }
-        
-       
+
+
         $auth = new $this->row["auth_context"];
 
-        debug("Storage::checkPermissions() Authenticating ... ");
-        if (!$auth->checkAuthState(true, $this->row)) {
-            debug("Storage::checkPermissions() Unable to authenticate request ... ");
-            throw new Exception("This resource is protected. Please login first.");
+        if ($auth instanceof Authenticator) {
+            debug("Storage::checkPermissions() Authenticating ... ");
+
+            if (!$auth->validate(true, $this->row)) {
+                debug("Storage::checkPermissions() Unable to authenticate request ... ");
+                throw new Exception("This resource is protected. Please login first.");
+            }
+        }
+        else {
+            throw new Exception("No suitable class for authentication");
         }
 
+
         $this->debugActiveTime("permissions checked");
-  }
-  protected function checkCache()
-  {
+    }
+
+    protected function checkCache()
+    {
 
         debug("Storage::checkCache()");
-        
+
         $etag = $this->headers["etag"];
-        
+
         if ($this->skip_cache) return false;
 
-        if (strlen($etag)<1) return false;
-        
+        if (strlen($etag) < 1) return false;
+
         // error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
 
         // check if the last modified date sent by the client is the the same as
@@ -370,28 +371,26 @@ class Storage
 
         $send_cache = false;
 
-//         if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
-//         {
-//             //error_log("Storage::checkCache HTTP_IF_MODIFIED_SINCE: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
-// 
-//             if (strcmp($_SERVER['HTTP_IF_MODIFIED_SINCE'],$last_modified)==0)
-//             {
-//                     $send_cache = true;
-//             }
-//             else {
-//                     $send_cache = false;
-//             }
-//         }
-        
-        if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
-        {
+        //         if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+        //         {
+        //             //error_log("Storage::checkCache HTTP_IF_MODIFIED_SINCE: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
+        //
+        //             if (strcmp($_SERVER['HTTP_IF_MODIFIED_SINCE'],$last_modified)==0)
+        //             {
+        //                     $send_cache = true;
+        //             }
+        //             else {
+        //                     $send_cache = false;
+        //             }
+        //         }
+
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
             //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
             $pos = strpos($_SERVER['HTTP_IF_NONE_MATCH'], $etag);
-            if ($pos!==FALSE)
-            {
+            if ($pos !== FALSE) {
                 $send_cache = true;
             }
-            
+
         }
 
         if ($send_cache) {
@@ -414,60 +413,60 @@ class Storage
         if (!file_exists($cache_folder)) {
             return false;
         }
-        $cache_file = $cache_folder."/".$this->getCacheFile();    
+        $cache_file = $cache_folder . "/" . $this->getCacheFile();
         if (!file_exists($cache_file)) {
             return false;
         }
-        $handle = fopen($cache_file,'r');
+        $handle = fopen($cache_file, 'r');
         flock($handle, LOCK_SH);
         $this->row[$this->blob_field] = file_get_contents($cache_file);
         flock($handle, LOCK_UN);
         fclose($handle);
 
         $this->row["size"] = filesize($cache_file);
-        
+
         $this->debugActiveTime("load disc cache finished");
-        
+
         $this->sendResponse(true);//response is from cache
         //exit
-        
-        return false;
-	  
-  }
-  
-  protected function getCacheFolder()
-  {
-        if (strlen($this->className)<1 || strlen($this->id)<1) throw new Exception("Empty className or ID");
-        return CACHE_ROOT."/".$this->className."/".$this->id."/";
-  }
-  
-  protected function getCacheFile()
-  {
-        $etag = $this->headers["etag"];
-        if (strlen($etag)<1) throw new Exception("Empty etag header");
-        
-        return $etag.".bin";
-  }
-  
-  protected function sendResponse($is_cache_data=false)
-  {
 
-        
+        return false;
+
+    }
+
+    protected function getCacheFolder()
+    {
+        if (strlen($this->className) < 1 || strlen($this->id) < 1) throw new Exception("Empty className or ID");
+        return CACHE_ROOT . "/" . $this->className . "/" . $this->id . "/";
+    }
+
+    protected function getCacheFile()
+    {
+        $etag = $this->headers["etag"];
+        if (strlen($etag) < 1) throw new Exception("Empty etag header");
+
+        return $etag . ".bin";
+    }
+
+    protected function sendResponse($is_cache_data = false)
+    {
+
+
         $this->debugActiveTime("start sendResponse");
-        
+
         $mime = "application/octetsream";
         if (isset($this->row["mime"])) {
             $mime = $this->row["mime"];
         }
 
         header("Content-Type: $mime");
-        header("Last-Modified: ".$this->headers["last_modified"]);
-        header("ETag: \"".$this->headers["etag"]."\"");
+        header("Last-Modified: " . $this->headers["last_modified"]);
+        header("ETag: \"" . $this->headers["etag"] . "\"");
 
         header("Cache-Control: no-cache, must-revalidate");
         //header("Pragma: ".$this->headers["etag"]);
 
-        header("Expires: ".$this->headers["expire"]);
+        header("Expires: " . $this->headers["expire"]);
         header("Content-Length: " . $this->row["size"]);
 
         $filename = $this->headers["etag"];
@@ -475,22 +474,22 @@ class Storage
             $filename = $this->row["filename"];
         }
 
-        if (strcmp($this->disposition,"attachment")==0) {
-            header("Content-Disposition: ".$this->disposition."; filename=$filename");
+        if (strcmp($this->disposition, "attachment") == 0) {
+            header("Content-Disposition: " . $this->disposition . "; filename=$filename");
         }
         header("Content-Transfer-Encoding: binary");
 
         if (!$is_cache_data) {
-               
+
             $this->debugActiveTime("reading disc cache");
-            
-            $cache_folder = $this->getCacheFolder();  
+
+            $cache_folder = $this->getCacheFolder();
             if (!file_exists($cache_folder)) {
                 mkdir($cache_folder, 0777, true);
             }
-            
-            $cache_file = $cache_folder."/".$this->getCacheFile();
-            $handle = fopen($cache_file,'c');
+
+            $cache_file = $cache_folder . "/" . $this->getCacheFile();
+            $handle = fopen($cache_file, 'c');
             flock($handle, LOCK_EX);
             ftruncate($handle, 0);
             file_put_contents($cache_file, $this->row[$this->blob_field]);
@@ -498,30 +497,30 @@ class Storage
             fclose($handle);
 
             $this->debugActiveTime("read disc cache finished");
-            
+
         }
         else {
-        
+
             header("X-Tag: disc_cache");
         }
 
-        
+
         $this->debugActiveTime("sending start");
-        
+
         $do_print = false;
         $fp = fopen("php://output", "wb");
         $written = 0;
         $fwrite = 0;
-        
+
         if ($fp) {
-            
+
             for ($written = 0; $written < (int)$this->row["size"]; $written += $fwrite) {
                 $fwrite = fwrite($fp, substr($this->row[$this->blob_field], $written, 4096));
                 //error writing
                 if ($fwrite === false) {
                     debug("Storage::sendResponse(): error: written only $written of {$this->row["size"]} from $filename");
                     break;
-                    
+
                 }
                 else {
                     @fflush($fp);
@@ -533,8 +532,8 @@ class Storage
         else {
             $do_print = true;
         }
-        
-        
+
+
         if ($do_print) {
             $written = -1;
             debug("Storage::sendResponse(): Sending using 'print' | filename: $filename size: {$this->row["size"]}");
@@ -543,30 +542,33 @@ class Storage
         else {
             debug("Storage::sendResponse(): filename='$filename' $written of {$this->row["size"]} bytes sent");
         }
-        
+
         $this->debugActiveTime("finished response sent");
-        
+
         exit;
-        
-  }
-  protected function sendError(Exception $e)
-  {
 
-    $this->debugActiveTime("sendError");
-  
-      // send the right headers
-      header("Content-Type: text/html");
-      header("Content-Length: ".strlen($e->getMessage()));
-      echo $e->getMessage();
+    }
 
-      exit;
-  }
-  protected function sendNotFound()
-  {
+    protected function sendError(Exception $e)
+    {
 
-      header("HTTP/1.0 404 Not Found");
-      exit;
-	
-  }
+        $this->debugActiveTime("sendError");
+
+        // send the right headers
+        header("Content-Type: text/html");
+        header("Content-Length: " . strlen($e->getMessage()));
+        echo $e->getMessage();
+
+        exit;
+    }
+
+    protected function sendNotFound()
+    {
+
+        header("HTTP/1.0 404 Not Found");
+        exit;
+
+    }
 }
+
 ?>

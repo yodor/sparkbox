@@ -1,10 +1,10 @@
 <?php
-include_once ("lib/beans/OrderedDataBean.php");
+include_once("lib/beans/OrderedDataBean.php");
 
 class DynamicPagePhotosBean extends OrderedDataBean
 {
 
-	protected $createString = "CREATE TABLE `page_photos` (
+    protected $createString = "CREATE TABLE `page_photos` (
  `ppID` int(10) unsigned NOT NULL AUTO_INCREMENT,
  `filename` varchar(255) NOT NULL DEFAULT '',
  `mime` varchar(255) NOT NULL DEFAULT '',
@@ -21,10 +21,12 @@ class DynamicPagePhotosBean extends OrderedDataBean
  CONSTRAINT `page_photos_ibfk_1` FOREIGN KEY (`dpID`) REFERENCES `dynamic_pages` (`dpID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8";
 
-	public function __construct() {
-		parent::__construct("page_photos");
-	}
+    public function __construct()
+    {
+        parent::__construct("page_photos");
+    }
 
 
 }
+
 ?>

@@ -1,10 +1,11 @@
 <?php
 
-interface IRenderer 
+interface IRenderer
 {
 
-  public function startRender();
-  public function finishRender();
+    public function startRender();
+
+    public function finishRender();
 
 }
 

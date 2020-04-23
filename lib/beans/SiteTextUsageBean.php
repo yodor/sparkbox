@@ -1,9 +1,9 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
-class SiteTextUsageBean extends DBTableBean 
+class SiteTextUsageBean extends DBTableBean
 {
-protected $createString = "
+    protected $createString = "
 CREATE TABLE `site_text_usage` (
  `stuID` int(10) unsigned NOT NULL auto_increment,
  `textID` int(10) unsigned NOT NULL,
@@ -18,8 +18,9 @@ CREATE TABLE `site_text_usage` (
 ";
 
 
-	public function __construct() {
-		parent::__construct("site_text_usage");
-	}
+    public function __construct()
+    {
+        parent::__construct("site_text_usage");
+    }
 
 }

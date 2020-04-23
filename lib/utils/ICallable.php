@@ -2,7 +2,7 @@
 
 interface ICallable
 {
-	public function execute($param);
+    public function execute($param);
 
 }
 

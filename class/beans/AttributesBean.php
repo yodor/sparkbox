@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 
 class AttributesBean extends DBTableBean
@@ -12,10 +12,10 @@ class AttributesBean extends DBTableBean
  PRIMARY KEY (`maID`),
  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("attributes");
+        parent::__construct("attributes");
     }
 
 }

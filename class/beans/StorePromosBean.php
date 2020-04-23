@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 
 class StorePromosBean extends DBTableBean
@@ -13,11 +13,12 @@ class StorePromosBean extends DBTableBean
  `discount_percent` int(11) NOT NULL,
  PRIMARY KEY (`spID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("store_promos");
+        parent::__construct("store_promos");
     }
 
 }
+
 ?>

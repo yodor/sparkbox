@@ -12,10 +12,7 @@ include_once("lib/components/KeywordSearchComponent.php");
 include_once("lib/iterators/SQLResultIterator.php");
 
 
-
-$menu=array(
-    
-);
+$menu = array();
 
 
 $page = new AdminPage();
@@ -39,27 +36,25 @@ $view->items_per_page = 100;
 $view->setCaption("Sizing Codes List");
 $view->setDefaultOrder(" size_value ASC ");
 
-$view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
-$view->addColumn(new TableColumn("size_value","Size"));
+$view->addColumn(new TableColumn($bean->key(), "ID"));
+$view->addColumn(new TableColumn("size_value", "Size"));
 
-$view->addColumn(new TableColumn("actions","Actions"));
+$view->addColumn(new TableColumn("actions", "Actions"));
 
 $act = new ActionsTableCellRenderer();
-$act->addAction(
-  new Action("Edit", "add.php", array( new ActionParameter("editID",$bean->getPrKey()) )  )
-); 
-$act->addAction(  new PipeSeparatorAction() );
-$act->addAction( $h_delete->createAction() );
-    
+$act->addAction(new Action("Edit", "add.php", array(new ActionParameter("editID", $bean->key()))));
+$act->addAction(new PipeSeparatorAction());
+$act->addAction($h_delete->createAction());
+
 $view->getColumn("actions")->setCellRenderer($act);
 
-Session::set("sizing.list", $page->getPageURL());
+Session::Set("sizing.list", $page->getPageURL());
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 $page->renderPageCaption();
 
 $view->render();
 
-$page->finishPage();
+$page->finishRender();
 ?>

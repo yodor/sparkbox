@@ -1,8 +1,8 @@
 <?php
-include_once ("lib/beans/OrderedDataBean.php");
+include_once("lib/beans/OrderedDataBean.php");
 
 
-class GalleryPhotosBean extends  OrderedDataBean
+class GalleryPhotosBean extends OrderedDataBean
 {
 
     protected $createString = "CREATE TABLE `gallery_photos` (
@@ -19,10 +19,10 @@ class GalleryPhotosBean extends  OrderedDataBean
  `position` int(11) NOT NULL,
  PRIMARY KEY (`gpID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("gallery_photos");
+        parent::__construct("gallery_photos");
     }
 
 }

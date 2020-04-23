@@ -7,10 +7,7 @@ include_once("class/beans/GalleryPhotosBean.php");
 include_once("lib/components/GalleryView.php");
 
 
-
-$menu=array(
-
-);
+$menu = array();
 
 
 $page = new AdminPage();
@@ -37,12 +34,12 @@ $gv->setCaption("Sample Photo Gallery Items");
 $gv->initView($bean, "add.php");
 
 
-$page->beginPage($menu);
+$page->startRender($menu);
 $page->renderPageCaption();
 
 $gv->render();
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

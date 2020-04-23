@@ -1,19 +1,18 @@
 <?php
-include_once("lib/input/renderers/InputTagRenderer.php");
+include_once("lib/input/renderers/InputFieldTag.php");
 
-class TextField extends InputTagRenderer
+class TextField extends InputFieldTag
 {
 
-  public function __construct()
-  {
-      parent::__construct();
+    public function __construct()
+    {
+        parent::__construct();
 
-      $this->setFieldAttribute("type", "text");
-      
-  }
+        $this->setFieldAttribute("type", "text");
 
-  
+    }
 
 
 }
+
 ?>

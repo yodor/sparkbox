@@ -1,17 +1,17 @@
 .SourceRelatedField .FieldElements {
-  display:table;
+    display: table;
 }
 
 .SourceRelatedField .FieldElements .SourceAttributeItem {
-  display:table-row;
+    display: table-row;
 }
 
 .SourceRelatedField .FieldElements .SourceAttributeItem .SourceAttributeName {
-  display:table-cell;
-  text-align:right;
+    display: table-cell;
+    text-align: right;
 }
 
 .SourceRelatedField .FieldElements .SourceAttributeItem .SourceAttributeUnit {
-  display:table-cell;
+    display: table-cell;
 
 }

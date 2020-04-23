@@ -1,73 +1,86 @@
 .news_view {
-  display:table;
-  width:100%;
-  border-spacing:10px;
+    display: table;
+    width: 100%;
+    border-spacing: 10px;
 }
+
 .news_view .column {
-  display:table-cell;
-  vertical-align:top;
-  border:1px dotted red;
+    display: table-cell;
+    vertical-align: top;
+    border: 1px dotted red;
 }
+
 .news_view .column.main {
-  
+
 }
+
 .news_view .column.main .title {
-  font-size:18px;
-  display:block;
+    font-size: 18px;
+    display: block;
 }
+
 .news_view .column.main .date {
-  font-size:14px;
-  font-style:italic;
+    font-size: 14px;
+    font-style: italic;
 }
+
 .news_view .column.main .content {
-  margin-top:20px;
-}
-.news_view .column.other {
-  width:250px;
-  max-width:250px;
+    margin-top: 20px;
 }
 
 .news_view .column.other {
-  
-  
+    width: 250px;
+    max-width: 250px;
 }
+
+.news_view .column.other {
+
+
+}
+
 .news_view .column.other .latest {
-  
+
 }
 
 .news_view .column.other .latest .item {
-  display:table;
-  text-decoration:none;
-  border-spacing:0px;
-  
+    display: table;
+    text-decoration: none;
+    border-spacing: 0px;
+
 }
 
 .news_view .column.other .latest .item .cell {
-  display:table-cell;
-  vertical-align:top;
-  padding-bottom:5px;
+    display: table-cell;
+    vertical-align: top;
+    padding-bottom: 5px;
 }
+
 .news_view .column.other .latest .item .cell.image {
-  padding-right:5px;
+    padding-right: 5px;
 }
+
 .news_view .column.other .latest .item .cell.image .panel {
 
 }
+
 .news_view .column.other .latest .item .cell.image .panel IMG {
-  display:block;
+    display: block;
 }
+
 .news_view .column.other .latest .item .cell.details SPAN {
-  display:block;
-  text-decoration:none;
-  color:black;
-  
+    display: block;
+    text-decoration: none;
+    color: black;
+
 }
+
 .news_view .column.other .latest .item .cell.details SPAN.title {
-  font-size:13px;
-  font-weight:bold;
+    font-size: 13px;
+    font-weight: bold;
 }
+
 .news_view .column.other .latest .item .cell.details SPAN.date {
-  font-size:12px;
-  font-style:italic;
-  
+    font-size: 12px;
+    font-style: italic;
+
 }

@@ -4,129 +4,122 @@ include_once("lib/handlers/TranslateBeanAjaxHandler.php");
 
 
 //IFinalRenderer delegate rendering to page control does not need to call render
-class BeanTranslationDialog extends MessageDialog implements IFinalRenderer, IHeadRenderer
+class BeanTranslationDialog extends MessageDialog implements IFinalRenderer
 {
 
-	public function __construct()
-	{
-		parent::__construct("Translate", "bean_translator");
-		$this->show_close_button=TRUE;
-		
-		$this->setDialogType(MessageDialog::TYPE_PLAIN);
-		
-		$btn_translate = StyledButton::DefaultButton();
-		$btn_translate->setText("Translate");
-		$btn_translate->setAttribute("action", "Translate");
-		$this->appendButton($btn_translate);
-		
-		$btn_clear = StyledButton::DefaultButton();
-		$btn_clear->setText("Clear");
-		$btn_clear->setAttribute("action", "Clear");
-		$this->appendButton($btn_clear);
-		
-		$btn_close = StyledButton::DefaultButton();
-		$btn_close->setText("Close");
-		$btn_close->setAttribute("action", "Close");
-		$this->appendButton($btn_close);
+    public function __construct()
+    {
+        parent::__construct("Translate", "bean_translator");
+        $this->show_close_button = TRUE;
 
-		RequestController::addAjaxHandler(new TranslateBeanAjaxHandler());
-	}
-	public function renderScript()
-	{
+        $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
-	    echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/popups/BeanTranslationDialog.js'></script>";
-	    echo "\n";
-	    
-	    //mcetext area translation support
-	    echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/MCETextArea.js'></script>";
-            echo "\n";
-            
-            echo "<script type='text/javascript' src='".SITE_ROOT."lib/js/tiny_mce/jquery.tinymce.min.js'></script>";
-            echo "\n";
-	    
-	    
-	}
-	public function renderStyle()
-	{	
+        $btn_translate = StyledButton::DefaultButton();
+        $btn_translate->setText("Translate");
+        $btn_translate->setAttribute("action", "Translate");
+        $this->appendButton($btn_translate);
 
-	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/BeanTranslationDialog.css' type='text/css'>";
-	    echo "\n";
-	    //mcetext area translation support
-	    echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/MCETextArea.css' type='text/css' >";
-            echo "\n";
-	}
-	public function renderImpl()
-	{
+        $btn_clear = StyledButton::DefaultButton();
+        $btn_clear->setText("Clear");
+        $btn_clear->setAttribute("action", "Clear");
+        $this->appendButton($btn_clear);
 
-		
-		echo tr("Original Text").":<BR>";
-		
-		echo "<textarea class='original_text' name='original_text' rows=10 readonly=true>";
-		echo "</textarea>";
-		echo "<br>";
+        $btn_close = StyledButton::DefaultButton();
+        $btn_close->setText("Close");
+        $btn_close->setAttribute("action", "Close");
+        $this->appendButton($btn_close);
 
-		
-		echo "<div class='AjaxProgress'></div>";
+        RequestController::addAjaxHandler(new TranslateBeanAjaxHandler());
+    }
 
-		include_once("lib/input/InputFactory.php");
-		
-		$ls = new InputField("langID", "Translation Language", 1);
-		
-		$renderer = new SelectField();
+    public function requiredStyle()
+    {
+        $arr = parent::requiredStyle();
+        $arr[] = SITE_ROOT . "lib/css/BeanTranslationDialog.css";
+        $arr[] = SITE_ROOT . "lib/css/MCETextArea.css";
+        return $arr;
+    }
 
-		include_once("lib/beans/LanguagesBean.php");
-		$lb = new LanguagesBean();
-		
+    public function requiredScript()
+    {
+        $arr = parent::requiredScript();
+        $arr[] = SITE_ROOT . "lib/js/popups/BeanTranslationDialog.js";
+        $arr[] = SITE_ROOT . "lib/js/MCETextArea.js";
+        $arr[] = SITE_ROOT . "lib/js/tiny_mce/jquery.tinymce.min.js";
+        return $arr;
+    }
 
-		$lb->setFilter(" langID>1 ");
-
-		$renderer->setSource($lb);
-		$renderer->list_key="langID";
-		$renderer->list_label="language";
+    public function renderImpl()
+    {
 
 
-		$ls->setRenderer($renderer);
+        echo tr("Original Text") . ":<BR>";
 
-		include_once("lib/components/InputComponent.php");
-		$cmp = new InputComponent();
-		$cmp->setField($ls);
-		$cmp->render();
-
-		echo "<form>";
-		
-		echo "<textarea name='translation' rows=10 >";
-
-		echo "</textarea>";
-
-		echo "</form>";
-?>
-<script type='text/javascript'>
-addLoadEvent(function(){
-  var bean_translator = new BeanTranslationDialog();
-  bean_translator.attachWith("bean_translator");
-
-  $("BODY").find("[action='TranslateBeanField']").each(function(index){
-     
-     var is_mce = $(this).parent().children(".MCETextArea").length > 0;
-     console.log("is_mce="+is_mce);
-     
-    
-	
-     
-     $(this).click(function(event){
-
-	  bean_translator.show($(this).attr("field"), is_mce);
+        echo "<textarea class='original_text' name='original_text' rows=10 readonly=true>";
+        echo "</textarea>";
+        echo "<br>";
 
 
-     });
-  });
+        echo "<div class='AjaxProgress'></div>";
 
-});
-</script>
-<?php
+        include_once("lib/input/DataInputFactory.php");
 
-	}
+        $ls = new DataInput("langID", "Translation Language", 1);
+
+        $renderer = new SelectField();
+
+        include_once("lib/beans/LanguagesBean.php");
+        $lb = new LanguagesBean();
+
+
+        $lb->setFilter(" langID>1 ");
+
+        $renderer->setSource($lb);
+        $renderer->list_key = "langID";
+        $renderer->list_label = "language";
+
+
+        $ls->setRenderer($renderer);
+
+        include_once("lib/components/InputComponent.php");
+        $cmp = new InputComponent();
+        $cmp->setField($ls);
+        $cmp->render();
+
+        echo "<form>";
+
+        echo "<textarea name='translation' rows=10 >";
+
+        echo "</textarea>";
+
+        echo "</form>";
+        ?>
+        <script type='text/javascript'>
+            addLoadEvent(function () {
+                var bean_translator = new BeanTranslationDialog();
+                bean_translator.attachWith("bean_translator");
+
+                $("BODY").find("[action='TranslateBeanField']").each(function (index) {
+
+                    var is_mce = $(this).parent().children(".MCETextArea").length > 0;
+                    console.log("is_mce=" + is_mce);
+
+
+                    $(this).click(function (event) {
+
+                        bean_translator.show($(this).attr("field"), is_mce);
+
+
+                    });
+                });
+
+            });
+        </script>
+        <?php
+
+    }
 
 
 }
+
 ?>

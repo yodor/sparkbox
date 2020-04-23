@@ -1,17 +1,19 @@
 <?php
-include_once("lib/input/renderers/InputRenderer.php");
+include_once("lib/input/renderers/InputField.php");
 
-class PasswordField extends InputTagRenderer {
+class PasswordField extends InputFieldTag
+{
 
-  public function __construct()
-  {
-      parent::__construct();
+    public function __construct()
+    {
+        parent::__construct();
 
-      $this->setClassName("PasswordField");
-      
-      $this->setFieldAttribute("type", "password");
+//        $this->setClassName("PasswordField");
 
-  }
+        $this->setFieldAttribute("type", "password");
+
+    }
 
 }
+
 ?>

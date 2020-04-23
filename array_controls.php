@@ -3,109 +3,106 @@ include_once("session.php");
 
 include_once("class/pages/DemoPage.php");
 
-
 $page = new DemoPage();
-
 
 $form = new InputForm();
 
+$textField = new ArrayDataInput("textField", "Text", 0);
+$textField->allow_dynamic_addition = true;
+$textField->setRenderer(new TextField());
+$textField->setValidator(new EmptyValueValidator());
+$textField->setProcessor(new BeanPostProcessor());
+$form->addField($textField);
+
+$textArea = new ArrayDataInput("textArea", "Text Area", 1);
+$textArea->allow_dynamic_addition = true;
+$textArea->setRenderer(new TextArea());
+$textArea->setValidator(new EmptyValueValidator());
+$textArea->setProcessor(new BeanPostProcessor());
+$form->addField($textArea);
 
 
-$field_text = new ArrayInputField("text", "Text", 0);
-$field_text->allow_dynamic_addition = true;
-$field_text->setRenderer(new TextField());
-$field_text->setValidator(new EmptyValueValidator());
-$field_text->setProcessor(new BeanPostProcessor());
-$form->addField($field_text);
+$select_items = new ArraySelector(array("Select Item 1", "Select Item 2", "Select Item 3"), "item_id", "item_value");
 
-$f1 = new ArrayInputField("field1", "TextArea", 1);
-$f1->allow_dynamic_addition = true;
-$f1->setRenderer(new TextArea());
-$f1->setValidator(new EmptyValueValidator());
-$f1->setProcessor(new BeanPostProcessor());
-$form->addField($f1);
-
-$aw2 = new ArraySelector(array("Select Item 1", "Select Item 2", "Select Item 3"),"item_id", "item_value");
-
-$f2 = new ArrayInputField("field2", "Select", 1);
-$f2->allow_dynamic_addition = true;
+$selectField = new ArrayDataInput("selectField", "Select", 1);
+$selectField->allow_dynamic_addition = true;
 
 $sr = new SelectField();
-$sr->setSource($aw2);
-$sr->list_key="item_id";
-$sr->list_label="item_value";
+$sr->setSource($select_items);
+$sr->list_key = "item_id";
+$sr->list_label = "item_value";
 
-$f2->setRenderer($sr);
-$f2->setValidator(new EmptyValueValidator());
-$f2->setProcessor(new BeanPostProcessor());
-$form->addField($f2);
-
-
-$f8 = new ArrayInputField("field8", "Date", 1);
-$f8->allow_dynamic_addition = true;
-
-$f8->setRenderer(new DateField());
-$f8->setValidator(new DateValidator());
-$f8->setProcessor(new DateInputProcessor());
-$form->addField($f8);
+$selectField->setRenderer($sr);
+$selectField->setValidator(new EmptyValueValidator());
+$selectField->setProcessor(new BeanPostProcessor());
+$form->addField($selectField);
 
 
+$dateField = new ArrayDataInput("dateField", "Date", 1);
+$dateField->allow_dynamic_addition = true;
+
+$dateField->setRenderer(new DateField());
+$dateField->setValidator(new DateValidator());
+$dateField->setProcessor(new DateInputProcessor());
+$form->addField($dateField);
 
 
+$check_items = new ArraySelector(array("Item1", "Item2", "Item3"), "item_id", "item_value");
+
+$checkField = new ArrayDataInput("checkField", "Checkbox", 1);
+$checkField->allow_dynamic_addition = true;
+
+$cr = new CheckField();
+$cr->setSource($check_items);
+$cr->list_key = "item_value";
+$cr->list_label = "item_value";
+
+$checkField->setRenderer($cr);
+$checkField->setValidator(new EmptyValueValidator());
+//???
+//$checkField->getValidator()->require_array_value = true;
+
+$checkField->setProcessor(new BeanPostProcessor());
+$form->addField($checkField);
 
 
-$aw = new ArraySelector(array("Item1", "Item2", "Item3"), "item_id", "item_value");
+$radio_items = new ArraySelector(array("Radio Item1", "Radio Item2", "Radio Item3"), "item_id", "item_value");
 
-$f16 = new ArrayInputField("field16", "Checkbox", 1);
-$f16->allow_dynamic_addition = true;
+$radioField = new ArrayDataInput("radioField", "Radio Button", 1);
+$radioField->allow_dynamic_addition = true;
 
-$r16 = new CheckField();
-$r16->setSource($aw);
-$r16->list_key = "item_value";
-$r16->list_label = "item_value";
-$f16->setRenderer($r16);
-$f16->setValidator(new EmptyValueValidator());
-$f16->setProcessor(new BeanPostProcessor());
-$form->addField($f16);
+$rr = new RadioField();
+$rr->setSource($radio_items);
+$rr->list_key = "item_value";
+$rr->list_label = "item_value";
 
-
-
-
-$aw3 = new ArraySelector(array("Radio Item1", "Radio Item2", "Radio Item3"),"item_id", "item_value");
-
-$f19 = new ArrayInputField("field19", "Radio", 1);
-$f19->allow_dynamic_addition = true;
-
-$r19 = new RadioField();
-$r19->setSource($aw3);
-$r19->list_key = "item_value";
-$r19->list_label = "item_value";
-$f19->setRenderer($r19);
-$f19->setValidator(new EmptyValueValidator());
-$f19->setProcessor(new BeanPostProcessor());
-$form->addField($f19);
+$radioField->setRenderer($rr);
+$radioField->setValidator(new EmptyValueValidator());
+$radioField->setProcessor(new BeanPostProcessor());
+$form->addField($radioField);
 
 
-$f17 = new ArrayInputField("field17", "Phone", 1);
-$f17->allow_dynamic_addition = true;
-$f17->add_field_text = "Add Phone";
-$f17->source_label_visible = true;
-$f17->append_offset = -1;
-$f17->setRenderer(new PhoneField());
-$f17->setValidator(new PhoneValidator());
-$f17->setProcessor(new PhoneInputProcessor());
-$form->addField($f17);
+$phoneField = new ArrayDataInput("phoneField", "Phone", 1);
+$phoneField->allow_dynamic_addition = true;
+$phoneField->add_field_text = "Add Phone";
+$phoneField->source_label_visible = true;
+$phoneField->append_offset = -1;
+
+$phoneField->setRenderer(new PhoneField());
+$phoneField->setValidator(new PhoneValidator());
+$phoneField->setProcessor(new PhoneInputProcessor());
+$form->addField($phoneField);
 
 
-$f18 = new ArrayInputField("field18", "Time", 1);
-$f18->allow_dynamic_addition = true;
-$f18->add_field_text = "Add Time";
-$f18->source_label_visible = true;
-$f18->append_offset = -1;
-$f18->setRenderer(new TimeField());
-$f18->setValidator(new TimeValidator());
-$f18->setProcessor(new TimeInputProcessor());
-$form->addField($f18);
+$timeField = new ArrayDataInput("timeField", "Time", 1);
+$timeField->allow_dynamic_addition = true;
+//$f18->add_field_text = "Add Time";
+//$f18->source_label_visible = true;
+//$f18->append_offset = -1;
+$timeField->setRenderer(new TimeField());
+$timeField->setValidator(new TimeValidator());
+$timeField->setProcessor(new TimeInputProcessor());
+$form->addField($timeField);
 
 $form_render = new FormRenderer();
 $form_render->setAttribute("name", "myform");
@@ -116,16 +113,14 @@ $form->setRenderer($form_render);
 $form->setProcessor(new FormProcessor());
 
 
-
 $form->getProcessor()->processForm($form);
 
-$page->beginPage();
-
+$page->startRender();
 
 
 $form_render->renderForm($form);
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

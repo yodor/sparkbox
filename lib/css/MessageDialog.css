@@ -1,5 +1,3 @@
-
-
 /*.SimplePanel {
 
   position:relative;
@@ -26,128 +24,132 @@
 }*/
 
 /* message dialog popups */
-.PopupPanel
-{
-  font-family:"Arial";
-  color:black;
-  position:absolute;
-  z-index:100;
-  display:none;
-  
+.PopupPanel {
+    font-family: "Arial";
+    color: black;
+    position: absolute;
+    z-index: 100;
+    display: none;
 
-  text-align:left;
 
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-radius: 10px;
+    text-align: left;
 
-  border:1px solid #eeeeee;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
 
-  background-color: #EEEEEE;
-  background: -webkit-gradient(linear, 0 0, 0 bottom, from(#EEEEEE), to(#CCCCCC));
-  background: -webkit-linear-gradient(#EEEEEE, #CCCCCC);
-  background: -moz-linear-gradient(#EEEEEE, #CCCCCC);
-  background: -ms-linear-gradient(#EEEEEE, #CCCCCC);
-  background: -o-linear-gradient(#EEEEEE, #CCCCCC);
-  background: linear-gradient(#EEEEEE, #CCCCCC);
+    border: 1px solid #eeeeee;
 
-  -webkit-box-shadow: #666 0px 2px 3px;
-  -moz-box-shadow: #666 0px 2px 3px;
-  box-shadow: #666 0px 2px 3px;
+    background-color: #EEEEEE;
+    background: -webkit-gradient(linear, 0 0, 0 bottom, from(#EEEEEE), to(#CCCCCC));
+    background: -webkit-linear-gradient(#EEEEEE, #CCCCCC);
+    background: -moz-linear-gradient(#EEEEEE, #CCCCCC);
+    background: -ms-linear-gradient(#EEEEEE, #CCCCCC);
+    background: -o-linear-gradient(#EEEEEE, #CCCCCC);
+    background: linear-gradient(#EEEEEE, #CCCCCC);
+
+    -webkit-box-shadow: #666 0px 2px 3px;
+    -moz-box-shadow: #666 0px 2px 3px;
+    box-shadow: #666 0px 2px 3px;
 }
+
 .PopupPanel .caption {
 
-  position:relative;
-  font-weight:bold;
-  font-size:1.3em;
+    position: relative;
+    font-weight: bold;
+    font-size: 1.3em;
 
 
-  cursor:default;
+    cursor: default;
 
 
-  -webkit-border-radius: 10px 10px 0px 0px ;
-  -moz-border-radius: 10px 10px 0px 0px;
-  border-radius:  10px 10px 0px 0px;
+    -webkit-border-radius: 10px 10px 0px 0px;
+    -moz-border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 10px 0px 0px;
 
-  padding:5px;
-  padding-left:10px;
+    padding: 5px;
+    padding-left: 10px;
 
-  color:white;
+    color: white;
 
-  background-color:#525252;
+    background-color: #525252;
 
-  background: -webkit-gradient(linear, 0 0, 0 bottom, from(#525252), to(#000000));
-  background: -webkit-linear-gradient(#525252, #000000);
-  background: -moz-linear-gradient(#525252, #000000);
-  background: -ms-linear-gradient(#525252, #000000);
-  background: -o-linear-gradient(#525252, #000000);
-  background: linear-gradient(#525252, #000000);
-  
-  cursor:move;
+    background: -webkit-gradient(linear, 0 0, 0 bottom, from(#525252), to(#000000));
+    background: -webkit-linear-gradient(#525252, #000000);
+    background: -moz-linear-gradient(#525252, #000000);
+    background: -ms-linear-gradient(#525252, #000000);
+    background: -o-linear-gradient(#525252, #000000);
+    background: linear-gradient(#525252, #000000);
+
+    cursor: move;
 }
+
 .PopupPanel .caption [action="close"] {
-  float:right;
-  min-width:0px;
-  cursor:pointer;
+    float: right;
+    min-width: 0px;
+    cursor: pointer;
 }
 
 .PopupPanel .caption .caption_text {
-  
+
 
 }
+
 .PopupPanel .Inner {
-  padding:5px;
+    padding: 5px;
 }
 
 .PopupPanel .message_text {
-  display:inline-block;
-  max-width:100%;
-  vertical-align:top;
-  margin:10px;
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+    margin: 10px;
 }
 
 .PopupPanel .message_icon {
-  width:64px;
-  height:64px;
-  display:inline-block;
-  vertical-align:top;
+    width: 64px;
+    height: 64px;
+    display: inline-block;
+    vertical-align: top;
 }
 
 
 .PopupPanel .buttons_bar {
-  display:block;
+    display: block;
 }
 
 .icon_close_popup {
-  background-image:url("../images/msgpopup/close.png");
-  background-position:center center;
-  background-repeat:no-repeat;
+    background-image: url("../images/msgpopup/close.png");
+    background-position: center center;
+    background-repeat: no-repeat;
 }
+
 .icon_info {
-  background-image:url("../images/msgpopup/exclamation.png");
-  background-position:center center;
-  background-repeat:no-repeat;
+    background-image: url("../images/msgpopup/exclamation.png");
+    background-position: center center;
+    background-repeat: no-repeat;
 }
+
 .icon_question {
-  background-image:url("../images/msgpopup/exclamation.png");
-  background-position:center center;
-  background-repeat:no-repeat;
+    background-image: url("../images/msgpopup/exclamation.png");
+    background-position: center center;
+    background-repeat: no-repeat;
 }
+
 .icon_error {
-  background-image:url("../images/msgpopup/exclamation.png");
-  background-position:center center;
-  background-repeat:no-repeat;
+    background-image: url("../images/msgpopup/exclamation.png");
+    background-position: center center;
+    background-repeat: no-repeat;
 }
-
-
 
 
 .PopupPanel .exception_link {
-  display:block;
-  color:red;
-  font-weight:bold;
+    display: block;
+    color: red;
+    font-weight: bold;
 }
+
 .PopupPanel .exception_details {
-  display:none;
-  visibility:hidden;
+    display: none;
+    visibility: hidden;
 }

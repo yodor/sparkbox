@@ -1,8 +1,9 @@
 
 .InputField.TextField input[type='text'] {
-    font-size:1.1em;
+    font-size: 1.1em;
 }
+
 .InputField.SelectField SELECT {
-    font-size:1.1em;
+    font-size: 1.1em;
 }
 

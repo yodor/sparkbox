@@ -1,7 +1,7 @@
 
 .MenuBar {
 
-  
+
 }
 
 /* Menu */
@@ -13,39 +13,39 @@
     text-align: center;
     margin: 0 auto;
     padding: 0;
-    display:block;
-    
-    background-color:white;
- 
-    z-index:10;
+    display: block;
+
+    background-color: white;
+
+    z-index: 10;
 }
+
 .MenuBar .MenuBarComponent {
-    display:inline-block;
+    display: inline-block;
 }
 
 /* CSS3 position: fixed */
 .MenuBar.fixed {
-    position:fixed;
+    position: fixed;
     width: 100%;
     box-shadow: 0 0 40px #222;
     -webkit-box-shadow: 0 0 40px #222;
     -moz-box-shadow: 0 0 40px #222;
-    z-index:100;
+    z-index: 100;
 }
 
 .MenuBar[name='ConstructedMenu'] {
-    z-index:0;
+    z-index: 0;
 }
 
 
 .MenuBar .MenuBarComponent .MenuBarItemRenderer {
-    display:inline-block;
-    height:auto;
-    font-size:1.2em;
+    display: inline-block;
+    height: auto;
+    font-size: 1.2em;
 }
 
 
-
 .MenuBar .MenuBarComponent .MenuSeparator {
-    display:inline-block;
+    display: inline-block;
 }

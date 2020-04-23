@@ -1,30 +1,32 @@
 <?php
-include_once("lib/input/renderers/InputRenderer.php");
+include_once("lib/input/renderers/InputField.php");
 
-class HiddenField extends InputRenderer {
+class HiddenField extends InputField
+{
 
-  public function __construct()
-  {
-	  parent::__construct();
-	  $this->attributes["type"]="hidden";
+    public function __construct()
+    {
+        parent::__construct();
+        $this->attributes["type"] = "hidden";
 
-  }
+    }
 
 
-  public function renderImpl()
-  {
-	
-	$field_value = $this->field->getValue();
+    public function renderImpl()
+    {
 
-	$field_value=htmlentities(mysql_real_unescape_string($field_value),ENT_QUOTES,"UTF-8");
+        $field_value = $this->field->getValue();
 
-	$this->attributes["value"] = $field_value;
-	$this->attributes["name"] = $this->field->getName();
+        $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");
 
-	$attr = $this->prepareAttributes();
+        $this->attributes["value"] = $field_value;
+        $this->attributes["name"] = $this->field->getName();
 
-	echo "<input $attr >";
-  }
+        $attr = $this->prepareAttributes();
+
+        echo "<input $attr >";
+    }
 
 }
+
 ?>

@@ -1,71 +1,68 @@
 <?php
 include_once("lib/input/validators/IInputValidator.php");
-include_once("lib/input/InputField.php");
+include_once("lib/input/DataInput.php");
 
 class TimeValidator implements IInputValidator
 {
-	
-	public static function isValidTime($value)
-	{
-		$pieces = explode(":",$value);
 
-		if (count($pieces)!=2)  {
-			
-			return false;
-		}
+    public static function isValidTime($value)
+    {
+        $pieces = explode(":", $value);
 
-		$ret = false;
-		try {
-			$hour = $pieces[0];
-			$minute = $pieces[1];
-			
-			TimeValidator::validate($hour, $minute);
-			$ret = true;
-		}
-		catch (Exception $e) {
+        if (count($pieces) != 2) {
 
-		}
-		return $ret;
-	}
+            return false;
+        }
 
-	protected static function validate($hour, $minute)
-	{
-	  
-	  if ($hour<0 || $hour>23) 
-	  {
-		  throw new Exception("Incorrect time: hour");
-	  }
+        $ret = false;
+        try {
+            $hour = $pieces[0];
+            $minute = $pieces[1];
 
-	  if ($minute<0 || $minute>59) 
-	  {
-		  throw new Exception("Incorrect time: minute");
-		  
-	  }
+            TimeValidator::validate($hour, $minute);
+            $ret = true;
+        }
+        catch (Exception $e) {
 
-	  
+        }
+        return $ret;
+    }
 
-	}
-	public function validateInput(InputField $field)
-	{
-		
-		$pieces = explode(":", $field->getValue());
+    protected static function validate($hour, $minute)
+    {
 
-		if (count($pieces)!=2)  {
-			throw new Exception("Incorrect time");
-			
-		}
+        if ($hour < 0 || $hour > 23) {
+            throw new Exception("Incorrect time: hour");
+        }
+
+        if ($minute < 0 || $minute > 59) {
+            throw new Exception("Incorrect time: minute");
+
+        }
 
 
-		$hour = $pieces[0];
-		$minute = $pieces[1];
-		
+    }
+
+    public function validateInput(DataInput $field)
+    {
+
+        $pieces = explode(":", $field->getValue());
+
+        if (count($pieces) != 2) {
+            throw new Exception("Incorrect time");
+
+        }
 
 
-		TimeValidator::validate($hour, $minute);
-		
-		
+        $hour = $pieces[0];
+        $minute = $pieces[1];
 
-	}
+
+        TimeValidator::validate($hour, $minute);
+
+
+    }
 
 }
+
 ?>

@@ -1,31 +1,32 @@
 <?php
-include_once ("lib/forms/InputForm.php");
-include_once ("lib/input/InputFactory.php");
-include_once ("lib/selectors/DBEnumSelector.php");
+include_once("lib/forms/InputForm.php");
+include_once("lib/input/DataInputFactory.php");
+include_once("lib/selectors/DBEnumSelector.php");
 
 class FAQItemInputForm extends InputForm
 {
 
-  public function __construct() 
-  {
-	
-      $field = InputFactory::CreateField(InputFactory::SELECT, "section", "Section", 1);
+    public function __construct()
+    {
 
-      $enm = new DBEnumSelector("faq_items", "section");
-      $rend = $field->getRenderer();
-      $rend->setSource($enm);
-      $rend->list_key="section";
-      $rend->list_label="section";
+        $field = DataInputFactory::Create(DataInputFactory::SELECT, "section", "Section", 1);
 
-      $this->addField($field);
+        $enm = new DBEnumSelector("faq_items", "section");
+        $rend = $field->getRenderer();
+        $rend->setSource($enm);
+        $rend->list_key = "section";
+        $rend->list_label = "section";
 
-      $field = InputFactory::CreateField(InputFactory::TEXTFIELD, "question", "Question", 1);
-      $this->addField($field);
+        $this->addField($field);
 
-      $field = InputFactory::CreateField(InputFactory::TEXTAREA, "answer", "Answer", 1);
-      $this->addField($field);
-	
-  }
+        $field = DataInputFactory::Create(DataInputFactory::TEXTFIELD, "question", "Question", 1);
+        $this->addField($field);
+
+        $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "answer", "Answer", 1);
+        $this->addField($field);
+
+    }
 
 }
+
 ?>

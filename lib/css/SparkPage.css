@@ -1,26 +1,23 @@
 * {
-    font-family:"Exo 2", "sans";
-
+    font-family: "Exo 2", "sans-serif";
 }
 
-body {
-
-    padding:0px;
-    margin:0px;
-    font-size:12px;
-
-}
-html {
-    height:100%;
+HTML {
+    height: 100%;
 }
 
-img {
-    border:0;
+BODY {
+    padding: 0;
+    margin: 0;
+    font-size: 100%;
 }
 
+A IMG INPUT {
+    border: none;
 
-
+}
 
 .clear {
-    clear:both;
+    clear: both;
 }
+

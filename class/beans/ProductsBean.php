@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 class ProductsBean extends DBTableBean
 {
@@ -41,9 +41,9 @@ class ProductsBean extends DBTableBean
  CONSTRAINT `products_ibfk_5` FOREIGN KEY (`catID`) REFERENCES `product_categories` (`catID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8";
 
-    public function __construct() 
+    public function __construct()
     {
-	  parent::__construct("products");
+        parent::__construct("products");
     }
 
 }

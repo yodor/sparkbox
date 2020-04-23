@@ -29,17 +29,16 @@ $form->setProcessor($proc);
 
 $proc->processForm($form);
 
-if ($proc->getStatus()== IFormProcessor::STATUS_OK) {
-  Session::set("alert", "Configuration Updated");
-  header("Location: seo.php");
-  exit;
+if ($proc->getStatus() == IFormProcessor::STATUS_OK) {
+    Session::Set("alert", "Configuration Updated");
+    header("Location: seo.php");
+    exit;
 }
 
 
-
-$page->beginPage();
+$page->startRender();
 
 $form->getRenderer()->renderForm($form);
 
-$page->finishPage();
+$page->finishRender();
 ?>

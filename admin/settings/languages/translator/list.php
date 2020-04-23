@@ -10,13 +10,13 @@ $page->checkAccess(ROLE_CONFIG_MENU);
 
 $bean = new SiteTextsBean();
 
-$menu=array();
+$menu = array();
 
 $tr = new LanguagesBean();
 $tr->startIterator();
 
-while ($tr->fetchNext($row)){
-	$menu[] = new MenuItem("Translate For ".$row["lang_code"], "phrases.php?langID=".$row["langID"],"applications-development-translation.png");
+while ($tr->fetchNext($row)) {
+    $menu[] = new MenuItem("Translate For " . $row["lang_code"], "phrases.php?langID=" . $row["langID"], "applications-development-translation.png");
 }
 
 
@@ -24,29 +24,26 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-
-
-$view = new TableView( new BeanResultIterator($bean));
+$view = new TableView(new BeanResultIterator($bean));
 $view->items_per_page = 30;
-$view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
-$view->addColumn(new TableColumn("value","Phrase"));
-$view->addColumn(new TableColumn("hash_value","Hash Code"));
-$view->addColumn(new TableColumn("actions","Actions"));
+$view->addColumn(new TableColumn($bean->key(), "ID"));
+$view->addColumn(new TableColumn("value", "Phrase"));
+$view->addColumn(new TableColumn("hash_value", "Hash Code"));
+$view->addColumn(new TableColumn("actions", "Actions"));
 
 //command actions edit/delete
 $act = new ActionsTableCellRenderer();
-$act->addAction( $h_delete->createAction() );
+$act->addAction($h_delete->createAction());
 
 $view->getColumn("actions")->setCellRenderer($act);
 
 $view->setCaption("Available Site Phrases");
 
 
-
-$page->beginPage($menu);
+$page->startRender($menu);
 $page->renderPageCaption();
 
 $view->render();
-$page->finishPage();
+$page->finishRender();
 
 ?>

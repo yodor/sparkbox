@@ -9,23 +9,21 @@ include_once("class/beans/ProductColorsBean.php");
 include_once("lib/components/GalleryView.php");
 
 
+$rc = new ReferenceKeyPageChecker(new ProductColorsBean(), "../list.php" . queryString($_GET));
 
-$rc = new ReferenceKeyPageChecker(new ProductColorsBean(), "../list.php".queryString($_GET));
-
-$menu=array();
-
+$menu = array();
 
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
 
-$action_back = new Action("", Session::get("product.color_scheme"), array());
+$action_back = new Action("", Session::Get("product.color_scheme"), array());
 $action_back->setAttribute("action", "back");
 $action_back->setAttribute("title", "Back");
 $page->addAction($action_back);
 
-$action_add = new Action("", "add.php?".$rc->ref_key."=".$rc->ref_id, array());
+$action_add = new Action("", "add.php?" . $rc->ref_key . "=" . $rc->ref_id, array());
 $action_add->setAttribute("action", "add");
 $action_add->setAttribute("title", "Add Photo");
 $page->addAction($action_add);
@@ -36,11 +34,11 @@ $page->addAction($action_add);
 // $page->addAction($action_add);
 $page->setAccessibleTitle("Color Scheme Photos");
 
-$page->setCaption( tr("Color Scheme Photos").": ".$rc->ref_row["color"] );
+$page->setCaption(tr("Color Scheme Photos") . ": " . $rc->ref_row["color"]);
 
 
 $bean = new ProductColorPhotosBean();
-$bean->setFilter($rc->ref_key."='".$rc->ref_id."'");
+$bean->setFilter($rc->ref_key . "='" . $rc->ref_id . "'");
 
 
 $h_delete = new DeleteItemRequestHandler($bean);
@@ -54,16 +52,16 @@ $gv->blob_field = "photo";
 
 $gv->initView($bean, "add.php", $rc->ref_key, $rc->ref_id);
 
-Session::set("color_scheme.photos", $page->getPageURL());
+Session::Set("color_scheme.photos", $page->getPageURL());
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 $page->renderPageCaption();
 
 $gv->render();
 
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

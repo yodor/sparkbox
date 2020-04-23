@@ -5,14 +5,12 @@ include_once("class/forms/ProductClassInputForm.php");
 include_once("class/beans/ProductClassesBean.php");
 include_once("class/beans/ProductsBean.php");
 
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
-$action_back = new Action("", Session::get("classes.list"), array());
+$action_back = new Action("", Session::Get("classes.list"), array());
 $action_back->setAttribute("action", "back");
 $action_back->setAttribute("title", "Back to Classes");
 $page->addAction($action_back);
@@ -26,15 +24,15 @@ $view = new InputFormView(new ProductClassesBean(), new ProductClassInputForm())
 
 $view->processInput();
 
-Session::set("attributes.list", $page->getPageURL());
+Session::Set("attributes.list", $page->getPageURL());
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 $page->renderPageCaption();
 
 $view->render();
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

@@ -1,35 +1,41 @@
 .admin_layout TR {
-    display:block;
+    display: block;
 }
+
 .admin_layout .admin_header {
-    min-height:62px;
-    max-height:62px;
-    display:block;
+    min-height: 62px;
+    max-height: 62px;
+    display: block;
 }
+
 .admin_layout .admin_header .LocationPath {
-    display:none;
+    display: none;
 }
 
 .admin_layout .admin_footer {
-    min-height:62px;
-    max-height:62px;
-    text-align:center;
-    display:block;
+    min-height: 62px;
+    max-height: 62px;
+    text-align: center;
+    display: block;
 }
+
 .admin_layout .admin_footer .copy {
-    display:block;
-    
+    display: block;
+
 }
+
 .admin_layout .admin_footer .logo {
-    text-align:center;
-    display:inline-block;
-    float:none;
+    text-align: center;
+    display: inline-block;
+    float: none;
 }
+
 .admin_layout .left_menu {
-    display:block;
-    height:auto;
-    
+    display: block;
+    height: auto;
+
 }
+
 /*.admin_layout .left_menu .MenuBarComponent  {
     display:none;
     border-radius:0px 0px 0px 10px;
@@ -37,6 +43,6 @@
 
 
 .admin_layout .page_area {
-    display:block;
-    height:auto;
+    display: block;
+    height: auto;
 }

@@ -1,6 +1,4 @@
 <?php
-include_once("session.php");
-
 include_once("lib/beans/DBTableBean.php");
 include_once("lib/components/TableView.php");
 include_once("lib/components/ListView.php");
@@ -8,14 +6,20 @@ include_once("lib/iterators/BeanResultIterator.php");
 include_once("lib/components/renderers/items/GalleryViewItemRenderer.php");
 include_once("lib/components/renderers/IActionsRenderer.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
-include_once ("lib/components/renderers/IPhotoRenderer.php");
+include_once("lib/components/renderers/IPhotoRenderer.php");
 
-class GalleryView extends Component implements IHeadRenderer
+class GalleryView extends Component
 {
-    protected $photos_bean;
-    protected $refkey="";
-    protected $refval=-1;
+    /**
+     * @var DBTableBean
+     */
+    protected $photos_bean = NULL;
+
+    protected $refkey = "";
+    protected $refval = -1;
+
     protected $view = NULL;
+
     protected $edit_script;
 
     protected $iphoto_renderer;
@@ -26,204 +30,206 @@ class GalleryView extends Component implements IHeadRenderer
 
     protected $view_mode = GalleryView::MODE_UNINITIALIZED;
 
-    
+
     public $blob_field = "item_photo";
-    
+
     public function getViewMode()
     {
-	return $this->view_mode;
+        return $this->view_mode;
 
     }
+
     public function getPhotoRenderer()
     {
-	return $this->iphoto_renderer;
+        return $this->iphoto_renderer;
     }
+
     public function getRefKey()
     {
-	return $this->refkey;
+        return $this->refkey;
     }
+
     public function getRefVal()
     {
-	return $this->refval;
+        return $this->refval;
     }
+
+    /**
+     * @return DBTableBean|null
+     */
     public function getBean()
     {
-	return $this->photos_bean;
+        return $this->photos_bean;
     }
+
     public function getEditScript()
     {
-	return $this->edit_script;
+        return $this->edit_script;
     }
-    public function initView(DBTableBean $bean,  $edit_script="gallery_add.php", $refkey="", $refval=-1)
+
+    public function initView(DBTableBean $bean, $edit_script = "gallery_add.php", $refkey = "", $refval = -1)
     {
-	$bkey = $bean->getPrKey();
-      
-	$this->photos_bean = $bean;
-	$this->refkey = $refkey;
-	$this->refval = $refval;
-	$this->edit_script = $edit_script;
+        $bkey = $bean->key();
 
-	$view = false;
-	if (strcmp_isset("view","list")) { 
+        $this->photos_bean = $bean;
+        $this->refkey = $refkey;
+        $this->refval = $refval;
+        $this->edit_script = $edit_script;
 
-	    $view = new TableView(new BeanResultIterator($bean));
-      //   $view->addColumn(new TableColumn("ppID", "ID"));
+        $view = false;
+        if (strcmp_isset("view", "list")) {
 
-	    if ($this->photos_bean instanceof OrderedDataBean) {
-		    $view->addColumn(new TableColumn("position","Position"));
-	    }
-	    $view->addColumn(new TableColumn($this->blob_field,"Photo"));
-	    $view->addColumn(new TableColumn("caption","Caption"));
-	    $view->addColumn(new TableColumn("date_upload","Date Upload"));
+            $view = new TableView(new BeanResultIterator($bean));
+            //   $view->addColumn(new TableColumn("ppID", "ID"));
 
-	    $photos_class = get_class($bean);
-	    $photos_bean = new $photos_class;
+            if ($this->photos_bean instanceof OrderedDataBean) {
+                $view->addColumn(new TableColumn("position", "Position"));
+            }
+            $view->addColumn(new TableColumn($this->blob_field, "Photo"));
+            $view->addColumn(new TableColumn("caption", "Caption"));
+            $view->addColumn(new TableColumn("date_upload", "Date Upload"));
 
-	    $renderer = new TableImageCellRenderer($photos_bean, IPhotoRenderer::RENDER_THUMB, 64,64);
+            $photos_class = get_class($bean);
+            $photos_bean = new $photos_class;
 
-	    $view->getColumn($this->blob_field)->setCellRenderer($renderer);
-	    $view->getColumn($this->blob_field)->getHeaderCellRenderer()->setSortable(false);
+            $renderer = new TableImageCellRenderer($photos_bean, IPhotoRenderer::RENDER_THUMB, 64, 64);
 
-	    $view->addColumn(new TableColumn("actions","Actions"));
+            $view->getColumn($this->blob_field)->setCellRenderer($renderer);
+            $view->getColumn($this->blob_field)->getHeaderCellRenderer()->setSortable(false);
 
-	    $act = new ActionsTableCellRenderer();
+            $view->addColumn(new TableColumn("actions", "Actions"));
 
-	    
-	    $this->initActions($act);
-
-	    $view->getColumn("actions")->setCellRenderer($act);
-	    $this->iphoto_renderer = $renderer;
-	    $this->view_mode = GalleryView::MODE_LIST;
-	}
-	else  {
-	    $view = new ListView(new BeanResultIterator($bean));
-
-	    $renderer = new GalleryViewItemRenderer($this);
-	    $renderer->setRenderMode(IPhotoRenderer::RENDER_CROP);
-	    $renderer->setThumbnailSize(-1,256);
-
-	    $this->initActions($renderer);
-
-	    $view->setItemRenderer($renderer);
-
-	    $view->items_per_page = 9;
-
-	    $this->iphoto_renderer = $renderer;
-	    $this->view_mode = GalleryView::MODE_GRID;
-
-	}
+            $act = new ActionsTableCellRenderer();
 
 
-	if ($this->photos_bean instanceof OrderedDataBean) {
-	    $view->setDefaultOrder(" position ASC ");
-	}
+            $this->initActions($act);
 
-	$view->getTopPaginator()->view_modes_enabled = true;
-	$view->getTopPaginator()->setCaption($this->caption);
-	$this->view = $view;
+            $view->getColumn("actions")->setCellRenderer($act);
+            $this->iphoto_renderer = $renderer;
+            $this->view_mode = GalleryView::MODE_LIST;
+        }
+        else {
+            $view = new ListView(new BeanResultIterator($bean));
+
+            $renderer = new GalleryViewItemRenderer($this);
+            $renderer->setRenderMode(IPhotoRenderer::RENDER_CROP);
+            $renderer->setThumbnailSize(-1, 256);
+
+            $this->initActions($renderer);
+
+            $view->setItemRenderer($renderer);
+
+            $view->items_per_page = 9;
+
+            $this->iphoto_renderer = $renderer;
+            $this->view_mode = GalleryView::MODE_GRID;
+
+        }
+
+
+        if ($this->photos_bean instanceof OrderedDataBean) {
+            $view->setDefaultOrder(" position ASC ");
+        }
+
+        $view->getTopPaginator()->view_modes_enabled = true;
+        $view->getTopPaginator()->setCaption($this->caption);
+        $this->view = $view;
 
     }
+
     public function setGridItemRenderer(IItemRenderer $r)
     {
-	$this->initActions($r);
+        $this->initActions($r);
 
-	$this->view->setItemRenderer($r);
+        $this->view->setItemRenderer($r);
     }
+
     protected function initActions(IActionsRenderer $act)
     {
-	$bkey = $this->photos_bean->getPrKey();
+        $bkey = $this->photos_bean->key();
 
-	$ref_param = new ActionParameter($this->refkey,$this->refkey);
-
-	
-	$edit_params = array(new ActionParameter("editID",$bkey));
-	if (strlen($this->refkey>0))$edit_params[] = $ref_param;
+        $ref_param = new ActionParameter($this->refkey, $this->refkey);
 
 
-	$act->addAction(new Action("Edit", $this->edit_script, $edit_params) );
-
-	$act->addAction(new PipeSeparatorAction());
-
-	$delete_params = array(new ActionParameter("item_id", $bkey));
-	if (strlen($this->refkey>0))$delete_params[] = $ref_param;
+        $edit_params = array(new ActionParameter("editID", $bkey));
+        if (strlen($this->refkey > 0)) $edit_params[] = $ref_param;
 
 
+        $act->addAction(new Action("Edit", $this->edit_script, $edit_params));
 
-	$act->addAction( new Action("Delete", "?cmd=delete_item", $delete_params ) );
+        $act->addAction(new PipeSeparatorAction());
 
-	if ($this->photos_bean instanceof OrderedDataBean) {
-	
-	    $act->addAction(new RowSeparatorAction());
-	    $act->addAction(new RowSeparatorAction());
+        $delete_params = array(new ActionParameter("item_id", $bkey));
+        if (strlen($this->refkey > 0)) $delete_params[] = $ref_param;
 
-	    $repos_param = array(
-	      new ActionParameter("item_id",$bkey), 
-	      new ActionParameter("#".get_class($this->photos_bean).".%$bkey%","", true)
-	    );
 
-	    if (strlen($this->refkey>0))$repos_param[] = $ref_param;
+        $act->addAction(new Action("Delete", "?cmd=delete_item", $delete_params));
 
-	    $act->addAction(new Action("First", "?cmd=reposition&type=first", $repos_param) ); 
-	    $act->addAction(new PipeSeparatorAction());
-	    $act->addAction(new Action("Last", "?cmd=reposition&type=last", $repos_param) ); 
-	    $act->addAction(new RowSeparatorAction());
-	    $act->addAction(new Action("Previous", "?cmd=reposition&type=previous", $repos_param) );
-	    $act->addAction(new PipeSeparatorAction());
-	    $act->addAction(new Action("Next", "?cmd=reposition&type=next", $repos_param) );
+        if ($this->photos_bean instanceof OrderedDataBean) {
 
-	    $act->addAction(new RowSeparatorAction());
+            $act->addAction(new RowSeparatorAction());
+            $act->addAction(new RowSeparatorAction());
 
-	    $act->addAction(
-	      new Action(
-		    "Choose Position", 
-		    "javascript:choosePosition(\"%$bkey%\",{$this->refval})", 
-		    array(new ActionParameter($bkey, $bkey))
-	      ) 
-	    );
-	}
+            $repos_param = array(new ActionParameter("item_id", $bkey), new ActionParameter("#" . get_class($this->photos_bean) . ".%$bkey%", "", true));
+
+            if (strlen($this->refkey > 0)) $repos_param[] = $ref_param;
+
+            $act->addAction(new Action("First", "?cmd=reposition&type=first", $repos_param));
+            $act->addAction(new PipeSeparatorAction());
+            $act->addAction(new Action("Last", "?cmd=reposition&type=last", $repos_param));
+            $act->addAction(new RowSeparatorAction());
+            $act->addAction(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
+            $act->addAction(new PipeSeparatorAction());
+            $act->addAction(new Action("Next", "?cmd=reposition&type=next", $repos_param));
+
+            $act->addAction(new RowSeparatorAction());
+
+            $act->addAction(new Action("Choose Position", "javascript:choosePosition(\"%$bkey%\",{$this->refval})", array(new ActionParameter($bkey, $bkey))));
+        }
     }
+
     public function getView()
     {
-	return $this->view;
+        return $this->view;
     }
-  
+
     public function startRender()
     {
 
     }
+
     public function finishRender()
     {
 
     }
-    public function renderScript()
+
+    public function requiredStyle()
     {
-    
-    }
-    public function renderStyle()
-    {
-	  echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/GalleryView.css' type='text/css' >";
-	  echo "\n";
+        $arr = parent::requiredStyle();
+        $arr[] = SITE_ROOT . "lib/css/GalleryView.css";
+        return $arr;
     }
 
     public function renderImpl()
     {
-	$this->view->render();
-?>
-<script type='text/javascript'>
-$(document).on("GalleryView", function(e){
-    if ("."+e.rel != "."+"<?php echo get_class($this->photos_bean);?>") return;
-    switch (e.message) {
-      case "onCloseImagePopup":
-	window.location.href="#"+e.rel+"."+e.position;
-	break;
+        $this->view->render();
+        ?>
+        <script type='text/javascript'>
+            $(document).on("GalleryView", function (e) {
+                if ("." + e.rel != "." + "<?php echo get_class($this->photos_bean);?>") return;
+                switch (e.message) {
+                    case "onCloseImagePopup":
+                        window.location.href = "#" + e.rel + "." + e.position;
+                        break;
 
-    }
-});
-</script>
-<?php
+                }
+            });
+        </script>
+        <?php
 
     }
 
 
 }
+
 ?>

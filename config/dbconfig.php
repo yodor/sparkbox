@@ -5,11 +5,11 @@ $prop = new DBConnectionProperties();
 $prop->driver = "MySQLi";
 // $prop->driver = "PDOMySQL";
 
-$prop->database="store_demo";
-$prop->user="store_demo";
-$prop->pass="store_demo";
-$prop->host="localhost";
-$prop->port="3306";
+$prop->database = "sparkbox_demo";
+$prop->user = "sparkbox";
+$prop->pass = "123456";
+$prop->host = "127.0.0.1";
+$prop->port = "3306";
 $prop->is_pdo = false;
 
 
@@ -31,8 +31,6 @@ DBConnections::addConnection($prop);
 // $prop1->setConnectionName("mysqli_conn");
 // 
 // DBConnections::addConnection($prop1);
-
-
 
 
 ?>

@@ -2,11 +2,11 @@
 
 interface IRequestProcessor
 {
-  
-  
-  public function shouldProcess();
-  public function processHandler();
-  
+
+    public function shouldProcess();
+
+    public function processHandler();
+
 }
 
 ?>

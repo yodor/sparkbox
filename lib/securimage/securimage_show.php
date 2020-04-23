@@ -50,7 +50,7 @@
 
 require_once dirname(__FILE__) . '/securimage.php';
 
-$img = new Securimage(array('captcha_type' => Securimage::SI_CAPTCHA_MATHEMATIC ));
+$img = new Securimage(array('captcha_type' => Securimage::SI_CAPTCHA_MATHEMATIC));
 
 // You can customize the image by making changes below, some examples are included - remove the "//" to uncomment
 

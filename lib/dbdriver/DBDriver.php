@@ -1,95 +1,108 @@
 <?php
 include_once("lib/dbdriver/DBConnections.php");
 
-abstract class DBDriver {
+abstract class DBDriver
+{
 
-        public $PDO = false;
-        
-	protected $error="";
+    public $PDO = false;
 
-	protected static $g_db = NULL;
-	
-	public static function get()
-	{
-	  return self::$g_db;
-	}
-	public static function set(DBDriver $connection)
-	{
-	  self::$g_db = $connection;
-	}
-	
-	public abstract function __construct(DBConnectionProperties $conn, $open_new=true);
+    protected $error = "";
 
-	public function __destruct()
-	{
-		$this->shutdown();
-	}
-	function close(){	}
+    protected static $g_db = NULL;
 
-	abstract public function query($str);
+    public static function Get()
+    {
+        return self::$g_db;
+    }
 
+    public static function Set(DBDriver $connection)
+    {
+        self::$g_db = $connection;
+    }
 
-	abstract public function fetch($str);
-	abstract public function fetchRow($str);
-	abstract public function fetchArray($str);
+    public abstract function __construct(DBConnectionProperties $conn, $open_new = true);
 
-	abstract public function dateTime($add_days=0, $interval_type=" DAY ");
+    public function __destruct()
+    {
+        $this->shutdown();
+    }
 
-	//return default connection to database
-	public static function factory($open_new=true, $use_persistent=false, $conn_name="default")
-	{
-                try {
-			//DBConnectionProperties
-			$conn_props = DBConnections::getConnection($conn_name);
+    function close()
+    {
+    }
 
-			$currDriver = false;
-			switch ($conn_props->driver)
-			{
-				case "MySQLi":
-						include_once("lib/dbdriver/MySQLiDriver.php");
-						$currDriver = new MySQLiDriver($conn_props, $open_new, $use_persistent);
-						break;
-
-				case "MySQL":
-						include_once("lib/dbdriver/MySQLDriver.php");
-						$currDriver = new MySQLDriver($conn_props, $open_new, $use_persistent);
-						break;
-                                case "PDOMySQL":
-                                                include_once("lib/dbdriver/PDOMySQLDriver.php");
-						$currDriver = new PDOMySQLDriver($conn_props, $open_new, $use_persistent);
-						break;
-
-			}
-			return $currDriver;
-                }
-                catch (Exception $e) {
-                    echo "DBDriver::factory() Unable to connect to database: ".$e->getMessage();
-                }
-	}
-	
-	public static function create($open_new=true, $use_persistent=false, $conn_name="default")
-	{
-		$g_db = DBDriver::factory($open_new, $use_persistent, $conn_name);
-		DBDriver::set($g_db);
-	}
-	
-	public function getError()
-	{
-		return $this->error;
-	}
-	abstract public function lastID();
+    abstract public function query($str);
 
 
-	abstract public function commit();
-	abstract public function rollback();
-	abstract public function transaction();
-	abstract public function numRows($res);
-	abstract public function numFields($res);
-	abstract public function fieldName($res,$pos);
-	abstract public function escapeString($data);
-	abstract protected function shutdown();
-	abstract protected function queryFields($table);
-	abstract protected function tableExists($table);
+    abstract public function fetch($str);
+
+    abstract public function fetchRow($str);
+
+    abstract public function fetchArray($str);
+
+    abstract public function dateTime($add_days = 0, $interval_type = " DAY ");
+
+    //return default connection to database
+    public static function Factory($open_new = true, $use_persistent = false, $conn_name = "default")
+    {
+
+        //DBConnectionProperties
+        $conn_props = DBConnections::getConnection($conn_name);
+
+        $currDriver = false;
+        switch ($conn_props->driver) {
+            case "MySQLi":
+                include_once("lib/dbdriver/MySQLiDriver.php");
+                $currDriver = new MySQLiDriver($conn_props, $open_new, $use_persistent);
+                break;
+
+            case "MySQL":
+                include_once("lib/dbdriver/MySQLDriver.php");
+                $currDriver = new MySQLDriver($conn_props, $open_new, $use_persistent);
+                break;
+            case "PDOMySQL":
+                include_once("lib/dbdriver/PDOMySQLDriver.php");
+                $currDriver = new PDOMySQLDriver($conn_props, $open_new, $use_persistent);
+                break;
+
+        }
+        return $currDriver;
+
+    }
+
+    public static function create($open_new = true, $use_persistent = false, $conn_name = "default")
+    {
+        $g_db = DBDriver::Factory($open_new, $use_persistent, $conn_name);
+        DBDriver::Set($g_db);
+    }
+
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    abstract public function lastID();
+
+
+    abstract public function commit();
+
+    abstract public function rollback();
+
+    abstract public function transaction();
+
+    abstract public function numRows($res);
+
+    abstract public function numFields($res);
+
+    abstract public function fieldName($res, $pos);
+
+    abstract public function escapeString($data);
+
+    abstract protected function shutdown();
+
+    abstract protected function queryFields($table);
+
+    abstract protected function tableExists($table);
 
 }
 

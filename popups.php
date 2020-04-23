@@ -7,13 +7,14 @@ $page = new DemoPage();
 
 function dumpCSS()
 {
-  echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/InputRenderer.css' type='text/css' >";
-  echo "\n";
+    echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/InputRenderer.css' type='text/css' >";
+    echo "\n";
 }
+
 $dialog = new ConfirmMessageDialog();
 
 
-$page->beginPage();
+$page->startRender();
 
 echo "<div class='InputField TextField'>";
 echo "<input type=text  value='Sample Text Message'>";
@@ -21,7 +22,7 @@ echo "</div>";
 
 echo "<BR>";
 
-StyledButton::DefaultButton()->drawButton("Show Message", "javascript:onShowMessage(this)");
+StyledButton::DefaultButton()->renderButton("Show Message", "javascript:onShowMessage(this)");
 
 echo "<HR>";
 
@@ -32,41 +33,37 @@ echo "</textarea>";
 echo "</div>";
 
 echo "<BR>";
-StyledButton::DefaultButton()->drawButton("Show Confirm", "javascript:onShowConfirm(this)");
+StyledButton::DefaultButton()->renderButton("Show Confirm", "javascript:onShowConfirm(this)");
 
 ?>
-<script type='text/javascript'>
-function onShowMessage()
-{
-  var message_text = $(".TextField input[type='text']").val();
-  showAlert(message_text);
-  
-}
+    <script type='text/javascript'>
+        function onShowMessage() {
+            var message_text = $(".TextField input[type='text']").val();
+            showAlert(message_text);
 
-function onShowConfirm()
-{
-  var message_text = $(".TextArea textarea").val();
-  showConfirm(message_text , onSampleConfirmOK, onSampleConfirmCancel);
-}
+        }
 
-function onSampleConfirmCancel(confirm_dialog) 
-{
+        function onShowConfirm() {
+            var message_text = $(".TextArea textarea").val();
+            showConfirm(message_text, onSampleConfirmOK, onSampleConfirmCancel);
+        }
 
-  showAlert("You pressed 'Cancel'", function(alert_dialog) {
-    alert("cancel");
-    alert_dialog.modal_pane.pane().remove();
-    confirm_dialog.modal_pane.pane().remove();
-  });
-}
+        function onSampleConfirmCancel(confirm_dialog) {
 
-function onSampleConfirmOK(elm)
-{
-  showAlert("You pressed 'OK'");
-}
-</script>
+            showAlert("You pressed 'Cancel'", function (alert_dialog) {
+                alert("cancel");
+                alert_dialog.modal_pane.pane().remove();
+                confirm_dialog.modal_pane.pane().remove();
+            });
+        }
+
+        function onSampleConfirmOK(elm) {
+            showAlert("You pressed 'OK'");
+        }
+    </script>
 <?php
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

@@ -1,12 +1,12 @@
 <?php
-include_once("lib/pages/SitePage.php");
+include_once("lib/pages/HTMLPage.php");
 include_once("lib/components/AbstractResultView.php");
 include_once("lib/components/renderers/items/TextItemRenderer.php");
 include_once("lib/components/renderers/IItemRenderer.php");
 
 include_once("lib/components/PageResultsPanel.php");
 
-class ListView extends AbstractResultView implements IHeadRenderer
+class ListView extends AbstractResultView
 {
 
     protected $item_renderer;
@@ -15,14 +15,12 @@ class ListView extends AbstractResultView implements IHeadRenderer
     {
         parent::__construct($itr);
     }
-    
-    public function renderScript()
-    {}
 
-    public function renderStyle()
+    public function requiredStyle()
     {
-        echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/ListView.css' type='text/css' >";
-        echo "\n";
+        $arr = parent::requiredStyle();
+        $arr[] = SITE_ROOT . "lib/css/ListView.css";
+        return $arr;
     }
 
     public function setItemRenderer(IItemRenderer $renderer)
@@ -30,28 +28,29 @@ class ListView extends AbstractResultView implements IHeadRenderer
         $this->item_renderer = $renderer;
         $this->item_renderer->setParent($this);
     }
-    public function getItemRenderer() 
+
+    public function getItemRenderer()
     {
         return $this->item_renderer;
     }
 
-    public function startRender() 
+    public function startRender()
     {
         parent::startRender();
 
         echo "<div class='viewport'>";
-        
+
         if (!$this->paginators_enabled) {
-            if (strlen($this->caption)>0) {
-                    echo "<div class='caption'>";
-                    echo $this->caption;
-                    echo "</div>";
+            if (strlen($this->caption) > 0) {
+                echo "<div class='caption'>";
+                echo $this->caption;
+                echo "</div>";
             }
         }
-        
+
     }
 
-    public function finishRender() 
+    public function finishRender()
     {
         echo "<div class=clear></div>";
         echo "</div>";
@@ -63,14 +62,14 @@ class ListView extends AbstractResultView implements IHeadRenderer
     public function renderImpl()
     {
 
-        if (!$this->item_renderer)throw new Exception("ItemRenderer not set");
+        if (!$this->item_renderer) throw new Exception("ItemRenderer not set");
 
-        $v = new ValueInterleave("even","odd");
+        $v = new ValueInterleave("even", "odd");
 
         $this->position_index = 0;
 
-        while ($this->itr->haveMoreResults($row)){
-                
+        while ($this->itr->haveMoreResults($row)) {
+
             $cls = $v->value();
 
             //$this->item_renderer->setClassName($cls);
@@ -84,11 +83,12 @@ class ListView extends AbstractResultView implements IHeadRenderer
             $v->advance();
         }
     }
-    
+
     public function getIterator()
     {
         return $this->itr;
     }
 
 }
+
 ?>

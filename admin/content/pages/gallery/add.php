@@ -7,14 +7,11 @@ include_once("lib/beans/DynamicPagePhotosBean.php");
 include_once("lib/forms/PhotoInputForm.php");
 
 
+$ref_key = "";
+$ref_val = "";
+$qrystr = refkeyPageCheck(new DynamicPagesBean(), "list.php", $ref_key, $ref_id);
 
-$ref_key="";
-$ref_val="";
-$qrystr=refkeyPageCheck(new DynamicPagesBean(), "list.php", $ref_key, $ref_id);
-
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
@@ -24,18 +21,18 @@ $event_photos->setFilter("$ref_key='$ref_id'");
 
 $view = new InputFormView($event_photos, new PhotoInputForm());
 
-//current version of dynamic page photos table is set to DBROWS
-$view->getForm()->getField("photo")->transact_mode = InputField::TRANSACT_DBROW;
+//current version of dynamic page photos table is set to TRANSACT_DBROW
+$view->getForm()->getField("photo")->transact_mode = DataInput::TRANSACT_DBROW;
 
 $view->getTransactor()->appendValue($ref_key, $ref_id);
 
 $view->processInput();
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 $view->render();
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

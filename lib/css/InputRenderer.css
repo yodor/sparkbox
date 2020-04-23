@@ -1,372 +1,321 @@
-.InputField.TextField {
-  display:inline-block;
-}
-.InputField.TextArea {
-  display:inline-block;
-}
+.InputComponent {
 
 
-
-.InputLabel  {
-  
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
+
+.InputComponent .InputLabel {
+    font-size: 100%;
+    display: inline-block;
+}
+
+.InputComponent .InputField {
+    display: inline-block;
+
+    background-color: white;
+
+    border-top: 1px solid #b7b7b7;
+    border-left: 1px solid #b7b7b7;
+    border-right: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+
+    margin: 0;
+    padding: 0.2em;
+}
+
 .InputLabel .required {
-  color:red;
-  font-weight:bold;
-  font-size:10px;
-  font-family:"Mono", "Consolas";
+    color: rgba(255, 0, 170, 0.62);
+    font-weight: bold;
+    font-family: "Monospaced", "Consolas";
 }
+
 .InputLabel[error="1"] {
-  color:red;
+    color: rgba(255, 0, 170, 0.62);
 }
 
-
-
-.InputField {
-
-  
-}
 
 .InputField .FieldElements {
-  display:inline-block;
+    display: block;
 }
+
 .InputField[error="1"] .FieldElements {
-  border:1px dotted red;
-  padding:1px;
+
 }
+
 /*.ArrayContents .InputField[error="1"] {
   border:1px dotted red;
 }*/
 .InputField .addon_content {
-  display:inline-block;
-  margin-left:10px;
+    display: inline-block;
+    margin-left: 1em;
+}
+
+.InputField INPUT {
+    font-size: 100%;
+    border: 0;
+    background-color: transparent;
+    outline: 0;
+    padding: 0;
+    margin: 0;
+    display: block;
 }
 
 
-
-
-
-
-.InputField.TextField {
-  
-    min-width:200px;
-     
-    background:url("../images/input_white_back.gif");
-    background-repeat:no-repeat;
-
-    border-top:1px solid #b7b7b7; border-left:1px solid #b7b7b7;
-    border-right:1px solid #dcdcdc;border-bottom:1px solid #dcdcdc;
-
-    margin:0;padding:0;
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-
-    font-size:14px;
-    padding:3px;
-}
-.InputField.TextField[error="1"] {
-  border:1px dotted red;
+.InputField.TextField INPUT {
+    width: 100%;
+    height: 100%;
 }
 
-.InputField.TextField input[type='text']
-{
-  width:100%;
-  height:100%;
-  border:0px;
-  background-color:transparent;
-  outline: 0;
-
+.InputField.PasswordField INPUT {
+    width: 100%;
+    height: 100%;
 }
 
-
-.InputField.TextArea {
-
-    background:url("../images/input_white_back.gif");
-    background-repeat:no-repeat;
-
-    border-top:1px solid #b7b7b7; border-left:1px solid #b7b7b7;
-    border-right:1px solid #dcdcdc;border-bottom:1px solid #dcdcdc;
-
-    font-size:14px;
-
-    
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    
-    margin:0;
-    padding:3px;
-
-    padding-bottom:0px;
-
-    
-}
-.InputField.TextArea[error="1"] {
-  border:1px dotted red;
-}
 .InputField.TextArea TEXTAREA {
-  background-color:transparent;
-  width:100%;
-  height:100%;
-  border:0px;
-  border-spacing:0px;
-  
-  -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    
-  outline: 0;
-  
-  resize:vertical;
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    outline: 0;
+    resize: vertical;
+    display: block;
 }
-.InputField.MCETextArea[error="1"] {
-  border:1px dotted red;
-}
-
-
-.InputField.PasswordField {
-    background:url("../images/input_white_back.gif");
-    background-repeat:no-repeat;
-
-    border-top:1px solid #b7b7b7; border-left:1px solid #b7b7b7;
-    border-right:1px solid #dcdcdc;border-bottom:1px solid #dcdcdc;
-
-    margin:0;padding:0;
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-
-    font-size:14px;
-    padding:3px;
-}
-.InputField.PasswordField[error="1"] {
-  border:1px dotted red;
-}
-.InputField.PasswordField input[type='password']
-{
-  width:100%;
-  height:100%;
-  border:0px;
-  background-color:transparent;
-  outline: 0;
-}
-
 
 
 .InputField.SelectField {
-  
+    padding: 0;
+    outline: 0;
+    margin: 0;
+    border: 0;
+    background-color: transparent;
 }
 
 .InputField.SelectField SELECT {
-  padding:3px;
-  outline:0;
-  margin:0px;
-  font-size:1em;
+
+    outline: 0;
+    font-size: 100%;
+    padding: 0.2em;
 }
 
-.InputField.SelectField .SelectOption {
-	
+.InputField.SelectField OPTION {
+    padding: 0.2em;
+    outline: 0;
+    font-size: 100%;
 }
 
 
 .InputField.NestedSelectField {
-  
+
 }
 
 .InputField.NestedSelectField SELECT {
-  padding:3px;
-  outline: 0;
-  margin:0px;
+    padding: 0.3em;
+    outline: 0;
+    padding: 0.2em;
 }
 
-.InputField.NestedSelectField .SelectOption {
-	
+.InputField.NestedSelectField OPTION {
+    padding: 0.3em;
+    outline: 0;
 }
 
+/*CheckBox*/
 
+.InputField.CheckField {
+    border: 0;
+    background-color: transparent;
+    display: inline-block;
 
-
+    margin: 0;
+    outline: 0;
+    padding: 0;
+}
 
 .InputField.CheckField[error="1"] .FieldElements {
-  padding:2px;
+
 }
 
 .InputField.CheckField .CheckItem {
-  display:inline-block;
-  vertical-align:middle;
-  padding-right:7px;
+    display: inline-block;
+    margin-right: 0.5em;
 }
-.InputField.CheckField .CheckItem INPUT[type='checkbox'] {
 
-  display:inline-block;
-  vertical-align:middle;
-  padding:0px;
-  margin:0px;
-  
-  margin-right:2px;
+.InputField.CheckField .CheckItem INPUT[type='checkbox'] {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: -0.03em;
+    margin-right: 0.1em;
+    width: 1.2em;
+    height: 1.2em;
 }
 
 .InputField.CheckField .CheckItem SPAN {
-  display:inline-block;
-  vertical-align:middle;
-  padding:0px;
-  margin:0px;
-  
+    display: inline-block;
+}
+
+
+/*RadioButton*/
+
+.InputField.RadioField {
+    border: 0;
+    background-color: transparent;
+    display: inline-block;
+
+    margin: 0;
+    outline: 0;
+    padding: 0;
 }
 
 
 .InputField.RadioField[error="1"] .FieldElements {
-  padding:2px;
+
 }
 
 .InputField.RadioField .RadioItem {
 
-  display:inline-block;
-  vertical-align:middle;
-  padding-right:7px;
-  
+    display: inline-block;
+    margin-right: 0.5em;
+
 }
 
 .InputField.RadioField .RadioItem INPUT[type='radio'] {
-  display:inline-block;
-  vertical-align:middle;
-  padding:0px;
-  margin:0px;
-  
-   margin-right:2px;
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: -0.03em;
+    margin-right: 0.1em;
+    width: 1.2em;
+    height: 1.2em;
 }
 
 
 .InputField.RadioField .RadioItem SPAN {
-  display:inline-block;
-  vertical-align:middle;
-  padding:0px;
-  margin:0px;
+    display: inline-block;
 }
 
-
-
+/*DateField*/
 
 .InputField.DateField {
-  display:inline-block;
-
+    display: inline-block;
+    background-color: transparent;
+    border: 0;
+    margin: 0;
+    outline: 0;
+    padding: 0;
 }
 
 
-.InputField.DateField .DatePart {
-  display:inline-block;
-  vertical-align:middle;
-  padding:3px;
-  outline: 0;
-  margin:0px;
-  margin-right:2px;
-  font-size:1em;
+.InputField.DateField SELECT {
+    display: inline-block;
+
+    outline: 0;
+    font-size: 100%;
+    margin-right: 0.3em;
+
+    padding: 0.2em;
+
 }
 
 .InputField.DateField .CalendarControl {
 
-  position:relative;
-  cursor:pointer;
-  display:inline-block;
-  vertical-align:middle;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    vertical-align: top;
+}
+
+.InputField.DateField .CalendarControl IMG {
+
+    padding: 0;
+    margin: 0;
+
+    border: 0;
+    display: block;
 
 }
 
+/*TimeField*/
+.InputField.TimeField {
+    display: inline-block;
+    background-color: transparent;
+    border: 0;
+    margin: 0;
+    outline: 0;
+    padding: 0;
 
+}
+
+.InputField.TimeField SELECT {
+    display: inline-block;
+
+    outline: 0;
+    font-size: 100%;
+    margin-right: 0.3em;
+
+    padding: 0.2em;
+}
+
+
+/*PhoneField*/
 
 .InputField.PhoneField {
+    border: 0;
+    background-color: transparent;
+    display: inline-block;
 
-
-}
-.InputField.PhoneField .PhonePart[type='text'] {
-    
-    background:url("../images/input_white_back.gif");
-    background-repeat:no-repeat;
-
-    border-top:1px solid #b7b7b7; border-left:1px solid #b7b7b7;
-    border-right:1px solid #dcdcdc;border-bottom:1px solid #dcdcdc;
-
-    margin:0;padding:0;
-
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-
-    font-size:14px;
-    padding:5px;
+    margin: 0;
     outline: 0;
+    padding: 0;
+
 }
+
+.InputField.PhoneField .PhonePart[type='text'] {
+    display: inline-block;
+
+    background-color: white;
+
+    border-top: 1px solid #b7b7b7;
+    border-left: 1px solid #b7b7b7;
+    border-right: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+
+    margin: 0;
+    padding: 0.2em;
+
+}
+
 .InputField.PhoneField .PhonePart.CountryCode {
-  width:60px !important;
-  min-width:60px !important;
-  display:inline !important;
+    width: 2.5em;
+    min-width: 2.5em;
+    display: inline;
 }
+
 .InputField.PhoneField .PhonePart.CityCode {
-  width:60px  !important;
-  min-width:60px !important;
-  display:inline  !important;
-}
-.PhoneField .PhonePart.PhoneNumber {
-  width:160px  !important;
-  min-width:160px  !important;
-  display:inline  !important;
+    width: 2.5em;
+    min-width: 2.5em;
+    display: inline;
 }
 
-
-.InputField.TimeField {
-  
-
-}
-.InputField.TimeField .TimePart {
-  display:inline-block;
-  padding:3px;
-  outline: 0;
-  margin:0px;
-  margin-right:2px;
-  font-size:1em;
+.InputField.PhoneField .PhonePart.PhoneNumber {
+    width: 5em;
+    min-width: 5em;;
+    display: inline;
 }
 
-
-
-
-
-.slider_field_wrapper {
-  padding:10px;
-}
-
-
-
-.FreetextWrapper {
-	display:block;
-}
-.FreetextWrapper .TextField {
-	width:auto;
-}
-
-
-
-
-
-
-
-.InputField .ActionRenderer.BeanTranslationLink {
-/*   margin-top:10px; */
-  display:inline-block;
-  
-}
-
-.InputField + .Controls {
-    padding-left:5px;
+/*HiddenField*/
+.InputField.HiddenField {
+    background-color: transparent;
+    border: 0;
 }
 
 .InputField > .caption:first-child {
-    
-    background-color:#EEEEEE;
-    color:black;
-    font-weight:bold;
-    padding:5px;
-    
+
+    background-color: #FFFFFF;
+    color: black;
+    font-weight: bold;
+    padding: 5px;
+
 }

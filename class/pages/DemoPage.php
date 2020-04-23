@@ -1,5 +1,5 @@
 <?php
-include_once("lib/pages/SimplePage.php");
+include_once("lib/pages/SparkPage.php");
 
 include_once("lib/utils/MainMenu.php");
 include_once("lib/components/MenuBarComponent.php");
@@ -7,11 +7,10 @@ include_once("lib/components/MenuBarComponent.php");
 include_once("lib/forms/InputForm.php");
 include_once("lib/forms/renderers/FormRenderer.php");
 include_once("lib/forms/processors/FormProcessor.php");
-include_once("lib/input/InputFactory.php");
+include_once("lib/input/DataInputFactory.php");
 
 
-
-class DemoPage extends SimplePage
+class DemoPage extends SparkPage
 {
 
     protected $menu_bar;
@@ -19,128 +18,129 @@ class DemoPage extends SimplePage
     public function __construct()
     {
 
-	parent::__construct();
+        parent::__construct();
 
-	$menu = new MainMenu();
+        $menu = new MainMenu();
 
-	$arr = array();
-	$item = new MenuItem("Controls", SITE_ROOT."controls.php");
-	$arr[] = $item;
-	
-	$item1 = new MenuItem("Array Controls", SITE_ROOT."array_controls.php");
-	$item->addMenuItem($item1);
-	$item2 = new MenuItem("AJAX Upload", SITE_ROOT."ajax_upload.php");
-	$item->addMenuItem($item2);
-	$item3 = new MenuItem("Upload", SITE_ROOT."upload_controls.php");
-	$item->addMenuItem($item3);
-	
-	
-	$arr[] = new MenuItem("Popups", SITE_ROOT."popups.php");
-	
-	$item = new MenuItem("Gallery", SITE_ROOT."gallery.php");
-	$arr[] = $item;
-	$item1 = new MenuItem("Styled Gallery Popup", SITE_ROOT."gallery_custom.php");
-	$item->addMenuItem($item1);
-	
-	$arr[] = new MenuItem("MCE Image Browser", SITE_ROOT."mce_browser.php");
-	
-	$menus = new MenuItem("Menus", SITE_ROOT."menu.php");
-	$arr[] = $menus;
-	
-	$db_menu = new MenuItem("DB Menu", SITE_ROOT."db_menu.php");
-	$menus->addMenuItem($db_menu);
-	
-	$item = new MenuItem("Tree View", SITE_ROOT."tree.php");
-	$arr[] = $item;
-	
-	$item1 = new MenuItem("Aggregate Tree", SITE_ROOT."related_tree.php");
-	$item->addMenuItem($item1);
+        $arr = array();
+        $item = new MenuItem("Controls", SITE_ROOT . "controls.php");
+        $arr[] = $item;
 
-	
-	$arr[] = new MenuItem("Fonts", SITE_ROOT."fonts.php");
-	$arr[] = new MenuItem("CSS3", SITE_ROOT."css3.php");
-	
-	$arr[] = new MenuItem("Publications", SITE_ROOT."news.php");
-	
-	$menu->setMenuItems($arr);
+        $item1 = new MenuItem("Array Controls", SITE_ROOT . "array_controls.php");
+        $item->addMenuItem($item1);
+        $item2 = new MenuItem("AJAX Upload", SITE_ROOT . "ajax_upload.php");
+        $item->addMenuItem($item2);
+        $item3 = new MenuItem("Upload", SITE_ROOT . "upload_controls.php");
+        $item->addMenuItem($item3);
 
 
-	$this->menu_bar = new MenuBarComponent($menu);
+        $arr[] = new MenuItem("Popups", SITE_ROOT . "popups.php");
 
-	$this->menu_bar->setName("DemoPage");
+        $item = new MenuItem("Gallery", SITE_ROOT . "gallery.php");
+        $arr[] = $item;
+        $item1 = new MenuItem("Styled Gallery Popup", SITE_ROOT . "gallery_custom.php");
+        $item->addMenuItem($item1);
 
-        
-// 	$this->menu_bar->getItemRenderer()->disableSubmenuRenderer();
-	
+        $arr[] = new MenuItem("MCE Image Browser", SITE_ROOT . "mce_browser.php");
+
+        $menus = new MenuItem("Menus", SITE_ROOT . "menu.php");
+        $arr[] = $menus;
+
+        $db_menu = new MenuItem("DB Menu", SITE_ROOT . "db_menu.php");
+        $menus->addMenuItem($db_menu);
+
+        $item = new MenuItem("Tree View", SITE_ROOT . "tree.php");
+        $arr[] = $item;
+
+        $item1 = new MenuItem("Aggregate Tree", SITE_ROOT . "related_tree.php");
+        $item->addMenuItem($item1);
+
+
+        $arr[] = new MenuItem("Fonts", SITE_ROOT . "fonts.php");
+        $arr[] = new MenuItem("CSS3", SITE_ROOT . "css3.php");
+
+        $arr[] = new MenuItem("Publications", SITE_ROOT . "news.php");
+
+        $menu->setMenuItems($arr);
+
+
+        $this->menu_bar = new MenuBarComponent($menu);
+
+        $this->menu_bar->setName("DemoPage");
+
+
+        // 	$this->menu_bar->getItemRenderer()->disableSubmenuRenderer();
+
         $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
     }
 
 
     protected function dumpCSS()
     {
-	parent::dumpCSS();
+        parent::dumpCSS();
 
-	echo "<link rel='stylesheet' href='".SITE_ROOT."css/demo.css' type='text/css'>";
-	echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
+        echo "<link rel='stylesheet' href='" . SITE_ROOT . "css/demo.css' type='text/css'>";
+        echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 
-	echo "\n";
+        echo "\n";
 
     }
+
     protected function dumpJS()
     {
-	parent::dumpJS();
-	
-	echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
-	
-	echo "\n";
+        parent::dumpJS();
+
+        echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
+
+        echo "\n";
     }
 
     protected function dumpMetaTags()
     {
-            parent::dumpMetaTags();
+        parent::dumpMetaTags();
 
     }
 
-    public function beginPage()
+    public function startRender()
     {
-	parent::beginPage();
+        parent::startRender();
 
-	echo "\n<!--beginPage DemoPage-->\n";
+        echo "\n<!--startRender DemoPage-->\n";
 
-	$main_menu = $this->menu_bar->getMainMenu();
-	$main_menu->selectActiveMenus();
+        $main_menu = $this->menu_bar->getMainMenu();
+        $main_menu->selectActiveMenus();
 
-	$this->preferred_title = constructSiteTitle($main_menu->getSelectedPath());
+        $this->preferred_title = constructSiteTitle($main_menu->getSelectedPath());
 
-	echo "<div align=center>";
+        echo "<div align=center>";
 
         $this->menu_bar->render();
-	  
+
         echo "<div class='main_content'>"; //inner contents
-          
+
     }
 
 
-    public function finishPage()
+    public function finishRender()
     {
 
-// 	  echo "<div class='version_label'>";
-// 	  echo "<label>";
-// 	  echo "PHP: ".phpversion();
-// 	  echo " | ";
-// 	  echo "MySQL: C.".mysql_get_client_info();
-// // 	  echo "/S.".mysql_get_server_info();
-// 	  echo "</label>";
-// 	  echo "</div>";
-	  
-	  echo "</div>"; //main_content
-	echo "</div>"; //align=center
+        // 	  echo "<div class='version_label'>";
+        // 	  echo "<label>";
+        // 	  echo "PHP: ".phpversion();
+        // 	  echo " | ";
+        // 	  echo "MySQL: C.".mysql_get_client_info();
+        // // 	  echo "/S.".mysql_get_server_info();
+        // 	  echo "</label>";
+        // 	  echo "</div>";
 
-	?>
-	
-<script type='text/javascript'>
+        echo "</div>"; //main_content
+        echo "</div>"; //align=center
 
-addLoadEvent(function(){
+        ?>
+
+        <script type='text/javascript'>
+
+            addLoadEvent(function () {
 
 
 //     var menu = $(".MenuBar[name='DemoPage']");
@@ -162,14 +162,13 @@ addLoadEvent(function(){
 //     });
 
 
+            });
+        </script>
+        <?php
+        echo "\n";
+        echo "\n<!--finishRender DemoPage-->\n";
 
-});
-</script>
-<?php
-	echo "\n";
-	echo "\n<!--finishPage DemoPage-->\n";
-
-	parent::finishPage();
+        parent::finishRender();
 
 
     }

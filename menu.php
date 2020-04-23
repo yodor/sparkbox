@@ -6,22 +6,20 @@ include_once("lib/components/MenuBarComponent.php");
 include_once("class/beans/ProductCategoriesBean.php");
 
 
-
-
 function constructSubmenu($item, $level, $max_items, $max_level)
 {
     $level++;
     $max_items--;
-    
-    if ($level>$max_level)return;
-    
-    for ($b=0;$b<$max_items;$b++) {
-      $sitem = new MenuItem("$b.MenuItem (Level: $level)","menu.php?branch=$b&level=$level");
-      $item->addMenuItem($sitem);
-      constructSubmenu($sitem, $level, $max_items, $max_level);
-      
+
+    if ($level > $max_level) return;
+
+    for ($b = 0; $b < $max_items; $b++) {
+        $sitem = new MenuItem("$b.MenuItem (Level: $level)", "menu.php?branch=$b&level=$level");
+        $item->addMenuItem($sitem);
+        constructSubmenu($sitem, $level, $max_items, $max_level);
+
     }
-    
+
 }
 
 
@@ -32,13 +30,13 @@ $menu = new MainMenu();
 $menu->setName("ConstructedMenu");
 
 $arr = array();
-for ($a=0;$a<1;$a++) {
-    $item =  new MenuItem("MenuItem ".($a+1), "menu.php");
-    
-    if ($a<2) {
-      constructSubmenu($item,0,6,3);
+for ($a = 0; $a < 1; $a++) {
+    $item = new MenuItem("MenuItem " . ($a + 1), "menu.php");
+
+    if ($a < 2) {
+        constructSubmenu($item, 0, 6, 3);
     }
-    $arr[]=$item;
+    $arr[] = $item;
 }
 
 $menu->setMenuItems($arr);
@@ -57,7 +55,7 @@ $menu1->constructMenuItems(0, NULL, "catID", "category_name");
 $menu_bar1 = new MenuBarComponent($menu1);
 $menu_bar1->setName("ProductCategoriesBean");
 
-$page->beginPage();
+$page->startRender();
 
 
 // echo "<div style='float:left;'>";
@@ -71,15 +69,13 @@ $menu_bar1->render();
 // echo "</div>";
 
 
-
-
-// 
+//
 // // echo "<div id=debug style='height:200px;overflow:scroll;'>Debug Area</div>";
 
 echo "<div class=clear></div>";
 
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

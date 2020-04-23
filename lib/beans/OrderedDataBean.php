@@ -1,173 +1,182 @@
 <?php
 
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 abstract class OrderedDataBean extends DBTableBean
 {
 
-	
-	private function appendFilter($have_other=true)
-	{
-		if ($this->filter) return ($have_other ? " AND {$this->filter} " : "{$this->filter}");
-		return ($have_other ? "" : "1") ;
-	}
-	public function deleteID($id, $db=false){
-        $docommit=false;
+
+    private function appendFilter($have_other = true)
+    {
+        if ($this->filter) return ($have_other ? " AND {$this->filter} " : "{$this->filter}");
+        return ($have_other ? "" : "1");
+    }
+
+    public function deleteID($id, $db = false)
+    {
+        $docommit = false;
         if (!$db) {
             $db = $this->db;
             $db->transaction();
-            $docommit=true;
+            $docommit = true;
         }
-		$row = $this->getByID($id);
-		$pos = (int)$row["position"];
+        $row = $this->getByID($id);
+        $pos = (int)$row["position"];
 
-		$res = $db->query("UPDATE {$this->table} SET position=position-1 WHERE position>$pos ".$this->appendFilter(true));
+        $res = $db->query("UPDATE {$this->table} SET position=position-1 WHERE position>$pos " . $this->appendFilter(true));
 
-		//$res = $db->query("DELETE FROM {$this->table} WHERE {$this->prkey}=$id");	
-		parent::deleteID($id, $db);
+        //$res = $db->query("DELETE FROM {$this->table} WHERE {$this->prkey}=$id");
+        parent::deleteID($id, $db);
 
-		if ($docommit==true) $db->commit();
-		return $res;
-	}
-	
-	public function insertRecord(&$row, &$db=false)
-	{
+        if ($docommit == true) $db->commit();
+        return $res;
+    }
 
-		$pos = $this->getMaxPosition();
-		$row["position"]=($pos+1);
-		return parent::insertRecord($row, $db);
+    public function insert(&$row, &$db = false)
+    {
 
-	}
-	public function reorderFixed($id, $new_pos)
-	{
-		$db = $this->db;
-		$db->transaction();
+        $pos = $this->getMaxPosition();
+        $row["position"] = ($pos + 1);
+        return parent::insert($row, $db);
 
-		$row = $this->getByID($id);
-		$pos = (int)$new_pos;
+    }
 
-		
-		$resp = $db->query("UPDATE {$this->table}  SET position=position+1 WHERE position>=$pos ".$this->appendFilter());
-		$ress = $db->query("UPDATE {$this->table}  SET position=$pos WHERE {$this->prkey}=$id");
+    public function reorderFixed($id, $new_pos)
+    {
+        $db = $this->db;
+        $db->transaction();
 
-		if ($resp && $ress){
-			$db->commit();
+        $row = $this->getByID($id);
+        $pos = (int)$new_pos;
 
-		}
-		else {
-			$db->rollback();
-		}
-	}
-  	public function reorderTop($id)
-	{
-		
 
-		$db = $this->db;
-		$db->transaction();
+        $resp = $db->query("UPDATE {$this->table}  SET position=position+1 WHERE position>=$pos " . $this->appendFilter());
+        $ress = $db->query("UPDATE {$this->table}  SET position=$pos WHERE {$this->prkey}=$id");
 
-		$row = $this->getByID($id);
-		$pos = (int)$row["position"];
+        if ($resp && $ress) {
+            $db->commit();
 
-		
-		$resp = $db->query("UPDATE {$this->table}  SET position=position+1 WHERE position<$pos ".$this->appendFilter());
-		$ress = $db->query("UPDATE {$this->table}  SET position=1 WHERE {$this->prkey}=$id");
+        }
+        else {
+            $db->rollback();
+        }
+    }
 
-		if ($resp && $ress){
-			$db->commit();
+    public function reorderTop($id)
+    {
 
-		}
-		else {
-			$db->rollback();
-		}
-	}
-	public function reorderBottom($id)
-	{
-		
 
-		$db = $this->db;
-		$db->transaction();
-		$maxp = $this->getMaxPosition();
+        $db = $this->db;
+        $db->transaction();
 
-		$row = $this->getByID($id);
-		$pos = (int)$row["position"];
+        $row = $this->getByID($id);
+        $pos = (int)$row["position"];
 
-		$resp = $db->query("UPDATE {$this->table}  SET position=position-1 WHERE position>$pos ".$this->appendFilter());
-		$ress = $db->query("UPDATE {$this->table}  SET position=$maxp WHERE {$this->prkey}=$id");
 
-		if ($resp && $ress){
-			$db->commit();
+        $resp = $db->query("UPDATE {$this->table}  SET position=position+1 WHERE position<$pos " . $this->appendFilter());
+        $ress = $db->query("UPDATE {$this->table}  SET position=1 WHERE {$this->prkey}=$id");
 
-		}
-		else {
-			$db->rollback();
-		}
-	}
+        if ($resp && $ress) {
+            $db->commit();
 
-	public function reorderUp($id)
-	{
-		
+        }
+        else {
+            $db->rollback();
+        }
+    }
 
-		$db = $this->db;
-		$db->transaction();
+    public function reorderBottom($id)
+    {
 
-		$row = $this->getByID($id);
-		$pos = (int)$row["position"];
 
-		$mx = $this->getMaxPosition();
-		if ($pos-1 < 1) {
-			//already at top
-			return;
-		}
+        $db = $this->db;
+        $db->transaction();
+        $maxp = $this->getMaxPosition();
 
-		$resn = $db->query("UPDATE {$this->table}  SET position=-1 WHERE {$this->prkey}=$id ");
-		$resp = $db->query("UPDATE {$this->table}  SET position=position+1 WHERE position=$pos-1 ".$this->appendFilter());
-		$ress = $db->query("UPDATE {$this->table}  SET position=$pos-1 WHERE {$this->prkey}=$id ");
+        $row = $this->getByID($id);
+        $pos = (int)$row["position"];
 
-		if ($resp && $resn && $ress){
-			$db->commit();
+        $resp = $db->query("UPDATE {$this->table}  SET position=position-1 WHERE position>$pos " . $this->appendFilter());
+        $ress = $db->query("UPDATE {$this->table}  SET position=$maxp WHERE {$this->prkey}=$id");
 
-		}
-		else {
-			$db->rollback();
-		}
-	}
-	public function reorderDown($id)
-	{
-		$db = $this->db;
-		$db->transaction();
+        if ($resp && $ress) {
+            $db->commit();
 
-		$row = $this->getByID($id);
-		$pos = (int)$row["position"];
+        }
+        else {
+            $db->rollback();
+        }
+    }
 
-		$mx = $this->getMaxPosition();
-		if ($pos+1 > $mx) {
-			//already at bottom
-			return;
-		}
+    public function reorderUp($id)
+    {
 
-		$resn = $db->query("UPDATE {$this->table} SET position=-1 WHERE {$this->prkey}=$id ");
-		$resp = $db->query("UPDATE {$this->table} SET position=position-1 WHERE position=$pos+1 ".$this->appendFilter());
-		$ress = $db->query("UPDATE {$this->table} SET position=$pos+1 WHERE {$this->prkey}=$id ");
 
-		if ($resp && $resn && $ress){
-			$db->commit();
-		}
-		else {
-			$db->rollback();
-		}
-	}
-	public function getMaxPosition(){
-		$db = $this->db;
-		$sql = "";
+        $db = $this->db;
+        $db->transaction();
 
-		$sql = "SELECT max(position)  FROM {$this->table} WHERE ".$this->appendFilter(false);
+        $row = $this->getByID($id);
+        $pos = (int)$row["position"];
 
-		$res = $db->query($sql);
-		if (!$res) throw new Exception ("DBError: ".$db->getError()."<HR>$sql");
-		$ret = $db->fetchRow($res);
+        $mx = $this->getMaxPosition();
+        if ($pos - 1 < 1) {
+            //already at top
+            return;
+        }
 
-		return (int)$ret[0];
+        $resn = $db->query("UPDATE {$this->table}  SET position=-1 WHERE {$this->prkey}=$id ");
+        $resp = $db->query("UPDATE {$this->table}  SET position=position+1 WHERE position=$pos-1 " . $this->appendFilter());
+        $ress = $db->query("UPDATE {$this->table}  SET position=$pos-1 WHERE {$this->prkey}=$id ");
 
-	}
+        if ($resp && $resn && $ress) {
+            $db->commit();
+
+        }
+        else {
+            $db->rollback();
+        }
+    }
+
+    public function reorderDown($id)
+    {
+        $db = $this->db;
+        $db->transaction();
+
+        $row = $this->getByID($id);
+        $pos = (int)$row["position"];
+
+        $mx = $this->getMaxPosition();
+        if ($pos + 1 > $mx) {
+            //already at bottom
+            return;
+        }
+
+        $resn = $db->query("UPDATE {$this->table} SET position=-1 WHERE {$this->prkey}=$id ");
+        $resp = $db->query("UPDATE {$this->table} SET position=position-1 WHERE position=$pos+1 " . $this->appendFilter());
+        $ress = $db->query("UPDATE {$this->table} SET position=$pos+1 WHERE {$this->prkey}=$id ");
+
+        if ($resp && $resn && $ress) {
+            $db->commit();
+        }
+        else {
+            $db->rollback();
+        }
+    }
+
+    public function getMaxPosition()
+    {
+        $db = $this->db;
+        $sql = "";
+
+        $sql = "SELECT max(position)  FROM {$this->table} WHERE " . $this->appendFilter(false);
+
+        $res = $db->query($sql);
+        if (!$res) throw new Exception ("DBError: " . $db->getError() . "<HR>$sql");
+        $ret = $db->fetchRow($res);
+
+        return (int)$ret[0];
+
+    }
 }
+
 ?>

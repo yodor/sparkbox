@@ -6,9 +6,9 @@ class ProductsQuery extends SelectQuery
     public function __construct()
     {
         parent::__construct();
-        
+
         // 		(SELECT GROUP_CONCAT(DISTINCT(CONCAT(ca.attribute_name,':', cast(iav.value as char))) SEPARATOR '|') FROM product_inventory pi4 JOIN inventory_attribute_values iav ON iav.piID=pi4.piID JOIN class_attributes ca ON ca.caID = iav.caID WHERE pi4.prodID=pi.prodID AND pi4.pclrID=pi.pclrID) as inventory_attributes_all, 
-        
+
         $this->fields = "
 		iav.value as ia_value, ca.attribute_name as ia_name,
 		(pclrs.color_photo IS NOT NULL) as have_chip, 
@@ -43,7 +43,7 @@ p.promotion, p.visible, p.class_name,  p.old_price, p.insert_date, p.update_date
 sc.color_code
 
 ";
-		$this->from = " product_inventory pi 
+        $this->from = " product_inventory pi 
 
 JOIN products p ON (p.prodID = pi.prodID AND p.visible=1) 
 JOIN product_categories pc ON pc.catID=p.catID 
@@ -57,7 +57,8 @@ LEFT JOIN store_colors sc ON sc.color=pi.color
 LEFT JOIN product_photos pp ON pp.prodID=pi.prodID
 
 ";
-		$this->where = "";
+        $this->where = "";
     }
 }
+
 ?>

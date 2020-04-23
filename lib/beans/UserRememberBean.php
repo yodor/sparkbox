@@ -3,7 +3,7 @@ include_once("lib/beans/DBTableBean.php");
 
 class UserRememberBean extends DBTableBean
 {
-protected $createString = "
+    protected $createString = "
 CREATE TABLE `user_remember` (
  `urID` int(10) unsigned NOT NULL auto_increment,
  `userID` int(10) unsigned NOT NULL,
@@ -15,11 +15,11 @@ CREATE TABLE `user_remember` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ";
 
-	public function __construct()
-	{
-		parent::__construct("user_remember");
-	}
-	
+    public function __construct()
+    {
+        parent::__construct("user_remember");
+    }
+
 }
 
 ?>

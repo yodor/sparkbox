@@ -5,9 +5,7 @@ include_once("class/forms/NewsItemInputForm.php");
 include_once("class/beans/NewsItemsBean.php");
 
 
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
@@ -16,11 +14,11 @@ $view = new InputFormView(new NewsItemsBean(), new NewsItemInputForm());
 
 $view->processInput();
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 $view->render();
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

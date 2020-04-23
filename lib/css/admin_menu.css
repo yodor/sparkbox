@@ -1,130 +1,147 @@
 .admin_menu {
 
-  min-width:180px;
-  
-  display:inline-block;
-  background-color:transparent;
+    min-width: 180px;
+
+    display: inline-block;
+    background-color: transparent;
 }
+
 .admin_menu .toggle {
-    display:none;
+    display: none;
 }
+
 .admin_menu .handle {
-    display:none !important;
+    display: none !important;
 }
+
 .admin_menu .MenuItemOuter {
-    display:block !important;
-    padding-top:0px !important;
-    padding-bottom:0px !important;
+    display: block !important;
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
 }
 
 .admin_menu .MenuBarItemRenderer {
-  display:block;
-  height:auto;
-  padding-left:0px;
-  padding-right:0px;
+    display: block;
+    height: auto;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 .admin_menu .MenuSeparator {
-  display:none
+    display: none
 }
+
 .admin_menu .MenuBarItemRenderer .MenuItemLink {
-  padding:5px;
-  
-  color:#517688;
-  display:block;
- 
-  
-/*   border-bottom:1px solid #cccccc; */
-  border-top:1px solid #cccccc;
-  
-  padding-left:5px;
-  padding-right:15px;
-  
-  
+    padding: 5px;
+
+    color: #517688;
+    display: block;
+
+
+    /*   border-bottom:1px solid #cccccc; */
+    border-top: 1px solid #cccccc;
+
+    padding-left: 5px;
+    padding-right: 15px;
+
+
 }
+
 .admin_menu .MenuBarItemRenderer[active="1"] .MenuItemLink {
-  background-color:#b9b3a3;
-  -webkit-border-radius: 0px 20px 20px 0px;
-  -moz-border-radius: 0px 20px 20px 0px;
-  border-radius: 0px 20px 20px 0px;
-  margin-right:-15px;
-  color:white;
-  background-image:none;
-  border-top:none;
-  border-bottom:none;
+    background-color: #b9b3a3;
+    -webkit-border-radius: 0px 20px 20px 0px;
+    -moz-border-radius: 0px 20px 20px 0px;
+    border-radius: 0px 20px 20px 0px;
+    margin-right: -15px;
+    color: white;
+    background-image: none;
+    border-top: none;
+    border-bottom: none;
 }
 
 .admin_menu .MenuBarItemRenderer[active="1"] .SubmenuRenderer {
-  background:white;
-  color:#b9b3a3;
-  
-  display:block;
-  position:relative;
-  border:0px;
-  padding-left:10px;
+    background: white;
+    color: #b9b3a3;
+
+    display: block;
+    position: relative;
+    border: 0px;
+    padding-left: 10px;
 }
+
 .admin_menu .SubmenuRenderer .SubmenuItemLink {
-  color:#666666;
-  padding-left:2px;
+    color: #666666;
+    padding-left: 2px;
 }
+
 .admin_menu .SubmenuRenderer .SubmenuItemLink .MenuIcon {
-  display:none;
+    display: none;
 }
+
 .admin_menu .SubmenuRenderer .SubmenuItemOuter {
-  padding:5px;
-  margin-left:15px;
-  background-image:url("../images/admin/submenu_item_bullet.png");
-  background-repeat:no-repeat;
-  background-position: left center;
+    padding: 5px;
+    margin-left: 15px;
+    background-image: url("../images/admin/submenu_item_bullet.png");
+    background-repeat: no-repeat;
+    background-position: left center;
 }
+
 .admin_menu .SubmenuRenderer .SubmenuItemOuter .RightPart {
-  display:none;
+    display: none;
 }
 
 .admin_menu .MenuBarItemRenderer[active="1"] .MenuItemLink + .SubmenuRenderer {
-  margin-left:0px;
-  padding-left:0px;
+    margin-left: 0px;
+    padding-left: 0px;
 }
+
 .admin_menu .SubmenuItemRenderer[selected="1"] > .SubmenuItemOuter .SubmenuItemLink {
-  text-decoration:underline;
-  font-weight:bold;
+    text-decoration: underline;
+    font-weight: bold;
 }
 
 .admin_menu .MenuBarItemRenderer[active="1"] .SubmenuItemRenderer .SubmenuRenderer {
-  display:none;
+    display: none;
 }
+
 .admin_menu .MenuBarItemRenderer[active="1"] .SubmenuItemRenderer[selected="1"] .SubmenuRenderer {
-  display:block;
-  
+    display: block;
+
 }
+
 .admin_menu .MenuIcon {
-  width:26px;
-  height:26px;
-  display:inline-block;
-  vertical-align:middle;
+    width: 26px;
+    height: 26px;
+    display: inline-block;
+    vertical-align: middle;
 }
+
 .icon_dashboard {
-  background-image:url("../images/admin/menu_icons/dashboard.png");
-  background-repeat:no-repeat;
-  background-position:center center;
+    background-image: url("../images/admin/menu_icons/dashboard.png");
+    background-repeat: no-repeat;
+    background-position: center center;
 }
+
 .icon_content {
-  background-image:url("../images/admin/menu_icons/languages.png");
-  background-repeat:no-repeat;
-  background-position:center center;
+    background-image: url("../images/admin/menu_icons/languages.png");
+    background-repeat: no-repeat;
+    background-position: center center;
 }
+
 .icon_registrations {
-  background-image:url("../images/admin/menu_icons/data_capture.png");
-  background-repeat:no-repeat;
-  background-position:center center;
+    background-image: url("../images/admin/menu_icons/data_capture.png");
+    background-repeat: no-repeat;
+    background-position: center center;
 }
+
 .icon_settings {
-  background-image:url("../images/admin/menu_icons/page_navigation.png");
-  background-repeat:no-repeat;
-  background-position:center center;
+    background-image: url("../images/admin/menu_icons/page_navigation.png");
+    background-repeat: no-repeat;
+    background-position: center center;
 }
+
 .icon_seo {
-  background-image:url("../images/admin/menu_icons/seo.png");
-  background-repeat:no-repeat;
-  background-position:center center;
+    background-image: url("../images/admin/menu_icons/seo.png");
+    background-repeat: no-repeat;
+    background-position: center center;
 }

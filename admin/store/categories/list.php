@@ -6,9 +6,7 @@ include_once("lib/components/NestedSetTreeView.php");
 include_once("lib/components/renderers/items/TextTreeItemRenderer.php");
 
 
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
@@ -28,10 +26,10 @@ RequestController::addRequestHandler($h_delete);
 
 
 $ir = new TextTreeItemRenderer();
-$ir->addAction(new Action("Up", "?cmd=reposition&type=left", array(new ActionParameter("item_id", $bean->getPrKey()))));
-$ir->addAction(new Action("Down", "?cmd=reposition&type=right", array(new ActionParameter("item_id", $bean->getPrKey()))));
+$ir->addAction(new Action("Up", "?cmd=reposition&type=left", array(new ActionParameter("item_id", $bean->key()))));
+$ir->addAction(new Action("Down", "?cmd=reposition&type=right", array(new ActionParameter("item_id", $bean->key()))));
 
-$ir->addAction(new Action("Edit", "add.php", array(new ActionParameter("editID", $bean->getPrKey()))));
+$ir->addAction(new Action("Edit", "add.php", array(new ActionParameter("editID", $bean->key()))));
 $ir->addAction($h_delete->createAction());
 
 
@@ -43,16 +41,14 @@ $tv->setName("ProductCategores");
 $tv->setItemRenderer($ir);
 
 
-Session::set("categories.list", $page->getPageURL());
+Session::Set("categories.list", $page->getPageURL());
 
-$page->beginPage($menu);
+$page->startRender($menu);
 $page->renderPageCaption();
 
 $tv->render();
 
-$page->finishPage();
-
-
+$page->finishRender();
 
 
 ?>

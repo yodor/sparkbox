@@ -6,111 +6,111 @@ include_once("lib/components/renderers/menus/SubmenuRenderer.php");
 class MenuBarItemRenderer extends MenuItemRenderer
 {
 
-  protected $ir_submenu = NULL;
+    protected $ir_submenu = NULL;
 
-  public function __construct()
-  {
-	  parent::__construct();
+    public function __construct()
+    {
+        parent::__construct();
 
-	  $this->ir_submenu = new SubmenuRenderer();
-	  
-  }
+        $this->ir_submenu = new SubmenuRenderer();
 
-  public function setSubmenuRenderer(IMenuItemRenderer $ir_submenu)
-  {
-	  $this->ir_submenu = $ir_submenu;
-  }
-  
-  public function disableSubmenuRenderer()
-  {
-	  $this->ir_submenu = NULL;
-  }
-  
-  public function setMenuItem(MenuItem $item)
-  {
+    }
 
-	  parent::setMenuItem($item);
+    public function setSubmenuRenderer(IMenuItemRenderer $ir_submenu)
+    {
+        $this->ir_submenu = $ir_submenu;
+    }
 
-	  $submenu = $item->getSubmenu();
+    public function disableSubmenuRenderer()
+    {
+        $this->ir_submenu = NULL;
+    }
 
-	  if (is_array($submenu) && count($submenu)>0) {
-	      $this->attributes["have_submenu"]="1";
-	  }
-	  else {
-	      if (isset($this->attributes["have_submenu"])) unset($this->attributes["have_submenu"]);
-	  }
-	  
-	  if ($item->isSelected()) {
-	      $this->attributes["active"] = 1;
-	  }
-	  else {
-	      if (isset($this->attributes["active"])) unset($this->attributes["active"]);
-	  }
-  }
+    public function setMenuItem(MenuItem $item)
+    {
+
+        parent::setMenuItem($item);
+
+        $submenu = $item->getSubmenu();
+
+        if (is_array($submenu) && count($submenu) > 0) {
+            $this->attributes["have_submenu"] = "1";
+        }
+        else {
+            if (isset($this->attributes["have_submenu"])) unset($this->attributes["have_submenu"]);
+        }
+
+        if ($item->isSelected()) {
+            $this->attributes["active"] = 1;
+        }
+        else {
+            if (isset($this->attributes["active"])) unset($this->attributes["active"]);
+        }
+    }
 
 
+    public function startRender()
+    {
+        $attrs = $this->prepareAttributes();
+        echo "<div $attrs>";
+    }
 
-  public function startRender()
-  {
-      $attrs = $this->prepareAttributes();
-      echo "<div $attrs>";
-  }
-  
-  public function finishRender()
-  {
-      echo "</div>";
-  }
+    public function finishRender()
+    {
+        echo "</div>";
+    }
 
-  public function renderImpl()
-  {
-  
-//       
-      
-      $href = $this->item->getHref();
-      $title = $this->item->getTitle();
+    public function renderImpl()
+    {
 
-      $target="";
+        //
 
-      if (strlen($this->item->getTarget())>0) {
-	  $target="target=\"".$this->item->getTarget()."\"";
+        $href = $this->item->getHref();
+        $title = $this->item->getTitle();
 
-      }
+        $target = "";
 
-      echo "<div class='MenuItemOuter'>";
-      echo "\n<a class='MenuItemLink' href='$href'  $target>";
+        if (strlen($this->item->getTarget()) > 0) {
+            $target = "target=\"" . $this->item->getTarget() . "\"";
 
-      if ($this->getMenuItem()->getIcon()) {
-		  $this->renderIcon();
-      }
+        }
 
-      if ($this->getMenuItem()->needTranslate()) {
-		  $title = tr($title);
-      }
-      echo $title;
+        echo "<div class='MenuItemOuter'>";
+        echo "\n<a class='MenuItemLink' href='$href'  $target>";
 
-      
-      echo "</a>";
+        if ($this->getMenuItem()->getIcon()) {
+            $this->renderIcon();
+        }
 
-      if (count($this->item->getSubmenu())>0) {
-        echo "<div class='handle'></div>";
-      }
-      echo "</div>";
-      
-      if (count($this->item->getSubmenu())>0) {
-		  if ($this->ir_submenu){
-			  
-			  
-			  $this->ir_submenu->setMenuItem($this->item);
-			  $this->ir_submenu->render();
-			  
-			  
-		  }
-		  
-      }
+        if ($this->getMenuItem()->needTranslate()) {
+            $title = tr($title);
+        }
+        echo $title;
 
-      
-  }
+
+        echo "</a>";
+
+        if (count($this->item->getSubmenu()) > 0) {
+            echo "<div class='handle'></div>";
+        }
+        echo "</div>";
+
+        if (count($this->item->getSubmenu()) > 0) {
+            if ($this->ir_submenu) {
+
+
+                $this->ir_submenu->setMenuItem($this->item);
+                $this->ir_submenu->render();
+
+
+            }
+
+        }
+
+
+    }
 
 
 }
+
 ?>

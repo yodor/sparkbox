@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 
 class ProductColorsBean extends DBTableBean
@@ -16,11 +16,12 @@ class ProductColorsBean extends DBTableBean
  CONSTRAINT `product_colors_ibfk_1` FOREIGN KEY (`prodID`) REFERENCES `products` (`prodID`) ON DELETE CASCADE ON UPDATE CASCADE,
  CONSTRAINT `product_colors_ibfk_2` FOREIGN KEY (`color`) REFERENCES `store_colors` (`color`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("product_colors");
+        parent::__construct("product_colors");
     }
 
 }
+
 ?>

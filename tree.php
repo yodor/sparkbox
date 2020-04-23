@@ -17,16 +17,8 @@ $ir = new TextTreeItemRenderer();
 // $ir->addAction(new Action("Down", "?cmd=reposition&direction=right", array(new ActionParameter("item_id", $bean->getPrKey()))));
 
 
-
-
-$ir->addAction(
-  new Action("Edit", "tree.php", 
-    array(
-//       new ActionParameter($bean->getPrKey(), $bean->getPrKey()),
-      new ActionParameter("editID", $bean->getPrKey()),
-    )
-  )
-);
+$ir->addAction(new Action("Edit", "tree.php", array(//       new ActionParameter($bean->getPrKey(), $bean->getPrKey()),
+                                                    new ActionParameter("editID", $bean->key()),)));
 
 $tv = new NestedSetTreeView();
 $tv->setName("demo_tree");
@@ -35,7 +27,6 @@ $tv->setSource($bean);
 
 
 $ir->setLabel("category_name");
-
 
 
 $tv->setItemRenderer($ir);
@@ -47,12 +38,12 @@ $proc->process($tv);
 
 // $tv->processFilters();
 
- 
-$page->beginPage();
+
+$page->startRender();
 
 $tv->render();
 
-$page->finishPage();
+$page->finishRender();
 
 
 ?>

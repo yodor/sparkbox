@@ -4,7 +4,7 @@ include_once("lib/beans/DBTableBean.php");
 class AdminAccessBean extends DBTableBean
 {
 
-protected $createString = "
+    protected $createString = "
 CREATE TABLE `admin_access` (
  `aclID` int(10) unsigned NOT NULL AUTO_INCREMENT,
  `userID` int(10) unsigned NOT NULL DEFAULT '0',
@@ -15,13 +15,12 @@ CREATE TABLE `admin_access` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 ";
 
-	public function __construct()
-	{
-		parent::__construct("admin_access");
-	}
-	
-	
-	
+    public function __construct()
+    {
+        parent::__construct("admin_access");
+    }
+
+
 }
 
 ?>

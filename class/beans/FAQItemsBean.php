@@ -1,9 +1,9 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 class FAQItemsBean extends DBTableBean
 {
-	protected $createString = "CREATE TABLE `faq_items` (
+    protected $createString = "CREATE TABLE `faq_items` (
  `fID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `section` enum('General','Orders', 'Returns','Credit Limit','Territories','Shipping','Contact') NOT NULL DEFAULT 'General',
  `question` varchar(255) NOT NULL,
@@ -11,9 +11,11 @@ class FAQItemsBean extends DBTableBean
  PRIMARY KEY (`fID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-	public function __construct() {
-		parent::__construct("faq_items");
-	}
+    public function __construct()
+    {
+        parent::__construct("faq_items");
+    }
 
 }
+
 ?>

@@ -1,7 +1,7 @@
 <?php
-include_once ("lib/beans/OrderedDataBean.php");
+include_once("lib/beans/OrderedDataBean.php");
 
-class ProductColorPhotosBean  extends OrderedDataBean
+class ProductColorPhotosBean extends OrderedDataBean
 {
     protected $createString = "CREATE TABLE `product_color_photos` (
  `pclrpID` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -14,11 +14,12 @@ class ProductColorPhotosBean  extends OrderedDataBean
  KEY `pclrID` (`pclrID`),
  CONSTRAINT `product_color_photos_ibfk_1` FOREIGN KEY (`pclrID`) REFERENCES `product_colors` (`pclrID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	  parent::__construct("product_color_photos");
+        parent::__construct("product_color_photos");
     }
 
 }
+
 ?>

@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 class ClassAttributeValuesBean extends DBTableBean
 {
@@ -15,10 +15,10 @@ class ClassAttributeValuesBean extends DBTableBean
  CONSTRAINT `class_attribute_values_ibfk_1` FOREIGN KEY (`prodID`) REFERENCES `products` (`prodID`) ON DELETE CASCADE ON UPDATE CASCADE,
  CONSTRAINT `class_attribute_values_ibfk_2` FOREIGN KEY (`caID`) REFERENCES `class_attributes` (`caID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	  parent::__construct("class_attribute_values");
+        parent::__construct("class_attribute_values");
     }
 
 }

@@ -2,29 +2,34 @@
     .main_content {
         /*margin-left:0px;
         margin-right:0px;*/
-        
-        display:block;
-        box-sizing:border-box;
-        
+
+        display: block;
+        box-sizing: border-box;
+
     }
+
     .main_content .column {
-        display:block;
-        vertical-align:top;
+        display: block;
+        vertical-align: top;
     }
+
     .main_content .column.left {
-        text-align:center;
-        
-        max-width:inherit;
+        text-align: center;
+
+        max-width: inherit;
     }
+
     .main_content .column.left .categories {
-        display:inline-block;
-        vertical-align:top;
+        display: inline-block;
+        vertical-align: top;
     }
+
     .main_content .column.left .filters {
-        display:inline-block;  
-        vertical-align:top;
+        display: inline-block;
+        vertical-align: top;
     }
 }
+
 /*.main_content {
   margin-left:0px;
   margin-right:0px;

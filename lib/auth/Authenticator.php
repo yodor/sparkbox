@@ -1,139 +1,208 @@
 <?php
+
+/**
+ * Abstract class for doing authentication
+ * Reimplement to get context specific authenticator
+ */
 abstract class Authenticator
 {
 
+    const CONTEXT_TOKEN = "token";
+    const CONTEXT_ID = "id";
+    const CONTEXT_DATA = "data";
+
+    protected $contextName = "";
+    protected $loginURL = "";
+
+    public function __construct(string $contextName)
+    {
+        $this->contextName = $contextName;
+    }
+
+    public static function HMAC($key, $data, $hash = 'md5', $blocksize = 64)
+    {
+        if (strlen($key) > $blocksize) {
+            $key = pack('H*', $hash($key));
+        }
+        $key = str_pad($key, $blocksize, chr(0));
+        $ipad = str_repeat(chr(0x36), $blocksize);
+        $opad = str_repeat(chr(0x5c), $blocksize);
+        return $hash(($key ^ $opad) . pack('H*', $hash(($key ^ $ipad) . $data)));
+    }
+
+    public static function RandomToken(int $length = 32)
+    {
+        $md5_size = 32;
+
+        if ($length > $md5_size) {
+            $length = $md5_size;
+        }
+
+        // Generate string with random data (max length $md5_size)
+        $string = md5(microtime(true) . "|" . rand());
+
+        // Position Limiting
+        $start_point = 32 - $length;
+
+        // Take a random starting point in the randomly
+        // Generated String, not going any higher then $start_point
+        return substr($string, rand(0, $start_point), $length);
+    }
+
+
     /**
-    * Abstract class for doing authentication
-    * Reimplement to get context specific authenticator
-    */
-    public static $lastID = -1;
-    
-    public static function hmac($key, $data, $hash = 'md5', $blocksize = 64)
+     * Called from Login or after registration routines are complete to set the logged in state of the context
+     * Store authentication data in session and cookie for a named context '$name'
+     * @param int $id
+     * @param array $data
+     * @throws Exception
+     */
+    public function store(int $id, array $data)
     {
-	if (strlen($key)>$blocksize) {
-	$key = pack('H*', $hash($key));
-	}
-	$key  = str_pad($key, $blocksize, chr(0));
-	$ipad = str_repeat(chr(0x36), $blocksize);
-	$opad = str_repeat(chr(0x5c), $blocksize);
-	return $hash(($key^$opad) . pack('H*', $hash(($key^$ipad) . $data)));
-    }
-    
-    public static function getLastAuthenticatedID()
-    {
-      return self::$lastID;
-    }
-    
-    public static function generateRandomAuth($length=32)
-    {
-	// Generate random 32 charecter string
-	$string = md5(time()."|".rand());
+        debug(get_class($this) . " Storing authentication data ... ");
 
-	// Position Limiting
-	$highest_startpoint = 32-$length;
+        session_regenerate_id(true);
 
-	// Take a random starting point in the randomly
-	// Generated String, not going any higher then $highest_startpoint
-	$randomString = substr($string,rand(0,$highest_startpoint),$length);
+        debug(get_class($this) . " SessionID regenerated ...");
 
-	return $randomString;
-    }
+        $token = Authenticator::RandomToken();
 
-    public static function logout() 
-    {
-	throw new Exception("Not implemented");
+        $context = array();
+        $context[Authenticator::CONTEXT_TOKEN] = $token;
+        $context[Authenticator::CONTEXT_ID] = $id;
+        $context[Authenticator::CONTEXT_DATA] = $data;
+
+        Session::Set($this->contextName, $context);
+
+        setcookie($this->contextName . "_" . Authenticator::CONTEXT_TOKEN, $token, 0, "/");
+        setcookie($this->contextName . "_" . Authenticator::CONTEXT_ID, $id, 0, "/");
+
+        //        if (is_array($data)) {
+        //            foreach ($data as $key => $val) {
+        //                setcookie($this->contextName."_".Authenticator::CONTEXT_DATA."_".$key, $val, 0, "/");
+        //            }
+        //        }
+
+        debugArray(get_class($this) . " Context data: ", Session::Get($this->contextName));
+        debugArray(get_class($this) . " Cookie data: ", $_COOKIE);
+        // do not redirect below
     }
 
     /**
-    * Perform checking of the authenticated state stored into the session
-    * @param string $auth_context The named context to check authentication state
-    * @param boolean $skip_cookie_check Authentication state is stored in session and into the COOKIE array.
-    *                Setting this parameter to false is skipping the checks with COOKIE
-    */
-    protected static function checkAuthStateImpl($auth_context, $skip_cookie_check=false)
+     * Perform checking of the authenticated state stored into the session and cookies
+     * @param bool $skip_cookie_check
+     * @param array|null $user_data
+     * @return bool
+     */
+    public function validate(bool $skip_cookie_check = false, array $user_data = NULL)
     {
-	self::$lastID = -1;
-	
-	if (!Session::contains($auth_context)) return false;
 
-	$auth_array = $_SESSION[$auth_context];
+        debug(get_class($this) . " Validate authenticated state: skip_cookie_check: " . $skip_cookie_check);
 
-	if (!isset($auth_array["auth"]) || !isset($auth_array["id"])) return false;
+        if (!Session::Contains($this->contextName)) {
+            debug(get_class($this) . " Session array does not contain context name: " . $this->contextName);
+            return false;
+        }
 
-	$session_auth = $auth_array["auth"];
-	$session_id = $auth_array["id"];
+        $context = Session::Get($this->contextName);
 
-	if ($skip_cookie_check) {
-	    self::$lastID = $session_id;
-	    return true;
-	}
-	
-	//session expired
-	if (!isset($_COOKIE[$auth_context."_auth"]) || !isset($_COOKIE[$auth_context."_id"]) ) return false;
+        debugArray(get_class($this) . " context name: " . $this->contextName . " Data: ", $context);
 
-	$cookie_auth = $_COOKIE[$auth_context."_auth"];
-	$cookie_id = $_COOKIE[$auth_context."_id"];
+        if (!isset($context[Authenticator::CONTEXT_TOKEN]) || !isset($context[Authenticator::CONTEXT_ID])) return false;
 
-	if (strcmp($session_auth, $cookie_auth)==0 && strcmp($session_id, $cookie_id)==0 )
-	{
-	    self::$lastID = $session_id;
-	    return true;
-	}
-	
-	return false;
+        $session_token = $context[Authenticator::CONTEXT_TOKEN];
+        $session_id = $context[Authenticator::CONTEXT_ID];
+
+        if ($skip_cookie_check) {
+            return true;
+        }
+
+        debug(get_class($this) . " Validating cookie values");
+
+
+        //session expired
+        if (!isset($_COOKIE[$this->contextName . "_" . Authenticator::CONTEXT_TOKEN]) || !isset($_COOKIE[$this->contextName . "_" . Authenticator::CONTEXT_ID])) {
+            debug(get_class($this) . " Required cookies were not found");
+            return false;
+        }
+
+        $cookie_token = $_COOKIE[$this->contextName . "_" . Authenticator::CONTEXT_TOKEN];
+        $cookie_id = $_COOKIE[$this->contextName . "_" . Authenticator::CONTEXT_ID];
+
+        if (strcmp($session_token, $cookie_token) == 0 && strcmp($session_id, $cookie_id) == 0) {
+            debug(get_class($this) . " Cookie values matched successfully");
+            return true;
+        }
+
+        debug(get_class($this) . " Cookie values does not match session values");
+
+        return false;
     }
-    
+
     /**
-    * Clear the authenticated state for this context
-    * @param string $context The named authentication context
-    */
-    protected static function clearAuthState($context)
+     * Logout. Clears any stored authentication data for a named context - '$name'
+     */
+    public function logout()
     {
-	setcookie($context."_id","",1,"/", COOKIE_DOMAIN);
-	setcookie($context."_auth","",1,"/", COOKIE_DOMAIN);
+        Session::Clear($this->contextName);
+        foreach ($_COOKIE as $key => $val) {
+            if (strpos($key, $this->contextName) === 0) {
+                setcookie($key, "", 1, "/", COOKIE_DOMAIN);
+            }
+        }
     }
-    
+
+
     /**
-    * Prepare the authentication context token with Session and COOKIE
-    * @param stirng $context The named context
-    * @param array $authstore The array of values to store into the authentication context 
-    */
-    public static function prepareAuthState($context, $authstore)
+     * Return the context name this class is handling
+     * @return string
+     */
+    public function name()
     {
-	session_regenerate_id(true);
-
-	$expire = time() + 60 * 60 * 24 *  365; // set expiration duration to one year
-
-	$auth_token=Authenticator::generateRandomAuth();
-
-
-	$_SESSION[$context]["auth"]=$auth_token;
-	setcookie($context."_auth", $auth_token, $expire, "/", COOKIE_DOMAIN);
-
-	foreach ($authstore as $key=>$val){
-	  $_SESSION[$context][$key]=$val;
-
-	  setcookie($context."_".$key, $val, $expire, "/", COOKIE_DOMAIN);
-	}
-	// do not redirect below
-    }
-    
-    public  static function authenticate($username, $pass, $rand, $remember_me=false, $check_password_only=false)
-    {
-	    throw new Exception("Not implemented");
-    }
-    public  static function updateLastSeen($userID)
-    {
-	    throw new Exception("Not implemented");
-    }
-    public  static function checkAuthState($skip_cookie_check=false, $user_data=NULL)
-    {
-	    throw new Exception("Not implemented");
+        return $this->contextName;
     }
 
-    public  static function getAuthContext()
+    public function getLoginURL()
     {
-	throw new Exception("Not implemented");
+        return $this->loginURL;
     }
+
+    public function setLoginURL(string $url)
+    {
+        $this->loginURL = $url;
+    }
+
+    /**
+     * @param bool $skip_cookie_check
+     * @param array|null $user_data
+     * @return mixed|null
+     */
+    public function data(bool $skip_cookie_check = false, array $user_data = NULL)
+    {
+        $context = NULL;
+
+        if ($this->validate($skip_cookie_check, $user_data)) {
+            $context = Session::Get($this->contextName, NULL);
+        }
+
+        return $context;
+    }
+
+    /**
+     * @param $username
+     * @param $pass
+     * @param $rand
+     * @param bool $remember_me
+     * @param bool $check_password_only
+     * @throws Exception
+     */
+    abstract public function authenticate(string $username, string $pass, $rand, bool $remember_me = false, bool $check_password_only = false);
+
+    /**
+     * @param $userID
+     * @throws Exception
+     */
+    abstract public function updateLastSeen($userID);
 }
+
 ?>

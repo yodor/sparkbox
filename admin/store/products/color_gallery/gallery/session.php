@@ -1,7 +1,7 @@
 <?php
 
 $cdir = dirname(__FILE__);
-$realpath = realpath ( $cdir."/../" );
+$realpath = realpath($cdir . "/../");
 include_once("$realpath/session.php");
 
 ?>

@@ -1,5 +1,5 @@
 <?php
-include_once ("lib/beans/DBTableBean.php");
+include_once("lib/beans/DBTableBean.php");
 
 
 class ProductFeaturesBean extends DBTableBean
@@ -12,11 +12,12 @@ class ProductFeaturesBean extends DBTableBean
  KEY `prodID` (`prodID`),
  CONSTRAINT `product_features_ibfk_1` FOREIGN KEY (`prodID`) REFERENCES `products` (`prodID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-    
-    public function __construct() 
+
+    public function __construct()
     {
-	parent::__construct("product_features");
+        parent::__construct("product_features");
     }
 
 }
+
 ?>

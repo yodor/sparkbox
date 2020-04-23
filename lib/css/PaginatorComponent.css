@@ -1,91 +1,97 @@
 .PaginatorComponent {
 
-  display:inline-table;
-  
-  border-spacing:5px;
-  border-collapse:separate;
-  width:100%;
+    display: inline-table;
+
+    border-spacing: 5px;
+    border-collapse: separate;
+    width: 100%;
 }
 
 .PaginatorComponent .cell {
-  display:table-cell;
-  vertical-align:middle;
+    display: table-cell;
+    vertical-align: middle;
 
 }
+
 .PaginatorComponent .cell label:after {
     content: ":";
-    padding-right:5px;
+    padding-right: 5px;
 }
+
 .PaginatorTopComponent .view_mode {
-  text-align:left;
-  vertical-align:middle;
-  white-space:nowrap;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 .PaginatorTopComponent .view_mode .icon {
-  background-repeat:no-repeat;
-  width:16px;
-  height:16px;
-  display:inline-block;
-  vertical-align:middle;
-  margin-right:5px;
+    background-repeat: no-repeat;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
 }
+
 .PaginatorTopComponent .view_mode .icon.list {
-  background-image:url("../images/list_actions/icon_list.png");
+    background-image: url("../images/list_actions/icon_list.png");
 }
+
 .PaginatorTopComponent .view_mode .icon.grid {
-  background-image:url("../images/list_actions/icon_grid.png");
+    background-image: url("../images/list_actions/icon_grid.png");
 }
-.PaginatorTopComponent .cell+.cell.caption {
-  text-align:center;
+
+.PaginatorTopComponent .cell + .cell.caption {
+    text-align: center;
 }
+
 .PaginatorTopComponent .caption {
-  font-weight:bold;
-  text-align:left;
-/*   width:100%; */
+    font-weight: bold;
+    text-align: left;
+    /*   width:100%; */
 }
 
 .PaginatorTopComponent .page_navigation.short {
-  text-align:right;
-  white-space:nowrap;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .PaginatorTopComponent .page_navigation.short A {
-  color:black;
+    color: black;
 
 }
 
 
 .PaginatorComponent .page_info {
 
-  text-align:left;
-  white-space:nowrap;
+    text-align: left;
+    white-space: nowrap;
 }
 
 .PaginatorComponent .page_navigation.long {
 
-  text-align:center;
-  
+    text-align: center;
+
 }
 
 .PaginatorComponent .page_navigation.long A {
-  color:#537689;
-  padding-left:5px;
-  padding-right:5px;
-  display:inline-block;
-  text-decoration:none;
+    color: #537689;
+    padding-left: 5px;
+    padding-right: 5px;
+    display: inline-block;
+    text-decoration: none;
 }
 
 .PaginatorComponent .page_navigation.long A.selected {
-  color:black;
-  padding-left:5px;
-  padding-right:5px;
-  border:1px solid #537689;
-  font-weight:bold;
+    color: black;
+    padding-left: 5px;
+    padding-right: 5px;
+    border: 1px solid #537689;
+    font-weight: bold;
 }
 
 .PaginatorComponent .results_info {
 
-  text-align:right;
-  white-space:nowrap;
+    text-align: right;
+    white-space: nowrap;
 }

@@ -3,7 +3,7 @@ include_once("lib/beans/NestedSetBean.php");
 
 class MenuItemsBean extends NestedSetBean
 {
-	protected $createString = "CREATE TABLE `menu_items` (
+    protected $createString = "CREATE TABLE `menu_items` (
  `menuID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `menu_title` varchar(50) NOT NULL,
  `link` varchar(255) NOT NULL,
@@ -13,10 +13,10 @@ class MenuItemsBean extends NestedSetBean
  PRIMARY KEY (`menuID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-	public function __construct($table_name="menu_items")
-	{
-		parent::__construct($table_name);
-	}
+    public function __construct($table_name = "menu_items")
+    {
+        parent::__construct($table_name);
+    }
 
 }
 

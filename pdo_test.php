@@ -3,11 +3,11 @@ include_once("session.php");
 $prop = new DBConnectionProperties();
 $prop->driver = "PDOMySQL";
 
-$prop->database="store_demo";
-$prop->user="store_demo";
-$prop->pass="store_demo";
-$prop->host="localhost";
-$prop->port="3306";
+$prop->database = "store_demo";
+$prop->user = "store_demo";
+$prop->pass = "store_demo";
+$prop->host = "localhost";
+$prop->port = "3306";
 $prop->setConnectionName("pdo");
 $prop->is_pdo = true;
 DBConnections::addConnection($prop);
@@ -16,7 +16,7 @@ DBConnections::addConnection($prop);
 DBDriver::create(true, false, "pdo");
 
 
-$db = DBDriver::get();
+$db = DBDriver::Get();
 
 // $res = $db->query("SELECT * FROM products");
 // while ($row = $db->fetch($res)) {
@@ -33,8 +33,8 @@ $db->execute($res);
 // var_dump($db->query('SELECT FOUND_ROWS();')->fetch(PDO::FETCH_COLUMN));
 
 var_dump($db->query(" SELECT FOUND_ROWS() ")->fetchColumn());
- 
-$res = null;
+
+$res = NULL;
 
 
 ?>

@@ -5,24 +5,24 @@ class AdminRolesSelector extends ArrayDataBean
 {
 
 
-  protected function initFields() 
-  {
-      $this->fields=array("roles");
-      $this->prkey="roles";
-  }
-  
-  protected function initValues() 
-  {
-      global $all_roles; //from config/admin_roles.php
+    protected function initFields()
+    {
+        $this->fields = array("roles");
+        $this->key = "roles";
+    }
 
-      if (is_array($all_roles)) {
-	$this->values = array();
-	foreach ($all_roles as $key=>$val)
-	{
-	    $this->values[] = array($this->prkey=>$val);
-	}
-      }
+    protected function initValues()
+    {
+        global $all_roles; //from config/admin_roles.php
 
-  }
+        if (is_array($all_roles)) {
+            $this->values = array();
+            foreach ($all_roles as $key => $val) {
+                $this->values[] = array($this->key => $val);
+            }
+        }
+
+    }
 }
+
 ?>

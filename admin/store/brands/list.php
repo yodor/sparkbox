@@ -4,9 +4,7 @@ include_once("class/pages/AdminPage.php");
 include_once("class/beans/BrandsBean.php");
 include_once("lib/components/TableView.php");
 
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
@@ -15,7 +13,6 @@ $action_add = new Action("", "add.php", array());
 $action_add->setAttribute("action", "add");
 $action_add->setAttribute("title", "Add Brand");
 $page->addAction($action_add);
-
 
 
 $bean = new BrandsBean();
@@ -28,35 +25,31 @@ $view = new TableView(new BeanResultIterator($bean));
 $view->setCaption("Brands List");
 $view->setDefaultOrder(" brand_name ASC ");
 
-$view->addColumn(new TableColumn($bean->getPrKey(),"ID"));
-$view->addColumn(new TableColumn("brand_name","Name"));
-$view->addColumn(new TableColumn("summary","Summary"));
-$view->addColumn(new TableColumn("url","URL"));
+$view->addColumn(new TableColumn($bean->key(), "ID"));
+$view->addColumn(new TableColumn("brand_name", "Name"));
+$view->addColumn(new TableColumn("summary", "Summary"));
+$view->addColumn(new TableColumn("url", "URL"));
 
 
-$view->addColumn(new TableColumn("actions","Actions"));
+$view->addColumn(new TableColumn("actions", "Actions"));
 
 
 $act = new ActionsTableCellRenderer();
-$act->addAction(
-  new Action("Edit", "add.php", array(new ActionParameter("editID",$bean->getPrKey()))  )
-); 
-$act->addAction(  new PipeSeparatorAction() );
-$act->addAction( $h_delete->createAction() );
-
+$act->addAction(new Action("Edit", "add.php", array(new ActionParameter("editID", $bean->key()))));
+$act->addAction(new PipeSeparatorAction());
+$act->addAction($h_delete->createAction());
 
 
 $view->getColumn("actions")->setCellRenderer($act);
 
-Session::set("brands.list", $page->getPageURL());
+Session::Set("brands.list", $page->getPageURL());
 
-$page->beginPage($menu);
+$page->startRender($menu);
 $page->renderPageCaption();
 
 $view->render();
 
 
-
-$page->finishPage();
+$page->finishRender();
 
 ?>

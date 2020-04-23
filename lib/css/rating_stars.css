@@ -1,27 +1,31 @@
 .rating_stars {
-  cursor:pointer;
-  position:relative;
-  display:table;
+    cursor: pointer;
+    position: relative;
+    display: table;
 }
+
 .rating_stars .star {
-  width:17px;
-  height:15px;
-  display:table-cell;
-  padding:2px;
+    width: 17px;
+    height: 15px;
+    display: table-cell;
+    padding: 2px;
 }
+
 .rating_stars .star.on {
-  background-image:url(/images/icon_star_on.png);
-  background-position:center center;
-  background-repeat:no-repeat;
+    background-image: url(/images/icon_star_on.png);
+    background-position: center center;
+    background-repeat: no-repeat;
 }
+
 .rating_stars .star.off {
-  background-image:url(/images/icon_star_off.png);
-  background-position:center center;
-  background-repeat:no-repeat;
+    background-image: url(/images/icon_star_off.png);
+    background-position: center center;
+    background-repeat: no-repeat;
 }
+
 .rating_stars .star.half {
-  background-image:url(/images/icon_star_half.png);
-  background-position:center center;
-  background-repeat:no-repeat;
+    background-image: url(/images/icon_star_half.png);
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 

@@ -10,14 +10,17 @@ function trbean($id, $field_name, &$row, DBTableBean $bean)
 {
 
 }
+
 function tr($str_original)
 {
-	return $str_original;
+    return $str_original;
 
 }
+
 function trnum($val)
 {
 
-	return $val;
+    return $val;
 }
+
 ?>

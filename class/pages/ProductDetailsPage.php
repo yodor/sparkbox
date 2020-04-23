@@ -14,31 +14,17 @@ class ProductDetailsPage extends ProductsPage
     protected function dumpCSS()
     {
         parent::dumpCSS();
-        echo "<link rel='stylesheet' href='".SITE_ROOT."css/product_details.css?ver=1.2' type='text/css'>";
+        echo "<link rel='stylesheet' href='" . SITE_ROOT . "css/product_details.css?ver=1.2' type='text/css'>";
         echo "\n";
     }
-    
+
     protected function dumpJS()
     {
         parent::dumpJS();
- 	echo "<script type='text/javascript' src='".SITE_ROOT."js/product_details.js?ver=1.2'></script>";
- 	echo "\n";
+        echo "<script type='text/javascript' src='" . SITE_ROOT . "js/product_details.js?ver=1.2'></script>";
+        echo "\n";
     }
 
-    protected function dumpMetaTags()
-    {
-        parent::dumpMetaTags();
-    }
-
-    public function beginPage()
-    {
-        parent::beginPage();
-    }
-
-    public function finishPage()
-    {
-	parent::finishPage();
-    }
 
 }
 

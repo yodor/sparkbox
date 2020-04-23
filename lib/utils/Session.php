@@ -1,54 +1,74 @@
 <?php
-class Session {
 
+/**
+ * Class Session
+ * Session/Cookie access
+ */
+class Session
+{
+    protected static $is_started = false;
 
-	public function __construct() 
-	{
-		 
-	  session_start();
+    public static function Start()
+    {
+        session_start();
+        Session::$is_started = true;
+        debug("Starting session with ID: " . session_id());
+    }
 
-	}
+    public static function Destroy()
+    {
+        session_destroy();
+        Session::$is_started = false;
+    }
 
+    public static function Contains(string $key)
+    {
+        return isset($_SESSION[$key]);
+    }
 
-	public static function contains($key){
-		return isset($_SESSION[$key]);
-	}
-	
-	public static function destroy(){
-		session_destroy();
+    public static function Get(string $key, $default = NULL)
+    {
+        if (isset($_SESSION[$key])) {
+            return $_SESSION[$key];
+        }
+        return $default;
+    }
 
-	}
-	public static function get($key, $default=false){
-		if (isset($_SESSION[$key])){
-			return $_SESSION[$key];
-		}
-		return $default;
-	}
+    public static function Set(string $key, $val)
+    {
+        $_SESSION[$key] = $val;
+    }
 
-	public static function set($key, $val){
-		$_SESSION[$key]=$val;
-	}
+    public static function Clear(string $key)
+    {
+        if (isset($_SESSION[$key])) {
+            unset($_SESSION[$key]);
+        }
+    }
 
-	public static function clear($key){
-		if (isset($_SESSION[$key])){
-			unset($_SESSION[$key]);
-		}
-	}
+    public static function SetCookie($key, $val, $expire = false)
+    {
+        if (!$expire) {
+            $expire = time() + 60 * 60 * 24 * 365;
+        }
 
-	public static function giveCookie($key, $val, $expire=false)
-	{
-		if (!$expire)	$expire = time() + 60 * 60 * 24 *  365;
+        setcookie($key, $val, $expire, "/", COOKIE_DOMAIN);
+    }
 
-		setCookie($key, $val, $expire, "/", COOKIE_DOMAIN);
-	}
-	public static function cookie($key, $default=false) {
-		if (isset($_COOKIE[$key])){
-			return $_COOKIE[$key];
-		}
-		else return $default;
-	}
-	public static function haveCookie($key) {
-		return isset($_COOKIE[$key]);
-	}
+    public static function GetCookie($key, $default = false)
+    {
+        if (isset($_COOKIE[$key])) {
+            return $_COOKIE[$key];
+        }
+        else {
+            return $default;
+        }
+    }
+
+    public static function HaveCookie($key)
+    {
+        return isset($_COOKIE[$key]);
+    }
 }
+
 ?>

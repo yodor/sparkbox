@@ -1,7 +1,6 @@
 <?php
 
-//tag to recognize all components that need to be rendered before ending body tag
-//All implementing IFinalRenderer delegate rendering to SimplePage
+//All components implementing this interface would get the output of renderFinal() placed before the ending body tag
 interface IFinalRenderer
 {
     public function renderFinal();

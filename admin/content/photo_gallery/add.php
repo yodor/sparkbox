@@ -1,11 +1,9 @@
 <?php
-define("DEBUG_OUTPUT", 1);
 include_once("session.php");
 include_once("class/pages/AdminPage.php");
 include_once("class/beans/GalleryPhotosBean.php");
 
 include_once("lib/forms/PhotoInputForm.php");
-
 
 
 $page = new AdminPage();
@@ -17,17 +15,15 @@ $event_photos = new GalleryPhotosBean();
 //prefer db_row
 $view = new InputFormView($event_photos, new PhotoInputForm());
 
-$form = $view->getForm()->getField("photo")->transact_mode = InputField::TRANSACT_DBROW;
+$form = $view->getForm()->getField("photo")->transact_mode = DataInput::TRANSACT_DBROW;
 
 $view->processInput();
 
-$page->beginPage();
+$page->startRender();
 
 $view->render();
 
-$page->finishPage();
-
-
+$page->finishRender();
 
 
 ?>

@@ -5,9 +5,7 @@ include_once("lib/forms/MenuItemInputForm.php");
 include_once("lib/beans/MenuItemsBean.php");
 
 
-$menu=array(
-
-);
+$menu = array();
 
 $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
@@ -18,17 +16,17 @@ $view = new InputFormView($bean, new MenuItemInputForm($bean));
 
 $view->processInput();
 
-$page->beginPage($menu);
+$page->startRender($menu);
 
 
 $view->render();
 
 
 $qry = $_GET;
-if(isset($qry["page_id"])) unset($qry["page_id"]);
-if(isset($qry["page_class"])) unset($qry["page_class"]);
+if (isset($qry["page_id"])) unset($qry["page_id"]);
+if (isset($qry["page_class"])) unset($qry["page_class"]);
 
-$_SESSION["chooser_return"] = $_SERVER['PHP_SELF'].queryString($qry);
+$_SESSION["chooser_return"] = $_SERVER['PHP_SELF'] . queryString($qry);
 
-$page->finishPage();
+$page->finishRender();
 ?>

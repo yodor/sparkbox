@@ -1,0 +1,239 @@
+.InputField.SessionUpload {
+
+    background-color: transparent;
+    border: 0;
+
+}
+
+.InputField.SessionUpload .FieldElements {
+
+
+}
+
+.InputField.SessionUpload .Details {
+    display: block;
+
+}
+
+.InputField.SessionUpload .Details .Caption {
+
+}
+
+.InputField.SessionUpload .Details .Limits {
+    display:block;
+}
+
+.InputField.SessionUpload .Details .Limits SPAN {
+    display: inline-block;
+    font-size: 80%;
+}
+
+.InputField.SessionUpload .Details .Limits LABEL {
+    display: inline-block;
+    font-size: 80%;
+}
+
+.InputField.SessionUpload .Details .Limits [field='max_post_size'] {
+    display: none;
+}
+
+.InputField.SessionUpload .Details .Limits [field='memory_limit'] {
+    display: none;
+}
+
+
+.InputField.SessionUpload .Controls {
+    display: inline-block;
+    /*overflow: hidden;*/
+    position: relative;
+
+    cursor: pointer;
+
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    min-width: 100px;
+    min-height: 30px;
+
+    margin-top: 5px;
+
+    text-align: center;
+
+}
+
+.InputField.SessionUpload .Controls BUTTON {
+
+    vertical-align: middle;
+
+    text-align: center;
+
+    position: absolute;
+    left: 0px;
+    top: 0px;
+
+
+}
+
+.InputField.SessionUpload .Controls INPUT[type="file"] {
+
+    width: 100%;
+    height: 100%;
+
+    -moz-opacity: 0;
+    filter: alpha(opacity:0);
+    opacity: 0;
+    z-index: 2;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    cursor: pointer;
+}
+
+
+.InputField.SessionUpload .Controls .progress {
+    width: 120px;
+    height: 15px;
+
+    margin-top: 5px;
+    margin-right: 20px;
+
+    display: block;
+    position: relative;
+
+    border: 1px solid #555;
+    border-radius: 3px;
+
+    visibility: hidden;
+}
+
+.InputField.SessionUpload .Controls.working .progress {
+    visibility: visible;
+
+}
+
+
+.InputField.SessionUpload .Controls .progress .bar {
+    background-color: #b4f5b4;
+    width: 0%;
+    height: 15px;
+
+    border-radius: 3px;
+    display: block;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 0;
+}
+
+.InputField.SessionUpload .Controls .progress .percent {
+
+    display: block;
+
+    font-size: 9px;
+    text-align: center;
+
+    position: relative;
+    z-index: 1;
+
+    margin-top: 2px;
+
+}
+
+.InputField.SessionUpload .Controls.working {
+    background-image: url("/lib/images/ajax-loader.gif");
+    background-repeat: no-repeat;
+    background-position: right center;
+}
+
+.InputField.SessionUpload .Controls.working INPUT[type="button"] {
+    visibility: hidden;
+}
+
+.InputField.SessionUpload .Controls.working BUTTON[value="browse"] {
+    visibility: hidden;
+}
+
+
+.InputField.SessionUpload .ArrayContents {
+    display: block !important;
+    vertical-align: top;
+    margin-top: 15px;
+
+}
+
+.InputField.SessionUpload .ArrayContents .Element {
+    display: inline-block !important;
+    vertical-align: top;
+    position: relative;
+    margin-left: 10px;
+}
+
+.InputField.SessionUpload .ArrayContents .Element .thumbnail {
+
+    display: inline-block;
+    vertical-align: top;
+
+    margin-right: 10px;
+    margin-bottom: 10px;
+
+}
+
+.InputField.SessionUpload .ArrayContents .Element .remove_button {
+    width: 20px;
+    height: 20px;
+    display: block;
+    border-radius: 20px;
+    background-color: black;
+    color: #ffffff;
+    border: 2px solid white;
+    text-align: center;
+    text-decoration: none;
+    position: absolute;
+
+    left: 0px;
+    top: 0px;
+    margin-left: -10px;
+    margin-top: -10px;
+
+    box-sizing: border-box;
+    -moz-box-sizing: border-box; /* Firefox */
+
+    padding-right: 0px;
+
+    font-size: 12px;
+    font-family: "Consolas", "Mono";
+
+    font-weight: bold;
+    text-transform: lowercase;
+
+    cursor: pointer;
+}
+
+/* file upload control */
+
+.InputField.SessionFileField.SessionUpload .ArrayContents {
+
+}
+
+.InputField.SessionFileField.SessionUpload .ArrayContents .Element {
+
+    display: block !important;
+
+}
+
+
+.InputField.SessionFileField.SessionUpload .ArrayContents .Element .thumbnail {
+    margin-right: 0px;
+}
+
+.InputField.SessionFileField.SessionUpload .ArrayContents .Element .details {
+    display: inline-block;
+}
+
+.InputField.SessionFileField.SessionUpload .ArrayContents .Element .filename {
+    display: block;
+}
+
+.InputField.SessionFileField.SessionUpload .ArrayContents .Element .filesize {
+    display: block;
+}

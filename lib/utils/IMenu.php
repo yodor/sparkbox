@@ -2,7 +2,7 @@
 
 interface IMenu
 {
-	
+
 
 }
 

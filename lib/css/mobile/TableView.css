@@ -1,112 +1,118 @@
 
 .TableView {
-    display:block;
+    display: block;
 }
+
 .TableView tbody {
-    display:block;
+    display: block;
 }
+
 .TableView TR {
-    display:block;
-    border-bottom:1px dashed #50a9f9;
-    padding-bottom:5px;
-    padding-top:5px;
+    display: block;
+    border-bottom: 1px dashed #50a9f9;
+    padding-bottom: 5px;
+    padding-top: 5px;
 }
+
 .TableView TR.odd {
-    background-color:#f3f6fb;
+    background-color: #f3f6fb;
 }
 
 /*header sorting */
 .TableView tbody TR:first-child {
-    text-align:center;
+    text-align: center;
 }
 
 .TableView .viewport TD {
-    display:block;
-    padding-top:1px;
-    padding-bottom:1px;
-    font-size:1.2em;
-    padding-left:0px;
-    padding-right:0px;
-    
+    display: block;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-size: 1.2em;
+    padding-left: 0px;
+    padding-right: 0px;
+
 }
+
 .TableView .viewport .TableCellRenderer {
-    text-align:left;
-    
-    
+    text-align: left;
+
+
 }
+
 .TableView .viewport TD.odd {
-    border:none;
-    text-align:left;
+    border: none;
+    text-align: left;
 }
+
 .TableView .viewport TD.even {
-    border:none;
-    text-align:left;
+    border: none;
+    text-align: left;
 }
 
 .TableView .viewport TH {
-    display:inline-block;
+    display: inline-block;
 }
 
-.TableView .viewport TD:not([title='']):before  {
+.TableView .viewport TD:not([title='']):before {
     content: attr(title) ": ";
 }
 
 .TableView .viewport .TableImageCellRenderer {
-    
+
 }
 
-.TableView .viewport .TableImageCellRenderer:not([title='']):before  {
+.TableView .viewport .TableImageCellRenderer:not([title='']):before {
     content: attr(title) ": ";
-    display:block;  
+    display: block;
 }
 
 .TableView .viewport .ActionsTableCellRenderer {
-    
-    display:block;
-    position:relative;
-    text-align:right !important;
-    
+
+    display: block;
+    position: relative;
+    text-align: right !important;
+
 }
 
 .TableView .viewport .ActionsTableCellRenderer .actions_list {
-    text-align:right;
+    text-align: right;
 }
 
 .TableView .viewport .ActionsTableCellRenderer .actions_list .ActionRenderer {
-    display:inline-block;
-    
+    display: inline-block;
+
 }
 
 .TableView .viewport .ActionsTableCellRenderer .actions_list .ActionRenderer[action*='Separator'] {
     color: #cccccc;
-    font-weight:bold;
-    padding-left:2px;
-    padding-right:3px;
+    font-weight: bold;
+    padding-left: 2px;
+    padding-right: 3px;
 }
 
 .TableView .viewport .ActionsTableCellRenderer .actions_list .ActionRenderer[action='RowSeparator'] {
-    display:block;
+    display: block;
 }
 
-.TableView .viewport .ActionsTableCellRenderer:not([title='']):before  {
+.TableView .viewport .ActionsTableCellRenderer:not([title='']):before {
     content: attr(title) ": ";
-    display:block;
-    text-align:center;
-    
-    color:black;
-    background-color:#d3e7f9;
+    display: block;
+    text-align: center;
+
+    color: black;
+    background-color: #d3e7f9;
 }
 
 .TableView TH[column='actions'] {
-    display:none;
+    display: none;
 }
 
 .TableView .viewport .TableCellImageList {
-    display:block;
+    display: block;
 }
 
 .TableView .viewport .TableCellImageList .TableCellImageItem {
-    display:inline-block;
-    padding:3px;
-    
+    display: inline-block;
+    padding: 3px;
+
 }

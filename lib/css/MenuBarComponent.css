@@ -1,122 +1,134 @@
 .MenuBar {
-  background-color:white; 
-  font-size:1.3em;
-  z-index:2;
+    background-color: white;
+    /*font-size: 100%;*/
+    z-index: 2;
 }
+
 .MenuBarComponent {
-  display:table;
-  
+    display: table;
+
 }
+
 .MenuBarComponent .MenuBarItemRenderer {
-  display:table-cell;
-  vertical-align:middle;
-  padding-left:5px;
-  padding-right:5px;
-  cursor:pointer;
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    cursor: pointer;
 }
+
 .MenuBarComponent .MenuBarItemRenderer .MenuItemLink {
-  
-  color:black;
-  display:inline-block;
-  text-decoration:none;
-  
-  
+
+    color: black;
+    display: inline-block;
+    text-decoration: none;
+
+
 }
 
 .MenuBar .MenuBarComponent .MenuBarItemRenderer .MenuItemOuter {
-    padding-top:5px;
-    padding-bottom:5px;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
 }
 
 .MenuBarComponent .MenuSeparator {
-  display:table-cell;
-  vertical-align:middle;
-  width:0px;
-  border-left:1px dotted black;
+    display: table-cell;
+    vertical-align: middle;
+    width: 0px;
+    border-left: 1px dotted black;
 }
 
 .MenuBarComponent .MenuBarItemRenderer.Hover {
-  background-color:black;
-  color:white;
+    background-color: black;
+    color: white;
 }
+
 .MenuBarComponent .MenuBarItemRenderer.Hover .MenuItemLink {
-  color:white;
+    color: white;
 }
 
-.MenuBarComponent .MenuBarItemRenderer[active="1"] .MenuItemLink  {
-  border-bottom:2px solid black;
-}
-.MenuBarComponent .MenuBarItemRenderer[active="1"].Hover .MenuItemLink  {
-  border-bottom:2px solid white;
+.MenuBarComponent .MenuBarItemRenderer[active="1"] .MenuItemLink {
+    border-bottom: 0.1em solid black;
 }
 
-.MenuBar .MenuBarComponent .MenuBarItemRenderer .handle{
-  display:inline-block;
-  padding-left:5px;
-  padding-right:5px;
+.MenuBarComponent .MenuBarItemRenderer[active="1"].Hover .MenuItemLink {
+    border-bottom: 0.1em solid white;
 }
+
+.MenuBar .MenuBarComponent .MenuBarItemRenderer .handle {
+    display: inline-block;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+
 .MenuBar .MenuBarComponent .MenuBarItemRenderer .handle[data-line]:before {
-  content:attr(data-line);
+    content: attr(data-line);
 }
-    
+
 .SubmenuRenderer {
-  display:none;
-  z-index:100;
-  
-  position:absolute;
-  white-space:nowrap;
-  
-  background-color:white;
-  padding-top:5px;
-  padding-bottom:5px;
-  border:1px solid black;
-  text-align:left;
+    display: none;
+    z-index: 100;
+
+    position: absolute;
+    white-space: nowrap;
+
+    background-color: white;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    border: 1px solid black;
+    text-align: left;
 }
+
 .SubmenuRenderer.normal {
-    display:table;
+    display: table;
 }
+
 .SubmenuItemRenderer {
 
-  color:black;
-}
-.SubmenuItemRenderer>.SubmenuItemOuter {
-  padding:5px;
-  padding-right:0px;
-  
-}
-.SubmenuItemRenderer>.SubmenuItemOuter .SubmenuItemLink {
-  color:black;
-  text-decoration:none;
-  padding-right:5px;
+    color: black;
 }
 
-.SubmenuItemRenderer>.SubmenuItemOuter .handle {
-  text-align:right;
-  display:inline-block;
-  color:black;
-  padding-left:5px;
-  padding-right:5px;
-  display:none;
-}
-.SubmenuItemRenderer>.SubmenuItemOuter .handle[data-line]:before {
-  content:attr(data-line);
-}
-
-.SubmenuItemRenderer.Hover>.SubmenuItemOuter {
-  padding-top:5px;
-  padding-bottom:5px;
-  background-color:black;
-  color:white;
-}
-.SubmenuItemRenderer.Hover>.SubmenuItemOuter .SubmenuItemLink {
-  color:white;
+.SubmenuItemRenderer > .SubmenuItemOuter {
+    padding: 0.2em;
+    padding-right: 0;
 
 }
 
-.SubmenuItemRenderer.Hover>.SubmenuItemOuter .handle {
+.SubmenuItemRenderer > .SubmenuItemOuter .SubmenuItemLink {
+    color: black;
+    text-decoration: none;
+    padding-right: 0.2em;
+}
+
+.SubmenuItemRenderer > .SubmenuItemOuter .handle {
+    text-align: right;
+    display: inline-block;
+    /*color: black;*/
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    display: none;
+}
+
+.SubmenuItemRenderer > .SubmenuItemOuter .handle[data-line]:before {
+    content: attr(data-line);
+}
+
+.SubmenuItemRenderer.Hover > .SubmenuItemOuter {
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    background-color: black;
+    color: white;
+}
+
+.SubmenuItemRenderer.Hover > .SubmenuItemOuter .SubmenuItemLink {
+    color: white;
+
+}
+
+.SubmenuItemRenderer.Hover > .SubmenuItemOuter .handle {
 
 }
 
 .MenuBar .toggle {
-    display:none;
+    display: none;
 }

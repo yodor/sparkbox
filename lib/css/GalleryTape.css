@@ -1,73 +1,78 @@
- .GalleryTape {
-  border-top:1px solid #4a176e;
-  border-bottom:1px solid #4a176e;
-  display:table;
-  padding-top:15px;
-  padding-bottom:15px;
-  text-align:center;
-  position:relative;
-  width:100%;
-  table-layout:fixed;
-  
+.GalleryTape {
+    border-top: 1px solid #4a176e;
+    border-bottom: 1px solid #4a176e;
+    display: table;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    text-align: center;
+    position: relative;
+    width: 100%;
+    table-layout: fixed;
+
 }
+
 .GalleryTape .viewport {
-  display:table-cell;
-  overflow:hidden;
+    display: table-cell;
+    overflow: hidden;
 }
 
- .GalleryTape .button {
-  display:table-cell;
+.GalleryTape .button {
+    display: table-cell;
 
-  background-repeat:no-repeat;
-  vertical-align:middle;
-  cursor:pointer;
-  position:relative;
-  min-width:22px;
-  
-}
- .GalleryTape .button.left {
-  background-image:url("../images/gallery_tape_left.png");
-  background-position:center center;
-  width:32px;
-  min-height:44px;
-}
- .GalleryTape .button.right {
-  background-image:url("../images/gallery_tape_right.png");
-  background-position:center center;
-  width:32px;
-  min-height:44px;
-}
-
- .GalleryTape .slots {
-  display:block;
-  vertical-align:top;
-  position:relative;
-  overflow:hidden;
-  height:174px;
-  max-height:174px;
-  white-space:nowrap;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+    cursor: pointer;
+    position: relative;
+    min-width: 22px;
 
 }
- .GalleryTape .slots .slot {
-   
-  background-color:#f2f2f2;
-  padding:5px;
-  
-  display:inline-block;
-  vertical-align:top;
-  
-  border:1px solid #dcdedb;
-  -webkit-border-radius: 3px;
-  
--moz-border-radius: 3px;
-border-radius: 3px;
-margin-left:2px;
-margin-right:2px;
 
-position:relative;
-/*   float:left; */
+.GalleryTape .button.left {
+    background-image: url("../images/gallery_tape_left.png");
+    background-position: center center;
+    width: 32px;
+    min-height: 44px;
 }
- .GalleryTape .slots .slot IMG {
-  border:1px solid #dcdedb;
-  display:block;
+
+.GalleryTape .button.right {
+    background-image: url("../images/gallery_tape_right.png");
+    background-position: center center;
+    width: 32px;
+    min-height: 44px;
+}
+
+.GalleryTape .slots {
+    display: block;
+    vertical-align: top;
+    position: relative;
+    overflow: hidden;
+    height: 174px;
+    max-height: 174px;
+    white-space: nowrap;
+
+}
+
+.GalleryTape .slots .slot {
+
+    background-color: #f2f2f2;
+    padding: 5px;
+
+    display: inline-block;
+    vertical-align: top;
+
+    border: 1px solid #dcdedb;
+    -webkit-border-radius: 3px;
+
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
+
+    position: relative;
+    /*   float:left; */
+}
+
+.GalleryTape .slots .slot IMG {
+    border: 1px solid #dcdedb;
+    display: block;
 }

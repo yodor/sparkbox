@@ -8,7 +8,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
 
     //combined query using all filter_selects
     protected $filter_all = NULL;
-    
+
     //array of name=> IQueryFilter or 'value'
     protected $filters = array();
 
@@ -22,12 +22,12 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
     {
         return count($this->filter_value);
     }
-    
+
     public function getFilterAll()
     {
         return $this->filter_all;
     }
-    
+
     public function getFilterSelect($name)
     {
         if (isset($this->filter_select[$name])) {
@@ -37,7 +37,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
             return NULL;
         }
     }
-    
+
     public function getFilterValue($name)
     {
         if (isset($this->filter_value[$name])) {
@@ -47,12 +47,12 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
             return NULL;
         }
     }
-    
+
     public function appliedSelectFilters()
     {
         return $this->filter_select;
     }
-    
+
     public function appliedSelectValues()
     {
         return $this->filter_value;
@@ -66,38 +66,38 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         $combining_filter = new SelectQuery();
         $combining_filter->fields = "";
         $combining_filter->from = "";
-        
+
         $this->filter_all = $combining_filter;
     }
 
     public function addFilter($filter_name, $filter_key)
     {
         if ($filter_key instanceof IQueryFilter) {
-        
+
         }
-        else if (strcmp($filter_key, $this->relation_prkey)==0) {
-                throw new Exception("Relation primary key can not be used as filter key");
+        else if (strcmp($filter_key, $this->relation_prkey) == 0) {
+            throw new Exception("Relation primary key can not be used as filter key");
         }
-        
+
         $this->filters[$filter_name] = $filter_key;
     }
 
     protected function processGetVars(NestedSetTreeView $view)
     {
         parent::processGetVars($view);
-        $this->processCombiningFilters($view); 
+        $this->processCombiningFilters($view);
     }
-    
+
     public function processCombiningFilters(NestedSetTreeView $view)
     {
         $combining_filter = $this->filter_all;
 
-        foreach ($this->filters as $name=>$value) {
-        
-            if ( !isset($_GET[$name]) ) continue;
-            
-            $filter_value = DBDriver::get()->escapeString($_GET[$name]);
-            if (!$filter_value)continue;
+        foreach ($this->filters as $name => $value) {
+
+            if (!isset($_GET[$name])) continue;
+
+            $filter_value = DBDriver::Get()->escapeString($_GET[$name]);
+            if (!$filter_value) continue;
 
             $sel = new SelectQuery();
             if ($value instanceof IQueryFilter) {
@@ -117,37 +117,37 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         //echo $combining_filter->getSQL();
         $this->filter_all = $combining_filter;
     }
-    
+
     protected function processTextAction(NestedSetTreeView $view)
     {
         parent::processTextAction($view);
 
         $text_action = $view->getItemRenderer()->getTextAction();
-        
-        foreach ($this->filter_value as $name=>$value) {
+
+        foreach ($this->filter_value as $name => $value) {
             $text_action->addParameter(new ActionParameter($name, $value, true));
         }
     }
-    
-    public function applyFiltersOn(NestedSetTreeView $view, &$sel, $filter_name, $skip_self=false)
+
+    public function applyFiltersOn(NestedSetTreeView $view, &$sel, $filter_name, $skip_self = false)
     {
         if (!$view) throw new Exception("Filter processing not finished");
-        
+
         // $sel = $sel->combineWith($this->getFilterAll());
 
-        foreach ($this->filter_select as $name=>$qry)
-        {
-            if ($skip_self && strcmp($filter_name, $name)===0) continue;
+        foreach ($this->filter_select as $name => $qry) {
+            if ($skip_self && strcmp($filter_name, $name) === 0) continue;
             $sel = $sel->combineWith($qry);
         }
 
         $nodeID = $view->getSelectedID();
 
-        if ($nodeID>0) {
+        if ($nodeID > 0) {
             $sel->where = " relation.catID = child.catID ";
             $sel = $view->getSource()->childNodesWith($sel, $nodeID);
         }
         return $this->getFilterValue($filter_name);
     }
 }
+
 ?>

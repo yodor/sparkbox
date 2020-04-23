@@ -1,6 +1,6 @@
 <?php
-include_once ("lib/beans/OrdersBean.php");
-include_once ("lib/cart/PaymentResult.php");
+include_once("lib/beans/OrdersBean.php");
+include_once("lib/cart/PaymentResult.php");
 
 abstract class PaymentProcessor
 {
@@ -14,39 +14,43 @@ abstract class PaymentProcessor
 
     public function __construct($userID)
     {
-        $this->userID=$userID;
+        $this->userID = $userID;
     }
 
     protected abstract function processOrderImpl($orderID, $order_row);
+
     protected abstract function processTokenImpl($token);
+
     protected abstract function cancelTokenImpl($token);
 
     public function processOrder($orderID)
     {
-        $order_row = PaymentProcessor::checkOrder($orderID,$this->userID);
+        $order_row = PaymentProcessor::checkOrder($orderID, $this->userID);
         $result = $this->processOrderImpl($orderID, $order_row);
         $this->paymentFinal($result);
-        
+
     }
 
     public function processToken($token)
     {
         $result = $this->processTokenImpl($token);
-		$chk = get_class($result);
-		if ($chk && strcmp($chk,"PaymentResult")==0) {
-		  $this->paymentFinal($result);
-		}
-		else {
-		  throw new Exception("Undefined Error Processing payment");
-		}
+        $chk = get_class($result);
+        if ($chk && strcmp($chk, "PaymentResult") == 0) {
+            $this->paymentFinal($result);
+        }
+        else {
+            throw new Exception("Undefined Error Processing payment");
+        }
 
     }
+
     public function cancelToken($token)
     {
-       $orderID = $this->cancelTokenImpl($token);
-       header("Location: payment.php?orderID=$orderID");
-       exit;
+        $orderID = $this->cancelTokenImpl($token);
+        header("Location: payment.php?orderID=$orderID");
+        exit;
     }
+
     protected function paymentFinal(PaymentResult $payment_result)
     {
 
@@ -54,7 +58,7 @@ abstract class PaymentProcessor
 
         $ob = new OrdersBean();
         $ob->finalizePayment($payment_result);
-    
+
         header("Location: confirmation.php?orderID=$orderID");
         exit;
     }
@@ -69,16 +73,17 @@ abstract class PaymentProcessor
 
         $c = $ob->checkOwner($orderID, $userID);
 
-        if ($c!==true){
+        if ($c !== true) {
             throw new Exception($c);
         }
         $order_row = $ob->getByID($orderID);
 
         $status = (int)$order_row["status"];
-        if ($status !== OrdersBean::STATUS_AWAITING_PAYMENT){
+        if ($status !== OrdersBean::STATUS_AWAITING_PAYMENT) {
             throw new Exception("Incorrect order status.");
         }
         return $order_row;
     }
 }
+
 ?>

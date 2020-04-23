@@ -3,7 +3,7 @@ include_once("lib/beans/DBTableBean.php");
 
 class MCEImagesBean extends DBTableBean
 {
-	protected $createString = "CREATE TABLE `mce_images` (
+    protected $createString = "CREATE TABLE `mce_images` (
  `imageID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `section` varchar(255) NOT NULL,
  `section_key` varchar(255) NOT NULL,
@@ -14,11 +14,11 @@ class MCEImagesBean extends DBTableBean
  PRIMARY KEY (`imageID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8";
 
-	public function __construct()
-	{
-		parent::__construct("mce_images");
-	}
-	
+    public function __construct()
+    {
+        parent::__construct("mce_images");
+    }
+
 }
 
 ?>

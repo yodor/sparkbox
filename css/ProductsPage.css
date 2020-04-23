@@ -1,10 +1,11 @@
 .caption.category_path .ActionRenderer {
-    font-size:1.2em;
+    font-size: 1.2em;
 }
+
 .caption.category_path .ActionRenderer:after {
     content: "//";
-    padding-left:5px;
-    padding-right:5px;
-    color:gray;
-    
+    padding-left: 5px;
+    padding-right: 5px;
+    color: gray;
+
 }

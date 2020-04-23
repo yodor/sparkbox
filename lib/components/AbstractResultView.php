@@ -1,5 +1,5 @@
 <?php
-include_once("lib/pages/SitePage.php");
+include_once("lib/pages/HTMLPage.php");
 include_once("lib/components/Component.php");
 include_once("lib/components/TableColumn.php");
 include_once("lib/iterators/SQLIterator.php");
@@ -8,13 +8,13 @@ include_once("lib/utils/Paginator.php");
 include_once("lib/components/PaginatorTopComponent.php");
 include_once("lib/components/PaginatorBottomComponent.php");
 
-abstract class AbstractResultView extends Component 
+abstract class AbstractResultView extends Component
 {
 
     public $items_per_page = 10;
 
     protected $itr = NULL;
-    protected $default_order="";
+    protected $default_order = "";
     protected $total_rows = 0;
     protected $current_row = array();
     protected $paginator = NULL;
@@ -26,103 +26,110 @@ abstract class AbstractResultView extends Component
 
     public function __construct(SQLIterator $itr)
     {
-	parent::__construct();
+        parent::__construct();
 
-	$this->itr = $itr;
-	$this->columns = array();
-	$this->paginator = new Paginator();
-	$this->paginator_top = new PaginatorTopComponent($this->paginator);
-	$this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
+        $this->itr = $itr;
+        $this->columns = array();
+        $this->paginator = new Paginator();
+        $this->paginator_top = new PaginatorTopComponent($this->paginator);
+        $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
     }
 
     public function getIterator()
     {
-	return $this->itr;
+        return $this->itr;
     }
 
     public function getTotalRows()
     {
-	return $this->total_rows;
+        return $this->total_rows;
     }
 
     public function getPositionIndex()
     {
-	$paginator = $this->paginator;
+        $paginator = $this->paginator;
 
-	$position_index = ($paginator->getCurrentPage() * $paginator->getItemsPerPage()) + $this->position_index;
+        $position_index = ($paginator->getCurrentPage() * $paginator->getItemsPerPage()) + $this->position_index;
 
-	return $position_index;
+        return $position_index;
     }
 
     public function enablePaginators($mode)
     {
-	$this->paginators_enabled = $mode;
+        $this->paginators_enabled = $mode;
     }
 
     public function getPaginator()
     {
-	return $this->paginator;
+        return $this->paginator;
     }
 
     public function getTopPaginator()
     {
-	return $this->paginator_top;
+        return $this->paginator_top;
     }
 
     public function getBottomPaginator()
     {
-	return $this->paginator_bottom;
+        return $this->paginator_bottom;
     }
 
     public function setCaption($caption)
     {
-	$this->caption = $caption;
-	$this->paginator_top->setCaption($caption);
+        $this->caption = $caption;
+        $this->paginator_top->setCaption($caption);
     }
 
     public function setDefaultOrder($default_order)
     {
-	$this->default_order = $default_order;
+        $this->default_order = $default_order;
     }
 
+    /**
+     * @throws Exception
+     */
     public function startRender()
     {
 
-	parent::startRender();
-  
-	$select = $this->itr->getSelectQuery();
-	
-	$this->total_rows=$this->itr->startQuery($select);
-	
-	$this->paginator->calculate($this->total_rows, $this->items_per_page);
+        parent::startRender();
 
-	$pagefilter = $this->paginator->preparePageFilter( $this->default_order );
+        $select = $this->itr->getSelectQuery();
 
-//	echo "PageFilter SQL: ".$pagefilter->getSQL(true);
-//	echo "Iterator SQL: ".$select->getSQL();
+        $this->total_rows = $this->itr->startQuery($select);
 
-	if ($this->paginators_enabled) {
-	      $select = $select->combineWith($pagefilter);
-	}
-	
-//	echo "Final SQL: ".$select->getSQL();
+        $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
-	$this->total_rows = $this->itr->startQuery($select);
+        $pageFilter = $this->paginator->preparePageFilter($this->default_order);
 
-	if ($this->paginators_enabled) {
-	      $this->paginator_top->render();
-	}
+        //	echo "PageFilter SQL: ".$pageFilter->getSQL(true);
+        //	echo "Iterator SQL: ".$select->getSQL();
+
+        if ($this->paginators_enabled) {
+            $select = $select->combineWith($pageFilter);
+        }
+
+        //	echo "Final SQL: ".$select->getSQL();
+
+        $this->total_rows = $this->itr->startQuery($select);
+
+        if ($this->paginators_enabled) {
+            $this->paginator_top->render();
+        }
     }
 
+    /**
+     * @throws Exception
+     */
     public function finishRender()
     {
-	if ($this->paginators_enabled) {
-	      $this->paginator_bottom->render();
-	}
+        if ($this->paginators_enabled) {
+            $this->paginator_bottom->render();
+        }
 
-	parent::finishRender();
+        parent::finishRender();
     }
 
 
 }
+
 ?>

@@ -1,8 +1,8 @@
 <?php
-include_once ("lib/beans/NestedSetBean.php");
+include_once("lib/beans/NestedSetBean.php");
 
 
-class ProductCategoriesBean extends  NestedSetBean
+class ProductCategoriesBean extends NestedSetBean
 {
 
     protected $createString = "CREATE TABLE `product_categories` (
@@ -18,9 +18,11 @@ class ProductCategoriesBean extends  NestedSetBean
     KEY `rgt` (`rgt`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-    public function __construct() {
-	  parent::__construct("product_categories");
+    public function __construct()
+    {
+        parent::__construct("product_categories");
     }
 
 }
+
 ?>

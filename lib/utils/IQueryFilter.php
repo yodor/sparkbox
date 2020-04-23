@@ -1,7 +1,10 @@
 <?php
-interface IQueryFilter {
 
-  public function getQueryFilter($source=NULL, $value=NULL);
-  
+interface IQueryFilter
+{
+
+    public function getQueryFilter($source = NULL, $value = NULL);
+
 }
+
 ?>

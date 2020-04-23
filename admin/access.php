@@ -2,15 +2,15 @@
 include_once("session.php");
 include_once("class/pages/AdminPage.php");
 
-$menu=array();
+$menu = array();
 
 $content = new AdminPage();
 
-$content->beginPage($menu);
+$content->startRender($menu);
 
 echo "Access to this resource is not allowed for your account.";
 
-$content->finishPage();
+$content->finishRender();
 
 
 ?>

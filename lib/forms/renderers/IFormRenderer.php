@@ -1,13 +1,16 @@
 <?php
 include_once("lib/forms/InputForm.php");
-include_once("lib/input/InputField.php");
+include_once("lib/input/DataInput.php");
 
-interface IFormRenderer 
+interface IFormRenderer
 {
     public function renderSubmitLine(InputForm $form);
+
     public function renderForm(InputForm $form);
+
     public function getSubmitName(InputForm $form);
-    public function renderField(InputField $field);
+
+    public function renderField(DataInput $field);
 }
 
 ?>

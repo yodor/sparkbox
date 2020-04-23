@@ -14,252 +14,264 @@ include_once("lib/handlers/IRequestProcessor.php");
 
 include_once("lib/panels/BeanTranslationDialog.php");
 
-class InputFormView extends Component 
+class InputFormView extends Component implements IDataBeanSetter
 {
 
-	public $item_updated_message = "Information was updated";
-	public $item_added_message = "Information was added";
-  
-	protected $bean = NULL;
-	protected $form = NULL;
+    public $item_updated_message = "Information was updated";
+    public $item_added_message = "Information was added";
 
-	protected $editID = -1;
+    /**
+     * @var DBTableBean|null
+     */
+    protected $bean = NULL;
 
-	protected $form_renderer = NULL;
-	protected $processor = NULL;
-	protected $transactor = NULL;
-	 
-	protected $error = false;
-	
-	public $reload_request = true;
-	
-	//transfer to this URL on processing finished
-	public $reload_url = "";
-	
-	public function __construct(DBTableBean $bean=NULL, InputForm $form=NULL)
-	{
-	
-	    parent::__construct();
+    /**
+     * @var InputForm|null
+     */
+    protected $form = NULL;
 
+    protected $editID = -1;
 
-	    $this->bean = $bean;
-	    $this->form = $form;
+    protected $form_renderer = NULL;
+    protected $processor = NULL;
+    protected $transactor = NULL;
 
-	    
+    protected $error = false;
 
-	    $this->form_render = new FormRenderer();
+    public $reload_request = true;
 
-	    if ($this->form) {
-		$this->form_render->setForm($form);
-	    }
-
-	    if ($this->bean instanceof DBTableBean) {
-		$this->attributes["bean"]=get_class($this->bean);
-		$this->form_render->setName(get_class($this->bean));
-	    }
-	    
-	    $this->processor = new FormProcessor();
-	    
-
-	    $this->transactor = new DBTransactor();
-	    
-
-	    foreach ($this->form->getFields() as $field_name => $field) {
-	    
-		    $renderer = $field->getRenderer();
-
-		    if ($renderer instanceof MCETextArea) {
-
-			$handler = $renderer->getImageBrowser()->getHandler();
-			
-			$handler->setSection(get_class($this->form), $field_name);
-			$handler->setOwnerID(SitePage::getInstance()->getAdminID());
-
-			
-		    }
-		    else if ($renderer instanceof SessionImageField) {
-			$uach = new UploadControlAjaxHandler();
-			
-			RequestController::addAjaxHandler($uach);
-			$renderer->assignUploadHandler($uach);
-		    }
-
-	    }
+    //transfer to this URL on processing finished
+    public $reload_url = "";
 
 
-	    
-	    if (TRANSLATOR_ENABLED) {
-		 $this->bean_translator = new BeanTranslationDialog();
-		 
-	    }
+    public function __construct(DBTableBean $bean = NULL, InputForm $form = NULL)
+    {
 
-	    $this->setEditID(-1);
-	}
+        parent::__construct();
 
 
-	public function getEditID()
-	{
-	    return $this->editID;
-	}
-	
-	public function setEditID($editID)
-	{
-	    $this->editID = (int)$editID;
-	    $this->attributes["editID"]=$this->editID;
-	    
-	}
-	
-	public function getForm()
-	{
-	    return $this->form;
-	}
-	
-	public function getBean()
-	{
-	    return $this->bean;
-	}
-  
-	public function getProcessor() 
-	{
-	    return $this->processor;
-	}
-	
-	public function setProcessor(IFormProcessor $processor)
-	{
-	    $this->processor = $processor;
-	}
-	
-	public function getTransactor()
-	{
-	    return $this->transactor;
-	}
-	
-	public function setTransactor(IDBTransactor $transactor)
-	{
-	    $this->transactor = $transactor;
-	}
+        $this->bean = $bean;
+        $this->form = $form;
 
-	public function processInput()
-	{
-	    debug("InputFormView::processInput: start Processing AjaxHandlers First ");
-	    
-	    RequestController::processAjaxHandlers();
-	
-	    debug("-------------------------------------");
-	    debug("InputFormView::processInput: start ");
-	    
-	    //will process external editID only if editID is not set
-	    if ( $this->editID<1 && isset($_GET["editID"]) ) {
-		$this->setEditID((int)$_GET["editID"]);
-		
-		debug("InputFormView::processInput: Using editID='{$this->editID}' from GET ");
-	    }
 
-	    
-	    try {
-		
-		$this->form->loadBeanData($this->editID, $this->bean);
+        $this->form_render = new FormRenderer();
 
-		$this->processor->processForm($this->form);
+        if ($this->form) {
+            $this->form_render->setForm($form);
+        }
 
-		$process_status = $this->processor->getStatus();
-		debug("InputFormView::processInput: FormProcessor returned status => ".(int)$process_status);
-		
-		//form is ok transact to db using the bean
-		if ($process_status === IFormProcessor::STATUS_OK) {
-	
-		    $this->transactor->transactValues($this->form);
+        if ($this->bean instanceof DBTableBean) {
+            $this->attributes["bean"] = get_class($this->bean);
+            $this->form_render->setName(get_class($this->bean));
+        }
 
-		    $this->transactor->processBean($this->bean, $this->editID);
+        $this->processor = new FormProcessor();
 
-		    //reload after adding item? 
-		    if ($this->editID<1) {
-		      Session::set("alert", $this->item_added_message);
-		      
 
-		    }
-		    else {
-		      Session::set("alert", $this->item_updated_message);
-		    }
+        $this->transactor = new DBTransactor();
 
-		    if ($this->reload_request === true) {
-// 			  Session::set("replace_history", 1);
-			  debug("InputFormView::processInput: finished redirection following ...");
-			  debug("-------------------------------------");
-			  
-			  //TODO: remove reload requirement here? session upload files might transact to dbrows changing UID of storage objects
-			  if ($this->reload_url) {
-                            header("Location: ".$this->reload_url);
-			  }
-			  else {
-                            $page = SitePage::getInstance();
-                            
-                            $back_action = $page->getAction("back");
-                            if (!is_null($back_action)) {
-                                header("Location: ".$back_action->getHrefClean());
-                            }
-                            else {
-                                header("Location: ".$_SERVER["REQUEST_URI"]);
-                            }
-			  }
-			  
-			  exit;
+
+        foreach ($this->form->getFields() as $field_name => $field) {
+
+            $renderer = $field->getRenderer();
+
+            if ($renderer instanceof MCETextArea) {
+
+                $handler = $renderer->getImageBrowser()->getHandler();
+
+                $handler->setSection(get_class($this->form), $field_name);
+                $handler->setOwnerID(AdminPageLib::Instance()->getUserID());
+
+            }
+            //            else if ($renderer instanceof SessionImageField) {
+            //                $uach = new ImageUploadAjaxHandler();
+            //
+            //                RequestController::addAjaxHandler($uach);
+            //                $renderer->assignUploadHandler($uach);
+            //            }
+            //            else if ($renderer instanceof SessionFileField) {
+            //                $uach = new FileUploadAjaxHandler();
+            //
+            //                RequestController::addAjaxHandler($uach);
+            //                $renderer->assignUploadHandler($uach);
+            //            }
+
+        }
+
+
+        if (TRANSLATOR_ENABLED) {
+            $this->bean_translator = new BeanTranslationDialog();
+
+        }
+
+        $this->setEditID(-1);
+    }
+
+
+    public function getEditID()
+    {
+        return $this->editID;
+    }
+
+    public function setEditID($editID)
+    {
+        $this->editID = (int)$editID;
+        $this->attributes["editID"] = $this->editID;
+
+    }
+
+    public function getForm()
+    {
+        return $this->form;
+    }
+
+    public function getEditBean()
+    {
+        return $this->bean;
+    }
+
+    public function setBean(IDataBean $bean)
+    {
+        $this->bean = $bean;
+    }
+
+    public function getProcessor()
+    {
+        return $this->processor;
+    }
+
+    public function setProcessor(IFormProcessor $processor)
+    {
+        $this->processor = $processor;
+    }
+
+    public function getTransactor()
+    {
+        return $this->transactor;
+    }
+
+    public function setTransactor(IDBTransactor $transactor)
+    {
+        $this->transactor = $transactor;
+    }
+
+    public function processInput()
+    {
+        debug("InputFormView::processInput: start Processing AjaxHandlers First ");
+
+        RequestController::processAjaxHandlers();
+
+        debug("-------------------------------------");
+        debug("InputFormView::processInput: start ");
+
+        //will process external editID only if editID is not set
+        if ($this->editID < 1 && isset($_GET["editID"])) {
+            $this->setEditID((int)$_GET["editID"]);
+
+            debug("InputFormView::processInput: Using editID='{$this->editID}' from GET ");
+        }
+
+
+        try {
+
+            $this->form->loadBeanData($this->editID, $this->bean);
+
+            $this->processor->processForm($this->form);
+
+            $process_status = $this->processor->getStatus();
+            debug("InputFormView::processInput: FormProcessor returned status => " . (int)$process_status);
+
+            //form is ok transact to db using the bean
+            if ($process_status === IFormProcessor::STATUS_OK) {
+
+                $this->transactor->transactValues($this->form);
+
+                $this->transactor->processBean($this->bean, $this->editID);
+
+                //reload after adding item?
+                if ($this->editID < 1) {
+                    Session::Set("alert", $this->item_added_message);
+
+
+                }
+                else {
+                    Session::Set("alert", $this->item_updated_message);
+                }
+
+                if ($this->reload_request === true) {
+                    // 			  Session::set("replace_history", 1);
+                    debug("InputFormView::processInput: finished redirection following ...");
+                    debug("-------------------------------------");
+
+                    //TODO: remove reload requirement here? session upload files might transact to dbrows changing UID of storage objects
+                    if ($this->reload_url) {
+                        header("Location: " . $this->reload_url);
                     }
-		      
-		    debug("InputFormView::processInput: Successfull ");
+                    else {
+                        $page = HTMLPage::Instance();
 
-		    
-		}
-		else if ($process_status === IFormProcessor::STATUS_ERROR) {
-		  throw new Exception($this->processor->getMessage());
-		}
+                        $back_action = $page->getAction("back");
+                        if (!is_null($back_action)) {
+                            header("Location: " . $back_action->getHrefClean());
+                        }
+                        else {
+                            header("Location: " . $_SERVER["REQUEST_URI"]);
+                        }
+                    }
 
-	    }
-	    catch (Exception $e) {
-		debug("InputFormView::processInput: Execption received: ".$e->getMessage());
-		Session::set("alert", $e->getMessage());
-		$this->error = $e->getMessage();
-		
-	    }
-	    
-	    debug("InputFormView::processInput: finished");
-	    debug("-------------------------------------");
-	}
+                    exit;
+                }
 
-	public function startRender()
-	{
-
-	    $attrs = $this->prepareAttributes();
-	    echo "<div $attrs>";
-
-	    if (strlen($this->caption)>0) {
-		echo "<div class='caption'>";
-		echo $this->caption;
-		echo "</div>";
-	    }
-
-	    $this->form_render->startRender();
-
-	}
-	
-	public function renderImpl()
-	{
-	    $this->form_render->renderImpl();
-	}
-
-	public function finishRender()
-	{
-
-	    $this->form_render->renderSubmitLine($this->form);
-
-	    $this->form_render->finishRender();
+                debug("InputFormView::processInput: Successfull ");
 
 
+            }
+            else if ($process_status === IFormProcessor::STATUS_ERROR) {
+                throw new Exception($this->processor->getMessage());
+            }
 
-	}
+        }
+        catch (Exception $e) {
+            debug("InputFormView::processInput: Execption received: " . $e->getMessage());
+            Session::Set("alert", $e->getMessage());
+            $this->error = $e->getMessage();
+
+        }
+
+        debug("InputFormView::processInput: finished");
+        debug("-------------------------------------");
+    }
+
+    public function startRender()
+    {
+
+        $attrs = $this->prepareAttributes();
+        echo "<div $attrs>";
+
+        if (strlen($this->caption) > 0) {
+            echo "<div class='caption'>";
+            echo $this->caption;
+            echo "</div>";
+        }
+
+        $this->form_render->startRender();
+
+    }
+
+    public function renderImpl()
+    {
+        $this->form_render->renderImpl();
+    }
+
+    public function finishRender()
+    {
+
+        $this->form_render->renderSubmitLine($this->form);
+
+        $this->form_render->finishRender();
 
 
-
+    }
 
 
 }

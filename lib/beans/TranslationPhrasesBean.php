@@ -5,7 +5,7 @@ include_once("lib/beans/SiteTextsBean.php");
 class TranslationPhrasesBean extends DBTableBean
 {
 
-protected $createString = "
+    protected $createString = "
 CREATE TABLE `translation_phrases` (
  `trID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `langID` int(11) unsigned NOT NULL,
@@ -20,95 +20,97 @@ CREATE TABLE `translation_phrases` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 ";
 
-	public static function needBeans()
-	{
-	  return array("LanguagesBean", "SiteTextsBean");
-	}
+    public static function needBeans()
+    {
+        return array("LanguagesBean", "SiteTextsBean");
+    }
 
-	public function __construct()
-	{
-		parent::__construct("translation_phrases");
-	}
+    public function __construct()
+    {
+        parent::__construct("translation_phrases");
+    }
 
-	public function processRecord($trID, $trow)
-	{
-			$lastid=-1;
+    public function processRecord($trID, $trow)
+    {
+        $lastid = -1;
 
-			if ($trID>0){
-				$str_operation = "Update";
-				$lastid = (int)$this->updateRecord($trID,$trow);
-			}
-			else {
-				$str_operation = "Insert";
-				$lastid = (int)$this->insertRecord($trow);
-			}
-			if ($lastid<1){
-				return $str_operation." - ".$this->getError();
-			}
-			return $lastid;
-	}
-	public function processTranslation($phrase, $translated, $langID)
-	{
-// 		ob_start();
-// 		var_dump($_POST);
-		
-		$stb = new SiteTextsBean();
-		$textID = (int)$stb->id4phrase($phrase);
+        if ($trID > 0) {
+            $str_operation = "Update";
+            $lastid = (int)$this->update($trID, $trow);
+        }
+        else {
+            $str_operation = "Insert";
+            $lastid = (int)$this->insert($trow);
+        }
+        if ($lastid < 1) {
+            return $str_operation . " - " . $this->getError();
+        }
+        return $lastid;
+    }
 
-// 		echo "TextID:$textID";
+    public function processTranslation($phrase, $translated, $langID)
+    {
+        // 		ob_start();
+        // 		var_dump($_POST);
 
-		$translated=trim($translated);
+        $stb = new SiteTextsBean();
+        $textID = (int)$stb->id4phrase($phrase);
 
-// 		echo $translated;
+        // 		echo "TextID:$textID";
 
-		$langID = (int)$langID;
+        $translated = trim($translated);
 
-		$num = $this->startIterator("WHERE langID='$langID' and textID='$textID' LIMIT 1");
+        // 		echo $translated;
 
-		$trID=-1;
-		$trow=array();
+        $langID = (int)$langID;
 
-		if ($this->fetchNext($trow)){
-			$trID=(int)$trow["trID"];
-		}
-		
-// 		$debug = ob_get_contents();
-// 		ob_end_clean();
-// 		@file_put_contents("/tmp/test.log",$debug, FILE_APPEND);
+        $num = $this->startIterator("WHERE langID='$langID' and textID='$textID' LIMIT 1");
 
-		if (strlen($translated)==0){
-			if ($trID>0){
-				$this->deleteID($trID);
-			}
-		}
-		else {
-			$db = $this->db;
-			
-			$trow["translated"]=$db->escapeString($translated);
-			$trow["textID"]=(int)$textID;
-			$trow["langID"]=(int)$langID;
+        $trID = -1;
+        $trow = array();
 
-			return $this->processRecord($trID,$trow);
-		}
-		return -1;
-		
-	}
-	public function fetchTranslation($phrase, $langID)
-	{
-		$stb = new SiteTextsBean();
-		$textID = (int)$stb->id4phrase($phrase);
-		$ret = "";
+        if ($this->fetchNext($trow)) {
+            $trID = (int)$trow["trID"];
+        }
 
-		
-		$num = $this->startIterator("WHERE langID='$langID' and textID='$textID' LIMIT 1");
+        // 		$debug = ob_get_contents();
+        // 		ob_end_clean();
+        // 		@file_put_contents("/tmp/test.log",$debug, FILE_APPEND);
 
-		if ($this->fetchNext($trow)){
-			$ret = $trow["translated"];
+        if (strlen($translated) == 0) {
+            if ($trID > 0) {
+                $this->deleteID($trID);
+            }
+        }
+        else {
+            $db = $this->db;
 
-		}
+            $trow["translated"] = $db->escapeString($translated);
+            $trow["textID"] = (int)$textID;
+            $trow["langID"] = (int)$langID;
 
-		return $ret;
-	}
+            return $this->processRecord($trID, $trow);
+        }
+        return -1;
+
+    }
+
+    public function fetchTranslation($phrase, $langID)
+    {
+        $stb = new SiteTextsBean();
+        $textID = (int)$stb->id4phrase($phrase);
+        $ret = "";
+
+
+        $num = $this->startIterator("WHERE langID='$langID' and textID='$textID' LIMIT 1");
+
+        if ($this->fetchNext($trow)) {
+            $ret = $trow["translated"];
+
+        }
+
+        return $ret;
+    }
 }
 
 ?>

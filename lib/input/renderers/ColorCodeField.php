@@ -1,19 +1,18 @@
 <?php
-include_once("lib/input/renderers/InputTagRenderer.php");
+include_once("lib/input/renderers/InputFieldTag.php");
 
-class ColorCodeField extends InputTagRenderer
+class ColorCodeField extends InputFieldTag
 {
 
-  public function __construct()
-  {
-      parent::__construct();
+    public function __construct()
+    {
+        parent::__construct();
 
-      $this->setFieldAttribute("type", "color");
-      
-  }
+        $this->setFieldAttribute("type", "color");
 
-  
+    }
 
 
 }
+
 ?>

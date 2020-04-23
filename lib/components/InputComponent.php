@@ -1,10 +1,10 @@
 <?php
 include_once("lib/components/Component.php");
-include_once("lib/input/InputField.php");
-include_once("lib/input/ArrayInputField.php");
-include_once("lib/input/renderers/ArrayField.php");
+include_once("lib/input/DataInput.php");
+include_once("lib/input/ArrayDataInput.php");
 
-class InputComponent extends Component implements IHeadRenderer
+
+class InputComponent extends Component
 {
 
     protected $field = NULL;
@@ -14,53 +14,42 @@ class InputComponent extends Component implements IHeadRenderer
 
     const RENDER_INPUT = 1;
     const RENDER_VALUE = 2;
-    const RENDER_ARRAY = 3;
+    //const RENDER_ARRAY = 3;
     public $render_mode = InputComponent::RENDER_INPUT;
 
-    protected $array_renderer = NULL;
+//    protected $array_renderer = NULL;
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->array_renderer = new ArrayField();
+//        $this->array_renderer = new ArrayField();
     }
 
-    public function renderScript()
-    {
-
-    }
-
-    public function renderStyle()
-    {
-        echo "<link rel='stylesheet' href='".SITE_ROOT."lib/css/InputRenderer.css' type='text/css' >";
-        echo "\n";
-    }
-
-    public function setField(InputField $field)
+    public function setField(DataInput $field)
     {
         $this->field = $field;
-        $this->attributes["field"]=$field->getName();
-        
+        $this->attributes["field"] = $field->getName();
+
         if ($field->isRequired()) {
-            $this->attributes["required"]=1;
+            $this->attributes["required"] = 1;
         }
         else {
-            $this->attributes["required"]="";
+            $this->attributes["required"] = "";
         }
 
     }
 
-    public function getArrayRenderer()
-    {
-        return $this->array_renderer;
-    }
-    
-    public function setArrayRenderer(IArrayFieldRenderer $renderer)
-    {
-        $this->array_renderer = $renderer;
-    }
-    
+//    public function getArrayRenderer()
+//    {
+//        return $this->array_renderer;
+//    }
+//
+//    public function setArrayRenderer(IArrayFieldRenderer $renderer)
+//    {
+//        $this->array_renderer = $renderer;
+//    }
+
     public function getField()
     {
         return $this->field;
@@ -73,24 +62,22 @@ class InputComponent extends Component implements IHeadRenderer
         $field = $this->field;
 
         if ($this->render_label) {
-            if ($renderer instanceof HiddenField) {}
+            if ($renderer instanceof HiddenField) {
+            }
             else {
                 $field->getLabelRenderer()->renderLabel($field);
             }
         }
 
-        if ($field instanceof ArrayInputField) {
+        if ($field instanceof ArrayDataInput) {
             //use private renderer if set 
-            
+
             if ($field->getArrayRenderer() instanceof IArrayFieldRenderer) {
                 $renderer = clone $field->getArrayRenderer();
             }
-            
-            if ($renderer instanceof IArrayFieldRenderer){
-                
-            }
-            else {
-                $renderer = clone $this->array_renderer;
+
+            if (!$renderer instanceof IArrayFieldRenderer) {
+               throw new Exception("IArrayFieldRenderer required for ArrayDataInput");
             }
         }
 
@@ -101,11 +88,13 @@ class InputComponent extends Component implements IHeadRenderer
         }
         else if ($this->render_mode === InputComponent::RENDER_VALUE) {
 
-            if ($field->getRenderer() instanceof HiddenField) {}
+            if ($field->getRenderer() instanceof HiddenField) {
+                //
+            }
             else {
                 $renderer->renderValue($field);
             }
-            
+
         }
 
 
@@ -113,11 +102,11 @@ class InputComponent extends Component implements IHeadRenderer
 
     public function finishRender()
     {
-        
+
         $field = $this->field;
         $field_name = $field->getName();
 
-        if (TRANSLATOR_ENABLED && $field->translatorEnabled() && ($field->getForm() instanceof InputForm) ) {
+        if (TRANSLATOR_ENABLED && $field->translatorEnabled() && ($field->getForm() instanceof InputForm)) {
             $form = $field->getForm();
             $editID = $form->getEditID();
 
@@ -140,7 +129,8 @@ class InputComponent extends Component implements IHeadRenderer
         parent::finishRender();
 
     }
-  
-  
+
+
 }
+
 ?>

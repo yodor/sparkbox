@@ -16,7 +16,7 @@ class NewsItemsBean extends DatedPublicationBean
 
     public function __construct()
     {
-	parent::__construct("news_items");
+        parent::__construct("news_items");
 
     }
 

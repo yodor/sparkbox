@@ -1,9 +1,9 @@
 <?php
-include_once("lib/input/InputField.php");
+include_once("lib/input/DataInput.php");
 
-interface IInputValidator 
+interface IInputValidator
 {
-  public function validateInput(InputField $field);
+    public function validateInput(DataInput $field);
 
 
 }
