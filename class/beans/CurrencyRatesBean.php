@@ -40,7 +40,7 @@ class CurrencyRatesBean extends DBTableBean
         }
         else {
             //default currency was not found
-            Session::Set("alert", "Requested default currency [" . DEFAULT_CURRENCY . "] is not available.");
+            Session::SetAlert("Requested default currency [" . DEFAULT_CURRENCY . "] is not available.");
             return $ret;
         }
 
@@ -52,7 +52,7 @@ class CurrencyRatesBean extends DBTableBean
         }
         catch (Exception $e) {
 
-            //Session::set("alert", "Requested currencyID: $dstID was not found.");
+            //Session::Alert("Requested currencyID: $dstID was not found.");
 
             $dstID = $srcID;
         }

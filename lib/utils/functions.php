@@ -395,7 +395,7 @@ function refkeyPageCheck(DBTableBean $ref_bean, $redirect_fail, &$ref_key, &$ref
         $ref_row = $ref_bean->getByID($ref_id);
     }
     catch (Exception $e) {
-        Session::Set("alert", $ref_key . ":$ref_id Not Found");
+        Session::SetAlert($ref_key . ":$ref_id Not Found");
         header("Location: $redirect_fail");
         exit;
     }

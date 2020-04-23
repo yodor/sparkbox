@@ -43,7 +43,7 @@ try {
     //   $page->header_image_url =  $header_href;
 }
 catch (Exception $e) {
-    Session::Set("alert", $e->getMessage());
+    Session::SetAlert($e->getMessage());
     header("Location: " . SITE_ROOT . "home.php");
     exit;
 }

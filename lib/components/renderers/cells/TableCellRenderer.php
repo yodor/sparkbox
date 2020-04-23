@@ -46,7 +46,7 @@ class TableCellRenderer extends Component implements ICellRenderer
 
     }
 
-    protected function processAttributes($row, TableColumn $tc)
+    protected function processAttributes(array $row, TableColumn $tc)
     {
         $this->setAttribute("column", $tc->getFieldName());
         $this->setAttribute("title", tr($tc->getLabel()));
@@ -58,7 +58,7 @@ class TableCellRenderer extends Component implements ICellRenderer
         }
     }
 
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
         $this->processAttributes($row, $tc);
 

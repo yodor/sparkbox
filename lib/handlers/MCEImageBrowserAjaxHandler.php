@@ -138,7 +138,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
     }
 
 
-    protected function assignUploadObjects(JSONResponse $resp, &$upload_object)
+    protected function assignUploadObjects(JSONResponse $resp, $upload_object)
     {
         debug("MCEImageBrowserAjaxHandler::assignUploadObjects");
 

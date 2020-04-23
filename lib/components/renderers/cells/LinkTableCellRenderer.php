@@ -17,7 +17,7 @@ class LinkTableCellRenderer extends TableCellRenderer implements ICellRenderer
 
     }
 
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
         $this->processAttributes($row, $tc);
 

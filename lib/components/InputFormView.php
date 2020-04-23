@@ -190,12 +190,12 @@ class InputFormView extends Component implements IDataBeanSetter
 
                 //reload after adding item?
                 if ($this->editID < 1) {
-                    Session::Set("alert", $this->item_added_message);
+                    Session::SetAlert($this->item_added_message);
 
 
                 }
                 else {
-                    Session::Set("alert", $this->item_updated_message);
+                    Session::SetAlert($this->item_updated_message);
                 }
 
                 if ($this->reload_request === true) {
@@ -233,7 +233,7 @@ class InputFormView extends Component implements IDataBeanSetter
         }
         catch (Exception $e) {
             debug("InputFormView::processInput: Execption received: " . $e->getMessage());
-            Session::Set("alert", $e->getMessage());
+            Session::SetAlert($e->getMessage());
             $this->error = $e->getMessage();
 
         }

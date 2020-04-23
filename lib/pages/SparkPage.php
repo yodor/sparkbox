@@ -2,7 +2,7 @@
 include_once("lib/pages/HTMLPage.php");
 include_once("lib/handlers/RequestController.php");
 include_once("lib/components/renderers/IHeadContents.php");
-include_once("lib/components/renderers/IFinalRenderer.php");
+include_once("lib/components/renderers/IPageComponent.php");
 include_once("lib/beans/ConfigBean.php");
 
 include_once("lib/panels/MessageDialog.php");
@@ -38,8 +38,8 @@ class SparkPage extends HTMLPage
     protected $context = NULL;
 
     /**
-     * Authentication support
-     * The authenticated user ID
+     * Authentication support. The authenticated user ID
+     * @var int
      */
     protected $userID = -1;
 
@@ -49,11 +49,24 @@ class SparkPage extends HTMLPage
      */
     protected $preferred_title = "";
 
+    /**
+     * @var string
+     */
     protected $page_title = "";
 
+    /**
+     * @var string
+     */
     protected $caption = "";
 
-    protected $final_components = array();
+    /**
+     * @var array IHeadContents
+     */
+    protected $page_components = array();
+
+    /**
+     * @var array IPageComponent
+     */
     protected $head_components = array();
 
     protected $opengraph_tags = array();
@@ -246,18 +259,17 @@ class SparkPage extends HTMLPage
         parent::headEnd();
     }
 
-    public function addFinalComponent(IFinalRenderer $cmp)
+    public function addComponent(Component $cmp)
     {
-        $this->final_components[] = $cmp;
-    }
+        if ($cmp instanceof IPageComponent)
+        {
+            $this->page_components[] = $cmp;
+        }
 
-    /**
-     * Add component implementing IHeadRenderer that want to render to the HEAD section of this page
-     * @param IHeadContents $cmp
-     */
-    public function addHeadComponent(IHeadContents $cmp)
-    {
-        $this->head_components[get_class($cmp)] = $cmp;
+        if ($cmp instanceof IHeadContents)
+        {
+            $this->head_components[] = $cmp;
+        }
     }
 
     /**
@@ -613,9 +625,9 @@ class SparkPage extends HTMLPage
     public function finishRender()
     {
 
-        $this->processMessages();
+        $this->renderPageComponents();
 
-        $this->processFinalComponents();
+        $this->processMessages();
 
         $this->bodyEnd();
 
@@ -625,28 +637,28 @@ class SparkPage extends HTMLPage
 
         ob_end_flush();
 
-
     }
 
     /**
      * Render all component implementing the IFinalRenderer before closing the BODY
      */
-    protected function processFinalComponents()
+    protected function renderPageComponents()
     {
-        foreach ($this->final_components as $idx => $cmp) {
-            $cmp->renderFinal();
+        foreach ($this->page_components as $idx => $cmp) {
+            $cmp->render();
         }
     }
 
     /**
-     * Show message as a popup if Session "alert" variable is set
-     * Clears the Session "alert" variable
+     * Show message as a popup if Session "alert" key is set
+     * Clears the Session "alert" key
      */
     protected function processMessages()
     {
 
-        if (Session::Get("alert", false)) {
-            $alert = Session::Get("alert");
+        $alert = Session::GetAlert();
+
+        if ($alert) {
 
             $alert = json_encode($alert);
             ?>
@@ -657,9 +669,10 @@ class SparkPage extends HTMLPage
                 });
             </script>
             <?php
-            Session::Clear("alert");
 
         }
+
+        Session::SetAlert("");
 
     }
 

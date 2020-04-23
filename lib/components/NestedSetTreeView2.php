@@ -201,12 +201,10 @@ class NestedSetTreeView extends Component implements ISelectSource
         parent::finishRender();
         ?>
         <script type='text/javascript'>
-            addLoadEvent(
-                function () {
-                    var tree_view = new TreeView();
-                    tree_view.attachWith("<?php echo $this->getName(); ?>");
-                }
-            );
+            onPageLoad(function () {
+                var tree_view = new TreeView();
+                tree_view.attachWith("<?php echo $this->getName(); ?>");
+            });
         </script>
         <?php
     }

@@ -64,7 +64,7 @@ class MCETextArea extends InputField
         echo "</textarea>";
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 var mce = new MCETextArea();
                 mce.attachWith("<?php echo $this->field->getName();?>");
             });

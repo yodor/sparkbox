@@ -61,7 +61,7 @@ class ActionsTableCellRenderer extends TableCellRenderer implements ICellRendere
         $parent->getHeaderCellRenderer()->setSortable(false);
     }
 
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
         $this->processAttributes($row, $tc);
 

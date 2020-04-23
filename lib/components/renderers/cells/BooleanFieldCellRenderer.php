@@ -16,7 +16,7 @@ class BooleanFieldCellRenderer extends TableCellRenderer implements ICellRendere
         $this->false_value = $false_value;
     }
 
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
         $this->processAttributes($row, $tc);
         $this->startRender();

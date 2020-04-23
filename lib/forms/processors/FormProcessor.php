@@ -8,18 +8,20 @@ class FormProcessor implements IFormProcessor
 
     protected $message = "";
 
-
+    /**
+     * @return string
+     */
     public function getMessage()
     {
         return $this->message;
     }
 
-    public function setMessage($message)
+    public function setMessage(string $message)
     {
         $this->message = $message;
     }
 
-    public function setStatus($status)
+    public function setStatus(int $status)
     {
         $this->status = $status;
     }

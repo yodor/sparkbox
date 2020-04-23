@@ -161,7 +161,7 @@ class ClassAttributeField extends DataSourceField implements IArrayFieldRenderer
         parent::finishRender();
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 console.log("Adding category handler");
 
                 $("[name='catID']").on("change", function () {

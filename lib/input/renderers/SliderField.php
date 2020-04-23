@@ -61,7 +61,7 @@ class SliderField extends InputField
 
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 var name = "<?php echo $field_name;?>";
                 if ($("input[name='" + name + "'] + .slider_input").value) {
                     $("input[name='" + name + "'] + .slider_input").value("<?php echo $field_value;?>");

@@ -109,7 +109,7 @@ class MenuBarComponent extends Component
         $this->bar->finishRender();
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 let menu_bar = new MenuBarComponent();
                 menu_bar.attachWith("<?php echo $this->getName();?>");
 

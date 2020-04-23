@@ -17,7 +17,7 @@ $g_lb = new LanguagesBean();
 $g_tr = new TranslationPhrasesBean();
 $g_bt = new TranslationBeansBean();
 
-function setLanguageString($str, $page_dir = "LTR")
+function setLanguageString(string $str, $page_dir = "LTR")
 {
     global $g_lb;
 
@@ -37,7 +37,7 @@ function setLanguageString($str, $page_dir = "LTR")
     setLanguage($str, $langID, $page_dir);
 }
 
-function setLanguageID($langID, $page_dir = "LTR")
+function setLanguageID(int $langID, $page_dir = "LTR")
 {
 
     global $g_lb;
@@ -53,7 +53,7 @@ function setLanguageID($langID, $page_dir = "LTR")
     setLanguage($str, $langID, $page_dir);
 }
 
-function setLanguage($str, $langID, $page_dir)
+function setLanguage(string $str, int $langID, $page_dir)
 {
     Session::Set("language", "$str");
     Session::Set("langID", $langID);
@@ -140,7 +140,7 @@ function getActiveLanguageID()
     return $langID;
 }
 
-function trbean($id, $field_name, &$row, DBTableBean $bean)
+function trbean(int $id, string $field_name, array &$row, DBTableBean $bean)
 {
     $lang_session = Session::Get("language", DEFAULT_LANGUAGE);
     global $g_bt;
@@ -161,7 +161,11 @@ function trbean($id, $field_name, &$row, DBTableBean $bean)
 
 }
 
-function tr($str_original)
+/**
+ * @param string $str_original
+ * @return string translated version of $str_original
+ */
+function tr(string $str_original)
 {
 
     if (strlen(trim($str_original)) == 0) return $str_original;
@@ -201,7 +205,7 @@ function tr($str_original)
         $num = $g_tr->startIterator("WHERE langID=$langID and textID=$textID");
         if ($num) {
             if ($g_tr->fetchNext($trow)) {
-                return $trow["translated"];
+                 return (string)$trow["translated"];
             }
             else {
                 throw new Exception("DBError: Translation can not be fetch from table. " . $g_tr->getError());

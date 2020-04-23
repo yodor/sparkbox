@@ -122,7 +122,7 @@ abstract class SessionUpload extends InputField implements IArrayFieldRenderer
         echo "\n";
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 var upload_control = new SessionUpload();
                 upload_control.attachWith("<?php echo $this->field->getName();?>");
 

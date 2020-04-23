@@ -17,7 +17,7 @@ class BeanFieldCellRenderer extends TableCellRenderer implements ICellRenderer
         $this->field_name = $field_name;
     }
 
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
         $this->processAttributes($row, $tc);
 

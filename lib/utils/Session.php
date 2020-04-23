@@ -8,6 +8,8 @@ class Session
 {
     protected static $is_started = false;
 
+    public const ALERT = "alert";
+
     public static function Start()
     {
         session_start();
@@ -28,7 +30,7 @@ class Session
 
     public static function Get(string $key, $default = NULL)
     {
-        if (isset($_SESSION[$key])) {
+        if (Session::Contains($key)) {
             return $_SESSION[$key];
         }
         return $default;
@@ -41,7 +43,7 @@ class Session
 
     public static function Clear(string $key)
     {
-        if (isset($_SESSION[$key])) {
+        if (Session::Contains($key)) {
             unset($_SESSION[$key]);
         }
     }
@@ -68,6 +70,21 @@ class Session
     public static function HaveCookie($key)
     {
         return isset($_COOKIE[$key]);
+    }
+
+    public static function SetAlert(string $msg)
+    {
+        if (strlen($msg)>0) {
+            Session::Set(Session::ALERT, $msg);
+        }
+        else {
+            Session::Clear(Session::ALERT);
+        }
+    }
+
+    public static function GetAlert()
+    {
+        return Session::Get(Session::ALERT, "");
     }
 }
 

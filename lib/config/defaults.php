@@ -139,7 +139,7 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
             }
             catch (Exception $e) {
 
-                Session::Set("alert", "Unable to open persistent connection to DB: " . $e->getMessage());
+                Session::SetAlert("Unable to open persistent connection to DB: " . $e->getMessage());
 
             }
         }
@@ -153,7 +153,7 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
 
         }
         catch (Exception $e) {
-            Session::Set("alert", "Unable to open connection to DB: " . $e->getMessage());
+            Session::SetAlert("Unable to open connection to DB: " . $e->getMessage());
         }
     }
 

@@ -1,7 +1,7 @@
 <?php
 include_once("lib/components/renderers/IRenderer.php");
 include_once("lib/components/renderers/IHeadContents.php");
-include_once("lib/components/renderers/IFinalRenderer.php");
+include_once("lib/components/renderers/IPageComponent.php");
 include_once("lib/pages/HTMLPage.php");
 
 abstract class Component implements IRenderer, IHeadContents
@@ -51,13 +51,9 @@ abstract class Component implements IRenderer, IHeadContents
         $page = HTMLPage::Instance();
 
         if ($page instanceof SparkPage) {
-            if ($this instanceof IFinalRenderer) {
-                $page->addFinalComponent($this);
-            }
-            if ($this instanceof IHeadContents) {
-                $page->addHeadComponent($this);
-            }
+            $page->addComponent($this);
         }
+
     }
 
     public function requiredStyle()
@@ -90,8 +86,6 @@ abstract class Component implements IRenderer, IHeadContents
 
     public function render()
     {
-        if ($this instanceof IFinalRenderer) throw new Exception("Trying to render final component");
-
         try {
             $this->startRender();
             $this->renderImpl();

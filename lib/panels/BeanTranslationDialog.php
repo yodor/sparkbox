@@ -4,7 +4,7 @@ include_once("lib/handlers/TranslateBeanAjaxHandler.php");
 
 
 //IFinalRenderer delegate rendering to page control does not need to call render
-class BeanTranslationDialog extends MessageDialog implements IFinalRenderer
+class BeanTranslationDialog extends MessageDialog implements IPageComponent
 {
 
     public function __construct()
@@ -95,7 +95,7 @@ class BeanTranslationDialog extends MessageDialog implements IFinalRenderer
         echo "</form>";
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 var bean_translator = new BeanTranslationDialog();
                 bean_translator.attachWith("bean_translator");
 

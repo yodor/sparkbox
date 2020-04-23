@@ -15,7 +15,7 @@ class CheckboxFieldCellRenderer extends TableCellRenderer implements ICellRender
 
     }
 
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
         $this->startRender();
         $field_key = $tc->getFieldName();

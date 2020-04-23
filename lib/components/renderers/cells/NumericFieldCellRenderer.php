@@ -15,7 +15,7 @@ class NumericFieldCellRenderer extends TableCellRenderer implements ICellRendere
         $this->format = $format;
     }
 
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
         $this->processAttributes($row, $tc);
 

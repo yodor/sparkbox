@@ -173,7 +173,7 @@ class PublicationArchiveComponent extends Component
 
             }
 
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 toggleArchiveYear(<?php echo $this->archive_year;?>);
             });
         </script>

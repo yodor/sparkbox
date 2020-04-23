@@ -21,7 +21,7 @@ if (isset($_GET["addItem"])) {
     try {
         $item = $products->getByID($prodID);
         if ($item["stock_amount"] < 1) {
-            Session::Set("alert", tr("Съжаляваме в момента няма наличност от този продукт"));
+            Session::SetAlert(tr("Съжаляваме в момента няма наличност от този продукт"));
             header("Location: " . SITE_ROOT . "details.php?prodID=" . $prodID);
             exit;
         }

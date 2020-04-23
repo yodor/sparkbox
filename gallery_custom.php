@@ -54,7 +54,7 @@ echo "<div class='button right' ></div>";
 echo "</div>";
 ?>
     <script type='text/javascript'>
-        addLoadEvent(function () {
+        onPageLoad(function () {
 
             var gallery_tape = new GalleryTape(".custom_gallery");
             gallery_tape.connectGalleryView("collection1");

@@ -35,7 +35,7 @@ class ReferenceKeyPageChecker
         catch (Exception $e) {
 
             if ($redirect_fail) {
-                Session::Set("alert", "Required parameter " . $this->ref_key . " of " . get_class($ref_bean) . " was not found.");
+                Session::SetAlert("Required parameter " . $this->ref_key . " of " . get_class($ref_bean) . " was not found.");
                 header("Location: $redirect_fail");
                 exit;
             }

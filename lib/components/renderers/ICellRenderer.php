@@ -3,9 +3,18 @@ include_once("lib/components/TableColumn.php");
 
 interface ICellRenderer
 {
-    public function renderCell($row, TableColumn $tc);
+    /**
+     * @param array $row DataSource result row
+     * @param TableColumn $tc
+     * @return mixed
+     */
+    public function renderCell(array &$row, TableColumn $tc);
 
-    public function setTooltipFromField($field_name);
+    /**
+     * @param string $field_name
+     * @return mixed
+     */
+    public function setTooltipFromField(string $field_name);
 
 }
 

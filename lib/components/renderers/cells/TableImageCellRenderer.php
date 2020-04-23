@@ -95,7 +95,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $this->list_limit = 1;
     }
 
-    protected function constructItems($row, TableColumn $tc)
+    protected function constructItems(array $row, TableColumn $tc)
     {
         $this->items = array();
 
@@ -178,7 +178,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         }
     }
 
-    protected function renderImageItems()
+    protected function renderImageItems(array $row, TableColumn $tc)
     {
         $num = count($this->items);
 
@@ -245,7 +245,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
     }
 
     //default rendering fetch from source linking with current 'view' prkey
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
         $this->processAttributes($row, $tc);
 

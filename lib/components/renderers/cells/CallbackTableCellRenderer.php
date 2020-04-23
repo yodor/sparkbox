@@ -16,7 +16,7 @@ class CallbackTableCellRenderer extends TableCellRenderer implements ICellRender
         $this->callback = $function_name;
     }
 
-    public function renderCell($row, TableColumn $tc)
+    public function renderCell(array &$row, TableColumn $tc)
     {
 
         $this->processAttributes($row, $tc);

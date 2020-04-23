@@ -79,7 +79,7 @@ abstract class UploadField extends InputField
 
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 var upload_field = new PlainUpload();
                 upload_field.attachWith("<?php echo $this->field->getName();?>");
 

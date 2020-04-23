@@ -45,13 +45,13 @@ if (isset($_POST["request_password"])) {
             if (!$users->update($userID, $update_row, $db)) throw new Exception("Unable to update records: " . $db->getError());
 
             $db->commit();
-            Session::Set("alert", tr("Your new password was sent to this email") . ": " . $fp->getValue());
+            Session::SetAlert(tr("Your new password was sent to this email") . ": " . $fp->getValue());
             header("Location: login.php");
             exit;
         }
         catch (Exception $e) {
             $db->rollback();
-            Session::Set("alert", "Error: " . $e->getMessage());
+            Session::SetAlert("Error: " . $e->getMessage());
         }
 
     }

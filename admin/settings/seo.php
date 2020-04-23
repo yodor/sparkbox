@@ -30,7 +30,7 @@ $form->setProcessor($proc);
 $proc->processForm($form);
 
 if ($proc->getStatus() == IFormProcessor::STATUS_OK) {
-    Session::Set("alert", "Configuration Updated");
+    Session::SetAlert("Configuration Updated");
     header("Location: seo.php");
     exit;
 }

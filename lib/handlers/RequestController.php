@@ -97,7 +97,7 @@ class RequestController
 
             }
             catch (Exception $e) {
-                Session::Set("alert", $e->getMessage());
+                Session::SetAlert($e->getMessage());
 
                 if (strlen($handler->getCancelUrl()) > 0) {
                     header("Location: " . $handler->getCancelUrl());
