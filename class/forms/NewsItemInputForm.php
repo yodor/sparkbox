@@ -10,7 +10,7 @@ class NewsItemInputForm extends InputForm
     {
 
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTFIELD, "item_title", "Title", 1);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "item_title", "Title", 1);
         $this->addField($field);
 
         $field = DataInputFactory::Create(DataInputFactory::DATE, "item_date", "Date", 1);

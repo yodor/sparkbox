@@ -62,9 +62,10 @@ class PhraseTranslationDialog extends MessageDialog
 
         echo "<div class='AjaxProgress'></div>";
 
-        echo "<textarea name='translation' rows=5 >";
+        echo "<div class='InputField TextArea'>";
+        echo "<textarea name='translation' rows=5>";
         echo "</textarea>";
-
+        echo "</div>";
 
         echo "</form>";
 

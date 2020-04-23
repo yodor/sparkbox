@@ -1,7 +1,6 @@
 <?php
 include_once("lib/handlers/JSONRequestHandler.php");
-include_once("lib/input/renderers/InputField.php");
-
+include_once("lib/storage/FileStorageObject.php");
 
 abstract class UploadControlAjaxHandler extends JSONRequestHandler
 {

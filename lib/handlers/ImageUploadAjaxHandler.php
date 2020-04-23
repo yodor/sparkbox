@@ -4,8 +4,6 @@ include_once("lib/components/renderers/IPhotoRenderer.php");
 
 include_once("lib/input/validators/ImageUploadValidator.php");
 
-include_once("lib/input/renderers/InputField.php");
-
 class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoRenderer
 {
 

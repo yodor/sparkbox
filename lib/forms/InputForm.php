@@ -1,5 +1,6 @@
 <?php
-include_once("lib/input/DataInput.php");
+include_once("lib/input/DataInputFactory.php");
+
 include_once("lib/beans/IDataBeanGetter.php");
 include_once("lib/beans/IDataBeanSetter.php");
 

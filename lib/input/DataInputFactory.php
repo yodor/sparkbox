@@ -1,4 +1,6 @@
 <?php
+include_once("lib/input/ArrayDataInput.php");
+include_once("lib/input/DataInput.php");
 
 include_once("lib/input/renderers/TextField.php");
 include_once("lib/input/renderers/DateField.php");
@@ -38,16 +40,14 @@ include_once("lib/input/processors/UploadDataInputProcessor.php");
 
 include_once("lib/input/processors/SessionUploadInputProcessor.php");
 
-include_once("lib/input/ArrayDataInput.php");
-
 include_once("lib/selectors/ArraySelector.php");
 
 
 class DataInputFactory
 {
 
-    const TEXTFIELD = 1;
-    const TEXTFIELD_PASSWORD = 2;
+    const TEXT = 1;
+    const PASSWORD = 2;
     const TEXTAREA = 3;
     const SELECT = 4;
     const SELECT_MULTI = 5;
@@ -67,12 +67,12 @@ class DataInputFactory
     const DYNAMIC_PAGE = 18;
     const SESSION_IMAGE = 19;
     const SESSION_FILE = 20;
-    const COLORCODE = 21;
+    const COLOR_CODE = 21;
 
     const CAPTCHA = 22;
 
     const HIDDEN_ARRAY = 100;
-    const TEXTFIELD_ARRAY = 101;
+    const TEXT_ARRAY = 101;
     const SELECT_ARRAY = 102;
 
     const SLIDER = 200;
@@ -96,11 +96,11 @@ class DataInputFactory
 
         switch ($type) {
 
-            case DataInputFactory::TEXTFIELD:
+            case DataInputFactory::TEXT:
                 $field->setRenderer(new TextField());
 
                 break;
-            case DataInputFactory::COLORCODE:
+            case DataInputFactory::COLOR_CODE:
                 $field->setRenderer(new ColorCodeField());
 
                 break;
@@ -121,7 +121,7 @@ class DataInputFactory
                 $field->setRenderer(new SelectMultipleField());
                 break;
 
-            case DataInputFactory::TEXTFIELD_PASSWORD:
+            case DataInputFactory::PASSWORD:
                 $field->setRenderer(new PasswordField());
                 $field->setValidator(new PasswordValidator());
 

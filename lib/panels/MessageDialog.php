@@ -1,5 +1,6 @@
 <?php
 include_once("lib/components/Component.php");
+include_once("lib/components/renderers/IPageComponent.php");
 include_once("lib/buttons/StyledButton.php");
 
 class MessageDialog extends Component implements IPageComponent

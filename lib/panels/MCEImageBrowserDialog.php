@@ -2,10 +2,6 @@
 include_once("lib/panels/MessageDialog.php");
 include_once("lib/handlers/MCEImageBrowserAjaxHandler.php");
 
-//include_once ("lib/panels/ConfirmMessageDialog.php");
-//include_once ("lib/input/DataInputFactory.php");
-//include_once ("lib/components/InputComponent.php");
-
 class MCEImageBrowserDialog extends MessageDialog
 {
 
@@ -33,7 +29,7 @@ class MCEImageBrowserDialog extends MessageDialog
         RequestController::addAjaxHandler($this->handler);
 
         $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
-        $this->image_input->getRenderer()->assignUploadHandler($this->handler);
+        $this->image_input->getArrayRenderer()->assignUploadHandler($this->handler);
 
 
     }

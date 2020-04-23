@@ -22,17 +22,19 @@
     -moz-box-sizing: border-box;
 }
 
+.PhraseTranslationDialog .Inner .InputField.TextArea {
+    display:block;
+}
+
 .PhraseTranslationDialog .Inner textarea[name='translation'] {
-    width: 100%;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
+
 }
 
 
 .PhraseTranslationDialog .Inner .buttons_bar {
     display: block;
     width: 100%;
-
+    margin-top: 0.8em;
 }
 
 .PhraseTranslationDialog .Inner .buttons_bar [action='Translate'] {

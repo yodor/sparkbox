@@ -7,7 +7,7 @@ $page = new DemoPage();
 
 $dialog = new ConfirmMessageDialog();
 
-$field1 = DataInputFactory::CREATE(DataInputFactory::TEXTFIELD, "message1", "Message", false);
+$field1 = DataInputFactory::CREATE(DataInputFactory::TEXT, "message1", "Message", false);
 $field1->setValue("Sample message text");
 
 $field2 = DataInputFactory::CREATE(DataInputFactory::TEXTAREA, "message2", "Confirmation Message", false);

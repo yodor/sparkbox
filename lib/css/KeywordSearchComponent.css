@@ -10,14 +10,18 @@
     padding: 0px;
 }
 
+.KeywordSearchComponent .InputLabel {
+    margin-right:0.5em;
+}
+
 .KeywordSearchComponent .buttons {
     display: table-cell;
     vertical-align: middle;
-    padding: 0px;
+
 }
 
-.KeywordSearchComponent .buttons * {
-    margin-bottom: 0px;
+.KeywordSearchComponent .buttons>* {
+    margin-right: 0.5em;
 }
 
 .KeywordSearchComponent + .TableView {

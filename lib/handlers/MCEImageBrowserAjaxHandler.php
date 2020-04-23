@@ -2,10 +2,9 @@
 include_once("lib/handlers/ImageUploadAjaxHandler.php");
 include_once("lib/utils/IStorageSection.php");
 include_once("lib/beans/MCEImagesBean.php");
-//
-include_once("lib/input/validators/ImageUploadValidator.php");
-include_once("lib/input/renderers/InputField.php");
 
+include_once("lib/input/validators/ImageUploadValidator.php");
+include_once("lib/forms/InputForm.php");
 
 class ImageDimensionForm extends InputForm
 {
@@ -24,13 +23,13 @@ class ImageDimensionForm extends InputForm
 
         $this->addField($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTFIELD, "caption", "Caption", 0);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "caption", "Caption", 0);
         $this->addField($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTFIELD, "width", "Width", 0);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "width", "Width", 0);
         $this->addField($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTFIELD, "height", "Height", 0);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "height", "Height", 0);
         $this->addField($field);
 
         $field = DataInputFactory::Create(DataInputFactory::CHECKBOX, "enable_popup", "Enable Popup", 0);
@@ -185,25 +184,37 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
         $image_row = $bean->getByID($imageID);
         if ($image_row["auth_context"]) {
-            $auth = $image_row["auth_context"];
-            $ownerID = $image_row["ownerID"];
+            $authClass = $image_row["auth_context"];
+            $ownerID = (int)$image_row["ownerID"];
 
-            @include_once("lib/auth/$auth.php");
-            @include_once("class/auth/$auth.php");
-            $class_loaded = class_exists($auth, false);
-            if (!$class_loaded) throw new Exception("Unable to load the stored authenticator");
+            @include_once("lib/auth/$authClass.php");
+            @include_once("class/auth/$authClass.php");
+            $class_loaded = class_exists($authClass, false);
+            if (!$class_loaded) throw new Exception(tr("Unable to load the Authenticator class"));
 
-            $contextData = $auth->data();
-            if (!$contextData) throw new Exception("The requested resource is protected with authenticator");
+            $auth = new $authClass();
 
-            $lastID = $contextData[Authenticator::CONTEXT_DATA][Authenticator::CONTEXT_ID];
+            if ($auth instanceof Authenticator) {
 
-            if ($ownerID > 0 && $lastID != $ownerID) throw new Exception("The requested resource is protected with owner authenticator");
+                $context = $auth->authorize();
+                if ($context instanceof AuthContext) {
+
+                    if ($ownerID > 0 && $context->getID() != $ownerID) throw new Exception(tr("Authorization failed"));
+
+                }
+                else {
+                    throw new Exception(tr("Not authorized"));
+                }
+
+            }
+            else {
+                throw new Exception(tr("Incorrect Authenticator object"));
+            }
 
 
         }
 
-        if (!$bean->deleteID($imageID)) throw new Exception("Unabel to delete: " . $bean->getDB()->getError());
+        if (!$bean->deleteID($imageID)) throw new Exception(tr("Unable to delete: ") . $bean->getDB()->getError());
 
 
     }

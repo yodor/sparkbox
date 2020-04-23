@@ -1,11 +1,7 @@
 <?php
-include_once("lib/components/renderers/IHeadContents.php");
-include_once("lib/panels/MCEImageBrowserDialog.php");
 
 class MCETextArea extends InputField
 {
-
-    //   protected $image_browser = NULL;
 
     protected static $image_browser = NULL;
 
@@ -16,9 +12,9 @@ class MCETextArea extends InputField
 
         //force single instance of the dialog to all MCETextAreas to prevent double session upload
         if (!self::$image_browser) {
+            include_once("lib/panels/MCEImageBrowserDialog.php");
             self::$image_browser = new MCEImageBrowserDialog();
         }
-
 
     }
 
@@ -31,7 +27,7 @@ class MCETextArea extends InputField
 
     public function requiredScript()
     {
-        $arr = parent::requiredStyle();
+        $arr = parent::requiredScript();
         $arr[] = SITE_ROOT . "lib/js/MCETextArea.js";
         $arr[] = SITE_ROOT . "lib/js/tiny_mce/jquery.tinymce.min.js";
         return $arr;

@@ -9,10 +9,10 @@ class BrandInputForm extends InputForm
 
     public function __construct()
     {
-        $field = DataInputFactory::Create(DataInputFactory::TEXTFIELD, "brand_name", "Brand Name", 1);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "brand_name", "Brand Name", 1);
         $this->addField($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTFIELD, "url", "Brand URL", 0);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "url", "Brand URL", 0);
         $field->setValidator(new URLValidator());
         $this->addField($field);
 
