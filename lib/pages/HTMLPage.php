@@ -33,43 +33,51 @@ abstract class HTMLPage implements IRenderer
 
     }
 
+    protected function headStart()
+    {
+
+        echo "<HEAD>";
+        echo "\n";
+
+        echo "<TITLE>" . SITE_TITLE . "</TITLE>";
+        echo "\n";
+
+        $this->dumpMetaTags();
+        echo "\n";
+
+        echo "<!-- HTMLPage CSS start -->";
+        $this->dumpCSS();
+        echo "<!-- HTMLPage CSS end -->";
+        echo "\n";
+
+        echo "<!-- HTMLPage Callable CSS start -->";
+        if (is_callable("dumpCSS")) {
+            dumpCSS();
+        }
+        echo "<!-- HTMLPage Callable CSS end -->";
+        echo "\n";
+
+        echo "<!-- HTMLPage JavaScript start -->";
+        $this->dumpJS();
+        echo "<!-- HTMLPage JavaScript end -->";
+        echo "\n";
+
+        echo "<!-- HTMLPage Callable JavaScript start -->";
+        if (is_callable("dumpJS")) {
+            dumpJS();
+        }
+        echo "<!-- HTMLPage Callable JavaScript end -->";
+        echo "\n";
+
+    }
+
     protected function dumpMetaTags()
     {
         echo "<meta http-equiv='content-type' content='text/html;charset=utf-8'>\n";
         echo "<meta http-equiv='Content-Style-Type' content='text/css'>\n";
 
         //echo "<meta http-equiv='X-UA-Compatible' content='IE=9' >\n";
-        //echo "<meta http-equiv='X-UA-Compatible' content='IE=8' >\n";       
-        echo "\n";
-    }
-
-    protected function headStart()
-    {
-
-        echo "<head>\n";
-        echo "<title>" . SITE_TITLE . "</title>\n";
-        $this->dumpMetaTags();
-
-        echo "\n";
-        echo "\n";
-
-        echo "<!-- HTMLPage CSS start -->";
-        $this->dumpCSS();
-        echo "<!-- HTMLPage CSS end -->";
-
-        echo "<!-- Callable CSS start -->";
-        if (is_callable("dumpCSS")) {
-            dumpCSS();
-        }
-        echo "<!-- Callable CSS end -->";
-
-        echo "\n";
-        $this->dumpJS();
-        echo "<!-- callable js start -->";
-        if (is_callable("dumpJS")) {
-            dumpJS();
-        }
-        echo "<!-- callable js end -->";
+        //echo "<meta http-equiv='X-UA-Compatible' content='IE=8' >\n";
         echo "\n";
     }
 
@@ -85,33 +93,28 @@ abstract class HTMLPage implements IRenderer
 
     protected function headEnd()
     {
-        echo "</head>\n";
+        echo "</HEAD>\n";
         echo "\n";
     }
 
     protected function bodyStart()
     {
-
-
-        echo "<body class='" . $this->getPageClass() . "' >\n";
+        echo "<BODY class='{$this->getPageClass()}'>";
         echo "\n";
-
     }
 
 
     protected function bodyEnd()
     {
         echo "\n";
-
-
-        echo "</body>\n";
+        echo "</BODY>\n";
         echo "\n";
     }
 
     protected function htmlEnd()
     {
         echo "\n";
-        echo "</html>";
+        echo "</HTML>";
         echo "\n";
     }
 

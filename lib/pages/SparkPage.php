@@ -11,12 +11,6 @@ class SparkPage extends HTMLPage
 {
 
     /**
-     * Sparkbox basic HTML page implementation. Re-implement this class
-     * as needed.
-     *
-     */
-
-    /**
      * Authentication support
      * Set this to instance of Authenticator to make this page require authentication
      * to access the page contents
@@ -298,18 +292,12 @@ class SparkPage extends HTMLPage
         echo "<!-- SparkPage CSS Start -->\n";
         parent::dumpCSS();
 
-        echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/popups.css' type='text/css' >";
+        echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/popups.css' type='text/css'>";
         echo "\n";
 
         //SparkPage default stylesheet
-        echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/SparkPage.css' type='text/css' >";
+        echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/SparkPage.css' type='text/css'>";
         echo "\n";
-
-        //prepare collection of unique IHeadRenderer components
-//        $components = array();
-//        foreach ($this->head_components as $idx => $cmp) {
-//            $components[get_class($cmp)] = $cmp;
-//        }
 
         $css_array = array();
         foreach ($this->head_components as $idx => $cmp) {
@@ -383,13 +371,14 @@ class SparkPage extends HTMLPage
 
         ?>
         <script type='text/javascript'>
-            var SITE_ROOT = "<?php echo SITE_ROOT;?>";
-            var ajax_loader = "<div class='AjaxLoader'></div>";
-            var ajax_loader_src = SITE_ROOT + "lib/images/ajax-loader.gif";
-            var left = "<?php echo $left;?>";
-            var right = "<?php echo $right;?>";
+            let SITE_ROOT = "<?php echo SITE_ROOT;?>";
+            let ajax_loader = "<div class='AjaxLoader'></div>";
+            let ajax_loader_src = SITE_ROOT + "lib/images/ajax-loader.gif";
+            let left = "<?php echo $left;?>";
+            let right = "<?php echo $right;?>";
         </script>
         <?php
+
         echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/jquery-1.8.0.min.js'></script>";
         echo "\n";
 
