@@ -5,7 +5,7 @@ include_once("lib/forms/renderers/FormRenderer.php");
 class AuthFormRenderer extends FormRenderer
 {
 
-    protected $auth_context = FALSE;
+    protected $auth = NULL;
 
     protected $username;
     protected $password;
@@ -23,8 +23,6 @@ class AuthFormRenderer extends FormRenderer
 
         $this->submit_button->setText("Login");
 
-        // 		$this->attributes["onSubmit"]="return checkLogin();";
-
         $this->setClassName("FormRenderer");
         $this->setFieldLayout(FormRenderer::FIELD_VBOX);
 
@@ -40,18 +38,10 @@ class AuthFormRenderer extends FormRenderer
         return $arr;
     }
 
-    // 	CONTEXT_ADMIN
-    public function setAuthContext(string $auth_context)
-    {
-        $this->auth_context = $auth_context;
-    }
-
     public function startRender()
     {
         parent::startRender();
-        $rand = rand();
-        $_SESSION[$this->auth_context]["rand"] = $rand;
-        $this->form->getField("rand")->setValue($rand);
+
     }
 
     public function finishRender()

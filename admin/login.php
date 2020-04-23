@@ -7,6 +7,7 @@ include_once("lib/handlers/AuthenticatorRequestHandler.php");
 include_once("lib/forms/AuthForm.php");
 include_once("lib/forms/renderers/AuthFormRenderer.php");
 
+
 $page = new AdminLoginPage();
 
 $auth = new AdminAuthenticator();
@@ -24,11 +25,18 @@ $afr = new AuthFormRenderer();
 
 $afr->setAttribute("name", "auth");
 $afr->setForm($af);
-$afr->setAuthContext($auth->name());
+
 $afr->getSubmitButton()->setClassName("admin_button orange");
 
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+// header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+header("Expires: 0");
 
 $page->startRender();
+
+//set the token after RequestController processHandlers is done
+$af->getField("rand")->setValue($auth->createLoginToken());
+
 $page->setPreferredTitle("Login");
 
 echo "<div class='login_component'>";
@@ -47,5 +55,6 @@ echo "</span>";
 echo "</div>";
 
 $page->finishRender();
+
 ?>
 

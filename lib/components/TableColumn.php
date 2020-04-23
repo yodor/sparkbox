@@ -41,12 +41,12 @@ class TableColumn extends Component
         $this->header_renderer->setParent($this);
     }
 
-    public function getHeaderCellRenderer()
+    public function getHeaderCellRenderer() : ICellRenderer
     {
         return $this->header_renderer;
     }
 
-    public function getCellRenderer()
+    public function getCellRenderer() : ICellRenderer
     {
         return $this->cell_renderer;
 
@@ -58,7 +58,7 @@ class TableColumn extends Component
         $this->cell_renderer->setParent($this);
     }
 
-    public function getView()
+    public function getView() : TableView
     {
         return $this->view;
     }
@@ -68,12 +68,12 @@ class TableColumn extends Component
         $this->view = $view;
     }
 
-    public function getFieldName()
+    public function getFieldName() : string
     {
         return $this->field_name;
     }
 
-    public function getLabel()
+    public function getLabel() : string
     {
         return $this->label;
     }

@@ -143,7 +143,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
 
     /**
      * @param string $field_name
-     * @return mixed
+     * @return DataInput
      * @throws Exception
      */
     public function getField(string $field_name)

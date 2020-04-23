@@ -18,13 +18,12 @@ class PageSessionMenu extends MainMenu
         $this->main_menu = $main_menu;
 
         //check if there is already a menu in session and use it instead or put the inital menu to the session
-        if (isset($_SESSION[$this->context]["Menu"])) {
-            $this->main_menu = unserialize($_SESSION[$this->context]["Menu"]);
+        if ($context->getData()->contains(SessionData::MENU)) {
+            $this->main_menu = unserialize($context->getData()->get(SessionData::MENU));
         }
         else {
-            $_SESSION[$this->context]["Menu"] = serialize($this->main_menu);
+            $context->getData()->set(SessionData::MENU, serialize($this->main_menu));
         }
-
     }
 
 
@@ -107,7 +106,8 @@ class PageSessionMenu extends MainMenu
 
         $this->selected_path = array_reverse($this->selected_path);
 
-        $_SESSION[$this->context]["Menu"] = serialize($this->main_menu);
+        $this->context->getData()->set(SessionData::MENU, serialize($this->main_menu));
+
 
         // 	debug("LocationPath::pathUpdate: Storing MenuElements: ");
         // 	$this->dumpMenu();

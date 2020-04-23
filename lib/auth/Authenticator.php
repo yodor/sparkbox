@@ -1,6 +1,7 @@
 <?php
 include_once("lib/auth/AuthContext.php");
-include_once("lib/auth/AuthData.php");
+include_once("lib/auth/AuthToken.php");
+include_once("lib/utils/SessionData.php");
 
 /**
  * Abstract class for doing authentication
@@ -8,14 +9,17 @@ include_once("lib/auth/AuthData.php");
  */
 abstract class Authenticator
 {
-
-    protected $contextName = "";
-    protected $loginURL = "";
-
+    /**
+     * @var IDataBean
+     */
     protected $bean = null;
 
-    public function __construct()
+    protected $session = null;
+
+    public function __construct(string $contextName, IDataBean $bean)
     {
+        $this->bean = $bean;
+        $this->session = new SessionData($contextName);
     }
 
     public static function HMAC($key, $data, $hash = 'md5', $blocksize = 64)
@@ -29,6 +33,10 @@ abstract class Authenticator
         return $hash(($key ^ $opad) . pack('H*', $hash(($key ^ $ipad) . $data)));
     }
 
+    /**
+     * @param int $length
+     * @return false|string
+     */
     public static function RandomToken(int $length = 32)
     {
         $md5_size = 32;
@@ -55,7 +63,7 @@ abstract class Authenticator
      */
     public function name()
     {
-        return $this->contextName;
+        return $this->session->name();
     }
 
     /**
@@ -63,14 +71,19 @@ abstract class Authenticator
      */
     public function logout()
     {
-        Session::Clear($this->contextName);
+        $this->session->clear();
         foreach ($_COOKIE as $key => $val) {
-            if (strpos($key, $this->contextName) === 0) {
+            if (strpos($key, $this->session->name()) === 0) {
                 setcookie($key, "", 1, "/");
             }
         }
     }
 
+    /**
+     * @param array $urow
+     * @return AuthContext
+     * @throws Exception
+     */
     public function register(array $urow)
     {
 
@@ -80,32 +93,36 @@ abstract class Authenticator
             throw new Exception(tr("Error during registering. Please try again later."));
         }
 
-        $data = $this->prepareAuthData($urow);
+        $this->fillSessionData($urow);
 
-        return $this->createContext($userID, $data);
+        $this->createAuthToken($userID);
+
+        return new AuthContext($userID, $this->session);
     }
 
+
     /**
-     * Validate authentication of this named context and return the AuthContext object or NULL
      * @param array|null $user_data
-     * @return mixed|null
+     * @return AuthContext|null
      */
     public function authorize(array $user_data = NULL)
     {
 
-        if (!Session::Contains($this->contextName)) {
-            debug(get_class($this) . " Session array does not contain AuthContext with name: " . $this->contextName);
+        if (!$this->session->contains(SessionData::AUTH_TOKEN)) {
+            debug(get_class($this) . " SessionData does not have auth_token set");
             return NULL;
         }
 
-        $context = unserialize(Session::Get($this->contextName));
+        $auth = $this->session->get(SessionData::AUTH_TOKEN);
 
-        if ($context instanceof AuthContext) {
-            debug(get_class($this) . " Validating un-serialized AuthContext using name: ". $this->contextName);
+        $token = unserialize($auth);
 
-            if ($context->validate($this->contextName) === TRUE) {
-                debug(get_class($this) . " Validation success name: ". $this->contextName);
-                return $context;
+        if ($token instanceof AuthToken) {
+            debug(get_class($this) . " AuthToken un-serialized from session");
+
+            if ($token->validateCookies($this->session->name()) === TRUE) {
+                debug(get_class($this) . " Cookie validation success");
+                return new AuthContext($token->getID(), $this->session);
             }
             else {
                 debug(get_class($this) . " AuthContext validation failed");
@@ -129,6 +146,8 @@ abstract class Authenticator
      */
     public function login(string $username, string $pass, string $rand, bool $remember_me = false, bool $check_password_only = false)
     {
+
+        debug(get_class($this) . " Login process using loginToken: " . $rand);
 
         $db = DBDriver::Get();
 
@@ -168,9 +187,9 @@ abstract class Authenticator
             }
 
 
-            $data = $this->prepareAuthData($row);
+            $this->fillSessionData($row);
 
-            $this->createContext($userID, $data);
+            $this->createAuthToken($userID);
 
             $this->updateLastSeen($userID);
 
@@ -188,42 +207,43 @@ abstract class Authenticator
         $row["counter"] = "counter+1";
         $row["last_active"] = "CURRENT_TIMESTAMP";
 
-        $this->bean->updateRecord($userID, $row);
+        $this->bean->update($userID, $row);
 
     }
 
     /**
-     * Called from Login or after registration routines are complete to set the logged in state of the context
-     * Store authentication data in session and cookie for a named context '$name'
+     * Create new AuthToken for user ID $id.
+     * Serialize the token to the SessionData of this Authenticator
      * @param int $id
-     * @param AuthData $data
-     * @return AuthContext
      */
-    protected function createContext(int $id, AuthData $data)
+    protected function createAuthToken(int $id)
     {
-        debug(get_class($this) . " Creating new AuthContext ... ");
+        debug(get_class($this) . " createAuthToken");
 
         session_regenerate_id(true);
 
-        debug(get_class($this) . " SessionID regenerated ...");
+        debug(get_class($this) . " SessionID regenerated");
 
-        $context = new AuthContext($id,  $data);
+        $token = new AuthToken($id);
 
-        $context->store($this->contextName);
+        $token->storeCookies($this->session->name());
+        debug(get_class($this) . " Cookies created");
 
-        return $context;
+        $this->session->set(SessionData::AUTH_TOKEN, serialize($token));
+        debug(get_class($this) . " AuthToken stored to SessionData");
     }
 
-    protected function prepareAuthData(array $row)
+    protected function fillSessionData(array $row)
     {
-        $data = new AuthData($this->contextName);
-        if (isset($row[AuthData::DATA_EMAIL])) {
-            $data->set(AuthData::DATA_EMAIL, $row[AuthData::DATA_EMAIL]);
+        debug(get_class($this) . " fillSessionData");
+
+        if (isset($row[SessionData::EMAIL])) {
+            $this->session->set(SessionData::EMAIL, $row[SessionData::EMAIL]);
         }
-        if (isset($row[AuthData::DATA_FULLNAME])) {
-            $data->set(AuthData::DATA_FULLNAME , $row[AuthData::DATA_FULLNAME]);
+        if (isset($row[SessionData::FULLNAME])) {
+            $this->session->set(SessionData::FULLNAME , $row[SessionData::FULLNAME]);
         }
-        return $data;
+
     }
 
     public function fbAuthenticate($oauth_token)
@@ -257,6 +277,25 @@ abstract class Authenticator
 
         return $urow;
 
+    }
+
+    /**
+     * @return false|string
+     */
+    public function createLoginToken()
+    {
+        $token = Authenticator::RandomToken(32);
+        $this->session->set(SessionData::LOGIN_TOKEN, $token);
+        return $token;
+    }
+
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    public function loginToken()
+    {
+        return $this->session->get(SessionData::LOGIN_TOKEN);
     }
 }
 

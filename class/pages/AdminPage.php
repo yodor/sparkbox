@@ -15,19 +15,10 @@ class AdminPage extends AdminPageLib
         MenuItem::$icon_path = LIB_ROOT . "images/admin/spark_icons/";
 
         $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
+
+        $this->addCSS(SITE_ROOT . "css/admin.css", false);
     }
 
-    protected function dumpJS()
-    {
-        parent::dumpJS();
-    }
-
-    protected function dumpCSS()
-    {
-        parent::dumpCSS();
-        echo '<link rel="stylesheet" href="' . SITE_ROOT . 'css/admin.css" type="text/css">';
-
-    }
 
 }
 

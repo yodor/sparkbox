@@ -13,7 +13,7 @@ class SparkPage extends HTMLPage
 
     /**
      * Authenticated context data array. is null if not authenticated yet
-     * @var null
+     * @var AuthContext
      */
     protected $context = NULL;
 

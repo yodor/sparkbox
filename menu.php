@@ -45,7 +45,6 @@ $menu_bar = new MenuBarComponent($menu);
 $menu_bar->setName("ConstructedMenu");
 
 $menu_bar->getMainMenu()->findMenuIndex();
-// ***************************************************************
 
 $menu1 = new MainMenu();
 $menu1->setMenuBeanClass("ProductCategoriesBean");
@@ -57,25 +56,15 @@ $menu_bar1->setName("ProductCategoriesBean");
 
 $page->startRender();
 
-
-// echo "<div style='float:left;'>";
 $menu_bar->render();
-// echo "</div>";
 
 echo "<BR><BR><BR><BR><BR><BR><BR><BR>";
 
-// echo "<div style='float:left;margin-left:40px;'>";
+
 $menu_bar1->render();
-// echo "</div>";
-
-
-//
-// // echo "<div id=debug style='height:200px;overflow:scroll;'>Debug Area</div>";
 
 echo "<div class=clear></div>";
 
-
 $page->finishRender();
-
 
 ?>

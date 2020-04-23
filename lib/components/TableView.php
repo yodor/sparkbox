@@ -17,19 +17,16 @@ include_once("lib/actions/Action.php");
 class TableView extends AbstractResultView implements IHeadContents
 {
 
-
-    protected $columns = false;
+    /**
+     * @var array TableColumn
+     */
+    protected $columns = array();
 
     protected $header_cells_enabled = true;
 
     public function __construct(SQLIterator $itr)
     {
-
         parent::__construct($itr);
-
-        $this->columns = array();
-
-
     }
 
     public function requiredStyle()
@@ -44,7 +41,6 @@ class TableView extends AbstractResultView implements IHeadContents
         $column_name = $column->getFieldName();
         $column->setView($this);
         $this->columns[$column_name] = $column;
-
     }
 
     public function insertColumnAfter(TableColumn $column, $after_column_name)
@@ -57,7 +53,6 @@ class TableView extends AbstractResultView implements IHeadContents
         $column->setView($this);
 
         $this->columns = array_slice($this->columns, 0, $index + 1, true) + array("$column_name" => $column) + array_slice($this->columns, $index + 1, count($this->columns) - 1, true);
-
     }
 
     public function resetActionsColumn()
@@ -74,7 +69,11 @@ class TableView extends AbstractResultView implements IHeadContents
         if (isset($this->columns[$field_name])) unset($this->columns[$field_name]);
     }
 
-    public function getColumn($field_name)
+    /**
+     * @param $field_name
+     * @return TableColumn
+     */
+    public function getColumn(string $field_name) : TableColumn
     {
         return $this->columns[$field_name];
     }
@@ -93,9 +92,11 @@ class TableView extends AbstractResultView implements IHeadContents
         if ($this->header_cells_enabled) {
             echo "<tr class='sort'>";
 
-            foreach ($this->columns as $pos => $tc) {
+            foreach (array_keys($this->columns) as $pos => $column_name) {
 
-                $tc->getHeaderCellRenderer()->renderCell(false, $tc);
+                $tc = $this->getColumn($column_name);
+                $emptyRow = array();
+                $tc->getHeaderCellRenderer()->renderCell($emptyRow, $tc);
             }
 
             echo "</tr>";
@@ -122,7 +123,10 @@ class TableView extends AbstractResultView implements IHeadContents
 
             echo "<tr class='$cls'>";
 
-            foreach ($this->columns as $pos => $tc) {
+            foreach (array_keys($this->columns) as $pos => $column_name) {
+
+                $tc = $this->getColumn($column_name);
+
                 $cellr = $tc->getCellRenderer();
                 $cellr->setClassName($cls);
 

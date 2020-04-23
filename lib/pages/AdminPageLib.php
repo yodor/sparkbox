@@ -20,11 +20,12 @@ include_once("lib/components/TableView.php");
 
 include_once("lib/utils/PageSessionMenu.php");
 
+include_once("lib/auth/AuthContext.php");
+
 class AdminPageLib extends SparkPage
 {
 
     public $caption = "";
-
 
     protected $roles = array();
 
@@ -44,8 +45,7 @@ class AdminPageLib extends SparkPage
             $this->roles[] = $row["role"];
         }
 
-        $dynmenu = new PageSessionMenu($this->auth->name(), $this->initMainMenu());
-
+        $dynmenu = new PageSessionMenu($this->context, $this->initMainMenu());
 
         $this->menu_bar = new MenuBarComponent($dynmenu);
         $this->menu_bar->toggle_first = false;
@@ -53,6 +53,13 @@ class AdminPageLib extends SparkPage
         $this->menu_bar->setClassName("admin_menu");
 
         $this->menu_bar->setAttribute("submenu_popup", "0");
+
+
+        $this->addCSS(SITE_ROOT . "lib/css/admin.css", false);
+        $this->addCSS(SITE_ROOT . "lib/css/admin_buttons.css", false);
+        $this->addCSS(SITE_ROOT . "lib/css/admin_menu.css", false);
+        $this->addCSS(SITE_ROOT . "lib/css/admin.css", false);
+
     }
 
     protected function initMainMenu()
@@ -76,12 +83,7 @@ class AdminPageLib extends SparkPage
     {
         parent::dumpCSS();
 
-        echo '<link rel="stylesheet" href="' . SITE_ROOT . 'lib/css/admin.css" type="text/css">';
-        echo "\n";
-        echo '<link rel="stylesheet" href="' . SITE_ROOT . 'lib/css/admin_buttons.css" type="text/css">';
-        echo "\n";
-        echo '<link rel="stylesheet" href="' . SITE_ROOT . 'lib/css/admin_menu.css" type="text/css">';
-        echo "\n";
+
 
     }
 
@@ -163,7 +165,11 @@ class AdminPageLib extends SparkPage
 
         echo "<div class='welcome'>";
 
-        echo "<span class='text_admin'>Welcome, {$this->context[Authenticator::CONTEXT_DATA][AdminAuthenticator::DATA_FULLNAME]}</span>";
+        $fullname = "";
+        if ($this->context->getData()->contains(SessionData::FULLNAME)) {
+            $fullname = $this->context->getData()->get(SessionData::FULLNAME);
+        }
+        echo "<span class='text_admin'>Welcome, $fullname</span>";
         $btn = StyledButton::DefaultButton();
         $btn->renderButton("Logout", ADMIN_ROOT . "logout.php");
         echo "</div>";
