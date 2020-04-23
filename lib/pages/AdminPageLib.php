@@ -238,7 +238,7 @@ class AdminPageLib extends SparkPage
         ?>
         <script type='text/javascript'>
 
-            // addLoadEvent(function(){
+            // onPageLoad(function(){
             //     if (docCookies.hasItem("MenuBar.visibility")) {
             //         var menu_visible = parseInt(docCookies.getItem("MenuBar.visibility"));
             //         //default is menu is visible

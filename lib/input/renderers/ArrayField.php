@@ -193,7 +193,7 @@ class ArrayField extends Component implements IArrayFieldRenderer
 
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 let array_controls = new ArrayControls();
                 array_controls.attachWith("<?php echo $this->field->getName();?>");
             });

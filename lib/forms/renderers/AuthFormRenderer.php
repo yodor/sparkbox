@@ -59,7 +59,7 @@ class AuthFormRenderer extends FormRenderer
         parent::finishRender();
         ?>
         <script type='text/javascript'>
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 var auth_form = new AuthForm();
                 auth_form.attachWith("<?php echo $this->getAttribute("name");?>");
             });

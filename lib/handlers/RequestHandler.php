@@ -144,7 +144,7 @@ abstract class RequestHandler implements IRequestProcessor
                 document.location.replace("<?php echo $this->cancel_url;?>");
             }
 
-            addLoadEvent(function () {
+            onPageLoad(function () {
                 showPopupPanel("msg_confirm");
             });
         </script>

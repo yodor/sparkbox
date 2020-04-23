@@ -39,7 +39,7 @@ function filterChanged(elm, filter_name, is_combined) {
 
 }
 
-addLoadEvent(function () {
+onPageLoad(function () {
 
     $(".drag").slider({
         range: true,

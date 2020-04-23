@@ -664,7 +664,7 @@ class SparkPage extends HTMLPage
             ?>
             <script type='text/javascript'>
                 let alert = <?php echo $alert;?>;
-                addLoadEvent(function () {
+                onPageLoad(function () {
                     showAlert(alert);
                 });
             </script>

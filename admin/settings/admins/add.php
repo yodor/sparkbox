@@ -37,7 +37,7 @@ $view->render();
             }
         }
 
-        addLoadEvent(function () {
+        onPageLoad(function () {
             toggleRoles();
         });
     </script>

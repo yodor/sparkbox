@@ -140,7 +140,7 @@ class DemoPage extends SparkPage
 
         <script type='text/javascript'>
 
-            addLoadEvent(function () {
+            onPageLoad(function () {
 
 
 //     var menu = $(".MenuBar[name='DemoPage']");
