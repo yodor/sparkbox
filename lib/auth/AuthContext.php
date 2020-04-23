@@ -1,11 +1,8 @@
 <?php
+include_once("lib/auth/AuthData.php");
 
-
-class AuthContext
+class AuthToken
 {
-    public const TOKEN = "token";
-    public const ID = "id";
-
     /**
      * @var int
      */
@@ -14,23 +11,46 @@ class AuthContext
     /**
      * @var string
      */
-    protected $token = "";
+    protected $hash = "";
 
-    /**
-     * @var AuthData|null
-     */
-    protected $data = null;
-
-    public function __construct(int $id, string $token, AuthData $data)
+    public function __construct(int $id, string $hash)
     {
         $this->id = $id;
-        $this->token = $token;
-        $this->data = $data;
+        $this->hash = $hash;
     }
 
     public function getID()
     {
         return $this->id;
+    }
+
+    public function getHash()
+    {
+        return $this->hash;
+    }
+
+}
+
+class AuthContext implements Serializable
+{
+    public const HASH = "hash";
+    public const ID = "id";
+
+    const TOKEN_LENGTH = 32;
+
+    const TOKEN = "token";
+    const DATA = "data";
+
+    protected $token = NULL;
+    /**
+     * @var AuthData|null
+     */
+    protected $data = NULL;
+
+    public function __construct(int $id, AuthData $data)
+    {
+        $this->token = new AuthToken($id, Authenticator::RandomToken(AuthContext::TOKEN_LENGTH));
+        $this->data = $data;
     }
 
     public function getToken()
@@ -46,9 +66,13 @@ class AuthContext
     public function store(string $contextName)
     {
         //hash_hmac ( string $algo , string $data , string $key [, bool $raw_output = FALSE ] ) : string
-        setcookie($contextName . "_" . AuthContext::TOKEN, $this->token, 0, "/");
-        setcookie($contextName . "_" . AuthContext::ID, $this->id, 0, "/");
-        Session::Set($contextName, serialize($this));
+        setcookie($contextName . "_" . AuthContext::HASH, $this->token->getHash(), 0, "/");
+        setcookie($contextName . "_" . AuthContext::ID, $this->token->getID(), 0, "/");
+
+        if (strcmp($this->data->name(),$contextName)!=0)throw new Exception("AuthData name missmatch");
+
+        Session::Set($contextName, serialize($this->token));
+        $this->data->store();
     }
 
     public function validate(string $contextName)
@@ -58,16 +82,22 @@ class AuthContext
             return false;
         }
 
-        if (!isset($_COOKIE[$contextName . "_" . AuthContext::TOKEN]) || !isset($_COOKIE[$contextName . "_" . AuthContext::ID])) {
+        if (!isset($_COOKIE[$contextName . "_" . AuthContext::HASH]) || !isset($_COOKIE[$contextName . "_" . AuthContext::ID])) {
             debug(get_class($this) . " Required cookies were not found");
             return false;
         }
 
-        $cookie_token = $_COOKIE[$contextName . "_" . AuthContext::TOKEN];
+        $cookie_hash = $_COOKIE[$contextName . "_" . AuthContext::HASH];
         $cookie_id = (int)$_COOKIE[$contextName . "_" . AuthContext::ID];
 
-        if (strcmp($cookie_token, $this->token) == 0 && $cookie_id == $this->id) {
+        if (strcmp($cookie_hash, $this->token->getHash()) == 0 && $cookie_id == $this->token->getID()) {
             debug(get_class($this) . " Cookie values matched successfully");
+
+            if ($this->data == NULL) {
+                $this->data = new AuthData($contextName);
+                $this->data->load();
+            }
+
             return true;
         }
 
@@ -76,4 +106,16 @@ class AuthContext
     }
 
 
+    public function serialize()
+    {
+        return serialize($this->token);
+    }
+
+    public function unserialize($serialized)
+    {
+        $token = unserialize($serialized);
+        if ($token instanceof AuthToken) {
+            $this->token = $token;
+        }
+    }
 }

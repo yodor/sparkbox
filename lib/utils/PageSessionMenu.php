@@ -5,10 +5,10 @@ include_once("lib/utils/MainMenu.php");
 class PageSessionMenu extends MainMenu
 {
 
-    protected $context = "DEFAULT_CONTEXT";
+    protected $context = NULL;
 
 
-    public function __construct($context, array $main_menu)
+    public function __construct(AuthContext $context, array $main_menu)
     {
         parent::__construct();
 

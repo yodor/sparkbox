@@ -10,10 +10,9 @@ include_once("lib/forms/renderers/AuthFormRenderer.php");
 $page = new AdminLoginPage();
 
 $auth = new AdminAuthenticator();
-$auth->setLoginURL(SITE_ROOT . "admin/login.php");
 
 $req = new AuthenticatorRequestHandler($auth, "doLogin");
-$req->setCancelUrl($auth->getLoginURL());
+$req->setCancelUrl(SITE_ROOT . "admin/login.php");
 $req->setSuccessUrl(SITE_ROOT . "admin/index.php");
 
 RequestController::addRequestHandler($req);

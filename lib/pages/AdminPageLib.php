@@ -33,10 +33,10 @@ class AdminPageLib extends SparkPage
     public function __construct()
     {
 
-        parent::__construct(new AdminAuthenticator());
+        parent::__construct(new AdminAuthenticator(), SITE_ROOT."admin/login.php");
 
         //here is either authenticated or redirection has happened in SimplePage CTOR
-        $adminID = (int)$this->context[Authenticator::CONTEXT_ID];
+        $adminID = $this->getUserID();
 
         $b = new AdminAccessBean();
         $n = $b->startIterator("WHERE userID=$adminID");

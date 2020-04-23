@@ -1,4 +1,6 @@
 <?php
+include_once("lib/auth/AuthContext.php");
+include_once("lib/auth/AuthData.php");
 
 /**
  * Abstract class for doing authentication
@@ -6,8 +8,6 @@
  */
 abstract class Authenticator
 {
-
-    const TOKEN_LENGTH = 32;
 
     protected $contextName = "";
     protected $loginURL = "";
@@ -98,14 +98,14 @@ abstract class Authenticator
             return NULL;
         }
 
-        $authContext = @unserialize(Session::Get($this->contextName));
+        $context = unserialize(Session::Get($this->contextName));
 
-        if ($authContext instanceof AuthContext) {
+        if ($context instanceof AuthContext) {
             debug(get_class($this) . " Validating un-serialized AuthContext using name: ". $this->contextName);
 
-            if ($this->validate($authContext, $user_data) === TURE) {
+            if ($context->validate($this->contextName) === TRUE) {
                 debug(get_class($this) . " Validation success name: ". $this->contextName);
-                return $authContext;
+                return $context;
             }
             else {
                 debug(get_class($this) . " AuthContext validation failed");
@@ -118,17 +118,6 @@ abstract class Authenticator
         return NULL;
     }
 
-    /**
-     * Perform validation of the AuthContext. This method can be overloaded for authenticating the user_data
-     * @param AuthContext $context
-     * @param string $name
-     * @param array|null $user_data
-     * @return bool
-     */
-    protected function validate(AuthContext $context, string $name, array $user_data = NULL)
-    {
-        return $context->validate($name);
-    }
 
     /**
      * @param string $username
@@ -175,7 +164,7 @@ abstract class Authenticator
             }
             if (isset($row["suspended"])) {
                 $is_suspended = (int)$row["suspended"];
-                throw new Exception(tr("Your account is temporary suspended."));
+                if ($is_suspended) throw new Exception(tr("Your account is temporary suspended."));
             }
 
 
@@ -218,9 +207,7 @@ abstract class Authenticator
 
         debug(get_class($this) . " SessionID regenerated ...");
 
-        $token = Authenticator::RandomToken(Authenticator::TOKEN_LENGTH);
-
-        $context = new AuthContext($id, $token, $data);
+        $context = new AuthContext($id,  $data);
 
         $context->store($this->contextName);
 
@@ -229,7 +216,7 @@ abstract class Authenticator
 
     protected function prepareAuthData(array $row)
     {
-        $data = new AuthData();
+        $data = new AuthData($this->contextName);
         if (isset($row[AuthData::DATA_EMAIL])) {
             $data->set(AuthData::DATA_EMAIL, $row[AuthData::DATA_EMAIL]);
         }
@@ -241,8 +228,6 @@ abstract class Authenticator
 
     public function fbAuthenticate($oauth_token)
     {
-
-        $userID = -1;
 
         $graph_url = "https://graph.facebook.com/me?access_token=$oauth_token";
         $user_fb = json_decode(file_get_contents($graph_url));
