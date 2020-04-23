@@ -56,16 +56,6 @@ class SparkPage extends HTMLPage
     public $keywords = "";
 
     /**
-     * Meta tag 'Description' as read from config table from DB
-     */
-    protected $config_description = "";
-
-    /**
-     * Meta tag 'Keywords' as read from config table from DB
-     */
-    protected $config_keywords = "";
-
-    /**
      * property used to connect the current page with menus
      */
     protected $accessible_title = "";
@@ -238,13 +228,11 @@ class SparkPage extends HTMLPage
 
     public function addComponent(Component $cmp)
     {
-        if ($cmp instanceof IPageComponent)
-        {
+        if ($cmp instanceof IPageComponent) {
             $this->page_components[] = $cmp;
         }
 
-        if ($cmp instanceof IHeadContents)
-        {
+        if ($cmp instanceof IHeadContents) {
             $this->head_components[] = $cmp;
         }
     }
@@ -262,7 +250,7 @@ class SparkPage extends HTMLPage
      * Gets the value of the $caption property
      * @return string
      */
-    public function getCaption()
+    public function getCaption() : string
     {
         return $this->caption;
     }
@@ -287,7 +275,7 @@ class SparkPage extends HTMLPage
             //dump used components in page
             //echo "<!-- " . $idx . " -->\n";
             $css_files = $cmp->requiredStyle();
-            foreach ($css_files as $key=>$url) {
+            foreach ($css_files as $key => $url) {
                 $usedBy = array();
                 if (isset($css_array[$url])) {
                     $usedBy = $css_array[$url];
@@ -298,10 +286,10 @@ class SparkPage extends HTMLPage
         }
 
         echo "<!-- Component CSS Files Start -->\n";
-        foreach($css_array as $url=>$usedBy) {
+        foreach ($css_array as $url => $usedBy) {
 
             echo "<link rel='stylesheet' href='$url' type='text/css' >";
-            echo "<!-- Used by: ".implode("; ", array_keys($usedBy))." -->\n";
+            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
         echo "<!-- Component CSS Files End -->\n";
 
@@ -388,7 +376,7 @@ class SparkPage extends HTMLPage
                 echo $js_files;
                 continue;
             }
-            foreach ($js_files as $key=>$url) {
+            foreach ($js_files as $key => $url) {
                 $usedBy = array();
                 if (isset($js_array[$url])) {
                     $usedBy = $js_array[$url];
@@ -399,10 +387,10 @@ class SparkPage extends HTMLPage
         }
 
         echo "<!-- Component JavaScript Files Start -->\n";
-        foreach($js_array as $url=>$usedBy) {
+        foreach ($js_array as $url => $usedBy) {
 
             echo "<script type='text/javascript' src='$url'></script>";
-            echo "<!-- Used by: ".implode("; ", array_keys($usedBy))." -->\n";
+            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
         echo "<!-- Component JavaScript Files End -->\n";
 
@@ -446,7 +434,7 @@ class SparkPage extends HTMLPage
                     throw new Exception("Your session is expired");
                 }
 
-                if (strlen($loginURL)>0) {
+                if (strlen($loginURL) > 0) {
                     header("Location: $loginURL");
                     exit;
                 }
@@ -459,7 +447,6 @@ class SparkPage extends HTMLPage
         }
 
         $dialog = new MessageDialog();
-
     }
 
 
@@ -468,7 +455,7 @@ class SparkPage extends HTMLPage
         $this->preferred_title = $page_title;
     }
 
-    public function getPreferredTitle()
+    public function getPreferredTitle() : string
     {
         return $this->preferred_title;
     }
@@ -480,24 +467,30 @@ class SparkPage extends HTMLPage
 
         $buffer = preg_replace('#(<title.*?>).*?(</title>)#', "<title>" . strip_tags($title) . "</title>", $buffer);
 
-        $keywords_config = "";
-        $description_config = "";
-
         $meta_keywords = "";
         $meta_description = "";
+
+        try {
+            if (DB_ENABLED) {
+                $config = ConfigBean::factory();
+                $config->setSection("seo");
+
+                $meta_keywords = $config->getValue("meta_keywords");
+                $meta_description = $config->getValue("meta_description");
+            }
+        }
+        catch (Exception $e) {
+            //
+        }
 
         if ($this->keywords) {
             $meta_keywords = $this->keywords;
         }
-        else {
-            $meta_keywords = $this->config_keywords;
-        }
+
         if ($this->description) {
             $meta_description = $this->description;
         }
-        else {
-            $meta_description = $this->config_description;
-        }
+
 
         $buffer = str_replace("%meta_keywords%", strip_tags($meta_keywords), $buffer);
         $buffer = str_replace("%meta_description%", strip_tags($meta_description), $buffer);
@@ -519,24 +512,7 @@ class SparkPage extends HTMLPage
     {
         RequestController::processAjaxHandlers();
 
-        try {
-            if (DB_ENABLED) {
-                $config = ConfigBean::factory();
-                $config->setSection("seo");
-
-                $this->config_keywords = $config->getValue("meta_keywords");
-                $this->config_description = $config->getValue("meta_description");
-
-            }
-        }
-        catch (Exception $e) {
-            error_log("Unable to access seo config section: " . $e->getMessage() . " | URI: " . $_SERVER["REQUEST_URI"]);
-            ob_start();
-            var_dump($e->getTrace());
-            $trace = ob_get_contents();
-            ob_end_clean();
-            error_log($trace);
-        }
+        RequestController::processRequestHandlers();
 
         ob_start(array($this, 'obCallback'));
 
@@ -544,11 +520,12 @@ class SparkPage extends HTMLPage
         $this->headStart();
         $this->headEnd();
 
-        echo "\n<!--startRender SparkPage-->\n";
+        echo "<!-- startRender SparkPage -->";
+        echo "\n";
 
         $this->bodyStart();
 
-        RequestController::processRequestHandlers();
+
     }
 
     /**
@@ -562,19 +539,18 @@ class SparkPage extends HTMLPage
      */
     public function finishRender()
     {
-
         $this->renderPageComponents();
 
         $this->processMessages();
 
         $this->bodyEnd();
 
-        echo "\n<!--finishRender SparkPage-->\n";
+        echo "<!-- finishRender SparkPage -->";
+        echo "\n";
 
         $this->htmlEnd();
 
         ob_end_flush();
-
     }
 
     /**

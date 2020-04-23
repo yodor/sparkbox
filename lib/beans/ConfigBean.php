@@ -45,15 +45,14 @@ class ConfigBean extends DBTableBean
 
         $db = DBDriver::Get();
 
-
         $s_key = $db->escapeString($key);
+
         $sql = "SELECT config_val FROM {$this->table} WHERE config_key='$s_key'";
         if ($this->section) {
             $sql .= " AND section='{$this->section}' ";
         }
         $res = $db->query($sql);
         if (!$res) throw new Exception("Config::getValue SELECT error: " . $db->getError());
-
 
         $num_rows = $db->fetchTotalRows();
 
