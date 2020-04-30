@@ -34,7 +34,7 @@ class CacheFile
 
         $cache_folder = $this->getCacheFolder();
         if (!file_exists($cache_folder)) {
-            $this->debugActiveTime("Creating cache folder");
+            debug("Creating cache folder");
             mkdir($cache_folder, 0777, true);
         }
 

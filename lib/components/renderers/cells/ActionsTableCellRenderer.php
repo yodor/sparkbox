@@ -11,13 +11,10 @@ class ActionsTableCellRenderer extends TableCellRenderer implements ICellRendere
 {
     protected $actions;
 
-
     public function __construct()
     {
         parent::__construct();
         $this->actions = array();
-
-
     }
 
     public function requiredStyle()

@@ -83,7 +83,7 @@ class GalleryView extends Component
             //   $view->addColumn(new TableColumn("ppID", "ID"));
 
             if ($this->photos_bean instanceof OrderedDataBean) {
-                $view->addColumn(new TableColumn("position", "Position"));
+                $view->addColumn(new TableColumn("position", "#"));
             }
             $view->addColumn(new TableColumn($this->blob_field, "Photo"));
             $view->addColumn(new TableColumn("caption", "Caption"));
@@ -100,7 +100,6 @@ class GalleryView extends Component
             $view->addColumn(new TableColumn("actions", "Actions"));
 
             $act = new ActionsTableCellRenderer();
-
 
             $this->initActions($act);
 
@@ -183,7 +182,7 @@ class GalleryView extends Component
 
             $act->addAction(new RowSeparatorAction());
 
-            $act->addAction(new Action("Choose Position", "javascript:choosePosition(\"%$bkey%\",{$this->refval})", array(new ActionParameter($bkey, $bkey))));
+            $act->addAction(new Action("Reposition", "javascript:choosePosition(\"%$bkey%\",{$this->refval})", array(new ActionParameter($bkey, $bkey))));
         }
     }
 

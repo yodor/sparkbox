@@ -1,6 +1,7 @@
 <?php
 include_once("lib/storage/HTTPResponse.php");
 include_once("lib/storage/CacheFile.php");
+include_once("lib/storage/FileStorageObject.php");
 
 abstract class BeanDataResponse extends HTTPResponse
 {
@@ -54,6 +55,7 @@ abstract class BeanDataResponse extends HTTPResponse
             $this->field_requested = true;
         }
 
+        //sub-classes set $this->field
         if (!$this->bean->haveField($this->field)) {
             throw new Exception("Bean does not support this field");
         }
@@ -64,6 +66,8 @@ abstract class BeanDataResponse extends HTTPResponse
         //        if (!array_key_exists($this->blob_field, $stypes)) {
         //            throw new Exception("No such blob field found");
         //        }
+
+
 
     }
 
@@ -95,6 +99,7 @@ abstract class BeanDataResponse extends HTTPResponse
 
         }
         else {
+            debug("Fetching ID: ".$this->id." Bean: ".get_class($this->bean));
             $this->row = $this->bean->getByID($this->id);
         }
 
@@ -105,18 +110,24 @@ abstract class BeanDataResponse extends HTTPResponse
 
     protected function unpackStorageObject()
     {
-        $storage_object = @unserialize($this->row[$this->field]);
+        debug("...");
 
-        if ($storage_object instanceof StorageObject) {
+        $object = @unserialize($this->row[$this->field]);
+
+        if ($object instanceof StorageObject) {
+
+            debug("Unpacked: ".get_class($object));
 
             //replace result with storageobject data
             $this->row = array();
             //image resizer expects row["photo"]
 
-            $storage_object->deconstruct($this->row, false);
+            $object->deconstruct($this->row, false);
 
         }
         else {
+
+            debug("No object unserialized from field[$this->field]");
 
             //Limit arbitrary data access from the result row
             if ($this->field_requested) {
@@ -125,7 +136,6 @@ abstract class BeanDataResponse extends HTTPResponse
             //continue for objects transacted to db as dbrow and the default key name will be used (photo or data)
 
         }
-
     }
 
     /**
@@ -206,7 +216,7 @@ abstract class BeanDataResponse extends HTTPResponse
      */
     public function send(bool $doExit = true)
     {
-        debug("...");
+        debug("Class: ".$this->className." ID: ".$this->id." Field: ".$this->field);
 
         $this->loadBeanData();
 

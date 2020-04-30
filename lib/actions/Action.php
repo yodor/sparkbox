@@ -49,7 +49,7 @@ class Action
      * @param array $parameters Collection of ActionParameter objects to construct the parametrized href with
      * @param string $check_code Presentation time evaluation code. Help if this action should be rendered or not
      */
-    public function __construct(string $title, string $href, array $parameters, string $check_code = "return true;")
+    public function __construct(string $title, string $href, array $parameters = array(), string $check_code = "return true;")
     {
         $this->title = $title;
         $this->href = $href;
@@ -249,7 +249,7 @@ class PipeSeparatorAction extends Action
 {
     public function __construct()
     {
-        parent::__construct("", "", array(), false);
+        parent::__construct("", "");
     }
 }
 
@@ -257,7 +257,7 @@ class RowSeparatorAction extends Action
 {
     public function __construct()
     {
-        parent::__construct("", "", array(), false);
+        parent::__construct("", "");
     }
 }
 
@@ -265,7 +265,7 @@ class EmptyAction extends Action
 {
     public function __construct()
     {
-        parent::__construct("", "", array(), false);
+        parent::__construct("", "");
     }
 }
 
