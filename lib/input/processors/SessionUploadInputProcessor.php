@@ -18,7 +18,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         parent::loadBeanData($editID, $bean, $field, $item_row);
         //now value contains array of this item row storage objects or referented source data values
         //
-        debug("SessionUploadInputProcessor::loadBeanData: ");
+        debug("loadBeanData: ");
         $field_name = $field->getName();
 
         $values = $field->getValue();
@@ -52,8 +52,8 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         $values = array_values($values);
         $field->setValue($values);
 
-        debug("SessionUploadInputProcessor::loadBeanData | Final value type: " . getType($values));
-        debugArray("SessionUploadInputProcessor::loadBeanData | Final UIDs Dump: ", $values);
+        debug("Final value type: " . getType($values));
+        debug("Final UIDs Dump: ", $values);
     }
 
 
@@ -66,7 +66,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 
         debug("-");
 
-        debug("SessionUploadInputProcessor::loadPostData field class: " . get_class($field));
+        debug("Field class: " . get_class($field));
         $field_name = $field->getName();
 
         $values = $field->getValue();
@@ -81,7 +81,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         $posted_uids = array();
         if (isset($arr["uid_$field_name"])) {
 
-            debug("SessionUploadInputProcessor::loadPostData: Found posted UIDs for field['$field_name']");
+            debug("Found posted UIDs for field['$field_name']");
             if (is_array($arr["uid_$field_name"])) {
                 $posted_uids = $arr["uid_$field_name"];
             }
@@ -90,7 +90,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
             }
         }
 
-        debugArray("SessionUploadInputProcessor::loadPostData: Final UIDs posted:", $posted_uids);
+        debug("Final UIDs posted:", $posted_uids);
 
         //remove from session files with non-posted uids
         foreach ($session_files as $uid => $file) {
@@ -114,7 +114,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 
             }
             else {
-                debug("SessionUploadInputProcessor:: [$uid] could not be deserialized as StorageObject - removing from session array");
+                debug("[$uid] could not be deserialized as StorageObject - removing from session array");
                 unset($session_files[$uid]);
             }
 
@@ -125,10 +125,8 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 
         $field->setValue($values);
 
-        debugArray("SessionUploadInputProcessor::loadPostData: Final field values including session fiels:", $values);
+        debug("Final field values including session fiels:", $values);
 
-        debug("SessionUploadInputProcessor::loadPostData Finished");
-        debug("-");
 
     }
 
@@ -146,11 +144,11 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         if (isset($_SESSION[UploadControlAjaxHandler::PARAM_CONTROL_NAME][$field_name])) {
 
             unset($_SESSION[UploadControlAjaxHandler::PARAM_CONTROL_NAME][$field_name]);
-            debug("SessionUploadInputProcessor::afterCommit: Cleared Session field['$field_name']");
+            debug("Cleared Session field['$field_name']");
         }
         if (isset($_SESSION["upload_control_removed"][$field_name])) {
             unset($_SESSION["upload_control_removed"][$field_name]);
-            debug("SessionUploadInputProcessor::afterCommit: Cleared Session Removed UIDs for field['$field_name']");
+            debug("Cleared Session Removed UIDs for field['$field_name']");
         }
 
     }
@@ -163,20 +161,19 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         $field_name = $field->getName();
 
         //transact only UIDs found inside the session array i.e. the new ones
-        debug("SessionUploadInputProcessor::transactValue: field['$field_name'] " . gettype($values));
-        debug("SessionUploadInputProcessor::transactValue: " . count($values) . " values to transact");
+        debug("field['$field_name'] " . gettype($values) . " #" . count($values) . " values to transact");
 
         if (!is_null($field->getSource())) {
             $data_source = $field->getSource();
 
-            debug("SessionUploadInputProcessor::transactValue | Field uses data source: '" . get_class($data_source) . "' will commit values in before commit ...");
+            debug("Field uses data source: '" . get_class($data_source) . "' will commit values in before commit ...");
             return;
         }
 
 
         if ($field->transact_mode == DataInput::TRANSACT_DBROW) {
 
-            debug("SessionUploadInputProcessor::transactValue | Transact Mode: TRANSACT_DBROW");
+            debug("Transact Mode: TRANSACT_DBROW");
 
             if (count($values) > 1) {
                 throw new Exception("Could not transact multiple objects to the main transaction using TRANSACT_DBROW mode.");
@@ -195,11 +192,12 @@ class SessionUploadInputProcessor extends BeanPostProcessor
                 else {
                     debug("Transacting StorageObject UID: $uid merged with the main transaction row ");
                     $dbrow = array();
-                    $storage_object->deconstruct($dbrow, $field_name);
+                    $storage_object->setDataKey($field_name);
+                    $storage_object->deconstruct($dbrow);
                     foreach ($dbrow as $key => $field_value) {
                         $transactor->appendValue($key, $field_value);
                     }
-                    debug("SessionUploadInputProcessor::transactValue | Deconstructed UID: $uid as fields in the main transaction row");
+                    debug("Deconstructed UID: $uid as fields in the main transaction row");
 
                 }
                 break;
@@ -208,7 +206,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 
         }
         else if ($field->transact_mode == DataInput::TRANSACT_OBJECT) {
-            debug("SessionUploadInputProcessor::transactValue | Transact Mode: MODE_OBJECT");
+            debug("Transact Mode: MODE_OBJECT");
 
             if (count($values) > 1) {
                 throw new Exception("Could not transact multiple objects to the main transaction using TRANSACT_OBJECT mode.");
@@ -241,7 +239,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
             throw new Exception("Could not transact this field using mode TRANSACT_VALUE");
         }
 
-        debug("SessionUploadInputProcessor::transactValue: field['$field_name'] finished values");
+        debug("field['$field_name'] finished values");
 
     }
 }

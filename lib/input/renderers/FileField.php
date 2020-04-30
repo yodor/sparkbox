@@ -1,7 +1,7 @@
 <?php
 include_once("lib/input/renderers/InputField.php");
 
-class FileField extends UploadField
+class FileField extends PlainUpload
 {
 
     public function __construct()
@@ -10,20 +10,22 @@ class FileField extends UploadField
 
         $this->setFieldAttribute("validator", "file");
 
-        //$this->setClassName("FileField PlainUpload UploadControl");
-
     }
 
-    public function renderContents(StorageObject $storage_object)
+    public function renderContents(StorageObject $object)
     {
 
-        if ($storage_object instanceof FileStorageObject) {
+        if ($object->getLength()>0) {
+            echo "<div class='Element' >";
 
-            if ($storage_object->getLength() > 0) {
-                $data_uri = "data:" . $storage_object->getMIME() . ";base64, " . base64_encode($storage_object->getData());
+            echo "<span class='thumbnail'><img src='" . SITE_ROOT . "lib/images/mimetypes/generic.png'></span>";
 
-                echo "<a href='javascript:window.open(\"$data_uri\");'>Download Existing File</a>";
-            }
+            echo "<div class='details'>";
+            echo "<span class='filename'><label>{$object->getFilename()}</label></span>";
+            echo "<span class='filesize'><label>" . file_size($object->getLength()) . "</label></span>";
+            echo "</div>";
+
+            echo "</div>";
         }
 
     }

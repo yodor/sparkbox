@@ -329,7 +329,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 if ($istorage instanceof ImageStorageObject) {
 
                     $photo_row = array();
-                    $istorage->deconstruct($photo_row, "photo");
+                    $istorage->deconstruct($photo_row);
                     $photo_row["prodID"] = $prodID;
 
                     $ppbID = $this->ppb->insert($photo_row, $this->db);

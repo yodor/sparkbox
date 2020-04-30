@@ -52,21 +52,21 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
 
     protected function _upload(JSONResponse $resp)
     {
-        debug("UploadControlAjaxHandler::_upload() ...");
 
-        debug("UploadControlAjaxHandler::_upload() creating input validator");
+        debug("Creating temporary DataInput object to handle input data posted");
         $validator = $this->validator();
 
         //virtual input field to process ajax posted data
+
         $input = new DataInput($this->field_name, "Upload Control", 1);
 
         $input->setValidator($validator);
         $input->setProcessor(new UploadDataInputProcessor());
 
-        debug("UploadControlAjaxHandler::_upload() loading POST data");
+        debug("DataInput object loading _POST data");
         $input->loadPostData($_POST);
 
-        debug("UploadControlAjaxHandler::_upload() validating input data");
+        debug("DataInput object validating data");
         $input->validate();
 
         //FileStorageObject
@@ -81,12 +81,12 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
 
         $this->assignUploadObjects($resp, $uploadObject);
 
-        debug("UploadControlAjaxHandler::_upload() finished");
+        debug("Finished");
     }
 
     protected function assignUploadObjects(JSONResponse $resp, FileStorageObject $uploadObject)
     {
-        debug("UploadControlAjaxHandler::assignUploadObjects() ...");
+        debug("...");
 
         $html = $this->getHTML($uploadObject, $this->field_name);
         //
@@ -111,7 +111,7 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
 
         //store the original data in the session array by the field name and UID
         $_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][(string)$uploadObject->getUID()] = serialize($fileData);
-        debug("UploadControlAjaxHandler::assignUploadObjects() | Session storing file UID: " . $uploadObject->getUID() . " for field['" . $this->field_name . "']");
+        debug("Stored FileStorageObject to session using UID: " . $uploadObject->getUID() . " for field['" . $this->field_name . "']");
 
         //       $num_files++;
 
@@ -121,7 +121,7 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
 
     protected function _remove(JSONResponse $resp)
     {
-        debug("UploadControlAjaxHandler::_remove() ...");
+        debug("...");
 
         if (!isset($_GET[UploadControlAjaxHandler::PARAM_UID])) throw new Exception("UID not passed");
 
@@ -129,16 +129,16 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
 
         if (strlen($uid) > 50) throw new Exception("UID maximum size reached");
 
-        debug("UploadControlAjaxHandler::_remove() UID: " . $uid);
+        debug("Using UID: " . $uid);
 
         if (isset($_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uid])) {
 
-            debug("UploadControlAjaxHandler::_remove() Removing UID:'$uid' from session array");
+            debug("Removing UID:'$uid' from session array");
             unset($_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uid]);
 
         }
 
-        debug("UploadControlAjaxHandler::_remove() finished");
+        debug("Finished");
     }
 
 }

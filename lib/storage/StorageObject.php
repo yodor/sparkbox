@@ -3,14 +3,16 @@
 class StorageObject
 {
 
+    protected $dataKey = "data";
+
     protected $data = NULL;
     protected $length = -1;
     protected $timestamp = 0; //date_time
     protected $uid = -1;
     protected $upload_status = NULL;
 
-    public $itemID = -1;
-    public $itemClass = "";
+    public $id = -1;
+    public $className = "";
 
     public function __construct()
     {
@@ -83,14 +85,23 @@ class StorageObject
         $this->uid = $uid;
     }
 
-    public function deconstruct(array &$row, $data_key = "data", $doEscape = true)
+    public function setDataKey(string $dataKey)
     {
-        $row[$data_key] = $this->data;
+        $this->dataKey = $dataKey;
+    }
+
+    public function getDataKey() : string
+    {
+        return $this->dataKey;
+    }
+
+    public function deconstruct(array &$row, $doEscape = true)
+    {
+        $row[$this->dataKey] = $this->data;
 
         if ($doEscape) {
 
-
-            $row[$data_key] = DBDriver::Get()->escapeString($this->data);
+            $row[$this->dataKey] = DBDriver::Get()->escapeString($this->data);
 
         }
         $row["size"] = $this->length;
@@ -98,7 +109,7 @@ class StorageObject
 
     }
 
-    public static function reconstruct(&$row, $field_name)
+    public static function reconstruct(&$row, $field_name) : StorageObject
     {
 
         $storage_object = NULL;

@@ -45,13 +45,15 @@ class FormProcessor implements IFormProcessor
 
         if (strlen($submit_name) == 0) {
             $submit_name = $form->getRenderer()->getSubmitName($form);
+
+            debug("Using form renderer submit key name");
         }
 
-        debug("FormProcessor::processForm with submit_name: $submit_name");
+        debug("Using submit key name: '$submit_name'");
 
         if (isset($_REQUEST[$submit_name])) {
 
-            debug("FormProcessor::processForm | '$submit_name' key found in the REQUEST. Start processing ...");
+            debug("Key '$submit_name' found in _REQUEST");
 
             //default status
 
@@ -73,9 +75,10 @@ class FormProcessor implements IFormProcessor
 
         }
         else {
-            debug("FormProcessor::processForm: | '$submit_name' key not found in REQUEST. Skipping form processing ....");
+            debug("Setting STATUS_NOT_PROCESSED - key '$submit_name' not found in _REQUEST");
             $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
         }
+
     }
 
     protected function processImpl(InputForm $form)

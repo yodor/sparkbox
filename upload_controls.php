@@ -24,8 +24,7 @@ $form->addField($f16);
 $f17 = new DataInput("field17", "Image Field", 0);
 
 $image_field = new ImageField();
-$image_field->setRenderMode(IPhotoRenderer::RENDER_CROP);
-$image_field->setThumbnailSize(-1, 64);
+$image_field->setPhotoSize(-1, 128);
 
 $f17->setRenderer($image_field);
 $f17->setValidator(new ImageUploadValidator());

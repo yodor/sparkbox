@@ -4,9 +4,9 @@ include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 
 class ProductPhotoCellRenderer extends TableImageCellRenderer
 {
-    public function __construct($render_mode = IPhotoRenderer::RENDER_CROP, $width = 48, $height = -1)
+    public function __construct($width = 48, $height = -1)
     {
-        parent::__construct(NULL, $render_mode, $width, $height);
+        parent::__construct(NULL, $width, $height);
 
     }
 

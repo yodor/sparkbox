@@ -75,9 +75,10 @@ function constructSiteTitle($path)
     return implode(TITLE_PATH_SEPARATOR, $title);
 }
 
-function debugArray($str, array $arr)
+function getArrayText(array $arr)
 {
-    debug($str);
+
+    $msg = array();
     foreach ($arr as $key => $val) {
         if ($val instanceof StorageObject) {
             if ($val instanceof ImageStorageObject) {
@@ -88,16 +89,108 @@ function debugArray($str, array $arr)
             }
         }
         if (is_array($val)) $val = "Array(" . implode(",", $val) . ")";
-        debug("[$key]=>$val");
+
+        $msg[] = "[$key]=>$val";
+    }
+    return implode("; ", $msg);
+
+}
+
+function debug($obj, $msg=null, $arr = null)
+{
+    if (defined("DEBUG_OUTPUT") && strcmp(DEBUG_OUTPUT, "1") == 0) {
+
+        $class = "";
+        $message = "";
+        $array = array();
+
+        if (is_object($obj)) {
+            $class = get_class($obj);
+            $message = $msg;
+            $array = $arr;
+        }
+        else {
+            $message = $obj;
+            $array = $msg;
+        }
+
+
+        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,0);
+
+        $first = $bt[0];
+        $parent = $first;
+
+        $file = basename($first["file"]);
+
+        if (count($bt)>0) {
+            //$last = $bt[count($bt)-1];
+
+            $index = 1;
+
+            while ($index<count($bt)) {
+                $parent = $bt[$index];
+                if (isset($parent["class"])) {
+                    break;
+                }
+                $index++;
+            }
+        }
+
+        $last = $bt[count($bt)-1];
+
+        $url = basename($_SERVER['SCRIPT_FILENAME']);
+        if (isset($last["file"])) {
+            $url = basename($last["file"]);
+        }
+
+        $line = $first["line"];
+
+        $file2 = $url;
+        if (isset($parent["file"])) {
+            $file2 = basename($parent["file"]);
+        }
+        $line2 = 0;
+        if (isset($parent["line"])) {
+            $line2 = $parent["line"];
+        }
+        else if (isset($first["line"])) {
+            $line2 = $first["line"];
+        }
+
+
+        if (strlen($class)<1) {
+            $class = $parent["class"];
+        }
+        $function = $parent["function"];
+
+        $time = microtime_float(true);
+
+
+        if (is_array($array)) {
+            $message.=" ".getArrayText($array);
+        }
+
+        //error_log("$time: $url:($file2:$line2)($file:$line) $class::$function() $message");
+        error_log("$time  $url [$file2:$line2] [$class::$function] $message");
+        //error_log("");
+//        error_log("---");
+//        ob_start();
+//        print_r($bt);
+//
+//        error_log(ob_get_contents());
+//        ob_end_clean();
+//        error_log("---");
+
+//        $caller = array_shift($bt);
+//        $caller1 = array_shift($bt);
+//        $file = basename($caller["file"]);
+//        $function = $caller1["function"];
+//        $cls = $caller["class"];
+//        print_r($caller1);
+//        error_log("File: $file - Class: $cls - Function: $function - Message: $str");
     }
 }
 
-function debug($str)
-{
-    if (defined("DEBUG_OUTPUT") && strcmp(DEBUG_OUTPUT, "1") == 0) {
-        error_log($str);
-    }
-}
 
 function keywordFilterSQL($keywords_text, $search_fields, $inner_glue = " OR ", $outer_glue = " AND ", $split_string = "/[,;]/")
 {
@@ -431,10 +524,10 @@ function text4div(&$text)
     return str_replace("\n", "<BR>", $text);
 }
 
-function strcmp_isset($key, $val, $arr = false)
+function strcmp_isset($key, $val, $arr = false) : bool
 {
     if (!$arr) $arr = $_GET;
-    return (isset($arr[$key]) && (strcmp($arr[$key], $val) == 0)) ? true : false;
+    return isset($arr[$key]) && (strcmp($arr[$key], $val) == 0);
 }
 
 

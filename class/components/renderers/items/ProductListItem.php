@@ -1,7 +1,7 @@
 <?php
 // include_once("class/beans/SellableProductsBean.php");
 include_once("lib/components/renderers/items/ItemRendererImpl.php");
-include_once("lib/utils/StorageItem.php");
+include_once("lib/storage/StorageItem.php");
 include_once("class/beans/ProductColorPhotosBean.php");
 
 class ProductListItem extends ItemRendererImpl
@@ -55,13 +55,13 @@ class ProductListItem extends ItemRendererImpl
         $photo = NULL;
         if (isset($item["pclrpID"]) && $item["pclrpID"] > 0) {
             $photo = new StorageItem();
-            $photo->itemID = (int)$item["pclrpID"];
-            $photo->itemClass = "ProductColorPhotosBean";//ProductColorPhotosBean::class;
+            $photo->id = (int)$item["pclrpID"];
+            $photo->className = "ProductColorPhotosBean";//ProductColorPhotosBean::class;
         }
         else if (isset($item["ppID"]) && $item["ppID"] > 0) {
             $photo = new StorageItem();
-            $photo->itemID = (int)$item["ppID"];
-            $photo->itemClass = "ProductPhotosBean";//ProductPhotosBean::class;
+            $photo->id = (int)$item["ppID"];
+            $photo->className = "ProductPhotosBean";//ProductPhotosBean::class;
         }
         if ($photo) {
             $this->photo = $photo;

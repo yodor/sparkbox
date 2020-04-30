@@ -511,9 +511,7 @@ class SparkPage extends HTMLPage
     public function startRender()
     {
         RequestController::processAjaxHandlers();
-
-        RequestController::processRequestHandlers();
-
+        
         ob_start(array($this, 'obCallback'));
 
         $this->htmlStart();
@@ -525,7 +523,7 @@ class SparkPage extends HTMLPage
 
         $this->bodyStart();
 
-
+        RequestController::processRequestHandlers();
     }
 
     /**

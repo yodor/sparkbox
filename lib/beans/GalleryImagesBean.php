@@ -69,7 +69,7 @@ class GalleryImagesBean extends ArrayDataBean
 
         }
 
-        debugArray("LoadedValues: ", $this->values);
+        debug("LoadedValues: ", $this->values);
 
     }
 

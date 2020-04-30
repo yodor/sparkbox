@@ -4,6 +4,8 @@ include_once("lib/storage/StorageObject.php");
 class FileStorageObject extends StorageObject
 {
 
+    protected $dataKey = "data";
+
     protected $mime = "application/octet-stream";
     protected $filename = NULL;
     protected $temp_name = NULL;
@@ -44,9 +46,9 @@ class FileStorageObject extends StorageObject
         return $this->temp_name;
     }
 
-    public function deconstruct(array &$row, $data_key = "data", $doEscape = true)
+    public function deconstruct(array &$row, $doEscape = true)
     {
-        parent::deconstruct($row, $data_key, $doEscape);
+        parent::deconstruct($row, $doEscape);
 
         $row["mime"] = $this->mime;
         $row["filename"] = $this->filename;

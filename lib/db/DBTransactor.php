@@ -239,7 +239,7 @@ class DBTransactor implements IDataBeanGetter
             call_user_func_array("DBTransactor_onMergeBeanValues", array(&$values));
 
         }
-        // 	  debugArray("Merged Values: ", $values);
+        // 	  debug("Merged Values: ", $values);
         return $values;
     }
 }

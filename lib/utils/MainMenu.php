@@ -226,7 +226,7 @@ class MainMenu
         $match = (strcmp($request, $href) == 0);
 
         if ($this->debug_matching) {
-            debug("matchItem  Mode: $find_mode | Request: $request Mathing With MenuItem: $href");
+            debug("matchItem  Mode: $find_mode | Request: $request Mathing with MenuItem(href): $href");
         }
 
         //href is found inside request
@@ -291,7 +291,7 @@ class MainMenu
         $arr = array();
         $this->flattenMenu($arr, $this->main_menu);
 
-        debug("MenuItem::selectActiveMenus: Flattened menu length: " . count($arr));
+        debug("Flattened menu length: " . count($arr));
 
         $this->findMenuIndex($find_mode, $arr);
 

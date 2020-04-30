@@ -2,19 +2,12 @@
 
 interface IPhotoRenderer
 {
-    const RENDER_CROP = 1;
-    const RENDER_THUMB = 2;
 
+    public function setPhotoSize(int $width, int $height);
 
-    public function setThumbnailSize($width, $height);
+    public function getPhotoWidth();
 
-    public function setRenderMode($mode);
-
-    public function getRenderMode();
-
-    public function getThumbnailWidth();
-
-    public function getThumbnailHeight();
+    public function getPhotoHeight();
 }
 
 ?>

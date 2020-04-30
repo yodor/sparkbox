@@ -22,22 +22,20 @@ class RequestController
         self::$request_handlers[get_class($handler)] = $handler;
     }
 
-    public static function findAjaxHandler($command_name)
+    public static function findAjaxHandler($command_name) : IRequestProcessor
     {
+        return self::$ajax_handlers[$command_name];
+    }
 
-        if (isset(self::$ajax_handlers[$command_name])) {
-            return self::$ajax_handlers[$command_name];
-        }
-        else {
-            return NULL;
-        }
-
+    public static function findRequestHandler(string $className) : RequestHandler
+    {
+        return self::$request_handlers[$className];
     }
 
     public static function processAjaxHandlers()
     {
         if (self::$working === true) {
-            debug("RequestController::processAjaxHandlers() Skip processing - Handler already working");
+            debug("Handler already working. Nothing to do.");
             return;
         }
 
@@ -48,13 +46,15 @@ class RequestController
             // header("Expires: 0");
             $processed = false;
 
-            foreach (self::$ajax_handlers as $key => $handler) {
-                debug("RequestController::CheckingHandler() $key=>" . get_class($handler));
+            foreach (array_keys(self::$ajax_handlers) as $idx => $commandName) {
+
+                $handler = RequestController::findAjaxHandler($commandName);
+
                 if ($handler->shouldProcess()) {
 
                     $ret = new JSONResponse("AjaxHandler");
                     try {
-                        debug("RequestController::processAjaxHandlers() Processing Handler: " . get_class($handler));
+                        debug("Handler '".get_class($handler)."' accepted processing");
                         $handler->processHandler();
                     }
                     catch (Exception $e) {
@@ -63,6 +63,9 @@ class RequestController
                         $ret->response();
                     }
                     $processed = true;
+                }
+                else {
+                    debug("Handler '".get_class($handler)."' denied processing");
                 }
             }
 
@@ -78,13 +81,14 @@ class RequestController
 
     public static function processRequestHandlers()
     {
-        $handler = false;
-        $ret = false;
+        $handler = NULL;
 
-        foreach (self::$request_handlers as $key => $val) {
+        foreach (array_keys(self::$request_handlers) as $idx => $className) {
 
-            if ($val->shouldProcess()) {
-                $handler = $val;
+            $requestHandler = RequestController::findRequestHandler($className);
+
+            if ($requestHandler->shouldProcess()) {
+                $handler = $requestHandler;
                 break;
             }
 
@@ -93,7 +97,7 @@ class RequestController
         if ($handler) {
 
             try {
-                $ret = $handler->processHandler();
+                $handler->processHandler();
 
             }
             catch (Exception $e) {
@@ -106,7 +110,7 @@ class RequestController
             }
 
         }
-        return $ret;
+
     }
 
 }

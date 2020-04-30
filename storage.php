@@ -3,11 +3,9 @@
 define("SKIP_LANGUAGE", 1);
 define("PERSISTENT_DB", 1);
 
-
 include_once("session.php");
-include_once("lib/utils/Storage.php");
+Session::Close();
 
-session_write_close();
-$storage = new Storage();
-$storage->processRequest();
+include_once("lib/storage/BeanDataRequest.php");
+$storage = new BeanDataRequest();
 ?>

@@ -1,0 +1,57 @@
+<?php
+
+class StorageItem
+{
+
+    public $id = -1;
+    public $className = "";
+    public $field = "";
+
+    public function __construct()
+    {
+
+    }
+
+    public function hrefImage($width, $height)
+    {
+        if ($width>0 || $height>0) {
+
+            if ($width == $height) {
+                return $this->hrefThumb($width);
+            }
+            return $this->hrefCrop($width, $height);
+        }
+        return $this->hrefFull();
+    }
+
+    public function hrefFull()
+    {
+        return STORAGE_HREF . "?cmd=image&".$this->getParameters();
+    }
+
+    public function hrefCrop($width, $height)
+    {
+        return STORAGE_HREF . "?cmd=image&".$this->getParameters()."&width=$width&height=$height";
+    }
+
+    public function hrefThumb($width)
+    {
+        return STORAGE_HREF . "?cmd=image&".$this->getParameters()."&size=$width";
+    }
+
+    public function hrefFile()
+    {
+        return STORAGE_HREF . "?cmd=data&".$this->getParameters();
+    }
+
+    public function getParameters()
+    {
+        $ret =  "id={$this->id}&class={$this->className}";
+        if ($this->field) {
+            $ret.="&field={$this->field}";
+        }
+        return $ret;
+    }
+}
+
+?>

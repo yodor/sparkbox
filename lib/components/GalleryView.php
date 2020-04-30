@@ -113,7 +113,7 @@ class GalleryView extends Component
 
             $renderer = new GalleryViewItemRenderer($this);
             $renderer->setRenderMode(IPhotoRenderer::RENDER_CROP);
-            $renderer->setThumbnailSize(-1, 256);
+            $renderer->setPreviewSize(-1, 256);
 
             $this->initActions($renderer);
 

@@ -1,11 +1,12 @@
 .ModalPane {
-    background-image: url("../images/modal_back.png");
+    /*background-image: url("../images/modal_back.png");*/
+    background-color: rgba(0,0,0,0.8);
     position: fixed;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    display: block;
+    display: table;
     z-Index: 100;
 }
 
@@ -20,7 +21,7 @@
 
 
 .TooltipPanel {
-    background-color: black;
+    /*background-color: black;*/
     padding: 0.5em;
 
     position: absolute;
@@ -29,71 +30,172 @@
     color: white;
     /*font-size:1.2em;*/
 
-    background-color: #0c2226;
-    -moz-border-radius: 0.3em;
-    -webkit-border-radius: 0.3em;
-    border-radius: 0.3em;
+    background-color: #102b31;
+    -moz-border-radius: 0.25em;
+    -webkit-border-radius: 0.25em;
+    border-radius: 0.25em;
     z-Index: 100;
     vertical-align: top;
     display: none;
+
 }
 
 
-.ImagePopupPanel {
+.ImagePopup {
     /*   border:1px dotted red; */
+    display:table;
+    width:100%;
+    height:100%;
+    vertical-align:middle;
+
+    background-repeat: no-repeat;
+    background-position: center center;
+
+
+
 }
 
-.ImagePopupPanel .Contents {
-    position: relative;
-    background: white;
-    padding: 5px;
-    z-Index: 0;
-
-    text-align: center;
-    display: block;
-    vertical-align: middle;
+.ImagePopup>* {
+    display:table-row;
+}
+.ImagePopup>*>* {
+    display:table-cell;
 }
 
-.ImagePopupPanel .Contents[working="1"] * {
-    display: none;
+.ImagePopup .Header>* {
+    vertical-align:top;
+
 }
 
-.ImagePopupPanel .Contents .ImagePart {
-    display: block;
+.ImagePopup .Footer>* {
+    vertical-align:bottom;
+
 }
 
-.ImagePopupPanel .Button {
-    display: block;
-    position: absolute;
-    z-Index: 1;
+.ImagePopup .Base>* {
+    vertical-align:middle;
+
+}
+.ImagePopup .Header .Contents {
+    height:80px;
+}
+.ImagePopup .Footer .Contents {
+    height:80px;
+}
+
+.ImagePopup .Header .Contents .Button {
+    display: inline-block;
+
+    width:100%;
+    height:100%;
+
+    z-index: 1;
+
     background-color: transparent;
+
     text-decoration: none;
-    text-align: center;
-    vertical-align: middle;
-    visibility: hidden;
+
+    background-repeat: no-repeat;
+
+    cursor: pointer;
+
+    background-size: 50px 50px;
+
+    background-position: right 20px center;
+}
+
+.ImagePopup .Base .Contents {
+    text-align:center;
+    position:relative;
+    vertical-align:middle;
+
+    background-repeat: no-repeat;
+    background-position: center center;
+    height:100%;
+
+}
+.ImagePopup .Base .Contents .ImagePart {
+    display: inline-block;
+    vertical-align:middle;
+}
+
+.ImagePopup .Base .Contents .Button {
+    display: inline-block;
+
+    width:50%;
+    max-width:50%;
+    height:100%;
+
+    z-index: 1;
+
+    background-color: transparent;
+
+    text-decoration: none;
 
     background-repeat: no-repeat;
     color: gray;
-    height: 44px;
-    width: 22px;
-    top: 50%;
-    margin-top: -22px;
+
     cursor: pointer;
+
+    background-size:50px 50px;
 }
 
-.ImagePopupPanel .Button[action="PrevImage"] {
-    left: -32px;
-    /*   margin-left:-44px; */
-    /*   background-image:url('../images/arrow_left.png'); */
+.ImagePopup .Button[action="PrevImage"] {
+
     background-image: url("../images/gallery_left.png");
 
+
+    left:0;
+    background-position:left center;
 }
 
-.ImagePopupPanel .Button[action="NextImage"] {
-    left: 100%;
-    margin-left: 10px;
+.ImagePopup .Button[action="NextImage"] {
 
-    /*   margin-left:-70px; */
-    /*   background-image:url('../images/arrow_right.png'); */
     background-image: url("../images/gallery_right.png");
+
+    left:50%;
+    background-position:right center;
+}
+
+.ImagePopup .Button[action="CloseImage"] {
+
+    background-image: url("../images/close.png");
+
+
+    left:0;
+    background-position:left center;
+}
+
+.cover-spin {
+    /*position:fixed;*/
+    /*width:100%;*/
+    /*left:0;right:0;top:0;bottom:0;*/
+    /*background-color: rgba(255,255,255,0.7);*/
+    /*z-index:9999;*/
+    /*display:block;*/
+}
+
+@-webkit-keyframes spin {
+    from {-webkit-transform:rotate(0deg);}
+    to {-webkit-transform:rotate(360deg);}
+}
+
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}
+
+.cover-spin::after {
+    content:'';
+    display:block;
+    position:absolute;
+    /*left:50%;top:50%;*/
+    width:2em;height:2em;
+    border-style:solid;
+    border-color:gray;
+    border-top-color:transparent;
+    border-width: 1em;
+    border-radius: 50%;
+    -webkit-animation: spin .8s linear infinite;
+    animation: spin .8s linear infinite;
 }

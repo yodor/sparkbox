@@ -1,7 +1,8 @@
 <?php
 include_once("lib/handlers/UploadControlAjaxHandler.php");
 include_once("lib/components/renderers/IPhotoRenderer.php");
-
+include_once("lib/utils/ImageScaler.php");
+include_once("lib/storage/StorageItem.php");
 include_once("lib/input/validators/ImageUploadValidator.php");
 
 class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoRenderer
@@ -10,30 +11,19 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
     //   IPhotoRenderer
     protected $width = -1;
     protected $height = -1;
-    protected $render_mode = IPhotoRenderer::RENDER_CROP;
 
-    public function setThumbnailSize($width, $height)
+    public function setPhotoSize($width, $height)
     {
         $this->width = $width;
         $this->height = $height;
     }
 
-    public function setRenderMode($mode)
-    {
-        $this->render_mode = $mode;
-    }
-
-    public function getRenderMode()
-    {
-        return $this->render_mode;
-    }
-
-    public function getThumbnailWidth()
+    public function getPhotoWidth()
     {
         return $this->width;
     }
 
-    public function getThumbnailHeight()
+    public function getPhotoHeight()
     {
         return $this->height;
     }
@@ -42,61 +32,61 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
     {
         parent::__construct("image_upload");
 
-        //previews of uploaded images are thumbnails with autofit to width 64
-        $this->setThumbnailSize(-1, 64);
+        $this->setPhotoSize(-1, 64);
 
     }
 
 
-    public function getHTML(FileStorageObject &$storageObject, string $field_name)
+    public function getHTML(FileStorageObject &$object, string $field_name)
     {
 
         //TODO:prepare other style contents for files. render files as alternating rows icon, filename , type, size, X
 
         debug("ImageUploadAjaxHandler::createUploadContents() ...");
 
-        $filename = $storageObject->getFileName();
+        $filename = $object->getFileName();
 
-        $mime = $storageObject->getMIME();
+        $mime = $object->getMIME();
 
-        $uid = $storageObject->getUID();
+        $uid = $object->getUID();
 
-        $itemID = $storageObject->itemID;
+        $itemID = $object->id;
 
-        $itemClass = $storageObject->itemClass;
+        $itemClass = $object->className;
 
         debug("ImageUploadAjaxHandler::createUploadContents() UID:$uid filename:$filename mime:$mime");
 
         //gc_collect_cycles();
 
-        ob_start();
-        if (!($storageObject instanceof FileStorageObject)) {
+
+        if (!($object instanceof FileStorageObject)) {
             throw new Exception("Incorrect storage object received");
         }
 
         //construct image data in row and pass to ImageResizer to create a temporary thumbnail of the uploaded image.
-        $row = array();
+        $scaler = new ImageScaler($this->width, $this->height);
 
-        $row["mime"] = $storageObject->getMIME();
+        $mime = $object->getMIME();
 
         //data is null during ajax upload. image data can be retrieved from tempName file.
-        if ($storageObject->getData()) {
-            $row["photo"] = $storageObject->getData();
+        if ($object->getData()) {
+            $scaler->process($object->getData(), $mime);
         }
         else {
-            $row["photo"] = file_get_contents($storageObject->getTempName());
+           $scaler->process(file_get_contents($object->getTempName()), $mime);
         }
+
         //temporary resize for base64_encode returned in ajax response
-        ImageResizer::$max_width = $this->getThumbnailWidth();
-        ImageResizer::$max_height = $this->getThumbnailHeight();
-        ImageResizer::crop($row);
+        $image_data = "data:$mime;base64," . base64_encode($scaler->getData());
 
-        $image_data = "data:$mime;base64," . base64_encode($row["photo"]);
-        unset($row);
+        ob_start();
 
+        $item = new StorageItem();
+        $item->className = $object->className;
+        $item->id = $object->id;
 
         echo "<div class='Element' tooltip='$filename' itemID='$itemID' itemClass='$itemClass'>";
-        echo "<a target='_itemGallery' href='" . SITE_ROOT . "storage.php?cmd=gallery_photo&class=$itemClass&id=$itemID'>";
+        echo "<a target='_itemGallery' href='{$item->hrefFull()}'>";
         echo "<img class='thumbnail' src='$image_data'>";
         echo "</a>";
         echo "<span class='remove_button' action='Remove'>X</span>";

@@ -23,6 +23,11 @@ class Session
         Session::$is_started = false;
     }
 
+    public static function Close()
+    {
+        session_write_close();
+    }
+
     public static function Contains(string $key)
     {
         return isset($_SESSION[$key]);

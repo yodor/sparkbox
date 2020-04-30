@@ -13,6 +13,7 @@ function dumpCSS()
 function dumpJS()
 {
     echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/GalleryTape.js'></script>";
+    echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/GalleryView.js'></script>";
     echo "\n";
 }
 

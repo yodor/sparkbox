@@ -25,7 +25,7 @@ abstract class JSONRequestHandler extends RequestHandler
             }
         }
 
-        debugArray("JSONRequestHandler::CTOR [Supported Content]: ", $this->supported_content);
+        debug("Accepting commands: ", $this->supported_content);
 
 
     }
@@ -33,14 +33,14 @@ abstract class JSONRequestHandler extends RequestHandler
     protected function parseParams()
     {
 
-        if (!isset($_GET["type"])) throw new Exception("Content Type not passed");
+        if (!isset($_GET["type"])) throw new Exception("Command 'type' parameter not passed");
         $content_type = $_GET["type"];
 
-        if (!in_array($content_type, $this->supported_content)) throw new Exception("Content Type not supported");
+        if (!in_array($content_type, $this->supported_content)) throw new Exception("Command not supported");
 
         $this->content_type = $content_type;
 
-        debug("JSONRequestHandler::parseParams() [Content Type] requested: " . $this->content_type);
+        debug("Requested command type: '{$this->content_type}'");
     }
 
     protected function process()
@@ -69,7 +69,7 @@ abstract class JSONRequestHandler extends RequestHandler
         }
         catch (Exception $e) {
 
-            debug("JSONRequestHandler::process() Exception during process: " . $e->getMessage());
+            debug("Exception during process: " . $e->getMessage());
 
             $ret->contents = "";
             $ret->status = JSONResponse::STATUS_ERROR;
@@ -88,11 +88,11 @@ abstract class JSONRequestHandler extends RequestHandler
         $err = error_get_last();
 
         //if response is sent last error is proably not fatal
-        debug("JSONRequestHandler::shutdown() | response_send = " . (int)$this->response_send);
+        debug($this, "Response_send = " . (int)$this->response_send);
 
         if (is_array($err)) {
 
-            debugArray("JSONRequestHandler::shutdown() => error_get_last: ", $err);
+            debug($this,"error_get_last: ", $err);
 
             if (!$this->response_send) {
 

@@ -228,7 +228,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
 
     public function loadBeanData($editID, DBTableBean $bean)
     {
-        debug("InputForm::loadBeanData: editID='$editID' " . get_class($bean));
+        debug("Loading data from '".get_class($bean)."' ID='$editID' ");
 
         //TODO: check if setEditBean and editID is used anymore
         $this->setBean($bean);
@@ -237,7 +237,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         $item_row = array();
 
         if ($editID > 0) {
-            debug("InputForm::loadBeanData: Edit/Update mode ");
+            debug("Edit/Update mode ");
             $item_row = $bean->getByID($editID);
             $item_key = $bean->key();
 
@@ -247,7 +247,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
 
             //initial loading of bean data
             foreach ($this->fields as $field_name => $field) {
-                debug("InputForm::loadBeanData: loading field: $field_name");
+                debug("Loading data for field name: $field_name");
 
                 //processor need value set. processor might need other values from the item_row or to parse differently the value
                 $field->getProcessor()->loadBeanData($editID, $bean, $field, $item_row);
@@ -255,7 +255,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
 
         }
         else {
-            debug("InputForm::loadBeanData: Add/Insert mode ");
+            debug("Add/Insert mode");
         }
         return $item_row;
     }
@@ -370,7 +370,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
     {
 
         foreach ($this->fields as $field_name => $field) {
-            if ($field instanceof UploadField) continue;
+            if ($field instanceof PlainUpload) continue;
             echo $field->getLabel() . ": " . $field->getValue() . "<br><BR>\r\n\r\n";
 
         }

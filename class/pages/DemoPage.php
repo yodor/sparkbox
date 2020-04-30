@@ -72,34 +72,14 @@ class DemoPage extends SparkPage
         // 	$this->menu_bar->getItemRenderer()->disableSubmenuRenderer();
 
         $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
-    }
 
+        $this->addCSS("demo.css");
+        $this->addCSS("//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css", false);
 
-    protected function dumpCSS()
-    {
-        parent::dumpCSS();
-
-        echo "<link rel='stylesheet' href='" . SITE_ROOT . "css/demo.css' type='text/css'>";
-        echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
-
-        echo "\n";
+        $this->addJS("//code.jquery.com/ui/1.11.4/jquery-ui.js", false);
 
     }
 
-    protected function dumpJS()
-    {
-        parent::dumpJS();
-
-        echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
-
-        echo "\n";
-    }
-
-    protected function dumpMetaTags()
-    {
-        parent::dumpMetaTags();
-
-    }
 
     public function startRender()
     {

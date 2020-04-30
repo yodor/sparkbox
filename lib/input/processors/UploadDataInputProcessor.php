@@ -13,18 +13,16 @@ class UploadDataInputProcessor extends BeanPostProcessor
         $file_storage = new FileStorageObject();
         $file_storage->setUploadStatus(UPLOAD_ERR_NO_FILE);
 
-        debug("UploadDataInputProcessor::loadPostData() checking files array with key: " . $name);
-
-        debug("UploadDataInputProcessor::loadPostData() posted keys: " . implode("|", array_keys($_FILES)));
+        debug("_FILES has keys: " . implode("|", array_keys($_FILES)));
 
         if (isset($_FILES[$name])) {
 
 
-            debug("UploadDataInputProcessor::loadPostData() processing posted files data with key: " . $name);
+            debug("Processing _FILES value for key: " . $name);
 
             if (is_array($_FILES[$name]["name"])) {
 
-                debug("UploadDataInputProcessor::loadPostData() posted file data is array");
+                debug("Value is array");
 
                 $file_storage = array();
 
@@ -39,13 +37,13 @@ class UploadDataInputProcessor extends BeanPostProcessor
                 }
             }
             else {
-                debug("UploadDataInputProcessor::loadPostData() posted file data is not array");
+                debug("Value is not array");
                 $this->processImpl($_FILES[$name], $file_storage);
             }
 
         }
         else {
-            debug("UploadDataInputProcessor::loadPostData() no key set for name: " . $name);
+            debug("Key '$name' not found in _FILES");
         }
 
         $field->setValue($file_storage);
@@ -59,7 +57,7 @@ class UploadDataInputProcessor extends BeanPostProcessor
 
         $file_storage->setUploadStatus($upload_status);
 
-        debug("UploadDataInputProcessor::processImpl() upload_status: " . $upload_status);
+        debug("upload_status: " . $upload_status);
 
         if ($upload_status === UPLOAD_ERR_OK) {
             $temp_name = $file['tmp_name'];
@@ -87,7 +85,7 @@ class UploadDataInputProcessor extends BeanPostProcessor
             $dump["MIME"] = $file_storage->getMIME();
             $dump["TempName"] = $file_storage->getTempName();
 
-            debugArray("UploadDataInputProcessor::processImpl() FileStorageObject: ", $dump);
+            debug("FileStorageObject populated with data: ", $dump);
 
         }
     }

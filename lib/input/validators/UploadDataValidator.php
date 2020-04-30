@@ -82,7 +82,7 @@ abstract class UploadDataValidator implements IInputValidator
 
         $upload_status = $file_storage->getUploadStatus();
 
-        debug("UploadDataValidator::validateInput() field['" . $field->getName() . "'] | class: " . get_class($file_storage) . " | UploadStatus: " . UploadDataValidator::errString($upload_status));
+        debug("Field['" . $field->getName() . "'] | Class: " . get_class($file_storage) . " | upload_status: " . UploadDataValidator::errString($upload_status));
 
         if ($upload_status === UPLOAD_ERR_NO_FILE) {
             if ($field->isRequired()) {

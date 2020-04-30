@@ -2,7 +2,7 @@
 include_once("lib/input/renderers/InputField.php");
 
 
-abstract class UploadField extends InputField
+abstract class PlainUpload extends InputField
 {
 
 
@@ -16,7 +16,7 @@ abstract class UploadField extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/SessionUpload.css";
+        $arr[] = SITE_ROOT . "lib/css/PlainUpload.css";
         return $arr;
     }
 
@@ -80,7 +80,7 @@ abstract class UploadField extends InputField
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                var upload_field = new PlainUpload();
+                let upload_field = new PlainUpload();
                 upload_field.attachWith("<?php echo $this->field->getName();?>");
 
             });

@@ -100,7 +100,7 @@ abstract class DBTableBean implements IDataBean
         if ($res) $this->db->free($res);
 
 
-        //       debugArray("Storage Types for Bean: ".get_class($this), $this->storage_types);
+        //       debug("Storage Types for Bean: ".get_class($this), $this->storage_types);
 
     }
 

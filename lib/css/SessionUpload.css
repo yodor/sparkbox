@@ -91,37 +91,33 @@
 
 
 .InputField.SessionUpload .Controls .progress {
-    width: 120px;
-    height: 15px;
-
-    margin-top: 5px;
-    margin-right: 20px;
+    width: 100%;
 
     display: block;
     position: relative;
 
     border: 1px solid #555;
-    border-radius: 3px;
+    border-radius: 0.2em;
 
     visibility: hidden;
+
 }
 
 .InputField.SessionUpload .Controls.working .progress {
     visibility: visible;
-
 }
 
 
 .InputField.SessionUpload .Controls .progress .bar {
     background-color: #b4f5b4;
-    width: 0%;
-    height: 15px;
+    width: 0;
+    height: 100%;
 
-    border-radius: 3px;
+    border-radius: 0.2em;
     display: block;
     position: absolute;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     z-index: 0;
 }
 
@@ -129,14 +125,15 @@
 
     display: block;
 
-    font-size: 9px;
+    font-size: 0.5em;
     text-align: center;
 
     position: relative;
     z-index: 1;
 
-    margin-top: 2px;
+    vertical-align:middle;
 
+    padding:0.3em;
 }
 
 .InputField.SessionUpload .Controls.working {
@@ -211,29 +208,31 @@
 
 /* file upload control */
 
-.InputField.SessionFileField.SessionUpload .ArrayContents {
+.InputField.SessionUpload.SessionFile .ArrayContents {
 
 }
 
-.InputField.SessionFileField.SessionUpload .ArrayContents .Element {
+.InputField.SessionUpload.SessionFile .ArrayContents .Element {
 
     display: block !important;
 
 }
 
 
-.InputField.SessionFileField.SessionUpload .ArrayContents .Element .thumbnail {
-    margin-right: 0px;
+.InputField.SessionUpload.SessionFile .ArrayContents .Element .thumbnail {
+    margin-right: 0;
+    display:inline-block;
 }
 
-.InputField.SessionFileField.SessionUpload .ArrayContents .Element .details {
+.InputField.SessionUpload.SessionFile .ArrayContents .Element .details {
     display: inline-block;
 }
 
-.InputField.SessionFileField.SessionUpload .ArrayContents .Element .filename {
+.InputField.SessionUpload.SessionFile .ArrayContents .Element .filename {
     display: block;
 }
 
-.InputField.SessionFileField.SessionUpload .ArrayContents .Element .filesize {
+.InputField.SessionUpload.SessionFile .ArrayContents .Element .filesize {
     display: block;
+    font-size:70%;
 }

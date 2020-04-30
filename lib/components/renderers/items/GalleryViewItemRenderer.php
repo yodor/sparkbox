@@ -15,7 +15,7 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
 
     protected $width = 128;
     protected $height = -1;
-    protected $render_mode = IPhotoRenderer::RENDER_CROP;
+
     protected $item = NULL;
 
     public function setItem($item)
@@ -28,28 +28,18 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
         return $this->item;
     }
 
-    public function setThumbnailSize($width, $height)
+    public function setPhotoSize($width, $height)
     {
         $this->width = $width;
         $this->height = $height;
     }
 
-    public function setRenderMode($mode)
-    {
-        $this->render_mode = $mode;
-    }
-
-    public function getRenderMode()
-    {
-        return $this->render_mode;
-    }
-
-    public function getThumbnailWidth()
+    public function getPhotoWidth()
     {
         return $this->width;
     }
 
-    public function getThumbnailHeight()
+    public function getPhotoHeight()
     {
         return $this->height;
     }
@@ -131,16 +121,13 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
 
         $photoID = $row[$photos_prkey];
 
-        if ($this->render_mode == IPhotoRenderer::RENDER_THUMB) {
-            $size = max($this->width, $this->height);
+        $item = new StorageItem();
+        $item->id = $photoID;
+        $item->className = get_class($photos_bean);
 
-            $thumb_href = SITE_ROOT . "storage.php?cmd=image_thumb&size=$size&width=$size&id=$photoID&class=" . get_class($photos_bean);
-        }
-        else {
-            $thumb_href = SITE_ROOT . "storage.php?cmd=image_crop&width={$this->width}&height={$this->height}&id=$photoID&class=" . get_class($photos_bean);
+        $thumb_href = $item->hrefImage($this->width, $this->height);
 
-        }
-        $image_href = SITE_ROOT . "storage.php?cmd=gallery_photo&id=$photoID&class=" . get_class($photos_bean);
+        $image_href = $item->hrefFull();
 
         echo "<div class='header_row'>";
 

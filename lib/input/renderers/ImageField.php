@@ -1,10 +1,11 @@
 <?php
 include_once("lib/input/renderers/UploadField.php");
 include_once("lib/components/renderers/IPhotoRenderer.php");
+include_once("lib/utils/ImageScaler.php");
 
-class ImageField extends UploadField implements IPhotoRenderer
+
+class ImageField extends PlainUpload implements IPhotoRenderer
 {
-    protected $render_mode = IPhotoRenderer::RENDER_THUMB;
 
     protected $width = -1;
     protected $height = 64;
@@ -18,77 +19,35 @@ class ImageField extends UploadField implements IPhotoRenderer
     }
 
 
-    public function setThumbnailSize($width, $height)
+    public function setPhotoSize($width, $height)
     {
         $this->width = $width;
         $this->height = $height;
     }
 
-    public function getRenderMode()
+    public function getPhotoWidth()
     {
-        return $this->render_mode;
+        return $this->width;
     }
 
-    public function getThumbnailWidth()
-    {
-        return $this->witdh;
-    }
-
-    public function getThumbnailHeight()
+    public function getPhotoHeight()
     {
         return $this->height;
     }
 
-    public function setRenderMode($rmode)
-    {
-        $this->render_mode = $rmode;
-    }
-
-    public function preparePreviewData(ImageStorageObject $storage_object)
-    {
-        $data = false;
-        $row = array();
-        $storage_object->deconstruct($row, "photo", false);
-
-        switch ($this->render_mode) {
-            case IPhotoRenderer::RENDER_THUMB:
-                $size = max($this->width, $this->height);
-                ImageResizer::$max_width = $this->width;
-                ImageResizer::$max_height = $this->height;
-
-                ImageResizer::thumbnail($row, $size);
-                break;
-            case IPhotoRenderer::RENDER_CROP:
-                ImageResizer::$max_width = $this->width;
-                ImageResizer::$max_height = $this->height;
-                ImageResizer::crop($row);
-                break;
-            default:
-                throw new Exception("No render mode set");
-        }
-        return $row["photo"];
-
-    }
-
-    public function renderContents(StorageObject $storage_object)
+    public function renderContents(StorageObject $object)
     {
 
-        if ($storage_object instanceof ImageStorageObject) {
+        if ($object instanceof ImageStorageObject) {
 
-            //resize
-            $raw_data = $this->preparePreviewData($storage_object);
+            $scaler = new ImageScaler($this->width, $this->height);
+            $scaler->process($object->getData(), $object->getMIME());
 
-            $image_data = "data:" . $storage_object->getMIME() . ";base64," . base64_encode($raw_data);
-
-            $filename = $storage_object->getFileName();
-
-            $uid = $storage_object->getUID();
-
+            $image_data = "data:" . $object->getMIME() . ";base64," . base64_encode($scaler->getData());
 
             echo "<img class='thumbnail' src='$image_data'>";
 
         }
-
 
     }
 

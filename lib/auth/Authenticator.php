@@ -297,6 +297,51 @@ abstract class Authenticator
     {
         return $this->session->get(SessionData::LOGIN_TOKEN);
     }
+
+    public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK=true)
+    {
+        debug("AuthorizeContext using contextName: $contextName");
+
+        if ($adminOK) {
+            include_once("lib/auth/AdminAuthenticator.php");
+            $auth_admin = new AdminAuthenticator();
+            if ($auth_admin->authorize()) {
+                debug("AdminAuthenticator authorization success");
+                return;
+            }
+            else {
+                debug("AdminAuthenticator authorization failed");
+            }
+        }
+
+        $auth_class = "lib/auth/$contextName.php";
+        @include_once($auth_class);
+        if (!class_exists($auth_class, false)) {
+            $auth_class = "class/auth/$contextName.php";
+            @include_once($auth_class);
+            if (!class_exists($auth_class, false)) {
+                throw new Exception("Unable to locate the authorization class");
+            }
+        }
+
+        $auth = new $contextName;
+
+        if ($auth instanceof Authenticator) {
+
+            $context = $auth->authorize($user_data);
+            if (!$context) {
+                debug("Authorization failed");
+                throw new Exception("This resource is protected. Please login first.");
+            }
+            debug("Authorization success");
+            return $context;
+
+        }
+        else {
+            throw new Exception("No suitable authenticator class");
+        }
+
+    }
 }
 
 ?>

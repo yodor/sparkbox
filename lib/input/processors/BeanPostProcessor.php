@@ -65,7 +65,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
             $processed_ids = array();
 
             debug("BeanPostProcessor::beforeCommit | field values count: " . count($field->getValue()));
-            // 	    debugArray("Post Values: ", $_POST);
+            // 	    debug("Post Values: ", $_POST);
 
             foreach ($field->getValue() as $idx => $value) {
 
@@ -126,7 +126,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             debug("Processing for non TRANSACT_VALUE modes ... ");
 
-            debugArray("Current source loaded UIDs dump: ", $this->source_loaded_uids);
+            debug("Current source loaded UIDs dump: ", $this->source_loaded_uids);
 
             $processed_ids = array();
 
@@ -148,7 +148,9 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
                     if ($field->transact_mode == DataInput::TRANSACT_DBROW) {
                         debug("BeanPostProcessor::beforeCommit | Transact Mode: TRANSACT_DBROW");
-                        $value->deconstruct($dbrow, $field_name);
+                        $value->setDataKey($field_name);
+                        $value->deconstruct($dbrow);
+
                         debug("BeanPostProcessor::beforeCommit | StorageObject UID: $uid deconstructed as fields in the data source row ...");
 
                     }
@@ -176,7 +178,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             }
 
-            debugArray("Processed data source keys dump: ", $processed_ids);
+            debug("Processed data source keys dump: ", $processed_ids);
 
             //delete remaining values - datasource values with keys not found in processed_ids
             $data_source->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
@@ -284,8 +286,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 if (!($storage_object instanceof StorageObject)) throw new Exception("Deserialized object is not a StorageObject.");
 
                 //tag with id and class
-                $storage_object->itemID = $item_row[$source_key];
-                $storage_object->itemClass = get_class($field->getSource());
+                $storage_object->id = $item_row[$source_key];
+                $storage_object->className = get_class($field->getSource());
 
                 $value = $storage_object;
 
@@ -332,8 +334,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                         //
 
                         //tag with id and class
-                        $storage_object->itemID = $item_row[$bean->key()];
-                        $storage_object->itemClass = get_class($bean);
+                        $storage_object->id = $item_row[$bean->key()];
+                        $storage_object->className = get_class($bean);
 
                         $value = $storage_object;
                     }
@@ -343,8 +345,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 $object = StorageObject::reconstruct($item_row, $field_name);
                 $uid = $object->getUID();
 
-                $object->itemID = $item_row[$bean->key()];
-                $object->itemClass = get_class($bean);
+                $object->id = $item_row[$bean->key()];
+                $object->className = get_class($bean);
 
                 $value = $object;
             }
@@ -397,14 +399,14 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
                 }
 
-                debugArray("BeanPostProcessor:loadBeanData | Data source values loaded: ", $source_values);
+                debug("BeanPostProcessor:loadBeanData | Data source values loaded: ", $source_values);
                 $values = $source_values;
 
             }
 
         }//array_key_exists
 
-        //       debugArray("SimpleInputProcessor::loadBeanData: | Final field values: ",$values);
+        //       debug("SimpleInputProcessor::loadBeanData: | Final field values: ",$values);
         $field->setValue($values);
 
     }

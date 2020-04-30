@@ -4,6 +4,8 @@ include_once("lib/storage/FileStorageObject.php");
 class ImageStorageObject extends FileStorageObject
 {
 
+    protected $dataKey = "photo";
+
     protected $width = -1;
     protected $height = -1;
 
@@ -25,7 +27,7 @@ class ImageStorageObject extends FileStorageObject
             $this->setData($file_storage->getData());
 
             //$this->setPurged($file_storage->isPurged());
-            debug("ImageStorageObject::CTOR: Created copy of FileStorageObject UID: " . $file_storage->getUID());
+            debug("Created copy of FileStorageObject UID: " . $file_storage->getUID());
 
         }
     }
@@ -52,19 +54,20 @@ class ImageStorageObject extends FileStorageObject
 
     public function setData($data)
     {
-        debug("ImageStorageObject::setData() Query image dimensions: Data Length: " . strlen($data));
+        debug("Querying image dimensions. Data Length: " . strlen($data));
 
         $source = false;
 
         //data is empty for during upload to limit memory usage. Using temporary file name
         if (strlen($data) == 0) {
+            debug("Data length = 0");
 
             if (strlen($this->getTempName()) == 0) {
-                debug("ImageStorageObject::setData() Empty Data and TempName!");
+                debug("Error - TempName is empty");
                 throw new Exception("Unable to create image object using the input data (TempName and data are null)");
             }
 
-            debug("ImageStorageObject::setData() Data is empty. Trying uploaded file: " . $this->getTempName());
+            debug("Using data of uploaded file: " . $this->getTempName());
 
             $source = $this->imageFromTemp();
 
@@ -81,7 +84,7 @@ class ImageStorageObject extends FileStorageObject
 
         @imagedestroy($source);
 
-        debug("ImageStorageObject::setData() Dimensions WIDTH:{$this->width} HEIGHT:{$this->height}");
+        debug("Image dimensions [{$this->width} x {$this->height}]");
 
         if ($this->width < 1 || $this->height < 1) {
             throw new Exception("Invalid image dimensions from input data");
@@ -93,13 +96,14 @@ class ImageStorageObject extends FileStorageObject
     //only valid during request lifetime, using is_uploaded_file
     public function imageFromTemp()
     {
-        if (!is_uploaded_file($this->getTempName())) throw new Exception("Not an uploaded file: " . $this->getTempName());
+        if (!is_uploaded_file($this->getTempName())) {
+            debug("File: " . $this->getTempName() . " is not a valid uploaded file");
+            throw new Exception("Not an uploaded file: " . $this->getTempName());
+        }
 
-        debug("ImageStorageObject::imageFromTemp() File: " . $this->getTempName() . " is valid uploaded file");
+        debug("File: " . $this->getTempName() . " is valid uploaded file. MIME: ".$this->getMIME());
 
         debug("Memory Info - memory_limit: " . ini_get("memory_limit") . " | memory_usage: " . memory_get_usage());
-
-        debug("ImageStorageObject::imageFromTemp() MIME: " . $this->getMIME());
 
         //check mimes
         $source = false;
@@ -113,14 +117,19 @@ class ImageStorageObject extends FileStorageObject
         else if (strcasecmp($this->getMIME(), "image/gif") == 0) {
             $source = @imagecreatefromgif($this->getTempName());
         }
-        if (!$source) throw new Exception("Unable to create image from uploaded file. Temp name is: " . $this->getTempName());
 
+        if (!$source) {
+            debug("Unable to create image object from this file: ".$this->getTempName());
+            throw new Exception("Unable to create image from uploaded file. Temp name is: " . $this->getTempName());
+        }
+
+        debug("Image created successfully from file: ".$this->getTempName());
         return $source;
     }
 
-    public function deconstruct(array &$row, $data_key = "data", $doEscape = true)
+    public function deconstruct(array &$row, $doEscape = true)
     {
-        parent::deconstruct($row, $data_key, $doEscape);
+        parent::deconstruct($row, $doEscape);
 
         $row["width"] = $this->width;
         $row["height"] = $this->height;

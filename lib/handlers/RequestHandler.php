@@ -12,46 +12,49 @@ abstract class RequestHandler implements IRequestProcessor
 
     protected $need_confirm = false;
 
+    const COMMAND = "cmd";
+    const CONFIRM = "confirm_handler";
+
     public function __construct(string $cmd)
     {
         $this->cmd = $cmd;
-        debug("JSONRequestHandler::CTOR | Command: $cmd");
+        debug("Accepting command: '$cmd'");
 
     }
 
-    public function setNeedConfirm($mode)
+    public function setNeedConfirm(bool $mode)
     {
-        $this->need_confirm = ($mode) ? true : false;
+        $this->need_confirm = $mode;
     }
 
-    public function getCommandName()
+    public function getCommandName() : string
     {
         return $this->cmd;
     }
 
-    public function setCancelUrl($url)
+    public function setCancelUrl(string $url)
     {
         $this->cancel_url = $url;
     }
 
-    public function getCancelUrl()
+    public function getCancelUrl() : string
     {
         return $this->cancel_url;
     }
 
-    public function setSuccessUrl($url)
+    public function setSuccessUrl(string $url)
     {
         $this->success_url = $url;
     }
 
-    public function getSuccessUrl()
+    public function getSuccessUrl() : string
     {
         return $this->success_url;
     }
 
-    public function shouldProcess()
+    public function shouldProcess() : bool
     {
-        if (isset($_REQUEST["cmd"]) && strcmp($_REQUEST["cmd"], $this->cmd) == 0) {
+        if (isset($_REQUEST[RequestHandler::COMMAND]) && strcmp($_REQUEST[RequestHandler::COMMAND], $this->cmd) == 0) {
 
             return TRUE;
         }
@@ -64,7 +67,7 @@ abstract class RequestHandler implements IRequestProcessor
 
         $do_process = false;
 
-        if ($this->need_confirm && !isset($_POST["confirm_handler"])) {
+        if ($this->need_confirm && !isset($_POST[RequestHandler::CONFIRM])) {
 
             $this->processConfirmation();
         }
@@ -74,20 +77,20 @@ abstract class RequestHandler implements IRequestProcessor
 
         if (!$do_process) return;
 
-        debug(get_class($this) . "Calling process ...");
+        debug("Calling process ...");
 
         if ($this->process()) {
-            debug(get_class($this), "Process returned true");
+            debug("Process returned true");
             if (strlen($this->getSuccessUrl()) > 0) {
-                debug(get_class($this) . "Redirecting to successURL: " . $this->getSuccessUrl());
+                debug("Redirecting to successURL: " . $this->getSuccessUrl());
                 header("Location: " . $this->getSuccessUrl());
                 exit;
             }
         }
         else {
-            debug(get_class($this), "Process returned false");
+            debug("Process returned false");
             if (strlen($this->getCancelUrl()) > 0) {
-                debug(get_class($this) . "Redirecting to cancelURL: " . $this->getSuccessUrl());
+                debug("Redirecting to cancelURL: " . $this->getSuccessUrl());
                 header("Location: " . $this->getCancelUrl());
                 exit;
             }
@@ -134,7 +137,7 @@ abstract class RequestHandler implements IRequestProcessor
         echo "<input type=hidden name=confirm_handler value=1>";
         echo "</form>";
         ?>
-        <script language=javascript defer=1>
+        <script type='text/javascript' >
             function confirmHandler() {
                 var frm = document.getElementById("confirm_handler_form");
                 frm.submit();
