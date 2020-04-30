@@ -100,16 +100,16 @@ $view->addColumn(new TableColumn("weight", "Weight"));
 
 $view->addColumn(new TableColumn("actions", "Actions"));
 
-$view->getColumn("product_photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+$view->getColumn("product_photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), -1, 64));
 $view->getColumn("product_photo")->getCellRenderer()->setSourceIteratorKey("prodID");
 $view->getColumn("product_photo")->getCellRenderer()->setListLimit(1);
 $view->getColumn("product_photo")->getHeaderCellRenderer()->setSortable(false);
 
-$view->getColumn("pclrID")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+$view->getColumn("pclrID")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(), -1, 64));
 $view->getColumn("pclrID")->getCellRenderer()->setSourceIteratorKey("pclrID");
 $view->getColumn("pclrID")->getHeaderCellRenderer()->setSortable(false);
 
-// $view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductInventoryPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+// $view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductInventoryPhotosBean(), -1, 64));
 // $view->getColumn("photo")->getCellRenderer()->setListLimit(1);
 // $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(false);
 

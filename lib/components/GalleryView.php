@@ -92,7 +92,7 @@ class GalleryView extends Component
             $photos_class = get_class($bean);
             $photos_bean = new $photos_class;
 
-            $renderer = new TableImageCellRenderer($photos_bean, IPhotoRenderer::RENDER_THUMB, 64, 64);
+            $renderer = new TableImageCellRenderer($photos_bean, -1, 128);
 
             $view->getColumn($this->blob_field)->setCellRenderer($renderer);
             $view->getColumn($this->blob_field)->getHeaderCellRenderer()->setSortable(false);
@@ -112,8 +112,7 @@ class GalleryView extends Component
             $view = new ListView(new BeanResultIterator($bean));
 
             $renderer = new GalleryViewItemRenderer($this);
-            $renderer->setRenderMode(IPhotoRenderer::RENDER_CROP);
-            $renderer->setPreviewSize(-1, 256);
+            $renderer->setPhotoSize(-1, 256);
 
             $this->initActions($renderer);
 
@@ -207,6 +206,13 @@ class GalleryView extends Component
     {
         $arr = parent::requiredStyle();
         $arr[] = SITE_ROOT . "lib/css/GalleryView.css";
+        return $arr;
+    }
+
+    public function requiredScript()
+    {
+        $arr = parent::requiredScript();
+        $arr[] = SITE_ROOT . "lib/js/GalleryView.js";
         return $arr;
     }
 

@@ -35,12 +35,6 @@ try {
     $b->fetchNext($rrow);
     if (!$rrow["visible"]) throw new Exception("This page is currently unavailable.");
 
-    // width:960px;
-    //   height:378px;
-
-    //   $header_href =  SITE_ROOT."storage.php?cmd=image_crop&width=960&height=246&id=$page_id&class=$page_class";
-
-    //   $page->header_image_url =  $header_href;
 }
 catch (Exception $e) {
     Session::SetAlert($e->getMessage());
@@ -68,7 +62,7 @@ echo "</div>";
 
 
 echo "<div class='photo'>";
-$photo_href = SITE_ROOT . "storage.php?cmd=gallery_photo&id=$page_id&class=$page_class";
+$photo_href = StorageItem::Image($page_id, $page_class);
 
 echo "<img src='$photo_href'>";
 
@@ -93,8 +87,7 @@ if ($num_photos && $dpp->fetchNext($dpprow)) {
 
     echo "<div class='photo_item' id='$photo_id' class='DynamicPagePhotosBean'>";
 
-    $img_href = SITE_ROOT . "storage.php?cmd=gallery_photo&id=$photo_id&class=" . get_class($dpp) . "";
-    // 		  $full_href = SITE_ROOT."storage.php?cmd=gallery_photo&id=$photo_id&class=".get_class($dpp)."";
+    $img_href = StorageItem::Image($photo_id, $dpp);
 
     echo "<a class='image_popup' href='$img_href' rel='DynamicPagePhotosBean'>";
     echo "<img src='$img_href' >";

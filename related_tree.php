@@ -129,7 +129,7 @@ if (strcmp_isset("view", "list", $_GET)) {
     $view->addColumn(new TableColumn("colors", "Colors"));
     $view->addColumn(new TableColumn("color_ids", "Colors"));
 
-    $view->getColumn("pclrpID")->setCellRenderer(new ProductPhotoCellRenderer(TableImageCellRenderer::RENDER_THUMB, -1, 48));
+    $view->getColumn("pclrpID")->setCellRenderer(new ProductPhotoCellRenderer(-1, 48));
     $view->getColumn("pclrpID")->getHeaderCellRenderer()->setSortable(false);
 }
 else {

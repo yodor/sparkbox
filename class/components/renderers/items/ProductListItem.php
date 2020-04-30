@@ -144,7 +144,7 @@ class ProductListItem extends ItemRendererImpl
                         echo "<div class='color_code' style='background-color:$color_code;width:48px;height:48px;' title='{$prow["color"]}'></div>";
                     }
                     else {
-                        $href = STORAGE_HREF . "?cmd=image_thumb&width=48&height=48&class=$chip_class&id=$chip_id";
+                        $href = StorageItem::Image($chip_id, $chip_class, 48, 48);
 
                         echo "<img src='$href' >";
                     }

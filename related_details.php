@@ -197,8 +197,8 @@ echo "<div class='column details'>";
 echo "<div class='images'>";
 
 //main image
-$gallery_href = STORAGE_HREF . "?cmd=image_crop&width=400&height=-1";
-$big_href = STORAGE_HREF . "?cmd=gallery_photo";
+$gallery_href = StorageItem::Image($itemID, "NewsItemsBean", 400, -1);
+$big_href = StorageItem::Image($itemID, "NewsItemsBean");
 echo "<div class='image_big' source='$gallery_href' >";
 echo "<a class='image_popup' href='' source='$big_href'><img src='$big_href'></a>";
 echo "</div>";
@@ -208,7 +208,7 @@ echo "<div class='image_gallery'>";
 foreach ($galleries as $pclrID => $gallery) {
     echo "<div class='list' pclrID='$pclrID'>";
     foreach ($gallery as $key => $item) {
-        $href_source = STORAGE_HREF . "?cmd=image_thumb&width=110&height=110";
+        $href_source = STORAGE_HREF . "?cmd=image&width=110&height=110";
 
         $href = $href_source . "&class=" . $item["class"] . "&id=" . $item["id"];
 
@@ -250,7 +250,7 @@ foreach ($color_chips as $pclrID => $item) {
     $pclrID = (int)$pclrID;
 
     if (isset($item["class"])) {
-        $href = STORAGE_HREF . "?cmd=image_thumb&width=48&height=48&class=" . $item["class"] . "&id=" . $item["id"];
+        $href = StorageItem::Image($item["id"], $item["class"], 48, 48);
     }
 
     $chip_colorName = $color_names[$pclrID];

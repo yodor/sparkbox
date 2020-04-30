@@ -614,8 +614,8 @@ abstract class DBTableBean implements IDataBean
 
     public function getThumb($id, $width = 100)
     {
-        $cls = get_class($this);
-        return "<img src='" . STORAGE_HREF . "?cmd=image_thumb&width=$width&class=$cls&id=$id'>";
+        $src = StorageItem::Image($id, get_class($this), $width, $width);
+        return "<img src='$src'>";
     }
 }
 

@@ -54,7 +54,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         $this->cmd = "mceImage";
 
         //do not require thumbnail. just create the imagestorage of the upload data
-        $this->setThumbnailSize(64, -1);
+        $this->setPhotoSize(-1, 64);
     }
 
     public function setSection($section_name, $section_key)
@@ -94,7 +94,8 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         ob_start();
         echo "<div class='Element' imageID=$id>";
         echo "<div class='remove_button'>X</div>";
-        echo "<img class='image_contents' src='" . SITE_ROOT . "storage.php?cmd=image_crop&width=-1&height=128&class=MCEImagesBean&id=$id'>";
+        $img_href = StorageItem::Image($id, "MCEImagesBean", -1,128);
+        echo "<img class='image_contents' src='$img_href'>";
         echo "</div>";
         $html = ob_get_contents();
         ob_end_clean();
@@ -233,7 +234,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         echo "<div class='ImageDimensionComponent'>";
 
         echo "<div class='preview'>";
-        $img_href = SITE_ROOT . "storage.php?cmd=image_crop&width=240&height=-1&id=$imageID&class=MCEImagesBean";
+        $img_href = StorageItem::Image($imageID, "MCEImagesBean", 240, -1);
         echo "<img src='$img_href'>";
         echo "</div>";
 

@@ -78,12 +78,12 @@ $view->addColumn(new TableColumn("color_photo", "Color Chip"));
 $view->addColumn(new TableColumn("actions", "Actions"));
 
 
-$view->getColumn("color_photo")->setCellRenderer(new TableImageCellRenderer(new ProductColorsBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+$view->getColumn("color_photo")->setCellRenderer(new TableImageCellRenderer(new ProductColorsBean(), -1, 64));
 $view->getColumn("color_photo")->getCellRenderer()->setBlobField("color_photo");
 $view->getColumn("color_photo")->getHeaderCellRenderer()->setSortable(false);
 
 
-$view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 48));
+$view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(),  -1, 64));
 $view->getColumn("photo")->getCellRenderer()->setListLimit(0);
 $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(false);
 

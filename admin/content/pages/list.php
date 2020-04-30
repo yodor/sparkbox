@@ -59,7 +59,7 @@ $view->addColumn(new TableColumn("actions", "Actions"));
 
 $view->getColumn("visible")->setCellRenderer(new BooleanFieldCellRenderer("Yes", "No"));
 
-$view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new DynamicPagesBean(), IPhotoRenderer::RENDER_CROP, -1, 55));
+$view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new DynamicPagesBean(),  -1, 64));
 $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(false);
 
 

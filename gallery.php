@@ -41,8 +41,8 @@ while ($bean->fetchNext($row)) {
     echo "<div class='slot'>";
     $itemID = $row[$bean->key()];
 
-    $img_href = SITE_ROOT . "storage.php?cmd=image_crop&width=-1&height=160&class=GalleryPhotosBean&id=$itemID";//&skip_cache=1
-    $popup_href = SITE_ROOT . "storage.php?cmd=gallery_photo&class=GalleryPhotosBean&id=$itemID";
+    $img_href = StorageItem::Image($itemID, $bean, -1, 160);
+    $popup_href = StorageItem::Image($itemID, $bean);
 
     echo "<a class='image_popup' href='$popup_href' name='gallery_tape." . $pos . "' rel='collection2'>";
     echo "<img src='$img_href'>";

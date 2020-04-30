@@ -52,6 +52,28 @@ class StorageItem
         }
         return $ret;
     }
+
+    public static function Create(int $id, $className)
+    {
+        $item = new StorageItem();
+        $item->id = $id;
+        if (is_object($className)) {
+            $className = get_class($className);
+        }
+        else if (strlen($className)<1) {
+            throw new Exception("Classname required");
+        }
+        $item->className = $className;
+
+        return $item;
+    }
+
+    public static function Image(int $id, $className, int $width=-1, int $height=-1)
+    {
+        $item = StorageItem::Create($id, $className);
+        return $item->hrefImage($width,$height);
+    }
+
 }
 
 ?>

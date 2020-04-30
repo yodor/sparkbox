@@ -97,11 +97,11 @@ $view->addColumn(new TableColumn("stock_amount", "Stock Amount"));
 
 $view->addColumn(new TableColumn("actions", "Actions"));
 
-$view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(), TableImageCellRenderer::RENDER_THUMB, -1, 64));
+$view->getColumn("photo")->setCellRenderer(new TableImageCellRenderer(new ProductPhotosBean(),  -1, 64));
 $view->getColumn("photo")->getCellRenderer()->setListLimit(0);
 $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(false);
 
-$view->getColumn("color_photos")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(), TableImageCellRenderer::RENDER_THUMB, 48, -1));
+$view->getColumn("color_photos")->setCellRenderer(new TableImageCellRenderer(new ProductColorPhotosBean(), -1, 64));
 $view->getColumn("color_photos")->getCellRenderer()->setListLimit(0);
 $view->getColumn("color_photos")->getHeaderCellRenderer()->setSortable(false);
 
