@@ -6,7 +6,6 @@ interface IDataBeanSetter
     public function setBean(IDataBean $bean);
 
     public function setEditID(int $editID);
-
 }
 
 ?>

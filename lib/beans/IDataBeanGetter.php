@@ -6,12 +6,12 @@ interface IDataBeanGetter
     /**
      * @return int
      */
-    public function getEditID();
+    public function getEditID() : int;
 
     /**
      * @return IDataBean
      */
-    public function getBean();
+    public function getBean() : IDataBean;
 }
 
 ?>

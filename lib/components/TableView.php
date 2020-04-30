@@ -22,7 +22,7 @@ class TableView extends AbstractResultView implements IHeadContents
      */
     protected $columns = array();
 
-    protected $header_cells_enabled = true;
+    protected $header_cells_enabled = TRUE;
 
     public function __construct(SQLIterator $itr)
     {
@@ -52,7 +52,7 @@ class TableView extends AbstractResultView implements IHeadContents
         $column_name = $column->getFieldName();
         $column->setView($this);
 
-        $this->columns = array_slice($this->columns, 0, $index + 1, true) + array("$column_name" => $column) + array_slice($this->columns, $index + 1, count($this->columns) - 1, true);
+        $this->columns = array_slice($this->columns, 0, $index + 1, TRUE) + array("$column_name" => $column) + array_slice($this->columns, $index + 1, count($this->columns) - 1, TRUE);
     }
 
     public function resetActionsColumn()
@@ -73,7 +73,7 @@ class TableView extends AbstractResultView implements IHeadContents
      * @param $field_name
      * @return TableColumn
      */
-    public function getColumn(string $field_name) : TableColumn
+    public function getColumn(string $field_name): TableColumn
     {
         return $this->columns[$field_name];
     }
@@ -117,17 +117,22 @@ class TableView extends AbstractResultView implements IHeadContents
         $v = new ValueInterleave("even", "odd");
         $this->position_index = 0;
 
+        $row = array();
+
         while ($this->itr->haveMoreResults($row)) {
 
             $cls = $v->value();
 
             echo "<tr class='$cls'>";
 
-            foreach (array_keys($this->columns) as $pos => $column_name) {
+            $keys = array_keys($this->columns);
 
-                $tc = $this->getColumn($column_name);
+            foreach ($this->columns as $column_name => $tc) {
+
+                //$tc = $this->getColumn($column_name);
 
                 $cellr = $tc->getCellRenderer();
+
                 $cellr->setClassName($cls);
 
                 $cellr->renderCell($row, $tc);

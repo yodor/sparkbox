@@ -15,8 +15,6 @@ include_once("lib/iterators/SQLResultIterator.php");
 $menu = array(
 
     new MenuItem("Inventory", "inventory/list.php", "list-add.png"), //     new MenuItem("Color Gallery", "color_gallery/list.php?prodID", "list-add.png"),
-    //     new MenuItem("Photo Gallery", "gallery/list.php?prodID", "list-add.png"),
-    //     new MenuItem("Add Product", "add.php", "list-add.png"),
 
 );
 

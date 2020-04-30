@@ -82,14 +82,14 @@ class DataInput implements IDataBeanSource
     protected $link_mode = false;
 
 
-    public function setSource(DBTableBean $data_source)
+    public function setSource(IDataBean $data_source)
     {
         debug("InputField: ['" . $this->getName() . "'] Setting source: " . get_class($data_source));
 
         $this->data_source = $data_source;
     }
 
-    public function getSource()
+    public function getSource() : IDataBean
     {
         return $this->data_source;
     }

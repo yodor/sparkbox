@@ -3,7 +3,6 @@ include_once("lib/components/Component.php");
 include_once("lib/beans/DBTableBean.php");
 include_once("lib/forms/InputForm.php");
 
-
 include_once("lib/forms/processors/FormProcessor.php");
 include_once("lib/forms/renderers/FormRenderer.php");
 include_once("lib/db/DBTransactor.php");
@@ -14,7 +13,7 @@ include_once("lib/handlers/IRequestProcessor.php");
 
 include_once("lib/panels/BeanTranslationDialog.php");
 
-class InputFormView extends Component implements IDataBeanSetter
+class InputFormView extends Component implements IDataBeanSetter, IDataBeanGetter
 {
 
     public $item_updated_message = "Information was updated";
@@ -108,24 +107,19 @@ class InputFormView extends Component implements IDataBeanSetter
     }
 
 
-    public function getEditID()
+    public function getEditID() : int
     {
         return $this->editID;
     }
 
-    public function setEditID($editID)
+    public function setEditID(int $editID)
     {
         $this->editID = (int)$editID;
         $this->attributes["editID"] = $this->editID;
 
     }
 
-    public function getForm()
-    {
-        return $this->form;
-    }
-
-    public function getEditBean()
+    public function getBean() : IDataBean
     {
         return $this->bean;
     }
@@ -133,6 +127,11 @@ class InputFormView extends Component implements IDataBeanSetter
     public function setBean(IDataBean $bean)
     {
         $this->bean = $bean;
+    }
+
+    public function getForm()
+    {
+        return $this->form;
     }
 
     public function getProcessor()

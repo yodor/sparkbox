@@ -159,7 +159,9 @@ function debug($obj, $msg=null, $arr = null)
 
 
         if (strlen($class)<1) {
-            $class = $parent["class"];
+            if (isset($parent["class"])) {
+                $class = $parent["class"];
+            }
         }
         $function = $parent["function"];
 

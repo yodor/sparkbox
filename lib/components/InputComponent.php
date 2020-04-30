@@ -110,7 +110,7 @@ class InputComponent extends Component
             $form = $field->getForm();
             $editID = $form->getEditID();
 
-            if ($editID > 0 && $form->getEditBean() instanceof DBTableBean) {
+            if ($editID > 0 && $form->getBean() instanceof DBTableBean) {
 
                 echo "<a class='ActionRenderer' action='TranslateBeanField' field='$field_name'>";
                 echo tr("Translate");

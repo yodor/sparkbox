@@ -12,7 +12,7 @@ abstract class DBDriver
 
     public static function Get()
     {
-        return self::$g_db;
+        return static::$g_db;
     }
 
     public static function Set(DBDriver $connection)

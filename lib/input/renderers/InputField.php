@@ -1,11 +1,10 @@
 <?php
 include_once("lib/components/Component.php");
-include_once("lib/beans/IDataSource.php");
+include_once("lib/beans/IDataBeanSource.php");
 include_once("lib/input/renderers/IFieldRenderer.php");
 include_once("lib/input/renderers/IErrorRenderer.php");
 
-abstract class InputField extends Component implements IDataSource, IFieldRenderer, IErrorRenderer
-
+abstract class InputField extends Component implements IDataBeanSource, IFieldRenderer, IErrorRenderer
 {
 
     /**
@@ -27,14 +26,14 @@ abstract class InputField extends Component implements IDataSource, IFieldRender
     protected $data_filter = "";
     protected $data_fields = " * ";
 
-    public $list_key = false;
-    public $list_label = false;
+    public $list_key = FALSE;
+    public $list_label = FALSE;
 
 
     public $addon_content = "";
 
 
-    protected $freetext_value = false;
+    protected $freetext_value = FALSE;
 
     protected $field_attributes = array();
 
@@ -42,13 +41,7 @@ abstract class InputField extends Component implements IDataSource, IFieldRender
 
     public function __construct()
     {
-
         parent::__construct();
-
-//        $this->component_class = "InputField";
-//
-//        $this->setClassName(get_class($this));
-
     }
 
     public function requiredStyle()
@@ -66,7 +59,6 @@ abstract class InputField extends Component implements IDataSource, IFieldRender
     {
         return $this->field_attributes[$name];
     }
-
 
     public function enableFreetextInput($src_id)
     {
@@ -89,11 +81,10 @@ abstract class InputField extends Component implements IDataSource, IFieldRender
         $this->data_bean = $data_bean;
     }
 
-    public function getSource()
+    public function getSource(): IDataBean
     {
         return $this->data_bean;
     }
-
 
     public function processErrorAttributes()
     {
@@ -110,12 +101,11 @@ abstract class InputField extends Component implements IDataSource, IFieldRender
             $this->attributes["error"] = 1;
         }
         else {
-            $this->attributes["error"] = false;
+            $this->attributes["error"] = FALSE;
         }
 
 
     }
-
 
     public function prepareFieldAttributes()
     {

@@ -27,12 +27,12 @@ class DBTransactor implements IDataBeanGetter
 
     }
 
-    public function getEditID()
+    public function getEditID() : int
     {
         return $this->editID;
     }
 
-    public function getBean()
+    public function getBean() : IDataBean
     {
         return $this->transaction_bean;
     }

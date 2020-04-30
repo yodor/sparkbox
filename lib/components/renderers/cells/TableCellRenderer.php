@@ -7,7 +7,7 @@ class TableCellRenderer extends Component implements ICellRenderer
 {
 
     protected $tooltip_field = "";
-    protected $action = false;
+    protected $action = FALSE;
 
     protected $value_attributes = array();
 
@@ -67,14 +67,13 @@ class TableCellRenderer extends Component implements ICellRenderer
         }
 
         $this->startRender();
-        if ($tc->getView()->getIterator()->getBean()) {
+        if ($tc->getView()->getIterator()->getBean() instanceof DBTableBean) {
 
             trbean($row[$tc->getView()->getIterator()->key()], $tc->getFieldName(), $row, $tc->getView()->getIterator()->getBean());
 
         }
 
         echo "<span>" . $row[$tc->getFieldName()] . "</span>";
-
 
         $this->finishRender();
     }

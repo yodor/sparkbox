@@ -106,7 +106,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         $this->bean = $bean;
     }
 
-    public function getBean()
+    public function getBean() : IDataBean
     {
         return $this->bean;
     }
@@ -116,7 +116,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         $this->beanID = $editid;
     }
 
-    public function getEditID()
+    public function getEditID() : int
     {
         return $this->beanID;
     }

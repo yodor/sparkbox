@@ -29,7 +29,7 @@ class TableColumn extends Component
         if (is_null($cr)) $this->setCellRenderer(new TableCellRenderer());
 
         if (strcasecmp($field_name, "actions") == 0) {
-            $this->getHeaderCellRenderer()->setSortable(false);
+            $this->getHeaderCellRenderer()->setSortable(FALSE);
         }
 
     }
@@ -41,12 +41,12 @@ class TableColumn extends Component
         $this->header_renderer->setParent($this);
     }
 
-    public function getHeaderCellRenderer() : ICellRenderer
+    public function getHeaderCellRenderer(): ICellRenderer
     {
         return $this->header_renderer;
     }
 
-    public function getCellRenderer() : ICellRenderer
+    public function getCellRenderer(): ICellRenderer
     {
         return $this->cell_renderer;
 
@@ -58,7 +58,7 @@ class TableColumn extends Component
         $this->cell_renderer->setParent($this);
     }
 
-    public function getView() : TableView
+    public function getView(): TableView
     {
         return $this->view;
     }
@@ -68,12 +68,12 @@ class TableColumn extends Component
         $this->view = $view;
     }
 
-    public function getFieldName() : string
+    public function getFieldName(): string
     {
         return $this->field_name;
     }
 
-    public function getLabel() : string
+    public function getLabel(): string
     {
         return $this->label;
     }

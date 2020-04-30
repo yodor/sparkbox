@@ -7,6 +7,9 @@ class SQLResultIterator implements SQLIterator
 
     private $select = NULL;
     private $res;
+    /**
+     * @var DBDriver
+     */
     private $db;
     private $prkey;
     protected $fields;
@@ -21,6 +24,12 @@ class SQLResultIterator implements SQLIterator
         $this->prkey = $prkey;
         $this->fields = $select->fields;
 
+    }
+
+    public function __destruct()
+    {
+        // TODO: Implement __destruct() method.
+        $this->db->free($this->res);
     }
 
     public function getBean()
@@ -47,6 +56,7 @@ class SQLResultIterator implements SQLIterator
 
         if (!$this->res) throw new Exception($this->db->getError() . "<br>$sql");
 
+        //TODO:?
         $ret = $this->db->query("SELECT FOUND_ROWS() as total");
         $row = $this->db->fetch($ret);
         $total = (int)$row["total"];

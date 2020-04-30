@@ -24,6 +24,7 @@ interface IDataBean
     public function key();
 
     public function startFieldIterator($filter_field, $filter_value);
+
 }
 
 ?>
