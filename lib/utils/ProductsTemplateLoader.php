@@ -237,9 +237,11 @@ class ProductsTemplateLoader extends CSVTemplateLoader
             $cav = $this->cav;
 
             $attrs->startIterator(" WHERE name = '$opt_name' LIMIT 1");
+            $attr_row = array();
             if ($attrs->fetchNext($attr_row)) {
                 $maID = (int)$attr_row[$attrs->key()];
                 $ca->startIterator(" WHERE maID = '$maID' AND catID='{$this->catID}' LIMIT 1 ");
+                $carow = array();
                 if ($ca->fetchNext($carow)) {
                     $caID = $carow[$ca->key()];
 

@@ -63,7 +63,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         parent::__construct();
         $this->relation_prkey = $prkey;
 
-        $combining_filter = new SelectQuery();
+        $combining_filter = new SQLSelect();
         $combining_filter->fields = "";
         $combining_filter->from = "";
 
@@ -99,9 +99,9 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
             $filter_value = DBDriver::Get()->escapeString($_GET[$name]);
             if (!$filter_value) continue;
 
-            $sel = new SelectQuery();
+            $sel = new SQLSelect();
             if ($value instanceof IQueryFilter) {
-                $sel = $value->getQueryFilter($view, $filter_value);
+                $sel = $value->filterSelect($view, $filter_value);
             }
             else {
                 $sel->fields = "";

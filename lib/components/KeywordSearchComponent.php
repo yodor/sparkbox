@@ -135,26 +135,26 @@ class KeywordSearchComponent extends Component implements IQueryFilter
 
     }
 
-    public function processSearch(SelectQuery &$select_query)
+    public function processSearch(SQLSelect &$select_query)
     {
-        $search_query = $this->sform->searchFilterQuery();
+        $search_query = $this->sform->searchFilterSelect();
 
         $select_query = $select_query->combineWith($search_query);
 
     }
 
-    public function processSearchHaving(SelectQuery &$select_query)
+    public function processSearchHaving(SQLSelect &$select_query)
     {
-        $search_query = $this->sform->searchFilterQuery();
+        $search_query = $this->sform->searchFilterSelect();
 
 
         $select_query->having = $search_query->where;
 
     }
 
-    public function getQueryFilter($source = NULL, $value = NULL)
+    public function filterSelect($source = NULL, $value = NULL)
     {
-        return $this->sform->searchFilterQuery();
+        return $this->sform->searchFilterSelect();
     }
 
 }

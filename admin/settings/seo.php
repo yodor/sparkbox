@@ -10,7 +10,7 @@ include_once("lib/forms/renderers/FormRenderer.php");
 $page = new AdminPage("SEO");
 $page->checkAccess(ROLE_CONFIG_MENU);
 
-$config = ConfigBean::factory();
+$config = ConfigBean::Factory();
 $config->setSection("seo");
 
 $form = new SEOConfigForm();

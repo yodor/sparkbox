@@ -256,6 +256,7 @@ abstract class Authenticator
         $email = $user_fb->email;
 
         $bean->startIterator("WHERE email='$email' LIMIT 1");
+        $urow = array();
         if (!$bean->fetchNext($urow)) throw new Exception("This email is not registered or not confirmed yet.");
 
         $userID = (int)$urow[$bean->key()];

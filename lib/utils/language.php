@@ -128,6 +128,7 @@ function getActiveLanguageID()
     $lang = DBDriver::Get()->escapeString($lang_session);
 
     $num = $g_lb->startIterator("WHERE language='$lang'");
+    $lrow = array();
     if ($g_lb->fetchNext($lrow)) {
         $langID = $lrow["langID"];
     }
@@ -154,6 +155,7 @@ function trbean(int $id, string $field_name, array &$row, DBTableBean $bean)
     // 		$keyid = $bean->getPrKey();
     $num = $g_bt->startIterator("WHERE langID='$langID' AND field_name='$field_name' AND table_name='$table_name' AND bean_id='$id' LIMIT 1", " translated ");
 
+    $btrow = array();
     if ($g_bt->fetchNext($btrow)) {
         $row[$field_name] = $btrow["translated"];
     }
@@ -204,6 +206,7 @@ function tr(string $str_original)
 
         $num = $g_tr->startIterator("WHERE langID=$langID and textID=$textID");
         if ($num) {
+            $trow = array();
             if ($g_tr->fetchNext($trow)) {
                  return (string)$trow["translated"];
             }

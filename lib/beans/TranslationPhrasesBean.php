@@ -104,6 +104,7 @@ CREATE TABLE `translation_phrases` (
 
         $num = $this->startIterator("WHERE langID='$langID' and textID='$textID' LIMIT 1");
 
+        $trow = array();
         if ($this->fetchNext($trow)) {
             $ret = $trow["translated"];
 

@@ -64,7 +64,7 @@ abstract class DataSourceField extends InputField
 
         $prkey = $this->data_bean->key();
         $index = 0;
-
+        $data_row = array();
         while ($this->data_bean->fetchNext($data_row)) {
 
             $id = $data_row[$prkey];

@@ -57,13 +57,15 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
     {
 
         global $g_bt;
-        $trow = array();
 
-        $g_bt->startIterator(" WHERE table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' LIMIT 1");
+        $itr = $g_bt->query();
+        $itr->select()->where = " table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' ";
+        $itr->select()->limit = " 1 ";
+
+        $itr->exec();
 
         $btID = -1;
-
-        if ($g_bt->fetchNext($trow)) {
+        if ($trow = $itr->next()) {
             $btID = $trow[$g_bt->key()];
         }
 
@@ -101,7 +103,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
         $g_bt->startIterator($sql);
 
         $ret->translation = "";
-
+        $trow = array();
         if ($g_bt->fetchNext($trow)) {
             $ret->translation = $trow["translated"];
         }
@@ -122,6 +124,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
 
         $ret->translation = "";
 
+        $trow = array();
         if ($g_bt->fetchNext($trow)) {
 
             $g_bt->deleteID($trow[$g_bt->key()]);

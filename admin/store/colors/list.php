@@ -9,7 +9,7 @@ include_once("lib/components/TableView.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 include_once("lib/components/renderers/cells/ColorCodeCellRenderer.php");
 include_once("lib/components/KeywordSearchComponent.php");
-include_once("lib/iterators/SQLResultIterator.php");
+include_once("lib/iterators/SQLQuery.php");
 
 
 $menu = array();
@@ -31,7 +31,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanResultIterator($bean));
+$view = new TableView(new BeanQuery($bean));
 $view->setCaption("Available Colors");
 $view->setDefaultOrder(" color ASC ");
 

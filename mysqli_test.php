@@ -12,6 +12,7 @@ include_once("class/beans/ProductsBean.php");
 $prods = new ProductsBean();
 $num = $prods->startIterator(" WHERE 1 LIMIT 10 ");
 echo "Number of results: $num";
+$row = array();
 while ($prods->fetchNext($row)) {
     echo "<HR>";
     var_dump($row);

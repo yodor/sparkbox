@@ -20,6 +20,7 @@ class DatedPublicationBean extends DBTableBean
         $this->startIterator(" GROUP BY YEAR({$this->datefield}) DESC ", " YEAR({$this->datefield}) AS year  ");
 
         $years_array = array();
+        $row = array();
         while ($this->fetchNext($row)) {
             $years_array[] = $row["year"];
         }
@@ -33,6 +34,7 @@ class DatedPublicationBean extends DBTableBean
         $this->startIterator(" WHERE month({$this->datefield})='$d_month' AND  YEAR({$this->datefield})=$d_year ", " DAY({$this->datefield}) AS day ");
 
         $ar = array();
+        $row = array();
         while ($this->fetchNext($row)) {
             $ar[] = $row["day"];
         }
@@ -47,7 +49,7 @@ class DatedPublicationBean extends DBTableBean
         $this->startIterator(" WHERE MONTHNAME({$this->datefield})='$d_month' AND YEAR({$this->datefield})=$d_year ORDER BY {$this->datefield} DESC ", " * ");
 
         $ar = array();
-
+        $row = array();
         while ($this->fetchNext($row)) {
             $ar[] = $row;
         }

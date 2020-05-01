@@ -1,12 +1,9 @@
 <?php
-include_once("lib/pages/HTMLPage.php");
 include_once("lib/components/AbstractResultView.php");
+include_once("lib/components/renderers/IHeadContents.php");
 
-include_once("lib/components/PageResultsPanel.php");
-
-include_once("lib/handlers/ToggleFieldRequestHandler.php");
-include_once("lib/handlers/DeleteItemRequestHandler.php");
-
+include_once("lib/utils/ValueInterleave.php");
+include_once("lib/components/TableColumn.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 include_once("lib/components/renderers/cells/CallbackTableCellRenderer.php");
 include_once("lib/components/renderers/cells/ActionsTableCellRenderer.php");
@@ -24,7 +21,7 @@ class TableView extends AbstractResultView implements IHeadContents
 
     protected $header_cells_enabled = TRUE;
 
-    public function __construct(SQLIterator $itr)
+    public function __construct(ISQLIterator $itr)
     {
         parent::__construct($itr);
     }
@@ -117,19 +114,13 @@ class TableView extends AbstractResultView implements IHeadContents
         $v = new ValueInterleave("even", "odd");
         $this->position_index = 0;
 
-        $row = array();
-
-        while ($this->itr->haveMoreResults($row)) {
+        while ($row = $this->itr->next()) {
 
             $cls = $v->value();
 
             echo "<tr class='$cls'>";
 
-            $keys = array_keys($this->columns);
-
             foreach ($this->columns as $column_name => $tc) {
-
-                //$tc = $this->getColumn($column_name);
 
                 $cellr = $tc->getCellRenderer();
 

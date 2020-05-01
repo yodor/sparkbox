@@ -3,7 +3,7 @@
 interface IQueryFilter
 {
 
-    public function getQueryFilter($source = NULL, $value = NULL);
+    public function filterSelect($source = NULL, $value = NULL);
 
 }
 

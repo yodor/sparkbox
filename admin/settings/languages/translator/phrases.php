@@ -6,7 +6,7 @@ include_once("lib/components/renderers/cells/CallbackTableCellRenderer.php");
 include_once("lib/components/KeywordSearchComponent.php");
 include_once("lib/beans/LanguagesBean.php");
 include_once("lib/panels/PhraseTranslationDialog.php");
-include_once("lib/iterators/SQLResultIterator.php");
+include_once("lib/iterators/SQLQuery.php");
 
 
 $page = new AdminPage();
@@ -39,17 +39,17 @@ $scomp->form_prepend = "<input type=hidden name=langID value='$langID'>";
 // SELECT st.textID, st.value as phrase, t.translated as translation, coalesce(t.trID,-1) as trID, coalesce(t.langID,2) as langID FROM  WHERE 1 having langID=2
 
 // $qry = $bean->getSelectQuery();
-$qry = new SelectQuery();
+$qry = new SQLSelect();
 $qry->fields = " st.textID, st.value as phrase, t.translated as translation, coalesce(t.trID,-1) as trID, coalesce(t.langID,$langID) as langID  ";
 $qry->from = " site_texts st LEFT JOIN translation_phrases t ON st.textID=t.textID ";
 $qry->having = " langID=$langID ";
 
-$search_qry = $scomp->getForm()->searchFilterQuery();
+$search_qry = $scomp->getForm()->searchFilterSelect();
 
 $qry = $qry->combineWith($search_qry);
 
 
-$view = new TableView(new SQLResultIterator($qry, $bean->key()));
+$view = new TableView(new SQLQuery($qry, $bean->key()));
 $view->setCaption("Available Phrases For Translation");
 // $view->setClassName("TranslationPhrases");
 // $view->setAttribute("langID", $langID);

@@ -40,7 +40,7 @@ $h_repos = new ChangePositionRequestHandler($bean);
 RequestController::addRequestHandler($h_repos);
 
 
-$view = new TableView(new BeanResultIterator($bean));
+$view = new TableView(new BeanQuery($bean));
 $view->setCaption("Dynamic Pages List");
 $view->setDefaultOrder(" position ASC ");
 // $view->search_filter = " ORDER BY day_num ASC ";

@@ -120,7 +120,7 @@ abstract class Component implements IRenderer, IHeadContents
         return $this->parent_component;
     }
 
-    public function getCaption()
+    public function getCaption() : string
     {
         return $this->caption;
     }

@@ -208,7 +208,7 @@ class SparkPage extends HTMLPage
     protected function headEnd()
     {
         if (DB_ENABLED) {
-            $config = ConfigBean::factory();
+            $config = ConfigBean::Factory();
             $config->setSection("seo");
 
             $google_analytics = $config->getValue("google_analytics");
@@ -472,7 +472,7 @@ class SparkPage extends HTMLPage
 
         try {
             if (DB_ENABLED) {
-                $config = ConfigBean::factory();
+                $config = ConfigBean::Factory();
                 $config->setSection("seo");
 
                 $meta_keywords = $config->getValue("meta_keywords");

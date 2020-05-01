@@ -29,7 +29,7 @@ try {
     $b = new $page_class;
 
     $prkey = $b->key();
-    $rrow = false;
+    $rrow = array();
     $num = $b->startIterator("WHERE $prkey='$page_id' LIMIT 1", " item_title, content, visible ");
     if ($num < 1) throw new Exception("This page is not available.");
     $b->fetchNext($rrow);
@@ -81,7 +81,7 @@ echo "<div class='PagePhotos'>";
 
 $dpp = new DynamicPagePhotosBean();
 $num_photos = $dpp->startIterator("WHERE dpID='$page_id' LIMIT 1", " ppID, caption ");
-
+$dpprow = array();
 if ($num_photos && $dpp->fetchNext($dpprow)) {
     $photo_id = $dpprow["ppID"];
 

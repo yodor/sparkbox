@@ -59,6 +59,7 @@ class CurrencyRatesBean extends DBTableBean
 
 
         $num = $this->startIterator(" WHERE srcID='$dstID' AND dstID='$srcID' ");
+        $row = array();
         if ($this->fetchNext($row)) {
             $rate = (float)$row["rate"];
             $ret["price_value"] = $price_value * $rate;

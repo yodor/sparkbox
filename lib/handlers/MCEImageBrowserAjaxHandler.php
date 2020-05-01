@@ -108,7 +108,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         debug("MCEImageBrowserAjaxHandler::_find | section_name='{$this->section_name}' AND section_key='{$this->section_key}'");
 
         $bean = new MCEImagesBean();
-        $qry = $bean->selectQuery();
+        $qry = $bean->select();
         $qry->where = " section='{$this->section_name}' AND section_key='{$this->section_key}'";
 
         if ($this->ownerID > 0) {
@@ -127,6 +127,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
         $resp->objects = array();
 
+        $imgrow = array();
         while ($bean->fetchNext($imgrow)) {
 
             $resp->objects[] = $this->createUploadElement($imgrow);

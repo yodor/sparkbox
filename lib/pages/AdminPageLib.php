@@ -12,7 +12,7 @@ include_once("lib/iterators/BeanResultIterator.php");
 
 
 include_once("lib/utils/ReferenceKeyPageChecker.php");
-include_once("lib/utils/SelectQuery.php");
+include_once("lib/utils/SQLSelect.php");
 
 
 include_once("lib/components/InputFormView.php");
@@ -41,6 +41,7 @@ class AdminPageLib extends SparkPage
 
         $b = new AdminAccessBean();
         $n = $b->startIterator("WHERE userID=$adminID");
+        $row = array();
         while ($b->fetchNext($row)) {
             $this->roles[] = $row["role"];
         }

@@ -61,12 +61,12 @@ abstract class ArrayDataBean implements IDataBean
         return $this->key;
     }
 
-    public function getCount()
+    public function getCount() : int
     {
         return $this->iterator->count();
     }
 
-    public function getByID($id)
+    public function getByID(int $id)
     {
         if (!isset($this->pos_map[$id])) throw new Exception("ID not found");
 
@@ -79,7 +79,7 @@ abstract class ArrayDataBean implements IDataBean
         return $row;
     }
 
-    public function fields()
+    public function fields() : array
     {
         return $this->fields;
     }
@@ -97,7 +97,7 @@ abstract class ArrayDataBean implements IDataBean
         $this->filter_value = $filter_value;
     }
 
-    public function fetchNext(&$row, $iterator = false)
+    public function fetchNext(array &$row, $iterator = false) : bool
     {
         $ret = $this->iterator->valid();
         $row = array();
@@ -141,7 +141,7 @@ abstract class ArrayDataBean implements IDataBean
         return $ret;
     }
 
-    public function deleteID($id)
+    public function deleteID(int $id)
     {
         if (!isset($this->pos_map[$id])) return false;
         $pos = $this->pos_map[$id];
@@ -156,7 +156,7 @@ abstract class ArrayDataBean implements IDataBean
         throw new Exception("Not implemented");
     }
 
-    public function haveField($field_name)
+    public function haveField(string $field_name) : bool
     {
         return (in_array($field_name, $this->fields));
     }

@@ -117,6 +117,7 @@ class NestedSelectField extends SelectField
         $field_values = $this->field->getValue();
         $field_name = $this->field->getName();
 
+        $data_row = array();
         while ($this->data_bean->fetchNext($data_row, $itr)) {
 
             $id = $data_row[$prkey];

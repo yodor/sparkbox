@@ -1,6 +1,6 @@
 <?php
 
-abstract class SQLQuery
+abstract class SQLStatement
 {
     protected $type = "SELECT";
     public $fields = " * ";

@@ -27,7 +27,7 @@ class ConfigBean extends DBTableBean
     }
 
 
-    public static function factory()
+    public static function Factory()
     {
         if (self::$instance === FALSE) {
             self::$instance = new ConfigBean();

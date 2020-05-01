@@ -19,7 +19,6 @@ class TableCellRenderer extends Component implements ICellRenderer
 
     public function startRender()
     {
-
         $all_attribs = $this->prepareAttributes();
         echo "<td $all_attribs >";
     }
@@ -67,10 +66,9 @@ class TableCellRenderer extends Component implements ICellRenderer
         }
 
         $this->startRender();
-        if ($tc->getView()->getIterator()->getBean() instanceof DBTableBean) {
 
+        if ($tc->getView()->getIterator() instanceof BeanQuery) {
             trbean($row[$tc->getView()->getIterator()->key()], $tc->getFieldName(), $row, $tc->getView()->getIterator()->getBean());
-
         }
 
         echo "<span>" . $row[$tc->getFieldName()] . "</span>";
@@ -78,7 +76,7 @@ class TableCellRenderer extends Component implements ICellRenderer
         $this->finishRender();
     }
 
-    public function setTooltipFromField($field_name)
+    public function setTooltipFromField(string $field_name)
     {
         $this->tooltip_field = $field_name;
     }

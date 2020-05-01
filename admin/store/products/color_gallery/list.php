@@ -11,7 +11,7 @@ include_once("class/beans/ProductColorPhotosBean.php");
 include_once("lib/components/TableView.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 include_once("lib/components/KeywordSearchComponent.php");
-include_once("lib/iterators/SQLResultIterator.php");
+include_once("lib/iterators/SQLQuery.php");
 
 
 $page = new AdminPage();
@@ -46,7 +46,7 @@ RequestController::addRequestHandler($h_delete);
 // $search_fields = array("prodID", "product_code", "product_name", "color", "size");
 // $ksc = new KeywordSearchComponent($search_fields);
 
-$select_colors = $bean->selectQuery();
+$select_colors = $bean->select();
 $select_colors->fields = " pclr.*, p.product_name, p.product_code ";
 $select_colors->from = " product_colors pclr LEFT JOIN products p ON p.prodID = pclr.prodID ";
 $select_colors->where = " pclr.prodID = " . $rc->ref_id;
@@ -58,7 +58,7 @@ $page->setCaption(tr("Color Scheme") . ": " . $rc->ref_row["product_name"]);
 // $ksc->processSearch($select_products);
 
 
-$view = new TableView(new SQLResultIterator($select_colors, $bean->key()));
+$view = new TableView(new SQLQuery($select_colors, $bean->key()));
 $view->setCaption("Color Schemes List");
 // $view->setDefaultOrder(" ORDER BY item_date DESC ");
 // $view->search_filter = " ORDER BY day_num ASC ";

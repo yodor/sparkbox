@@ -5,7 +5,7 @@ include_once("class/pages/AdminPage.php");
 include_once("lib/components/TableView.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 include_once("lib/components/KeywordSearchComponent.php");
-include_once("lib/iterators/SQLResultIterator.php");
+include_once("lib/iterators/SQLQuery.php");
 
 include_once("class/beans/ProductInventoryBean.php");
 include_once("class/beans/ProductPhotosBean.php");
@@ -53,7 +53,7 @@ RequestController::addRequestHandler($h_delete);
 // $search_fields = array("prodID", "product_code", "product_name", "color", "size");
 // $ksc = new KeywordSearchComponent($search_fields);
 
-$select_inventory = $bean->selectQuery();
+$select_inventory = $bean->select();
 $select_inventory->fields = " pi.*, pi.prodID as product_photo, pclr.pclrID,  sc.color_code, pi.size_value, p.product_name, p.product_code  ";
 $select_inventory->from = " product_inventory pi LEFT JOIN product_colors pclr ON pclr.pclrID = pi.pclrID LEFT JOIN store_colors sc ON sc.color=pclr.color LEFT JOIN products p ON p.prodID = pi.prodID JOIN color_chips cc ON cc.prodID = p.prodID LEFT JOIN product_photos pp ON pp.prodID = pi.prodID ";
 $select_inventory->group_by = " pi.piID ";
@@ -69,7 +69,7 @@ else {
 // $ksc->processSearch($select_products);
 
 
-$view = new TableView(new SQLResultIterator($select_inventory, "piID"));
+$view = new TableView(new SQLQuery($select_inventory, "piID"));
 $view->setCaption("Inventory List");
 $view->setDefaultOrder(" piID DESC ");
 

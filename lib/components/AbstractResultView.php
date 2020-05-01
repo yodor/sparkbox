@@ -1,9 +1,6 @@
 <?php
-include_once("lib/pages/HTMLPage.php");
 include_once("lib/components/Component.php");
-include_once("lib/components/TableColumn.php");
-include_once("lib/iterators/SQLIterator.php");
-include_once("lib/utils/ValueInterleave.php");
+include_once("lib/iterators/ISQLIterator.php");
 include_once("lib/utils/Paginator.php");
 include_once("lib/components/PaginatorTopComponent.php");
 include_once("lib/components/PaginatorBottomComponent.php");
@@ -24,7 +21,7 @@ abstract class AbstractResultView extends Component
     protected $paginators_enabled = true;
     protected $select_query = NULL;
 
-    public function __construct(SQLIterator $itr)
+    public function __construct(ISQLIterator $itr)
     {
         parent::__construct();
 
@@ -35,17 +32,32 @@ abstract class AbstractResultView extends Component
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
     }
 
-    public function getIterator()
+    public function requiredStyle()
+    {
+        $arr = parent::requiredStyle();
+        $arr[] = SITE_ROOT."lib/css/GalleryView.css";
+        return $arr;
+    }
+
+    public function requiredScript()
+    {
+
+        $arr = parent::requiredScript();
+        $arr[] = SITE_ROOT."lib/js/GalleryView.js";
+        return $arr;
+    }
+
+    public function getIterator() : ISQLIterator
     {
         return $this->itr;
     }
 
-    public function getTotalRows()
+    public function getTotalRows() : int
     {
         return $this->total_rows;
     }
 
-    public function getPositionIndex()
+    public function getPositionIndex() : int
     {
         $paginator = $this->paginator;
 
@@ -59,24 +71,24 @@ abstract class AbstractResultView extends Component
         $this->paginators_enabled = $mode;
     }
 
-    public function getPaginator()
+    public function getPaginator() : Paginator
     {
         return $this->paginator;
     }
 
-    public function getTopPaginator()
+    public function getTopPaginator() : PaginatorTopComponent
     {
         return $this->paginator_top;
     }
 
-    public function getBottomPaginator()
+    public function getBottomPaginator() : PaginatorBottomComponent
     {
         return $this->paginator_bottom;
     }
 
-    public function setCaption($caption)
+    public function setCaption(string $caption)
     {
-        $this->caption = $caption;
+        parent::setCaption($caption);
         $this->paginator_top->setCaption($caption);
     }
 
@@ -93,9 +105,9 @@ abstract class AbstractResultView extends Component
 
         parent::startRender();
 
-        $select = $this->itr->getSelectQuery();
+        $select = $this->itr->select();
 
-        $this->total_rows = $this->itr->startQuery($select);
+        $this->total_rows = $this->itr->exec();
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
@@ -106,16 +118,18 @@ abstract class AbstractResultView extends Component
 
         if ($this->paginators_enabled) {
             $select = $select->combineWith($pageFilter);
+            $this->itr->setSelect($select);
         }
 
-        //	echo "Final SQL: ".$select->getSQL();
+        //echo "Final SQL: ".$select->getSQL();
 
-        $this->total_rows = $this->itr->startQuery($select);
+        $this->total_rows = $this->itr->exec();
 
         if ($this->paginators_enabled) {
             $this->paginator_top->render();
         }
     }
+
 
     /**
      * @throws Exception

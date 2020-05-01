@@ -69,6 +69,7 @@ class TranslatePhraseAjaxHandler extends JSONRequestHandler
         $ret->original_text = $strow["value"];
 
         $g_tr->startIterator("WHERE trID='" . $this->trID . "'");
+        $trrow = array();
         if ($g_tr->fetchNext($trrow)) {
             $ret->translation = $trrow["translated"];
         }

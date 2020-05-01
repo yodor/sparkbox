@@ -10,7 +10,7 @@ include_once("class/beans/ProductInventoryBean.php");
 include_once("lib/components/TableView.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 include_once("lib/components/KeywordSearchComponent.php");
-include_once("lib/iterators/SQLResultIterator.php");
+include_once("lib/iterators/SQLQuery.php");
 
 $menu = array(
 
@@ -35,7 +35,7 @@ $search_fields = array("product_code", "product_name", "category_name", "class_n
 $ksc = new KeywordSearchComponent($search_fields);
 $ksc->getForm()->getRenderer()->setAttribute("method", "get");
 
-$select_products = $bean->selectQuery();
+$select_products = $bean->select();
 // $select_products->fields = " *, sum(stock_amount) as stock_amount, min(price) as price_min, max(price) as price_max, 
 // group_concat(color SEPARATOR ';' ) as colors, group_concat(size SEPARATOR ';') as sizes,
 // min(weight) as weight_min, max(weight) as weight_max
@@ -54,7 +54,7 @@ $select_products->group_by = "  p.prodID, pi.prodID ";
 $ksc->processSearch($select_products);
 
 
-$view = new TableView(new SQLResultIterator($select_products, "prodID"));
+$view = new TableView(new SQLQuery($select_products, "prodID"));
 $view->setCaption("Product Inventory List");
 $view->setDefaultOrder("  p.insert_date DESC  ");
 // $view->search_filter = " ORDER BY day_num ASC ";

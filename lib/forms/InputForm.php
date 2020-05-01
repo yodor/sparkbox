@@ -297,9 +297,9 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         return $sf;
     }
 
-    public function searchFilterQuery()
+    public function searchFilterSelect() : SQLSelect
     {
-        $sel = new SelectQuery();
+        $sel = new SQLSelect();
         $sel->fields = "";
         $sel->from = "";
 

@@ -1,6 +1,6 @@
 <?php
 include_once("lib/beans/DBTableBean.php");
-include_once("lib/utils/SelectQuery.php");
+include_once("lib/utils/SQLSelect.php");
 
 class NestedSetBean extends DBTableBean
 {
@@ -287,10 +287,10 @@ class NestedSetBean extends DBTableBean
         }
         $prkey = $this->prkey;
 
-        $sel = $this->selectQuery();
+        $sel = $this->select();
         $sel->fields = "*";
 
-        $psel = new SelectQuery();
+        $psel = new SQLSelect();
         $psel->fields = "";
         $psel->where = " parentID=$parentID  ";
         $psel->order_by = "  {$this->prkey} ASC , lft ASC ";
@@ -515,7 +515,7 @@ class NestedSetBean extends DBTableBean
     public function constructPathField($catID, $field_name)
     {
 
-        $sqry = new SelectQuery();
+        $sqry = new SQLSelect();
         $sqry->fields = " parent.catID, parent.$field_name ";
         $sqry->from = " {$this->table} AS node, {$this->table} AS parent ";
         $sqry->where = " (node.lft BETWEEN parent.lft AND parent.rgt) AND node.catID = $catID ";
@@ -540,7 +540,7 @@ class NestedSetBean extends DBTableBean
     public function constructPath($catID)
     {
 
-        $sqry = new SelectQuery();
+        $sqry = new SQLSelect();
         $sqry->fields = " parent.catID ";
         $sqry->from = " {$this->table} AS node, {$this->table} AS parent ";
         $sqry->where = " (node.lft BETWEEN parent.lft AND parent.rgt) AND node.catID = $catID ";
@@ -562,7 +562,7 @@ class NestedSetBean extends DBTableBean
     }
 
 
-    public function listTreeRelation(SelectQuery $relation, $relation_table, $relation_prkey, $count_field = "")
+    public function listTreeRelation(SQLSelect $relation, $relation_table, $relation_prkey, $count_field = "")
     {
         $prkey = $this->prkey;
 
@@ -570,7 +570,7 @@ class NestedSetBean extends DBTableBean
             $count_field = " COUNT ($relation_table.$relation_prkey) ";
         }
         //aggregate relation query
-        $sqry = new SelectQuery();
+        $sqry = new SQLSelect();
 
         $sqry->fields = "  parent.*, $count_field ";
         $sqry->from = "  {$this->table} AS node, {$this->table} AS parent ";
@@ -610,7 +610,7 @@ class NestedSetBean extends DBTableBean
         $fields_sql = implode(",", $fieldlist);
 
         //aggregate relation query
-        $sqry = new SelectQuery();
+        $sqry = new SQLSelect();
         $sqry->fields = "  $fields_sql, $count_field as related_count ";
         $sqry->from = "  {$this->table} AS node, {$this->table} AS parent, $related_table ";
         $sqry->where = "  (node.lft BETWEEN parent.lft AND parent.rgt) AND node.$prkey = $related_table.$prkey ";
@@ -623,7 +623,7 @@ class NestedSetBean extends DBTableBean
 
     public function listTreeSelect()
     {
-        $sqry = new SelectQuery();
+        $sqry = new SQLSelect();
         $sqry->fields = " node.* ";
         $sqry->from = " {$this->table} AS node, {$this->table} AS parent ";
         $sqry->where = " (node.lft BETWEEN parent.lft AND parent.rgt) ";
@@ -634,9 +634,9 @@ class NestedSetBean extends DBTableBean
     }
 
     //used with aggregate table. selects node and its child nodes for aggregation
-    public function childNodesWith(SelectQuery $other, $nodeID = -1)
+    public function childNodesWith(SQLSelect $other, $nodeID = -1)
     {
-        $pcsql = new SelectQuery();
+        $pcsql = new SQLSelect();
         // 	    $pcsql->fields = " child.* ";
         $pcsql->fields = " child.{$this->prkey} ";
         $pcsql->from = " {$this->table} AS node , {$this->table} AS child ";
@@ -648,9 +648,9 @@ class NestedSetBean extends DBTableBean
         return $pcsql->combineWith($other);
     }
 
-    public function parentNodesWith(SelectQuery $other, $nodeID = -1)
+    public function parentNodesWith(SQLSelect $other, $nodeID = -1)
     {
-        $pcsql = new SelectQuery();
+        $pcsql = new SQLSelect();
         $pcsql->fields = " parent.{$this->prkey} ";
         $pcsql->from = " {$this->table} AS node, {$this->table} AS parent ";
         $pcsql->where = " (node.lft BETWEEN parent.lft AND parent.rgt) ";
@@ -662,7 +662,7 @@ class NestedSetBean extends DBTableBean
 
     public function childNodes($parentID)
     {
-        $pcsql = new SelectQuery();
+        $pcsql = new SQLSelect();
         $pcsql->fields = " * ";
         $pcsql->from = " {$this->table} ";
         $pcsql->where = " parentID='$parentID' ";

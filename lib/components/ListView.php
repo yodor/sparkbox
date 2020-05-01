@@ -11,7 +11,7 @@ class ListView extends AbstractResultView
 
     protected $item_renderer;
 
-    public function __construct(SQLIterator $itr)
+    public function __construct(ISQLIterator $itr)
     {
         parent::__construct($itr);
     }
@@ -68,7 +68,7 @@ class ListView extends AbstractResultView
 
         $this->position_index = 0;
 
-        while ($this->itr->haveMoreResults($row)) {
+        while ($this->itr->next($row)) {
 
             $cls = $v->value();
 
@@ -84,7 +84,7 @@ class ListView extends AbstractResultView
         }
     }
 
-    public function getIterator()
+    public function getIterator() : ISQLIterator
     {
         return $this->itr;
     }

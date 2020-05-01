@@ -35,7 +35,7 @@ class ArraySelector extends ArrayDataBean
 
     }
 
-    public static function FromSelect(SelectQuery $qry, $prkey, $label)
+    public static function FromSelect(SQLSelect $qry, $prkey, $label)
     {
         $db = DBDriver::Get();
 

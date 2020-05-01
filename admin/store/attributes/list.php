@@ -20,7 +20,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanResultIterator($bean));
+$view = new TableView(new BeanQuery($bean));
 $view->setCaption("Store Attributes List");
 $view->setDefaultOrder(" name ASC ");
 

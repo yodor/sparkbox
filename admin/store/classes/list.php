@@ -9,7 +9,7 @@ include_once("class/beans/ProductClassesBean.php");
 include_once("lib/components/TableView.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
 include_once("lib/components/KeywordSearchComponent.php");
-include_once("lib/iterators/SQLResultIterator.php");
+include_once("lib/iterators/SQLQuery.php");
 // include_once("class/beans/ProductInventoryPhotosBean.php");
 
 
@@ -33,7 +33,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanResultIterator($bean));
+$view = new TableView(new BeanQuery($bean));
 $view->setCaption("Product Classes List");
 $view->setDefaultOrder($bean->key() . " DESC ");
 $view->addColumn(new TableColumn($bean->key(), "ID"));

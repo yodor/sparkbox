@@ -10,7 +10,7 @@ include_once("class/beans/ProductsBean.php");
 include_once("class/beans/ProductPhotosBean.php");
 include_once("lib/components/TableView.php");
 include_once("lib/components/KeywordSearchComponent.php");
-include_once("lib/iterators/SQLResultIterator.php");
+include_once("lib/iterators/SQLQuery.php");
 include_once("lib/utils/RelatedSourceFilterProcessor.php");
 include_once("class/beans/ProductColorPhotosBean.php");
 include_once("class/utils/filters/ProductFilters.php");
@@ -47,10 +47,10 @@ $ir->setTextAction(new Action("Text Action", "related_tree.php?filter=self", arr
 $treeView->setItemRenderer($ir);
 
 //construct initial relation query to aggregate with the tree view
-$product_selector = new SelectQuery();
+$product_selector = new SQLSelect();
 $product_selector->fields = "  ";
 
-$inventory_selector = new SelectQuery();
+$inventory_selector = new SQLSelect();
 $inventory_selector->fields = "  ";
 
 //color/size/price filters need NOT grouping! in the derived table
@@ -115,7 +115,7 @@ $product_selector->group_by = " relation.prodID, relation.color ";
 
 
 if (strcmp_isset("view", "list", $_GET)) {
-    $view = new TableView(new SQLResultIterator($product_selector, "piID"));
+    $view = new TableView(new SQLQuery($product_selector, "piID"));
     // $view->addColumn(new TableColumn("piID","ID"));
     // $view->addColumn(new TableColumn("prodID","ID"));
     $view->addColumn(new TableColumn("pclrpID", "Photo"));
@@ -133,7 +133,7 @@ if (strcmp_isset("view", "list", $_GET)) {
     $view->getColumn("pclrpID")->getHeaderCellRenderer()->setSortable(false);
 }
 else {
-    $view = new ListView(new SQLResultIterator($product_selector, "piID"));
+    $view = new ListView(new SQLQuery($product_selector, "piID"));
     $view->setItemRenderer(new ProductListItem());
 }
 $view->items_per_page = 12;
@@ -151,13 +151,13 @@ $derived = clone $page->derived;
 $derived_table = $derived->getSQL(false, false);
 
 //prepare filter fields source data
-$brand_select = new SelectQuery();
+$brand_select = new SQLSelect();
 $brand_select->fields = " brand_name ";
 $brand_select->from = " ($derived_table) as relation ";
 $brand_select->group_by = " brand_name ";
 $brand_value = $proc->applyFiltersOn($treeView, $brand_select, "brand_name");
 
-$color_select = new SelectQuery();
+$color_select = new SQLSelect();
 $color_select->fields = " color ";
 $color_select->from = " ($derived_table) as relation ";
 $color_select->where = "  ";
@@ -165,7 +165,7 @@ $color_select->order_by = " color ";
 $color_select->group_by = " color ";
 $color_value = $proc->applyFiltersOn($treeView, $color_select, "color");
 
-$size_select = new SelectQuery();
+$size_select = new SQLSelect();
 $size_select->fields = " size_value ";
 $size_select->from = " ($derived_table) as relation ";
 $size_select->where = "  ";
@@ -174,7 +174,7 @@ $size_select->order_by = " prodID ";
 $size_value = $proc->applyFiltersOn($treeView, $size_select, "size_value");
 
 $price_info = array();
-$price_select = new SelectQuery();
+$price_select = new SQLSelect();
 $price_select->fields = " min(sell_price) as price_min, max(sell_price) as price_max ";
 $price_select->from = " ($derived_table) as relation ";
 
@@ -195,7 +195,7 @@ $db->free($res);
 $dyn_filters = array();
 try {
 
-    $ia_name_select = new SelectQuery(); //clone $inventory_selector;
+    $ia_name_select = new SQLSelect(); //clone $inventory_selector;
     $ia_name_select->fields = "  ";
     $ia_name_select->from = " ($derived_table) as relation  ";
     $ia_name_select->where = "   ";
@@ -210,7 +210,7 @@ try {
     if (!$res) throw new Exception ("Unable to query inventory attributes: " . $db->getError());
     while ($row = $db->fetch($res)) {
         $name = $row["ia_name"];
-        $sel = new SelectQuery();
+        $sel = new SQLSelect();
         $sel->fields = "  ";
         $sel->from = " ($derived_table) as relation  ";
 

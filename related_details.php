@@ -12,7 +12,7 @@ include_once("lib/components/TableView.php");
 include_once("lib/components/ListView.php");
 
 include_once("lib/components/KeywordSearchComponent.php");
-include_once("lib/iterators/SQLResultIterator.php");
+include_once("lib/iterators/SQLQuery.php");
 include_once("lib/components/renderers/items/ItemRendererImpl.php");
 
 include_once("class/beans/SellableProductsView.php");

@@ -108,7 +108,7 @@ class MainMenu
 
         if ($total_items < 1) return;
 
-
+        $row = array();
         while ($this->bean->fetchNext($row, $iterator)) {
 
             $menuID = (int)$row[$key];

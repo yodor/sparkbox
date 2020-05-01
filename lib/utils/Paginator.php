@@ -213,7 +213,7 @@ class Paginator
 
     public function preparePageFilter($default_order = "")
     {
-        $filter = new SelectQuery();
+        $filter = new SQLSelect();
         $filter->from = "";
         $filter->fields = "";
 

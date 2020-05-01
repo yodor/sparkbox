@@ -24,7 +24,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanResultIterator($bean));
+$view = new TableView(new BeanQuery($bean));
 $view->items_per_page = 30;
 $view->addColumn(new TableColumn($bean->key(), "ID"));
 $view->addColumn(new TableColumn("value", "Phrase"));

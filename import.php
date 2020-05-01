@@ -69,6 +69,7 @@ class ImportIvona extends CSVTemplateLoader
             $brand_row = array("brand_name" => $brand_name);
             $brandID = $this->brands->insert($brand_row);
         }
+        $brand_row = array();
         if ($this->brands->fetchNext($brand_row)) {
             $brandID = $brand_row["brandID"];
         }
@@ -101,6 +102,7 @@ class ImportIvona extends CSVTemplateLoader
                         if ($catID < 1) throw new Exception("Unable to insert category at level 0: " . $this->db->getError());
                     }
                     else {
+                        $cat_row = array();
                         if ($this->pc->fetchNext($cat_row)) {
                             $catID = $cat_row["catID"];
                         }
@@ -114,6 +116,7 @@ class ImportIvona extends CSVTemplateLoader
                         if ($catID < 1) throw new Exception("Unable to insert category at level $a. " . $this->db->getError());
                     }
                     else {
+                        $cat_row = array();
                         if ($this->pc->fetchNext($cat_row)) {
                             $catID = $cat_row["catID"];
                         }

@@ -22,6 +22,7 @@ CREATE TABLE countries (
     {
         $c = new CountriesBean();
         $c->startIterator(" WHERE country_code='$code' LIMIT 1");
+        $crrow = array();
         if ($c->fetchNext($crrow)) {
             return (int)$crrow[$c->key()];
         }

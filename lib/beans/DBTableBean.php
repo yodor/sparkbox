@@ -18,7 +18,7 @@ abstract class DBTableBean implements IDataBean
 
     protected $createString = "";
 
-    protected $filter = false;
+    protected $filter = FALSE;
 
     protected $last_iterator_sql = "";
 
@@ -30,7 +30,7 @@ abstract class DBTableBean implements IDataBean
 
     protected static $instances = array();
 
-    protected static $use_prepared_statement = false;
+    protected static $use_prepared_statement = FALSE;
 
     public function __construct($table_name, $dbdriver = NULL)
     {
@@ -132,15 +132,14 @@ abstract class DBTableBean implements IDataBean
     }
 
     /**
-     * Return this table primary key name
-     * @return mixed
+     * @return string Table primary key
      */
-    public function key()
+    public function key(): string
     {
         return $this->prkey;
     }
 
-    public function fields()
+    public function fields(): array
     {
         return $this->fields;
     }
@@ -150,9 +149,9 @@ abstract class DBTableBean implements IDataBean
         return $this->storage_types;
     }
 
-    public function selectQuery()
+    public function select(): SQLSelect
     {
-        $select = new SelectQuery();
+        $select = new SQLSelect();
         $select->fields = " * ";
         $select->from = $this->table;
         $select->where = $this->filter;
@@ -170,7 +169,7 @@ abstract class DBTableBean implements IDataBean
         $this->filter = $sqlfilter;
     }
 
-    public function getCount()
+    public function getCount(): int
     {
 
         $res = $this->db->query("SELECT count(*) as cnt from {$this->table} ");
@@ -193,7 +192,7 @@ abstract class DBTableBean implements IDataBean
 
     }
 
-    public function haveField($field_name)
+    public function haveField($field_name): bool
     {
         return in_array($field_name, $this->fields);
     }
@@ -203,7 +202,7 @@ abstract class DBTableBean implements IDataBean
         return $this->startIterator("WHERE $filter_field='$filter_value'");
     }
 
-    public function startSelectIterator(SelectQuery $select)
+    public function startSelectIterator(SQLSelect $select)
     {
         $total = -1;
         $sql = $select->getSQL();
@@ -223,7 +222,7 @@ abstract class DBTableBean implements IDataBean
             $itr_filter = trim($itr_filter);
 
             $filter = str_ireplace("WHERE", "", $filter);
-            if (strpos($this->filter, "JOIN") !== false) {
+            if (strpos($this->filter, "JOIN") !== FALSE) {
                 $itr_filter = $this->filter . " " . $filter;
             }
             else {
@@ -261,6 +260,11 @@ abstract class DBTableBean implements IDataBean
         return $itr;
     }
 
+    public function query() : SQLQuery
+    {
+        return new SQLQuery($this->select(), $this->prkey, $this->db);
+    }
+
     public function startIterator($filter = "", $fields = " * ")
     {
         $itr_filter = $filter;
@@ -268,7 +272,7 @@ abstract class DBTableBean implements IDataBean
             $itr_filter = trim($itr_filter);
 
             $filter = str_ireplace("WHERE", "", $filter);
-            if (strpos($this->filter, "JOIN") !== false) {
+            if (strpos($this->filter, "JOIN") !== FALSE) {
                 $itr_filter = $this->filter . " " . $filter;
             }
             else {
@@ -284,13 +288,16 @@ abstract class DBTableBean implements IDataBean
         return $total;
     }
 
-    public function fetchNext(&$row, $iterator = false)
+    public function fetchNext(array &$row, $iterator = FALSE): bool
     {
-        if ($iterator === false) {
+        if ($iterator === FALSE) {
             $iterator = $this->iterator;
         }
 
-        return ($row = $this->db->fetch($iterator));
+        if ($row = $this->db->fetch($iterator)) {
+            return TRUE;
+        }
+        return FALSE;
     }
 
     private function fillDebug()
@@ -303,7 +310,7 @@ abstract class DBTableBean implements IDataBean
         return $trace;
     }
 
-    public function getByID($id, $db = false, $fields = " * ")
+    public function getByID($id, $db = FALSE, $fields = " * ")
     {
         if (!$db) $db = $this->db;
 
@@ -322,7 +329,7 @@ abstract class DBTableBean implements IDataBean
         return $row;
     }
 
-    public function getByRef($refkey, $refid, $db = false, $fields = " * ")
+    public function getByRef($refkey, $refid, $db = FALSE, $fields = " * ")
     {
 
         if (!$db) $db = $this->db;
@@ -340,19 +347,19 @@ abstract class DBTableBean implements IDataBean
         $db->free($res);
 
         if (!$row) {
-            return false;
+            return FALSE;
         }
         return $row;
     }
 
-    public function deleteID($id, $db = false)
+    public function deleteID($id, $db = FALSE)
     {
-        $docommit = false;
+        $docommit = FALSE;
 
         if (!$db) {
             $db = $this->db;
             $db->transaction();
-            $docommit = true;
+            $docommit = TRUE;
         }
 
         $qry = "DELETE FROM {$this->table} WHERE {$this->prkey}=$id";
@@ -371,13 +378,13 @@ abstract class DBTableBean implements IDataBean
         return $res;
     }
 
-    public function deleteRef($refkey, $refval, $db = false, $keep_ids = array())
+    public function deleteRef($refkey, $refval, $db = FALSE, $keep_ids = array())
     {
-        $docommit = false;
+        $docommit = FALSE;
         if (!$db) {
             $db = $this->db;
             $db->transaction();
-            $docommit = true;
+            $docommit = TRUE;
         }
 
         $sql = "DELETE FROM {$this->table} WHERE $refkey='$refval'";
@@ -467,24 +474,24 @@ abstract class DBTableBean implements IDataBean
         // 	  if (strpos($storage_type, "bool")!==false) {
         // 		return true;
         // 	  }
-        if (strpos($storage_type, "date") !== false || strpos($storage_type, "timestamp") !== false) {
-            if (endsWith($value, "()")) return false;
-            return true;
+        if (strpos($storage_type, "date") !== FALSE || strpos($storage_type, "timestamp") !== FALSE) {
+            if (endsWith($value, "()")) return FALSE;
+            return TRUE;
         }
-        return true;
+        return TRUE;
     }
 
-    public function insert(&$row, &$db = false)
+    public function insert(&$row, &$db = FALSE)
     {
 
         $last_insert = -1;
 
-        $docommit = false;
+        $docommit = FALSE;
 
         if (!$db) {
             $db = $this->db;
             $db->transaction();
-            $docommit = true;
+            $docommit = TRUE;
         }
 
         $values = array();
@@ -498,7 +505,7 @@ abstract class DBTableBean implements IDataBean
 
         $ret = $db->query($sql);
 
-        if ($ret === false) {
+        if ($ret === FALSE) {
             if ($docommit) $db->rollback();
             return -1;
         }
@@ -513,15 +520,15 @@ abstract class DBTableBean implements IDataBean
         return $last_insert;
     }
 
-    public function update($id, &$row, &$db = false)
+    public function update($id, &$row, &$db = FALSE)
     {
 
-        $docommit = false;
+        $docommit = FALSE;
 
         if (!$db) {
             $db = $this->db;
             $db->transaction();
-            $docommit = true;
+            $docommit = TRUE;
         }
 
         $values = array();
@@ -535,9 +542,9 @@ abstract class DBTableBean implements IDataBean
 
         $ret = $db->query($sql);
 
-        if ($ret === false) {
+        if ($ret === FALSE) {
             if ($docommit) $db->rollback();
-            return false;
+            return FALSE;
         }
 
         if ($docommit) $db->commit();
@@ -586,7 +593,7 @@ abstract class DBTableBean implements IDataBean
                 $values[$key] = "NULL";
             }
             else {
-                if ($this->needQuotes($key, $value) === true) {
+                if ($this->needQuotes($key, $value) === TRUE) {
                     $values[$key] = "'" . $value . "'";
                 }
                 else {
@@ -594,7 +601,7 @@ abstract class DBTableBean implements IDataBean
                 }
             }
 
-            if ($for_update === true) {
+            if ($for_update === TRUE) {
 
                 $values[$key] = "$key=" . $values[$key];//already quoted
 
@@ -604,12 +611,12 @@ abstract class DBTableBean implements IDataBean
 
     protected function prepareInsertValues(&$row, &$values)
     {
-        $this->prepareValues($row, $values, false);
+        $this->prepareValues($row, $values, FALSE);
     }
 
     protected function prepareUpdateValues(&$row, &$values)
     {
-        $this->prepareValues($row, $values, true);
+        $this->prepareValues($row, $values, TRUE);
     }
 
     public function getThumb($id, $width = 100)

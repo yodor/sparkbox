@@ -2,7 +2,7 @@
 include_once("lib/components/Component.php");
 include_once("lib/input/renderers/DateField.php");
 include_once("lib/components/InputRowComponent.php");
-include_once("lib/utils/SelectQuery.php");
+include_once("lib/utils/SQLSelect.php");
 
 class DatePeriodSearchComponent extends Component
 {
@@ -87,21 +87,21 @@ class DatePeriodSearchComponent extends Component
 
     }
 
-    public function processSelectQuery(SelectQuery $sqry, $date_field_name = "item_date")
+    public function processSelectQuery(SQLSelect $sqry, $date_field_name = "item_date")
     {
         $psd = $this->pstart->getValue();
         $ped = $this->pend->getValue();
 
         if (strlen($psd) > 0) {
 
-            $psq = new SelectQuery();
+            $psq = new SQLSelect();
             $psq->fields = "";
             $psq->where = " $date_field_name >= timestamp('$psd 00:00:00') ";
             $sqry = $sqry->combineWith($psq);
 
         }
         if (strlen($ped) > 0) {
-            $peq = new SelectQuery();
+            $peq = new SQLSelect();
             $peq->fields = "";
             $peq->where = " $date_field_name <= timestamp('$ped 23:59:59') ";
             $sqry = $sqry->combineWith($peq);

@@ -21,7 +21,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanResultIterator($bean));
+$view = new TableView(new BeanQuery($bean));
 
 $view->addColumn(new TableColumn($bean->key(), "ID"));
 $view->addColumn(new TableColumn("lang_code", "Language Code"));

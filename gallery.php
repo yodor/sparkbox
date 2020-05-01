@@ -35,7 +35,7 @@ echo "<div class='viewport'>";
 echo "<div class='slots'>";
 
 $pos = 0;
-
+$row = array();
 while ($bean->fetchNext($row)) {
 
     echo "<div class='slot'>";

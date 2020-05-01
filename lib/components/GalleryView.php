@@ -79,7 +79,7 @@ class GalleryView extends Component
         $view = false;
         if (strcmp_isset("view", "list")) {
 
-            $view = new TableView(new BeanResultIterator($bean));
+            $view = new TableView(new BeanQuery($bean));
             //   $view->addColumn(new TableColumn("ppID", "ID"));
 
             if ($this->photos_bean instanceof OrderedDataBean) {
@@ -108,7 +108,7 @@ class GalleryView extends Component
             $this->view_mode = GalleryView::MODE_LIST;
         }
         else {
-            $view = new ListView(new BeanResultIterator($bean));
+            $view = new ListView(new BeanQuery($bean));
 
             $renderer = new GalleryViewItemRenderer($this);
             $renderer->setPhotoSize(-1, 256);

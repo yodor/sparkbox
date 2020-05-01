@@ -4,8 +4,6 @@ include_once("lib/components/Component.php");
 abstract class PaginatorComponent extends Component
 {
     protected $paginator = false;
-    protected $caption = "";
-
 
     public function __construct(Paginator $paginator)
     {
@@ -30,19 +28,9 @@ abstract class PaginatorComponent extends Component
         $this->paginator = $paginator;
     }
 
-    public function getPaginator()
+    public function getPaginator() : Paginator
     {
         return $this->paginator;
-    }
-
-    public function setCaption($caption)
-    {
-        $this->caption = $caption;
-    }
-
-    public function getCaption()
-    {
-        return $this->caption;
     }
 
     public function drawPrevButton()

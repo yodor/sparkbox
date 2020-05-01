@@ -23,7 +23,7 @@ class ProductListItem extends ItemRendererImpl
         // 		$this->addClassName("clearfix");
 
 
-        $sel = new SelectQuery();
+        $sel = new SQLSelect();
         $sel->fields = " pi.piID, pc.pclrID, pc.color, pc.prodID, sc.color_code,
 
 (SELECT pclrpID FROM product_color_photos pcp WHERE pcp.pclrID=pc.pclrID ORDER BY position ASC LIMIT 1) as pclrpID,

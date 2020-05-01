@@ -2,24 +2,23 @@
 
 interface IDataBean
 {
+    public function getCount() : int;
 
-    public function getCount();
-
-    public function fields();
+    public function fields() : array;
 
     public function startIterator($filter = "", $fields = "");
 
-    public function fetchNext(&$row, $iterator = false);
+    public function fetchNext(array &$row, $iterator = false) : bool;
 
-    public function deleteID($id);
+    public function deleteID(int $id);
 
-    public function getByID($id);
+    public function getByID(int $id);
 
     public function getByRef($refkey, $refid);
 
     public function deleteRef($refkey, $refval);
 
-    public function haveField($field_name);
+    public function haveField(string $field_name) : bool;
 
     public function key();
 

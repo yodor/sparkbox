@@ -654,6 +654,7 @@ function Cloud(DBTableBean $artists, $sort_field, $top = 50)
     $list = array();
     $listid = array();
     $listcount = array();
+
     while ($artists->fetchNext($cntrow)) {
 
         $listid[] = $cntrow[$artists->key()];

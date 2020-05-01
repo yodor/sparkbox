@@ -34,6 +34,7 @@ CREATE TABLE `site_texts` (
 
         if ($num > 0) {
 
+            $strow = array();
             if ($this->fetchNext($strow)) {
                 $textID = (int)$strow["textID"];
             }

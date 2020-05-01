@@ -24,7 +24,7 @@ $h_toggle = new ToggleFieldRequestHandler($bean);
 RequestController::addRequestHandler($h_toggle);
 
 
-$view = new TableView(new BeanResultIterator($bean));
+$view = new TableView(new BeanQuery($bean));
 
 $view->addColumn(new TableColumn($bean->key(), "ID"));
 $view->addColumn(new TableColumn("email", "Email"));
@@ -59,11 +59,12 @@ function draw_access_level(&$row, TableColumn $tc)
     $key_id = $tc->getView()->getIterator()->key();
     $id = $row[$key_id];
 
-
     echo $row["access_level"] . "<br>";
 
     if (strcmp($row["access_level"], "Limited Access") == 0) {
         global $ac;
+        $qry = $ac->query();
+        $qry->
         $ac->startIterator("WHERE $key_id=$id");
         while ($ac->fetchNext($rowac)) {
 

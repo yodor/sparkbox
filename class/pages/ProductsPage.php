@@ -20,7 +20,7 @@ class ProductsPage extends DemoPage
 
         $this->action_renderer = new ActionRenderer();
 
-        $derived = new ProductsQuery();
+        $derived = new ProductsSQL();
 
         //  		echo $derived->getSQL(false, false);
         // 		exit;

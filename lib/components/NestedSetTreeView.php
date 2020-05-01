@@ -2,7 +2,7 @@
 include_once("lib/components/Component.php");
 include_once("lib/components/renderers/items/NestedSetItemRenderer.php");
 include_once("lib/beans/NestedSetBean.php");
-include_once("lib/utils/SelectQuery.php");
+include_once("lib/utils/SQLSelect.php");
 include_once("lib/utils/IQueryFilter.php");
 include_once("lib/utils/ISelectSource.php");
 
@@ -70,7 +70,7 @@ class NestedSetTreeView extends Component
 
         $source_prkey = $this->data_source->key();
 
-        $sqry = new SelectQuery();
+        $sqry = new SQLSelect();
         $sqry->fields = " $related_table.* ";
 
         $sqry->from = "  $related_table ";
@@ -161,7 +161,7 @@ class NestedSetTreeView extends Component
 
             if ($filter_key instanceof IQueryFilter) {
 
-                $this->filter_select = $filter_key->getQueryFilter();
+                $this->filter_select = $filter_key->filterSelect();
 
             }
             else if ($this->related_source instanceof DBTableBean) {
@@ -173,7 +173,7 @@ class NestedSetTreeView extends Component
 
                     $filter_value = $this->filter_values[$filter_key];
 
-                    $sel = new SelectQuery();
+                    $sel = new SQLSelect();
                     $sel->fields = "";
                     $sel->from = "";
                     $sel->where = " $related_table.$filter_key='$filter_value' ";
@@ -217,7 +217,7 @@ class NestedSetTreeView extends Component
         return $this->select_qry;
     }
 
-    public function setSelectQuery(SelectQuery $qry)
+    public function setSelectQuery(SQLSelect $qry)
     {
         $this->select_qry = $qry;
     }

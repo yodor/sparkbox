@@ -1,12 +1,12 @@
 <?php
-include_once("lib/utils/SelectQuery.php");
+include_once("lib/utils/SQLSelect.php");
 
 interface ISelectSource
 {
 
     public function getSelectQuery();
 
-    public function setSelectQuery(SelectQuery $qry);
+    public function setSelectQuery(SQLSelect $qry);
 
 
 }
