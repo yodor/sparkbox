@@ -68,7 +68,7 @@ class ListView extends AbstractResultView
 
         $this->position_index = 0;
 
-        while ($this->itr->next($row)) {
+        while ($row = $this->itr->next()) {
 
             $cls = $v->value();
 

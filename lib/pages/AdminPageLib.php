@@ -8,7 +8,7 @@ include_once("lib/handlers/ChangePositionRequestHandler.php");
 include_once("lib/handlers/DeleteItemRequestHandler.php");
 include_once("lib/handlers/ToggleFieldRequestHandler.php");
 
-include_once("lib/iterators/BeanResultIterator.php");
+include_once("lib/iterators/BeanQuery.php");
 
 
 include_once("lib/utils/ReferenceKeyPageChecker.php");

@@ -2,7 +2,7 @@
 include_once("lib/beans/DBTableBean.php");
 include_once("lib/components/TableView.php");
 include_once("lib/components/ListView.php");
-include_once("lib/iterators/BeanResultIterator.php");
+include_once("lib/iterators/BeanQuery.php");
 include_once("lib/components/renderers/items/GalleryViewItemRenderer.php");
 include_once("lib/components/renderers/IActionsRenderer.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");

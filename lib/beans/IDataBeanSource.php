@@ -8,7 +8,7 @@ interface IDataBeanSource
 
     public function setSource(IDataBean $data_bean);
 
-    public function getSource() : IDataBean;
+    public function getSource() : ?IDataBean;
 
 }
 

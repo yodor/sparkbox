@@ -89,7 +89,7 @@ class DataInput implements IDataBeanSource
         $this->data_source = $data_source;
     }
 
-    public function getSource() : IDataBean
+    public function getSource() : ?IDataBean
     {
         return $this->data_source;
     }

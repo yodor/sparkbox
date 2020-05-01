@@ -21,7 +21,7 @@ abstract class AbstractResultView extends Component
     protected $paginators_enabled = true;
     protected $select_query = NULL;
 
-    public function __construct(ISQLIterator $itr)
+    public function __construct(SQLQuery $itr)
     {
         parent::__construct();
 
@@ -105,8 +105,6 @@ abstract class AbstractResultView extends Component
 
         parent::startRender();
 
-        $select = $this->itr->select();
-
         $this->total_rows = $this->itr->exec();
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
@@ -117,8 +115,7 @@ abstract class AbstractResultView extends Component
         //	echo "Iterator SQL: ".$select->getSQL();
 
         if ($this->paginators_enabled) {
-            $select = $select->combineWith($pageFilter);
-            $this->itr->setSelect($select);
+            $this->itr->select->combine($pageFilter);
         }
 
         //echo "Final SQL: ".$select->getSQL();
