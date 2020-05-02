@@ -85,7 +85,7 @@ class DemoPage extends SparkPage
     {
         parent::startRender();
 
-        echo "\n<!--startRender DemoPage-->\n";
+        echo "\n<!-- startRender DemoPage -->\n";
 
         $main_menu = $this->menu_bar->getMainMenu();
         $main_menu->selectActiveMenus();
@@ -104,52 +104,13 @@ class DemoPage extends SparkPage
     public function finishRender()
     {
 
-        // 	  echo "<div class='version_label'>";
-        // 	  echo "<label>";
-        // 	  echo "PHP: ".phpversion();
-        // 	  echo " | ";
-        // 	  echo "MySQL: C.".mysql_get_client_info();
-        // // 	  echo "/S.".mysql_get_server_info();
-        // 	  echo "</label>";
-        // 	  echo "</div>";
-
         echo "</div>"; //main_content
         echo "</div>"; //align=center
 
-        ?>
-
-        <script type='text/javascript'>
-
-            onPageLoad(function () {
-
-
-//     var menu = $(".MenuBar[name='DemoPage']");
-//     var pos = menu.offset();
-
-
-//     $(window).scroll(function(){
-//         if($(this).scrollTop() > pos.top+menu.height() && !menu.hasClass('fixed')){
-//         //menu.fadeOut('fast', function(){
-//         //  $(this).removeClass('default').addClass('fixed').fadeIn('fast');
-//         //});
-//         menu.removeClass('default').addClass('fixed').fadeIn('fast');
-//         } else if($(this).scrollTop() <= pos.top && menu.hasClass('fixed')){
-//         //menu.fadeOut('fast', function(){
-//         //  $(this).removeClass('fixed').addClass('default').fadeIn('fast');
-//         //});
-//         menu.removeClass('fixed').addClass('default').fadeIn('fast');
-//         }
-//     });
-
-
-            });
-        </script>
-        <?php
         echo "\n";
-        echo "\n<!--finishRender DemoPage-->\n";
+        echo "\n<!-- finishRender DemoPage-->\n";
 
         parent::finishRender();
-
 
     }
 

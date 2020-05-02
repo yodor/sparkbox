@@ -7,12 +7,7 @@ include_once("class/beans/NewsItemsBean.php");
 include_once("lib/components/PublicationArchiveComponent.php");
 
 $page = new DemoPage();
-
-function dumpCSS()
-{
-    echo '<link rel="stylesheet" href="' . SITE_ROOT . 'css/news.css" type="text/css">';
-    echo "\n";
-}
+$page->addCSS(SITE_ROOT . "css/news.css");
 
 
 $nb = new NewsItemsBean();

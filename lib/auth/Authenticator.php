@@ -153,11 +153,12 @@ abstract class Authenticator
 
         $username = $db->escapeString($username);
 
-        $this->bean->startIterator("WHERE email='$username' LIMIT 1");
+        $qry = $this->bean->queryField("email", $username, 1);
+
 
         try {
-            $row = array();
-            if (!$this->bean->fetchNext($row)) throw new Exception("Username or password not recognized");
+            $qry->exec();
+            if (! ($row = $qry->next())) throw new Exception("Username or password not recognized");
 
             $userID = $row[$this->bean->key()];
 
@@ -255,9 +256,10 @@ abstract class Authenticator
         $bean = new UsersBean();
         $email = $user_fb->email;
 
-        $bean->startIterator("WHERE email='$email' LIMIT 1");
-        $urow = array();
-        if (!$bean->fetchNext($urow)) throw new Exception("This email is not registered or not confirmed yet.");
+        $qry = $bean->queryField("email", $email, 1);
+        $qry->exec();
+
+        if (! ($urow = $qry->next())) throw new Exception("This email is not registered or not confirmed yet");
 
         $userID = (int)$urow[$bean->key()];
 

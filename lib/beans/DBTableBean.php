@@ -1,6 +1,8 @@
 <?php
 include_once("lib/dbdriver/DBDriver.php");
 include_once("lib/beans/IDataBean.php");
+include_once("lib/iterators/SQLQuery.php");
+include_once("lib/utils/SQLSelect.php");
 
 abstract class DBTableBean implements IDataBean
 {
@@ -32,6 +34,8 @@ abstract class DBTableBean implements IDataBean
 
     protected static $use_prepared_statement = FALSE;
 
+    protected $sqlSelect = null;
+
     public function __construct($table_name, $dbdriver = NULL)
     {
         $this->table = $table_name;
@@ -53,6 +57,12 @@ abstract class DBTableBean implements IDataBean
         if (!isset(self::$instances[$bclass])) {
             self::$instances[$bclass] = $this;
         }
+
+        $this->sqlSelect = new SQLSelect();
+        $this->sqlSelect->fields = " * ";
+        $this->sqlSelect->from = $this->table;
+
+
     }
 
     public static function instance($class)
@@ -151,12 +161,8 @@ abstract class DBTableBean implements IDataBean
 
     public function select(): SQLSelect
     {
-        $select = new SQLSelect();
-        $select->fields = " * ";
-        $select->from = $this->table;
-        $select->where = $this->filter;
 
-        return $select;
+        return $this->sqlSelect;
     }
 
     public function getLastIteratorSQL()
@@ -167,6 +173,7 @@ abstract class DBTableBean implements IDataBean
     public function setFilter($sqlfilter)
     {
         $this->filter = $sqlfilter;
+        $this->sqlSelect->where = $sqlfilter;
     }
 
     public function getCount(): int
@@ -258,6 +265,21 @@ abstract class DBTableBean implements IDataBean
 
         $total = (int)$row["total"];
         return $itr;
+    }
+
+    public function queryID(int $id)
+    {
+        return $this->queryField($this->prkey, $id, 1);
+    }
+
+    public function queryField(string $field, string $value, int $limit = 0, string $sign = " = ") : SQLQuery
+    {
+        $qry = $this->query();
+        $qry->select->where = " $field $sign '$value' ";
+        if ($limit>0) {
+            $qry->select->limit = " $limit ";
+        }
+        return $qry;
     }
 
     public function query() : SQLQuery

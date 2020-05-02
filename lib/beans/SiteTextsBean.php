@@ -28,19 +28,20 @@ CREATE TABLE `site_texts` (
 
         $strdb = $this->db->escapeString($str);
 
-        $num = $this->startIterator("WHERE hash_value = md5('$strdb') LIMIT 1");
+        $qry = $this->query();
+        $qry->select->where = " hash_value = md5('$strdb') ";
+        $qry->select->limit = " 1 ";
+        $num = $qry->exec();
 
         // 		debug("SiteTextsBean::id4phrase: $str | is_found: $num");
 
         if ($num > 0) {
 
-            $strow = array();
-            if ($this->fetchNext($strow)) {
+            if ($strow = $qry->next()) {
                 $textID = (int)$strow["textID"];
             }
             else {
-
-                throw new Exception("DBError could not fetch text for translation: " . $this->getError());
+                throw new Exception("Could not fetch text for translation: " . $qry->getDB()->getError());
             }
         }
         else {

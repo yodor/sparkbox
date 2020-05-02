@@ -47,6 +47,8 @@ class ProductsPage extends DemoPage
         //
         // 	}
         // 	$this->category_path = $category_path;
+
+        $this->addCSS(SITE_ROOT . "css/ProductsPage.css");
     }
 
     public function renderCategoryPath($nodeID)
@@ -95,34 +97,8 @@ class ProductsPage extends DemoPage
         $this->action_renderer->renderActions($actions);
 
         echo "</div>";
-    }
 
-    protected function dumpCSS()
-    {
-        parent::dumpCSS();
-        echo "<link rel='stylesheet' href='" . SITE_ROOT . "css/ProductsPage.css?ver=1.0' type='text/css'>";
-        echo "\n";
-    }
 
-    protected function dumpJS()
-    {
-        parent::dumpJS();
-
-    }
-
-    protected function dumpMetaTags()
-    {
-        parent::dumpMetaTags();
-    }
-
-    public function beginPage()
-    {
-        parent::startRender();
-    }
-
-    public function finishPage()
-    {
-        parent::finishRender();
     }
 
 }

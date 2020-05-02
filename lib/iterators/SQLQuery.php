@@ -29,7 +29,6 @@ class SQLQuery implements ISQLIterator
 
     public function __destruct()
     {
-        // TODO: Implement __destruct() method.
         $this->db->free($this->res);
     }
 
@@ -52,7 +51,9 @@ class SQLQuery implements ISQLIterator
 
     public function next()
     {
-        return $this->db->fetch($this->res);
+        $ret = $this->db->fetch($this->res);
+        if (!$ret) $this->db->free($this->res);
+        return $ret;
     }
 
     public function key() : string
@@ -60,6 +61,14 @@ class SQLQuery implements ISQLIterator
         return $this->key;
     }
 
+    public function getDB() : DBDriver
+    {
+        return $this->db;
+    }
+    public function setDB(DBDriver $db)
+    {
+        $this->db = $db;
+    }
 }
 
 ?>

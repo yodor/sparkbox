@@ -6,6 +6,12 @@ class DatedPublicationBean extends DBTableBean
 
     protected $datefield;
 
+    /**
+     * DatedPublicationBean constructor.
+     * @param $table_name
+     * @param string $datefield
+     * @throws Exception
+     */
     public function __construct($table_name, $datefield = "item_date")
     {
         parent::__construct($table_name);
@@ -16,12 +22,13 @@ class DatedPublicationBean extends DBTableBean
     public function getYearsArray()
     {
 
-
-        $this->startIterator(" GROUP BY YEAR({$this->datefield}) DESC ", " YEAR({$this->datefield}) AS year  ");
+        $qry = $this->query();
+        $qry->select->fields = " YEAR({$this->datefield}) AS year  ";
+        $qry->select->group_by = " YEAR({$this->datefield}) DESC  ";
+        $qry->exec();
 
         $years_array = array();
-        $row = array();
-        while ($this->fetchNext($row)) {
+        while ($row = $qry->next()) {
             $years_array[] = $row["year"];
         }
         return $years_array;
@@ -30,12 +37,14 @@ class DatedPublicationBean extends DBTableBean
     public function filterDayList($d_year, $d_month)
     {
 
-
-        $this->startIterator(" WHERE month({$this->datefield})='$d_month' AND  YEAR({$this->datefield})=$d_year ", " DAY({$this->datefield}) AS day ");
+        $qry = $this->query();
+        $qry->select->fields = " DAY({$this->datefield}) AS day  ";
+        $qry->select->where = " month({$this->datefield})='$d_month' AND  YEAR({$this->datefield})=$d_year ";
+        $qry->exec();
 
         $ar = array();
-        $row = array();
-        while ($this->fetchNext($row)) {
+
+        while ($row = $qry->next()) {
             $ar[] = $row["day"];
         }
 
@@ -45,12 +54,14 @@ class DatedPublicationBean extends DBTableBean
     public function filterMonthList($d_year, $d_month)
     {
 
-
-        $this->startIterator(" WHERE MONTHNAME({$this->datefield})='$d_month' AND YEAR({$this->datefield})=$d_year ORDER BY {$this->datefield} DESC ", " * ");
+        $qry = $this->query();
+        $qry->select->where = " MONTHNAME({$this->datefield})='$d_month' AND YEAR({$this->datefield})=$d_year ";
+        $qry->select->order_by = " {$this->datefield} DESC ";
+        $qry->exec();
 
         $ar = array();
-        $row = array();
-        while ($this->fetchNext($row)) {
+
+        while ($row = $qry->next()) {
             $ar[] = $row;
         }
 
@@ -59,12 +70,10 @@ class DatedPublicationBean extends DBTableBean
 
     public function containsDataForMonth($d_year, $d_month)
     {
-        $found = false;
-
-        $found = $this->startIterator(" WHERE monthname({$this->datefield})='$d_month' and year({$this->datefield})='$d_year' ", " * ");
-
-        return $found;
-
+        $qry = $this->query();
+        $qry->select->where = " MONTHNAME({$this->datefield})='$d_month' AND YEAR({$this->datefield})='$d_year' ";
+        $qry->select->limit = " 1 ";
+        return $qry->exec();
     }
 
     // 	public function pastEventsBefore($year, $month, $limit=1){

@@ -49,7 +49,13 @@ class CheckField extends DataSourceField
             $item = clone $this->item;
 
             $item->setValue(1);
-            $item->setLabel($this->caption);
+
+//            if (strlen($item->getLabel())) {
+//
+//            }
+//            else {
+//                $item->setLabel($this->caption);
+//            }
             $item->setName($field_name);
 
             $item->setSelected($field_values);

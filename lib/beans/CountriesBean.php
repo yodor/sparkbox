@@ -21,9 +21,10 @@ CREATE TABLE countries (
     public static function code2id($code)
     {
         $c = new CountriesBean();
-        $c->startIterator(" WHERE country_code='$code' LIMIT 1");
-        $crrow = array();
-        if ($c->fetchNext($crrow)) {
+        $qry = $c->queryField("country_code", $code, 1);
+        $qry->exec();
+
+        if ($crrow = $qry->next()) {
             return (int)$crrow[$c->key()];
         }
         else {

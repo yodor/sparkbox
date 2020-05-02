@@ -4,10 +4,9 @@ include_once("lib/utils/SQLSelect.php");
 interface ISelectSource
 {
 
-    public function getSelectQuery();
+    public function select() : SQLSelect;
 
-    public function setSelectQuery(SQLSelect $qry);
-
+    public function setSelect(SQLSelect $qry);
 
 }
 

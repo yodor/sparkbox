@@ -6,7 +6,7 @@ include_once("lib/utils/SQLSelect.php");
 include_once("lib/utils/IQueryFilter.php");
 include_once("lib/utils/ISelectSource.php");
 
-class NestedSetTreeView extends Component
+class NestedSetTreeView extends Component implements ISelectSource
 {
 
     public $open_all = true;
@@ -212,12 +212,12 @@ class NestedSetTreeView extends Component
         return $this->data_source;
     }
 
-    public function getSelectQuery()
+    public function select() : SQLSelect
     {
         return $this->select_qry;
     }
 
-    public function setSelectQuery(SQLSelect $qry)
+    public function setSelect(SQLSelect $qry)
     {
         $this->select_qry = $qry;
     }
@@ -251,7 +251,7 @@ class NestedSetTreeView extends Component
 
         $this->setAttribute("source", get_class($bean));
 
-        $this->setSelectQuery($sqry);
+        $this->setSelect($sqry);
 
         $this->data_source = $bean;
 
@@ -267,7 +267,7 @@ class NestedSetTreeView extends Component
         }
         $sqry = $this->data_source->listTreeRelatedSelect($related_source, $count_field, $related_fields);
 
-        $this->setSelectQuery($sqry);
+        $this->setSelect($sqry);
 
         $this->related_source = $related_source;
 

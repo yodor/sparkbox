@@ -64,12 +64,15 @@ CREATE TABLE `translation_phrases` (
 
         $langID = (int)$langID;
 
-        $num = $this->startIterator("WHERE langID='$langID' and textID='$textID' LIMIT 1");
+        $qry = $this->query();
+        $qry->select->where = " langID='$langID' and textID='$textID' ";
+        $qry->select->limit = " 1 ";
+        $num = $qry->exec();
 
         $trID = -1;
         $trow = array();
 
-        if ($this->fetchNext($trow)) {
+        if ($trow = $qry->next()) {
             $trID = (int)$trow["trID"];
         }
 
@@ -101,13 +104,13 @@ CREATE TABLE `translation_phrases` (
         $textID = (int)$stb->id4phrase($phrase);
         $ret = "";
 
+        $qry = $this->query();
+        $qry->select->where = " langID='$langID' AND textID='$textID' ";
+        $qry->select->limit = " 1 ";
+        $num = $qry->exec();
 
-        $num = $this->startIterator("WHERE langID='$langID' and textID='$textID' LIMIT 1");
-
-        $trow = array();
-        if ($this->fetchNext($trow)) {
+        if ($trow = $qry->next()) {
             $ret = $trow["translated"];
-
         }
 
         return $ret;

@@ -5,12 +5,7 @@ include_once("class/pages/DemoPage.php");
 
 
 $page = new DemoPage();
-
-function dumpCSS()
-{
-    echo '<link rel="stylesheet" href="' . SITE_ROOT . 'css/fonts.css" type="text/css">';
-    echo "\n";
-}
+$page->addCSS(SITE_ROOT . "css/fonts.css");
 
 $page->startRender();
 

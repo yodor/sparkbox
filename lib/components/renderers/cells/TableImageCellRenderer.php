@@ -149,7 +149,6 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         }
 
 
-
         $pfrow = array();
         while ($this->bean->fetchNext($pfrow)) {
             $photoID = $pfrow[$this->bean->key()];

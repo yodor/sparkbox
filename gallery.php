@@ -2,30 +2,23 @@
 include_once("session.php");
 
 include_once("class/pages/DemoPage.php");
-
 include_once("class/beans/GalleryPhotosBean.php");
 
-function dumpCSS()
-{
-    echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/GalleryTape.css'>";
-}
-
-function dumpJS()
-{
-    echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/GalleryTape.js'></script>";
-    echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/GalleryView.js'></script>";
-    echo "\n";
-}
 
 $page = new DemoPage();
-
-
-$page->startRender();
+$page->addCSS(SITE_ROOT . "lib/css/GalleryTape.css");
+$page->addJS(SITE_ROOT . "lib/js/GalleryTape.js");
+$page->addJS(SITE_ROOT . "lib/js/GalleryView.js");
 
 
 $bean = new GalleryPhotosBean();
-$bean->startIterator(" WHERE 1 ORDER BY position ASC ", $bean->key());
+$qry = $bean->query();
+$qry->select->order_by = " position ASC ";
+$qry->select->fields = $bean->key();
 
+$qry->exec();
+
+$page->startRender();
 
 echo "<div class='image_gallery GalleryTape'>";
 
@@ -35,8 +28,8 @@ echo "<div class='viewport'>";
 echo "<div class='slots'>";
 
 $pos = 0;
-$row = array();
-while ($bean->fetchNext($row)) {
+
+while ($row = $qry->next()) {
 
     echo "<div class='slot'>";
     $itemID = $row[$bean->key()];

@@ -5,6 +5,23 @@ abstract class HTMLPage implements IRenderer
 {
 
     /**
+     * property
+     * array of Strings representing URL of all css files used
+     */
+    protected $css_files = array();
+
+    /**
+     * property
+     * array of Strings representing URLs of all JavaScript that are used in this page
+     */
+    protected $js_files = array();
+
+    /**
+     * property array of key=>value strings used to render all meta tags of this page
+     */
+    protected $meta = array();
+
+    /**
      * Abstract class for rendering html pages
      */
 
@@ -20,6 +37,9 @@ abstract class HTMLPage implements IRenderer
     public function __construct()
     {
         self::$instance = $this;
+
+        $this->addMeta("Content-Type", "text/html;charset=utf-8");
+        $this->addMeta("Content-Style-Type", "text/css");
     }
 
     protected function htmlStart()
@@ -28,100 +48,94 @@ abstract class HTMLPage implements IRenderer
 
         $dir = ' DIR="' . Session::Get("page_dir") . '" ';
 
-        echo "<html $dir  >\n";
-        echo "\n";
-
+        echo "<HTML $dir>";
     }
 
     protected function headStart()
     {
-
         echo "<HEAD>";
         echo "\n";
 
         echo "<TITLE>" . SITE_TITLE . "</TITLE>";
         echo "\n";
 
-        $this->dumpMetaTags();
+        $this->renderMetaTags();
         echo "\n";
 
-        echo "<!-- HTMLPage CSS start -->";
-        $this->dumpCSS();
-        echo "<!-- HTMLPage CSS end -->";
+        $this->renderCSS();
         echo "\n";
 
-        echo "<!-- HTMLPage Callable CSS start -->";
-        if (is_callable("dumpCSS")) {
-            dumpCSS();
+        $this->renderJS();
+        echo "\n";
+    }
+
+    protected function renderMetaTags()
+    {
+        foreach ($this->meta as $name => $content) {
+            echo "<META name='" . htmlentities($name) . "' content='" . htmlentities($content) . "'>";
         }
-        echo "<!-- HTMLPage Callable CSS end -->";
-        echo "\n";
+    }
 
-        echo "<!-- HTMLPage JavaScript start -->";
-        $this->dumpJS();
-        echo "<!-- HTMLPage JavaScript end -->";
-        echo "\n";
+    protected function renderCSS()
+    {
+        echo "<!-- CSS Files Start -->";
 
-        echo "<!-- HTMLPage Callable JavaScript start -->";
-        if (is_callable("dumpJS")) {
-            dumpJS();
+        foreach ($this->css_files as $href => $usedBy) {
+            echo "<link rel='stylesheet' href='$href' type='text/css' >";
+            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->";
         }
-        echo "<!-- HTMLPage Callable JavaScript end -->";
-        echo "\n";
+
+        echo "<!-- CSS Files End -->";
 
     }
 
-    protected function dumpMetaTags()
+    protected function renderJS()
     {
-        echo "<meta http-equiv='content-type' content='text/html;charset=utf-8'>\n";
-        echo "<meta http-equiv='Content-Style-Type' content='text/css'>\n";
+        echo "<!-- JavaScript Files Start -->";
 
-        //echo "<meta http-equiv='X-UA-Compatible' content='IE=9' >\n";
-        //echo "<meta http-equiv='X-UA-Compatible' content='IE=8' >\n";
-        echo "\n";
-    }
+        foreach ($this->js_files as $src => $usedBy) {
+            echo "<script type='text/javascript' src='$src'></script>";
+            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->";
+        }
+        echo "<!-- JavaScript Files End -->";
 
-    protected function dumpCSS()
-    {
-        echo "\n";
-    }
-
-    protected function dumpJS()
-    {
-        echo "\n";
     }
 
     protected function headEnd()
     {
-        echo "</HEAD>\n";
-        echo "\n";
+        echo "</HEAD>";
     }
 
     protected function bodyStart()
     {
         echo "<BODY class='{$this->getPageClass()}'>";
-        echo "\n";
     }
-
 
     protected function bodyEnd()
     {
-        echo "\n";
-        echo "</BODY>\n";
-        echo "\n";
+        echo "</BODY>";
     }
 
     protected function htmlEnd()
     {
-        echo "\n";
         echo "</HTML>";
-        echo "\n";
     }
 
+    public function startRender()
+    {
+        $this->htmlStart();
 
-    public abstract function startRender();
+        $this->headStart();
+        $this->headEnd();
 
-    public abstract function finishRender();
+        $this->bodyStart();
+    }
+
+    public function finishRender()
+    {
+        $this->bodyEnd();
+        $this->htmlEnd();
+    }
 
 
     /**
@@ -154,6 +168,67 @@ abstract class HTMLPage implements IRenderer
     public function getPageURL()
     {
         return $_SERVER["SCRIPT_NAME"] . "?" . $_SERVER["QUERY_STRING"];
+    }
+
+    /**
+     *  Add meta tag to be rendered into this page.
+     * @param $name string The name attribute to add to the Meta collection
+     * @param $content string The content attribute
+     */
+    public function addMeta(string $name, string $content)
+    {
+        $this->meta[$name] = $content;
+    }
+
+    /**
+     *  Get the content attribute of the meta
+     * @param $name string The name attribute to
+     * @return string The content attribute as set to the $name
+     */
+    public function getMeta(string $name)
+    {
+        return isset($this->meta[$name]) ? $this->meta[$name] : "";
+    }
+
+    /**
+     * Adds a CSS file to this page CSS scripts collection
+     * @param string $filename The filename of the CSS script.
+     */
+    public function addCSS(string $filename, string $className = "", bool $prepend = FALSE)
+    {
+        if (!$className) $className = get_class($this);
+        $usedBy = array();
+        if (isset($this->css_files[$filename])) {
+            $usedBy = $this->css_files[$filename];
+        }
+        $usedBy[$className] = 1;
+        $this->css_files[$filename] = $usedBy;
+
+        if ($prepend) {
+            unset($this->css_files[$filename]);
+            $this->css_files = array($filename => $usedBy) + $this->css_files;
+        }
+    }
+
+    /**
+     * Adds a JavaScript file to page JavaScripts collection
+     * @param string $filename The filename of the CSS script.
+     */
+    public function addJS(string $filename, string $className = "", bool $prepend = FALSE)
+    {
+        if (!$className) $className = get_class($this);
+        $usedBy = array();
+        if (isset($this->js_files[$filename])) {
+            $usedBy = $this->js_files[$filename];
+
+        }
+        $usedBy[$className] = 1;
+        $this->js_files[$filename] = $usedBy;
+
+        if ($prepend) {
+            unset($this->js_files[$filename]);
+            $this->js_files = array($filename => $usedBy) + $this->js_files;
+        }
     }
 
 }

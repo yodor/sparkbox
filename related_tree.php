@@ -18,16 +18,6 @@ include_once("class/utils/filters/ProductFilters.php");
 include_once("class/components/renderers/items/ProductListItem.php");
 include_once("class/components/renderers/cells/ProductPhotoCellRenderer.php");
 
-// function dumpCSS()
-// {
-//   echo "<link rel='stylesheet' href='".SITE_ROOT."css/related_tree.css' type='text/css'>";
-//   echo "\n";
-// }
-// function dumpJS()
-// {
-//   echo "<script type='text/javascript' src='".SITE_ROOT."js/product_list.js?ver=1.0'></script>";
-//   echo "\n";
-// }
 
 $page = new ProductListPage();
 

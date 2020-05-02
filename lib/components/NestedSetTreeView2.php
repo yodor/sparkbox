@@ -68,12 +68,12 @@ class NestedSetTreeView extends Component implements ISelectSource
         return $this->data_source;
     }
 
-    public function getSelectQuery()
+    public function select() : SQLSelect
     {
         return $this->select_qry;
     }
 
-    public function setSelectQuery(SQLSelect $qry)
+    public function setSelect(SQLSelect $qry)
     {
         $this->select_qry = $qry;
     }

@@ -5,26 +5,25 @@ include_once("class/pages/DemoPage.php");
 
 include_once("class/beans/GalleryPhotosBean.php");
 
-function dumpCSS()
-{
-    echo "<link rel='stylesheet' href='" . SITE_ROOT . "lib/css/GalleryTape.css'>";
-}
-
-function dumpJS()
-{
-    echo "<script type='text/javascript' src='" . SITE_ROOT . "lib/js/GalleryTape.js'></script>";
-    echo "\n";
-}
 
 $page = new DemoPage();
+$page->addCSS(SITE_ROOT . "lib/css/GalleryTape.css");
+$page->addJS(SITE_ROOT . "lib/js/GalleryTape.js");
 
 
-$page->startRender();
+
 
 
 $bean = new GalleryPhotosBean();
-$bean->startIterator(" WHERE 1 ", $bean->key());
+$qry = $bean->query();
 
+$qry->select->fields = $bean->key();
+$qry->select->where = 1;
+
+$qry->exec();
+
+
+$page->startRender();
 
 echo "<div class='custom_gallery GalleryTape'>";
 
@@ -33,7 +32,7 @@ echo "<div class='button left'></div>";
 echo "<div class='viewport'>";
 echo "<div class='slots'>";
 
-while ($bean->fetchNext($row)) {
+while ($row = $qry->next()) {
 
     echo "<div class='slot'>";
     $itemID = $row[$bean->key()];

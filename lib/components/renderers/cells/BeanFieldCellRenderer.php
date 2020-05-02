@@ -24,9 +24,11 @@ class BeanFieldCellRenderer extends TableCellRenderer implements ICellRenderer
         $this->startRender();
         $field_key = $tc->getFieldName();
 
-        $this->bean->startIterator("WHERE $field_key=" . $row[$field_key]);
-        $brow = array();
-        if ($this->bean->fetchNext($brow)) {
+        $qry = $this->bean->queryField($field_key, $row[$field_key], 1);
+
+        $qry->exec();
+
+        if ($brow = $qry->next()) {
             echo $brow[$this->field_name];
         }
 

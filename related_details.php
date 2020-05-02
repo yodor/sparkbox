@@ -21,16 +21,7 @@ include_once("class/components/renderers/items/ProductListItem.php");
 
 include_once("class/pages/ProductDetailsPage.php");
 
-// function dumpJS()
-// {
-//   echo "<script type='text/javascript' src='".SITE_ROOT."js/product_details.js'></script>";
-//   echo "\n";
-// }
-// function dumpCSS()
-// {
-//   echo "<link rel='stylesheet' href='".SITE_ROOT."css/product_details.css' type='text/css'>";
-//   echo "\n";
-// }
+
 
 $page = new ProductDetailsPage();
 

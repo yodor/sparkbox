@@ -36,7 +36,7 @@ class AdminPageLib extends SparkPage
 
         parent::__construct(new AdminAuthenticator(), SITE_ROOT."admin/login.php");
 
-        //here is either authenticated or redirection has happened in SimplePage CTOR
+        //control gets here only if authorized
         $adminID = $this->getUserID();
 
         $b = new AdminAccessBean();
@@ -66,26 +66,16 @@ class AdminPageLib extends SparkPage
     protected function initMainMenu()
     {
         global $admin_menu;
+
         if (!isset($admin_menu)) {
 
             $admin_menu = array();
-
-
             $admin_menu[] = new MenuItem("Content", ADMIN_ROOT . "content/index.php", "class:icon_content");
-
             $admin_menu[] = new MenuItem("Settings", ADMIN_ROOT . "settings/index.php", "class:icon_settings");
 
-
         }
+
         return $admin_menu;
-    }
-
-    protected function dumpCSS()
-    {
-        parent::dumpCSS();
-
-
-
     }
 
     public function renderPageCaption($str = NULL)
@@ -152,8 +142,6 @@ class AdminPageLib extends SparkPage
     {
         $dynmenu = $this->menu_bar->getMainMenu();
 
-        // 			echo "<div class='admin_logo'></div>";
-
         $arr = $dynmenu->getSelectedPath();
         if (count($arr) > 0) {
             echo "<div class='LocationPath'>";
@@ -183,14 +171,14 @@ class AdminPageLib extends SparkPage
         //allow processing of ajax handlers first
         parent::startRender();
 
-
         $dynmenu = $this->menu_bar->getMainMenu();
 
         $dynmenu->update($arr_menu);
 
         $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());
 
-        echo "\n<!--beginPage AdminPage-->\n";
+        echo "\n<!-- startRender AdminPageLib -->\n";
+
         echo "<table class='admin_layout'>";
 
         echo "<tr>";
@@ -217,14 +205,8 @@ class AdminPageLib extends SparkPage
 
         echo "</td>";
 
-
-        // 	    $sname = str_replace(".php","",basename($_SERVER["SCRIPT_NAME"]));
-        // 	    $pname = basename(dirname($_SERVER["SCRIPT_NAME"]));
-
         echo "<td class='page_area " . $this->getPageClass() . "'>";
         echo "\n\n";
-
-
     }
 
     public function finishRender()
@@ -241,29 +223,8 @@ class AdminPageLib extends SparkPage
         echo "</td></tr>";
         echo "</table>";
 
-        echo "\n<!--finishPage AdminPage-->\n";
-        ?>
-        <script type='text/javascript'>
+        echo "\n<!-- finishRender AdminPageLib -->\n";
 
-            // onPageLoad(function(){
-            //     if (docCookies.hasItem("MenuBar.visibility")) {
-            //         var menu_visible = parseInt(docCookies.getItem("MenuBar.visibility"));
-            //         //default is menu is visible
-            //         if ( menu_visible == 0) {
-            //             if ($(".MenuBar").hasClass("normal")) {
-            //                 $(".MenuBar").removeClass("normal");
-            //             }
-            //         }
-            //         else if (menu_visible == 1) {
-            //
-            //             $(".MenuBar").addClass("normal");
-            //
-            //         }
-            //     }
-            //
-            // });
-        </script>
-        <?php
         parent::finishRender();
     }
 
