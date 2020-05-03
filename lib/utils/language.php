@@ -85,21 +85,21 @@ if (!Session::Contains("language") || !Session::Contains("langID")) {
 }
 
 
-$reload = false;
+$reload = FALSE;
 
 
 if (isset($_GET["change_language"]) && isset($_GET["language"])) {
     $lng = $_GET["language"];
     setLanguageString($lng);
-    $reload = true;
+    $reload = TRUE;
 }
 else if (isset($_GET["change_language"]) && isset($_GET["langID"])) {
     $langID = (int)$_GET["langID"];
     setLanguageID($langID);
-    $reload = true;
+    $reload = TRUE;
 }
 
-if ($reload === true) {
+if ($reload === TRUE) {
     $qarr = $_GET;
 
     if (isset($qarr["language"])) unset($qarr["language"]);
@@ -127,9 +127,10 @@ function getActiveLanguageID()
     $lang_session = Session::Get("language", DEFAULT_LANGUAGE);
     $lang = DBDriver::Get()->escapeString($lang_session);
 
-    $num = $g_lb->startIterator("WHERE language='$lang'");
-    $lrow = array();
-    if ($g_lb->fetchNext($lrow)) {
+    $qry = $g_lb->queryField("language", $lang, 1);
+    $num = $qry->exec();
+
+    if ($lrow = $qry->next()) {
         $langID = $lrow["langID"];
     }
     else {
@@ -148,15 +149,15 @@ function trbean(int $id, string $field_name, array &$row, DBTableBean $bean)
 
     $langID = getActiveLanguageID();
 
-
-    //if ($langID==1) return;
     $table_name = $bean->getTableName();
 
-    // 		$keyid = $bean->getPrKey();
-    $num = $g_bt->startIterator("WHERE langID='$langID' AND field_name='$field_name' AND table_name='$table_name' AND bean_id='$id' LIMIT 1", " translated ");
+    $qry = $g_bt->query();
+    $qry->select->where = " langID='$langID' AND field_name='$field_name' AND table_name='$table_name' AND bean_id='$id' ";
+    $qry->select->limit = " 1 ";
+    $qry->select->fields = " translated ";
+    $num = $qry->exec();
 
-    $btrow = array();
-    if ($g_bt->fetchNext($btrow)) {
+    if ($btrow = $qry->next()) {
         $row[$field_name] = $btrow["translated"];
     }
 
@@ -167,26 +168,16 @@ function trbean(int $id, string $field_name, array &$row, DBTableBean $bean)
  * @param string $str_original
  * @return string translated version of $str_original
  */
-function tr(string $str_original)
+function tr(string $str_original): string
 {
 
     if (strlen(trim($str_original)) == 0) return $str_original;
 
-
     global $g_sp, $g_stu, $g_tr, $g_lb;
-
 
     $str = DBDriver::Get()->escapeString($str_original);
 
     try {
-
-        // 		$bt = debug_backtrace();
-        // 		//store call trace to ease deletion of old phrases
-        // 		//var_dump($bt[0]);
-        // 		$caller = $bt[0];
-        // 		unset($caller["function"]);
-        // 		unset($caller["args"]);
-        // 		$usedby = implode("|",$caller);
 
         $usedby = " ";
 
@@ -203,15 +194,18 @@ function tr(string $str_original)
 
         //do not try to translate english
         //if ($langID==1)return $str_original;
-
-        $num = $g_tr->startIterator("WHERE langID=$langID and textID=$textID");
+        $qry = $g_tr->query();
+        $qry->select->where = " langID=$langID and textID=$textID ";
+        $qry->select->limit = " 1 ";
+        $qry->select->fields = " translated ";
+        $num = $qry->exec();
         if ($num) {
-            $trow = array();
-            if ($g_tr->fetchNext($trow)) {
-                 return (string)$trow["translated"];
+
+            if ($trow = $qry->next()) {
+                return $trow["translated"];
             }
             else {
-                throw new Exception("DBError: Translation can not be fetch from table. " . $g_tr->getError());
+                return $str_original;
             }
         }
         else {
@@ -231,7 +225,8 @@ function trnum($val)
 {
     $language = Session::Get("language");
     if (strcmp($language, "arabic") == 0) {
-        $arnum = array("0" => "٠", "1" => "١", "2" => "٢", "3" => "٣", "4" => "٤", "5" => "٥", "6" => "٦", "7" => "٧", "8" => "٨", "9" => "٩", "." => ".", "," => ",");
+        $arnum = array("0" => "٠", "1" => "١", "2" => "٢", "3" => "٣", "4" => "٤", "5" => "٥", "6" => "٦", "7" => "٧",
+                       "8" => "٨", "9" => "٩", "." => ".", "," => ",");
         $ret = "";
 
         for ($a = 0; $a < strlen($val); $a++) {

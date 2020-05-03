@@ -70,14 +70,12 @@ class InputComponent extends Component
         }
 
         if ($field instanceof ArrayDataInput) {
-            //use private renderer if set 
 
-            if ($field->getArrayRenderer() instanceof IArrayFieldRenderer) {
+            if ($field->getArrayRenderer() instanceof ArrayField) {
                 $renderer = clone $field->getArrayRenderer();
             }
-
-            if (!$renderer instanceof IArrayFieldRenderer) {
-               throw new Exception("IArrayFieldRenderer required for ArrayDataInput");
+            if (!$renderer instanceof ArrayField) {
+                throw new Exception("ArrayField renderer required for ArrayDataInput");
             }
         }
 

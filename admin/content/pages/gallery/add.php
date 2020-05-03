@@ -17,7 +17,7 @@ $page = new AdminPage();
 $page->checkAccess(ROLE_CONTENT_MENU);
 
 $event_photos = new DynamicPagePhotosBean();
-$event_photos->setFilter("$ref_key='$ref_id'");
+$event_photos->select()->where = "$ref_key='$ref_id'";
 
 $view = new InputFormView($event_photos, new PhotoInputForm());
 

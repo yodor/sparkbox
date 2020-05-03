@@ -22,7 +22,7 @@ $action_back->setAttribute("title", "Back to Color Scheme Photos");
 $page->addAction($action_back);
 
 $photos = new ProductColorPhotosBean();
-$photos->setFilter("$ref_key='$ref_id'");
+$photos->select()->where = "$ref_key='$ref_id'";
 
 $view = new InputFormView($photos, new PhotoInputForm());
 

@@ -33,7 +33,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanQuery($bean));
+$view = new TableView($bean->query());
 $view->setCaption("Product Classes List");
 $view->setDefaultOrder($bean->key() . " DESC ");
 $view->addColumn(new TableColumn($bean->key(), "ID"));

@@ -13,10 +13,10 @@ class ImageDimensionForm extends InputForm
         parent::__construct();
         $modes = array("gallery_photo" => "Full", "image_crop" => "Crop", "image_thumb" => "Thumbnail");
 
-        $render_modes = new ArraySelector($modes, "id", "label");
+        $render_modes = new ArrayDataIterator($modes, "id", "label");
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "render_mode", "Render Mode", 0);
-        $field->getRenderer()->setSource($render_modes);
+        $field->getRenderer()->setIterator($render_modes);
         $field->getRenderer()->list_key = "id";
         $field->getRenderer()->list_label = "label";
         $field->getRenderer()->na_str = "";
@@ -108,30 +108,28 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         debug("MCEImageBrowserAjaxHandler::_find | section_name='{$this->section_name}' AND section_key='{$this->section_key}'");
 
         $bean = new MCEImagesBean();
-        $qry = $bean->select();
-        $qry->where = " section='{$this->section_name}' AND section_key='{$this->section_key}'";
+        $qry = $bean->query();
+        $qry->select->where = " section='{$this->section_name}' AND section_key='{$this->section_key}'";
 
         if ($this->ownerID > 0) {
-            $qry->where .= " AND ownerID='{$this->ownerID}' ";
+            $qry->select->where .= " AND ownerID='{$this->ownerID}' ";
 
         }
         if (isset($_GET["imageID"])) {
             $imageID = (int)$_GET["imageID"];
-            $qry->where .= " AND imageID='$imageID' ";
+            $qry->select->where .= " AND imageID='$imageID' ";
         }
 
-        $qry->fields = " section, section_key, imageID, ownerID, auth_context ";
+        $qry->select->fields = " section, section_key, imageID, ownerID, auth_context ";
 
 
-        $num_images = $bean->startSelectIterator($qry);
+        $num_images = $qry->exec();
 
         $resp->objects = array();
 
-        $imgrow = array();
-        while ($bean->fetchNext($imgrow)) {
 
+        while ($imgrow = $qry->next()) {
             $resp->objects[] = $this->createUploadElement($imgrow);
-
         }
 
         $resp->result_count = $num_images;

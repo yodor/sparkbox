@@ -28,15 +28,11 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer
     {
         parent::__construct();
         $this->setItemRenderer(new SourceAttributeItem());
-
-        //       RequestController::addAjaxHandler(new SourceRelatedFieldAjaxHandler());
-
-
     }
 
     public function setSource(IDataBean $source)
     {
-        parent::setSource($source);
+        parent::setIterator($source);
         $this->addClassName(get_class($source));
     }
 
@@ -74,8 +70,8 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer
 
             // 	  if (!in_array($this->list_label, $source_fields)) throw new Exception("List Label '{$this->list_label}' not found in data source fields");
 
-            $num = $this->data_bean->startIterator($this->data_filter, $this->data_fields);
-            //   echo $this->data_bean->getLastIteratorSQL();
+            $this->qry = $this->data_bean->query();
+            $num = $this->qry->exec();
 
             if ($num < 1) {
                 echo "Selected source does not provide optional attributes";
@@ -104,8 +100,7 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer
         $prkey = $this->data_bean->key();
         $index = 0;
 
-        $data_row = array();
-        while ($this->data_bean->fetchNext($data_row)) {
+        while ($data_row = $this->qry->next()) {
 
             // 		$id = $data_row[$this->getSource()->getPrKey()];
             $id = $data_row[$prkey];

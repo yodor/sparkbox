@@ -56,7 +56,7 @@ abstract class HTMLPage implements IRenderer
         echo "<HEAD>";
         echo "\n";
 
-        echo "<TITLE>" . SITE_TITLE . "</TITLE>";
+        echo "<TITLE>%title%</TITLE>";
         echo "\n";
 
         $this->renderMetaTags();

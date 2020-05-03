@@ -2,6 +2,7 @@
 include_once("session.php");
 
 include_once("class/pages/DemoPage.php");
+include_once("lib/iterators/ArrayDataIterator.php");
 
 $page = new DemoPage();
 
@@ -22,13 +23,13 @@ $textArea->setProcessor(new BeanPostProcessor());
 $form->addField($textArea);
 
 
-$select_items = new ArraySelector(array("Select Item 1", "Select Item 2", "Select Item 3"), "item_id", "item_value");
+$select_items = new ArrayDataIterator(array("Select Item 1", "Select Item 2", "Select Item 3"), "item_id", "item_value");
 
 $selectField = new ArrayDataInput("selectField", "Select", 1);
 $selectField->allow_dynamic_addition = true;
 
 $sr = new SelectField();
-$sr->setSource($select_items);
+$sr->setIterator($select_items);
 $sr->list_key = "item_id";
 $sr->list_label = "item_value";
 
@@ -47,13 +48,13 @@ $dateField->setProcessor(new DateInputProcessor());
 $form->addField($dateField);
 
 
-$check_items = new ArraySelector(array("Item1", "Item2", "Item3"), "item_id", "item_value");
+$check_items = new ArrayDataIterator(array("Item1", "Item2", "Item3"), "item_id", "item_value");
 
 $checkField = new ArrayDataInput("checkField", "Checkbox", 1);
 $checkField->allow_dynamic_addition = true;
 
 $cr = new CheckField();
-$cr->setSource($check_items);
+$cr->setIterator($check_items);
 $cr->list_key = "item_value";
 $cr->list_label = "item_value";
 
@@ -66,13 +67,13 @@ $checkField->setProcessor(new BeanPostProcessor());
 $form->addField($checkField);
 
 
-$radio_items = new ArraySelector(array("Radio Item1", "Radio Item2", "Radio Item3"), "item_id", "item_value");
+$radio_items = new ArrayDataIterator(array("Radio Item1", "Radio Item2", "Radio Item3"), "item_id", "item_value");
 
 $radioField = new ArrayDataInput("radioField", "Radio Button", 1);
 $radioField->allow_dynamic_addition = true;
 
 $rr = new RadioField();
-$rr->setSource($radio_items);
+$rr->setIterator($radio_items);
 $rr->list_key = "item_value";
 $rr->list_label = "item_value";
 

@@ -13,9 +13,9 @@ $bean = new SiteTextsBean();
 $menu = array();
 
 $tr = new LanguagesBean();
-$tr->startIterator();
-
-while ($tr->fetchNext($row)) {
+$qry = $tr->query();
+$qry->exec();
+while ($row = $qry->next()) {
     $menu[] = new MenuItem("Translate For " . $row["lang_code"], "phrases.php?langID=" . $row["langID"], "applications-development-translation.png");
 }
 
@@ -24,7 +24,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanQuery($bean));
+$view = new TableView($bean->query());
 $view->items_per_page = 30;
 $view->addColumn(new TableColumn($bean->key(), "ID"));
 $view->addColumn(new TableColumn("value", "Phrase"));

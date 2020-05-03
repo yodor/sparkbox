@@ -50,7 +50,7 @@ class DataInput implements IDataBeanSource
     protected $error;
 
 
-    protected $script_required;
+    protected $script_required = false;
     protected $input_type;
 
     //InputForm is owning this InputField
@@ -81,15 +81,14 @@ class DataInput implements IDataBeanSource
     protected $link_field = NULL;
     protected $link_mode = false;
 
-
-    public function setSource(IDataBean $data_source)
+    //target data store
+    public function setIterator(IDataBean $data_source)
     {
         debug("InputField: ['" . $this->getName() . "'] Setting source: " . get_class($data_source));
-
         $this->data_source = $data_source;
     }
 
-    public function getSource() : ?IDataBean
+    public function getIterator() : ?IDataBean
     {
         return $this->data_source;
     }
@@ -99,14 +98,13 @@ class DataInput implements IDataBeanSource
         $this->value_transactor = $transactor;
     }
 
-    public function getValueTransactor()
+    public function getValueTransactor() : ?IDBFieldTransactor
     {
 
         if ($this->value_transactor instanceof IDBFieldTransactor) return $this->value_transactor;
         if ($this->input_processor instanceof IDBFieldTransactor) return $this->input_processor;
 
         return NULL;
-
     }
 
     public function __construct(string $name, string $label, bool $required)
@@ -140,7 +138,7 @@ class DataInput implements IDataBeanSource
         $this->link_field = $field;
     }
 
-    public function getLinkField()
+    public function getLinkField() : ?DataInput
     {
         return $this->link_field;
     }
@@ -160,7 +158,7 @@ class DataInput implements IDataBeanSource
         $this->input_processor = $ip;
     }
 
-    public function getProcessor()
+    public function getProcessor() : IBeanPostProcessor
     {
         return $this->input_processor;
     }
@@ -170,12 +168,12 @@ class DataInput implements IDataBeanSource
         $this->validator = $validator;
     }
 
-    public function getValidator()
+    public function getValidator() : IInputValidator
     {
         return $this->validator;
     }
 
-    public function setRenderer(IFieldRenderer $renderer)
+    public function setRenderer(InputField $renderer)
     {
         $this->renderer = $renderer;
     }
@@ -183,12 +181,12 @@ class DataInput implements IDataBeanSource
     /**
      * @return IFieldRenderer
      */
-    public function getRenderer()
+    public function getRenderer() : InputField
     {
         return $this->renderer;
     }
 
-    public function getRenderPrivate()
+    public function getRenderPrivate() : ?InputField
     {
         return $this->renderer;
     }
@@ -198,7 +196,7 @@ class DataInput implements IDataBeanSource
         $this->label_renderer = $label_renderer;
     }
 
-    public function getLabelRenderer()
+    public function getLabelRenderer() : ?ILabelRenderer
     {
         return $this->label_renderer;
     }
@@ -214,7 +212,7 @@ class DataInput implements IDataBeanSource
         return $this->user_data;
     }
 
-    public function isEditable()
+    public function isEditable() : bool
     {
         return $this->editable;
     }
@@ -229,22 +227,22 @@ class DataInput implements IDataBeanSource
         $this->form = $form;
     }
 
-    public function getForm()
+    public function getForm() : ?InputForm
     {
         return $this->form;
     }
 
-    public function getLabel()
+    public function getLabel() : string
     {
         return $this->label;
     }
 
-    public function setLabel($str)
+    public function setLabel(string $str)
     {
         $this->label = $str;
     }
 
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }
@@ -254,24 +252,14 @@ class DataInput implements IDataBeanSource
         $this->name = $name;
     }
 
-    public function isRequired()
+    public function isRequired() : bool
     {
-        return ((int)$this->required > 0) ? true : false;
-    }
-
-    public function isScriptRequired()
-    {
-        return ((int)$this->script_required > 0) ? true : false;
+        return $this->required;
     }
 
     public function setRequired(bool $mode)
     {
-        $this->required = ($mode ? 1 : 0);
-    }
-
-    public function setScriptRequired(bool $mode)
-    {
-        $this->script_required = ($mode ? 1 : 0);
+        $this->required = $mode;
     }
 
     public function getValue()
@@ -284,7 +272,7 @@ class DataInput implements IDataBeanSource
         $this->value = $value;
     }
 
-    public function getError()
+    public function getError() : string
     {
         return $this->error;
     }
@@ -294,7 +282,7 @@ class DataInput implements IDataBeanSource
         $this->error = $err;
     }
 
-    public function haveError()
+    public function haveError() : bool
     {
         return (strlen($this->error) > 0);
     }
@@ -332,7 +320,6 @@ class DataInput implements IDataBeanSource
     public function validate()
     {
         try {
-
             $this->validator->validateInput($this);
         }
         catch (Exception $e) {
@@ -345,7 +332,7 @@ class DataInput implements IDataBeanSource
         $this->translator_enabled = $mode;
     }
 
-    public function translatorEnabled()
+    public function translatorEnabled() : bool
     {
         return $this->translator_enabled;
     }

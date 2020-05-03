@@ -9,9 +9,9 @@ interface IDataBeanGetter
     public function getEditID() : int;
 
     /**
-     * @return IDataBean
+     * @return DBTableBean
      */
-    public function getBean() : IDataBean;
+    public function getBean() : DBTableBean;
 }
 
 ?>

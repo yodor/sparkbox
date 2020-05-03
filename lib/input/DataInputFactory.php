@@ -40,8 +40,6 @@ include_once("lib/input/processors/UploadDataInputProcessor.php");
 
 include_once("lib/input/processors/SessionUploadInputProcessor.php");
 
-include_once("lib/selectors/ArraySelector.php");
-
 
 class DataInputFactory
 {

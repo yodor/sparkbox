@@ -71,10 +71,9 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         include_once("lib/beans/LanguagesBean.php");
         $lb = new LanguagesBean();
 
+        $lb->select()->where = " langID>1 ";
 
-        $lb->setFilter(" langID>1 ");
-
-        $renderer->setSource($lb);
+        $renderer->setIterator($lb);
         $renderer->list_key = "langID";
         $renderer->list_label = "language";
 

@@ -80,25 +80,18 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
     {
         $this->items = array();
 
-
         $source_fields = $this->bean->fields();
 
-        $photoID = -1;
+        $qry = $this->bean->query();
 
-        $limit = " LIMIT 1";
-        $list_limit = (int)$this->list_limit;
-        //       echo $list_limit;
+        $qry->select->fields = $this->bean->key();
 
-        if ($list_limit > 0) {
-            $limit = " LIMIT $list_limit";
-        }
-        else {
-            $limit = "";
+        if ((int)$this->list_limit > 0) {
+            $qry->select->limit = $this->list_limit;
         }
 
-        $order_by = "";
         if ($this->bean->haveField("position")) {
-            $order_by = " ORDER BY position ASC ";
+            $qry->select->order_by = " position ASC ";
         }
 
         $num = 0;
@@ -106,20 +99,19 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             //iterate source based on view's prkey
             $prkey = $tc->getView()->getIterator()->key();
             if (in_array($prkey, $source_fields)) {
-                $num = $this->bean->startIterator("WHERE $prkey=" . $row[$prkey] . " " . $order_by . " " . $limit);
+                $qry->select->where = "$prkey={$row[$prkey]}";
             }
             else {
                 //check sources' prkey with row
                 $prkey = $this->bean->key();
                 if ($this->source_key) {
                     $prkey = $this->source_key;
-
                 }
 
                 $row_fields = array_keys($row);
                 if (in_array($prkey, $row_fields)) {
                     $value = (int)$row[$prkey];
-                    $num = $this->bean->startIterator("WHERE $prkey=$value " . $order_by . " " . $limit);
+                    $qry->select->where = "$prkey=$value";
                 }
                 else {
                     //check assigned column value. this might be array also try exploding first
@@ -130,27 +122,24 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
                     }
                     else {
                         $value = (int)$row_value;
-
                     }
                     if (is_array($value) && count($value) > 0) {
-                        $num = $this->bean->startIterator("WHERE $prkey IN (" . implode(",", $value) . ") " . $order_by . " " . $limit);
+                        $qry->select->where = " $prkey IN (" . implode(",", $value) . ") ";
                     }
                     else {
-                        $num = $this->bean->startIterator("WHERE $prkey=$value " . $order_by . " " . $limit);
+                        $qry->select->where = " $prkey=$value ";
                     }
 
                 }
             }
+            $num = $qry->exec();
         }
         catch (Exception $e) {
             echo $e->getMessage();
-            echo $this->bean->getLastIteratorSQL();
-
+            echo $qry->select->getSQL();
         }
 
-
-        $pfrow = array();
-        while ($this->bean->fetchNext($pfrow)) {
+        while ($pfrow = $qry->next()) {
             $photoID = $pfrow[$this->bean->key()];
             $item = new StorageItem();
             $item->id = $photoID;
@@ -159,9 +148,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             if ($this->blob_field) {
                 $item->field = $this->blob_field;
             }
-
             $this->items[] = $item;
-
         }
     }
 

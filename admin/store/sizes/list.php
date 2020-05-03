@@ -30,7 +30,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanQuery($bean));
+$view = new TableView($bean->query());
 $view->items_per_page = 100;
 
 $view->setCaption("Sizing Codes List");

@@ -8,12 +8,8 @@ include_once("lib/handlers/ChangePositionRequestHandler.php");
 include_once("lib/handlers/DeleteItemRequestHandler.php");
 include_once("lib/handlers/ToggleFieldRequestHandler.php");
 
-include_once("lib/iterators/BeanQuery.php");
-
-
 include_once("lib/utils/ReferenceKeyPageChecker.php");
 include_once("lib/utils/SQLSelect.php");
-
 
 include_once("lib/components/InputFormView.php");
 include_once("lib/components/TableView.php");
@@ -40,9 +36,10 @@ class AdminPageLib extends SparkPage
         $adminID = $this->getUserID();
 
         $b = new AdminAccessBean();
-        $n = $b->startIterator("WHERE userID=$adminID");
-        $row = array();
-        while ($b->fetchNext($row)) {
+        $qry = $b->queryField("userID", $adminID);
+        $n = $qry->exec();
+
+        while ($row = $qry->next()) {
             $this->roles[] = $row["role"];
         }
 

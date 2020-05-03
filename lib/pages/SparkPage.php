@@ -280,12 +280,11 @@ class SparkPage extends HTMLPage
         return $this->preferred_title;
     }
 
-    public function obCallback(string $buffer)
+    public function obCallback(string &$buffer)
     {
-
         $title = $this->preferred_title . TITLE_PATH_SEPARATOR . SITE_TITLE;
 
-        $buffer = preg_replace('#(<title.*?>).*?(</title>)#', "<title>" . strip_tags($title) . "</title>", $buffer);
+        //$buffer = str_replace("%%title%%", strip_tags($title), $buffer);
 
         $meta_keywords = "";
         $meta_description = "";
@@ -311,11 +310,13 @@ class SparkPage extends HTMLPage
             $meta_description = $this->description;
         }
 
+        $replace = array("%title%"=>strip_tags($title), "%meta_keywords%"=>strip_tags($meta_keywords), "%meta_description%"=>strip_tags($meta_description));
 
-        $buffer = str_replace("%meta_keywords%", strip_tags($meta_keywords), $buffer);
-        $buffer = str_replace("%meta_description%", strip_tags($meta_description), $buffer);
+        $buffer = strtr($buffer, $replace);
 
-        return $buffer;
+        //$buffer = str_replace("%meta_keywords%", , $buffer);
+        //$buffer = str_replace("%meta_description%", strip_tags($meta_description), $buffer);
+
     }
 
 
@@ -332,7 +333,9 @@ class SparkPage extends HTMLPage
     {
         RequestController::processAjaxHandlers();
         
-        ob_start(array($this, 'obCallback'));
+        //ob_start(array($this, 'obCallback'));
+        ob_start();
+        //ob_implicit_flush (0 );
 
         foreach ($this->head_components as $idx => $cmp) {
             $css_files = $cmp->requiredStyle();
@@ -368,7 +371,11 @@ class SparkPage extends HTMLPage
 
         parent::finishRender();
 
-        ob_end_flush();
+        $buffer = ob_get_contents();
+        ob_end_clean();
+        $this->obCallback($buffer);
+
+        print $buffer;
     }
 
     /**

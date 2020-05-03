@@ -11,7 +11,7 @@ class ListView extends AbstractResultView
 
     protected $item_renderer;
 
-    public function __construct(ISQLIterator $itr)
+    public function __construct(IDataIterator $itr)
     {
         parent::__construct($itr);
     }
@@ -84,7 +84,7 @@ class ListView extends AbstractResultView
         }
     }
 
-    public function getIterator() : ISQLIterator
+    public function getIterator() : IDataIterator
     {
         return $this->itr;
     }

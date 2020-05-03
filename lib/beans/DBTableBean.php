@@ -20,20 +20,23 @@ abstract class DBTableBean implements IDataBean
 
     protected $createString = "";
 
-    protected $filter = FALSE;
-
-    protected $last_iterator_sql = "";
+//    protected $filter = FALSE;
+//
+//    protected $last_iterator_sql = "";
 
     protected $db = NULL;
 
     protected $storage_types = NULL;
 
-    protected $iterator = NULL;
+//    protected $iterator = NULL;
 
     protected static $instances = array();
 
     protected static $use_prepared_statement = FALSE;
 
+    /**
+     * @var SQLSelect|null
+     */
     protected $sqlSelect = null;
 
     public function __construct($table_name, $dbdriver = NULL)
@@ -75,7 +78,7 @@ abstract class DBTableBean implements IDataBean
 
     public function __destruct()
     {
-        $this->db->free($this->iterator);
+        //$this->db->free($this->iterator);
     }
 
     protected function initFields()
@@ -161,20 +164,19 @@ abstract class DBTableBean implements IDataBean
 
     public function select(): SQLSelect
     {
-
         return $this->sqlSelect;
     }
 
-    public function getLastIteratorSQL()
-    {
-        return $this->last_iterator_sql;
-    }
-
-    public function setFilter($sqlfilter)
-    {
-        $this->filter = $sqlfilter;
-        $this->sqlSelect->where = $sqlfilter;
-    }
+//    public function getLastIteratorSQL()
+//    {
+//        return $this->last_iterator_sql;
+//    }
+//
+//    public function setFilter($sqlfilter)
+//    {
+//        $this->filter = $sqlfilter;
+//        $this->sqlSelect->where = $sqlfilter;
+//    }
 
     public function getCount(): int
     {
@@ -204,68 +206,68 @@ abstract class DBTableBean implements IDataBean
         return in_array($field_name, $this->fields);
     }
 
-    public function startFieldIterator($filter_field, $filter_value)
-    {
-        return $this->startIterator("WHERE $filter_field='$filter_value'");
-    }
-
-    public function startSelectIterator(SQLSelect $select)
-    {
-        $total = -1;
-        $sql = $select->getSQL();
-
-        $this->db->free($this->iterator);
-
-        $this->iterator = $this->createIterator($sql, $total);
-
-        return $total;
-    }
-
-    public function createIteratorSQL($filter = "", $fields = " * ")
-    {
-        $itr_filter = $filter;
-
-        if ($this->filter) {
-            $itr_filter = trim($itr_filter);
-
-            $filter = str_ireplace("WHERE", "", $filter);
-            if (strpos($this->filter, "JOIN") !== FALSE) {
-                $itr_filter = $this->filter . " " . $filter;
-            }
-            else {
-                $itr_filter = "WHERE {$this->filter}" . $filter;
-            }
-        }
-
-        $sql = "SELECT SQL_CALC_FOUND_ROWS $fields FROM {$this->table} $itr_filter ";
-        return $sql;
-
-    }
-
-    public function createIterator($sql, &$total)
-    {
-        if ($this->iterator) $this->db->free($this->iterator);
-
-        $this->last_iterator_sql = $sql;
-
-        // 	debug("DBTabelBean::createIterator | SQL: $sql");
-
-        $itr = $this->db->query($sql);
-
-        if (!$itr) {
-
-            debug("DBTabelBean::createIterator | Unable to create iterator for SQL: $sql");
-
-            throw new Exception("Unable to create iterator: " . $this->db->getError());
-        }
-
-        $res = $this->db->query("SELECT FOUND_ROWS() as total");
-        $row = $this->db->fetch($res);
-        $this->db->free($res);
-
-        $total = (int)$row["total"];
-        return $itr;
-    }
+//    public function startFieldIterator($filter_field, $filter_value)
+//    {
+//        return $this->startIterator("WHERE $filter_field='$filter_value'");
+//    }
+//
+//    public function startSelectIterator(SQLSelect $select)
+//    {
+//        $total = -1;
+//        $sql = $select->getSQL();
+//
+//        $this->db->free($this->iterator);
+//
+//        $this->iterator = $this->createIterator($sql, $total);
+//
+//        return $total;
+//    }
+//
+//    public function createIteratorSQL($filter = "", $fields = " * ")
+//    {
+//        $itr_filter = $filter;
+//
+//        if ($this->filter) {
+//            $itr_filter = trim($itr_filter);
+//
+//            $filter = str_ireplace("WHERE", "", $filter);
+//            if (strpos($this->filter, "JOIN") !== FALSE) {
+//                $itr_filter = $this->filter . " " . $filter;
+//            }
+//            else {
+//                $itr_filter = "WHERE {$this->filter}" . $filter;
+//            }
+//        }
+//
+//        $sql = "SELECT SQL_CALC_FOUND_ROWS $fields FROM {$this->table} $itr_filter ";
+//        return $sql;
+//
+//    }
+//
+//    public function createIterator($sql, &$total)
+//    {
+//        if ($this->iterator) $this->db->free($this->iterator);
+//
+//        $this->last_iterator_sql = $sql;
+//
+//        // 	debug("DBTabelBean::createIterator | SQL: $sql");
+//
+//        $itr = $this->db->query($sql);
+//
+//        if (!$itr) {
+//
+//            debug("DBTabelBean::createIterator | Unable to create iterator for SQL: $sql");
+//
+//            throw new Exception("Unable to create iterator: " . $this->db->getError());
+//        }
+//
+//        $res = $this->db->query("SELECT FOUND_ROWS() as total");
+//        $row = $this->db->fetch($res);
+//        $this->db->free($res);
+//
+//        $total = (int)$row["total"];
+//        return $itr;
+//    }
 
     public function queryID(int $id)
     {
@@ -274,6 +276,9 @@ abstract class DBTableBean implements IDataBean
 
     public function queryField(string $field, string $value, int $limit = 0, string $sign = " = ") : SQLQuery
     {
+        $field = $this->db->escapeString($field);
+        $value = $this->db->escapeString($value);
+
         $qry = $this->query();
         $qry->select->where = " $field $sign '$value' ";
         if ($limit>0) {
@@ -284,43 +289,45 @@ abstract class DBTableBean implements IDataBean
 
     public function query() : SQLQuery
     {
-        return new SQLQuery($this->select(), $this->prkey, $this->db);
+        $qry = new SQLQuery($this->select(), $this->prkey, $this->getTableName());
+        $qry->setDB($this->db);
+        return $qry;
     }
 
-    public function startIterator($filter = "", $fields = " * ")
-    {
-        $itr_filter = $filter;
-        if ($this->filter) {
-            $itr_filter = trim($itr_filter);
-
-            $filter = str_ireplace("WHERE", "", $filter);
-            if (strpos($this->filter, "JOIN") !== FALSE) {
-                $itr_filter = $this->filter . " " . $filter;
-            }
-            else {
-                $itr_filter = "WHERE {$this->filter}" . $filter;
-            }
-        }
-
-        $sql = "SELECT SQL_CALC_FOUND_ROWS $fields FROM {$this->table}  $itr_filter ";
-        $total = -1;
-
-        $this->iterator = $this->createIterator($sql, $total);
-
-        return $total;
-    }
-
-    public function fetchNext(array &$row, $iterator = FALSE): bool
-    {
-        if ($iterator === FALSE) {
-            $iterator = $this->iterator;
-        }
-
-        if ($row = $this->db->fetch($iterator)) {
-            return TRUE;
-        }
-        return FALSE;
-    }
+//    public function startIterator($filter = "", $fields = " * ")
+//    {
+//        $itr_filter = $filter;
+//        if ($this->filter) {
+//            $itr_filter = trim($itr_filter);
+//
+//            $filter = str_ireplace("WHERE", "", $filter);
+//            if (strpos($this->filter, "JOIN") !== FALSE) {
+//                $itr_filter = $this->filter . " " . $filter;
+//            }
+//            else {
+//                $itr_filter = "WHERE {$this->filter}" . $filter;
+//            }
+//        }
+//
+//        $sql = "SELECT SQL_CALC_FOUND_ROWS $fields FROM {$this->table}  $itr_filter ";
+//        $total = -1;
+//
+//        $this->iterator = $this->createIterator($sql, $total);
+//
+//        return $total;
+//    }
+//
+//    public function fetchNext(array &$row, $iterator = FALSE): bool
+//    {
+//        if ($iterator === FALSE) {
+//            $iterator = $this->iterator;
+//        }
+//
+//        if ($row = $this->db->fetch($iterator)) {
+//            return TRUE;
+//        }
+//        return FALSE;
+//    }
 
     private function fillDebug()
     {
@@ -336,18 +343,19 @@ abstract class DBTableBean implements IDataBean
     {
         if (!$db) $db = $this->db;
 
-        $sql = "SELECT $fields from {$this->table} WHERE {$this->prkey}='$id'";
-        $res = $db->query($sql);
+        $select = clone $this->select();
+        $select->fields = $fields;
+        $select->where = " $this->prkey='$id' ";
+        $select->limit = " 1 ";
+        $qry = new SQLQuery($select, $this->prkey, $this->getTableName());
+        $qry->setDB($db);
 
-        if (!$res) throw new Exception("DBTableBean::getByID DBError: " . $db->getError());
+        $num = $qry->exec();
 
-        $row = $db->fetch($res);
-
-        $db->free($res);
-
-        if (!$row) {
+        if (! ($row = $qry->next())) {
             throw new Exception("No such ID");
         }
+
         return $row;
     }
 
@@ -358,20 +366,18 @@ abstract class DBTableBean implements IDataBean
 
         $refkey = $db->escapeString($refkey);
         $refid = (int)$refid;
-        $sql = "SELECT $fields FROM {$this->table} WHERE $refkey='$refid' LIMIT 1";
 
-        $res = $db->query($sql);
-        if (!$res) {
-            throw new Exception("DBError: " . $db->getError());
-        }
-        $row = $db->fetch($res);
+        $select = clone $this->select();
+        $select->fields = $fields;
+        $select->where = " $refkey='$refid' ";
+        $select->limit = " 1 ";
 
-        $db->free($res);
+        $qry = new SQLQuery($select, $this->prkey, $this->getTableName());
+        $qry->setDB($db);
 
-        if (!$row) {
-            return FALSE;
-        }
-        return $row;
+        $num = $qry->exec();
+        return $qry->next();
+
     }
 
     public function deleteID($id, $db = FALSE)
@@ -460,30 +466,35 @@ abstract class DBTableBean implements IDataBean
 
     public function findFieldValue($field_name, $field_value)
     {
-        $field_name = $this->db->escapeString($field_name);
-
-        $res = $this->db->query("SELECT {$this->prkey}, $field_name FROM {$this->table} WHERE $field_name='$field_value' LIMIT 1");
-        if (!$res) throw new Exception("DBTableBean::findFieldValue DB Error: " . $this->db->getError());
-
-        $result = $this->db->fetch($res);
-        $this->db->free($res);
-        return $result;
+        $qry = $this->queryField($field_name, $field_value, 1);
+        $qry->exec();
+        return $qry->next();
     }
 
-    public function fieldValue($id, $field_name)
+    public function fieldValues(int $id, array $field_names) : ?array
     {
-        $id = (int)$id;
-
-        $field_name = $this->db->escapeString($field_name);
-
-        $res = $this->db->query("SELECT {$this->prkey}, `$field_name` FROM {$this->table} WHERE {$this->prkey}=$id ");
-        if (!$res) throw new Exception("DBTableBean::fieldValue DB Error: " . $this->db->getError());
-
-        if ($row = $this->db->fetch($res)) {
-            $this->db->free($res);
-            return $row[$field_name];
+        $qry = $this->queryField($this->prkey, $id, 1);
+        foreach ($field_names as $idx=>$value) {
+            $field_names[$idx] = "`".$this->db->escapeString($value)."`";
         }
+        $qry->select->fields = " {$this->prkey}, ".implode(",",$field_names);
+        $qry->exec();
+        if ($row = $qry->next()) {
+            return $row;
+        }
+        return NULL;
+    }
 
+    public function fieldValue(int $id, string $field) : ?string
+    {
+        $field = $this->db->escapeString($field);
+
+        $qry = $this->queryField($this->prkey, $id, 1);
+        $qry->select->fields = " {$this->prkey}, `$field` ";
+        $qry->exec();
+        if ($row = $qry->next()) {
+            return $row[$field];
+        }
         return NULL;
     }
 

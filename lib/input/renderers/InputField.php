@@ -1,10 +1,9 @@
 <?php
 include_once("lib/components/Component.php");
 include_once("lib/beans/IDataBeanSource.php");
-include_once("lib/input/renderers/IFieldRenderer.php");
 include_once("lib/input/renderers/IErrorRenderer.php");
 
-abstract class InputField extends Component implements IDataBeanSource, IFieldRenderer, IErrorRenderer
+abstract class InputField extends Component implements IErrorRenderer
 {
 
     /**
@@ -20,18 +19,14 @@ abstract class InputField extends Component implements IDataBeanSource, IFieldRe
     protected $field = NULL;
 
     /**
-     * @var IDataBean
+     * @var IDataIterator
      */
-    protected $data_bean = NULL;
-    protected $data_filter = "";
-    protected $data_fields = " * ";
+    protected $iterator = NULL;
 
     public $list_key = FALSE;
     public $list_label = FALSE;
 
-
     public $addon_content = "";
-
 
     protected $freetext_value = FALSE;
 
@@ -46,7 +41,9 @@ abstract class InputField extends Component implements IDataBeanSource, IFieldRe
 
     public function requiredStyle()
     {
-        return array(SITE_ROOT . "lib/css/InputField.css");
+        $arr = parent::requiredStyle();
+        $arr[] = SITE_ROOT . "lib/css/InputField.css";
+        return $arr;
     }
 
     public function setFieldAttribute($name, $value)
@@ -70,20 +67,14 @@ abstract class InputField extends Component implements IDataBeanSource, IFieldRe
         return $this->freetext_value;
     }
 
-    public function setFilter($data_filter, $data_fields = " * ")
+    public function setIterator(IDataIterator $query)
     {
-        $this->data_filter = $data_filter;
-        $this->data_fields = $data_fields;
+        $this->iterator = $query;
     }
 
-    public function setSource(IDataBean $data_bean)
+    public function getIterator(): IDataIterator
     {
-        $this->data_bean = $data_bean;
-    }
-
-    public function getSource(): IDataBean
-    {
-        return $this->data_bean;
+        return $this->iterator;
     }
 
     public function processErrorAttributes()
@@ -103,7 +94,6 @@ abstract class InputField extends Component implements IDataBeanSource, IFieldRe
         else {
             $this->attributes["error"] = FALSE;
         }
-
 
     }
 

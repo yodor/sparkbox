@@ -31,7 +31,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanQuery($bean));
+$view = new TableView($bean->query());
 $view->setCaption("Available Colors");
 $view->setDefaultOrder(" color ASC ");
 

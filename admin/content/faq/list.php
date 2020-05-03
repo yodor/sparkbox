@@ -22,7 +22,7 @@ $h_delete = new DeleteItemRequestHandler($bean);
 RequestController::addRequestHandler($h_delete);
 
 
-$view = new TableView(new BeanQuery($bean));
+$view = new TableView($bean->query());
 $view->setCaption("FAQ Items");
 $view->setDefaultOrder(" fID DESC ");
 // $view->search_filter = " ORDER BY day_num ASC ";

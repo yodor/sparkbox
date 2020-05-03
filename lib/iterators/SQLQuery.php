@@ -1,7 +1,7 @@
 <?php
-include_once("lib/iterators/ISQLIterator.php");
+include_once("lib/iterators/IDataIterator.php");
 
-class SQLQuery implements ISQLIterator
+class SQLQuery implements IDataIterator
 {
 
     /**
@@ -14,16 +14,20 @@ class SQLQuery implements ISQLIterator
      */
     protected $db = null;
     protected $key = "";
+    protected $name = "";
+
     protected $res = null;
 
-    public function __construct(SQLSelect $select, string $primaryKey = "id", DBDriver $db = NULL)
+    protected $numResults = 0;
+
+    public function __construct(SQLSelect $select, string $primaryKey = "id", string $tableName="")
     {
 
         $this->select = $select;
         $this->key = $primaryKey;
+        $this->name = $tableName;
 
-        if ($db instanceof DBDriver) $this->db = $db;
-        else $this->db = DBDriver::Get();
+        $this->db = DBDriver::Get();
 
     }
 
@@ -37,16 +41,16 @@ class SQLQuery implements ISQLIterator
         $this->db->free($this->res);
 
         $this->res = $this->db->query($this->select->getSQL());
-
+       // mysqli_result::fetch_fields
         if (!$this->res) throw new Exception($this->db->getError());
 
         //TODO:?
         $res = $this->db->query("SELECT FOUND_ROWS() as total");
         $row = $this->db->fetch($res);
-        $total = (int)$row["total"];
+        $this->numResults = (int)$row["total"];
         $this->db->free($res);
 
-        return $total;
+        return $this->numResults;
     }
 
     public function next()
@@ -65,9 +69,20 @@ class SQLQuery implements ISQLIterator
     {
         return $this->db;
     }
+
     public function setDB(DBDriver $db)
     {
         $this->db = $db;
+    }
+
+    public function name() : string
+    {
+        return $this->name;
+    }
+
+    public function count() : int
+    {
+        return $this->numResults;
     }
 }
 

@@ -48,7 +48,7 @@ class InputLabel extends Component implements ILabelRenderer, IErrorRenderer
         $star = "";
 
         if ($this->field->getForm() && $this->field->getForm()->star_required) {
-            $star = ($this->field->isRequired() || $this->field->isScriptRequired()) ? "<span class=required>*</span>" : "";
+            $star = ($this->field->isRequired()) ? "<span class=required>*</span>" : "";
         }
 
         echo $star;

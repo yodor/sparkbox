@@ -27,7 +27,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     public function beforeCommit(DataInput $field, DBTransactor $transactor, DBDriver $db, $item_key)
     {
-        $data_source = $field->getSource();
+        $data_source = $field->getIterator();
         if (!($data_source instanceof DBTableBean)) {
             debug("Data source is null or not from expected class DBTableBean nothing to do in beforeCommit");
             return;
@@ -41,30 +41,30 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
         $field_name = $field->getName();
 
-        debug("BeanPostProcessor::beforeCommit | Using data Source: " . get_class($data_source) . " | Field: $field_name | lastID: $lastID | Source PrimaryKey: $source_key | Field Values count: " . count($field->getValue()));
+        debug("Using data Source: " . get_class($data_source) . " | Field: $field_name | lastID: $lastID | Source PrimaryKey: $source_key | Field Values count: " . count($field->getValue()));
 
 
         $foreign_transacted = 0;
 
         if (count($field->getValue()) < 1) {
 
-            debug("BeanPostProcessor::beforeCommit | 0 values to transact to data source. Clearing all rows of the data source: " . get_class($data_source));
+            debug("0 values to transact to data source. Clearing all rows of the data source: " . get_class($data_source));
             $data_source->deleteRef($item_key, $transactor->getLastID(), $db);
 
             return;
         }
 
         if ($field->transact_mode == DataInput::TRANSACT_VALUE) {
-            debug("BeanPostProcessor::beforeCommit | Transact Mode: TRANSACT_VALUE");
+            debug("Transact Mode: TRANSACT_VALUE");
             // 	    $data_source->deleteRef($item_key, $lastID, $db);
-            debug("BeanPostProcessor::beforeCommit | Merging updated values ...");
+            debug("Merging updated values ...");
 
             //TODO:try to update data source found in source_loaded_values. Delete removed values. Keep order of loaded
             //TODO: !!! merging is not really possible if there are unique constraints on the primary key and the foreign key as it tries to update before deleting the old key
 
             $processed_ids = array();
 
-            debug("BeanPostProcessor::beforeCommit | field values count: " . count($field->getValue()));
+            debug("field values count: " . count($field->getValue()));
             // 	    debug("Post Values: ", $_POST);
 
             foreach ($field->getValue() as $idx => $value) {
@@ -147,17 +147,17 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                     $dbrow[$item_key] = $transactor->getLastID();
 
                     if ($field->transact_mode == DataInput::TRANSACT_DBROW) {
-                        debug("BeanPostProcessor::beforeCommit | Transact Mode: TRANSACT_DBROW");
+                        debug("Transact Mode: TRANSACT_DBROW");
                         $value->setDataKey($field_name);
                         $value->deconstruct($dbrow);
 
-                        debug("BeanPostProcessor::beforeCommit | StorageObject UID: $uid deconstructed as fields in the data source row ...");
+                        debug("StorageObject UID: $uid deconstructed as fields in the data source row ...");
 
                     }
                     else if ($field->transact_mode == DataInput::TRANSACT_OBJECT) {
-                        debug("BeanPostProcessor::beforeCommit | Transact Mode: TRANSACT_OBJECT");
+                        debug("Transact Mode: TRANSACT_OBJECT");
                         $dbrow[$field_name] = $db->escapeString(serialize($value));
-                        debug("BeanPostProcessor::beforeCommit | StorageObject UID: $uid stored as serialized value in the data source row ...");
+                        debug("StorageObject UID: $uid stored as serialized value in the data source row ...");
                     }
                     else {
                         throw new Exception("Unknown transact mode: " . $field->transact_mode);
@@ -169,7 +169,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
                     $processed_ids[] = $refID;
 
-                    debug("BeanPostProcessor::beforeCommit | StorageObject UID: $uid transacted to data source with ID: " . $refID);
+                    debug("StorageObject UID: $uid transacted to data source with ID: " . $refID);
                 }
                 else {
                     //skip transaction. same uid
@@ -187,7 +187,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
         }
 
-        debug("BeanPostProcessor::beforeCommit | Total $foreign_transacted rows transacted to data source: " . get_class($data_source));
+        debug("Total $foreign_transacted rows transacted to data source: " . get_class($data_source));
 
     }
 
@@ -215,13 +215,13 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 //transacts additional values from renderer data source
                 //matching by 'this' field name and its value posted. do not copy on empty 'value'
                 if (is_array($this->renderer_source_copy_fields) && count($this->renderer_source_copy_fields) > 0 && $value) {
-                    debug("BeanPostProcessor::transactValue[" . $field->getName() . "] Renderer copy fields requested ... ");
+                    debug("value[" . $field->getName() . "] Renderer copy fields requested ... ");
                     $renderer = $field->getRenderer();
-                    $renderer_source = $renderer->getSource();
+                    $renderer_source = $renderer->getIterator();
                     if (!$renderer_source instanceof DBTableBean) throw new Exception("Renderer copy fields requested without DBTableBean renderer source");
                     $source_fields = $renderer_source->fields();
 
-                    debug("BeanPostProcessor::transactValue[" . $field->getName() . "] Renderer source: " . get_class($renderer_source) . " | List key: [{$renderer->list_key}] | List label: [{$renderer->list_label}]");
+                    debug("value[" . $field->getName() . "] Renderer source: " . get_class($renderer_source) . " | List key: [{$renderer->list_key}] | List label: [{$renderer->list_label}]");
 
                     if (!in_array($renderer->list_key, $source_fields)) throw new Exception("List Key '{$renderer->list_key}' not found in renderer source fields");
                     if (!in_array($renderer->list_label, $source_fields)) throw new Exception("List Label '{$renderer->list_label}' not found in renderer source fields");
@@ -229,10 +229,10 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                     $row = $renderer_source->getByRef($renderer->list_key, $value);
                     if (!$row) throw new Exception("Unable to query renderer source data for field: " . $field->getName());
                     foreach ($this->renderer_source_copy_fields as $idx => $field_name) {
-                        debug("BeanPostProcessor::transactValue[" . $field->getName() . "] | Doing copy for source field [$field_name]");
+                        debug("value[" . $field->getName() . "] | Doing copy for source field [$field_name]");
                         if (isset($row[$field_name])) {
                             $transactor->appendValue($field_name, $row[$field_name]);
-                            debug("BeanPostProcessor::transactValue[" . $field->getName() . "] | source field [$field_name] value transacted to main transaction");
+                            debug("value[" . $field->getName() . "] | source field [$field_name] value transacted to main transaction");
                         }
                         else {
                             throw new Exception("Requested copy field [$field_name] not found in data row");
@@ -287,7 +287,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
                 //tag with id and class
                 $storage_object->id = $item_row[$source_key];
-                $storage_object->className = get_class($field->getSource());
+                $storage_object->className = get_class($field->getIterator());
 
                 $value = $storage_object;
 
@@ -301,7 +301,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             }
             else {
-                if (!is_null($value)) throw new Exception("Expected serialized contents in '$field_name' of data source: " . get_class($field->getSource()));
+                if (!is_null($value)) throw new Exception("Expected serialized contents in '$field_name' of data source: " . get_class($field->getIterator()));
             }
         }
         return $value;
@@ -313,7 +313,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
     {
         $field_name = $field->getName();
         $item_key = $bean->key();
-        debug("BeanPostProcessor::loadBeanData | field[$field_name] for bean: " . get_class($bean) . " | item_key: $item_key");
+        debug("field[$field_name] for bean: " . get_class($bean) . " | item_key: $item_key");
 
 
         $values = array();
@@ -321,7 +321,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
         if (array_key_exists($field_name, $item_row)) {
 
-            debug("BeanPostProcessor::loadBeanData: '$field_name' found in the item_row - loading value");
+            debug("'$field_name' found in the item_row - loading value");
 
             $value = $item_row[$field_name];
 
@@ -365,17 +365,17 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
 
             //process data source values
-            debug("BeanPostProcessor::loadBeanData: '$field_name' not found in item_row - trying field source values");
+            debug("field '$field_name' not found in item_row - trying field source values");
 
-            $data_source = $field->getSource();
+            $data_source = $field->getIterator();
 
             if (is_null($data_source)) {
-                debug("BeanPostProcessor::loadBeanData: '$field_name' no data source is set for this field");
+                debug("'$field_name' no data source is set for this field");
                 $values = NULL;
             }
             else {
 
-                debug("BeanPostProcessor::loadBeanData: field: '$field_name' | Using Data Source: " . get_class($data_source));
+                debug("field: '$field_name' | Using Data Source: " . get_class($data_source));
 
                 if (!($data_source instanceof DBTableBean)) throw new Exception("Received data source: '" . get_class($data_source) . "' but 'DBTableBean' expected.");
 
@@ -384,7 +384,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
                 if (!in_array($item_key, $source_fields)) throw new Exception("ItemKey: $item_key not exist in data source fileds");
 
-                debug("BeanPostProcessor::loadBeanData: processing data_source values using access field: '$item_key'");
+                debug("processing data_source values using access field: '$item_key'");
 
                 $source_values = array();
                 $data_source->startFieldIterator($item_key, $editID);
@@ -399,7 +399,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
                 }
 
-                debug("BeanPostProcessor:loadBeanData | Data source values loaded: ", $source_values);
+                debug("Data source values loaded: ", $source_values);
                 $values = $source_values;
 
             }

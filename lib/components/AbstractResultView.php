@@ -47,7 +47,7 @@ abstract class AbstractResultView extends Component
         return $arr;
     }
 
-    public function getIterator() : ISQLIterator
+    public function getIterator() : IDataIterator
     {
         return $this->itr;
     }

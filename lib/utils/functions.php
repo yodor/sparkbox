@@ -646,40 +646,6 @@ function StarsForValue($val, $min = 1, $max = 5)
     }
 }
 
-
-function Cloud(DBTableBean $artists, $sort_field, $top = 50)
-{
-    echo "<center>";
-    $artists->startIterator(" WHERE 1 ORDER BY view_counter DESC limit $top");
-    $list = array();
-    $listid = array();
-    $listcount = array();
-
-    while ($artists->fetchNext($cntrow)) {
-
-        $listid[] = $cntrow[$artists->key()];
-        $listcount[] = $cntrow["view_counter"];
-    }
-
-    $list_filter = implode(",", $listid);
-
-    $list_max = $listcount[0] + 1;
-    $list_min = $listcount[count($listcount) - 1] + 1;
-
-    $artists->startIterator(" WHERE " . $artists->key() . " in ($list_filter) order by $sort_field ASC limit $top");
-    while ($artists->fetchNext($row)) {
-        $artistID = $row[$artists->key()];
-        $cnt = $row["view_counter"] + 1;
-
-        $fs = ($cnt / $list_max);
-        $fs = $fs * 14;
-        $fs = 12 + $fs;
-
-        echo "<a class=tag_cloud style='font-size:{$fs}px' href='profile.php?id=$artistID'>" . $row[$sort_field] . "</a>";
-    }
-    echo "</center>";
-}
-
 function timestamp2mysqldate($timestamp)
 {
     return date("Y-m-d H:i:s", $timestamp);

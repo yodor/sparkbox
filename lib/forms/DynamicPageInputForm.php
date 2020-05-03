@@ -34,10 +34,10 @@ class DynamicPageInputForm extends InputForm
 
         $field = new DataInput("render_class", "CSS Class Name", 0);
         //
-        $sel = new ArraySelector(array("Notices"), "arr_id", "arr_val");
+        $sel = new ArrayDataIterator(array("Notices"), "arr_id", "arr_val");
         //
         $rend = new SelectField();
-        $rend->setSource($sel);
+        $rend->setIterator($sel);
         //
         $rend->na_str = "Normal";
         $rend->na_val = "";

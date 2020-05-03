@@ -1,10 +1,10 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
+include_once("lib/input/renderers/ArrayField.php");
 include_once("lib/components/renderers/IPhotoRenderer.php");
-include_once("lib/input/renderers/IArrayFieldRenderer.php");
+
 
 //TODO: lead out as AjaxInputRenderer
-abstract class SessionUpload extends InputField implements IArrayFieldRenderer
+abstract class SessionUpload extends ArrayField
 {
     protected $ajax_handler = NULL;
 
@@ -44,7 +44,10 @@ abstract class SessionUpload extends InputField implements IArrayFieldRenderer
         return $arr;
     }
 
-    abstract public function renderArrayContents();
+    public function renderArrayContents()
+    {
+
+    }
 
     public function renderControls()
     {

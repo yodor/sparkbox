@@ -1,7 +1,6 @@
 <?php
 include_once("lib/handlers/JSONResponse.php");
 include_once("lib/handlers/IRequestProcessor.php");
-include_once("lib/utils/ICallable.php");
 
 abstract class RequestHandler implements IRequestProcessor
 {

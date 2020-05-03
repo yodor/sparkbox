@@ -13,17 +13,20 @@ class NestedSetTreeView extends Component implements ISelectSource
     public $list_label = "";
 
     /**
-     * @var IDataBean
+     * @var NestedSetBean
      */
     protected $data_source = NULL;
+
+    /**
+     * @var DBTableBean
+     */
+    protected $related_source = NULL;
+
+
     protected $select_qry = NULL;
 
     protected $item_renderer = NULL;
 
-    /**
-     * @var IDataBean
-     */
-    protected $related_source = NULL;
     protected $related_filters = array();
     protected $filter_values = array();
 

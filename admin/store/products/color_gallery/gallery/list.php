@@ -38,7 +38,7 @@ $page->setCaption(tr("Color Scheme Photos") . ": " . $rc->ref_row["color"]);
 
 
 $bean = new ProductColorPhotosBean();
-$bean->setFilter($rc->ref_key . "='" . $rc->ref_id . "'");
+$bean->select()->where = $rc->ref_key . "='" . $rc->ref_id . "'";
 
 
 $h_delete = new DeleteItemRequestHandler($bean);

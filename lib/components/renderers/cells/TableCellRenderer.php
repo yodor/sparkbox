@@ -67,8 +67,9 @@ class TableCellRenderer extends Component implements ICellRenderer
 
         $this->startRender();
 
-        if ($tc->getView()->getIterator() instanceof BeanQuery) {
-            trbean($row[$tc->getView()->getIterator()->key()], $tc->getFieldName(), $row, $tc->getView()->getIterator()->getBean());
+        $iterator = $tc->getView()->getIterator();
+        if ($iterator->name()) {
+            trbean($row[$iterator->key()], $tc->getFieldName(), $row, $iterator->name());
         }
 
         echo "<span>" . $row[$tc->getFieldName()] . "</span>";

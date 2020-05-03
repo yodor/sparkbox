@@ -1,9 +1,8 @@
 <?php
 include_once("lib/components/Component.php");
-include_once("lib/input/renderers/IArrayFieldRenderer.php");
 include_once("lib/components/renderers/ActionRenderer.php");
 
-class ArrayField extends Component implements IArrayFieldRenderer
+class ArrayField extends InputField
 {
     /**
      * @var DataInput
@@ -81,7 +80,7 @@ class ArrayField extends Component implements IArrayFieldRenderer
     public function renderField(DataInput $field)
     {
         if (!$field instanceof ArrayDataInput) {
-            throw new Exception("ArrayInputField required for this control");
+            throw new Exception("ArrayDataInput required for this renderer");
         }
         $this->setField($field);
         $this->render();
@@ -97,7 +96,7 @@ class ArrayField extends Component implements IArrayFieldRenderer
         $this->field = $field;
     }
 
-    public function renderValue(DataInput $field)
+    public function renderValue(DataInput $field, int $render_index=-1)
     {
 
     }

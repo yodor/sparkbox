@@ -86,7 +86,7 @@ abstract class ArrayDataBean implements IDataBean
 
     public function startIterator($filter = "", $fields = "")
     {
-        $this->iterator = new ArrayIterator($this->values);
+        $this->iterator = new ArrayDataIterator($this->values);
     }
 
     public function startFieldIterator($filter_field, $filter_value)
@@ -161,7 +161,10 @@ abstract class ArrayDataBean implements IDataBean
         return (in_array($field_name, $this->fields));
     }
 
+    public function query() : SQLQuery
+    {
 
+    }
 }
 
 ?>

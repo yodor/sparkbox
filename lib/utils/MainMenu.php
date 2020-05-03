@@ -102,14 +102,15 @@ class MainMenu
 
         $total_items = 0;
 
-        $sql = $this->bean->createIteratorSQL("WHERE parentID='$parentID' ORDER BY lft");
+        $qry = $this->bean->queryField("parentID", $parentID);
+        $qry->select->order_by = " lft ";
 
-        $iterator = $this->bean->createIterator($sql, $total_items);
+        $total_items = $qry->exec();
 
         if ($total_items < 1) return;
 
-        $row = array();
-        while ($this->bean->fetchNext($row, $iterator)) {
+
+        while ($row = $qry->next()) {
 
             $menuID = (int)$row[$key];
 
@@ -151,9 +152,7 @@ class MainMenu
             $this->main_menu = $arr_menu;
         }
 
-        $db = $this->bean->getDB();
 
-        if (is_resource($iterator)) $db->free($iterator);
     }
 
 

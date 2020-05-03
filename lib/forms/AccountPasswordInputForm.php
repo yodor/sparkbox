@@ -12,17 +12,14 @@ class AccountPasswordInputForm extends InputForm
 
         $field = new DataInput("cpass", "Current Password", 0);
         $field->setRenderer(new PasswordField());
-        $field->setScriptRequired(true);
         $this->addField($field);
 
         $field = new DataInput("pass", "New Password", 0);
         $field->setRenderer(new PasswordField());
-        $field->setScriptRequired(true);
         $this->addField($field);
 
         $field = new DataInput("pass1", "Repeat Password", 0);
         $field->setRenderer(new PasswordField());
-        $field->setScriptRequired(true);
         $this->addField($field);
 
         $field = new DataInput("cpassword", "Current Password MD5", 0);
@@ -40,9 +37,7 @@ class AccountPasswordInputForm extends InputForm
         $field = new DataInput("rand", "Salt", 0);
         $field->setRenderer(new HiddenField());
         $this->addField($field);
-
     }
-
 
 }
 

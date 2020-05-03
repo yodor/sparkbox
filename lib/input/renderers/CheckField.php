@@ -36,15 +36,13 @@ class CheckField extends DataSourceField
     {
         $field_values = $this->field->getValue();
 
-
         $field_name = $this->field->getName();
 
         $field_attr = $this->prepareFieldAttributes();
 
 
-        parent::renderImpl();
 
-        if (!($this->data_bean instanceof IDataBean)) {
+        if (!($this->iterator)) {
 
             $item = clone $this->item;
 
@@ -66,6 +64,9 @@ class CheckField extends DataSourceField
             $item->render();
             echo "</div>";
         }
+        else {
+            parent::renderImpl();
+        }
 
     }
 
@@ -73,7 +74,7 @@ class CheckField extends DataSourceField
     {
         $field_value = $this->field->getValue();
 
-        if (!($this->data_bean instanceof IDataBean)) {
+        if (!($this->iterator)) {
 
             if ($field_value > 0) {
                 echo tr("Yes");

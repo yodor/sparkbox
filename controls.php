@@ -2,6 +2,7 @@
 include_once("session.php");
 include_once("class/pages/DemoPage.php");
 include_once("lib/forms/InputForm.php");
+include_once("lib/iterators/ArrayDataIterator.php");
 
 $page = new DemoPage();
 
@@ -24,21 +25,22 @@ $f3->setValidator(new PasswordValidator());
 $form->addField($f3);
 
 
-$aw2 = new ArraySelector(array("SelectItem1", "SelectItem2", "SelectItem3"), "item_id", "item_value");
+$aw2 = new ArrayDataIterator(array("SelectItem1", "SelectItem2", "SelectItem3"), "item_id", "item_value");
 
 $f4 = new DataInput("field4", "Select", 1);
 $scmp = new SelectField();
-$scmp->setSource($aw2);
+$scmp->setIterator($aw2);
 $scmp->list_key = "item_id";
 $scmp->list_label = "item_value";
 
 $f4->setRenderer($scmp);
 $form->addField($f4);
 
+$aw3 = new ArrayDataIterator(array("SelectMultiItem1", "SelectMultiItem2", "SelectMultiItem3"), "item_id", "item_value");
 
 $f4m = new DataInput("field4m", "Select Multi", 1);
 $scmp1 = new SelectMultipleField();
-$scmp1->setSource($aw2);
+$scmp1->setIterator($aw3);
 $scmp1->list_key = "item_id";
 $scmp1->list_label = "item_value";
 
@@ -66,12 +68,12 @@ $f6->setProcessor(new BeanPostProcessor());
 $form->addField($f6);
 
 
-$aw = new ArraySelector(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"), "item_id", "item_value");
+$aw = new ArrayDataIterator(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"), "item_id", "item_value");
 
 $f11 = new DataInput("field11", "Checkbox DataSource", 1);
 
 $r11 = new CheckField();
-$r11->setSource($aw);
+$r11->setIterator($aw);
 $r11->list_key = "item_value";
 $r11->list_label = "item_value";
 
@@ -80,12 +82,12 @@ $f11->setValidator(new EmptyValueValidator());
 $f11->setProcessor(new BeanPostProcessor());
 $form->addField($f11);
 
-$aw = new ArraySelector(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"), "item_id", "item_value");
+$aw = new ArrayDataIterator(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"), "item_id", "item_value");
 
 $f11 = new DataInput("field11_req", "Checkbox DataSource<BR><small>Require array value</small>", 1);
 
 $r11 = new CheckField();
-$r11->setSource($aw);
+$r11->setIterator($aw);
 $r11->list_key = "item_value";
 $r11->list_label = "item_value";
 
@@ -97,10 +99,10 @@ $f11->setProcessor(new BeanPostProcessor());
 $form->addField($f11);
 
 
-$aw1 = new ArraySelector(array("RadioItem1", "RadioItem2", "RadioItem3"), "item_id", "item_value");
+$aw1 = new ArrayDataIterator(array("RadioItem1", "RadioItem2", "RadioItem3"), "item_id", "item_value");
 $f12 = new DataInput("field12", "Radiobox DataSource", 1);
 $r12 = new RadioField();
-$r12->setSource($aw1);
+$r12->setIterator($aw1);
 $r12->list_key = "item_value";
 $r12->list_label = "item_value";
 $f12->setRenderer($r12);

@@ -31,9 +31,10 @@ class CurrencyRatesBean extends DBTableBean
 
         $srcID = (int)Session::Get("currency_defaultID");
 
-        $currencies->startIterator(" WHERE currency_code = '" . DEFAULT_CURRENCY . "'");
-        if ($currencies->fetchNext($crrow)) {
-            $srcID = $crrow[$currencies->key()];
+        $qry = $currencies->queryField("currency_code", DEFAULT_CURRENCY, 1);
+        $qry->exec();
+        if ($crrow = $qry->next()) {
+            $srcID = $crrow[$qry->key()];
             Session::Set("currency_defaultID", $srcID);
             $ret["symbol"] = $crrow["symbol"];
             $ret["currency_code"] = $crrow["currency_code"];
@@ -57,13 +58,14 @@ class CurrencyRatesBean extends DBTableBean
             $dstID = $srcID;
         }
 
+        $qry = $this->query();
+        $qry->select->where = " srcID='$dstID' AND dstID='$srcID' ";
+        $qry->select->limit = " 1 ";
+        $num = $qry->exec();
 
-        $num = $this->startIterator(" WHERE srcID='$dstID' AND dstID='$srcID' ");
-        $row = array();
-        if ($this->fetchNext($row)) {
+        if ($row = $qry->next()) {
             $rate = (float)$row["rate"];
             $ret["price_value"] = $price_value * $rate;
-
         }
         else {
             $ret["price_value"] = $price_value;

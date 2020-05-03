@@ -1,40 +1,21 @@
 <?php
-include_once("lib/beans/ArrayDataBean.php");
+include_once("lib/iterators/ArrayDataIterator.php");
 
-class DBEnumSelector extends ArrayDataBean
+class DBEnumSelector extends ArrayDataIterator
 {
-    private $table_name;
-    private $table_field;
 
-    public function __construct($table_name, $table_field)
+    public function __construct(string $table_name, string $table_field)
     {
-        $this->table_name = $table_name;
-        $this->table_field = $table_field;
-
-        parent::__construct();
-
-    }
-
-    protected function initFields()
-    {
-
-        $this->fields = array($this->table_field);
-        $this->key = $this->table_field;
-    }
-
-    protected function initValues()
-    {
-
         $db = DBDriver::Get();
 
         $ret = $db->fieldType($this->table_name, $this->table_field);
         $ret = $db->enum2array($ret);
 
-        $this->values = array();
-        foreach ($ret as $key => $val) {
-            $this->values[] = array($this->table_field => $val);
-        }
+        $this->key = $this->table_field;
+
+        parent::__construct($ret);
     }
+
 
 
 }

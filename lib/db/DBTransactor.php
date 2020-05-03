@@ -32,32 +32,32 @@ class DBTransactor implements IDataBeanGetter
         return $this->editID;
     }
 
-    public function getBean() : IDataBean
+    public function getBean() : DBTableBean
     {
         return $this->transaction_bean;
     }
 
-    public function getLastID()
+    public function getLastID() : int
     {
         return $this->lastID;
     }
 
-    public function appendValue($key, $val)
+    public function appendValue(string $key, $val)
     {
         $this->transact_values[$key] = $val;
     }
 
-    public function assignInsertValue($key, $val)
+    public function assignInsertValue(string $key, $val)
     {
         $this->insert_values[$key] = $val;
     }
 
-    public function assignUpdateValue($key, $val)
+    public function assignUpdateValue(string $key, $val)
     {
         $this->update_values[$key] = $val;
     }
 
-    public function removeValue($key)
+    public function removeValue(strin $key)
     {
         if (isset($this->transact_values[$key])) {
 
@@ -65,12 +65,12 @@ class DBTransactor implements IDataBeanGetter
         }
     }
 
-    public function getValue($key)
+    public function getValue(string $key)
     {
         return $this->transact_values[$key];
     }
 
-    public function getTransactionValues()
+    public function getTransactionValues() : array
     {
         return $this->transact_values;
     }
@@ -80,25 +80,25 @@ class DBTransactor implements IDataBeanGetter
         $this->form = $form;
 
         debug("------------------------------------");
-        debug("DBTransactor::transactValues | InputForm: " . get_class($form));
+        debug("InputForm: " . get_class($form));
 
         foreach ($form->getFields() as $field_name => $field) {
-            debug("DBTransactor::transactValues: field['$field_name']");
+            debug("field['$field_name']");
             if ($field->skip_transaction) {
-                debug("DBTransactor::transactValues: field['$field_name'] skip_transaction flag is set");
+                debug("field['$field_name'] skip_transaction flag is set");
                 continue;
             }
 
             $field_transactor = $field->getValueTransactor();
 
             if ($field_transactor instanceof IDBFieldTransactor) {
-                debug("DBTransactor::transactValues: field['$field_name'] Using transactor: " . get_class($field_transactor));
+                debug("field['$field_name'] Using transactor: " . get_class($field_transactor));
                 $field->getValueTransactor()->transactValue($field, $this);
-                debug("DBTransactor::transactValues: field['$field_name'] transacted");
+                debug("field['$field_name'] transacted");
             }
             else {
 
-                debug("DBTransactor::transactValues: field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
+                debug("field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
             }
 
         }
@@ -109,7 +109,7 @@ class DBTransactor implements IDataBeanGetter
     public function beforeCommit(DBTableBean $bean, DBDriver $db)
     {
 
-        debug("DBTransactor::beforeCommit | DBTableBean: " . get_class($bean));
+        debug("DBTableBean: " . get_class($bean));
         if (!$this->form) throw new Exception("Expected InputForm is null");
 
 
@@ -120,13 +120,13 @@ class DBTransactor implements IDataBeanGetter
             $field_transactor = $field->getValueTransactor();
 
             if ($field_transactor instanceof IDBFieldTransactor) {
-                debug("DBTransactor::beforeCommit: field['$field_name'] Using transactor: " . get_class($field_transactor));
+                debug("field['$field_name'] Using transactor: " . get_class($field_transactor));
                 $field->getValueTransactor()->beforeCommit($field, $this, $db, $bean->key());
-                debug("DBTransactor::beforeCommit: field['$field_name'] finished");
+                debug("field['$field_name'] finished");
             }
             else {
 
-                debug("DBTransactor::transactValues: field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
+                debug("field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
             }
 
         }
@@ -135,7 +135,7 @@ class DBTransactor implements IDataBeanGetter
 
     public function afterCommit(DBTableBean $bean)
     {
-        debug("DBTransactor::afterCommit | DBTableBean: " . get_class($bean));
+        debug("DBTableBean: " . get_class($bean));
         if (!$this->form) throw new Exception("Expected InputForm is null");
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
@@ -144,12 +144,12 @@ class DBTransactor implements IDataBeanGetter
             $field_transactor = $field->getValueTransactor();
 
             if ($field_transactor instanceof IDBFieldTransactor) {
-                debug("DBTransactor::afterCommit: field['$field_name'] Using transactor: " . get_class($field_transactor));
+                debug("field['$field_name'] Using transactor: " . get_class($field_transactor));
                 $field->getValueTransactor()->afterCommit($field, $this);
-                debug("DBTransactor::afterCommit: field['$field_name'] finished");
+                debug("field['$field_name'] finished");
             }
             else {
-                debug("DBTransactor::afterCommit: field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
+                debug("field['$field_name'] no suitable IDBFieldTransactor found. Skipping ...");
             }
 
         }
@@ -157,7 +157,7 @@ class DBTransactor implements IDataBeanGetter
     }
 
 
-    public function processBean(DBTableBean $bean, $editID)
+    public function processBean(DBTableBean $bean, int $editID)
     {
 
         $this->transaction_bean = $bean;
@@ -207,7 +207,7 @@ class DBTransactor implements IDataBeanGetter
     }
 
 
-    protected function processBeanTransaction(DBTableBean $bean, DBDriver $db, $editID)
+    protected function processBeanTransaction(DBTableBean $bean, DBDriver $db, int $editID)
     {
         debug("DBTransactor::processBeanTransaction | DBTableBean: " . get_class($bean) . " | EditID: $editID");
 
@@ -225,7 +225,7 @@ class DBTransactor implements IDataBeanGetter
         $this->values = $values;
     }
 
-    protected function mergeBeanValues(DBTableBean $bean, DBDriver $db, $editID)
+    protected function mergeBeanValues(DBTableBean $bean, DBDriver $db, int $editID)
     {
         $values = array();
         if ($editID > 0) {

@@ -5,11 +5,12 @@ include_once("lib/input/renderers/IDataSourceItem.php");
 abstract class DataSourceField extends InputField
 {
 
+    /**
+     * @var SQLQuery|null
+     */
     public function __construct()
     {
         parent::__construct();
-
-
     }
 
     public function setItemRenderer(IDataSourceItem $cmp)
@@ -25,21 +26,13 @@ abstract class DataSourceField extends InputField
     public function renderImpl()
     {
 
-        if ($this->data_bean instanceof IDataBean) {
+        $this->iterator->exec();
 
-            $source_fields = $this->data_bean->fields();
+        $this->startRenderItems();
 
-            if (!in_array($this->list_key, $source_fields)) throw new Exception("List Key '{$this->list_key}' not found in data source fields");
-            if (!in_array($this->list_label, $source_fields)) throw new Exception("List Label '{$this->list_label}' not found in data source fields");
+        $this->renderItems();
 
-            $this->data_bean->startIterator($this->data_filter, $this->data_fields);
-
-            $this->startRenderItems();
-
-            $this->renderItems();
-
-            $this->finishRenderItems();
-        }
+        $this->finishRenderItems();
 
     }
 
@@ -62,10 +55,10 @@ abstract class DataSourceField extends InputField
             $field_values = array($field_values);
         }
 
-        $prkey = $this->data_bean->key();
+        $prkey = $this->iterator->key();
         $index = 0;
-        $data_row = array();
-        while ($this->data_bean->fetchNext($data_row)) {
+
+        while ($data_row = $this->iterator->next()) {
 
             $id = $data_row[$prkey];
 

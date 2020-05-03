@@ -31,7 +31,7 @@ $page->addAction($action_add);
 $page->setCaption(tr("Product Gallery") . ": " . $rc->ref_row["product_name"]);
 
 $bean = new ProductPhotosBean();
-$bean->setFilter($rc->ref_key . "='" . $rc->ref_id . "'");
+$bean->select()->where = $rc->ref_key . "='" . $rc->ref_id . "'";
 
 
 $h_delete = new DeleteItemRequestHandler($bean);

@@ -73,10 +73,10 @@ class DemoPage extends SparkPage
 
         $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
 
-        $this->addCSS("demo.css");
-        $this->addCSS("//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css", false);
+        $this->addCSS(SITE_ROOT. "css/demo.css");
+        $this->addCSS("//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css");
 
-        $this->addJS("//code.jquery.com/ui/1.11.4/jquery-ui.js", false);
+        $this->addJS("//code.jquery.com/ui/1.11.4/jquery-ui.js");
 
     }
 

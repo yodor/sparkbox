@@ -21,7 +21,7 @@ class TableView extends AbstractResultView implements IHeadContents
 
     protected $header_cells_enabled = TRUE;
 
-    public function __construct(ISQLIterator $itr)
+    public function __construct(IDataIterator $itr)
     {
         parent::__construct($itr);
     }

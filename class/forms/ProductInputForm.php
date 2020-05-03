@@ -25,7 +25,7 @@ class ProductInputForm extends InputForm
         $field = DataInputFactory::Create(DataInputFactory::NESTED_SELECT, "catID", "Category", 1);
         $bean1 = new ProductCategoriesBean();
         $rend = $field->getRenderer();
-        $rend->setSource($bean1);
+        $rend->setIterator($bean1);
         $rend->list_key = "catID";
         $rend->list_label = "category_name";
 
@@ -33,14 +33,14 @@ class ProductInputForm extends InputForm
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "brand_name", "Brand", 1);
         $rend = $field->getRenderer();
-        $rend->setSource(new BrandsBean());
+        $rend->setIterator(new BrandsBean());
         $rend->list_key = "brand_name";
         $rend->list_label = "brand_name";
         $this->addField($field);
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "class_name", "Product Class", 0);
         $rend = $field->getRenderer();
-        $rend->setSource(new ProductClassesBean());
+        $rend->setIterator(new ProductClassesBean());
         $rend->list_key = "class_name";
         $rend->list_label = "class_name";
         $this->addField($field);
@@ -55,7 +55,7 @@ class ProductInputForm extends InputForm
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "gender", "Gender", 0);
         $rend = $field->getRenderer();
-        $rend->setSource(new GendersBean());
+        $rend->setIterator(new GendersBean());
         $rend->list_key = "gender_title";
         $rend->list_label = "gender_title";
         $this->addField($field);
@@ -83,7 +83,7 @@ class ProductInputForm extends InputForm
         $this->addField($field);
 
         $input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 0);
-        $input->setSource(new ProductPhotosBean());
+        $input->setIterator(new ProductPhotosBean());
         $input->transact_mode = DataInput::TRANSACT_OBJECT;
         $input->getValueTransactor()->max_slots = 4;
         $this->addField($input);
@@ -108,7 +108,7 @@ class ProductInputForm extends InputForm
         $field1->setSource($features_source);
 
         $renderer = new TextField();
-        $renderer->setSource($features_source);
+        $renderer->setIterator($features_source);
         $field1->setRenderer($renderer);
 
         $field1->setValidator(new EmptyValueValidator());

@@ -6,9 +6,10 @@ interface IDataBean
 
     public function fields() : array;
 
-    public function startIterator($filter = "", $fields = "");
+    public function query() : SQLQuery;
+    //public function startIterator($filter = "", $fields = "");
 
-    public function fetchNext(array &$row, $iterator = false) : bool;
+    //public function fetchNext(array &$row, $iterator = false) : bool;
 
     public function deleteID(int $id);
 
@@ -22,7 +23,7 @@ interface IDataBean
 
     public function key();
 
-    public function startFieldIterator($filter_field, $filter_value);
+    //public function startFieldIterator($filter_field, $filter_value);
 
 }
 

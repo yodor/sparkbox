@@ -26,14 +26,12 @@ class UserInputForm extends InputForm
 
         $field = new DataInput("pass", "Create Password", 0);
         $field->setRenderer(new PasswordField());
-        $field->setScriptRequired(true);
         $field->getRenderer()->setAttribute("autocomplete", "off");
         $this->addField($field);
 
 
         $field = new DataInput("pass1", "Repeat Password", 0);
         $field->setRenderer(new PasswordField());
-        $field->setScriptRequired(true);
         $field->getRenderer()->setAttribute("autocomplete", "off");
         $this->addField($field);
 

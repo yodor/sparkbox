@@ -2,7 +2,7 @@
 include_once("lib/beans/DBTableBean.php");
 include_once("lib/components/TableView.php");
 include_once("lib/components/ListView.php");
-include_once("lib/iterators/BeanQuery.php");
+
 include_once("lib/components/renderers/items/GalleryViewItemRenderer.php");
 include_once("lib/components/renderers/IActionsRenderer.php");
 include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
@@ -79,7 +79,7 @@ class GalleryView extends Component
         $view = false;
         if (strcmp_isset("view", "list")) {
 
-            $view = new TableView(new BeanQuery($bean));
+            $view = new TableView($bean->query());
             //   $view->addColumn(new TableColumn("ppID", "ID"));
 
             if ($this->photos_bean instanceof OrderedDataBean) {
@@ -108,7 +108,7 @@ class GalleryView extends Component
             $this->view_mode = GalleryView::MODE_LIST;
         }
         else {
-            $view = new ListView(new BeanQuery($bean));
+            $view = new ListView($bean->query());
 
             $renderer = new GalleryViewItemRenderer($this);
             $renderer->setPhotoSize(-1, 256);

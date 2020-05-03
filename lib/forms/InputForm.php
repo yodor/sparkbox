@@ -101,12 +101,12 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         }
     }
 
-    public function setBean(IDataBean $bean)
+    public function setBean(DBTableBean $bean)
     {
         $this->bean = $bean;
     }
 
-    public function getBean() : IDataBean
+    public function getBean() : DBTableBean
     {
         return $this->bean;
     }

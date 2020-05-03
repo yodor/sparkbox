@@ -27,7 +27,7 @@ $action_add->setAttribute("title", "Add Photo");
 $page->addAction($action_add);
 
 $bean = new DynamicPagePhotosBean();
-$bean->setFilter($rc->ref_key . "='" . $rc->ref_id . "'");
+$bean->select()->where = $rc->ref_key . "='" . $rc->ref_id . "'";
 
 
 $h_delete = new DeleteItemRequestHandler($bean);

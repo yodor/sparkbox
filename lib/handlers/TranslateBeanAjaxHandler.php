@@ -98,13 +98,15 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
 
         global $g_bt;
 
-        $sql = " WHERE table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' LIMIT 1";
-
-        $g_bt->startIterator($sql);
+        $qry = $g_bt->query();
+        $qry->select->where = "table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}'";
+        $qry->select->limit = " 1 ";
+        $qry->select->fields = " translated ";
+        $qry->exec();
 
         $ret->translation = "";
-        $trow = array();
-        if ($g_bt->fetchNext($trow)) {
+
+        if ($trow = $qry->next()) {
             $ret->translation = $trow["translated"];
         }
         else {
@@ -118,14 +120,15 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
 
         global $g_bt;
 
-        $sql = " WHERE table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' LIMIT 1";
-
-        $g_bt->startIterator($sql, $g_bt->key());
+        $qry = $g_bt->query();
+        $qry->select->where = " table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' ";
+        $qry->select->limit = " 1 ";
+        $qry->select->fields = $g_bt->key();
+        $qry->exec();
 
         $ret->translation = "";
 
-        $trow = array();
-        if ($g_bt->fetchNext($trow)) {
+        if ($trow = $qry->next()) {
 
             $g_bt->deleteID($trow[$g_bt->key()]);
             $ret->message = tr("Translation was removed");

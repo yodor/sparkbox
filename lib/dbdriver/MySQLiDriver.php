@@ -94,7 +94,7 @@ class MySQLiDriver extends DBDriver
     public function query($str)
     {
         $res = mysqli_query($this->connection, $str);
-
+        //mysqli_result::fetch_fields
         if (!$res) $this->error = mysqli_error($this->connection);
 
         return $res;

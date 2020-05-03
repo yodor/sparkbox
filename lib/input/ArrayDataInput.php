@@ -1,6 +1,6 @@
 <?php
 include_once("lib/input/DataInput.php");
-include_once("lib/input/renderers/ArrayField.php");
+
 
 class ArrayDataInput extends DataInput
 {
@@ -8,9 +8,9 @@ class ArrayDataInput extends DataInput
     public $allow_dynamic_addition = false;
 
     /**
-     * @var IArrayFieldRenderer|null
+     * @var ArrayField|null
      */
-    protected $array_renderer = NULL;
+    protected $array_renderer;
 
     public function __construct(string $name, string $label, bool $required)
     {
@@ -19,15 +19,16 @@ class ArrayDataInput extends DataInput
         $this->value = array();
         $this->error = array();
 
+        include_once("lib/input/renderers/ArrayField.php");
         $this->array_renderer = new ArrayField();
     }
 
-    public function getArrayRenderer()
+    public function getArrayRenderer() : ArrayField
     {
         return $this->array_renderer;
     }
 
-    public function setArrayRenderer(IArrayFieldRenderer $renderer)
+    public function setArrayRenderer(ArrayField $renderer)
     {
         $this->array_renderer = $renderer;
     }
@@ -101,7 +102,7 @@ class ArrayDataInput extends DataInput
 
     }
 
-    public function haveError()
+    public function haveError() : bool
     {
 
         if (is_array($this->error)) {

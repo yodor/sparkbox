@@ -18,8 +18,8 @@ $itemID = -1;
 if (isset($_GET[$prkey])) {
     $itemID = (int)$_GET[$prkey];
 }
-$num = $nb->startIterator("WHERE $prkey='$itemID' LIMIT 1");
 
+$qry = $nb->queryField($prkey,$itemID, 1);
 
 $pac = new PublicationArchiveComponent(new NewsItemsBean(), SITE_ROOT . "news.php");
 
@@ -28,11 +28,12 @@ $selected_year = $pac->getYear();
 $selected_month = $pac->getMonth();
 
 if ($pac->haveSelection()) {
-    $num = $nb->startIterator(" WHERE YEAR(item_date)='$selected_year' AND MONTHNAME(item_date)='$selected_month' ORDER BY item_date DESC");
+    $qry->select->where = " YEAR(item_date)='$selected_year' AND MONTHNAME(item_date)='$selected_month' ";
+    $qry->select->order_by = " item_date DESC ";
+    $qry->select->limit = "";
 }
-if ($num < 1) {
-    $num = $nb->startIterator(" WHERE YEAR(item_date)='$selected_year' AND MONTHNAME(item_date)='$selected_month' ORDER BY item_date DESC LIMIT 1 ");
-}
+
+$qry->exec();
 
 
 $page->startRender();
@@ -41,7 +42,7 @@ $page->startRender();
 echo "<div class='news_view'>";
 
 echo "<div class='column main'>";
-while ($nb->fetchNext($item_row)) {
+while ($item_row = $qry->next()) {
     $itemID = $item_row[$nb->key()];
     trbean($itemID, "item_title", $item_row, $nb);
     trbean($itemID, "content", $item_row, $nb);
@@ -93,12 +94,14 @@ function drawLatestNews($num, $selected_year = false, $selected_month = false)
 {
 
 
-    $nb = new NewsItemsBean();
-    $sql = "ORDER BY item_date DESC LIMIT 3";
+    global $nb;
 
-    $nb->startIterator($sql);
+    $qry=$nb->query();
+    $qry->select->order_by = " item_date DESC";
+    $qry->select->limit = "3";
+    $qry->exec();
 
-    while ($nb->fetchNext($item_row)) {
+    while ($item_row = $qry->next()) {
         $itemID = $item_row[$nb->key()];
         echo "<a class='item' newsID='$itemID' href='" . SITE_ROOT . "news.php?newsID=$itemID'>";
 
