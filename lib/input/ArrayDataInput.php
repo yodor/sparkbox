@@ -15,7 +15,7 @@ class ArrayDataInput extends DataInput
         $this->error = array();
 
         $this->renderer = new ArrayField();
-        $this->renderer->setFieldAttribute("name", $name);
+
     }
 
     public function setRenderer(InputField $renderer)
@@ -27,7 +27,7 @@ class ArrayDataInput extends DataInput
         else {
             parent::setRenderer($renderer);
         }
-
+        $this->renderer->setFieldAttribute("name", $this->getName());
     }
 
     public function getArrayRenderer() : ArrayField

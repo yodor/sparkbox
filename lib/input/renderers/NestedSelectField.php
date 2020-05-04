@@ -23,11 +23,9 @@ class NestedSelectField extends SelectField
         $field_values = $this->field->getValue();
         $field_name = $this->field->getName();
 
-
         $path = array();
 
         $source_key = $this->iterator->key();
-
 
         while ($row = $this->iterator->next()) {
 
@@ -39,7 +37,6 @@ class NestedSelectField extends SelectField
 
             $value = $row[$this->list_key];
             $label = $row[$this->list_label];
-
 
             while (count($path) > 0 && $lft > $path[count($path) - 1]) {
                 array_pop($path);

@@ -9,7 +9,7 @@ class SQLSelect extends SQLStatement
         $this->type = "SELECT ";
     }
 
-    public function getSQL($where_only = false, $add_calc = true)
+    public function getSQL($where_only = FALSE, $add_calc = TRUE)
     {
         $sql = "";
 
@@ -117,7 +117,7 @@ class SQLSelect extends SQLStatement
             $this->limit .= " " . $other->limit;
         }
     }
-    
+
     public function combineWith(SQLSelect $other)
     {
         $csql = clone $this;

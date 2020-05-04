@@ -1,6 +1,6 @@
 <?php
 include_once("lib/forms/InputForm.php");
-include_once("lib/selectors/ArraySelector.php");
+include_once("lib/iterators/ArrayDataIterator.php");
 
 class DynamicPageInputForm extends InputForm
 {

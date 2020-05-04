@@ -63,7 +63,8 @@ abstract class DataSourceField extends InputField
 
             $id = $data_row[$prkey];
 
-            $value = $data_row[$this->list_key];
+            $value = isset($data_row[$this->list_key]) ? $data_row[$this->list_key] : "";
+
             $label = $data_row[$this->list_label];
 
             $selected = $this->isModelSelected($value, $field_values);

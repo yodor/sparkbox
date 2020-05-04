@@ -8,9 +8,12 @@ abstract class DBDriver
 
     protected $error = "";
 
+    /**
+     * @var DBDriver
+     */
     protected static $g_db = NULL;
 
-    public static function Get()
+    public static function Get() : DBDriver
     {
         return static::$g_db;
     }

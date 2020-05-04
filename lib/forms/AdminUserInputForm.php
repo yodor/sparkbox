@@ -56,8 +56,8 @@ class AdminUserInputForm extends InputForm
         $rend = new SelectField();
         $rend->na_str = "";
         $rend->na_val = false;
-        $rend->list_key = "access_level";
-        $rend->list_label = "access_level";
+        $rend->list_key = ArrayDataIterator::KEY_ID;
+        $rend->list_label = ArrayDataIterator::KEY_VALUE;
         $rend->setIterator($enum);
         $rend->setAttribute("onChange", "toggleRoles()");
         $field->setRenderer($rend);
@@ -70,7 +70,7 @@ class AdminUserInputForm extends InputForm
 
         $rend = new CheckField();
         $rend->setIterator(new AdminRolesIterator());
-        $rend->list_key = ArrayDataIterator::KEY_VALUE;
+        $rend->list_key = ArrayDataIterator::KEY_ID;
         $rend->list_label = ArrayDataIterator::KEY_VALUE;
         $field->setRenderer($rend);
         // 	  $field->setValueTransactor(new AdminRolesTransactor());

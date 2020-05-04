@@ -66,7 +66,6 @@ class InputFormView extends Component implements IDBTableEditor
 
         $this->processor = new FormProcessor();
 
-
         $this->transactor = new DBTransactor();
 
         $fieldNames = $this->form->getFieldNames();
@@ -172,7 +171,7 @@ class InputFormView extends Component implements IDBTableEditor
         try {
 
             debug("Loading bean data into form");
-            $this->form->loadBeanData($this->editID, $this->bean);
+            $this->form->loadBeanData($this->getEditID(), $this->getBean());
 
             debug("Calling form processor");
             $this->processor->processForm($this->form);

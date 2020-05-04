@@ -24,6 +24,7 @@ class SessionData
     {
         return $this->name;
     }
+
     public function clear()
     {
         Session::Clear($this->name);
@@ -37,14 +38,15 @@ class SessionData
 
     public function get(string $key)
     {
-        if (!isset($this->data[$key])) throw new Exception("SessionData key not found: ".$key);
+        if (!isset($this->data[$key])) throw new Exception("SessionData key not found: " . $key);
         return $this->data[$key];
     }
+
     public function contains(string $key)
     {
         if (isset($this->data[$key])) {
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
     }
 }

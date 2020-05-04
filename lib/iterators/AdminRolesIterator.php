@@ -8,6 +8,7 @@ class AdminRolesIterator extends ArrayDataIterator
     public function __construct()
     {
         global $admin_roles;
+        if (!is_array($admin_roles))$admin_roles = array();
         parent::__construct($admin_roles);
     }
 
