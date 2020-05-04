@@ -8,7 +8,10 @@ class RadioItem extends DataSourceItem
 
     public function renderImpl()
     {
-        echo "<input type='radio' value='{$this->value}' name='{$this->name}' id='{$this->id}' ";
+        //hackish! - force submit of unchecked checkbox
+        //echo "<input type='hidden' name='{$this->name}' value=''>";
+
+        echo "<input type='radio' value='{$this->value}' name='{$this->name}'  ";
         if ($this->isSelected()) echo "CHECKED ";
         echo ">";
         echo "<span>{$this->label}</span>";

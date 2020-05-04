@@ -25,24 +25,24 @@ $f3->setValidator(new PasswordValidator());
 $form->addField($f3);
 
 
-$aw2 = new ArrayDataIterator(array("SelectItem1", "SelectItem2", "SelectItem3"), "item_id", "item_value");
+$aw2 = new ArrayDataIterator(array("SelectItem1", "SelectItem2", "SelectItem3"));
 
 $f4 = new DataInput("field4", "Select", 1);
 $scmp = new SelectField();
 $scmp->setIterator($aw2);
-$scmp->list_key = "item_id";
-$scmp->list_label = "item_value";
+$scmp->list_key = ArrayDataIterator::KEY_ID;
+$scmp->list_label = ArrayDataIterator::KEY_VALUE;
 
 $f4->setRenderer($scmp);
 $form->addField($f4);
 
-$aw3 = new ArrayDataIterator(array("SelectMultiItem1", "SelectMultiItem2", "SelectMultiItem3"), "item_id", "item_value");
+$aw3 = new ArrayDataIterator(array("SelectMultiItem1", "SelectMultiItem2", "SelectMultiItem3"));
 
 $f4m = new DataInput("field4m", "Select Multi", 1);
 $scmp1 = new SelectMultipleField();
 $scmp1->setIterator($aw3);
-$scmp1->list_key = "item_id";
-$scmp1->list_label = "item_value";
+$scmp1->list_key = ArrayDataIterator::KEY_ID;
+$scmp1->list_label = ArrayDataIterator::KEY_VALUE;
 
 $f4m->setRenderer($scmp1);
 $form->addField($f4m);
@@ -68,28 +68,28 @@ $f6->setProcessor(new BeanPostProcessor());
 $form->addField($f6);
 
 
-$aw = new ArrayDataIterator(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"), "item_id", "item_value");
+$aw = new ArrayDataIterator(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"));
 
 $f11 = new DataInput("field11", "Checkbox DataSource", 1);
 
 $r11 = new CheckField();
 $r11->setIterator($aw);
-$r11->list_key = "item_value";
-$r11->list_label = "item_value";
+$r11->list_key = ArrayDataIterator::KEY_VALUE;
+$r11->list_label = ArrayDataIterator::KEY_VALUE;
 
 $f11->setRenderer($r11);
 $f11->setValidator(new EmptyValueValidator());
 $f11->setProcessor(new BeanPostProcessor());
 $form->addField($f11);
 
-$aw = new ArrayDataIterator(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"), "item_id", "item_value");
+$aw = new ArrayDataIterator(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"));
 
 $f11 = new DataInput("field11_req", "Checkbox DataSource<BR><small>Require array value</small>", 1);
 
 $r11 = new CheckField();
 $r11->setIterator($aw);
-$r11->list_key = "item_value";
-$r11->list_label = "item_value";
+$r11->list_key = ArrayDataIterator::KEY_VALUE;
+$r11->list_label = ArrayDataIterator::KEY_VALUE;
 
 $f11->setRenderer($r11);
 $validator = new EmptyValueValidator();
@@ -99,12 +99,12 @@ $f11->setProcessor(new BeanPostProcessor());
 $form->addField($f11);
 
 
-$aw1 = new ArrayDataIterator(array("RadioItem1", "RadioItem2", "RadioItem3"), "item_id", "item_value");
+$aw1 = new ArrayDataIterator(array("RadioItem1", "RadioItem2", "RadioItem3"));
 $f12 = new DataInput("field12", "Radiobox DataSource", 1);
 $r12 = new RadioField();
 $r12->setIterator($aw1);
-$r12->list_key = "item_value";
-$r12->list_label = "item_value";
+$r12->list_key = ArrayDataIterator::KEY_VALUE;
+$r12->list_label = ArrayDataIterator::KEY_VALUE;
 $f12->setRenderer($r12);
 $f12->setValidator(new EmptyValueValidator());
 $f12->setProcessor(new BeanPostProcessor());

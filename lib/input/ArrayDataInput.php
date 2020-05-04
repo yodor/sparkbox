@@ -1,16 +1,11 @@
 <?php
 include_once("lib/input/DataInput.php");
-
+include_once("lib/input/renderers/ArrayField.php");
 
 class ArrayDataInput extends DataInput
 {
 
     public $allow_dynamic_addition = false;
-
-    /**
-     * @var ArrayField|null
-     */
-    protected $array_renderer;
 
     public function __construct(string $name, string $label, bool $required)
     {
@@ -19,18 +14,17 @@ class ArrayDataInput extends DataInput
         $this->value = array();
         $this->error = array();
 
-        include_once("lib/input/renderers/ArrayField.php");
-        $this->array_renderer = new ArrayField();
+
+        $this->renderer = new ArrayField();
     }
 
-    public function getArrayRenderer() : ArrayField
+    public function setRenderer(InputField $renderer)
     {
-        return $this->array_renderer;
-    }
-
-    public function setArrayRenderer(ArrayField $renderer)
-    {
-        $this->array_renderer = $renderer;
+        if (!($renderer instanceof ArrayField)) {
+            throw new Exception("Incorrect renderer for ArrayDataInput");
+        }
+        parent::setRenderer($renderer);
+        $this->renderer->setFieldAttribute("name", $this->getName());
     }
 
     public function setValidator(IInputValidator $validator)
@@ -75,7 +69,6 @@ class ArrayDataInput extends DataInput
 
     public function appendElement($val)
     {
-
         $this->value[] = $val;
     }
 

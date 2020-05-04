@@ -48,6 +48,7 @@ abstract class DataSourceField extends InputField
 
     protected function renderItems()
     {
+
         $field_values = $this->field->getValue();
         $field_name = $this->field->getName();
 
@@ -82,6 +83,14 @@ abstract class DataSourceField extends InputField
         }
     }
 
+    /**
+     * Iterator values construct the array
+     * Checkboxes post values directly
+     * Search inside values if iterator value is found
+     * @param $value
+     * @param $field_values
+     * @return bool
+     */
     protected function isModelSelected($value, $field_values)
     {
         return (in_array($value, $field_values));

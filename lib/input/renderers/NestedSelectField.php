@@ -52,7 +52,7 @@ class NestedSelectField extends SelectField
             $rgt = $row["rgt"];
             $nodeID = $row[$source_key];
 
-            trbean($nodeID, $this->list_label, $row, $this->data_bean);
+            trbean($nodeID, $this->list_label, $row, $this->data_bean->getTableName());
 
             $value = $row[$this->list_key];
             $label = $row[$this->list_label];
@@ -122,7 +122,7 @@ class NestedSelectField extends SelectField
 
             $id = $data_row[$prkey];
 
-            trbean($id, $this->list_label, $data_row, $this->data_bean);
+            trbean($id, $this->list_label, $data_row, $this->data_bean->getTableName());
 
             $value = $data_row[$this->list_key];
             $label = $data_row[$this->list_label];

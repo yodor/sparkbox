@@ -142,17 +142,15 @@ function getActiveLanguageID()
     return $langID;
 }
 
-function trbean(int $id, string $field_name, array &$row, DBTableBean $bean)
+function trbean(int $id, string $field_name, array &$row, string $tableName)
 {
     $lang_session = Session::Get("language", DEFAULT_LANGUAGE);
     global $g_bt;
 
     $langID = getActiveLanguageID();
 
-    $table_name = $bean->getTableName();
-
     $qry = $g_bt->query();
-    $qry->select->where = " langID='$langID' AND field_name='$field_name' AND table_name='$table_name' AND bean_id='$id' ";
+    $qry->select->where = " langID='$langID' AND field_name='$field_name' AND table_name='$tableName' AND bean_id='$id' ";
     $qry->select->limit = " 1 ";
     $qry->select->fields = " translated ";
     $num = $qry->exec();

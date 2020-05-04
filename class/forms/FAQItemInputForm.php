@@ -11,7 +11,7 @@ class FAQItemInputForm extends InputForm
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "section", "Section", 1);
 
-        $enm = new DBEnumSelector("faq_items", "section");
+        $enm = new DBEnumIterator("faq_items", "section");
         $rend = $field->getRenderer();
         $rend->setIterator($enm);
         $rend->list_key = "section";

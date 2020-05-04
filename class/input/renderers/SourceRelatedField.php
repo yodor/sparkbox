@@ -21,7 +21,7 @@ class SourceAttributeItem extends DataSourceItem
 }
 
 
-class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer
+class SourceRelatedField extends DataSourceField
 {
 
     public function __construct()
@@ -30,11 +30,11 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer
         $this->setItemRenderer(new SourceAttributeItem());
     }
 
-    public function setSource(IDataBean $source)
-    {
-        parent::setIterator($source);
-        $this->addClassName(get_class($source));
-    }
+    //    public function setSource(IDataBean $source)
+    //    {
+    //        parent::setIterator($source);
+    //        $this->addClassName(get_class($source));
+    //    }
 
     public function requiredStyle()
     {
@@ -61,28 +61,18 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer
     public function renderImpl()
     {
 
+        $num = $this->iterator->exec();
 
-        if ($this->data_bean instanceof IDataBean) {
-
-            $source_fields = $this->data_bean->fields();
-
-            if (!in_array($this->list_key, $source_fields)) throw new Exception("List Key '{$this->list_key}' not found in data source fields");
-
-            // 	  if (!in_array($this->list_label, $source_fields)) throw new Exception("List Label '{$this->list_label}' not found in data source fields");
-
-            $this->qry = $this->data_bean->query();
-            $num = $this->qry->exec();
-
-            if ($num < 1) {
-                echo "Selected source does not provide optional attributes";
-                return;
-            }
-            $this->startRenderItems();
-
-            $this->renderItems();
-
-            $this->finishRenderItems();
+        if ($num < 1) {
+            echo "Selected source does not provide optional attributes";
+            return;
         }
+
+        $this->startRenderItems();
+
+        $this->renderItems();
+
+        $this->finishRenderItems();
 
     }
 
@@ -97,10 +87,10 @@ class SourceRelatedField extends DataSourceField implements IArrayFieldRenderer
             $field_values = array($field_values);
         }
 
-        $prkey = $this->data_bean->key();
+        $prkey = $this->iterator->key();
         $index = 0;
 
-        while ($data_row = $this->qry->next()) {
+        while ($data_row = $this->iterator->next()) {
 
             // 		$id = $data_row[$this->getSource()->getPrKey()];
             $id = $data_row[$prkey];

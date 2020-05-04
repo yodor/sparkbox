@@ -1,10 +1,9 @@
 <?php
 include_once("lib/dbdriver/DBDriver.php");
-include_once("lib/beans/IDataBean.php");
 include_once("lib/iterators/SQLQuery.php");
 include_once("lib/utils/SQLSelect.php");
 
-abstract class DBTableBean implements IDataBean
+abstract class DBTableBean
 {
 
     /**

@@ -26,7 +26,7 @@ class ProductClassInputForm extends InputForm
         $attribs = new AttributesBean();
 
         $rend = new SelectField();
-        $rend->setIterator($attribs);
+        $rend->setIterator($attribs->query());
         $rend->list_key = "name";
         $rend->list_label = "name";
 
@@ -41,7 +41,8 @@ class ProductClassInputForm extends InputForm
         $act_rend->setAttribute("action", "inline-new");
         $arend->addControl($act_rend);
 
-        $field1->setArrayRenderer($arend);
+        //TODO check was setArrayRenderer
+        $field1->setRenderer($arend);
 
         $this->addField($field1);
 

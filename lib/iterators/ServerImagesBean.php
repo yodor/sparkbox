@@ -1,24 +1,18 @@
 <?php
-include_once("lib/beans/ArrayDataBean.php");
+include_once("lib/iterators/ArrayDataIterator.php");
 
-class GalleryImagesBean extends ArrayDataBean
+class ServerImagesBean extends ArrayDataIterator
 {
-
 
     public function __construct()
     {
-        $this->initFolderLocation();
 
+        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_images/";
         $this->key = "id";
         $this->value_key = "filename";
 
-
         parent::__construct();
-    }
 
-    protected function initFolderLocation()
-    {
-        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_images/";
     }
 
     //databean
@@ -37,8 +31,6 @@ class GalleryImagesBean extends ArrayDataBean
         $files = array();
 
         $dh = opendir($dir);
-        if (!is_resource($dh)) throw new Exception("Could not open '$dir'");
-
         while (false !== ($filename = readdir($dh))) {
             if (is_dir($filename)) continue;
             if (strcmp($filename, ".") == 0) continue;
@@ -50,7 +42,6 @@ class GalleryImagesBean extends ArrayDataBean
 
         sort($files);
 
-
         $this->values = array();
 
         foreach ($files as $idx => $filename) {
@@ -60,8 +51,8 @@ class GalleryImagesBean extends ArrayDataBean
             //not image file
             if ($size === FALSE) continue;
 
-            $width = $size[0];
-            $height = $size[1];
+            $width = $size["width"];
+            $height = $size["height"];
             $mime = $size["mime"];
             $date_upload = date("Y-m-d H:m:i", filemtime($filename));
 
@@ -69,7 +60,6 @@ class GalleryImagesBean extends ArrayDataBean
 
         }
 
-        debug("LoadedValues: ", $this->values);
 
     }
 

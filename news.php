@@ -44,8 +44,8 @@ echo "<div class='news_view'>";
 echo "<div class='column main'>";
 while ($item_row = $qry->next()) {
     $itemID = $item_row[$nb->key()];
-    trbean($itemID, "item_title", $item_row, $nb);
-    trbean($itemID, "content", $item_row, $nb);
+    trbean($itemID, "item_title", $item_row, $nb->getTableName());
+    trbean($itemID, "content", $item_row, $nb->getTableName());
 
     echo "<div class='item_view' itemID='$itemID'>";
     echo "<div class='title'>";

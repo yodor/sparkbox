@@ -5,8 +5,8 @@ include_once("lib/input/DataInputFactory.php");
 include_once("lib/beans/AdminUsersBean.php");
 include_once("lib/beans/AdminAccessBean.php");
 
-include_once("lib/selectors/AdminRolesSelector.php");
-include_once("lib/selectors/DBEnumSelector.php");
+include_once("lib/iterators/AdminRolesIterator.php");
+include_once("lib/iterators/DBEnumIterator.php");
 
 include_once("lib/input/transactors/CustomFieldTransactor.php");
 
@@ -51,7 +51,7 @@ class AdminUserInputForm extends InputForm
 
         $field = new DataInput("access_level", "Access Level", 1);
 
-        $enum = new DBEnumSelector("admin_users", "access_level");
+        $enum = new DBEnumIterator("admin_users", "access_level");
 
         $rend = new SelectField();
         $rend->na_str = "";
@@ -66,12 +66,12 @@ class AdminUserInputForm extends InputForm
 
 
         $field = new DataInput("role", "Admin Roles", 0);
-        $field->setIterator(new AdminAccessBean());
+        $field->setSource(new AdminAccessBean());
 
         $rend = new CheckField();
-        $rend->setIterator(new AdminRolesSelector());
-        $rend->list_key = "roles";
-        $rend->list_label = "roles";
+        $rend->setIterator(new AdminRolesIterator());
+        $rend->list_key = ArrayDataIterator::KEY_VALUE;
+        $rend->list_label = ArrayDataIterator::KEY_VALUE;
         $field->setRenderer($rend);
         // 	  $field->setValueTransactor(new AdminRolesTransactor());
 

@@ -19,7 +19,7 @@ class ProductCategoryInputForm extends InputForm
         $pcats = new ProductCategoriesBean();
 
         $rend = new NestedSelectField();
-        $rend->setIterator($pcats);
+        $rend->setIterator($pcats->query());
         $rend->list_key = "catID";
         $rend->list_label = "category_name";
         $rend->na_str = '--- TOP ---';

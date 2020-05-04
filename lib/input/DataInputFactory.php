@@ -186,7 +186,7 @@ class DataInputFactory
                 $field->transact_mode = DataInput::TRANSACT_OBJECT;
                 $field->allow_dynamic_addition = false;
 
-                $field->setArrayRenderer(new SessionImage());
+                $field->setRenderer(new SessionImage());
 
                 $processor = new SessionUploadInputProcessor();
                 $processor->max_slots = 1;
@@ -205,7 +205,7 @@ class DataInputFactory
                 $field->transact_mode = DataInput::TRANSACT_OBJECT;
                 $field->allow_dynamic_addition = false;
 
-                $field->setArrayRenderer(new SessionFile());
+                $field->setRenderer(new SessionFile());
 
                 $processor = new SessionUploadInputProcessor();
                 $processor->max_slots = 1;

@@ -76,6 +76,8 @@ abstract class SessionUpload extends ArrayField
         $max_slots = $this->field->getProcessor()->max_slots;
         $this->setFieldAttribute("max_slots", $max_slots);
 
+        $this->setAttribute("field", $this->field->getName());
+
         if ($this->ajax_handler instanceof UploadControlAjaxHandler) {
             $this->setAttribute("handler_command", $this->ajax_handler->getCommandName());
         }

@@ -10,13 +10,13 @@ include_once("lib/utils/SessionData.php");
 abstract class Authenticator
 {
     /**
-     * @var IDataBean
+     * @var DBTableBean
      */
     protected $bean = null;
 
     protected $session = null;
 
-    public function __construct(string $contextName, IDataBean $bean)
+    public function __construct(string $contextName, DBTableBean $bean)
     {
         $this->bean = $bean;
         $this->session = new SessionData($contextName);

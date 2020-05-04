@@ -113,11 +113,9 @@ $form_render->setFieldLayout(FormRenderer::FIELD_HBOX);
 $form->setRenderer($form_render);
 $form->setProcessor(new FormProcessor());
 
-
 $form->getProcessor()->processForm($form);
 
 $page->startRender();
-
 
 $form_render->renderForm($form);
 

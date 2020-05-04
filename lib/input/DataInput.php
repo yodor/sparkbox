@@ -1,7 +1,7 @@
 <?php
-include_once("lib/beans/IDataBeanSource.php");
 include_once("lib/input/validators/EmptyValueValidator.php");
 include_once("lib/input/renderers/InputLabel.php");
+include_once("lib/input/renderers/InputField.php");
 include_once("lib/input/processors/BeanPostProcessor.php");
 
 //
@@ -19,7 +19,7 @@ include_once("lib/input/processors/BeanPostProcessor.php");
 //- transacts the data value to a DB row field value using IDBFieldTransactor.
 //- setting a IDataBeanSource to the field makes it work with values fetched from the data source
 
-class DataInput implements IDataBeanSource
+class DataInput
 {
 
     //transact DBROW without source is incompatible with non required field.
@@ -68,8 +68,11 @@ class DataInput implements IDataBeanSource
     protected $input_processor = NULL;
     //IDBFieldTransactor
     protected $value_transactor = NULL;
-    //DBTableBean
-    protected $data_source = NULL;
+
+    /**
+     * @var DBTableBean|null
+     */
+    protected $bean;
 
     protected $editable;
 
@@ -82,15 +85,15 @@ class DataInput implements IDataBeanSource
     protected $link_mode = false;
 
     //target data store
-    public function setIterator(IDataBean $data_source)
+    public function setSource(DBTableBean $data_source)
     {
         debug("InputField: ['" . $this->getName() . "'] Setting source: " . get_class($data_source));
-        $this->data_source = $data_source;
+        $this->bean = $data_source;
     }
 
-    public function getIterator() : ?IDataBean
+    public function getSource() : ?DBTableBean
     {
-        return $this->data_source;
+        return $this->bean;
     }
 
     public function setValueTransactor(IDBFieldTransactor $transactor)
@@ -111,26 +114,23 @@ class DataInput implements IDataBeanSource
     {
         $this->label = $label;
         $this->name = $name;
-        $this->required = ($required > 0) ? true : false;
+        $this->required = $required;
 
         $this->value = "";
         $this->error = "";
 
         $this->form = NULL;
-        $this->user_data = false;
+        $this->user_data = NULL;
         $this->translator_enabled = false;
         $this->editable = true;
 
-
         $this->label_renderer = new InputLabel();
-
         $this->validator = new EmptyValueValidator();
-
         $this->input_processor = new BeanPostProcessor();
 
         $this->accepted_tags = DefaultAcceptedTags();
 
-        $this->data_source = NULL;
+        $this->bean = NULL;
     }
 
     public function setLinkField(DataInput $field)
@@ -179,24 +179,24 @@ class DataInput implements IDataBeanSource
     }
 
     /**
-     * @return IFieldRenderer
+     * @return InputField
      */
     public function getRenderer() : InputField
     {
         return $this->renderer;
     }
 
-    public function getRenderPrivate() : ?InputField
-    {
-        return $this->renderer;
-    }
+//    public function getRenderPrivate() : ?InputField
+//    {
+//        return $this->renderer;
+//    }
 
-    public function setLabelRenderer(ILabelRenderer $label_renderer)
+    public function setLabelRenderer(InputLabel $label_renderer)
     {
         $this->label_renderer = $label_renderer;
     }
 
-    public function getLabelRenderer() : ?ILabelRenderer
+    public function getLabelRenderer() : InputLabel
     {
         return $this->label_renderer;
     }

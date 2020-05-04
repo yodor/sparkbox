@@ -29,7 +29,7 @@ class MCEImageBrowserDialog extends MessageDialog
         RequestController::addAjaxHandler($this->handler);
 
         $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
-        $this->image_input->getArrayRenderer()->assignUploadHandler($this->handler);
+        $this->image_input->getRenderer()->assignUploadHandler($this->handler);
 
 
     }

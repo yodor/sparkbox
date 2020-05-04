@@ -94,6 +94,7 @@ class ArrayField extends InputField
     public function setField(DataInput $field)
     {
         $this->field = $field;
+
     }
 
     public function renderValue(DataInput $field, int $render_index=-1)

@@ -34,15 +34,15 @@ class DynamicPageInputForm extends InputForm
 
         $field = new DataInput("render_class", "CSS Class Name", 0);
         //
-        $sel = new ArrayDataIterator(array("Notices"), "arr_id", "arr_val");
+        $sel = new ArrayDataIterator(array("Notices"));
         //
         $rend = new SelectField();
         $rend->setIterator($sel);
         //
         $rend->na_str = "Normal";
         $rend->na_val = "";
-        $rend->list_key = "arr_id";
-        $rend->list_label = "arr_val";
+        $rend->list_key = ArrayDataIterator::KEY_ID;
+        $rend->list_label = ArrayDataIterator::KEY_VALUE;
         //
         //
         $field->setRenderer($rend);

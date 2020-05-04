@@ -27,7 +27,7 @@ class MenuItemInputForm extends InputForm
         $rend->na_str = "--- TOP ---";
         $rend->na_val = "0";
 
-        $rend->setIterator($source);
+        $rend->setIterator($source->query());
         $rend->list_key = "menuID";
         $rend->list_label = "menu_title";
 

@@ -4,32 +4,40 @@ include_once("lib/iterators/IDataIterator.php");
 class ArrayDataIterator implements IDataIterator
 {
 
-    protected $key = "id";
-    protected $value_key = "value";
+    const KEY_ID = "id";
+    const KEY_VALUE = "value";
+
+    protected $id_key = ArrayDataIterator::KEY_ID;
+    protected $value_key = ArrayDataIterator::KEY_VALUE;
 
     protected $pos = -1;
 
-    public function __construct(array $arr, string $prkey = "id", string $value_key = "value")
+    public function __construct(array $arr, string $prkey = ArrayDataIterator::KEY_ID, string $value_key = ArrayDataIterator::KEY_VALUE)
     {
 
-        $this->key = $prkey;
+        $this->id_key = $prkey;
         $this->value_key = $value_key;
 
         $this->values = array();
 
         foreach ($arr as $key => $val) {
-            $this->values[] = array($this->key => $key, $this->value_key => $val);
+            $this->values[] = array($this->id_key => $key, $this->value_key => $val);
         }
     }
 
+    /**
+     * Start data iterator and return number of items in this collection
+     * @return int
+     */
     public function exec() : int
     {
+        $this->pos = -1;
         return count($this->values);
     }
 
     public function key() : string
     {
-        return $this->key;
+        return $this->id_key;
     }
 
     public function count() : int

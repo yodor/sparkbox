@@ -22,7 +22,7 @@ class MainMenu
     const FIND_INDEX_PATHCHECK = 5;
 
     /**
-     * @var IDataBean
+     * @var DBTableBean
      */
     protected $bean = NULL;
 
@@ -114,7 +114,7 @@ class MainMenu
 
             $menuID = (int)$row[$key];
 
-            trbean($menuID, $title, $row, $this->bean);
+            trbean($menuID, $title, $row, $this->bean->getTableName());
 
             $link = "";
             if (strlen($this->prefix_root) > 0) {

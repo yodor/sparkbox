@@ -1,7 +1,7 @@
 <?php
 include_once("lib/components/Component.php");
-include_once("lib/beans/IDataBeanSource.php");
 include_once("lib/input/renderers/IErrorRenderer.php");
+include_once("lib/iterators/IDataIterator.php");
 
 abstract class InputField extends Component implements IErrorRenderer
 {
@@ -115,16 +115,13 @@ abstract class InputField extends Component implements IErrorRenderer
     {
         $this->field = $field;
 
-
         $this->setFieldAttribute("name", $field->getName());
-
 
         //access attributes directly. allow sub components to override setAttribute
         $this->attributes["field"] = $field->getName();
         $this->attributes["tooltip"] = $this->tooltip_text;
 
         $this->processErrorAttributes();
-
 
         $field_error = $field->getError();
 

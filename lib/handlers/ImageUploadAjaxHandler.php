@@ -42,7 +42,7 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
 
         //TODO:prepare other style contents for files. render files as alternating rows icon, filename , type, size, X
 
-        debug("ImageUploadAjaxHandler::createUploadContents() ...");
+        debug("...");
 
         $filename = $object->getFileName();
 
@@ -54,7 +54,7 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
 
         $itemClass = $object->className;
 
-        debug("ImageUploadAjaxHandler::createUploadContents() UID:$uid filename:$filename mime:$mime");
+        debug("UID:$uid filename:$filename mime:$mime");
 
         //gc_collect_cycles();
 

@@ -72,20 +72,19 @@ class InputLabel extends Component implements ILabelRenderer, IErrorRenderer
 
         if ($this->field->haveError()) {
 
-            $field_error = $this->field->getError();
-
-            if (is_array($field_error)) {
-                // 	$field_error = implode(";", $field_error);
+            if ($this->field instanceof ArrayDataInput) {
                 $field_error = "Some elements of this collection have errors";
-
             }
+            else {
+                $field_error = $this->field->getError();
+            }
+
             if (strlen($field_error) > 0) {
                 $this->setAttribute("error", 1);
 
                 if ($this->error_render_mode == IErrorRenderer::MODE_TOOLTIP) {
                     $this->setAttribute("tooltip", tr($field_error));
                 }
-
             }
         }
         else {

@@ -21,7 +21,8 @@ class ProductInventoryInputForm extends InputForm
     {
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "pclrID", "Color Scheme", 0);
-        $field->getRenderer()->setIterator(new ProductColorsBean());
+        $pcb = new ProductColorsBean();
+        $field->getRenderer()->setIterator($pcb->query());
 
 
         $field->getRenderer()->list_key = "pclrID";
@@ -31,7 +32,8 @@ class ProductInventoryInputForm extends InputForm
 
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "size_value", "Sizing", 0);
-        $field->getRenderer()->setIterator(new StoreSizesBean());
+        $ssb = new StoreSizesBean();
+        $field->getRenderer()->setIterator($ssb->query());
         $field->getRenderer()->list_key = "size_value";
         $field->getRenderer()->list_label = "size_value";
 
@@ -67,8 +69,8 @@ class ProductInventoryInputForm extends InputForm
 
         $rend = new SourceRelatedField();
 
-
-        $rend->setIterator(new ClassAttributesBean());
+        $cab = new ClassAttributesBean();
+        $rend->setIterator($cab->query());
 
         $rend->list_key = "caID";
         $rend->list_label = "attribute_name";

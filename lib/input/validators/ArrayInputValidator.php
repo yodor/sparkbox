@@ -18,7 +18,7 @@ class ArrayInputValidator implements IInputValidator
         // 	      $field->setValue($values_ordered);
 
 
-        debug("ArrayInputValidator::validateInput");
+        debug("Validating field: {$field->getName()}");
 
         $values_array = $field->getValue();
 
@@ -34,7 +34,6 @@ class ArrayInputValidator implements IInputValidator
 
         }
 
-
         $values_array = $field->getValue();
 
         if (!is_array($values_array) || count($values_array) < 1) {
@@ -44,7 +43,7 @@ class ArrayInputValidator implements IInputValidator
 
         }
 
-        debug("ArrayInputValidator::validateInput: field value is array");
+        debug("field value is array");
 
         for ($idx = 0; $idx < count($values_array); $idx++) {
 
@@ -52,7 +51,7 @@ class ArrayInputValidator implements IInputValidator
 
             $value = $values_array[$idx];
 
-            debug("ArrayInputValidator::validateInput: validating field at position '$idx' - " . getType($value));
+            debug("validating field at position '$idx' - " . getType($value));
 
             try {
                 $cfield = clone $field;

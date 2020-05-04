@@ -150,7 +150,7 @@ class NestedSetTreeView extends Component implements ISelectSource
                 $render_mode = NestedSetItemRenderer::BRANCH_LEAF;
             }
 
-            trbean($nodeID, $this->list_label, $row, $this->data_source);
+            trbean($nodeID, $this->list_label, $row, $this->data_source->getTableName());
 
             while (count($path) > 0 && $lft > $path[count($path) - 1]) {
                 array_pop($path);

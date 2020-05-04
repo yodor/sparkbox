@@ -1,7 +1,7 @@
 <?php
 include_once("lib/iterators/ArrayDataIterator.php");
 
-class DBEnumSelector extends ArrayDataIterator
+class DBEnumIterator extends ArrayDataIterator
 {
 
     public function __construct(string $table_name, string $table_field)
@@ -11,7 +11,7 @@ class DBEnumSelector extends ArrayDataIterator
         $ret = $db->fieldType($this->table_name, $this->table_field);
         $ret = $db->enum2array($ret);
 
-        $this->key = $this->table_field;
+        $this->id_key = $this->table_field;
 
         parent::__construct($ret);
     }

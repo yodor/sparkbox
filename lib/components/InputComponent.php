@@ -7,7 +7,10 @@ include_once("lib/input/ArrayDataInput.php");
 class InputComponent extends Component
 {
 
-    protected $field = NULL;
+    /**
+     * @var DataInput
+     */
+    protected $field;
 
     public $render_label = true;
     public $render_remove = false;
@@ -50,7 +53,7 @@ class InputComponent extends Component
 //        $this->array_renderer = $renderer;
 //    }
 
-    public function getField()
+    public function getField() : DataInput
     {
         return $this->field;
     }
@@ -58,41 +61,36 @@ class InputComponent extends Component
     public function renderImpl()
     {
 
-        $renderer = $this->field->getRenderer();
-        $field = $this->field;
+        $renderer = null;
+
+        if ($this->field instanceof ArrayDataInput) {
+            $renderer = clone $this->field->getRenderer();
+        }
+        else {
+            $renderer = $this->field->getRenderer();
+        }
 
         if ($this->render_label) {
             if ($renderer instanceof HiddenField) {
             }
             else {
-                $field->getLabelRenderer()->renderLabel($field);
-            }
-        }
-
-        if ($field instanceof ArrayDataInput) {
-
-            if ($field->getArrayRenderer() instanceof ArrayField) {
-                $renderer = clone $field->getArrayRenderer();
-            }
-            if (!$renderer instanceof ArrayField) {
-                throw new Exception("ArrayField renderer required for ArrayDataInput");
+                $this->field->getLabelRenderer()->renderLabel($this->field);
             }
         }
 
         if ($this->render_mode === InputComponent::RENDER_INPUT) {
 
-            $renderer->renderField($field);
+            $renderer->renderField($this->field);
 
         }
         else if ($this->render_mode === InputComponent::RENDER_VALUE) {
 
-            if ($field->getRenderer() instanceof HiddenField) {
+            if ($renderer instanceof HiddenField) {
                 //
             }
             else {
-                $renderer->renderValue($field);
+                $renderer->renderValue($this->field);
             }
-
         }
 
 

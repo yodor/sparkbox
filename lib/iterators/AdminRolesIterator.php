@@ -1,0 +1,34 @@
+<?php
+include_once("lib/iterators/ArrayDataIterator.php");
+
+class AdminRolesIterator extends ArrayDataIterator
+{
+
+
+    public function __construct()
+    {
+        global $admin_roles;
+        parent::__construct($admin_roles);
+    }
+
+//    protected function initFields()
+//    {
+//        $this->fields = array("roles");
+//        $this->key = "roles";
+//    }
+//
+//    protected function initValues()
+//    {
+//        global $all_roles; //from config/admin_roles.php
+//
+//        if (is_array($all_roles)) {
+//            $this->values = array();
+//            foreach ($all_roles as $key => $val) {
+//                $this->values[] = array($this->key => $val);
+//            }
+//        }
+//
+//    }
+}
+
+?>

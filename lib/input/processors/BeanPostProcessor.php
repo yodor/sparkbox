@@ -27,7 +27,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     public function beforeCommit(DataInput $field, DBTransactor $transactor, DBDriver $db, $item_key)
     {
-        $data_source = $field->getIterator();
+        $data_source = $field->getSource();
         if (!($data_source instanceof DBTableBean)) {
             debug("Data source is null or not from expected class DBTableBean nothing to do in beforeCommit");
             return;
@@ -287,7 +287,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
                 //tag with id and class
                 $storage_object->id = $item_row[$source_key];
-                $storage_object->className = get_class($field->getIterator());
+                $storage_object->className = get_class($field->getSource());
 
                 $value = $storage_object;
 
@@ -301,7 +301,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             }
             else {
-                if (!is_null($value)) throw new Exception("Expected serialized contents in '$field_name' of data source: " . get_class($field->getIterator()));
+                if (!is_null($value)) throw new Exception("Expected serialized contents in '$field_name' of data source: " . get_class($field->getSource()));
             }
         }
         return $value;
@@ -367,7 +367,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
             //process data source values
             debug("field '$field_name' not found in item_row - trying field source values");
 
-            $data_source = $field->getIterator();
+            $data_source = $field->getSource();
 
             if (is_null($data_source)) {
                 debug("'$field_name' no data source is set for this field");

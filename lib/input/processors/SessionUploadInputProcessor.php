@@ -163,8 +163,8 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         //transact only UIDs found inside the session array i.e. the new ones
         debug("field['$field_name'] " . gettype($values) . " #" . count($values) . " values to transact");
 
-        if (!is_null($field->getIterator())) {
-            $data_source = $field->getIterator();
+        if (!is_null($field->getSource())) {
+            $data_source = $field->getSource();
 
             debug("Field uses data source: '" . get_class($data_source) . "' will commit values in before commit ...");
             return;

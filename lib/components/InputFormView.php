@@ -13,7 +13,7 @@ include_once("lib/handlers/IRequestProcessor.php");
 
 include_once("lib/panels/BeanTranslationDialog.php");
 
-class InputFormView extends Component implements IDataBeanSetter, IDataBeanGetter
+class InputFormView extends Component implements IDBTableEditor
 {
 
     public $item_updated_message = "Information was updated";
@@ -69,9 +69,10 @@ class InputFormView extends Component implements IDataBeanSetter, IDataBeanGette
 
         $this->transactor = new DBTransactor();
 
+        $fieldNames = $this->form->getFieldNames();
+        foreach ($fieldNames as $pos => $fieldName) {
 
-        foreach ($this->form->getFields() as $field_name => $field) {
-
+            $field = $this->form->getField($fieldName);
             $renderer = $field->getRenderer();
 
             if ($renderer instanceof MCETextArea) {
@@ -119,12 +120,12 @@ class InputFormView extends Component implements IDataBeanSetter, IDataBeanGette
 
     }
 
-    public function getBean() : IDataBean
+    public function getBean() : DBTableBean
     {
         return $this->bean;
     }
 
-    public function setBean(IDataBean $bean)
+    public function setBean(DBTableBean $bean)
     {
         $this->bean = $bean;
     }

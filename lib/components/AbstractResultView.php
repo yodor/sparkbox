@@ -1,6 +1,6 @@
 <?php
 include_once("lib/components/Component.php");
-include_once("lib/iterators/ISQLIterator.php");
+
 include_once("lib/utils/Paginator.php");
 include_once("lib/components/PaginatorTopComponent.php");
 include_once("lib/components/PaginatorBottomComponent.php");

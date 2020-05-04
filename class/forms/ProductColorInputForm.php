@@ -23,7 +23,8 @@ class ProductColorInputForm extends InputForm
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "color", "Color Code", 1);
 
         $rend = $field->getRenderer();
-        $rend->setIterator(new StoreColorsBean());
+        $scb = new StoreColorsBean();
+        $rend->setIterator($scb->query());
         $rend->list_label = "color";
         $rend->list_key = "color";
         $rend->addon_content = "<a class='ActionRenderer' action='new' href='../../colors/add.php'>" . tr("New Color Code") . "</a>";
@@ -48,7 +49,7 @@ class ProductColorInputForm extends InputForm
         $input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photos", 0);
         $bean = new ProductColorPhotosBean();
 
-        $input->setIterator($bean);
+        $input->setSource($bean);
 
         $input->transact_mode = DataInput::TRANSACT_OBJECT;
         $input->getValueTransactor()->max_slots = 10;

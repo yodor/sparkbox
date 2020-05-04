@@ -1,8 +1,8 @@
 <?php
 include_once("lib/forms/InputForm.php");
-include_once("lib/beans/IDataBeanGetter.php");
+include_once("lib/beans/IDBTableEditor.php");
 
-class DBTransactor implements IDataBeanGetter
+class DBTransactor implements IDBTableEditor
 {
 
     protected $transact_values = NULL;
@@ -35,6 +35,14 @@ class DBTransactor implements IDataBeanGetter
     public function getBean() : DBTableBean
     {
         return $this->transaction_bean;
+    }
+    public function setEditID(int $editID): void
+    {
+        $this->editID = $editID;
+    }
+    public function setBean(DBTableBean $bean): void
+    {
+        $this->bean = $bean;
     }
 
     public function getLastID() : int

@@ -73,7 +73,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $lb->select()->where = " langID>1 ";
 
-        $renderer->setIterator($lb);
+        $renderer->setIterator($lb->query());
         $renderer->list_key = "langID";
         $renderer->list_label = "language";
 

@@ -1,8 +1,8 @@
 <?php
 include_once("lib/input/DataInputFactory.php");
 
-include_once("lib/beans/IDataBeanGetter.php");
-include_once("lib/beans/IDataBeanSetter.php");
+include_once("lib/beans/IDBTableEditor.php");
+
 
 /**
  * Class InputForm
@@ -18,12 +18,12 @@ include_once("lib/beans/IDataBeanSetter.php");
  * after SitePage->begin() is called which marks end of server side processing and start of rendering
  *form can be rendered using IFormRenderer->renderForm()
  */
-class InputForm implements IDataBeanSetter, IDataBeanGetter
+class InputForm implements IDBTableEditor
 {
     /**
      * @var bool
      */
-    public $star_required = true;
+    public $star_required = TRUE;
 
     /**
      * @var array
@@ -31,7 +31,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
     protected $fields = array();
 
     /**
-     * @var IDataBean
+     * @var DBTableBean
      */
     protected $bean = NULL;
     /**
@@ -55,7 +55,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         $this->beanID = -1;
     }
 
-    public function getRenderer()
+    public function getRenderer(): ?IFormRenderer
     {
         return $this->renderer;
     }
@@ -70,7 +70,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         $this->processor = $processor;
     }
 
-    public function getProcessor()
+    public function getProcessor(): ?IFormProcessor
     {
         return $this->processor;
     }
@@ -90,7 +90,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         $field_name = $field->getName();
 
 
-        $this->fields = array_slice($this->fields, 0, $index + 1, true) + array("$field_name" => $field) + array_slice($this->fields, $index + 1, count($this->fields) - 1, true);
+        $this->fields = array_slice($this->fields, 0, $index + 1, TRUE) + array("$field_name" => $field) + array_slice($this->fields, $index + 1, count($this->fields) - 1, TRUE);
 
     }
 
@@ -101,22 +101,22 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         }
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean) : void
     {
         $this->bean = $bean;
     }
 
-    public function getBean() : DBTableBean
+    public function getBean(): DBTableBean
     {
         return $this->bean;
     }
 
-    public function setEditID(int $editid)
+    public function setEditID(int $editid) : void
     {
         $this->beanID = $editid;
     }
 
-    public function getEditID() : int
+    public function getEditID(): int
     {
         return $this->beanID;
     }
@@ -125,31 +125,19 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
      * @param string $field_name
      * @return bool
      */
-    public function haveField(string $field_name)
+    public function haveField(string $field_name) : bool
     {
         return array_key_exists($field_name, $this->fields);
     }
 
     /**
      * @param string $field_name
-     * @return mixed
-     * @throws Exception
-     */
-    public function fieldExists(string $field_name)
-    {
-        if (!$this->haveField($field_name)) throw new Exception("InputField [$field_name] is not defined in this form: " . get_class());
-        return $this->fields[$field_name];
-    }
-
-
-    /**
-     * @param string $field_name
      * @return DataInput
      * @throws Exception
      */
-    public function getField(string $field_name)
+    public function getField(string $field_name): DataInput
     {
-        return $this->fieldExists($field_name);
+        return $this->fields[$field_name];
     }
 
 
@@ -167,34 +155,38 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
     /**
      * @return array
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
 
-
-    public function valueUnescape($field_name)
+    public function getFieldNames() : array
     {
-        $field = $this->fieldExists($field_name);
+        return array_keys($this->fields);
+    }
+
+    public function valueUnescape(string $field_name)
+    {
+        $field = $this->getField($field_name);
         return mysql_real_unescape_string($field->getValue());
     }
 
     /**
      * @return bool
      */
-    public function haveErrors()
+    public function haveErrors() : bool
     {
-        $found_error = false;
+        $found_error = FALSE;
         foreach ($this->fields as $field_name => $field) {
-            if ($field->haveError() === true) {
-                $found_error = true;
+            if ($field->haveError() === TRUE) {
+                $found_error = TRUE;
                 break;
             }
         }
         return $found_error;
     }
 
-    public function clear()
+    public function clear() : void
     {
         foreach ($this->fields as $field_name => $field) {
             $field->clear();
@@ -202,23 +194,36 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
     }
 
 
-    public function loadPostData(array $arr)
+    /**
+     * Load values with data from _POST or DBTableBean
+     * @param array $arr
+     * @throws Exception
+     */
+    public function loadPostData(array $arr) : void
     {
-        foreach ($this->fields as $field_name => $field) {
+
+        $field_names = array_keys($this->fields);
+
+        foreach ($field_names as $pos => $field_name) {
+            $field = $this->getField($field_name);
+
             if ($field->isEditable()) {
                 $field->loadPostData($arr);
-
             }
         }
 
     }
 
     /**
-     *
+     * Validate data values for all fields in this form
+     * @throws Exception
      */
     public function validate()
     {
-        foreach ($this->fields as $field_name => $field) {
+        $field_names = array_keys($this->fields);
+
+        foreach ($field_names as $pos => $field_name) {
+            $field = $this->getField($field_name);
 
             if ($field->isEditable()) {
                 $field->validate();
@@ -228,7 +233,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
 
     public function loadBeanData($editID, DBTableBean $bean)
     {
-        debug("Loading data from '".get_class($bean)."' ID='$editID' ");
+        debug("Loading data from '" . get_class($bean) . "' ID='$editID' ");
 
         //TODO: check if setEditBean and editID is used anymore
         $this->setBean($bean);
@@ -297,7 +302,7 @@ class InputForm implements IDataBeanSetter, IDataBeanGetter
         return $sf;
     }
 
-    public function searchFilterSelect() : SQLSelect
+    public function searchFilterSelect(): SQLSelect
     {
         $sel = new SQLSelect();
         $sel->fields = "";
