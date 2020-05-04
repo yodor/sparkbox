@@ -14,17 +14,30 @@ class ArrayDataInput extends DataInput
         $this->value = array();
         $this->error = array();
 
-
         $this->renderer = new ArrayField();
+        $this->renderer->setFieldAttribute("name", $name);
     }
 
     public function setRenderer(InputField $renderer)
     {
         if (!($renderer instanceof ArrayField)) {
+            //debug("ArrayDataInput but renderer not instance of ArrayField - setting it as item renderer");
             throw new Exception("Incorrect renderer for ArrayDataInput");
         }
-        parent::setRenderer($renderer);
-        $this->renderer->setFieldAttribute("name", $this->getName());
+        else {
+            parent::setRenderer($renderer);
+        }
+
+    }
+
+    public function getArrayRenderer() : ArrayField
+    {
+        return $this->renderer;
+    }
+
+    public function setArrayRenderer(ArrayField $renderer)
+    {
+        $this->renderer = $renderer;
     }
 
     public function setValidator(IInputValidator $validator)

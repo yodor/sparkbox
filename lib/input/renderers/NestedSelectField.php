@@ -17,42 +17,25 @@ class NestedSelectField extends SelectField
 
     }
 
-    public function renderImpl()
-    {
-
-        if (!$this->data_bean instanceof NestedSetBean) {
-            throw new Exception("NestedSetBean required as data source for this field");
-        }
-
-        parent::renderImpl();
-    }
-
     protected function renderItems()
     {
-        //       $this->listChildsSelect($this->rootParent, 0);
 
         $field_values = $this->field->getValue();
         $field_name = $this->field->getName();
 
-        $db = DBDriver::Get();
-
-        $sel = $this->data_bean->listTreeSelect();
-
-
-        $res = $db->query($sel->getSQL());
 
         $path = array();
 
-        $source_key = $this->data_bean->key();
+        $source_key = $this->iterator->key();
 
 
-        while ($row = $db->fetch($res)) {
+        while ($row = $this->iterator->next()) {
 
             $lft = $row["lft"];
             $rgt = $row["rgt"];
             $nodeID = $row[$source_key];
 
-            trbean($nodeID, $this->list_label, $row, $this->data_bean->getTableName());
+            trbean($nodeID, $this->list_label, $row, $this->iterator->name());
 
             $value = $row[$this->list_key];
             $label = $row[$this->list_label];

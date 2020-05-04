@@ -203,8 +203,10 @@ abstract class Component implements IRenderer, IHeadContents
 
             if (!$this->render_tooltip && strcmp($name, "tooltip") == 0) continue;
 
-
-            if (is_null($value) || strlen($value) < 1) {
+            if (is_array($value)) {
+                debug("component attribute value is array: ".get_class($this).": $name");
+            }
+            else if (is_null($value) || strlen($value) < 1) {
 
                 $attributes[] = $name;
 

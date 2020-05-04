@@ -18,7 +18,7 @@ abstract class DataSourceField extends InputField
         $this->item = $cmp;
     }
 
-    public function getItemRenderer()
+    public function getItemRenderer() : IDataSourceItem
     {
         return $this->item;
     }

@@ -84,7 +84,7 @@ class ProductInventoryInputForm extends InputForm
     {
         $this->prodID = (int)$prodID;
 
-        $this->getField("pclrID")->getRenderer()->getIterator()->select()->where = " prodID='{$this->prodID}' ";
+        $this->getField("pclrID")->getRenderer()->getIterator()->select->where = " prodID='{$this->prodID}' ";
 
         $this->getField("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' action='inline-new' href='../color_gallery/add.php?prodID={$this->prodID}'>" . tr("New Color Scheme") . "</a>";
 
@@ -98,9 +98,9 @@ class ProductInventoryInputForm extends InputForm
 
         $rend->setCaption(tr("Product Class") . ": " . $this->product["class_name"]);
 
-        $rend->getIterator()->select()->from.=" ca LEFT JOIN attributes attr ON attr.name = ca.attribute_name ";
-        $rend->getIterator()->select()->where = " ca.class_name='". $this->product["class_name"]."' ";
-        $rend->getIterator()->select()->fields = " ca.*, attr.unit as attribute_unit, attr.type attribute_type ";
+        $rend->getIterator()->select->from.=" ca LEFT JOIN attributes attr ON attr.name = ca.attribute_name ";
+        $rend->getIterator()->select->where = " ca.class_name='". $this->product["class_name"]."' ";
+        $rend->getIterator()->select->fields = " ca.*, attr.unit as attribute_unit, attr.type attribute_type ";
 
         $this->getField("price")->setValue($this->product["price"]);
         $this->getField("buy_price")->setValue($this->product["buy_price"]);
@@ -116,12 +116,12 @@ class ProductInventoryInputForm extends InputForm
 
         $rend = $this->getField("value")->getRenderer();
 
-        $rend->getIterator()->select()->from.=" ca LEFT JOIN inventory_attribute_values iav ON iav.caID = ca.caID AND iav.piID=$editID LEFT JOIN attributes attr ON attr.name = ca.attribute_name ";
-        $rend->getIterator()->select()->where = " ca.class_name='". $this->product["class_name"]."' ";
-        $rend->getIterator()->select()->fields = " ca.*, iav.value, attr.unit as attribute_unit, attr.type attribute_type ";
+        $rend->getIterator()->select->from.=" ca LEFT JOIN inventory_attribute_values iav ON iav.caID = ca.caID AND iav.piID=$editID LEFT JOIN attributes attr ON attr.name = ca.attribute_name ";
+        $rend->getIterator()->select->where = " ca.class_name='". $this->product["class_name"]."' ";
+        $rend->getIterator()->select->fields = " ca.*, iav.value, attr.unit as attribute_unit, attr.type attribute_type ";
     }
 
-    public function loadPostData(array $arr)
+    public function loadPostData(array $arr) : void
     {
         parent::loadPostData($arr);
 

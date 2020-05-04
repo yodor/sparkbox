@@ -500,17 +500,42 @@ abstract class DBTableBean
     public function needQuotes($key, &$value = "")
     {
         $storage_type = $this->storage_types[$key];
+//        echo "$key=>$storage_type | ";
+
         // 	  if (strpos($storage_type,"char")!==false || strpos($storage_type,"text")!==false || strpos($storage_type,"blob")!==false  ||  strpos($storage_type,"enum")!==false) {
         // 		return true;
         // 	  }
         // 	  if (strpos($storage_type, "bool")!==false) {
         // 		return true;
         // 	  }
+
         if (strpos($storage_type, "date") !== FALSE || strpos($storage_type, "timestamp") !== FALSE) {
             if (endsWith($value, "()")) return FALSE;
             return TRUE;
         }
         return TRUE;
+    }
+
+    public function isNumeric($key) : bool
+    {
+        $storage_type = $this->storage_types[$key];
+        if (
+            (strpos($storage_type, "decimal")!== FALSE) ||
+            (strpos($storage_type, "numeric")!== FALSE) ||
+            (strpos($storage_type, "integer")!== FALSE) ||
+            (strpos($storage_type, "float")!== FALSE) ||
+            (strpos($storage_type, "double")!== FALSE) ||
+
+            (strpos($storage_type, "tinyint")!== FALSE) ||
+            (strpos($storage_type, "small")!== FALSE) ||
+            (strpos($storage_type, "mediumint")!== FALSE) ||
+            (strpos($storage_type, "int")!== FALSE) ||
+            (strpos($storage_type, "bigint")!== FALSE) )
+        {
+            return TRUE;
+        }
+        return FALSE;
+
     }
 
     public function insert(&$row, &$db = FALSE)
@@ -552,7 +577,7 @@ abstract class DBTableBean
         return $last_insert;
     }
 
-    public function update($id, &$row, &$db = FALSE)
+    public function update(int $id, &$row, &$db = FALSE)
     {
 
         $docommit = FALSE;
@@ -600,6 +625,8 @@ abstract class DBTableBean
 
     protected function prepareValues(&$row, &$values, $for_update)
     {
+
+
         $keys = array();
 
         foreach ($row as $key => $val) {
@@ -614,6 +641,7 @@ abstract class DBTableBean
             $value = $row[$key];
             // 	  debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value));
 
+            //take first element of an array
             if (is_array($value)) {
 
                 if (count($value) < 1) continue;
@@ -625,6 +653,11 @@ abstract class DBTableBean
                 $values[$key] = "NULL";
             }
             else {
+
+                if ($this->isNumeric($key) && strlen($value)<1) {
+                    $value = 0;
+                }
+
                 if ($this->needQuotes($key, $value) === TRUE) {
                     $values[$key] = "'" . $value . "'";
                 }
@@ -639,6 +672,8 @@ abstract class DBTableBean
 
             }
         }
+
+
     }
 
     protected function prepareInsertValues(&$row, &$values)

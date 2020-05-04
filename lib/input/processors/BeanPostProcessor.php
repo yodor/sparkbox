@@ -387,10 +387,10 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 debug("processing data_source values using access field: '$item_key'");
 
                 $source_values = array();
-                $data_source->startFieldIterator($item_key, $editID);
+                $qry = $data_source->queryField($item_key, $editID);
+                $qry->exec();
 
-                $row = array();
-                while ($data_source->fetchNext($row)) {
+                while ($row = $qry->next()) {
 
                     debug("DataSourceLoadID: $source_key=>" . $row[$source_key]);
 

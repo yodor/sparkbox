@@ -43,7 +43,7 @@ class MenuItemInputForm extends InputForm
         $this->load();
     }
 
-    public function loadPostData(array $arr)
+    public function loadPostData(array $arr) : void
     {
         parent::loadPostData($arr);
         $this->load();

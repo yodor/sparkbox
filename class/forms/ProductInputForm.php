@@ -148,7 +148,7 @@ class ProductInputForm extends InputForm
 
     }
 
-    public function loadPostData(array $arr)
+    public function loadPostData(array $arr) : void
     {
         parent::loadPostData($arr);
 

@@ -22,6 +22,11 @@ class ArrayField extends InputField
     const DEFAULT_CONTROL_ACTION = "Add";
     const DEFAULT_CONTROL_NAME = "Add";
 
+    /**
+     * @var InputField
+     */
+    protected $item_renderer = NULL;
+
     public function __construct()
     {
         parent::__construct();
@@ -35,6 +40,16 @@ class ArrayField extends InputField
 
         $this->action_renderer = new ActionRenderer(new Action("Remove", "", array()));
 
+    }
+
+    public function setItemRenderer(InputField $renderer)
+    {
+        $this->item_renderer = $renderer;
+    }
+
+    public function getItemRenderer() : ?InputField
+    {
+        return $this->item_renderer;
     }
 
     public function requiredStyle()
@@ -130,7 +145,15 @@ class ArrayField extends InputField
         echo "<div class='ElementSource'>";
 
         $field = new DataInput("render_source", $this->field->getLabel(), $this->field->isRequired());
-        $renderer = clone $this->field->getRenderer();
+
+        $renderer = null;
+        if ($this->item_renderer){
+            $renderer = clone $this->item_renderer;
+        }
+        else {
+            $renderer = clone $this->field->getRenderer();
+        }
+
         $field->setRenderer($renderer);
 
         $renderer->renderField($field);
@@ -148,7 +171,13 @@ class ArrayField extends InputField
         echo "<div class='ArrayContents' field='" . $this->field->getName() . "'>";
         $values = $this->field->getValue();
 
-        $renderer = clone $this->field->getRenderer();
+        $renderer = NULL;
+        if ($this->item_renderer) {
+            $renderer = clone $this->item_renderer;
+        }
+        else {
+            $renderer = clone $this->field->getRenderer();
+        }
 
         if (is_array($values)) {
 

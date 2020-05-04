@@ -1,12 +1,16 @@
 <?php
 include_once("lib/forms/processors/IFormProcessor.php");
+include_once("lib/beans/IDBTableEditor.php");
 
-class FormProcessor implements IFormProcessor
+class FormProcessor implements IFormProcessor, IDBTableEditor
 {
 
     protected $status = IFormProcessor::STATUS_NOT_PROCESSED;
 
     protected $message = "";
+
+    protected $editID = -1;
+    protected $bean = NULL;
 
     /**
      * @return string
@@ -29,6 +33,32 @@ class FormProcessor implements IFormProcessor
     public function getStatus()
     {
         return $this->status;
+    }
+
+    public function setEditID(int $editID): void
+    {
+        $this->editID = $editID;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEditID(): int
+    {
+        return $this->editID;
+    }
+
+    public function setBean(DBTableBean $bean): void
+    {
+        $this->bean = $bean;
+    }
+
+    /**
+     * @return DBTableBean
+     */
+    public function getBean(): ?DBTableBean
+    {
+        return $this->bean;
     }
 
     public function __construct()

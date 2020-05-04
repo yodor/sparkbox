@@ -272,7 +272,10 @@ class DataInput
         $this->value = $value;
     }
 
-    public function getError() : string
+    /**
+     * @return string|array
+     */
+    public function getError()
     {
         return $this->error;
     }
@@ -311,7 +314,7 @@ class DataInput
     }
 
     //coming from user posts. can throw exception
-    public function loadPostData(array $arr)
+    public function loadPostData(array $arr) : void
     {
         $this->input_processor->loadPostData($this, $arr);
     }

@@ -57,13 +57,13 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         $this->setPhotoSize(-1, 64);
     }
 
-    public function setSection($section_name, $section_key)
+    public function setSection(string $section_name, string $section_key)
     {
         $this->section_name = $section_name;
         $this->section_key = $section_key;
     }
 
-    public function setOwnerID($ownerID)
+    public function setOwnerID(int $ownerID)
     {
         $this->ownerID = $ownerID;
     }

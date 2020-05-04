@@ -231,7 +231,7 @@ class InputForm implements IDBTableEditor
         }
     }
 
-    public function loadBeanData($editID, DBTableBean $bean)
+    public function loadBeanData(int $editID, DBTableBean $bean)
     {
         debug("Loading data from '" . get_class($bean) . "' ID='$editID' ");
 

@@ -11,9 +11,9 @@ class ClassAttributeItem extends DataSourceItem
 
         echo "<label data='attribute_name'>" . $this->label . "</label>";
 
-        echo "<input data='attribute_value' type='text' value='{$this->value}' name='{$this->name}[]'>";
+        echo "<input data='attribute_value' type='text' value='{$this->value}' name='{$this->name}'>";
 
-        echo "<input data='foreign_key' type='hidden' name='fk_{$this->name}[]' value='caID:{$this->id}'>";
+        echo "<input data='foreign_key' type='hidden' name='fk_{$this->name}' value='caID:{$this->id}'>";
 
 
         echo "<label data='attribute_unit'>" . $this->data_row["unit"] . "</label>";
@@ -46,8 +46,8 @@ class ClassAttributeFieldAjaxHandler extends JSONRequestHandler
     public function _render(JSONResponse $req)
     {
         $field = new ArrayDataInput("value", "Category Attributes", 0);
-        $field->allow_dynamic_addition = false;
-        $field->source_label_visible = true;
+        $field->allow_dynamic_addition = FALSE;
+        $field->source_label_visible = TRUE;
 
 
         $bean1 = new ClassAttributeValuesBean();
@@ -71,15 +71,16 @@ class ClassAttributeField extends DataSourceField implements IArrayFieldRenderer
     protected $catID = -1;
     protected $prodID = -1;
 
-
     public function __construct()
     {
         parent::__construct();
         $this->setItemRenderer(new ClassAttributeItem());
+
         $cab = new ClassAttributesBean();
         $this->setIterator($cab->query());
         $this->list_key = "caID";
         $this->list_label = "attribute_name";
+
         RequestController::addAjaxHandler(new ClassAttributeFieldAjaxHandler());
     }
 
@@ -90,14 +91,12 @@ class ClassAttributeField extends DataSourceField implements IArrayFieldRenderer
         return $arr;
     }
 
-
     public function setCategoryID($catID)
     {
         $this->catID = $catID;
-
         $this->iterator->select->fields = " ca.*, ma.name as attribute_name, ma.unit, ma.type ";
-        $this->iterator->select->from.= " ca, attributes ma  ";
-        $this->iterator->select->where = " ca.catID='$catID' AND ma.maID=ca.maID";
+        $this->iterator->select->from = $this->iterator->name(). " ca, attributes ma ";
+        $this->iterator->select->where = "ca.catID='$catID' AND ma.maID=ca.maID";
 
     }
 
@@ -105,28 +104,14 @@ class ClassAttributeField extends DataSourceField implements IArrayFieldRenderer
     {
         $this->prodID = (int)$prodID;
         if ($this->prodID > 0) {
-            $this->iterator->select->from.= " ca LEFT JOIN class_attribute_values cav ON ca.caID = cav.caID , attributes ma ";
-            $this->iterator->select->where = " ma.maID=ca.maID AND ca.catID='{$this->catID}' ";
-            $this->iterator->select->group_by = " ca.caID ";
-            $this->iterator->select->having = " (cav.prodID='{$this->prodID}' OR cav.prodID IS NULL) ";
-            $this->iterator->select->fields = " ca.*, ma.name as attribute_name, ma.unit, ma.type, cav.value, cav.prodID ";
+            $this->iterator->select->fields = "ca.*, ma.name as attribute_name, ma.unit, ma.type, cav.value, cav.prodID";
+            $this->iterator->select->from = $this->iterator->name(). " ca LEFT JOIN class_attribute_values cav ON ca.caID = cav.caID , attributes ma ";
+            $this->iterator->select->where = "ma.maID=ca.maID AND ca.catID='{$this->catID}'";
+            $this->iterator->select->group_by = "ca.caID";
+            $this->iterator->select->having = "(cav.prodID='{$this->prodID}' OR cav.prodID IS NULL)";
         }
     }
 
-    public function renderControls()
-    {
-
-    }
-
-    public function renderElementSource()
-    {
-
-    }
-
-    public function renderArrayContents()
-    {
-
-    }
 
     public function renderImpl()
     {
@@ -134,23 +119,24 @@ class ClassAttributeField extends DataSourceField implements IArrayFieldRenderer
         if ($this->catID < 1) {
 
             echo tr("Select product category first");
-
             return;
         }
 
+        parent::renderImpl();
 
-        $num = $this->qry->exec();
+    }
 
-        if ($num < 1) {
-            echo "Selected category does not provide optional attributes";
+    protected function renderItems()
+    {
+
+        if ( $this->iterator->count() < 1) {
+            echo tr("No optional attributes");
             return;
         }
-        $this->startRenderItems();
 
-        $this->renderItems();
+        $this->list_key = $this->field->getName();
 
-        $this->finishRenderItems();
-
+        parent::renderItems();
     }
 
     public function finishRender()
@@ -187,42 +173,7 @@ class ClassAttributeField extends DataSourceField implements IArrayFieldRenderer
     }
 
 
-    protected function renderItems()
-    {
 
-        $field_values = $this->field->getValue();
-        $field_name = $this->field->getName();
-
-        if (!is_array($field_values)) {
-            $field_values = array($field_values);
-        }
-
-        $prkey = $this->iterator->key();
-        $index = 0;
-
-        while ($data_row = $this->iterator->next()) {
-
-            $id = $data_row["caID"];
-
-
-            $value = isset($data_row[$field_name]) ? $data_row[$field_name] : "";
-            $label = $data_row[$this->list_label];
-
-
-            $item = clone $this->item;
-            $item->setID($id);
-            $item->setValue($value);
-            $item->setLabel($label);
-            $item->setName($field_name);
-            $item->setIndex($index);
-
-            $item->setDataRow($data_row);
-
-            $item->render();
-
-            $index++;
-        }
-    }
 }
 
 ?>

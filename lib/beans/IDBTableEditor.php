@@ -16,7 +16,7 @@ interface IDBTableEditor
     /**
      * @return DBTableBean
      */
-    public function getBean() : DBTableBean;
+    public function getBean() : ?DBTableBean;
 
     /**
      * @param DBTableBean $bean
