@@ -28,26 +28,6 @@ class ProductsPage extends DemoPage
 
         $this->derived = $derived;
 
-
-        //         $selection_path = $this->tv->getSelectionPath();
-        // 	if (count($selection_path)>0) {
-        //
-        //
-        // 	  $list = implode(",", $selection_path);
-        //
-        // 	  $this->cats->startIterator("WHERE catID in ($list) ORDER BY lft");
-        //
-        // 	  while($this->cats->fetchNext($catrow)) {
-        // 	    $catID = $catrow["catID"];
-        // 	    trbean($catID, "category_name", $catrow, $this->cats);
-        //
-        // 	    $category_path[$catID] = $catrow["category_name"];
-        // 	  }
-        //
-        //
-        // 	}
-        // 	$this->category_path = $category_path;
-
         $this->addCSS(SITE_ROOT . "css/ProductsPage.css");
     }
 

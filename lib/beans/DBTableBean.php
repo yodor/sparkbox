@@ -19,19 +19,14 @@ abstract class DBTableBean
 
     protected $createString = "";
 
-//    protected $filter = FALSE;
-//
-//    protected $last_iterator_sql = "";
-
+    /**
+     * @var DBDriver|null
+     */
     protected $db = NULL;
 
     protected $storage_types = NULL;
 
-//    protected $iterator = NULL;
-
     protected static $instances = array();
-
-    protected static $use_prepared_statement = FALSE;
 
     /**
      * @var SQLSelect|null
@@ -51,7 +46,7 @@ abstract class DBTableBean
 
         $bclass = get_class($this);
 
-        if (!$this->db) throw new Exception("DBTableBean::$bclass could not attach with DBDriver");
+        if (!$this->db) throw new Exception("$bclass could not attach with DBDriver");
 
         $this->initFields();
 
@@ -188,85 +183,10 @@ abstract class DBTableBean
 
     }
 
-    public function containsValue($key, $val)
-    {
-
-        $total = 0;
-        $val = $this->db->escapeString($val);
-        $sql = "SELECT SQL_CALC_FOUND_ROWS * from {$this->table} WHERE $key LIKE '$val' LIMIT 1";
-        $itr = $this->createIterator($sql, $total);
-        $this->db->free($itr);
-        return ($total > 0);
-
-    }
-
     public function haveField($field_name): bool
     {
         return in_array($field_name, $this->fields);
     }
-
-//    public function startFieldIterator($filter_field, $filter_value)
-//    {
-//        return $this->startIterator("WHERE $filter_field='$filter_value'");
-//    }
-//
-//    public function startSelectIterator(SQLSelect $select)
-//    {
-//        $total = -1;
-//        $sql = $select->getSQL();
-//
-//        $this->db->free($this->iterator);
-//
-//        $this->iterator = $this->createIterator($sql, $total);
-//
-//        return $total;
-//    }
-//
-//    public function createIteratorSQL($filter = "", $fields = " * ")
-//    {
-//        $itr_filter = $filter;
-//
-//        if ($this->filter) {
-//            $itr_filter = trim($itr_filter);
-//
-//            $filter = str_ireplace("WHERE", "", $filter);
-//            if (strpos($this->filter, "JOIN") !== FALSE) {
-//                $itr_filter = $this->filter . " " . $filter;
-//            }
-//            else {
-//                $itr_filter = "WHERE {$this->filter}" . $filter;
-//            }
-//        }
-//
-//        $sql = "SELECT SQL_CALC_FOUND_ROWS $fields FROM {$this->table} $itr_filter ";
-//        return $sql;
-//
-//    }
-//
-//    public function createIterator($sql, &$total)
-//    {
-//        if ($this->iterator) $this->db->free($this->iterator);
-//
-//        $this->last_iterator_sql = $sql;
-//
-//        // 	debug("DBTabelBean::createIterator | SQL: $sql");
-//
-//        $itr = $this->db->query($sql);
-//
-//        if (!$itr) {
-//
-//            debug("DBTabelBean::createIterator | Unable to create iterator for SQL: $sql");
-//
-//            throw new Exception("Unable to create iterator: " . $this->db->getError());
-//        }
-//
-//        $res = $this->db->query("SELECT FOUND_ROWS() as total");
-//        $row = $this->db->fetch($res);
-//        $this->db->free($res);
-//
-//        $total = (int)$row["total"];
-//        return $itr;
-//    }
 
     public function queryID(int $id)
     {
@@ -292,41 +212,6 @@ abstract class DBTableBean
         $qry->setDB($this->db);
         return $qry;
     }
-
-//    public function startIterator($filter = "", $fields = " * ")
-//    {
-//        $itr_filter = $filter;
-//        if ($this->filter) {
-//            $itr_filter = trim($itr_filter);
-//
-//            $filter = str_ireplace("WHERE", "", $filter);
-//            if (strpos($this->filter, "JOIN") !== FALSE) {
-//                $itr_filter = $this->filter . " " . $filter;
-//            }
-//            else {
-//                $itr_filter = "WHERE {$this->filter}" . $filter;
-//            }
-//        }
-//
-//        $sql = "SELECT SQL_CALC_FOUND_ROWS $fields FROM {$this->table}  $itr_filter ";
-//        $total = -1;
-//
-//        $this->iterator = $this->createIterator($sql, $total);
-//
-//        return $total;
-//    }
-//
-//    public function fetchNext(array &$row, $iterator = FALSE): bool
-//    {
-//        if ($iterator === FALSE) {
-//            $iterator = $this->iterator;
-//        }
-//
-//        if ($row = $this->db->fetch($iterator)) {
-//            return TRUE;
-//        }
-//        return FALSE;
-//    }
 
     private function fillDebug()
     {

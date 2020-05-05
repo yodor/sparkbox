@@ -74,7 +74,7 @@ abstract class DataSourceItem extends Component implements IDataSourceItem
     public function __construct()
     {
         parent::__construct();
-        $this->component_class = "";
+        //$this->component_class = "";
     }
 
     public function startRender()

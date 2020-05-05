@@ -29,10 +29,12 @@ try {
     $b = new $page_class;
 
     $prkey = $b->key();
-    $rrow = array();
-    $num = $b->startIterator("WHERE $prkey='$page_id' LIMIT 1", " item_title, content, visible ");
+
+    $qry = $qry->queryField($prkey, $page_id, 1);
+    $qry->select->fields = " item_title, content, visible ";
+    $num = $qry->exec();
     if ($num < 1) throw new Exception("This page is not available.");
-    $b->fetchNext($rrow);
+    $row = $qry->next();
     if (!$rrow["visible"]) throw new Exception("This page is currently unavailable.");
 
 }
@@ -80,9 +82,11 @@ echo "<div class='PagePhotos'>";
 
 
 $dpp = new DynamicPagePhotosBean();
-$num_photos = $dpp->startIterator("WHERE dpID='$page_id' LIMIT 1", " ppID, caption ");
-$dpprow = array();
-if ($num_photos && $dpp->fetchNext($dpprow)) {
+$qry = $dpp->queryField("dpID", $page_id, 1);
+$qry->select->fields = " ppID, caption ";
+$num_photos = $qry->exec();
+
+if ($num_photos && $dprow = $dpp->next()) {
     $photo_id = $dpprow["ppID"];
 
     echo "<div class='photo_item' id='$photo_id' class='DynamicPagePhotosBean'>";

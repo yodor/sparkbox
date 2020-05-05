@@ -25,8 +25,11 @@ class UserGroupsBean extends DBTableBean
     {
         $userID = (int)$userID;
         $groupID = (int)$groupID;
-        $n = $this->startIterator(" WHERE userID='$userID' AND groupID='$groupID' ");
-        if ($n > 0) return true;
+        $qry = $this->query();
+        $qry->select->where = " userID='$userID' AND groupID='$groupID' ";
+        $qry->select->fields = " userID ";
+        $qry->select->limit = " 1 ";
+        if ($qry->exec() > 0) return true;
         return false;
     }
 

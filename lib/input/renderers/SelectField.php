@@ -74,19 +74,9 @@ class SelectField extends DataSourceField
 
     }
 
-    public function startRender()
-    {
-        parent::startRender();
-
-        echo "<div class='FieldElements'>";
-        $attrs = $this->prepareFieldAttributes();
-        echo "<select $attrs >";
-    }
-
     public function finishRender()
     {
 
-        echo "</select>";
 
         $field_value = $this->field->getValue();
         $field_name = $this->field->getName();
@@ -109,8 +99,6 @@ class SelectField extends DataSourceField
 
         }
 
-        echo "</div>";//field_elements
-
         parent::finishRender();
 
     }
@@ -118,8 +106,12 @@ class SelectField extends DataSourceField
     protected function startRenderItems()
     {
         //prepare the default select value
+        parent::startRenderItems();
 
-        if (strlen($this->na_str) > 0) {
+        $attrs = $this->prepareFieldAttributes();
+        echo "<select $attrs >";
+
+        if ($this->na_str) {
             $item = clone $this->item;
             $item->setID(-1);
             $item->setValue($this->na_val);
@@ -127,7 +119,6 @@ class SelectField extends DataSourceField
             $item->setIndex(-1);
 
             $selected = $this->isModelSelected($this->na_val, $this->field->getValue());
-
 
             $item->setSelected($selected);
 
@@ -139,6 +130,8 @@ class SelectField extends DataSourceField
     protected function finishRenderItems()
     {
 
+        echo "</select>";
+        parent::finishRenderItems();
     }
 
     protected function isModelSelected($value, $field_values)
@@ -182,19 +175,13 @@ class SelectMultipleField extends SelectField
 
         $this->setFieldAttribute("multiple", "");
         $this->addClassName("SelectField");
+        $this->na_str = "";
     }
 
-    public function startRender()
+    protected function startRenderItems()
     {
-        DataSourceField::startRender();
-
         $this->setFieldAttribute("name", $this->field->getName() . "[]");
-
-        echo "<div class='FieldElements'>";
-        $attrs = $this->prepareFieldAttributes();
-
-
-        echo "<select $attrs  >";
+        parent::startRenderItems();
     }
 
 

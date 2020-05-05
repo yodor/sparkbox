@@ -7,9 +7,11 @@ class StorageItem
     public $className = "";
     public $field = "";
 
-    public function __construct()
+    public function __construct(int $id = -1, string $className = "", string $field = "")
     {
-
+        $this->id = $id;
+        $this->className = $className;
+        $this->field = $field;
     }
 
     public function hrefImage($width, $height)
