@@ -1,8 +1,7 @@
 <?php
 include_once("lib/components/Component.php");
-include_once("lib/input/renderers/IDataSourceItem.php");
 
-abstract class DataSourceItem extends Component implements IDataSourceItem
+abstract class DataSourceItem extends Component
 {
     protected $data_row = array();
     protected $index = -1;
@@ -15,6 +14,8 @@ abstract class DataSourceItem extends Component implements IDataSourceItem
     protected $data_row_attributes = array();
     protected $user_attributes = "";
 
+    protected $selected = false;
+    
     public function addDataRowAttribute($name)
     {
         $this->data_row_attributes[] = $name;

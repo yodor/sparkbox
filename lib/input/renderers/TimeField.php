@@ -4,9 +4,9 @@ include_once("lib/input/renderers/InputField.php");
 class TimeField extends InputField
 {
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
 
         $this->is_compound = true;
 
@@ -14,8 +14,8 @@ class TimeField extends InputField
 
     public function renderImpl()
     {
-        $field_value = $this->field->getValue();
-        $field_name = $this->field->getName();
+        $field_value = $this->input->getValue();
+        $field_name = $this->input->getName();
 
 
         $hour = -1;

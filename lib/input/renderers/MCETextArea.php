@@ -5,10 +5,10 @@ class MCETextArea extends InputField
 
     protected static $image_browser = NULL;
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
 
-        parent::__construct();
+        parent::__construct($input);
 
         //force single instance of the dialog to all MCETextAreas to prevent double session upload
         if (!self::$image_browser) {
@@ -52,7 +52,7 @@ class MCETextArea extends InputField
 
         echo "<textarea class='MCETextArea' $field_attrs>";
 
-        $field_value = $this->field->getValue();
+        $field_value = $this->input->getValue();
 
         $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");
         echo $field_value;
@@ -62,7 +62,7 @@ class MCETextArea extends InputField
         <script type='text/javascript'>
             onPageLoad(function () {
                 var mce = new MCETextArea();
-                mce.attachWith("<?php echo $this->field->getName();?>");
+                mce.attachWith("<?php echo $this->input->getName();?>");
             });
         </script>
         <?php
@@ -72,7 +72,7 @@ class MCETextArea extends InputField
 
     public function renderValueImpl()
     {
-        $field_value = $this->field->getValue();
+        $field_value = $this->input->getValue();
 
         if (strlen($field_value) > 0) {
             $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");

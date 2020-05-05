@@ -7,9 +7,9 @@ class CaptchaInputField extends InputField
 
     protected $options = NULL;
 
-    public function __construct($options = NULL)
+    public function __construct(DataInput $input, $options = NULL)
     {
-        parent::__construct();
+        parent::__construct($input);
 
         if (is_array($options)) {
             $this->options = $options;
@@ -32,8 +32,8 @@ class CaptchaInputField extends InputField
 
     protected function renderImpl()
     {
-        $field_value = $this->field->getValue();
-        $field_name = $this->field->getName();
+        $field_value = $this->input->getValue();
+        $field_name = $this->input->getName();
 
 
         $this->options["input_name"] = $field_name;

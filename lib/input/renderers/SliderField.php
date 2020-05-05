@@ -6,25 +6,11 @@ class SliderField extends InputField
 
     public $accepted_values = NULL;
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setClassName("slider_field");
-
-    }
-    //   public function startRender()
-    //   {
-    // 	  echo "<div class='slider_field_wrapper'>";
-    //   }
-    //   public function finishRender()
-    //   {
-    // 	  echo "</div>";
-    //   }
     public function renderImpl()
     {
 
-        $field_value = $this->field->getValue();
-        $field_name = $this->field->getName();
+        $field_value = $this->input->getValue();
+        $field_name = $this->input->getName();
 
         $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");
         $this->attributes["type"] = "hidden";

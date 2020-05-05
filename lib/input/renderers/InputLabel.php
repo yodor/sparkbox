@@ -1,36 +1,19 @@
 <?php
 include_once("lib/components/Component.php");
-include_once("lib/input/renderers/ILabelRenderer.php");
 include_once("lib/input/renderers/IErrorRenderer.php");
 
-
-class InputLabel extends Component implements ILabelRenderer, IErrorRenderer
+class InputLabel extends Component implements IErrorRenderer
 {
 
-    protected $field = NULL;
-    protected $render_index = -1;
+    protected $input = NULL;
 
     public $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
 
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
         parent::__construct();
-
-        //$this->component_class = "InputLabel";
-    }
-
-    public function renderLabel(DataInput $field, int $render_index = -1)
-    {
-
-        $this->field = $field;
-        $this->render_index = $render_index;
-
-        $this->startRender();
-
-        $this->renderImpl();
-
-        $this->finishRender();
+        $this->input = $input;
     }
 
     public function startRender()
@@ -43,19 +26,19 @@ class InputLabel extends Component implements ILabelRenderer, IErrorRenderer
 
     public function renderImpl()
     {
-        echo tr($this->field->getLabel());
+        echo tr($this->input->getLabel());
 
         $star = "";
 
-        if ($this->field->getForm() && $this->field->getForm()->star_required) {
-            $star = ($this->field->isRequired()) ? "<span class=required>*</span>" : "";
+        if ($this->input->getForm() && $this->input->getForm()->star_required) {
+            $star = ($this->input->isRequired()) ? "<span class=required>*</span>" : "";
         }
 
         echo $star;
 
         if ($this->error_render_mode == IErrorRenderer::MODE_SPAN) {
             echo "<small class='error_details'>";
-            echo tr($this->field->getError());
+            echo tr($this->input->getError());
             echo "</small>";
         }
 
@@ -70,13 +53,13 @@ class InputLabel extends Component implements ILabelRenderer, IErrorRenderer
     public function processErrorAttributes()
     {
 
-        if ($this->field->haveError()) {
+        if ($this->input->haveError()) {
 
-            if ($this->field instanceof ArrayDataInput) {
+            if ($this->input instanceof ArrayDataInput) {
                 $field_error = "Some elements of this collection have errors";
             }
             else {
-                $field_error = $this->field->getError();
+                $field_error = $this->input->getError();
             }
 
             if (strlen($field_error) > 0) {

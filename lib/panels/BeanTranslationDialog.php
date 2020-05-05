@@ -81,8 +81,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $ls->setRenderer($renderer);
 
         include_once("lib/components/InputComponent.php");
-        $cmp = new InputComponent();
-        $cmp->setField($ls);
+        $cmp = new InputComponent($ls);
         $cmp->render();
 
         echo "<form>";

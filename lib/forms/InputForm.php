@@ -106,7 +106,7 @@ class InputForm implements IDBTableEditor
         $this->bean = $bean;
     }
 
-    public function getBean(): DBTableBean
+    public function getBean(): ?DBTableBean
     {
         return $this->bean;
     }

@@ -57,11 +57,8 @@ class MCEImageBrowserDialog extends MessageDialog
     {
 
         echo "<form method='post' enctype='multipart/form-data'>";
-        $icmp = new InputComponent();
-
-        $icmp->setField($this->image_input);
+        $icmp = new InputComponent($this->image_input);
         $icmp->render();
-
 
         echo "</form>";
 

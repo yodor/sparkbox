@@ -16,7 +16,7 @@ abstract class InputField extends Component implements IErrorRenderer
     /**
      * @var DataInput
      */
-    protected $field = NULL;
+    protected $input;
 
     /**
      * @var IDataIterator
@@ -32,11 +32,13 @@ abstract class InputField extends Component implements IErrorRenderer
 
     protected $field_attributes = array();
 
-    protected $tooltip_text = "";
-
-    public function __construct()
+    public function __construct(DataInput $input)
     {
         parent::__construct();
+        $this->input = $input;
+
+        $input->setRenderer($this);
+
     }
 
     public function requiredStyle()
@@ -80,7 +82,7 @@ abstract class InputField extends Component implements IErrorRenderer
     public function processErrorAttributes()
     {
 
-        $field_error = $this->field->getError();
+        $field_error = $this->input->getError();
 
         if (is_array($field_error)) $field_error = implode(";", $field_error);
 
@@ -92,38 +94,40 @@ abstract class InputField extends Component implements IErrorRenderer
             $this->attributes["error"] = 1;
         }
         else {
-            $this->attributes["error"] = FALSE;
+            //$this->attributes["error"] = FALSE;
         }
 
     }
 
     public function prepareFieldAttributes()
     {
-        if (!$this->field->isEditable()) {
+        if (!$this->input->isEditable()) {
             $this->setFieldAttribute("disabled", "true");
         }
         return $this->getAttributesText($this->field_attributes);
 
     }
 
-    public function getField()
+    public function setInput(DataInput $input)
     {
-        return $this->field;
+        $this->input = $input;
     }
 
-    public function setField(DataInput $field)
+    public function getInput()
     {
-        $this->field = $field;
+        return $this->input;
+    }
 
-        $this->setFieldAttribute("name", $field->getName());
+    public function startRender()
+    {
+        $this->setFieldAttribute("name", $this->input->getName());
 
         //access attributes directly. allow sub components to override setAttribute
-        $this->attributes["field"] = $field->getName();
-        $this->attributes["tooltip"] = $this->tooltip_text;
+        $this->attributes["field"] = $this->input->getName();
 
         $this->processErrorAttributes();
 
-        $field_error = $field->getError();
+        $field_error = $this->input->getError();
 
         if (is_array($field_error)) $field_error = implode(";", $field_error);
 
@@ -136,45 +140,24 @@ abstract class InputField extends Component implements IErrorRenderer
             }
 
         }
-    }
+        parent::startRender();
 
-    public function renderField(DataInput $field)
-    {
-        $this->setField($field);
-
-        $this->startRender();
         if (strlen($this->caption) > 0) {
             echo "<div class='caption'>";
             echo $this->caption;
             echo "</div>";
         }
-        $this->renderImpl();
-        $this->finishRender();
-    }
-
-    public function renderValue(DataInput $field, int $render_index = -1)
-    {
-        $this->field = $field;
-
-        $this->component_class = "InputValue";
-
-        $this->startRender();
-        $this->renderValueImpl();
-        $this->finishRender();
-
     }
 
     public function finishRender()
     {
 
-
-        $user_data = $this->field->getUserData();
+        $user_data = $this->input->getUserData();
         if (strlen($user_data) > 0) {
             echo "<div class='UserData'>";
             echo $user_data;
             echo "</div>";
         }
-
 
         if ($this->addon_content) {
             echo "<div class='addon_content'>";
@@ -185,38 +168,6 @@ abstract class InputField extends Component implements IErrorRenderer
         parent::finishRender();
     }
 
-
-    public function renderValueImpl()
-    {
-        $field_value = $this->field->getValue();
-
-        if (strlen($field_value) < 1) echo self::$value_na;
-
-        else {
-
-            $link_field = $this->field->getLinkField();
-
-            if ($link_field instanceof DataInput) {
-                $link_value = $link_field->getValue();
-
-                if (strcmp($this->field->getRenderer()->getFreetextInput(), $field_value) === 0) {
-                    echo $field_value . " - " . $link_value;
-                }
-                else {
-                    echo $field_value;
-                }
-            }
-            else {
-                $field_value = $this->field->getValue();
-
-                $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");
-                $field_value = str_replace("\n", "<BR>", $field_value);
-                echo $field_value;
-            }
-        }
-
-
-    }
 }
 
 ?>

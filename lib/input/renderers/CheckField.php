@@ -24,18 +24,18 @@ class CheckItem extends DataSourceItem
 class CheckField extends DataSourceField
 {
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
         $this->setItemRenderer(new CheckItem());
 
     }
 
     public function renderImpl()
     {
-        $field_values = $this->field->getValue();
+        $field_values = $this->input->getValue();
 
-        $field_name = $this->field->getName();
+        $field_name = $this->input->getName();
 
         $field_attr = $this->prepareFieldAttributes();
 
@@ -69,24 +69,6 @@ class CheckField extends DataSourceField
 
     }
 
-    public function renderValueImpl()
-    {
-        $field_value = $this->field->getValue();
-
-        if (!($this->iterator)) {
-
-            if ($field_value > 0) {
-                echo tr("Yes");
-            }
-            else {
-                echo tr("No");
-            }
-
-        }
-        else {
-            parent::renderValueImpl();
-        }
-    }
 }
 
 ?>

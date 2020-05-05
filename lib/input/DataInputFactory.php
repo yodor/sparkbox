@@ -40,7 +40,6 @@ include_once("lib/input/processors/UploadDataInputProcessor.php");
 
 include_once("lib/input/processors/SessionUploadInputProcessor.php");
 
-
 class DataInputFactory
 {
 
@@ -85,153 +84,151 @@ class DataInputFactory
      */
     public static function Create(int $type, string $name, string $label, bool $required)
     {
-        $field = new DataInput($name, $label, $required);
-        $field->transact_mode = DataInput::TRANSACT_VALUE;
+        $input = new DataInput($name, $label, $required);
+        $input->transact_mode = DataInput::TRANSACT_VALUE;
 
-        $field->setValidator(new EmptyValueValidator());
+        $input->setValidator(new EmptyValueValidator());
         $processor = new BeanPostProcessor();
-        $field->setProcessor($processor);
+        $input->setProcessor($processor);
 
         switch ($type) {
 
             case DataInputFactory::TEXT:
-                $field->setRenderer(new TextField());
-
+                new TextField($input);
                 break;
+
             case DataInputFactory::COLOR_CODE:
-                $field->setRenderer(new ColorCodeField());
+                new ColorCodeField($input);
+                break;
 
-                break;
             case DataInputFactory::EMAIL:
-                $field->setRenderer(new TextField());
-                $field->setValidator(new EmailValidator());
+                new TextField($input);
+                $input->setValidator(new EmailValidator());
                 break;
+
             case DataInputFactory::TEXTAREA:
-                $field->setRenderer(new TextArea());
+                new TextArea($input);
                 break;
 
             case DataInputFactory::SELECT:
-                $field->setRenderer(new SelectField());
-                $field->getProcessor()->transact_empty_string_as_null = true;
+                new SelectField($input);
+                $input->getProcessor()->transact_empty_string_as_null = TRUE;
                 break;
 
             case DataInputFactory::SELECT_MULTI:
-                $field->setRenderer(new SelectMultipleField());
+                new SelectMultipleField($input);
                 break;
 
             case DataInputFactory::PASSWORD:
-                $field->setRenderer(new PasswordField());
-                $field->setValidator(new PasswordValidator());
-
+                new PasswordField($input);
+                $input->setValidator(new PasswordValidator());
                 break;
+
             case DataInputFactory::HIDDEN:
-                $field->setRenderer(new HiddenField());
-
+                new HiddenField($input);
                 break;
+
             case DataInputFactory::CHECKBOX:
-                $field->setRenderer(new CheckField());
+                new CheckField($input);
                 break;
 
             case DataInputFactory::RADIO:
-                $field->setRenderer(new RadioField());
+                new RadioField($input);
                 break;
 
             case DataInputFactory::MCE_TEXTAREA:
-                $field->setRenderer(new MCETextArea());
+                new MCETextArea($input);
                 break;
 
             case DataInputFactory::DATE:
-                $field->setRenderer(new DateField());
-                $field->setProcessor(new DateInputProcessor());
-                $field->setValidator(new DateValidator());
+                new DateField($input);
+                $input->setProcessor(new DateInputProcessor());
+                $input->setValidator(new DateValidator());
                 break;
 
             case DataInputFactory::TIME:
-                $field->setRenderer(new TimeField());
-                $field->setProcessor(new TimeInputProcessor());
-                $field->setValidator(new TimeValidator());
+                new TimeField($input);
+                $input->setProcessor(new TimeInputProcessor());
+                $input->setValidator(new TimeValidator());
                 break;
 
             case DataInputFactory::PHONE:
-                $field->setRenderer(new PhoneField());
-                $field->setProcessor(new PhoneInputProcessor());
-                $field->setValidator(new PhoneValidator());
-
+                new PhoneField($input);
+                $input->setProcessor(new PhoneInputProcessor());
+                $input->setValidator(new PhoneValidator());
                 break;
 
             case DataInputFactory::FILE:
-                $field->setRenderer(new FileField());
-                $field->setValidator(new FileUploadValidator());
-                $field->setProcessor(new UploadDataInputProcessor());
+                new FileField($input);
+                $input->setValidator(new FileUploadValidator());
+                $input->setProcessor(new UploadDataInputProcessor());
                 break;
 
             case DataInputFactory::IMAGE:
-                $field->setRenderer(new ImageField());
-                $field->setValidator(new ImageUploadValidator());
-                $field->setProcessor(new UploadDataInputProcessor());
+                new ImageField($input);
+                $input->setValidator(new ImageUploadValidator());
+                $input->setProcessor(new UploadDataInputProcessor());
                 break;
 
-
             case DataInputFactory::NESTED_SELECT:
-                $field->setRenderer(new NestedSelectField());
+                new NestedSelectField($input);
                 break;
 
             case DataInputFactory::SLIDER:
-                $field->setRenderer(new SliderField());
+                new SliderField($input);
                 break;
 
             case DataInputFactory::SESSION_IMAGE:
 
-                $field = new ArrayDataInput($name, $label, $required);
-                $field->transact_mode = DataInput::TRANSACT_OBJECT;
-                $field->allow_dynamic_addition = false;
+                $input = new ArrayDataInput($name, $label, $required);
+                $input->transact_mode = DataInput::TRANSACT_OBJECT;
+                $input->allow_dynamic_addition = FALSE;
 
-                $field->setRenderer(new SessionImage());
+                new SessionImage($input);
 
                 $processor = new SessionUploadInputProcessor();
                 $processor->max_slots = 1;
-                $field->setProcessor($processor);
+                $input->setProcessor($processor);
 
                 $validator = new ImageUploadValidator();
-                $validator->skip_is_uploaded_check = true;
-                $field->setValidator($validator);
+                $validator->skip_is_uploaded_check = TRUE;
+                $input->setValidator($validator);
 
-                $field->setValueTransactor($processor);
+                $input->setValueTransactor($processor);
 
                 break;
             case DataInputFactory::SESSION_FILE:
 
-                $field = new ArrayDataInput($name, $label, $required);
-                $field->transact_mode = DataInput::TRANSACT_OBJECT;
-                $field->allow_dynamic_addition = false;
+                $input = new ArrayDataInput($name, $label, $required);
+                $input->transact_mode = DataInput::TRANSACT_OBJECT;
+                $input->allow_dynamic_addition = FALSE;
 
-                $field->setRenderer(new SessionFile());
+                new SessionFile($input);
 
                 $processor = new SessionUploadInputProcessor();
                 $processor->max_slots = 1;
-                $field->setProcessor($processor);
+                $input->setProcessor($processor);
 
                 $validator = new FileUploadValidator();
-                $validator->skip_is_uploaded_check = true;
-                $field->setValidator($validator);
+                $validator->skip_is_uploaded_check = TRUE;
+                $input->setValidator($validator);
 
-                $field->setValueTransactor($processor);
+                $input->setValueTransactor($processor);
 
                 break;
             case DataInputFactory::CAPTCHA:
 
-                $field = new DataInput($name, $label, $required);
-                $field->setRenderer(new CaptchaInputField());
-                $field->setValidator(new CaptchaInputValidator());
+                $input = new DataInput($name, $label, $required);
+                new CaptchaInputField($input);
+                $input->setValidator(new CaptchaInputValidator());
                 break;
 
             default:
-                throw new Exception("Unknown field type: " . $type);
+                throw new Exception("Unknown input type: " . $type);
                 break;
 
-
         }
-        return $field;
+        return $input;
 
     }
 

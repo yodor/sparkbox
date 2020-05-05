@@ -7,7 +7,7 @@ class ArrayField extends InputField
     /**
      * @var DataInput
      */
-    protected $field = NULL;
+    protected $input = NULL;
 
     /**
      * @var array Component
@@ -27,10 +27,11 @@ class ArrayField extends InputField
      */
     protected $item_renderer = NULL;
 
-    public function __construct()
+    public function __construct(InputField $field)
     {
-        parent::__construct();
-        //$this->setClassName("InputField");
+        parent::__construct($field);
+
+        $this->item_renderer = $field;
 
         $button_add = StyledButton::DefaultButton();
         $button_add->setType(StyledButton::TYPE_BUTTON);
@@ -88,45 +89,39 @@ class ArrayField extends InputField
         return $this->controls;
     }
 
-    /**
-     * @param DataInput $field
-     * @throws Exception
-     */
-    public function renderField(DataInput $field)
+//    /**
+//     * @param DataInput $field
+//     * @throws Exception
+//     */
+//    public function renderField(DataInput $field)
+//    {
+//        if (!$field instanceof ArrayDataInput) {
+//            throw new Exception("ArrayDataInput required for this renderer");
+//        }
+//        $this->setField($field);
+//        $this->render();
+//    }
+
+    public function getInput()
     {
-        if (!$field instanceof ArrayDataInput) {
-            throw new Exception("ArrayDataInput required for this renderer");
-        }
-        $this->setField($field);
-        $this->render();
+        return $this->input;
     }
 
-    public function getField()
-    {
-        return $this->field;
-    }
-
-    public function setField(DataInput $field)
-    {
-        $this->field = $field;
-
-    }
-
-    public function renderValue(DataInput $field, int $render_index=-1)
-    {
-
-    }
-
+//    public function setField(DataInput $field)
+//    {
+//        $this->field = $field;
+//
+//    }
 
     public function renderControls()
     {
-        if (!$this->field->allow_dynamic_addition) return;
+        if (!$this->input->allow_dynamic_addition) return;
 
-        echo "<div class='ArrayControls' field='" . $this->field->getName() . "'>";
+        echo "<div class='ArrayControls' field='" . $this->input->getName() . "'>";
 
         foreach ($this->controls as $name => $cmp) {
             if (strcasecmp($name, ArrayField::DEFAULT_CONTROL_NAME) == 0) {
-                $add_text = tr(ArrayField::DEFAULT_CONTROL_NAME) . " " . tr($this->field->getLabel());
+                $add_text = tr(ArrayField::DEFAULT_CONTROL_NAME) . " " . tr($this->input->getLabel());
                 $cmp->setText($add_text);
             }
             $cmp->render();
@@ -140,23 +135,16 @@ class ArrayField extends InputField
 
     public function renderElementSource()
     {
-        if (!$this->field->allow_dynamic_addition) return;
+        if (!$this->input->allow_dynamic_addition) return;
 
         echo "<div class='ElementSource'>";
 
-        $field = new DataInput("render_source", $this->field->getLabel(), $this->field->isRequired());
+        $fake_input = new DataInput("render_source", $this->input->getLabel(), $this->input->isRequired());
 
-        $renderer = null;
-        if ($this->item_renderer){
-            $renderer = clone $this->item_renderer;
-        }
-        else {
-            $renderer = clone $this->field->getRenderer();
-        }
+        $renderer = clone $this->item_renderer;
+        $renderer->setInput($fake_input);
 
-        $field->setRenderer($renderer);
-
-        $renderer->renderField($field);
+        $renderer->render();
 
         echo "<div class='Controls'>";
         $this->action_renderer->render();
@@ -168,16 +156,9 @@ class ArrayField extends InputField
 
     public function renderArrayContents()
     {
-        echo "<div class='ArrayContents' field='" . $this->field->getName() . "'>";
-        $values = $this->field->getValue();
+        echo "<div class='ArrayContents' field='" . $this->input->getName() . "'>";
 
-        $renderer = NULL;
-        if ($this->item_renderer) {
-            $renderer = clone $this->item_renderer;
-        }
-        else {
-            $renderer = clone $this->field->getRenderer();
-        }
+        $values = $this->input->getValue();
 
         if (is_array($values)) {
 
@@ -185,18 +166,20 @@ class ArrayField extends InputField
 
                 //class ElementSource is renamed to class Element from ArrayControls.js
 
-                $field = new DataInput($this->field->getName() . "[$idx]", $this->field->getLabel(), $this->field->isRequired());
+                $element_input = new DataInput($this->input->getName() . "[$idx]", $this->input->getLabel(), $this->input->isRequired());
 
-                $field->setError($this->field->getErrorAt($idx));
+                $element_input->setError($this->input->getErrorAt($idx));
 
-                $field->setValue($value);
-
+                $element_input->setValue($value);
 
                 echo "<div class='Element' pos='$idx'>";
 
-                $renderer->renderField($field);
+                $renderer = clone $this->item_renderer;
+                $renderer->setInput($element_input);
 
-                if ($this->field->allow_dynamic_addition) {
+                $renderer->render();
+
+                if ($this->input->allow_dynamic_addition) {
                     echo "<div class='Controls' >";
 
                     echo "<a class='ActionRenderer' action='Remove' >";
@@ -224,7 +207,7 @@ class ArrayField extends InputField
         <script type='text/javascript'>
             onPageLoad(function () {
                 let array_controls = new ArrayControls();
-                array_controls.attachWith("<?php echo $this->field->getName();?>");
+                array_controls.attachWith("<?php echo $this->input->getName();?>");
             });
         </script>
         <?php

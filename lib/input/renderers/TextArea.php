@@ -4,11 +4,6 @@ include_once("lib/input/renderers/InputField.php");
 class TextArea extends InputField
 {
 
-    public function __construct()
-    {
-        parent::__construct();
-
-    }
 
     //expose field attributes as field attributes to calling classes
     public function setAttribute($name, $value)
@@ -23,7 +18,7 @@ class TextArea extends InputField
 
         echo "<textarea class='TextArea' $field_attrs>";
 
-        $field_value = $this->field->getValue();
+        $field_value = $this->input->getValue();
         $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");
 
         echo $field_value;
@@ -33,7 +28,7 @@ class TextArea extends InputField
 
     public function renderValueImpl()
     {
-        $field_value = $this->field->getValue();
+        $field_value = $this->input->getValue();
 
         if (strlen($field_value) > 0) {
             $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");

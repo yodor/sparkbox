@@ -55,7 +55,6 @@ class FormRenderer extends Component implements IFormRenderer
 
         $this->submit_button->setType(StyledButton::TYPE_SUBMIT);
 
-        $this->field_renderer = new InputComponent();
 
         $this->setFieldLayout($field_layout);
 
@@ -65,11 +64,6 @@ class FormRenderer extends Component implements IFormRenderer
     {
         return array(SITE_ROOT . "lib/css/FormRenderer.css");
 
-    }
-
-    public function getFieldRenderer()
-    {
-        return $this->field_renderer;
     }
 
     public function addButton(StyledButton $b)
@@ -192,8 +186,8 @@ class FormRenderer extends Component implements IFormRenderer
             }
         }
         if (!$callback_rendered) {
-            $this->field_renderer->setField($field);
-            $this->field_renderer->render();
+            $component = new InputComponent($field);
+            $component->render();
         }
 
     }

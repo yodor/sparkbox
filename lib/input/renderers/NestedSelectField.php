@@ -14,8 +14,8 @@ class NestedSelectField extends SelectField
     protected function renderItems()
     {
 
-        $field_values = $this->field->getValue();
-        $field_name = $this->field->getName();
+        $field_values = $this->input->getValue();
+        $field_name = $this->input->getName();
 
         $path = array();
 

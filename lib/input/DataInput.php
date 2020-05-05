@@ -37,29 +37,38 @@ class DataInput
 
     public $skip_transaction = false;
 
-    //when set to true will skip this field in search filter construction in searchFilter()
-    public $skip_search_filter_processing = false;
-
-
+    /**
+     * @var string
+     */
     protected $name;
+    /**
+     * @var string
+     */
     protected $label;
+    /**
+     * @var bool
+     */
     protected $required;
 
     protected $value;
 
     protected $error;
 
-
-    protected $script_required = false;
-    protected $input_type;
-
-    //InputForm is owning this InputField
+    /**
+     * DataInput is part of form
+     * @var InputForm
+     */
     protected $form = NULL;
 
-    //IFieldRenderer is rendering the $value of this InputField
+    /**
+     * Value rendering is done using InputField
+     * @var InputField|null
+     */
     protected $renderer = NULL;
 
-    //LabelRenderer is rendering the $label of this InputField
+    /**
+     * @var InputLabel|null
+     */
     protected $label_renderer = NULL;
 
     //IInputValidator is responsible for validation of the $value data
@@ -74,11 +83,19 @@ class DataInput
      */
     protected $bean;
 
+    /**
+     * @var bool
+     */
     protected $editable;
 
+    /**
+     * @var null
+     */
     protected $user_data;
 
-    //bool
+    /**
+     * @var bool
+     */
     protected $translator_enabled = false;
 
     protected $link_field = NULL;
@@ -116,15 +133,12 @@ class DataInput
         $this->name = $name;
         $this->required = $required;
 
-        $this->value = "";
-        $this->error = "";
-
         $this->form = NULL;
         $this->user_data = NULL;
         $this->translator_enabled = false;
         $this->editable = true;
 
-        $this->label_renderer = new InputLabel();
+        $this->label_renderer = new InputLabel($this);
         $this->validator = new EmptyValueValidator();
         $this->input_processor = new BeanPostProcessor();
 
@@ -185,11 +199,6 @@ class DataInput
     {
         return $this->renderer;
     }
-
-//    public function getRenderPrivate() : ?InputField
-//    {
-//        return $this->renderer;
-//    }
 
     public function setLabelRenderer(InputLabel $label_renderer)
     {

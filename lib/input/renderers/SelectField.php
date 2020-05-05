@@ -3,19 +3,6 @@ include_once("lib/input/renderers/InputField.php");
 include_once("lib/input/renderers/DataSourceField.php");
 include_once("lib/input/renderers/DataSourceItem.php");
 
-class FreetextWrapper extends Component
-{
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function renderImpl()
-    {
-
-    }
-}
-
 class SelectOption extends DataSourceItem
 {
     public function __construct()
@@ -52,17 +39,16 @@ class SelectField extends DataSourceField
     public $na_str = "--- SELECT ---";
     public $na_val = NULL;
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
         $this->setItemRenderer(new SelectOption());
     }
 
-
-    public function renderField(DataInput $field, $render_index = -1)
+    public function startRender()
     {
 
-        if ($field->getLinkField() instanceof DataInput) {
+        if ($this->input->getLinkField() instanceof DataInput) {
             $this->setFieldAttribute("onChange", "javascript:toggleLinkedField(this)");
             if ($this->freetext_value) {
                 $this->setFieldAttribute("link_value", $this->freetext_value);
@@ -70,22 +56,20 @@ class SelectField extends DataSourceField
 
         }
 
-        parent::renderField($field, $render_index);
+        parent::startRender();
 
     }
 
     public function finishRender()
     {
 
-
-        $field_value = $this->field->getValue();
-        $field_name = $this->field->getName();
-
+        $field_value = $this->input->getValue();
+        $field_name = $this->input->getName();
 
         if ($this->freetext_value) {
-            $lf = $this->field->getLinkField();
+            $lf = $this->input->getLinkField();
 
-            $cmp = new FreetextWrapper();
+            $cmp = new MLTagComponent();
             $cmp->setAttribute("field", $field_name);
             if (strcmp($field_value, $this->freetext_value) === 0) {
             }
@@ -93,8 +77,8 @@ class SelectField extends DataSourceField
                 $cmp->setClassName($cmp->getClassName() . " hidden");
             }
             $cmp->startRender();
-            $lf->getLabelRenderer()->renderLabel($lf);
-            $lf->getRenderer()->renderField($lf);
+            $lf->getLabelRenderer()->render();
+            $lf->getRenderer()->render();
             $cmp->finishRender();
 
         }
@@ -118,7 +102,7 @@ class SelectField extends DataSourceField
             $item->setLabel($this->na_str);
             $item->setIndex(-1);
 
-            $selected = $this->isModelSelected($this->na_val, $this->field->getValue());
+            $selected = $this->isModelSelected($this->na_val, $this->input->getValue());
 
             $item->setSelected($selected);
 
@@ -169,18 +153,18 @@ class SelectField extends DataSourceField
 
 class SelectMultipleField extends SelectField
 {
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
 
         $this->setFieldAttribute("multiple", "");
-        $this->addClassName("SelectField");
+
         $this->na_str = "";
     }
 
     protected function startRenderItems()
     {
-        $this->setFieldAttribute("name", $this->field->getName() . "[]");
+        $this->setFieldAttribute("name", $this->input->getName() . "[]");
         parent::startRenderItems();
     }
 

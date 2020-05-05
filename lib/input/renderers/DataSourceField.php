@@ -1,24 +1,29 @@
 <?php
 include_once("lib/input/renderers/InputField.php");
-include_once("lib/input/renderers/IDataSourceItem.php");
+include_once("lib/input/renderers/DataSourceItem.php");
 
 abstract class DataSourceField extends InputField
 {
 
     /**
+     * @var DataSourceItem
+     */
+    protected $item;
+
+    /**
      * @var SQLQuery|null
      */
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
     }
 
-    public function setItemRenderer(IDataSourceItem $cmp)
+    public function setItemRenderer(DataSourceItem $cmp)
     {
         $this->item = $cmp;
     }
 
-    public function getItemRenderer() : IDataSourceItem
+    public function getItemRenderer() : DataSourceItem
     {
         return $this->item;
     }
@@ -49,8 +54,8 @@ abstract class DataSourceField extends InputField
     protected function renderItems()
     {
 
-        $field_values = $this->field->getValue();
-        $field_name = $this->field->getName();
+        $field_values = $this->input->getValue();
+        $field_name = $this->input->getName();
 
         if (!is_array($field_values)) {
             $field_values = array($field_values);

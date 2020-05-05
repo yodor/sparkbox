@@ -22,9 +22,9 @@ class RadioItem extends DataSourceItem
 class RadioField extends DataSourceField
 {
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
 
         $this->setItemRenderer(new RadioItem());
 

@@ -15,12 +15,6 @@ class DateField extends InputField
     public $h_pos = "left";
     public $v_pos = "down";
 
-    public function __construct()
-    {
-        parent::__construct();
-
-    }
-
     public function setYearPeriod($y_start, $y_end)
     {
         $this->y_start = $y_start;
@@ -46,8 +40,8 @@ class DateField extends InputField
 
         echo "<div class='FieldElements'>";
 
-        $field_value = $this->field->getValue();
-        $field_name = $this->field->getName();
+        $field_value = $this->input->getValue();
+        $field_name = $this->input->getName();
 
         $pieces = explode("-", $field_value);
 
@@ -122,7 +116,7 @@ class DateField extends InputField
 
     public function renderValueImpl()
     {
-        $field_value = $this->field->getValue();
+        $field_value = $this->input->getValue();
 
         if (DateValidator::isValidDate($field_value)) {
             $pieces = explode("-", $field_value);

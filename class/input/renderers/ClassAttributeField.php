@@ -49,31 +49,28 @@ class ClassAttributeFieldAjaxHandler extends JSONRequestHandler
         $field->allow_dynamic_addition = FALSE;
         $field->source_label_visible = TRUE;
 
-
         $bean1 = new ClassAttributeValuesBean();
         $field->setSource($bean1);
 
-        $rend = new ClassAttributeField();
-        $field->setRenderer($rend);
+        $rend = new ClassAttributeField($field);
 
         $rend->setCategoryID($this->catID);
         $rend->setProductID($this->prodID);
 
-        $rend->setField($field);
         $rend->renderImpl();
 
     }
 }
 
-class ClassAttributeField extends DataSourceField implements IArrayFieldRenderer
+class ClassAttributeField extends DataSourceField
 {
 
     protected $catID = -1;
     protected $prodID = -1;
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
         $this->setItemRenderer(new ClassAttributeItem());
 
         $cab = new ClassAttributesBean();

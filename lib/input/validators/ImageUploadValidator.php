@@ -48,14 +48,14 @@ class ImageUploadValidator extends UploadDataValidator
         //field->getValue() contains FileStorageObject as uploaded from user
         $image_storage = new ImageStorageObject($field->getValue());
 
-        $this->processImage($image_storage);
+        $this->process($image_storage);
 
         //assign ImageStorageObject to field after processing
         $field->setValue($image_storage);
 
     }
 
-    public function processImage(ImageStorageObject $image_storage)
+    public function process(ImageStorageObject $image_storage)
     {
 
 

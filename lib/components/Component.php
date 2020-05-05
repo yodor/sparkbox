@@ -6,6 +6,9 @@ include_once("lib/pages/HTMLPage.php");
 
 abstract class Component implements IRenderer, IHeadContents
 {
+
+    protected $render_index = -1;
+
     /**
      * @var string CSS class name of this component
      */
@@ -84,9 +87,11 @@ abstract class Component implements IRenderer, IHeadContents
         echo "</div>";
     }
 
-    public function render()
+    public function render(int $render_index = -1)
     {
+
         try {
+            $this->render_index = $render_index;
             $this->startRender();
             $this->renderImpl();
             $this->finishRender();

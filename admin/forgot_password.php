@@ -14,8 +14,8 @@ $page = new AdminLoginPage();
 $ub = new AdminUsersBean();
 
 $fp = DataInputFactory::Create(DataInputFactory::EMAIL, "email", "Email", 1);
-$ic = new InputComponent();
-$ic->setField($fp);
+$ic = new InputComponent($fp);
+
 
 if (isset($_POST["request_password"])) {
 

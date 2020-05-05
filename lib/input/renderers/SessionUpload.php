@@ -4,7 +4,7 @@ include_once("lib/components/renderers/IPhotoRenderer.php");
 
 
 //TODO: lead out as AjaxInputRenderer
-abstract class SessionUpload extends ArrayField
+class SessionUpload extends InputField
 {
     protected $ajax_handler = NULL;
 
@@ -14,14 +14,18 @@ abstract class SessionUpload extends ArrayField
      * set the type attribute to 'file'
      * @param UploadControlAjaxHandler $ajax_handler
      */
-    public function __construct(UploadControlAjaxHandler $ajax_handler)
+    public function __construct(DataInput $input, UploadControlAjaxHandler $ajax_handler)
     {
-        parent::__construct();
+        parent::__construct($input);
+
+        $this->input = $input;
+
         $this->setFieldAttribute("type", "file");
 
         $this->ajax_handler = $ajax_handler;
 
         RequestController::addAjaxHandler($this->ajax_handler);
+
     }
 
     public function assignUploadHandler(UploadControlAjaxHandler $handler)
@@ -46,7 +50,31 @@ abstract class SessionUpload extends ArrayField
 
     public function renderArrayContents()
     {
+        $field_name = $this->input->getName();
 
+        $images = $this->input->getValue();
+
+        if (!$this->ajax_handler) {
+            echo "<div class='ArrayContents'>";
+            echo "<div class='error'>Upload Handler not registered</div>";
+            echo "</div>";
+            return;
+        }
+
+        $validator = $this->ajax_handler->validator();
+
+        echo "<div class='ArrayContents' field='" . $this->input->getName() . "'>";
+
+        foreach ($images as $idx => $storage_object) {
+
+            if (is_null($storage_object)) continue;
+
+            $validator->process($storage_object);
+
+            echo $this->ajax_handler->getHTML($storage_object, $field_name);
+
+        }
+        echo "</div>";
     }
 
     public function renderControls()
@@ -73,10 +101,10 @@ abstract class SessionUpload extends ArrayField
 
     public function startRender()
     {
-        $max_slots = $this->field->getProcessor()->max_slots;
+        $max_slots = $this->input->getProcessor()->max_slots;
         $this->setFieldAttribute("max_slots", $max_slots);
 
-        $this->setAttribute("field", $this->field->getName());
+        $this->setAttribute("field", $this->input->getName());
 
         if ($this->ajax_handler instanceof UploadControlAjaxHandler) {
             $this->setAttribute("handler_command", $this->ajax_handler->getCommandName());
@@ -90,7 +118,7 @@ abstract class SessionUpload extends ArrayField
 
     public function renderDetails()
     {
-        $max_slots = $this->field->getProcessor()->max_slots;
+        $max_slots = $this->input->getProcessor()->max_slots;
 
         echo "<div class='Details'>";
 
@@ -115,9 +143,7 @@ abstract class SessionUpload extends ArrayField
     public function renderImpl()
     {
 
-
         echo "<div class='FieldElements'>";
-
 
         $this->renderDetails();
         echo "\n";
@@ -129,7 +155,7 @@ abstract class SessionUpload extends ArrayField
         <script type='text/javascript'>
             onPageLoad(function () {
                 var upload_control = new SessionUpload();
-                upload_control.attachWith("<?php echo $this->field->getName();?>");
+                upload_control.attachWith("<?php echo $this->input->getName();?>");
 
             });
         </script>

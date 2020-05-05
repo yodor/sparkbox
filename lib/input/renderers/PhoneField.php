@@ -4,22 +4,17 @@ include_once("lib/input/renderers/InputField.php");
 class PhoneField extends InputField
 {
 
-
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
-
-
+        parent::__construct($input);
         $this->is_compound = true;
     }
 
     public function renderImpl()
     {
 
-
-        $field_name = $this->field->getName();
-        $field_value = $this->field->getValue();
-
+        $field_name = $this->input->getName();
+        $field_value = $this->input->getValue();
 
         $pieces = explode("|", $field_value);
 
@@ -47,21 +42,7 @@ class PhoneField extends InputField
         echo "</div>";
     }
 
-    public function renderValueImpl()
-    {
-        $field_value = $this->field->getValue();
-        $pieces = explode("|", $field_value);
 
-        $country_code = "";
-        $city_code = "";
-        $phone_code = "";
-        if (count($pieces) == 3 && strlen($field_value) > 2) {
-            echo "+" . $pieces[0] . " " . $pieces[1] . " " . $pieces[2];
-        }
-        else {
-            echo "-";
-        }
-    }
 }
 
 ?>

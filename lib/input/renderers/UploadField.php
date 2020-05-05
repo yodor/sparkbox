@@ -6,11 +6,10 @@ abstract class PlainUpload extends InputField
 {
 
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
         $this->setFieldAttribute("type", "file");
-
     }
 
     public function requiredStyle()
@@ -32,8 +31,8 @@ abstract class PlainUpload extends InputField
 
     public function renderImpl()
     {
-        $storage_object = $this->field->getValue();
-        $field_name = $this->field->getName();
+        $storage_object = $this->input->getValue();
+        $field_name = $this->input->getName();
 
         echo "<div class='FieldElements'>";
 
@@ -81,7 +80,7 @@ abstract class PlainUpload extends InputField
         <script type='text/javascript'>
             onPageLoad(function () {
                 let upload_field = new PlainUpload();
-                upload_field.attachWith("<?php echo $this->field->getName();?>");
+                upload_field.attachWith("<?php echo $this->input->getName();?>");
 
             });
         </script>
