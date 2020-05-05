@@ -15,11 +15,11 @@ class FileInputForm extends InputForm
         $field->setValidator(new FileUploadValidator());
         $field->setProcessor(new UploadDataInputProcessor());
         $field->setRenderer(new FileField());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("caption", "Caption", 0);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
         if (!$accept_mimes) {
             $this->accept_mimes = array("application/acrobat", "application/x-pdf", "application/pdf", "application/rtf", "application/msword", "application/msexcel", "application/vnd.oasis.opendocument.text", "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.oasis.opendocument.presentation", "application/vnd.oasis.opendocument.graphics", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -27,7 +27,7 @@ class FileInputForm extends InputForm
             );
         }
 
-        $this->getField("data")->getValidator()->setAcceptMimes($this->accept_mimes);
+        $this->getInput("data")->getValidator()->setAcceptMimes($this->accept_mimes);
 
     }
 

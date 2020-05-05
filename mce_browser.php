@@ -9,7 +9,7 @@ $page = new DemoPage();
 $form = new InputForm();
 
 $input = DataInputFactory::Create(DataInputFactory::MCE_TEXTAREA, "text", "Text", 1);
-$form->addField($input);
+$form->addInput($input);
 $handler = $input->getRenderer()->getImageBrowser()->getHandler();
 
 $handler->setSection("mce_image_demo", "text");

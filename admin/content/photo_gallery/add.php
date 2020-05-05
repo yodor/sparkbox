@@ -15,7 +15,7 @@ $event_photos = new GalleryPhotosBean();
 //prefer db_row
 $view = new InputFormView($event_photos, new PhotoInputForm());
 
-$form = $view->getForm()->getField("photo")->transact_mode = DataInput::TRANSACT_DBROW;
+$form = $view->getForm()->getInput("photo")->transact_mode = DataInput::TRANSACT_DBROW;
 
 $view->processInput();
 

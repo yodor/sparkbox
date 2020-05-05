@@ -12,24 +12,24 @@ class DynamicPageInputForm extends InputForm
 
         $field = new DataInput("item_title", "Title", 1);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("content", "Content", 1);
         $rend = new MCETextArea();
         $rend->setAttribute("rows", 20);
         $rend->setAttribute("cols", 80);
         $field->setRenderer($rend);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("item_date", "Date", 0);
         $field->setRenderer(new DateField());
         $field->setValidator(new DateValidator());
         $field->setProcessor(new DateInputProcessor());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("visible", "Visible", 0);
         $field->setRenderer(new CheckField());
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = new DataInput("render_class", "CSS Class Name", 0);
@@ -46,17 +46,17 @@ class DynamicPageInputForm extends InputForm
         //
         //
         $field->setRenderer($rend);
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 0);
         $field->transact_mode = DataInput::TRANSACT_OBJECT;
         $field->getProcessor()->max_slots = 1;
-        $this->addField($field);
+        $this->addInput($field);
 
 
-        $this->getField("item_title")->enableTranslator(true);
-        $this->getField("content")->enableTranslator(true);
+        $this->getInput("item_title")->enableTranslator(true);
+        $this->getInput("content")->enableTranslator(true);
     }
 
 }

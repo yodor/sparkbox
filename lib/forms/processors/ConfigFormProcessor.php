@@ -17,7 +17,7 @@ class ConfigFormProcessor extends FormProcessor
 
         global $config;
 
-        foreach ($form->getFields() as $field_name => $field) {
+        foreach ($form->getInputs() as $field_name => $field) {
             $field_value = $field->getValue();
             $config->setValue($field_name, $field_value);
         }

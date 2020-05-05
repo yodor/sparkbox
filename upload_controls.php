@@ -19,7 +19,7 @@ $f16 = new DataInput("field16", "File Field", 0);
 $f16->setRenderer(new FileField());
 $f16->setValidator(new FileUploadValidator());
 $f16->setProcessor(new UploadDataInputProcessor());
-$form->addField($f16);
+$form->addInput($f16);
 
 $f17 = new DataInput("field17", "Image Field", 0);
 
@@ -29,7 +29,7 @@ $image_field->setPhotoSize(-1, 128);
 $f17->setRenderer($image_field);
 $f17->setValidator(new ImageUploadValidator());
 $f17->setProcessor(new UploadDataInputProcessor());
-$form->addField($f17);
+$form->addInput($f17);
 
 
 $form_render = new FormRenderer();

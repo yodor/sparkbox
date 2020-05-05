@@ -35,7 +35,7 @@ header("Expires: 0");
 $page->startRender();
 
 //set the token after RequestController processHandlers is done
-$af->getField("rand")->setValue($auth->createLoginToken());
+$af->getInput("rand")->setValue($auth->createLoginToken());
 
 $page->setPreferredTitle("Login");
 

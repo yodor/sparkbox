@@ -24,7 +24,7 @@ class AuthFormRenderer extends FormRenderer
         $this->submit_button->setText("Login");
 
         $this->setClassName("FormRenderer");
-        $this->setFieldLayout(FormRenderer::FIELD_VBOX);
+        $this->setLayout(FormRenderer::FIELD_VBOX);
 
         $this->setAttribute("name", "AuthForm");
 

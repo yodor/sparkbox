@@ -13,7 +13,7 @@ class ProductCategoryInputForm extends InputForm
     {
         $field = new DataInput("category_name", "Category Name", 1);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("parentID", "Parent Category", 1);
         $pcats = new ProductCategoriesBean();
@@ -26,10 +26,10 @@ class ProductCategoryInputForm extends InputForm
         $rend->na_val = "0";
 
         $field->setRenderer($rend);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         // 	  $field1 = new ArrayInputField("maID", "Attribute", 0);
         // 	  $field1->allow_dynamic_addition=true;
@@ -48,7 +48,7 @@ class ProductCategoryInputForm extends InputForm
         // 	  $this->addField($field1);
 
 
-        $this->getField("category_name")->enableTranslator(true);
+        $this->getInput("category_name")->enableTranslator(true);
     }
 
 }

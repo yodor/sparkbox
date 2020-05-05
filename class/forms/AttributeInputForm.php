@@ -9,11 +9,11 @@ class AttributeInputForm extends InputForm
     {
         $field = new DataInput("name", "Attribute Name", 1);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("unit", "Attribute Unit", 0);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
     }
 
 }

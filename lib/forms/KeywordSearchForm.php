@@ -15,7 +15,7 @@ class KeywordSearchForm extends InputForm
 
         $field = new DataInput("keyword", "Keyword", 0);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
     }
 
@@ -70,7 +70,7 @@ class KeywordSearchForm extends InputForm
 
     public function clearQuery(&$qryarr)
     {
-        foreach ($this->fields as $field_name => $field) {
+        foreach ($this->inputs as $field_name => $field) {
             if (isset($qryarr[$field_name])) {
                 unset($qryarr[$field_name]);
             }

@@ -114,7 +114,7 @@ class KeywordSearchComponent extends Component implements IQueryFilter
     {
         echo "<div class='fields'>";
 
-        $field = $this->sform->getField("keyword");
+        $field = $this->sform->getInput("keyword");
         $field->getLabelRenderer()->renderLabel($field);
 
         $field->getRenderer()->renderField($field);

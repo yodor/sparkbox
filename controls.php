@@ -10,17 +10,17 @@ $form = new InputForm();
 
 $f1 = new DataInput("field1", "Text", 1);
 $tf = new TextField($f1);
-$form->addField($f1);
+$form->addInput($f1);
 
 $f2 = new DataInput("field2", "Email", 1);
 $tf1 = new TextField($f2);
 $f2->setValidator(new EmailValidator());
-$form->addField($f2);
+$form->addInput($f2);
 //
 $f3 = new DataInput("field3", "Password", 1);
 $pf = new PasswordField($f3);
 $f3->setValidator(new PasswordValidator());
-$form->addField($f3);
+$form->addInput($f3);
 
 $aw2 = new ArrayDataIterator(array("SelectItem1", "SelectItem2", "SelectItem3"));
 
@@ -30,7 +30,7 @@ $scmp->setIterator($aw2);
 $scmp->list_key = ArrayDataIterator::KEY_ID;
 $scmp->list_label = ArrayDataIterator::KEY_VALUE;
 
-$form->addField($f4);
+$form->addInput($f4);
 
 $aw3 = new ArrayDataIterator(array("SelectMultiItem1", "SelectMultiItem2", "SelectMultiItem3"));
 
@@ -40,24 +40,24 @@ $scmp1->setIterator($aw3);
 $scmp1->list_key = ArrayDataIterator::KEY_ID;
 $scmp1->list_label = ArrayDataIterator::KEY_VALUE;
 
-$form->addField($f4m);
+$form->addInput($f4m);
 
 $f5 = new DataInput("field5", "Text Area", 1);
 $ta = new TextArea($f5);
-$form->addField($f5);
+$form->addInput($f5);
 
 $f6 = new DataInput("field10", "Checkbox Single", 0);
 $cf = new CheckField($f6);
 $f6->setValidator(new EmptyValueValidator());
 $f6->setProcessor(new BeanPostProcessor());
-$form->addField($f6);
+$form->addInput($f6);
 
 $f6 = new DataInput("field101", "Accept Check", 1);
 $cf1 = new CheckField($f6);
 $cf1->setCaption("Accept By Clicking Here");
 $f6->setValidator(new EmptyValueValidator());
 $f6->setProcessor(new BeanPostProcessor());
-$form->addField($f6);
+$form->addInput($f6);
 
 $aw = new ArrayDataIterator(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"));
 
@@ -70,7 +70,7 @@ $cf2->list_label = ArrayDataIterator::KEY_VALUE;
 
 $f11->setValidator(new EmptyValueValidator());
 $f11->setProcessor(new BeanPostProcessor());
-$form->addField($f11);
+$form->addInput($f11);
 
 $aw = new ArrayDataIterator(array("CheckboxItem1", "CheckboxItem2", "CheckboxItem3"));
 
@@ -85,7 +85,7 @@ $validator = new EmptyValueValidator();
 $validator->require_array_value = TRUE;
 $f11->setValidator($validator);
 $f11->setProcessor(new BeanPostProcessor());
-$form->addField($f11);
+$form->addInput($f11);
 
 $aw1 = new ArrayDataIterator(array("RadioItem1", "RadioItem2", "RadioItem3"));
 $f12 = new DataInput("field12", "Radiobox DataSource", 1);
@@ -96,37 +96,37 @@ $rf->list_label = ArrayDataIterator::KEY_VALUE;
 
 $f12->setValidator(new EmptyValueValidator());
 $f12->setProcessor(new BeanPostProcessor());
-$form->addField($f12);
+$form->addInput($f12);
 
 $f7 = new DataInput("field7", "Date", 1);
 $df = new DateField($f7);
 $f7->setValidator(new DateValidator());
 $f7->setProcessor(new DateInputProcessor());
-$form->addField($f7);
+$form->addInput($f7);
 
 $f8 = new DataInput("field8", "Time", 1);
 $tf = new TimeField($f8);
 $f8->setValidator(new TimeValidator());
 $f8->setProcessor(new TimeInputProcessor());
-$form->addField($f8);
+$form->addInput($f8);
 
 $f9 = new DataInput("field9", "Phone", 1);
 $pf = new PhoneField($f9);
 $f9->setValidator(new PhoneValidator());
 $f9->setProcessor(new PhoneInputProcessor());
-$form->addField($f9);
+$form->addInput($f9);
 
 $f15 = new DataInput("field15", "Hidden", 0);
 $hf = new HiddenField($f15);
-$form->addField($f15);
+$form->addInput($f15);
 
 $f16 = DataInputFactory::Create(DataInputFactory::CAPTCHA, "captcha_field", "Captcha Code", 1);
-$form->addField($f16);
+$form->addInput($f16);
 
 $form_render = new FormRenderer();
 $form_render->setAttribute("name", "myform");
 $form_render->setAttribute("id", "myform");
-$form_render->setFieldLayout(FormRenderer::FIELD_HBOX);
+$form_render->setLayout(FormRenderer::FIELD_HBOX);
 
 $form->setRenderer($form_render);
 $form->setProcessor(new FormProcessor());

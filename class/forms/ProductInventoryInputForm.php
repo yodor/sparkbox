@@ -28,7 +28,7 @@ class ProductInventoryInputForm extends InputForm
         $field->getRenderer()->list_key = "pclrID";
         $field->getRenderer()->list_label = "color";
         $field->getValueTransactor()->renderer_source_copy_fields = array("color");
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "size_value", "Sizing", 0);
@@ -39,22 +39,22 @@ class ProductInventoryInputForm extends InputForm
 
         $field->getRenderer()->addon_content = "<a class='ActionRenderer' action='inline-new' href='../../sizes/add.php'>" . tr("New Sizing Code") . "</a>";
 
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "stock_amount", "Stock Amount", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "price", "Price", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "buy_price", "Buy Price", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "old_price", "Old Price", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "weight", "Weight", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new ArrayDataInput("value", "Class Attributes", 0);
         $field->allow_dynamic_addition = false;
@@ -77,16 +77,16 @@ class ProductInventoryInputForm extends InputForm
 
         $field->setRenderer($rend);
 
-        $this->addField($field);
+        $this->addInput($field);
     }
 
     public function setProductID($prodID)
     {
         $this->prodID = (int)$prodID;
 
-        $this->getField("pclrID")->getRenderer()->getIterator()->select->where = " prodID='{$this->prodID}' ";
+        $this->getInput("pclrID")->getRenderer()->getIterator()->select->where = " prodID='{$this->prodID}' ";
 
-        $this->getField("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' action='inline-new' href='../color_gallery/add.php?prodID={$this->prodID}'>" . tr("New Color Scheme") . "</a>";
+        $this->getInput("pclrID")->getRenderer()->addon_content = "<a class='ActionRenderer' action='inline-new' href='../color_gallery/add.php?prodID={$this->prodID}'>" . tr("New Color Scheme") . "</a>";
 
         // 	  $this->getField("size_value")->getRenderer()->setFilter(" WHERE prodID='{$this->prodID}' ");
 
@@ -94,7 +94,7 @@ class ProductInventoryInputForm extends InputForm
         $this->product = $prods->getByID($this->prodID);
 
 
-        $rend = $this->getField("value")->getRenderer();
+        $rend = $this->getInput("value")->getRenderer();
 
         $rend->setCaption(tr("Product Class") . ": " . $this->product["class_name"]);
 
@@ -102,10 +102,10 @@ class ProductInventoryInputForm extends InputForm
         $rend->getIterator()->select->where = " ca.class_name='". $this->product["class_name"]."' ";
         $rend->getIterator()->select->fields = " ca.*, attr.unit as attribute_unit, attr.type attribute_type ";
 
-        $this->getField("price")->setValue($this->product["price"]);
-        $this->getField("buy_price")->setValue($this->product["buy_price"]);
-        $this->getField("old_price")->setValue($this->product["old_price"]);
-        $this->getField("weight")->setValue($this->product["weight"]);
+        $this->getInput("price")->setValue($this->product["price"]);
+        $this->getInput("buy_price")->setValue($this->product["buy_price"]);
+        $this->getInput("old_price")->setValue($this->product["old_price"]);
+        $this->getInput("weight")->setValue($this->product["weight"]);
 
     }
 
@@ -114,7 +114,7 @@ class ProductInventoryInputForm extends InputForm
 
         $item_row = parent::loadBeanData($editID, $bean);
 
-        $rend = $this->getField("value")->getRenderer();
+        $rend = $this->getInput("value")->getRenderer();
 
         $rend->getIterator()->select->from.=" ca LEFT JOIN inventory_attribute_values iav ON iav.caID = ca.caID AND iav.piID=$editID LEFT JOIN attributes attr ON attr.name = ca.attribute_name ";
         $rend->getIterator()->select->where = " ca.class_name='". $this->product["class_name"]."' ";

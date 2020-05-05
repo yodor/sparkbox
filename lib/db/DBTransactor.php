@@ -105,10 +105,10 @@ class DBTransactor implements IDBTableEditor
 
         debug("Using form: " . get_class($form));
 
-        $fieldNames = $form->getFieldNames();
+        $fieldNames = $form->getInputNames();
 
         foreach ($fieldNames as $pos => $fieldName) {
-            $field = $form->getField($fieldName);
+            $field = $form->getInput($fieldName);
 
             if ($field->skip_transaction) {
                 debug("field['$fieldName'] skip_transaction flag is set");
@@ -136,10 +136,10 @@ class DBTransactor implements IDBTableEditor
         if (!$this->form) throw new Exception("Expected InputForm is null");
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
-        $fieldNames = $this->form->getFieldNames();
+        $fieldNames = $this->form->getInputNames();
         foreach ($fieldNames as $pos => $fieldName) {
 
-            $field = $this->form->getField($fieldName);
+            $field = $this->form->getInput($fieldName);
 
             $transactor = $field->getValueTransactor();
 
@@ -161,10 +161,10 @@ class DBTransactor implements IDBTableEditor
         if (!$this->form) throw new Exception("Expected InputForm is null");
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
-        $fieldNames = $this->form->getFieldNames();
+        $fieldNames = $this->form->getInputNames();
         foreach ($fieldNames as $pos => $fieldName) {
 
-            $field = $this->form->getField($fieldName);
+            $field = $this->form->getInput($fieldName);
 
             $transactor = $field->getValueTransactor();
 

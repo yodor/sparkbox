@@ -12,11 +12,11 @@ $form = new InputForm();
 
 $input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 1);
 $input->getValueTransactor()->max_slots = 4;
-$form->addField($input);
+$form->addInput($input);
 
-//$input = DataInputFactory::Create(DataInputFactory::SESSION_FILE, "document", "Document", 1);
-//$input->getValueTransactor()->max_slots = 4;
-//$form->addField($input);
+$input = DataInputFactory::Create(DataInputFactory::SESSION_FILE, "document", "Document", 1);
+$input->getValueTransactor()->max_slots = 4;
+$form->addInput($input);
 
 $form_render = new FormRenderer();
 $form->setRenderer($form_render);

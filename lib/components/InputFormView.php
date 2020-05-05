@@ -68,10 +68,10 @@ class InputFormView extends Component implements IDBTableEditor
 
         $this->transactor = new DBTransactor();
 
-        $fieldNames = $this->form->getFieldNames();
+        $fieldNames = $this->form->getInputNames();
         foreach ($fieldNames as $pos => $fieldName) {
 
-            $field = $this->form->getField($fieldName);
+            $field = $this->form->getInput($fieldName);
             $renderer = $field->getRenderer();
 
             if ($renderer instanceof MCETextArea) {

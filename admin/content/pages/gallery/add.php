@@ -22,7 +22,7 @@ $event_photos->select()->where = "$ref_key='$ref_id'";
 $view = new InputFormView($event_photos, new PhotoInputForm());
 
 //current version of dynamic page photos table is set to TRANSACT_DBROW
-$view->getForm()->getField("photo")->transact_mode = DataInput::TRANSACT_DBROW;
+$view->getForm()->getInput("photo")->transact_mode = DataInput::TRANSACT_DBROW;
 
 $view->getTransactor()->appendValue($ref_key, $ref_id);
 

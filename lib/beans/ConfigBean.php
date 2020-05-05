@@ -167,7 +167,7 @@ class ConfigBean extends DBTableBean
 
     public function loadForm(InputForm $form)
     {
-        foreach ($form->getFields() as $field_name => $field) {
+        foreach ($form->getInputs() as $field_name => $field) {
             $stored_value = $this->getValue($field_name);
             $field->setValue($stored_value);
         }

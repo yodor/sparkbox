@@ -11,11 +11,11 @@ class PhotoInputForm extends InputForm
 
         $field = new DataInput("caption", "Caption", 0);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
     }
 

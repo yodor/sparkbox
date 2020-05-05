@@ -13,12 +13,12 @@ class MenuItemInputForm extends InputForm
 
         $field = new DataInput("menu_title", "Menu Title", 1);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("link", "Link", 1);
         $field->setRenderer(new TextField());
         $field->content_after = "<a class='ActionRenderer DynamicPageChooser' href='" . ADMIN_ROOT . "content/pages/list.php?chooser=1'>" . tr("Choose Dynamic Page") . "</a>";
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("parentID", "Parent Menu", 1);
         $rend = new NestedSelectField();
@@ -32,7 +32,7 @@ class MenuItemInputForm extends InputForm
         $rend->list_label = "menu_title";
 
         $field->setRenderer($rend);
-        $this->addField($field);
+        $this->addInput($field);
 
 
     }
@@ -61,7 +61,7 @@ class MenuItemInputForm extends InputForm
             $link_url = SITE_ROOT . "content/index.php?page_class=$page_class&page_id=$page_id";
 
 
-            $this->getField("link")->setValue($link_url);
+            $this->getInput("link")->setValue($link_url);
         }
 
     }
@@ -71,9 +71,9 @@ class MenuItemInputForm extends InputForm
         parent::validate();
         $editID = $this->getEditID();
         if ($editID > 0) {
-            $parentID = $this->getField("parentID")->getValue();
+            $parentID = $this->getInput("parentID")->getValue();
             if ($parentID == $editID) {
-                $this->getField("parentID")->setError("Can not reparent to self");
+                $this->getInput("parentID")->setError("Can not reparent to self");
             }
         }
     }

@@ -11,12 +11,12 @@ class LanguageInputForm extends InputForm
 
         $field = new DataInput("lang_code", "Language Code", 1);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("language", "Language Name", 1);
         $field->setRenderer(new TextField());
         // 	$field->setValueTransactor(new CustomFieldTransactor("language"));
-        $this->addField($field);
+        $this->addInput($field);
 
     }
 

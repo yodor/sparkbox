@@ -12,33 +12,33 @@ class UserInputForm extends InputForm
 
         $field = new DataInput("first_name", "First Name", 1);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("last_name", "Last Name", 1);
         $field->setRenderer(new TextField());
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = new DataInput("email", "Email", 1);
         $field->setRenderer(new TextField());
         $field->setValidator(new EmailValidator());
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = new DataInput("pass", "Create Password", 0);
         $field->setRenderer(new PasswordField());
         $field->getRenderer()->setAttribute("autocomplete", "off");
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = new DataInput("pass1", "Repeat Password", 0);
         $field->setRenderer(new PasswordField());
         $field->getRenderer()->setAttribute("autocomplete", "off");
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = new DataInput("pass_hash", "Password Hash", 1);
         $field->setRenderer(new HiddenField());
-        $this->addField($field);
+        $this->addInput($field);
 
 
     }
@@ -52,10 +52,10 @@ class UserInputForm extends InputForm
 
         parent::validate();
 
-        $password_hash = $this->getField("password_hash"); //hold md5 input
+        $password_hash = $this->getInput("password_hash"); //hold md5 input
 
-        $f_pass = $this->getField("pass"); //hold the input that is rendered
-        $f_pass1 = $this->getField("pass1"); //hold the input that is rendered
+        $f_pass = $this->getInput("pass"); //hold the input that is rendered
+        $f_pass1 = $this->getInput("pass1"); //hold the input that is rendered
 
         if (isEmptyPassword($password_hash->getValue()) === true) {
             if ($this->getEditID() > 0) {
@@ -75,7 +75,7 @@ class UserInputForm extends InputForm
             }
         }
 
-        $req_email = $this->getField("email")->getValue();
+        $req_email = $this->getInput("email")->getValue();
         $existing = $this->getBean()->findFieldValue("email", $req_email);
 
         if ($existing) {
@@ -83,7 +83,7 @@ class UserInputForm extends InputForm
             $existID = $existing[$this->getBean()->key()];
 
             if ($this->getEditID() != $existID) {
-                $this->getField("email")->setError("This email is already registered with other account");
+                $this->getInput("email")->setError("This email is already registered with other account");
             }
         }
 

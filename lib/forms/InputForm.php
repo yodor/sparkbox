@@ -1,6 +1,5 @@
 <?php
 include_once("lib/input/DataInputFactory.php");
-
 include_once("lib/beans/IDBTableEditor.php");
 
 
@@ -8,8 +7,8 @@ include_once("lib/beans/IDBTableEditor.php");
  * Class InputForm
  * Generic HTML "Form" implementation
  * - Collection of "InputField" components
- * - Can be assigned with "IFormRenderer" to render this form
- * - Can be assigned with "IFormProcessor" to process the collection of InputFeilds
+ * - Can be assigned with "FormRenderer" to render this form
+ * - Can be assigned with "FormProcessor" to process the collection of InputFeilds
  * - Editor for DBTableBean class, and row ID can be set
  *
  * Sparkbox Form handling usage:
@@ -28,7 +27,7 @@ class InputForm implements IDBTableEditor
     /**
      * @var array
      */
-    protected $fields = array();
+    protected $inputs = array();
 
     /**
      * @var DBTableBean
@@ -45,7 +44,7 @@ class InputForm implements IDBTableEditor
     protected $processor = NULL;
 
     /**
-     * @var IFormRenderer
+     * @var FormRenderer
      */
     protected $renderer = NULL;
 
@@ -55,12 +54,12 @@ class InputForm implements IDBTableEditor
         $this->beanID = -1;
     }
 
-    public function getRenderer(): ?IFormRenderer
+    public function getRenderer(): ?FormRenderer
     {
         return $this->renderer;
     }
 
-    public function setRenderer(IFormRenderer $renderer)
+    public function setRenderer(FormRenderer $renderer)
     {
         $this->renderer = $renderer;
     }
@@ -75,29 +74,27 @@ class InputForm implements IDBTableEditor
         return $this->processor;
     }
 
-    public function addField(DataInput $field)
+    public function addInput(DataInput $input)
     {
-        $field->setForm($this);
-        $this->fields[$field->getName()] = $field;
+        $input->setForm($this);
+        $this->inputs[$input->getName()] = $input;
     }
 
-    public function insertFieldAfter(DataInput $field, $after_field_name)
+    public function insertFieldAfter(DataInput $input, string $after_name)
     {
+        $index = array_search($after_name, array_keys($this->inputs));
 
-        $keys = array_keys($this->fields);
-        $index = array_search($after_field_name, $keys);
-
-        $field_name = $field->getName();
-
-
-        $this->fields = array_slice($this->fields, 0, $index + 1, TRUE) + array("$field_name" => $field) + array_slice($this->fields, $index + 1, count($this->fields) - 1, TRUE);
+        $this->inputs =
+            array_slice($this->inputs, 0, $index + 1, TRUE) +
+            array($input->getName() => $input) +
+            array_slice($this->inputs, $index + 1, count($this->inputs) - 1, TRUE);
 
     }
 
-    public function removeField($field_name)
+    public function removeInput(string $name)
     {
-        if (isset($this->fields[$field_name])) {
-            unset($this->fields[$field_name]);
+        if (isset($this->inputs[$name])) {
+            unset($this->inputs[$name]);
         }
     }
 
@@ -125,9 +122,9 @@ class InputForm implements IDBTableEditor
      * @param string $field_name
      * @return bool
      */
-    public function haveField(string $field_name) : bool
+    public function haveInput(string $name) : bool
     {
-        return array_key_exists($field_name, $this->fields);
+        return array_key_exists($name, $this->inputs);
     }
 
     /**
@@ -135,19 +132,19 @@ class InputForm implements IDBTableEditor
      * @return DataInput
      * @throws Exception
      */
-    public function getField(string $field_name): DataInput
+    public function getInput(string $name): DataInput
     {
-        return $this->fields[$field_name];
+        return $this->inputs[$name];
     }
 
 
     // 	public function getValuesArray()
-    public function getFieldValues()
+    public function getInputValues()
     {
         $ret = array();
 
-        foreach ($this->fields as $field_name => $field) {
-            $ret[$field_name] = $field->getValue();
+        foreach ($this->inputs as $name => $input) {
+            $ret[$name] = $input->getValue();
         }
         return $ret;
     }
@@ -155,20 +152,20 @@ class InputForm implements IDBTableEditor
     /**
      * @return array
      */
-    public function getFields(): array
+    public function getInputs(): array
     {
-        return $this->fields;
+        return $this->inputs;
     }
 
-    public function getFieldNames() : array
+    public function getInputNames() : array
     {
-        return array_keys($this->fields);
+        return array_keys($this->inputs);
     }
 
-    public function valueUnescape(string $field_name)
+    public function valueUnescape(string $name)
     {
-        $field = $this->getField($field_name);
-        return mysql_real_unescape_string($field->getValue());
+        $input = $this->getInput($name);
+        return mysql_real_unescape_string($input->getValue());
     }
 
     /**
@@ -177,8 +174,8 @@ class InputForm implements IDBTableEditor
     public function haveErrors() : bool
     {
         $found_error = FALSE;
-        foreach ($this->fields as $field_name => $field) {
-            if ($field->haveError() === TRUE) {
+        foreach ($this->inputs as $name => $input) {
+            if ($input->haveError() === TRUE) {
                 $found_error = TRUE;
                 break;
             }
@@ -188,8 +185,8 @@ class InputForm implements IDBTableEditor
 
     public function clear() : void
     {
-        foreach ($this->fields as $field_name => $field) {
-            $field->clear();
+        foreach ($this->inputs as $name => $input) {
+            $input->clear();
         }
     }
 
@@ -202,13 +199,13 @@ class InputForm implements IDBTableEditor
     public function loadPostData(array $arr) : void
     {
 
-        $field_names = array_keys($this->fields);
+        $names = array_keys($this->inputs);
 
-        foreach ($field_names as $pos => $field_name) {
-            $field = $this->getField($field_name);
+        foreach ($names as $pos => $name) {
+            $input = $this->getInput($name);
 
-            if ($field->isEditable()) {
-                $field->loadPostData($arr);
+            if ($input->isEditable()) {
+                $input->loadPostData($arr);
             }
         }
 
@@ -220,13 +217,13 @@ class InputForm implements IDBTableEditor
      */
     public function validate()
     {
-        $field_names = array_keys($this->fields);
+        $names = array_keys($this->inputs);
 
-        foreach ($field_names as $pos => $field_name) {
-            $field = $this->getField($field_name);
+        foreach ($names as $pos => $name) {
+            $input = $this->getInput($name);
 
-            if ($field->isEditable()) {
-                $field->validate();
+            if ($input->isEditable()) {
+                $input->validate();
             }
         }
     }
@@ -249,13 +246,15 @@ class InputForm implements IDBTableEditor
             //do not validate values comming from db
             //$this->load($item_row);
 
-
             //initial loading of bean data
-            foreach ($this->fields as $field_name => $field) {
-                debug("Loading data for field name: $field_name");
+            $names = $this->getInputNames();
+            foreach ($names as $pos => $name) {
 
+                debug("Loading data for field name: $name");
+
+                $input = $this->getInput($name);
                 //processor need value set. processor might need other values from the item_row or to parse differently the value
-                $field->getProcessor()->loadBeanData($editID, $bean, $field, $item_row);
+                $input->getProcessor()->loadBeanData($editID, $bean, $input, $item_row);
             }
 
         }
@@ -270,15 +269,15 @@ class InputForm implements IDBTableEditor
         $search_filter = array();
 
 
-        foreach ($this->fields as $field_name => $field) {
+        foreach ($this->inputs as $name => $input) {
 
-            if ($field->skip_search_filter_processing) continue;
+            if ($input->skip_search_filter_processing) continue;
 
-            $val = $field->getValue();
+            $val = $input->getValue();
 
             if ($val > -1 && strcmp($val, "") != 0) {
 
-                $field_name = str_replace("|", ".", $field_name);
+                $field_name = str_replace("|", ".", $name);
 
                 $sffk = $this->searchFilterForKey($field_name, $val);
                 if ($sffk) $search_filter[] = $sffk;
@@ -323,10 +322,10 @@ class InputForm implements IDBTableEditor
         echo "<?xml version='1.0' encoding='utf-8'?>";
         echo "<inputform class='" . get_class($this) . "'>";
         echo "<fields>";
-        foreach ($this->fields as $field_name => $field) {
+        foreach ($this->inputs as $name => $input) {
             echo "<field>";
-            echo "<name>$field_name</name>";
-            echo "<value><![CDATA[" . $field->getValue() . "]]></value>";
+            echo "<name>$name</name>";
+            echo "<value><![CDATA[" . $input->getValue() . "]]></value>";
             echo "</field>";
         }
         echo "</fields>";
@@ -348,9 +347,9 @@ class InputForm implements IDBTableEditor
             $name = (string)$field->name;
             $value = (string)$field->value;
             // 		echo $name."=>".$value;
-            if (!$this->haveField($name)) continue;
+            if (!$this->haveInput($name)) continue;
 
-            $this->getField($name)->setValue($value);
+            $this->getInput($name)->setValue($value);
         }
 
 
@@ -358,7 +357,7 @@ class InputForm implements IDBTableEditor
 
     public function dumpErrors()
     {
-        foreach ($this->fields as $field_name => $field) {
+        foreach ($this->inputs as $field_name => $field) {
 
             if ($field->haveError()) {
                 echo "$field_name:";
@@ -374,9 +373,9 @@ class InputForm implements IDBTableEditor
     public function dumpForm()
     {
 
-        foreach ($this->fields as $field_name => $field) {
-            if ($field instanceof PlainUpload) continue;
-            echo $field->getLabel() . ": " . $field->getValue() . "<br><BR>\r\n\r\n";
+        foreach ($this->inputs as $name => $input) {
+            if ($input instanceof PlainUpload) continue;
+            echo $input->getLabel() . ": " . $input->getValue() . "<br><BR>\r\n\r\n";
 
         }
     }

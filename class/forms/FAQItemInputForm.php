@@ -17,13 +17,13 @@ class FAQItemInputForm extends InputForm
         $rend->list_key = "section";
         $rend->list_label = "section";
 
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "question", "Question", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "answer", "Answer", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
     }
 

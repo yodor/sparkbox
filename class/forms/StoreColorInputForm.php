@@ -10,12 +10,12 @@ class StoreColorInputForm extends InputForm
     {
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "color", "Color Name", 1);
-        $this->addField($field);
+        $this->addInput($field);
         $field->enableTranslator(true);
 
         $field = DataInputFactory::Create(DataInputFactory::COLOR_CODE, "color_code", "Color Code", 0);
 
-        $this->addField($field);
+        $this->addInput($field);
 
     }
 

@@ -32,7 +32,7 @@ class ProductColorInputForm extends InputForm
         $opt = $rend->getItemRenderer();
         $opt->addDataRowAttribute("color_code");
 
-        $this->addField($field);
+        $this->addInput($field);
         // 	$field->enableTranslator(true);
 
 
@@ -43,7 +43,7 @@ class ProductColorInputForm extends InputForm
 
         $input->transact_mode = DataInput::TRANSACT_OBJECT;
         $input->getValueTransactor()->max_slots = 1;
-        $this->addField($input);
+        $this->addInput($input);
 
 
         $input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photos", 0);
@@ -54,7 +54,7 @@ class ProductColorInputForm extends InputForm
         $input->transact_mode = DataInput::TRANSACT_OBJECT;
         $input->getValueTransactor()->max_slots = 10;
 
-        $this->addField($input);
+        $this->addInput($input);
 
         // 	$field = new ArrayInputField("value", "Optional Attributes", 0);
         // 	$field->allow_dynamic_addition = false;

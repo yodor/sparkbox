@@ -21,19 +21,19 @@ class ImageDimensionForm extends InputForm
         $field->getRenderer()->list_label = "label";
         $field->getRenderer()->na_str = "";
 
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "caption", "Caption", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "width", "Width", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "height", "Height", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::CHECKBOX, "enable_popup", "Enable Popup", 0);
-        $this->addField($field);
+        $this->addInput($field);
     }
 }
 

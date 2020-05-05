@@ -13,20 +13,20 @@ class SEOConfigForm extends InputForm
         $rend = $field->getRenderer();
         $rend->setAttribute("rows", 10);
         $rend->setAttribute("cols", 80);
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "meta_keywords", "Meta Keywords", 0);
         $rend = $field->getRenderer();
         $rend->setAttribute("rows", 10);
         $rend->setAttribute("cols", 80);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "google_analytics", "Google Analytics", 0);
         $rend = $field->getRenderer();
         $rend->setAttribute("rows", 10);
         $rend->setAttribute("cols", 80);
-        $this->addField($field);
+        $this->addInput($field);
 
     }
 

@@ -1,6 +1,5 @@
 <?php
 include_once("lib/components/Component.php");
-include_once("lib/forms/renderers/IFormRenderer.php");
 include_once("lib/components/InputComponent.php");
 
 class FieldSet extends Component
@@ -23,7 +22,7 @@ class FieldSet extends Component
     }
 }
 
-class FormRenderer extends Component implements IFormRenderer
+class FormRenderer extends Component
 {
     protected $form = NULL;
     protected $submit_button = NULL;
@@ -56,7 +55,7 @@ class FormRenderer extends Component implements IFormRenderer
         $this->submit_button->setType(StyledButton::TYPE_SUBMIT);
 
 
-        $this->setFieldLayout($field_layout);
+        $this->setLayout($field_layout);
 
     }
 
@@ -76,7 +75,7 @@ class FormRenderer extends Component implements IFormRenderer
         return $this->buttons[$text];
     }
 
-    public function setFieldLayout($mode)
+    public function setLayout($mode)
     {
         $this->field_layout = $mode;
         $this->attributes["field_layout"] = $this->field_layout;
@@ -114,9 +113,9 @@ class FormRenderer extends Component implements IFormRenderer
 
     public function renderImpl()
     {
-        $fields = $this->form->getFields();
-        foreach ($fields as $field_name => $field) {
-            $this->renderField($field);
+        $inputs = $this->form->getInputs();
+        foreach ($inputs as $name => $input) {
+            $this->renderInput($input);
         }
     }
 
@@ -170,14 +169,14 @@ class FormRenderer extends Component implements IFormRenderer
     }
 
 
-    public function renderField(DataInput $field)
+    public function renderInput(DataInput $input)
     {
-        if ($field->getLinkMode()) return;
+        if ($input->getLinkMode()) return;
 
         $callback_rendered = false;
         if ($this->render_field_callback) {
             if (is_callable($this->render_field_callback)) {
-                $callback_rendered = call_user_func($this->render_field_callback, $field, $this);
+                $callback_rendered = call_user_func($this->render_field_callback, $input, $this);
             }
             else {
                 //TODO: Check if exception throwing is more appropriate here
@@ -186,7 +185,7 @@ class FormRenderer extends Component implements IFormRenderer
             }
         }
         if (!$callback_rendered) {
-            $component = new InputComponent($field);
+            $component = new InputComponent($input);
             $component->render();
         }
 

@@ -12,7 +12,7 @@ class ProductClassInputForm extends InputForm
     {
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "class_name", "Class Name", 1);
-        $this->addField($field);
+        $this->addInput($field);
         $field->enableTranslator(false);
 
 
@@ -44,7 +44,7 @@ class ProductClassInputForm extends InputForm
         //TODO check was setArrayRenderer
         $field1->setRenderer($arend);
 
-        $this->addField($field1);
+        $this->addInput($field1);
 
     }
 

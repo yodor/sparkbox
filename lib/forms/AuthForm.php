@@ -10,16 +10,16 @@ class AuthForm extends InputForm
         parent::__construct();
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "username", "Email", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "password", "Password", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::HIDDEN, "rand", "rand", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::HIDDEN, "pass", "pass_hash", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
     }
 

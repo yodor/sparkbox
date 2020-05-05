@@ -29,7 +29,7 @@ class ProductInputForm extends InputForm
         $rend->list_key = "catID";
         $rend->list_label = "category_name";
 
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "brand_name", "Brand", 1);
         $rend = $field->getRenderer();
@@ -37,7 +37,7 @@ class ProductInputForm extends InputForm
         $rend->setIterator($brands->query());
         $rend->list_key = "brand_name";
         $rend->list_label = "brand_name";
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "class_name", "Product Class", 0);
         $rend = $field->getRenderer();
@@ -45,14 +45,14 @@ class ProductInputForm extends InputForm
         $rend->setIterator($pcb->query());
         $rend->list_key = "class_name";
         $rend->list_label = "class_name";
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "product_code", "Product Code", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "product_name", "Product Name", 1);
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "gender", "Gender", 0);
@@ -61,7 +61,7 @@ class ProductInputForm extends InputForm
         $rend->setIterator($genders->query());
         $rend->list_key = "gender_title";
         $rend->list_label = "gender_title";
-        $this->addField($field);
+        $this->addInput($field);
 
         // 	$field = DataInputFactory::CreateField(DataInputFactory::TEXTFIELD, "price", "Price", 0);
         // 	$this->addField($field);
@@ -80,28 +80,28 @@ class ProductInputForm extends InputForm
         // 	$this->addField($field);
 
         $field = DataInputFactory::Create(DataInputFactory::CHECKBOX, "visible", "Visible (On Sale)", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::CHECKBOX, "promotion", "Promotion", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
         $input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 0);
 
         $input->setSource(new ProductPhotosBean());
         $input->transact_mode = DataInput::TRANSACT_OBJECT;
         $input->getValueTransactor()->max_slots = 4;
-        $this->addField($input);
+        $this->addInput($input);
 
         $field = DataInputFactory::Create(DataInputFactory::MCE_TEXTAREA, "product_summary", "Product Summary", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = DataInputFactory::Create(DataInputFactory::MCE_TEXTAREA, "product_description", "Product Description", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "keywords", "Keywords", 0);
-        $this->addField($field);
+        $this->addInput($field);
 
 
         $field1 = new ArrayDataInput("feature", "Features", 0);
@@ -118,7 +118,7 @@ class ProductInputForm extends InputForm
         $field1->setValidator(new EmptyValueValidator());
         $field1->setProcessor(new BeanPostProcessor());
 
-        $this->addField($field1);
+        $this->addInput($field1);
 
 
         // 	$field = new ArrayInputField("value", "Optional Attributes", 0);

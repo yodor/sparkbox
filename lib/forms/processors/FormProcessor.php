@@ -121,7 +121,7 @@ class FormProcessor implements IFormProcessor, IDBTableEditor
             $this->status = IFormProcessor::STATUS_ERROR;
 
 
-            foreach ($form->getFields() as $field_name => $field) {
+            foreach ($form->getInputs() as $field_name => $field) {
                 if ($field->haveError()) {
                     debug("Field: '$field_name': Error");
                 }

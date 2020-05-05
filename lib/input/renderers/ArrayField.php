@@ -29,7 +29,7 @@ class ArrayField extends InputField
 
     public function __construct(InputField $field)
     {
-        parent::__construct($field);
+        parent::__construct($field->getInput());
 
         $this->item_renderer = $field;
 
