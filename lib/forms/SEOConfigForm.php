@@ -1,5 +1,5 @@
 <?php
-include_once("lib/forms/InputForm.php");
+include_once("forms/InputForm.php");
 
 
 class SEOConfigForm extends InputForm

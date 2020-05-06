@@ -1,5 +1,5 @@
 <?php
-include_once("lib/forms/processors/FormProcessor.php");
+include_once("forms/processors/FormProcessor.php");
 
 class ConfigFormProcessor extends FormProcessor
 {

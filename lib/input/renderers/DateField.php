@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
-include_once("lib/input/validators/DateValidator.php");
+include_once("input/renderers/InputField.php");
+include_once("input/validators/DateValidator.php");
 
 class DateField extends InputField
 {
@@ -24,14 +24,14 @@ class DateField extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/CalendarPopup.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/CalendarPopup.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/CalendarPopup.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/CalendarPopup.js";
         return $arr;
     }
 
@@ -108,7 +108,7 @@ class DateField extends InputField
         if ($this->render_calendar) {
             // 	calendar_popup_button
             echo "<div class='CalendarControl' onClick='javascript:new CalendarPopup(this)'>";
-            echo "<img border=0  src='" . SITE_ROOT . "lib/images/calendar_icon.png'>";
+            echo "<img border=0  src='" . SITE_ROOT . "sparkfront/images/calendar_icon.png'>";
             echo "</div>";
         }
         echo "</div>";

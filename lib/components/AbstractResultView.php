@@ -1,9 +1,9 @@
 <?php
-include_once("lib/components/Component.php");
+include_once("components/Component.php");
 
-include_once("lib/utils/Paginator.php");
-include_once("lib/components/PaginatorTopComponent.php");
-include_once("lib/components/PaginatorBottomComponent.php");
+include_once("utils/Paginator.php");
+include_once("components/PaginatorTopComponent.php");
+include_once("components/PaginatorBottomComponent.php");
 
 abstract class AbstractResultView extends Component
 {
@@ -35,7 +35,7 @@ abstract class AbstractResultView extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT."lib/css/GalleryView.css";
+        $arr[] = SITE_ROOT."sparkfront/css/GalleryView.css";
         return $arr;
     }
 
@@ -43,7 +43,7 @@ abstract class AbstractResultView extends Component
     {
 
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT."lib/js/GalleryView.js";
+        $arr[] = SITE_ROOT."sparkfront/js/GalleryView.js";
         return $arr;
     }
 

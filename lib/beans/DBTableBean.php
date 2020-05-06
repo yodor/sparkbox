@@ -1,7 +1,7 @@
 <?php
-include_once("lib/dbdriver/DBDriver.php");
-include_once("lib/iterators/SQLQuery.php");
-include_once("lib/utils/SQLSelect.php");
+include_once("dbdriver/DBDriver.php");
+include_once("iterators/SQLQuery.php");
+include_once("utils/SQLSelect.php");
 
 abstract class DBTableBean
 {

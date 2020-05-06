@@ -1,6 +1,6 @@
 <?php
-include_once("lib/panels/MessageDialog.php");
-include_once("lib/handlers/MCEImageBrowserAjaxHandler.php");
+include_once("panels/MessageDialog.php");
+include_once("handlers/MCEImageBrowserAjaxHandler.php");
 
 class MCEImageBrowserDialog extends MessageDialog
 {
@@ -37,7 +37,7 @@ class MCEImageBrowserDialog extends MessageDialog
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/popups/MCEImageBrowserDialog.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/popups/MCEImageBrowserDialog.js";
         return $arr;
     }
 

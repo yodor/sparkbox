@@ -1,8 +1,8 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/forms/KeywordSearchForm.php");
-include_once("lib/utils/IQueryFilter.php");
-include_once("lib/forms/renderers/FormRenderer.php");
+include_once("components/Component.php");
+include_once("forms/KeywordSearchForm.php");
+include_once("utils/IQueryFilter.php");
+include_once("forms/renderers/FormRenderer.php");
 
 class KeywordSearchComponent extends Component implements IQueryFilter
 {
@@ -85,7 +85,7 @@ class KeywordSearchComponent extends Component implements IQueryFilter
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/KeywordSearchComponent.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/KeywordSearchComponent.css";
         return $arr;
     }
 
@@ -115,9 +115,9 @@ class KeywordSearchComponent extends Component implements IQueryFilter
         echo "<div class='fields'>";
 
         $field = $this->sform->getInput("keyword");
-        $field->getLabelRenderer()->renderLabel($field);
+        $field->getLabelRenderer()->render();
 
-        $field->getRenderer()->renderField($field);
+        $field->getRenderer()->render();
 
         echo "</div>";
 

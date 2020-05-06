@@ -1,5 +1,5 @@
 <?php
-include_once("lib/input/processors/BeanPostProcessor.php");
+include_once("input/processors/BeanPostProcessor.php");
 
 /**
  * Class CompoundInputProcessor

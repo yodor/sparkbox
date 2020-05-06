@@ -1,7 +1,7 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
-include_once("lib/input/renderers/DataSourceField.php");
-include_once("lib/input/renderers/DataSourceItem.php");
+include_once("input/renderers/InputField.php");
+include_once("input/renderers/DataSourceField.php");
+include_once("input/renderers/DataSourceItem.php");
 
 class SelectOption extends DataSourceItem
 {

@@ -1,6 +1,6 @@
 <?php
-include_once("lib/auth/Authenticator.php");
-include_once("lib/beans/AdminUsersBean.php");
+include_once("auth/Authenticator.php");
+include_once("beans/AdminUsersBean.php");
 
 class AdminAuthenticator extends Authenticator
 {

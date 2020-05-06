@@ -1,7 +1,7 @@
 <?php
-include_once("lib/input/validators/IInputValidator.php");
-include_once("lib/input/DataInput.php");
-require_once("lib/securimage/securimage.php");
+include_once("input/validators/IInputValidator.php");
+include_once("input/DataInput.php");
+require_once("securimage/securimage.php");
 
 class CaptchaInputValidator implements IInputValidator
 {

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/CSVTemplateLoader.php");
+include_once("utils/CSVTemplateLoader.php");
 include_once("class/beans/ProductCategoriesBean.php");
 include_once("class/beans/BrandsBean.php");
 include_once("class/beans/AttributesBean.php");
@@ -293,7 +293,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
             try {
 
-                $ret_img = $this->zip->statName("images/$imgname");
+                $ret_img = $this->zip->statName("sparkfront/images/$imgname");
 
                 if ($ret_img === FALSE) {
                     //image not found but continue
@@ -301,7 +301,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                     continue;
                 }
 
-                $filedata = $this->zip->getFromName("images/$imgname");
+                $filedata = $this->zip->getFromName("sparkfront/images/$imgname");
 
                 $source = imagecreatefromstring($filedata);
                 if ($source === FALSE) {

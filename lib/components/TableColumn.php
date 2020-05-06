@@ -1,7 +1,7 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/cells/TableCellRenderer.php");
-include_once("lib/components/renderers/cells/TableHeaderCellRenderer.php");
+include_once("components/Component.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/renderers/cells/TableHeaderCellRenderer.php");
 
 class TableColumn extends Component
 {

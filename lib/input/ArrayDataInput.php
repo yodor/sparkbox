@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/DataInput.php");
-include_once("lib/input/renderers/ArrayField.php");
+include_once("input/DataInput.php");
+include_once("input/renderers/ArrayField.php");
 
 class ArrayDataInput extends DataInput
 {

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/components/renderers/IRenderer.php");
+include_once("components/renderers/IRenderer.php");
 
 abstract class HTMLPage implements IRenderer
 {

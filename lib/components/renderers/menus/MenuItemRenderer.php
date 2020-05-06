@@ -1,6 +1,6 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/IMenuItemRenderer.php");
+include_once("components/Component.php");
+include_once("components/renderers/IMenuItemRenderer.php");
 
 
 abstract class MenuItemRenderer extends Component implements IMenuItemRenderer

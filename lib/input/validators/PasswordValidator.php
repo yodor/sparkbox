@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/validators/EmptyValueValidator.php");
-include_once("lib/input/DataInput.php");
+include_once("input/validators/EmptyValueValidator.php");
+include_once("input/DataInput.php");
 
 class PasswordValidator extends EmptyValueValidator
 {

@@ -1,6 +1,6 @@
 <?php
-include_once("lib/forms/InputForm.php");
-include_once("lib/beans/MenuItemsBean.php");
+include_once("forms/InputForm.php");
+include_once("beans/MenuItemsBean.php");
 
 
 class MenuItemInputForm extends InputForm

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/beans/NestedSetBean.php");
+include_once("beans/NestedSetBean.php");
 
 class MenuItemsBean extends NestedSetBean
 {

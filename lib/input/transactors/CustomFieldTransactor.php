@@ -1,7 +1,7 @@
 <?php
-include_once("lib/input/transactors/IDBFieldTransactor.php");
-include_once("lib/input/DataInput.php");
-include_once("lib/db/DBTransactor.php");
+include_once("input/transactors/IDBFieldTransactor.php");
+include_once("input/DataInput.php");
+include_once("db/DBTransactor.php");
 
 class CustomFieldTransactor implements IDBFieldTransactor
 {

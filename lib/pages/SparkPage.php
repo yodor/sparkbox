@@ -1,11 +1,11 @@
 <?php
-include_once("lib/pages/HTMLPage.php");
-include_once("lib/handlers/RequestController.php");
-include_once("lib/components/renderers/IHeadContents.php");
-include_once("lib/components/renderers/IPageComponent.php");
-include_once("lib/beans/ConfigBean.php");
+include_once("pages/HTMLPage.php");
+include_once("handlers/RequestController.php");
+include_once("components/renderers/IHeadContents.php");
+include_once("components/renderers/IPageComponent.php");
+include_once("beans/ConfigBean.php");
 
-include_once("lib/panels/MessageDialog.php");
+include_once("panels/MessageDialog.php");
 
 class SparkPage extends HTMLPage
 {
@@ -204,8 +204,9 @@ class SparkPage extends HTMLPage
         ?>
         <script type='text/javascript'>
             let SITE_ROOT = "<?php echo SITE_ROOT;?>";
+            let SPARKFRONT = "<?php echo SPARKFRONT;?>";
             let ajax_loader = "<div class='AjaxLoader'></div>";
-            let ajax_loader_src = SITE_ROOT + "lib/images/ajax-loader.gif";
+            let ajax_loader_src = SPARKFRONT + "images/ajax-loader.gif";
             let left = "<?php echo $left;?>";
             let right = "<?php echo $right;?>";
         </script>
@@ -257,14 +258,14 @@ class SparkPage extends HTMLPage
         $this->addMeta("keywords", "%meta_keywords%");
         $this->addMeta("description", "%meta_description%");
 
-        $this->addCSS(SITE_ROOT . "lib/css/popups.css");
-        $this->addCSS(SITE_ROOT . "lib/css/SparkPage.css");
+        $this->addCSS(SPARKFRONT . "css/popups.css");
+        $this->addCSS(SPARKFRONT . "css/SparkPage.css");
 
-        $this->addJS(SITE_ROOT . "lib/js/jquery-1.8.0.min.js");
-        $this->addJS(SITE_ROOT . "lib/js/utils.js");
-        $this->addJS(SITE_ROOT . "lib/js/JSONRequest.js");
-        $this->addJS(SITE_ROOT . "lib/js/tooltip.js");
-        $this->addJS(SITE_ROOT . "lib/js/ModalPopup.js");
+        $this->addJS(SPARKFRONT . "js/jquery-1.8.0.min.js");
+        $this->addJS(SPARKFRONT . "js/utils.js");
+        $this->addJS(SPARKFRONT . "js/JSONRequest.js");
+        $this->addJS(SPARKFRONT . "js/tooltip.js");
+        $this->addJS(SPARKFRONT . "js/ModalPopup.js");
 
         $dialog = new MessageDialog();
     }

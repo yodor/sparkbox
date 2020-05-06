@@ -1,5 +1,5 @@
 <?php
-include_once("lib/beans/OrderedDataBean.php");
+include_once("beans/OrderedDataBean.php");
 
 class DynamicPagesBean extends OrderedDataBean
 {

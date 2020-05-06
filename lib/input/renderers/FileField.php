@@ -1,5 +1,5 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
+include_once("input/renderers/InputField.php");
 
 class FileField extends PlainUpload
 {
@@ -18,7 +18,7 @@ class FileField extends PlainUpload
         if ($object->getLength()>0) {
             echo "<div class='Element' >";
 
-            echo "<span class='thumbnail'><img src='" . SITE_ROOT . "lib/images/mimetypes/generic.png'></span>";
+            echo "<span class='thumbnail'><img src='" . SITE_ROOT . "sparkfront/images/mimetypes/generic.png'></span>";
 
             echo "<div class='details'>";
             echo "<span class='filename'><label>{$object->getFilename()}</label></span>";

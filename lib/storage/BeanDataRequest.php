@@ -1,8 +1,8 @@
 <?php
-include_once ("lib/storage/BeanDataResponse.php");
-include_once ("lib/storage/ErrorResponse.php");
-include_once ("lib/storage/ImageDataResponse.php");
-include_once ("lib/storage/FileDataResponse.php");
+include_once ("storage/BeanDataResponse.php");
+include_once ("storage/ErrorResponse.php");
+include_once ("storage/ImageDataResponse.php");
+include_once ("storage/FileDataResponse.php");
 
 class BeanDataRequest
 {

@@ -1,6 +1,6 @@
 <?php
 
-include_once("lib/dbdriver/DBDriver.php");
+include_once("dbdriver/DBDriver.php");
 
 
 class PDOMySQLDriver extends DBDriver

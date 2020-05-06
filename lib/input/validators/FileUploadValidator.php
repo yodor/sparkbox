@@ -1,7 +1,7 @@
 <?php
-include_once("lib/input/validators/UploadDataValidator.php");
+include_once("input/validators/UploadDataValidator.php");
 
-// include_once("lib/dbdriver/DBDriver.php");
+// include_once("dbdriver/DBDriver.php");
 
 class FileUploadValidator extends UploadDataValidator
 {

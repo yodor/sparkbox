@@ -1,10 +1,10 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/ListView.php");
-include_once("lib/components/renderers/IActionsRenderer.php");
-include_once("lib/components/renderers/IItemRenderer.php");
-include_once("lib/components/renderers/IPhotoRenderer.php");
-include_once("lib/components/renderers/ActionRenderer.php");
+include_once("components/Component.php");
+include_once("components/ListView.php");
+include_once("components/renderers/IActionsRenderer.php");
+include_once("components/renderers/IItemRenderer.php");
+include_once("components/renderers/IPhotoRenderer.php");
+include_once("components/renderers/ActionRenderer.php");
 
 class GalleryViewItemRenderer extends Component implements IItemRenderer, IActionsRenderer, IPhotoRenderer
 {
@@ -69,8 +69,8 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/ActionRenderer.css";
-        $arr[] = SITE_ROOT . "lib/css/GalleryView.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/ActionRenderer.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/GalleryView.css";
         return $arr;
 
     }

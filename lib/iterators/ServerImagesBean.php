@@ -1,5 +1,5 @@
 <?php
-include_once("lib/iterators/ArrayDataIterator.php");
+include_once("iterators/ArrayDataIterator.php");
 
 class ServerImagesBean extends ArrayDataIterator
 {
@@ -7,7 +7,7 @@ class ServerImagesBean extends ArrayDataIterator
     public function __construct()
     {
 
-        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_images/";
+        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_sparkfront/images/";
         $this->key = "id";
         $this->value_key = "filename";
 

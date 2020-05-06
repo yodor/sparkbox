@@ -1,5 +1,5 @@
 <?php
-include_once("lib/beans/DBTableBean.php");
+include_once("beans/DBTableBean.php");
 
 //TODO:Check Usage
 class ReferenceKeyPageChecker

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/Session.php");
+include_once("utils/Session.php");
 
 class SessionData
 {

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/actions/Action.php");
+include_once("actions/Action.php");
 
 interface IActionsRenderer
 {

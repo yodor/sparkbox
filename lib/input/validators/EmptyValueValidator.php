@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/validators/IInputValidator.php");
-include_once("lib/input/DataInput.php");
+include_once("input/validators/IInputValidator.php");
+include_once("input/DataInput.php");
 
 class EmptyValueValidator implements IInputValidator
 {

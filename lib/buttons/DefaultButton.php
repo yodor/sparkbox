@@ -1,5 +1,5 @@
 <?php
-include_once("lib/buttons/StyledButton.php");
+include_once("buttons/StyledButton.php");
 
 class DefaultButton extends StyledButton
 {

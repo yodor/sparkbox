@@ -1,6 +1,6 @@
 <?php
-include_once("lib/components/renderers/menus/MenuItemRenderer.php");
-include_once("lib/components/renderers/menus/SubmenuRenderer.php");
+include_once("components/renderers/menus/MenuItemRenderer.php");
+include_once("components/renderers/menus/SubmenuRenderer.php");
 
 
 class MenuBarItemRenderer extends MenuItemRenderer

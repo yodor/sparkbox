@@ -1,6 +1,6 @@
 <?php
-include_once("lib/cart/PaymentProcessor.php");
-include_once("lib/Authenticator.php");
+include_once("cart/PaymentProcessor.php");
+include_once("Authenticator.php");
 
 class FreeOrderProcessor extends PaymentProcessor
 {

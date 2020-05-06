@@ -1,5 +1,5 @@
 <?php
-include_once("lib/dbdriver/DBConnections.php");
+include_once("dbdriver/DBConnections.php");
 
 abstract class DBDriver
 {
@@ -55,16 +55,16 @@ abstract class DBDriver
         $currDriver = false;
         switch ($conn_props->driver) {
             case "MySQLi":
-                include_once("lib/dbdriver/MySQLiDriver.php");
+                include_once("dbdriver/MySQLiDriver.php");
                 $currDriver = new MySQLiDriver($conn_props, $open_new, $use_persistent);
                 break;
 
             case "MySQL":
-                include_once("lib/dbdriver/MySQLDriver.php");
+                include_once("dbdriver/MySQLDriver.php");
                 $currDriver = new MySQLDriver($conn_props, $open_new, $use_persistent);
                 break;
             case "PDOMySQL":
-                include_once("lib/dbdriver/PDOMySQLDriver.php");
+                include_once("dbdriver/PDOMySQLDriver.php");
                 $currDriver = new PDOMySQLDriver($conn_props, $open_new, $use_persistent);
                 break;
 

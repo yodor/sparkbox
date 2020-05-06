@@ -1,6 +1,6 @@
 <?php
-include_once("lib/panels/MessageDialog.php");
-include_once("lib/handlers/TranslateBeanAjaxHandler.php");
+include_once("panels/MessageDialog.php");
+include_once("handlers/TranslateBeanAjaxHandler.php");
 
 
 //IFinalRenderer delegate rendering to page control does not need to call render
@@ -35,17 +35,17 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/BeanTranslationDialog.css";
-        $arr[] = SITE_ROOT . "lib/css/MCETextArea.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/BeanTranslationDialog.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/MCETextArea.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/popups/BeanTranslationDialog.js";
-        $arr[] = SITE_ROOT . "lib/js/MCETextArea.js";
-        $arr[] = SITE_ROOT . "lib/js/tiny_mce/jquery.tinymce.min.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/popups/BeanTranslationDialog.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/MCETextArea.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/tiny_mce/jquery.tinymce.min.js";
         return $arr;
     }
 
@@ -62,13 +62,13 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         echo "<div class='AjaxProgress'></div>";
 
-        include_once("lib/input/DataInputFactory.php");
+        include_once("input/DataInputFactory.php");
 
         $ls = new DataInput("langID", "Translation Language", 1);
 
         $renderer = new SelectField();
 
-        include_once("lib/beans/LanguagesBean.php");
+        include_once("beans/LanguagesBean.php");
         $lb = new LanguagesBean();
 
         $lb->select()->where = " langID>1 ";
@@ -80,7 +80,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $ls->setRenderer($renderer);
 
-        include_once("lib/components/InputComponent.php");
+        include_once("components/InputComponent.php");
         $cmp = new InputComponent($ls);
         $cmp->render();
 

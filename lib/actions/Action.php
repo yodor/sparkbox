@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/Paginator.php");
+include_once("utils/Paginator.php");
 
 class ActionParameter
 {

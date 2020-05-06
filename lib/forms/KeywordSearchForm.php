@@ -1,5 +1,5 @@
 <?php
-include_once("lib/forms/InputForm.php");
+include_once("forms/InputForm.php");
 
 class KeywordSearchForm extends InputForm
 {
@@ -14,7 +14,7 @@ class KeywordSearchForm extends InputForm
         $this->search_expressions = array();
 
         $field = new DataInput("keyword", "Keyword", 0);
-        $field->setRenderer(new TextField());
+        new TextField($field);
         $this->addInput($field);
 
     }

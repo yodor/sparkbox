@@ -1,6 +1,6 @@
 <?php
-include_once("lib/forms/InputForm.php");
-include_once("lib/input/DataInputFactory.php");
+include_once("forms/InputForm.php");
+include_once("input/DataInputFactory.php");
 
 class AuthForm extends InputForm
 {

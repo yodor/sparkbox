@@ -1,7 +1,7 @@
 <?php
 
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/IItemRenderer.php");
+include_once("components/Component.php");
+include_once("components/renderers/IItemRenderer.php");
 
 class TextItemRenderer extends Component implements IItemRenderer
 {

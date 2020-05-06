@@ -1,14 +1,14 @@
 <?php
-include_once("lib/forms/InputForm.php");
-include_once("lib/input/DataInputFactory.php");
+include_once("forms/InputForm.php");
+include_once("input/DataInputFactory.php");
 
-include_once("lib/beans/AdminUsersBean.php");
-include_once("lib/beans/AdminAccessBean.php");
+include_once("beans/AdminUsersBean.php");
+include_once("beans/AdminAccessBean.php");
 
-include_once("lib/iterators/AdminRolesIterator.php");
-include_once("lib/iterators/DBEnumIterator.php");
+include_once("iterators/AdminRolesIterator.php");
+include_once("iterators/DBEnumIterator.php");
 
-include_once("lib/input/transactors/CustomFieldTransactor.php");
+include_once("input/transactors/CustomFieldTransactor.php");
 
 class AdminUserInputForm extends InputForm
 {

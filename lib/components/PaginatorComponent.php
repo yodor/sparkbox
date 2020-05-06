@@ -1,5 +1,5 @@
 <?php
-include_once("lib/components/Component.php");
+include_once("components/Component.php");
 
 abstract class PaginatorComponent extends Component
 {
@@ -19,7 +19,7 @@ abstract class PaginatorComponent extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/PaginatorComponent.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/PaginatorComponent.css";
         return $arr;
     }
 

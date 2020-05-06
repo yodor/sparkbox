@@ -1,7 +1,7 @@
 <?php
-include_once ("lib/storage/BeanDataResponse.php");
-include_once ("lib/storage/ImageStorageObject.php");
-include_once ("lib/utils/ImageScaler.php");
+include_once ("storage/BeanDataResponse.php");
+include_once ("storage/ImageStorageObject.php");
+include_once ("utils/ImageScaler.php");
 
 class ImageDataResponse extends BeanDataResponse
 {

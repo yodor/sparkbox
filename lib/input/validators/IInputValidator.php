@@ -1,5 +1,5 @@
 <?php
-include_once("lib/input/DataInput.php");
+include_once("input/DataInput.php");
 
 interface IInputValidator
 {

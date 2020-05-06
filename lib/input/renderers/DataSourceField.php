@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
-include_once("lib/input/renderers/DataSourceItem.php");
+include_once("input/renderers/InputField.php");
+include_once("input/renderers/DataSourceItem.php");
 
 abstract class DataSourceField extends InputField
 {

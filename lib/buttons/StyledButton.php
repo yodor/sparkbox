@@ -1,5 +1,5 @@
 <?php
-include_once("lib/components/Component.php");
+include_once("components/Component.php");
 
 
 class StyledButton extends Component
@@ -33,7 +33,7 @@ class StyledButton extends Component
         if (self::$default_button) {
             return clone self::$default_button;
         }
-        include_once("lib/buttons/DefaultButton.php");
+        include_once("buttons/DefaultButton.php");
         $d = new DefaultButton();
         $d->setClassName(self::$default_class);
 
@@ -43,7 +43,7 @@ class StyledButton extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/DefaultButton.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/DefaultButton.css";
         return $arr;
     }
 

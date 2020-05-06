@@ -1,7 +1,7 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/ICellRenderer.php");
-include_once("lib/components/TableColumn.php");
+include_once("components/Component.php");
+include_once("components/renderers/ICellRenderer.php");
+include_once("components/TableColumn.php");
 
 class NumericFieldCellRenderer extends TableCellRenderer implements ICellRenderer
 {

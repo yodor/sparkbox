@@ -1,5 +1,5 @@
 <?php
-include_once("lib/iterators/ArrayDataIterator.php");
+include_once("iterators/ArrayDataIterator.php");
 
 class GalleryImagesBean extends ArrayDataIterator
 {
@@ -18,7 +18,7 @@ class GalleryImagesBean extends ArrayDataIterator
 
     protected function initFolderLocation()
     {
-        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_images/";
+        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_sparkfront/images/";
     }
 
     //databean

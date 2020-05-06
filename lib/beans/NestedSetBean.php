@@ -1,6 +1,6 @@
 <?php
-include_once("lib/beans/DBTableBean.php");
-include_once("lib/utils/SQLSelect.php");
+include_once("beans/DBTableBean.php");
+include_once("utils/SQLSelect.php");
 
 class NestedSetBean extends DBTableBean
 {

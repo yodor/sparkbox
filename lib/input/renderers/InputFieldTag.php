@@ -1,5 +1,5 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
+include_once("input/renderers/InputField.php");
 
 abstract class InputFieldTag extends InputField
 {

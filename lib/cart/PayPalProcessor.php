@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/Session.php");
+include_once("utils/Session.php");
 
 // 1.setup is needed to access the processor.
 // $proc = new PayPalProcessor(PayPalProcessor::MODE_SANDBOX);

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/components/NestedSetTreeView2.php");
+include_once("components/NestedSetTreeView2.php");
 
 class NestedSetFilterProcessor
 {

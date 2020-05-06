@@ -1,7 +1,7 @@
 <?php
-include_once("lib/handlers/RequestHandler.php");
+include_once("handlers/RequestHandler.php");
 
-include_once("lib/panels/ConfirmMessageDialog.php");
+include_once("panels/ConfirmMessageDialog.php");
 
 class ToggleFieldRequestHandler extends RequestHandler
 {

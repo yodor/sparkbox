@@ -1,10 +1,11 @@
 <?php
-include_once("lib/handlers/ImageUploadAjaxHandler.php");
-include_once("lib/utils/IStorageSection.php");
-include_once("lib/beans/MCEImagesBean.php");
+include_once("handlers/ImageUploadAjaxHandler.php");
+include_once("utils/IStorageSection.php");
+include_once("beans/MCEImagesBean.php");
 
-include_once("lib/input/validators/ImageUploadValidator.php");
-include_once("lib/forms/InputForm.php");
+include_once("input/validators/ImageUploadValidator.php");
+include_once("forms/InputForm.php");
+include_once("iterators/ArrayDataIterator.php");
 
 class ImageDimensionForm extends InputForm
 {
@@ -187,7 +188,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
             $authClass = $image_row["auth_context"];
             $ownerID = (int)$image_row["ownerID"];
 
-            @include_once("lib/auth/$authClass.php");
+            @include_once("auth/$authClass.php");
             @include_once("class/auth/$authClass.php");
             $class_loaded = class_exists($authClass, false);
             if (!$class_loaded) throw new Exception(tr("Unable to load the Authenticator class"));

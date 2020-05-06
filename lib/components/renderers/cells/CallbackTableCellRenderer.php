@@ -1,6 +1,6 @@
 <?php
-include_once("lib/components/renderers/cells/TableCellRenderer.php");
-include_once("lib/components/TableColumn.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/TableColumn.php");
 
 class CallbackTableCellRenderer extends TableCellRenderer implements ICellRenderer
 {

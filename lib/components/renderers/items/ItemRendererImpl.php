@@ -1,9 +1,9 @@
 <?php
 
-include_once("lib/components/Component.php");
-include_once("lib/components/ListView.php");
+include_once("components/Component.php");
+include_once("components/ListView.php");
 
-include_once("lib/components/renderers/IItemRenderer.php");
+include_once("components/renderers/IItemRenderer.php");
 
 abstract class ItemRendererImpl extends Component implements IItemRenderer
 {

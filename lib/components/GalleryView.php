@@ -1,12 +1,12 @@
 <?php
-include_once("lib/beans/DBTableBean.php");
-include_once("lib/components/TableView.php");
-include_once("lib/components/ListView.php");
+include_once("beans/DBTableBean.php");
+include_once("components/TableView.php");
+include_once("components/ListView.php");
 
-include_once("lib/components/renderers/items/GalleryViewItemRenderer.php");
-include_once("lib/components/renderers/IActionsRenderer.php");
-include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
-include_once("lib/components/renderers/IPhotoRenderer.php");
+include_once("components/renderers/items/GalleryViewItemRenderer.php");
+include_once("components/renderers/IActionsRenderer.php");
+include_once("components/renderers/cells/TableImageCellRenderer.php");
+include_once("components/renderers/IPhotoRenderer.php");
 
 class GalleryView extends Component
 {
@@ -204,14 +204,14 @@ class GalleryView extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/GalleryView.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/GalleryView.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/GalleryView.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/GalleryView.js";
         return $arr;
     }
 

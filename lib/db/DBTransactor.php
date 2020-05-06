@@ -1,6 +1,6 @@
 <?php
-include_once("lib/forms/InputForm.php");
-include_once("lib/beans/IDBTableEditor.php");
+include_once("forms/InputForm.php");
+include_once("beans/IDBTableEditor.php");
 
 class DBTransactor implements IDBTableEditor
 {

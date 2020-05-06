@@ -1,7 +1,7 @@
 <?php
-include_once("lib/auth/AuthContext.php");
-include_once("lib/auth/AuthToken.php");
-include_once("lib/utils/SessionData.php");
+include_once("auth/AuthContext.php");
+include_once("auth/AuthToken.php");
+include_once("utils/SessionData.php");
 
 /**
  * Abstract class for doing authentication
@@ -306,7 +306,7 @@ abstract class Authenticator
         debug("AuthorizeContext using contextName: $contextName");
 
         if ($adminOK) {
-            include_once("lib/auth/AdminAuthenticator.php");
+            include_once("auth/AdminAuthenticator.php");
             $auth_admin = new AdminAuthenticator();
             if ($auth_admin->authorize()) {
                 debug("AdminAuthenticator authorization success");
@@ -317,7 +317,7 @@ abstract class Authenticator
             }
         }
 
-        $auth_class = "lib/auth/$contextName.php";
+        $auth_class = "auth/$contextName.php";
         @include_once($auth_class);
         if (!class_exists($auth_class, false)) {
             $auth_class = "class/auth/$contextName.php";

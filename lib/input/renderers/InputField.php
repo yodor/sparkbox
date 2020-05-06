@@ -1,7 +1,7 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/input/renderers/IErrorRenderer.php");
-include_once("lib/iterators/IDataIterator.php");
+include_once("components/Component.php");
+include_once("input/renderers/IErrorRenderer.php");
+include_once("iterators/IDataIterator.php");
 
 /**
  * Class InputField
@@ -56,7 +56,7 @@ abstract class InputField extends Component implements IErrorRenderer
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/InputField.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/InputField.css";
         return $arr;
     }
 

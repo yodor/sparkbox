@@ -1,7 +1,7 @@
 <?php
-include_once("lib/forms/InputForm.php");
-include_once("lib/input/DataInput.php");
-include_once("lib/input/validators/EmailValidator.php");
+include_once("forms/InputForm.php");
+include_once("input/DataInput.php");
+include_once("input/validators/EmailValidator.php");
 
 class UserInputForm extends InputForm
 {

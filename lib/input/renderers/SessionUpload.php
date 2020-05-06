@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/renderers/ArrayField.php");
-include_once("lib/components/renderers/IPhotoRenderer.php");
+include_once("input/renderers/ArrayField.php");
+include_once("components/renderers/IPhotoRenderer.php");
 
 //TODO: lead out as AjaxInputRenderer
 abstract class SessionUpload extends InputField
@@ -35,15 +35,15 @@ abstract class SessionUpload extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/SessionUpload.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/SessionUpload.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/jqplugins/jquery.form.js";
-        $arr[] = SITE_ROOT . "lib/js/SessionUpload.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/jqplugins/jquery.form.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/SessionUpload.js";
         return $arr;
     }
 

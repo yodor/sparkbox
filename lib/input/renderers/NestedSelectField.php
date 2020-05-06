@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/renderers/SelectField.php");
-include_once("lib/beans/NestedSetBean.php");
+include_once("input/renderers/SelectField.php");
+include_once("beans/NestedSetBean.php");
 
 
 class NestedSelectField extends SelectField

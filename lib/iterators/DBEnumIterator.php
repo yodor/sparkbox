@@ -1,5 +1,5 @@
 <?php
-include_once("lib/iterators/ArrayDataIterator.php");
+include_once("iterators/ArrayDataIterator.php");
 
 class DBEnumIterator extends ArrayDataIterator
 {

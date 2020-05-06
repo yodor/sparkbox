@@ -1,6 +1,6 @@
 <?php
-include_once ("lib/storage/BeanDataResponse.php");
-include_once ("lib/storage/FileStorageObject.php");
+include_once ("storage/BeanDataResponse.php");
+include_once ("storage/FileStorageObject.php");
 
 class FileDataResponse extends BeanDataResponse
 {

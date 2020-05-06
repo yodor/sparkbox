@@ -1,8 +1,8 @@
 <?php
-include_once("lib/input/validators/EmptyValueValidator.php");
-include_once("lib/input/renderers/InputLabel.php");
-include_once("lib/input/renderers/InputField.php");
-include_once("lib/input/processors/BeanPostProcessor.php");
+include_once("input/validators/EmptyValueValidator.php");
+include_once("input/renderers/InputLabel.php");
+include_once("input/renderers/InputField.php");
+include_once("input/processors/BeanPostProcessor.php");
 
 //
 //Generic class representing a data value (input in form linked to table row field value)

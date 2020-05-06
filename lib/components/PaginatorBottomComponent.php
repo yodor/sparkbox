@@ -1,5 +1,5 @@
 <?php
-include_once("lib/components/PaginatorComponent.php");
+include_once("components/PaginatorComponent.php");
 
 class PaginatorBottomComponent extends PaginatorComponent
 {

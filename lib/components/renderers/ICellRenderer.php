@@ -1,5 +1,5 @@
 <?php
-include_once("lib/components/TableColumn.php");
+include_once("components/TableColumn.php");
 
 interface ICellRenderer
 {

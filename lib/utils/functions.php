@@ -480,7 +480,7 @@ function object2array($object)
 
 function refkeyPageCheck(DBTableBean $ref_bean, $redirect_fail, &$ref_key, &$ref_id, &$ref_row = array())
 {
-    include_once("lib/beans/DBTableBean.php");
+    include_once("beans/DBTableBean.php");
     try {
         $ref_key = $ref_bean->key();
 
@@ -627,9 +627,9 @@ function NiceTime($date)
 
 function StarsForValue($val, $min = 1, $max = 5)
 {
-    $on_star = "<img class='star star_on'  src='" . SITE_ROOT . "images/icon_star_on.png'>";
-    $half_star = "<img class='star star_half' src='" . SITE_ROOT . "images/icon_star_half.png'>";
-    $off_star = "<img class='star star_off' src='" . SITE_ROOT . "images/icon_star_off.png'>";
+    $on_star = "<img class='star star_on'  src='" . SITE_ROOT . "sparkfront/images/icon_star_on.png'>";
+    $half_star = "<img class='star star_half' src='" . SITE_ROOT . "sparkfront/images/icon_star_half.png'>";
+    $off_star = "<img class='star star_off' src='" . SITE_ROOT . "sparkfront/images/icon_star_off.png'>";
 
     // 	$val = ($val/10);
 

@@ -1,10 +1,10 @@
 <?php
-include_once("lib/pages/HTMLPage.php");
-include_once("lib/components/AbstractResultView.php");
-include_once("lib/components/renderers/items/TextItemRenderer.php");
-include_once("lib/components/renderers/IItemRenderer.php");
+include_once("pages/HTMLPage.php");
+include_once("components/AbstractResultView.php");
+include_once("components/renderers/items/TextItemRenderer.php");
+include_once("components/renderers/IItemRenderer.php");
 
-include_once("lib/components/PageResultsPanel.php");
+include_once("components/PageResultsPanel.php");
 
 class ListView extends AbstractResultView
 {
@@ -19,7 +19,7 @@ class ListView extends AbstractResultView
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/ListView.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/ListView.css";
         return $arr;
     }
 

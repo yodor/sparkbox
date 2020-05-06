@@ -1,7 +1,7 @@
 <?php
-include_once("lib/components/renderers/items/NestedSetItemRenderer.php");
-include_once("lib/components/renderers/IActionsRenderer.php");
-include_once("lib/components/renderers/ActionRenderer.php");
+include_once("components/renderers/items/NestedSetItemRenderer.php");
+include_once("components/renderers/IActionsRenderer.php");
+include_once("components/renderers/ActionRenderer.php");
 
 class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsRenderer
 {

@@ -1,7 +1,7 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/input/DataInput.php");
-include_once("lib/input/ArrayDataInput.php");
+include_once("components/Component.php");
+include_once("input/DataInput.php");
+include_once("input/ArrayDataInput.php");
 
 class InputComponent extends Component
 {

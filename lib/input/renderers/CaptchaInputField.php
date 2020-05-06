@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
-require_once("lib/securimage/securimage.php");
+include_once("input/renderers/InputField.php");
+require_once("securimage/securimage.php");
 
 class CaptchaInputField extends InputField
 {

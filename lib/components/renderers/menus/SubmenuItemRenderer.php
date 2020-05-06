@@ -1,5 +1,5 @@
 <?php
-include_once("lib/components/renderers/menus/MenuItemRenderer.php");
+include_once("components/renderers/menus/MenuItemRenderer.php");
 
 
 class SubmenuItemRenderer extends MenuItemRenderer

@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/DataInputFactory.php");
-include_once("lib/beans/IDBTableEditor.php");
+include_once("input/DataInputFactory.php");
+include_once("beans/IDBTableEditor.php");
 
 
 /**

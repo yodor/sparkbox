@@ -1,17 +1,17 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/beans/DBTableBean.php");
-include_once("lib/forms/InputForm.php");
+include_once("components/Component.php");
+include_once("beans/DBTableBean.php");
+include_once("forms/InputForm.php");
 
-include_once("lib/forms/processors/FormProcessor.php");
-include_once("lib/forms/renderers/FormRenderer.php");
-include_once("lib/db/DBTransactor.php");
+include_once("forms/processors/FormProcessor.php");
+include_once("forms/renderers/FormRenderer.php");
+include_once("db/DBTransactor.php");
 
-include_once("lib/handlers/UploadControlAjaxHandler.php");
+include_once("handlers/UploadControlAjaxHandler.php");
 
-include_once("lib/handlers/IRequestProcessor.php");
+include_once("handlers/IRequestProcessor.php");
 
-include_once("lib/panels/BeanTranslationDialog.php");
+include_once("panels/BeanTranslationDialog.php");
 
 class InputFormView extends Component implements IDBTableEditor
 {

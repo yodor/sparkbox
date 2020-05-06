@@ -1,7 +1,7 @@
 <?php
-include_once("lib/beans/DatedPublicationBean.php");
-include_once("lib/components/Component.php");
-include_once("lib/utils/ValueInterleave.php");
+include_once("beans/DatedPublicationBean.php");
+include_once("components/Component.php");
+include_once("utils/ValueInterleave.php");
 
 class PublicationArchiveComponent extends Component
 {
@@ -43,7 +43,7 @@ class PublicationArchiveComponent extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/PublicationArchiveComponent.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/PublicationArchiveComponent.css";
         return $arr;
     }
 

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/input/processors/CompoundInputProcessor.php");
+include_once("input/processors/CompoundInputProcessor.php");
 
 class DateInputProcessor extends CompoundInputProcessor
 {

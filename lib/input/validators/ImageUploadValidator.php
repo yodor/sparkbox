@@ -1,7 +1,7 @@
 <?php
-include_once("lib/input/validators/UploadDataValidator.php");
-include_once("lib/storage/ImageStorageObject.php");
-include_once("lib/utils/ImageResizer.php");
+include_once("input/validators/UploadDataValidator.php");
+include_once("storage/ImageStorageObject.php");
+include_once("utils/ImageResizer.php");
 
 
 class ImageUploadValidator extends UploadDataValidator

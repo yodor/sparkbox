@@ -1,6 +1,6 @@
 <?php
-include_once("lib/forms/InputForm.php");
-include_once("lib/input/DataInput.php");
+include_once("forms/InputForm.php");
+include_once("input/DataInput.php");
 
 
 class AccountPasswordInputForm extends InputForm

@@ -1,6 +1,6 @@
 <?php
-include_once("lib/beans/OrdersBean.php");
-include_once("lib/cart/PaymentResult.php");
+include_once("beans/OrdersBean.php");
+include_once("cart/PaymentResult.php");
 
 abstract class PaymentProcessor
 {

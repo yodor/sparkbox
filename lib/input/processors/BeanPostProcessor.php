@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/processors/IBeanPostProcessor.php");
-include_once("lib/input/transactors/IDBFieldTransactor.php");
+include_once("input/processors/IBeanPostProcessor.php");
+include_once("input/transactors/IDBFieldTransactor.php");
 
 class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 {

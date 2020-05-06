@@ -1,6 +1,6 @@
 <?php
-include_once("lib/components/NestedSetTreeView2.php");
-include_once("lib/utils/NestedSetFilterProcessor.php");
+include_once("components/NestedSetTreeView2.php");
+include_once("utils/NestedSetFilterProcessor.php");
 
 class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
 {

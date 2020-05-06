@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/SQLSelect.php");
+include_once("utils/SQLSelect.php");
 
 interface ISelectSource
 {

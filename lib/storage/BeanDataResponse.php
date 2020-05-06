@@ -1,7 +1,7 @@
 <?php
-include_once("lib/storage/HTTPResponse.php");
-include_once("lib/storage/CacheFile.php");
-include_once("lib/storage/FileStorageObject.php");
+include_once("storage/HTTPResponse.php");
+include_once("storage/CacheFile.php");
+include_once("storage/FileStorageObject.php");
 
 abstract class BeanDataResponse extends HTTPResponse
 {
@@ -34,13 +34,13 @@ abstract class BeanDataResponse extends HTTPResponse
         $this->id = $id;
         $this->className = $className;
 
-        if (file_exists("class/beans/" . $this->className . ".php")) {
-            include_once("class/beans/" . $this->className . ".php");
-        }
-        else if (file_exists("lib/beans/" . $this->className . ".php")) {
-            include_once("lib/beans/" . $this->className . ".php");
-        }
-        else {
+
+
+        @include_once("class/beans/" . $this->className . ".php");
+
+        @include_once("beans/" . $this->className . ".php");
+
+        if (!class_exists($this->className,false)) {
             throw new Exception("Bean class not found: " . $this->className);
         }
 

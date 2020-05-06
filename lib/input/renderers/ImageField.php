@@ -1,7 +1,7 @@
 <?php
-include_once("lib/input/renderers/UploadField.php");
-include_once("lib/components/renderers/IPhotoRenderer.php");
-include_once("lib/utils/ImageScaler.php");
+include_once("input/renderers/UploadField.php");
+include_once("components/renderers/IPhotoRenderer.php");
+include_once("utils/ImageScaler.php");
 
 
 class ImageField extends PlainUpload implements IPhotoRenderer

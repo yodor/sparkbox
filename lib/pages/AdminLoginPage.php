@@ -1,5 +1,5 @@
 <?php
-include_once("lib/pages/SparkPage.php");
+include_once("pages/SparkPage.php");
 
 class AdminLoginPage extends SparkPage
 {
@@ -10,8 +10,8 @@ class AdminLoginPage extends SparkPage
 
         $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
 
-        $this->addCSS(SITE_ROOT . "lib/css/admin.css",false);
-        $this->addCSS(SITE_ROOT . "lib/css/admin_buttons.css", false);
+        $this->addCSS(SITE_ROOT . "sparkfront/css/admin.css",false);
+        $this->addCSS(SITE_ROOT . "sparkfront/css/admin_buttons.css", false);
     }
 
     public function startRender()

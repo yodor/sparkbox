@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/MainMenu.php");
+include_once("utils/MainMenu.php");
 
 class MenuItem
 {
@@ -21,7 +21,7 @@ class MenuItem
 
     protected $need_translate = true;
 
-    public static $icon_path = "../images/admin/spark_icons/";
+    public static $icon_path = "../sparkfront/images/admin/spark_icons/";
 
     public function __construct($title, $href = "", $icon = "")
     {

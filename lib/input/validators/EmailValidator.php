@@ -1,5 +1,5 @@
 <?php
-include_once("lib/input/validators/IInputValidator.php");
+include_once("input/validators/IInputValidator.php");
 
 
 class EmailValidator implements IInputValidator

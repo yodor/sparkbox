@@ -1,8 +1,8 @@
 <?php
-include_once("lib/components/renderers/cells/TableCellRenderer.php");
-include_once("lib/components/renderers/IPhotoRenderer.php");
-include_once("lib/components/TableColumn.php");
-include_once("lib/storage/StorageItem.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/renderers/IPhotoRenderer.php");
+include_once("components/TableColumn.php");
+include_once("storage/StorageItem.php");
 
 class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 {

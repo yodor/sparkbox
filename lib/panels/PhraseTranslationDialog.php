@@ -1,6 +1,6 @@
 <?php
-include_once("lib/panels/MessageDialog.php");
-include_once("lib/handlers/TranslatePhraseAjaxHandler.php");
+include_once("panels/MessageDialog.php");
+include_once("handlers/TranslatePhraseAjaxHandler.php");
 
 class PhraseTranslationDialog extends MessageDialog
 {
@@ -34,14 +34,14 @@ class PhraseTranslationDialog extends MessageDialog
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/PhraseTranslationDialog.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/PhraseTranslationDialog.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/popups/PhraseTranslationDialog.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/popups/PhraseTranslationDialog.js";
         return $arr;
     }
 

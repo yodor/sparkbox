@@ -1,7 +1,7 @@
 <?php
-include_once("lib/input/processors/BeanPostProcessor.php");
-include_once("lib/storage/FileStorageObject.php");
-include_once("lib/storage/ImageStorageObject.php");
+include_once("input/processors/BeanPostProcessor.php");
+include_once("storage/FileStorageObject.php");
+include_once("storage/ImageStorageObject.php");
 
 
 class SessionUploadInputProcessor extends BeanPostProcessor

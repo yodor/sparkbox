@@ -1,15 +1,15 @@
 <?php
-include_once("lib/components/AbstractResultView.php");
-include_once("lib/components/renderers/IHeadContents.php");
+include_once("components/AbstractResultView.php");
+include_once("components/renderers/IHeadContents.php");
 
-include_once("lib/utils/ValueInterleave.php");
-include_once("lib/components/TableColumn.php");
-include_once("lib/components/renderers/cells/TableImageCellRenderer.php");
-include_once("lib/components/renderers/cells/CallbackTableCellRenderer.php");
-include_once("lib/components/renderers/cells/ActionsTableCellRenderer.php");
-include_once("lib/components/renderers/cells/BooleanFieldCellRenderer.php");
+include_once("utils/ValueInterleave.php");
+include_once("components/TableColumn.php");
+include_once("components/renderers/cells/TableImageCellRenderer.php");
+include_once("components/renderers/cells/CallbackTableCellRenderer.php");
+include_once("components/renderers/cells/ActionsTableCellRenderer.php");
+include_once("components/renderers/cells/BooleanFieldCellRenderer.php");
 
-include_once("lib/actions/Action.php");
+include_once("actions/Action.php");
 
 class TableView extends AbstractResultView implements IHeadContents
 {
@@ -29,7 +29,7 @@ class TableView extends AbstractResultView implements IHeadContents
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/TableView.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/TableView.css";
         return $arr;
     }
 

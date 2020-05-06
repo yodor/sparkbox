@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/SQLStatement.php");
+include_once("utils/SQLStatement.php");
 
 class SQLSelect extends SQLStatement
 {

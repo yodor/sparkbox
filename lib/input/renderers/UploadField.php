@@ -1,5 +1,5 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
+include_once("input/renderers/InputField.php");
 
 
 abstract class PlainUpload extends InputField
@@ -14,14 +14,14 @@ abstract class PlainUpload extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/PlainUpload.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/PlainUpload.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/PlainUpload.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/PlainUpload.js";
         return $arr;
     }
 

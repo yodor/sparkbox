@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/renderers/InputField.php");
-include_once("lib/components/Component.php");
+include_once("input/renderers/InputField.php");
+include_once("components/Component.php");
 
 class RadioItem extends DataSourceItem
 {

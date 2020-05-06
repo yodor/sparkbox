@@ -12,7 +12,7 @@ class MCETextArea extends InputField
 
         //force single instance of the dialog to all MCETextAreas to prevent double session upload
         if (!self::$image_browser) {
-            include_once("lib/panels/MCEImageBrowserDialog.php");
+            include_once("panels/MCEImageBrowserDialog.php");
             self::$image_browser = new MCEImageBrowserDialog();
         }
 
@@ -21,15 +21,15 @@ class MCETextArea extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/MCETextArea.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/MCETextArea.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/MCETextArea.js";
-        $arr[] = SITE_ROOT . "lib/js/tiny_mce/jquery.tinymce.min.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/MCETextArea.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/tiny_mce/jquery.tinymce.min.js";
         return $arr;
     }
 

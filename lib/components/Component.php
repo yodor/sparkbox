@@ -1,8 +1,8 @@
 <?php
-include_once("lib/components/renderers/IRenderer.php");
-include_once("lib/components/renderers/IHeadContents.php");
-include_once("lib/components/renderers/IPageComponent.php");
-include_once("lib/pages/HTMLPage.php");
+include_once("components/renderers/IRenderer.php");
+include_once("components/renderers/IHeadContents.php");
+include_once("components/renderers/IPageComponent.php");
+include_once("pages/HTMLPage.php");
 
 abstract class Component implements IRenderer, IHeadContents
 {

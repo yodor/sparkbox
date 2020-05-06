@@ -1,22 +1,22 @@
 <?php
-include_once("lib/pages/SparkPage.php");
+include_once("pages/SparkPage.php");
 
-include_once("lib/auth/AdminAuthenticator.php");
-include_once("lib/beans/AdminAccessBean.php");
+include_once("auth/AdminAuthenticator.php");
+include_once("beans/AdminAccessBean.php");
 
-include_once("lib/handlers/ChangePositionRequestHandler.php");
-include_once("lib/handlers/DeleteItemRequestHandler.php");
-include_once("lib/handlers/ToggleFieldRequestHandler.php");
+include_once("handlers/ChangePositionRequestHandler.php");
+include_once("handlers/DeleteItemRequestHandler.php");
+include_once("handlers/ToggleFieldRequestHandler.php");
 
-include_once("lib/utils/ReferenceKeyPageChecker.php");
-include_once("lib/utils/SQLSelect.php");
+include_once("utils/ReferenceKeyPageChecker.php");
+include_once("utils/SQLSelect.php");
 
-include_once("lib/components/InputFormView.php");
-include_once("lib/components/TableView.php");
+include_once("components/InputFormView.php");
+include_once("components/TableView.php");
 
-include_once("lib/utils/PageSessionMenu.php");
+include_once("utils/PageSessionMenu.php");
 
-include_once("lib/auth/AuthContext.php");
+include_once("auth/AuthContext.php");
 
 class AdminPageLib extends SparkPage
 {
@@ -53,10 +53,10 @@ class AdminPageLib extends SparkPage
         $this->menu_bar->setAttribute("submenu_popup", "0");
 
 
-        $this->addCSS(SITE_ROOT . "lib/css/admin.css", false);
-        $this->addCSS(SITE_ROOT . "lib/css/admin_buttons.css", false);
-        $this->addCSS(SITE_ROOT . "lib/css/admin_menu.css", false);
-        $this->addCSS(SITE_ROOT . "lib/css/admin.css", false);
+        $this->addCSS(SITE_ROOT . "sparkfront/css/admin.css", false);
+        $this->addCSS(SITE_ROOT . "sparkfront/css/admin_buttons.css", false);
+        $this->addCSS(SITE_ROOT . "sparkfront/css/admin_menu.css", false);
+        $this->addCSS(SITE_ROOT . "sparkfront/css/admin.css", false);
 
     }
 
@@ -215,7 +215,7 @@ class AdminPageLib extends SparkPage
         echo "<tr><td colspan=2 class='admin_footer'>";
 
         echo "<span class='copy'>Copyright &copy; " . date("Y") . " " . SITE_TITLE . ". All Rights Reserved.</span>";
-        echo "<img class='logo' src='" . SITE_ROOT . "lib/images/admin/sparkbox.png'>";
+        echo "<img class='logo' src='" . SITE_ROOT . "sparkfront/images/admin/sparkbox.png'>";
 
         echo "</td></tr>";
         echo "</table>";

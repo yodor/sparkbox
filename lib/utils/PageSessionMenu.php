@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/MainMenu.php");
+include_once("utils/MainMenu.php");
 
 
 class PageSessionMenu extends MainMenu
@@ -7,6 +7,7 @@ class PageSessionMenu extends MainMenu
 
     protected $context = NULL;
 
+    protected $dataKey = "";
 
     public function __construct(AuthContext $context, array $main_menu)
     {
@@ -17,12 +18,14 @@ class PageSessionMenu extends MainMenu
         //assign initial menu
         $this->main_menu = $main_menu;
 
+        $this->dataKey = md5(SessionData::MENU."|".get_class($this).SITE_TITLE);
+
         //check if there is already a menu in session and use it instead or put the inital menu to the session
-        if ($context->getData()->contains(SessionData::MENU)) {
-            $this->main_menu = unserialize($context->getData()->get(SessionData::MENU));
+        if ($context->getData()->contains($this->dataKey)) {
+            $this->main_menu = unserialize($context->getData()->get($this->dataKey));
         }
         else {
-            $context->getData()->set(SessionData::MENU, serialize($this->main_menu));
+            $context->getData()->set($this->dataKey, serialize($this->main_menu));
         }
     }
 
@@ -106,7 +109,7 @@ class PageSessionMenu extends MainMenu
 
         $this->selected_path = array_reverse($this->selected_path);
 
-        $this->context->getData()->set(SessionData::MENU, serialize($this->main_menu));
+        $this->context->getData()->set($this->dataKey, serialize($this->main_menu));
 
 
         // 	debug("LocationPath::pathUpdate: Storing MenuElements: ");

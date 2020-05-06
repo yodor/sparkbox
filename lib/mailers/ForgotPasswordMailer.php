@@ -1,5 +1,5 @@
 <?php
-include_once("lib/mailers/Mailer.php");
+include_once("mailers/Mailer.php");
 
 
 class ForgotPasswordMailer extends Mailer

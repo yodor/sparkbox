@@ -1,5 +1,5 @@
 <?php
-include_once("lib/handlers/RequestHandler.php");
+include_once("handlers/RequestHandler.php");
 
 class DeleteItemRequestHandler extends RequestHandler
 {

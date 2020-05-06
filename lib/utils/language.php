@@ -1,12 +1,12 @@
 <?php
-include_once("lib/beans/LanguagesBean.php");
-include_once("lib/beans/SiteTextsBean.php");
-include_once("lib/beans/SiteTextUsageBean.php");
+include_once("beans/LanguagesBean.php");
+include_once("beans/SiteTextsBean.php");
+include_once("beans/SiteTextUsageBean.php");
 
 
-include_once("lib/beans/TranslationBeansBean.php");
-include_once("lib/beans/TranslationPhrasesBean.php");
-include_once("lib/utils/Session.php");
+include_once("beans/TranslationBeansBean.php");
+include_once("beans/TranslationPhrasesBean.php");
+include_once("utils/Session.php");
 
 
 //TODO: check usage when this file is included from js.php files that include the main/top session.php

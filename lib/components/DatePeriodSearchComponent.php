@@ -1,8 +1,8 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/input/renderers/DateField.php");
-include_once("lib/components/InputRowComponent.php");
-include_once("lib/utils/SQLSelect.php");
+include_once("components/Component.php");
+include_once("input/renderers/DateField.php");
+include_once("components/InputRowComponent.php");
+include_once("utils/SQLSelect.php");
 
 class DatePeriodSearchComponent extends Component
 {

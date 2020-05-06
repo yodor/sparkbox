@@ -1,10 +1,10 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/items/NestedSetItemRenderer.php");
-include_once("lib/beans/NestedSetBean.php");
-include_once("lib/utils/SQLSelect.php");
-include_once("lib/utils/IQueryFilter.php");
-include_once("lib/utils/ISelectSource.php");
+include_once("components/Component.php");
+include_once("components/renderers/items/NestedSetItemRenderer.php");
+include_once("beans/NestedSetBean.php");
+include_once("utils/SQLSelect.php");
+include_once("utils/IQueryFilter.php");
+include_once("utils/ISelectSource.php");
 
 class NestedSetTreeView extends Component implements ISelectSource
 {
@@ -47,14 +47,14 @@ class NestedSetTreeView extends Component implements ISelectSource
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/TreeView.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/TreeView.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/TreeView.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/TreeView.js";
         return $arr;
     }
 

@@ -1,6 +1,6 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/ActionRenderer.php");
+include_once("components/Component.php");
+include_once("components/renderers/ActionRenderer.php");
 
 class ArrayField extends InputField
 {
@@ -56,14 +56,14 @@ class ArrayField extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/ArrayField.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/ArrayField.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/ArrayControls.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/ArrayControls.js";
         return $arr;
     }
 

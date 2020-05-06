@@ -1,5 +1,5 @@
 <?php
-include_once("lib/utils/SessionData.php");
+include_once("utils/SessionData.php");
 
 class AuthContext
 {

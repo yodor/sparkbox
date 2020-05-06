@@ -1,7 +1,7 @@
 <?php
-include_once("lib/beans/SiteTextsBean.php");
-include_once("lib/beans/TranslationBeansBean.php");
-include_once("lib/handlers/RequestHandler.php");
+include_once("beans/SiteTextsBean.php");
+include_once("beans/TranslationBeansBean.php");
+include_once("handlers/RequestHandler.php");
 
 
 abstract class JSONRequestHandler extends RequestHandler

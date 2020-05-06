@@ -1,6 +1,6 @@
 <?php
-include_once("lib/handlers/JSONResponse.php");
-include_once("lib/handlers/RequestHandler.php");
+include_once("handlers/JSONResponse.php");
+include_once("handlers/RequestHandler.php");
 
 class RequestController
 {

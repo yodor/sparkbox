@@ -1,6 +1,6 @@
 <?php
-include_once("lib/input/renderers/SessionUpload.php");
-include_once("lib/handlers/FileUploadAjaxHandler.php");
+include_once("input/renderers/SessionUpload.php");
+include_once("handlers/FileUploadAjaxHandler.php");
 
 class SessionFile extends SessionUpload
 {

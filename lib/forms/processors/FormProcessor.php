@@ -1,6 +1,6 @@
 <?php
-include_once("lib/forms/processors/IFormProcessor.php");
-include_once("lib/beans/IDBTableEditor.php");
+include_once("forms/processors/IFormProcessor.php");
+include_once("beans/IDBTableEditor.php");
 
 class FormProcessor implements IFormProcessor, IDBTableEditor
 {

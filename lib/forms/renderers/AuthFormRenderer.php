@@ -1,5 +1,5 @@
 <?php
-include_once("lib/forms/renderers/FormRenderer.php");
+include_once("forms/renderers/FormRenderer.php");
 
 
 class AuthFormRenderer extends FormRenderer
@@ -33,8 +33,8 @@ class AuthFormRenderer extends FormRenderer
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/md5.js";
-        $arr[] = SITE_ROOT . "lib/js/AuthForm.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/md5.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/AuthForm.js";
         return $arr;
     }
 

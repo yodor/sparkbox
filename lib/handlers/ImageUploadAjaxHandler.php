@@ -1,9 +1,9 @@
 <?php
-include_once("lib/handlers/UploadControlAjaxHandler.php");
-include_once("lib/components/renderers/IPhotoRenderer.php");
-include_once("lib/utils/ImageScaler.php");
-include_once("lib/storage/StorageItem.php");
-include_once("lib/input/validators/ImageUploadValidator.php");
+include_once("handlers/UploadControlAjaxHandler.php");
+include_once("components/renderers/IPhotoRenderer.php");
+include_once("utils/ImageScaler.php");
+include_once("storage/StorageItem.php");
+include_once("input/validators/ImageUploadValidator.php");
 
 class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoRenderer
 {

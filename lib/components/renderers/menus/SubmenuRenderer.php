@@ -1,7 +1,7 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/menus/SubmenuItemRenderer.php");
-include_once("lib/components/renderers/IMenuItemRenderer.php");
+include_once("components/Component.php");
+include_once("components/renderers/menus/SubmenuItemRenderer.php");
+include_once("components/renderers/IMenuItemRenderer.php");
 
 
 class SubmenuRenderer extends Component implements IMenuItemRenderer

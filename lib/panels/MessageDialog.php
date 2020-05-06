@@ -1,7 +1,7 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/IPageComponent.php");
-include_once("lib/buttons/StyledButton.php");
+include_once("components/Component.php");
+include_once("components/renderers/IPageComponent.php");
+include_once("buttons/StyledButton.php");
 
 class MessageDialog extends Component implements IPageComponent
 {
@@ -52,14 +52,14 @@ class MessageDialog extends Component implements IPageComponent
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/MessageDialog.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/MessageDialog.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "lib/js/popups/MessageDialog.js";
+        $arr[] = SITE_ROOT . "sparkfront/js/popups/MessageDialog.js";
         return $arr;
     }
 

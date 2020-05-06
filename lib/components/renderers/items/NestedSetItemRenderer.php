@@ -1,6 +1,6 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/renderers/INestedSetSourceItem.php");
+include_once("components/Component.php");
+include_once("components/renderers/INestedSetSourceItem.php");
 
 
 abstract class NestedSetItemRenderer extends Component implements INestedSetSourceItem

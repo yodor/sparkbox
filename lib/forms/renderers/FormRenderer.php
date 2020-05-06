@@ -1,6 +1,6 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/components/InputComponent.php");
+include_once("components/Component.php");
+include_once("components/InputComponent.php");
 
 class FieldSet extends Component
 {
@@ -61,7 +61,7 @@ class FormRenderer extends Component
 
     public function requiredStyle()
     {
-        return array(SITE_ROOT . "lib/css/FormRenderer.css");
+        return array(SITE_ROOT . "sparkfront/css/FormRenderer.css");
 
     }
 

@@ -1,5 +1,5 @@
 <?php
-include_once("lib/storage/StorageObject.php");
+include_once("storage/StorageObject.php");
 
 class FileStorageObject extends StorageObject
 {

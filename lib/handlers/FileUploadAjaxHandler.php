@@ -1,9 +1,9 @@
 <?php
-include_once("lib/handlers/UploadControlAjaxHandler.php");
+include_once("handlers/UploadControlAjaxHandler.php");
 
-include_once("lib/input/validators/FileUploadValidator.php");
+include_once("input/validators/FileUploadValidator.php");
 
-include_once("lib/input/renderers/InputField.php");
+include_once("input/renderers/InputField.php");
 
 class FileUploadAjaxHandler extends UploadControlAjaxHandler
 {
@@ -38,7 +38,7 @@ class FileUploadAjaxHandler extends UploadControlAjaxHandler
         $arr = explode("/", $mime, 2);
         $first = $arr[0];
         echo "<div class='Element' tooltip='$filename'>";
-        echo "<span class='thumbnail'><img src='" . SITE_ROOT . "lib/images/mimetypes/generic.png'></span>";
+        echo "<span class='thumbnail'><img src='" . SITE_ROOT . "sparkfront/images/mimetypes/generic.png'></span>";
         echo "<div class='details'>";
         echo "<span class='filename'><label>$filename</label></span>";
         echo "<span class='filesize'><label>" . file_size($storageObject->getLength()) . "</label></span>";

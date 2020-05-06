@@ -1,6 +1,6 @@
 <?php
-include_once("lib/components/Component.php");
-include_once("lib/actions/Action.php");
+include_once("components/Component.php");
+include_once("actions/Action.php");
 
 class ActionRenderer extends Component
 {
@@ -43,7 +43,7 @@ class ActionRenderer extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "lib/css/ActionRenderer.css";
+        $arr[] = SITE_ROOT . "sparkfront/css/ActionRenderer.css";
         return $arr;
     }
 

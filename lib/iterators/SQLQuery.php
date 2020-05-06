@@ -1,5 +1,5 @@
 <?php
-include_once("lib/iterators/IDataIterator.php");
+include_once("iterators/IDataIterator.php");
 
 class SQLQuery implements IDataIterator
 {
