@@ -2,9 +2,8 @@
 include_once("lib/input/renderers/ArrayField.php");
 include_once("lib/components/renderers/IPhotoRenderer.php");
 
-
 //TODO: lead out as AjaxInputRenderer
-class SessionUpload extends InputField
+abstract class SessionUpload extends InputField
 {
     protected $ajax_handler = NULL;
 
@@ -20,11 +19,11 @@ class SessionUpload extends InputField
 
         $this->input = $input;
 
-        $this->setFieldAttribute("type", "file");
-
         $this->ajax_handler = $ajax_handler;
 
         RequestController::addAjaxHandler($this->ajax_handler);
+
+        $this->setAttribute("handler_command", $this->ajax_handler->getCommandName());
 
     }
 
@@ -46,6 +45,51 @@ class SessionUpload extends InputField
         $arr[] = SITE_ROOT . "lib/js/jqplugins/jquery.form.js";
         $arr[] = SITE_ROOT . "lib/js/SessionUpload.js";
         return $arr;
+    }
+
+    protected function prepareInputAttributes(): string
+    {
+        $max_slots = $this->input->getProcessor()->max_slots;
+
+        $this->setInputAttribute("type", "file");
+        $this->setInputAttribute("max_slots", $max_slots);
+
+        return parent::prepareInputAttributes();
+    }
+
+    public function renderDetails()
+    {
+        $max_slots = $this->input->getProcessor()->max_slots;
+
+        echo "<div class='Details'>";
+
+        echo "<div class='Limits'>";
+
+        echo "<div field='max_size'><label>UPLOAD_MAX_FILESIZE: </label><span>" . file_size(UPLOAD_MAX_FILESIZE) . "</span></div>";
+        echo "<div field='max_post_size'><label>POST_MAX_FILESIZE: </label><span>" . file_size(POST_MAX_FILESIZE) . "</span></div>";
+        echo "<div field='memory_limit'><label>MEMORY_LIMIT: </label><span>" . file_size(MEMORY_LIMIT) . "</span></div>";
+        echo "<div field='max_slots'><label>Available Slots: </label><span>" . $max_slots . "</span></div>";
+
+        echo "</div>";
+
+        echo "</div>";
+    }
+
+    public function renderControls()
+    {
+        echo "<div class='Controls' >";
+        StyledButton::DefaultButton()->renderButton("Browse", "", "browse");
+
+        $attr = $this->prepareInputAttributes();
+
+        echo "<input $attr>";
+
+        echo "<div class='progress'>";
+        echo "<div class='bar'></div>";
+        echo "<div class='percent'>0%</div>";
+        echo "</div>";
+        echo "</div>";
+
     }
 
     public function renderArrayContents()
@@ -77,80 +121,17 @@ class SessionUpload extends InputField
         echo "</div>";
     }
 
-    public function renderControls()
-    {
-        echo "<div class='Controls' >";
-        StyledButton::DefaultButton()->renderButton("Browse", "", "browse");
-
-        $attr = $this->prepareFieldAttributes();
-
-        echo "<input $attr>";
-
-        echo "<div class='progress'>";
-        echo "<div class='bar'></div>";
-        echo "<div class='percent'>0%</div>";
-        echo "</div>";
-        echo "</div>";
-
-    }
-
-    public function renderElementSource()
-    {
-        //
-    }
-
-    public function startRender()
-    {
-        $max_slots = $this->input->getProcessor()->max_slots;
-        $this->setFieldAttribute("max_slots", $max_slots);
-
-        $this->setAttribute("field", $this->input->getName());
-
-        if ($this->ajax_handler instanceof UploadControlAjaxHandler) {
-            $this->setAttribute("handler_command", $this->ajax_handler->getCommandName());
-        }
-        else {
-            $this->setAttribute("handler_command", "null");
-        }
-
-        parent::startRender();
-    }
-
-    public function renderDetails()
-    {
-        $max_slots = $this->input->getProcessor()->max_slots;
-
-        echo "<div class='Details'>";
-
-        if (strlen($this->caption) > 0) {
-            echo "<span class='Caption'>";
-            echo $this->caption;
-            echo "</span>";
-
-        }
-        echo "<div class='Limits'>";
-
-        echo "<div field='max_size'><label>UPLOAD_MAX_FILESIZE: </label><span>" . file_size(UPLOAD_MAX_FILESIZE) . "</span></div>";
-        echo "<div field='max_post_size'><label>POST_MAX_FILESIZE: </label><span>" . file_size(POST_MAX_FILESIZE) . "</span></div>";
-        echo "<div field='memory_limit'><label>MEMORY_LIMIT: </label><span>" . file_size(MEMORY_LIMIT) . "</span></div>";
-        echo "<div field='max_slots'><label>Available Slots: </label><span>" . $max_slots . "</span></div>";
-
-        echo "</div>";
-
-        echo "</div>";
-    }
-
     public function renderImpl()
     {
 
         echo "<div class='FieldElements'>";
 
         $this->renderDetails();
-        echo "\n";
+
         $this->renderControls();
-        echo "\n";
+
         $this->renderArrayContents();
-        echo "\n";
+
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
@@ -161,7 +142,6 @@ class SessionUpload extends InputField
         </script>
         <?php
         echo "</div>";
-
 
     }
 

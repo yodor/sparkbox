@@ -15,12 +15,12 @@ class NumericValidator implements IInputValidator
 
     }
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
-        $value = $field->getValue();
+        $value = $input->getValue();
 
         if (strlen($value) === 0) {
-            if ($field->isRequired()) throw new Exception("Input numeric value");
+            if ($input->isRequired()) throw new Exception("Input numeric value");
         }
         else {
 

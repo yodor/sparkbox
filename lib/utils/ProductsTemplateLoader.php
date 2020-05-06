@@ -330,7 +330,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 $validator->skip_is_uploaded_check = true;
 
 
-                $validator->validateInput($field);
+                $validator->validate($field);
 
                 $istorage = $field->getValue();
                 if ($istorage instanceof ImageStorageObject) {

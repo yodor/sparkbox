@@ -35,7 +35,7 @@ class MCETextArea extends InputField
 
     public function setAttribute($name, $value)
     {
-        $this->setFieldAttribute($name, $value);
+        $this->setInputAttribute($name, $value);
         self::$image_browser->setAttribute($name, $value);
     }
 
@@ -48,9 +48,9 @@ class MCETextArea extends InputField
     public function renderImpl()
     {
 
-        $field_attrs = $this->prepareFieldAttributes();
+        $attrs = $this->prepareInputAttributes();
 
-        echo "<textarea class='MCETextArea' $field_attrs>";
+        echo "<textarea class='MCETextArea' $attrs>";
 
         $field_value = $this->input->getValue();
 
@@ -70,19 +70,19 @@ class MCETextArea extends InputField
 
     }
 
-    public function renderValueImpl()
-    {
-        $field_value = $this->input->getValue();
-
-        if (strlen($field_value) > 0) {
-            $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");
-            $field_value = str_replace("\n", "<BR>", $field_value);
-            echo $field_value;
-        }
-        else {
-            echo "-";
-        }
-    }
+//    public function renderValueImpl()
+//    {
+//        $field_value = $this->input->getValue();
+//
+//        if (strlen($field_value) > 0) {
+//            $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");
+//            $field_value = str_replace("\n", "<BR>", $field_value);
+//            echo $field_value;
+//        }
+//        else {
+//            echo "-";
+//        }
+//    }
 
 }
 

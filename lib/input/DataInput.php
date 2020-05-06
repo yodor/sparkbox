@@ -332,7 +332,7 @@ class DataInput
     public function validate()
     {
         try {
-            $this->validator->validateInput($this);
+            $this->validator->validate($this);
         }
         catch (Exception $e) {
             $this->setError($e->getMessage());

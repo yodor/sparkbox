@@ -54,10 +54,10 @@ abstract class UploadDataValidator implements IInputValidator
     }
 
     /**
-     * @param DataInput $field
+     * @param DataInput $input
      * @throws Exception
      */
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
 
 
@@ -78,15 +78,15 @@ abstract class UploadDataValidator implements IInputValidator
         }
 
         //UploadDataInputProcessor always created one FileStroageObject with error_status UPLOAD_ERR_NO_FILE
-        $file_storage = $field->getValue();
+        $file_storage = $input->getValue();
 
         $upload_status = $file_storage->getUploadStatus();
 
-        debug("Field['" . $field->getName() . "'] | Class: " . get_class($file_storage) . " | upload_status: " . UploadDataValidator::errString($upload_status));
+        debug("Field['" . $input->getName() . "'] | Class: " . get_class($file_storage) . " | upload_status: " . UploadDataValidator::errString($upload_status));
 
         if ($upload_status === UPLOAD_ERR_NO_FILE) {
-            if ($field->isRequired()) {
-                if (!$field->getForm() || $field->getForm()->getEditID() < 1) {
+            if ($input->isRequired()) {
+                if (!$input->getForm() || $input->getForm()->getEditID() < 1) {
                     throw new Exception(UploadDataValidator::errString($upload_status));
                 }
             }
@@ -116,7 +116,7 @@ abstract class UploadDataValidator implements IInputValidator
             throw new Exception("Wrong File Type: " . $file_storage->getMIME() . ".<Br>Required Type: " . implode(';', $this->accept_mimes));
         }
 
-        $this->processUploadData($field);
+        $this->processUploadData($input);
 
     }
 

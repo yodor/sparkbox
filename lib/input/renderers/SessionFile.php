@@ -9,7 +9,7 @@ class SessionFile extends SessionUpload
     {
         parent::__construct($input, new FileUploadAjaxHandler());
 
-        $this->setFieldAttribute("validator", "file");
+//        $this->setInputAttribute("validator", "file");
     }
 
 

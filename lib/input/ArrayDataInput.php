@@ -36,7 +36,7 @@ class ArrayDataInput extends DataInput
         return "";
     }
 
-    public function setErrorAt($idx, $err)
+    public function setErrorAt(int $idx, string $err)
     {
 
         if (strlen($err) > 0) {

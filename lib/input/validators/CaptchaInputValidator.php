@@ -6,14 +6,14 @@ require_once("lib/securimage/securimage.php");
 class CaptchaInputValidator implements IInputValidator
 {
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
 
-        $value = $field->getValue();
+        $value = $input->getValue();
 
         $securimage = new Securimage();
 
-        if ($securimage->check($field->getValue()) == false) {
+        if ($securimage->check($input->getValue()) == false) {
             throw new Exception("Неправилен код за сигурност!");
         }
 

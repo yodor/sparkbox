@@ -10,9 +10,6 @@ abstract class DataSourceField extends InputField
      */
     protected $item;
 
-    /**
-     * @var SQLQuery|null
-     */
     public function __construct(DataInput $input)
     {
         parent::__construct($input);

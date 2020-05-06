@@ -6,9 +6,9 @@ class URLValidator implements IInputValidator
 {
 
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
-        $val = $field->getValue();
+        $val = $input->getValue();
 
         $proto_http = substr($val, 0, 7);
         $proto_https = substr($val, 0, 8);
@@ -17,7 +17,7 @@ class URLValidator implements IInputValidator
             //
         }
         else {
-            if ($field->isRequired()) {
+            if ($input->isRequired()) {
                 throw new Exception("HTTP or HTTPS :// required");
             }
         }

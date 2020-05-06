@@ -5,15 +5,15 @@ include_once("lib/storage/FileStorageObject.php");
 class UploadDataInputProcessor extends BeanPostProcessor
 {
 
-    public function loadPostData(DataInput $field, array $arr)
+    public function loadPostData(DataInput $input, array &$arr)
     {
 
-        $name = $field->getName();
+        $name = $input->getName();
 
         $file_storage = new FileStorageObject();
         $file_storage->setUploadStatus(UPLOAD_ERR_NO_FILE);
 
-        debug("_FILES has keys: " . implode("|", array_keys($_FILES)));
+        debug("_FILES array keys: " . implode("|", array_keys($_FILES)));
 
         if (isset($_FILES[$name])) {
 
@@ -46,7 +46,7 @@ class UploadDataInputProcessor extends BeanPostProcessor
             debug("Key '$name' not found in _FILES");
         }
 
-        $field->setValue($file_storage);
+        $input->setValue($file_storage);
 
     }
 

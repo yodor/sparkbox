@@ -4,10 +4,10 @@ include_once("lib/input/DataInput.php");
 
 class PasswordValidator extends EmptyValueValidator
 {
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
 
-        parent::validateInput($field);
+        parent::validate($input);
 
 
     }

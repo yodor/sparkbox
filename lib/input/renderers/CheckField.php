@@ -37,7 +37,7 @@ class CheckField extends DataSourceField
 
         $field_name = $this->input->getName();
 
-        $field_attr = $this->prepareFieldAttributes();
+        $field_attr = $this->prepareInputAttributes();
 
 
         if (!$this->iterator) {

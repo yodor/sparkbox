@@ -19,7 +19,7 @@ class DateValidator implements IInputValidator
             $year = $pieces[0];
             $month = $pieces[1];
             $day = $pieces[2];
-            DateValidator::validate($year, $month, $day);
+            DateValidator::validateDate($year, $month, $day);
             $ret = true;
         }
         catch (Exception $e) {
@@ -43,7 +43,7 @@ class DateValidator implements IInputValidator
     }
 
 
-    protected static function validate($year, $month, $day)
+    protected static function validateDate($year, $month, $day)
     {
 
         if ($year < 1) {
@@ -73,11 +73,11 @@ class DateValidator implements IInputValidator
 
     }
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
 
 
-        $pieces = explode("-", $field->getValue());
+        $pieces = explode("-", $input->getValue());
 
         if (count($pieces) != 3) {
             throw new Exception("Incorrect date (date format)");
@@ -90,15 +90,15 @@ class DateValidator implements IInputValidator
 
 
         try {
-            DateValidator::validate($year, $month, $day);
+            DateValidator::validateDate($year, $month, $day);
         }
         catch (Exception $e) {
-            if (strlen($year) > 0 || strlen($month) > 0 || strlen($day) > 0 || $field->isRequired()) {
+            if (strlen($year) > 0 || strlen($month) > 0 || strlen($day) > 0 || $input->isRequired()) {
                 throw  $e;
             }
             else {
-                if (!$field->isRequired()) {
-                    $field->clear();
+                if (!$input->isRequired()) {
+                    $input->clear();
                 }
             }
         }

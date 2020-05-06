@@ -13,15 +13,15 @@ class SessionUploadInputProcessor extends BeanPostProcessor
     protected $loaded_uids = array();
 
 
-    public function loadBeanData(int $editID, DBTableBean $bean, DataInput $field, array $item_row)
+    public function loadBeanData(int $editID, DBTableBean $bean, DataInput $input, array &$item_row)
     {
-        parent::loadBeanData($editID, $bean, $field, $item_row);
-        //now value contains array of this item row storage objects or referented source data values
+        parent::loadBeanData($editID, $bean, $input, $item_row);
+        //now value contains array of this item row storage objects or referenced source data values
         //
         debug("loadBeanData: ");
-        $field_name = $field->getName();
+        $field_name = $input->getName();
 
-        $values = $field->getValue();
+        $values = $input->getValue();
         $this->loaded_uids = array();
 
         //trying to load field that does not have corresponding value in table. reset the value to empty array
@@ -50,14 +50,14 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         }
 
         $values = array_values($values);
-        $field->setValue($values);
+        $input->setValue($values);
 
         debug("Final value type: " . getType($values));
         debug("Final UIDs Dump: ", $values);
     }
 
 
-    public function loadPostData(DataInput $field, array $arr)
+    public function loadPostData(DataInput $input, array &$arr)
     {
 
         //
@@ -66,10 +66,10 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 
         debug("-");
 
-        debug("Field class: " . get_class($field));
-        $field_name = $field->getName();
+        debug("Field class: " . get_class($input));
+        $field_name = $input->getName();
 
-        $values = $field->getValue();
+        $values = $input->getValue();
 
         $num_files = 0;
 
@@ -123,7 +123,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         //reorder
         $values = array_values($values);
 
-        $field->setValue($values);
+        $input->setValue($values);
 
         debug("Final field values including session fiels:", $values);
 
@@ -137,9 +137,9 @@ class SessionUploadInputProcessor extends BeanPostProcessor
     //       parent::beforeCommit($field, $transactor, $db, $item_key);
     //
     //   }
-    public function afterCommit(DataInput $field, DBTransactor $transactor)
+    public function afterCommit(DataInput $input, DBTransactor $transactor)
     {
-        $field_name = $field->getName();
+        $field_name = $input->getName();
 
         if (isset($_SESSION[UploadControlAjaxHandler::PARAM_CONTROL_NAME][$field_name])) {
 
@@ -153,25 +153,25 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 
     }
 
-    public function transactValue(DataInput $field, DBTransactor $transactor)
+    public function transactValue(DataInput $input, DBTransactor $transactor)
     {
 
 
-        $values = $field->getValue();
-        $field_name = $field->getName();
+        $values = $input->getValue();
+        $field_name = $input->getName();
 
         //transact only UIDs found inside the session array i.e. the new ones
         debug("field['$field_name'] " . gettype($values) . " #" . count($values) . " values to transact");
 
-        if (!is_null($field->getSource())) {
-            $data_source = $field->getSource();
+        if (!is_null($input->getSource())) {
+            $data_source = $input->getSource();
 
             debug("Field uses data source: '" . get_class($data_source) . "' will commit values in before commit ...");
             return;
         }
 
 
-        if ($field->transact_mode == DataInput::TRANSACT_DBROW) {
+        if ($input->transact_mode == DataInput::TRANSACT_DBROW) {
 
             debug("Transact Mode: TRANSACT_DBROW");
 
@@ -205,7 +205,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 
 
         }
-        else if ($field->transact_mode == DataInput::TRANSACT_OBJECT) {
+        else if ($input->transact_mode == DataInput::TRANSACT_OBJECT) {
             debug("Transact Mode: MODE_OBJECT");
 
             if (count($values) > 1) {

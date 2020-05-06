@@ -9,9 +9,6 @@ class SessionImage extends SessionUpload
     {
         parent::__construct($input, new ImageUploadAjaxHandler());
 
-        //TODO: not needed
-        $this->setFieldAttribute("validator", "image");
-
     }
 
 }

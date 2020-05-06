@@ -4,15 +4,11 @@ include_once("lib/input/renderers/InputFieldTag.php");
 class ColorCodeField extends InputFieldTag
 {
 
-    public function __construct(DataInput $input)
+    protected function prepareInputAttributes(): string
     {
-        parent::__construct($input);
-
-        $this->setFieldAttribute("type", "color");
-
+        $this->setInputAttribute("type", "color");
+        return parent::prepareInputAttributes();
     }
-
-
 }
 
 ?>

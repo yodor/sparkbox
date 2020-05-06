@@ -6,9 +6,9 @@ include_once("lib/beans/NestedSetBean.php");
 class NestedSelectField extends SelectField
 {
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
     }
 
     protected function renderItems()

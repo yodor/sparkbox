@@ -7,15 +7,15 @@ class EmptyValueValidator implements IInputValidator
     public $require_array_value = false;
 
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
 
-        $value = $field->getValue();
+        $value = $input->getValue();
 
         //checkbox and radios receive array of values here
         if (is_array($value)) {
 
-            if ($field->isRequired()) {
+            if ($input->isRequired()) {
                 if (count($value) < 1) throw new Exception("Input value ");
                 $empty_count = 0;
                 foreach ($value as $idx => $val) {
@@ -27,12 +27,12 @@ class EmptyValueValidator implements IInputValidator
         }
         else {
 
-            if (strlen(trim($value)) == 0 && $field->isRequired()) {
+            if (strlen(trim($value)) == 0 && $input->isRequired()) {
                 throw new Exception("Input value ");
             }
 
-            if ($field->getLinkMode() && strlen(trim($value)) === 0) {
-                $link_field = $field->getLinkField();
+            if ($input->getLinkMode() && strlen(trim($value)) === 0) {
+                $link_field = $input->getLinkField();
                 $fti = $link_field->getRenderer()->getFreetextInput();
                 if (strcmp($fti, $link_field->getValue()) === 0) {
                     throw new Exception("Please specify other");

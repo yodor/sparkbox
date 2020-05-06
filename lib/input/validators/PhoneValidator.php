@@ -6,13 +6,13 @@ class PhoneValidator implements IInputValidator
 {
 
     /**
-     * @param DataInput $field
+     * @param DataInput $input
      * @throws Exception
      */
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
 
-        $pieces = explode("|", $field->getValue());
+        $pieces = explode("|", $input->getValue());
 
         if (count($pieces) != 3) {
             throw new Exception("Incorrect phone");
@@ -29,7 +29,7 @@ class PhoneValidator implements IInputValidator
 
         $err = "";
 
-        if ($field->isRequired() || $have_entry) {
+        if ($input->isRequired() || $have_entry) {
             if ((int)$country_code < 1 || !preg_match("/^([0-9])+$/", $country_code)) {
                 $err = "Input country code";
                 $ret = false;

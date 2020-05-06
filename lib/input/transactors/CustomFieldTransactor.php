@@ -13,25 +13,25 @@ class CustomFieldTransactor implements IDBFieldTransactor
         $this->transact_field_name = $transact_field_name;
     }
 
-    public function beforeCommit(DataInput $field, DBTransactor $transactor, DBDriver $db, $item_key)
+    public function beforeCommit(DataInput $input, DBTransactor $transactor, DBDriver $db, $item_key)
     {
 
 
     }
 
-    public function afterCommit(DataInput $field, DBTransactor $transactor)
+    public function afterCommit(DataInput $input, DBTransactor $transactor)
     {
 
     }
 
-    public function transactValue(DataInput $field, DBTransactor $transactor)
+    public function transactValue(DataInput $input, DBTransactor $transactor)
     {
         if ($this->transact_field_name) {
-            $transactor->appendValue($this->transact_field_name, $field->getValue());
+            $transactor->appendValue($this->transact_field_name, $input->getValue());
 
         }
         else {
-            debug("CustomFieldTransactor::transactValue: Not transacting field['" . $field->getName() . "'] with empty transact_field_name");
+            debug("CustomFieldTransactor::transactValue: Not transacting field['" . $input->getName() . "'] with empty transact_field_name");
 
         }
     }

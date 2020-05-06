@@ -8,7 +8,7 @@ class FileField extends PlainUpload
     {
         parent::__construct($input);
 
-        $this->setFieldAttribute("validator", "file");
+        //$this->setInputAttribute("validator", "file");
 
     }
 

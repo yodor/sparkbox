@@ -275,7 +275,7 @@ $rend = $field->getRenderer();
 $rend->setIterator(ArrayDataIterator::FromSelect($brand_select, "brand_name", "brand_name"));
 $rend->list_key = "brand_name";
 $rend->list_label = "brand_name";
-$rend->setFieldAttribute("onChange", "javascript:filterChanged(this)");
+$rend->setInputAttribute("onChange", "javascript:filterChanged(this)");
 $field->setValue($brand_value);
 
 $rend->renderField($field);
@@ -288,7 +288,7 @@ $rend = $field->getRenderer();
 $rend->setIterator(ArrayDataIterator::FromSelect($color_select, "color", "color"));
 $rend->list_key = "color";
 $rend->list_label = "color";
-$rend->setFieldAttribute("onChange", "javascript:filterChanged(this)");
+$rend->setInputAttribute("onChange", "javascript:filterChanged(this)");
 $field->setValue($color_value);
 
 $rend->renderField($field);
@@ -301,7 +301,7 @@ $rend = $field->getRenderer();
 $rend->setIterator(ArrayDataIterator::FromSelect($size_select, "size_value", "size_value"));
 $rend->list_key = "size_value";
 $rend->list_label = "size_value";
-$rend->setFieldAttribute("onChange", "javascript:filterChanged(this)");
+$rend->setInputAttribute("onChange", "javascript:filterChanged(this)");
 $field->setValue($size_value);
 
 $rend->renderField($field);
@@ -341,8 +341,8 @@ try {
         $rend->setIterator(ArrayDataIterator::FromSelect($item["select"], "ia_value", "ia_value"));
         $rend->list_key = "ia_value";
         $rend->list_label = "ia_value";
-        $rend->setFieldAttribute("onChange", "javascript:filterChanged(this, 'ia', true)");
-        $rend->setFieldAttribute("filter_group", "ia");
+        $rend->setInputAttribute("onChange", "javascript:filterChanged(this, 'ia', true)");
+        $rend->setInputAttribute("filter_group", "ia");
         $field->setValue($item["value"]);
 
         $rend->renderField($field);

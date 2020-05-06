@@ -13,14 +13,14 @@ class EnumFieldValidator implements IInputValidator
         $this->field_name = $field_name;
     }
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
-        if (!$this->field_name) $this->field_name = $field->getName();
+        if (!$this->field_name) $this->field_name = $input->getName();
 
         $ret = DBDriver::Get()->fieldType($this->table_name, $this->field_name);
         $ret = DBDriver::Get()->enum2array($ret);
 
-        if (!in_array($field->getValue(), $ret)) {
+        if (!in_array($input->getValue(), $ret)) {
 
             throw new Exception("Incorrect value");
 

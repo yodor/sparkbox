@@ -4,22 +4,18 @@ include_once("lib/input/renderers/InputField.php");
 abstract class InputFieldTag extends InputField
 {
 
-    public function startRender()
+    protected function prepareInputAttributes() : string
     {
-
         $field_value = mysql_real_unescape_string($this->input->getValue());
 
-        $this->setFieldAttribute("value", $field_value);
-        $this->setFieldAttribute("name", $this->input->getName());
+        $this->setInputAttribute("value", $field_value);
 
-
-        parent::startRender();
-
+        return parent::prepareInputAttributes();
     }
 
     protected function renderImpl()
     {
-        $field_attr = $this->prepareFieldAttributes();
+        $field_attr = $this->prepareInputAttributes();
 
         echo "<input $field_attr>";
     }

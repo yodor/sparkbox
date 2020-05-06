@@ -19,7 +19,7 @@ class TimeValidator implements IInputValidator
             $hour = $pieces[0];
             $minute = $pieces[1];
 
-            TimeValidator::validate($hour, $minute);
+            TimeValidator::validateTime($hour, $minute);
             $ret = true;
         }
         catch (Exception $e) {
@@ -28,7 +28,7 @@ class TimeValidator implements IInputValidator
         return $ret;
     }
 
-    protected static function validate($hour, $minute)
+    protected static function validateTime($hour, $minute)
     {
 
         if ($hour < 0 || $hour > 23) {
@@ -43,10 +43,10 @@ class TimeValidator implements IInputValidator
 
     }
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
 
-        $pieces = explode(":", $field->getValue());
+        $pieces = explode(":", $input->getValue());
 
         if (count($pieces) != 2) {
             throw new Exception("Incorrect time");
@@ -58,7 +58,7 @@ class TimeValidator implements IInputValidator
         $minute = $pieces[1];
 
 
-        TimeValidator::validate($hour, $minute);
+        TimeValidator::validateTime($hour, $minute);
 
 
     }

@@ -6,24 +6,27 @@ class SliderField extends InputField
 
     public $accepted_values = NULL;
 
-    public function renderImpl()
+    protected function prepareInputAttributes(): string
     {
 
-        $field_value = $this->input->getValue();
-        $field_name = $this->input->getName();
-
-        $field_value = htmlentities(mysql_real_unescape_string($field_value), ENT_QUOTES, "UTF-8");
-        $this->attributes["type"] = "hidden";
-        $this->attributes["value"] = $field_value;
-        $this->attributes["name"] = $field_name;
+        $field_value = htmlentities(mysql_real_unescape_string($this->input->getValue()), ENT_QUOTES, "UTF-8");
+        $this->setInputAttribute("type", "hidden");
+        $this->setInputAttribute("value", $field_value);
 
         if (is_array($this->accepted_values)) {
-            $this->attributes["increments"] = implode("|", $this->accepted_values);
-            $this->attributes["min"] = 0;
-            $this->attributes["max"] = count($this->accepted_values) - 1;
+            $this->setInputAttribute("increments" , implode("|", $this->accepted_values));
+            $this->setInputAttribute("min", 0);
+            $this->setInputAttribute("max", count($this->accepted_values) - 1);
         }
 
-        $attrs = $this->prepareAttributes();
+        return parent::prepareInputAttributes();
+
+    }
+
+    protected function renderImpl()
+    {
+
+        $attrs = $this->prepareInputAttributes();
 
         echo "<input $attrs>";
 
@@ -45,10 +48,12 @@ class SliderField extends InputField
             echo "</table>";
         }
 
+        $field_value = htmlentities(mysql_real_unescape_string($this->input->getValue()), ENT_QUOTES, "UTF-8");
+
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                var name = "<?php echo $field_name;?>";
+                var name = "<?php echo $this->input->getName();?>";
                 if ($("input[name='" + name + "'] + .slider_input").value) {
                     $("input[name='" + name + "'] + .slider_input").value("<?php echo $field_value;?>");
                 }

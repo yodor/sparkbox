@@ -49,9 +49,9 @@ class SelectField extends DataSourceField
     {
 
         if ($this->input->getLinkField() instanceof DataInput) {
-            $this->setFieldAttribute("onChange", "javascript:toggleLinkedField(this)");
+            $this->setInputAttribute("onChange", "javascript:toggleLinkedField(this)");
             if ($this->freetext_value) {
-                $this->setFieldAttribute("link_value", $this->freetext_value);
+                $this->setInputAttribute("link_value", $this->freetext_value);
             }
 
         }
@@ -92,7 +92,7 @@ class SelectField extends DataSourceField
         //prepare the default select value
         parent::startRenderItems();
 
-        $attrs = $this->prepareFieldAttributes();
+        $attrs = $this->prepareInputAttributes();
         echo "<select $attrs >";
 
         if ($this->na_str) {
@@ -157,14 +157,14 @@ class SelectMultipleField extends SelectField
     {
         parent::__construct($input);
 
-        $this->setFieldAttribute("multiple", "");
+        $this->setInputAttribute("multiple", "");
 
         $this->na_str = "";
     }
 
     protected function startRenderItems()
     {
-        $this->setFieldAttribute("name", $this->input->getName() . "[]");
+        $this->setInputAttribute("name", $this->input->getName() . "[]");
         parent::startRenderItems();
     }
 

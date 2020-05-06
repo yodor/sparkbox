@@ -4,14 +4,11 @@ include_once("lib/input/renderers/InputFieldTag.php");
 class TextField extends InputFieldTag
 {
 
-    public function __construct(DataInput $input)
+    protected function prepareInputAttributes(): string
     {
-        parent::__construct($input);
-
-        $this->setFieldAttribute("type", "text");
-
+        $this->setInputAttribute("type", "text");
+        return parent::prepareInputAttributes();
     }
-
 
 }
 

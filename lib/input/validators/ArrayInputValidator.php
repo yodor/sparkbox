@@ -2,75 +2,67 @@
 
 class ArrayInputValidator implements IInputValidator
 {
-    protected $validator_private = NULL;
+    protected $item_validator = NULL;
 
     public function __construct(IInputValidator $validator_private)
     {
-        $this->validator_private = $validator_private;
+        $this->item_validator = $validator_private;
     }
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
         //input processor passes ordered values to the field
         //from arrayinputprocessor
         // 	      $values_ordered = reorderArray($values_array);
         //
         // 	      $field->setValue($values_ordered);
+        if (! ($input instanceof ArrayDataInput)) throw new Exception("Not an instance of ArrayDataInput");
 
+        debug("Validating values of ArrayDataInput: '{$input->getName()}'");
 
-        debug("Validating field: {$field->getName()}");
-
-        $values_array = $field->getValue();
+        $values_array = $input->getValue();
 
         if (is_array($values_array)) {
 
-            // 		//case for checkbox arrays and posting empty row
-            // 		for ($idx=0;$idx<count($values_array);$idx++) {
-            // 		    $values_array[$idx] = isset($values_array[$idx]) ? $values_array[$idx] : array();
-            // 		}
-
             $values_array = array_values($values_array);
-            $field->setValue($values_array);
+            $input->setValue($values_array);
 
         }
 
-        $values_array = $field->getValue();
+        $values_array = $input->getValue();
 
         if (!is_array($values_array) || count($values_array) < 1) {
-            if ($field->isRequired()) {
+            if ($input->isRequired()) {
                 throw new Exception("Input value(s) for this collection");
             }
-
         }
-
-        debug("field value is array");
 
         for ($idx = 0; $idx < count($values_array); $idx++) {
 
-            $field->setErrorAt($idx, false);
+            $input->setErrorAt($idx, "");
 
             $value = $values_array[$idx];
 
-            debug("validating field at position '$idx' - " . getType($value));
+            debug("Value[$idx] - Type: " . getType($value));
 
             try {
-                $cfield = clone $field;
+                $cfield = clone $input;
 
                 $cfield->setValue($value);
 
                 //array inputs required?
-                $cfield->setRequired(true);
+                //$cfield->setRequired($this->validator_private->require_array_value);
 
-                $this->validator_private->validateInput($cfield);
+                $this->item_validator->validate($cfield);
 
                 //set value back to the original array as upload validator changes type of storage object
-                $field->setValueAt($idx, $cfield->getValue());
+                $input->setValueAt($idx, $cfield->getValue());
 
             }
             catch (Exception $e) {
 
-                debug("ArrayInputValidator::validateInput: Exception at position '$idx' - " . getType($value) . " Setting field error: " . $e->getMessage());
-                $field->setErrorAt($idx, $e->getMessage());
+                debug("Validate result: ".$e->getMessage());
+                $input->setErrorAt($idx, $e->getMessage());
 
             }
 
@@ -79,24 +71,11 @@ class ArrayInputValidator implements IInputValidator
 
     }
 
-    public function getValidatorPrivate()
+    public function getItemValidator()
     {
-        return $this->validator_private;
+        return $this->item_validator;
     }
-    //   public function validateFinal(InputField $field)
-    //   {
-    //        $this->validator_private->validateFinal($field);
-    //
-    //        if ($field->isRequired() && count($field->getValue())<1) throw new Exception("This required field needs value");
-    //   }
-    //   public function validateFinal(InputField $field)
-    //   {
-    //       debug("UploadDataValidator::validateFinal: field['".$field->getName()."']");
-    //
-    //       if ($field->isRequired() && count($field->getValue())<1) {
-    // 	  throw new Exception("Select atleast one value for this array ");
-    //       }
-    //   }
+
 }
 
 ?>

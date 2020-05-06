@@ -3,6 +3,10 @@ include_once("lib/components/Component.php");
 include_once("lib/input/renderers/IErrorRenderer.php");
 include_once("lib/iterators/IDataIterator.php");
 
+/**
+ * Class InputField
+ * Base class to wraps various input tags into a Component
+ */
 abstract class InputField extends Component implements IErrorRenderer
 {
 
@@ -19,6 +23,8 @@ abstract class InputField extends Component implements IErrorRenderer
     protected $input;
 
     /**
+     * Implementing classes use this iterator to render their contents
+     * (DataSourceField)
      * @var IDataIterator
      */
     protected $iterator = NULL;
@@ -30,7 +36,12 @@ abstract class InputField extends Component implements IErrorRenderer
 
     protected $freetext_value = FALSE;
 
-    protected $field_attributes = array();
+    /**
+     * Attributes to be used for the actual input element.
+     * Separate collection from the Component attributes.
+     * @var array
+     */
+    protected $input_attributes = array();
 
     public function __construct(DataInput $input)
     {
@@ -39,6 +50,7 @@ abstract class InputField extends Component implements IErrorRenderer
 
         $input->setRenderer($this);
 
+        $this->attributes["field"] = $this->input->getName();
     }
 
     public function requiredStyle()
@@ -48,15 +60,14 @@ abstract class InputField extends Component implements IErrorRenderer
         return $arr;
     }
 
-    public function setFieldAttribute($name, $value)
+    public function setInputAttribute($name, $value)
     {
-        $this->field_attributes[$name] = $value;
-        return $this;
+        $this->input_attributes[$name] = $value;
     }
 
-    public function getFieldAttribute($name)
+    public function getInputAttribute($name)
     {
-        return $this->field_attributes[$name];
+        return $this->input_attributes[$name];
     }
 
     public function enableFreetextInput($src_id)
@@ -79,35 +90,6 @@ abstract class InputField extends Component implements IErrorRenderer
         return $this->iterator;
     }
 
-    public function processErrorAttributes()
-    {
-
-        $field_error = $this->input->getError();
-
-        if (is_array($field_error)) $field_error = implode(";", $field_error);
-
-        if (strlen($field_error) > 0) {
-
-            if ($this->error_render_mode == IErrorRenderer::MODE_TOOLTIP) {
-                $this->attributes["tooltip"] = $field_error;
-            }
-            $this->attributes["error"] = 1;
-        }
-        else {
-            //$this->attributes["error"] = FALSE;
-        }
-
-    }
-
-    public function prepareFieldAttributes()
-    {
-        if (!$this->input->isEditable()) {
-            $this->setFieldAttribute("disabled", "true");
-        }
-        return $this->getAttributesText($this->field_attributes);
-
-    }
-
     public function setInput(DataInput $input)
     {
         $this->input = $input;
@@ -118,28 +100,32 @@ abstract class InputField extends Component implements IErrorRenderer
         return $this->input;
     }
 
+    public function processErrorAttributes()
+    {
+        if (!$this->input->haveError()) return;
+
+        if ($this->error_render_mode == IErrorRenderer::MODE_TOOLTIP) {
+            $this->setAttribute("tooltip", tr($this->input->getError()));
+        }
+        $this->setAttribute("error", 1);
+    }
+
+    protected function prepareInputAttributes() : string
+    {
+        $this->setInputAttribute("name", $this->input->getName());
+
+        if (!$this->input->isEditable()) {
+            $this->setInputAttribute("disabled", "true");
+        }
+        return $this->getAttributesText($this->input_attributes);
+
+    }
+
     public function startRender()
     {
-        $this->setFieldAttribute("name", $this->input->getName());
-
-        //access attributes directly. allow sub components to override setAttribute
-        $this->attributes["field"] = $this->input->getName();
 
         $this->processErrorAttributes();
 
-        $field_error = $this->input->getError();
-
-        if (is_array($field_error)) $field_error = implode(";", $field_error);
-
-        if (strlen($field_error) > 0) {
-
-            if ($this->error_render_mode == IErrorRenderer::MODE_SPAN) {
-                echo "<span class='error_detail'>";
-                echo $field_error;
-                echo "</span>";
-            }
-
-        }
         parent::startRender();
 
         if (strlen($this->caption) > 0) {
@@ -165,7 +151,14 @@ abstract class InputField extends Component implements IErrorRenderer
             echo "</div>";
         }
 
+        if ($this->input->haveError() && $this->error_render_mode == IErrorRenderer::MODE_SPAN) {
+            echo "<small class='error_details'>";
+            echo tr($this->input->getError());
+            echo "</small>";
+        }
+
         parent::finishRender();
+
     }
 
 }

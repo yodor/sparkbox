@@ -12,11 +12,10 @@ class TimeField extends InputField
 
     }
 
-    public function renderImpl()
+    protected function renderImpl()
     {
         $field_value = $this->input->getValue();
         $field_name = $this->input->getName();
-
 
         $hour = -1;
         $minute = -1;

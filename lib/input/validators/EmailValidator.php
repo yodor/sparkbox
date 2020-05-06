@@ -11,11 +11,11 @@ class EmailValidator implements IInputValidator
         $this->domain_check_enabled = $domain_check_enabled;
     }
 
-    public function validateInput(DataInput $field)
+    public function validate(DataInput $input)
     {
         $ret = "";
 
-        $value = trim($field->getValue());
+        $value = trim($input->getValue());
 
         if (strlen($value) == 0) throw new Exception("Input value");
 

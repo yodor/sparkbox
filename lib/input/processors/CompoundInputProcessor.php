@@ -25,11 +25,11 @@ class CompoundInputProcessor extends BeanPostProcessor
     }
 
 
-    public function loadPostData(DataInput $field, array $arr)
+    public function loadPostData(DataInput $input, array &$arr)
     {
 
 
-        $field_name = $field->getName();
+        $field_name = $input->getName();
 
 
         foreach ($this->compound_names as $idx => $subname) {
@@ -67,12 +67,12 @@ class CompoundInputProcessor extends BeanPostProcessor
 
             }
 
-            $field->setValue($arr_compound);
+            $input->setValue($arr_compound);
 
         }
         else {
 
-            $field->setValue(implode($this->concat_char, $this->compound_values));
+            $input->setValue(implode($this->concat_char, $this->compound_values));
 
         }
 

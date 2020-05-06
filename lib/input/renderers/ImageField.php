@@ -15,7 +15,7 @@ class ImageField extends PlainUpload implements IPhotoRenderer
     {
         parent::__construct($input);
 
-        $this->setFieldAttribute("validator", "image");
+        $this->setInputAttribute("validator", "image");
     }
 
 
