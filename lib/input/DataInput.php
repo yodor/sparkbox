@@ -37,6 +37,8 @@ class DataInput
 
     public $skip_transaction = false;
 
+    public $skip_search_filter_processing = false;
+
     /**
      * @var string
      */

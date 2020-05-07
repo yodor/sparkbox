@@ -1,8 +1,8 @@
 <?php
 include_once("forms/processors/IFormProcessor.php");
-include_once("beans/IDBTableEditor.php");
+include_once("beans/IBeanEditor.php");
 
-class FormProcessor implements IFormProcessor, IDBTableEditor
+class FormProcessor implements IFormProcessor, IBeanEditor
 {
 
     protected $status = IFormProcessor::STATUS_NOT_PROCESSED;

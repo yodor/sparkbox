@@ -10,7 +10,7 @@ class PhotoInputForm extends InputForm
         parent::__construct();
 
         $field = new DataInput("caption", "Caption", 0);
-        $field->setRenderer(new TextField());
+        new TextField($field);
         $this->addInput($field);
 
 

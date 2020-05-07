@@ -1,8 +1,8 @@
 <?php
 include_once("forms/InputForm.php");
-include_once("beans/IDBTableEditor.php");
+include_once("beans/IBeanEditor.php");
 
-class DBTransactor implements IDBTableEditor
+class DBTransactor implements IBeanEditor
 {
 
     protected $transact_values = array();

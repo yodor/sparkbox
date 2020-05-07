@@ -38,9 +38,12 @@ class CacheFile
             mkdir($cache_folder, 0777, true);
         }
 
-        debug("Using cache folder: $cache_folder");
 
-        $this->fileName = $cache_folder . "/" . $this->getCacheFile();
+
+        $this->fileName = $cache_folder . DIRECTORY_SEPARATOR . $this->getCacheFile();
+
+
+        debug("Using filename: $this->fileName");
     }
 
     public function exists() : bool
@@ -69,7 +72,7 @@ class CacheFile
 
     protected function getCacheFolder() : string
     {
-        return CACHE_ROOT . "/" . $this->className . "/" . $this->id . "/";
+        return CACHE_ROOT . DIRECTORY_SEPARATOR . $this->className . DIRECTORY_SEPARATOR . $this->id ;
     }
 
     protected function getCacheFile() : string
@@ -80,12 +83,14 @@ class CacheFile
     public function store($data)
     {
         $handle = fopen($this->fileName, 'c');
+        //acquire an exclusive lock (writer)
         flock($handle, LOCK_EX);
         ftruncate($handle, 0);
         file_put_contents($this->fileName, $data);
+        fflush($handle);
         flock($handle, LOCK_UN);
         fclose($handle);
 
-        debug("Data saved to file: {$this->fileName} - Size: ".filesize($this->fileName));
+        debug("Store complete - size: ".filesize($this->fileName)." filename: {$this->fileName}");
     }
 }

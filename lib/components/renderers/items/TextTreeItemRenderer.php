@@ -1,9 +1,9 @@
 <?php
 include_once("components/renderers/items/NestedSetItemRenderer.php");
-include_once("components/renderers/IActionsRenderer.php");
+include_once("components/renderers/IActionsCollection.php");
 include_once("components/renderers/ActionRenderer.php");
 
-class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsRenderer
+class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsCollection
 {
 
     protected $actions = NULL;
@@ -41,12 +41,17 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsRend
         $this->actions[] = $a;
     }
 
+    public function getAction(string $title) : Action
+    {
+        return $this->actions[$title];
+    }
+
     public function setActions(array $actions)
     {
         $this->actions = $actions;
     }
 
-    public function getActions()
+    public function getActions() : array
     {
         return $this->actions;
     }
@@ -60,7 +65,7 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsRend
         foreach ($this->actions as $key => $action) {
             $this->action_renderer->setAction($action);
 
-            $this->action_renderer->setResultRow($this->data_row);
+            $this->action_renderer->setData($this->data_row);
             $this->action_renderer->render();
 
         }
@@ -89,7 +94,7 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsRend
         $this->action_renderer->setAction($this->text_action);
         $this->action_renderer->enableActionFromLabel(false);
         $this->action_renderer->setAttribute("action", "TextTreeItemAction");
-        $this->action_renderer->setResultRow($this->data_row);
+        $this->action_renderer->setData($this->data_row);
         $this->action_renderer->render();
 
 

@@ -21,7 +21,7 @@ abstract class AbstractResultView extends Component
     protected $paginators_enabled = true;
     protected $select_query = NULL;
 
-    public function __construct(SQLQuery $itr)
+    public function __construct(IDataIterator $itr)
     {
         parent::__construct();
 

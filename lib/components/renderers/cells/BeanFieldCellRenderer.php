@@ -1,15 +1,14 @@
 <?php
-include_once("components/Component.php");
-include_once("components/renderers/ICellRenderer.php");
-include_once("components/TableColumn.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
 
-class BeanFieldCellRenderer extends TableCellRenderer implements ICellRenderer
+class BeanFieldCellRenderer extends TableCellRenderer
 {
 
     protected $bean = false;
     protected $field_name = false;
 
-    public function __construct(DBTableBean $bean, $field_name)
+
+    public function __construct(DBTableBean $bean, string $field_name)
     {
         parent::__construct();
 
@@ -17,22 +16,19 @@ class BeanFieldCellRenderer extends TableCellRenderer implements ICellRenderer
         $this->field_name = $field_name;
     }
 
-    public function renderCell(array &$row, TableColumn $tc)
+    public function setData(array &$row)
     {
-        $this->processAttributes($row, $tc);
+        parent::setData($row);
 
-        $this->startRender();
-        $field_key = $tc->getFieldName();
+        $field_key = $this->column->getFieldName();
 
         $qry = $this->bean->queryField($field_key, $row[$field_key], 1);
-
+        $qry->select->fields = $this->field_name;
         $qry->exec();
 
         if ($brow = $qry->next()) {
-            echo $brow[$this->field_name];
+            $this->value =  $brow[$this->field_name];
         }
-
-        $this->finishRender();
     }
 }
 

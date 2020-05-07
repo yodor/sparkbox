@@ -11,27 +11,25 @@ class MenuItemInputForm extends InputForm
 
         parent::__construct();
 
-        $field = new DataInput("menu_title", "Menu Title", 1);
-        $field->setRenderer(new TextField());
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "menu_title", "Menu Title", 1);
         $this->addInput($field);
 
-        $field = new DataInput("link", "Link", 1);
-        $field->setRenderer(new TextField());
+        $field = DataInputFactory::Create(DataInputFactory::TEXT,"link", "Link", 1);
         $field->content_after = "<a class='ActionRenderer DynamicPageChooser' href='" . ADMIN_ROOT . "content/pages/list.php?chooser=1'>" . tr("Choose Dynamic Page") . "</a>";
         $this->addInput($field);
 
         $field = new DataInput("parentID", "Parent Menu", 1);
-        $rend = new NestedSelectField();
+
+        $rend = new NestedSelectField($field);
 
         // $source = new MenuItemsBean();
         $rend->na_str = "--- TOP ---";
-        $rend->na_val = "0";
+        $rend->na_val = "-1";
 
-        $rend->setIterator($source->query());
+        $rend->setIterator(new SQLQuery($source->listTreeSelect(), "menuID", $source->getTableName()));
         $rend->list_key = "menuID";
         $rend->list_label = "menu_title";
 
-        $field->setRenderer($rend);
         $this->addInput($field);
 
 

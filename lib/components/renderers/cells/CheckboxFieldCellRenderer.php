@@ -1,36 +1,36 @@
 <?php
-include_once("components/Component.php");
-include_once("components/renderers/ICellRenderer.php");
-include_once("components/TableColumn.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
 
-class CheckboxFieldCellRenderer extends TableCellRenderer implements ICellRenderer
+class CheckboxFieldCellRenderer extends TableCellRenderer
 {
-    protected $value_field = "";
+    protected $field = "";
 
-    public function __construct($value_field = "")
+    public function __construct($field = "")
     {
         parent::__construct();
 
-        $this->value_field = $value_field;
+        $this->field = $field;
 
     }
 
-    public function renderCell(array &$row, TableColumn $tc)
+    protected function renderImpl()
     {
-        $this->startRender();
-        $field_key = $tc->getFieldName();
+        echo "<div class='value'>";
+        echo "<input type=checkbox name='select_{$this->field}[]'  value='".attributeValue($this->value)."'>";
+        echo "<span>{$this->value}</span>";
+        echo "</div>";
+    }
 
-        $value = json_string($row[$field_key]);
-        if ($this->value_field) {
-            $value = json_string($row[$this->value_field]);
+    public function setData(array &$row)
+    {
+        parent::setData($row);
+
+        if (!$this->field) {
+            $this->field = $this->column->getFieldName();
         }
 
-        echo "<input type=checkbox name='select_{$field_key}[]'  value=$value>";
-        echo "<BR>";
-        echo $row[$field_key];
+        $this->value = $row[$this->field];
 
-
-        $this->finishRender();
     }
 }
 

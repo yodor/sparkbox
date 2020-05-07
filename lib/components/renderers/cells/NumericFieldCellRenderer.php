@@ -1,31 +1,27 @@
 <?php
-include_once("components/Component.php");
-include_once("components/renderers/ICellRenderer.php");
-include_once("components/TableColumn.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
 
-class NumericFieldCellRenderer extends TableCellRenderer implements ICellRenderer
+class NumericFieldCellRenderer extends TableCellRenderer
 {
 
-    protected $format;
+    protected $format = "%01.2f";
 
-    public function __construct($format = "%01.2f")
+    public function __construct(string $format = "")
     {
         parent::__construct();
 
-        $this->format = $format;
+        if ($format) {
+            $this->format = $format;
+        }
     }
 
-    public function renderCell(array &$row, TableColumn $tc)
+    protected function renderImpl()
     {
-        $this->processAttributes($row, $tc);
 
-        $this->startRender();
-        $field_key = $tc->getFieldName();
+        echo sprintf($this->format, $this->value);
 
-        echo sprintf($this->format, $row[$field_key]);
-
-        $this->finishRender();
     }
+
 }
 
 ?>

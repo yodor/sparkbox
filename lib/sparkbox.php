@@ -31,7 +31,7 @@ define("LIB_ROOT", $lib_root . "/");
 
 
 //define("CACHE_ROOT", realpath($doc_root . "/../") . "/spark_cache/");
-define("CACHE_ROOT", realpath($install_path . "/../") . "/spark_cache/");
+define("CACHE_ROOT", realpath($install_path . "/../") . "/spark_cache");
 
 //ini_set("include_path", "." . PATH_SEPARATOR . INSTALL_PATH);
 //if (isset($local_include_path)) {

@@ -180,7 +180,7 @@ GalleryView.prototype.createPopupContents = function () {
 
     html += "</div>";//base
 
-    html += "<div class='Footer'><div class='Contents'></div></div>";
+    html += "<div class='Footer'><div class='Contents'><div class='Caption'></div></div></div>";
 
     html += "</div>";//ImagePopupPanel
 
@@ -219,20 +219,29 @@ GalleryView.prototype.fetchImage = function () {
     let data_href = aelm.attr("data-href");
     if (data_href) href = data_href;
 
+    let caption = aelm.attr("caption");
+
+
+    if (caption) {
+        let contents = this.modal_pane.popup().find(".Footer .Contents .Caption");
+        contents.html(caption);
+    }
+
     //console.log("ImagePopup::fetchImage["+this.pos+"] Fetching Image URL:"+href);
 
 
-    let screen_width = $(window).width();
-    let screen_height = $(window).height();
-
-
-    if (href.indexOf("?") != -1) href = href + "&max-width=" + (screen_width - this.margin_width) + "&max-height=" + (screen_height - this.margin_height);
+    // let screen_width = $(window).width();
+    // let screen_height = $(window).height();
+    //
+    //
+    // if (href.indexOf("?") != -1) href = href + "&max-width=" + (screen_width - this.margin_width) + "&max-height=" + (screen_height - this.margin_height);
 
 
     let viewport = this.modal_pane.popup();
     let loader = this.modal_pane.popup().find(".Base .Contents");
 
     $(viewport).css("background-image", "url("+href+")");
+    $(viewport).css("background-size", "contain");
 
     $(loader).removeClass("cover-spin");
 

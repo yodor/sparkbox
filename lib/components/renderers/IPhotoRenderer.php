@@ -5,9 +5,9 @@ interface IPhotoRenderer
 
     public function setPhotoSize(int $width, int $height);
 
-    public function getPhotoWidth();
+    public function getPhotoWidth() : int;
 
-    public function getPhotoHeight();
+    public function getPhotoHeight() : int;
 }
 
 ?>

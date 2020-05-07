@@ -2,11 +2,12 @@
 include_once("components/renderers/cells/TableCellRenderer.php");
 include_once("components/TableColumn.php");
 
-class CallbackTableCellRenderer extends TableCellRenderer implements ICellRenderer
+class CallbackTableCellRenderer extends TableCellRenderer
 {
 
     protected $callback = false;
 
+    protected $data = NULL;
 
     public function __construct($function_name)
     {
@@ -16,19 +17,16 @@ class CallbackTableCellRenderer extends TableCellRenderer implements ICellRender
         $this->callback = $function_name;
     }
 
-    public function renderCell(array &$row, TableColumn $tc)
+    protected function renderImpl()
+    {
+        call_user_func_array($this->callback, array($this->data, $this->column));
+    }
+
+    public function setData(array &$row)
     {
 
-        $this->processAttributes($row, $tc);
-
-        $this->startRender();
-        $prkey = $tc->getView()->getIterator()->key();
-
-
-        call_user_func_array($this->callback, array(&$row, &$tc));
-
-
-        $this->finishRender();
+        parent::setData($row);
+        $this->data = $row;
     }
 }
 

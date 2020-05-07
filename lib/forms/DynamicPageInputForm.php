@@ -11,24 +11,23 @@ class DynamicPageInputForm extends InputForm
         parent::__construct();
 
         $field = new DataInput("item_title", "Title", 1);
-        $field->setRenderer(new TextField());
+        new TextField($field);
         $this->addInput($field);
 
         $field = new DataInput("content", "Content", 1);
-        $rend = new MCETextArea();
+        $rend = new MCETextArea($field);
         $rend->setAttribute("rows", 20);
         $rend->setAttribute("cols", 80);
-        $field->setRenderer($rend);
         $this->addInput($field);
 
         $field = new DataInput("item_date", "Date", 0);
-        $field->setRenderer(new DateField());
+        new DateField($field);
         $field->setValidator(new DateValidator());
         $field->setProcessor(new DateInputProcessor());
         $this->addInput($field);
 
         $field = new DataInput("visible", "Visible", 0);
-        $field->setRenderer(new CheckField());
+        new CheckField($field);
         $this->addInput($field);
 
 
@@ -36,7 +35,7 @@ class DynamicPageInputForm extends InputForm
         //
         $sel = new ArrayDataIterator(array("Notices"));
         //
-        $rend = new SelectField();
+        $rend = new SelectField($field);
         $rend->setIterator($sel);
         //
         $rend->na_str = "Normal";
@@ -45,7 +44,7 @@ class DynamicPageInputForm extends InputForm
         $rend->list_label = ArrayDataIterator::KEY_VALUE;
         //
         //
-        $field->setRenderer($rend);
+
         $this->addInput($field);
 
 

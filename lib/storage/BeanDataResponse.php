@@ -19,7 +19,7 @@ abstract class BeanDataResponse extends HTTPResponse
     protected $etag_parts = array();
     protected $disposition = "inline";
 
-    public $skip_cache = false;
+    public $skip_cache = FALSE;
 
     /**
      * This flag is set when request URI contains specific key name to return from the result row.
@@ -27,21 +27,20 @@ abstract class BeanDataResponse extends HTTPResponse
      * To limit arbitrary data access
      * @var bool
      */
-    protected $field_requested = false;
+    protected $field_requested = FALSE;
 
     public function __construct(int $id, string $className)
     {
         $this->id = $id;
         $this->className = $className;
 
-
-
         @include_once("class/beans/" . $this->className . ".php");
-
-        @include_once("beans/" . $this->className . ".php");
-
-        if (!class_exists($this->className,false)) {
-            throw new Exception("Bean class not found: " . $this->className);
+        if (!class_exists($this->className, FALSE)) {
+            //try sparkbox beans
+            @include_once("beans/" . $this->className . ".php");
+            if (!class_exists($this->className, FALSE)) {
+                throw new Exception("Bean class not found: " . $this->className);
+            }
         }
 
         $this->bean = new $this->className();
@@ -52,7 +51,7 @@ abstract class BeanDataResponse extends HTTPResponse
 
         if (isset($_GET["field"])) {
             $this->field = $_GET["field"];
-            $this->field_requested = true;
+            $this->field_requested = TRUE;
         }
 
         //sub-classes set $this->field
@@ -61,13 +60,6 @@ abstract class BeanDataResponse extends HTTPResponse
         }
 
         $this->etag_parts[] = $this->field;
-
-        //        $stypes = $this->bean->storageTypes();
-        //        if (!array_key_exists($this->blob_field, $stypes)) {
-        //            throw new Exception("No such blob field found");
-        //        }
-
-
 
     }
 
@@ -81,7 +73,7 @@ abstract class BeanDataResponse extends HTTPResponse
 
         Session::Start();
 
-        Authenticator::AuthorizeResource($this->row["auth_context"], $this->row, true);
+        Authenticator::AuthorizeResource($this->row["auth_context"], $this->row, TRUE);
 
         Session::Close();
     }
@@ -99,7 +91,7 @@ abstract class BeanDataResponse extends HTTPResponse
 
         }
         else {
-            debug("Fetching ID: ".$this->id." Bean: ".get_class($this->bean));
+            debug("Fetching ID: " . $this->id . " Bean: " . get_class($this->bean));
             $this->row = $this->bean->getByID($this->id);
         }
 
@@ -116,22 +108,22 @@ abstract class BeanDataResponse extends HTTPResponse
 
         if ($object instanceof StorageObject) {
 
-            debug("Unpacked: ".get_class($object));
+            debug("Unpacked: " . get_class($object));
 
             //replace result with storageobject data
             $this->row = array();
             //image resizer expects row["photo"]
 
-            $object->deconstruct($this->row, false);
+            $object->deconstruct($this->row, FALSE);
 
         }
         else {
 
-            debug("No object unserialized from field[$this->field]");
+            debug("Field[$this->field] does not contain StorageObject");
 
             //Limit arbitrary data access from the result row
             if ($this->field_requested) {
-                throw new Exception("Incorrect request received. Source data type is not StorageObject.");
+                throw new Exception("Field does not contain StorageObject");
             }
             //continue for objects transacted to db as dbrow and the default key name will be used (photo or data)
 
@@ -142,28 +134,38 @@ abstract class BeanDataResponse extends HTTPResponse
      * All content will be hashed and used as ETag header field
      * @return array
      */
-    protected function getETagParts() : array
+    protected function getETagParts(): array
     {
         return $this->etag_parts;
     }
 
+    public const DATE_FORMAT = "D, d M Y H:i:s T";
+
     protected function fillHeaders()
     {
         // set headers and etag
-        $last_modified = gmdate("D, d M Y H:i:s T");
+        $last_modified = gmdate(BeanDataResponse::DATE_FORMAT);
 
         if (isset($this->row["date_upload"])) {
-            $last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_upload"]));
+            $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["date_upload"]));
         }
         else if (isset($this->row["date_updated"])) {
-            $last_modified = gmdate("D, d M Y H:i:s T", strtotime($this->row["date_updated"]));
+            $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["date_updated"]));
         }
 
+        debug("Using last-modified: $last_modified");
+
+        //always keep one year ahead from request time
+        $expires = gmdate(BeanDataResponse::DATE_FORMAT, strtotime("+1 year"));
+        debug("Using expires: $expires");
+
         $etag = md5(implode("|", $this->getETagParts()) . "-" . $last_modified);
+        debug("Using ETag: $etag");
 
         $this->setHeader("ETag", $etag);
-        //always keep one year ahead from request time
-        $this->setHeader("Expires", gmdate("D, d M Y H:i:s T", strtotime("+1 year", strtotime($last_modified))));
+
+        $this->setHeader("Expires", $expires);
+
         $this->setHeader("Last-Modified", $last_modified);
 
         $mime = "application/octet-stream";
@@ -204,19 +206,19 @@ abstract class BeanDataResponse extends HTTPResponse
             //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
             $pos = strpos($_SERVER['HTTP_IF_NONE_MATCH'], $this->getHeader("ETag"));
             if ($pos !== FALSE) {
-                return true;
+                return TRUE;
             }
         }
 
-        return false;
+        return FALSE;
     }
 
     /**
      * @throws Exception
      */
-    public function send(bool $doExit = true)
+    public function send(bool $doExit = TRUE)
     {
-        debug("Class: ".$this->className." ID: ".$this->id." Field: ".$this->field);
+        debug("Class: " . $this->className . " ID: " . $this->id . " Field: " . $this->field);
 
         $this->loadBeanData();
 
@@ -235,17 +237,16 @@ abstract class BeanDataResponse extends HTTPResponse
                 $this->setHeader("HTTP/1.1 304 Not Modified");
                 $this->setHeader("Last-Modified", gmdate("D, d M Y H:i:s T"));
                 $this->setHeader("Cache-Control", "no-cache, must-revalidate");
-                parent::send(true);
+                parent::send(TRUE);
                 //header("Pragma: ".$this->headers["etag"]);
                 //header("ETag: $etag");
             }
 
-
             if ($cacheFile->exists()) {
                 $ret = $cacheFile->load();
-                $this->setHeader("X-Tag", "CacheFile");
+                $this->setHeader("X-Tag", "SparkCache");
                 $this->setData($ret[CacheFile::KEY_DATA], $ret[CacheFile::KEY_SIZE]);
-                parent::send(true);
+                parent::send(TRUE);
             }
 
         }
@@ -254,7 +255,7 @@ abstract class BeanDataResponse extends HTTPResponse
 
         $cacheFile->store($this->getData());
 
-        parent::send(true);
+        parent::send(TRUE);
     }
 
     abstract protected function processData();

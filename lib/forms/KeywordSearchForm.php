@@ -34,7 +34,7 @@ class KeywordSearchForm extends InputForm
         return $this->ts_fields;
     }
 
-    protected function searchFilterForKey($key, $val)
+    protected function searchFilterForKey(string $key, string $val)
     {
         $db = DBDriver::Get();
         $val = $db->escapeString($val);

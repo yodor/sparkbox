@@ -1,6 +1,6 @@
 <?php
 include_once("input/DataInputFactory.php");
-include_once("beans/IDBTableEditor.php");
+include_once("beans/IBeanEditor.php");
 
 
 /**
@@ -17,7 +17,7 @@ include_once("beans/IDBTableEditor.php");
  * after SitePage->begin() is called which marks end of server side processing and start of rendering
  *form can be rendered using IFormRenderer->renderForm()
  */
-class InputForm implements IDBTableEditor
+class InputForm implements IBeanEditor
 {
     /**
      * @var bool
@@ -268,8 +268,10 @@ class InputForm implements IDBTableEditor
     {
         $search_filter = array();
 
+        $names = array_keys($this->inputs);
+        foreach ($names as $pos => $name) {
 
-        foreach ($this->inputs as $name => $input) {
+            $input = $this->getInput($name);
 
             if ($input->skip_search_filter_processing) continue;
 
@@ -279,26 +281,15 @@ class InputForm implements IDBTableEditor
 
                 $field_name = str_replace("|", ".", $name);
 
-                $sffk = $this->searchFilterForKey($field_name, $val);
-                if ($sffk) $search_filter[] = $sffk;
+                $search_filter[] = $this->searchFilterForKey($field_name, $val);;
             }
         }
         return $search_filter;
     }
 
-    protected function searchFilterForKey($key, $val)
+    protected function searchFilterForKey(string $key, string $val) : string
     {
         return "$key='$val'";
-    }
-
-    public function searchFilter($type = " WHERE ")
-    {
-        $sa = $this->searchFilterArray();
-        $sf = "";
-        if (count($sa) > 0) {
-            $sf = " $type " . implode(" AND ", $sa);
-        }
-        return $sf;
     }
 
     public function searchFilterSelect(): SQLSelect

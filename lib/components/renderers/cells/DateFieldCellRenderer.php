@@ -1,39 +1,29 @@
 <?php
-include_once("components/Component.php");
-include_once("components/renderers/ICellRenderer.php");
-include_once("components/TableColumn.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
 
-class DateFieldCellRenderer extends TableCellRenderer implements ICellRenderer
+class DateFieldCellRenderer extends TableCellRenderer
 {
 
-    protected $format;
+    protected $format = "j, F Y";
 
     public function __construct($format = "j, F Y")
     {
         parent::__construct();
-
         $this->format = $format;
     }
 
-    public function renderCell(array &$row, TableColumn $tc)
+    protected function renderImpl()
     {
-
-        $this->processAttributes($row, $tc);
-
-        $this->startRender();
-        $field_key = $tc->getFieldName();
-
-        $date_value = $row[$field_key];
-        if (strcmp($date_value, "0000-00-00 00:00:00") == 0) {
+        echo "<span>";
+        if (strcmp($this->value, "0000-00-00 00:00:00") == 0) {
             echo "N/A";
         }
         else {
-            echo date($this->format, strtotime($date_value));
-
+            echo date($this->format, strtotime($this->value));
         }
-
-        $this->finishRender();
+        echo "<span>";
     }
+
 }
 
 ?>

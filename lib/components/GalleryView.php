@@ -4,7 +4,7 @@ include_once("components/TableView.php");
 include_once("components/ListView.php");
 
 include_once("components/renderers/items/GalleryViewItemRenderer.php");
-include_once("components/renderers/IActionsRenderer.php");
+include_once("components/renderers/IActionRenderer.php");
 include_once("components/renderers/cells/TableImageCellRenderer.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
@@ -33,15 +33,25 @@ class GalleryView extends Component
 
     public $blob_field = "item_photo";
 
+
+    public function requiredStyle()
+    {
+        $arr = parent::requiredStyle();
+        $arr[] = SITE_ROOT . "sparkfront/css/GalleryView.css";
+        return $arr;
+    }
+
+    public function requiredScript()
+    {
+        $arr = parent::requiredScript();
+        $arr[] = SITE_ROOT . "sparkfront/js/GalleryView.js";
+        return $arr;
+    }
+
     public function getViewMode()
     {
         return $this->view_mode;
 
-    }
-
-    public function getPhotoRenderer()
-    {
-        return $this->iphoto_renderer;
     }
 
     public function getRefKey()
@@ -80,6 +90,8 @@ class GalleryView extends Component
         if (strcmp_isset("view", "list")) {
 
             $view = new TableView($bean->query());
+            $this->view = $view;
+
             //   $view->addColumn(new TableColumn("ppID", "ID"));
 
             if ($this->photos_bean instanceof OrderedDataBean) {
@@ -109,13 +121,12 @@ class GalleryView extends Component
         }
         else {
             $view = new ListView($bean->query());
+            $this->view = $view;
 
             $renderer = new GalleryViewItemRenderer($this);
             $renderer->setPhotoSize(-1, 256);
 
-            $this->initActions($renderer);
-
-            $view->setItemRenderer($renderer);
+            $this->setGridItemRenderer($renderer);
 
             $view->items_per_page = 9;
 
@@ -131,27 +142,25 @@ class GalleryView extends Component
 
         $view->getTopPaginator()->view_modes_enabled = true;
         $view->getTopPaginator()->setCaption($this->caption);
-        $this->view = $view;
+
 
     }
 
-    public function setGridItemRenderer(IItemRenderer $r)
+    public function setGridItemRenderer(GalleryViewItemRenderer $r)
     {
         $this->initActions($r);
 
         $this->view->setItemRenderer($r);
     }
 
-    protected function initActions(IActionsRenderer $act)
+    protected function initActions(IActionsCollection $act)
     {
         $bkey = $this->photos_bean->key();
 
         $ref_param = new ActionParameter($this->refkey, $this->refkey);
 
-
         $edit_params = array(new ActionParameter("editID", $bkey));
         if (strlen($this->refkey > 0)) $edit_params[] = $ref_param;
-
 
         $act->addAction(new Action("Edit", $this->edit_script, $edit_params));
 
@@ -159,7 +168,6 @@ class GalleryView extends Component
 
         $delete_params = array(new ActionParameter("item_id", $bkey));
         if (strlen($this->refkey > 0)) $delete_params[] = $ref_param;
-
 
         $act->addAction(new Action("Delete", "?cmd=delete_item", $delete_params));
 
@@ -201,36 +209,11 @@ class GalleryView extends Component
 
     }
 
-    public function requiredStyle()
-    {
-        $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/GalleryView.css";
-        return $arr;
-    }
 
-    public function requiredScript()
-    {
-        $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/GalleryView.js";
-        return $arr;
-    }
 
     public function renderImpl()
     {
         $this->view->render();
-        ?>
-        <script type='text/javascript'>
-            $(document).on("GalleryView", function (e) {
-                if ("." + e.rel != "." + "<?php echo get_class($this->photos_bean);?>") return;
-                switch (e.message) {
-                    case "onCloseImagePopup":
-                        window.location.href = "#" + e.rel + "." + e.position;
-                        break;
-
-                }
-            });
-        </script>
-        <?php
 
     }
 

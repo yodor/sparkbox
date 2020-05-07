@@ -81,6 +81,16 @@
 }
 .ImagePopup .Footer .Contents {
     height:80px;
+    text-align:right;
+}
+
+.ImagePopup .Footer .Contents .Caption {
+    display:inline-block;
+    vertical-align: middle;
+    background-color:rgba(1,1,1,0.75);
+    color:white;
+    padding: 1em;
+    border-top-left-radius: 1em;
 }
 
 .ImagePopup .Header .Contents .Button {

@@ -1,68 +1,30 @@
 <?php
 include_once("components/Component.php");
 include_once("components/ListView.php");
-include_once("components/renderers/IActionsRenderer.php");
+include_once("components/renderers/IActionRenderer.php");
 include_once("components/renderers/IItemRenderer.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/renderers/ActionRenderer.php");
 
-class GalleryViewItemRenderer extends Component implements IItemRenderer, IActionsRenderer, IPhotoRenderer
+class GalleryViewItemRenderer extends Component implements IItemRenderer, IActionsCollection, IPhotoRenderer
 {
 
-    protected $gallery_view;
+    protected $view = NULL;
 
-    protected $actions;
+    protected $actions = array();
 
-    protected $width = 128;
+    protected $width = 256;
     protected $height = -1;
 
     protected $item = NULL;
 
-    public function setItem($item)
-    {
-        $this->item = $item;
-    }
-
-    public function getItem()
-    {
-        return $this->item;
-    }
-
-    public function setPhotoSize($width, $height)
-    {
-        $this->width = $width;
-        $this->height = $height;
-    }
-
-    public function getPhotoWidth()
-    {
-        return $this->width;
-    }
-
-    public function getPhotoHeight()
-    {
-        return $this->height;
-    }
-
-    public function addAction(Action $a)
-    {
-        $this->actions[$a->getTitle()] = $a;
-    }
-
-    public function setActions(array $actions)
-    {
-        $this->actions = $actions;
-    }
-
-    public function getActions()
-    {
-        return $this->actions;
-    }
+    protected $actionRenderer = NULL;
 
     public function __construct(GalleryView $view)
     {
         parent::__construct();
-        $this->gallery_view = $view;
+        $this->view = $view;
+        $this->actionRenderer = new ActionRenderer();
 
     }
 
@@ -75,155 +37,153 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
 
     }
 
-    public function startRender()
+    public function setItem($item)
     {
+        $this->item = $item;
 
         if (isset($this->item["position"])) {
             $this->setAttribute("position", $this->item["position"]);
         }
 
-        $photos_bean = $this->gallery_view->getBean();
-        $photos_prkey = $photos_bean->key();
-        $photoID = $this->item[$photos_prkey];
+        $photos = $this->view->getBean();
+
+        $photoID = $this->item[$photos->key()];
+
         $this->setAttribute("itemID", $photoID);
 
-        $refID = $this->gallery_view->getRefVal();
-        $ref_key = $this->gallery_view->getRefKey();
+        $refID = $this->view->getRefVal();
+        $ref_key = $this->view->getRefKey();
 
-        if ($ref_key) {
-            $this->setAttribute("ref_key", "$ref_key");
-            $this->setAttribute("ref_id", "$refID");
-        }
-
-        $all_attr = $this->prepareAttributes();
-        echo "<div $all_attr >";
+        $this->setAttribute("ref_key", $ref_key);
+        $this->setAttribute("ref_id", $refID);
 
     }
 
-    public function finishRender()
+    public function getItem()
     {
-        echo "</div>";
+        return $this->item;
     }
 
-    public function renderImpl()
+    public function setPhotoSize(int $width, int $height)
+    {
+        $this->width = $width;
+        $this->height = $height;
+    }
+
+    public function getPhotoWidth(): int
+    {
+        return $this->width;
+    }
+
+    public function getPhotoHeight(): int
+    {
+        return $this->height;
+    }
+
+    public function addAction(Action $a)
+    {
+        $this->actions[$a->getTitle()] = $a;
+    }
+
+    public function getAction(string $title): Action
+    {
+        return $this->actions[$title];
+    }
+
+    public function setActions(array $actions)
+    {
+        $this->actions = $actions;
+    }
+
+    public function getActions(): ?array
+    {
+        return $this->actions;
+    }
+
+    protected function renderImpl()
     {
 
-
-        $row = $this->item;
-
-
-        $refID = $this->gallery_view->getRefVal();
-        $ref_key = $this->gallery_view->getRefKey();
-
-        $photos_bean = $this->gallery_view->getBean();
-        $photos_prkey = $photos_bean->key();
-
-
-        $photoID = $row[$photos_prkey];
+        $photoID = $this->item[$this->view->getBean()->key()];
 
         $item = new StorageItem();
         $item->id = $photoID;
-        $item->className = get_class($photos_bean);
+        $item->className = get_class($this->view->getBean());
 
         $thumb_href = $item->hrefImage($this->width, $this->height);
 
         $image_href = $item->hrefFull();
 
-        echo "<div class='header_row'>";
+        echo "<div class='header'>";
 
+        if (isset($this->item["position"])) {
+            echo "<div class='position'>";
 
-        if (isset($row["position"])) {
-            echo "<div class='item_position'>";
-
-            echo "<label>" . tr("Position") . ": </label><span>" . $row["position"] . "</span>";
+            echo "<span>#" . $this->item["position"] . "</span>";
 
             echo "</div>";
 
         }
 
-        $this->renderActions($row);
-
-        echo "<div class=clear></div>";
-
-        echo "</div>";
-
-
-        $tooltip = tr("Caption") . ": " . $row["caption"] . "<BR>";
-        $tooltip .= tr("Upload Date") . ": " . dateFormat($row["date_upload"], true);
-
-
-        echo "<div class='image_slot'>";
-
-        // 		$named_link = get_class($this->gallery_view->getBean()).".".$this->item["position"];
-        $named_link = get_class($this->gallery_view->getBean()) . "." . $photoID;
-
-        $rel = get_class($this->gallery_view->getBean());
-
-        echo "<a class='image_popup' href='$image_href' name='$named_link' rel='" . get_class($this->gallery_view->getBean()) . "'>";
-        echo "<img src='$thumb_href' tooltip='" . attributeValue($tooltip) . "'>";
-        echo "</a>";
-
-        if ($this->actions["First"]) {
-
-            $this->renderRepositionAction($this->actions["First"], $row);
-
-        }
-        if ($this->actions["Last"]) {
-
-            $this->renderRepositionAction($this->actions["Last"], $row);
-
-        }
-        if ($this->actions["Previous"]) {
-
-            $this->renderRepositionAction($this->actions["Previous"], $row);
-
-        }
-        if ($this->actions["Next"]) {
-
-            $this->renderRepositionAction($this->actions["Next"], $row);
-
-        }
-
-        echo "</div>";
-
-
-    }
-
-    public function renderRepositionAction($act, &$row)
-    {
-        $act = new ActionRenderer($act, $row);
-        $act->setClassName("reposition_action");
-        $act->render_title = false;
-        $act->render();
-
-
-    }
-
-    public function renderActions(array &$row)
-    {
-
         echo "<div class='item_actions'>";
 
+        $this->actionRenderer->render_title = TRUE;
+
         if (isset($this->actions["Edit"])) {
-
-            $act = new ActionRenderer($this->actions["Edit"], $row);
-            $act->render();
-
-
+            $this->actionRenderer->setAction($this->actions["Edit"]);
+            $this->actionRenderer->setData($this->item);
+            $this->actionRenderer->render();
         }
 
-        $act = new ActionRenderer(new PipeSeparatorAction(), NULL);
-        $act->render();
+        $this->actionRenderer->setAction(new PipeSeparatorAction());
+        $this->actionRenderer->render();
 
         if (isset($this->actions["Delete"])) {
-            $act = new ActionRenderer($this->actions["Delete"], $row);
-            $act->render();
-
-
+            $this->actionRenderer->setAction($this->actions["Delete"]);
+            $this->actionRenderer->setData($this->item);
+            $this->actionRenderer->render();
         }
+
+        echo "</div>"; // item actions
+
+        echo "</div>"; //header
+
+        $tooltip = tr("Caption") . ": " . $this->item["caption"] . "<BR>";
+        $tooltip .= tr("Upload Date") . ": " . dateFormat($this->item["date_upload"], TRUE);
+
+        $named_link = get_class($this->view->getBean()) . "." . $photoID;
+
+        $rel = get_class($this->view->getBean());
+
+        echo "<a 
+        class='image_popup image_slot' 
+        style='background-image:url($thumb_href)' 
+        href='$image_href' 
+        name='$named_link' 
+        rel='$rel' tooltip='" . attributeValue($tooltip) . "'
+        caption='" . attributeValue($this->item["caption"]) . "' >";
+
+        echo "</a>";
+
+        echo "<div class='footer'>";
+
+        $this->renderFooterAction("First");
+        $this->renderFooterAction("Previous");
+        $this->renderFooterAction("Next");
+        $this->renderFooterAction("Last");
 
         echo "</div>";
 
+    }
+
+    public function renderFooterAction(string $title)
+    {
+        if (!isset($this->actions[$title])) return;
+
+        $this->actionRenderer->render_title = FALSE;
+
+        $this->actionRenderer->setAction($this->actions[$title]);
+        $this->actionRenderer->setData($this->item);
+        $this->actionRenderer->render();
 
     }
 

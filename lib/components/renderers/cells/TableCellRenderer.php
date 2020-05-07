@@ -1,9 +1,8 @@
 <?php
-include_once("components/Component.php");
-include_once("components/renderers/ICellRenderer.php");
+include_once("components/MLTagComponent.php");
+include_once("components/TableColumn.php");
 
-
-class TableCellRenderer extends Component implements ICellRenderer
+class TableCellRenderer extends MLTagComponent
 {
 
     protected $tooltip_field = "";
@@ -11,75 +10,68 @@ class TableCellRenderer extends Component implements ICellRenderer
 
     protected $value_attributes = array();
 
+    protected $value = "";
+
+    protected $column = null;
+
+    protected $field = "";
+
     public function __construct()
     {
-        parent::__construct();
-
-    }
-
-    public function startRender()
-    {
-        $all_attribs = $this->prepareAttributes();
-        echo "<td $all_attribs >";
+        parent::__construct("TD");
     }
 
     public function setAction(Action $a)
     {
         $this->action = $a;
-
     }
 
-    public function finishRender()
+    /**
+     * Set attribute from datarow key_name
+     * @param $key_name
+     */
+    public function addValueAttribute(string $field)
     {
-        echo "</td>";
+        $this->value_attributes[] = $field;
     }
 
-    public function renderImpl()
+    protected function renderImpl()
     {
-
+        echo $this->value;
     }
 
-    public function addValueAttribute($field_name)
+    public function setColumn(TableColumn $tc)
     {
-        $this->value_attributes[] = $field_name;
+        $this->column = $tc;
 
+        $this->field = $tc->getFieldName();
+
+        $this->setAttribute("column", $this->field);
+        $this->setAttribute("title", $tc->getLabel());
     }
 
-    protected function processAttributes(array $row, TableColumn $tc)
+    public function setData(array &$row)
     {
-        $this->setAttribute("column", $tc->getFieldName());
-        $this->setAttribute("title", tr($tc->getLabel()));
 
         foreach ($this->value_attributes as $idx => $field) {
             if (isset($row[$field])) {
                 $this->setAttribute($field, $row[$field]);
             }
         }
-    }
-
-    public function renderCell(array &$row, TableColumn $tc)
-    {
-        $this->processAttributes($row, $tc);
 
         if (isset($row[$this->tooltip_field])) {
             $this->setTooltipText($row[$this->tooltip_field]);
         }
 
-        $this->startRender();
-
-        $iterator = $tc->getView()->getIterator();
-        if ($iterator->name()) {
-            trbean($row[$iterator->key()], $tc->getFieldName(), $row, $iterator->name());
+        if (isset($row[$this->field])) {
+            $this->value = $row[$this->field];
         }
 
-        echo "<span>" . $row[$tc->getFieldName()] . "</span>";
-
-        $this->finishRender();
     }
 
-    public function setTooltipFromField(string $field_name)
+    public function setTooltipFromField(string $field)
     {
-        $this->tooltip_field = $field_name;
+        $this->tooltip_field = $field;
     }
 
 }

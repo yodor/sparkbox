@@ -8,7 +8,7 @@ class CustomFieldTransactor implements IDBFieldTransactor
 
     public $transact_field_name = "";
 
-    public function __construct($transact_field_name)
+    public function __construct(string $transact_field_name)
     {
         $this->transact_field_name = $transact_field_name;
     }
@@ -31,7 +31,7 @@ class CustomFieldTransactor implements IDBFieldTransactor
 
         }
         else {
-            debug("CustomFieldTransactor::transactValue: Not transacting field['" . $input->getName() . "'] with empty transact_field_name");
+            debug("Not transacting field['" . $input->getName() . "'] with empty transact_field_name");
 
         }
     }

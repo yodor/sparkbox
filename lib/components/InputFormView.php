@@ -13,7 +13,7 @@ include_once("handlers/IRequestProcessor.php");
 
 include_once("panels/BeanTranslationDialog.php");
 
-class InputFormView extends Component implements IDBTableEditor
+class InputFormView extends Component implements IBeanEditor
 {
 
     public $item_updated_message = "Information was updated";

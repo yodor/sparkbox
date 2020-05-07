@@ -12,18 +12,18 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
     protected $width = -1;
     protected $height = -1;
 
-    public function setPhotoSize($width, $height)
+    public function setPhotoSize(int $width, int $height)
     {
         $this->width = $width;
         $this->height = $height;
     }
 
-    public function getPhotoWidth()
+    public function getPhotoWidth() : int
     {
         return $this->width;
     }
 
-    public function getPhotoHeight()
+    public function getPhotoHeight() : int
     {
         return $this->height;
     }

@@ -1,20 +1,22 @@
 <?php
-include_once("components/Component.php");
 include_once("components/renderers/cells/TableCellRenderer.php");
-include_once("components/TableColumn.php");
 include_once("actions/Action.php");
-include_once("components/renderers/IActionsRenderer.php");
-include_once("components/renderers/ICellRenderer.php");
 include_once("components/renderers/ActionRenderer.php");
+include_once("components/renderers/IActionsCollection.php");
 
-class ActionsTableCellRenderer extends TableCellRenderer implements ICellRenderer, IActionsRenderer
+class ActionsTableCellRenderer extends TableCellRenderer implements IActionsCollection
 {
     protected $actions;
+
+    protected $data = NULL;
+
+    protected $renderer = NULL;
 
     public function __construct()
     {
         parent::__construct();
         $this->actions = array();
+        $this->renderer = new ActionRenderer();
     }
 
     public function requiredStyle()
@@ -29,7 +31,7 @@ class ActionsTableCellRenderer extends TableCellRenderer implements ICellRendere
         $this->actions = $actions;
     }
 
-    public function getActions()
+    public function getActions(): ?array
     {
         return $this->actions;
     }
@@ -47,41 +49,33 @@ class ActionsTableCellRenderer extends TableCellRenderer implements ICellRendere
         }
     }
 
-    public function getAction($title)
+    public function getAction(string $title): Action
     {
         return $this->actions[$title];
     }
 
-    public function setParentComponent(Component $parent)
+    public function setColumn(TableColumn $parent)
     {
-        // 	  $tc = (TableColumn)$parent;
-        $parent->getHeaderCellRenderer()->setSortable(false);
+        parent::setColumn($parent);
+        $parent->setSortable(FALSE);
     }
 
-    public function renderCell(array &$row, TableColumn $tc)
+    public function setData(array &$row)
     {
-        $this->processAttributes($row, $tc);
-
-        $this->startRender();
-
-        $this->renderActions($row);
-
-        $this->finishRender();
+        parent::setData($row);
+        $this->renderer->setData($row);
     }
 
-    public function renderActions(array &$row)
+    protected function renderImpl()
     {
         echo "<div class='actions_list'>";
 
-        $last_action = NULL;
-
-        foreach ($this->actions as $key => $action) {
+        $actions = array_keys($this->actions);
+        foreach ($actions as $pos => $title) {
+            $action = $this->getAction($title);
             if (eval($action->getCheckCode())) {
-
-                $action = new ActionRenderer($action, $row);
-                $action->render();
-                $last_action = $action;
-
+                $this->renderer->setAction($action);
+                $this->renderer->render();
             }
         }
 

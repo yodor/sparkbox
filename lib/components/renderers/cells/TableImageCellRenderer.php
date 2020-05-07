@@ -23,6 +23,23 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     protected $items = array();
 
+    protected $action = null;
+
+
+    protected $data = null;
+
+    public function __construct(DBTableBean $bean, int $width = 48, int $height = -1)
+    {
+        parent::__construct();
+
+        //source
+        $this->bean = $bean;
+        $this->width = $width;
+        $this->height = $height;
+
+        $this->list_limit = 1;
+    }
+
     public function setSourceIteratorKey($source_key)
     {
         $source_fields = $this->bean->fields();
@@ -40,43 +57,28 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $this->blob_field = $blob_field;
     }
 
-    public function setPhotoSize($width, $height)
+    public function setPhotoSize(int $width, int $height)
     {
         $this->width = $width;
         $this->height = $height;
     }
 
-    public function getPhotoWidth()
+    public function getPhotoWidth() : int
     {
         return $this->width;
     }
 
-    public function getPhotoHeight()
+    public function getPhotoHeight() : int
     {
         return $this->height;
     }
-
-    protected $action = false;
 
     public function setAction(Action $action)
     {
         $this->action = $action;
     }
 
-
-    public function __construct($bean, $width = 48, $height = -1)
-    {
-        parent::__construct();
-
-        //source
-        $this->bean = $bean;
-        $this->width = $width;
-        $this->height = $height;
-
-        $this->list_limit = 1;
-    }
-
-    protected function constructItems(array $row, TableColumn $tc)
+    protected function constructItems()
     {
         $this->items = array();
 
@@ -97,9 +99,9 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $num = 0;
         try {
             //iterate source based on view's prkey
-            $prkey = $tc->getView()->getIterator()->key();
+            $prkey = $this->column->getView()->getIterator()->key();
             if (in_array($prkey, $source_fields)) {
-                $qry->select->where = "$prkey={$row[$prkey]}";
+                $qry->select->where = "$prkey={$this->data[$prkey]}";
             }
             else {
                 //check sources' prkey with row
@@ -108,14 +110,14 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
                     $prkey = $this->source_key;
                 }
 
-                $row_fields = array_keys($row);
+                $row_fields = array_keys($this->data);
                 if (in_array($prkey, $row_fields)) {
-                    $value = (int)$row[$prkey];
+                    $value = (int)$this->data[$prkey];
                     $qry->select->where = "$prkey=$value";
                 }
                 else {
                     //check assigned column value. this might be array also try exploding first
-                    $row_value = $row[$tc->getFieldName()];
+                    $row_value = $this->data[$this->column->getFieldName()];
 
                     if ($row_value) {
                         $value = explode("|", $row_value);
@@ -152,7 +154,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         }
     }
 
-    protected function renderImageItems(array $row, TableColumn $tc)
+    protected function renderImageItems()
     {
         $num = count($this->items);
 
@@ -178,7 +180,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             }
             else {
                 if ($this->action) {
-                    $href = $this->action->getHref($row);
+                    $href = $this->action->getHref($this->data);
                     echo "<a href='$href'>$img_tag</a>";
                 }
                 else {
@@ -199,22 +201,22 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         }
     }
 
-    //default rendering fetch from source linking with current 'view' prkey
-    public function renderCell(array &$row, TableColumn $tc)
+    protected function renderImpl()
     {
-        $this->processAttributes($row, $tc);
-
-        $this->startRender();
-
         try {
-            $this->constructItems($row, $tc);
-            $this->renderImageItems($row, $tc);
+            $this->constructItems();
+            $this->renderImageItems();
         }
         catch (Exception $e) {
             echo $e->getMessage();
         }
+    }
+    //default rendering fetch from source linking with current 'view' prkey
+    public function setData(array &$row)
+    {
+        parent::setData($row);
+        $this->data = $row;
 
-        $this->finishRender();
     }
 
 

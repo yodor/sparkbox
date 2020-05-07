@@ -1,24 +1,17 @@
 <?php
-include_once("components/Component.php");
-include_once("components/renderers/ICellRenderer.php");
-include_once("components/TableColumn.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
 
-class ColorCodeCellRenderer extends TableCellRenderer implements ICellRenderer
+class ColorCodeCellRenderer extends TableCellRenderer
 {
 
-    public function renderCell(array &$row, TableColumn $tc)
+    protected $color = "";
+
+    protected function renderImpl()
     {
-        $this->processAttributes($row, $tc);
-
-        $this->startRender();
-        $field_key = $tc->getFieldName();
-
-        echo "<div class='color_value' style='background-color:{$row[$field_key]}'>";
+        echo "<div class='color_value' style='background-color:{$this->value}'>";
         echo "</div>";
-
-
-        $this->finishRender();
     }
+
 }
 
 ?>

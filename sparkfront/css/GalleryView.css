@@ -16,22 +16,20 @@
 
 }
 
-.GalleryViewItemRenderer .header_row {
-
+.GalleryViewItemRenderer .header {
     display: block;
-    padding: 5px;
+    padding: 0.5em;
     background-color: #efefef;
     color: black;
+    text-align:center;
+}
+
+.GalleryViewItemRenderer .header .item_position {
 
 }
 
-.GalleryViewItemRenderer .header_row .item_position {
-    float: left;
-    margin-right: 10px;
-}
+.GalleryViewItemRenderer .header .item_actions {
 
-.GalleryViewItemRenderer .header_row .item_actions {
-    float: right;
 }
 
 
@@ -41,60 +39,55 @@
     display: table-cell;
     text-align: center;
     vertical-align: middle;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center center;
+    width:256px;
+    height:256px;
 }
 
-.GalleryViewItemRenderer .image_slot .image_popup {
-    position: relative;
-    display: inline-block;
+.GalleryViewItemRenderer .image_slot IMG {
+    object-fit: cover;
 }
 
-.GalleryViewItemRenderer .image_slot .image_popup IMG {
-    display: inline-block;
+.GalleryViewItemRenderer .footer {
+    padding-top:0.5em;
+    padding-bottom:0.5em;
 }
-
-.GalleryViewItemRenderer .image_slot .reposition_action {
-    display: none;
-    width: 32px;
-    height: 32px;
-    position: absolute;
+.GalleryViewItemRenderer .footer .reposition_action {
+    /*display: none;*/
+    /*width: 32px;*/
+    /*height: 32px;*/
+    /*position: absolute;*/
 }
-
-.GalleryViewItemRenderer .image_slot .reposition_action[action="First"] {
+.GalleryViewItemRenderer .footer [action] {
+    width:1.5em;
+    height:1.5em;
+    display:inline-block;
+    background-size:contain;
+    /*box-sizing: border-box;*/
+}
+.GalleryViewItemRenderer .footer [action="First"] {
     background-image: url("../images/list_actions/item_move_top.png");
     background-position: center center;
-    left: 50%;
-    top: 5px;
-    margin-left: -16px;
+
 }
 
-.GalleryViewItemRenderer .image_slot .reposition_action[action="Last"] {
+.GalleryViewItemRenderer .footer [action="Last"] {
     background-image: url("../images/list_actions/item_move_bottom.png");
     background-position: center center;
-    left: 50%;
-    top: 100%;
-    margin-top: -37px;
-    margin-left: -16px;
+
 }
 
-.GalleryViewItemRenderer .image_slot .reposition_action[action="Previous"] {
+.GalleryViewItemRenderer .footer [action="Previous"] {
     background-image: url("../images/list_actions/item_move_left.png");
     background-position: center center;
-    left: 5px;
-    top: 50%;
-    margin-top: -16px;
+
 }
 
-.GalleryViewItemRenderer .image_slot .reposition_action[action="Next"] {
+.GalleryViewItemRenderer .footer [action="Next"] {
     background-image: url("../images/list_actions/item_move_right.png");
     background-position: center center;
-    left: 100%;
-    top: 50%;
-    margin-top: -16px;
-    margin-left: -37px;
+
 }
 
-.GalleryViewItemRenderer .image_slot:hover .reposition_action {
-    display: block;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-}

@@ -76,8 +76,18 @@ abstract class Component implements IRenderer, IHeadContents
 
     protected abstract function renderImpl();
 
+    /**
+     * Called in start render before prepareAttributes
+     * Can be used from sub classess to set all required attributes
+     */
+    protected function processAttributes()
+    {
+
+    }
+
     public function startRender()
     {
+        $this->processAttributes();
         $attrs = $this->prepareAttributes();
         echo "<div $attrs>";
     }
@@ -257,6 +267,7 @@ abstract class Component implements IRenderer, IHeadContents
         }
 
     }
+
 
     protected function prepareAttributes()
     {

@@ -1,11 +1,18 @@
 <?php
 include_once("components/Component.php");
+include_once("components/renderers/IActionRenderer.php");
 include_once("actions/Action.php");
 
-class ActionRenderer extends Component
+class ActionRenderer extends Component implements IActionRenderer
 {
     protected $action = NULL;
-    protected $result_row = NULL;
+
+    /**
+     * DBTableBean result row data
+     * @var array|null
+     */
+    protected $data = NULL;
+
     public $render_title = true;
 
     protected $action_from_label = true;
@@ -14,13 +21,13 @@ class ActionRenderer extends Component
 
     protected $text_translation_enabled = true;
 
-    public function __construct(Action $action = NULL, $result_row = NULL)
+    public function __construct(Action $action = NULL, array $data = NULL)
     {
         parent::__construct();
-        $this->result_row = $result_row;
+        $this->data = $data;
         $this->action_from_label = true;
 
-        if ($action instanceof Action) {
+        if ($action) {
             $this->setAction($action);
         }
     }
@@ -50,6 +57,11 @@ class ActionRenderer extends Component
     public function setAction(Action $action)
     {
         $this->action = $action;
+
+        if ($this->action->getTitle()) {
+            $this->setAttribute("title", tr($this->action->getTitle()));
+        }
+
         if ($this->action_from_label) {
             $this->setAttribute("action", $this->action->getTitle());
         }
@@ -65,9 +77,14 @@ class ActionRenderer extends Component
         }
     }
 
-    public function setResultRow(&$row)
+    public function getAction() : Action
     {
-        $this->result_row = $row;
+        return $this->action;
+    }
+
+    public function setData(array $row)
+    {
+        $this->data = $row;
     }
 
     public function startRender()
@@ -79,8 +96,8 @@ class ActionRenderer extends Component
         }
         else {
             $this->appendAttributes($this->action->getAttributes());
-            if ($this->result_row) {
-                $this->setAttribute("href", $this->action->getHref($this->result_row));
+            if ($this->data) {
+                $this->setAttribute("href", $this->action->getHref($this->data));
             }
             else {
                 $this->setAttribute("href", $this->action->getHrefClean());

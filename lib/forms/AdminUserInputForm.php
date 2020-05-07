@@ -19,30 +19,28 @@ class AdminUserInputForm extends InputForm
         parent::__construct();
 
         $field = new DataInput("email", "Email", 1);
-        $field->setRenderer(new TextField());
+        new TextField($field);
         $field->setValidator(new EmailValidator());
         $this->addInput($field);
 
         $field = new DataInput("fullname", "Full Name", 0);
-        $field->setRenderer(new TextField());
+        new TextField($field);
         $this->addInput($field);
 
         $field = new DataInput("pass", "Create Password", 0);
         $field->skip_transaction = true;
-        $rend = new PasswordField();
+        $rend = new PasswordField($field);
         $rend->setAttribute("autocomplete", "off");
-        $field->setRenderer($rend);
         $this->addInput($field);
 
         $field = new DataInput("pass1", "Repeat Password", 0);
         $field->skip_transaction = true;
-        $rend = new PasswordField();
+        $rend = new PasswordField($field);
         $rend->setAttribute("autocomplete", "off");
-        $field->setRenderer($rend);
         $this->addInput($field);
 
         $field = new DataInput("password_hash", "Password Hash", 1);
-        $field->setRenderer(new HiddenField());
+        new HiddenField($field);
 
         //transact this field to DB field password
         $field->setValueTransactor(new CustomFieldTransactor("password"));

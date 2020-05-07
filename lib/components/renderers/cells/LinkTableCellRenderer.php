@@ -1,36 +1,31 @@
 <?php
-include_once("components/Component.php");
-include_once("components/renderers/ICellRenderer.php");
-include_once("components/TableColumn.php");
+include_once("components/renderers/cells/TableCellRenderer.php");
 
-class LinkTableCellRenderer extends TableCellRenderer implements ICellRenderer
+class LinkTableCellRenderer extends TableCellRenderer
 {
 
-    protected $action = NULL;
-
+    protected $renderer = NULL;
 
     public function __construct(Action $act)
     {
         parent::__construct();
 
-        $this->action = $act;
+        $this->renderer = new ActionRenderer($act);
 
     }
 
-    public function renderCell(array &$row, TableColumn $tc)
+    protected function renderImpl()
     {
-        $this->processAttributes($row, $tc);
+        $this->renderer->render();
+    }
 
-        $this->startRender();
-        $field_key = $tc->getFieldName();
+    public function setData(array &$row)
+    {
+        parent::setData($row);
 
-        $this->action->setTitle($row[$field_key]);
+        $this->renderer->getAction()->setTitle($this->value);
+        $this->renderer->setData($row);
 
-        $ar = new ActionRenderer($this->action, $row);
-        $ar->render();
-
-
-        $this->finishRender();
     }
 }
 

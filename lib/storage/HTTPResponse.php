@@ -46,7 +46,7 @@ class HTTPResponse
 
     public function getSize()
     {
-        return strlen($this->data);
+        return $this->dataSize;
     }
 
     /**

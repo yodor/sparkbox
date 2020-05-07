@@ -2,7 +2,7 @@
 include_once("components/renderers/cells/TableCellRenderer.php");
 include_once("components/TableColumn.php");
 
-class BooleanFieldCellRenderer extends TableCellRenderer implements ICellRenderer
+class BooleanFieldCellRenderer extends TableCellRenderer
 {
 
     protected $true_value = "Enabled";
@@ -16,12 +16,12 @@ class BooleanFieldCellRenderer extends TableCellRenderer implements ICellRendere
         $this->false_value = $false_value;
     }
 
-    public function renderCell(array &$row, TableColumn $tc)
+    public function setData(array &$row)
     {
-        $this->processAttributes($row, $tc);
-        $this->startRender();
-        echo ($row[$tc->getFieldName()]) ? tr($this->true_value) : tr($this->false_value);
-        $this->finishRender();
+        parent::setData($row);
+
+        $this->value = ($row[$this->column->getFieldName()]) ? tr($this->true_value) : tr($this->false_value);
+
     }
 }
 

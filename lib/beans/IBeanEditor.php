@@ -1,7 +1,7 @@
 <?php
 include_once("beans/DBTableBean.php");
 
-interface IDBTableEditor
+interface IBeanEditor
 {
     /**
      * @return int

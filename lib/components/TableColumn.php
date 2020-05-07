@@ -6,23 +6,34 @@ include_once("components/renderers/cells/TableHeaderCellRenderer.php");
 class TableColumn extends Component
 {
 
-    protected $header_renderer;
-    protected $cell_renderer;
+    /**
+     * @var TableCellRenderer|null
+     */
+    protected $header;
 
+    /**
+     * @var TableCellRenderer|null
+     */
+    protected $cell;
+
+    /**
+     * @var TableView
+     */
     protected $view;
 
-    protected $field_name;
-    protected $label;
+    protected $field_name = "";
+    protected $label = "";
 
+    protected $sortable = TRUE;
 
-    public function __construct(string $field_name, string $label, ICellRenderer $cr = NULL, ICellRenderer $hr = NULL)
+    public function __construct(string $field_name, string $label, TableCellRenderer $cr = NULL, TableCellRenderer $hr = NULL)
     {
         parent::__construct();
 
         $this->field_name = $field_name;
         $this->label = $label;
-        $this->cell_renderer = $cr;
-        $this->header_renderer = $hr;
+        $this->cell = $cr;
+        $this->header = $hr;
 
         if (is_null($hr)) $this->setHeaderCellRenderer(new TableHeaderCellRenderer());
 
@@ -35,27 +46,27 @@ class TableColumn extends Component
     }
 
 
-    public function setHeaderCellRenderer(ICellRenderer $renderer)
+    public function setHeaderCellRenderer(TableCellRenderer $renderer)
     {
-        $this->header_renderer = $renderer;
-        $this->header_renderer->setParent($this);
+        $this->header = $renderer;
+        $this->header->setColumn($this);
     }
 
-    public function getHeaderCellRenderer(): ICellRenderer
+    public function getHeaderCellRenderer(): TableCellRenderer
     {
-        return $this->header_renderer;
+        return $this->header;
     }
 
-    public function getCellRenderer(): ICellRenderer
+    public function getCellRenderer(): TableCellRenderer
     {
-        return $this->cell_renderer;
+        return $this->cell;
 
     }
 
-    public function setCellRenderer(ICellRenderer $renderer)
+    public function setCellRenderer(TableCellRenderer $renderer)
     {
-        $this->cell_renderer = $renderer;
-        $this->cell_renderer->setParent($this);
+        $this->cell = $renderer;
+        $this->cell->setColumn($this);
     }
 
     public function getView(): TableView
@@ -78,16 +89,28 @@ class TableColumn extends Component
         return $this->label;
     }
 
+    public function isSortable()
+    {
+        return $this->sortable;
+    }
+    public function setSortable(bool $mode)
+    {
+        $this->sortable = $mode;
+    }
+
     public function startRender()
     {
+
     }
 
     public function renderImpl()
     {
+
     }
 
     public function finishRender()
     {
+
     }
 
 }
