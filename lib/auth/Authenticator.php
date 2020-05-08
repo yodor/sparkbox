@@ -304,25 +304,30 @@ abstract class Authenticator
     public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK=true)
     {
         debug("AuthorizeContext using contextName: $contextName");
+//
+//        if ($adminOK) {
+//            debug("Trying AdminAuthenticator first");
+//
+//            include_once("auth/AdminAuthenticator.php");
+//            $auth_admin = new AdminAuthenticator();
+//            $context = $auth_admin->authorize();
+//            if ($auth_admin->authorize()) {
+//                debug("AdminAuthenticator authorization success");
+//                return;
+//            }
+//            else {
+//                debug("AdminAuthenticator authorization failed");
+//            }
+//        }
 
-        if ($adminOK) {
-            include_once("auth/AdminAuthenticator.php");
-            $auth_admin = new AdminAuthenticator();
-            if ($auth_admin->authorize()) {
-                debug("AdminAuthenticator authorization success");
-                return;
-            }
-            else {
-                debug("AdminAuthenticator authorization failed");
-            }
-        }
 
         $auth_class = "auth/$contextName.php";
         @include_once($auth_class);
-        if (!class_exists($auth_class, false)) {
+        if (!class_exists($contextName, false)) {
             $auth_class = "class/auth/$contextName.php";
             @include_once($auth_class);
-            if (!class_exists($auth_class, false)) {
+            if (!class_exists($contextName, false)) {
+                debug("Authenticator class can not be loaded");
                 throw new Exception("Unable to locate the authorization class");
             }
         }

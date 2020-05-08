@@ -30,7 +30,11 @@ class AdminPageLib extends SparkPage
     public function __construct()
     {
 
-        parent::__construct(new AdminAuthenticator(), LOCAL."admin/login.php");
+        $this->auth = new AdminAuthenticator();
+        $this->loginURL = LOCAL."admin/login.php";
+        $this->authorized_access = true;
+
+        parent::__construct();
 
         //control gets here only if authorized
         $adminID = $this->getUserID();
@@ -215,7 +219,7 @@ class AdminPageLib extends SparkPage
         echo "<tr><td colspan=2 class='admin_footer'>";
 
         echo "<span class='copy'>Copyright &copy; " . date("Y") . " " . SITE_TITLE . ". All Rights Reserved.</span>";
-        echo "<img class='logo' src='" . LOCAL . "SPARK_LOCAL/images/admin/sparkbox.png'>";
+        echo "<img class='logo' src='" . SPARK_LOCAL . "/images/admin/sparkbox.png'>";
 
         echo "</td></tr>";
         echo "</table>";

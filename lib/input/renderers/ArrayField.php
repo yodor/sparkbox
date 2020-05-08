@@ -160,6 +160,7 @@ class ArrayField extends InputField
 
         $values = $this->input->getValue();
 
+
         if (is_array($values)) {
 
             foreach ($values as $idx => $value) {

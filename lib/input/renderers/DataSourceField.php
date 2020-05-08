@@ -28,7 +28,7 @@ abstract class DataSourceField extends InputField
     public function renderImpl()
     {
 
-        $this->iterator->exec();
+        $num = $this->iterator->exec();
 
         $this->startRenderItems();
 
@@ -59,9 +59,12 @@ abstract class DataSourceField extends InputField
         }
 
         $prkey = $this->iterator->key();
+
         $index = 0;
 
         while ($data_row = $this->iterator->next()) {
+
+            debug("DataRow: ",$data_row);
 
             $id = $data_row[$prkey];
 

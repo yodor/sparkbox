@@ -2,6 +2,7 @@
 include_once("storage/HTTPResponse.php");
 include_once("storage/CacheFile.php");
 include_once("storage/FileStorageObject.php");
+include_once("auth/Authenticator.php");
 
 abstract class BeanDataResponse extends HTTPResponse
 {

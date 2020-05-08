@@ -24,7 +24,7 @@ class NestedSetTreeView extends Component implements ISelectSource
     public function __construct()
     {
         parent::__construct();
-
+        $this->setClassName("TreeView");
     }
 
     public function requiredStyle()

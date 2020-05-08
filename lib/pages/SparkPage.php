@@ -11,9 +11,23 @@ class SparkPage extends HTMLPage
 {
 
     /**
+     * Require auth success to access the page
+     * @var bool
+     */
+    protected $authorized_access = false;
+
+    /**
+     * Login page redirection on auth fail
+     * @var string
+     */
+    protected $loginURL = "";
+
+    /**
+     * Authenticator to use
      * @var Authenticator
      */
     protected $auth = NULL;
+
     /**
      * Authenticated context data array. is null if not authenticated yet
      * @var AuthContext
@@ -64,11 +78,11 @@ class SparkPage extends HTMLPage
 
     protected $accessible_parent = "";
 
-
     /**
      * property array of Action objects holding page action buttons
      */
     protected $actions = array();
+
 
     /**
      * @return int The numeric ID as from the Authenticator
@@ -190,11 +204,10 @@ class SparkPage extends HTMLPage
      * Gets the value of the $caption property
      * @return string
      */
-    public function getCaption() : string
+    public function getCaption(): string
     {
         return $this->caption;
     }
-
 
     protected function renderJS()
     {
@@ -213,45 +226,12 @@ class SparkPage extends HTMLPage
         <?php
     }
 
-    public function __construct(Authenticator $auth = NULL, string $loginURL = "")
+    public function __construct()
     {
 
         parent::__construct();
 
-        if ($auth) {
-            $this->auth = $auth;
-        }
-
-        if ($this->auth) {
-            debug("Using Authenticator: " . get_class($this->auth));
-
-            $this->context = $this->auth->authorize();
-
-            if ($this->context) {
-
-                debug("Authorization success");
-
-            }
-            else {
-
-                debug("Authorization failed");
-
-                if (isset($_GET["ajax"])) {
-                    throw new Exception("Your session is expired");
-                }
-
-                if (strlen($loginURL) > 0) {
-                    header("Location: $loginURL");
-                    exit;
-                }
-
-                throw new Exception("Authorization failed");
-                //redirect routines
-
-            }
-
-        }
-
+        $this->authorize();
 
         $this->addMeta("revisit-after", "1 days");
         $this->addMeta("robots", "index, follow");
@@ -270,13 +250,56 @@ class SparkPage extends HTMLPage
         $dialog = new MessageDialog();
     }
 
+    protected function authorize()
+    {
+        if ($this->auth) {
+
+            debug("Using Authenticator: " . get_class($this->auth));
+
+            $this->context = $this->auth->authorize();
+
+            if ($this->context) {
+
+                debug("Authorization success");
+
+            }
+            else {
+
+                debug("Authorization failed");
+
+                if ($this->authorized_access) {
+
+                    debug("'authorized_access' is set for this page");
+
+                    if (isset($_GET["ajax"])) {
+                        throw new Exception("Your session is expired");
+                    }
+
+                    if (strlen($this->loginURL) > 0) {
+
+                        debug("Redirecting to login page URL: " . $this->loginURL);
+
+                        header("Location: {$this->loginURL}");
+                        exit;
+                    }
+
+                    throw new Exception("Authorization failed");
+                }
+                else {
+                    debug("'authorized_access' is NOT set");
+                }
+
+            }
+
+        }
+    }
 
     public function setPreferredTitle(string $page_title)
     {
         $this->preferred_title = $page_title;
     }
 
-    public function getPreferredTitle() : string
+    public function getPreferredTitle(): string
     {
         return $this->preferred_title;
     }
@@ -311,7 +334,8 @@ class SparkPage extends HTMLPage
             $meta_description = $this->description;
         }
 
-        $replace = array("%title%"=>strip_tags($title), "%meta_keywords%"=>strip_tags($meta_keywords), "%meta_description%"=>strip_tags($meta_description));
+        $replace = array("%title%"            => strip_tags($title), "%meta_keywords%" => strip_tags($meta_keywords),
+                         "%meta_description%" => strip_tags($meta_description));
 
         $buffer = strtr($buffer, $replace);
 
@@ -319,7 +343,6 @@ class SparkPage extends HTMLPage
         //$buffer = str_replace("%meta_description%", strip_tags($meta_description), $buffer);
 
     }
-
 
     /**
      * Start rendering of this page
@@ -333,7 +356,7 @@ class SparkPage extends HTMLPage
     public function startRender()
     {
         RequestController::processAjaxHandlers();
-        
+
         //ob_start(array($this, 'obCallback'));
         ob_start();
         //ob_implicit_flush (0 );
@@ -344,7 +367,7 @@ class SparkPage extends HTMLPage
                 echo $css_files;
             }
             foreach ($css_files as $key => $url) {
-                $this->addCSS($url, get_class($cmp), true);
+                $this->addCSS($url, get_class($cmp), TRUE);
             }
             $js_files = $cmp->requiredScript();
             if (!is_array($js_files)) {
