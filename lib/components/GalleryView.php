@@ -37,14 +37,14 @@ class GalleryView extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/GalleryView.css";
+        $arr[] = SPARK_LOCAL . "/css/GalleryView.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/GalleryView.js";
+        $arr[] = SPARK_LOCAL . "/js/GalleryView.js";
         return $arr;
     }
 

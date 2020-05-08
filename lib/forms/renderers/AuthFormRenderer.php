@@ -33,8 +33,8 @@ class AuthFormRenderer extends FormRenderer
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/md5.js";
-        $arr[] = SITE_ROOT . "sparkfront/js/AuthForm.js";
+        $arr[] = SPARK_LOCAL . "/js/md5.js";
+        $arr[] = SPARK_LOCAL . "/js/AuthForm.js";
         return $arr;
     }
 

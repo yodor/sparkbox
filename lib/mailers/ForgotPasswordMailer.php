@@ -18,7 +18,7 @@ class ForgotPasswordMailer extends Mailer
         //
         // 		$this->setTemplateHTML($server_file);
         //
-        // 		$this->replaceBody("Base HREF", SITE_URL.SITE_ROOT."system/token/");
+        // 		$this->replaceBody("Base HREF", SITE_URL.LOCAL."system/token/");
 
 
         $message = "";

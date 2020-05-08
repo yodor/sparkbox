@@ -57,14 +57,14 @@ class NestedSetTreeView extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/TreeView.css";
+        $arr[] = SPARK_LOCAL . "/css/TreeView.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/TreeView.js";
+        $arr[] = SPARK_LOCAL . "/js/TreeView.js";
         return $arr;
     }
 
@@ -152,7 +152,7 @@ class NestedSetTreeView extends Component
 
         foreach ($this->combining_filters as $name => $value) {
             if (isset($_GET[$name])) {
-                $filter_value = DBDriver::Get()->escape($_GET[$name]);
+                $filter_value = DBConnections::Get()->escape($_GET[$name]);
 
                 if ($filter_value) {
                     if ($value instanceof IQueryFilter) {
@@ -222,7 +222,7 @@ class NestedSetTreeView extends Component
 
             }
             else if (isset($_GET[$filter_key])) {
-                $this->filter_values[$filter_key] = DBDriver::Get()->escape($_GET[$filter_key]);
+                $this->filter_values[$filter_key] = DBConnections::Get()->escape($_GET[$filter_key]);
             }
         }
 
@@ -374,7 +374,7 @@ class NestedSetTreeView extends Component
             }
         }
 
-        $db = DBDriver::Get();
+        $db = DBConnections::Get();
 
         $sql = $this->select_qry->getSQL();
 

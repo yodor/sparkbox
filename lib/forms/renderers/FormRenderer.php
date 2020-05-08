@@ -61,8 +61,10 @@ class FormRenderer extends Component
 
     public function requiredStyle()
     {
-        return array(SITE_ROOT . "sparkfront/css/FormRenderer.css");
+        $arr = parent::requiredStyle();
+        $arr[] = SPARK_LOCAL . "/css/FormRenderer.css";
 
+        return $arr;
     }
 
     public function addButton(StyledButton $b)

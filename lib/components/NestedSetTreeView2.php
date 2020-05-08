@@ -24,20 +24,20 @@ class NestedSetTreeView extends Component implements ISelectSource
     public function __construct()
     {
         parent::__construct();
-        $this->setClassName("TreeView");
+
     }
 
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/TreeView.css";
+        $arr[] = SPARK_LOCAL . "/css/TreeView.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/TreeView.js";
+        $arr[] = SPARK_LOCAL . "/js/TreeView.js";
         return $arr;
     }
 
@@ -107,7 +107,7 @@ class NestedSetTreeView extends Component implements ISelectSource
 
         $this->setAttribute("source", get_class($bean));
 
-        $this->setSelectQuery($sqry);
+        $this->setSelect($sqry);
 
         $this->data_source = $bean;
 
@@ -120,7 +120,7 @@ class NestedSetTreeView extends Component implements ISelectSource
         if (!($this->data_source instanceof NestedSetBean)) throw new Exception("No suitable data_source assigned");
         if (!($this->item_renderer instanceof NestedSetItemRenderer)) throw new Exception("No suitable item_renderer assigned");
 
-        $db = DBDriver::Get();
+        $db = DBConnections::Get();
 
         $sql = $this->select_qry->getSQL();
 

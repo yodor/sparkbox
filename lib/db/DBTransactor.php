@@ -189,7 +189,7 @@ class DBTransactor implements IBeanEditor
 
         debug("DBTableBean: " . get_class($bean));
 
-        $db = DBDriver::Get();
+        $db = DBConnections::Factory();
 
         try {
             $db->transaction();

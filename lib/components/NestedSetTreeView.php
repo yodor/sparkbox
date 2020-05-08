@@ -47,14 +47,14 @@ class NestedSetTreeView extends Component implements ISelectSource
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/TreeView.css";
+        $arr[] = SPARK_LOCAL . "/css/TreeView.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/TreeView.js";
+        $arr[] = SPARK_LOCAL . "/js/TreeView.js";
         return $arr;
     }
 
@@ -146,7 +146,7 @@ class NestedSetTreeView extends Component implements ISelectSource
                 //
             }
             else if (isset($_GET[$filter_key])) {
-                $this->filter_values[$filter_key] = DBDriver::Get()->escape($_GET[$filter_key]);
+                $this->filter_values[$filter_key] = DBConnections::Get()->escape($_GET[$filter_key]);
             }
         }
 
@@ -295,7 +295,7 @@ class NestedSetTreeView extends Component implements ISelectSource
         }
 
 
-        $db = DBDriver::Get();
+        $db = DBConnections::Get();
 
         // 	echo "<div style='display:none;' class='debug'>";
         // 	echo "QS:".microtime(true);

@@ -31,7 +31,7 @@ abstract class DBTableBean
     /**
      * @var SQLSelect|null
      */
-    protected $sqlSelect = null;
+    protected $select = null;
 
     public function __construct(string $table_name, DBDriver $dbdriver = NULL)
     {
@@ -41,7 +41,7 @@ abstract class DBTableBean
             $this->db = $dbdriver;
         }
         else {
-            $this->db = DBDriver::Get();
+            $this->db = DBConnections::Get();
         }
 
         $bclass = get_class($this);
@@ -55,9 +55,9 @@ abstract class DBTableBean
             self::$instances[$bclass] = $this;
         }
 
-        $this->sqlSelect = new SQLSelect();
-        $this->sqlSelect->fields = " * ";
-        $this->sqlSelect->from = $this->table;
+        $this->select = new SQLSelect();
+        $this->select->fields = " * ";
+        $this->select->from = $this->table;
 
 
     }
@@ -158,7 +158,7 @@ abstract class DBTableBean
 
     public function select(): SQLSelect
     {
-        return $this->sqlSelect;
+        return $this->select;
     }
 
 //    public function getLastIteratorSQL()
@@ -498,7 +498,7 @@ abstract class DBTableBean
 
     protected function manageCache($id)
     {
-        $cache_file = CACHE_ROOT . "/" . get_class($this) . "/" . $id;
+        $cache_file = CACHE_PATH . "/" . get_class($this) . "/" . $id;
         if (!is_dir($cache_file)) return;
         try {
             @deleteDir($cache_file);

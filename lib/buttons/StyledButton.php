@@ -43,7 +43,7 @@ class StyledButton extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/DefaultButton.css";
+        $arr[] = SPARK_LOCAL . "/css/DefaultButton.css";
         return $arr;
     }
 

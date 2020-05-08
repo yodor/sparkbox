@@ -71,7 +71,7 @@ class StorageObject
     public function serializeDB()
     {
 
-        return DBDriver::Get()->escape(serialize($this));
+        return DBConnections::Get()->escape(serialize($this));
 
     }
 
@@ -101,7 +101,7 @@ class StorageObject
 
         if ($doEscape) {
 
-            $row[$this->dataKey] = DBDriver::Get()->escape($this->data);
+            $row[$this->dataKey] = DBConnections::Get()->escape($this->data);
 
         }
         $row["size"] = $this->length;

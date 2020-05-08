@@ -72,7 +72,7 @@ class UploadDataInputProcessor extends BeanPostProcessor
 
 
             if (DB_ENABLED) {
-                $file_storage->setTimestamp(DBDriver::Get()->dateTime());
+                $file_storage->setTimestamp(DBConnections::Get()->dateTime());
             }
             else {
                 $file_storage->setTimestamp(date("Y-m-d H:m:i"));

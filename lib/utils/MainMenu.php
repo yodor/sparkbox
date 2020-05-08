@@ -130,8 +130,8 @@ class MainMenu
 
             }
             if (strpos($menu_link, "/") === 0) {
-                if (strcmp(SITE_ROOT, "/") !== 0) {
-                    $menu_link = SITE_ROOT . $menu_link;
+                if (strcmp(LOCAL, "/") !== 0) {
+                    $menu_link = LOCAL . $menu_link;
                 }
             }
             $link .= $menu_link;

@@ -293,7 +293,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
             try {
 
-                $ret_img = $this->zip->statName("sparkfront/images/$imgname");
+                $ret_img = $this->zip->statName(SPARK_LOCAL . "/images/$imgname");
 
                 if ($ret_img === FALSE) {
                     //image not found but continue
@@ -301,7 +301,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                     continue;
                 }
 
-                $filedata = $this->zip->getFromName("sparkfront/images/$imgname");
+                $filedata = $this->zip->getFromName(SPARK_LOCAL. "/images/$imgname");
 
                 $source = imagecreatefromstring($filedata);
                 if ($source === FALSE) {

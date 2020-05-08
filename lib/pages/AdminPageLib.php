@@ -30,7 +30,7 @@ class AdminPageLib extends SparkPage
     public function __construct()
     {
 
-        parent::__construct(new AdminAuthenticator(), SITE_ROOT."admin/login.php");
+        parent::__construct(new AdminAuthenticator(), LOCAL."admin/login.php");
 
         //control gets here only if authorized
         $adminID = $this->getUserID();
@@ -53,10 +53,10 @@ class AdminPageLib extends SparkPage
         $this->menu_bar->setAttribute("submenu_popup", "0");
 
 
-        $this->addCSS(SITE_ROOT . "sparkfront/css/admin.css", false);
-        $this->addCSS(SITE_ROOT . "sparkfront/css/admin_buttons.css", false);
-        $this->addCSS(SITE_ROOT . "sparkfront/css/admin_menu.css", false);
-        $this->addCSS(SITE_ROOT . "sparkfront/css/admin.css", false);
+        $this->addCSS(SPARK_LOCAL . "/css/admin.css", false);
+        $this->addCSS(SPARK_LOCAL . "/css/admin_buttons.css", false);
+        $this->addCSS(SPARK_LOCAL . "/css/admin_menu.css", false);
+        $this->addCSS(SPARK_LOCAL . "/css/admin.css", false);
 
     }
 
@@ -67,8 +67,8 @@ class AdminPageLib extends SparkPage
         if (!isset($admin_menu)) {
 
             $admin_menu = array();
-            $admin_menu[] = new MenuItem("Content", ADMIN_ROOT . "content/index.php", "class:icon_content");
-            $admin_menu[] = new MenuItem("Settings", ADMIN_ROOT . "settings/index.php", "class:icon_settings");
+            $admin_menu[] = new MenuItem("Content", ADMIN_LOCAL . "/content/index.php", "class:icon_content");
+            $admin_menu[] = new MenuItem("Settings", ADMIN_LOCAL . "/settings/index.php", "class:icon_settings");
 
         }
 
@@ -129,7 +129,7 @@ class AdminPageLib extends SparkPage
     {
         $ret = $this->haveRole($role);
         if (!$ret && $do_redirect) {
-            header("Location: " . ADMIN_ROOT . "access.php");
+            header("Location: " . ADMIN_LOCAL . "access.php");
             exit;
         }
         return $ret;
@@ -157,7 +157,7 @@ class AdminPageLib extends SparkPage
         }
         echo "<span class='text_admin'>Welcome, $fullname</span>";
         $btn = StyledButton::DefaultButton();
-        $btn->renderButton("Logout", ADMIN_ROOT . "logout.php");
+        $btn->renderButton("Logout", ADMIN_LOCAL . "logout.php");
         echo "</div>";
 
 
@@ -215,7 +215,7 @@ class AdminPageLib extends SparkPage
         echo "<tr><td colspan=2 class='admin_footer'>";
 
         echo "<span class='copy'>Copyright &copy; " . date("Y") . " " . SITE_TITLE . ". All Rights Reserved.</span>";
-        echo "<img class='logo' src='" . SITE_ROOT . "sparkfront/images/admin/sparkbox.png'>";
+        echo "<img class='logo' src='" . LOCAL . "SPARK_LOCAL/images/admin/sparkbox.png'>";
 
         echo "</td></tr>";
         echo "</table>";

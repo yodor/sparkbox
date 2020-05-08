@@ -28,8 +28,8 @@ class CacheFile
             throw new Exception("Incorrect ID");
         }
 
-        if (!defined("CACHE_ROOT")) {
-            throw new Exception("CACHE_ROOT undefined");
+        if (!defined("CACHE_PATH")) {
+            throw new Exception("CACHE_PATH undefined");
         }
 
         $cache_folder = $this->getCacheFolder();
@@ -73,7 +73,7 @@ class CacheFile
 
     protected function getCacheFolder() : string
     {
-        return CACHE_ROOT . DIRECTORY_SEPARATOR . $this->className . DIRECTORY_SEPARATOR . $this->id ;
+        return CACHE_PATH . DIRECTORY_SEPARATOR . $this->className . DIRECTORY_SEPARATOR . $this->id ;
     }
 
     protected function getCacheFile() : string

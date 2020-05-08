@@ -31,8 +31,8 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/ActionRenderer.css";
-        $arr[] = SITE_ROOT . "sparkfront/css/GalleryView.css";
+        $arr[] = SPARK_LOCAL . "/css/ActionRenderer.css";
+        $arr[] = SPARK_LOCAL . "/css/GalleryView.css";
         return $arr;
 
     }

@@ -27,7 +27,7 @@ class SQLQuery implements IDataIterator
         $this->key = $primaryKey;
         $this->name = $tableName;
 
-        $this->db = DBDriver::Get();
+        $this->db = DBConnections::Get();
 
     }
 

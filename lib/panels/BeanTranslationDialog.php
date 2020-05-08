@@ -35,17 +35,17 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/BeanTranslationDialog.css";
-        $arr[] = SITE_ROOT . "sparkfront/css/MCETextArea.css";
+        $arr[] = SPARK_LOCAL . "/css/BeanTranslationDialog.css";
+        $arr[] = SPARK_LOCAL . "/css/MCETextArea.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/popups/BeanTranslationDialog.js";
-        $arr[] = SITE_ROOT . "sparkfront/js/MCETextArea.js";
-        $arr[] = SITE_ROOT . "sparkfront/js/tiny_mce/jquery.tinymce.min.js";
+        $arr[] = SPARK_LOCAL . "/js/popups/BeanTranslationDialog.js";
+        $arr[] = SPARK_LOCAL . "/js/MCETextArea.js";
+        $arr[] = SPARK_LOCAL . "/js/tiny_mce/jquery.tinymce.min.js";
         return $arr;
     }
 

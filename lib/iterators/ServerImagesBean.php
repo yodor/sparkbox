@@ -7,7 +7,7 @@ class ServerImagesBean extends ArrayDataIterator
     public function __construct()
     {
 
-        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_sparkfront/images/";
+        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_root/images/";
         $this->key = "id";
         $this->value_key = "filename";
 

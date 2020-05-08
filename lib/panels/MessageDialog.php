@@ -52,14 +52,14 @@ class MessageDialog extends Component implements IPageComponent
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/MessageDialog.css";
+        $arr[] = SPARK_LOCAL . "/css/MessageDialog.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/popups/MessageDialog.js";
+        $arr[] = SPARK_LOCAL . "/js/popups/MessageDialog.js";
         return $arr;
     }
 

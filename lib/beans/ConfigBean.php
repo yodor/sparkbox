@@ -43,7 +43,7 @@ class ConfigBean extends DBTableBean
     public function getValue(string $key, $def_value = "")
     {
 
-        $key = DBDriver::Get()->escape($key);
+        $key = DBConnections::Get()->escape($key);
 
         $sel = new SQLSelect();
         $sel->fields = "config_val";
@@ -74,7 +74,7 @@ class ConfigBean extends DBTableBean
     public function clearValue($key)
     {
 
-        $db = DBDriver::Get();
+        $db = DBConnections::Get();
 
         $s_key = $db->escape($key);
 
@@ -98,7 +98,7 @@ class ConfigBean extends DBTableBean
     public function setValue($key, $val)
     {
 
-        $db = DBDriver::Get();
+        $db = DBConnections::Get();
 
         $s_key = $db->escape($key);
 

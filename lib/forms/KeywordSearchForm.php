@@ -36,8 +36,8 @@ class KeywordSearchForm extends InputForm
 
     protected function searchFilterForKey(string $key, string $val) : string
     {
-        $db = DBDriver::Get();
-        $val = $db->escape($val);
+
+        $val = DBConnections::Get()->escape($val);
         if (strcmp($key, "keyword") == 0) {
             $allwords = explode(" ", $val);
 

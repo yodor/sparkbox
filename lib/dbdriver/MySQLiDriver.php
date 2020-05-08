@@ -4,37 +4,46 @@ include_once("dbdriver/DBDriver.php");
 
 class MySQLiDriver extends DBDriver
 {
-    private $connection = NULL;
+    /**
+     * @var mysqli
+     */
+    private $conn = NULL;
 
-    public static $conn_count = 0;
-
-    public function __construct(DBConnectionProperties $conn, $open_new = true, $need_persistent = false)
+    /**
+     * MySQLiDriver constructor.
+     * @param DBConnectionProperties $props
+     * @param bool $open_new
+     * @param bool $need_persistent
+     * @throws Exception
+     */
+    public function __construct(DBConnectionProperties $props, $open_new = true, $need_persistent = false)
     {
 
+        $host = $props->host;
+
         if ($need_persistent) {
-            $this->connection = mysqli_connect("p:" . $conn->host, $conn->user, $conn->pass, $conn->database, $conn->port);
-        }
-        else {
-            $this->connection = mysqli_connect($conn->host, $conn->user, $conn->pass, $conn->database, $conn->port);
+            $host = "p:".$host;
         }
 
-        if (mysqli_connect_errno()) {
-            throw new Exception("Unable to connect to database server(" . MySQLiDriver::$conn_count . "): " . mysqli_connect_error());
+        $this->conn = @new mysqli($props->host, $props->user, $props->pass, $props->database, $props->port);
+
+        if ($this->conn->connect_errno) {
+            throw new Exception("Error connecting to database server: ". $this->conn->connect_error);
         }
 
-        mysqli_autocommit($this->connection, false);
-        mysqli_set_charset($this->connection, "utf8");
-
-        mysqli_query($this->connection, "SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ");
-        mysqli_query($this->connection, "SET collation_connection = 'utf8_general_ci' ");
-
-        mysqli_query($this->connection, "SET character_set_results = 'utf8'");
-        mysqli_query($this->connection, "SET character_set_connection = 'utf8'");
-        mysqli_query($this->connection, "SET character_set_client = 'utf8'");
+        $this->conn->autocommit(false);
+        $this->conn->set_charset("utf8");
 
 
-        MySQLiDriver::$conn_count++;
-        $ex = NULL;
+        $this->conn->query("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ");
+        $this->conn->query( "SET collation_connection = 'utf8_general_ci' ");
+
+        $this->conn->query( "SET character_set_results = 'utf8'");
+        $this->conn->query("SET character_set_connection = 'utf8'");
+        $this->conn->query( "SET character_set_client = 'utf8'");
+
+
+        DBConnections::$conn_count++;
 
 
     }
@@ -46,7 +55,13 @@ class MySQLiDriver extends DBDriver
 
     public function shutdown()
     {
-        if (is_resource($this->connection)) mysqli_close($this->connection);
+        if ($this->conn) $this->conn->close();
+
+    }
+
+    public function getError() : string
+    {
+        return $this->conn->error;
     }
 
     public function dateTime($add_days = 0, $interval_type = " DAY ")
@@ -65,99 +80,82 @@ class MySQLiDriver extends DBDriver
 
     public function query(string $str)
     {
-        $res = mysqli_query($this->connection, $str);
-
-        if (!$res) $this->error = mysqli_error($this->connection);
-
-        return $res;
+        return $this->conn->query($str);
     }
 
     public function numRows($res) : int
     {
-        return mysqli_num_rows($res);
+        $res = $this->assert_resource($res);
+        return $res->num_rows;
     }
 
     public function numFields($res) : int
     {
-        return mysqli_num_fields($res);
+        $res = $this->assert_resource($res);
+        return $res->field_count;
     }
 
     public function fieldName($res, int $pos)
     {
-
-        $arr = mysqli_fetch_fields($res);
+        $res = $this->assert_resource($res);
+        $arr = $res->fetch_fields();
         return $arr[$pos];
     }
 
-    protected function assert_resource(&$res)
+    protected function assert_resource(&$res) : mysqli_result
     {
         if (!($res instanceof mysqli_result)) throw new Exception("No valid mysqli_resource passed");
+        return $res;
     }
 
     public function fetch($res)
     {
-        $this->assert_resource($res);
+        $res = $this->assert_resource($res);
 
-        $ret = mysqli_fetch_assoc($res) or $this->error = mysqli_error($this->connection);
-
-        return $ret;
+        return $res->fetch_assoc();
     }
 
     public function fetchArray($res)
     {
-        $this->assert_resource($res);
+        $res = $this->assert_resource($res);
 
-        $ret = mysqli_fetch_array($res) or $this->error = mysqli_error($this->connection);
+        return $res->fetch_array(MYSQLI_NUM);
 
-        return $ret;
-    }
-
-    public function fetchRow($res)
-    {
-        $this->assert_resource($res);
-
-        $ret = mysqli_fetch_row($res) or $this->error = mysqli_error($this->connection);
-
-        return $ret;
     }
 
     public function free($res)
     {
         if ($res instanceof mysqli_result) {
-            @mysqli_free_result($res);
+            @$res->free();
         }
     }
 
     public function lastID() : int
     {
-        return mysqli_insert_id($this->connection);
+        return $this->conn->insert_id;
     }
 
     public function commit()
     {
-        $res = mysqli_query($this->connection, "COMMIT") or $this->error = mysqli_error($this->connection);
-        return $res;
+        return $this->conn->commit();
     }
 
     public function rollback()
     {
-        $res = mysqli_query($this->connection, "ROLLBACK") or $this->error = mysqli_error($this->connection);
-        return $res;
+        return $this->conn->rollback();
     }
 
     public function transaction()
     {
-        $res = mysqli_query($this->connection, "START TRANSACTION") or $this->error = mysqli_error($this->connection);
-        $res = mysqli_query($this->connection, "BEGIN") or $this->error = mysqli_error($this->connection);
-        return $res;
+        return $this->conn->begin_transaction();
     }
 
     public function escape(string $data)
     {
-        return mysqli_real_escape_string($this->connection, $data);
+        return $this->conn->real_escape_string($data);
     }
 
-    public function queryFields($table)
+    public function queryFields(string $table)
     {
         return $this->query("show fields from $table");
     }
@@ -184,9 +182,9 @@ class MySQLiDriver extends DBDriver
 
     public function tableExists(string $table)
     {
-        $ret = $this->query("show tables like '$table'");
-        $num = $this->numRows($ret);
-        if ($num < 1) return FALSE;
+        $res = $this->query("show tables like '$table'");
+
+        if ($res->num_rows < 1) return FALSE;
         return TRUE;
     }
 

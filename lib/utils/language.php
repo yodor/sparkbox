@@ -125,7 +125,7 @@ function getActiveLanguageID()
     $langID = 1;
 
     $lang_session = Session::Get("language", DEFAULT_LANGUAGE);
-    $lang = DBDriver::Get()->escape($lang_session);
+    $lang = DBConnections::Get()->escape($lang_session);
 
     $qry = $g_lb->queryField("language", $lang, 1);
     $num = $qry->exec();
@@ -173,7 +173,7 @@ function tr(string $str_original): string
 
     global $g_sp, $g_stu, $g_tr, $g_lb;
 
-    $str = DBDriver::Get()->escape($str_original);
+    $str = DBConnections::Get()->escape($str_original);
 
     try {
 

@@ -53,7 +53,7 @@ class ToggleFieldRequestHandler extends RequestHandler
     protected function process()
     {
 
-        $db = DBDriver::Get();
+        $db = DBConnections::Factory();
 
         try {
             $field_name = $db->escape($this->field_name);

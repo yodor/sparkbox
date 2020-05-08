@@ -19,7 +19,7 @@ class ListView extends AbstractResultView
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/ListView.css";
+        $arr[] = SPARK_LOCAL . "/css/ListView.css";
         return $arr;
     }
 

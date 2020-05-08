@@ -56,14 +56,14 @@ class ArrayField extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/ArrayField.css";
+        $arr[] = SPARK_LOCAL . "/css/ArrayField.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/ArrayControls.js";
+        $arr[] = SPARK_LOCAL . "/js/ArrayControls.js";
         return $arr;
     }
 

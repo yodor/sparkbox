@@ -56,7 +56,7 @@ abstract class InputField extends Component implements IErrorRenderer
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/InputField.css";
+        $arr[] = SPARK_LOCAL . "/css/InputField.css";
         return $arr;
     }
 

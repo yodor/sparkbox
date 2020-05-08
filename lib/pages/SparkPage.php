@@ -203,10 +203,10 @@ class SparkPage extends HTMLPage
 
         ?>
         <script type='text/javascript'>
-            let SITE_ROOT = "<?php echo SITE_ROOT;?>";
-            let SPARKFRONT = "<?php echo SPARKFRONT;?>";
+            let LOCAL = "<?php echo LOCAL;?>";
+            let SPARK_LOCAL = "<?php echo SPARK_LOCAL;?>";
             let ajax_loader = "<div class='AjaxLoader'></div>";
-            let ajax_loader_src = SPARKFRONT + "images/ajax-loader.gif";
+            let ajax_loader_src = SPARK_LOCAL + "/images/ajax-loader.gif";
             let left = "<?php echo $left;?>";
             let right = "<?php echo $right;?>";
         </script>
@@ -258,14 +258,14 @@ class SparkPage extends HTMLPage
         $this->addMeta("keywords", "%meta_keywords%");
         $this->addMeta("description", "%meta_description%");
 
-        $this->addCSS(SPARKFRONT . "css/popups.css");
-        $this->addCSS(SPARKFRONT . "css/SparkPage.css");
+        $this->addCSS(SPARK_LOCAL . "/css/popups.css");
+        $this->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
 
-        $this->addJS(SPARKFRONT . "js/jquery-1.8.0.min.js");
-        $this->addJS(SPARKFRONT . "js/utils.js");
-        $this->addJS(SPARKFRONT . "js/JSONRequest.js");
-        $this->addJS(SPARKFRONT . "js/tooltip.js");
-        $this->addJS(SPARKFRONT . "js/ModalPopup.js");
+        $this->addJS(SPARK_LOCAL . "/js/jquery-1.8.0.min.js");
+        $this->addJS(SPARK_LOCAL . "/js/utils.js");
+        $this->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
+        $this->addJS(SPARK_LOCAL . "/js/tooltip.js");
+        $this->addJS(SPARK_LOCAL . "/js/ModalPopup.js");
 
         $dialog = new MessageDialog();
     }

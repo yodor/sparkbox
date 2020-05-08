@@ -18,7 +18,7 @@ class GalleryImagesBean extends ArrayDataIterator
 
     protected function initFolderLocation()
     {
-        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_sparkfront/images/";
+        $this->folder = $_SERVER["DOCUMENT_ROOT"] . DIRECTORY_SEPARATOR . "gallery_root/images/";
     }
 
     //databean

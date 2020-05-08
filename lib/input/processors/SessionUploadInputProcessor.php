@@ -228,7 +228,7 @@ class SessionUploadInputProcessor extends BeanPostProcessor
                 }
                 else {
                     debug("Transacting StorageObject UID: $uid serialized to the main transaction row");
-                    $value = DBDriver::Get()->escape(serialize($storage_object));
+                    $value = DBConnections::Get()->escape(serialize($storage_object));
                     $transactor->appendValue($field_name, $value);
                 }
                 break;

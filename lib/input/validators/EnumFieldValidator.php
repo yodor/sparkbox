@@ -17,8 +17,8 @@ class EnumFieldValidator implements IInputValidator
     {
         if (!$this->field_name) $this->field_name = $input->getName();
 
-        $ret = DBDriver::Get()->fieldType($this->table_name, $this->field_name);
-        $ret = DBDriver::Get()->Enum2Array($ret);
+        $ret = DBConnections::Get()->fieldType($this->table_name, $this->field_name);
+        $ret = DBConnections::Get()->Enum2Array($ret);
 
         if (!in_array($input->getValue(), $ret)) {
 

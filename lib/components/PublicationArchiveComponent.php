@@ -43,7 +43,7 @@ class PublicationArchiveComponent extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/PublicationArchiveComponent.css";
+        $arr[] = SPARK_LOCAL . "/css/PublicationArchiveComponent.css";
         return $arr;
     }
 
@@ -52,7 +52,7 @@ class PublicationArchiveComponent extends Component
 
         if (isset($_GET["year"]) && isset($_GET["month"])) {
             $this->archive_year = (int)$_GET["year"];
-            $this->archive_month = DBDriver::Get()->escape($_GET["month"]);
+            $this->archive_month = DBConnections::Get()->escape($_GET["month"]);
             $this->have_selection = true;
         }
         else if (isset($_GET[$this->bean->key()])) {

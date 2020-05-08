@@ -21,7 +21,7 @@ class MenuItem
 
     protected $need_translate = true;
 
-    public static $icon_path = "../sparkfront/images/admin/spark_icons/";
+    public static $icon_path = SPARK_LOCAL . "/images/admin/spark_icons/";
 
     public function __construct($title, $href = "", $icon = "")
     {

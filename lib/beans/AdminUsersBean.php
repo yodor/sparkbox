@@ -23,9 +23,9 @@ class AdminUsersBean extends DBTableBean
  CONSTRAINT `admin_users_ibfk_1` FOREIGN KEY (`adminID`) REFERENCES `admin_users` (`userID`) ON DELETE SET NULL ON UPDATE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-    public function __construct($dbdriver = NULL)
+    public function __construct()
     {
-        parent::__construct("admin_users", $dbdriver);
+        parent::__construct("admin_users");
     }
 
     public function deleteID($id, $db = false)

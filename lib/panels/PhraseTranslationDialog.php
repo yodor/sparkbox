@@ -34,14 +34,14 @@ class PhraseTranslationDialog extends MessageDialog
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/PhraseTranslationDialog.css";
+        $arr[] = SPARK_LOCAL . "/css/PhraseTranslationDialog.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/popups/PhraseTranslationDialog.js";
+        $arr[] = SPARK_LOCAL . "/js/popups/PhraseTranslationDialog.js";
         return $arr;
     }
 

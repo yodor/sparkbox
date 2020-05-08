@@ -85,7 +85,7 @@ class KeywordSearchComponent extends Component implements IQueryFilter
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/KeywordSearchComponent.css";
+        $arr[] = SPARK_LOCAL . "/css/KeywordSearchComponent.css";
         return $arr;
     }
 

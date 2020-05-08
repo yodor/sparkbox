@@ -24,14 +24,14 @@ class DateField extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/CalendarPopup.css";
+        $arr[] = LOCAL . "SPARK_LOCAL/css/CalendarPopup.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/CalendarPopup.js";
+        $arr[] = LOCAL . "SPARK_LOCAL/js/CalendarPopup.js";
         return $arr;
     }
 
@@ -108,7 +108,7 @@ class DateField extends InputField
         if ($this->render_calendar) {
             // 	calendar_popup_button
             echo "<div class='CalendarControl' onClick='javascript:new CalendarPopup(this)'>";
-            echo "<img border=0  src='" . SITE_ROOT . "sparkfront/images/calendar_icon.png'>";
+            echo "<img border=0  src='" . SPARK_LOCAL . "/images/calendar_icon.png'>";
             echo "</div>";
         }
         echo "</div>";

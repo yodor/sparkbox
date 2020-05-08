@@ -28,7 +28,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     protected $data = null;
 
-    public function __construct(DBTableBean $bean, int $width = 48, int $height = -1)
+    public function __construct(?DBTableBean $bean, int $width = 48, int $height = -1)
     {
         parent::__construct();
 

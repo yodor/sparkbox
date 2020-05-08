@@ -39,7 +39,7 @@ MCEImageBrowserDialog.prototype.onClickImage = function (imageID, event) {
                 var form = md.modal_pane.popup().find("FORM");
                 var render_mode = form.find("[name='render_mode']").val();
 
-                var image_src = SITE_ROOT + "storage.php?cmd=" + render_mode + "&class=MCEImagesBean&id=" + imageID;
+                var image_src = LOCAL + "/storage.php?cmd=" + render_mode + "&class=MCEImagesBean&id=" + imageID;
 
                 var width = parseInt(form.find("[name='width']").val());
                 var height = parseInt(form.find("[name='height']").val());
@@ -74,7 +74,7 @@ MCEImageBrowserDialog.prototype.onClickImage = function (imageID, event) {
                 var final_tag = image_tag;
 
                 if (popup.is(":checked")) {
-                    var popup_href = SITE_ROOT + "storage.php?cmd=image&class=MCEImagesBean&id=" + imageID;
+                    var popup_href = LOCAL + "/storage.php?cmd=image&class=MCEImagesBean&id=" + imageID;
                     final_tag = $("<a href='' class='image_popup'></a>");
                     final_tag.attr("href", popup_href);
                     final_tag.html(image_tag);

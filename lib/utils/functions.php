@@ -196,7 +196,7 @@ function debug($obj, $msg=null, $arr = null)
 
 function keywordFilterSQL($keywords_text, $search_fields, $inner_glue = " OR ", $outer_glue = " AND ", $split_string = "/[,;]/")
 {
-    $db = DBDriver::Get();
+    $db = DBConnections::Get();
 
     if (strlen($keywords_text) < 1) throw new Exception("keywords_text parameter empty");
     if (!is_array($search_fields) && strlen($search_fields) < 1) throw new Exception("search_fields parameter empty");
@@ -363,7 +363,7 @@ function safeVal($val, $accepted_tags = NULL)
 
     $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
-    return DBDriver::Get()->escape($ret);
+    return DBConnections::Get()->escape($ret);
 
 }
 
@@ -627,9 +627,9 @@ function NiceTime($date)
 
 function StarsForValue($val, $min = 1, $max = 5)
 {
-    $on_star = "<img class='star star_on'  src='" . SITE_ROOT . "sparkfront/images/icon_star_on.png'>";
-    $half_star = "<img class='star star_half' src='" . SITE_ROOT . "sparkfront/images/icon_star_half.png'>";
-    $off_star = "<img class='star star_off' src='" . SITE_ROOT . "sparkfront/images/icon_star_off.png'>";
+    $on_star = "<img class='star star_on'  src='" . SPARK_LOCAL . "/images/icon_star_on.png'>";
+    $half_star = "<img class='star star_half' src='" . SPARK_LOCAL . "/images/icon_star_half.png'>";
+    $off_star = "<img class='star star_off' src='" . SPARK_LOCAL . "/images/icon_star_off.png'>";
 
     // 	$val = ($val/10);
 
@@ -698,7 +698,7 @@ function outputCSV($sql_query, $filename = 'export.csv')
         fputcsv($filehandler, $vals); // add parameters if you want
     }
 
-    $db = DBDriver::Get();
+    $db = DBConnections::Get();
     // Gets the data from the database
     $result = $db->query($sql_query);
     $fields_cnt = $db->numFields($result);
@@ -728,7 +728,7 @@ function exportMysqlToCsv($sql_query, $filename = 'export.csv')
     $csv_escaped = "\\";
     //     $sql_query = "select * from $table";
 
-    $db = DBDriver::Get();
+    $db = DBConnections::Get();
     // Gets the data from the database
     $result = $db->query($sql_query);
     $fields_cnt = $db->numFields($result);

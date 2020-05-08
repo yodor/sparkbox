@@ -28,22 +28,22 @@ class StorageItem
 
     public function hrefFull()
     {
-        return STORAGE_HREF . "?cmd=image&".$this->getParameters();
+        return STORAGE_LOCAL . "?cmd=image&".$this->getParameters();
     }
 
     public function hrefCrop($width, $height)
     {
-        return STORAGE_HREF . "?cmd=image&".$this->getParameters()."&width=$width&height=$height";
+        return STORAGE_LOCAL . "?cmd=image&".$this->getParameters()."&width=$width&height=$height";
     }
 
     public function hrefThumb($width)
     {
-        return STORAGE_HREF . "?cmd=image&".$this->getParameters()."&size=$width";
+        return STORAGE_LOCAL . "?cmd=image&".$this->getParameters()."&size=$width";
     }
 
     public function hrefFile()
     {
-        return STORAGE_HREF . "?cmd=data&".$this->getParameters();
+        return STORAGE_LOCAL . "?cmd=data&".$this->getParameters();
     }
 
     public function getParameters()

@@ -35,7 +35,7 @@ abstract class AbstractResultView extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT."sparkfront/css/GalleryView.css";
+        $arr[] = SPARK_LOCAL."/css/GalleryView.css";
         return $arr;
     }
 
@@ -43,7 +43,7 @@ abstract class AbstractResultView extends Component
     {
 
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT."sparkfront/js/GalleryView.js";
+        $arr[] = SPARK_LOCAL."/js/GalleryView.js";
         return $arr;
     }
 

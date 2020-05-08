@@ -44,15 +44,15 @@ class NestedSetBean extends DBTableBean
                 $row["rgt"] = $rgt + 1;
 
                 $sql = "UPDATE {$this->table} SET rgt=rgt+2 WHERE rgt>=$rgt";
-                if ($this->filter) {
-                    $sql .= " AND {$this->filter} ";
+                if ($this->select->where) {
+                    $sql .= " AND {$this->select->where} ";
                 }
                 $res = $db->query($sql);
                 if (!$res) throw new Exception($db->getError());
 
                 $sql = "UPDATE {$this->table} SET lft=lft+2 WHERE lft>$rgt";
-                if ($this->filter) {
-                    $sql .= " AND {$this->filter} ";
+                if ($this->select->where) {
+                    $sql .= " AND {$this->select->where} ";
                 }
                 $res = $db->query($sql);
                 if (!$res) throw new Exception($db->getError());
@@ -63,8 +63,8 @@ class NestedSetBean extends DBTableBean
             else {
 
                 $sql = "SELECT MAX(rgt) as max_rgt FROM {$this->table}";
-                if ($this->filter) {
-                    $sql .= " AND {$this->filter} ";
+                if ($this->select->where) {
+                    $sql .= " AND {$this->select->where} ";
                 }
                 $res = $db->query($sql);
                 if (!$res) throw new Exception($db->getError());
@@ -131,8 +131,8 @@ class NestedSetBean extends DBTableBean
                 else {
                     //reparent to top
                     $sql = "SELECT MAX(rgt) as max_rgt FROM {$this->table}";
-                    if ($this->filter) {
-                        $sql .= " AND {$this->filter} ";
+                    if ($this->select->where) {
+                        $sql .= " AND {$this->select->where} ";
                     }
                     $res = $db->query($sql);
                     if (!$res) throw new Exception($db->getError());
@@ -162,15 +162,15 @@ class NestedSetBean extends DBTableBean
 
                 //make space
                 $sql = "UPDATE {$this->table} SET lft = lft + $extent WHERE lft >= $new_lft";
-                if ($this->filter) {
-                    $sql .= " AND {$this->filter} ";
+                if ($this->select->where) {
+                    $sql .= " AND {$this->select->where} ";
                 }
                 $res = $db->query($sql);
                 if (!$res) throw new Exception($db->getError());
 
                 $sql = "UPDATE {$this->table} SET rgt = rgt + $extent WHERE rgt >= $new_lft";
-                if ($this->filter) {
-                    $sql .= " AND {$this->filter} ";
+                if ($this->select->where) {
+                    $sql .= " AND {$this->select->where} ";
                 }
                 $res = $db->query($sql);
                 if (!$res) throw new Exception($db->getError());
@@ -178,8 +178,8 @@ class NestedSetBean extends DBTableBean
 
                 //move into new space
                 $sql = "UPDATE {$this->table} SET lft = lft + $distance, rgt = rgt + $distance WHERE lft >= $tmppos AND rgt < $tmppos + $extent";
-                if ($this->filter) {
-                    $sql .= " AND {$this->filter} ";
+                if ($this->select->where) {
+                    $sql .= " AND {$this->select->where} ";
                 }
                 $res = $db->query($sql);
                 if (!$res) throw new Exception($db->getError());
@@ -187,15 +187,15 @@ class NestedSetBean extends DBTableBean
 
                 // 			//remove old space
                 $sql = "UPDATE {$this->table} SET lft = lft - $extent WHERE lft > $rgt";
-                if ($this->filter) {
-                    $sql .= " AND {$this->filter} ";
+                if ($this->select->where) {
+                    $sql .= " AND {$this->select->where} ";
                 }
                 $res = $db->query($sql);
                 if (!$res) throw new Exception($db->getError());
 
                 $sql = "UPDATE {$this->table} SET rgt = rgt - $extent WHERE rgt > $rgt";
-                if ($this->filter) {
-                    $sql .= " AND {$this->filter} ";
+                if ($this->select->where) {
+                    $sql .= " AND {$this->select->where} ";
                 }
                 $res = $db->query($sql);
                 if (!$res) throw new Exception($db->getError());
@@ -240,31 +240,31 @@ class NestedSetBean extends DBTableBean
 
 
             $sql = "UPDATE {$this->table} SET lft=lft-1, rgt=rgt-1 WHERE lft BETWEEN $lft AND $rgt";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
             $res = $db->query($sql);
             if (!$res) throw new Exception($db->getError());
 
 
             $sql = "UPDATE {$this->table} SET rgt = rgt - 2 WHERE rgt > $rgt";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
             $res = $db->query($sql);
             if (!$res) throw new Exception($db->getError());
 
             $sql = "UPDATE {$this->table} SET lft = lft - 2 WHERE lft > $rgt";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
             $res = $db->query($sql);
             if (!$res) throw new Exception($db->getError());
 
 
             $sql = "UPDATE {$this->table} SET parentID=$parentID WHERE parentID=$id";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
             $res = $db->query($sql);
             if (!$res) throw new Exception($db->getError());
@@ -326,8 +326,8 @@ class NestedSetBean extends DBTableBean
     protected function getIDLeft($lft)
     {
         $sql = "SELECT {$this->prkey} FROM {$this->table} WHERE lft = '$lft' ";
-        if ($this->filter) {
-            $sql .= " AND {$this->filter} ";
+        if ($this->select->where) {
+            $sql .= " AND {$this->select->where} ";
         }
         $res = $this->db->query($sql);
 
@@ -342,8 +342,8 @@ class NestedSetBean extends DBTableBean
 
 
         $sql = "SELECT {$this->prkey} FROM {$this->table} WHERE rgt = '$rgt' ";
-        if ($this->filter) {
-            $sql .= " AND {$this->filter} ";
+        if ($this->select->where) {
+            $sql .= " AND {$this->select->where} ";
         }
         $res = $this->db->query($sql);
         if (!$res) throw new Exception("NestedSetBean::getIDRight($rgt) - Error: " . $this->db->getError());
@@ -375,9 +375,8 @@ class NestedSetBean extends DBTableBean
             $brotherSize = $brother["rgt"] - $brother["lft"] + 1;
 
             $sql = "SELECT {$this->prkey} FROM {$this->table} WHERE   (lft BETWEEN {$node["lft"]} AND {$node["rgt"]}) ";
-
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
 
             $res = $db->query($sql);
@@ -391,8 +390,8 @@ class NestedSetBean extends DBTableBean
             $idlist = implode(",", $idlist);
 
             $sql = "UPDATE {$this->table} SET lft = lft - $brotherSize, rgt = rgt - $brotherSize WHERE (lft BETWEEN {$node["lft"]} AND {$node["rgt"]}) ";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
 
             $res = $db->query($sql);
@@ -400,8 +399,8 @@ class NestedSetBean extends DBTableBean
 
             $sql = "UPDATE {$this->table} SET lft = lft + $nodeSize, rgt = rgt + $nodeSize WHERE (lft BETWEEN {$brother["lft"]} AND {$brother["rgt"]}) ";
             $sql .= " AND {$this->prkey} NOT IN ( $idlist ) ";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
 
             $res = $db->query($sql);
@@ -441,8 +440,8 @@ class NestedSetBean extends DBTableBean
 
 
             $sql = "SELECT {$this->prkey} FROM {$this->table} WHERE  (lft BETWEEN {$node["lft"]} AND {$node["rgt"]}) ";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
             $res = $db->query($sql);
             if (!$res) throw new Exception("NestedSetBean::moveRight - unable to update table: " . $db->getError());
@@ -454,16 +453,16 @@ class NestedSetBean extends DBTableBean
             $idlist = implode(" , ", $idlist);
 
             $sql = "UPDATE {$this->table} SET lft = lft + $brotherSize, rgt = rgt + $brotherSize WHERE (lft BETWEEN {$node["lft"]} AND {$node["rgt"]}) ";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
             $res = $db->query($sql);
             if (!$res) throw new Exception("NestedSetBean::moveRight - unable to update table: " . $db->getError());
 
             $sql = "UPDATE {$this->table} SET lft = lft - $nodeSize, rgt = rgt - " . $nodeSize . " WHERE (lft BETWEEN " . $brother["lft"] . " AND " . $brother["rgt"] . ") ";
             $sql .= " AND {$this->prkey} NOT IN ($idlist) ";
-            if ($this->filter) {
-                $sql .= " AND {$this->filter} ";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where} ";
             }
 
             $sql .= ";";
@@ -491,9 +490,9 @@ class NestedSetBean extends DBTableBean
 	AND node.catID = $catID
 	AND parent.lft>0";
 
-        if ($this->filter) {
-            $q .= " AND (node.{$this->filter} AND parent.{$this->filter}) ";
-        }
+//        if ($this->filter) {
+//            $q .= " AND (node.{$this->filter} AND parent.{$this->filter}) ";
+//        }
 
         $q .= " ORDER BY parent.lft; ";
 

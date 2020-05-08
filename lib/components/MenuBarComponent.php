@@ -37,7 +37,7 @@ class MenuBarComponent extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARKFRONT . "css/MenuBarComponent.css";
+        $arr[] = SPARK_LOCAL . "/css/MenuBarComponent.css";
         return $arr;
 
     }
@@ -45,7 +45,7 @@ class MenuBarComponent extends Component
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARKFRONT . "js/MenuBarComponent.js";
+        $arr[] = SPARK_LOCAL . "/js/MenuBarComponent.js";
         return $arr;
     }
 

@@ -29,7 +29,7 @@ class TableView extends AbstractResultView implements IHeadContents
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/TableView.css";
+        $arr[] = SPARK_LOCAL . "/css/TableView.css";
         return $arr;
     }
 

@@ -18,7 +18,7 @@ class FileField extends PlainUpload
         if ($object->getLength()>0) {
             echo "<div class='Element' >";
 
-            echo "<span class='thumbnail'><img src='" . SITE_ROOT . "sparkfront/images/mimetypes/generic.png'></span>";
+            echo "<span class='thumbnail'><img src='" . SPARK_LOCAL . "/images/mimetypes/generic.png'></span>";
 
             echo "<div class='details'>";
             echo "<span class='filename'><label>{$object->getFilename()}</label></span>";

@@ -14,14 +14,14 @@ abstract class PlainUpload extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/PlainUpload.css";
+        $arr[] = LOCAL . "SPARK_LOCAL/css/PlainUpload.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/PlainUpload.js";
+        $arr[] = LOCAL . "SPARK_LOCAL/js/PlainUpload.js";
         return $arr;
     }
 

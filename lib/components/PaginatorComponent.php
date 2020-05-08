@@ -19,7 +19,7 @@ abstract class PaginatorComponent extends Component
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/PaginatorComponent.css";
+        $arr[] = SPARK_LOCAL . "/css/PaginatorComponent.css";
         return $arr;
     }
 

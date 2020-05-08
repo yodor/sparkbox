@@ -53,7 +53,7 @@ class ActionRenderer extends Component implements IActionRenderer
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/ActionRenderer.css";
+        $arr[] = SPARK_LOCAL . "/css/ActionRenderer.css";
         return $arr;
     }
 

@@ -54,7 +54,7 @@ MCETextArea.prototype.attachWith = function (name) {
 
 
         // Location of TinyMCE script
-        script_url: SPARKFRONT + 'js/tiny_mce/tinymce.min.js',
+        script_url: SPARK_LOCAL + '/js/tiny_mce/tinymce.min.js',
 
         strict_loading_mode: true,
         theme: "modern",

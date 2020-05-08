@@ -35,15 +35,15 @@ abstract class SessionUpload extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SITE_ROOT . "sparkfront/css/SessionUpload.css";
+        $arr[] = SPARK_LOCAL . "/css/SessionUpload.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SITE_ROOT . "sparkfront/js/jqplugins/jquery.form.js";
-        $arr[] = SITE_ROOT . "sparkfront/js/SessionUpload.js";
+        $arr[] = SPARK_LOCAL . "/js/jqplugins/jquery.form.js";
+        $arr[] = SPARK_LOCAL . "/js/SessionUpload.js";
         return $arr;
     }
 
