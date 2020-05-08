@@ -294,31 +294,33 @@ class NestedSetBean extends DBTableBean
         $psel->fields = "";
         $psel->where = " parentID=$parentID  ";
         $psel->order_by = "  {$this->prkey} ASC , lft ASC ";
-        $sel = $sel->combineWith($psel);
 
-        $res = $db->query($sel->getSQL());
-        $num_rows = $db->fetchTotalRows();
+        $sel->combine($psel);
 
-        if ($num_rows) {
-            while ($row = $db->fetch($res)) {
-                $catID = (int)$row[$prkey];
-                $lft++;
-                $db->transaction();
+        $qry = new SQLQuery($sel);
+        $qry->setDB($db);
 
-                $usql = "UPDATE {$this->table} set lft=$lft, rgt=$cnt WHERE $prkey=$catID ";
+        $numRows = $qry->exec();
 
-                $db->query($usql);
-                $db->commit();
-                $cnt++;
-                $this->reconstructNestedSet($db, $lft, $cnt, $catID);
+        while ($row = $qry->next()) {
+            $catID = (int)$row[$prkey];
+            $lft++;
+            $db->transaction();
 
-                $db->transaction();
-                $db->query("UPDATE {$this->table} set rgt=$cnt WHERE $prkey=$catID");
-                $db->commit();
-                $lft = $cnt;
-                $cnt++;
-            }
+            $usql = "UPDATE {$this->table} set lft=$lft, rgt=$cnt WHERE $prkey=$catID ";
+
+            $db->query($usql);
+            $db->commit();
+            $cnt++;
+            $this->reconstructNestedSet($db, $lft, $cnt, $catID);
+
+            $db->transaction();
+            $db->query("UPDATE {$this->table} set rgt=$cnt WHERE $prkey=$catID");
+            $db->commit();
+            $lft = $cnt;
+            $cnt++;
         }
+
     }
 
     protected function getIDLeft($lft)

@@ -11,13 +11,6 @@ class MySQLiDriver extends DBDriver
     public function __construct(DBConnectionProperties $conn, $open_new = true, $need_persistent = false)
     {
 
-        // 		$retry = 0;
-        // 		$retry_max = 5;
-        // 		$ex = NULL;
-        // 		while ($retry < $retry_max) {
-        //
-        // 		  try {
-        // in php 5.3 and up only
         if ($need_persistent) {
             $this->connection = mysqli_connect("p:" . $conn->host, $conn->user, $conn->pass, $conn->database, $conn->port);
         }
@@ -39,30 +32,10 @@ class MySQLiDriver extends DBDriver
         mysqli_query($this->connection, "SET character_set_connection = 'utf8'");
         mysqli_query($this->connection, "SET character_set_client = 'utf8'");
 
-        // 	$vars = $conn->getVariables();
-        // 	foreach($vars as $dbvar=>$phpvar) {
-        // 	    global $$phpvar;
-        // 	    debug("Connection  @$dbvar = ".$$phpvar);
-        // 	    if (!mysql_query("SET @$dbvar = '".$$phpvar."';",$this->connection)) {
-        // 		debug("Unable to set @$dbvar variable to value: ".$$phpvar);
-        // 	    }
-        // 	    else {
-        // 		debug("@$dbvar variable is now set to value: ".$$phpvar);
-        // 	    }
-        // 	}
 
         MySQLiDriver::$conn_count++;
         $ex = NULL;
-        // 			  break;
-        // 		  }
-        // 		  catch (Exception $e) {
-        // 			  $retry++;
-        // 			  sleep(2);
-        // 			  $ex = $e;
-        // 		  }
-        /*
-                }
-                if ($ex) throw $ex;*/
+
 
     }
 
@@ -74,7 +47,6 @@ class MySQLiDriver extends DBDriver
     public function shutdown()
     {
         if (is_resource($this->connection)) mysqli_close($this->connection);
-
     }
 
     public function dateTime($add_days = 0, $interval_type = " DAY ")
@@ -91,34 +63,40 @@ class MySQLiDriver extends DBDriver
         return $row["datetime"];
     }
 
-    public function query($str)
+    public function query(string $str)
     {
         $res = mysqli_query($this->connection, $str);
-        //mysqli_result::fetch_fields
+
         if (!$res) $this->error = mysqli_error($this->connection);
 
         return $res;
     }
 
-    public function numRows($res)
+    public function numRows($res) : int
     {
         return mysqli_num_rows($res);
     }
 
-    public function numFields($res)
+    public function numFields($res) : int
     {
         return mysqli_num_fields($res);
     }
 
-    public function fieldName($res, $pos)
+    public function fieldName($res, int $pos)
     {
+
         $arr = mysqli_fetch_fields($res);
         return $arr[$pos];
     }
 
+    protected function assert_resource(&$res)
+    {
+        if (!($res instanceof mysqli_result)) throw new Exception("No valid mysqli_resource passed");
+    }
+
     public function fetch($res)
     {
-        if (!($res instanceof mysqli_result)) throw new Exception("No valid result  passed");
+        $this->assert_resource($res);
 
         $ret = mysqli_fetch_assoc($res) or $this->error = mysqli_error($this->connection);
 
@@ -127,7 +105,7 @@ class MySQLiDriver extends DBDriver
 
     public function fetchArray($res)
     {
-        if (!($res instanceof mysqli_result)) throw new Exception("No valid result  passed");
+        $this->assert_resource($res);
 
         $ret = mysqli_fetch_array($res) or $this->error = mysqli_error($this->connection);
 
@@ -136,7 +114,7 @@ class MySQLiDriver extends DBDriver
 
     public function fetchRow($res)
     {
-        if (!($res instanceof mysqli_result)) throw new Exception("No valid result  passed");
+        $this->assert_resource($res);
 
         $ret = mysqli_fetch_row($res) or $this->error = mysqli_error($this->connection);
 
@@ -150,32 +128,31 @@ class MySQLiDriver extends DBDriver
         }
     }
 
-    public function lastID()
+    public function lastID() : int
     {
         return mysqli_insert_id($this->connection);
     }
 
     public function commit()
     {
-        $ret = mysqli_query($this->connection, "COMMIT") or $this->error = mysqli_error($this->connection);
-        return $ret;
+        $res = mysqli_query($this->connection, "COMMIT") or $this->error = mysqli_error($this->connection);
+        return $res;
     }
 
     public function rollback()
     {
-        $ret = mysqli_query($this->connection, "ROLLBACK") or $this->error = mysqli_error($this->connection);
-        return $ret;
+        $res = mysqli_query($this->connection, "ROLLBACK") or $this->error = mysqli_error($this->connection);
+        return $res;
     }
 
     public function transaction()
     {
-
-        $ret = mysqli_query($this->connection, "START TRANSACTION") or $this->error = mysqli_error($this->connection);
-        $ret = mysqli_query($this->connection, "BEGIN") or $this->error = mysqli_error($this->connection);
-        return $ret;
+        $res = mysqli_query($this->connection, "START TRANSACTION") or $this->error = mysqli_error($this->connection);
+        $res = mysqli_query($this->connection, "BEGIN") or $this->error = mysqli_error($this->connection);
+        return $res;
     }
 
-    public function escapeString($data)
+    public function escape(string $data)
     {
         return mysqli_real_escape_string($this->connection, $data);
     }
@@ -185,7 +162,7 @@ class MySQLiDriver extends DBDriver
         return $this->query("show fields from $table");
     }
 
-    public function fieldType($table, $field_name)
+    public function fieldType(string $table, string $field_name)
     {
         $found = false;
         $ret = false;
@@ -203,16 +180,9 @@ class MySQLiDriver extends DBDriver
     }
 
     //enum('T1','TIR','CIM')
-    public static function enum2array($enum_str)
-    {
-        $enum_str = str_replace("enum(", "", $enum_str);
-        $enum_str = str_replace(")", "", $enum_str);
-        $enum_str = str_replace("'", "", $enum_str);
 
-        return explode(",", $enum_str);
-    }
 
-    public function tableExists($table)
+    public function tableExists(string $table)
     {
         $ret = $this->query("show tables like '$table'");
         $num = $this->numRows($ret);
@@ -223,7 +193,7 @@ class MySQLiDriver extends DBDriver
     public function fetchTotalRows()
     {
         $ret = $this->query("SELECT FOUND_ROWS() as total");
-        if (!$ret) throw new Exception("Unable to fecth found_rows(): " . $this->getError());
+        if (!$ret) throw new Exception("Unable to fetch found_rows(): " . $this->getError());
         $row = $this->fetch($ret);
         return $row["total"];
     }

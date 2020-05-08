@@ -33,7 +33,7 @@ abstract class DBTableBean
      */
     protected $sqlSelect = null;
 
-    public function __construct($table_name, $dbdriver = NULL)
+    public function __construct(string $table_name, DBDriver $dbdriver = NULL)
     {
         $this->table = $table_name;
 
@@ -195,8 +195,8 @@ abstract class DBTableBean
 
     public function queryField(string $field, string $value, int $limit = 0, string $sign = " = ") : SQLQuery
     {
-        $field = $this->db->escapeString($field);
-        $value = $this->db->escapeString($value);
+        $field = $this->db->escape($field);
+        $value = $this->db->escape($value);
 
         $qry = $this->query();
         $qry->select->where = " $field $sign '$value' ";
@@ -248,7 +248,7 @@ abstract class DBTableBean
 
         if (!$db) $db = $this->db;
 
-        $refkey = $db->escapeString($refkey);
+        $refkey = $db->escape($refkey);
         $refid = (int)$refid;
 
         $select = clone $this->select();
@@ -330,7 +330,7 @@ abstract class DBTableBean
         $id = (int)$id;
 
 
-        $field = $this->db->escapeString($field);
+        $field = $this->db->escape($field);
 
         try {
 
@@ -359,7 +359,7 @@ abstract class DBTableBean
     {
         $qry = $this->queryField($this->prkey, $id, 1);
         foreach ($field_names as $idx=>$value) {
-            $field_names[$idx] = "`".$this->db->escapeString($value)."`";
+            $field_names[$idx] = "`".$this->db->escape($value)."`";
         }
         $qry->select->fields = " {$this->prkey}, ".implode(",",$field_names);
         $qry->exec();
@@ -371,7 +371,7 @@ abstract class DBTableBean
 
     public function fieldValue(int $id, string $field) : ?string
     {
-        $field = $this->db->escapeString($field);
+        $field = $this->db->escape($field);
 
         $qry = $this->queryField($this->prkey, $id, 1);
         $qry->select->fields = " {$this->prkey}, `$field` ";

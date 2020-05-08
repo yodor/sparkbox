@@ -88,7 +88,7 @@ CREATE TABLE `translation_phrases` (
         else {
             $db = $this->db;
 
-            $trow["translated"] = $db->escapeString($translated);
+            $trow["translated"] = $db->escape($translated);
             $trow["textID"] = (int)$textID;
             $trow["langID"] = (int)$langID;
 

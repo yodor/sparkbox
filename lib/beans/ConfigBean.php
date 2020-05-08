@@ -40,35 +40,34 @@ class ConfigBean extends DBTableBean
         $this->section = $section;
     }
 
-    public function getValue($key, $def_value = "")
+    public function getValue(string $key, $def_value = "")
     {
 
-        $db = DBDriver::Get();
+        $key = DBDriver::Get()->escape($key);
 
-        $s_key = $db->escapeString($key);
+        $sel = new SQLSelect();
+        $sel->fields = "config_val";
+        $sel->from = $this->table;
+        $sel->where = "config_key='$key'";
+        $sel->limit = " 1 ";
 
-        $sql = "SELECT config_val FROM {$this->table} WHERE config_key='$s_key'";
         if ($this->section) {
-            $sql .= " AND section='{$this->section}' ";
+            $sel->where.= " AND section='{$this->section}' ";
         }
-        $res = $db->query($sql);
-        if (!$res) throw new Exception("Config::getValue SELECT error: " . $db->getError());
 
-        $num_rows = $db->fetchTotalRows();
+        $qry = new SQLQuery($sel);
 
         $result = $def_value;
 
-        while ($row = $db->fetch($res)) {
-            $val = $row["config_val"];
-            $serial = @unserialize($val);
+        if ($qry->exec() && $row = $qry->next()) {
+            $result = $row["config_val"];
+            $serial = @unserialize($result);
             if ($serial instanceof StorageObject) {
-                $val = $serial;
+                $result = $serial;
             }
-            if ($num_rows < 2) return $val;
-
-            $result = $val;
-
         }
+
+
         return $result;
     }
 
@@ -77,7 +76,7 @@ class ConfigBean extends DBTableBean
 
         $db = DBDriver::Get();
 
-        $s_key = $db->escapeString($key);
+        $s_key = $db->escape($key);
 
         $sql = "DELETE FROM {$this->table} WHERE config_key='$s_key' ";
         if ($this->section) {
@@ -101,7 +100,7 @@ class ConfigBean extends DBTableBean
 
         $db = DBDriver::Get();
 
-        $s_key = $db->escapeString($key);
+        $s_key = $db->escape($key);
 
         $delete_sql = "DELETE FROM {$this->table} WHERE config_key='$s_key' ";
         if ($this->section) {
@@ -146,7 +145,7 @@ class ConfigBean extends DBTableBean
 
                 }
                 else {
-                    $row["config_val"] = $db->escapeString($value);
+                    $row["config_val"] = $db->escape($value);
                 }
 
                 $cfgID = $this->insert($row, $db);

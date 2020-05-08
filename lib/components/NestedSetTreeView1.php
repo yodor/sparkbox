@@ -152,7 +152,7 @@ class NestedSetTreeView extends Component
 
         foreach ($this->combining_filters as $name => $value) {
             if (isset($_GET[$name])) {
-                $filter_value = DBDriver::Get()->escapeString($_GET[$name]);
+                $filter_value = DBDriver::Get()->escape($_GET[$name]);
 
                 if ($filter_value) {
                     if ($value instanceof IQueryFilter) {
@@ -222,7 +222,7 @@ class NestedSetTreeView extends Component
 
             }
             else if (isset($_GET[$filter_key])) {
-                $this->filter_values[$filter_key] = DBDriver::Get()->escapeString($_GET[$filter_key]);
+                $this->filter_values[$filter_key] = DBDriver::Get()->escape($_GET[$filter_key]);
             }
         }
 

@@ -233,11 +233,11 @@ class Paginator
         }
 
         if (isset($_GET["orderby"])) {
-            $order_field = DBDriver::Get()->escapeString($_GET["orderby"]);
+            $order_field = DBDriver::Get()->escape($_GET["orderby"]);
             $this->order_field = $order_field;
         }
         if (isset($_GET["orderdir"])) {
-            $order_direction = DBDriver::Get()->escapeString($_GET["orderdir"]);
+            $order_direction = DBDriver::Get()->escape($_GET["orderdir"]);
         }
 
         if ($order_field) {

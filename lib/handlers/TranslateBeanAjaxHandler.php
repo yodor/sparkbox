@@ -36,7 +36,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
         $this->beanID = (int)$_GET["beanID"];
 
         if (!isset($_GET["field_name"])) throw new Exception("field_name not passed");
-        $this->field_name = DBDriver::Get()->escapeString($_GET["field_name"]);
+        $this->field_name = DBDriver::Get()->escape($_GET["field_name"]);
 
 
         if (!isset($_GET["bean_class"])) throw new Exception("bean_class not passed");
@@ -69,7 +69,7 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
             $btID = $trow[$g_bt->key()];
         }
 
-        $trow["translated"] = DBDriver::Get()->escapeString(trim($_REQUEST["translation"]));
+        $trow["translated"] = DBDriver::Get()->escape(trim($_REQUEST["translation"]));
         if (strlen($trow["translated"]) < 1) throw new Exception(tr("Input a text to be used as translation"));
 
         $trow["langID"] = $this->langID;

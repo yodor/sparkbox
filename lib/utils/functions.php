@@ -205,7 +205,7 @@ function keywordFilterSQL($keywords_text, $search_fields, $inner_glue = " OR ", 
     $keywords = preg_split($split_string, $keywords_text);
     $kwsearch = array();
     foreach ($keywords as $key => $word) {
-        $word = $db->escapeString(trim($word));
+        $word = $db->escape(trim($word));
         if (!is_array($search_fields)) {
             $search_fields = array($search_fields);
         }
@@ -363,7 +363,7 @@ function safeVal($val, $accepted_tags = NULL)
 
     $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
-    return DBDriver::Get()->escapeString($ret);
+    return DBDriver::Get()->escape($ret);
 
 }
 

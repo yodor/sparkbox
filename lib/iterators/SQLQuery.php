@@ -55,6 +55,8 @@ class SQLQuery implements IDataIterator
 
     public function next()
     {
+        if (!$this->res) throw new Exception("Not executed yet");
+        
         $ret = $this->db->fetch($this->res);
         if (!$ret) $this->db->free($this->res);
         return $ret;

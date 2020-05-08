@@ -56,7 +56,7 @@ class ToggleFieldRequestHandler extends RequestHandler
         $db = DBDriver::Get();
 
         try {
-            $field_name = $db->escapeString($this->field_name);
+            $field_name = $db->escape($this->field_name);
 
             $update_row[$field_name] = $this->status;
 

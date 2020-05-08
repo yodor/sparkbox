@@ -58,10 +58,11 @@ class CacheFile
         $ret = array();
 
         $ret[CacheFile::KEY_DATA] = "";
+        $ret[CacheFile::KEY_SIZE] = -1;
 
         $handle = fopen($this->fileName, 'r');
         flock($handle, LOCK_SH);
-        $ret[CacheFile::KEY_DATA] = file_get_contents($this->fileName);
+        $ret[CacheFile::KEY_DATA] = fread($handle, filesize($this->fileName));
         flock($handle, LOCK_UN);
         fclose($handle);
 

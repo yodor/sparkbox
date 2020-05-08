@@ -187,7 +187,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 $prod_row["gnID"] = (int)$genderID;
             }
             else {
-                $prod_row[$field] = $this->db->escapeString($value);
+                $prod_row[$field] = $this->db->escape($value);
             }
         }
 
@@ -253,7 +253,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                     $cavrow = array();
                     $cavrow["prodID"] = $prodID;
                     $cavrow[$ca->key()] = (int)$caID;
-                    $cavrow["value"] = $this->db->escapeString($value);
+                    $cavrow["value"] = $this->db->escape($value);
 
                     $cavID = $cav->insert($cavrow, $this->db);
 
@@ -277,7 +277,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
             if (strlen($value) < 1) continue;
             $pfbrow = array();
             $pfbrow["prodID"] = $prodID;
-            $pfbrow["feature"] = $this->db->escapeString($value);
+            $pfbrow["feature"] = $this->db->escape($value);
             $pfbID = $this->pfb->insert($pfbrow, $this->db);
 
             if ($pfbID < 1) $this->notices[$this->currentRow] .= "!Unable to insert product feature '$value'. DBError: " . $this->db->getError();

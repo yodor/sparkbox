@@ -2,15 +2,13 @@
 
 class DBConnectionProperties
 {
-    public $driver = "MySQL";
+    public $driver = "MySQLi";
     public $database = "";
     public $user = "";
     public $pass = "";
     public $host = "";
     public $port = "";
     protected $variables = array();
-
-    public $is_pdo = false;
 
     protected $connectionName = "default";
 

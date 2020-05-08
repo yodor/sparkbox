@@ -51,14 +51,13 @@ class AdminUserInputForm extends InputForm
 
         $enum = new DBEnumIterator("admin_users", "access_level");
 
-        $rend = new SelectField();
+        $rend = new SelectField($field);
         $rend->na_str = "";
         $rend->na_val = false;
-        $rend->list_key = ArrayDataIterator::KEY_ID;
+        $rend->list_key = ArrayDataIterator::KEY_VALUE;
         $rend->list_label = ArrayDataIterator::KEY_VALUE;
         $rend->setIterator($enum);
         $rend->setAttribute("onChange", "toggleRoles()");
-        $field->setRenderer($rend);
 
         $this->addInput($field);
 
@@ -66,11 +65,11 @@ class AdminUserInputForm extends InputForm
         $field = new DataInput("role", "Admin Roles", 0);
         $field->setSource(new AdminAccessBean());
 
-        $rend = new CheckField();
+        $rend = new CheckField($field);
         $rend->setIterator(new AdminRolesIterator());
         $rend->list_key = ArrayDataIterator::KEY_ID;
         $rend->list_label = ArrayDataIterator::KEY_VALUE;
-        $field->setRenderer($rend);
+
         // 	  $field->setValueTransactor(new AdminRolesTransactor());
 
         $this->addInput($field);

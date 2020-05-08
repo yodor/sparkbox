@@ -4,38 +4,65 @@ include_once("dbdriver/DBConnections.php");
 abstract class DBDriver
 {
 
-    public $PDO = false;
-
     protected $error = "";
 
     /**
      * @var DBDriver
      */
-    protected static $g_db = NULL;
+    protected static $driver = NULL;
 
-    public static function Get() : DBDriver
+    static public function Get(): DBDriver
     {
-        return static::$g_db;
+        return DBDriver::$driver;
     }
 
-    public static function Set(DBDriver $connection)
+    static public function Set(DBDriver $connection)
     {
-        self::$g_db = $connection;
+        DBDriver::$driver = $connection;
     }
 
-    public abstract function __construct(DBConnectionProperties $conn, $open_new = true);
+    //return default connection to database
+    static public function Factory($open_new = TRUE, $use_persistent = FALSE, $conn_name = "default")
+    {
+
+        //DBConnectionProperties
+        $conn_props = DBConnections::getConnection($conn_name);
+
+        $currDriver = FALSE;
+        switch ($conn_props->driver) {
+            case "MySQLi":
+                include_once("dbdriver/MySQLiDriver.php");
+                $currDriver = new MySQLiDriver($conn_props, $open_new, $use_persistent);
+                break;
+
+
+        }
+        if ($currDriver instanceof DBDriver) return $currDriver;
+        throw new Exception("Unsupoorted DBDriver: ".$conn_props->driver);
+    }
+
+    public static function Enum2Array($enum_str)
+    {
+        $enum_str = str_replace("enum(", "", $enum_str);
+        $enum_str = str_replace(")", "", $enum_str);
+        $enum_str = str_replace("'", "", $enum_str);
+
+        return explode(",", $enum_str);
+    }
+
+    abstract function __construct(DBConnectionProperties $conn, $open_new = TRUE, $need_persistent = FALSE);
 
     public function __destruct()
     {
         $this->shutdown();
     }
 
-    function close()
+    public function getError()
     {
+        return $this->error;
     }
 
-    abstract public function query($str);
-
+    abstract public function query(string $str);
 
     abstract public function fetch($str);
 
@@ -45,47 +72,7 @@ abstract class DBDriver
 
     abstract public function dateTime($add_days = 0, $interval_type = " DAY ");
 
-    //return default connection to database
-    public static function Factory($open_new = true, $use_persistent = false, $conn_name = "default")
-    {
-
-        //DBConnectionProperties
-        $conn_props = DBConnections::getConnection($conn_name);
-
-        $currDriver = false;
-        switch ($conn_props->driver) {
-            case "MySQLi":
-                include_once("dbdriver/MySQLiDriver.php");
-                $currDriver = new MySQLiDriver($conn_props, $open_new, $use_persistent);
-                break;
-
-            case "MySQL":
-                include_once("dbdriver/MySQLDriver.php");
-                $currDriver = new MySQLDriver($conn_props, $open_new, $use_persistent);
-                break;
-            case "PDOMySQL":
-                include_once("dbdriver/PDOMySQLDriver.php");
-                $currDriver = new PDOMySQLDriver($conn_props, $open_new, $use_persistent);
-                break;
-
-        }
-        return $currDriver;
-
-    }
-
-    public static function create($open_new = true, $use_persistent = false, $conn_name = "default")
-    {
-        $g_db = DBDriver::Factory($open_new, $use_persistent, $conn_name);
-        DBDriver::Set($g_db);
-    }
-
-    public function getError()
-    {
-        return $this->error;
-    }
-
-    abstract public function lastID();
-
+    abstract public function lastID() : int;
 
     abstract public function commit();
 
@@ -93,19 +80,19 @@ abstract class DBDriver
 
     abstract public function transaction();
 
-    abstract public function numRows($res);
+    abstract public function numRows($res) : int;
 
-    abstract public function numFields($res);
+    abstract public function numFields($res) : int;
 
-    abstract public function fieldName($res, $pos);
+    abstract public function fieldName($res, int $pos);
 
-    abstract public function escapeString($data);
+    abstract public function escape(string $data);
 
-    abstract protected function shutdown();
+    abstract public function shutdown();
 
-    abstract protected function queryFields($table);
+    abstract public function queryFields(string $table);
 
-    abstract protected function tableExists($table);
+    abstract public function tableExists(string $table);
 
 }
 

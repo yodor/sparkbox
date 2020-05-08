@@ -82,6 +82,9 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
     {
         $this->items = array();
 
+        if (!$this->blob_field) {
+            $this->blob_field = $this->column->getFieldName();
+        }
         $source_fields = $this->bean->fields();
 
         $qry = $this->bean->query();
@@ -146,10 +149,8 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             $item = new StorageItem();
             $item->id = $photoID;
             $item->className = get_class($this->bean);
+            $item->field = $this->blob_field;
 
-            if ($this->blob_field) {
-                $item->field = $this->blob_field;
-            }
             $this->items[] = $item;
         }
     }

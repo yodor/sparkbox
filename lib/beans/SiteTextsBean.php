@@ -26,7 +26,7 @@ CREATE TABLE `site_texts` (
 
         $str = html_entity_decode(stripslashes(trim($str)));
 
-        $strdb = $this->db->escapeString($str);
+        $strdb = $this->db->escape($str);
 
         $qry = $this->query();
         $qry->select->where = " hash_value = md5('$strdb') ";

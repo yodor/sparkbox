@@ -66,7 +66,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $ls = new DataInput("langID", "Translation Language", 1);
 
-        $renderer = new SelectField();
+        $renderer = new SelectField($ls);
 
         include_once("beans/LanguagesBean.php");
         $lb = new LanguagesBean();
@@ -77,8 +77,6 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $renderer->list_key = "langID";
         $renderer->list_label = "language";
 
-
-        $ls->setRenderer($renderer);
 
         include_once("components/InputComponent.php");
         $cmp = new InputComponent($ls);

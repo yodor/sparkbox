@@ -5,6 +5,9 @@ include_once("actions/Action.php");
 
 class ActionRenderer extends Component implements IActionRenderer
 {
+    /**
+     * @var Action|null
+     */
     protected $action = NULL;
 
     /**
@@ -141,7 +144,7 @@ class ActionRenderer extends Component implements IActionRenderer
         }
     }
 
-    public function renderActions($actions)
+    public function renderActions(array $actions)
     {
         foreach ($actions as $idx => $item) {
             if ($item instanceof MenuItem) {

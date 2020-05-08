@@ -25,7 +25,7 @@ CREATE TABLE `languages` (
 
         $db = $this->db;
 
-        $lng_name = $db->escapeString($lng_name);
+        $lng_name = $db->escape($lng_name);
 
         $q = "SELECT langID from {$this->table} WHERE language='$lng_name'";
         $res = $db->query($q);

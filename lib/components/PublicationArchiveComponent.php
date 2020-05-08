@@ -52,7 +52,7 @@ class PublicationArchiveComponent extends Component
 
         if (isset($_GET["year"]) && isset($_GET["month"])) {
             $this->archive_year = (int)$_GET["year"];
-            $this->archive_month = DBDriver::Get()->escapeString($_GET["month"]);
+            $this->archive_month = DBDriver::Get()->escape($_GET["month"]);
             $this->have_selection = true;
         }
         else if (isset($_GET[$this->bean->key()])) {

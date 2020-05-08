@@ -156,7 +156,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                     }
                     else if ($input->transact_mode == DataInput::TRANSACT_OBJECT) {
                         debug("Transact Mode: TRANSACT_OBJECT");
-                        $dbrow[$field_name] = $db->escapeString(serialize($value));
+                        $dbrow[$field_name] = $db->escape(serialize($value));
                         debug("StorageObject UID: $uid stored as serialized value in the data source row ...");
                     }
                     else {

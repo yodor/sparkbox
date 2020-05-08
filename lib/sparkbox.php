@@ -147,53 +147,34 @@ if (!defined("SKIP_SESSION")) {
 //define SKIP_DB to skip creating a connection to DB
 if (DB_ENABLED && !defined("SKIP_DB")) {
 
+    debug("Setting default DBDriver");
+
     include_once("dbdriver/DBConnections.php");
     include_once("config/dbconfig.php");
     include_once("dbdriver/DBDriver.php");
 
-    //TODO:check persistent connections with mysql. Introduced in php 5.3
-    $create_regular = false;
 
-    if (!defined("PERSISTENT_DB")) {
-        $create_regular = true;
+    try {
+
+        $driver = DBDriver::Factory(true, true, "default");
+        //set default driver
+        DBDriver::Set($driver);
     }
-    else {
-        if (!DBConnections::getConnection("default")->is_pdo || !startsWith(phpversion(), "5.3")) {
-            $create_regular = true;
-        }
-        else {
-            try {
-                DBDriver::create(true, true, "default");
-            }
-            catch (Exception $e) {
+    catch (Exception $e) {
 
-                Session::SetAlert("Unable to open persistent connection to DB: " . $e->getMessage());
-
-            }
-        }
-
+        Session::SetAlert("Unable to open persistent connection to DB: " . $e->getMessage());
     }
 
-    if ($create_regular) {
-        try {
-
-            DBDriver::create();
-
-        }
-        catch (Exception $e) {
-            Session::SetAlert("Unable to open connection to DB: " . $e->getMessage());
-        }
-    }
-
-
-    //   $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');
-    //   $mrow = DBDriver::get()->fetch($g_res);
-    //   DBDriver::get()->free($g_res);
-
-    //   echo $mrow["packet_size"];//33554432
-
-    $defines->set("MAX_PACKET_SIZE", "33554432");
-    $defines->export();
+//
+//
+//    //   $g_res = DBDriver::get()->query('SELECT @@max_allowed_packet as packet_size');
+//    //   $mrow = DBDriver::get()->fetch($g_res);
+//    //   DBDriver::get()->free($g_res);
+//
+//    //   echo $mrow["packet_size"];//33554432
+//
+//    $defines->set("MAX_PACKET_SIZE", "33554432");
+//    $defines->export();
 }
 
 

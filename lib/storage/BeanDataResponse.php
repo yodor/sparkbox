@@ -22,7 +22,7 @@ abstract class BeanDataResponse extends HTTPResponse
     public $skip_cache = FALSE;
 
     /**
-     * This flag is set when request URI contains specific key name to return from the result row.
+     * This flag is set when request URI contains specific field name to return from the result row.
      * Custom key name from the result row is allowed only if contents are of type StorageObject
      * To limit arbitrary data access
      * @var bool
@@ -31,6 +31,8 @@ abstract class BeanDataResponse extends HTTPResponse
 
     public function __construct(int $id, string $className)
     {
+        parent::__construct();
+
         $this->id = $id;
         $this->className = $className;
 
@@ -113,7 +115,7 @@ abstract class BeanDataResponse extends HTTPResponse
             //replace result with storageobject data
             $this->row = array();
             //image resizer expects row["photo"]
-
+            $object->setDataKey($this->field);
             $object->deconstruct($this->row, FALSE);
 
         }
@@ -153,14 +155,14 @@ abstract class BeanDataResponse extends HTTPResponse
             $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["date_updated"]));
         }
 
-        debug("Using last-modified: $last_modified");
+        debug("last-modified: $last_modified");
 
         //always keep one year ahead from request time
         $expires = gmdate(BeanDataResponse::DATE_FORMAT, strtotime("+1 year"));
-        debug("Using expires: $expires");
+        debug("expires: $expires");
 
         $etag = md5(implode("|", $this->getETagParts()) . "-" . $last_modified);
-        debug("Using ETag: $etag");
+        debug("ETag: $etag");
 
         $this->setHeader("ETag", $etag);
 
@@ -253,7 +255,7 @@ abstract class BeanDataResponse extends HTTPResponse
 
         $this->processData();
 
-        $cacheFile->store($this->getData());
+        $cacheFile->store($this->data);
 
         parent::send(TRUE);
     }

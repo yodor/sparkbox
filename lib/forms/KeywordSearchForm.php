@@ -34,10 +34,10 @@ class KeywordSearchForm extends InputForm
         return $this->ts_fields;
     }
 
-    protected function searchFilterForKey(string $key, string $val)
+    protected function searchFilterForKey(string $key, string $val) : string
     {
         $db = DBDriver::Get();
-        $val = $db->escapeString($val);
+        $val = $db->escape($val);
         if (strcmp($key, "keyword") == 0) {
             $allwords = explode(" ", $val);
 

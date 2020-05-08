@@ -188,30 +188,9 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
             $authClass = $image_row["auth_context"];
             $ownerID = (int)$image_row["ownerID"];
 
-            @include_once("auth/$authClass.php");
-            @include_once("class/auth/$authClass.php");
-            $class_loaded = class_exists($authClass, false);
-            if (!$class_loaded) throw new Exception(tr("Unable to load the Authenticator class"));
+            $context = Authenticator::AuthorizeResource($image_row["auth_context"], NULL, false);
 
-            $auth = new $authClass();
-
-            if ($auth instanceof Authenticator) {
-
-                $context = $auth->authorize();
-                if ($context instanceof AuthContext) {
-
-                    if ($ownerID > 0 && $context->getID() != $ownerID) throw new Exception(tr("Authorization failed"));
-
-                }
-                else {
-                    throw new Exception(tr("Not authorized"));
-                }
-
-            }
-            else {
-                throw new Exception(tr("Incorrect Authenticator object"));
-            }
-
+            if ($ownerID > 0 && $context->getID() != $ownerID) throw new Exception(tr("Authorization failed"));
 
         }
 

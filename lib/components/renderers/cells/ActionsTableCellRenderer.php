@@ -6,11 +6,21 @@ include_once("components/renderers/IActionsCollection.php");
 
 class ActionsTableCellRenderer extends TableCellRenderer implements IActionsCollection
 {
+    /**
+     * @var array
+     */
     protected $actions;
 
-    protected $data = NULL;
+    /**
+     * @var ActionRenderer
+     */
+    protected $renderer;
 
-    protected $renderer = NULL;
+    /**
+     * Actions to render after eval'ing the checkCode
+     * @var null
+     */
+    protected $render_actions = NULL;
 
     public function __construct()
     {
@@ -64,19 +74,27 @@ class ActionsTableCellRenderer extends TableCellRenderer implements IActionsColl
     {
         parent::setData($row);
         $this->renderer->setData($row);
+
+        $this->render_actions = array();
+
+        $actions = array_keys($this->actions);
+        foreach ($actions as $pos => $title) {
+            $action = $this->getAction($title);
+            if (eval($action->getCheckCode())) {
+                $this->render_actions[] = $action;
+            }
+        }
     }
 
     protected function renderImpl()
     {
         echo "<div class='actions_list'>";
 
-        $actions = array_keys($this->actions);
-        foreach ($actions as $pos => $title) {
-            $action = $this->getAction($title);
-            if (eval($action->getCheckCode())) {
-                $this->renderer->setAction($action);
-                $this->renderer->render();
-            }
+        foreach ($this->render_actions as $pos => $action) {
+
+            $this->renderer->setAction($action);
+            $this->renderer->render();
+
         }
 
         echo "</div>";

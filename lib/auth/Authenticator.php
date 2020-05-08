@@ -151,7 +151,7 @@ abstract class Authenticator
 
         $db = DBDriver::Get();
 
-        $username = $db->escapeString($username);
+        $username = $db->escape($username);
 
         $qry = $this->bean->queryField("email", $username, 1);
 

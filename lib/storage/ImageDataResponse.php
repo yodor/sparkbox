@@ -45,6 +45,8 @@ class ImageDataResponse extends BeanDataResponse
 
         $this->etag_parts[] = $this->scaler->grayFilter;
 
+        debug("Using field: {$this->field}");
+
     }
 
     protected function processData()

@@ -146,7 +146,7 @@ class NestedSetTreeView extends Component implements ISelectSource
                 //
             }
             else if (isset($_GET[$filter_key])) {
-                $this->filter_values[$filter_key] = DBDriver::Get()->escapeString($_GET[$filter_key]);
+                $this->filter_values[$filter_key] = DBDriver::Get()->escape($_GET[$filter_key]);
             }
         }
 

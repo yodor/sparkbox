@@ -9,7 +9,7 @@ class DBEnumIterator extends ArrayDataIterator
 
         $ret = $db->fieldType($table_name, $table_field);
 
-        $ret = $db->enum2array($ret);
+        $ret = $db->Enum2Array($ret);
 
         parent::__construct($ret);
     }

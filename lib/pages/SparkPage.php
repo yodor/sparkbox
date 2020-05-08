@@ -340,13 +340,21 @@ class SparkPage extends HTMLPage
 
         foreach ($this->head_components as $idx => $cmp) {
             $css_files = $cmp->requiredStyle();
+            if (!is_array($css_files)) {
+                echo $css_files;
+            }
             foreach ($css_files as $key => $url) {
                 $this->addCSS($url, get_class($cmp), true);
             }
             $js_files = $cmp->requiredScript();
-            foreach ($js_files as $key => $url) {
-                //no prepend here
-                $this->addJS($url, get_class($cmp), false);
+            if (!is_array($js_files)) {
+                echo $js_files;
+            }
+            else {
+                foreach ($js_files as $key => $url) {
+                    //no prepend here
+                    $this->addJS($url, get_class($cmp), FALSE);
+                }
             }
         }
 

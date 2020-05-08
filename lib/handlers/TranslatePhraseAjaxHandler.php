@@ -36,7 +36,7 @@ class TranslatePhraseAjaxHandler extends JSONRequestHandler
         global $g_tr;
         $trrow = array();
 
-        $trrow["translated"] = DBDriver::Get()->escapeString(trim($_REQUEST["translation"]));
+        $trrow["translated"] = DBDriver::Get()->escape(trim($_REQUEST["translation"]));
         if (strlen($trrow["translated"]) < 1) throw new Exception(tr("Input a text to be used as translation"));
 
         if ($this->trID < 1) {

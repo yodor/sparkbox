@@ -48,6 +48,10 @@ class InputForm implements IBeanEditor
      */
     protected $renderer = NULL;
 
+    /**
+     * InputForm constructor.
+     * @throws Exception
+     */
     public function __construct()
     {
         $this->bean = NULL;
