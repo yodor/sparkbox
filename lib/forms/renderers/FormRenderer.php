@@ -173,7 +173,6 @@ class FormRenderer extends Component
 
     public function renderInput(DataInput $input)
     {
-        if ($input->getLinkMode()) return;
 
         $callback_rendered = false;
         if ($this->render_field_callback) {

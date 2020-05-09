@@ -11,11 +11,14 @@ abstract class InputField extends Component implements IErrorRenderer
 {
 
     /**
+     * @var DataIteratorItem|null
+     */
+    protected $item = NULL;
+
+    /**
      * @var int
      */
     public $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
-
-    public static $value_na = "-";
 
     /**
      * @var DataInput
@@ -23,18 +26,14 @@ abstract class InputField extends Component implements IErrorRenderer
     protected $input;
 
     /**
-     * Implementing classes use this iterator to render their contents
+     * Render values iterator
+     * Implementing classes use this iterator to render their values using data from the iterator
      * (DataSourceField)
      * @var IDataIterator
      */
     protected $iterator = NULL;
 
-    public $list_key = FALSE;
-    public $list_label = FALSE;
-
     public $addon_content = "";
-
-    protected $freetext_value = FALSE;
 
     /**
      * Attributes to be used for the actual input element.
@@ -51,6 +50,7 @@ abstract class InputField extends Component implements IErrorRenderer
         $input->setRenderer($this);
 
         $this->attributes["field"] = $this->input->getName();
+
     }
 
     public function requiredStyle()
@@ -60,34 +60,36 @@ abstract class InputField extends Component implements IErrorRenderer
         return $arr;
     }
 
-    public function setInputAttribute($name, $value)
+    public function setInputAttribute(string $name, string $value)
     {
         $this->input_attributes[$name] = $value;
     }
 
-    public function getInputAttribute($name)
+    public function getInputAttribute(string $name) : string
     {
         return $this->input_attributes[$name];
     }
 
-    public function enableFreetextInput($src_id)
-    {
-        $this->freetext_value = $src_id;
-    }
-
-    public function getFreetextInput()
-    {
-        return $this->freetext_value;
-    }
-
-    public function setIterator(IDataIterator $query)
+    public function setItemIterator(IDataIterator $query)
     {
         $this->iterator = $query;
     }
 
-    public function getIterator(): IDataIterator
+    public function getItemIterator(): IDataIterator
     {
         return $this->iterator;
+    }
+
+    public function setItemRenderer(DataIteratorItem $item)
+    {
+        $this->item = $item;
+        $this->item->setValueKey($this->input->getName());
+        $this->item->setLabelKey($this->input->getName());
+    }
+
+    public function getItemRenderer() : ?DataIteratorItem
+    {
+        return $this->item;
     }
 
     public function setInput(DataInput $input)
@@ -166,6 +168,7 @@ abstract class InputField extends Component implements IErrorRenderer
         parent::finishRender();
 
     }
+
 
 }
 

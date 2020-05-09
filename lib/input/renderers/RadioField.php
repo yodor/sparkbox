@@ -2,7 +2,7 @@
 include_once("input/renderers/InputField.php");
 include_once("components/Component.php");
 
-class RadioItem extends DataSourceItem
+class RadioItem extends DataIteratorItem
 {
 
 
@@ -12,14 +12,14 @@ class RadioItem extends DataSourceItem
         //echo "<input type='hidden' name='{$this->name}' value=''>";
 
         echo "<input type='radio' value='{$this->value}' name='{$this->name}'  ";
-        if ($this->isSelected()) echo "CHECKED ";
+        if ($this->selected) echo "CHECKED ";
         echo ">";
         echo "<span>{$this->label}</span>";
     }
 
 }
 
-class RadioField extends DataSourceField
+class RadioField extends DataIteratorField
 {
 
     public function __construct(DataInput $input)

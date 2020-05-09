@@ -26,7 +26,7 @@ class PhraseTranslationDialog extends MessageDialog
         $btn->setAttribute("action", "Close");
         $this->appendButton($btn);
 
-        $h_translate = new TranslatePhraseAjaxHandler(HTMLPage::Instance());
+        $h_translate = new TranslatePhraseAjaxHandler();
         RequestController::addAjaxHandler($h_translate);
 
     }

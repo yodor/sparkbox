@@ -10,7 +10,7 @@ abstract class Component implements IRenderer, IHeadContents
     protected $render_index = -1;
 
     /**
-     * @var string CSS class name of this component
+     * @var string Additional CSS class name of this component
      */
     protected $className = "";
 

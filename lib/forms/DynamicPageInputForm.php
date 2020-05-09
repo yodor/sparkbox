@@ -5,7 +5,6 @@ include_once("iterators/ArrayDataIterator.php");
 class DynamicPageInputForm extends InputForm
 {
 
-
     public function __construct()
     {
         parent::__construct();
@@ -30,32 +29,29 @@ class DynamicPageInputForm extends InputForm
         new CheckField($field);
         $this->addInput($field);
 
-
         $field = new DataInput("render_class", "CSS Class Name", 0);
         //
         $sel = new ArrayDataIterator(array("Notices"));
         //
         $rend = new SelectField($field);
-        $rend->setIterator($sel);
+        $rend->setItemIterator($sel);
         //
-        $rend->na_str = "Normal";
-        $rend->na_val = "";
-        $rend->list_key = ArrayDataIterator::KEY_ID;
-        $rend->list_label = ArrayDataIterator::KEY_VALUE;
+        $rend->na_label = "Normal";
+        $rend->na_value = "";
+        $rend->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_ID);
+        $rend->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
         //
         //
 
         $this->addInput($field);
-
 
         $field = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 0);
         $field->transact_mode = DataInput::TRANSACT_OBJECT;
         $field->getProcessor()->max_slots = 1;
         $this->addInput($field);
 
-
-        $this->getInput("item_title")->enableTranslator(true);
-        $this->getInput("content")->enableTranslator(true);
+        $this->getInput("item_title")->enableTranslator(TRUE);
+        $this->getInput("content")->enableTranslator(TRUE);
     }
 
 }

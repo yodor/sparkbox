@@ -2,7 +2,6 @@
 include_once("panels/MessageDialog.php");
 include_once("handlers/TranslateBeanAjaxHandler.php");
 
-
 //IFinalRenderer delegate rendering to page control does not need to call render
 class BeanTranslationDialog extends MessageDialog implements IPageComponent
 {
@@ -52,13 +51,11 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     public function renderImpl()
     {
 
-
         echo tr("Original Text") . ":<BR>";
 
         echo "<textarea class='original_text' name='original_text' rows=10 readonly=true>";
         echo "</textarea>";
         echo "<br>";
-
 
         echo "<div class='AjaxProgress'></div>";
 
@@ -73,10 +70,9 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $lb->select()->where = " langID>1 ";
 
-        $renderer->setIterator($lb->query());
-        $renderer->list_key = "langID";
-        $renderer->list_label = "language";
-
+        $renderer->setItemIterator($lb->query());
+        $renderer->getItemRenderer()->setValueKey("langID");
+        $renderer->getItemRenderer()->setLabelKey("language");
 
         include_once("components/InputComponent.php");
         $cmp = new InputComponent($ls);
@@ -114,7 +110,6 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         <?php
 
     }
-
 
 }
 

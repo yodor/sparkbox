@@ -7,6 +7,9 @@ interface IDataIterator
 
     public function next();
 
+    /**
+     * @return string The primary key of this data iterator
+     */
     public function key() : string;
 
     /**

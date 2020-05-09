@@ -13,6 +13,8 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
     protected $field_name = NULL;
     protected $bean_class = NULL;
 
+    protected $table_name = NULL;
+
     public function __construct()
     {
         parent::__construct("bean_translator");
@@ -59,8 +61,8 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
         global $g_bt;
 
         $itr = $g_bt->query();
-        $itr->select()->where = " table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' ";
-        $itr->select()->limit = " 1 ";
+        $itr->select->where = " table_name='{$this->table_name}' AND field_name='{$this->field_name}' AND bean_id='{$this->beanID}' AND langID='{$this->langID}' ";
+        $itr->select->limit = " 1 ";
 
         $itr->exec();
 

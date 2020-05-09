@@ -25,13 +25,13 @@ class ArrayField extends InputField
     /**
      * @var InputField
      */
-    protected $item_renderer = NULL;
+    protected $element_renderer = NULL;
 
     public function __construct(InputField $field)
     {
         parent::__construct($field->getInput());
 
-        $this->item_renderer = $field;
+        $this->element_renderer = $field;
 
         $button_add = StyledButton::DefaultButton();
         $button_add->setType(StyledButton::TYPE_BUTTON);
@@ -43,14 +43,14 @@ class ArrayField extends InputField
 
     }
 
-    public function setItemRenderer(InputField $renderer)
+    public function setElementRenderer(InputField $renderer)
     {
-        $this->item_renderer = $renderer;
+        $this->element_renderer = $renderer;
     }
 
-    public function getItemRenderer() : ?InputField
+    public function getElementRenderer() : ?InputField
     {
-        return $this->item_renderer;
+        return $this->element_renderer;
     }
 
     public function requiredStyle()
@@ -141,7 +141,7 @@ class ArrayField extends InputField
 
         $fake_input = new DataInput("render_source", $this->input->getLabel(), $this->input->isRequired());
 
-        $renderer = clone $this->item_renderer;
+        $renderer = clone $this->element_renderer;
         $renderer->setInput($fake_input);
 
         $renderer->render();
@@ -175,7 +175,7 @@ class ArrayField extends InputField
 
                 echo "<div class='Element' pos='$idx'>";
 
-                $renderer = clone $this->item_renderer;
+                $renderer = clone $this->element_renderer;
                 $renderer->setInput($element_input);
 
                 $renderer->render();

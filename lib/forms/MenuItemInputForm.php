@@ -2,7 +2,6 @@
 include_once("forms/InputForm.php");
 include_once("beans/MenuItemsBean.php");
 
-
 class MenuItemInputForm extends InputForm
 {
 
@@ -14,7 +13,7 @@ class MenuItemInputForm extends InputForm
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "menu_title", "Menu Title", 1);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT,"link", "Link", 1);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "link", "Link", 1);
         $field->content_after = "<a class='ActionRenderer DynamicPageChooser' href='" . ADMIN_LOCAL . "content/pages/list.php?chooser=1'>" . tr("Choose Dynamic Page") . "</a>";
         $this->addInput($field);
 
@@ -23,15 +22,14 @@ class MenuItemInputForm extends InputForm
         $rend = new NestedSelectField($field);
 
         // $source = new MenuItemsBean();
-        $rend->na_str = "--- TOP ---";
-        $rend->na_val = "-1";
+        $rend->na_label = "--- TOP ---";
+        $rend->na_value = "-1";
 
-        $rend->setIterator(new SQLQuery($source->listTreeSelect(), "menuID", $source->getTableName()));
-        $rend->list_key = "menuID";
-        $rend->list_label = "menu_title";
+        $rend->setItemIterator(new SQLQuery($source->listTreeSelect(), "menuID", $source->getTableName()));
+        $rend->getItemRenderer()->setValueKey("menuID");
+        $rend->getItemRenderer()->setLabelKey("menu_title");
 
         $this->addInput($field);
-
 
     }
 
@@ -41,7 +39,7 @@ class MenuItemInputForm extends InputForm
         $this->load();
     }
 
-    public function loadPostData(array $arr) : void
+    public function loadPostData(array $arr): void
     {
         parent::loadPostData($arr);
         $this->load();
@@ -57,7 +55,6 @@ class MenuItemInputForm extends InputForm
             $page_id = (int)$_GET["page_id"];
 
             $link_url = LOCAL . "content/index.php?page_class=$page_class&page_id=$page_id";
-
 
             $this->getInput("link")->setValue($link_url);
         }

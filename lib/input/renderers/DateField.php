@@ -24,14 +24,14 @@ class DateField extends InputField
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = LOCAL . "SPARK_LOCAL/css/CalendarPopup.css";
+        $arr[] = SPARK_LOCAL . "/css/CalendarPopup.css";
         return $arr;
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = LOCAL . "SPARK_LOCAL/js/CalendarPopup.js";
+        $arr[] = SPARK_LOCAL . "/js/CalendarPopup.js";
         return $arr;
     }
 

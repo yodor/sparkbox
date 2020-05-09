@@ -225,8 +225,10 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 if (is_array($this->renderer_source_copy_fields) && count($this->renderer_source_copy_fields) > 0 && $value) {
                     debug("renderer_source_copy_fields ... ");
                     $renderer = $input->getRenderer();
-                    $qry = $renderer->getIterator();
-                    $qry->select->where = $renderer->list_key."='$value'";
+                    if (!$renderer instanceof DataIteratorField) throw new Exception("Renderer not instance of DataIteratorField");
+                    $qry = $renderer->getItemIterator();
+
+                    $qry->select->where = $renderer->getItemRenderer()->getValueKey()."='$value'";
                     $qry->select->fields = implode(", " , $this->renderer_source_copy_fields);
                     $qry->select->limit = " 1 ";
                     $num = $qry->exec();

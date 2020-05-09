@@ -35,9 +35,9 @@ class DataInput
 
     public $accepted_tags = "";
 
-    public $skip_transaction = false;
+    public $skip_transaction = FALSE;
 
-    public $skip_search_filter_processing = false;
+    public $skip_search_filter_processing = FALSE;
 
     /**
      * @var string
@@ -76,7 +76,7 @@ class DataInput
     //IInputValidator is responsible for validation of the $value data
     protected $validator = NULL;
     //IBeanPostProcessor
-    protected $input_processor = NULL;
+    protected $processor = NULL;
     //IDBFieldTransactor
     protected $value_transactor = NULL;
 
@@ -98,19 +98,16 @@ class DataInput
     /**
      * @var bool
      */
-    protected $translator_enabled = false;
-
-    protected $link_field = NULL;
-    protected $link_mode = false;
+    protected $translator_enabled = FALSE;
 
     //target data store
     public function setSource(DBTableBean $data_source)
     {
-        debug("InputField: ['" . $this->getName() . "'] Setting source: " . get_class($data_source));
+        debug("DataInput '" . $this->getName() . "' using source: " . get_class($data_source));
         $this->bean = $data_source;
     }
 
-    public function getSource() : ?DBTableBean
+    public function getSource(): ?DBTableBean
     {
         return $this->bean;
     }
@@ -120,11 +117,11 @@ class DataInput
         $this->value_transactor = $transactor;
     }
 
-    public function getValueTransactor() : ?IDBFieldTransactor
+    public function getValueTransactor(): ?IDBFieldTransactor
     {
 
         if ($this->value_transactor instanceof IDBFieldTransactor) return $this->value_transactor;
-        if ($this->input_processor instanceof IDBFieldTransactor) return $this->input_processor;
+        if ($this->processor instanceof IDBFieldTransactor) return $this->processor;
 
         return NULL;
     }
@@ -137,46 +134,26 @@ class DataInput
 
         $this->form = NULL;
         $this->user_data = NULL;
-        $this->translator_enabled = false;
-        $this->editable = true;
+        $this->translator_enabled = FALSE;
+        $this->editable = TRUE;
 
         $this->label_renderer = new InputLabel($this);
         $this->validator = new EmptyValueValidator();
-        $this->input_processor = new BeanPostProcessor();
+        $this->processor = new BeanPostProcessor();
 
         $this->accepted_tags = DefaultAcceptedTags();
 
         $this->bean = NULL;
     }
 
-    public function setLinkField(DataInput $field)
-    {
-        $this->link_field = $field;
-    }
-
-    public function getLinkField() : ?DataInput
-    {
-        return $this->link_field;
-    }
-
-    public function setLinkMode($mode)
-    {
-        $this->link_mode = $mode;
-    }
-
-    public function getLinkMode()
-    {
-        return $this->link_mode;
-    }
-
     public function setProcessor(IBeanPostProcessor $ip)
     {
-        $this->input_processor = $ip;
+        $this->processor = $ip;
     }
 
-    public function getProcessor() : IBeanPostProcessor
+    public function getProcessor(): IBeanPostProcessor
     {
-        return $this->input_processor;
+        return $this->processor;
     }
 
     public function setValidator(IInputValidator $validator)
@@ -184,7 +161,7 @@ class DataInput
         $this->validator = $validator;
     }
 
-    public function getValidator() : IInputValidator
+    public function getValidator(): IInputValidator
     {
         return $this->validator;
     }
@@ -197,7 +174,7 @@ class DataInput
     /**
      * @return InputField
      */
-    public function getRenderer() : InputField
+    public function getRenderer(): InputField
     {
         return $this->renderer;
     }
@@ -207,11 +184,10 @@ class DataInput
         $this->label_renderer = $label_renderer;
     }
 
-    public function getLabelRenderer() : InputLabel
+    public function getLabelRenderer(): InputLabel
     {
         return $this->label_renderer;
     }
-
 
     public function setUserData($data)
     {
@@ -223,7 +199,7 @@ class DataInput
         return $this->user_data;
     }
 
-    public function isEditable() : bool
+    public function isEditable(): bool
     {
         return $this->editable;
     }
@@ -238,12 +214,12 @@ class DataInput
         $this->form = $form;
     }
 
-    public function getForm() : ?InputForm
+    public function getForm(): ?InputForm
     {
         return $this->form;
     }
 
-    public function getLabel() : string
+    public function getLabel(): string
     {
         return $this->label;
     }
@@ -253,7 +229,7 @@ class DataInput
         $this->label = $str;
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -263,7 +239,7 @@ class DataInput
         $this->name = $name;
     }
 
-    public function isRequired() : bool
+    public function isRequired(): bool
     {
         return $this->required;
     }
@@ -296,7 +272,7 @@ class DataInput
         $this->error = $err;
     }
 
-    public function haveError() : bool
+    public function haveError(): bool
     {
         return (strlen($this->error) > 0);
     }
@@ -307,27 +283,10 @@ class DataInput
         $this->error = "";
     }
 
-    public function getErrorText(int $render_index)
-    {
-        $error_text = "";
-
-        if ($render_index > -1) {
-
-            $error_text = $this->getErrorAt($render_index);
-
-        }
-        else {
-
-            $error_text = $this->getError();
-        }
-
-        return $error_text;
-    }
-
     //coming from user posts. can throw exception
-    public function loadPostData(array $arr) : void
+    public function loadPostData(array $arr): void
     {
-        $this->input_processor->loadPostData($this, $arr);
+        $this->processor->loadPostData($this, $arr);
     }
 
     //validate sets error on the field
@@ -346,7 +305,7 @@ class DataInput
         $this->translator_enabled = $mode;
     }
 
-    public function translatorEnabled() : bool
+    public function translatorEnabled(): bool
     {
         return $this->translator_enabled;
     }

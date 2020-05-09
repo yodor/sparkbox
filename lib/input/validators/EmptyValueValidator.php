@@ -16,27 +16,19 @@ class EmptyValueValidator implements IInputValidator
         if (is_array($value)) {
 
             if ($input->isRequired()) {
-                if (count($value) < 1) throw new Exception("Input value ");
+                if (count($value) < 1) throw new Exception("Input value");
                 $empty_count = 0;
                 foreach ($value as $idx => $val) {
                     if (strlen(trim($val)) == 0 && $this->require_array_value) $empty_count++;
                 }
-                if ($empty_count == count($value)) throw new Exception("Input value ");
+                if ($empty_count == count($value)) throw new Exception("Input value");
             }
 
         }
         else {
 
             if (strlen(trim($value)) == 0 && $input->isRequired()) {
-                throw new Exception("Input value ");
-            }
-
-            if ($input->getLinkMode() && strlen(trim($value)) === 0) {
-                $link_field = $input->getLinkField();
-                $fti = $link_field->getRenderer()->getFreetextInput();
-                if (strcmp($fti, $link_field->getValue()) === 0) {
-                    throw new Exception("Please specify other");
-                }
+                throw new Exception("Input value");
             }
 
         }

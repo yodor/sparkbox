@@ -1,8 +1,8 @@
 <?php
-include_once("input/renderers/DataSourceField.php");
-include_once("input/renderers/DataSourceItem.php");
+include_once("input/renderers/DataIteratorField.php");
+include_once("input/renderers/DataIteratorItem.php");
 
-class CheckItem extends DataSourceItem
+class CheckItem extends DataIteratorItem
 {
 
     public function renderImpl()
@@ -20,51 +20,34 @@ class CheckItem extends DataSourceItem
 
 }
 
-
-class CheckField extends DataSourceField
+class CheckField extends DataIteratorField
 {
 
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
         $this->setItemRenderer(new CheckItem());
-
     }
 
     public function renderImpl()
     {
-        $field_values = $this->input->getValue();
-
-        $field_name = $this->input->getName();
-
-        $field_attr = $this->prepareInputAttributes();
-
 
         if (!$this->iterator) {
 
-            $item = clone $this->item;
+            $item = $this->item;
 
             $item->setValue(1);
-
-//            if (strlen($item->getLabel())) {
-//
-//            }
-//            else {
-//                $item->setLabel($this->caption);
-//            }
-            $item->setName($field_name);
-
-            $item->setSelected($field_values);
-
-            $item->setUserAttributes($field_attr);
+            $item->setName($this->input->getName());
+            $item->setSelected($this->input->getValue() ? TRUE : FALSE);
+            $item->setUserAttributes($this->prepareInputAttributes());
 
             echo "<div class='FieldElements'>";
             $item->render();
             echo "</div>";
+
         }
         else {
             parent::renderImpl();
-
         }
 
     }

@@ -1,14 +1,13 @@
 <?php
 include_once("input/renderers/InputField.php");
-include_once("input/renderers/DataSourceField.php");
-include_once("input/renderers/DataSourceItem.php");
+include_once("input/renderers/DataIteratorField.php");
+include_once("input/renderers/DataIteratorItem.php");
 
-class SelectOption extends DataSourceItem
+class SelectOption extends DataIteratorItem
 {
     public function __construct()
     {
         parent::__construct();
-
     }
 
     public function startRender()
@@ -16,7 +15,7 @@ class SelectOption extends DataSourceItem
         $attribs = $this->prepareAttributes();
 
         echo "<option value='{$this->value}' $attribs ";
-        if ($this->isSelected()) echo "SELECTED";
+        if ($this->selected) echo "SELECTED";
         echo ">";
     }
 
@@ -27,17 +26,35 @@ class SelectOption extends DataSourceItem
 
     public function renderImpl()
     {
-
         echo $this->label;
     }
 
+    protected function isModelSelected(DataInput $input) : bool
+    {
+        $field_values = $input->getValue();
+        $selected = FALSE;
+        if (is_array($field_values)) {
+            foreach ($field_values as $idx => $field_value) {
+                if (strcmp($this->value, $field_value) == 0) {
+                    $selected = TRUE;
+                    break;
+                }
+            }
+        }
+        else {
+            if (strcmp($this->value, $field_values) == 0) {
+                $selected = TRUE;
+            }
+        }
+        return $selected;
+    }
 }
 
-class SelectField extends DataSourceField
+class SelectField extends DataIteratorField
 {
 
-    public $na_str = "--- SELECT ---";
-    public $na_val = NULL;
+    public $na_label = "--- SELECT ---";
+    public $na_value = NULL;
 
     public function __construct(DataInput $input)
     {
@@ -45,66 +62,31 @@ class SelectField extends DataSourceField
         $this->setItemRenderer(new SelectOption());
     }
 
-    public function startRender()
-    {
-
-        if ($this->input->getLinkField() instanceof DataInput) {
-            $this->setInputAttribute("onChange", "javascript:toggleLinkedField(this)");
-            if ($this->freetext_value) {
-                $this->setInputAttribute("link_value", $this->freetext_value);
-            }
-
-        }
-
-        parent::startRender();
-
-    }
-
-    public function finishRender()
-    {
-
-        $field_value = $this->input->getValue();
-        $field_name = $this->input->getName();
-
-        if ($this->freetext_value) {
-            $lf = $this->input->getLinkField();
-
-            $cmp = new MLTagComponent();
-            $cmp->setAttribute("field", $field_name);
-            if (strcmp($field_value, $this->freetext_value) === 0) {
-            }
-            else {
-                $cmp->setClassName($cmp->getClassName() . " hidden");
-            }
-            $cmp->startRender();
-            $lf->getLabelRenderer()->render();
-            $lf->getRenderer()->render();
-            $cmp->finishRender();
-
-        }
-
-        parent::finishRender();
-
-    }
-
     protected function startRenderItems()
     {
-        //prepare the default select value
+
         parent::startRenderItems();
 
         $attrs = $this->prepareInputAttributes();
         echo "<select $attrs >";
 
-        if ($this->na_str) {
-            $item = clone $this->item;
+        //prepare the default select value
+        if ($this->na_label) {
+
+            $data = array($this->getItemRenderer()->getValueKey()=>$this->na_value,
+                $this->getItemRenderer()->getLabelKey()=>$this->na_label);
+
+            //$item = clone $this->item;
+            $item = $this->item;
             $item->setID(-1);
-            $item->setValue($this->na_val);
-            $item->setLabel($this->na_str);
+            //$item->setValue($this->na_value);
+            //$item->setLabel($this->na_label);
             $item->setIndex(-1);
 
-            $selected = $this->isModelSelected($this->na_val, $this->input->getValue());
+            //$selected = $this->isModelSelected($this->na_value, $this->input->getValue());
 
-            $item->setSelected($selected);
+            //$item->setSelected($selected);
+            $item->setData($data, $this->input);
 
             $item->render();
 
@@ -118,37 +100,8 @@ class SelectField extends DataSourceField
         parent::finishRenderItems();
     }
 
-    protected function isModelSelected($value, $field_values)
-    {
-        $selected = false;
-        if (is_array($field_values)) {
-            foreach ($field_values as $idx => $field_value) {
-                if (strcmp($value, $field_value) == 0) {
-                    $selected = true;
-                    break;
-                }
-            }
-        }
-        else {
-            if (strcmp($value, $field_values) == 0) {
-                $selected = true;
-            }
-        }
-        return $selected;
-    }
-
-    public function createFreetextField(DataInput $field)
-    {
-        $field_link = new DataInput($field->getName() . "_other", "Please Specify", 0);
-        $field_link->setRenderer(new TextField());
-        $field_link->setLinkMode(true);
-
-        $field->setLinkField($field_link);
-        $field_link->setLinkField($field);
 
 
-        return $field_link;
-    }
 }
 
 class SelectMultipleField extends SelectField
@@ -159,7 +112,7 @@ class SelectMultipleField extends SelectField
 
         $this->setInputAttribute("multiple", "");
 
-        $this->na_str = "";
+        $this->na_label = "";
     }
 
     protected function startRenderItems()
@@ -167,7 +120,6 @@ class SelectMultipleField extends SelectField
         $this->setInputAttribute("name", $this->input->getName() . "[]");
         parent::startRenderItems();
     }
-
 
 }
 
