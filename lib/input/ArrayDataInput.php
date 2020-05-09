@@ -5,7 +5,9 @@ include_once("input/renderers/ArrayField.php");
 class ArrayDataInput extends DataInput
 {
 
-    public $allow_dynamic_addition = false;
+    public const ERROR_TEXT = "This input collection have errors";
+
+    public $allow_dynamic_addition = FALSE;
 
     public function __construct(string $name, string $label, bool $required)
     {
@@ -83,18 +85,16 @@ class ArrayDataInput extends DataInput
 
     }
 
-    public function haveError() : bool
+    public function haveError(): bool
     {
 
         if (is_array($this->error)) {
-            if (count($this->error) > 0) return true;
+            if (count($this->error) > 0) return TRUE;
         }
-        else {
-            if (strlen($this->error) > 0) {
-                return true;
-            }
+        if ($this->error) {
+            return TRUE;
         }
-        return false;
+        return FALSE;
 
     }
 

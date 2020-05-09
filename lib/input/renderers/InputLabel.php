@@ -23,7 +23,13 @@ class InputLabel extends Component implements IErrorRenderer
         $this->setAttribute("error", 1);
 
         if ($this->error_render_mode == IErrorRenderer::MODE_TOOLTIP) {
-            $this->setAttribute("tooltip", tr($this->input->getError()));
+
+            $error = $this->input->getError();
+            if ($this->input instanceof ArrayDataInput) {
+                $error = ArrayDataInput::ERROR_TEXT;
+            }
+            $this->setAttribute("tooltip", tr($error));
+
         }
 
     }

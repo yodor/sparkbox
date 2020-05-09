@@ -13,7 +13,7 @@ abstract class DBDriver
         return explode(",", $enum_str);
     }
 
-    abstract function __construct(DBConnectionProperties $conn, $open_new = TRUE, $need_persistent = FALSE);
+    abstract function __construct(DBConnectionProperties $conn, $persistent = FALSE);
 
     public function __destruct()
     {

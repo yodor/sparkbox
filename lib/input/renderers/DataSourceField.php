@@ -64,8 +64,6 @@ abstract class DataSourceField extends InputField
 
         while ($data_row = $this->iterator->next()) {
 
-            debug("DataRow: ",$data_row);
-
             $id = $data_row[$prkey];
 
             $value = isset($data_row[$this->list_key]) ? $data_row[$this->list_key] : "";
@@ -74,7 +72,8 @@ abstract class DataSourceField extends InputField
 
             $selected = $this->isModelSelected($value, $field_values);
 
-            $item = clone $this->item;
+            $item = $this->item;
+            //$item = clone $this->item;
             $item->setID($id);
             $item->setValue($value);
             $item->setLabel($label);

@@ -22,8 +22,8 @@ $location = preg_replace("!^${doc_root}!", '', $install_path);
 
 //app/site deployment (server path)
 $defines->set("INSTALL_PATH", $install_path);
-$defines->set("CACHE_PATH", realpath($install_path . "/../spark_cache"));
 
+$defines->set("CACHE_PATH", dirname($install_path)."/spark_cache");
 
 //app/site deployment - HTTP accessible
 $defines->set("LOCAL", $location."/");
@@ -127,13 +127,14 @@ if (!defined("SKIP_SESSION")) {
 //define SKIP_DB to skip creating a default connection to DB
 if (DB_ENABLED && !defined("SKIP_DB")) {
 
-    debug("Setting default DBDriver");
-
     include_once("dbdriver/DBConnections.php");
     include_once("config/dbconfig.php");
     include_once("dbdriver/DBDriver.php");
 
-    $driver = DBConnections::Factory(true, true, "default");
+    $use_persistent = false;
+    if (defined("PERSISTENT_DB")) $use_persistent = true;
+    debug("Setting default DBDriver use_persistent: ". (int)$use_persistent);
+    $driver = DBConnections::Factory(DBConnectionProperties::DEFAULT_NAME, $use_persistent);
     //set default driver
     DBConnections::Set($driver);
 }

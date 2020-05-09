@@ -53,7 +53,7 @@ class BeanDataRequest
                 throw new Exception("Unable to construct BeanDataResponse");
             }
 
-            //$resp->skip_cache = true;
+            $resp->skip_cache = false;
             $resp->send();
 
         }

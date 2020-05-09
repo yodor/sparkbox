@@ -56,12 +56,12 @@ class ImageScaler
         return $this->height;
     }
 
-    public function process(string $data, string $mime)
+    public function process(string $data, int $length, string $mime)
     {
 
         $this->mime = $mime;
         $this->data = $data;
-        $this->dataSize = strlen($data);
+        $this->dataSize = $length;
 
         if ($this->mode == ImageScaler::MODE_CROP) {
             $this->processCrop();
@@ -162,8 +162,7 @@ class ImageScaler
             imagefilter($h_source, IMG_FILTER_GRAYSCALE);
         }
 
-        ob_start();
-
+        ob_start(null, 0);
         if (strcmp($this->mime, ImageScaler::TYPE_PNG)==0) {
             imagesavealpha($h_source, true);
             imagepng($h_source);
@@ -171,13 +170,13 @@ class ImageScaler
         else {
             imagejpeg($h_source, NULL, 95);
         }
-
         $this->data = ob_get_contents();
         $this->dataSize = ob_get_length();
+
         ob_end_clean();
     }
 
-    public function getData()
+    public function getData() : string
     {
         return $this->data;
     }

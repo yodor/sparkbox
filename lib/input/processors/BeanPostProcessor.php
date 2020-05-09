@@ -18,6 +18,8 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
     //field source copy fields
     public $bean_copy_fields = array();
 
+    //transacts additional values from renderer data source
+    //matching by 'this' field name and its value posted. do not copy on empty 'value'
     public $renderer_source_copy_fields = array();
 
     public function __construct()
@@ -200,8 +202,14 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     public function transactValue(DataInput $input, DBTransactor $transactor)
     {
+
+        debug("DataInput: {$input->getName()}");
+
         switch ($input->transact_mode) {
             case DataInput::TRANSACT_VALUE:
+
+                debug("Transact mode: TRANSACT_VALUE");
+
                 $value = $input->getValue();
 
                 if (!is_array($value)) {
@@ -215,28 +223,20 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 //transacts additional values from renderer data source
                 //matching by 'this' field name and its value posted. do not copy on empty 'value'
                 if (is_array($this->renderer_source_copy_fields) && count($this->renderer_source_copy_fields) > 0 && $value) {
-                    debug("value[" . $input->getName() . "] Renderer copy fields requested ... ");
+                    debug("renderer_source_copy_fields ... ");
                     $renderer = $input->getRenderer();
-                    $renderer_source = $renderer->getIterator();
-                    if (!$renderer_source instanceof DBTableBean) throw new Exception("Renderer copy fields requested without DBTableBean renderer source");
-                    $source_fields = $renderer_source->fields();
+                    $qry = $renderer->getIterator();
+                    $qry->select->where = $renderer->list_key."='$value'";
+                    $qry->select->fields = implode(", " , $this->renderer_source_copy_fields);
+                    $qry->select->limit = " 1 ";
+                    $num = $qry->exec();
+                    debug("Iterator: ".$qry->name(). " WHERE: {$qry->select->where} returned #$num results");
+                    if ($num < 1) throw new Exception("Renderer IDataIterator returned no results");
 
-                    debug("value[" . $input->getName() . "] Renderer source: " . get_class($renderer_source) . " | List key: [{$renderer->list_key}] | List label: [{$renderer->list_label}]");
-
-                    if (!in_array($renderer->list_key, $source_fields)) throw new Exception("List Key '{$renderer->list_key}' not found in renderer source fields");
-                    if (!in_array($renderer->list_label, $source_fields)) throw new Exception("List Label '{$renderer->list_label}' not found in renderer source fields");
-
-                    $row = $renderer_source->getByRef($renderer->list_key, $value);
-                    if (!$row) throw new Exception("Unable to query renderer source data for field: " . $input->getName());
-                    foreach ($this->renderer_source_copy_fields as $idx => $field_name) {
-                        debug("value[" . $input->getName() . "] | Doing copy for source field [$field_name]");
-                        if (isset($row[$field_name])) {
-                            $transactor->appendValue($field_name, $row[$field_name]);
-                            debug("value[" . $input->getName() . "] | source field [$field_name] value transacted to main transaction");
-                        }
-                        else {
-                            throw new Exception("Requested copy field [$field_name] not found in data row");
-                        }
+                    $row = $qry->next();
+                    debug("Transacting renderer source fields to main transaction: ", $row);
+                    foreach($row as $field_name => $value) {
+                        $transactor->appendValue($field_name, $value);
                     }
                 }
 

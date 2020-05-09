@@ -105,7 +105,13 @@ abstract class InputField extends Component implements IErrorRenderer
         if (!$this->input->haveError()) return;
 
         if ($this->error_render_mode == IErrorRenderer::MODE_TOOLTIP) {
-            $this->setAttribute("tooltip", tr($this->input->getError()));
+
+            $error = $this->input->getError();
+            if ($this->input instanceof ArrayDataInput) {
+                $error = ArrayDataInput::ERROR_TEXT;
+            }
+            $this->setAttribute("tooltip", tr($error));
+
         }
         $this->setAttribute("error", 1);
     }

@@ -16,16 +16,16 @@ class MySQLiDriver extends DBDriver
      * @param bool $need_persistent
      * @throws Exception
      */
-    public function __construct(DBConnectionProperties $props, $open_new = true, $need_persistent = false)
+    public function __construct(DBConnectionProperties $props, $persistent = FALSE)
     {
 
         $host = $props->host;
 
-        if ($need_persistent) {
+        if ($persistent) {
             $host = "p:".$host;
         }
 
-        $this->conn = @new mysqli($props->host, $props->user, $props->pass, $props->database, $props->port);
+        $this->conn = @new mysqli($host, $props->user, $props->pass, $props->database, $props->port);
 
         if ($this->conn->connect_errno) {
             throw new Exception("Error connecting to database server: ". $this->conn->connect_error);

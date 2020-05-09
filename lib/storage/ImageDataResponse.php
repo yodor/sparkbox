@@ -51,7 +51,7 @@ class ImageDataResponse extends BeanDataResponse
 
     protected function processData()
     {
-        $this->scaler->process($this->row[$this->field], $this->row["mime"]);
+        $this->scaler->process($this->row[$this->field], $this->row["size"], $this->row["mime"]);
         $this->setData($this->scaler->getData(), $this->scaler->getDataSize());
     }
 

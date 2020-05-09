@@ -68,15 +68,34 @@ abstract class BeanDataResponse extends HTTPResponse
 
     protected function authorizeAccess()
     {
+        if (!$this->bean->haveField("auth_context")) {
+            debug("No auth_context defined");
+            return;
+        }
 
-        if (!isset($this->row["auth_context"])) return;
-        if (strlen($this->row["auth_context"]) < 1) return;
+        $qry = $this->bean->queryField($this->bean->key(), $this->id, 1);
+        $fields = array();
 
-        debug("Protected object requested ...");
+        $storageTypes = $this->bean->storageTypes();
+
+        foreach ($storageTypes as $name => $storageType) {
+            if (strpos($storageType, "blob")!== FALSE) continue;
+            $fields[] = $name;
+        }
+        $qry->select->fields = implode(",", $fields);
+        if (!$qry->exec()) throw new Exception("Unable to query for auth_context");
+
+        $row = $qry->next();
+
+        $auth_context = $row["auth_context"];
+
+        if (strlen($auth_context) < 1) return;
+
+        debug("Protected resource requested - auth_context: $auth_context");
 
         Session::Start();
 
-        Authenticator::AuthorizeResource($this->row["auth_context"], $this->row, TRUE);
+        Authenticator::AuthorizeResource($auth_context, $row, TRUE);
 
         Session::Close();
     }
@@ -193,28 +212,36 @@ abstract class BeanDataResponse extends HTTPResponse
 
     }
 
-    protected function isBrowserCached()
+    protected function requestETag()
     {
-
-        // error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
-
-        // check if the last modified date sent by the client is the the same as
-        // the last modified date of the requested file. If so, return 304 header
-        // and exit.
-
-        // check if the Etag sent by the client is the same as the Etag of the
-        // requested file. If so, return 304 header and exit.
-
         if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
-            //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
-            $pos = strpos($_SERVER['HTTP_IF_NONE_MATCH'], $this->getHeader("ETag"));
-            if ($pos !== FALSE) {
-                return TRUE;
-            }
+            return $_SERVER['HTTP_IF_NONE_MATCH'];
         }
-
-        return FALSE;
+        return "";
     }
+
+//    protected function isBrowserCached()
+//    {
+//
+//        // error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
+//
+//        // check if the last modified date sent by the client is the the same as
+//        // the last modified date of the requested file. If so, return 304 header
+//        // and exit.
+//
+//        // check if the Etag sent by the client is the same as the Etag of the
+//        // requested file. If so, return 304 header and exit.
+//
+//        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+//            //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
+//            $pos = strpos($_SERVER['HTTP_IF_NONE_MATCH'], $this->getHeader("ETag"));
+//            if ($pos !== FALSE) {
+//                return TRUE;
+//            }
+//        }
+//
+//        return FALSE;
+//    }
 
     /**
      * @throws Exception
@@ -223,42 +250,54 @@ abstract class BeanDataResponse extends HTTPResponse
     {
         debug("Class: " . $this->className . " ID: " . $this->id . " Field: " . $this->field);
 
-        $this->loadBeanData();
-
+        //check auth_context field exists for this bean and authorize
         $this->authorizeAccess();
 
+        //browser is sending ETag
+        $requestETag = $this->requestETag();
+
+        debug("Request ETag is: $requestETag");
+
+        if (!$this->skip_cache) {
+            if ($requestETag) {
+                $cacheFile = new CacheFile($requestETag, $this->className, $this->id);
+                if ($cacheFile->exists()) {
+                    debug("Cache file exists for this ETag className and ID - sending 304 not modified only");
+                    //exit with 304 not modified
+                    $this->sendNotModified();
+                }
+                debug("Cache file does not exists for this ETag className and ID");
+            }
+        }
+
+        //browser did not send ETag (browser have cache disabled?)
+        //so load fully the bean data
+
+        $this->loadBeanData();
         $this->unpackStorageObject();
 
+        //calculate the ETag
         $this->fillHeaders();
 
         $cacheFile = new CacheFile($this->headers["ETag"], $this->className, $this->id);
 
         if (!$this->skip_cache) {
-
-            if ($this->isBrowserCached()) {
-                $this->clearHeaders();
-                $this->setHeader("HTTP/1.1 304 Not Modified");
-                $this->setHeader("Last-Modified", gmdate("D, d M Y H:i:s T"));
-                $this->setHeader("Cache-Control", "no-cache, must-revalidate");
-                parent::send(TRUE);
-                //header("Pragma: ".$this->headers["etag"]);
-                //header("ETag: $etag");
-            }
-
+            //check if we have the ETag in cache so to skip image processing
             if ($cacheFile->exists()) {
-                $ret = $cacheFile->load();
+                debug("Sending mathched ETag file from cache");
                 $this->setHeader("X-Tag", "SparkCache");
-                $this->setData($ret[CacheFile::KEY_DATA], $ret[CacheFile::KEY_SIZE]);
-                parent::send(TRUE);
+                $this->sendFile($cacheFile->fileName());
             }
-
         }
 
+        //do the magic - image resize etc
         $this->processData();
 
+        //store to cache
         $cacheFile->store($this->data);
 
-        parent::send(TRUE);
+        $this->sendFile($cacheFile->fileName());
+
     }
 
     abstract protected function processData();

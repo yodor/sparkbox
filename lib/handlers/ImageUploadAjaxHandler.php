@@ -70,10 +70,10 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
 
         //data is null during ajax upload. image data can be retrieved from tempName file.
         if ($object->getData()) {
-            $scaler->process($object->getData(), $mime);
+            $scaler->process($object->getData(), $object->getLength(), $mime);
         }
         else {
-           $scaler->process(file_get_contents($object->getTempName()), $mime);
+           $scaler->process(file_get_contents($object->getTempName()), filesize($object->getTempName()), $mime);
         }
 
         //temporary resize for base64_encode returned in ajax response
