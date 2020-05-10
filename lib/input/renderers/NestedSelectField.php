@@ -37,7 +37,7 @@ class NestedSelectField extends SelectField
             $item = clone $this->item;
             $item->setID($nodeID);
             $item->setName($this->input->getName() . "[]");
-            $item->setData($row, $this->input);
+            $item->setData($row);
 
             $label = implode('', array_fill(0, $margin, '&nbsp;')) . $item->getLabel();
             $item->setLabel($label);

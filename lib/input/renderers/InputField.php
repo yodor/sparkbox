@@ -1,13 +1,13 @@
 <?php
 include_once("components/Component.php");
 include_once("input/renderers/IErrorRenderer.php");
-include_once("iterators/IDataIterator.php");
+include_once("components/renderers/IDataIteratorItemRenderer.php");
 
 /**
  * Class InputField
  * Base class to wraps various input tags into a Component
  */
-abstract class InputField extends Component implements IErrorRenderer
+abstract class InputField extends Component implements IErrorRenderer, IDataIteratorItemRenderer
 {
 
     /**

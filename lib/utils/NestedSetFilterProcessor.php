@@ -1,14 +1,16 @@
 <?php
-include_once("components/NestedSetTreeView2.php");
+include_once("components/NestedSetTreeView.php");
 
 class NestedSetFilterProcessor
 {
 
     protected $item_clicked_action = NULL;
 
-    public function __construct()
+    protected $bean = NULL;
+
+    public function __construct(NestedSetBean $bean)
     {
-        $this->item_clicked_action = NULL;
+        $this->bean = $bean;
     }
 
     public function setItemClickedAction(Action $action)
@@ -18,28 +20,25 @@ class NestedSetFilterProcessor
 
     public function process(NestedSetTreeView $view)
     {
-
         $this->processGetVars($view);
         $this->processTextAction($view);
-
     }
 
     protected function processGetVars(NestedSetTreeView $view)
     {
 
-        $bean = $view->getSource();
-        $source_prkey = $bean->key();
+        $key = $view->getItemIterator()->key();
 
-        if (isset($_GET[$source_prkey])) {
-            $nodeID = (int)$_GET[$source_prkey];
+        if (isset($_GET[$key])) {
+            $nodeID = (int)$_GET[$key];
             $view->setSelectedID($nodeID);
         }
 
     }
 
-    protected function createDefaultAction($bean)
+    protected function createDefaultAction(IDataIterator $iterator)
     {
-        $tv_item_clicked = new Action("TextItemClicked", "", array(new ActionParameter($bean->key(), $bean->key())));
+        $tv_item_clicked = new Action("TextItemClicked", "", array(new ActionParameter($iterator->key(), $iterator->key())));
 
         //clicking on this will clear the page parameter of the paginator from the href url
         $tv_item_clicked->setClearPageParam(true);
@@ -49,11 +48,10 @@ class NestedSetFilterProcessor
 
     protected function processTextAction(NestedSetTreeView $view)
     {
-        $bean = $view->getSource();
-        $source_prkey = $bean->key();
+        $key = $view->getItemIterator()->key();
 
         if (!$this->item_clicked_action) {
-            $this->item_clicked_action = $this->createDefaultAction($bean);
+            $this->item_clicked_action = $this->createDefaultAction($view->getItemIterator());
         }
 
         $view->getItemRenderer()->setTextAction($this->item_clicked_action);

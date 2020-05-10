@@ -1,7 +1,6 @@
 <?php
-include_once("input/renderers/InputField.php");
 include_once("input/renderers/DataIteratorField.php");
-include_once("input/renderers/DataIteratorItem.php");
+include_once("components/renderers/items/DataIteratorItem.php");
 
 class SelectOption extends DataIteratorItem
 {
@@ -29,25 +28,7 @@ class SelectOption extends DataIteratorItem
         echo $this->label;
     }
 
-    protected function isModelSelected(DataInput $input) : bool
-    {
-        $field_values = $input->getValue();
-        $selected = FALSE;
-        if (is_array($field_values)) {
-            foreach ($field_values as $idx => $field_value) {
-                if (strcmp($this->value, $field_value) == 0) {
-                    $selected = TRUE;
-                    break;
-                }
-            }
-        }
-        else {
-            if (strcmp($this->value, $field_values) == 0) {
-                $selected = TRUE;
-            }
-        }
-        return $selected;
-    }
+
 }
 
 class SelectField extends DataIteratorField
@@ -76,17 +57,15 @@ class SelectField extends DataIteratorField
             $data = array($this->getItemRenderer()->getValueKey()=>$this->na_value,
                 $this->getItemRenderer()->getLabelKey()=>$this->na_label);
 
-            //$item = clone $this->item;
             $item = $this->item;
+
             $item->setID(-1);
-            //$item->setValue($this->na_value);
-            //$item->setLabel($this->na_label);
+
             $item->setIndex(-1);
 
-            //$selected = $this->isModelSelected($this->na_value, $this->input->getValue());
+            $item->setData($data);
 
-            //$item->setSelected($selected);
-            $item->setData($data, $this->input);
+            $item->setSelected($this->isModelSelected());
 
             $item->render();
 
@@ -100,7 +79,25 @@ class SelectField extends DataIteratorField
         parent::finishRenderItems();
     }
 
-
+    protected function isModelSelected() : bool
+    {
+        $field_values = $this->input->getValue();
+        $selected = FALSE;
+        if (is_array($field_values)) {
+            foreach ($field_values as $idx => $field_value) {
+                if (strcmp($this->item->getValue(), $field_value) == 0) {
+                    $selected = TRUE;
+                    break;
+                }
+            }
+        }
+        else {
+            if (strcmp($this->item->getValue(), $field_values) == 0) {
+                $selected = TRUE;
+            }
+        }
+        return $selected;
+    }
 
 }
 

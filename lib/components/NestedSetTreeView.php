@@ -1,47 +1,43 @@
 <?php
 include_once("components/Component.php");
-include_once("components/renderers/items/NestedSetItemRenderer.php");
-include_once("beans/NestedSetBean.php");
-include_once("utils/SQLSelect.php");
-include_once("utils/IQueryFilter.php");
-include_once("utils/ISelectSource.php");
+include_once("components/renderers/items/DataIteratorItem.php");
 
-class NestedSetTreeView extends Component implements ISelectSource
+include_once("beans/NestedSetBean.php");
+include_once("iterators/IDataIterator.php");
+
+class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
 {
 
-    public $open_all = true;
-    public $list_label = "";
+    const BRANCH_OPENED = "opened";
+    const BRANCH_CLOSED = "closed";
+    const BRANCH_LEAF = "leaf";
+
+    const ICON_HANDLE_OPEN = "+";
+    const ICON_HANDLE_CLOSE = "-";
+    const ICON_HANDLE_LEAF = "&middot";
+
+    public $open_all = TRUE;
+
+    //    protected $data_source = NULL;
+    //    protected $select_qry = NULL;
 
     /**
-     * @var NestedSetBean
+     * @var IDataIterator
      */
-    protected $data_source = NULL;
+    public $iterator = NULL;
 
     /**
-     * @var DBTableBean
+     * @var DataIteratorItem
      */
-    protected $related_source = NULL;
+    protected $item = NULL;
 
-
-    protected $select_qry = NULL;
-
-    protected $item_renderer = NULL;
-
-    protected $related_filters = array();
-    protected $filter_values = array();
-
+    protected $selected_nodeID = NULL;
     protected $selection_path = array();
-
-    protected $selected_nodeID = -1;
-
-    protected $filter_select = NULL;
 
     public function __construct()
     {
         parent::__construct();
-
         $this->setClassName("TreeView");
-
     }
 
     public function requiredStyle()
@@ -58,284 +54,81 @@ class NestedSetTreeView extends Component implements ISelectSource
         return $arr;
     }
 
+    public function setItemIterator(IDataIterator $query)
+    {
+        $this->iterator = $query;
+        $this->setAttribute("source", $this->iterator->name());
+    }
+
+    public function getItemIterator(): IDataIterator
+    {
+        return $this->iterator;
+
+    }
+
+    public function setSelectedID($nodeID)
+    {
+        $this->selected_nodeID = (int)$nodeID;
+
+        //        $this->selection_path = $this->data_source->constructPath($this->selected_nodeID);
+    }
+
+    /**
+     * Available after rendering and selected_nodeID is > -1
+     * @return array
+     */
     public function getSelectionPath()
     {
+
         return $this->selection_path;
-    }
-
-
-    //used in the main list to fetch the matched products with category
-    public function getRelationSelect()
-    {
-
-        $related_table = $this->related_source->getTableName();
-        $related_prkey = $this->related_source->key();
-
-        $source_prkey = $this->data_source->key();
-
-        $sqry = new SQLSelect();
-        $sqry->fields = " $related_table.* ";
-
-        $sqry->from = "  $related_table ";
-        $sqry->where = " $related_table.$source_prkey = child.$source_prkey ";
-        $sqry->group_by = " $related_table.$related_prkey ";
-
-        if ($this->filter_select) {
-
-            $sqry = $sqry->combineWith($this->filter_select);
-
-        }
-
-        //apply other plain filters
-        // 	foreach ($this->related_filters as $filter_name=>$filter_key) {
-        //
-        // 	    if (strcmp_isset("filter", $filter_name)) {
-        // 		//check filter
-        // 		if ($filter_key instanceof IQueryFilter) {
-        // 		    $filter_query = $filter_key->getQueryFilter();
-        // 		    if ($filter_query->where) {
-        // 		      $sqry->where.= " AND ".$filter_query->where;
-        // 		    }
-        // 		}
-        // 		else {
-        // 		    $filter_value = $this->filter_values[$filter_key];
-        // 		    $sqry->where.= " AND $related_table.$filter_key = '$filter_value' ";
-        // 		}
-        //
-        // 	    }
-        // 	}
-
-
-        $sqry = $this->data_source->childNodesWith($sqry, $this->selected_nodeID);
-
-        return $sqry;
 
     }
 
-
-    //filter=category&catID=15 =>filter_name = brand; filter_key=brandID
-    public function addRelatedFilter($filter_name, $filter_key)
+    public function getSelectedID()
     {
-        if ($filter_key instanceof IQueryFilter) {
-            //
-        }
-        else if (strcmp($filter_key, $this->data_source->key()) == 0) {
-            throw new Exception("Data source primary key can not be used as filter value");
-        }
-
-        $this->related_filters[$filter_name] = $filter_key;
+        return $this->selected_nodeID;
     }
 
-    public function processFilters()
+    public function setItemRenderer(DataIteratorItem $renderer)
     {
-
-        $source_prkey = $this->data_source->key();
-
-        if (isset($_GET[$source_prkey])) {
-
-            $this->selected_nodeID = (int)$_GET[$source_prkey];
-            $this->selection_path = $this->data_source->constructPath($this->selected_nodeID);
-
-        }
-
-        $have_filter = false;
-
-        //parse plain filters
-        foreach ($this->related_filters as $filter_name => $filter_key) {
-            if ($filter_key instanceof IQueryFilter) {
-                //
-            }
-            else if (isset($_GET[$filter_key])) {
-                $this->filter_values[$filter_key] = DBConnections::Get()->escape($_GET[$filter_key]);
-            }
-        }
-
-
-        $text_action = $this->getItemRenderer()->getTextAction();
-
-        if (isset($_GET["filter"]) && isset($this->related_filters[$_GET["filter"]])) {
-
-            $requested_filter = $_GET["filter"];
-
-            $have_filter = true;
-            $this->open_all = true;
-
-            $filter_key = $this->related_filters[$requested_filter];
-
-            if ($filter_key instanceof IQueryFilter) {
-
-                $this->filter_select = $filter_key->filterSelect();
-
-            }
-            else if ($this->related_source instanceof DBTableBean) {
-
-                $related_table = $this->related_source->getTableName();
-                $related_prkey = $this->related_source->key();
-
-                if (isset($this->filter_values[$filter_key])) {
-
-                    $filter_value = $this->filter_values[$filter_key];
-
-                    $sel = new SQLSelect();
-                    $sel->fields = "";
-                    $sel->from = "";
-                    $sel->where = " $related_table.$filter_key='$filter_value' ";
-
-                    $this->filter_select = $sel;
-
-                }
-                else {
-                    debug("NestedSetTreeView::processFilters: filter requested without corresponding key value");
-                }
-            }
-
-            if ($this->filter_select) {
-
-                $this->select_qry = $this->select_qry->combineWith($this->filter_select);
-
-            }
-
-            $text_action->addParameter(new ActionParameter($source_prkey, $source_prkey));
-
-        }
-        else {
-
-            $text_action->prependRequestParams(false);
-            $text_action->addParameter(new ActionParameter("filter", "self", true));
-            $text_action->addParameter(new ActionParameter($source_prkey, $source_prkey));
-
-        }
-
-        return $have_filter;
+        $this->item = $renderer;
     }
 
-
-    public function getSource()
+    public function getItemRenderer(): DataIteratorItem
     {
-        return $this->data_source;
+        return $this->item;
     }
 
-    public function select() : SQLSelect
+    protected function renderImpl()
     {
-        return $this->select_qry;
-    }
-
-    public function setSelect(SQLSelect $qry)
-    {
-        $this->select_qry = $qry;
-    }
-
-    public function setItemRenderer(NestedSetItemRenderer $renderer)
-    {
-        $this->item_renderer = $renderer;
-    }
-
-    public function getItemRenderer()
-    {
-        return $this->item_renderer;
-    }
-
-    public function setSource(NestedSetBean $bean)
-    {
-
-        $sqry = $bean->listTreeSelect();
-
-        //take first text or char field
-        $storage_types = $bean->storageTypes();
-
-        $this->list_label = $bean->key();
-
-        foreach ($storage_types as $field_name => $storage_type) {
-            if (strpos($storage_type, "char") !== false || strpos($storage_type, "text") !== false) {
-                $this->list_label = $field_name;
-                break;
-            }
-        }
-
-        $this->setAttribute("source", get_class($bean));
-
-        $this->setSelect($sqry);
-
-        $this->data_source = $bean;
-
-
-    }
-
-    //related count calculated on $count_field default counting on the prkey of the $related_source
-    public function setRelatedSource(DBTableBean $related_source, $count_field = "", $related_fields = NULL)
-    {
-
-        if (!is_array($related_fields)) {
-            $related_fields = array($this->list_label);
-        }
-        $sqry = $this->data_source->listTreeRelatedSelect($related_source, $count_field, $related_fields);
-
-        $this->setSelect($sqry);
-
-        $this->related_source = $related_source;
-
-    }
-
-    public function renderImpl()
-    {
-
-        if (!($this->data_source instanceof NestedSetBean)) throw new Exception("No suitable data_source assigned");
-        if (!($this->item_renderer instanceof NestedSetItemRenderer)) throw new Exception("No suitable item_renderer assigned");
-
-        $request_source = false;
-        $related_prkey = false;
-
-        //keep the url clean from the related source prkey for navigation
-        if ($this->related_source) {
-            $related_prkey = $this->related_source->key();
-            if (isset($_GET[$related_prkey])) {
-                $request_source = $_GET[$related_prkey];
-                unset($_GET[$related_prkey]);
-            }
-        }
-
-
-        $db = DBConnections::Get();
-
-        // 	echo "<div style='display:none;' class='debug'>";
-        // 	echo "QS:".microtime(true);
-
-        $sql = $this->select_qry->getSQL();
-
-        // 	echo "<div>$sql</div>";
-
-        $res = $db->query($sql);
 
         $path = array();
 
-        $source_key = $this->data_source->key();
+        $source_key = $this->iterator->key();
 
         $open_tags = 0;
 
-
-        // 	echo "QF:".microtime(true);
-        // 	echo "</div>";
+        $num = $this->iterator->exec();
 
         echo "<ul class='NodeChilds'>";
-        $ctr = 0;
 
+        while ($row = $this->iterator->next()) {
 
-        while ($row = $db->fetch($res)) {
-            $ctr++;
-
+            if (!isset($row["lft"]) || !isset($row["rgt"])) throw new Exception("No suitable iterator set (lft/rgt) missing");
             $lft = $row["lft"];
             $rgt = $row["rgt"];
+
             $nodeID = $row[$source_key];
 
-            $render_mode = NestedSetItemRenderer::BRANCH_CLOSED;
+            $render_mode = NestedSetTreeView::BRANCH_CLOSED;
             if ($this->open_all) {
-                $render_mode = NestedSetItemRenderer::BRANCH_OPENED;
+                $render_mode = NestedSetTreeView::BRANCH_OPENED;
             }
             if ($rgt == $lft + 1) {
-                $render_mode = NestedSetItemRenderer::BRANCH_LEAF;
+                $render_mode = NestedSetTreeView::BRANCH_LEAF;
             }
 
-            trbean($nodeID, $this->list_label, $row, $this->data_source->getTableName());
+            trbean($nodeID, $this->item->getLabelKey(), $row, $this->iterator->name());
 
             while (count($path) > 0 && $lft > $path[count($path) - 1]) {
                 array_pop($path);
@@ -345,8 +138,8 @@ class NestedSetTreeView extends Component implements ISelectSource
                     echo "</li>";
                     $open_tags -= 2;
                 }
-
             }
+
             $path[] = $rgt;
 
             $path_len = count($path);
@@ -354,19 +147,26 @@ class NestedSetTreeView extends Component implements ISelectSource
             echo "<li class='NodeOuter'>";
             $open_tags++;
 
-            $selected = ($nodeID == $this->selected_nodeID) ? true : false;
+            $selected = FALSE;
+            if ($nodeID == $this->selected_nodeID) {
+                $this->selection_path = array_values($path);
+                $selected = TRUE;
+            }
 
-            $item = clone $this->item_renderer;
+            $item = $this->item;
             $item->setID($nodeID);
-            $item->setDataRow($row);
-            $item->setBranchType($render_mode);
+            $item->setData($row);
+
+            $item->setAttribute("branch_type", $render_mode);
+
             $item->setSelected($selected);
-            $item_label = $row[$this->list_label];
+
+            $item_label = $this->item->getLabel();
             if (isset($row["related_count"])) {
                 $item_label .= " (" . $row["related_count"] . ")";
             }
-            $item->setLabel($item_label);
 
+            $item->setLabel($item_label);
 
             $item->render();
 
@@ -374,17 +174,7 @@ class NestedSetTreeView extends Component implements ISelectSource
             $open_tags++;
         }
 
-        // 	for ($a=0;$a<$open_tags;$a+=2) {
-        // 	  echo "</ul>";
-        // 	  echo "</li>";
-        // 	}
         echo "</ul>";
-
-        //restore url
-        if ($request_source) {
-            $_GET[$related_prkey] = $request_source;
-        }
-
 
     }
 
@@ -393,12 +183,10 @@ class NestedSetTreeView extends Component implements ISelectSource
         parent::finishRender();
         ?>
         <script type='text/javascript'>
-            onPageLoad(
-                function () {
-                    var tree_view = new TreeView();
-                    tree_view.attachWith("<?php echo $this->getName(); ?>");
-                }
-            );
+            onPageLoad(function () {
+                var tree_view = new TreeView();
+                tree_view.attachWith("<?php echo $this->getName(); ?>");
+            });
         </script>
         <?php
     }

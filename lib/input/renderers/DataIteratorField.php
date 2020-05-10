@@ -1,6 +1,6 @@
 <?php
 include_once("input/renderers/InputField.php");
-include_once("input/renderers/DataIteratorItem.php");
+include_once("components/renderers/items/DataIteratorItem.php");
 
 abstract class DataIteratorField extends InputField
 {
@@ -56,26 +56,30 @@ abstract class DataIteratorField extends InputField
             $item->setName($field_name . "[]");
             $item->setIndex($index);
 
-            $item->setData($data_row, $this->input);
+            $item->setData($data_row);
 
+            $item->setSelected($this->isModelSelected());
             $item->render();
 
             $index++;
         }
     }
 
-//    /**
-//     * Iterator values construct the array
-//     * Checkboxes post values directly
-//     * Search inside values if iterator value is found
-//     * @param $value
-//     * @param $field_values
-//     * @return bool
-//     */
-//    protected function isModelSelected($value, $field_values)
-//    {
-//        return (in_array($value, $field_values));
-//    }
+    /**
+     * Iterator values construct the array
+     * Checkboxes post values directly
+     * Search inside values if iterator value is found
+     * @param DataInput $input
+     * @return bool
+     */
+    protected function isModelSelected() : bool
+    {
+        $field_values = $this->input->getValue();
+        if (!is_array($field_values)) {
+            $field_values = array($field_values);
+        }
+        return (in_array($this->item->getValue(), $field_values));
+    }
 
 
 }

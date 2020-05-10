@@ -1,10 +1,9 @@
 <?php
-include_once("input/renderers/InputField.php");
-include_once("components/Component.php");
+include_once("input/renderers/DataIteratorField.php");
+include_once("components/renderers/items/DataIteratorItem.php");
 
 class RadioItem extends DataIteratorItem
 {
-
 
     public function renderImpl()
     {
@@ -28,7 +27,7 @@ class RadioField extends DataIteratorField
 
         $this->setItemRenderer(new RadioItem());
 
-        $this->is_compound = true;
+        $this->is_compound = TRUE;
 
     }
 

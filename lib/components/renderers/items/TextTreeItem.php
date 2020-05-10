@@ -1,9 +1,9 @@
 <?php
-include_once("components/renderers/items/NestedSetItemRenderer.php");
+include_once("components/renderers/items/NestedSetItem.php");
 include_once("components/renderers/IActionsCollection.php");
 include_once("components/renderers/ActionRenderer.php");
 
-class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsCollection
+class TextTreeItem extends NestedSetItem implements IActionsCollection
 {
 
     protected $actions = NULL;
@@ -19,12 +19,10 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsColl
         $this->actions = array();
         $this->attribute_actions = array();
 
-
         $this->action_renderer = new ActionRenderer(NULL, NULL);
 
-        $this->action_renderer->enableTextTranslation(false);
+        $this->action_renderer->enableTextTranslation(FALSE);
     }
-
 
     public function getTextAction()
     {
@@ -41,7 +39,7 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsColl
         $this->actions[] = $a;
     }
 
-    public function getAction(string $title) : Action
+    public function getAction(string $title): Action
     {
         return $this->actions[$title];
     }
@@ -51,7 +49,7 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsColl
         $this->actions = $actions;
     }
 
-    public function getActions() : array
+    public function getActions(): array
     {
         return $this->actions;
     }
@@ -61,11 +59,11 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsColl
         if (count($this->actions) < 1) return;
 
         echo "<div class='node_actions'>";
-        $this->action_renderer->enableActionFromLabel(true);
+        $this->action_renderer->enableActionFromLabel(TRUE);
         foreach ($this->actions as $key => $action) {
             $this->action_renderer->setAction($action);
 
-            $this->action_renderer->setData($this->data_row);
+            $this->action_renderer->setData($this->data);
             $this->action_renderer->render();
 
         }
@@ -79,7 +77,6 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsColl
         echo "<div class='Button'></div>";
         echo "</div> ";
 
-
     }
 
     public function renderText()
@@ -88,25 +85,21 @@ class TextTreeItemRenderer extends NestedSetItemRenderer implements IActionsColl
         // 	    echo "<input type='checkbox'>";
         // 	    echo "</div> ";
 
-
         $this->text_action->setTitle($this->label);
 
         $this->action_renderer->setAction($this->text_action);
-        $this->action_renderer->enableActionFromLabel(false);
+        $this->action_renderer->enableActionFromLabel(FALSE);
         $this->action_renderer->setAttribute("action", "TextTreeItemAction");
-        $this->action_renderer->setData($this->data_row);
+        $this->action_renderer->setData($this->data);
         $this->action_renderer->render();
-
 
     }
 
-    public function renderImpl()
+    protected function renderImpl()
     {
-
-
         $this->renderHandle();
         $this->renderText();
-        $this->renderActions($this->data_row);
+        $this->renderActions($this->data);
     }
 
 }

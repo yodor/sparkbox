@@ -22,7 +22,8 @@ class TextItemRenderer extends Component implements IItemRenderer
     public function __construct($field_name)
     {
         parent::__construct();
-        $this->setAttributes("align=left valign=middle");
+        $this->setAttribute("align", "left");
+        $this->setAttribute("valign", "middle");
         $this->setFieldName($field_name);
     }
 

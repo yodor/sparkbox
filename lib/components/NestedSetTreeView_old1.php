@@ -1,6 +1,6 @@
 <?php
 include_once("components/Component.php");
-include_once("components/renderers/items/NestedSetItemRenderer.php");
+include_once("components/renderers/items/NestedSetItem.php");
 include_once("beans/NestedSetBean.php");
 include_once("utils/SQLSelect.php");
 include_once("utils/IQueryFilter.php");
@@ -303,7 +303,7 @@ class NestedSetTreeView extends Component
         $this->select_qry = $qry;
     }
 
-    public function setItemRenderer(NestedSetItemRenderer $renderer)
+    public function setItemRenderer(NestedSetItem $renderer)
     {
         $this->item_renderer = $renderer;
     }
@@ -360,7 +360,7 @@ class NestedSetTreeView extends Component
     {
 
         if (!($this->data_source instanceof NestedSetBean)) throw new Exception("No suitable data_source assigned");
-        if (!($this->item_renderer instanceof NestedSetItemRenderer)) throw new Exception("No suitable item_renderer assigned");
+        if (!($this->item_renderer instanceof NestedSetItem)) throw new Exception("No suitable item_renderer assigned");
 
         $request_source = false;
         $related_prkey = false;
@@ -394,12 +394,12 @@ class NestedSetTreeView extends Component
             $rgt = $row["rgt"];
             $nodeID = $row[$source_key];
 
-            $render_mode = NestedSetItemRenderer::BRANCH_CLOSED;
+            $render_mode = NestedSetItem::BRANCH_CLOSED;
             if ($this->open_all) {
-                $render_mode = NestedSetItemRenderer::BRANCH_OPENED;
+                $render_mode = NestedSetItem::BRANCH_OPENED;
             }
             if ($rgt == $lft + 1) {
-                $render_mode = NestedSetItemRenderer::BRANCH_LEAF;
+                $render_mode = NestedSetItem::BRANCH_LEAF;
             }
 
             trbean($nodeID, $this->list_label, $row, $this->data_source->getTableName());
@@ -425,7 +425,7 @@ class NestedSetTreeView extends Component
 
             $item = clone $this->item_renderer;
             $item->setID($nodeID);
-            $item->setDataRow($row);
+            $item->setData($row);
             $item->setBranchType($render_mode);
             $item->setSelected($selected);
             $item_label = $row[$this->list_label];
