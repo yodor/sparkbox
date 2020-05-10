@@ -36,33 +36,33 @@ class AuthToken
     public function storeCookies(string $contextName)
     {
         //hash_hmac ( string $algo , string $data , string $key [, bool $raw_output = FALSE ] ) : string
-        setcookie($contextName . "_" . AuthToken::HASH, $this->hash, 0, "/");
-        setcookie($contextName . "_" . AuthToken::ID, $this->id, 0, "/");
-
+        Session::SetCookie($contextName . "_" . AuthToken::HASH, $this->hash);
+        Session::SetCookie($contextName . "_" . AuthToken::ID, $this->id);
     }
 
     public function validateCookies(string $contextName)
     {
         if ($this->id < 1 || strlen($this->hash) != AuthToken::TOKEN_LENGTH) {
-            debug(" Token data invalid");
-            return false;
+            debug("Token data invalid");
+            return FALSE;
         }
 
-        if (!isset($_COOKIE[$contextName . "_" . AuthToken::HASH]) || !isset($_COOKIE[$contextName . "_" . AuthToken::ID])) {
-            debug(" Required cookies were not found");
-            return false;
+        if (!Session::HaveCookie($contextName . "_" . AuthToken::HASH) || !Session::HaveCookie($contextName . "_" . AuthToken::ID)) {
+            debug("Required cookies were not found");
+            return FALSE;
         }
 
-        $cookie_hash = $_COOKIE[$contextName . "_" . AuthToken::HASH];
-        $cookie_id = (int)$_COOKIE[$contextName . "_" . AuthToken::ID];
+        $cookie_hash = Session::GetCookie($contextName . "_" . AuthToken::HASH);
+        $cookie_id = (int)Session::GetCookie($contextName . "_" . AuthToken::ID);
 
         if (strcmp($cookie_hash, $this->hash) == 0 && $cookie_id == (int)$this->id) {
-            debug(" Cookie values matched successfully");
-            return true;
+            debug("Cookie values matched successfully");
+            return TRUE;
         }
 
-        debug(get_class($this) . " Cookie values does not match");
-        return false;
+        debug("Cookie values mismatch");
+        return FALSE;
     }
 }
+
 ?>

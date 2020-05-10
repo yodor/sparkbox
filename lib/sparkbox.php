@@ -133,7 +133,7 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
 
     $use_persistent = false;
     if (defined("PERSISTENT_DB")) $use_persistent = true;
-    debug("Setting default DBDriver use_persistent: ". (int)$use_persistent);
+
     $driver = DBConnections::Factory(DBConnectionProperties::DEFAULT_NAME, $use_persistent);
     //set default driver
     DBConnections::Set($driver);

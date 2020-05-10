@@ -6,10 +6,27 @@ include_once("components/MLTagComponent.php");
 
 class MenuBarComponent extends Component
 {
+    /**
+     * @var MainMenu
+     */
     protected $main_menu;
+
+    /**
+     * @var MenuBarItemRenderer
+     */
     protected $ir_baritem;
+
+    /**
+     * @var MLTagComponent
+     */
     protected $bar;
-    public $toggle_first = false;
+
+    /**
+     * @var MLTagComponent
+     */
+    protected $toggle;
+
+    public $toggle_first = FALSE;
 
     public function __construct(MainMenu $menu)
     {
@@ -31,7 +48,6 @@ class MenuBarComponent extends Component
         $this->toggle = new MLTagComponent("A");
         $this->toggle->setClassName("toggle");
 
-
     }
 
     public function requiredStyle()
@@ -49,7 +65,7 @@ class MenuBarComponent extends Component
         return $arr;
     }
 
-    public function getMainMenu()
+    public function getMainMenu() : MainMenu
     {
         return $this->main_menu;
 
@@ -60,12 +76,12 @@ class MenuBarComponent extends Component
         $this->ir_baritem = $ir_baritem;
     }
 
-    public function getItemRenderer()
+    public function getItemRenderer() : MenuBarItemRenderer
     {
         return $this->ir_baritem;
     }
 
-    public function setName($name)
+    public function setName(string $name)
     {
         parent::setName($name);
         $this->bar->setName($name);
@@ -80,10 +96,9 @@ class MenuBarComponent extends Component
         }
         parent::startRender();
 
-
     }
 
-    public function renderImpl()
+    protected function renderImpl()
     {
         $menu_items = $this->main_menu->getMenuItems();
 

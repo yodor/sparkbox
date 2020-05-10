@@ -41,7 +41,7 @@ function endsWith($haystack, $needle)
 {
     $length = strlen($needle);
     if ($length == 0) {
-        return true;
+        return TRUE;
     }
 
     return (substr($haystack, -$length) === $needle);
@@ -96,103 +96,84 @@ function getArrayText(array $arr)
 
 }
 
-function debug($obj, $msg=null, $arr = null)
+function debug($obj, $msg = NULL, $arr = NULL)
 {
-    if (defined("DEBUG_OUTPUT") && strcmp(DEBUG_OUTPUT, "1") == 0) {
+    if (!(isset($GLOBALS["DEBUG_OUTPUT"]) && $GLOBALS["DEBUG_OUTPUT"])) return;
 
-        $class = "";
-        $message = "";
-        $array = array();
+    $class = "";
+    $message = "";
+    $array = array();
 
-        if (is_object($obj)) {
-            $class = get_class($obj);
-            $message = $msg;
-            $array = $arr;
-        }
-        else {
-            $message = $obj;
-            $array = $msg;
-        }
-
-
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,0);
-
-        $first = $bt[0];
-        $parent = $first;
-
-        $file = basename($first["file"]);
-
-        if (count($bt)>0) {
-            //$last = $bt[count($bt)-1];
-
-            $index = 1;
-
-            while ($index<count($bt)) {
-                $parent = $bt[$index];
-                if (isset($parent["class"])) {
-                    break;
-                }
-                $index++;
-            }
-        }
-
-        $last = $bt[count($bt)-1];
-
-        $url = basename($_SERVER['SCRIPT_FILENAME']);
-        if (isset($last["file"])) {
-            $url = basename($last["file"]);
-        }
-
-        $line = $first["line"];
-
-        $file2 = $url;
-        if (isset($parent["file"])) {
-            $file2 = basename($parent["file"]);
-        }
-        $line2 = 0;
-        if (isset($parent["line"])) {
-            $line2 = $parent["line"];
-        }
-        else if (isset($first["line"])) {
-            $line2 = $first["line"];
-        }
-
-
-        if (strlen($class)<1) {
-            if (isset($parent["class"])) {
-                $class = $parent["class"];
-            }
-        }
-        $function = $parent["function"];
-
-        $time = microtime_float(true);
-
-
-        if (is_array($array)) {
-            $message.=" ".getArrayText($array);
-        }
-
-        //error_log("$time: $url:($file2:$line2)($file:$line) $class::$function() $message");
-        error_log("$time  $url [$file2:$line2] [$class::$function] $message");
-        //error_log("");
-//        error_log("---");
-//        ob_start();
-//        print_r($bt);
-//
-//        error_log(ob_get_contents());
-//        ob_end_clean();
-//        error_log("---");
-
-//        $caller = array_shift($bt);
-//        $caller1 = array_shift($bt);
-//        $file = basename($caller["file"]);
-//        $function = $caller1["function"];
-//        $cls = $caller["class"];
-//        print_r($caller1);
-//        error_log("File: $file - Class: $cls - Function: $function - Message: $str");
+    if (is_object($obj)) {
+        $class = get_class($obj);
+        $message = $msg;
+        $array = $arr;
     }
-}
+    else {
+        $message = $obj;
+        $array = $msg;
+    }
 
+    $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 0);
+
+    $first = $bt[0];
+    $parent = $first;
+
+    $file = basename($first["file"]);
+
+    if (count($bt) > 0) {
+        //$last = $bt[count($bt)-1];
+
+        $index = 1;
+
+        while ($index < count($bt)) {
+            $parent = $bt[$index];
+            if (isset($parent["class"])) {
+                break;
+            }
+            $index++;
+        }
+    }
+
+    $last = $bt[count($bt) - 1];
+
+    $url = basename($_SERVER['SCRIPT_FILENAME']);
+    if (isset($last["file"])) {
+        $url = basename($last["file"]);
+    }
+
+    $line = $first["line"];
+
+    $file2 = $url;
+    if (isset($parent["file"])) {
+        $file2 = basename($parent["file"]);
+    }
+    $line2 = 0;
+    if (isset($parent["line"])) {
+        $line2 = $parent["line"];
+    }
+    else if (isset($first["line"])) {
+        $line2 = $first["line"];
+    }
+
+    if (strlen($class) < 1) {
+        if (isset($parent["class"])) {
+            $class = $parent["class"];
+        }
+    }
+    $function = $parent["function"];
+
+    $time = "";
+    if (isset($GLOBALS["DEBUG_OUTPUT_MICROTIME"])) {
+        $time = microtime_float(TRUE);
+    }
+
+    if (is_array($array)) {
+        $message .= " " . getArrayText($array);
+    }
+
+    error_log("$time $url [$file2:$line2] [$class::$function] $message");
+}
 
 function keywordFilterSQL($keywords_text, $search_fields, $inner_glue = " OR ", $outer_glue = " AND ", $split_string = "/[,;]/")
 {
@@ -223,7 +204,6 @@ function keywordFilterSQL($keywords_text, $search_fields, $inner_glue = " OR ", 
     return $kwsearch;
 
 }
-
 
 function queryArray()
 {
@@ -258,7 +238,6 @@ function queryString($qryarr = 0, $append = "")
         $append = str_replace("?", "", $append);
         $ret .= "?" . $append;
     }
-
 
     return $ret;
 
@@ -411,7 +390,7 @@ function parse_signed_request($signed_request, $secret)
 
     // decode the data
     $sig = base64_url_decode($encoded_sig);
-    $data = json_decode(base64_url_decode($payload), true);
+    $data = json_decode(base64_url_decode($payload), TRUE);
 
     if (strtoupper($data['algorithm']) !== 'HMAC-SHA256') {
         // 	  error_log('Unknown algorithm. Expected HMAC-SHA256');
@@ -420,7 +399,7 @@ function parse_signed_request($signed_request, $secret)
     }
 
     // check sig
-    $expected_sig = hash_hmac('sha256', $payload, $secret, $raw = true);
+    $expected_sig = hash_hmac('sha256', $payload, $secret, $raw = TRUE);
     if ($sig !== $expected_sig) {
         //     error_log('Bad Signed JSON signature!');
         throw new Exception("Bad Signed JSNO signature!");
@@ -477,7 +456,6 @@ function object2array($object)
     return $arr;
 }
 
-
 function refkeyPageCheck(DBTableBean $ref_bean, $redirect_fail, &$ref_key, &$ref_id, &$ref_row = array())
 {
     include_once("beans/DBTableBean.php");
@@ -502,7 +480,6 @@ function refkeyPageCheck(DBTableBean $ref_bean, $redirect_fail, &$ref_key, &$ref
     return $qrystr;
 }
 
-
 function mysql_real_unescape_string($input, $checkbr = 0)
 {
 
@@ -526,12 +503,11 @@ function text4div(&$text)
     return str_replace("\n", "<BR>", $text);
 }
 
-function strcmp_isset($key, $val, $arr = false) : bool
+function strcmp_isset($key, $val, $arr = FALSE): bool
 {
     if (!$arr) $arr = $_GET;
     return isset($arr[$key]) && (strcmp($arr[$key], $val) == 0);
 }
-
 
 function CalculateAge($date)
 {
@@ -546,7 +522,6 @@ function CalculateAge($date)
         $adjust = 1;
     }
 
-
     return (($year - $year_birth) - $adjust);
 
 }
@@ -560,7 +535,7 @@ function microtime_float()
 function isOnline($last_seen_date)
 {
     if (strcmp($last_seen_date, "0000-00-00 00:00:00") == 0) {
-        return false;
+        return FALSE;
     }
     $last_seen = strtotime($last_seen_date);
     $now = strtotime("now");
@@ -569,10 +544,10 @@ function isOnline($last_seen_date)
     $session_lifetime = ini_get("session.gc_maxlifetime");
 
     if ($diff >= $session_lifetime) {
-        return false;
+        return FALSE;
     }
     else {
-        return true;
+        return TRUE;
     }
 
 }
@@ -624,7 +599,6 @@ function NiceTime($date)
     return "$difference $periods[$j] {$tense}";
 }
 
-
 function StarsForValue($val, $min = 1, $max = 5)
 {
     $on_star = "<img class='star star_on'  src='" . SPARK_LOCAL . "/images/icon_star_on.png'>";
@@ -652,14 +626,14 @@ function timestamp2mysqldate($timestamp)
 
 }
 
-function dateFormat($date, $time = true)
+function dateFormat($date, $time = TRUE)
 {
     $tm = "H:i";
     if (!$time) $tm = "";
     return date("M j, Y $tm", strtotime($date));
 }
 
-function dateFormatFromUnix($unixtime, $time = true)
+function dateFormatFromUnix($unixtime, $time = TRUE)
 {
     $tm = "H:i";
     if (!$time) $tm = "";
@@ -668,7 +642,6 @@ function dateFormatFromUnix($unixtime, $time = true)
 
 function date2time($date, $format = '%a, %d %b %Y %H:%M:%S %z')
 {
-
 
     $arr = strptime($date, $format);
 
@@ -684,7 +657,6 @@ function date2time($date, $format = '%a, %d %b %Y %H:%M:%S %z')
 function outputCSV($sql_query, $filename = 'export.csv')
 {
 
-
     header("Content-type: text/csv");
     header("Content-Disposition: attachment; filename=$filename");
     header("Pragma: no-cache");
@@ -693,7 +665,6 @@ function outputCSV($sql_query, $filename = 'export.csv')
     $outstream = fopen("php://output", "w");
     function __outputCSV(&$vals, $key, $filehandler)
     {
-
 
         fputcsv($filehandler, $vals); // add parameters if you want
     }
@@ -732,7 +703,6 @@ function exportMysqlToCsv($sql_query, $filename = 'export.csv')
     // Gets the data from the database
     $result = $db->query($sql_query);
     $fields_cnt = $db->numFields($result);
-
 
     $schema_insert = '';
 
@@ -782,7 +752,6 @@ function exportMysqlToCsv($sql_query, $filename = 'export.csv')
     exit;
 
 }
-
 
 function dumpVal($val)
 {

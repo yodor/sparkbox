@@ -12,9 +12,9 @@ abstract class Authenticator
     /**
      * @var DBTableBean
      */
-    protected $bean = null;
+    protected $bean = NULL;
 
-    protected $session = null;
+    protected $session = NULL;
 
     public function __construct(string $contextName, DBTableBean $bean)
     {
@@ -46,7 +46,7 @@ abstract class Authenticator
         }
 
         // Generate string with random data (max length $md5_size)
-        $string = md5(microtime(true) . "|" . rand());
+        $string = md5(microtime(TRUE) . "|" . rand());
 
         // Position Limiting
         $start_point = 32 - $length;
@@ -55,7 +55,6 @@ abstract class Authenticator
         // Generated String, not going any higher then $start_point
         return substr($string, rand(0, $start_point), $length);
     }
-
 
     /**
      * Return the context name this class is handling
@@ -74,7 +73,7 @@ abstract class Authenticator
         $this->session->clear();
         foreach ($_COOKIE as $key => $val) {
             if (strpos($key, $this->session->name()) === 0) {
-                setcookie($key, "", 1, "/");
+                Session::ClearCookie($key);
             }
         }
     }
@@ -89,7 +88,7 @@ abstract class Authenticator
 
         $userID = $this->bean->insert($urow);
         if ($userID < 1) {
-            error_log("Authenticator::register() Error: ". $this->bean->getDB()->getError());
+            debug("Error: " . $this->bean->getDB()->getError());
             throw new Exception(tr("Error during registering. Please try again later."));
         }
 
@@ -100,7 +99,6 @@ abstract class Authenticator
         return new AuthContext($userID, $this->session);
     }
 
-
     /**
      * @param array|null $user_data
      * @return AuthContext|null
@@ -109,7 +107,7 @@ abstract class Authenticator
     {
 
         if (!$this->session->contains(SessionData::AUTH_TOKEN)) {
-            debug(get_class($this) . " SessionData does not have auth_token set");
+            debug($this, "SessionData does not have auth_token set");
             return NULL;
         }
 
@@ -118,23 +116,22 @@ abstract class Authenticator
         $token = unserialize($auth);
 
         if ($token instanceof AuthToken) {
-            debug(get_class($this) . " AuthToken un-serialized from session");
+            debug($this, "AuthToken un-serialized from session");
 
             if ($token->validateCookies($this->session->name()) === TRUE) {
-                debug(get_class($this) . " Cookie validation success");
+                debug($this, "Cookie validation success");
                 return new AuthContext($token->getID(), $this->session);
             }
             else {
-                debug(get_class($this) . " AuthContext validation failed");
+                debug($this, "AuthContext validation failed");
             }
         }
         else {
-            debug(get_class($this) . " AuthContext un-serialize failed");
+            debug($this, "AuthContext un-serialize failed");
         }
 
         return NULL;
     }
-
 
     /**
      * @param string $username
@@ -144,10 +141,10 @@ abstract class Authenticator
      * @param bool $check_password_only
      * @throws Exception
      */
-    public function login(string $username, string $pass, string $rand, bool $remember_me = false, bool $check_password_only = false)
+    public function login(string $username, string $pass, string $rand, bool $remember_me = FALSE, bool $check_password_only = FALSE)
     {
 
-        debug(get_class($this) . " Login process using loginToken: " . $rand);
+        debug($this, "Using loginToken: " . $rand);
 
         $db = DBConnections::Get();
 
@@ -155,10 +152,9 @@ abstract class Authenticator
 
         $qry = $this->bean->queryField("email", $username, 1);
 
-
         try {
             $qry->exec();
-            if (! ($row = $qry->next())) throw new Exception("Username or password not recognized");
+            if (!($row = $qry->next())) throw new Exception("Username or password not recognized");
 
             $userID = $row[$this->bean->key()];
 
@@ -186,7 +182,6 @@ abstract class Authenticator
                 $is_suspended = (int)$row["suspended"];
                 if ($is_suspended) throw new Exception(tr("Your account is temporary suspended."));
             }
-
 
             $this->fillSessionData($row);
 
@@ -219,30 +214,28 @@ abstract class Authenticator
      */
     protected function createAuthToken(int $id)
     {
-        debug(get_class($this) . " createAuthToken");
+        debug($this, "Regenerating session ID");
 
-        session_regenerate_id(true);
-
-        debug(get_class($this) . " SessionID regenerated");
+        session_regenerate_id(TRUE);
 
         $token = new AuthToken($id);
 
+        debug($this, "Creating cookies for SessionData name: ".$this->session->name());
         $token->storeCookies($this->session->name());
-        debug(get_class($this) . " Cookies created");
 
+        debug($this, "Serializing auth_token in SessionData");
         $this->session->set(SessionData::AUTH_TOKEN, serialize($token));
-        debug(get_class($this) . " AuthToken stored to SessionData");
     }
 
     protected function fillSessionData(array $row)
     {
-        debug(get_class($this) . " fillSessionData");
+        debug($this,"fill common SessionData");
 
         if (isset($row[SessionData::EMAIL])) {
             $this->session->set(SessionData::EMAIL, $row[SessionData::EMAIL]);
         }
         if (isset($row[SessionData::FULLNAME])) {
-            $this->session->set(SessionData::FULLNAME , $row[SessionData::FULLNAME]);
+            $this->session->set(SessionData::FULLNAME, $row[SessionData::FULLNAME]);
         }
 
     }
@@ -259,7 +252,7 @@ abstract class Authenticator
         $qry = $bean->queryField("email", $email, 1);
         $qry->exec();
 
-        if (! ($urow = $qry->next())) throw new Exception("This email is not registered or not confirmed yet");
+        if (!($urow = $qry->next())) throw new Exception("This email is not registered or not confirmed yet");
 
         $userID = (int)$urow[$bean->key()];
 
@@ -283,6 +276,8 @@ abstract class Authenticator
     }
 
     /**
+     * Create new random token and store as variable 'LOGIN_TOKEN' in SessionData
+     * Use this token in AuthForm HIDDEN field (rand)
      * @return false|string
      */
     public function createLoginToken()
@@ -293,6 +288,7 @@ abstract class Authenticator
     }
 
     /**
+     * Get the 'LOGIN_TOKEN' variable from SessionData
      * @return mixed
      * @throws Exception
      */
@@ -301,32 +297,31 @@ abstract class Authenticator
         return $this->session->get(SessionData::LOGIN_TOKEN);
     }
 
-    public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK=true)
+    public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK = TRUE)
     {
         debug("AuthorizeContext using contextName: $contextName");
-//
-//        if ($adminOK) {
-//            debug("Trying AdminAuthenticator first");
-//
-//            include_once("auth/AdminAuthenticator.php");
-//            $auth_admin = new AdminAuthenticator();
-//            $context = $auth_admin->authorize();
-//            if ($auth_admin->authorize()) {
-//                debug("AdminAuthenticator authorization success");
-//                return;
-//            }
-//            else {
-//                debug("AdminAuthenticator authorization failed");
-//            }
-//        }
-
+        //
+        //        if ($adminOK) {
+        //            debug("Trying AdminAuthenticator first");
+        //
+        //            include_once("auth/AdminAuthenticator.php");
+        //            $auth_admin = new AdminAuthenticator();
+        //            $context = $auth_admin->authorize();
+        //            if ($auth_admin->authorize()) {
+        //                debug("AdminAuthenticator authorization success");
+        //                return;
+        //            }
+        //            else {
+        //                debug("AdminAuthenticator authorization failed");
+        //            }
+        //        }
 
         $auth_class = "auth/$contextName.php";
         @include_once($auth_class);
-        if (!class_exists($contextName, false)) {
+        if (!class_exists($contextName, FALSE)) {
             $auth_class = "class/auth/$contextName.php";
             @include_once($auth_class);
-            if (!class_exists($contextName, false)) {
+            if (!class_exists($contextName, FALSE)) {
                 debug("Authenticator class can not be loaded");
                 throw new Exception("Unable to locate the authorization class");
             }

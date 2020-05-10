@@ -1,11 +1,10 @@
 <?php
 include_once("utils/MenuItem.php");
 
-
 class MainMenu
 {
 
-    protected $debug_matching = false;
+    protected $debug_matching = FALSE;
 
     protected $bean_class = NULL;
     protected $prefix_root = "";
@@ -13,7 +12,6 @@ class MainMenu
     protected $selected_item = NULL;
 
     protected $name = "";
-
 
     const FIND_INDEX_NORMAL = 1;
     const FIND_INDEX_LOOSE = 2;
@@ -32,7 +30,6 @@ class MainMenu
 
     protected $selected_path = array();
 
-
     public $uri_match_variable = "REQUEST_URI";
 
     protected $link_page = NULL;
@@ -50,7 +47,7 @@ class MainMenu
         $this->prefix_root = "";
     }
 
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -66,12 +63,12 @@ class MainMenu
 
     }
 
-    public function getMenuItems()
+    public function getMenuItems(): ?array
     {
         return $this->main_menu;
     }
 
-    public function getSelectedItem()
+    public function getSelectedItem(): ?MenuItem
     {
         return $this->selected_item;
 
@@ -82,7 +79,7 @@ class MainMenu
         $this->selected_item = $item;
     }
 
-    public function setMenuBeanClass($menu_items_class, $prefix_root = "", $link_page = "")
+    public function setMenuBeanClass(string $menu_items_class, $prefix_root = "", $link_page = "")
     {
         $this->bean_class = $menu_items_class;
         $this->bean = new $this->bean_class();
@@ -109,17 +106,11 @@ class MainMenu
 
         if ($total_items < 1) return;
 
-
         while ($row = $qry->next()) {
 
             $menuID = (int)$row[$key];
 
             trbean($menuID, $title, $row, $this->bean->getTableName());
-
-            $link = "";
-            if (strlen($this->prefix_root) > 0) {
-                $link .= $this->prefix_root;
-            }
 
             $menu_link = "";
             if (isset($row["link"])) {
@@ -127,17 +118,31 @@ class MainMenu
             }
             else if (strlen($this->link_page) > 0) {
                 $menu_link = $this->link_page . "?" . $key . "=" . $menuID;
+            }
+
+            if ($this->prefix_root) {
+                $menu_link = $this->prefix_root . $menu_link;
+            }
+
+            //debug("MenuLink is: $menu_link");
+
+            // - url is external
+            if (strpos($menu_link, "//") === 0) {
 
             }
-            if (strpos($menu_link, "/") === 0) {
-                if (strcmp(LOCAL, "/") !== 0) {
-                    $menu_link = LOCAL . $menu_link;
-                }
-            }
-            $link .= $menu_link;
+            // - url is internal root
+            else if (strpos($menu_link, "/") === 0) {
 
-            $item = new MenuItem($row[$title], $link);
-            $item->enableTranslation(false);
+                $menu_link = ltrim($menu_link, "/");
+                $local = rtrim(LOCAL, "/");
+                $menu_link = $local . "/" . $menu_link;
+
+            }
+
+            //debug("MenuLink is: $menu_link");
+
+            $item = new MenuItem($row[$title], $menu_link);
+            $item->enableTranslation(FALSE);
             // 		    $item->setMenuID($menuID);
             if ($parentID == 0) {
                 $arr_menu[] = $item;
@@ -152,9 +157,7 @@ class MainMenu
             $this->main_menu = $arr_menu;
         }
 
-
     }
-
 
     public function flattenMenu(&$arr, $current_menu)
     {
@@ -167,7 +170,7 @@ class MainMenu
         }
     }
 
-    public function findMenuIndex($find_mode = MainMenu::FIND_INDEX_NORMAL, $find_arr = false)
+    public function findMenuIndex($find_mode = MainMenu::FIND_INDEX_NORMAL, $find_arr = FALSE)
     {
         $this->selindex = -1;
 
@@ -183,12 +186,12 @@ class MainMenu
 
             $match = $this->matchItem($find_mode, $curr);
 
-            if ($match === true) {
+            if ($match === TRUE) {
                 $this->selected_item = $curr;
                 $position = $a;
                 break;
             }
-            else if ($match !== false) {
+            else if ($match !== FALSE) {
                 if ($match < $match_min) {
                     $match_min = $match;
                     $closest = $curr;
@@ -230,11 +233,11 @@ class MainMenu
 
         //href is found inside request
         if ($find_mode === MainMenu::FIND_INDEX_LOOSE) {
-            $match = (mb_strpos($request, $href) !== false);
+            $match = (mb_strpos($request, $href) !== FALSE);
         }
         //request is found inside href
         else if ($find_mode === MainMenu::FIND_INDEX_LOOSE_REVERSE) {
-            $match = (mb_strpos($href, $request) !== false);
+            $match = (mb_strpos($href, $request) !== FALSE);
         }
         else if ($find_mode === MainMenu::FIND_INDEX_LEVENSHTEIN) {
             $match = @levenshtein($request, $href);
@@ -251,15 +254,15 @@ class MainMenu
                 $request = $request[0];
             }
             $this->last_match_value = $request;
-            if (strcmp($request, $href) == 0) return true;
+            if (strcmp($request, $href) == 0) return TRUE;
 
             $breq = dirname($request);
-            if (endsWith($request, "/") === true) {
+            if (endsWith($request, "/") === TRUE) {
                 $breq = $request;
             }
 
             $hreq = dirname($href);
-            if (mb_strpos($breq, $hreq) === false) return false;
+            if (mb_strpos($breq, $hreq) === FALSE) return FALSE;
 
             $match = @levenshtein($request, $href);
 
@@ -273,13 +276,13 @@ class MainMenu
         return $match;
     }
 
-    public function setUnselectedAll()
+    public function unselectAll()
     {
         $arr = array();
         $this->flattenMenu($arr, $this->main_menu);
 
         foreach ($arr as $index => $sub) {
-            $sub->setSelected(false);
+            $sub->setSelected(FALSE);
         }
     }
 
@@ -294,7 +297,7 @@ class MainMenu
 
         $this->findMenuIndex($find_mode, $arr);
 
-        $this->setUnselectedAll();
+        $this->unselectAll();
 
         $this->updateSelectedMenu();
 
@@ -304,7 +307,7 @@ class MainMenu
     {
         if ($this->selected_item) {
 
-            $this->selected_item->setSelected(true);
+            $this->selected_item->setSelected(TRUE);
 
             $current = $this->selected_item;
 
@@ -313,7 +316,7 @@ class MainMenu
             while ($current->getParent()) {
 
                 $parent = $current->getParent();
-                $parent->setSelected(true);
+                $parent->setSelected(TRUE);
 
                 $current = $parent;
 
@@ -324,7 +327,7 @@ class MainMenu
         }
     }
 
-    public function getSelectedPath()
+    public function getSelectedPath(): array
     {
         return $this->selected_path;
     }

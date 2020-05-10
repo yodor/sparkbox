@@ -6,21 +6,21 @@
  */
 class Session
 {
-    protected static $is_started = false;
+    protected static $is_started = FALSE;
 
     public const ALERT = "alert";
 
     public static function Start()
     {
         session_start();
-        Session::$is_started = true;
-        debug("Starting session with ID: " . session_id());
+        Session::$is_started = TRUE;
+        //debug("Starting session with ID: " . session_id());
     }
 
     public static function Destroy()
     {
         session_destroy();
-        Session::$is_started = false;
+        Session::$is_started = FALSE;
     }
 
     public static function Close()
@@ -53,16 +53,17 @@ class Session
         }
     }
 
-    public static function SetCookie($key, $val, $expire = false)
+    public static function SetCookie($key, $val, $expire = 0)
     {
-        if (!$expire) {
-            $expire = time() + 60 * 60 * 24 * 365;
-        }
-
-        setcookie($key, $val, $expire, "/", COOKIE_DOMAIN);
+        setcookie($key, $val, $expire, LOCAL, COOKIE_DOMAIN);
     }
 
-    public static function GetCookie($key, $default = false)
+    public static function ClearCookie($key)
+    {
+        setcookie($key, "", 1, LOCAL, COOKIE_DOMAIN);
+    }
+
+    public static function GetCookie($key, $default = FALSE)
     {
         if (isset($_COOKIE[$key])) {
             return $_COOKIE[$key];
@@ -79,7 +80,7 @@ class Session
 
     public static function SetAlert(string $msg)
     {
-        if (strlen($msg)>0) {
+        if (strlen($msg) > 0) {
             Session::Set(Session::ALERT, $msg);
         }
         else {
