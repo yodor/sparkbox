@@ -1,6 +1,7 @@
 <?php
 include_once("beans/DBTableBean.php");
 include_once("utils/SQLSelect.php");
+include_once("utils/SQLUpdate.php");
 
 class NestedSetBean extends DBTableBean
 {
@@ -171,7 +172,8 @@ class NestedSetBean extends DBTableBean
                 $update = new SQLUpdate($this->select);
                 $update->set["lft"] = "lft + $distance";
                 $update->set["rgt"] = "rgt + $distance";
-                $update->appendWhere("lft >= $tmppos AND rgt < $tmppos + $extent");
+                $update->appendWhere(" (lft >= $tmppos AND rgt < $tmppos + $extent)");
+
                 if (!$db->query($update->getSQL())) throw new Exception("Update Error(3): " . $db->getError() . "<HR>" . $update->getSQL());
 
                 //remove old space
@@ -452,7 +454,7 @@ class NestedSetBean extends DBTableBean
 
         $sel->where .= " AND node.$prkey = $nodeEquals  ";
 
-        $sel->group_by = "";
+        $sel->group_by = " ";
 
         $sel->order_by = " parent.lft ";
 

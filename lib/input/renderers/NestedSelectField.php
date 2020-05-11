@@ -34,10 +34,15 @@ class NestedSelectField extends SelectField
             $path_len = count($path);
             $margin = 3 * ($path_len);
 
-            $item = clone $this->item;
+            $selected = ($nodeID == $this->input->getValue());
+
+            $item = $this->item;
             $item->setID($nodeID);
+
             $item->setName($this->input->getName() . "[]");
             $item->setData($row);
+
+            $item->setSelected($selected);
 
             $label = implode('', array_fill(0, $margin, '&nbsp;')) . $item->getLabel();
             $item->setLabel($label);

@@ -1,6 +1,7 @@
 <?php
 include_once("input/renderers/InputField.php");
 
+//plain <input> tag component
 abstract class InputFieldTag extends InputField
 {
 

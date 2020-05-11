@@ -315,13 +315,13 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
     {
         $name = $input->getName();
         $item_key = $bean->key();
-        debug("input [$name] for bean: " . get_class($bean) . " | item_key: $item_key");
+        debug("Using DataInput [$name] with DBTableBean: " . get_class($bean) . " | Primary Key: $item_key");
 
         $values = array();
 
         if (array_key_exists($name, $item_row)) {
 
-            debug("'$name' found in the item_row - loading value");
+            debug("Key '$name' found in the bean result row - loading value");
 
             $value = $item_row[$name];
 
@@ -363,26 +363,26 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
         else {
 
             //process data source values
-            debug("field '$name' not found in item_row - trying field source values");
+            debug("Key '$name' not found in the bean result row - trying values from source of DataInput");
 
             $data_source = $input->getSource();
 
             if (is_null($data_source)) {
-                debug("'$name' no data source is set for this field");
+                debug("DataInput source is NULL");
                 $values = NULL;
             }
             else {
 
-                debug("field: '$name' | Using Data Source: " . get_class($data_source));
+                debug("Using DataInput source: " . get_class($data_source));
 
                 if (!($data_source instanceof DBTableBean)) throw new Exception("Received data source: '" . get_class($data_source) . "' but 'DBTableBean' expected.");
 
                 $source_fields = $data_source->fields();
                 $source_key = $data_source->key();
 
-                if (!in_array($item_key, $source_fields)) throw new Exception("ItemKey: $item_key not exist in data source fileds");
+                if (!in_array($item_key, $source_fields)) throw new Exception("Key '$item_key' was not found in the DataInput 'source' fields");
 
-                debug("processing data_source values using access field: '$item_key'");
+                debug("Processing DataInput 'source' values using key: '$item_key'");
 
                 $source_values = array();
                 $qry = $data_source->queryField($item_key, $editID);
@@ -404,7 +404,12 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
         }//array_key_exists
 
-        //       debug("SimpleInputProcessor::loadBeanData: | Final field values: ",$values);
+        if (is_array($values)) {
+            debug("Setting value: ",$values);
+        }
+        else {
+            debug("Setting value: $values");
+        }
         $input->setValue($values);
 
     }

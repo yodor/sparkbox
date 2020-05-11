@@ -254,9 +254,8 @@ class InputForm implements IBeanEditor
             $names = $this->getInputNames();
             foreach ($names as $pos => $name) {
 
-                debug("Loading data for field name: $name");
-
                 $input = $this->getInput($name);
+                debug("Processing DataInput [$name]");
                 //processor need value set. processor might need other values from the item_row or to parse differently the value
                 $input->getProcessor()->loadBeanData($editID, $bean, $input, $item_row);
             }
