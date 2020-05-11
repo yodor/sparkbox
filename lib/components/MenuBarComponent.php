@@ -2,7 +2,6 @@
 include_once("components/Component.php");
 include_once("utils/MainMenu.php");
 include_once("components/renderers/menus/MenuBarItemRenderer.php");
-include_once("components/MLTagComponent.php");
 
 class MenuBarComponent extends Component
 {
@@ -17,12 +16,12 @@ class MenuBarComponent extends Component
     protected $ir_baritem;
 
     /**
-     * @var MLTagComponent
+     * @var Component
      */
     protected $bar;
 
     /**
-     * @var MLTagComponent
+     * @var Component
      */
     protected $toggle;
 
@@ -42,10 +41,12 @@ class MenuBarComponent extends Component
             $this->setAttribute("source", $bean_name);
         }
 
-        $this->bar = new MLTagComponent("DIV");
+        $this->bar = new Component();
         $this->bar->setClassName("MenuBar");
 
-        $this->toggle = new MLTagComponent("A");
+        $this->toggle = new Component();
+        $this->toggle->setTagName("A");
+
         $this->toggle->setClassName("toggle");
 
     }

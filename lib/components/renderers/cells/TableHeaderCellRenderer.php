@@ -4,13 +4,14 @@ include_once("components/renderers/cells/TableCellRenderer.php");
 class TableHeaderCellRenderer extends TableCellRenderer
 {
 
+    protected $tagName = "TH";
     protected $sort_field = "";
     protected $sort_href = "";
 
     public function __construct($is_sortable = TRUE)
     {
         parent::__construct();
-        $this->tag = "TH";
+
     }
 
     public function isSortable()

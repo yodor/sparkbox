@@ -75,7 +75,7 @@ MCEImageBrowserDialog.prototype.onClickImage = function (imageID, event) {
 
                 if (popup.is(":checked")) {
                     var popup_href = LOCAL + "/storage.php?cmd=image&class=MCEImagesBean&id=" + imageID;
-                    final_tag = $("<a href='' class='image_popup'></a>");
+                    final_tag = $("<a href='' class='ImagePopup'></a>");
                     final_tag.attr("href", popup_href);
                     final_tag.html(image_tag);
 

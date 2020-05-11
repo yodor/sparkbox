@@ -8,7 +8,7 @@ include_once("handlers/ChangePositionRequestHandler.php");
 include_once("handlers/DeleteItemRequestHandler.php");
 include_once("handlers/ToggleFieldRequestHandler.php");
 
-include_once("utils/ReferenceKeyPageChecker.php");
+include_once("utils/RequestBeanKey.php");
 include_once("utils/SQLSelect.php");
 
 include_once("components/InputFormView.php");

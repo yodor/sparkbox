@@ -21,3 +21,14 @@ A IMG INPUT {
     clear: both;
 }
 
+.AjaxLoader {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/ajax-loader.gif");
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+
+

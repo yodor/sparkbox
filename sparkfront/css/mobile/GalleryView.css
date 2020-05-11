@@ -4,6 +4,6 @@
     display: block;
 }
 
-.GalleryViewItemRenderer .image_slot .image_popup IMG {
+.GalleryViewItemRenderer .image_slot .ImagePopup IMG {
     width: 100%;
 }

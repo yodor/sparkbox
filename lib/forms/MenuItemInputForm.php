@@ -25,7 +25,7 @@ class MenuItemInputForm extends InputForm
         $rend->na_label = "--- TOP ---";
         $rend->na_value = "-1";
 
-        $rend->setItemIterator(new SQLQuery($source->listTreeSelect(), "menuID", $source->getTableName()));
+        $rend->setItemIterator(new SQLQuery($source->selectTree(array("menu_title")), "menuID", $source->getTableName()));
         $rend->getItemRenderer()->setValueKey("menuID");
         $rend->getItemRenderer()->setLabelKey("menu_title");
 

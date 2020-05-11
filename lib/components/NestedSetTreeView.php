@@ -12,11 +12,11 @@ class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
     const BRANCH_CLOSED = "closed";
     const BRANCH_LEAF = "leaf";
 
-    const ICON_HANDLE_OPEN = "+";
-    const ICON_HANDLE_CLOSE = "-";
-    const ICON_HANDLE_LEAF = "&middot";
+//    const ICON_HANDLE_OPEN = "+";
+//    const ICON_HANDLE_CLOSE = "-";
+//    const ICON_HANDLE_LEAF = "&middot";
 
-    public $open_all = TRUE;
+    public $open_all = false;
 
     //    protected $data_source = NULL;
     //    protected $select_qry = NULL;
@@ -108,9 +108,13 @@ class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
 
         $open_tags = 0;
 
+//        echo $this->iterator->select->getSQL();
+
         $num = $this->iterator->exec();
 
         echo "<ul class='NodeChilds'>";
+
+        $selection = array();
 
         while ($row = $this->iterator->next()) {
 
@@ -120,18 +124,11 @@ class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
 
             $nodeID = $row[$source_key];
 
-            $render_mode = NestedSetTreeView::BRANCH_CLOSED;
-            if ($this->open_all) {
-                $render_mode = NestedSetTreeView::BRANCH_OPENED;
-            }
-            if ($rgt == $lft + 1) {
-                $render_mode = NestedSetTreeView::BRANCH_LEAF;
-            }
-
             trbean($nodeID, $this->item->getLabelKey(), $row, $this->iterator->name());
 
             while (count($path) > 0 && $lft > $path[count($path) - 1]) {
                 array_pop($path);
+                array_pop($selection);
 
                 if ($open_tags >= 1) {
                     echo "</ul>";
@@ -142,18 +139,26 @@ class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
 
             $path[] = $rgt;
 
-            $path_len = count($path);
+            $selection[] = $nodeID;
+
+            $selected = FALSE;
+            if ($nodeID == $this->selected_nodeID) {
+                $this->selection_path = $selection;
+                $selected = TRUE;
+            }
 
             echo "<li class='NodeOuter'>";
             $open_tags++;
 
-            $selected = FALSE;
-            if ($nodeID == $this->selected_nodeID) {
-                $this->selection_path = array_values($path);
-                $selected = TRUE;
+            $render_mode = NestedSetTreeView::BRANCH_CLOSED;
+            if ($this->open_all) {
+                $render_mode = NestedSetTreeView::BRANCH_OPENED;
+            }
+            if ($rgt == $lft + 1) {
+                $render_mode = NestedSetTreeView::BRANCH_LEAF;
             }
 
-            $item = $this->item;
+            $item = clone $this->item;
             $item->setID($nodeID);
             $item->setData($row);
 
@@ -161,7 +166,8 @@ class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
 
             $item->setSelected($selected);
 
-            $item_label = $this->item->getLabel();
+            $item_label = $item->getLabel();
+
             if (isset($row["related_count"])) {
                 $item_label .= " (" . $row["related_count"] . ")";
             }

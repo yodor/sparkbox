@@ -3,7 +3,7 @@ include_once("pages/HTMLPage.php");
 include_once("components/AbstractResultView.php");
 include_once("components/renderers/items/TextItemRenderer.php");
 include_once("components/renderers/IItemRenderer.php");
-
+include_once("utils/ValueInterleave.php");
 include_once("components/PageResultsPanel.php");
 
 class ListView extends AbstractResultView

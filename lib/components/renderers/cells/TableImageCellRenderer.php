@@ -47,12 +47,12 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $this->source_key = $source_key;
     }
 
-    public function setListLimit($num)
+    public function setListLimit(int $num)
     {
         $this->list_limit = (int)$num;
     }
 
-    public function setBlobField($blob_field)
+    public function setBlobField(string $blob_field)
     {
         $this->blob_field = $blob_field;
     }
@@ -85,6 +85,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         if (!$this->blob_field) {
             $this->blob_field = $this->column->getFieldName();
         }
+        
         $source_fields = $this->bean->fields();
 
         $qry = $this->bean->query();
@@ -186,7 +187,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
                 }
                 else {
 
-                    echo "<a class='image_popup' href='{$item->hrefFull()}'  >";
+                    echo "<a class='ImagePopup' href='{$item->hrefFull()}'  >";
                     echo $img_tag;
                     echo "</a>";
                 }
@@ -212,7 +213,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             echo $e->getMessage();
         }
     }
-    //default rendering fetch from source linking with current 'view' prkey
+    //default rendering fetch from source bean linking with current 'view' iterator prkey
     public function setData(array &$row)
     {
         parent::setData($row);

@@ -42,7 +42,10 @@ class SQLQuery implements IDataIterator
 
         $this->res = $this->db->query($this->select->getSQL());
        // mysqli_result::fetch_fields
-        if (!$this->res) throw new Exception($this->db->getError());
+        if (!$this->res) {
+            debug($this->select->getSQL());
+            throw new Exception($this->db->getError());
+        }
 
         //TODO:?
         $res = $this->db->query("SELECT FOUND_ROWS() as total");

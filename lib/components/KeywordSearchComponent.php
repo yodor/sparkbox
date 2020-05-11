@@ -105,7 +105,7 @@ class KeywordSearchComponent extends Component implements IQueryFilter
         parent::finishRender();
     }
 
-    public function getForm()
+    public function getForm() : InputForm
     {
         return $this->sform;
     }
@@ -156,5 +156,6 @@ class KeywordSearchComponent extends Component implements IQueryFilter
     {
         return $this->sform->searchFilterSelect();
     }
+
 
 }

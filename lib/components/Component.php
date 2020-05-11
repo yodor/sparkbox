@@ -4,8 +4,9 @@ include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
 include_once("pages/HTMLPage.php");
 
-abstract class Component implements IRenderer, IHeadContents
+class Component implements IRenderer, IHeadContents
 {
+    protected $tagName = "DIV";
 
     protected $render_index = -1;
 
@@ -39,6 +40,8 @@ abstract class Component implements IRenderer, IHeadContents
 
     public $render_tooltip = true;
 
+    protected $contents = "";
+
     public function __construct()
     {
         //$this->component_class = get_class($this);
@@ -51,7 +54,7 @@ abstract class Component implements IRenderer, IHeadContents
 
         $this->component_class = implode(" ", $class_chain);
 
-        $page = HTMLPage::Instance();
+        $page = SparkPage::Instance();
 
         if ($page instanceof SparkPage) {
             $page->addComponent($this);
@@ -74,7 +77,10 @@ abstract class Component implements IRenderer, IHeadContents
         return array();
     }
 
-    protected abstract function renderImpl();
+    public function setTagName(string $tagName)
+    {
+        $this->tagName = $tagName;
+    }
 
     /**
      * Called in start render before prepareAttributes
@@ -89,12 +95,17 @@ abstract class Component implements IRenderer, IHeadContents
     {
         $this->processAttributes();
         $attrs = $this->prepareAttributes();
-        echo "<div $attrs>";
+        echo "<$this->tagName $attrs>";
+    }
+
+    protected function renderImpl()
+    {
+        echo $this->contents;
     }
 
     public function finishRender()
     {
-        echo "</div>";
+        echo "</$this->tagName>";
     }
 
     public function render(int $render_index = -1)

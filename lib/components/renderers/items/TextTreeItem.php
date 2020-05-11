@@ -14,6 +14,7 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
     {
         parent::__construct();
 
+        //construct default empty action with no parameters
         $this->text_action = new Action("Text Action", "", array());
 
         $this->actions = array();

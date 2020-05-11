@@ -4,12 +4,12 @@ include_once("beans/DBTableBean.php");
 
 class DBViewBean extends DBTableBean
 {
-    public function __construct($table_name)
+    public function __construct(string $table_name)
     {
         parent::__construct($table_name);
     }
 
-    public function deleteID($id, $db = false)
+    public function deleteID(int $id, DBDriver $db = NULL)
     {
         throw new Exception("View not writable");
     }
@@ -19,19 +19,19 @@ class DBViewBean extends DBTableBean
         throw new Exception("View not writable");
     }
 
-    public function toggleField($id, $field)
+    public function toggleField(int $id, string $field)
     {
         throw new Exception("View not writable");
     }
 
-    public function update($id, &$row, &$db = false)
+    public function update($id, array &$row, DBDriver $db = NULL)
     {
         throw new Exception("View not writable");
     }
 
     //
 
-    public function insert(&$row, &$db = false)
+    public function insert(array &$row, DBDriver $db = NULL) : int
     {
         throw new Exception("View not writable");
     }

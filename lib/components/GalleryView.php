@@ -90,6 +90,7 @@ class GalleryView extends Component
         if (strcmp_isset("view", "list")) {
 
             $view = new TableView($bean->query());
+
             $this->view = $view;
 
             //   $view->addColumn(new TableColumn("ppID", "ID"));
@@ -120,7 +121,10 @@ class GalleryView extends Component
             $this->view_mode = GalleryView::MODE_LIST;
         }
         else {
-            $view = new ListView($bean->query());
+
+            $qry = $bean->query();
+
+            $view = new ListView($qry);
             $this->view = $view;
 
             $renderer = new GalleryViewItemRenderer($this);

@@ -296,7 +296,7 @@ class InputForm implements IBeanEditor
         return "$key='$val'";
     }
 
-    public function searchFilterSelect(): SQLSelect
+    public function searchFilterSelect(string $oper="AND"): SQLSelect
     {
         $sel = new SQLSelect();
         $sel->fields = "";
@@ -305,7 +305,7 @@ class InputForm implements IBeanEditor
         $sa = $this->searchFilterArray();
         $sf = "";
         if (count($sa) > 0) {
-            $sf = implode(" AND ", $sa);
+            $sf = implode(" $oper ", $sa);
         }
         $sel->where = $sf;
         return $sel;

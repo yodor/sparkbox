@@ -32,21 +32,6 @@ abstract class AbstractResultView extends Component
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
     }
 
-    public function requiredStyle()
-    {
-        $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL."/css/GalleryView.css";
-        return $arr;
-    }
-
-    public function requiredScript()
-    {
-
-        $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL."/js/GalleryView.js";
-        return $arr;
-    }
-
     public function getIterator() : IDataIterator
     {
         return $this->itr;

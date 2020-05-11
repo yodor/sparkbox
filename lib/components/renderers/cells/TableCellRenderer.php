@@ -1,10 +1,10 @@
 <?php
-include_once("components/MLTagComponent.php");
+include_once("components/Component.php");
 include_once("components/TableColumn.php");
 
-class TableCellRenderer extends MLTagComponent
+class TableCellRenderer extends Component
 {
-
+    protected $tagName = "TD";
     protected $tooltip_field = "";
     protected $action = FALSE;
 
@@ -18,7 +18,7 @@ class TableCellRenderer extends MLTagComponent
 
     public function __construct()
     {
-        parent::__construct("TD");
+        parent::__construct();
     }
 
     public function setAction(Action $a)

@@ -144,8 +144,9 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         $nodeID = $view->getSelectedID();
 
         if ($nodeID > 0) {
-            $sel->where = " relation.catID = child.catID ";
-            $sel = $this->bean->childNodesWith($sel, $nodeID);
+
+            $sel = $this->bean->selectChildNodesWith($sel, $nodeID);
+            //group by ?
         }
         return $this->getFilterValue($filter_name);
     }

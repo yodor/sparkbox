@@ -32,9 +32,7 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/ActionRenderer.css";
-        $arr[] = SPARK_LOCAL . "/css/GalleryView.css";
         return $arr;
-
     }
 
     public function setItem($item)
@@ -155,7 +153,7 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
         $rel = get_class($this->view->getBean());
 
         echo "<a 
-        class='image_popup image_slot' 
+        class='ImagePopup image_slot' 
         style='background-image:url($thumb_href)' 
         href='$image_href' 
         name='$named_link' 
