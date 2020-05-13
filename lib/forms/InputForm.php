@@ -2,7 +2,6 @@
 include_once("input/DataInputFactory.php");
 include_once("beans/IBeanEditor.php");
 
-
 /**
  * Class InputForm
  * Generic HTML "Form" implementation
@@ -48,6 +47,8 @@ class InputForm implements IBeanEditor
      */
     protected $renderer = NULL;
 
+    protected $name = "";
+
     /**
      * InputForm constructor.
      * @throws Exception
@@ -56,8 +57,16 @@ class InputForm implements IBeanEditor
     {
         $this->bean = NULL;
         $this->beanID = -1;
+        $this->name = get_class($this);
     }
-
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+    public function getName() : string
+    {
+        return $this->name;
+    }
     public function getRenderer(): ?FormRenderer
     {
         return $this->renderer;
@@ -88,10 +97,7 @@ class InputForm implements IBeanEditor
     {
         $index = array_search($after_name, array_keys($this->inputs));
 
-        $this->inputs =
-            array_slice($this->inputs, 0, $index + 1, TRUE) +
-            array($input->getName() => $input) +
-            array_slice($this->inputs, $index + 1, count($this->inputs) - 1, TRUE);
+        $this->inputs = array_slice($this->inputs, 0, $index + 1, TRUE) + array($input->getName() => $input) + array_slice($this->inputs, $index + 1, count($this->inputs) - 1, TRUE);
 
     }
 
@@ -102,7 +108,7 @@ class InputForm implements IBeanEditor
         }
     }
 
-    public function setBean(DBTableBean $bean) : void
+    public function setBean(DBTableBean $bean)
     {
         $this->bean = $bean;
     }
@@ -112,7 +118,7 @@ class InputForm implements IBeanEditor
         return $this->bean;
     }
 
-    public function setEditID(int $editid) : void
+    public function setEditID(int $editid)
     {
         $this->beanID = $editid;
     }
@@ -126,7 +132,7 @@ class InputForm implements IBeanEditor
      * @param string $field_name
      * @return bool
      */
-    public function haveInput(string $name) : bool
+    public function haveInput(string $name): bool
     {
         return array_key_exists($name, $this->inputs);
     }
@@ -140,7 +146,6 @@ class InputForm implements IBeanEditor
     {
         return $this->inputs[$name];
     }
-
 
     // 	public function getValuesArray()
     public function getInputValues()
@@ -161,7 +166,7 @@ class InputForm implements IBeanEditor
         return $this->inputs;
     }
 
-    public function getInputNames() : array
+    public function getInputNames(): array
     {
         return array_keys($this->inputs);
     }
@@ -175,7 +180,7 @@ class InputForm implements IBeanEditor
     /**
      * @return bool
      */
-    public function haveErrors() : bool
+    public function haveErrors(): bool
     {
         $found_error = FALSE;
         foreach ($this->inputs as $name => $input) {
@@ -187,20 +192,19 @@ class InputForm implements IBeanEditor
         return $found_error;
     }
 
-    public function clear() : void
+    public function clear()
     {
         foreach ($this->inputs as $name => $input) {
             $input->clear();
         }
     }
 
-
     /**
      * Load values with data from _POST or DBTableBean
      * @param array $arr
      * @throws Exception
      */
-    public function loadPostData(array $arr) : void
+    public function loadPostData(array $arr)
     {
 
         $names = array_keys($this->inputs);
@@ -209,7 +213,7 @@ class InputForm implements IBeanEditor
             $input = $this->getInput($name);
 
             if ($input->isEditable()) {
-                $input->loadPostData($arr);
+                $input->getProcessor()->loadPostData($arr);
             }
         }
 
@@ -257,7 +261,7 @@ class InputForm implements IBeanEditor
                 $input = $this->getInput($name);
                 debug("Processing DataInput [$name]");
                 //processor need value set. processor might need other values from the item_row or to parse differently the value
-                $input->getProcessor()->loadBeanData($editID, $bean, $input, $item_row);
+                $input->getProcessor()->loadBeanData($editID, $bean, $item_row);
             }
 
         }
@@ -290,12 +294,12 @@ class InputForm implements IBeanEditor
         return $search_filter;
     }
 
-    protected function searchFilterForKey(string $key, string $val) : string
+    protected function searchFilterForKey(string $key, string $val): string
     {
         return "$key='$val'";
     }
 
-    public function searchFilterSelect(string $oper="AND"): SQLSelect
+    public function searchFilterSelect(string $oper = "AND"): SQLSelect
     {
         $sel = new SQLSelect();
         $sel->fields = "";
@@ -346,7 +350,6 @@ class InputForm implements IBeanEditor
             $this->getInput($name)->setValue($value);
         }
 
-
     }
 
     public function dumpErrors()
@@ -373,7 +376,6 @@ class InputForm implements IBeanEditor
 
         }
     }
-
 
 }
 

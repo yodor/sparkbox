@@ -1,7 +1,6 @@
 <?php
 include_once("components/Component.php");
-include_once("components/ListView.php");
-include_once("components/renderers/IActionRenderer.php");
+include_once("components/ItemView.php");
 include_once("components/renderers/IItemRenderer.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/renderers/ActionRenderer.php");
@@ -19,6 +18,11 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     protected $item = NULL;
 
     protected $actionRenderer = NULL;
+
+    /**
+     * @var URLParameter
+     */
+    protected $urlparam;
 
     public function __construct(GalleryView $view)
     {
@@ -49,11 +53,10 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
 
         $this->setAttribute("itemID", $photoID);
 
-        $refID = $this->view->getRefVal();
-        $ref_key = $this->view->getRefKey();
-
-        $this->setAttribute("ref_key", $ref_key);
-        $this->setAttribute("ref_id", $refID);
+        if ($this->urlparam) {
+            $this->setAttribute("ref_key", $this->urlparam->name());
+            $this->setAttribute("ref_id", $this->urlparam->value());
+        }
 
     }
 
@@ -188,5 +191,15 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     public function renderSeparator($idx_curr, $items_total)
     {
 
+    }
+
+    /**
+     * @param URLParameter $urlparam
+     * @return void
+     */
+    public function addURLParameter(URLParameter $param)
+    {
+        //TODO: implement actions
+        $this->urlparam = $param;
     }
 }

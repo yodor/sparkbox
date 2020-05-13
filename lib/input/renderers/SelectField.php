@@ -54,8 +54,8 @@ class SelectField extends DataIteratorField
         //prepare the default select value
         if ($this->na_label) {
 
-            $data = array($this->getItemRenderer()->getValueKey()=>$this->na_value,
-                $this->getItemRenderer()->getLabelKey()=>$this->na_label);
+//            $data = array($this->getItemRenderer()->getValueKey()=>$this->na_value,
+//                $this->getItemRenderer()->getLabelKey()=>$this->na_label);
 
             $item = $this->item;
 
@@ -63,7 +63,10 @@ class SelectField extends DataIteratorField
 
             $item->setIndex(-1);
 
-            $item->setData($data);
+            //$item->setData($data);
+
+            $item->setValue($this->na_value);
+            $item->setLabel($this->na_label);
 
             $item->setSelected($this->isModelSelected());
 

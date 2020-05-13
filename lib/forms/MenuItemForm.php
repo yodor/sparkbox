@@ -2,7 +2,7 @@
 include_once("forms/InputForm.php");
 include_once("beans/MenuItemsBean.php");
 
-class MenuItemInputForm extends InputForm
+class MenuItemForm extends InputForm
 {
 
     public function __construct(NestedSetBean $source)
@@ -39,7 +39,7 @@ class MenuItemInputForm extends InputForm
         $this->load();
     }
 
-    public function loadPostData(array $arr): void
+    public function loadPostData(array $arr)
     {
         parent::loadPostData($arr);
         $this->load();

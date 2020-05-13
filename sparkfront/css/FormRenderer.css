@@ -13,18 +13,18 @@
     text-align: left;
 }
 
-.FormRenderer[field_layout="HBox"] .InputComponent {
+.FormRenderer[layout="HBox"] .InputComponent {
     display: table-row;
 }
 
-.FormRenderer[field_layout="HBox"] .InputComponent .InputLabel {
+.FormRenderer[layout="HBox"] .InputComponent .InputLabel {
     display: table-cell;
     text-align: right;
 
     vertical-align: middle;
 }
 
-.FormRenderer[field_layout="HBox"] .InputComponent .InputField {
+.FormRenderer[layout="HBox"] .InputComponent .InputField {
     display: table-cell;
     text-align: left;
 
@@ -32,14 +32,14 @@
 }
 
 
-.FormRenderer[field_layout="HBox"] .InputComponent .content_after {
+.FormRenderer[layout="HBox"] .InputComponent .content_after {
     display: table-cell;
     text-align: left;
 
     vertical-align: middle;
 }
 
-.FormRenderer[field_layout="HBox"] .InputComponent .content_before {
+.FormRenderer[layout="HBox"] .InputComponent .content_before {
     display: table-cell;
     text-align: left;
 
@@ -48,54 +48,49 @@
 
 /*HBOX Array*/
 
-.FormRenderer[field_layout="HBox"] .ArrayContents:empty {
+.FormRenderer[layout="HBox"] .ArrayContents:empty {
     display: none;
 }
 
-.FormRenderer[field_layout="HBox"] .ArrayContents {
+.FormRenderer[layout="HBox"] .ArrayContents {
     display: table;
     border-spacing: 0.2em;
     border-collapse: separate;
 }
 
-.FormRenderer[field_layout="HBox"] .ArrayContents .Element {
+.FormRenderer[layout="HBox"] .ArrayContents .Element {
     display: table-row;
 }
 
-.FormRenderer[field_layout="HBox"] .ArrayContents .Element > * {
+.FormRenderer[layout="HBox"] .ArrayContents .Element > * {
     display: table-cell;
     vertical-align: middle;
 }
 
-/*.FormRenderer[field_layout="HBox"] .ArrayContents .Element .Controls {*/
-/*    display: table-cell;*/
-/*    vertical-align: middle;*/
-/*}*/
+/*vbox*/
 
-/* vbox */
-
-.FormRenderer[field_layout="VBox"] .InputComponent {
+.FormRenderer[layout="VBox"] .InputComponent {
 
     display: block;
 
 }
 
-.FormRenderer[field_layout="VBox"] .InputComponent .InputField {
+.FormRenderer[layout="VBox"] .InputComponent .InputField {
     display: block;
 
 }
 
-.FormRenderer[field_layout="VBox"] .InputComponent .InputLabel {
+.FormRenderer[layout="VBox"] .InputComponent .InputLabel {
     display: inline-block;
     text-align: left;
 }
 
-.FormRenderer[field_layout="VBox"] .InputComponent .content_after {
+.FormRenderer[layout="VBox"] .InputComponent .content_after {
     display: inline-block;
     text-align: left;
 }
 
-.FormRenderer[field_layout="VBox"] .InputComponent .content_before {
+.FormRenderer[layout="VBox"] .InputComponent .content_before {
     display: inline-block;
     text-align: left;
 }
@@ -107,15 +102,26 @@
 
 }
 
-.FormRenderer .SubmitLine .Buttons {
-    display: table-cell;
-    text-align: right;
+.FormRenderer .SubmitLine .TextSpace {
+
+    text-align: left;
+    vertical-align: middle;
+    display:table-cell;
 }
 
-.FormRenderer .SubmitLine .TextSpace {
-    display: table-cell;
-    text-align: left;
+.FormRenderer .SubmitLine .Buttons {
+
+    text-align: right;
+    vertical-align: middle;
+    display:table-cell;
 }
+
+.FormRenderer .SubmitLine .Buttons>* {
+    margin-left:0.5em;
+    margin-left:0em;
+}
+
+
 
 
 

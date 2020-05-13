@@ -4,13 +4,6 @@ include_once("components/PaginatorComponent.php");
 class PaginatorBottomComponent extends PaginatorComponent
 {
 
-    public function __construct(Paginator $paginator)
-    {
-        parent::__construct($paginator);
-
-        $this->setClassName("PaginatorBottomComponent");
-    }
-
     public function renderImpl()
     {
 

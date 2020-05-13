@@ -73,7 +73,7 @@ abstract class AbstractResultView extends Component
 
     public function setCaption(string $caption)
     {
-        parent::setCaption($caption);
+        //parent::setCaption($caption);
         $this->paginator_top->setCaption($caption);
     }
 

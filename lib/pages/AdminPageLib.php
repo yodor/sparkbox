@@ -11,7 +11,7 @@ include_once("handlers/ToggleFieldRequestHandler.php");
 include_once("utils/RequestBeanKey.php");
 include_once("utils/SQLSelect.php");
 
-include_once("components/InputFormView.php");
+include_once("components/BeanFormEditor.php");
 include_once("components/TableView.php");
 
 include_once("utils/PageSessionMenu.php");

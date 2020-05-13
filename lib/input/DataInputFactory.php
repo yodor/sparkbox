@@ -33,12 +33,12 @@ include_once("input/validators/FileUploadValidator.php");
 include_once("input/validators/EmptyValueValidator.php");
 include_once("input/validators/CaptchaInputValidator.php");
 
-include_once("input/processors/DateInputProcessor.php");
-include_once("input/processors/TimeInputProcessor.php");
-include_once("input/processors/PhoneInputProcessor.php");
-include_once("input/processors/UploadDataInputProcessor.php");
+include_once("input/processors/DateInput.php");
+include_once("input/processors/TimeInput.php");
+include_once("input/processors/PhoneInput.php");
+include_once("input/processors/UploadDataInput.php");
 
-include_once("input/processors/SessionUploadInputProcessor.php");
+include_once("input/processors/SessionUploadInput.php");
 
 class DataInputFactory
 {
@@ -85,11 +85,11 @@ class DataInputFactory
     public static function Create(int $type, string $name, string $label, bool $required)
     {
         $input = new DataInput($name, $label, $required);
-        $input->transact_mode = DataInput::TRANSACT_VALUE;
+
 
         $input->setValidator(new EmptyValueValidator());
-        $processor = new BeanPostProcessor();
-        $input->setProcessor($processor);
+        $processor = new InputProcessor($input);
+        $processor->transact_mode = InputProcessor::TRANSACT_VALUE;
 
         switch ($type) {
 
@@ -142,32 +142,34 @@ class DataInputFactory
 
             case DataInputFactory::DATE:
                 new DateField($input);
-                $input->setProcessor(new DateInputProcessor());
+                new DateInput($input);
                 $input->setValidator(new DateValidator());
                 break;
 
             case DataInputFactory::TIME:
                 new TimeField($input);
-                $input->setProcessor(new TimeInputProcessor());
+                new TimeInput($input);
                 $input->setValidator(new TimeValidator());
                 break;
 
             case DataInputFactory::PHONE:
                 new PhoneField($input);
-                $input->setProcessor(new PhoneInputProcessor());
+                new PhoneInput($input);
                 $input->setValidator(new PhoneValidator());
                 break;
 
             case DataInputFactory::FILE:
                 new FileField($input);
+                new UploadDataInput($input);
                 $input->setValidator(new FileUploadValidator());
-                $input->setProcessor(new UploadDataInputProcessor());
+
                 break;
 
             case DataInputFactory::IMAGE:
                 new ImageField($input);
+                new UploadDataInput($input);
                 $input->setValidator(new ImageUploadValidator());
-                $input->setProcessor(new UploadDataInputProcessor());
+
                 break;
 
             case DataInputFactory::NESTED_SELECT:
@@ -181,39 +183,35 @@ class DataInputFactory
             case DataInputFactory::SESSION_IMAGE:
 
                 $input = new ArrayDataInput($name, $label, $required);
-                $input->transact_mode = DataInput::TRANSACT_OBJECT;
+
                 $input->allow_dynamic_addition = FALSE;
 
                 new SessionImage($input);
 
-                $processor = new SessionUploadInputProcessor();
+                $processor = new SessionUploadInput($input);
                 $processor->max_slots = 1;
-                $input->setProcessor($processor);
+                $processor->transact_mode = InputProcessor::TRANSACT_OBJECT;
 
                 $validator = new ImageUploadValidator();
                 $validator->skip_is_uploaded_check = TRUE;
                 $input->setValidator($validator);
 
-                $input->setValueTransactor($processor);
-
                 break;
             case DataInputFactory::SESSION_FILE:
 
                 $input = new ArrayDataInput($name, $label, $required);
-                $input->transact_mode = DataInput::TRANSACT_OBJECT;
+
                 $input->allow_dynamic_addition = FALSE;
 
                 new SessionFile($input);
 
-                $processor = new SessionUploadInputProcessor();
+                $processor = new SessionUploadInput($input);
                 $processor->max_slots = 1;
-                $input->setProcessor($processor);
+                $processor->transact_mode = DataInput::TRANSACT_OBJECT;
 
                 $validator = new FileUploadValidator();
                 $validator->skip_is_uploaded_check = TRUE;
                 $input->setValidator($validator);
-
-                $input->setValueTransactor($processor);
 
                 break;
             case DataInputFactory::CAPTCHA:

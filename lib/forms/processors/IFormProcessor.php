@@ -9,7 +9,7 @@ interface IFormProcessor
     const STATUS_NOT_PROCESSED = 0;
     const STATUS_OK = 1;
 
-    public function processForm(InputForm $form, string $submit_name = "");
+    public function process(InputForm $form);
 
     /**
      * @return string

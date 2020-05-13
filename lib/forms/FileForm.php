@@ -2,7 +2,7 @@
 include_once("forms/InputForm.php");
 include_once("input/DataInputFactory.php");
 
-class FileInputForm extends InputForm
+class FileForm extends InputForm
 {
 
     public $accept_mimes = NULL;
@@ -13,7 +13,7 @@ class FileInputForm extends InputForm
 
         $field = new DataInput("data", "File", 1);
         $field->setValidator(new FileUploadValidator());
-        $field->setProcessor(new UploadDataInputProcessor());
+        new UploadDataInput($field);
         new FileField($field);
         $this->addInput($field);
 

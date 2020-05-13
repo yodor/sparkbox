@@ -3,7 +3,7 @@ include_once("forms/InputForm.php");
 include_once("input/DataInput.php");
 
 
-class AccountPasswordInputForm extends InputForm
+class AccountPasswordForm extends InputForm
 {
 
     public function __construct()

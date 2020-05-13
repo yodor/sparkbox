@@ -3,83 +3,88 @@ include_once("components/Component.php");
 include_once("forms/KeywordSearchForm.php");
 include_once("utils/IQueryFilter.php");
 include_once("forms/renderers/FormRenderer.php");
+include_once("components/TextComponent.php");
 
-class KeywordSearchComponent extends Component implements IQueryFilter
+class KeywordSearchComponent extends Container implements IQueryFilter
 {
-
-    protected $sform = false;
-
-    public $form_append = "";
-    public $form_prepend = "";
-
-    protected $buttons = array();
 
     const ACTION_SEARCH = "search";
     const ACTION_CLEAR = "clear";
 
-    protected $table_name = "";
-    protected $table_fields = "";
+    const SUBMIT_KEY = "filter";
 
-    protected $have_filter = false;
+    protected $table_fields = array();
 
-    public function getButton($action)
-    {
-        return $this->buttons[$action];
+    protected $have_filter = FALSE;
 
-    }
+    protected $form;
+    protected $formRenderer;
 
-    public function __construct($table_fields)
+    public function __construct(array $table_fields)
     {
         parent::__construct();
 
         $this->table_fields = $table_fields;
 
-        $this->sform = new KeywordSearchForm($this->table_fields);
+        $this->form = new KeywordSearchForm($this->table_fields);
 
         $qry = $_REQUEST;
 
-        if (strcmp_isset("clear", "search", $qry) === true) {
+        if (strcmp_isset(KeywordSearchComponent::SUBMIT_KEY, KeywordSearchComponent::ACTION_CLEAR, $qry) === TRUE) {
 
-            $this->sform->clearQuery($qry);
+            $this->form->clearQuery($qry);
+            unset($qry[KeywordSearchComponent::SUBMIT_KEY]);
+
             $qstr = queryString($qry);
             $loc = $_SERVER["PHP_SELF"] . "$qstr";
 
             header("Location: $loc");
             exit;
         }
-        $this->sform->loadPostData($_REQUEST);
-        $this->sform->validate();
+        else if (strcmp_isset(KeywordSearchComponent::SUBMIT_KEY, KeywordSearchComponent::ACTION_SEARCH, $qry) === TRUE) {
+            $this->form->loadPostData($qry);
+            $this->form->validate();
+            $this->have_filter = TRUE;
+        }
 
+        $this->formRenderer = new FormRenderer($this->form);
+        //$this->formRenderer->setLayout(FormRenderer::FIELD_VBOX);
+
+        $this->formRenderer->getButtons()->clear();
 
         $submit_search = StyledButton::DefaultButton();
         $submit_search->setType(StyledButton::TYPE_SUBMIT);
-        $submit_search->setText("Search");
-        $submit_search->setName("filter");
-        $submit_search->setValue("search");
-        $submit_search->setAttribute("action", "search");
-        $this->buttons[KeywordSearchComponent::ACTION_SEARCH] = $submit_search;
+        $submit_search->setText(tr("Search"));
+        $submit_search->setName(KeywordSearchComponent::SUBMIT_KEY);
+        $submit_search->setValue(KeywordSearchComponent::ACTION_SEARCH);
+        $submit_search->setAttribute("action", KeywordSearchComponent::ACTION_SEARCH);
+        $this->formRenderer->getButtons()->append($submit_search);
 
         $submit_clear = StyledButton::DefaultButton();
         $submit_clear->setType(StyledButton::TYPE_SUBMIT);
-        $submit_clear->setText("Clear");
-        $submit_clear->setName("clear");
-        $submit_clear->setValue("search");
-        $submit_clear->setAttribute("action", "clear");
-        $this->buttons[KeywordSearchComponent::ACTION_CLEAR] = $submit_clear;
+        $submit_clear->setText(tr("Clear"));
+        $submit_clear->setName(KeywordSearchComponent::SUBMIT_KEY);
+        $submit_clear->setValue(KeywordSearchComponent::ACTION_CLEAR);
+        $submit_clear->setAttribute("action", KeywordSearchComponent::ACTION_CLEAR);
+        $this->formRenderer->getButtons()->append($submit_clear);
 
-        $this->sform->setRenderer(new FormRenderer());
-
-        if (isset($_GET["filter"])) {
-            $this->sform->loadPostData($_GET);
-            $this->sform->validate();
-            $this->have_filter = true;
-        }
+        $this->append($this->formRenderer);
 
     }
 
-    public function haveFilter()
+    //TODO: check usage
+    public function getButton(string $action) : StyledButton
     {
-        return $this->have_filter;
+        $comparator = function (Component $cmp) use ($action) {
+            if (strcmp($cmp->getAttribute("action"), $action) == 0) {
+                return TRUE;
+            }
+            return FALSE;
+        };
+
+        $result = $this->formRenderer->getButtons()->findBy($comparator);
+        if ($result instanceof StyledButton) return $result;
+        return $result;
     }
 
     public function requiredStyle()
@@ -89,55 +94,19 @@ class KeywordSearchComponent extends Component implements IQueryFilter
         return $arr;
     }
 
-    public function startRender()
+    public function haveFilter()
     {
-        parent::startRender();
-        $this->sform->getRenderer()->startRender();
-
-        echo $this->form_prepend;
+        return $this->have_filter;
     }
 
-    public function finishRender()
+    public function getForm(): InputForm
     {
-        echo $this->form_append;
-        $this->sform->getRenderer()->finishRender();
-
-        parent::finishRender();
-    }
-
-    public function getForm() : InputForm
-    {
-        return $this->sform;
-    }
-
-    public function renderImpl()
-    {
-        echo "<div class='fields'>";
-
-        $field = $this->sform->getInput("keyword");
-        $field->getLabelRenderer()->render();
-
-        $field->getRenderer()->render();
-
-        echo "</div>";
-
-        echo "<div class='buttons'>";
-
-        $submit_search = $this->buttons[KeywordSearchComponent::ACTION_SEARCH];
-        $submit_search->render();
-
-        $submit_clear = $this->buttons[KeywordSearchComponent::ACTION_CLEAR];
-        $submit_clear->render();
-
-
-        echo "</div>";
-
-
+        return $this->form;
     }
 
     public function processSearch(SQLSelect &$select_query)
     {
-        $search_query = $this->sform->searchFilterSelect();
+        $search_query = $this->form->searchFilterSelect();
 
         $select_query = $select_query->combineWith($search_query);
 
@@ -145,8 +114,7 @@ class KeywordSearchComponent extends Component implements IQueryFilter
 
     public function processSearchHaving(SQLSelect &$select_query)
     {
-        $search_query = $this->sform->searchFilterSelect();
-
+        $search_query = $this->form->searchFilterSelect();
 
         $select_query->having = $search_query->where;
 
@@ -154,8 +122,7 @@ class KeywordSearchComponent extends Component implements IQueryFilter
 
     public function filterSelect($source = NULL, $value = NULL)
     {
-        return $this->sform->searchFilterSelect();
+        return $this->form->searchFilterSelect();
     }
-
 
 }

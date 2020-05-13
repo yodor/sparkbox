@@ -204,7 +204,7 @@ class Paginator
         $this->total_pages = (int)$total_pages;
     }
 
-    public static function clearPageFilter(&$arr)
+    public static function clearPageFilter(array &$arr)
     {
         if (isset($arr["page"])) unset($arr["page"]);
         if (isset($arr["orderdir"])) unset($arr["orderdir"]);

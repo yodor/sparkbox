@@ -5,7 +5,7 @@ include_once("forms/InputForm.php");
 
 include_once("forms/processors/FormProcessor.php");
 include_once("forms/renderers/FormRenderer.php");
-include_once("db/DBTransactor.php");
+include_once("db/BeanTransactor.php");
 
 include_once("handlers/UploadControlAjaxHandler.php");
 
@@ -13,7 +13,7 @@ include_once("handlers/IRequestProcessor.php");
 
 include_once("panels/BeanTranslationDialog.php");
 
-class InputFormView extends Component implements IBeanEditor
+class BeanFormEditor extends Container implements IBeanEditor
 {
 
     public $item_updated_message = "Information was updated";
@@ -43,7 +43,7 @@ class InputFormView extends Component implements IBeanEditor
     public $reload_url = "";
 
 
-    public function __construct(DBTableBean $bean = NULL, InputForm $form = NULL)
+    public function __construct(DBTableBean $bean, InputForm $form)
     {
 
         parent::__construct();
@@ -52,21 +52,14 @@ class InputFormView extends Component implements IBeanEditor
         $this->bean = $bean;
         $this->form = $form;
 
+        $this->form_render = new FormRenderer($form);
 
-        $this->form_render = new FormRenderer();
-
-        if ($this->form) {
-            $this->form_render->setForm($form);
-        }
-
-        if ($this->bean instanceof DBTableBean) {
-            $this->attributes["bean"] = get_class($this->bean);
-            $this->form_render->setName(get_class($this->bean));
-        }
+        $this->attributes["bean"] = get_class($this->bean);
+        $this->form_render->setName(get_class($this->bean));
 
         $this->processor = new FormProcessor();
 
-        $this->transactor = new DBTransactor();
+        $this->transactor = new BeanTransactor($this->bean, $this->editID);
 
         $fieldNames = $this->form->getInputNames();
         foreach ($fieldNames as $pos => $fieldName) {
@@ -104,6 +97,9 @@ class InputFormView extends Component implements IBeanEditor
         }
 
         $this->setEditID(-1);
+
+        $this->append($this->form_render);
+
     }
 
 
@@ -112,10 +108,11 @@ class InputFormView extends Component implements IBeanEditor
         return $this->editID;
     }
 
-    public function setEditID(int $editID) : void
+    public function setEditID(int $editID)
     {
         $this->editID = (int)$editID;
         $this->attributes["editID"] = $this->editID;
+        $this->transactor->setEditID($editID);
 
     }
 
@@ -124,9 +121,10 @@ class InputFormView extends Component implements IBeanEditor
         return $this->bean;
     }
 
-    public function setBean(DBTableBean $bean) : void
+    public function setBean(DBTableBean $bean)
     {
         $this->bean = $bean;
+        $this->transactor->setBean($bean);
     }
 
     public function getForm() : InputForm
@@ -144,12 +142,12 @@ class InputFormView extends Component implements IBeanEditor
         $this->processor = $processor;
     }
 
-    public function getTransactor() : DBTransactor
+    public function getTransactor() : BeanTransactor
     {
         return $this->transactor;
     }
 
-    public function setTransactor(DBTransactor $transactor)
+    public function setTransactor(BeanTransactor $transactor)
     {
         $this->transactor = $transactor;
     }
@@ -174,7 +172,7 @@ class InputFormView extends Component implements IBeanEditor
             $this->form->loadBeanData($this->getEditID(), $this->getBean());
 
             debug("Calling form processor");
-            $this->processor->processForm($this->form);
+            $this->processor->process($this->form);
 
             $process_status = $this->processor->getStatus();
             debug("FormProcessor status => " . (int)$process_status);
@@ -183,10 +181,10 @@ class InputFormView extends Component implements IBeanEditor
             if ($process_status === IFormProcessor::STATUS_OK) {
 
                 debug("Transacting form values");
-                $this->transactor->transactValues($this->form);
+                $this->transactor->processForm($this->form);
 
                 debug("Processing bean");
-                $this->transactor->processBean($this->bean, $this->editID);
+                $this->transactor->processBean();
 
                 //reload after adding item?
                 if ($this->editID < 1) {
@@ -209,7 +207,7 @@ class InputFormView extends Component implements IBeanEditor
 
                         $back_action = $page->getAction("back");
                         if (!is_null($back_action)) {
-                            header("Location: " . $back_action->getHrefClean());
+                            header("Location: " . $back_action->getHref());
                         }
                         else {
                             header("Location: " . $_SERVER["REQUEST_URI"]);
@@ -240,36 +238,7 @@ class InputFormView extends Component implements IBeanEditor
 
     }
 
-    public function startRender()
-    {
 
-        $attrs = $this->prepareAttributes();
-        echo "<div $attrs>";
-
-        if (strlen($this->caption) > 0) {
-            echo "<div class='caption'>";
-            echo $this->caption;
-            echo "</div>";
-        }
-
-        $this->form_render->startRender();
-
-    }
-
-    public function renderImpl()
-    {
-        $this->form_render->renderImpl();
-    }
-
-    public function finishRender()
-    {
-
-        $this->form_render->renderSubmitLine($this->form);
-
-        $this->form_render->finishRender();
-
-
-    }
 
 
 }

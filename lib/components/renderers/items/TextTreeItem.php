@@ -103,4 +103,10 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
         $this->renderActions($this->data);
     }
 
+    public function addURLParameter(URLParameter $param)
+    {
+        // TODO: Implement addURLParameter() method.
+
+    }
+
 }

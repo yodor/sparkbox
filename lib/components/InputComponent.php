@@ -11,6 +11,11 @@ class InputComponent extends Component
      */
     protected $input;
 
+    /**
+     * @var InputLabel
+     */
+    protected $label_renderer;
+
     public function __construct(DataInput $input)
     {
         parent::__construct();
@@ -24,6 +29,18 @@ class InputComponent extends Component
         else {
             $this->attributes["required"] = "";
         }
+
+        $this->label_renderer = new InputLabel($input);
+    }
+
+    public function setLabelRenderer(InputLabel $label_renderer)
+    {
+        $this->label_renderer = $label_renderer;
+    }
+
+    public function getLabelRenderer(): InputLabel
+    {
+        return $this->label_renderer;
     }
 
     public function getInput(): DataInput
@@ -34,10 +51,9 @@ class InputComponent extends Component
     public function renderImpl()
     {
 
-        if ($this->input->getRenderer() instanceof HiddenField) {
-        }
-        else {
-            $this->input->getLabelRenderer()->render();
+        if (! ($this->input->getRenderer() instanceof HiddenField)){
+
+            $this->label_renderer->render();
         }
 
         $this->input->getRenderer()->render();
@@ -64,11 +80,11 @@ class InputComponent extends Component
 
         }
 
-        if ($this->input->content_after) {
-            echo "<div class='content_after'>";
-            echo $this->input->content_after;
-            echo "</div>";
-        }
+//        if ($this->input->content_after) {
+//            echo "<div class='content_after'>";
+//            echo $this->input->content_after;
+//            echo "</div>";
+//        }
 
         parent::finishRender();
 

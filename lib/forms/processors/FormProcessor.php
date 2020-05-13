@@ -15,7 +15,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     /**
      * @return string
      */
-    public function getMessage()
+    public function getMessage() : string
     {
         return $this->message;
     }
@@ -30,12 +30,12 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         $this->status = $status;
     }
 
-    public function getStatus()
+    public function getStatus() : int
     {
         return $this->status;
     }
 
-    public function setEditID(int $editID): void
+    public function setEditID(int $editID)
     {
         $this->editID = $editID;
     }
@@ -48,7 +48,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         return $this->editID;
     }
 
-    public function setBean(DBTableBean $bean): void
+    public function setBean(DBTableBean $bean)
     {
         $this->bean = $bean;
     }
@@ -63,29 +63,20 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
     public function __construct()
     {
+        $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
 
     }
 
-
-    public function processForm(InputForm $form, $submit_name = "")
+    public function process(InputForm $form)
     {
-
-
-        // 	  $method = $form->getRenderer()->getAttribute("method");
-
-        if (strlen($submit_name) == 0) {
-            $submit_name = $form->getRenderer()->getSubmitName($form);
-
-            debug("Using form renderer submit key name");
+        $submitKey = FormRenderer::SUBMIT_NAME;
+        $submitValue = "";
+        if (isset($_REQUEST[$submitKey])) {
+            $submitValue = $_REQUEST[$submitKey];
         }
 
-        debug("Using submit key name: '$submit_name'");
-
-        if (isset($_REQUEST[$submit_name])) {
-
-            debug("Key '$submit_name' found in _REQUEST");
-
-            //default status
+        if (strcmp($submitValue, $form->getName()) == 0) {
+            debug("Loading form with _REQUEST values - key '$submitKey' value = Form name: '{$form->getName()}' ");
 
             try {
 
@@ -105,7 +96,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
         }
         else {
-            debug("Setting STATUS_NOT_PROCESSED - key '$submit_name' not found in _REQUEST");
+            debug("Setting STATUS_NOT_PROCESSED - _REQUEST key '$submitKey' not found or not equal to '{$form->getName()}' ");
             $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
         }
 
@@ -113,28 +104,27 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
     protected function processImpl(InputForm $form)
     {
-        debug("FormProcessor::processImpl ...");
 
         if ($form->haveErrors()) {
-            debug("FormProcessor::processImpl: " . get_class($form) . " form have fields with errors, throwing ...");
 
             $this->status = IFormProcessor::STATUS_ERROR;
 
-
+            $error_inputs = array();
             foreach ($form->getInputs() as $field_name => $field) {
                 if ($field->haveError()) {
-                    debug("Field: '$field_name': Error");
+                    $error_inputs[] = $field->getName();
                 }
             }
+            debug("STATUS_ERROR - Form '{$form->getName()}' - error found in DataInput(s): ", $error_inputs);
 
-            throw new Exception("Form have errors. Ensure you input all required fields.");
+            throw new Exception("Please make input in all required fields");
 
         }
         else {
 
             $this->status = IFormProcessor::STATUS_OK;
 
-            debug("FormProcessor::processImpl: " . get_class($form) . " does not have fields with errors. STATUS_FORM_OK");
+            debug("STATUS_OK - Form '{$form->getName()}' ");
 
         }
     }

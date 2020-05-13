@@ -9,31 +9,36 @@ class AuthenticatorRequestHandler extends RequestHandler
     /**
      * @var Authenticator
      */
-    private $auth = NULL;
+    protected $auth;
 
-    private $randsalt = NULL;
-    private $username = NULL;
-    private $pass = NULL;
-    private $remember = NULL;
+    protected $randsalt = "";
+
+    protected $email = "";
+    protected $pass = "";
+    protected $remember = false;
 
     public function __construct(Authenticator $auth, $cmd = "doLogin")
     {
         parent::__construct($cmd);
         $this->auth = $auth;
-
     }
 
+    public function getAuthenticator() : Authenticator
+    {
+        return $this->auth;
+    }
+    
     /**
      * @throws Exception
      */
     protected function parseParams()
     {
-        if (!isset($_REQUEST["username"])) throw new Exception("Username not passed");
+        if (!isset($_REQUEST["email"])) throw new Exception("Username not passed");
         if (!isset($_REQUEST["pass"])) throw new Exception("Password not passed");
 
         $this->randsalt = $this->auth->loginToken();
 
-        $this->username = $_POST["username"];
+        $this->email = $_POST["email"];
         $this->pass = substr($_POST["pass"], 0, 32);
 
         $this->remember = isset($_POST["remember"]);
@@ -53,7 +58,7 @@ class AuthenticatorRequestHandler extends RequestHandler
         try {
 
             //throws exception on login error
-            $this->auth->login($this->username, $this->pass, $this->randsalt, $this->remember);
+            $this->auth->login($this->email, $this->pass, $this->randsalt, $this->remember);
             $success = true;
         }
         catch (Exception $e) {

@@ -6,9 +6,9 @@ include_once("input/DataInput.php");
 interface IBeanPostProcessor
 {
 
-    public function loadBeanData(int $editID, DBTableBean $bean, DataInput $input, array &$item_row);
+    public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row);
 
-    public function loadPostData(DataInput $input, array &$arr);
+    public function loadPostData(array &$arr);
 
 }
 

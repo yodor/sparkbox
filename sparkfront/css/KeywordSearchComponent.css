@@ -1,33 +1,31 @@
 
 .KeywordSearchComponent {
-    display: table;
+    display: inline-block;
     border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
 }
 
-.KeywordSearchComponent .fields {
-    display: table-cell;
-    vertical-align: middle;
-    padding: 0px;
+.KeywordSearchComponent .FormRenderer {
+    border-spacing: 0.25em;
 }
 
-.KeywordSearchComponent .InputLabel {
-    margin-right:0.5em;
+.KeywordSearchComponent .InputComponent {
+    display: inline-block !important;
+    vertical-align: top;
 }
 
-.KeywordSearchComponent .buttons {
-    display: table-cell;
-    vertical-align: middle;
-
+.KeywordSearchComponent .Container {
+    padding: 0;
+    margin: 0;
+    vertical-align: top;
 }
 
-.KeywordSearchComponent .buttons>* {
-    margin-right: 0.5em;
+.KeywordSearchComponent .Container.SubmitLine {
+    display: inline-block;
 }
 
-.KeywordSearchComponent + .TableView {
-    margin-top: 10px;
-}
-
-.KeywordSearchComponent + .ListView {
-    margin-top: 10px;
+.KeywordSearchComponent .Container.TextSpace {
+    display: none;
 }

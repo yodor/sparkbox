@@ -198,57 +198,6 @@ IMG {
     background-repeat: repeat-x;
 }
 
-.login_component {
-    display: inline-block;
-    height: 318px;
-    vertical-align: middle;
-    text-align: left;
-}
-
-.login_component .inner {
-    display: inline-block;
-    border: 1px solid #eaeaea;
-    padding: 20px;
-
-}
-
-.login_component .inner .caption {
-    text-transform: uppercase;
-    color: #517789;
-    font-weight: bold;
-    font-size: 24px;
-    letter-spacing: 2px;
-    border-bottom: 1px solid #eaeaea;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    display: inline-block;
-
-}
-
-.AuthFormRenderer {
-    width: 100%;
-}
-
-.AuthFormRenderer .InputComponent .TextField {
-    width: 100%;
-}
-
-.AuthFormRenderer .InputComponent .PasswordField {
-    width: 100%;
-}
-
-.AuthFormRenderer .submit_line {
-    display: block;
-    margin-top: 20px;
-}
-
-.AuthFormRenderer .submit_line .forgot_password {
-    float: left;
-}
-
-.AuthFormRenderer .submit_line button {
-    float: right;
-}
 
 
 .InputFormView[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
@@ -309,3 +258,15 @@ IMG {
     color: #f9a541;
 }
 
+
+.AdminLoginPage.forgot_password .FormRenderer {
+    border: 1px solid #eaeaea;
+}
+
+.AdminLoginPage.forgot_password .FormRenderer .SubmitLine .TextSpace {
+    display:block;
+}
+
+.AdminLoginPage.forgot_password .FormRenderer .SubmitLine .Buttons {
+    display:block;
+}

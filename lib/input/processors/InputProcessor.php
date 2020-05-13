@@ -1,19 +1,34 @@
 <?php
 include_once("input/processors/IBeanPostProcessor.php");
-include_once("input/transactors/IDBFieldTransactor.php");
+include_once("input/processors/IDBFieldTransactor.php");
 
-class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
+/**
+ * TODO: Write better description
+ * Takes care to to process the values posted or loaded from DBTableBean
+ *
+ * Class InputProcessor
+ */
+class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 {
+
+    //transact DBROW without source is incompatible with non required field.
+    const TRANSACT_DBROW = 1;
+    const TRANSACT_OBJECT = 2;
+    const TRANSACT_VALUE = 3;
+
+    public $transact_mode = InputProcessor::TRANSACT_VALUE;
+
+    //does not want transactValue to be called if true
+    public $skip_transaction = FALSE;
 
     //keeps map of storage_object UID to data_source primary key value
     protected $source_loaded_uids = array();
-
     protected $source_loaded_keys = array();
 
     //foreign keys are posted in the order or values, if true will process them. used in direct mapping between fields.
-    public $process_datasource_foreign_keys = false;
+    public $process_datasource_foreign_keys = FALSE;
 
-    public $transact_empty_string_as_null = false;
+    public $transact_empty_string_as_null = FALSE;
 
     //field source copy fields
     public $bean_copy_fields = array();
@@ -22,41 +37,77 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
     //matching by 'this' field name and its value posted. do not copy on empty 'value'
     public $renderer_source_copy_fields = array();
 
-    public function __construct()
-    {
+    //default is to use the DataInput name as transact field
+    public $transact_field_name = "";
 
+    /**
+     * @var DataInput
+     */
+    protected $input;
+
+    /**
+     * @var DBTableBean
+     */
+    protected $transact_bean;
+
+
+    public $accepted_tags;
+
+    public function __construct(DataInput $input)
+    {
+        $this->input = $input;
+        $this->input->setProcessor($this);
+
+        $this->accepted_tags = DefaultAcceptedTags();
     }
 
-    public function beforeCommit(DataInput $input, DBTransactor $transactor, DBDriver $db, $item_key)
+    public function setTransactBean(DBTableBean $bean)
     {
-        $data_source = $input->getSource();
-        if (!($data_source instanceof DBTableBean)) {
-            debug("Data source is null or not from expected class DBTableBean nothing to do in beforeCommit");
+        $this->transact_bean = $bean;
+    }
+
+    public function getTransactBean() : ?DBTableBean
+    {
+        return $this->transact_bean;
+    }
+
+    /**
+     * DBTransactor calls this method just before commmit() on the main transaction
+     * Populate additional fields in the transactor
+     * @param BeanTransactor $transactor
+     * @param DBDriver $db
+     * @param string $item_key
+     * @throws Exception
+     */
+    public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key)
+    {
+
+        if (!$this->transact_bean) {
+            debug("transact_bean is null  nothing to do in beforeCommit");
             return;
         }
-        if ($data_source->getTableName() == $transactor->getBean()->getTableName()) {
-            throw new Exception("Field transact error for field: '" . $input->getName() . "'. Data source bean and main transaction bean are the same - '" . get_class($data_source) . "'");
+        if (strcmp($this->transact_bean->getTableName(), $transactor->getBean()->getTableName())==0) {
+            throw new Exception("Field transact error for field: '" . $this->input->getName() . "'. Data source bean and main transaction bean are the same - '" . get_class($this->transact_bean) . "'");
         }
 
-        $source_key = $data_source->key();
+        $source_key = $this->transact_bean->key();
         $lastID = $transactor->getLastID();
 
-        $field_name = $input->getName();
+        $field_name = $this->input->getName();
 
-        debug("Using data Source: " . get_class($data_source) . " | Field: $field_name | lastID: $lastID | Source PrimaryKey: $source_key | Field Values count: " . count($input->getValue()));
-
+        debug("Using data Source: " . get_class($this->transact_bean) . " | Field: $field_name | lastID: $lastID | Source PrimaryKey: $source_key | Field Values count: " . count($this->input->getValue()));
 
         $foreign_transacted = 0;
 
-        if (count($input->getValue()) < 1) {
+        if (count($this->input->getValue()) < 1) {
 
-            debug("0 values to transact to data source. Clearing all rows of the data source: " . get_class($data_source));
-            $data_source->deleteRef($item_key, $transactor->getLastID(), $db);
+            debug("0 values to transact to data source. Clearing all rows of the data source: " . get_class($this->transact_bean));
+            $this->transact_bean->deleteRef($item_key, $transactor->getLastID(), $db);
 
             return;
         }
 
-        if ($input->transact_mode == DataInput::TRANSACT_VALUE) {
+        if ($this->transact_mode == InputProcessor::TRANSACT_VALUE) {
             debug("Transact Mode: TRANSACT_VALUE");
             // 	    $data_source->deleteRef($item_key, $lastID, $db);
             debug("Merging updated values ...");
@@ -66,10 +117,10 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             $processed_ids = array();
 
-            debug("field values count: " . count($input->getValue()));
+            debug("field values count: " . count($this->input->getValue()));
             // 	    debug("Post Values: ", $_POST);
 
-            foreach ($input->getValue() as $idx => $value) {
+            foreach ($this->input->getValue() as $idx => $value) {
 
                 $dbrow = array();
                 $dbrow[$item_key] = $transactor->getLastID();
@@ -94,7 +145,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
                 //process bean copy fields
                 if (is_array($this->bean_copy_fields) && count($this->bean_copy_fields) > 0) {
-                    $bean_fields = $transactor->getTransactionValues();
+                    $bean_fields = $transactor->getValues();
                     foreach ($bean_fields as $key => $val) {
                         if (in_array($key, $this->bean_copy_fields)) {
                             $dbrow[$key] = $val;
@@ -106,12 +157,12 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 if ($sourceID > 0) {
                     debug("DataSourceID: " . $sourceID);
 
-                    if (!$data_source->update($sourceID, $dbrow, $db)) throw new Exception("Unable to update  data source bean. Error: " . $db->getError());
+                    if (!$this->transact_bean->update($sourceID, $dbrow, $db)) throw new Exception("Unable to update  data source bean. Error: " . $db->getError());
                     $processed_ids[] = $sourceID;
                 }
                 else {
 
-                    $refID = $data_source->insert($dbrow, $db);
+                    $refID = $this->transact_bean->insert($dbrow, $db);
                     if ($refID < 1) throw new Exception("Unable to insert into data source bean. Error: " . $db->getError());
                     $processed_ids[] = $refID;
                 }
@@ -120,8 +171,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
             }
 
             //TODO:duplicate keys might get triggered
-            $data_source->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
-
+            $this->transact_bean->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
 
         }
         else {
@@ -132,14 +182,13 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             $processed_ids = array();
 
-            foreach ($input->getValue() as $idx => $value) {
+            foreach ($this->input->getValue() as $idx => $value) {
 
                 if (!($value instanceof StorageObject)) throw new Exception("Transact mode TRANSACT_DBROW can transact only values of type  StorageObject");
 
                 $uid = $value->getUID();
 
                 debug("Processing UID: $uid");
-
 
                 if (!array_key_exists($uid, $this->source_loaded_uids)) {
                     debug("StorageObject UID: $uid not found in the loaded keys array. Will commit insert operation to data source ...");
@@ -148,7 +197,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                     $dbrow = array();
                     $dbrow[$item_key] = $transactor->getLastID();
 
-                    if ($input->transact_mode == DataInput::TRANSACT_DBROW) {
+                    if ($this->transact_mode == InputProcessor::TRANSACT_DBROW) {
                         debug("Transact Mode: TRANSACT_DBROW");
                         $value->setDataKey($field_name);
                         $value->deconstruct($dbrow);
@@ -156,16 +205,16 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                         debug("StorageObject UID: $uid deconstructed as fields in the data source row ...");
 
                     }
-                    else if ($input->transact_mode == DataInput::TRANSACT_OBJECT) {
+                    else if ($this->transact_mode == InputProcessor::TRANSACT_OBJECT) {
                         debug("Transact Mode: TRANSACT_OBJECT");
                         $dbrow[$field_name] = $db->escape(serialize($value));
                         debug("StorageObject UID: $uid stored as serialized value in the data source row ...");
                     }
                     else {
-                        throw new Exception("Unknown transact mode: " . $input->transact_mode);
+                        throw new Exception("Unknown transact mode: " . $this->transact_mode);
                     }
 
-                    $refID = $data_source->insert($dbrow, $db);
+                    $refID = $this->transact_bean->insert($dbrow, $db);
                     if ($refID < 1) throw new Exception("Unable to insert into data source bean. Error: " . $db->getError());
                     $foreign_transacted++;
 
@@ -183,34 +232,34 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
             debug("Processed data source keys dump: ", $processed_ids);
 
             //delete remaining values - datasource values with keys not found in processed_ids
-            $data_source->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
+            $this->transact_bean->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
 
             debug("Remaining data source keys removed");
 
         }
 
-        debug("Total $foreign_transacted rows transacted to data source: " . get_class($data_source));
+        debug("Total $foreign_transacted rows transacted to data source: " . get_class($this->transact_bean));
 
     }
 
-    public function afterCommit(DataInput $input, DBTransactor $transactor)
+    public function afterCommit(BeanTransactor $transactor)
     {
         //
     }
 
     //
 
-    public function transactValue(DataInput $input, DBTransactor $transactor)
+    public function transactValue(BeanTransactor $transactor)
     {
 
-        debug("DataInput: {$input->getName()}");
+        debug("DataInput: {$this->input->getName()}");
 
-        switch ($input->transact_mode) {
-            case DataInput::TRANSACT_VALUE:
+        switch ($this->transact_mode) {
+            case InputProcessor::TRANSACT_VALUE:
 
                 debug("Transact mode: TRANSACT_VALUE");
 
-                $value = $input->getValue();
+                $value = $this->input->getValue();
 
                 if (!is_array($value)) {
                     if (strlen($value) == 0 && $this->transact_empty_string_as_null) {
@@ -218,56 +267,61 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                     }
                 }
 
-                $transactor->appendValue($input->getName(), $value);
+                if ($this->transact_field_name) {
+                    $transactor->appendValue($this->transact_field_name, $value);
+                }
+                else {
+                    $transactor->appendValue($this->input->getName(), $value);
+                }
 
                 //transacts additional values from renderer data source
                 //matching by 'this' field name and its value posted. do not copy on empty 'value'
                 if (is_array($this->renderer_source_copy_fields) && count($this->renderer_source_copy_fields) > 0 && $value) {
                     debug("renderer_source_copy_fields ... ");
-                    $renderer = $input->getRenderer();
+                    $renderer = $this->input->getRenderer();
                     if (!$renderer instanceof DataIteratorField) throw new Exception("Renderer not instance of DataIteratorField");
                     $qry = $renderer->getItemIterator();
 
-                    $qry->select->where = $renderer->getItemRenderer()->getValueKey()."='$value'";
-                    $qry->select->fields = implode(", " , $this->renderer_source_copy_fields);
+                    $qry->select->where = $renderer->getItemRenderer()->getValueKey() . "='$value'";
+                    $qry->select->fields = implode(", ", $this->renderer_source_copy_fields);
                     $qry->select->limit = " 1 ";
                     $num = $qry->exec();
-                    debug("Iterator: ".$qry->name(). " WHERE: {$qry->select->where} returned #$num results");
+                    debug("Iterator: " . $qry->name() . " WHERE: {$qry->select->where} returned #$num results");
                     if ($num < 1) throw new Exception("Renderer IDataIterator returned no results");
 
                     $row = $qry->next();
                     debug("Transacting renderer source fields to main transaction: ", $row);
-                    foreach($row as $field_name => $value) {
+                    foreach ($row as $field_name => $value) {
                         $transactor->appendValue($field_name, $value);
                     }
                 }
 
                 break;
-            case DataInput::TRANSACT_DBROW:
-                throw new Exception("Unsupported TRANSACT_DBROW for input field['" . $input->getName() . "']");
+            case InputProcessor::TRANSACT_DBROW:
+                throw new Exception("Unsupported TRANSACT_DBROW for input field['" . $this->input->getName() . "']");
                 break;
-            case DataInput::TRANSACT_OBJECT:
-                throw new Exception("Unsupported TRANSACT_OBJECT for input field['" . $input->getName() . "']");
+            case InputProcessor::TRANSACT_OBJECT:
+                throw new Exception("Unsupported TRANSACT_OBJECT for input field['" . $this->input->getName() . "']");
                 break;
             default:
-                throw new Exception("Unsupported transaction mode for input field['" . $input->getName() . "']");
+                throw new Exception("Unsupported transaction mode for input field['" . $this->input->getName() . "']");
         }
 
     }
 
-    protected function processRowData(DataInput $field, &$item_row, $source_key)
+    protected function processRowData(array &$item_row, string $source_key)
     {
         $value = NULL;
-        $field_name = $field->getName();
+        $field_name = $this->input->getName();
 
-        if ($field->transact_mode == DataInput::TRANSACT_VALUE) {
+        if ($this->transact_mode == InputProcessor::TRANSACT_VALUE) {
 
             $value = $item_row[$field_name];
             $this->source_loaded_keys[] = $item_row[$source_key];
             debug("SourceLoaded value for datasource keyID: " . $item_row[$source_key]);
 
         }
-        if ($field->transact_mode == DataInput::TRANSACT_DBROW) {
+        if ($this->transact_mode == InputProcessor::TRANSACT_DBROW) {
 
             $value = StorageObject::reconstruct($item_row, $field_name);
             $uid = $value->getUID();
@@ -279,17 +333,17 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
             debug("Source Load UID: Reconstructed StorageObject UID: $uid From data source $source_key='$source_key_value'");
 
         }
-        else if ($field->transact_mode == DataInput::TRANSACT_OBJECT) {
+        else if ($this->transact_mode == InputProcessor::TRANSACT_OBJECT) {
 
             $value = $item_row[$field_name];
 
             $storage_object = @unserialize($value);
-            if ($storage_object !== false) {
+            if ($storage_object !== FALSE) {
                 if (!($storage_object instanceof StorageObject)) throw new Exception("Deserialized object is not a StorageObject.");
 
                 //tag with id and class
                 $storage_object->id = $item_row[$source_key];
-                $storage_object->className = get_class($field->getSource());
+                $storage_object->className = get_class($this->transact_bean);
 
                 $value = $storage_object;
 
@@ -303,17 +357,23 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             }
             else {
-                if (!is_null($value)) throw new Exception("Expected serialized contents in '$field_name' of data source: " . get_class($field->getSource()));
+                if (!is_null($value)) throw new Exception("Expected serialized contents in '$field_name' of data source: " . get_class($this->transact_bean));
             }
         }
         return $value;
     }
 
-
-    //called from InputFormView to load the field data from bean fields
-    public function loadBeanData(int $editID, DBTableBean $bean, DataInput $input, array &$item_row)
+    /**
+     * BeanFormEditor calls this method to load the field data from bean fields
+     * @param int $editID
+     * @param DBTableBean $bean
+     * @param DataInput $input
+     * @param array $item_row
+     * @throws Exception
+     */
+    public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)
     {
-        $name = $input->getName();
+        $name = $this->input->getName();
         $item_key = $bean->key();
         debug("Using DataInput [$name] with DBTableBean: " . get_class($bean) . " | Primary Key: $item_key");
 
@@ -325,11 +385,11 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             $value = $item_row[$name];
 
-            if ($input->transact_mode == DataInput::TRANSACT_OBJECT) {
+            if ($this->transact_mode == InputProcessor::TRANSACT_OBJECT) {
                 //non required fields holdings storage objects can load NULL values, remove them as they dont need presentation
                 if (!is_null($value)) {
                     $object = @unserialize($value);
-                    if ($object !== false) {
+                    if ($object !== FALSE) {
                         if (!($object instanceof StorageObject)) throw new Exception("Deserialized object is not a StorageObject.");
                         //
 
@@ -341,7 +401,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
                     }
                 }
             }
-            else if ($input->transact_mode == DataInput::TRANSACT_DBROW) {
+            else if ($this->transact_mode == InputProcessor::TRANSACT_DBROW) {
                 $object = StorageObject::reconstruct($item_row, $name);
                 $uid = $object->getUID();
 
@@ -352,7 +412,7 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
             }
 
             //TODO: InputField::TRANSACT_OBJECT can be array ?
-            if ($input instanceof ArrayDataInput) {
+            if ($this->input instanceof ArrayDataInput) {
                 $values = array($value);
             }
             else {
@@ -365,34 +425,30 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
             //process data source values
             debug("Key '$name' not found in the bean result row - trying values from source of DataInput");
 
-            $data_source = $input->getSource();
-
-            if (is_null($data_source)) {
+            if (!$this->transact_bean) {
                 debug("DataInput source is NULL");
                 $values = NULL;
             }
             else {
 
-                debug("Using DataInput source: " . get_class($data_source));
+                debug("Using transact bean: " . get_class($this->transact_bean));
 
-                if (!($data_source instanceof DBTableBean)) throw new Exception("Received data source: '" . get_class($data_source) . "' but 'DBTableBean' expected.");
-
-                $source_fields = $data_source->fields();
-                $source_key = $data_source->key();
+                $source_fields = $this->transact_bean->fields();
+                $source_key = $this->transact_bean->key();
 
                 if (!in_array($item_key, $source_fields)) throw new Exception("Key '$item_key' was not found in the DataInput 'source' fields");
 
                 debug("Processing DataInput 'source' values using key: '$item_key'");
 
                 $source_values = array();
-                $qry = $data_source->queryField($item_key, $editID);
+                $qry = $this->transact_bean->queryField($item_key, $editID);
                 $qry->exec();
 
                 while ($row = $qry->next()) {
 
                     debug("DataSourceLoadID: $source_key=>" . $row[$source_key]);
 
-                    $source_values[] = $this->processRowData($input, $row, $source_key);
+                    $source_values[] = $this->processRowData($row, $source_key);
                     // 		$source_values[$row[$source_key]] = $this->processRowData($field, $row, $source_key);
 
                 }
@@ -405,33 +461,38 @@ class BeanPostProcessor implements IBeanPostProcessor, IDBFieldTransactor
         }//array_key_exists
 
         if (is_array($values)) {
-            debug("Setting value: ",$values);
+            debug("Setting value: ", $values);
         }
         else {
             debug("Setting value: $values");
         }
-        $input->setValue($values);
+        $this->input->setValue($values);
 
     }
 
-    //called from post
-    public function loadPostData(DataInput $input, array &$arr)
+
+    /**
+     * Load value using arr as input
+     * Match input name to array key name and set the value to this datainput from it
+     * @param array $data Posted data array
+     */
+    public function loadPostData(array &$data)
     {
 
-        $name = $input->getName();
+        $name = $this->input->getName();
 
         //sanitize non-compound fields
-        if (array_key_exists($name, $arr)) {
+        if (array_key_exists($name, $data)) {
 
-            $value = $arr[$name];
+            $value = $data[$name];
 
-            $value = sanitizeInput($value, $input->accepted_tags);
+            $value = sanitizeInput($value, $this->accepted_tags);
 
-            $input->setValue($value);
+            $this->input->setValue($value);
 
         }
         else {
-            $input->clear();
+            $this->input->clear();
         }
 
     }

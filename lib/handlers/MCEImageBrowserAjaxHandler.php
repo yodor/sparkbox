@@ -207,7 +207,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
 
         $form = new ImageDimensionForm();
-        $frend = new FormRenderer();
+        $frend = new FormRenderer($form);
 
 
         echo "<div class='ImageDimensionComponent'>";
@@ -218,7 +218,6 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         echo "</div>";
 
         echo "<div class='dimension'>";
-        $frend->setForm($form);
         $frend->render();
         echo "</div>";
 

@@ -1,62 +1,107 @@
 <?php
 include_once("components/Component.php");
 include_once("components/InputComponent.php");
+include_once("components/Container.php");
 
 class FieldSet extends Component
 {
+    protected $tagName = "fieldset";
+
     protected $fields = array();
 
-    public function startRender()
-    {
-        echo "<fieldset>";
-    }
-
-    public function finishRender()
-    {
-        echo "</fieldset>";
-    }
-
-    public function renderImpl()
-    {
-
-    }
 }
 
 class FormRenderer extends Component
 {
-    protected $form = NULL;
-    protected $submit_button = NULL;
+    protected $form;
+    protected $submitButton;
+
     protected $render_field_callback = NULL;
+
+    protected $tagName = "FORM";
 
     const FIELD_HBOX = "HBox";
     const FIELD_VBOX = "VBox";
 
-    protected $field_layout = FormRenderer::FIELD_VBOX;
+    const SUBMIT_NAME = "SubmitForm";
 
-    protected $buttons = array();
+    protected $layout = FormRenderer::FIELD_HBOX;
 
-    public $contains_upload = false;
+    protected $method;
 
-    protected $field_renderer = NULL;
+    protected $submitLine;
 
-    public function __construct($field_layout = FormRenderer::FIELD_HBOX)
+    const METHOD_POST = "post";
+    const METHOD_GET = "get";
+
+    public function __construct(InputForm $form)
     {
         parent::__construct();
-        $this->attributes["method"] = "post";
-        $this->attributes["enctype"] = "multipart/form-data";
+
+        $this->form = $form;
+        $form->setRenderer($this);
 
 
-        $this->submit_button = StyledButton::DefaultButton();
-        $this->submit_button->setAttribute("action", "form_submit");
-        $this->submit_button->setName("submit_item");
-        $this->submit_button->setText("Submit Form");
-        $this->submit_button->setValue("submit");
+        $this->setAttribute("enctype", "multipart/form-data");
 
-        $this->submit_button->setType(StyledButton::TYPE_SUBMIT);
+        $this->setMethod(FormRenderer::METHOD_POST);
 
+        $button = StyledButton::DefaultButton();
+        $button->setAttribute("action", "submit");
+        $button->setText("Submit");
+        $button->setType(StyledButton::TYPE_SUBMIT);
+        $button->setName(FormRenderer::SUBMIT_NAME);
 
-        $this->setLayout($field_layout);
+        $this->submitButton = $button;
 
+        $this->submitLine = new Container();
+        $this->submitLine->setClassName("SubmitLine");
+
+        $textSpace = new Container();
+        $textSpace->setClassName("TextSpace");
+        $this->submitLine->append($textSpace);
+
+        $buttons = new Container();
+        $buttons->setClassName("Buttons");
+
+        $buttons->append($this->submitButton);
+        $this->submitLine->append($buttons);
+
+        $this->setLayout($this->layout);
+
+    }
+    public function setMethod(string $method)
+    {
+        $this->method = $method;
+        $this->setAttribute("method", $method);
+    }
+    public function getMethod() : string
+    {
+        return $this->method;
+    }
+    public function getSubmitLine() : Container
+    {
+        return $this->submitLine;
+    }
+
+    public function getButtons() : Container
+    {
+        $buttons = $this->submitLine->getByClassName("Buttons");
+        if ($buttons instanceof Container) return $buttons;
+
+        throw new Exception("Buttons container not found");
+    }
+    public function getSubmitButton() : StyledButton
+    {
+        return $this->submitButton;
+    }
+
+    public function getTextSpace() : Container
+    {
+        $textSpace = $this->submitLine->getByClassName("TextSpace");
+        if ($textSpace instanceof Container) return $textSpace;
+
+        throw new Exception("TextSpace container not found");
     }
 
     public function requiredStyle()
@@ -67,20 +112,10 @@ class FormRenderer extends Component
         return $arr;
     }
 
-    public function addButton(StyledButton $b)
+    public function setLayout(string $mode)
     {
-        $this->buttons[$b->getText()] = $b;
-    }
-
-    public function getButton($text)
-    {
-        return $this->buttons[$text];
-    }
-
-    public function setLayout($mode)
-    {
-        $this->field_layout = $mode;
-        $this->attributes["field_layout"] = $this->field_layout;
+        $this->layout = $mode;
+        $this->setAttribute("layout" , $this->layout);
     }
 
     public function setRenderFieldCallback($fname)
@@ -97,84 +132,43 @@ class FormRenderer extends Component
 
     public function startRender()
     {
-        $attrs = $this->prepareAttributes();
-        echo "<form $attrs>";
-        if ($this->contains_upload) {
-            echo "<input type=hidden name='MAX_FILE_SIZE' value='" . UPLOAD_MAX_FILESIZE . "'>";
+        parent::startRender();
+        if (strcmp($this->method, FormRenderer::METHOD_POST)==0) {
+            //echo "<input type=hidden name='MAX_FILE_SIZE' value='" . UPLOAD_MAX_FILESIZE . "'>";
         }
-
-
     }
 
-    public function finishRender()
-    {
-
-
-        echo "</form>";
-    }
-
-    public function renderImpl()
+    protected function renderImpl()
     {
         $inputs = $this->form->getInputs();
         foreach ($inputs as $name => $input) {
             $this->renderInput($input);
         }
+
+        $this->renderSubmitLine();
+
+        //echo "<div class=clear></div>";
+
     }
 
-    public function getSubmitName(InputForm $form)
+    protected function processAttributes()
     {
-        return $this->submit_button->getName();
+        parent::processAttributes();
+        $this->setName($this->form->getName());
+
     }
 
-    public function getSubmitButton()
+
+    public function renderSubmitLine()
     {
-        return $this->submit_button;
+        $this->submitButton->setValue($this->form->getName());
+        $this->submitLine->render();
     }
-
-    public function renderForm(InputForm $form)
-    {
-        $this->form = $form;
-
-        $this->startRender();
-
-        $this->renderImpl();
-
-        $this->renderSubmitLine($this->form);
-
-        echo "<div class=clear></div>";
-
-        $this->finishRender();
-
-    }
-
-    public function renderSubmitLine(InputForm $form)
-    {
-        echo "<div class='SubmitLine'>";
-
-        echo "<div class='TextSpace'>";
-        echo "</div>";
-
-        echo "<div class='Buttons'>";
-
-
-        foreach ($this->buttons as $href => $btn) {
-            $btn->render();
-
-        }
-
-        $this->submit_button->render();
-
-
-        echo "</div>";
-
-        echo "</div>";
-    }
-
 
     public function renderInput(DataInput $input)
     {
 
-        $callback_rendered = false;
+        $callback_rendered = FALSE;
         if ($this->render_field_callback) {
             if (is_callable($this->render_field_callback)) {
                 $callback_rendered = call_user_func($this->render_field_callback, $input, $this);
@@ -191,7 +185,6 @@ class FormRenderer extends Component
         }
 
     }
-
 
 }
 

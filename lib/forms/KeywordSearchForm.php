@@ -68,15 +68,13 @@ class KeywordSearchForm extends InputForm
         }
     }
 
-    public function clearQuery(&$qryarr)
+    public function clearQuery(array &$qryarr)
     {
         foreach ($this->inputs as $field_name => $field) {
             if (isset($qryarr[$field_name])) {
                 unset($qryarr[$field_name]);
             }
         }
-        unset($qryarr["clear"]);
-
     }
 }
 

@@ -136,11 +136,7 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
 
         parent::startRender();
 
-        if (strlen($this->caption) > 0) {
-            echo "<div class='caption'>";
-            echo $this->caption;
-            echo "</div>";
-        }
+
     }
 
     public function finishRender()

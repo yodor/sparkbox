@@ -1,9 +1,9 @@
-function AuthForm() {
-    this.component_class = "FORM.AuthFormRenderer";
+function LoginForm() {
+    this.component_class = "FORM";
     this.cls = this.component_class;
 }
 
-AuthForm.prototype.attachWith = function (name) {
+LoginForm.prototype.attachWith = function (name) {
     if (name) {
         this.name = name;
         this.cls = this.component_class + "[name='" + name + "']";
@@ -13,10 +13,10 @@ AuthForm.prototype.attachWith = function (name) {
     try {
 
         this.form = $(this.cls);
-        if (!this.form.get(0)) throw "Required form component not found";
+        if (!this.form.get(0)) throw "Required form component class not found";
 
-        this.username = this.form.find("INPUT[name='username']").first();
-        if (!this.username.get(0)) throw "Required field not found";
+        this.email = this.form.find("INPUT[name='email']").first();
+        if (!this.email.get(0)) throw "Required field not found";
 
         this.password = this.form.find("INPUT[name='password']").first();
         if (!this.password.get(0)) throw "Required field not found";
@@ -37,11 +37,11 @@ AuthForm.prototype.attachWith = function (name) {
     }
 
 }
-AuthForm.prototype.onSubmit = function (event) {
-    this.username.val(trim(this.username.val()));
+LoginForm.prototype.onSubmit = function (event) {
+    this.email.val(trim(this.email.val()));
     this.password.val(trim(this.password.val()));
 
-    let u = this.username.val();
+    let u = this.email.val();
     let p = this.password.val();
     let r = this.rand.val();
 
@@ -66,7 +66,7 @@ AuthForm.prototype.onSubmit = function (event) {
     return true;
 
 }
-AuthForm.prototype.processPassword = function () {
+LoginForm.prototype.processPassword = function () {
 
     let p = this.password.val();
     let r = this.rand.val();
@@ -81,8 +81,8 @@ AuthForm.prototype.processPassword = function () {
 }
 
 
-AuthForm.prototype.processEmail = function () {
-    let u = this.username.val();
+LoginForm.prototype.processEmail = function () {
+    let u = this.email.val();
 
     let emailFilter = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 

@@ -33,6 +33,8 @@ abstract class DBTableBean
      */
     protected $select = NULL;
 
+    protected $error = "";
+
     public function __construct(string $table_name, DBDriver $dbdriver = NULL)
     {
         $this->table = $table_name;
@@ -120,9 +122,9 @@ abstract class DBTableBean
         return $this->table;
     }
 
-    public function getError()
+    public function getError() : string
     {
-        return $this->db->getError();
+        return $this->error;
     }
 
     public function setDB(DBDriver $db)
@@ -199,7 +201,7 @@ abstract class DBTableBean
         return $qry;
     }
 
-    public function findFieldValue($field_name, $field_value)
+    public function findFieldValue(string $field_name, string $field_value)
     {
         $qry = $this->queryField($field_name, $field_value, 1);
         $qry->exec();
@@ -425,7 +427,9 @@ abstract class DBTableBean
         $res = $db->query($sql);
 
         if ($res === FALSE) {
+            $this->error = $db->getError();
             if ($docommit) $db->rollback();
+
             return -1;
         }
 
@@ -462,6 +466,7 @@ abstract class DBTableBean
         $res = $db->query($sql);
 
         if ($res === FALSE) {
+            $this->error = $db->getError();
             if ($docommit) $db->rollback();
             return FALSE;
         }

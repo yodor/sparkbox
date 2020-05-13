@@ -1,9 +1,8 @@
 <?php
 include_once("components/Component.php");
-include_once("components/renderers/IActionRenderer.php");
 include_once("actions/Action.php");
 
-class ActionRenderer extends Component implements IActionRenderer
+class ActionRenderer extends Component
 {
     /**
      * @var Action|null
@@ -16,38 +15,40 @@ class ActionRenderer extends Component implements IActionRenderer
      */
     protected $data = NULL;
 
-    public $render_title = true;
+    public $render_title = TRUE;
 
-    protected $action_from_label = true;
+    protected $action_from_label = TRUE;
 
-    protected $separator_enabled = false;
+    protected $separator_enabled = FALSE;
 
-    protected $text_translation_enabled = true;
+    protected $text_translation_enabled = TRUE;
+
+    protected $tagName = "A";
 
     public function __construct(Action $action = NULL, array $data = NULL)
     {
         parent::__construct();
+
         $this->data = $data;
-        $this->action_from_label = true;
 
         if ($action) {
             $this->setAction($action);
         }
     }
 
-    public function enableSeparator($mode)
+    public function enableSeparator(bool $mode)
     {
         $this->separator_enabled = $mode;
     }
 
-    public function enableActionFromLabel($mode)
+    public function enableActionFromLabel(bool $mode)
     {
-        $this->action_from_label = ($mode) ? true : false;
+        $this->action_from_label = $mode;
     }
 
-    public function enableTextTranslation($mode)
+    public function enableTextTranslation(bool $mode)
     {
-        $this->text_translation_enabled = ($mode) ? true : false;
+        $this->text_translation_enabled = $mode;
     }
 
     public function requiredStyle()
@@ -61,15 +62,28 @@ class ActionRenderer extends Component implements IActionRenderer
     {
         $this->action = $action;
 
+    }
+
+    public function getAction(): Action
+    {
+        return $this->action;
+    }
+
+    public function setData(array &$row)
+    {
+        $this->data = $row;
+    }
+
+    protected function processAttributes()
+    {
+        parent::processAttributes();
+
         if ($this->action->getTitle()) {
             $this->setAttribute("title", tr($this->action->getTitle()));
         }
 
         if ($this->action_from_label) {
             $this->setAttribute("action", $this->action->getTitle());
-        }
-        else {
-            $this->setAttribute("action", "");
         }
 
         if ($this->action instanceof RowSeparatorAction) {
@@ -78,37 +92,18 @@ class ActionRenderer extends Component implements IActionRenderer
         else if ($this->action instanceof PipeSeparatorAction) {
             $this->setAttribute("action", "PipeSeparator");
         }
-    }
-
-    public function getAction() : Action
-    {
-        return $this->action;
-    }
-
-    public function setData(array $row)
-    {
-        $this->data = $row;
-    }
-
-    public function startRender()
-    {
 
         if ($this->action->isEmptyAction()) {
-            $attrs = $this->prepareAttributes();
-            echo "<span $attrs>";
+            $this->tagName = "SPAN";
         }
         else {
-            $this->appendAttributes($this->action->getAttributes());
-            if ($this->data) {
-                $this->setAttribute("href", $this->action->getHref($this->data));
-            }
-            else {
-                $this->setAttribute("href", $this->action->getHrefClean());
-            }
-            $attrs = $this->prepareAttributes();
-            echo "<a $attrs>";
-        }
+            $this->tagName = "A";
 
+            $this->appendAttributes($this->action->getAttributes());
+
+            $this->setAttribute("href", $this->action->getHref($this->data));
+
+        }
     }
 
     protected function renderImpl()
@@ -134,15 +129,6 @@ class ActionRenderer extends Component implements IActionRenderer
         }
     }
 
-    public function finishRender()
-    {
-        if ($this->action->isEmptyAction()) {
-            echo "</span>";
-        }
-        else {
-            echo "</a>";
-        }
-    }
 
     public function renderActions(array $actions)
     {

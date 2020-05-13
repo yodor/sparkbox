@@ -126,7 +126,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         $text_action = $view->getItemRenderer()->getTextAction();
 
         foreach ($this->filter_value as $name => $value) {
-            $text_action->addParameter(new ActionParameter($name, $value, TRUE));
+            $text_action->addParameter(new URLParameter($name, $value));
         }
     }
 

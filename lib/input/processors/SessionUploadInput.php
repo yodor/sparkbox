@@ -1,27 +1,24 @@
 <?php
-include_once("input/processors/BeanPostProcessor.php");
+include_once("input/processors/InputProcessor.php");
 include_once("storage/FileStorageObject.php");
 include_once("storage/ImageStorageObject.php");
 
-
-class SessionUploadInputProcessor extends BeanPostProcessor
+class SessionUploadInput extends InputProcessor
 {
-
 
     public $max_slots = 1;
 
     protected $loaded_uids = array();
 
-
-    public function loadBeanData(int $editID, DBTableBean $bean, DataInput $input, array &$item_row)
+    public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)
     {
-        parent::loadBeanData($editID, $bean, $input, $item_row);
+        parent::loadBeanData($editID, $bean, $item_row);
         //now value contains array of this item row storage objects or referenced source data values
         //
-        debug("loadBeanData: ");
-        $field_name = $input->getName();
 
-        $values = $input->getValue();
+        $field_name = $this->input->getName();
+
+        $values = $this->input->getValue();
         $this->loaded_uids = array();
 
         //trying to load field that does not have corresponding value in table. reset the value to empty array
@@ -40,36 +37,27 @@ class SessionUploadInputProcessor extends BeanPostProcessor
             $uid = $storage_object->getUID();
             $this->loaded_uids[$uid] = 1;
 
-            //TODO: clickable link for imageuploadfield
-            // 		if (isset($this->source_loaded_uids[$uid])) {
-            // 		  $storage_object->itemID = $this->source_loaded_uids[$uid];
-            // 		  $storage_object->itemClass = get_class($field->getSource());
-            // 		}
-
-
         }
 
         $values = array_values($values);
-        $input->setValue($values);
+        $this->input->setValue($values);
 
         debug("Final value type: " . getType($values));
         debug("Final UIDs Dump: ", $values);
     }
 
-
-    public function loadPostData(DataInput $input, array &$arr)
+    public function loadPostData(array &$arr)
     {
 
         //
         //arr holds the posted UIDs
         //
 
-        debug("-");
+        debug("DataInput class: " . get_class($this->input));
 
-        debug("Field class: " . get_class($input));
-        $field_name = $input->getName();
+        $field_name = $this->input->getName();
 
-        $values = $input->getValue();
+        $values = $this->input->getValue();
 
         $num_files = 0;
 
@@ -123,23 +111,15 @@ class SessionUploadInputProcessor extends BeanPostProcessor
         //reorder
         $values = array_values($values);
 
-        $input->setValue($values);
+        $this->input->setValue($values);
 
         debug("Final field values including session fiels:", $values);
 
-
     }
 
-
-    //   public function beforeCommit(InputField $field, DBTransactor $transactor, DBDriver $db, $item_key)
-    //   {
-    //
-    //       parent::beforeCommit($field, $transactor, $db, $item_key);
-    //
-    //   }
-    public function afterCommit(DataInput $input, DBTransactor $transactor)
+    public function afterCommit(BeanTransactor $transactor)
     {
-        $field_name = $input->getName();
+        $field_name = $this->input->getName();
 
         if (isset($_SESSION[UploadControlAjaxHandler::PARAM_CONTROL_NAME][$field_name])) {
 
@@ -153,25 +133,22 @@ class SessionUploadInputProcessor extends BeanPostProcessor
 
     }
 
-    public function transactValue(DataInput $input, DBTransactor $transactor)
+    public function transactValue(BeanTransactor $transactor)
     {
 
-
-        $values = $input->getValue();
-        $field_name = $input->getName();
+        $values = $this->input->getValue();
+        $field_name = $this->input->getName();
 
         //transact only UIDs found inside the session array i.e. the new ones
-        debug("field['$field_name'] " . gettype($values) . " #" . count($values) . " values to transact");
+        debug("DataInput ['$field_name'] Value Type: " . gettype($values) . " #" . count($values) . " values to transact");
 
-        if (!is_null($input->getSource())) {
-            $data_source = $input->getSource();
+        if ($this->transact_bean) {
 
-            debug("Field uses data source: '" . get_class($data_source) . "' will commit values in before commit ...");
+            debug("Using transact bean: '" . get_class($this->transact_bean) . "' will commit values in beforeCommit() ...");
             return;
         }
 
-
-        if ($input->transact_mode == DataInput::TRANSACT_DBROW) {
+        if ($this->transact_mode == InputProcessor::TRANSACT_DBROW) {
 
             debug("Transact Mode: TRANSACT_DBROW");
 
@@ -203,9 +180,8 @@ class SessionUploadInputProcessor extends BeanPostProcessor
                 break;
             }
 
-
         }
-        else if ($input->transact_mode == DataInput::TRANSACT_OBJECT) {
+        else if ($this->transact_mode == InputProcessor::TRANSACT_OBJECT) {
             debug("Transact Mode: MODE_OBJECT");
 
             if (count($values) > 1) {
@@ -221,7 +197,6 @@ class SessionUploadInputProcessor extends BeanPostProcessor
             //transact the first value if it is not the same as the loaded one
             foreach ($values as $idx => $storage_object) {
                 $uid = $storage_object->getUID();
-
 
                 if (array_key_exists($uid, $this->loaded_uids)) {
                     debug("StorageObject UID: $uid is the same UID as the bean loaded one. Not transacting this object to the main transaction row.");

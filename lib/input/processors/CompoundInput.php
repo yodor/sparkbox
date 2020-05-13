@@ -1,20 +1,20 @@
 <?php
-include_once("input/processors/BeanPostProcessor.php");
+include_once("input/processors/InputProcessor.php");
 
 /**
  * Class CompoundInputProcessor
- * Read multiple html posted input values into one InputField value
+ * Read multiple posted input values into one DataInput value
  */
-class CompoundInputProcessor extends BeanPostProcessor
+class CompoundInput extends InputProcessor
 {
 
     protected $concat_char = "-";
     protected $compound_names = array();
     protected $compound_values = array();
 
-    public function __construct()
+    public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct($input);
 
         $this->compound_values = array();
 
@@ -25,11 +25,11 @@ class CompoundInputProcessor extends BeanPostProcessor
     }
 
 
-    public function loadPostData(DataInput $input, array &$arr)
+    public function loadPostData(array &$arr)
     {
 
 
-        $field_name = $input->getName();
+        $field_name = $this->input->getName();
 
 
         foreach ($this->compound_names as $idx => $subname) {
@@ -67,12 +67,12 @@ class CompoundInputProcessor extends BeanPostProcessor
 
             }
 
-            $input->setValue($arr_compound);
+            $this->input->setValue($arr_compound);
 
         }
         else {
 
-            $input->setValue(implode($this->concat_char, $this->compound_values));
+            $this->input->setValue(implode($this->concat_char, $this->compound_values));
 
         }
 

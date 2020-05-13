@@ -1,7 +1,7 @@
 <?php
 
 include_once("components/Component.php");
-include_once("components/ListView.php");
+include_once("components/ItemView.php");
 
 include_once("components/renderers/IItemRenderer.php");
 
@@ -50,7 +50,7 @@ class CallbackItemRenderer extends Component implements IItemRenderer
         call_user_func_array($this->callback, array(&$this->item, $this->getParent()));
     }
 
-    //   public function renderItem($row, ListView $tc) {
+    //   public function renderItem($row, ItemView $tc) {
     // 	  $this->startRender();
     //
     // 	  $this->finishRender();

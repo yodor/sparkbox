@@ -82,6 +82,15 @@ class Component implements IRenderer, IHeadContents
         $this->tagName = $tagName;
     }
 
+    public function setContents(string $contents)
+    {
+        $this->contents = $contents;
+    }
+    public function getContents() : string
+    {
+        return $this->contents;
+    }
+
     /**
      * Called in start render before prepareAttributes
      * Can be used from sub classess to set all required attributes
@@ -96,12 +105,23 @@ class Component implements IRenderer, IHeadContents
         $this->processAttributes();
         $attrs = $this->prepareAttributes();
         echo "<$this->tagName $attrs>";
+
+        $this->renderCaption();
     }
 
+    public function renderCaption()
+    {
+        if (strlen($this->caption) > 0) {
+            echo "<div class='caption'>";
+            echo $this->caption;
+            echo "</div>";
+        }
+    }
     protected function renderImpl()
     {
         echo $this->contents;
     }
+
 
     public function finishRender()
     {

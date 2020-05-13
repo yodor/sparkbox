@@ -1,14 +1,14 @@
 
-.ListView {
+.ItemView {
     display: inline-block;
 }
 
-.ListView .viewport {
+.ItemView .viewport {
 
 
 }
 
-.ListView .PaginatorTopComponent {
+.ItemView .PaginatorTopComponent {
 
     /*   border: 1px solid #aeaeae; */
     background-color: #e7e7e7;
@@ -16,7 +16,7 @@
     color: #537689;
 }
 
-.ListView .PaginatorBottomComponent {
+.ItemView .PaginatorBottomComponent {
 
     /*   border: 1px solid #aeaeae; */
     background-color: #e7e7e7;

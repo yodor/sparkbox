@@ -456,6 +456,7 @@ function object2array($object)
     return $arr;
 }
 
+//TODO: refactor and use RequestBeanKey
 function refkeyPageCheck(DBTableBean $ref_bean, $redirect_fail, &$ref_key, &$ref_id, &$ref_row = array())
 {
     include_once("beans/DBTableBean.php");

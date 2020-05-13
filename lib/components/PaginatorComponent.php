@@ -12,8 +12,13 @@ abstract class PaginatorComponent extends Component
 
         $this->paginator = $paginator;
 
-        $this->component_class = "PaginatorComponent";
+        //$this->component_class = "PaginatorComponent";
 
+    }
+
+    public function renderCaption()
+    {
+        //parent::renderCaption();
     }
 
     public function requiredStyle()

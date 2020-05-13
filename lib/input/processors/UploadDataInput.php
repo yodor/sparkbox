@@ -1,14 +1,14 @@
 <?php
-include_once("input/processors/BeanPostProcessor.php");
+include_once("input/processors/InputProcessor.php");
 include_once("storage/FileStorageObject.php");
 
-class UploadDataInputProcessor extends BeanPostProcessor
+class UploadDataInput extends InputProcessor
 {
 
-    public function loadPostData(DataInput $input, array &$arr)
+    public function loadPostData(array &$arr)
     {
 
-        $name = $input->getName();
+        $name = $this->input->getName();
 
         $file_storage = new FileStorageObject();
         $file_storage->setUploadStatus(UPLOAD_ERR_NO_FILE);
@@ -46,7 +46,7 @@ class UploadDataInputProcessor extends BeanPostProcessor
             debug("Key '$name' not found in _FILES");
         }
 
-        $input->setValue($file_storage);
+        $this->input->setValue($file_storage);
 
     }
 

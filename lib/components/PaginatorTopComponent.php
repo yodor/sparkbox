@@ -5,14 +5,6 @@ class PaginatorTopComponent extends PaginatorComponent
 {
     public $view_modes_enabled = false;
 
-    public function __construct(Paginator $paginator)
-    {
-        parent::__construct($paginator);
-
-        $this->setClassName("PaginatorTopComponent");
-
-    }
-
     public function renderImpl()
     {
         if ($this->view_modes_enabled) {
@@ -35,7 +27,6 @@ class PaginatorTopComponent extends PaginatorComponent
         if ($this->caption) {
             echo "<div class='cell caption'>" . tr($this->caption) . "</div>";
         }
-
 
         $this->renderSortFields();
 

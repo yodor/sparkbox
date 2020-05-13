@@ -1,0 +1,47 @@
+
+.LoginFormRenderer {
+
+    border: 1px solid #eaeaea;
+
+}
+
+.LoginFormRenderer .InputComponent {
+    margin: 0.3em;
+}
+
+.LoginFormRenderer .caption {
+    text-transform: uppercase;
+    color: #517789;
+    font-weight: bold;
+    font-size: 1.5em;
+    letter-spacing: 0.2em;
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 1em;
+    padding-bottom: 1em;
+    display: block;
+    text-align: center;
+}
+
+.LoginFormRenderer .InputComponent[field='pass'] {
+    display: none !important;
+}
+
+.LoginFormRenderer .InputComponent[field='rand'] {
+    display: none !important;
+}
+
+.LoginFormRenderer .SubmitLine {
+    display:block !important;
+    width:100%;
+
+}
+
+.LoginFormRenderer .SubmitLine .TextSpace {
+    width:100%;
+    column-span: all;
+}
+.LoginFormRenderer .SubmitLine .Buttons {
+    column-span: all;
+
+}
+

@@ -10,36 +10,27 @@ class UserInputForm extends InputForm
     {
         parent::__construct();
 
-        $field = new DataInput("first_name", "First Name", 1);
-        $field->setRenderer(new TextField());
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "first_name", "First Name", 1);
         $this->addInput($field);
 
-        $field = new DataInput("last_name", "Last Name", 1);
-        $field->setRenderer(new TextField());
+        $field = DataInputFactory::Create(DataInputFactory::TEXT,"last_name", "Last Name", 1);
         $this->addInput($field);
 
-        $field = new DataInput("email", "Email", 1);
-        $field->setRenderer(new TextField());
-        $field->setValidator(new EmailValidator());
+        $field = DataInputFactory::Create(DataInputFactory::EMAIL,"email", "Email", 1);
         $this->addInput($field);
 
-
-        $field = new DataInput("pass", "Create Password", 0);
-        $field->setRenderer(new PasswordField());
+        $field = DataInputFactory::Create(DataInputFactory::PASSWORD,"pass", "Create Password", 0);
         $field->getRenderer()->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
 
-        $field = new DataInput("pass1", "Repeat Password", 0);
-        $field->setRenderer(new PasswordField());
+        $field = DataInputFactory::Create(DataInputFactory::PASSWORD,"pass1", "Repeat Password", 0);
         $field->getRenderer()->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
 
-        $field = new DataInput("pass_hash", "Password Hash", 1);
-        $field->setRenderer(new HiddenField());
+        $field = DataInputFactory::Create(DataInputFactory::HIDDEN, "pass_hash", "Password Hash", 1);
         $this->addInput($field);
-
 
     }
 
@@ -59,7 +50,7 @@ class UserInputForm extends InputForm
 
         if (isEmptyPassword($password_hash->getValue()) === true) {
             if ($this->getEditID() > 0) {
-                $password_hash->skip_transaction = true;
+                $password_hash->getProcessor()->skip_transaction = true;
 
             }
             else {

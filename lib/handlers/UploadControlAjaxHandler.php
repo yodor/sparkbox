@@ -61,10 +61,10 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
         $input = new DataInput($this->field_name, "Upload Control", 1);
 
         $input->setValidator($validator);
-        $input->setProcessor(new UploadDataInputProcessor());
+        new UploadDataInput($input);
 
         debug("DataInput object loading _POST data");
-        $input->loadPostData($_POST);
+        $input->getProcessor()->loadPostData($_POST);
 
         debug("DataInput object validating data");
         $input->validate();

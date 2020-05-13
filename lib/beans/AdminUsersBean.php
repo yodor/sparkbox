@@ -45,6 +45,7 @@ class AdminUsersBean extends DBTableBean
     public function emailExists(string $email)
     {
         return $this->findFieldValue("email", $email);
+
     }
 
     public function email(int $userID)

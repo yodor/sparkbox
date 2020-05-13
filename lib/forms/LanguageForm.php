@@ -1,7 +1,7 @@
 <?php
 include_once("forms/InputForm.php");
 
-class LanguageInputForm extends InputForm
+class LanguageForm extends InputForm
 {
 
     public function __construct()

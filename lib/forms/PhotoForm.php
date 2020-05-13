@@ -2,7 +2,7 @@
 include_once("forms/InputForm.php");
 include_once("input/DataInputFactory.php");
 
-class PhotoInputForm extends InputForm
+class PhotoForm extends InputForm
 {
 
     public function __construct()

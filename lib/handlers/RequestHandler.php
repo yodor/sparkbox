@@ -11,8 +11,8 @@ abstract class RequestHandler implements IRequestProcessor
 
     protected $need_confirm = false;
 
-    const COMMAND = "cmd";
-    const CONFIRM = "confirm_handler";
+    const KEY_COMMAND = "cmd";
+    const KEY_CONFIRM = "confirm_handler";
 
     public function __construct(string $cmd)
     {
@@ -53,7 +53,7 @@ abstract class RequestHandler implements IRequestProcessor
 
     public function shouldProcess() : bool
     {
-        if (isset($_REQUEST[RequestHandler::COMMAND]) && strcmp($_REQUEST[RequestHandler::COMMAND], $this->cmd) == 0) {
+        if (isset($_REQUEST[RequestHandler::KEY_COMMAND]) && strcmp($_REQUEST[RequestHandler::KEY_COMMAND], $this->cmd) == 0) {
 
             return TRUE;
         }
@@ -66,7 +66,7 @@ abstract class RequestHandler implements IRequestProcessor
 
         $do_process = false;
 
-        if ($this->need_confirm && !isset($_POST[RequestHandler::CONFIRM])) {
+        if ($this->need_confirm && !isset($_POST[RequestHandler::KEY_CONFIRM])) {
 
             $this->processConfirmation();
         }

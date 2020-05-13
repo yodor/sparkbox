@@ -2,7 +2,7 @@
 include_once("input/validators/EmptyValueValidator.php");
 include_once("input/renderers/InputLabel.php");
 include_once("input/renderers/InputField.php");
-include_once("input/processors/BeanPostProcessor.php");
+include_once("input/processors/InputProcessor.php");
 
 //
 //Generic class representing a data value (input in form linked to table row field value)
@@ -21,21 +21,6 @@ include_once("input/processors/BeanPostProcessor.php");
 
 class DataInput
 {
-
-    //transact DBROW without source is incompatible with non required field.
-    const TRANSACT_DBROW = 1;
-    const TRANSACT_OBJECT = 2;
-    const TRANSACT_VALUE = 3;
-
-    //int
-    public $transact_mode = DataInput::TRANSACT_VALUE;
-
-    public $content_after = "";
-    public $content_before = "";
-
-    public $accepted_tags = "";
-
-    public $skip_transaction = FALSE;
 
     public $skip_search_filter_processing = FALSE;
 
@@ -68,17 +53,11 @@ class DataInput
      */
     protected $renderer = NULL;
 
-    /**
-     * @var InputLabel|null
-     */
-    protected $label_renderer = NULL;
 
     //IInputValidator is responsible for validation of the $value data
     protected $validator = NULL;
-    //IBeanPostProcessor
+    //InputProcessor
     protected $processor = NULL;
-    //IDBFieldTransactor
-    protected $value_transactor = NULL;
 
     /**
      * @var DBTableBean|null
@@ -100,31 +79,6 @@ class DataInput
      */
     protected $translator_enabled = FALSE;
 
-    //target data store
-    public function setSource(DBTableBean $data_source)
-    {
-        debug("DataInput '" . $this->getName() . "' using source: " . get_class($data_source));
-        $this->bean = $data_source;
-    }
-
-    public function getSource(): ?DBTableBean
-    {
-        return $this->bean;
-    }
-
-    public function setValueTransactor(IDBFieldTransactor $transactor)
-    {
-        $this->value_transactor = $transactor;
-    }
-
-    public function getValueTransactor(): ?IDBFieldTransactor
-    {
-
-        if ($this->value_transactor instanceof IDBFieldTransactor) return $this->value_transactor;
-        if ($this->processor instanceof IDBFieldTransactor) return $this->processor;
-
-        return NULL;
-    }
 
     public function __construct(string $name, string $label, bool $required)
     {
@@ -137,21 +91,21 @@ class DataInput
         $this->translator_enabled = FALSE;
         $this->editable = TRUE;
 
-        $this->label_renderer = new InputLabel($this);
-        $this->validator = new EmptyValueValidator();
-        $this->processor = new BeanPostProcessor();
 
-        $this->accepted_tags = DefaultAcceptedTags();
+        $this->validator = new EmptyValueValidator();
+        $this->processor = new InputProcessor($this);
+
+
 
         $this->bean = NULL;
     }
 
-    public function setProcessor(IBeanPostProcessor $ip)
+    public function setProcessor(InputProcessor $processor)
     {
-        $this->processor = $ip;
+        $this->processor = $processor;
     }
 
-    public function getProcessor(): IBeanPostProcessor
+    public function getProcessor(): InputProcessor
     {
         return $this->processor;
     }
@@ -177,16 +131,6 @@ class DataInput
     public function getRenderer(): InputField
     {
         return $this->renderer;
-    }
-
-    public function setLabelRenderer(InputLabel $label_renderer)
-    {
-        $this->label_renderer = $label_renderer;
-    }
-
-    public function getLabelRenderer(): InputLabel
-    {
-        return $this->label_renderer;
     }
 
     public function setUserData($data)
@@ -281,12 +225,6 @@ class DataInput
     {
         $this->value = "";
         $this->error = "";
-    }
-
-    //coming from user posts. can throw exception
-    public function loadPostData(array $arr): void
-    {
-        $this->processor->loadPostData($this, $arr);
     }
 
     //validate sets error on the field

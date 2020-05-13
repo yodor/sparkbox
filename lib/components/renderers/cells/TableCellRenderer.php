@@ -5,14 +5,22 @@ include_once("components/TableColumn.php");
 class TableCellRenderer extends Component
 {
     protected $tagName = "TD";
+
     protected $tooltip_field = "";
-    protected $action = FALSE;
+
+    /**
+     * @var Action
+     */
+    protected $action;
 
     protected $value_attributes = array();
 
     protected $value = "";
 
-    protected $column = null;
+    /**
+     * @var TableColumn
+     */
+    protected $column;
 
     protected $field = "";
 

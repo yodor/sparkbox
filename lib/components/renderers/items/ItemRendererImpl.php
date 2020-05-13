@@ -1,7 +1,7 @@
 <?php
 
 include_once("components/Component.php");
-include_once("components/ListView.php");
+include_once("components/ItemView.php");
 
 include_once("components/renderers/IItemRenderer.php");
 

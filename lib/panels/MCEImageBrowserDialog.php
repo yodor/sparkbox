@@ -5,8 +5,15 @@ include_once("handlers/MCEImageBrowserAjaxHandler.php");
 class MCEImageBrowserDialog extends MessageDialog
 {
 
-    protected $handler = NULL;
-    protected $dimension_dialog = NULL;
+    /**
+     * @var MCEImageBrowserAjaxHandler
+     */
+    protected $handler;
+
+    /**
+     * @var InputComponent
+     */
+    protected $icmp;
 
     public function __construct()
     {
@@ -31,6 +38,8 @@ class MCEImageBrowserDialog extends MessageDialog
         $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
         $this->image_input->getRenderer()->assignUploadHandler($this->handler);
 
+
+        $this->icmp = new InputComponent($this->image_input);
 
     }
 
@@ -57,8 +66,8 @@ class MCEImageBrowserDialog extends MessageDialog
     {
 
         echo "<form method='post' enctype='multipart/form-data'>";
-        $icmp = new InputComponent($this->image_input);
-        $icmp->render();
+
+        $this->icmp->render();
 
         echo "</form>";
 

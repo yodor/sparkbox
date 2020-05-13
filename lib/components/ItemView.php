@@ -6,7 +6,7 @@ include_once("components/renderers/IItemRenderer.php");
 include_once("utils/ValueInterleave.php");
 include_once("components/PageResultsPanel.php");
 
-class ListView extends AbstractResultView
+class ItemView extends AbstractResultView
 {
 
     protected $item_renderer;
@@ -19,7 +19,7 @@ class ListView extends AbstractResultView
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/ListView.css";
+        $arr[] = SPARK_LOCAL . "/css/ItemView.css";
         return $arr;
     }
 
@@ -71,8 +71,6 @@ class ListView extends AbstractResultView
         while ($row = $this->itr->next()) {
 
             $cls = $v->value();
-
-            //$this->item_renderer->setClassName($cls);
 
             $this->item_renderer->setItem($row);
             $this->item_renderer->render();

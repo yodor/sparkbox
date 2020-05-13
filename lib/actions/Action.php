@@ -1,14 +1,14 @@
 <?php
 include_once("utils/Paginator.php");
+include_once("utils/URLParameter.php");
 
-class ActionParameter
+class ActionParameter extends URLParameter
 {
     /**
      * Parameters to pass to the action getHref($row) to construct the parametrized query
      */
-    public $param_name = "";
-    public $field_name = "";
-    public $is_value_param = false;
+
+    protected $field;
 
     /**
      * @param string $param_name Parameter name
@@ -17,11 +17,26 @@ class ActionParameter
      *                                False: field_name is looked into the rendering row and return its value instead to Action.getHref(&$row) during parametrization
      */
     //
-    public function __construct(string $param_name, string $field_name, $is_value_param = false)
+    public function __construct(string $param_name, string $field_name="")
     {
-        $this->param_name = $param_name;
-        $this->field_name = $field_name;
-        $this->is_value_param = $is_value_param;
+        if (!$field_name) {
+            $field_name = $param_name;
+        }
+        $this->field = $field_name;
+
+        parent::__construct($param_name, "");
+    }
+
+    public function field()
+    {
+        return $this->field;
+    }
+
+    public function setValue(array &$data)
+    {
+        if (isset($data[$this->field])) {
+            $this->value = $data[$this->field];
+        }
     }
 }
 
@@ -41,6 +56,7 @@ class Action
     protected $attributes = NULL;
     protected $clear_page_param = false;
 
+    protected $prepend_request_params = true;
     /**
      * CTOR
      *
@@ -64,9 +80,9 @@ class Action
     }
 
     //remove paginator page=? parameter from this href
-    public function setClearPageParam($mode)
+    public function setClearPageParam(bool $mode)
     {
-        $this->clear_page_param = ($mode) ? true : false;
+        $this->clear_page_param = $mode;
     }
 
     /**
@@ -74,20 +90,19 @@ class Action
      *
      * @param boolean $mode If set to true will prepend the current request query parameters to this link href
      */
-    public function prependRequestParams($mode)
+    public function prependRequestParams(bool $mode)
     {
-        $this->prepend_request_params = ($mode) ? true : false;
+        $this->prepend_request_params = $mode;
     }
 
-    public function setHref($href)
+    public function setHref(string $href)
     {
         $this->href = $href;
     }
 
-    public function setAttribute($name, $value)
+    public function setAttribute(string $name, string $value)
     {
         $this->attributes[$name] = $value;
-        return $this;
     }
 
     public function getAttribute($name)
@@ -100,14 +115,9 @@ class Action
         return $this->attributes;
     }
 
-    public function addParameter(ActionParameter $param)
+    public function addParameter(URLParameter $param)
     {
         $this->parameters[] = $param;
-    }
-
-    public function prepareAction(&$row)
-    {
-
     }
 
     public function getParameterCount()
@@ -117,7 +127,7 @@ class Action
 
     public function isEmptyAction()
     {
-        return ($this->getParameterCount() < 1 && strlen($this->getHrefClean()) < 1);
+        return ($this->getParameterCount() < 1 && strlen($this->getHref()) < 1);
     }
 
     public function copyAction(Action $action)
@@ -125,46 +135,34 @@ class Action
         $this->title = $action->getTitle();
         $this->check_code = $action->getCheckCode();
         $this->parameters = $action->getParameters();
-        $this->href = $action->getHrefClean();
+        $this->href = $action->getHref();
         $this->attributes = $action->getAttributes();
-    }
-
-    /**
-     * @return string Return the current href property
-     */
-    public function getHrefClean()
-    {
-        return $this->href;
     }
 
     /**
      * @param array $row Input array to parametrize the href with
      * @return string Return parametrized href using the input array $row
      */
-    public function getHref(&$row)
+    public function getHref(array &$row = NULL)
     {
+        if (!is_array($row)) return $this->href;
 
         if (stripos($this->href, "javascript:") !== false) {
 
             $href = $this->href;
 
             foreach ($this->parameters as $pos => $act_param) {
-                if (isset($row[$act_param->field_name])) {
-
-                    $href = str_replace("%" . $act_param->field_name . "%", $row[$act_param->field_name], $href);
+                if ($act_param instanceof ActionParameter) {
+                    $act_param->setValue($row);
+                    $href = str_replace("%" . $act_param->field() . "%", $act_param->value(), $href);
                 }
             }
+
             return $href;
         }
 
         $href = array();
         $params = array();
-
-        $script_name = $this->href;
-        $script_params = "";
-        if (strpos($script_name, "?") !== false) {
-            list($script_name, $script_params) = explode("?", $script_name);
-        }
 
         //TODO: Check order of parameters
         //1. parameters from current URL
@@ -174,11 +172,15 @@ class Action
                     $params[$key] = $param;
                 }
             }
-            // 	    $params = array_merge($params, $_GET);
         }
 
         //2. static parameters from action href
-        $static_pairs = explode("&", $script_params);
+        $script_name = $this->href;
+        $script_query = "";
+        if (strpos($script_name, "?") !== false) {
+            list($script_name, $script_query) = explode("?", $script_name);
+        }
+        $static_pairs = explode("&", $script_query);
         foreach ($static_pairs as $pos => $pair) {
             $param_name = $pair;
             $param_value = "";
@@ -190,16 +192,17 @@ class Action
             }
         }
 
-        //3. parameters passed in the CTOR array 'parameters'
+        //3. parameters passed in the CTOR array 'parameters' (parametrized with this data row)
         foreach ($this->parameters as $pos => $act_param) {
-            if ($act_param->is_value_param === TRUE) {
-                $params[$act_param->param_name] = $act_param->field_name;
+
+            if ($act_param instanceof ActionParameter) {
+                $act_param->setValue($row);
             }
-            else if (isset($row[$act_param->field_name])) {
-                $params[$act_param->param_name] = $row[$act_param->field_name];
-            }
+            //URLParameter
+            $params[$act_param->name()] = $act_param->value();
         }
 
+        //clear parameters from the Paginator
         if (strlen($script_name) > 0 || $this->clear_page_param) {
             Paginator::clearPageFilter($params);
         }
@@ -210,6 +213,7 @@ class Action
                 $ret = str_replace("%" . $param_name . "%", $value, $ret);
             }
         }
+
         if (strrpos($ret, "&") === strlen($ret) - 1) {
             $ret = substr_replace($ret, "", -1);
         }
