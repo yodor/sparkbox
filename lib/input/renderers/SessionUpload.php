@@ -78,7 +78,7 @@ abstract class SessionUpload extends InputField
     public function renderControls()
     {
         echo "<div class='Controls' >";
-        StyledButton::DefaultButton()->renderButton("Browse", "", "browse");
+        ColorButton::RenderButton("Browse", "", "browse");
 
         $attr = $this->prepareInputAttributes();
 

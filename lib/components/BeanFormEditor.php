@@ -100,6 +100,13 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->append($this->form_render);
 
+//        if (Session::Get(SparkPage::IteratorSessionKey($this->bean->getTableName()))) {
+//            $action_back = new Action("", Session::Get(SparkPage::IteratorSessionKey($this->bean->getTableName())), array());
+//            $action_back->setAttribute("action", "back");
+//            $action_back->setAttribute("title", tr("Back"));
+//            AdminPageLib::Instance()->addAction($action_back);
+//        }
+
     }
 
 

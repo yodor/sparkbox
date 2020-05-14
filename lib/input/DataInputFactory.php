@@ -207,7 +207,7 @@ class DataInputFactory
 
                 $processor = new SessionUploadInput($input);
                 $processor->max_slots = 1;
-                $processor->transact_mode = DataInput::TRANSACT_OBJECT;
+                $processor->transact_mode = InputProcessor::TRANSACT_OBJECT;
 
                 $validator = new FileUploadValidator();
                 $validator->skip_is_uploaded_check = TRUE;

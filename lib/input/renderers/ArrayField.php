@@ -33,8 +33,8 @@ class ArrayField extends InputField
 
         $this->element_renderer = $field;
 
-        $button_add = StyledButton::DefaultButton();
-        $button_add->setType(StyledButton::TYPE_BUTTON);
+        $button_add = new ColorButton();
+        $button_add->setType(ColorButton::TYPE_BUTTON);
         $button_add->setName(ArrayField::DEFAULT_CONTROL_NAME);
         $button_add->setAttribute("action", ArrayField::DEFAULT_CONTROL_ACTION);
         $this->addControl($button_add);

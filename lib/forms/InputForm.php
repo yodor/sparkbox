@@ -63,10 +63,13 @@ class InputForm implements IBeanEditor
     {
         $this->name = $name;
     }
+
     public function getName() : string
     {
-        return $this->name;
+        if ($this->name) return $this->name;
+        return get_class($this);
     }
+
     public function getRenderer(): ?FormRenderer
     {
         return $this->renderer;

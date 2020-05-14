@@ -13,15 +13,13 @@ class PhraseTranslationDialog extends MessageDialog
         $this->show_close_button = TRUE;
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
-        $btn = StyledButton::DefaultButton();
-        $btn->setButtonType(StyledButton::TYPE_BUTTON);
+        $btn = new ColorButton();
         $btn->setText("Translate");
         $btn->setAttribute("action", "Translate");
 
         $this->appendButton($btn);
 
-        $btn = StyledButton::DefaultButton();
-        $btn->setButtonType(StyledButton::TYPE_BUTTON);
+        $btn = new ColorButton();
         $btn->setText("Close");
         $btn->setAttribute("action", "Close");
         $this->appendButton($btn);

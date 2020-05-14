@@ -12,9 +12,6 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
      */
     protected $bean = NULL;
 
-    protected $width = -1;
-    protected $height = 64;
-
     protected $list_limit = 0;
 
     protected $blob_field = "";
@@ -27,17 +24,34 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     protected $image_popup = NULL;
 
-    public function __construct(int $width = 48, int $height = -1)
+    protected static $DefaultWidth = 128;
+    protected static $DefaultHeight = -1;
+
+    protected $sortable = FALSE;
+
+    public static function SetDefaultPhotoSize(int $width, int $height)
+    {
+        TableImageCellRenderer::$DefaultWidth=$width;
+        TableImageCellRenderer::$DefaultHeight=$height;
+    }
+
+    public function __construct(int $width = -1, int $height = -1)
     {
         parent::__construct();
 
-        $this->width = $width;
-        $this->height = $height;
-
         $this->list_limit = 1;
+
+        if ($width<1 && $height<1) {
+            $width = TableImageCellRenderer::$DefaultWidth;
+            $height = TableImageCellRenderer::$DefaultHeight;
+        }
+
+        $this->image_popup = new ImagePopup();
+        $this->image_popup->setPhotoSize($width, $height);
+
     }
 
-    public function setBean(DBTableBean $bean, string $relateField="")
+    public function setBean(DBTableBean $bean, string $relateField = "")
     {
         $this->bean = $bean;
         if ($relateField) {
@@ -58,18 +72,17 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     public function setPhotoSize(int $width, int $height)
     {
-        $this->width = $width;
-        $this->height = $height;
+        $this->image_popup->setPhotoSize($width, $height);
     }
 
     public function getPhotoWidth(): int
     {
-        return $this->width;
+        return $this->image_popup->getPhotoWidth();
     }
 
     public function getPhotoHeight(): int
     {
-        return $this->height;
+        return $this->image_popup->getPhotoHeight();
     }
 
     public function setAction(Action $action)
@@ -79,177 +92,102 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     protected function constructItems(array &$data)
     {
+
         $this->items = array();
 
-        if ($this->bean instanceof DBTableBean) {
-            //check if table name is same for the bean and iterator
-            $iterator = $this->column->getView()->getIterator();
+        if (!$this->bean) return;
 
-            //iterator is the same table as the bean
-            if (strcmp($iterator->name(), $this->bean->getTableName()) == 0) {
-                $item = new StorageItem();
-                $item->className = get_class($this->bean);
-                $item->id = $data[$this->bean->key()];
-                $item->field = $this->blob_field;
-                $this->items[] = $item;
-            }
-            else {
+        //check if table name is same for the bean and iterator
+        $iterator = $this->column->getView()->getIterator();
 
-                $relate_key = $iterator->key();
-                if ($this->relateField) {
-                    $relate_key = $this->relateField;
-                }
-
-                $relate_value = $data[$relate_key];
-
-                $qry = $this->bean->queryField($relate_key, $relate_value, $this->list_limit);
-                $qry->select->fields = $this->bean->key();
-                if ($this->bean->haveField("position")) {
-                    $qry->select->order_by = " position ASC ";
-                }
-
-                $qry->exec();
-
-                while ($result = $qry->next()) {
-                    $photoID = $result[$this->bean->key()];
-
-                    $item = new StorageItem();
-                    $item->id = $photoID;
-                    $item->className = get_class($this->bean);
-                    $item->field = $this->blob_field;
-
-                    $this->items[] = $item;
-                }
-
-            }
-
+        //iterator is the same table as the bean
+        if (strcmp($iterator->name(), $this->bean->getTableName()) == 0) {
+            $item = new StorageItem();
+            $item->className = get_class($this->bean);
+            $item->id = $data[$this->bean->key()];
+            $item->field = $this->blob_field;
+            $this->items[] = $item;
         }
         else {
-            echo "No bean set";
+
+            $fieldName = $this->column->getFieldName();
+
+            debug("Column '$fieldName' Related bean: '" . get_class($this->bean) . "' Related field: '$this->relateField'");
+
+            $relate_key = $this->bean->key();
+            if ($this->relateField) {
+                $relate_key = $this->relateField;
+            }
+
+            $qry = $this->bean->query();
+            $qry->select->fields = $this->bean->key();
+            if ($this->list_limit > 0) {
+                $qry->select->limit = $this->list_limit;
+            }
+            if ($this->bean->haveField("position")) {
+                $qry->select->order_by = " position ASC ";
+            }
+
+            //if result row contains key named by the column field name then we use the values as primary key values of the bean
+            //else we match reversely if the bean primary key name is found as key in the result row we use this
+            //else try iterators' primary key and value as relation value access
+            $values = "";
+
+            if (isset($data[$fieldName])) {
+                debug("Using column field '$fieldName' as data key");
+                $values = $data[$fieldName];
+            }
+            else if (isset($data[$relate_key])) {
+                debug("Using bean field '$relate_key' as data key");
+                $values = $data[$relate_key];
+            }
+            else {
+                debug("Using iterator key '$relate_key' as data key");
+                $relate_key = $this->column->getView()->getIterator()->key();
+                $values = $data[$relate_key];
+            }
+
+            if (!$values) return;
+
+            debug("Using '$relate_key' as bean access key");
+
+            $values = explode("|", $values);
+            $qry->select->where = " $relate_key IN ( " . implode(",", $values) . " )";
+
+            $qry->exec();
+
+            while ($result = $qry->next()) {
+                $photoID = $result[$this->bean->key()];
+
+                $item = new StorageItem();
+                $item->id = $photoID;
+                $item->className = get_class($this->bean);
+                $item->field = $this->blob_field;
+
+                $this->items[] = $item;
+            }
+
         }
+
     }
-    //    protected function constructItems(array &$data)
-    //    {
-    //        $this->items = array();
-    //
-    //        if (!$this->blob_field) {
-    //            $this->blob_field = $this->column->getFieldName();
-    //        }
-    //
-    //        $source_fields = $this->bean->fields();
-    //
-    //        $qry = $this->bean->query();
-    //
-    //        $qry->select->fields = $this->bean->key();
-    //
-    //        if ((int)$this->list_limit > 0) {
-    //            $qry->select->limit = $this->list_limit;
-    //        }
-    //
-    //        if ($this->bean->haveField("position")) {
-    //            $qry->select->order_by = " position ASC ";
-    //        }
-    //
-    //        $num = 0;
-    //        try {
-    //            //iterate source based on view's prkey
-    //            $prkey = $this->column->getView()->getIterator()->key();
-    //            if (in_array($prkey, $source_fields)) {
-    //                $qry->select->where = "$prkey={$this->data[$prkey]}";
-    //            }
-    //            else {
-    //                //check sources' prkey with row
-    //                $prkey = $this->bean->key();
-    //                if ($this->source_key) {
-    //                    $prkey = $this->source_key;
-    //                }
-    //
-    //                $row_fields = array_keys($this->data);
-    //                if (in_array($prkey, $row_fields)) {
-    //                    $value = (int)$this->data[$prkey];
-    //                    $qry->select->where = "$prkey=$value";
-    //                }
-    //                else {
-    //                    //check assigned column value. this might be array also try exploding first
-    //                    $row_value = $this->data[$this->column->getFieldName()];
-    //
-    //                    if ($row_value) {
-    //                        $value = explode("|", $row_value);
-    //                    }
-    //                    else {
-    //                        $value = (int)$row_value;
-    //                    }
-    //                    if (is_array($value) && count($value) > 0) {
-    //                        $qry->select->where = " $prkey IN (" . implode(",", $value) . ") ";
-    //                    }
-    //                    else {
-    //                        $qry->select->where = " $prkey=$value ";
-    //                    }
-    //
-    //                }
-    //            }
-    //            $num = $qry->exec();
-    //        }
-    //        catch (Exception $e) {
-    //            echo $e->getMessage();
-    //            echo $qry->select->getSQL();
-    //        }
-    //
-    //        while ($pfrow = $qry->next()) {
-    //            $photoID = $pfrow[$this->bean->key()];
-    //            $item = new StorageItem();
-    //            $item->id = $photoID;
-    //            $item->className = get_class($this->bean);
-    //            $item->field = $this->blob_field;
-    //
-    //            $this->items[] = $item;
-    //        }
-    //    }
 
     protected function renderImageItems()
     {
         $num = count($this->items);
 
-        if ($num < 1) {
-            // 		echo "N/A";
-
-        }
-        if ($num > 1) {
-            echo "<div class='TableCellImageList'  count='$num'>";
-        }
+        echo "<div class='ImageList'  count='$num'>";
 
         foreach ($this->items as $idx => $item) {
 
-            $photoID = $item->id;
-            $bean_class = $item->className;
+            $this->image_popup->setStorageItem($item);
 
-            echo "<div class='TableCellImageItem' itemID='$photoID' itemClass='$bean_class'>";
+            $this->image_popup->setClassName("Item");
 
-            $img_tag = "<img src='{$item->hrefImage($this->width, $this->height)}'>";
-
-            if ($this->action instanceof EmptyAction) {
-                echo $img_tag;
-            }
-            else {
-                if ($this->action) {
-                    $href = $this->action->getHref($this->data);
-                    echo "<a href='$href'>$img_tag</a>";
-                }
-                else {
-
-                    echo "<a class='ImagePopup' href='{$item->hrefFull()}'  >";
-                    echo $img_tag;
-                    echo "</a>";
-                }
-            }
-
-            echo "</div>"; //TableCellImageItem
-
+            $this->image_popup->render();
         }
 
-        if ($num > 1) {
-            echo "</div>"; //TableCellImageList
-        }
+        echo "</div>"; //ImageList
+
     }
 
     protected function renderImpl()
@@ -263,7 +201,26 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
     public function setData(array &$row)
     {
         parent::setData($row);
+
+        if (!$this->bean) {
+            $this->bean = $this->column->getView()->getIterator()->bean();
+        }
+
         $this->constructItems($row);
+
+        if ($this->action) {
+            $this->image_popup->setAttribute("href", $this->action->getHref($row));
+        }
+        else {
+            $this->image_popup->clearAttribute("href");
+        }
+
+        if (isset($row["caption"])) {
+            $this->image_popup->setAttribute("caption", $row["caption"]);
+        }
+        else {
+            $this->image_popup->clearAttribute("caption");
+        }
 
     }
 

@@ -82,6 +82,11 @@ class BeanTransactor implements IBeanEditor
         $this->values[$key] = $val;
     }
 
+    public function appendURLParameter(URLParameter $param)
+    {
+        $this->values[$param->name()] = $param->value();
+    }
+
     /**
      * Add value '$val' using key name '$key' only during insert operation
      * @param string $key

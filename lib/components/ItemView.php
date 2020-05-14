@@ -56,6 +56,7 @@ class ItemView extends AbstractResultView
         echo "</div>";
 
         parent::finishRender();
+
     }
 
 

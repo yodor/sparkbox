@@ -1,3 +1,7 @@
+A.ImagePopup {
+    cursor:pointer;
+}
+
 .ModalPane .ImagePopup {
     /*   border:1px dotted red; */
     display:table;

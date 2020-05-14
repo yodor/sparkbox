@@ -1,0 +1,109 @@
+
+INPUT[type="submit"]::-moz-focus-inner, INPUT[type="button"]::-moz-focus-inner, A {
+    border: 0;
+}
+
+/*for IE8 */
+INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
+    outline: none;
+}
+
+
+.ColorButton {
+    display: inline-block;
+    position: relative;
+
+    text-align: center;
+    vertical-align: bottom;
+
+    padding-top: 0.1em;
+    padding-bottom: 0.2em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+
+    border: 1px solid #0c2226;
+
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    border-radius: 0.2em;
+
+    outline: none;
+
+    font-size: 100%;
+    font-weight: normal;
+    text-transform: none;
+    text-decoration: none;
+
+    color: #fff;
+    background-color: #506266;
+
+    cursor: pointer;
+
+    min-width:4em;
+}
+
+.ColorButton:link {
+
+}
+
+.ColorButton:visited {
+    color: #fff;
+}
+
+.ColorButton:hover {
+    color: #fff;
+
+
+    -moz-box-shadow: 0 0 0.1em 0.1em #667d85;
+    -webkit-box-shadow: 0 0 0.1em 0.1em #667d85;
+    box-shadow: 0 0 0.1em 0.1em #667d85;
+
+    outline: none;
+}
+
+.ColorButton:active {
+    color: #fff;
+
+    -webkit-box-shadow: inset 0 0 0.1em 0.1em #0c2226;
+    -moz-box-shadow: inset 0 0 0.1em 0.1em #0c2226;
+    box-shadow: inset 0 0 0.1em 0.1em #0c2226;
+    outline: none;
+}
+
+
+.buttons_bar {
+    display: table;
+    float: right;
+}
+
+.buttons_bar .button_slot {
+    display: table-cell;
+    vertical-align: middle;
+
+    padding: 0.5em;
+}
+
+.buttons_bar .button_slot A {
+    display: inline-block;
+    text-align: center;
+}
+
+TD.input_field {
+    vertical-align: middle;
+}
+
+.button_remove_array_field {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ColorButton[action="submit"]  {
+    border-color: #ac5c05;
+    background-color: #f1af5b;
+    background: -webkit-gradient(linear, 0 0, 0 bottom, from(#f9a541), to(#f78f14));
+    background: -webkit-linear-gradient(#f9a541, #f78f14);
+    background: -moz-linear-gradient(#f9a541, #f78f14);
+    background: -ms-linear-gradient(#f9a541, #f78f14);
+    background: -o-linear-gradient(#f9a541, #f78f14);
+    background: linear-gradient(#f9a541, #f78f14);
+}

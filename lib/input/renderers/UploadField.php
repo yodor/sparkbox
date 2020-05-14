@@ -48,7 +48,7 @@ abstract class PlainUpload extends InputField
         echo "</div>";
 
         echo "<div class='Controls' >";
-        StyledButton::DefaultButton()->renderButton("Browse", "", "browse");
+        ColorButton::RenderButton("Browse", "", "browse");
 
         $attr = $this->prepareInputAttributes();
 

@@ -8,16 +8,29 @@ include_once("components/renderers/ActionRenderer.php");
 class GalleryViewItemRenderer extends Component implements IItemRenderer, IActionsCollection, IPhotoRenderer
 {
 
-    protected $view = NULL;
-
     protected $actions = array();
-
-    protected $width = 256;
-    protected $height = -1;
 
     protected $item = NULL;
 
-    protected $actionRenderer = NULL;
+    /**
+     * @var GalleryView
+     */
+    protected $view;
+
+    /**
+     * @var ActionRenderer
+     */
+    protected $actionRenderer;
+
+    /**
+     * @var ImagePopup
+     */
+    protected $image_popup;
+
+    /**
+     * @var int
+     */
+    protected $position = -1;
 
     /**
      * @var URLParameter
@@ -29,7 +42,7 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
         parent::__construct();
         $this->view = $view;
         $this->actionRenderer = new ActionRenderer();
-
+        $this->image_popup = new ImagePopup();
     }
 
     public function requiredStyle()
@@ -43,13 +56,11 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     {
         $this->item = $item;
 
-        if (isset($this->item["position"])) {
-            $this->setAttribute("position", $this->item["position"]);
+        if (isset($item["position"])) {
+            $this->setAttribute("position", $item["position"]);
         }
 
-        $photos = $this->view->getBean();
-
-        $photoID = $this->item[$photos->key()];
+        $photoID = (int)$this->item[$this->view->getBean()->key()];
 
         $this->setAttribute("itemID", $photoID);
 
@@ -57,6 +68,22 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
             $this->setAttribute("ref_key", $this->urlparam->name());
             $this->setAttribute("ref_id", $this->urlparam->value());
         }
+
+        $this->image_popup->setID($photoID);
+        $this->image_popup->setBeanClass(get_class($this->view->getBean()));
+
+        $tooltip = tr("Caption") . ": " . $this->item["caption"]."<BR>";
+        $tooltip .= tr("Upload Date") . ": " . dateFormat($this->item["date_upload"], TRUE);
+
+        $this->image_popup->setAttribute("tooltip", $tooltip);
+        $this->image_popup->setAttribute("caption", $item["caption"]);
+
+        $this->image_popup->setName($this->image_popup->getBeanClass() . "." . $this->image_popup->getID());
+
+        if (isset($item["position"])) {
+            $this->position = $item["position"];
+        }
+
 
     }
 
@@ -67,18 +94,17 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
 
     public function setPhotoSize(int $width, int $height)
     {
-        $this->width = $width;
-        $this->height = $height;
+        $this->image_popup->setPhotoSize($width, $height);
     }
 
     public function getPhotoWidth(): int
     {
-        return $this->width;
+        return $this->image_popup->getPhotoWidth();
     }
 
     public function getPhotoHeight(): int
     {
-        return $this->height;
+        return $this->image_popup->getPhotoHeight();
     }
 
     public function addAction(Action $a)
@@ -104,25 +130,12 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     protected function renderImpl()
     {
 
-        $photoID = $this->item[$this->view->getBean()->key()];
-
-        $item = new StorageItem();
-        $item->id = $photoID;
-        $item->className = get_class($this->view->getBean());
-
-        $thumb_href = $item->hrefImage($this->width, $this->height);
-
-        $image_href = $item->hrefFull();
-
         echo "<div class='header'>";
 
-        if (isset($this->item["position"])) {
+        if ($this->position) {
             echo "<div class='position'>";
-
-            echo "<span>#" . $this->item["position"] . "</span>";
-
+            echo "<span>#$this->position</span>";
             echo "</div>";
-
         }
 
         echo "<div class='item_actions'>";
@@ -148,22 +161,7 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
 
         echo "</div>"; //header
 
-        $tooltip = tr("Caption") . ": " . $this->item["caption"] . "<BR>";
-        $tooltip .= tr("Upload Date") . ": " . dateFormat($this->item["date_upload"], TRUE);
-
-        $named_link = get_class($this->view->getBean()) . "." . $photoID;
-
-        $rel = get_class($this->view->getBean());
-
-        echo "<a 
-        class='ImagePopup image_slot' 
-        style='background-image:url($thumb_href)' 
-        href='$image_href' 
-        name='$named_link' 
-        rel='$rel' tooltip='" . attributeValue($tooltip) . "'
-        caption='" . attributeValue($this->item["caption"]) . "' >";
-
-        echo "</a>";
+        $this->image_popup->render();
 
         echo "<div class='footer'>";
 

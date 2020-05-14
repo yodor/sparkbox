@@ -32,16 +32,7 @@ abstract class ItemRendererImpl extends Component implements IItemRenderer
 
     }
 
-    public function startRender()
-    {
-        $all_attr = $this->prepareAttributes();
-        echo "<div $all_attr >";
-    }
 
-    public function finishRender()
-    {
-        echo "</div>";
-    }
 
 
     //abstract public function renderSeparator($idx_curr, $items_total);

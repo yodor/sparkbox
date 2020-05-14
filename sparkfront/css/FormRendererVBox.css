@@ -1,0 +1,53 @@
+.FormRenderer[layout="VBox"] {
+    display: inline-block;
+    text-align: left;
+}
+
+
+.FormRenderer[layout="VBox"] .InputComponent {
+
+    display: block;
+    margin-bottom:0.5em;
+}
+
+.FormRenderer[layout="VBox"] .InputComponent .InputField {
+    display: block;
+
+}
+
+.FormRenderer[layout="VBox"] .InputComponent .InputLabel {
+    display: inline-block;
+    text-align: left;
+}
+
+.FormRenderer[layout="VBox"] .InputComponent .content_after {
+    display: inline-block;
+    text-align: left;
+}
+
+.FormRenderer[layout="VBox"] .InputComponent .content_before {
+    display: inline-block;
+    text-align: left;
+}
+.FormRenderer[layout="VBox"] .SubmitLine {
+    display:block;
+    width:100%;
+}
+
+.FormRenderer[layout="VBox"] .SubmitLine .TextSpace {
+    text-align: left;
+    vertical-align: middle;
+    display:inline-block;
+    width:100%;
+}
+
+.FormRenderer[layout="VBox"] .SubmitLine .Buttons {
+
+    text-align: right;
+    vertical-align: middle;
+    width:100%;
+}
+
+.FormRenderer[layout="VBox"] .SubmitLine .Buttons>* {
+
+}

@@ -124,9 +124,7 @@ IMG {
 
 .admin_layout .admin_footer {
     background-image: url("../images/admin/footer_back.png");
-    /*  min-height:90px;
-      max-height:90px;
-      height:90px;*/
+
     color: #9a9a9a;
     padding-top: 5px;
     padding-bottom: 5px;
@@ -183,12 +181,12 @@ IMG {
     background-image: url("../images/page_actions/green_left.png");
 }
 
-.admin_layout .page_area .page_area.products.list .TableView .viewport .TableCellImageList {
+.admin_layout .page_area .page_area.products.list .TableView .viewport .ImageList {
     /*   max-width:120px; */
     display: inline-block;
 }
 
-.admin_layout .page_area .page_area.products.list .TableView .viewport .TableCellImageItem {
+.admin_layout .page_area .page_area.products.list .TableView .viewport .ImageList .Item {
     display: inline-block;
 }
 

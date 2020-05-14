@@ -26,7 +26,7 @@ class DownloadCSVPaginatorComponent extends Component
     {
 
         echo "<form method=post>";
-        StyledButton::DefaultButton()->renderSubmit("Download as CSV", "download_csv");
+        ColorButton::RenderSubmit("Download as CSV", "download_csv");
         echo "</form>";
 
     }

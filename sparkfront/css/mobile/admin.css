@@ -3,8 +3,10 @@
 }
 
 .admin_layout .admin_header {
-    min-height: 62px;
-    max-height: 62px;
+    /*min-height: 62px;*/
+    /*max-height: 62px;*/
+    height:64px;
+    max-height:64px;
     display: block;
 }
 
@@ -13,8 +15,8 @@
 }
 
 .admin_layout .admin_footer {
-    min-height: 62px;
-    max-height: 62px;
+    /*min-height: 62px;*/
+    /*max-height: 62px;*/
     text-align: center;
     display: block;
 }

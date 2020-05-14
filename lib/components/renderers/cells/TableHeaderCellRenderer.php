@@ -14,7 +14,7 @@ class TableHeaderCellRenderer extends TableCellRenderer
 
     }
 
-    public function isSortable()
+    public function isSortable() : bool
     {
         return $this->column->isSortable();
     }

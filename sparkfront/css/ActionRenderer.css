@@ -84,7 +84,7 @@
     background-position: left center;
 }
 
-.DefaultButton + .ActionRenderer[action='inline-new'] {
+.ColorButton + .ActionRenderer[action='inline-new'] {
     margin-left: 5px;
 }
 

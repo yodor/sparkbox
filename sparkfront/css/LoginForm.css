@@ -1,8 +1,10 @@
 
+
+
 .LoginFormRenderer {
 
     border: 1px solid #eaeaea;
-
+    padding: 1em;
 }
 
 .LoginFormRenderer .InputComponent {
@@ -29,6 +31,7 @@
 .LoginFormRenderer .InputComponent[field='rand'] {
     display: none !important;
 }
+
 
 .LoginFormRenderer .SubmitLine {
     display:block !important;

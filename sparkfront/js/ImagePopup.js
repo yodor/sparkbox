@@ -103,11 +103,10 @@ ImagePopup.prototype.prevImage = function (event) {
 
 ImagePopup.prototype.popupImage = function (aelm) {
 
-    let related = aelm.attr("rel");
-
+    let related = aelm.attr("itemClass");
 
     if (related) {
-        this.collection = $("A.ImagePopup[rel='" + related + "']");
+        this.collection = $("A.ImagePopup[itemClass='" + related + "']");
         this.related = related;
     } else {
         this.collection = aelm;
@@ -172,15 +171,13 @@ ImagePopup.prototype.createPopupContents = function () {
 
     html += "<div class='Contents'>";
 
-    //html += "<div class='ImagePart'>";
-
     html += "<a class='Button' action='PrevImage'></a><a class='Button' action='NextImage'></a>";
 
     html += "</div>";//contents
 
     html += "</div>";//base
 
-    html += "<div class='Footer'><div class='Contents'><div class='Caption'></div></div></div>";
+    html += "<div class='Footer'><div class='Contents'></div></div>";
 
     html += "</div>";//ImagePopupPanel
 
@@ -215,32 +212,25 @@ ImagePopup.prototype.fetchImage = function () {
         return;
     }
 
-    let href = aelm.attr("href");
-    let data_href = aelm.attr("data-href");
-    if (data_href) href = data_href;
+    let itemClass = aelm.attr("itemClass");
+    let itemID = aelm.attr("itemID");
+
+    let data_href = STORAGE_LOCAL + "?cmd=image&class=" + itemClass + "&id=" + itemID;
 
     let caption = aelm.attr("caption");
 
-
+    let contents = this.modal_pane.popup().find(".Footer .Contents");
     if (caption) {
-        let contents = this.modal_pane.popup().find(".Footer .Contents .Caption");
-        contents.html(caption);
+        contents.html("<div class='Caption'>"+caption+"</div>");
     }
-
-    //console.log("ImagePopup::fetchImage["+this.pos+"] Fetching Image URL:"+href);
-
-
-    // let screen_width = $(window).width();
-    // let screen_height = $(window).height();
-    //
-    //
-    // if (href.indexOf("?") != -1) href = href + "&max-width=" + (screen_width - this.margin_width) + "&max-height=" + (screen_height - this.margin_height);
-
+    else {
+        contents.html("");
+    }
 
     let viewport = this.modal_pane.popup();
     let loader = this.modal_pane.popup().find(".Base .Contents");
 
-    $(viewport).css("background-image", "url("+href+")");
+    $(viewport).css("background-image", "url(" + data_href + ")");
     $(viewport).css("background-size", "contain");
 
     $(loader).removeClass("cover-spin");
@@ -261,7 +251,7 @@ ImagePopup.prototype.startImageLoader = function () {
     let loader = this.modal_pane.popup().find(".Base .Contents");
     $(loader).addClass("cover-spin");
 
-    setTimeout(function(event) {
+    setTimeout(function (event) {
         this.fetchImage();
     }.bind(this), 100);
 

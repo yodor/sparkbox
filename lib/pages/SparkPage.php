@@ -15,7 +15,7 @@ class SparkPage extends HTMLPage
      * Require auth success to access the page
      * @var bool
      */
-    protected $authorized_access = false;
+    protected $authorized_access = FALSE;
 
     /**
      * Login page redirection on auth fail
@@ -83,7 +83,6 @@ class SparkPage extends HTMLPage
      * property array of Action objects holding page action buttons
      */
     protected $actions = array();
-
 
     /**
      * @return int The numeric ID as from the Authenticator
@@ -219,6 +218,7 @@ class SparkPage extends HTMLPage
         <script type='text/javascript'>
             let LOCAL = "<?php echo LOCAL;?>";
             let SPARK_LOCAL = "<?php echo SPARK_LOCAL;?>";
+            let STORAGE_LOCAL = "<?php echo STORAGE_LOCAL;?>";
             let ajax_loader = "<div class='AjaxLoader'></div>";
             let ajax_loader_src = SPARK_LOCAL + "/images/ajax-loader.gif";
             let left = "<?php echo $left;?>";
@@ -251,7 +251,6 @@ class SparkPage extends HTMLPage
         $this->addJS(SPARK_LOCAL . "/js/ModalPopup.js");
         $this->addJS(SPARK_LOCAL . "/js/Tooltip.js");
         $this->addJS(SPARK_LOCAL . "/js/ImagePopup.js");
-
 
         $dialog = new MessageDialog();
     }

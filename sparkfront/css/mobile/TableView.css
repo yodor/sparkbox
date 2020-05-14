@@ -107,11 +107,11 @@
     display: none;
 }
 
-.TableView .viewport .TableCellImageList {
+.TableView .viewport .ImageList {
     display: block;
 }
 
-.TableView .viewport .TableCellImageList .TableCellImageItem {
+.TableView .viewport .ImageList .Item {
     display: inline-block;
     padding: 3px;
 

@@ -456,31 +456,6 @@ function object2array($object)
     return $arr;
 }
 
-//TODO: refactor and use RequestBeanKey
-function refkeyPageCheck(DBTableBean $ref_bean, $redirect_fail, &$ref_key, &$ref_id, &$ref_row = array())
-{
-    include_once("beans/DBTableBean.php");
-    try {
-        $ref_key = $ref_bean->key();
-
-        if (!isset($_GET[$ref_key])) throw new Exception($ref_key . " not passed");
-        $ref_id = (int)$_GET[$ref_key];
-
-        $ref_row = $ref_bean->getByID($ref_id);
-    }
-    catch (Exception $e) {
-        Session::SetAlert($ref_key . ":$ref_id Not Found");
-        header("Location: $redirect_fail");
-        exit;
-    }
-
-    $arr = $_GET;
-
-    if (isset($arr[$ref_key])) unset($arr[$ref_key]);
-    $qrystr = queryString($arr, $ref_key . "=" . $ref_id);
-    return $qrystr;
-}
-
 function mysql_real_unescape_string($input, $checkbr = 0)
 {
 

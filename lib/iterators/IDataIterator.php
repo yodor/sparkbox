@@ -20,6 +20,7 @@ interface IDataIterator
 
     public function count() : int;
 
+    public function bean() : ?DBTableBean;
 }
 
 ?>

@@ -1,7 +1,7 @@
 <?php
 include_once("components/Component.php");
 include_once("components/renderers/IPageComponent.php");
-include_once("buttons/StyledButton.php");
+include_once("components/ColorButton.php");
 
 class MessageDialog extends Component implements IPageComponent
 {
@@ -34,8 +34,7 @@ class MessageDialog extends Component implements IPageComponent
 
         $this->attributes["id"] = $id;
 
-        $btn_ok = StyledButton::DefaultButton();
-        $btn_ok->setButtonType(StyledButton::TYPE_BUTTON);
+        $btn_ok = new ColorButton();
         $btn_ok->setText("OK");
         $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
         $btn_ok->setAttribute("default_action", 1);
@@ -86,7 +85,7 @@ class MessageDialog extends Component implements IPageComponent
         return $this->buttons[$text];
     }
 
-    public function appendButton(StyledButton $btn)
+    public function appendButton(ColorButton $btn)
     {
         $this->buttons[$btn->getText()] = $btn;
     }
@@ -105,7 +104,7 @@ class MessageDialog extends Component implements IPageComponent
             echo "<div class='caption'>";
 
             if ($this->show_close_button) {
-                $b = StyledButton::DefaultButton();
+                $b = new ColorButton();
                 $b->setText("X");
                 $b->setAttribute("action", MessageDialog::BUTTON_ACTION_CLOSE);
                 $b->render();

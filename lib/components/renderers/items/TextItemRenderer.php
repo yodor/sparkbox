@@ -32,18 +32,7 @@ class TextItemRenderer extends Component implements IItemRenderer
         $this->field_name = $field_name;
     }
 
-    public function startRender()
-    {
-        $all_attr = $this->prepareAttributes();
-        echo "<div $all_attr>";
-    }
-
-    public function finishRender()
-    {
-        echo "</div>";
-    }
-
-    public function renderImpl()
+    protected function renderImpl()
     {
         echo $this->item[$this->field_name];
     }

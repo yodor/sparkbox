@@ -75,8 +75,10 @@ class FormProcessor implements IFormProcessor, IBeanEditor
             $submitValue = $_REQUEST[$submitKey];
         }
 
-        if (strcmp($submitValue, $form->getName()) == 0) {
-            debug("Loading form with _REQUEST values - key '$submitKey' value = Form name: '{$form->getName()}' ");
+        $form_name = $form->getName();
+
+        if (strcmp($submitValue, $form_name) == 0) {
+            debug("Loading form with _REQUEST values - key '$submitKey' value = Form name: '$form_name' ");
 
             try {
 

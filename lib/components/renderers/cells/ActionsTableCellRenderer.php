@@ -22,6 +22,8 @@ class ActionsTableCellRenderer extends TableCellRenderer implements IActionsColl
      */
     protected $render_actions = NULL;
 
+    protected $sortable = FALSE;
+
     public function __construct()
     {
         parent::__construct();

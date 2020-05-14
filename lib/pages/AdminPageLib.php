@@ -160,8 +160,7 @@ class AdminPageLib extends SparkPage
             $fullname = $this->context->getData()->get(SessionData::FULLNAME);
         }
         echo "<span class='text_admin'>Welcome, $fullname</span>";
-        $btn = StyledButton::DefaultButton();
-        $btn->renderButton("Logout", ADMIN_LOCAL . "logout.php");
+        ColorButton::RenderButton("Logout", ADMIN_LOCAL . "logout.php");
         echo "</div>";
 
 
@@ -208,6 +207,8 @@ class AdminPageLib extends SparkPage
 
         echo "<td class='page_area " . $this->getPageClass() . "'>";
         echo "\n\n";
+
+        $this->renderPageCaption();
     }
 
     public function finishRender()
@@ -227,6 +228,18 @@ class AdminPageLib extends SparkPage
         echo "\n<!-- finishRender AdminPageLib -->\n";
 
         parent::finishRender();
+    }
+
+    const ACTION_ADD = "add";
+    const ACTION_BACK = "back";
+
+    public static function CreateAction(string $action, string $title = "", array $parameters = array()) : Action
+    {
+        $action_add = new Action("", "$action.php", $parameters);
+        $action_add->setAttribute("action", $action);
+        if (!$title) $title = ucfirst($action);
+        $action_add->setAttribute("title", $title);
+        return $action_add;
     }
 
 }

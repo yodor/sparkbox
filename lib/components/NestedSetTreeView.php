@@ -187,6 +187,8 @@ class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
     public function finishRender()
     {
         parent::finishRender();
+
+
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {

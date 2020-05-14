@@ -25,8 +25,7 @@ class MCEImageBrowserDialog extends MessageDialog
 
         $this->buttons = array();
 
-        $btn_cancel = StyledButton::DefaultButton();
-        $btn_cancel->setButtonType(StyledButton::TYPE_BUTTON);
+        $btn_cancel = new ColorButton();
         $btn_cancel->setText("Close");
         $btn_cancel->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
         $this->buttons[MessageDialog::BUTTON_ACTION_CANCEL] = $btn_cancel;

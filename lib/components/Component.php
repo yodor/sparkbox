@@ -38,7 +38,7 @@ class Component implements IRenderer, IHeadContents
 
     protected $component_class = "";
 
-    public $render_tooltip = true;
+    public $render_tooltip = TRUE;
 
     protected $contents = "";
 
@@ -50,7 +50,6 @@ class Component implements IRenderer, IHeadContents
         array_pop($class_chain);
         $class_chain = array_reverse($class_chain);
         $class_chain[] = get_class($this);
-
 
         $this->component_class = implode(" ", $class_chain);
 
@@ -82,11 +81,17 @@ class Component implements IRenderer, IHeadContents
         $this->tagName = $tagName;
     }
 
+    public function getTagName(): string
+    {
+        return $this->tagName;
+    }
+
     public function setContents(string $contents)
     {
         $this->contents = $contents;
     }
-    public function getContents() : string
+
+    public function getContents(): string
     {
         return $this->contents;
     }
@@ -117,11 +122,11 @@ class Component implements IRenderer, IHeadContents
             echo "</div>";
         }
     }
+
     protected function renderImpl()
     {
         echo $this->contents;
     }
-
 
     public function finishRender()
     {
@@ -142,13 +147,12 @@ class Component implements IRenderer, IHeadContents
         }
     }
 
-
     public function setName(string $name)
     {
         $this->setAttribute("name", $name);
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->getAttribute("name");
     }
@@ -166,7 +170,7 @@ class Component implements IRenderer, IHeadContents
         return $this->parent_component;
     }
 
-    public function getCaption() : string
+    public function getCaption(): string
     {
         return $this->caption;
     }
@@ -211,10 +215,10 @@ class Component implements IRenderer, IHeadContents
         $this->className .= " " . $className;
     }
 
-    public function setAttribute(string $name, $value)
+    public function setAttribute(string $name, string $value)
     {
+
         $this->attributes[$name] = $value;
-        return $this;
     }
 
     public function clearAttribute(string $name)
@@ -224,23 +228,24 @@ class Component implements IRenderer, IHeadContents
         }
     }
 
-    public function getAttribute(string $name)
+    public function getAttribute(string $name): string
     {
-        return $this->attributes[$name];
+        if (isset($this->attributes[$name])) return $this->attributes[$name];
+        return "";
     }
 
-    public function setStyleAttribute(string $name, $value)
+    public function setStyleAttribute(string $name, string $value)
     {
         $this->style[$name] = $value;
-        return $this;
     }
 
-    public function getStyleAttribute($name)
+    public function getStyleAttribute($name): string
     {
-        return $this->style[$name];
+        if (isset($this->style[$name])) return $this->style[$name];
+        return "";
     }
 
-    public function getAttributesText(array $src_attributes = NULL)
+    public function getAttributesText(array $src_attributes = NULL): string
     {
         if (!$src_attributes) $src_attributes = $this->attributes;
 
@@ -250,7 +255,7 @@ class Component implements IRenderer, IHeadContents
             if (!$this->render_tooltip && strcmp($name, "tooltip") == 0) continue;
 
             if (is_array($value)) {
-                debug("component attribute value is array: ".get_class($this).": $name");
+                debug("component attribute value is array: " . get_class($this) . ": $name");
             }
             else if (is_null($value) || strlen($value) < 1) {
 
@@ -264,9 +269,9 @@ class Component implements IRenderer, IHeadContents
                 if (in_array($name, $this->json_attributes)) {
                     $attributes[] = $name . "=" . json_string($attribute_value);
                 }
-                else if (in_array($name, $this->special_attributes)) {
-                    $attributes[] = $name . "='" . htmlspecialchars(trim($attribute_value)) . "'";
-                }
+//                else if (in_array($name, $this->special_attributes)) {
+//                    $attributes[] = $name . "='" . htmlspecialchars(trim($attribute_value)) . "'";
+//                }
                 else {
                     $attributes[] = $name . "='" . $attribute_value . "'";
                 }
@@ -277,7 +282,7 @@ class Component implements IRenderer, IHeadContents
 
     }
 
-    public function getStyleText()
+    public function getStyleText(): string
     {
 
         $styles = array();
@@ -299,17 +304,16 @@ class Component implements IRenderer, IHeadContents
 
     }
 
-
     protected function prepareAttributes()
     {
         $attrs = "";
         //$class_names = trim($this->component_class . " " . $this->className);
         $cssClass = "";
         if (strlen($this->component_class) > 0) {
-            $cssClass.=trim($this->component_class);
+            $cssClass .= trim($this->component_class);
         }
-        if (strlen($this->className)>0) {
-            $cssClass.=" ".trim($this->className);
+        if (strlen($this->className) > 0) {
+            $cssClass .= " " . trim($this->className);
         }
         $attrs .= " class='$cssClass' ";
 

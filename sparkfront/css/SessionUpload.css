@@ -2,7 +2,7 @@
 
     background-color: transparent;
     border: 0;
-
+    padding: 0;
 }
 
 .InputField.SessionUpload .FieldElements {
@@ -20,7 +20,7 @@
 }
 
 .InputField.SessionUpload .Details .Limits {
-    display:block;
+    display: block;
 }
 
 .InputField.SessionUpload .Details .Limits SPAN {
@@ -131,9 +131,9 @@
     position: relative;
     z-index: 1;
 
-    vertical-align:middle;
+    vertical-align: middle;
 
-    padding:0.3em;
+    padding: 0.3em;
 }
 
 .InputField.SessionUpload .Controls.working {
@@ -221,7 +221,7 @@
 
 .InputField.SessionUpload.SessionFile .ArrayContents .Element .thumbnail {
     margin-right: 0;
-    display:inline-block;
+    display: inline-block;
 }
 
 .InputField.SessionUpload.SessionFile .ArrayContents .Element .details {
@@ -234,5 +234,5 @@
 
 .InputField.SessionUpload.SessionFile .ArrayContents .Element .filesize {
     display: block;
-    font-size:70%;
+    font-size: 70%;
 }

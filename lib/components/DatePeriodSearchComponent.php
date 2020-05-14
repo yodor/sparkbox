@@ -81,8 +81,8 @@ class DatePeriodSearchComponent extends Component
         $ir->render();
 
         echo "<tr><td>";
-        StyledButton::DefaultButton()->renderSubmit("Clear Filter", "clear_filter");
-        StyledButton::DefaultButton()->renderSubmit("Filter Dates", "filter_dates");
+        ColorButton::RenderSubmit("Clear Filter", "clear_filter");
+        ColorButton::RenderSubmit("Filter Dates", "filter_dates");
         echo "</td></tr>";
 
     }

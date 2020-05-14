@@ -67,6 +67,7 @@ class TableColumn extends Component
     {
         $this->cell = $renderer;
         $this->cell->setColumn($this);
+        $this->sortable = $renderer->isSortable();
     }
 
     public function getView(): TableView
@@ -93,6 +94,7 @@ class TableColumn extends Component
     {
         return $this->sortable;
     }
+
     public function setSortable(bool $mode)
     {
         $this->sortable = $mode;

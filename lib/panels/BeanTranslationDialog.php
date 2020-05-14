@@ -13,17 +13,17 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
-        $btn_translate = StyledButton::DefaultButton();
+        $btn_translate = new ColorButton();
         $btn_translate->setText("Translate");
         $btn_translate->setAttribute("action", "Translate");
         $this->appendButton($btn_translate);
 
-        $btn_clear = StyledButton::DefaultButton();
+        $btn_clear = new ColorButton();
         $btn_clear->setText("Clear");
         $btn_clear->setAttribute("action", "Clear");
         $this->appendButton($btn_clear);
 
-        $btn_close = StyledButton::DefaultButton();
+        $btn_close = new ColorButton();
         $btn_close->setText("Close");
         $btn_close->setAttribute("action", "Close");
         $this->appendButton($btn_close);

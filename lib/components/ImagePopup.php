@@ -14,15 +14,20 @@ class ImagePopup extends Component implements IPhotoRenderer
     protected $width = -1;
     protected $height = 256;
 
-    protected $beanClass = "";
-    protected $id = -1;
-
     protected $mode = ImagePopup::MODE_IMAGETAG;
+
+    protected $storageItem;
 
     public function __construct()
     {
         parent::__construct();
+        $this->storageItem = new StorageItem();
 
+    }
+
+    public function setStorageItem(StorageItem $storageItem)
+    {
+        $this->storageItem = $storageItem;
     }
 
     public function setRenderMode(int $mode)
@@ -46,30 +51,41 @@ class ImagePopup extends Component implements IPhotoRenderer
 
     public function setID(int $id)
     {
-        $this->id = $id;
+        $this->storageItem->id = $id;
+    }
+
+    public function getID() : int
+    {
+        return $this->storageItem->id;
     }
 
     public function setBeanClass(string $beanClass)
     {
-        $this->beanClass = $beanClass;
+        $this->storageItem->className = $beanClass;
     }
 
     public function setBean(DBTableBean $bean)
     {
-        $this->beanClass = get_class($bean);
+        $this->storageItem->className = get_class($bean);
+    }
+
+    public function getBeanClass() : string
+    {
+        return $this->storageItem->className;
     }
 
     protected function processAttributes()
     {
         parent::processAttributes();
-        $this->thumb_url = StorageItem::Image($this->id, $this->beanClass, $this->width, $this->height);
-        $this->popup_url = StorageItem::Image($this->id, $this->beanClass);
+        $this->thumb_url = $this->storageItem->hrefImage($this->width, $this->height);
+        $this->popup_url = $this->storageItem->hrefImage();
 
-        $this->setAttribute("href", $this->popup_url);
         if ($this->mode == ImagePopup::MODE_BACKGROUND) {
-
             $this->setStyleAttribute("background-image", "url({$this->thumb_url})");
         }
+
+        $this->setAttribute("itemID", $this->storageItem->id);
+        $this->setAttribute("itemClass", $this->storageItem->className);
     }
 
     protected function renderImpl()

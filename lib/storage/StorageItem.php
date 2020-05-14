@@ -14,7 +14,7 @@ class StorageItem
         $this->field = $field;
     }
 
-    public function hrefImage($width, $height)
+    public function hrefImage(int $width = -1, int $height = -1)
     {
         if ($width>0 || $height>0) {
 

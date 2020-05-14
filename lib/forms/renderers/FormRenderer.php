@@ -25,7 +25,7 @@ class FormRenderer extends Component
 
     const SUBMIT_NAME = "SubmitForm";
 
-    protected $layout = FormRenderer::FIELD_HBOX;
+    protected $layout = FormRenderer::FIELD_VBOX;
 
     protected $method;
 
@@ -41,15 +41,14 @@ class FormRenderer extends Component
         $this->form = $form;
         $form->setRenderer($this);
 
-
         $this->setAttribute("enctype", "multipart/form-data");
 
         $this->setMethod(FormRenderer::METHOD_POST);
 
-        $button = StyledButton::DefaultButton();
+        $button = new ColorButton();
         $button->setAttribute("action", "submit");
         $button->setText("Submit");
-        $button->setType(StyledButton::TYPE_SUBMIT);
+        $button->setType(ColorButton::TYPE_SUBMIT);
         $button->setName(FormRenderer::SUBMIT_NAME);
 
         $this->submitButton = $button;
@@ -70,33 +69,37 @@ class FormRenderer extends Component
         $this->setLayout($this->layout);
 
     }
+
     public function setMethod(string $method)
     {
         $this->method = $method;
         $this->setAttribute("method", $method);
     }
-    public function getMethod() : string
+
+    public function getMethod(): string
     {
         return $this->method;
     }
-    public function getSubmitLine() : Container
+
+    public function getSubmitLine(): Container
     {
         return $this->submitLine;
     }
 
-    public function getButtons() : Container
+    public function getButtons(): Container
     {
         $buttons = $this->submitLine->getByClassName("Buttons");
         if ($buttons instanceof Container) return $buttons;
 
         throw new Exception("Buttons container not found");
     }
-    public function getSubmitButton() : StyledButton
+
+    public function getSubmitButton(): ColorButton
     {
         return $this->submitButton;
     }
 
-    public function getTextSpace() : Container
+    public function getTextSpace(): Container
     {
         $textSpace = $this->submitLine->getByClassName("TextSpace");
         if ($textSpace instanceof Container) return $textSpace;
@@ -115,7 +118,7 @@ class FormRenderer extends Component
     public function setLayout(string $mode)
     {
         $this->layout = $mode;
-        $this->setAttribute("layout" , $this->layout);
+        $this->setAttribute("layout", $this->layout);
     }
 
     public function setRenderFieldCallback($fname)
@@ -130,39 +133,43 @@ class FormRenderer extends Component
 
     }
 
+    /**
+     * Will set this component name as the form name or form class
+     */
+    protected function processAttributes()
+    {
+        parent::processAttributes();
+        $this->setName($this->form->getName());
+    }
+
     public function startRender()
     {
         parent::startRender();
-        if (strcmp($this->method, FormRenderer::METHOD_POST)==0) {
+        if (strcmp($this->method, FormRenderer::METHOD_POST) == 0) {
             //echo "<input type=hidden name='MAX_FILE_SIZE' value='" . UPLOAD_MAX_FILESIZE . "'>";
         }
     }
 
+
     protected function renderImpl()
+    {
+        $this->renderInputs();
+        if ($this->submitLine->isEnabled()) {
+            $this->renderSubmitLine();
+        }
+        else {
+            $this->renderSubmitValue();
+        }
+    }
+
+
+
+    public function renderInputs()
     {
         $inputs = $this->form->getInputs();
         foreach ($inputs as $name => $input) {
             $this->renderInput($input);
         }
-
-        $this->renderSubmitLine();
-
-        //echo "<div class=clear></div>";
-
-    }
-
-    protected function processAttributes()
-    {
-        parent::processAttributes();
-        $this->setName($this->form->getName());
-
-    }
-
-
-    public function renderSubmitLine()
-    {
-        $this->submitButton->setValue($this->form->getName());
-        $this->submitLine->render();
     }
 
     public function renderInput(DataInput $input)
@@ -186,6 +193,28 @@ class FormRenderer extends Component
 
     }
 
+    public function renderSubmitLine()
+    {
+        //prefer submit value of the submit button
+        $submit_value = $this->getSubmitValue();
+
+        $this->submitButton->setValue($submit_value);
+        $this->submitLine->render();
+    }
+
+    public function renderSubmitValue()
+    {
+        echo "<input type=hidden name='".FormRenderer::SUBMIT_NAME."' value='".$this->getSubmitValue()."'>";
+    }
+
+    public function getSubmitValue()
+    {
+        $submit_value = $this->submitButton->getValue();
+        if (!$submit_value) {
+            $submit_value = $this->getName();
+        }
+        return $submit_value;
+    }
 }
 
 ?>

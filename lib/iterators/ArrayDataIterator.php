@@ -82,6 +82,11 @@ class ArrayDataIterator implements IDataIterator
 
         return new ArrayDataIterator($arr, $prkey, $label);
     }
+
+    public function bean() : ?DBTableBean
+    {
+        return NULL;
+    }
 }
 
 ?>

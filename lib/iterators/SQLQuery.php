@@ -41,9 +41,9 @@ class SQLQuery implements IDataIterator
         $this->db->free($this->res);
 
         $this->res = $this->db->query($this->select->getSQL());
-       // mysqli_result::fetch_fields
+
         if (!$this->res) {
-            debug($this->select->getSQL());
+            debug("Error: ".$this->db->getError()." SQL: ".$this->select->getSQL());
             throw new Exception($this->db->getError());
         }
 
@@ -88,6 +88,16 @@ class SQLQuery implements IDataIterator
     public function count() : int
     {
         return $this->numResults;
+    }
+
+    public function setBean(DBTableBean $bean)
+    {
+        $this->bean = $bean;
+    }
+
+    public function bean() : ?DBTableBean
+    {
+        return $this->bean;
     }
 }
 

@@ -21,7 +21,7 @@ class GalleryView extends Component
 
     protected $edit_script;
 
-    protected $iphoto_renderer;
+    protected $photo_renderer;
 
     const MODE_GRID = 1;
     const MODE_LIST = 2;
@@ -50,8 +50,10 @@ class GalleryView extends Component
             $view->addColumn(new TableColumn("caption", "Caption"));
             $view->addColumn(new TableColumn("date_upload", "Date Upload"));
 
-            $renderer = new TableImageCellRenderer(-1, 128);
+            $renderer = new TableImageCellRenderer();
             $renderer->setBean($this->bean);
+
+            $this->photo_renderer = $renderer;
 
             $view->getColumn("photo")->setCellRenderer($renderer);
             $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(FALSE);
@@ -78,6 +80,7 @@ class GalleryView extends Component
 
             $this->view_mode = GalleryView::MODE_GRID;
 
+            $this->photo_renderer = $renderer;
         }
 
         if ($this->bean instanceof OrderedDataBean) {
@@ -85,6 +88,12 @@ class GalleryView extends Component
         }
 
         $view->getTopPaginator()->view_modes_enabled = TRUE;
+
+    }
+
+    public function getPhotoRenderer() : IPhotoRenderer
+    {
+        return $this->photo_renderer;
     }
 
     public function requiredStyle()
@@ -201,6 +210,7 @@ class GalleryView extends Component
     protected function renderImpl()
     {
         $this->view->render();
+
 
     }
 

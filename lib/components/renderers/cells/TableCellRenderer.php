@@ -24,9 +24,21 @@ class TableCellRenderer extends Component
 
     protected $field = "";
 
+    protected $sortable = TRUE;
+
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function isSortable(): bool
+    {
+        return $this->sortable;
+    }
+
+    public function setSortable(bool $mode)
+    {
+        $this->sortable = $mode;
     }
 
     public function setAction(Action $a)

@@ -48,20 +48,20 @@ class KeywordSearchComponent extends Container implements IQueryFilter
         }
 
         $this->formRenderer = new FormRenderer($this->form);
-        //$this->formRenderer->setLayout(FormRenderer::FIELD_VBOX);
+        $this->formRenderer->setLayout(FormRenderer::FIELD_HBOX);
 
         $this->formRenderer->getButtons()->clear();
 
-        $submit_search = StyledButton::DefaultButton();
-        $submit_search->setType(StyledButton::TYPE_SUBMIT);
+        $submit_search = new ColorButton();
+        $submit_search->setType(ColorButton::TYPE_SUBMIT);
         $submit_search->setText(tr("Search"));
         $submit_search->setName(KeywordSearchComponent::SUBMIT_KEY);
         $submit_search->setValue(KeywordSearchComponent::ACTION_SEARCH);
         $submit_search->setAttribute("action", KeywordSearchComponent::ACTION_SEARCH);
         $this->formRenderer->getButtons()->append($submit_search);
 
-        $submit_clear = StyledButton::DefaultButton();
-        $submit_clear->setType(StyledButton::TYPE_SUBMIT);
+        $submit_clear = new ColorButton();
+        $submit_clear->setType(ColorButton::TYPE_SUBMIT);
         $submit_clear->setText(tr("Clear"));
         $submit_clear->setName(KeywordSearchComponent::SUBMIT_KEY);
         $submit_clear->setValue(KeywordSearchComponent::ACTION_CLEAR);
@@ -73,7 +73,7 @@ class KeywordSearchComponent extends Container implements IQueryFilter
     }
 
     //TODO: check usage
-    public function getButton(string $action) : StyledButton
+    public function getButton(string $action) : ColorButton
     {
         $comparator = function (Component $cmp) use ($action) {
             if (strcmp($cmp->getAttribute("action"), $action) == 0) {
@@ -83,7 +83,7 @@ class KeywordSearchComponent extends Container implements IQueryFilter
         };
 
         $result = $this->formRenderer->getButtons()->findBy($comparator);
-        if ($result instanceof StyledButton) return $result;
+        if ($result instanceof ColorButton) return $result;
         return $result;
     }
 

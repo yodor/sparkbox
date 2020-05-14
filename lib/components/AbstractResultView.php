@@ -123,6 +123,8 @@ abstract class AbstractResultView extends Component
         }
 
         parent::finishRender();
+
+
     }
 
 

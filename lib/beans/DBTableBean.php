@@ -198,6 +198,7 @@ abstract class DBTableBean
     {
         $qry = new SQLQuery(clone $this->select(), $this->prkey, $this->getTableName());
         $qry->setDB($this->db);
+        $qry->setBean($this);
         return $qry;
     }
 
