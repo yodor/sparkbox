@@ -53,7 +53,6 @@ class DataInput
      */
     protected $renderer = NULL;
 
-
     //IInputValidator is responsible for validation of the $value data
     protected $validator = NULL;
     //InputProcessor
@@ -79,7 +78,6 @@ class DataInput
      */
     protected $translator_enabled = FALSE;
 
-
     public function __construct(string $name, string $label, bool $required)
     {
         $this->label = $label;
@@ -91,11 +89,8 @@ class DataInput
         $this->translator_enabled = FALSE;
         $this->editable = TRUE;
 
-
         $this->validator = new EmptyValueValidator();
         $this->processor = new InputProcessor($this);
-
-
 
         $this->bean = NULL;
     }

@@ -79,7 +79,7 @@ abstract class BeanDataResponse extends HTTPResponse
         $storageTypes = $this->bean->storageTypes();
 
         foreach ($storageTypes as $name => $storageType) {
-            if (strpos($storageType, "blob")!== FALSE) continue;
+            if (strpos($storageType, "blob") !== FALSE) continue;
             $fields[] = $name;
         }
         $qry->select->fields = implode(",", $fields);
@@ -220,28 +220,28 @@ abstract class BeanDataResponse extends HTTPResponse
         return "";
     }
 
-//    protected function isBrowserCached()
-//    {
-//
-//        // error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
-//
-//        // check if the last modified date sent by the client is the the same as
-//        // the last modified date of the requested file. If so, return 304 header
-//        // and exit.
-//
-//        // check if the Etag sent by the client is the same as the Etag of the
-//        // requested file. If so, return 304 header and exit.
-//
-//        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
-//            //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
-//            $pos = strpos($_SERVER['HTTP_IF_NONE_MATCH'], $this->getHeader("ETag"));
-//            if ($pos !== FALSE) {
-//                return TRUE;
-//            }
-//        }
-//
-//        return FALSE;
-//    }
+    //    protected function isBrowserCached()
+    //    {
+    //
+    //        // error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
+    //
+    //        // check if the last modified date sent by the client is the the same as
+    //        // the last modified date of the requested file. If so, return 304 header
+    //        // and exit.
+    //
+    //        // check if the Etag sent by the client is the same as the Etag of the
+    //        // requested file. If so, return 304 header and exit.
+    //
+    //        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+    //            //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
+    //            $pos = strpos($_SERVER['HTTP_IF_NONE_MATCH'], $this->getHeader("ETag"));
+    //            if ($pos !== FALSE) {
+    //                return TRUE;
+    //            }
+    //        }
+    //
+    //        return FALSE;
+    //    }
 
     /**
      * @throws Exception

@@ -86,7 +86,6 @@ class DataInputFactory
     {
         $input = new DataInput($name, $label, $required);
 
-
         $input->setValidator(new EmptyValueValidator());
         $processor = new InputProcessor($input);
         $processor->transact_mode = InputProcessor::TRANSACT_VALUE;

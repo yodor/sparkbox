@@ -1,7 +1,6 @@
 <?php
 include_once("forms/InputForm.php");
 
-
 class SEOConfigForm extends InputForm
 {
 
@@ -14,7 +13,6 @@ class SEOConfigForm extends InputForm
         $rend->setInputAttribute("rows", 10);
         $rend->setInputAttribute("cols", 80);
         $this->addInput($field);
-
 
         $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "meta_keywords", "Meta Keywords", 0);
         $rend = $field->getRenderer();
@@ -29,7 +27,6 @@ class SEOConfigForm extends InputForm
         $this->addInput($field);
 
     }
-
 
 }
 

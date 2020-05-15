@@ -26,7 +26,6 @@ class ConfigBean extends DBTableBean
 
     }
 
-
     public static function Factory()
     {
         if (self::$instance === FALSE) {
@@ -52,7 +51,7 @@ class ConfigBean extends DBTableBean
         $sel->limit = " 1 ";
 
         if ($this->section) {
-            $sel->where.= " AND section='{$this->section}' ";
+            $sel->where .= " AND section='{$this->section}' ";
         }
 
         $qry = new SQLQuery($sel);
@@ -66,7 +65,6 @@ class ConfigBean extends DBTableBean
                 $result = $serial;
             }
         }
-
 
         return $result;
     }
@@ -137,7 +135,6 @@ class ConfigBean extends DBTableBean
 
                         $db->query($delete_sql);
 
-
                     }
                     else {
                         continue;
@@ -149,7 +146,6 @@ class ConfigBean extends DBTableBean
                 }
 
                 $cfgID = $this->insert($row, $db);
-
 
                 if ($cfgID < 1) throw new Exception("Config::setValue insert error:" . $db->getError());
             }

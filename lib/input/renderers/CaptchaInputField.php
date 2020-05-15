@@ -18,12 +18,12 @@ class CaptchaInputField extends InputField
 
             $options = array();
 
-            $options["disable_flash_fallback"] = true; // allow flash fall      
-            $options["show_text_input"] = true;
+            $options["disable_flash_fallback"] = TRUE; // allow flash fall
+            $options["show_text_input"] = TRUE;
             $options["refresh_alt_text"] = "Обнови";
             $options["refresh_title_text"] = "Обнови";
             $options["input_text"] = "";
-            $options["show_audio_button"] = false;
+            $options["show_audio_button"] = FALSE;
             $options["captcha_type"] = Securimage::SI_CAPTCHA_MATHEMATIC;
 
             $this->options = $options;
@@ -35,14 +35,11 @@ class CaptchaInputField extends InputField
         $field_value = $this->input->getValue();
         $field_name = $this->input->getName();
 
-
         $this->options["input_name"] = $field_name;
 
         echo Securimage::getCaptchaHtml($this->options);
 
-
     }
-
 
 }
 

@@ -8,10 +8,10 @@ class DateField extends InputField
     protected $y_start = -1;
     protected $y_end = -1;
 
-    public $render_calendar = true;
+    public $render_calendar = TRUE;
 
-    public $short_month = false;
-    public $short_yaer = false;
+    public $short_month = FALSE;
+    public $short_yaer = FALSE;
     public $h_pos = "left";
     public $v_pos = "down";
 
@@ -45,7 +45,6 @@ class DateField extends InputField
 
         $pieces = explode("-", $field_value);
 
-
         $year = -1;
         $month = -1;
         $day = -1;
@@ -56,7 +55,6 @@ class DateField extends InputField
             $day = $pieces[2];
         }
 
-
         if ($this->y_start == -1) {
             $this->y_start = date("Y") - 30;
             $this->y_end = date("Y") + 30;
@@ -64,7 +62,6 @@ class DateField extends InputField
         if ($this->y_end == -1) {
             $this->y_end = $this->y_start + 30;
         }
-
 
         echo "<select name='day_{$field_name}' class='DatePart Day'>";
         echo "<option value=''>--</option>";
@@ -84,7 +81,6 @@ class DateField extends InputField
         }
 
         $months = $months_full;
-
 
         echo "<select name='month_{$field_name}' class='DatePart Month'>";
         echo "<option value=''>--</option>";

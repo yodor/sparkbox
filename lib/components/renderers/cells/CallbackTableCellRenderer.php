@@ -5,7 +5,7 @@ include_once("components/TableColumn.php");
 class CallbackTableCellRenderer extends TableCellRenderer
 {
 
-    protected $callback = false;
+    protected $callback = FALSE;
 
     protected $data = NULL;
 

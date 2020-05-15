@@ -12,7 +12,6 @@ include_once("class/beans/ProductPhotosBean.php");
 
 include_once("class/beans/GendersBean.php");
 
-
 class ProductsTemplateLoader extends CSVTemplateLoader
 {
     public $testMode = 1;
@@ -96,7 +95,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
     public function processKeysRow($data)
     {
 
-
         $num = count($data);
 
         if ($num < 1 || !is_array($data)) {
@@ -137,7 +135,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
             throw new Exception("CatID: $catID not found in current product categories. ");
         }
 
-
         $this->brandID = $brandID;
         $this->catID = $catID;
 
@@ -159,7 +156,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
         $optional_attr = array();
         $features = array();
         $images = array();
-
 
         foreach ($data as $pos => $value) {
             $field = $this->fields[$pos];
@@ -196,7 +192,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
         $prod_row["importID"] = (int)$this->importID;
         $prod_row["visible"] = 0;
 
-
         //insert product
         $prodID = $this->prods->insert($prod_row, $this->db);
         if ($prodID < 1) {
@@ -207,7 +202,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
             throw new Exception("Error inserting the product data: " . $this->db->getError() . "<BR>" . $errcnt);
         }
-
 
         $this->processOptionalAttributes($prodID, $optional_attr);
 
@@ -301,7 +295,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                     continue;
                 }
 
-                $filedata = $this->zip->getFromName(SPARK_LOCAL. "/images/$imgname");
+                $filedata = $this->zip->getFromName(SPARK_LOCAL . "/images/$imgname");
 
                 $source = imagecreatefromstring($filedata);
                 if ($source === FALSE) {
@@ -317,7 +311,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
                 $fstorage->setTimestamp($this->db->dateTime());
 
-
                 $finfo = new finfo(FILEINFO_MIME_TYPE);
                 $fstorage->setMIME($finfo->buffer($filedata));
 
@@ -327,8 +320,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 $field->setValue($fstorage);
 
                 $validator = new ImageUploadValidator();
-                $validator->skip_is_uploaded_check = true;
-
+                $validator->skip_is_uploaded_check = TRUE;
 
                 $validator->validate($field);
 
@@ -352,7 +344,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
             catch (Exception $e) {
                 $this->notices[$this->currentRow] .= "!Unable to insert product image '$imgname'. " . $e->getMessage() . " | DBError: " . $this->db->getError();
             }
-
 
         }
     }

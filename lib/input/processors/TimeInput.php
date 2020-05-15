@@ -12,7 +12,6 @@ class TimeInput extends CompoundInput
 
     }
 
-
 }
 
 ?>

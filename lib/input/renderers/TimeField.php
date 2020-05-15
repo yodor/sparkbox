@@ -8,7 +8,7 @@ class TimeField extends InputField
     {
         parent::__construct($input);
 
-        $this->is_compound = true;
+        $this->is_compound = TRUE;
 
     }
 
@@ -19,7 +19,7 @@ class TimeField extends InputField
 
         $hour = -1;
         $minute = -1;
-        if (strpos($field_value, ":") !== false) {
+        if (strpos($field_value, ":") !== FALSE) {
             list($hour, $minute) = explode(":", $field_value);
         }
         echo "<div class='FieldElements'>";

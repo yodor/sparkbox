@@ -76,7 +76,6 @@ class SQLSelect extends SQLStatement
             }
         }
 
-
         if (strlen(trim($this->where)) > 0) {
             if (strlen(trim($other->where)) > 0) {
                 $this->where = $this->where . " AND " . $other->where;

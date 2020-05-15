@@ -106,7 +106,6 @@ class HTTPResponse
     {
         if ($this->dataSize < 1) return;
 
-
         echo $this->data;
 
         debug("Data sending completed: $this->dataSize bytes sent");

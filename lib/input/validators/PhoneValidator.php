@@ -23,7 +23,7 @@ class PhoneValidator implements IInputValidator
         $city_code = $pieces[1];
         $phone_code = $pieces[2];
 
-        $ret = true;
+        $ret = TRUE;
 
         $have_entry = (strlen($country_code) > 0 || strlen($city_code) > 0 || strlen($phone_code) > 0);
 
@@ -32,17 +32,17 @@ class PhoneValidator implements IInputValidator
         if ($input->isRequired() || $have_entry) {
             if ((int)$country_code < 1 || !preg_match("/^([0-9])+$/", $country_code)) {
                 $err = "Input country code";
-                $ret = false;
+                $ret = FALSE;
             }
 
             if ((int)$city_code < 1 || !preg_match("/^([0-9])+$/", $city_code)) {
                 $err = "Input city code";
-                $ret = false;
+                $ret = FALSE;
             }
 
             if ((int)$phone_code < 1 || !preg_match("/^([0-9])+$/", $phone_code)) {
                 $err = "Input phone number";
-                $ret = false;
+                $ret = FALSE;
             }
         }
         if (!$ret) {

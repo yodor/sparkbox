@@ -1,7 +1,6 @@
 <?php
 include_once("components/renderers/items/DataIteratorItem.php");
 
-
 class TextItemRenderer extends DataIteratorItem
 {
 
@@ -26,11 +25,10 @@ class TextItemRenderer extends DataIteratorItem
         $this->field_name = $field_name;
     }
 
-    public function getFieldName() : string
+    public function getFieldName(): string
     {
         return $this->field_name;
     }
-
 
 }
 

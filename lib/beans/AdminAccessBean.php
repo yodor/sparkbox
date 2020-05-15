@@ -20,7 +20,6 @@ CREATE TABLE `admin_access` (
         parent::__construct("admin_access");
     }
 
-
 }
 
 ?>

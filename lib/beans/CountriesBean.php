@@ -17,7 +17,6 @@ CREATE TABLE countries (
         parent::__construct("countries");
     }
 
-
     public static function code2id($code)
     {
         $c = new CountriesBean();
@@ -31,6 +30,5 @@ CREATE TABLE countries (
             throw new Exception("country code not found");
         }
     }
-
 
 }

@@ -137,7 +137,6 @@ abstract class HTMLPage implements IRenderer
         $this->htmlEnd();
     }
 
-
     /**
      * Set the preferred CSS class name of this page
      * @param string $cls

@@ -12,7 +12,6 @@ class PageResultsPanel extends Component
     public $total_pages;
     public $page;
 
-
     public $max_page = 7;
 
     public function __construct(int $total_rows, int $ipp, string $class = 'page')
@@ -23,9 +22,7 @@ class PageResultsPanel extends Component
         $this->ipp = $ipp;
         $this->total_rows = $total_rows;
 
-
         $total_pages = $this->total_rows / $this->ipp;
-
 
         $qry = $_GET;
 
@@ -51,13 +48,13 @@ class PageResultsPanel extends Component
         if ($cend > $total_pages) {
             $cend = $total_pages;
         }
-        $show_next = false;
+        $show_next = FALSE;
         if ($cend < $total_pages) {
-            $this->show_next = true;
+            $this->show_next = TRUE;
         }
-        $show_prev = false;
+        $show_prev = FALSE;
         if ($cstart > 0) {
-            $this->show_prev = true;
+            $this->show_prev = TRUE;
 
         }
 
@@ -105,7 +102,6 @@ class PageResultsPanel extends Component
 
         $a = $this->cstart;
 
-
         if ($this->show_prev) {
             $qry["page"] = 0;
             $q = queryString($qry);
@@ -116,7 +112,6 @@ class PageResultsPanel extends Component
             echo "<a class='" . $this->getClassName() . "' style='padding:5px;' href='$q'> << " . tr("Prev") . " </a> | ";
 
         }
-
 
         while ($a < $this->cend) {
             $qry["page"] = $a;

@@ -5,7 +5,7 @@ class ValueInterleave
 
     private $iter;
 
-    public function __construct($cls_even, $cls_odd = false)
+    public function __construct($cls_even, $cls_odd = FALSE)
     {
         if (is_array($cls_even)) {
             $this->iter = new ArrayIterator($cls_even);

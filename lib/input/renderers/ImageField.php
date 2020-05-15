@@ -3,13 +3,11 @@ include_once("input/renderers/UploadField.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("utils/ImageScaler.php");
 
-
 class ImageField extends PlainUpload implements IPhotoRenderer
 {
 
     protected $width = -1;
     protected $height = 64;
-
 
     public function __construct(DataInput $input)
     {
@@ -18,19 +16,18 @@ class ImageField extends PlainUpload implements IPhotoRenderer
         $this->setInputAttribute("validator", "image");
     }
 
-
     public function setPhotoSize(int $width, int $height)
     {
         $this->width = $width;
         $this->height = $height;
     }
 
-    public function getPhotoWidth() : int
+    public function getPhotoWidth(): int
     {
         return $this->width;
     }
 
-    public function getPhotoHeight() : int
+    public function getPhotoHeight(): int
     {
         return $this->height;
     }

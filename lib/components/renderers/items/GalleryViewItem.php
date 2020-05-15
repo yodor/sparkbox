@@ -4,12 +4,10 @@ include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/ItemView.php");
 include_once("components/Action.php");
 
-
 class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IPhotoRenderer
 {
 
     protected $actions = array();
-
 
     /**
      * @var GalleryView
@@ -72,12 +70,11 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
         $this->image_popup->setID($photoID);
         $this->image_popup->setBeanClass(get_class($this->view->getBean()));
 
-
         $tooltip = tr("Upload Date") . ": " . dateFormat($item["date_upload"], TRUE);
 
         if (isset($item["caption"])) {
             $this->image_popup->setAttribute("caption", $item["caption"]);
-            $tooltip.= tr("Caption") . ": " . $item["caption"]."<BR>";
+            $tooltip .= tr("Caption") . ": " . $item["caption"] . "<BR>";
         }
 
         $this->image_popup->setAttribute("tooltip", $tooltip);

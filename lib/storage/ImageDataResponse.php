@@ -1,12 +1,12 @@
 <?php
-include_once ("storage/BeanDataResponse.php");
-include_once ("storage/ImageStorageObject.php");
-include_once ("utils/ImageScaler.php");
+include_once("storage/BeanDataResponse.php");
+include_once("storage/ImageStorageObject.php");
+include_once("utils/ImageScaler.php");
 
 class ImageDataResponse extends BeanDataResponse
 {
 
-    protected $disposition  = "inline";
+    protected $disposition = "inline";
     protected $field = "photo";
 
     protected $scaler = NULL;
@@ -35,7 +35,7 @@ class ImageDataResponse extends BeanDataResponse
         $this->scaler = new ImageScaler($width, $height);
 
         if (isset($_GET["gray_filter"])) {
-            $this->scaler->grayFilter = true;
+            $this->scaler->grayFilter = TRUE;
 
         }
 

@@ -6,7 +6,7 @@ interface IBeanEditor
     /**
      * @return int
      */
-    public function getEditID() : int;
+    public function getEditID(): int;
 
     /**
      * @param int $editID
@@ -16,7 +16,7 @@ interface IBeanEditor
     /**
      * @return DBTableBean
      */
-    public function getBean() : ?DBTableBean;
+    public function getBean(): ?DBTableBean;
 
     /**
      * @param DBTableBean $bean

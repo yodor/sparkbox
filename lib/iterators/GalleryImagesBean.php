@@ -4,14 +4,12 @@ include_once("iterators/ArrayDataIterator.php");
 class GalleryImagesBean extends ArrayDataIterator
 {
 
-
     public function __construct()
     {
         $this->initFolderLocation();
 
         $this->key = "id";
         $this->value_key = "filename";
-
 
         parent::__construct();
     }
@@ -33,13 +31,12 @@ class GalleryImagesBean extends ArrayDataIterator
 
         $dir = $this->folder;
 
-
         $files = array();
 
         $dh = opendir($dir);
         if (!is_resource($dh)) throw new Exception("Could not open '$dir'");
 
-        while (false !== ($filename = readdir($dh))) {
+        while (FALSE !== ($filename = readdir($dh))) {
             if (is_dir($filename)) continue;
             if (strcmp($filename, ".") == 0) continue;
             if (strcmp($filename, "..") == 0) continue;
@@ -49,7 +46,6 @@ class GalleryImagesBean extends ArrayDataIterator
         }
 
         sort($files);
-
 
         $this->values = array();
 
@@ -65,7 +61,9 @@ class GalleryImagesBean extends ArrayDataIterator
             $mime = $size["mime"];
             $date_upload = date("Y-m-d H:m:i", filemtime($filename));
 
-            $this->values[] = array($this->key => $idx, $this->value_key => $filename, "width" => $width, "height" => $height, "size" => filesize($filename), "mime" => $mime, "date_upload" => $date_upload);
+            $this->values[] = array($this->key    => $idx, $this->value_key => $filename, "width" => $width,
+                                    "height"      => $height, "size" => filesize($filename), "mime" => $mime,
+                                    "date_upload" => $date_upload);
 
         }
 

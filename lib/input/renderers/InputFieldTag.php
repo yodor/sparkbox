@@ -20,7 +20,6 @@ abstract class InputFieldTag extends InputField
         echo "<input $field_attr>";
     }
 
-
 }
 
 ?>

@@ -22,7 +22,7 @@ class MessageDialog extends Component implements IPageComponent
 
     protected $buttonsBar;
 
-    public $show_close_button = false;
+    public $show_close_button = FALSE;
 
     public function __construct($title = "Message", $id = "message_dialog")
     {
@@ -68,13 +68,13 @@ class MessageDialog extends Component implements IPageComponent
     protected function initButtons()
     {
         $btn_ok = new ColorButton();
-        $btn_ok->setText("OK");
+        $btn_ok->setContents("OK");
         $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
         $btn_ok->setAttribute("default_action", 1);
         $this->buttonsBar->append($btn_ok);
     }
 
-    public function getButtons() : Container
+    public function getButtons(): Container
     {
         return $this->buttonsBar;
     }
@@ -108,15 +108,14 @@ class MessageDialog extends Component implements IPageComponent
         if (strlen($this->title) > 0) {
             echo "<div class='caption'>";
 
-//            if ($this->show_close_button) {
-//                $b = new ColorButton();
-//                $b->setText("X");
-//                $b->setAttribute("action", MessageDialog::BUTTON_ACTION_CLOSE);
-//                $b->render();
-//            }
+            //            if ($this->show_close_button) {
+            //                $b = new ColorButton();
+            //                $b->setText("X");
+            //                $b->setAttribute("action", MessageDialog::BUTTON_ACTION_CLOSE);
+            //                $b->render();
+            //            }
 
             echo "<span class='caption_text'>" . tr($this->title) . "</span>";
-
 
             echo "<div class=clear></div>";
             echo "</div>";
@@ -152,11 +151,7 @@ class MessageDialog extends Component implements IPageComponent
 
         parent::finishRender();
 
-
     }
-
-
-
 
 }
 

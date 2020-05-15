@@ -10,7 +10,6 @@ interface IMenuItemRenderer extends IRenderer
 
     public function renderSeparator($idx_curr, $items_total);
 
-
 }
 
 ?>

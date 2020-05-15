@@ -73,7 +73,7 @@ abstract class PaymentProcessor
 
         $c = $ob->checkOwner($orderID, $userID);
 
-        if ($c !== true) {
+        if ($c !== TRUE) {
             throw new Exception($c);
         }
         $order_row = $ob->getByID($orderID);

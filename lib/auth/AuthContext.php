@@ -13,12 +13,12 @@ class AuthContext
         $this->data = $data;
     }
 
-    public function getID() : int
+    public function getID(): int
     {
         return $this->id;
     }
 
-    public function getData() : SessionData
+    public function getData(): SessionData
     {
         return $this->data;
     }

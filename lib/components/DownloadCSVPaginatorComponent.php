@@ -1,7 +1,6 @@
 <?php
 include_once("components/Component.php");
 
-
 class DownloadCSVPaginatorComponent extends Component
 {
 

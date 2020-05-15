@@ -9,7 +9,6 @@ class PasswordValidator extends EmptyValueValidator
 
         parent::validate($input);
 
-
     }
 
 }

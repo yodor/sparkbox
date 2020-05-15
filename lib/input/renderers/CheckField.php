@@ -31,7 +31,6 @@ class CheckField extends DataIteratorField
         $this->setItemRenderer(new CheckItem());
     }
 
-
     public function renderImpl()
     {
 

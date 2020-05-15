@@ -1,10 +1,10 @@
 <?php
-include_once ("storage/BeanDataResponse.php");
-include_once ("storage/FileStorageObject.php");
+include_once("storage/BeanDataResponse.php");
+include_once("storage/FileStorageObject.php");
 
 class FileDataResponse extends BeanDataResponse
 {
-    public $skip_cache = true;
+    public $skip_cache = TRUE;
     protected $field = "data";
     protected $disposition = "attachment";
 

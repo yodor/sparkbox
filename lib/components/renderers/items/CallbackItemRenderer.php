@@ -1,12 +1,10 @@
 <?php
 include_once("components/renderers/items/DataIteratorItem.php");
 
-
 class CallbackItemRenderer extends DataIteratorItem
 {
 
     protected $callback;
-
 
     public function __construct($function_name)
     {

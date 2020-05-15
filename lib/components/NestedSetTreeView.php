@@ -13,11 +13,11 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     const BRANCH_CLOSED = "closed";
     const BRANCH_LEAF = "leaf";
 
-//    const ICON_HANDLE_OPEN = "+";
-//    const ICON_HANDLE_CLOSE = "-";
-//    const ICON_HANDLE_LEAF = "&middot";
+    //    const ICON_HANDLE_OPEN = "+";
+    //    const ICON_HANDLE_CLOSE = "-";
+    //    const ICON_HANDLE_LEAF = "&middot";
 
-    public $open_all = false;
+    public $open_all = FALSE;
 
     //    protected $data_source = NULL;
     //    protected $select_qry = NULL;
@@ -109,7 +109,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
         $open_tags = 0;
 
-//        echo $this->iterator->select->getSQL();
+        //        echo $this->iterator->select->getSQL();
 
         $num = $this->iterator->exec();
 
@@ -188,7 +188,6 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     public function finishRender()
     {
         parent::finishRender();
-
 
         ?>
         <script type='text/javascript'>

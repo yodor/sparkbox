@@ -72,7 +72,7 @@ abstract class DataIteratorField extends InputField
      * @param DataInput $input
      * @return bool
      */
-    protected function isModelSelected() : bool
+    protected function isModelSelected(): bool
     {
         $field_values = $this->input->getValue();
         if (!is_array($field_values)) {
@@ -80,7 +80,6 @@ abstract class DataIteratorField extends InputField
         }
         return (in_array($this->item->getValue(), $field_values));
     }
-
 
 }
 

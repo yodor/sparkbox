@@ -1,5 +1,5 @@
 <?php
-include_once ("utils/SQLStatement.php");
+include_once("utils/SQLStatement.php");
 
 class SQLUpdate extends SQLStatement
 {
@@ -17,14 +17,14 @@ class SQLUpdate extends SQLStatement
 
     public function getSQL($where_only = FALSE)
     {
-        $sql = $this->type." ".$this->from;
-        $sql.=" SET ";
+        $sql = $this->type . " " . $this->from;
+        $sql .= " SET ";
         $set = array();
-        foreach ($this->set as $columnName=>$columnValue) {
-            $set[] = $columnName." = ".$columnValue;
+        foreach ($this->set as $columnName => $columnValue) {
+            $set[] = $columnName . " = " . $columnValue;
         }
-        $sql.= implode(",", $set);
-        $sql.= " WHERE ".$this->where;
+        $sql .= implode(",", $set);
+        $sql .= " WHERE " . $this->where;
 
         return $sql;
     }

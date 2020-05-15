@@ -7,12 +7,11 @@ class DeleteItemRequestHandler extends RequestHandler
     protected $item_id;
     protected $bean;
 
-
     public function __construct(DBTableBean $bean)
     {
         parent::__construct("delete_item");
         $this->bean = $bean;
-        $this->need_confirm = true;
+        $this->need_confirm = TRUE;
     }
 
     protected function parseParams()

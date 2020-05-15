@@ -66,7 +66,7 @@ class MenuBarComponent extends Component
         return $arr;
     }
 
-    public function getMainMenu() : MainMenu
+    public function getMainMenu(): MainMenu
     {
         return $this->main_menu;
 
@@ -77,7 +77,7 @@ class MenuBarComponent extends Component
         $this->ir_baritem = $ir_baritem;
     }
 
-    public function getItemRenderer() : MenuBarItemRenderer
+    public function getItemRenderer(): MenuBarItemRenderer
     {
         return $this->ir_baritem;
     }

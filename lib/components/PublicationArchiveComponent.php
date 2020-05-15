@@ -9,10 +9,10 @@ class PublicationArchiveComponent extends Component
     protected $bean;
     protected $archive_year;
     protected $archive_month;
-    protected $archive_title = false;
+    protected $archive_title = FALSE;
     protected $link_page = "";
 
-    protected $have_selection = false;
+    protected $have_selection = FALSE;
 
     public function getYear()
     {
@@ -53,7 +53,7 @@ class PublicationArchiveComponent extends Component
         if (isset($_GET["year"]) && isset($_GET["month"])) {
             $this->archive_year = (int)$_GET["year"];
             $this->archive_month = DBConnections::Get()->escape($_GET["month"]);
-            $this->have_selection = true;
+            $this->have_selection = TRUE;
         }
         else if (isset($_GET[$this->bean->key()])) {
             $itemID = (int)$_GET[$this->bean->key()];
@@ -62,19 +62,16 @@ class PublicationArchiveComponent extends Component
             $this->archive_year = date("Y", strtotime($item_row["item_date"]));
             $this->archive_month = date("F", strtotime($item_row["item_date"]));
 
-
         }
         else {
             $arr_years = $this->bean->getYearsArray();
             //  print_r($arr_years);
-
 
             $start = strtotime(date("F"));
 
             if (count($arr_years) > 0) {
                 $this->archive_year = $arr_years[0];
                 $this->archive_month = date("F", strtotime("1 December " . $this->archive_year));
-
 
                 $arr = $this->bean->filterMonthList($this->archive_year, $this->archive_month);
                 $cc = 0;
@@ -102,12 +99,12 @@ class PublicationArchiveComponent extends Component
 
         echo "<div class='viewport'>";
 
-        $m = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+        $m = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+                   "November", "December");
 
         $years_array = $this->bean->getYearsArray();
 
         $v = new ValueInterleave("even", "odd");
-
 
         $cls = $v->value();
 
@@ -181,6 +178,5 @@ class PublicationArchiveComponent extends Component
         <?php
 
     }
-
 
 }

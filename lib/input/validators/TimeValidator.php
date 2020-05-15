@@ -11,16 +11,16 @@ class TimeValidator implements IInputValidator
 
         if (count($pieces) != 2) {
 
-            return false;
+            return FALSE;
         }
 
-        $ret = false;
+        $ret = FALSE;
         try {
             $hour = $pieces[0];
             $minute = $pieces[1];
 
             TimeValidator::validateTime($hour, $minute);
-            $ret = true;
+            $ret = TRUE;
         }
         catch (Exception $e) {
 
@@ -40,7 +40,6 @@ class TimeValidator implements IInputValidator
 
         }
 
-
     }
 
     public function validate(DataInput $input)
@@ -53,13 +52,10 @@ class TimeValidator implements IInputValidator
 
         }
 
-
         $hour = $pieces[0];
         $minute = $pieces[1];
 
-
         TimeValidator::validateTime($hour, $minute);
-
 
     }
 

@@ -2,7 +2,6 @@
 include_once("forms/InputForm.php");
 include_once("input/DataInput.php");
 
-
 class AccountPasswordForm extends InputForm
 {
 
@@ -31,7 +30,7 @@ class AccountPasswordForm extends InputForm
         $this->addInput($field);
 
         $field = new DataInput("password1", "Repeat Password MD5", 0);
-        new HiddenField($field) ;
+        new HiddenField($field);
         $this->addInput($field);
 
         $field = new DataInput("rand", "Salt", 0);

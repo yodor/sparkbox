@@ -1,12 +1,10 @@
 <?php
 include_once("forms/renderers/FormRenderer.php");
 
-
 class LoginFormRenderer extends FormRenderer
 {
 
-
-    public $fbLoginEnabled = false;
+    public $fbLoginEnabled = FALSE;
 
     /**
      * @var AuthenticatorRequestHandler
@@ -26,17 +24,15 @@ class LoginFormRenderer extends FormRenderer
         $this->submitButton->setValue($handler->getCommandName());
 
         $this->submitButton->setAttribute("action", "login");
-        $this->submitButton->setText("Login");
+        $this->submitButton->setContents("Login");
 
         $this->setAttribute("autocomplete", "on");
-
 
         $this->action = new Action("Forgot Password", "forgot_password.php");
 
         $this->getTextSpace()->append($this->action);
 
     }
-
 
     public function requiredScript()
     {
@@ -45,10 +41,11 @@ class LoginFormRenderer extends FormRenderer
         $arr[] = SPARK_LOCAL . "/js/LoginForm.js";
         return $arr;
     }
+
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL."/css/LoginForm.css";
+        $arr[] = SPARK_LOCAL . "/css/LoginForm.css";
         return $arr;
     }
 

@@ -34,13 +34,13 @@ class PhraseTranslationDialog extends MessageDialog
     protected function initButtons()
     {
         $btn = new ColorButton();
-        $btn->setText("Translate");
+        $btn->setContents("Translate");
         $btn->setAttribute("action", "Translate");
 
         $this->buttonsBar->append($btn);
 
         $btn = new ColorButton();
-        $btn->setText("Close");
+        $btn->setContents("Close");
         $btn->setAttribute("action", "Close");
         $this->buttonsBar->append($btn);
     }

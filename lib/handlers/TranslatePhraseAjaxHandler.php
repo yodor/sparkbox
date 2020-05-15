@@ -3,14 +3,12 @@ include_once("beans/SiteTextsBean.php");
 include_once("beans/TranslationPhrasesBean.php");
 include_once("handlers/JSONRequestHandler.php");
 
-
 class TranslatePhraseAjaxHandler extends JSONRequestHandler
 {
 
     private $trID = -1;
     private $textID = -1;
     private $langID = -1;
-
 
     public function __construct()
     {
@@ -56,7 +54,6 @@ class TranslatePhraseAjaxHandler extends JSONRequestHandler
             $ret->message = tr("Translation Updated");
         }
 
-
     }
 
     protected function _fetch(JSONResponse $ret)
@@ -72,7 +69,7 @@ class TranslatePhraseAjaxHandler extends JSONRequestHandler
         $qry->select->fields = " translated ";
         $qry->exec();
 
-        if ($trrow=$qry->next()) {
+        if ($trrow = $qry->next()) {
             $ret->translation = $trrow["translated"];
         }
         else {

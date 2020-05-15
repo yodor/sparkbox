@@ -7,7 +7,7 @@ abstract class UploadDataValidator implements IInputValidator
     protected $maxsize = -1;
     protected $accept_mimes = array();
 
-    public $skip_is_uploaded_check = false;
+    public $skip_is_uploaded_check = FALSE;
 
     //in ArrayInputField case Processors get called only once, but validators are called for each array value
     public function __construct()
@@ -59,7 +59,6 @@ abstract class UploadDataValidator implements IInputValidator
      */
     public function validate(DataInput $input)
     {
-
 
         if ($this->maxsize < 1) {
             $this->maxsize = UPLOAD_MAX_FILESIZE;
@@ -123,7 +122,6 @@ abstract class UploadDataValidator implements IInputValidator
     abstract protected function processUploadData(DataInput $field);
 
     //   abstract protected function getStorageObject();
-
 
 }
 

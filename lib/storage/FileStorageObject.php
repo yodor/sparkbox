@@ -10,7 +10,6 @@ class FileStorageObject extends StorageObject
     protected $filename = NULL;
     protected $temp_name = NULL;
 
-
     public function __construct()
     {
         parent::__construct();
@@ -46,7 +45,7 @@ class FileStorageObject extends StorageObject
         return $this->temp_name;
     }
 
-    public function deconstruct(array &$row, $doEscape = true)
+    public function deconstruct(array &$row, $doEscape = TRUE)
     {
         parent::deconstruct($row, $doEscape);
 

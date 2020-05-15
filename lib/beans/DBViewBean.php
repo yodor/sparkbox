@@ -14,7 +14,7 @@ class DBViewBean extends DBTableBean
         throw new Exception("View not writable");
     }
 
-    public function deleteRef($refkey, $refval, $db = false, $keep_ids = array())
+    public function deleteRef($refkey, $refval, $db = FALSE, $keep_ids = array())
     {
         throw new Exception("View not writable");
     }
@@ -31,11 +31,10 @@ class DBViewBean extends DBTableBean
 
     //
 
-    public function insert(array &$row, DBDriver $db = NULL) : int
+    public function insert(array &$row, DBDriver $db = NULL): int
     {
         throw new Exception("View not writable");
     }
-
 
 }
 

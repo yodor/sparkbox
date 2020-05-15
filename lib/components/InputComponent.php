@@ -51,7 +51,7 @@ class InputComponent extends Component
     public function renderImpl()
     {
 
-        if (! ($this->input->getRenderer() instanceof HiddenField)){
+        if (!($this->input->getRenderer() instanceof HiddenField)) {
 
             $this->label_renderer->render();
         }
@@ -80,11 +80,11 @@ class InputComponent extends Component
 
         }
 
-//        if ($this->input->content_after) {
-//            echo "<div class='content_after'>";
-//            echo $this->input->content_after;
-//            echo "</div>";
-//        }
+        //        if ($this->input->content_after) {
+        //            echo "<div class='content_after'>";
+        //            echo $this->input->content_after;
+        //            echo "</div>";
+        //        }
 
         parent::finishRender();
 

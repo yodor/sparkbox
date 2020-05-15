@@ -16,7 +16,7 @@ class ArrayInputValidator implements IInputValidator
         // 	      $values_ordered = reorderArray($values_array);
         //
         // 	      $field->setValue($values_ordered);
-        if (! ($input instanceof ArrayDataInput)) throw new Exception("Not an instance of ArrayDataInput");
+        if (!($input instanceof ArrayDataInput)) throw new Exception("Not an instance of ArrayDataInput");
 
         $values_array = $input->getValue();
 
@@ -28,7 +28,7 @@ class ArrayInputValidator implements IInputValidator
 
         $values_array = $input->getValue();
 
-        debug("Input name: '{$input->getName()}' value type: " . getType($values_array)." is_required: ".$input->isRequired());
+        debug("Input name: '{$input->getName()}' value type: " . getType($values_array) . " is_required: " . $input->isRequired());
 
         if (!is_array($values_array) || count($values_array) < 1) {
 
@@ -62,13 +62,12 @@ class ArrayInputValidator implements IInputValidator
             }
             catch (Exception $e) {
 
-                debug("Validate result: ".$e->getMessage());
+                debug("Validate result: " . $e->getMessage());
                 $input->setErrorAt($idx, $e->getMessage());
 
             }
 
         }
-
 
     }
 

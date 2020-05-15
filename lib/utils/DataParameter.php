@@ -11,7 +11,7 @@ class DataParameter extends URLParameter
      * @param string $param_name
      * @param string $field_name data row key name to use to set the value of this parameter
      */
-    public function __construct(string $param_name, string $field_name="")
+    public function __construct(string $param_name, string $field_name = "")
     {
         if (!$field_name) {
             $field_name = $param_name;
@@ -33,4 +33,5 @@ class DataParameter extends URLParameter
         }
     }
 }
+
 ?>

@@ -8,7 +8,7 @@ class Component implements IRenderer, IHeadContents
 {
     protected $tagName = "DIV";
 
-    protected $render_index = -1;
+    protected $index = -1;
 
     /**
      * @var string Additional CSS class name of this component
@@ -25,7 +25,7 @@ class Component implements IRenderer, IHeadContents
     /**
      * @var Component
      */
-    protected $parent_component = NULL;
+    protected $parent = NULL;
 
     protected $caption = "";
 
@@ -38,13 +38,13 @@ class Component implements IRenderer, IHeadContents
 
     protected $component_class = "";
 
-    public $render_tooltip = TRUE;
-
     protected $contents = "";
 
     protected $name = "";
 
-    protected $index = -1;
+    public $translation_enabled = FALSE;
+    public $render_tooltip = TRUE;
+    public $render_enabled = TRUE;
 
     public function __construct()
     {
@@ -84,7 +84,8 @@ class Component implements IRenderer, IHeadContents
     {
         $this->index = $index;
     }
-    public function getIndex() : int
+
+    public function getIndex(): int
     {
         return $this->index;
     }
@@ -120,6 +121,7 @@ class Component implements IRenderer, IHeadContents
 
     public function startRender()
     {
+
         $this->processAttributes();
         $attrs = $this->prepareAttributes();
         echo "<$this->tagName $attrs>";
@@ -143,14 +145,15 @@ class Component implements IRenderer, IHeadContents
 
     public function finishRender()
     {
+
         echo "</$this->tagName>";
     }
 
-    public function render(int $render_index = -1)
+    public function render()
     {
+        if (!$this->render_enabled) return;
 
         try {
-            $this->render_index = $render_index;
             $this->startRender();
             $this->renderImpl();
             $this->finishRender();
@@ -173,15 +176,15 @@ class Component implements IRenderer, IHeadContents
 
     public function setParent(Component $parent)
     {
-        $this->parent_component = $parent;
+        $this->parent = $parent;
     }
 
     /**
      * @return Component|null
      */
-    public function getParent() : ?Component
+    public function getParent(): ?Component
     {
-        return $this->parent_component;
+        return $this->parent;
     }
 
     public function getCaption(): string
@@ -194,7 +197,7 @@ class Component implements IRenderer, IHeadContents
         $this->caption = $caption;
     }
 
-    public function getTooltipText() : string
+    public function getTooltipText(): string
     {
         return $this->getAttribute("tooltip");
     }
@@ -204,7 +207,7 @@ class Component implements IRenderer, IHeadContents
         $this->setAttribute("tooltip", $text);
     }
 
-    public function getAttributes() : array
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -283,9 +286,9 @@ class Component implements IRenderer, IHeadContents
                 if (in_array($name, $this->json_attributes)) {
                     $attributes[] = $name . "=" . json_string($attribute_value);
                 }
-//                else if (in_array($name, $this->special_attributes)) {
-//                    $attributes[] = $name . "='" . htmlspecialchars(trim($attribute_value)) . "'";
-//                }
+                //                else if (in_array($name, $this->special_attributes)) {
+                //                    $attributes[] = $name . "='" . htmlspecialchars(trim($attribute_value)) . "'";
+                //                }
                 else {
                     $attributes[] = $name . "='" . $attribute_value . "'";
                 }

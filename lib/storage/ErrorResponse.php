@@ -1,5 +1,5 @@
 <?php
-include_once ("storage/HTTPResponse.php");
+include_once("storage/HTTPResponse.php");
 
 class ErrorResponse extends HTTPResponse
 {

@@ -27,8 +27,7 @@ class ImageResizer
     public static $src_x = 0;
     public static $src_y = 0;
 
-
-    public static $gray_filter = false;
+    public static $gray_filter = FALSE;
 
     public static $n_width = -1;
     public static $n_height = -1;
@@ -76,22 +75,20 @@ class ImageResizer
         ImageResizer::$src_width = imagesx($source);
         ImageResizer::$src_height = imagesy($source);
 
-
         debug("ImageResizer::crop() Original Image Size:(" . ImageResizer::$src_width . " x " . ImageResizer::$src_height . ")");
 
         $scale = 1;
 
-        $exact_fit = false;
+        $exact_fit = FALSE;
 
         if ($dst_width > 0 || $dst_height > 0) {
 
             if ($dst_width > 0 && $dst_height > 0) {
 
                 debug("ImageResizer::crop() Requested Exact Fit Rectangle: ($dst_width x $dst_height)");
-                $exact_fit = true;
+                $exact_fit = TRUE;
 
                 $scale = max($dst_width / ImageResizer::$src_width, $dst_height / ImageResizer::$src_height);
-
 
             }
             else if ($dst_width > 0) {
@@ -111,20 +108,16 @@ class ImageResizer
 
             }
 
-
         }
-
 
         $n_width = ImageResizer::$src_width * $scale;
         $n_height = ImageResizer::$src_height * $scale;
-
 
         if ($n_width < 1) $n_width = 1;
         if ($n_height < 1) $n_height = 1;
 
         ImageResizer::$n_width = $n_width;
         ImageResizer::$n_height = $n_height;
-
 
         debug("ImageResizer::crop() Calculated Output Image Dimension ($n_width x $n_height) Scale: $scale");
 
@@ -145,7 +138,7 @@ class ImageResizer
 
                 //$source = ImageResizer::createSource($row);
 
-                ImageResizer::outputImage($row, $source, true);
+                ImageResizer::outputImage($row, $source, TRUE);
             }
         }
         else {
@@ -153,7 +146,6 @@ class ImageResizer
         }
 
         @imagedestroy($source);
-
 
     }
 
@@ -202,7 +194,6 @@ class ImageResizer
             $new_h = abs($new_w * $aspect_ratio);
         }
 
-
         $img = imagecreatetruecolor($size, $size);
         imagecopyresampled($img, $src_img, $dstx, $dsty, 0, 0, $new_w, $new_h, $width, $height);
         imagedestroy($src_img);
@@ -236,7 +227,6 @@ class ImageResizer
         $src_width = imagesx($source);
         $src_height = imagesy($source);
 
-
         $scale = min($dst_width / $src_width, $dst_height / $src_height);
 
         $n_width = $src_width * $scale;
@@ -247,7 +237,7 @@ class ImageResizer
 
         debug("ImageResizer::autoCrop: Original Image Size:($src_width,$src_height)");
         debug("ImageResizer::autoCrop: Scale: " . $scale);
-        debug("ImageResizer::autoCrop: New Image Size:($n_width, $n_height) | " . memory_get_usage(true));
+        debug("ImageResizer::autoCrop: New Image Size:($n_width, $n_height) | " . memory_get_usage(TRUE));
 
         ImageResizer::$n_width = $n_width;
         ImageResizer::$n_height = $n_height;
@@ -261,7 +251,7 @@ class ImageResizer
 
     }
 
-    protected static function outputImage(&$row, &$source, $force_process = false)
+    protected static function outputImage(&$row, &$source, $force_process = FALSE)
     {
 
         $photo = NULL;
@@ -269,8 +259,7 @@ class ImageResizer
         if (ImageResizer::$n_width != ImageResizer::$src_width || ImageResizer::$n_height != ImageResizer::$src_height || $force_process) {
 
             $photo = imagecreatetruecolor(ImageResizer::$n_width, ImageResizer::$n_height);
-            imagealphablending($photo, false);
-
+            imagealphablending($photo, FALSE);
 
             // Resize
             imagecopyresampled($photo, $source, 0, 0, 0, 0, ImageResizer::$n_width, ImageResizer::$n_height, ImageResizer::$src_width, ImageResizer::$src_height);
@@ -281,7 +270,6 @@ class ImageResizer
 
         }
 
-
         if (ImageResizer::$gray_filter) {
             imagefilter($source, IMG_FILTER_GRAYSCALE);
         }
@@ -290,7 +278,7 @@ class ImageResizer
 
         if (ImageResizer::$output_type === ImageResizer::TYPE_PNG) {
 
-            imagesavealpha($source, true);
+            imagesavealpha($source, TRUE);
             imagepng($source);
         }
         else {

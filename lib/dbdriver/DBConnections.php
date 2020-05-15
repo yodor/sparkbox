@@ -20,7 +20,7 @@ class DBConnectionProperties
         $this->variables = $arr;
     }
 
-    public function getVariables() : array
+    public function getVariables(): array
     {
         return $this->variables;
     }
@@ -30,7 +30,7 @@ class DBConnectionProperties
         $this->connectionName = $name;
     }
 
-    public function getConnectionName() : string
+    public function getConnectionName(): string
     {
         return $this->connectionName;
     }
@@ -49,12 +49,12 @@ class DBConnections
         self::$available_connections[$dbconn->getConnectionName()] = $dbconn;
     }
 
-    public static function haveConnection(string $connection_name) : bool
+    public static function haveConnection(string $connection_name): bool
     {
         return array_key_exists($connection_name, self::$available_connections);
     }
 
-    public static function getProperties(string $connection_name) : DBConnectionProperties
+    public static function getProperties(string $connection_name): DBConnectionProperties
     {
         if (!self::haveConnection($connection_name)) throw new Exception("Undefined connection name '$connection_name'");
         return self::$available_connections[$connection_name];
@@ -87,7 +87,7 @@ class DBConnections
      * @return DBDriver
      * @throws Exception
      */
-    static public function Factory($conn_name = DBConnectionProperties::DEFAULT_NAME, $persistent = FALSE) : DBDriver
+    static public function Factory($conn_name = DBConnectionProperties::DEFAULT_NAME, $persistent = FALSE): DBDriver
     {
         //DBConnectionProperties
         $props = DBConnections::getProperties($conn_name);
@@ -101,7 +101,7 @@ class DBConnections
 
         }
         if ($currDriver instanceof DBDriver) return $currDriver;
-        throw new Exception("Unsupoorted DBDriver: ".$props->driver);
+        throw new Exception("Unsupoorted DBDriver: " . $props->driver);
     }
 
 }

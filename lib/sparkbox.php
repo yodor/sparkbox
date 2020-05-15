@@ -19,14 +19,13 @@ include_once("utils/functions.php");
 $doc_root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', $_SERVER['SCRIPT_FILENAME']);
 $location = preg_replace("!^${doc_root}!", '', $install_path);
 
-
 //app/site deployment (server path)
 $defines->set("INSTALL_PATH", $install_path);
 
-$defines->set("CACHE_PATH", dirname($install_path)."/spark_cache");
+$defines->set("CACHE_PATH", dirname($install_path) . "/spark_cache");
 
 //app/site deployment - HTTP accessible
-$defines->set("LOCAL", $location."/");
+$defines->set("LOCAL", $location . "/");
 
 $location = $defines->get("LOCAL");
 
@@ -58,18 +57,16 @@ ini_set("session.use_only_cookies", "0");
 
 ini_set("zlib.output_compression", "0");
 
-
 //important for storage cache to work is the timezone matching across the lamp stack, apache uses the system timezone
 //mysql driver uses date.timezone to set the mysql timezone
 $timezone = "Europe/Sofia";
-if ($defines->get("TIMEZONE")){
+if ($defines->get("TIMEZONE")) {
     $timezone = $defines->get("TIMEZONE");
 }
 ini_set("date.timezone", $timezone);
 
 //merge get/post into the request array prevent cookie mix in
 $_REQUEST = array_merge($_GET, $_POST);
-
 
 $umf = ini_get("upload_max_filesize");
 KMG($umf);
@@ -88,14 +85,11 @@ $defines->set("IMAGE_UPLOAD_DEFAULT_HEIGHT", 720);
 
 //IMAGE_UPLOAD_DOWNSCALE = true  | uploaded images with different size from 'base size' are downscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 //IMAGE_UPLOAD_DOWNSCALE = false | uploaded images are not downscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
-$defines->set("IMAGE_UPLOAD_DOWNSCALE", true);
+$defines->set("IMAGE_UPLOAD_DOWNSCALE", TRUE);
 
 //IMAGE_UPLOAD_UPSCALE = true  | uploaded images with different size from 'base size' are upscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 //IMAGE_UPLOAD_UPSCALE = false | uploaded images are not upscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
-$defines->set("IMAGE_UPLOAD_UPSCALE", false);
-
-
-
+$defines->set("IMAGE_UPLOAD_UPSCALE", FALSE);
 
 $defines->set("DEFAULT_EMAIL_NAME", $site_domain . " Administration");
 $defines->set("DEFAULT_EMAIL_ADDRESS", "info@" . $site_domain);
@@ -114,14 +108,12 @@ include_once("config/defaults.php");
 
 $defines->export();
 
-
 //define SKIP_SESSION to skip starting session
 if (!defined("SKIP_SESSION")) {
     include_once("utils/Session.php");
     Session::Start();
 
 }
-
 
 //
 //define SKIP_DB to skip creating a default connection to DB
@@ -131,14 +123,13 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
     include_once("config/dbconfig.php");
     include_once("dbdriver/DBDriver.php");
 
-    $use_persistent = false;
-    if (defined("PERSISTENT_DB")) $use_persistent = true;
+    $use_persistent = FALSE;
+    if (defined("PERSISTENT_DB")) $use_persistent = TRUE;
 
     $driver = DBConnections::Factory(DBConnectionProperties::DEFAULT_NAME, $use_persistent);
     //set default driver
     DBConnections::Set($driver);
 }
-
 
 if (TRANSLATOR_ENABLED && !defined("SKIP_DB") && !defined("SKIP_TRANSLATOR")) {
     include_once("utils/language.php");
@@ -147,9 +138,7 @@ else {
     include_once("utils/language_notranslator.php");
 }
 
-
 // $constants = get_defined_constants(true);
 // debug("Exported Globals: ",$constants["user"]);
-
 
 ?>

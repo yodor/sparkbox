@@ -33,8 +33,8 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     public static function SetDefaultPhotoSize(int $width, int $height)
     {
-        TableImageCellRenderer::$DefaultWidth=$width;
-        TableImageCellRenderer::$DefaultHeight=$height;
+        TableImageCellRenderer::$DefaultWidth = $width;
+        TableImageCellRenderer::$DefaultHeight = $height;
     }
 
     public function __construct(int $width = -1, int $height = -1)
@@ -43,7 +43,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
         $this->list_limit = 1;
 
-        if ($width<1 && $height<1) {
+        if ($width < 1 && $height < 1) {
             $width = TableImageCellRenderer::$DefaultWidth;
             $height = TableImageCellRenderer::$DefaultHeight;
         }
@@ -92,15 +92,16 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $this->action = $action;
     }
 
-    protected function getDataValues(?string $values) : array
+    protected function getDataValues(?string $values): array
     {
         if (is_null($values)) return array();
         $values = explode("|", $values);
-        if ($this->list_limit>0 ) {
+        if ($this->list_limit > 0) {
             array_splice($values, $this->list_limit);
         }
         return $values;
     }
+
     protected function constructItems(array &$data)
     {
 
@@ -129,7 +130,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             if (array_key_exists($fieldName, $data)) {
 
                 $values = $this->getDataValues($data[$fieldName]);
-                foreach ($values as $idx=>$value) {
+                foreach ($values as $idx => $value) {
                     $item = new StorageItem();
                     $item->className = get_class($this->bean);
                     $item->id = $value;
@@ -187,7 +188,6 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         catch (Exception $e) {
             $this->error = $e->getMessage();
         }
-
 
         if ($this->action) {
             $this->action->setData($row);

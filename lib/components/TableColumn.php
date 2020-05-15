@@ -45,7 +45,6 @@ class TableColumn extends Component
 
     }
 
-
     public function setHeaderCellRenderer(TableCellRenderer $renderer)
     {
         $this->header = $renderer;

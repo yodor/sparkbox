@@ -3,7 +3,7 @@ include_once("components/Component.php");
 
 abstract class PaginatorComponent extends Component
 {
-    protected $paginator = false;
+    protected $paginator = FALSE;
 
     public function __construct(Paginator $paginator)
     {
@@ -33,7 +33,7 @@ abstract class PaginatorComponent extends Component
         $this->paginator = $paginator;
     }
 
-    public function getPaginator() : Paginator
+    public function getPaginator(): Paginator
     {
         return $this->paginator;
     }
@@ -106,7 +106,6 @@ abstract class PaginatorComponent extends Component
         }
         echo "</select>";
 
-
         $order_field = $this->paginator->getOrderField();
         $order_direction = $this->paginator->getOrderDirection();
 
@@ -122,7 +121,6 @@ abstract class PaginatorComponent extends Component
         $dir_href = queryString($dir_qry);
 
         echo "<a class='direction' href='$dir_href'>$dir_label</a>";
-
 
         echo "</div>";
 
@@ -146,7 +144,6 @@ abstract class PaginatorComponent extends Component
         if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
             echo "<label>" . tr("Page") . "</label>";
         }
-
 
         if ($this->paginator->getCurrentPage() > 0) {
 

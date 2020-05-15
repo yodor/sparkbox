@@ -1,7 +1,6 @@
 <?php
 include_once("forms/InputForm.php");
 
-
 interface IFormProcessor
 {
 

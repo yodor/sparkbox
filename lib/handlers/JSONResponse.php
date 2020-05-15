@@ -34,7 +34,6 @@ class JSONResponse
         echo json_encode(get_object_vars($this));
     }
 
-
 }
 
 ?>

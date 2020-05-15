@@ -6,13 +6,10 @@ interface IDataIteratorRenderer
 {
     public function setIterator(IDataIterator $query);
 
-
     public function getIterator(): IDataIterator;
-
 
     public function setItemRenderer(DataIteratorItem $item);
 
-
-    public function getItemRenderer() : ?DataIteratorItem;
+    public function getItemRenderer(): ?DataIteratorItem;
 
 }

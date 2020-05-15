@@ -29,23 +29,23 @@ class ArrayDataIterator implements IDataIterator
      * Start data iterator and return number of items in this collection
      * @return int
      */
-    public function exec() : int
+    public function exec(): int
     {
         $this->pos = -1;
         return count($this->values);
     }
 
-    public function key() : string
+    public function key(): string
     {
         return $this->id_key;
     }
 
-    public function count() : int
+    public function count(): int
     {
         return count($this->values);
     }
 
-    public function name() : string
+    public function name(): string
     {
         return "";
     }
@@ -56,7 +56,7 @@ class ArrayDataIterator implements IDataIterator
         if (isset($this->values[$this->pos])) {
             return $this->values[$this->pos];
         }
-        return null;
+        return NULL;
     }
 
     public static function FromSelect(SQLSelect $qry, $prkey, $label)
@@ -83,7 +83,7 @@ class ArrayDataIterator implements IDataIterator
         return new ArrayDataIterator($arr, $prkey, $label);
     }
 
-    public function bean() : ?DBTableBean
+    public function bean(): ?DBTableBean
     {
         return NULL;
     }

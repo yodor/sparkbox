@@ -11,7 +11,6 @@ class DateInput extends CompoundInput
         parent::__construct($input);
     }
 
-
 }
 
 ?>

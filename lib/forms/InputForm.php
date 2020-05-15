@@ -59,12 +59,13 @@ class InputForm implements IBeanEditor
         $this->beanID = -1;
         $this->name = get_class($this);
     }
+
     public function setName(string $name)
     {
         $this->name = $name;
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         if ($this->name) return $this->name;
         return get_class($this);

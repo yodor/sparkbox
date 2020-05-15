@@ -38,7 +38,8 @@ require_once dirname(__FILE__) . '/securimage.php';
 
 // if using database, adjust these options as necessary and change $img = new Securimage(); to $img = new Securimage($options);
 // see test.mysql.php or test.sqlite.php for examples
-$options = array('use_database' => true, 'database_name' => '', 'database_user' => '', 'database_driver' => Securimage::SI_DRIVER_MYSQL);
+$options = array('use_database'    => TRUE, 'database_name' => '', 'database_user' => '',
+                 'database_driver' => Securimage::SI_DRIVER_MYSQL);
 
 $img = new Securimage();
 
@@ -57,7 +58,6 @@ $img = new Securimage();
 
 // set namespace if supplied to script via HTTP GET
 if (!empty($_GET['namespace'])) $img->setNamespace($_GET['namespace']);
-
 
 // mp3 or wav format
 $format = (isset($_GET['format']) && strtolower($_GET['format']) == 'mp3') ? 'mp3' : NULL;

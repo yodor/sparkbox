@@ -15,7 +15,7 @@ class AuthenticatorRequestHandler extends RequestHandler
 
     protected $email = "";
     protected $pass = "";
-    protected $remember = false;
+    protected $remember = FALSE;
 
     public function __construct(Authenticator $auth, $cmd = "doLogin")
     {
@@ -23,11 +23,11 @@ class AuthenticatorRequestHandler extends RequestHandler
         $this->auth = $auth;
     }
 
-    public function getAuthenticator() : Authenticator
+    public function getAuthenticator(): Authenticator
     {
         return $this->auth;
     }
-    
+
     /**
      * @throws Exception
      */
@@ -54,12 +54,12 @@ class AuthenticatorRequestHandler extends RequestHandler
     protected function process()
     {
 
-        $success = false;
+        $success = FALSE;
         try {
 
             //throws exception on login error
             $this->auth->login($this->email, $this->pass, $this->randsalt, $this->remember);
-            $success = true;
+            $success = TRUE;
         }
         catch (Exception $e) {
             sleep(1);
@@ -69,7 +69,6 @@ class AuthenticatorRequestHandler extends RequestHandler
         return $success;
 
     }
-
 
 }
 

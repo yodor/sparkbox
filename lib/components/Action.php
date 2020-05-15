@@ -14,7 +14,7 @@ class Action extends DataIteratorItem
 
     protected $data_parameters;
 
-    protected $check_code = "return true;";
+    protected $check_code = NULL;
 
     /**
      * @var URLBuilder
@@ -24,10 +24,6 @@ class Action extends DataIteratorItem
     //set action attribute equal to the contents
     public $action_from_label = TRUE;
 
-    public $translation_enabled = TRUE;
-
-    protected $render_enabled = true;
-
     /**
      * Action constructor.
      *
@@ -36,7 +32,7 @@ class Action extends DataIteratorItem
      * @param array $parameters
      * @param string $check_code this will be eval'ed before rendering
      */
-    public function __construct(string $contents="", string $href="", array $parameters = array(), $check_code = NULL)
+    public function __construct(string $contents = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
     {
         parent::__construct();
 
@@ -47,7 +43,7 @@ class Action extends DataIteratorItem
 
         $this->data_parameters = array();
 
-        foreach ($parameters as $idx=>$parameter) {
+        foreach ($parameters as $idx => $parameter) {
             //data row parameter
             if ($parameter instanceof DataParameter) {
                 $this->data_parameters[$parameter->name()] = $parameter;
@@ -62,6 +58,9 @@ class Action extends DataIteratorItem
         }
 
         $this->check_code = $check_code;
+
+        $this->translation_enabled = TRUE;
+
     }
 
     public function requiredStyle()
@@ -71,12 +70,12 @@ class Action extends DataIteratorItem
         return $arr;
     }
 
-    public function getURL() : URLBuilder
+    public function getURL(): URLBuilder
     {
         return $this->urlbuilder;
     }
 
-    public function getDataParameter(string $name) : DataParameter
+    public function getDataParameter(string $name): DataParameter
     {
         return $this->data_parameters[$name];
     }
@@ -86,31 +85,29 @@ class Action extends DataIteratorItem
         $this->data_parameters[$param->name()] = $param;
     }
 
-    /**
-     * @param array $row  Input array to parametrize the href with
-     * @return string|string[]|void Return parametrized href using the input array $row
-     */
     public function setData(array $row)
     {
-        //TODO: use anonymous function
+
         if ($this->check_code) {
-            debug("Action has check code anonymous function set");
+            debug("Action has check_code anonymous function set");
             $check_code = $this->check_code;
             if (!$check_code($this, $row)) {
-                $this->render_enabled = false;
+                debug("check_code disabled rendering of this action");
+                $this->render_enabled = FALSE;
                 return;
             }
         }
 
         $script_name = $this->urlbuilder->getScriptName();
 
-        if (stripos($script_name, "javascript:") !== false) {
+        if (stripos($script_name, "javascript:") !== FALSE) {
 
             $names = array_keys($this->data_parameters);
             foreach ($names as $idx => $name) {
                 $param = $this->getDataParameter($name);
 
                 $param->setData($row);
+                //replace "%field%" with $data[$field]
                 $script_name = str_replace("%" . $param->field() . "%", $param->value(), $script_name);
 
             }
@@ -126,31 +123,15 @@ class Action extends DataIteratorItem
             $this->urlbuilder->addParameter($param);
         }
 
-//        $ret = $script_name . queryString($params);
-//        if (is_array($row)) {
-//            foreach ($row as $param_name => $value) {
-//                $ret = str_replace("%" . $param_name . "%", $value, $ret);
-//            }
-//        }
-//
-//        if (strrpos($ret, "&") === strlen($ret) - 1) {
-//            $ret = substr_replace($ret, "", -1);
-//        }
-//
-//        return $ret;
+        //        $ret = $script_name . queryString($params);
+        //        if (is_array($row)) {
+        //            foreach ($row as $param_name => $value) {
+        //                $ret = str_replace("%" . $param_name . "%", $value, $ret);
+        //            }
+        //        }
+        //
+        //        return $ret;
 
-    }
-
-    protected function renderImpl()
-    {
-        if (!$this->render_enabled) return;
-
-        if ($this->translation_enabled) {
-            echo tr($this->contents);
-        }
-        else {
-            echo $this->contents;
-        }
     }
 
     protected function processAttributes()
@@ -206,7 +187,7 @@ class PipeSeparator extends Action
         parent::__construct();
         $this->contents = " | ";
         $this->tagName = "SPAN";
-        $this->translation_enabled = false;
+        $this->translation_enabled = FALSE;
     }
 }
 
@@ -216,7 +197,7 @@ class RowSeparator extends Action
     {
         parent::__construct();
         $this->tagName = "SPAN";
-        $this->translation_enabled = false;
+        $this->translation_enabled = FALSE;
     }
 }
 
@@ -226,7 +207,7 @@ class EmptyAction extends Action
     {
         parent::__construct("", "");
         $this->setAttribute("action", "Empty");
-        $this->translation_enabled = false;
+        $this->translation_enabled = FALSE;
     }
 }
 

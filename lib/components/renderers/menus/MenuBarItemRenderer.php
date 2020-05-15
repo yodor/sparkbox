@@ -2,7 +2,6 @@
 include_once("components/renderers/menus/MenuItemRenderer.php");
 include_once("components/renderers/menus/SubmenuRenderer.php");
 
-
 class MenuBarItemRenderer extends MenuItemRenderer
 {
 
@@ -48,7 +47,6 @@ class MenuBarItemRenderer extends MenuItemRenderer
         }
     }
 
-
     public function startRender()
     {
         $attrs = $this->prepareAttributes();
@@ -87,7 +85,6 @@ class MenuBarItemRenderer extends MenuItemRenderer
         }
         echo $title;
 
-
         echo "</a>";
 
         if (count($this->item->getSubmenu()) > 0) {
@@ -98,18 +95,14 @@ class MenuBarItemRenderer extends MenuItemRenderer
         if (count($this->item->getSubmenu()) > 0) {
             if ($this->ir_submenu) {
 
-
                 $this->ir_submenu->setMenuItem($this->item);
                 $this->ir_submenu->render();
-
 
             }
 
         }
 
-
     }
-
 
 }
 

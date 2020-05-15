@@ -1,7 +1,6 @@
 <?php
 include_once("utils/MainMenu.php");
 
-
 class PageSessionMenu extends MainMenu
 {
 
@@ -18,7 +17,7 @@ class PageSessionMenu extends MainMenu
         //assign initial menu
         $this->main_menu = $main_menu;
 
-        $this->dataKey = md5(SessionData::MENU."|".get_class($this).SITE_TITLE);
+        $this->dataKey = md5(SessionData::MENU . "|" . get_class($this) . SITE_TITLE);
 
         //check if there is already a menu in session and use it instead or put the inital menu to the session
         if ($context->getData()->contains($this->dataKey)) {
@@ -28,7 +27,6 @@ class PageSessionMenu extends MainMenu
             $context->getData()->set($this->dataKey, serialize($this->main_menu));
         }
     }
-
 
     //set selected menu items and add submenu 'arr_menu' to last selected node
     public function update($arr_menu = array())
@@ -48,8 +46,7 @@ class PageSessionMenu extends MainMenu
 
         $old_selected = $old_selected[0];
 
-
-        $enable_add = true;
+        $enable_add = TRUE;
 
         foreach ($arr_menu as $key => $subitem) {
 
@@ -61,13 +58,12 @@ class PageSessionMenu extends MainMenu
                 $subitem->setHref(dirname($_SERVER['PHP_SELF']) . "/" . $subitem->getHref());
             }
 
-
         }
 
         foreach ($arr_menu as $key => $subitem) {
             //item is current ?
             if (strcmp($old_selected->getHref(), $subitem->getHref()) === 0) {
-                $enable_add = false;
+                $enable_add = FALSE;
                 break;
             }
         }
@@ -86,7 +82,6 @@ class PageSessionMenu extends MainMenu
 
         $last_selected = $this->selected_path[0];
 
-
         //append page to submenu
         $match = $this->matchItem(MainMenu::FIND_INDEX_LOOSE, $last_selected);
 
@@ -103,14 +98,11 @@ class PageSessionMenu extends MainMenu
                 $this->selectActiveMenus(MainMenu::FIND_INDEX_LOOSE);
             }
 
-
         }
-
 
         $this->selected_path = array_reverse($this->selected_path);
 
         $this->context->getData()->set($this->dataKey, serialize($this->main_menu));
-
 
         // 	debug("LocationPath::pathUpdate: Storing MenuElements: ");
         // 	$this->dumpMenu();
@@ -157,7 +149,6 @@ class PageSessionMenu extends MainMenu
             $this->dumpMenuSub($subitem, $level);
         }
     }
-
 
 }
 

@@ -1,7 +1,6 @@
 <?php
 include_once("handlers/RequestHandler.php");
 
-
 class ChangePositionRequestHandler extends RequestHandler
 {
 
@@ -51,8 +50,8 @@ class ChangePositionRequestHandler extends RequestHandler
             unset($arr["position"]);
         }
         if ($this->bean instanceof OrderedDataBean) {
-            if (strcmp($this->type, "fixed") == 0){
-                if ($this->position<1) {
+            if (strcmp($this->type, "fixed") == 0) {
+                if ($this->position < 1) {
                     $this->need_redirect = FALSE;
                 }
             }
@@ -105,8 +104,7 @@ class ChangePositionRequestHandler extends RequestHandler
 
                     ?>
                     <script type="text/javascript">
-                        function onConfirmMessageDialog(is_confirmed)
-                        {
+                        function onConfirmMessageDialog(is_confirmed) {
                             if (is_confirmed) {
 
                                 let position = document.querySelector(".ModalPane .ConfirmMessageDialog .InputField [name=position]").value
@@ -115,13 +113,13 @@ class ChangePositionRequestHandler extends RequestHandler
                                 searchParams.set("position", position);
 
                                 window.location.href = `${location.pathname}?${searchParams}`;
-                            }
-                            else {
+                            } else {
                                 window.location.href = "<?php echo $this->cancel_url;?>";
                             }
 
                         }
-                        onPageLoad(function(){
+
+                        onPageLoad(function () {
                             showPopupPanel("<?php echo $dialog->getID()?>");
                         });
                     </script>

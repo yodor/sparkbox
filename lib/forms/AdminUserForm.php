@@ -8,7 +8,6 @@ include_once("beans/AdminAccessBean.php");
 include_once("iterators/AdminRolesIterator.php");
 include_once("iterators/DBEnumIterator.php");
 
-
 class AdminUserForm extends InputForm
 {
 
@@ -22,11 +21,11 @@ class AdminUserForm extends InputForm
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(DataInputFactory::TEXT,"fullname", "Full Name", 0);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "fullname", "Full Name", 0);
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(DataInputFactory::PASSWORD,"pass", "Create Password", 0);
+        $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "pass", "Create Password", 0);
         $field->getProcessor()->skip_transaction = TRUE;
         $field->getRenderer()->setInputAttribute("autocomplete", "off");
         $this->addInput($field);
@@ -38,7 +37,7 @@ class AdminUserForm extends InputForm
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(DataInputFactory::HIDDEN,"password_hash", "Password Hash", 1);
+        $field = DataInputFactory::Create(DataInputFactory::HIDDEN, "password_hash", "Password Hash", 1);
         $field->getProcessor()->transact_field_name = "password";
         $this->addInput($field);
 

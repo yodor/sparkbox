@@ -26,7 +26,6 @@ class DynamicPagePhotosBean extends OrderedDataBean
         parent::__construct("page_photos");
     }
 
-
 }
 
 ?>

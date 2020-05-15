@@ -1,10 +1,8 @@
 <?php
 include_once("mailers/Mailer.php");
 
-
 class ForgotPasswordMailer extends Mailer
 {
-
 
     public function __construct($email, $random_pass, $login_url)
     {
@@ -13,13 +11,11 @@ class ForgotPasswordMailer extends Mailer
 
         $this->to = $email;
 
-
         // 		$server_file = INSTALL_PATH."/emails/admin_forgot_password.html";
         //
         // 		$this->setTemplateHTML($server_file);
         //
         // 		$this->replaceBody("Base HREF", SITE_URL.LOCAL."system/token/");
-
 
         $message = "";
         $message .= "Hello,\r\n";
@@ -29,7 +25,6 @@ class ForgotPasswordMailer extends Mailer
         $message .= "Sincerely,\r\n";
         $message .= SITE_TITLE;
         $this->body = $message;
-
 
     }
 

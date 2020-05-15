@@ -36,7 +36,6 @@ class BeanTransactor implements IBeanEditor
      */
     protected $form = NULL;
 
-
     public function __construct(DBTableBean $bean, int $editID)
     {
         $this->values = array();
@@ -235,7 +234,7 @@ class BeanTransactor implements IBeanEditor
                 }
             }
             catch (Exception $exx) {
-                debug("afterCommit() failed: ".$exx->getMessage());
+                debug("afterCommit() failed: " . $exx->getMessage());
             }
 
         }

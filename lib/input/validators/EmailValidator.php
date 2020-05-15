@@ -1,12 +1,11 @@
 <?php
 include_once("input/validators/IInputValidator.php");
 
-
 class EmailValidator implements IInputValidator
 {
-    public $domain_check_enabled = true;
+    public $domain_check_enabled = TRUE;
 
-    public function __construct($domain_check_enabled = true)
+    public function __construct($domain_check_enabled = TRUE)
     {
         $this->domain_check_enabled = $domain_check_enabled;
     }
@@ -19,7 +18,6 @@ class EmailValidator implements IInputValidator
 
         if (strlen($value) == 0) throw new Exception("Input value");
 
-
         // $regexp="/^[a-z0-9]+([_\\.-][a-z0-9]+)*@([a-z0-9]+([\.-][a-z0-9]+)*)+\\.[a-z]{2,}$/i";
         //
         // 		if( !preg_match($regexp, $value) )
@@ -30,7 +28,6 @@ class EmailValidator implements IInputValidator
             throw new Exception("Incorrect email syntax");
         }
 
-
         if ($this->domain_check_enabled) {
 
             list($username, $domain) = explode('@', $value);
@@ -39,13 +36,11 @@ class EmailValidator implements IInputValidator
 
         }
 
-
     }
 
     //checkdnsrr and getmxrr are really very slow on the current server use this
     public function checkMX($domain)
     {
-
 
         $ret = checkdnsrr($domain . ".", "MX");
 

@@ -41,7 +41,7 @@ class NestedSetFilterProcessor
         $tv_item_clicked = new Action("TextItemClicked", "", array(new DataParameter($iterator->key(), $iterator->key())));
 
         //clicking on this will clear the page parameter of the paginator from the href url
-        $tv_item_clicked->getURL()->setClearPageParams(true);
+        $tv_item_clicked->getURL()->setClearPageParams(TRUE);
 
         return $tv_item_clicked;
     }
@@ -56,7 +56,6 @@ class NestedSetFilterProcessor
 
         $view->getItemRenderer()->setTextAction($this->item_clicked_action);
     }
-
 
 }
 

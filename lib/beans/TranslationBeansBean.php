@@ -24,7 +24,6 @@ CREATE TABLE `translation_beans` (
         parent::__construct("translation_beans");
     }
 
-
 }
 
 ?>

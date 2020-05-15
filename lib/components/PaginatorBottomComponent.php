@@ -34,7 +34,6 @@ class PaginatorBottomComponent extends PaginatorComponent
         echo "<span>" . $this->paginator->getResultsTotal() . "</span>";
         echo "</div>";
 
-
     }
 }
 

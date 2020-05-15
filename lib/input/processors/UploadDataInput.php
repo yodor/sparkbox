@@ -17,7 +17,6 @@ class UploadDataInput extends InputProcessor
 
         if (isset($_FILES[$name])) {
 
-
             debug("Processing _FILES value for key: " . $name);
 
             if (is_array($_FILES[$name]["name"])) {
@@ -69,7 +68,6 @@ class UploadDataInput extends InputProcessor
             $file_storage->setFilename($file['name']);
             $file_storage->setLength($file['size']);
             $file_storage->setMIME($file['type']);
-
 
             if (DB_ENABLED) {
                 $file_storage->setTimestamp(DBConnections::Get()->dateTime());

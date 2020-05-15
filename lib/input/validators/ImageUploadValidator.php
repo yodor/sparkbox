@@ -3,13 +3,12 @@ include_once("input/validators/UploadDataValidator.php");
 include_once("storage/ImageStorageObject.php");
 include_once("utils/ImageResizer.php");
 
-
 class ImageUploadValidator extends UploadDataValidator
 {
 
     private $resize_width = 0;
     private $resize_height = 0;
-    private $resize_enabled = true;
+    private $resize_enabled = TRUE;
 
     public function __construct()
     {
@@ -19,7 +18,7 @@ class ImageUploadValidator extends UploadDataValidator
         $this->setAcceptMimes($accept_mimes);
 
         if (IMAGE_UPLOAD_UPSCALE || IMAGE_UPLOAD_DOWNSCALE) {
-            $this->resize_enabled = true;
+            $this->resize_enabled = TRUE;
             $this->resize_width = IMAGE_UPLOAD_DEFAULT_WIDTH;
             $this->resize_height = IMAGE_UPLOAD_DEFAULT_HEIGHT;
         }
@@ -29,7 +28,7 @@ class ImageUploadValidator extends UploadDataValidator
     {
         $this->resize_width = $width;
         $this->resize_height = $height;
-        $this->resize_enabled = true;
+        $this->resize_enabled = TRUE;
     }
 
     /**
@@ -58,13 +57,11 @@ class ImageUploadValidator extends UploadDataValidator
     public function process(ImageStorageObject $image_storage)
     {
 
-
         debug("------------- ImageUploadValidator::processImage() UID: " . $image_storage->getUID());
 
         debug("Uploaded Image Size:(" . $image_storage->getWidth() . "," . $image_storage->getHeight() . ")");
         debug("MIME: " . $image_storage->getMIME());
         debug("Length: " . $image_storage->getLength());
-
 
         //should be disabled during ajax upload and before submit of actual form. original uploaded image is stored in session
         if (!$this->resize_enabled) {
@@ -72,7 +69,6 @@ class ImageUploadValidator extends UploadDataValidator
             debug("----------------------------------------------------------------------");
             return;
         }
-
 
         $scale = 1;
         $dst_width = $this->resize_width;
@@ -142,11 +138,9 @@ class ImageUploadValidator extends UploadDataValidator
         if ($n_width < 1) $n_width = 1;
         if ($n_height < 1) $n_height = 1;
 
+        debug("Creating scaled image ($n_width, $n_height) | Memory usage before scaling: " . memory_get_usage(TRUE));
 
-        debug("Creating scaled image ($n_width, $n_height) | Memory usage before scaling: " . memory_get_usage(true));
-
-
-        $source = false;
+        $source = FALSE;
 
         if ($image_storage->haveData()) {
             $source = imagecreatefromstring($image_storage->getData());
@@ -157,9 +151,8 @@ class ImageUploadValidator extends UploadDataValidator
 
         if (!is_resource($source)) throw new Exception("ImageUploadValidator::processImage() can not create image resource from data");
 
-
         $scaled_source = imagecreatetruecolor($n_width, $n_height);
-        imagealphablending($scaled_source, false);
+        imagealphablending($scaled_source, FALSE);
 
         // Resize
         imagecopyresampled($scaled_source, $source, 0, 0, 0, 0, $n_width, $n_height, $image_storage->getWidth(), $image_storage->getHeight());
@@ -175,7 +168,7 @@ class ImageUploadValidator extends UploadDataValidator
 
             debug("Output Format is PNG");
 
-            imagesavealpha($scaled_source, true);
+            imagesavealpha($scaled_source, TRUE);
 
             imagepng($scaled_source);
 
@@ -197,7 +190,6 @@ class ImageUploadValidator extends UploadDataValidator
         ob_end_clean();
 
         @imagedestroy($scaled_source);
-
 
         debug("----------------------------------------------------------------------");
     }

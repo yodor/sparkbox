@@ -17,16 +17,18 @@ class URLBuilder
 
     protected $keep_request_params = TRUE;
 
-    public function __construct(string $href="")
+    public function __construct(string $href = "")
     {
         $this->parameters = array();
 
         $this->setHref($href);
     }
+
     public function isEmpty()
     {
         return (count($this->parameters) < 1 && strlen($this->script_name) < 1);
     }
+
     //remove paginator page=? parameter from this href
     public function setClearPageParams(bool $mode)
     {
@@ -48,12 +50,12 @@ class URLBuilder
         $this->parameters[$param->name()] = $param;
     }
 
-    public function getParameter($name) : URLParameter
+    public function getParameter($name): URLParameter
     {
         return $this->parameters[$name];
     }
 
-    public function getParameterNames() : array
+    public function getParameterNames(): array
     {
         return array_keys($this->parameters);
     }
@@ -62,23 +64,23 @@ class URLBuilder
     {
         $this->process();
 
-        $ret = $this->protocol.$this->domain.$this->script_name;
+        $ret = $this->protocol . $this->domain . $this->script_name;
 
-        if (stripos($ret, "javascript:") !== false) {
+        if (stripos($ret, "javascript:") !== FALSE) {
 
         }
-        else if (count($this->parameters)>0) {
-            $ret.="?";
+        else if (count($this->parameters) > 0) {
+            $ret .= "?";
 
             $names = array_keys($this->parameters);
 
             $pairs = array();
-            foreach ($names as $pos=>$name) {
+            foreach ($names as $pos => $name) {
                 $param = $this->getParameter($name);
-                $pairs[] = $param->name()."=".$param->value();
+                $pairs[] = $param->name() . "=" . $param->value();
             }
 
-            $ret.=implode("&", $pairs);
+            $ret .= implode("&", $pairs);
 
         }
 
@@ -113,7 +115,7 @@ class URLBuilder
         foreach ($static_pairs as $pos => $pair) {
             $param_name = $pair;
             $param_value = "";
-            if (strpos($pair, "=") !== false) {
+            if (strpos($pair, "=") !== FALSE) {
                 list($param_name, $param_value) = explode("=", $pair);
             }
             if (strlen($param_name) > 0) {
@@ -127,22 +129,22 @@ class URLBuilder
             Paginator::clearPageFilter($this->parameters);
         }
 
-//        $ret = $this->script_name . queryString($params);
-//        if (is_array($row)) {
-//            foreach ($row as $param_name => $value) {
-//                $ret = str_replace("%" . $param_name . "%", $value, $ret);
-//            }
-//        }
-//
-//        if (strrpos($ret, "&") === strlen($ret) - 1) {
-//            $ret = substr_replace($ret, "", -1);
-//        }
+        //        $ret = $this->script_name . queryString($params);
+        //        if (is_array($row)) {
+        //            foreach ($row as $param_name => $value) {
+        //                $ret = str_replace("%" . $param_name . "%", $value, $ret);
+        //            }
+        //        }
+        //
+        //        if (strrpos($ret, "&") === strlen($ret) - 1) {
+        //            $ret = substr_replace($ret, "", -1);
+        //        }
 
     }
 
     public function setHref(string $href)
     {
-        if (stripos($href, "javascript:") !== false) {
+        if (stripos($href, "javascript:") !== FALSE) {
 
             $this->script_name = $href;
             $this->script_query = "";
@@ -152,7 +154,7 @@ class URLBuilder
         $script_name = $href;
         $script_query = "";
 
-        if (strpos($script_name, "?") !== false) {
+        if (strpos($script_name, "?") !== FALSE) {
             list($script_name, $script_query) = explode("?", $script_name);
         }
 

@@ -4,13 +4,13 @@ include_once("forms/InputForm.php");
 class KeywordSearchForm extends InputForm
 {
 
-    protected $ts_fields = NULL;
+    protected $table_fields = NULL;
     protected $search_expressions = NULL;
 
     public function __construct(array $table_fields)
     {
         parent::__construct();
-        $this->ts_fields = $table_fields;
+        $this->table_fields = $table_fields;
         $this->search_expressions = array();
 
         $field = new DataInput("keyword", "Keyword", 0);
@@ -19,22 +19,22 @@ class KeywordSearchForm extends InputForm
 
     }
 
-    public function setCompareExpression($field_name, array $expressions)
+    public function setCompareExpression(string $field_name, array $expressions)
     {
         $this->search_expressions[$field_name] = $expressions;
     }
 
     public function setSearchFields(array $table_fields)
     {
-        $this->ts_fields = $table_fields;
+        $this->table_fields = $table_fields;
     }
 
     public function getSearchFields()
     {
-        return $this->ts_fields;
+        return $this->table_fields;
     }
 
-    protected function searchFilterForKey(string $key, string $val) : string
+    protected function searchFilterForKey(string $key, string $val): string
     {
 
         $val = DBConnections::Get()->escape($val);
@@ -45,7 +45,7 @@ class KeywordSearchForm extends InputForm
 
             foreach ($allwords as $pos => $keyword) {
                 $ret = array();
-                foreach ($this->ts_fields as $pos1 => $field_name) {
+                foreach ($this->table_fields as $pos1 => $field_name) {
 
                     if (isset($this->search_expressions[$field_name])) {
                         foreach ($this->search_expressions[$field_name] as $idx => $expression) {

@@ -1,6 +1,5 @@
 <?php
 
-
 class ImageScaler
 {
 
@@ -18,12 +17,12 @@ class ImageScaler
     protected $width = -1;
     protected $height = -1;
 
-    public $grayFilter = false;
+    public $grayFilter = FALSE;
 
-    public $upscale_enabled = false;
-    public $downscale_enabled = false;
+    public $upscale_enabled = FALSE;
+    public $downscale_enabled = FALSE;
 
-    protected $data = null;
+    protected $data = NULL;
     protected $dataSize = 0;
 
     //resulting image width and height
@@ -32,7 +31,7 @@ class ImageScaler
         $this->width = $width;
         $this->height = $height;
 
-        if ($this->width>0 || $this->height>0) {
+        if ($this->width > 0 || $this->height > 0) {
             $this->mode = ImageScaler::MODE_CROP;
 
             if ($this->width == $this->height) {
@@ -41,17 +40,17 @@ class ImageScaler
         }
     }
 
-    public function getMode() : int
+    public function getMode(): int
     {
         return $this->mode;
     }
 
-    public function getWidth() : int
+    public function getWidth(): int
     {
         return $this->width;
     }
 
-    public function getHeight() : int
+    public function getHeight(): int
     {
         return $this->height;
     }
@@ -87,13 +86,13 @@ class ImageScaler
         //1264x720
         //449x256
         $ratio = 0;
-        if ($this->width>0 && $this->height>0) {
+        if ($this->width > 0 && $this->height > 0) {
 
             $pix_req = $this->width * $this->height;
             $pix_img = $image_width * $image_height;
 
             //upscale
-            if ($pix_req>$pix_img) {
+            if ($pix_req > $pix_img) {
 
             }
             //downscale
@@ -103,14 +102,14 @@ class ImageScaler
 
         }
         else {
-            if ($this->height>0) {
+            if ($this->height > 0) {
                 //scale to height , width auto
                 $ratio = $image_height / $this->height;
                 $this->width = (int)($image_width / $ratio);
 
                 debug("Using fit to height");
             }
-            else if ($this->width>0) {
+            else if ($this->width > 0) {
                 $ratio = $image_width / $this->width;
                 $this->height = (int)($image_height / $ratio);
 
@@ -143,7 +142,9 @@ class ImageScaler
         $image_height = imagesy($h_source);
         $image_size = min($image_width, $image_height);
 
-        $h_crop = imagecrop($h_source, ['x' => ($image_width-$image_size) / 2, 'y' => ($image_height - $image_size) / 2, 'width' => $image_size, 'height' => $image_size]);
+        $h_crop = imagecrop($h_source, ['x'      => ($image_width - $image_size) / 2,
+                                        'y'      => ($image_height - $image_size) / 2, 'width' => $image_size,
+                                        'height' => $image_size]);
         imagedestroy($h_source);
 
         $h_thumbnail = $this->createImage($this->width, $this->width);
@@ -162,9 +163,9 @@ class ImageScaler
             imagefilter($h_source, IMG_FILTER_GRAYSCALE);
         }
 
-        ob_start(null, 0);
-        if (strcmp($this->mime, ImageScaler::TYPE_PNG)==0) {
-            imagesavealpha($h_source, true);
+        ob_start(NULL, 0);
+        if (strcmp($this->mime, ImageScaler::TYPE_PNG) == 0) {
+            imagesavealpha($h_source, TRUE);
             imagepng($h_source);
         }
         else {
@@ -176,12 +177,12 @@ class ImageScaler
         ob_end_clean();
     }
 
-    public function getData() : string
+    public function getData(): string
     {
         return $this->data;
     }
 
-    public function getDataSize() : int
+    public function getDataSize(): int
     {
         return $this->dataSize;
     }
@@ -189,8 +190,8 @@ class ImageScaler
     protected function createImage(int $width, int $height)
     {
         $h_thumbnail = imagecreatetruecolor($width, $height);
-        imageantialias($h_thumbnail, true);
-        imagealphablending($h_thumbnail, true);
+        imageantialias($h_thumbnail, TRUE);
+        imagealphablending($h_thumbnail, TRUE);
         return $h_thumbnail;
     }
 }

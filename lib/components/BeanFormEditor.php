@@ -35,19 +35,17 @@ class BeanFormEditor extends Container implements IBeanEditor
     protected $processor = NULL;
     protected $transactor = NULL;
 
-    protected $error = false;
+    protected $error = FALSE;
 
-    public $reload_request = true;
+    public $reload_request = TRUE;
 
     //transfer to this URL on processing finished
     public $reload_url = "";
-
 
     public function __construct(DBTableBean $bean, InputForm $form)
     {
 
         parent::__construct();
-
 
         $this->bean = $bean;
         $this->form = $form;
@@ -90,7 +88,6 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         }
 
-
         if (TRANSLATOR_ENABLED) {
             $this->bean_translator = new BeanTranslationDialog();
 
@@ -100,17 +97,16 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->append($this->form_render);
 
-//        if (Session::Get(SparkPage::IteratorSessionKey($this->bean->getTableName()))) {
-//            $action_back = new Action("", Session::Get(SparkPage::IteratorSessionKey($this->bean->getTableName())), array());
-//            $action_back->setAttribute("action", "back");
-//            $action_back->setAttribute("title", tr("Back"));
-//            AdminPageLib::Instance()->addAction($action_back);
-//        }
+        //        if (Session::Get(SparkPage::IteratorSessionKey($this->bean->getTableName()))) {
+        //            $action_back = new Action("", Session::Get(SparkPage::IteratorSessionKey($this->bean->getTableName())), array());
+        //            $action_back->setAttribute("action", "back");
+        //            $action_back->setAttribute("title", tr("Back"));
+        //            AdminPageLib::Instance()->addAction($action_back);
+        //        }
 
     }
 
-
-    public function getEditID() : int
+    public function getEditID(): int
     {
         return $this->editID;
     }
@@ -123,7 +119,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     }
 
-    public function getBean() : DBTableBean
+    public function getBean(): DBTableBean
     {
         return $this->bean;
     }
@@ -134,12 +130,12 @@ class BeanFormEditor extends Container implements IBeanEditor
         $this->transactor->setBean($bean);
     }
 
-    public function getForm() : InputForm
+    public function getForm(): InputForm
     {
         return $this->form;
     }
 
-    public function getProcessor() : IFormProcessor
+    public function getProcessor(): IFormProcessor
     {
         return $this->processor;
     }
@@ -149,7 +145,7 @@ class BeanFormEditor extends Container implements IBeanEditor
         $this->processor = $processor;
     }
 
-    public function getTransactor() : BeanTransactor
+    public function getTransactor(): BeanTransactor
     {
         return $this->transactor;
     }
@@ -171,7 +167,6 @@ class BeanFormEditor extends Container implements IBeanEditor
 
             debug("Using editID='{$this->editID}' from _GET ");
         }
-
 
         try {
 
@@ -201,7 +196,7 @@ class BeanFormEditor extends Container implements IBeanEditor
                     Session::SetAlert($this->item_updated_message);
                 }
 
-                if ($this->reload_request === true) {
+                if ($this->reload_request === TRUE) {
                     // 			  Session::set("replace_history", 1);
                     debug("Finished processing - redirect following");
 
@@ -226,7 +221,6 @@ class BeanFormEditor extends Container implements IBeanEditor
 
                 debug("Process status is successful");
 
-
             }
             else if ($process_status === IFormProcessor::STATUS_ERROR) {
                 debug("Process status is error");
@@ -244,9 +238,6 @@ class BeanFormEditor extends Container implements IBeanEditor
         debug("Finished");
 
     }
-
-
-
 
 }
 

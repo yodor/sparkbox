@@ -3,7 +3,7 @@ include_once("components/PaginatorComponent.php");
 
 class PaginatorTopComponent extends PaginatorComponent
 {
-    public $view_modes_enabled = false;
+    public $view_modes_enabled = FALSE;
 
     public function renderImpl()
     {
@@ -32,7 +32,6 @@ class PaginatorTopComponent extends PaginatorComponent
 
         $this->renderSortComponents();
 
-
         echo "<div class='cell page_navigation short' nowrap>";
 
         echo "<label>" . tr("Page") . "</label>";
@@ -51,7 +50,6 @@ class PaginatorTopComponent extends PaginatorComponent
         $this->drawNextButton();
 
         echo "</div>";
-
 
     }
 }

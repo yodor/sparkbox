@@ -4,8 +4,7 @@ include_once("input/DataInput.php");
 
 class EmptyValueValidator implements IInputValidator
 {
-    public $require_array_value = false;
-
+    public $require_array_value = FALSE;
 
     public function validate(DataInput $input)
     {
@@ -32,7 +31,6 @@ class EmptyValueValidator implements IInputValidator
             }
 
         }
-
 
     }
 

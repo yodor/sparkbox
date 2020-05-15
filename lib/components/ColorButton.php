@@ -6,8 +6,6 @@ class ColorButton extends Component
 
     protected $tagName = "BUTTON";
 
-    protected $text;
-
     const TYPE_SUBMIT = "submit";
     const TYPE_RESET = "reset";
     const TYPE_BUTTON = "button";
@@ -18,7 +16,7 @@ class ColorButton extends Component
     {
         $btn = new ColorButton();
 
-        $btn->setText($text);
+        $btn->setContents($text);
         //$btn->setValue();
         $btn->setAttribute("onClick", "javascript:document.location.href='$href'");
         $btn->render();
@@ -28,7 +26,7 @@ class ColorButton extends Component
     {
         $btn = new ColorButton();
         $btn->setType(ColorButton::TYPE_SUBMIT);
-        $btn->setText($text);
+        $btn->setContents($text);
         $btn->setAttribute("value", $value);
         $btn->setAttribute("name", $name);
         $btn->render();
@@ -46,6 +44,8 @@ class ColorButton extends Component
 
         $this->setType(ColorButton::TYPE_BUTTON);
         $this->setClassName(self::$default_class);
+
+        $this->translation_enabled = TRUE;
     }
 
     public function requiredStyle()
@@ -65,31 +65,14 @@ class ColorButton extends Component
         return $this->getAttribute("type");
     }
 
-    public function getText(): string
-    {
-        return $this->text;
-    }
-
-    public function setText(string $text)
-    {
-        $this->text = $text;
-    }
-
     public function setValue(string $value)
     {
-
         $this->setAttribute("value", $value);
-
     }
 
-    public function getValue(): ?string
+    public function getValue(): string
     {
         return $this->getAttribute("value");
-    }
-
-    public function renderImpl()
-    {
-        echo tr($this->text);
     }
 
 }

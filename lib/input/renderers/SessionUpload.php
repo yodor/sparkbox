@@ -56,7 +56,6 @@ abstract class SessionUpload extends InputField
         $this->setInputAttribute("type", "file");
         $this->setInputAttribute("max_slots", $max_slots);
 
-
     }
 
     public function renderDetails()

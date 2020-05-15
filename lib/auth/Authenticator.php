@@ -220,7 +220,7 @@ abstract class Authenticator
 
         $token = new AuthToken($id);
 
-        debug($this, "Creating cookies for SessionData name: ".$this->session->name());
+        debug($this, "Creating cookies for SessionData name: " . $this->session->name());
         $token->storeCookies($this->session->name());
 
         debug($this, "Serializing auth_token in SessionData");
@@ -229,7 +229,7 @@ abstract class Authenticator
 
     protected function fillSessionData(array $row)
     {
-        debug($this,"fill common SessionData");
+        debug($this, "fill common SessionData");
 
         if (isset($row[SessionData::EMAIL])) {
             $this->session->set(SessionData::EMAIL, $row[SessionData::EMAIL]);

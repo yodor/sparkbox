@@ -78,7 +78,7 @@ abstract class RequestHandler implements IRequestProcessor
 
         if (!$do_process) return;
 
-        debug("Calling process with need_redirect: ".(int)$this->need_redirect);
+        debug("Calling process with need_redirect: " . (int)$this->need_redirect);
 
         $redirectURL = "";
 
@@ -122,16 +122,12 @@ abstract class RequestHandler implements IRequestProcessor
         $md = new ConfirmMessageDialog($title, "msg_confirm");
 
         $btn_ok = $md->getButtons()->getByAction(MessageDialog::BUTTON_ACTION_CONFIRM);
-        if ($btn_ok instanceof ColorButton) {
-            $btn_ok->setText("Confirm");
-            $btn_ok->setAttribute("onClick", "javascript:confirmHandler()");
-        }
+        $btn_ok->setContents("Confirm");
+        $btn_ok->setAttribute("onClick", "javascript:confirmHandler()");
 
         $btn_cancel = $md->getButtons()->getByAction(MessageDialog::BUTTON_ACTION_CANCEL);
-        if ($btn_ok instanceof ColorButton) {
-            $btn_cancel->setText("Cancel");
-            $btn_cancel->setAttribute("onClick", "javascript:cancelHandler()");
-        }
+        $btn_cancel->setContents("Cancel");
+        $btn_cancel->setAttribute("onClick", "javascript:cancelHandler()");
 
         $md->startRender();
 

@@ -56,7 +56,7 @@ class ImageStorageObject extends FileStorageObject
     {
         debug("Querying image dimensions. Data Length: " . strlen($data));
 
-        $source = false;
+        $source = FALSE;
 
         //data is empty for during upload to limit memory usage. Using temporary file name
         if (strlen($data) == 0) {
@@ -101,12 +101,12 @@ class ImageStorageObject extends FileStorageObject
             throw new Exception("Not an uploaded file: " . $this->getTempName());
         }
 
-        debug("File: " . $this->getTempName() . " is valid uploaded file. MIME: ".$this->getMIME());
+        debug("File: " . $this->getTempName() . " is valid uploaded file. MIME: " . $this->getMIME());
 
         debug("Memory Info - memory_limit: " . ini_get("memory_limit") . " | memory_usage: " . memory_get_usage());
 
         //check mimes
-        $source = false;
+        $source = FALSE;
 
         if (strcasecmp($this->getMIME(), "image/jpeg") == 0 || strcasecmp($this->getMIME(), "image/jpg") == 0) {
             $source = @imagecreatefromjpeg($this->getTempName());
@@ -119,15 +119,15 @@ class ImageStorageObject extends FileStorageObject
         }
 
         if (!$source) {
-            debug("Unable to create image object from this file: ".$this->getTempName());
+            debug("Unable to create image object from this file: " . $this->getTempName());
             throw new Exception("Unable to create image from uploaded file. Temp name is: " . $this->getTempName());
         }
 
-        debug("Image created successfully from file: ".$this->getTempName());
+        debug("Image created successfully from file: " . $this->getTempName());
         return $source;
     }
 
-    public function deconstruct(array &$row, $doEscape = true)
+    public function deconstruct(array &$row, $doEscape = TRUE)
     {
         parent::deconstruct($row, $doEscape);
 

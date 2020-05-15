@@ -19,7 +19,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     protected $paginator_top = NULL;
     protected $paginator_bottom = NULL;
     protected $position_index = -1;
-    protected $paginators_enabled = true;
+    protected $paginators_enabled = TRUE;
     protected $select_query = NULL;
 
     protected $item_renderer;
@@ -35,7 +35,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
     }
 
-    public function getIterator() : IDataIterator
+    public function getIterator(): IDataIterator
     {
         return $this->iterator;
     }
@@ -51,17 +51,17 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->item_renderer->setParent($this);
     }
 
-    public function getItemRenderer() : DataIteratorItem
+    public function getItemRenderer(): DataIteratorItem
     {
         return $this->item_renderer;
     }
 
-    public function getTotalRows() : int
+    public function getTotalRows(): int
     {
         return $this->total_rows;
     }
 
-    public function getPositionIndex() : int
+    public function getPositionIndex(): int
     {
         $paginator = $this->paginator;
 
@@ -75,17 +75,17 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->paginators_enabled = $mode;
     }
 
-    public function getPaginator() : Paginator
+    public function getPaginator(): Paginator
     {
         return $this->paginator;
     }
 
-    public function getTopPaginator() : PaginatorTopComponent
+    public function getTopPaginator(): PaginatorTopComponent
     {
         return $this->paginator_top;
     }
 
-    public function getBottomPaginator() : PaginatorBottomComponent
+    public function getBottomPaginator(): PaginatorBottomComponent
     {
         return $this->paginator_bottom;
     }
@@ -131,7 +131,6 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         }
     }
 
-
     /**
      * @throws Exception
      */
@@ -143,9 +142,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         parent::finishRender();
 
-
     }
-
 
 }
 

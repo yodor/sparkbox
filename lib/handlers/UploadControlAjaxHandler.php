@@ -90,7 +90,8 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
 
         $html = $this->getHTML($uploadObject, $this->field_name);
         //
-        $jsonObject = array("name" => $uploadObject->getFilename(), "uid" => $uploadObject->getUID(), "mime" => $uploadObject->getMIME(), "html" => $html,);
+        $jsonObject = array("name" => $uploadObject->getFilename(), "uid" => $uploadObject->getUID(),
+                            "mime" => $uploadObject->getMIME(), "html" => $html,);
 
         //JSONResponse returns all dynamically assigned properties in its result
         $resp->objects[] = $jsonObject;

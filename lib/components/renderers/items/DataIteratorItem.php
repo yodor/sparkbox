@@ -26,13 +26,13 @@ abstract class DataIteratorItem extends Component
      * @param string $name
      * @param string $field
      */
-    public function addDataAttribute(string $name, string $field="")
+    public function addDataAttribute(string $name, string $field = "")
     {
-        if (!$field)$field = $name;
+        if (!$field) $field = $name;
         $this->data_attributes[$name] = $field;
     }
 
-    public function getDataAttributes() : array
+    public function getDataAttributes(): array
     {
         return $this->data_attributes;
     }

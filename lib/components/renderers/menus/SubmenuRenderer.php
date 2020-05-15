@@ -3,7 +3,6 @@ include_once("components/Component.php");
 include_once("components/renderers/menus/SubmenuItemRenderer.php");
 include_once("components/renderers/IMenuItemRenderer.php");
 
-
 class SubmenuRenderer extends Component implements IMenuItemRenderer
 {
 
@@ -17,7 +16,6 @@ class SubmenuRenderer extends Component implements IMenuItemRenderer
         $this->ir_menuitem = new SubmenuItemRenderer();
 
     }
-
 
     public function getMenuItem()
     {
@@ -48,7 +46,6 @@ class SubmenuRenderer extends Component implements IMenuItemRenderer
     {
         echo "</div>";
     }
-
 
     public function renderImpl()
     {

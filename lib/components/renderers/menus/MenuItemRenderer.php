@@ -2,19 +2,16 @@
 include_once("components/Component.php");
 include_once("components/renderers/IMenuItemRenderer.php");
 
-
 abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
 {
 
     protected $item = NULL;
-
 
     public function __construct()
     {
         parent::__construct();
 
     }
-
 
     public function renderSeparator($idx_curr, $items_total)
     {

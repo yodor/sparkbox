@@ -15,7 +15,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     /**
      * @return string
      */
-    public function getMessage() : string
+    public function getMessage(): string
     {
         return $this->message;
     }
@@ -30,7 +30,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         $this->status = $status;
     }
 
-    public function getStatus() : int
+    public function getStatus(): int
     {
         return $this->status;
     }

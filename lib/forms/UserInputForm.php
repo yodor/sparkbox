@@ -13,21 +13,19 @@ class UserInputForm extends InputForm
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "first_name", "First Name", 1);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT,"last_name", "Last Name", 1);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "last_name", "Last Name", 1);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::EMAIL,"email", "Email", 1);
+        $field = DataInputFactory::Create(DataInputFactory::EMAIL, "email", "Email", 1);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::PASSWORD,"pass", "Create Password", 0);
+        $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "pass", "Create Password", 0);
         $field->getRenderer()->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
-
-        $field = DataInputFactory::Create(DataInputFactory::PASSWORD,"pass1", "Repeat Password", 0);
+        $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "pass1", "Repeat Password", 0);
         $field->getRenderer()->setAttribute("autocomplete", "off");
         $this->addInput($field);
-
 
         $field = DataInputFactory::Create(DataInputFactory::HIDDEN, "pass_hash", "Password Hash", 1);
         $this->addInput($field);
@@ -48,9 +46,9 @@ class UserInputForm extends InputForm
         $f_pass = $this->getInput("pass"); //hold the input that is rendered
         $f_pass1 = $this->getInput("pass1"); //hold the input that is rendered
 
-        if (isEmptyPassword($password_hash->getValue()) === true) {
+        if (isEmptyPassword($password_hash->getValue()) === TRUE) {
             if ($this->getEditID() > 0) {
-                $password_hash->getProcessor()->skip_transaction = true;
+                $password_hash->getProcessor()->skip_transaction = TRUE;
 
             }
             else {

@@ -8,7 +8,7 @@ class RequestController
     protected static $ajax_handlers = array();
     protected static $request_handlers = array();
 
-    protected static $working = false;
+    protected static $working = FALSE;
 
     public static function addAjaxHandler(IRequestProcessor $handler)
     {
@@ -22,29 +22,29 @@ class RequestController
         self::$request_handlers[get_class($handler)] = $handler;
     }
 
-    public static function findAjaxHandler($command_name) : IRequestProcessor
+    public static function findAjaxHandler($command_name): IRequestProcessor
     {
         return self::$ajax_handlers[$command_name];
     }
 
-    public static function findRequestHandler(string $className) : RequestHandler
+    public static function findRequestHandler(string $className): RequestHandler
     {
         return self::$request_handlers[$className];
     }
 
     public static function processAjaxHandlers()
     {
-        if (self::$working === true) {
+        if (self::$working === TRUE) {
             debug("Handler already working. Nothing to do.");
             return;
         }
 
         if (isset($_GET["ajax"])) {
 
-            self::$working = true;
+            self::$working = TRUE;
             // header("Pragma: no-cache");
             // header("Expires: 0");
-            $processed = false;
+            $processed = FALSE;
 
             foreach (array_keys(self::$ajax_handlers) as $idx => $commandName) {
 
@@ -54,7 +54,7 @@ class RequestController
 
                     $ret = new JSONResponse("AjaxHandler");
                     try {
-                        debug("Handler '".get_class($handler)."' accepted processing");
+                        debug("Handler '" . get_class($handler) . "' accepted processing");
                         $handler->processHandler();
                     }
                     catch (Exception $e) {
@@ -62,10 +62,10 @@ class RequestController
                         $ret->message = $e->getMessage();
                         $ret->response();
                     }
-                    $processed = true;
+                    $processed = TRUE;
                 }
                 else {
-                    debug("Handler '".get_class($handler)."' denied processing");
+                    debug("Handler '" . get_class($handler) . "' denied processing");
                 }
             }
 

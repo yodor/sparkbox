@@ -97,8 +97,6 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         return $this->input_attributes;
     }
 
-
-
     public function setInput(DataInput $input)
     {
         $this->input = $input;

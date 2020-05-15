@@ -33,5 +33,4 @@ class URLParameter
         return $ret;
     }
 
-
 }

@@ -122,7 +122,7 @@ abstract class DBTableBean
         return $this->table;
     }
 
-    public function getError() : string
+    public function getError(): string
     {
         return $this->error;
     }

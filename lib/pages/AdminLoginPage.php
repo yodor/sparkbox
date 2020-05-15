@@ -10,8 +10,8 @@ class AdminLoginPage extends SparkPage
 
         $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
 
-        $this->addCSS(SPARK_LOCAL . "/css/admin.css",false);
-        $this->addCSS(SPARK_LOCAL . "/css/admin_buttons.css", false);
+        $this->addCSS(SPARK_LOCAL . "/css/admin.css", FALSE);
+        $this->addCSS(SPARK_LOCAL . "/css/admin_buttons.css", FALSE);
     }
 
     public function startRender()

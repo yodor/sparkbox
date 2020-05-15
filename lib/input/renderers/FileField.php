@@ -15,7 +15,7 @@ class FileField extends PlainUpload
     public function renderContents(StorageObject $object)
     {
 
-        if ($object->getLength()>0) {
+        if ($object->getLength() > 0) {
             echo "<div class='Element' >";
 
             echo "<span class='thumbnail'><img src='" . SPARK_LOCAL . "/images/mimetypes/generic.png'></span>";

@@ -8,7 +8,6 @@ interface IStorageSection
 
     public function setAuthenticator(Authenticator $auth);
 
-
 }
 
 ?>

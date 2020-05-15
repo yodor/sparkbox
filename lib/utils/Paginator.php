@@ -24,8 +24,8 @@ class Paginator
     protected $ipp = 10;
     protected $total_rows = 0;
 
-    protected $show_next = true;
-    protected $show_prev = true;
+    protected $show_next = TRUE;
+    protected $show_prev = TRUE;
 
     protected $total_pages = 0;
     protected $page = 0;
@@ -35,9 +35,7 @@ class Paginator
 
     public $max_page_list = 7;
 
-
-    public static $page_filter_only = false;
-
+    public static $page_filter_only = FALSE;
 
     protected $sort_fields = array();
     protected $sort_components = array();
@@ -82,7 +80,6 @@ class Paginator
     {
         return $this->sort_components;
     }
-
 
     public function getSelectedSortField()
     {
@@ -180,13 +177,13 @@ class Paginator
             if ($cend > $total_pages) {
                 $cend = $total_pages;
             }
-            $show_next = false;
+            $show_next = FALSE;
             if ($cend < $total_pages) {
-                $this->show_next = true;
+                $this->show_next = TRUE;
             }
-            $show_prev = false;
+            $show_prev = FALSE;
             if ($cstart > 0) {
-                $this->show_prev = true;
+                $this->show_prev = TRUE;
 
             }
         }
@@ -195,8 +192,8 @@ class Paginator
             $cend = 1;
             $cstart = 1;
             $total_pages = 1;
-            $this->show_prev = false;
-            $this->show_next = false;
+            $this->show_prev = FALSE;
+            $this->show_next = FALSE;
         }
         $this->page = (int)$page;
         $this->page_list_end = (int)$cend;
@@ -219,7 +216,6 @@ class Paginator
 
         $page = $this->page;
         $ipp = $this->ipp;
-
 
         $order_field = NULL;
         $order_direction = $this->default_order_direction;
@@ -268,7 +264,6 @@ class Paginator
         if ($ipp > 0) {
             $filter->limit = " " . ($page * $ipp) . ", $ipp";
         }
-
 
         return $filter;
     }

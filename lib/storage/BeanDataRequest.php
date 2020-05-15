@@ -1,8 +1,8 @@
 <?php
-include_once ("storage/BeanDataResponse.php");
-include_once ("storage/ErrorResponse.php");
-include_once ("storage/ImageDataResponse.php");
-include_once ("storage/FileDataResponse.php");
+include_once("storage/BeanDataResponse.php");
+include_once("storage/ErrorResponse.php");
+include_once("storage/ImageDataResponse.php");
+include_once("storage/FileDataResponse.php");
 
 class BeanDataRequest
 {
@@ -41,19 +41,19 @@ class BeanDataRequest
             }
             $className = (string)$_GET[BeanDataRequest::KEY_CLASS];
 
-            $resp = null;
+            $resp = NULL;
 
-            if (strcmp($this->cmd, BeanDataRequest::CMD_DATA)==0) {
+            if (strcmp($this->cmd, BeanDataRequest::CMD_DATA) == 0) {
                 $resp = new FileDataResponse($id, $className);
             }
-            else if (strcmp($this->cmd, BeanDataRequest::CMD_PHOTO)==0) {
+            else if (strcmp($this->cmd, BeanDataRequest::CMD_PHOTO) == 0) {
                 $resp = new ImageDataResponse($id, $className);
             }
-            if (! ($resp instanceof BeanDataResponse)) {
+            if (!($resp instanceof BeanDataResponse)) {
                 throw new Exception("Unable to construct BeanDataResponse");
             }
 
-            $resp->skip_cache = false;
+            $resp->skip_cache = FALSE;
             $resp->send();
 
         }
@@ -63,6 +63,5 @@ class BeanDataRequest
         }
 
     }
-
 
 }

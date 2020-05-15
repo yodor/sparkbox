@@ -13,7 +13,7 @@ class CaptchaInputValidator implements IInputValidator
 
         $securimage = new Securimage();
 
-        if ($securimage->check($input->getValue()) == false) {
+        if ($securimage->check($input->getValue()) == FALSE) {
             throw new Exception("Неправилен код за сигурност!");
         }
 

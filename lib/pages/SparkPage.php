@@ -100,7 +100,7 @@ class SparkPage extends HTMLPage
         $this->actions[$action->getAttribute("action")] = $action;
     }
 
-    public function getAction($action_name) : ?Action
+    public function getAction($action_name): ?Action
     {
         if (isset($this->actions[$action_name])) {
             return $this->actions[$action_name];

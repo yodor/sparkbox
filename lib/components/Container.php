@@ -4,7 +4,7 @@ class Container extends Component
 {
     protected $items;
 
-    protected $enabled = true;
+    protected $enabled = TRUE;
 
     public function __construct()
     {
@@ -19,8 +19,8 @@ class Container extends Component
 
     public function requiredStyle()
     {
-        $arr =  parent::requiredStyle();
-        $arr[] = SPARK_LOCAL."/css/Container.css";
+        $arr = parent::requiredStyle();
+        $arr[] = SPARK_LOCAL . "/css/Container.css";
         return $arr;
     }
 
@@ -34,7 +34,7 @@ class Container extends Component
         return $this->enabled;
     }
 
-    public function count() : int
+    public function count(): int
     {
         return count($this->items);
     }
@@ -46,12 +46,12 @@ class Container extends Component
 
     public function insert(Component $cmp, int $idx)
     {
-        array_splice($this->items, $idx, 0, $cmp );
+        array_splice($this->items, $idx, 0, $cmp);
     }
 
     public function prepend(Component $cmp)
     {
-        $this->insert($cmp , 0);
+        $this->insert($cmp, 0);
     }
 
     /**
@@ -70,15 +70,15 @@ class Container extends Component
      * @param int $idx The index of the component in this container
      * @return Component
      */
-    public function get(int $idx) : Component
+    public function get(int $idx): Component
     {
         return $this->items[$idx];
     }
 
-    public function getByName(string $name) : Component
+    public function getByName(string $name): Component
     {
         $comparator = function (Component $cmp) use ($name) {
-            if (strcmp($name, $cmp->getName())==0) {
+            if (strcmp($name, $cmp->getName()) == 0) {
                 return TRUE;
             }
             return FALSE;
@@ -87,10 +87,10 @@ class Container extends Component
 
     }
 
-    public function getByClassName(string $name) : Component
+    public function getByClassName(string $name): Component
     {
         $comparator = function (Component $cmp) use ($name) {
-            if (strcmp($name, $cmp->getClassName())==0) {
+            if (strcmp($name, $cmp->getClassName()) == 0) {
                 return TRUE;
             }
             return FALSE;
@@ -99,10 +99,10 @@ class Container extends Component
 
     }
 
-    public function getByAttribute(string $name, string $value) : Component
+    public function getByAttribute(string $name, string $value): Component
     {
         $comparator = function (Component $cmp) use ($name, $value) {
-            if (strcmp($value, $cmp->getAttribute($name))==0) {
+            if (strcmp($value, $cmp->getAttribute($name)) == 0) {
                 return TRUE;
             }
             return FALSE;
@@ -110,15 +110,15 @@ class Container extends Component
         return $this->findBy($comparator);
     }
 
-    public function getByAction(string $action_value) : Component
+    public function getByAction(string $action_value): Component
     {
         return $this->getByAttribute("action", $action_value);
     }
 
-    public function findBy($callback) : ?Component
+    public function findBy($callback): ?Component
     {
         $indexes = array_keys($this->items);
-        foreach ($indexes as $idx=>$index) {
+        foreach ($indexes as $idx => $index) {
             $component = $this->get($index);
             if ($callback($component)) {
                 return $component;
@@ -127,14 +127,13 @@ class Container extends Component
         return NULL;
     }
 
-    public function renderImpl()
+    protected function renderImpl()
     {
         $indexes = array_keys($this->items);
-        foreach ($indexes as $idx=>$index) {
+        foreach ($indexes as $idx => $index) {
             $component = $this->get($index);
             $component->render();
         }
     }
-
 
 }

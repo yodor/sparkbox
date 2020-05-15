@@ -19,7 +19,7 @@ class StorageObject
         $this->data = NULL;
         $this->length = -1;
         $this->timestamp = 0;
-        $this->uid = microtime(true) . "." . rand();
+        $this->uid = microtime(TRUE) . "." . rand();
     }
 
     public function getUploadStatus()
@@ -90,12 +90,12 @@ class StorageObject
         $this->dataKey = $dataKey;
     }
 
-    public function getDataKey() : string
+    public function getDataKey(): string
     {
         return $this->dataKey;
     }
 
-    public function deconstruct(array &$row, $doEscape = true)
+    public function deconstruct(array &$row, $doEscape = TRUE)
     {
         $row[$this->dataKey] = $this->data;
 
@@ -108,7 +108,7 @@ class StorageObject
         $row["date_upload"] = $this->timestamp;
     }
 
-    public static function reconstruct(&$row, $field_name) : StorageObject
+    public static function reconstruct(&$row, $field_name): StorageObject
     {
 
         $storage_object = NULL;

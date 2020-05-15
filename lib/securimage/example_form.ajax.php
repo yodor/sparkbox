@@ -8,7 +8,6 @@ $GLOBALS['DEBUG_MODE'] = 1;
 // CHANGE TO 0 TO TURN OFF DEBUG MODE
 // IN DEBUG MODE, ONLY THE CAPTCHA CODE IS VALIDATED, AND NO EMAIL IS SENT
 
-
 // Process the form, if it was submitted
 process_si_contact_form();
 
@@ -168,7 +167,7 @@ function process_si_contact_form()
 
         $errors = array();  // initialize empty error array
 
-        if (isset($GLOBALS['DEBUG_MODE']) && $GLOBALS['DEBUG_MODE'] == false) {
+        if (isset($GLOBALS['DEBUG_MODE']) && $GLOBALS['DEBUG_MODE'] == FALSE) {
             // only check for errors if the form is not in debug mode
 
             if (strlen($name) < 3) {
@@ -197,7 +196,7 @@ function process_si_contact_form()
             require_once dirname(__FILE__) . '/securimage.php';
             $securimage = new Securimage();
 
-            if ($securimage->check($captcha) == false) {
+            if ($securimage->check($captcha) == FALSE) {
                 $errors['captcha_error'] = 'Incorrect security code entered';
             }
         }
@@ -207,7 +206,7 @@ function process_si_contact_form()
             $time = date('r');
             $message = "A message was submitted from the contact form.  The following information was provided.<br /><br />" . "Name: $name<br />" . "Email: $email<br />" . "URL: $URL<br />" . "Message:<br />" . "<pre>$message</pre>" . "<br /><br />IP Address: {$_SERVER['REMOTE_ADDR']}<br />" . "Time: $time<br />" . "Browser: " . htmlspecialchars($_SERVER['HTTP_USER_AGENT']) . "<br />";
 
-            if (isset($GLOBALS['DEBUG_MODE']) && $GLOBALS['DEBUG_MODE'] == false) {
+            if (isset($GLOBALS['DEBUG_MODE']) && $GLOBALS['DEBUG_MODE'] == FALSE) {
                 // send the message with mail()
                 mail($GLOBALS['ct_recipient'], $GLOBALS['ct_msg_subject'], $message, "From: {$GLOBALS['ct_recipient']}\r\nReply-To: {$email}\r\nContent-type: text/html; charset=ISO-8859-1\r\nMIME-Version: 1.0");
             }

@@ -5,7 +5,6 @@ include_once("input/DataInput.php");
 class URLValidator implements IInputValidator
 {
 
-
     public function validate(DataInput $input)
     {
         $val = $input->getValue();

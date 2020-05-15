@@ -14,7 +14,6 @@ CREATE TABLE `site_texts` (
 ) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_unicode_ci
 ";
 
-
     public function __construct()
     {
         parent::__construct("site_texts");

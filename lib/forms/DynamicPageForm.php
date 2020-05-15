@@ -15,8 +15,8 @@ class DynamicPageForm extends InputForm
 
         $field = new DataInput("content", "Content", 1);
         $rend = new MCETextArea($field);
-//        $rend->setAttribute("rows", 20);
-//        $rend->setAttribute("cols", 80);
+        //        $rend->setAttribute("rows", 20);
+        //        $rend->setAttribute("cols", 80);
         $this->addInput($field);
 
         $field = new DataInput("item_date", "Date", 0);

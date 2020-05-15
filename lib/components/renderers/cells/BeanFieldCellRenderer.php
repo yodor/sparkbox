@@ -4,9 +4,8 @@ include_once("components/renderers/cells/TableCellRenderer.php");
 class BeanFieldCellRenderer extends TableCellRenderer
 {
 
-    protected $bean = false;
-    protected $field_name = false;
-
+    protected $bean = FALSE;
+    protected $field_name = FALSE;
 
     public function __construct(DBTableBean $bean, string $field_name)
     {
@@ -27,7 +26,7 @@ class BeanFieldCellRenderer extends TableCellRenderer
         $qry->exec();
 
         if ($brow = $qry->next()) {
-            $this->value =  $brow[$this->field_name];
+            $this->value = $brow[$this->field_name];
         }
     }
 }

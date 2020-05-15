@@ -10,8 +10,8 @@ class MenuItem
     protected $w = 0;
     protected $h = 0;
 
-    protected $selected = false;
-    protected $disabled = false;
+    protected $selected = FALSE;
+    protected $disabled = FALSE;
 
     protected $parent_item = NULL;
 
@@ -19,7 +19,7 @@ class MenuItem
 
     protected $childNodes = array();
 
-    protected $need_translate = true;
+    protected $need_translate = TRUE;
 
     public static $icon_path = SPARK_LOCAL . "/images/admin/spark_icons/";
 
@@ -28,13 +28,13 @@ class MenuItem
         $this->title = $title;
         $this->href = $href;
         $this->icon = $icon;
-        $this->need_translate = true;
+        $this->need_translate = TRUE;
     }
     //flag for renderers to handle the title translation themselves - enableTranslation(true) - default - uses tr($title)
     //enableTranslation(false) -  title is already translated translation in MainMenu::constructMenuItems 
     public function enableTranslation($mode)
     {
-        $this->need_translate = (($mode > 0) ? true : false);
+        $this->need_translate = (($mode > 0) ? TRUE : FALSE);
     }
 
     public function needTranslate()
@@ -44,7 +44,7 @@ class MenuItem
 
     public function setDisabled($mode)
     {
-        $this->disabled = (($mode > 0) ? true : false);
+        $this->disabled = (($mode > 0) ? TRUE : FALSE);
     }
 
     public function isDisabled()
@@ -59,7 +59,7 @@ class MenuItem
 
     public function setSelected($mode)
     {
-        $this->selected = (($mode > 0) ? true : false);
+        $this->selected = (($mode > 0) ? TRUE : FALSE);
     }
 
     public function setTarget($target)

@@ -50,7 +50,6 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      */
     protected $transact_bean;
 
-
     public $accepted_tags;
 
     public function __construct(DataInput $input)
@@ -66,7 +65,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         $this->transact_bean = $bean;
     }
 
-    public function getTransactBean() : ?DBTableBean
+    public function getTransactBean(): ?DBTableBean
     {
         return $this->transact_bean;
     }
@@ -86,7 +85,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             debug("transact_bean is null  nothing to do in beforeCommit");
             return;
         }
-        if (strcmp($this->transact_bean->getTableName(), $transactor->getBean()->getTableName())==0) {
+        if (strcmp($this->transact_bean->getTableName(), $transactor->getBean()->getTableName()) == 0) {
             throw new Exception("Field transact error for field: '" . $this->input->getName() . "'. Data source bean and main transaction bean are the same - '" . get_class($this->transact_bean) . "'");
         }
 
@@ -469,7 +468,6 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         $this->input->setValue($values);
 
     }
-
 
     /**
      * Load value using arr as input

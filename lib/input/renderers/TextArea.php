@@ -15,7 +15,6 @@ class TextArea extends InputField
         echo "</textarea>";
     }
 
-
 }
 
 ?>

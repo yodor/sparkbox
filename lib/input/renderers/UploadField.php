@@ -1,7 +1,6 @@
 <?php
 include_once("input/renderers/InputField.php");
 
-
 abstract class PlainUpload extends InputFieldTag
 {
 

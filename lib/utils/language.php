@@ -3,11 +3,9 @@ include_once("beans/LanguagesBean.php");
 include_once("beans/SiteTextsBean.php");
 include_once("beans/SiteTextUsageBean.php");
 
-
 include_once("beans/TranslationBeansBean.php");
 include_once("beans/TranslationPhrasesBean.php");
 include_once("utils/Session.php");
-
 
 //TODO: check usage when this file is included from js.php files that include the main/top session.php
 
@@ -20,7 +18,6 @@ $g_bt = new TranslationBeansBean();
 function setLanguageString(string $str, $page_dir = "LTR")
 {
     global $g_lb;
-
 
     if (strcmp($str, "arabic") == 0) {
         $page_dir = "RTL";
@@ -71,7 +68,6 @@ function setLanguage(string $str, int $langID, $page_dir)
     Session::SetCookie("langID", "$langID");
 }
 
-
 //sane defaults
 if (!Session::Contains("language") || !Session::Contains("langID")) {
     if (Session::HaveCookie("langID")) {
@@ -84,9 +80,7 @@ if (!Session::Contains("language") || !Session::Contains("langID")) {
     }
 }
 
-
 $reload = FALSE;
-
 
 if (isset($_GET["change_language"]) && isset($_GET["language"])) {
     $lng = $_GET["language"];
@@ -158,7 +152,6 @@ function trbean(int $id, string $field_name, array &$row, string $tableName)
     if ($btrow = $qry->next()) {
         $row[$field_name] = $btrow["translated"];
     }
-
 
 }
 

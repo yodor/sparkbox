@@ -172,7 +172,7 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at top position");
         }
 
-        debug("ID: $id position - current: $pos new: ".($pos - 1));
+        debug("ID: $id position - current: $pos new: " . ($pos - 1));
 
         $db = $this->db;
         try {
@@ -213,8 +213,7 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at bottom position");
         }
 
-        debug("ID: $id position - current: $pos new: ".($pos + 1));
-
+        debug("ID: $id position - current: $pos new: " . ($pos + 1));
 
         $db = $this->db;
         try {

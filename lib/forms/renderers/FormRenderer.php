@@ -1,5 +1,5 @@
 <?php
-include_once("components/Component.php");
+include_once("components/Container.php");
 include_once("components/InputComponent.php");
 include_once("components/Container.php");
 
@@ -11,7 +11,7 @@ class FieldSet extends Component
 
 }
 
-class FormRenderer extends Component
+class FormRenderer extends Container
 {
     protected $form;
     protected $submitButton;
@@ -47,7 +47,7 @@ class FormRenderer extends Component
 
         $button = new ColorButton();
         $button->setAttribute("action", "submit");
-        $button->setText("Submit");
+        $button->setContents("Submit");
         $button->setType(ColorButton::TYPE_SUBMIT);
         $button->setName(FormRenderer::SUBMIT_NAME);
 
@@ -150,7 +150,6 @@ class FormRenderer extends Component
         }
     }
 
-
     protected function renderImpl()
     {
         $this->renderInputs();
@@ -161,8 +160,6 @@ class FormRenderer extends Component
             $this->renderSubmitValue();
         }
     }
-
-
 
     public function renderInputs()
     {
@@ -204,7 +201,7 @@ class FormRenderer extends Component
 
     public function renderSubmitValue()
     {
-        echo "<input type=hidden name='".FormRenderer::SUBMIT_NAME."' value='".$this->getSubmitValue()."'>";
+        echo "<input type=hidden name='" . FormRenderer::SUBMIT_NAME . "' value='" . $this->getSubmitValue() . "'>";
     }
 
     public function getSubmitValue()

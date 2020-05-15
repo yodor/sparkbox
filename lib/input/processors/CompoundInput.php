@@ -24,13 +24,10 @@ class CompoundInput extends InputProcessor
         }
     }
 
-
     public function loadPostData(array &$arr)
     {
 
-
         $field_name = $this->input->getName();
-
 
         foreach ($this->compound_names as $idx => $subname) {
             $compound_name = $subname . "_" . $field_name; //ex for field birthdate => year_birthdate, month_birthdate, day_birthdate
@@ -75,7 +72,6 @@ class CompoundInput extends InputProcessor
             $this->input->setValue(implode($this->concat_char, $this->compound_values));
 
         }
-
 
     }
 

@@ -54,7 +54,7 @@ class ImagePopup extends Component implements IPhotoRenderer
         $this->storageItem->id = $id;
     }
 
-    public function getID() : int
+    public function getID(): int
     {
         return $this->storageItem->id;
     }
@@ -69,7 +69,7 @@ class ImagePopup extends Component implements IPhotoRenderer
         $this->storageItem->className = get_class($bean);
     }
 
-    public function getBeanClass() : string
+    public function getBeanClass(): string
     {
         return $this->storageItem->className;
     }

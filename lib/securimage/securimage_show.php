@@ -44,7 +44,6 @@
  *
  */
 
-
 // Remove the "//" from the following line for debugging problems
 // error_reporting(E_ALL); ini_set('display_errors', 1);
 
@@ -73,7 +72,6 @@ $img = new Securimage(array('captcha_type' => Securimage::SI_CAPTCHA_MATHEMATIC)
 
 // set namespace if supplied to script via HTTP GET
 if (!empty($_GET['namespace'])) $img->setNamespace($_GET['namespace']);
-
 
 $img->show();  // outputs the image and content headers to the browser
 // alternate use:

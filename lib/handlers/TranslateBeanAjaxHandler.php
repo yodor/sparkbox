@@ -3,7 +3,6 @@ include_once("beans/SiteTextsBean.php");
 include_once("beans/TranslationBeansBean.php");
 include_once("handlers/JSONRequestHandler.php");
 
-
 class TranslateBeanAjaxHandler extends JSONRequestHandler
 {
 
@@ -40,10 +39,8 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
         if (!isset($_GET["field_name"])) throw new Exception("field_name not passed");
         $this->field_name = DBConnections::Get()->escape($_GET["field_name"]);
 
-
         if (!isset($_GET["bean_class"])) throw new Exception("bean_class not passed");
         $this->bean_class = $_GET["bean_class"];
-
 
         if ($this->langID < 1) throw new Exception(self::languageAlertText());
 
@@ -53,7 +50,6 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
         $this->table_name = $bean->getTableName();
 
     }
-
 
     protected function _store(JSONResponse $ret)
     {
@@ -91,12 +87,10 @@ class TranslateBeanAjaxHandler extends JSONRequestHandler
 
         $ret->btID = $btID;
 
-
     }
 
     protected function _fetch(JSONResponse $ret)
     {
-
 
         global $g_bt;
 

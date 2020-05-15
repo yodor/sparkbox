@@ -7,7 +7,7 @@ class PhoneField extends InputField
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-        $this->is_compound = true;
+        $this->is_compound = TRUE;
     }
 
     public function renderImpl()
@@ -41,7 +41,6 @@ class PhoneField extends InputField
 
         echo "</div>";
     }
-
 
 }
 

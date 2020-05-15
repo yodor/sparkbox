@@ -16,7 +16,7 @@ class CheckboxFieldCellRenderer extends TableCellRenderer
     protected function renderImpl()
     {
         echo "<div class='value'>";
-        echo "<input type=checkbox name='select_{$this->field}[]'  value='".attributeValue($this->value)."'>";
+        echo "<input type=checkbox name='select_{$this->field}[]'  value='" . attributeValue($this->value) . "'>";
         echo "<span>{$this->value}</span>";
         echo "</div>";
     }

@@ -25,7 +25,6 @@ class LoginForm extends InputForm
 
     }
 
-
 }
 
 ?>

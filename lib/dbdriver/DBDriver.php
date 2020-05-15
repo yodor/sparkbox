@@ -20,7 +20,7 @@ abstract class DBDriver
         $this->shutdown();
     }
 
-    abstract public function getError() : string;
+    abstract public function getError(): string;
 
     abstract public function query(string $str);
 
@@ -30,7 +30,7 @@ abstract class DBDriver
 
     abstract public function dateTime($add_days = 0, $interval_type = " DAY ");
 
-    abstract public function lastID() : int;
+    abstract public function lastID(): int;
 
     abstract public function commit();
 
@@ -38,9 +38,9 @@ abstract class DBDriver
 
     abstract public function transaction();
 
-    abstract public function numRows($res) : int;
+    abstract public function numRows($res): int;
 
-    abstract public function numFields($res) : int;
+    abstract public function numFields($res): int;
 
     abstract public function fieldName($res, int $pos);
 

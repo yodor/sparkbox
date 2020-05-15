@@ -36,17 +36,17 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     protected function initButtons()
     {
         $btn_translate = new ColorButton();
-        $btn_translate->setText("Translate");
+        $btn_translate->setContents("Translate");
         $btn_translate->setAttribute("action", "Translate");
         $this->buttonsBar->append($btn_translate);
 
         $btn_clear = new ColorButton();
-        $btn_clear->setText("Clear");
+        $btn_clear->setContents("Clear");
         $btn_clear->setAttribute("action", "Clear");
         $this->buttonsBar->append($btn_clear);
 
         $btn_close = new ColorButton();
-        $btn_close->setText("Close");
+        $btn_close->setContents("Close");
         $btn_close->setAttribute("action", "Close");
         $this->buttonsBar->append($btn_close);
     }

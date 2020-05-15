@@ -18,12 +18,12 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
         $this->height = $height;
     }
 
-    public function getPhotoWidth() : int
+    public function getPhotoWidth(): int
     {
         return $this->width;
     }
 
-    public function getPhotoHeight() : int
+    public function getPhotoHeight(): int
     {
         return $this->height;
     }
@@ -35,7 +35,6 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
         $this->setPhotoSize(-1, 64);
 
     }
-
 
     public function getHTML(FileStorageObject &$object, string $field_name)
     {
@@ -58,7 +57,6 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
 
         //gc_collect_cycles();
 
-
         if (!($object instanceof FileStorageObject)) {
             throw new Exception("Incorrect storage object received");
         }
@@ -73,7 +71,7 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
             $scaler->process($object->getData(), $object->getLength(), $mime);
         }
         else {
-           $scaler->process(file_get_contents($object->getTempName()), filesize($object->getTempName()), $mime);
+            $scaler->process(file_get_contents($object->getTempName()), filesize($object->getTempName()), $mime);
         }
 
         //temporary resize for base64_encode returned in ajax response
@@ -105,11 +103,10 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
     {
         $validator = new ImageUploadValidator();
         //turn off resizing during ajax calls. resizing will be done on the final submit of form
-        $validator->setResizeEnabled(false);
+        $validator->setResizeEnabled(FALSE);
         //$validator->setResizedSize($this->width, $this->height);
         return $validator;
     }
-
 
 }
 

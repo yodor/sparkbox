@@ -27,7 +27,6 @@ class LinkTableCellRenderer extends TableCellRenderer
         $this->action->setData($row);
         $this->action->setContents($this->value);
 
-
     }
 }
 

@@ -41,7 +41,6 @@ class ImageDimensionForm extends InputForm
 class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStorageSection
 {
 
-
     protected $field_name = NULL;
 
     protected $section_name = "global";
@@ -78,12 +77,10 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
     {
         parent::parseParams();
 
-
     }
 
     public function getHTML(FileStorageObject &$object, $field_name)
     {
-
 
     }
 
@@ -91,11 +88,10 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
     {
         $id = $imgrow["imageID"];
 
-
         ob_start();
         echo "<div class='Element' imageID=$id>";
         echo "<div class='remove_button'>X</div>";
-        $img_href = StorageItem::Image($id, "MCEImagesBean", -1,128);
+        $img_href = StorageItem::Image($id, "MCEImagesBean", -1, 128);
         echo "<img class='image_contents' src='$img_href'>";
         echo "</div>";
         $html = ob_get_contents();
@@ -123,11 +119,9 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
         $qry->select->fields = " section, section_key, imageID, ownerID, auth_context ";
 
-
         $num_images = $qry->exec();
 
         $resp->objects = array();
-
 
         while ($imgrow = $qry->next()) {
             $resp->objects[] = $this->createUploadElement($imgrow);
@@ -136,7 +130,6 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         $resp->result_count = $num_images;
 
     }
-
 
     protected function assignUploadObjects(JSONResponse $resp, FileStorageObject $upload_object)
     {
@@ -173,7 +166,6 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
         $resp->result_count = 1;
     }
 
-
     protected function _remove(JSONResponse $resp)
     {
 
@@ -188,14 +180,13 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
             $authClass = $image_row["auth_context"];
             $ownerID = (int)$image_row["ownerID"];
 
-            $context = Authenticator::AuthorizeResource($image_row["auth_context"], NULL, false);
+            $context = Authenticator::AuthorizeResource($image_row["auth_context"], NULL, FALSE);
 
             if ($ownerID > 0 && $context->getID() != $ownerID) throw new Exception(tr("Authorization failed"));
 
         }
 
         if (!$bean->deleteID($imageID)) throw new Exception(tr("Unable to delete: ") . $bean->getDB()->getError());
-
 
     }
 
@@ -205,10 +196,8 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
         $imageID = (int)$_GET["imageID"];
 
-
         $form = new ImageDimensionForm();
         $frend = new FormRenderer($form);
-
 
         echo "<div class='ImageDimensionComponent'>";
 

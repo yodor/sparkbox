@@ -21,22 +21,20 @@ class MCEImageBrowserDialog extends MessageDialog
 
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
-        $this->show_close_button = false;
+        $this->show_close_button = FALSE;
 
         $this->buttons = array();
 
         $btn_cancel = new ColorButton();
-        $btn_cancel->setText("Close");
+        $btn_cancel->setContents("Close");
         $btn_cancel->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
         $this->buttons[MessageDialog::BUTTON_ACTION_CANCEL] = $btn_cancel;
-
 
         $this->handler = new MCEImageBrowserAjaxHandler();
         RequestController::addAjaxHandler($this->handler);
 
         $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
         $this->image_input->getRenderer()->assignUploadHandler($this->handler);
-
 
         $this->icmp = new InputComponent($this->image_input);
 
@@ -59,7 +57,6 @@ class MCEImageBrowserDialog extends MessageDialog
         $this->handler = $handler;
     }
 
-
     //final method
     public function renderImpl()
     {
@@ -70,7 +67,6 @@ class MCEImageBrowserDialog extends MessageDialog
 
         echo "</form>";
 
-
         echo tr("Existing Images") . ": ";
         echo "<BR>";
 
@@ -79,9 +75,7 @@ class MCEImageBrowserDialog extends MessageDialog
         echo "</div>";
         echo "</div>";
 
-
     }
-
 
 }
 

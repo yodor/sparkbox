@@ -1,7 +1,6 @@
 <?php
 include_once("beans/DBTableBean.php");
 
-
 class UsersBean extends DBTableBean
 {
 
@@ -20,7 +19,6 @@ class UsersBean extends DBTableBean
  PRIMARY KEY (`userID`),
  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-
 
     public function __construct()
     {

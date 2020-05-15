@@ -27,11 +27,10 @@ class ServerImagesBean extends ArrayDataIterator
 
         $dir = $this->folder;
 
-
         $files = array();
 
         $dh = opendir($dir);
-        while (false !== ($filename = readdir($dh))) {
+        while (FALSE !== ($filename = readdir($dh))) {
             if (is_dir($filename)) continue;
             if (strcmp($filename, ".") == 0) continue;
             if (strcmp($filename, "..") == 0) continue;
@@ -56,10 +55,11 @@ class ServerImagesBean extends ArrayDataIterator
             $mime = $size["mime"];
             $date_upload = date("Y-m-d H:m:i", filemtime($filename));
 
-            $this->values[] = array($this->key => $idx, $this->value_key => $filename, "width" => $width, "height" => $height, "size" => filesize($filename), "mime" => $mime, "date_upload" => $date_upload);
+            $this->values[] = array($this->key    => $idx, $this->value_key => $filename, "width" => $width,
+                                    "height"      => $height, "size" => filesize($filename), "mime" => $mime,
+                                    "date_upload" => $date_upload);
 
         }
-
 
     }
 

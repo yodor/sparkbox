@@ -15,7 +15,6 @@ class DynamicPagesBean extends OrderedDataBean
  PRIMARY KEY (`dpID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-
     public function __construct()
     {
         parent::__construct("dynamic_pages");

@@ -22,29 +22,26 @@ class MySQLiDriver extends DBDriver
         $host = $props->host;
 
         if ($persistent) {
-            $host = "p:".$host;
+            $host = "p:" . $host;
         }
 
         $this->conn = @new mysqli($host, $props->user, $props->pass, $props->database, $props->port);
 
         if ($this->conn->connect_errno) {
-            throw new Exception("Error connecting to database server: ". $this->conn->connect_error);
+            throw new Exception("Error connecting to database server: " . $this->conn->connect_error);
         }
 
-        $this->conn->autocommit(false);
+        $this->conn->autocommit(FALSE);
         $this->conn->set_charset("utf8");
 
-
         $this->conn->query("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ");
-        $this->conn->query( "SET collation_connection = 'utf8_general_ci' ");
+        $this->conn->query("SET collation_connection = 'utf8_general_ci' ");
 
-        $this->conn->query( "SET character_set_results = 'utf8'");
+        $this->conn->query("SET character_set_results = 'utf8'");
         $this->conn->query("SET character_set_connection = 'utf8'");
-        $this->conn->query( "SET character_set_client = 'utf8'");
-
+        $this->conn->query("SET character_set_client = 'utf8'");
 
         DBConnections::$conn_count++;
-
 
     }
 
@@ -59,7 +56,7 @@ class MySQLiDriver extends DBDriver
 
     }
 
-    public function getError() : string
+    public function getError(): string
     {
         return $this->conn->error;
     }
@@ -83,13 +80,13 @@ class MySQLiDriver extends DBDriver
         return $this->conn->query($str);
     }
 
-    public function numRows($res) : int
+    public function numRows($res): int
     {
         $res = $this->assert_resource($res);
         return $res->num_rows;
     }
 
-    public function numFields($res) : int
+    public function numFields($res): int
     {
         $res = $this->assert_resource($res);
         return $res->field_count;
@@ -102,7 +99,7 @@ class MySQLiDriver extends DBDriver
         return $arr[$pos];
     }
 
-    protected function assert_resource(&$res) : mysqli_result
+    protected function assert_resource(&$res): mysqli_result
     {
         if (!($res instanceof mysqli_result)) throw new Exception("No valid mysqli_resource passed");
         return $res;
@@ -130,7 +127,7 @@ class MySQLiDriver extends DBDriver
         }
     }
 
-    public function lastID() : int
+    public function lastID(): int
     {
         return $this->conn->insert_id;
     }
@@ -162,13 +159,13 @@ class MySQLiDriver extends DBDriver
 
     public function fieldType(string $table, string $field_name)
     {
-        $found = false;
-        $ret = false;
+        $found = FALSE;
+        $ret = FALSE;
         $res = $this->queryFields($table);
         while ($row = $this->fetch($res)) {
             if (strcmp($row["Field"], $field_name) == 0) {
                 $ret = $row["Type"];
-                $found = true;
+                $found = TRUE;
                 break;
             }
         }
@@ -178,7 +175,6 @@ class MySQLiDriver extends DBDriver
     }
 
     //enum('T1','TIR','CIM')
-
 
     public function tableExists(string $table)
     {

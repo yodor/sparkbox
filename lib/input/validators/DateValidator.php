@@ -11,16 +11,16 @@ class DateValidator implements IInputValidator
 
         if (count($pieces) != 3) {
 
-            return false;
+            return FALSE;
         }
 
-        $ret = false;
+        $ret = FALSE;
         try {
             $year = $pieces[0];
             $month = $pieces[1];
             $day = $pieces[2];
             DateValidator::validateDate($year, $month, $day);
-            $ret = true;
+            $ret = TRUE;
         }
         catch (Exception $e) {
 
@@ -41,7 +41,6 @@ class DateValidator implements IInputValidator
         return $ret;
 
     }
-
 
     protected static function validateDate($year, $month, $day)
     {
@@ -66,16 +65,14 @@ class DateValidator implements IInputValidator
         }
 
         $u_date = strtotime($year . "-" . $month . "-" . $day);
-        if ($u_date === false) {
+        if ($u_date === FALSE) {
             throw new Exception("Incorrect Date");
         }
-
 
     }
 
     public function validate(DataInput $input)
     {
-
 
         $pieces = explode("-", $input->getValue());
 
@@ -83,11 +80,9 @@ class DateValidator implements IInputValidator
             throw new Exception("Incorrect date (date format)");
         }
 
-
         $year = $pieces[0];
         $month = $pieces[1];
         $day = $pieces[2];
-
 
         try {
             DateValidator::validateDate($year, $month, $day);
@@ -102,7 +97,6 @@ class DateValidator implements IInputValidator
                 }
             }
         }
-
 
     }
 

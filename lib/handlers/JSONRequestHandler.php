@@ -3,13 +3,12 @@ include_once("beans/SiteTextsBean.php");
 include_once("beans/TranslationBeansBean.php");
 include_once("handlers/RequestHandler.php");
 
-
 abstract class JSONRequestHandler extends RequestHandler
 {
 
     protected $supported_content = NULL;
     protected $content_type = "";
-    protected $response_send = false;
+    protected $response_send = FALSE;
 
     public function __construct(string $cmd)
     {
@@ -19,14 +18,13 @@ abstract class JSONRequestHandler extends RequestHandler
 
         $class_methods = get_class_methods($this);
         foreach ($class_methods as $key => $fname) {
-            if (strpos($fname, "_") === 0 && strpos($fname, "__") === false) {
+            if (strpos($fname, "_") === 0 && strpos($fname, "__") === FALSE) {
                 $supported_content = str_replace("_", "", $fname);
                 $this->supported_content[] = $supported_content;
             }
         }
 
         debug("Accepting commands: ", $this->supported_content);
-
 
     }
 
@@ -79,7 +77,7 @@ abstract class JSONRequestHandler extends RequestHandler
 
         ob_end_clean();
         $ret->response();
-        $this->response_send = true;
+        $this->response_send = TRUE;
 
     }
 
@@ -92,7 +90,7 @@ abstract class JSONRequestHandler extends RequestHandler
 
         if (is_array($err)) {
 
-            debug($this,"error_get_last: ", $err);
+            debug($this, "error_get_last: ", $err);
 
             if (!$this->response_send) {
 

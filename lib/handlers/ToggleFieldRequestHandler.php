@@ -17,7 +17,7 @@ class ToggleFieldRequestHandler extends RequestHandler
 
         $this->bean = $bean;
 
-        $this->need_confirm = true;
+        $this->need_confirm = TRUE;
     }
 
     protected function parseParams()
@@ -62,7 +62,7 @@ class ToggleFieldRequestHandler extends RequestHandler
 
             if (!$this->bean->update($this->item_id, $update_row, $db)) throw new Exception("Unable to toggle field: " . $db->getError());
             $db->commit();
-            $success = true;
+            $success = TRUE;
             header("Location: {$this->cancel_url}");
             exit;
         }

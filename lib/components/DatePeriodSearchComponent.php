@@ -10,7 +10,6 @@ class DatePeriodSearchComponent extends Component
     protected $pstart = NULL;
     protected $pend = NULL;
 
-
     public $formadd = "";
 
     public function __construct()

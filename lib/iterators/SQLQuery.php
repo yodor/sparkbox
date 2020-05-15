@@ -7,20 +7,20 @@ class SQLQuery implements IDataIterator
     /**
      * @var SQLSelect|null
      */
-    public $select = null;
+    public $select = NULL;
 
     /**
      * @var DBDriver
      */
-    protected $db = null;
+    protected $db = NULL;
     protected $key = "";
     protected $name = "";
 
-    protected $res = null;
+    protected $res = NULL;
 
     protected $numResults = 0;
 
-    public function __construct(SQLSelect $select, string $primaryKey = "id", string $tableName="")
+    public function __construct(SQLSelect $select, string $primaryKey = "id", string $tableName = "")
     {
 
         $this->select = $select;
@@ -36,14 +36,14 @@ class SQLQuery implements IDataIterator
         $this->db->free($this->res);
     }
 
-    public function exec() : int
+    public function exec(): int
     {
         $this->db->free($this->res);
 
         $this->res = $this->db->query($this->select->getSQL());
 
         if (!$this->res) {
-            debug("Error: ".$this->db->getError()." SQL: ".$this->select->getSQL());
+            debug("Error: " . $this->db->getError() . " SQL: " . $this->select->getSQL());
             throw new Exception($this->db->getError());
         }
 
@@ -59,18 +59,18 @@ class SQLQuery implements IDataIterator
     public function next()
     {
         if (!$this->res) throw new Exception("Not executed yet");
-        
+
         $ret = $this->db->fetch($this->res);
         if (!$ret) $this->db->free($this->res);
         return $ret;
     }
 
-    public function key() : string
+    public function key(): string
     {
         return $this->key;
     }
 
-    public function getDB() : DBDriver
+    public function getDB(): DBDriver
     {
         return $this->db;
     }
@@ -80,12 +80,12 @@ class SQLQuery implements IDataIterator
         $this->db = $db;
     }
 
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }
 
-    public function count() : int
+    public function count(): int
     {
         return $this->numResults;
     }
@@ -95,7 +95,7 @@ class SQLQuery implements IDataIterator
         $this->bean = $bean;
     }
 
-    public function bean() : ?DBTableBean
+    public function bean(): ?DBTableBean
     {
         return $this->bean;
     }

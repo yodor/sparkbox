@@ -28,7 +28,6 @@ class SelectOption extends DataIteratorItem
         echo $this->label;
     }
 
-
 }
 
 class SelectField extends DataIteratorField
@@ -55,8 +54,8 @@ class SelectField extends DataIteratorField
         //prepare the default select value
         if ($this->na_label) {
 
-//            $data = array($this->getItemRenderer()->getValueKey()=>$this->na_value,
-//                $this->getItemRenderer()->getLabelKey()=>$this->na_label);
+            //            $data = array($this->getItemRenderer()->getValueKey()=>$this->na_value,
+            //                $this->getItemRenderer()->getLabelKey()=>$this->na_label);
 
             $item = $this->item;
 
@@ -83,7 +82,7 @@ class SelectField extends DataIteratorField
         parent::finishRenderItems();
     }
 
-    protected function isModelSelected() : bool
+    protected function isModelSelected(): bool
     {
         $field_values = $this->input->getValue();
         $selected = FALSE;

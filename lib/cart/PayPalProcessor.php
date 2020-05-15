@@ -47,7 +47,6 @@ class PayPalSale
         $this->ItemPrice = $ItemPrice; // course title
         $this->ItemQty = $ItemQty; // 1
 
-
     }
 
     public function setPayerID($payerID)
@@ -179,7 +178,6 @@ class PayPalSaleDetails
             $this->response[$key] = urldecode($val);
         }
 
-
     }
 
     public function getPayerID()
@@ -290,7 +288,6 @@ class PayPalProcessor
         //Respond according to message we receive from Paypal
         if ("SUCCESS" == strtoupper($httpParsedResponseAr["ACK"]) || "SUCCESSWITHWARNING" == strtoupper($httpParsedResponseAr["ACK"])) {
 
-
             return $httpParsedResponseAr["TOKEN"];
 
         }
@@ -302,15 +299,12 @@ class PayPalProcessor
     public function confirmPayment(PayPalSale $sale)
     {
 
-
         $padata = "&TOKEN=" . urlencode($sale->getPaymentToken()) . "&PAYERID=" . urlencode($sale->getPayerID()) . "&PAYMENTREQUEST_0_PAYMENTACTION=" . urlencode("SALE") .
 
             //set item info here, otherwise we won"t see product details later
             "&L_PAYMENTREQUEST_0_NAME0=" . urlencode($sale->getItemName()) . "&L_PAYMENTREQUEST_0_NUMBER0=" . urlencode($sale->getItemNumber()) . "&L_PAYMENTREQUEST_0_DESC0=" . urlencode($sale->getItemDesc()) . "&L_PAYMENTREQUEST_0_AMT0=" . urlencode($sale->getItemPrice()) . "&L_PAYMENTREQUEST_0_QTY0=" . urlencode($sale->getItemQty()) .
 
-
             "&PAYMENTREQUEST_0_ITEMAMT=" . urlencode($sale->getTotalPrice()) . "&PAYMENTREQUEST_0_TAXAMT=" . urlencode($sale->getTaxAmount()) . "&PAYMENTREQUEST_0_SHIPPINGAMT=" . urlencode($sale->getShippingCost()) . "&PAYMENTREQUEST_0_HANDLINGAMT=" . urlencode($sale->getHandlingCost()) . "&PAYMENTREQUEST_0_INSURANCEAMT=" . urlencode($sale->getInsuranceCost()) . "&PAYMENTREQUEST_0_AMT=" . urlencode($sale->getGrandTotal()) . "&PAYMENTREQUEST_0_CURRENCYCODE=" . urlencode($this->currency_code);
-
 
         $httpParsedResponseAr = $this->PPHttpPost("DoExpressCheckoutPayment", $padata);
 

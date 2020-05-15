@@ -16,7 +16,7 @@ class StorageItem
 
     public function hrefImage(int $width = -1, int $height = -1)
     {
-        if ($width>0 || $height>0) {
+        if ($width > 0 || $height > 0) {
 
             if ($width == $height) {
                 return $this->hrefThumb($width);
@@ -28,29 +28,29 @@ class StorageItem
 
     public function hrefFull()
     {
-        return STORAGE_LOCAL . "?cmd=image&".$this->getParameters();
+        return STORAGE_LOCAL . "?cmd=image&" . $this->getParameters();
     }
 
     public function hrefCrop($width, $height)
     {
-        return STORAGE_LOCAL . "?cmd=image&".$this->getParameters()."&width=$width&height=$height";
+        return STORAGE_LOCAL . "?cmd=image&" . $this->getParameters() . "&width=$width&height=$height";
     }
 
     public function hrefThumb($width)
     {
-        return STORAGE_LOCAL . "?cmd=image&".$this->getParameters()."&size=$width";
+        return STORAGE_LOCAL . "?cmd=image&" . $this->getParameters() . "&size=$width";
     }
 
     public function hrefFile()
     {
-        return STORAGE_LOCAL . "?cmd=data&".$this->getParameters();
+        return STORAGE_LOCAL . "?cmd=data&" . $this->getParameters();
     }
 
     public function getParameters()
     {
-        $ret =  "id={$this->id}&class={$this->className}";
+        $ret = "id={$this->id}&class={$this->className}";
         if ($this->field) {
-            $ret.="&field={$this->field}";
+            $ret .= "&field={$this->field}";
         }
         return $ret;
     }
@@ -62,7 +62,7 @@ class StorageItem
         if (is_object($className)) {
             $className = get_class($className);
         }
-        else if (strlen($className)<1) {
+        else if (strlen($className) < 1) {
             throw new Exception("Classname required");
         }
         $item->className = $className;
@@ -70,10 +70,10 @@ class StorageItem
         return $item;
     }
 
-    public static function Image(int $id, $className, int $width=-1, int $height=-1)
+    public static function Image(int $id, $className, int $width = -1, int $height = -1)
     {
         $item = StorageItem::Create($id, $className);
-        return $item->hrefImage($width,$height);
+        return $item->hrefImage($width, $height);
     }
 
 }

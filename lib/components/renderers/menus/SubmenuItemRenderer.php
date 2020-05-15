@@ -1,7 +1,6 @@
 <?php
 include_once("components/renderers/menus/MenuItemRenderer.php");
 
-
 class SubmenuItemRenderer extends MenuItemRenderer
 {
 
@@ -62,7 +61,6 @@ class SubmenuItemRenderer extends MenuItemRenderer
 
         echo "\n";
 
-
         echo "<a class='SubmenuItemLink' href='$href' $target >";
 
         if ($this->getMenuItem()->getIcon()) {
@@ -81,7 +79,6 @@ class SubmenuItemRenderer extends MenuItemRenderer
         }
 
         echo "</div>"; //SubmenuItemOuter
-
 
     }
 

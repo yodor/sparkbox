@@ -9,11 +9,9 @@ class GroupsBean extends DBTableBean
     //   PRIMARY KEY  (`groupID`)
     // ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 
-
     public function __construct()
     {
         parent::__construct("groups");
     }
-
 
 }

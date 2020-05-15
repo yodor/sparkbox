@@ -14,7 +14,6 @@ class ArrayField extends InputField
      */
     protected $controls;
 
-
     /**
      * Remove element action of the element source
      * @var Action
@@ -43,9 +42,8 @@ class ArrayField extends InputField
         $button_add->setType(ColorButton::TYPE_BUTTON);
         $button_add->setName(ArrayField::DEFAULT_CONTROL_NAME);
         $button_add->setAttribute("action", ArrayField::DEFAULT_CONTROL_ACTION);
-        $button_add->setText(ArrayField::DEFAULT_CONTROL_TEXT);
+        $button_add->setContents(ArrayField::DEFAULT_CONTROL_TEXT);
         $this->addControl($button_add);
-
 
         $this->action = new Action("Remove");
 
@@ -56,7 +54,7 @@ class ArrayField extends InputField
         $this->element_renderer = $renderer;
     }
 
-    public function getElementRenderer() : ?InputField
+    public function getElementRenderer(): ?InputField
     {
         return $this->element_renderer;
     }
@@ -92,7 +90,7 @@ class ArrayField extends InputField
     /**
      * @return Container
      */
-    public function getControls() : Container
+    public function getControls(): Container
     {
         return $this->controls;
     }
@@ -110,17 +108,17 @@ class ArrayField extends InputField
 
         $this->controls->render();
 
-//        echo "<div class='ArrayControls' field='" .  . "'>";
-//
-//        foreach ($this->controls as $name => $cmp) {
-//            if (strcasecmp($name, ArrayField::DEFAULT_CONTROL_NAME) == 0) {
-//                $add_text = tr(ArrayField::DEFAULT_CONTROL_NAME) . " " . tr($this->input->getLabel());
-//                $cmp->setText($add_text);
-//            }
-//            $cmp->render();
-//        }
-//
-//        echo "</div>";
+        //        echo "<div class='ArrayControls' field='" .  . "'>";
+        //
+        //        foreach ($this->controls as $name => $cmp) {
+        //            if (strcasecmp($name, ArrayField::DEFAULT_CONTROL_NAME) == 0) {
+        //                $add_text = tr(ArrayField::DEFAULT_CONTROL_NAME) . " " . tr($this->input->getLabel());
+        //                $cmp->setText($add_text);
+        //            }
+        //            $cmp->render();
+        //        }
+        //
+        //        echo "</div>";
     }
 
     public function renderElementSource()
@@ -149,7 +147,6 @@ class ArrayField extends InputField
         echo "<div class='ArrayContents' field='" . $this->input->getName() . "'>";
 
         $values = $this->input->getValue();
-
 
         if (is_array($values)) {
 
