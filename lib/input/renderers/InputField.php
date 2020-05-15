@@ -1,5 +1,5 @@
 <?php
-include_once("components/Component.php");
+include_once("components/Container.php");
 include_once("input/renderers/IErrorRenderer.php");
 include_once("components/renderers/IDataIteratorRenderer.php");
 

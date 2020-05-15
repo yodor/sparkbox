@@ -9,7 +9,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     public function __construct()
     {
         parent::__construct("Translate", "bean_translator");
-        $this->show_close_button = TRUE;
+        //$this->show_close_button = TRUE;
 
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
 

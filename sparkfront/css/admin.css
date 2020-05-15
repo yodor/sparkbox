@@ -198,15 +198,15 @@ IMG {
 
 
 
-.InputFormView[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
+.BeanFormEditor[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
     display: block;
 }
 
-.InputFormView[bean='AdminUsersBean'] .InputComponent[field="password"] {
+.BeanFormEditor[bean='AdminUsersBean'] .InputComponent[field="password"] {
     display: none;
 }
 
-.InputFormView[bean='AdminUsersBean'] .InputComponent[field="password1"] {
+.BeanFormEditor[bean='AdminUsersBean'] .InputComponent[field="password1"] {
     display: none;
 }
 
@@ -215,12 +215,12 @@ IMG {
     font-weight: bold;
 }
 
-.InputFormView[bean='MenuItemsBean'] .FormRenderer .InputField {
+.BeanFormEditor[bean='MenuItemsBean'] .FormRenderer .InputField {
     min-width: 400px;
 
 }
 
-.InputFormView .FormRenderer .InputField.MCETextArea TEXTAREA {
+.BeanFormEditor .FormRenderer .InputField.MCETextArea TEXTAREA {
     height: 150px;
     /*   max-height:150px; */
 }
@@ -230,7 +230,7 @@ IMG {
 }
 
 
-.InputFormView > .caption:first-child {
+.BeanFormEditor > .caption:first-child {
     color: #656565;
     font-size: 20px;
     /* font-weight: bold; */
@@ -268,12 +268,12 @@ IMG {
 .AdminLoginPage.forgot_password .FormRenderer .SubmitLine .Buttons {
     display:block;
 }
-.admin_layout .KeywordSearchComponent {
+.admin_layout .KeywordSearch {
     display:block;
 }
-.admin_layout .KeywordSearchComponent .InputComponent[field='keyword'] .InputLabel {
+.admin_layout .KeywordSearch .InputComponent[field='keyword'] .InputLabel {
     display:none !important;
 }
-.admin_layout .KeywordSearchComponent .SubmitLine .Buttons>* {
+.admin_layout .KeywordSearch .SubmitLine .Buttons>* {
     margin-left: 0.3em;
 }

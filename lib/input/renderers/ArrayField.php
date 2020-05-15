@@ -43,9 +43,12 @@ class ArrayField extends InputField
         $button_add->setName(ArrayField::DEFAULT_CONTROL_NAME);
         $button_add->setAttribute("action", ArrayField::DEFAULT_CONTROL_ACTION);
         $button_add->setContents(ArrayField::DEFAULT_CONTROL_TEXT);
+
+
         $this->addControl($button_add);
 
-        $this->action = new Action("Remove");
+        $this->action = new Action("Remove","");
+        $this->action->getURL()->setKeepRequestParams(false);
 
     }
 
@@ -108,17 +111,6 @@ class ArrayField extends InputField
 
         $this->controls->render();
 
-        //        echo "<div class='ArrayControls' field='" .  . "'>";
-        //
-        //        foreach ($this->controls as $name => $cmp) {
-        //            if (strcasecmp($name, ArrayField::DEFAULT_CONTROL_NAME) == 0) {
-        //                $add_text = tr(ArrayField::DEFAULT_CONTROL_NAME) . " " . tr($this->input->getLabel());
-        //                $cmp->setText($add_text);
-        //            }
-        //            $cmp->render();
-        //        }
-        //
-        //        echo "</div>";
     }
 
     public function renderElementSource()
@@ -135,6 +127,7 @@ class ArrayField extends InputField
         $renderer->render();
 
         echo "<div class='Controls'>";
+
         $this->action->render();
         echo "</div>";
 

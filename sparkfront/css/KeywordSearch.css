@@ -1,0 +1,30 @@
+
+.KeywordSearch {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    border-collapse: collapse !important;
+    margin-bottom:1em;
+    margin-top:1em;
+}
+
+
+.KeywordSearch .InputComponent {
+    display: inline-block !important;
+    vertical-align: top;
+}
+
+.KeywordSearch .Container {
+    padding: 0;
+    margin: 0;
+    vertical-align: top;
+}
+
+.KeywordSearch .Container.SubmitLine {
+    display: inline-block !important;
+}
+
+.KeywordSearch .Container.TextSpace {
+    display: none;
+}

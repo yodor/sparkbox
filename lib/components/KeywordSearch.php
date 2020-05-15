@@ -5,7 +5,7 @@ include_once("utils/IQueryFilter.php");
 include_once("forms/renderers/FormRenderer.php");
 include_once("components/TextComponent.php");
 
-class KeywordSearchComponent extends FormRenderer implements IQueryFilter
+class KeywordSearch extends FormRenderer implements IQueryFilter
 {
 
     const ACTION_SEARCH = "search";
@@ -33,10 +33,10 @@ class KeywordSearchComponent extends FormRenderer implements IQueryFilter
 
         $qry = $_REQUEST;
 
-        if (strcmp_isset(KeywordSearchComponent::SUBMIT_KEY, KeywordSearchComponent::ACTION_CLEAR, $qry) === TRUE) {
+        if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_CLEAR, $qry) === TRUE) {
 
             $this->form->clearQuery($qry);
-            unset($qry[KeywordSearchComponent::SUBMIT_KEY]);
+            unset($qry[KeywordSearch::SUBMIT_KEY]);
 
             $qstr = queryString($qry);
             $loc = $_SERVER["PHP_SELF"] . "$qstr";
@@ -44,7 +44,7 @@ class KeywordSearchComponent extends FormRenderer implements IQueryFilter
             header("Location: $loc");
             exit;
         }
-        else if (strcmp_isset(KeywordSearchComponent::SUBMIT_KEY, KeywordSearchComponent::ACTION_SEARCH, $qry) === TRUE) {
+        else if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $qry) === TRUE) {
             $this->form->loadPostData($qry);
             $this->form->validate();
             $this->have_filter = TRUE;
@@ -57,17 +57,17 @@ class KeywordSearchComponent extends FormRenderer implements IQueryFilter
         $submit_search = new ColorButton();
         $submit_search->setType(ColorButton::TYPE_SUBMIT);
         $submit_search->setContents("Search");
-        $submit_search->setName(KeywordSearchComponent::SUBMIT_KEY);
-        $submit_search->setValue(KeywordSearchComponent::ACTION_SEARCH);
-        $submit_search->setAttribute("action", KeywordSearchComponent::ACTION_SEARCH);
+        $submit_search->setName(KeywordSearch::SUBMIT_KEY);
+        $submit_search->setValue(KeywordSearch::ACTION_SEARCH);
+        $submit_search->setAttribute("action", KeywordSearch::ACTION_SEARCH);
         $this->getButtons()->append($submit_search);
 
         $submit_clear = new ColorButton();
         $submit_clear->setType(ColorButton::TYPE_SUBMIT);
         $submit_clear->setContents("Clear");
-        $submit_clear->setName(KeywordSearchComponent::SUBMIT_KEY);
-        $submit_clear->setValue(KeywordSearchComponent::ACTION_CLEAR);
-        $submit_clear->setAttribute("action", KeywordSearchComponent::ACTION_CLEAR);
+        $submit_clear->setName(KeywordSearch::SUBMIT_KEY);
+        $submit_clear->setValue(KeywordSearch::ACTION_CLEAR);
+        $submit_clear->setAttribute("action", KeywordSearch::ACTION_CLEAR);
         $this->getButtons()->append($submit_clear);
 
     }
@@ -90,7 +90,7 @@ class KeywordSearchComponent extends FormRenderer implements IQueryFilter
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/KeywordSearchComponent.css";
+        $arr[] = SPARK_LOCAL . "/css/KeywordSearch.css";
         return $arr;
     }
 

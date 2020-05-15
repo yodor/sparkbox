@@ -140,7 +140,12 @@ class Component implements IRenderer, IHeadContents
 
     protected function renderImpl()
     {
-        echo $this->contents;
+        if ($this->translation_enabled) {
+            echo tr($this->contents);
+        }
+        else {
+            echo $this->contents;
+        }
     }
 
     public function finishRender()

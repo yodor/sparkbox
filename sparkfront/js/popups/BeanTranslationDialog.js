@@ -34,8 +34,8 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
     this.modal_pane.showID(this.cls);
 
     //bean_id, field_name, bean_class
-    var bean_id = $(".InputFormView").attr("editID");
-    var bean_class = $(".InputFormView").attr("bean");
+    var bean_id = $(".BeanFormEditor").attr("editID");
+    var bean_class = $(".BeanFormEditor").attr("bean");
 
 
     var popup = this.modal_pane.popup();

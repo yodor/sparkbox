@@ -89,12 +89,15 @@ class Action extends DataIteratorItem
     {
 
         if ($this->check_code) {
-            debug("Action has check_code anonymous function set");
+            debug("Action has check_code anonymous function set: ".$this->getContents());
             $check_code = $this->check_code;
             if (!$check_code($this, $row)) {
                 debug("check_code disabled rendering of this action");
                 $this->render_enabled = FALSE;
                 return;
+            }
+            else {
+                $this->render_enabled = TRUE;
             }
         }
 
