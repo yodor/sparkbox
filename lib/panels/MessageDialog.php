@@ -10,18 +10,17 @@ class MessageDialog extends Component implements IPageComponent
     const TYPE_INFO = 2;
     const TYPE_QUESTION = 3;
 
-
     const BUTTON_ACTION_CONFIRM = "confirm";
     const BUTTON_ACTION_CANCEL = "cancel";
     const BUTTON_ACTION_CLOSE = "close";
 
     protected $type = MessageDialog::TYPE_INFO;
-    protected $buttons = array();
 
     protected $title = "";
     protected $id = "";
     protected $icon_class = "";
 
+    protected $buttonsBar;
 
     public $show_close_button = false;
 
@@ -32,20 +31,24 @@ class MessageDialog extends Component implements IPageComponent
         $this->title = $title;
         $this->id = $id;
 
-        $this->attributes["id"] = $id;
+        $this->setAttribute("id", $id);
 
-        $btn_ok = new ColorButton();
-        $btn_ok->setText("OK");
-        $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
-        $btn_ok->setAttribute("default_action", 1);
+        $this->setAttribute("name", $id);
 
-        $this->buttons[MessageDialog::BUTTON_ACTION_CONFIRM] = $btn_ok;
+        $this->buttonsBar = new Container();
+        $this->buttonsBar->setClassName("buttons_bar");
 
         $this->setClassName("PopupPanel");
 
+        $this->setDialogType($this->type);
 
-        $this->setDialogType(MessageDialog::TYPE_INFO);
+        $this->initButtons();
 
+    }
+
+    public function getID()
+    {
+        return $this->id;
     }
 
     public function requiredStyle()
@@ -62,37 +65,39 @@ class MessageDialog extends Component implements IPageComponent
         return $arr;
     }
 
-    public function clearButtons()
+    protected function initButtons()
     {
-        $this->buttons = array();
+        $btn_ok = new ColorButton();
+        $btn_ok->setText("OK");
+        $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
+        $btn_ok->setAttribute("default_action", 1);
+        $this->buttonsBar->append($btn_ok);
     }
 
-    public function getButtonForAction($action)
+    public function getButtons() : Container
     {
-        if (isset($this->buttons[$action])) return $this->buttons[$action];
-        return NULL;
+        return $this->buttonsBar;
     }
 
-    public function getButtonAt($pos)
+    public function setDialogType($type)
     {
-        $key_pos = array_values(array_keys($this->buttons));
+        $this->type = $type;
 
-        return $this->buttons[$key_pos[$pos]];
-    }
+        $icon_class = "";
+        if ($this->type == MessageDialog::TYPE_ERROR) {
+            $icon_class = "icon_error";
+        }
+        else if ($this->type == MessageDialog::TYPE_QUESTION) {
+            $icon_class = "icon_question";
+        }
+        else if ($this->type == MessageDialog::TYPE_INFO) {
+            $icon_class = "icon_info";
+        }
+        else if ($this->type == MessageDialog::TYPE_PLAIN) {
+            $icon_class = "";
+        }
 
-    public function getButton($text)
-    {
-        return $this->buttons[$text];
-    }
-
-    public function appendButton(ColorButton $btn)
-    {
-        $this->buttons[$btn->getText()] = $btn;
-    }
-
-    public function getButtons()
-    {
-        return $this->buttons;
+        $this->icon_class = $icon_class;
     }
 
     public function startRender()
@@ -103,12 +108,12 @@ class MessageDialog extends Component implements IPageComponent
         if (strlen($this->title) > 0) {
             echo "<div class='caption'>";
 
-            if ($this->show_close_button) {
-                $b = new ColorButton();
-                $b->setText("X");
-                $b->setAttribute("action", MessageDialog::BUTTON_ACTION_CLOSE);
-                $b->render();
-            }
+//            if ($this->show_close_button) {
+//                $b = new ColorButton();
+//                $b->setText("X");
+//                $b->setAttribute("action", MessageDialog::BUTTON_ACTION_CLOSE);
+//                $b->render();
+//            }
 
             echo "<span class='caption_text'>" . tr($this->title) . "</span>";
 
@@ -128,12 +133,6 @@ class MessageDialog extends Component implements IPageComponent
         }
     }
 
-    public function renderImpl()
-    {
-
-
-    }
-
     public function finishRender()
     {
         if ($this->type === MessageDialog::TYPE_PLAIN) {
@@ -145,7 +144,7 @@ class MessageDialog extends Component implements IPageComponent
 
         echo "<div class=clear></div>";
 
-        $this->drawButtons();
+        $this->buttonsBar->render();
 
         echo "<div class=clear></div>";
 
@@ -156,41 +155,7 @@ class MessageDialog extends Component implements IPageComponent
 
     }
 
-    public function drawButtons()
-    {
-        if (count($this->buttons) > 0) {
-            echo "<div class='buttons_bar'>";
-            foreach ($this->buttons as $pos => $btn) {
-                // 			echo "<div class='button_slot'>";
-                $btn->render();
-                // 			echo "</div>";
-            }
-            echo "<div class=clear></div>";
-            echo "</div>";
-        }
-    }
 
-    public function setDialogType($type)
-    {
-        $this->type = $type;
-
-        $icon_class = "";
-        if ($this->type == MessageDialog::TYPE_ERROR) {
-            $icon_class = "icon_error";
-        }
-        else if ($this->type == MessageDialog::TYPE_QUESTION) {
-            $icon_class = "icon_question";
-        }
-        else if ($this->type == MessageDialog::TYPE_INFO) {
-            $icon_class = "icon_info";
-        }
-        else if ($this->type == MessageDialog::TYPE_PLAIN) {
-            $icon_class = "";
-            $this->clearButtons();
-        }
-
-        $this->icon_class = $icon_class;
-    }
 
 
 }

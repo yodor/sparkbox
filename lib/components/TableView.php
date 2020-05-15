@@ -9,7 +9,7 @@ include_once("components/renderers/cells/CallbackTableCellRenderer.php");
 include_once("components/renderers/cells/ActionsTableCellRenderer.php");
 include_once("components/renderers/cells/BooleanFieldCellRenderer.php");
 
-include_once("actions/Action.php");
+include_once("components/Action.php");
 
 class TableView extends AbstractResultView implements IHeadContents
 {
@@ -94,7 +94,7 @@ class TableView extends AbstractResultView implements IHeadContents
 
                 $tc = $this->getColumn($name);
                 $emptyRow = array();
-                $tc->getHeaderCellRenderer()->setData($emptyRow, $tc);
+                $tc->getHeaderCellRenderer()->setData($emptyRow);
                 $tc->getHeaderCellRenderer()->render();
             }
 
@@ -109,14 +109,13 @@ class TableView extends AbstractResultView implements IHeadContents
         parent::finishRender();
     }
 
-
     protected function renderImpl()
     {
 
         $v = new ValueInterleave("even", "odd");
         $this->position_index = 0;
 
-        while ($row = $this->itr->next()) {
+        while ($row = $this->iterator->next()) {
 
             $cls = $v->value();
 
@@ -131,7 +130,7 @@ class TableView extends AbstractResultView implements IHeadContents
 
                 $cellr->setClassName($cls);
 
-                $cellr->setData($row, $tc);
+                $cellr->setData($row);
 
                 $cellr->render();
             }
@@ -143,9 +142,7 @@ class TableView extends AbstractResultView implements IHeadContents
             $v->advance();
         }
 
-
     }
-
 
 }
 

@@ -8,7 +8,8 @@
 }
 
 .KeywordSearchComponent .FormRenderer {
-    border-spacing: 0.25em;
+    /*border-spacing: 0.25em;*/
+    border-collapse: collapse;
 }
 
 .KeywordSearchComponent .InputComponent {

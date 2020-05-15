@@ -17,7 +17,7 @@ class ImageDimensionForm extends InputForm
         $render_modes = new ArrayDataIterator($modes, "id", "label");
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "render_mode", "Render Mode", 0);
-        $field->getRenderer()->setItemIterator($render_modes);
+        $field->getRenderer()->setIterator($render_modes);
         $field->getRenderer()->getItemRenderer()->setValueKey("id");
         $field->getRenderer()->getItemRenderer()->setLabelKey("label");
         $field->getRenderer()->na_label = "";

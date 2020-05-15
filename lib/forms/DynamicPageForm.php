@@ -34,7 +34,7 @@ class DynamicPageForm extends InputForm
         $sel = new ArrayDataIterator(array("Notices"));
         //
         $rend = new SelectField($field);
-        $rend->setItemIterator($sel);
+        $rend->setIterator($sel);
         //
         $rend->na_label = "Normal";
         $rend->na_value = "";

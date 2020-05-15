@@ -280,7 +280,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
                     debug("renderer_source_copy_fields ... ");
                     $renderer = $this->input->getRenderer();
                     if (!$renderer instanceof DataIteratorField) throw new Exception("Renderer not instance of DataIteratorField");
-                    $qry = $renderer->getItemIterator();
+                    $qry = $renderer->getIterator();
 
                     $qry->select->where = $renderer->getItemRenderer()->getValueKey() . "='$value'";
                     $qry->select->fields = implode(", ", $this->renderer_source_copy_fields);

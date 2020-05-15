@@ -10,55 +10,51 @@ abstract class DataIteratorItem extends Component
     protected $label_key;
 
     protected $data = array();
-    protected $index = -1;
 
     protected $label = "";
     protected $value = "";
 
-    protected $id = "";
-    protected $name = "";
-    protected $key_name = "";
+    protected $id = -1;
 
     //render html attributes from data_row
     protected $data_attributes = array();
 
-    protected $user_attributes = "";
-
     protected $selected = FALSE;
 
-    public function addDataAttribute($name)
+    /**
+     * During setData set the attribute '$name' to the value of $row[$field]
+     * @param string $name
+     * @param string $field
+     */
+    public function addDataAttribute(string $name, string $field="")
     {
-        $this->data_attributes[] = $name;
+        if (!$field)$field = $name;
+        $this->data_attributes[$name] = $field;
     }
 
-    public function getDataAttributes()
+    public function getDataAttributes() : array
     {
         return $this->data_attributes;
     }
 
-    public function setUserAttributes($attr_text)
-    {
-        $this->user_attributes = $attr_text;
-    }
-
-    public function setIndex($index)
-    {
-        $this->index = $index;
-    }
-
-    public function setLabel($label)
+    public function setLabel(string $label)
     {
         $this->label = $label;
     }
-    public function getLabel() : string
+
+    public function getLabel(): string
     {
         return $this->label;
     }
 
-    public function setID($id)
+    public function setID(int $id)
     {
-        //source model id
         $this->id = $id;
+    }
+
+    public function getID(): int
+    {
+        return $this->id;
     }
 
     public function setValueKey(string $field)
@@ -76,7 +72,7 @@ abstract class DataIteratorItem extends Component
         $this->label_key = $field;
     }
 
-    public function getLabelKey() : string
+    public function getLabelKey(): string
     {
         return $this->label_key;
     }
@@ -85,13 +81,10 @@ abstract class DataIteratorItem extends Component
     {
         $this->value = $value;
     }
+
     public function getValue()
     {
         return $this->value;
-    }
-    public function setName($name)
-    {
-        $this->name = $name;
     }
 
     public function __construct()
@@ -104,7 +97,7 @@ abstract class DataIteratorItem extends Component
     {
         parent::processAttributes();
 
-        if ($this->index>-1) {
+        if ($this->index > -1) {
             $this->setAttribute("index", $this->index);
         }
     }
@@ -122,17 +115,31 @@ abstract class DataIteratorItem extends Component
     public function setData(array $data)
     {
         $this->data = $data;
-        foreach ($this->data_attributes as $idx => $name) {
-            if (isset($this->data[$name])) {
-                $this->setAttribute($name, $this->data[$name]);
+
+        foreach ($this->data_attributes as $attributeName => $fieldName) {
+            if (isset($this->data[$fieldName])) {
+                $this->setAttribute($attributeName, $this->data[$fieldName]);
             }
         }
 
-        $this->value = isset($data[$this->value_key]) ? $data[$this->value_key] : "";
-        $this->label = $data[$this->label_key];
+        if ($this->value_key) {
+            if (isset($data[$this->value_key])) {
+                $this->value = isset($data[$this->value_key]) ? $data[$this->value_key] : "";
+            }
+        }
+
+        if ($this->label_key) {
+            if (isset($data[$this->label_key])) {
+                $this->label = $data[$this->label_key];
+            }
+        }
 
     }
 
+    public function renderSeparator(int $idx_curr, int $items_total)
+    {
+
+    }
 }
 
 ?>

@@ -1,16 +1,15 @@
 <?php
-include_once("components/Component.php");
-include_once("components/ItemView.php");
-include_once("components/renderers/IItemRenderer.php");
+include_once("components/renderers/items/DataIteratorItem.php");
 include_once("components/renderers/IPhotoRenderer.php");
-include_once("components/renderers/ActionRenderer.php");
+include_once("components/ItemView.php");
+include_once("components/Action.php");
 
-class GalleryViewItemRenderer extends Component implements IItemRenderer, IActionsCollection, IPhotoRenderer
+
+class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IPhotoRenderer
 {
 
     protected $actions = array();
 
-    protected $item = NULL;
 
     /**
      * @var GalleryView
@@ -18,9 +17,9 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     protected $view;
 
     /**
-     * @var ActionRenderer
+     * @var Action
      */
-    protected $actionRenderer;
+    protected $action;
 
     /**
      * @var ImagePopup
@@ -41,26 +40,27 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     {
         parent::__construct();
         $this->view = $view;
-        $this->actionRenderer = new ActionRenderer();
+        $this->action = new Action();
         $this->image_popup = new ImagePopup();
+        $this->image_popup->setClassName("image_slot");
     }
 
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/ActionRenderer.css";
+        $arr[] = SPARK_LOCAL . "/css/Action.css";
         return $arr;
     }
 
-    public function setItem($item)
+    public function setData(array $item)
     {
-        $this->item = $item;
+        parent::setData($item);
 
         if (isset($item["position"])) {
             $this->setAttribute("position", $item["position"]);
         }
 
-        $photoID = (int)$this->item[$this->view->getBean()->key()];
+        $photoID = (int)$item[$this->view->getBean()->key()];
 
         $this->setAttribute("itemID", $photoID);
 
@@ -72,11 +72,15 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
         $this->image_popup->setID($photoID);
         $this->image_popup->setBeanClass(get_class($this->view->getBean()));
 
-        $tooltip = tr("Caption") . ": " . $this->item["caption"]."<BR>";
-        $tooltip .= tr("Upload Date") . ": " . dateFormat($this->item["date_upload"], TRUE);
+
+        $tooltip = tr("Upload Date") . ": " . dateFormat($item["date_upload"], TRUE);
+
+        if (isset($item["caption"])) {
+            $this->image_popup->setAttribute("caption", $item["caption"]);
+            $tooltip.= tr("Caption") . ": " . $item["caption"]."<BR>";
+        }
 
         $this->image_popup->setAttribute("tooltip", $tooltip);
-        $this->image_popup->setAttribute("caption", $item["caption"]);
 
         $this->image_popup->setName($this->image_popup->getBeanClass() . "." . $this->image_popup->getID());
 
@@ -84,12 +88,12 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
             $this->position = $item["position"];
         }
 
+        $actions = array_keys($this->actions);
+        foreach ($actions as $idx => $contents) {
+            $action = $this->getAction($contents);
+            $action->setData($item);
+        }
 
-    }
-
-    public function getItem()
-    {
-        return $this->item;
     }
 
     public function setPhotoSize(int $width, int $height)
@@ -109,12 +113,12 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
 
     public function addAction(Action $a)
     {
-        $this->actions[$a->getTitle()] = $a;
+        $this->actions[$a->getContents()] = $a;
     }
 
-    public function getAction(string $title): Action
+    public function getAction(string $contents): Action
     {
-        return $this->actions[$title];
+        return $this->actions[$contents];
     }
 
     public function setActions(array $actions)
@@ -140,21 +144,15 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
 
         echo "<div class='item_actions'>";
 
-        $this->actionRenderer->render_title = TRUE;
-
         if (isset($this->actions["Edit"])) {
-            $this->actionRenderer->setAction($this->actions["Edit"]);
-            $this->actionRenderer->setData($this->item);
-            $this->actionRenderer->render();
+            $this->actions["Edit"]->render();
         }
 
-        $this->actionRenderer->setAction(new PipeSeparatorAction());
-        $this->actionRenderer->render();
+        $pipe = new PipeSeparator();
+        $pipe->render();
 
         if (isset($this->actions["Delete"])) {
-            $this->actionRenderer->setAction($this->actions["Delete"]);
-            $this->actionRenderer->setData($this->item);
-            $this->actionRenderer->render();
+            $this->actions["Delete"]->render();
         }
 
         echo "</div>"; // item actions
@@ -178,11 +176,10 @@ class GalleryViewItemRenderer extends Component implements IItemRenderer, IActio
     {
         if (!isset($this->actions[$title])) return;
 
-        $this->actionRenderer->render_title = FALSE;
+        $action = $this->actions[$title];
 
-        $this->actionRenderer->setAction($this->actions[$title]);
-        $this->actionRenderer->setData($this->item);
-        $this->actionRenderer->render();
+        $action->setContents("");
+        $action->render();
 
     }
 

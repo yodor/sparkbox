@@ -41,10 +41,10 @@ class ToggleFieldRequestHandler extends RequestHandler
 
     }
 
-    public function createAction($title = "Toggle", $href_add = "", $check_code = "return 1;", $parameters_array = array())
+    public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array())
     {
 
-        $parameters = array(new ActionParameter("item_id", $this->bean->key()));
+        $parameters = array(new DataParameter("item_id", $this->bean->key()));
 
         return new Action($title, "?cmd={$this->cmd}&$href_add", array_merge($parameters, $parameters_array), $check_code);
 

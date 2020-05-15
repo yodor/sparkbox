@@ -7,11 +7,13 @@ class CheckItem extends DataIteratorItem
 
     public function renderImpl()
     {
+        //TODO: find a way to set individual attributes
+        $attrs = $this->prepareAttributes();
 
         //hackish! - force submit of unchecked checkbox
         echo "<input type='hidden' name='{$this->name}' value=''>";
 
-        echo "<input type='checkbox' value='{$this->value}' name='{$this->name}' {$this->user_attributes}";
+        echo "<input type='checkbox' value='{$this->value}' name='{$this->name}' $attrs ";
         if ($this->isSelected()) echo "CHECKED";
 
         echo ">";
@@ -29,17 +31,17 @@ class CheckField extends DataIteratorField
         $this->setItemRenderer(new CheckItem());
     }
 
+
     public function renderImpl()
     {
 
         if (!$this->iterator) {
 
-            $item = $this->item;
+            $item = clone $this->item;
 
             $item->setValue(1);
             $item->setName($this->input->getName());
             $item->setSelected($this->input->getValue() ? TRUE : FALSE);
-            $item->setUserAttributes($this->prepareInputAttributes());
 
             echo "<div class='FieldElements'>";
             $item->render();

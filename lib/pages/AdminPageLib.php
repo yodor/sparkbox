@@ -31,8 +31,8 @@ class AdminPageLib extends SparkPage
     {
 
         $this->auth = new AdminAuthenticator();
-        $this->loginURL = LOCAL."admin/login.php";
-        $this->authorized_access = true;
+        $this->loginURL = LOCAL . "admin/login.php";
+        $this->authorized_access = TRUE;
 
         parent::__construct();
 
@@ -50,17 +50,16 @@ class AdminPageLib extends SparkPage
         $dynmenu = new PageSessionMenu($this->context, $this->initMainMenu());
 
         $this->menu_bar = new MenuBarComponent($dynmenu);
-        $this->menu_bar->toggle_first = false;
+        $this->menu_bar->toggle_first = FALSE;
         $this->menu_bar->setName("admin_menu");
         $this->menu_bar->setClassName("admin_menu");
 
         $this->menu_bar->setAttribute("submenu_popup", "0");
 
-
-        $this->addCSS(SPARK_LOCAL . "/css/admin.css", false);
-        $this->addCSS(SPARK_LOCAL . "/css/admin_buttons.css", false);
-        $this->addCSS(SPARK_LOCAL . "/css/admin_menu.css", false);
-        $this->addCSS(SPARK_LOCAL . "/css/admin.css", false);
+        $this->addCSS(SPARK_LOCAL . "/css/admin.css", FALSE);
+        $this->addCSS(SPARK_LOCAL . "/css/admin_buttons.css", FALSE);
+        $this->addCSS(SPARK_LOCAL . "/css/admin_menu.css", FALSE);
+        $this->addCSS(SPARK_LOCAL . "/css/admin.css", FALSE);
 
     }
 
@@ -84,10 +83,8 @@ class AdminPageLib extends SparkPage
 
         $caption = "";
 
-
         $dynmenu = $this->menu_bar->getMainMenu();
         $arr = $dynmenu->getSelectedPath();
-
 
         //default caption of page from MenuItem
         if (count($arr) > 0) {
@@ -98,7 +95,6 @@ class AdminPageLib extends SparkPage
             }
         }
 
-
         //property caption
         if ($this->caption) {
             $caption = $this->caption;
@@ -107,15 +103,12 @@ class AdminPageLib extends SparkPage
             $caption = $str;
         }
 
-
         if ($caption) {
             echo "<div class='page_caption'>";
 
-
             if (count($this->actions) > 0) {
-                $renderer = new ActionRenderer();
                 echo "<div class='page_actions'>";
-                $renderer->renderActions($this->actions);
+                Action::RenderActions($this->actions);
                 echo "</div>";
             }
             echo $caption;
@@ -123,13 +116,12 @@ class AdminPageLib extends SparkPage
         }
     }
 
-
     public function haveRole($role)
     {
         return in_array($role, $this->roles) || (count($this->roles) == 0);
     }
 
-    public function checkAccess($role, $do_redirect = true)
+    public function checkAccess($role, $do_redirect = TRUE)
     {
         $ret = $this->haveRole($role);
         if (!$ret && $do_redirect) {
@@ -147,9 +139,7 @@ class AdminPageLib extends SparkPage
         if (count($arr) > 0) {
             echo "<div class='LocationPath'>";
             echo "<label>" . tr("Location") . ": </label>";
-            $act = new ActionRenderer();
-            $act->enableSeparator(true);
-            $act->renderActions($dynmenu->getSelectedPath());
+            Action::RenderActions($dynmenu->getSelectedPath(), TRUE);
             echo "</div>";
         }
 
@@ -162,7 +152,6 @@ class AdminPageLib extends SparkPage
         echo "<span class='text_admin'>Welcome, $fullname</span>";
         ColorButton::RenderButton("Logout", ADMIN_LOCAL . "logout.php");
         echo "</div>";
-
 
     }
 
@@ -195,9 +184,7 @@ class AdminPageLib extends SparkPage
 
         echo "<td class='left_menu'>";
 
-
         $this->menu_bar->render();
-
 
         if (is_callable("drawMenuPrivate")) {
             call_user_func("drawMenuPrivate", $this);
@@ -233,7 +220,7 @@ class AdminPageLib extends SparkPage
     const ACTION_ADD = "add";
     const ACTION_BACK = "back";
 
-    public static function CreateAction(string $action, string $title = "", array $parameters = array()) : Action
+    public static function CreateAction(string $action, string $title = "", array $parameters = array()): Action
     {
         $action_add = new Action("", "$action.php", $parameters);
         $action_add->setAttribute("action", $action);

@@ -11,9 +11,9 @@ class SelectOption extends DataIteratorItem
 
     public function startRender()
     {
-        $attribs = $this->prepareAttributes();
+        //$attribs = $this->prepareAttributes();
 
-        echo "<option value='{$this->value}' $attribs ";
+        echo "<option value='{$this->value}'  ";
         if ($this->selected) echo "SELECTED";
         echo ">";
     }
@@ -49,7 +49,8 @@ class SelectField extends DataIteratorField
         parent::startRenderItems();
 
         $attrs = $this->prepareInputAttributes();
-        echo "<select $attrs >";
+
+        echo "<select $attrs>";
 
         //prepare the default select value
         if ($this->na_label) {

@@ -14,7 +14,7 @@ class MenuItemForm extends InputForm
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "link", "Link", 1);
-        $field->content_after = "<a class='ActionRenderer DynamicPageChooser' href='" . ADMIN_LOCAL . "content/pages/list.php?chooser=1'>" . tr("Choose Dynamic Page") . "</a>";
+        $field->content_after = "<a class='Action DynamicPageChooser' href='" . ADMIN_LOCAL . "content/pages/list.php?chooser=1'>" . tr("Choose Dynamic Page") . "</a>";
         $this->addInput($field);
 
         $field = new DataInput("parentID", "Parent Menu", 1);
@@ -25,7 +25,7 @@ class MenuItemForm extends InputForm
         $rend->na_label = "--- TOP ---";
         $rend->na_value = "-1";
 
-        $rend->setItemIterator(new SQLQuery($source->selectTree(array("menu_title")), "menuID", $source->getTableName()));
+        $rend->setIterator(new SQLQuery($source->selectTree(array("menu_title")), "menuID", $source->getTableName()));
         $rend->getItemRenderer()->setValueKey("menuID");
         $rend->getItemRenderer()->setLabelKey("menu_title");
 

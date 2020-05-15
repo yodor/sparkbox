@@ -1,30 +1,32 @@
 <?php
 include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/Action.php");
 
 class LinkTableCellRenderer extends TableCellRenderer
 {
 
-    protected $renderer = NULL;
+    protected $action;
 
     public function __construct(Action $act)
     {
         parent::__construct();
 
-        $this->renderer = new ActionRenderer($act);
+        $this->action = $act;
 
     }
 
     protected function renderImpl()
     {
-        $this->renderer->render();
+        $this->action->render();
     }
 
     public function setData(array &$row)
     {
         parent::setData($row);
 
-        $this->renderer->getAction()->setTitle($this->value);
-        $this->renderer->setData($row);
+        $this->action->setData($row);
+        $this->action->setContents($this->value);
+
 
     }
 }

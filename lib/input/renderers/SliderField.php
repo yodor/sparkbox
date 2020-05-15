@@ -6,20 +6,19 @@ class SliderField extends InputField
 
     public $accepted_values = NULL;
 
-    protected function prepareInputAttributes(): string
+    protected function processInputAttributes()
     {
 
+        parent::processInputAttributes();
         $field_value = htmlentities(mysql_real_unescape_string($this->input->getValue()), ENT_QUOTES, "UTF-8");
         $this->setInputAttribute("type", "hidden");
         $this->setInputAttribute("value", $field_value);
 
         if (is_array($this->accepted_values)) {
-            $this->setInputAttribute("increments" , implode("|", $this->accepted_values));
+            $this->setInputAttribute("increments", implode("|", $this->accepted_values));
             $this->setInputAttribute("min", 0);
             $this->setInputAttribute("max", count($this->accepted_values) - 1);
         }
-
-        return parent::prepareInputAttributes();
 
     }
 

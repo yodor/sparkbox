@@ -75,19 +75,47 @@ class Container extends Component
         return $this->items[$idx];
     }
 
-    public function getByClassName(string $name) : Component
+    public function getByName(string $name) : Component
     {
-        $indexes = array_keys($this->items);
-        foreach ($indexes as $idx=>$index) {
-            $component = $this->get($index);
-            if (strcmp($name, $component->getClassName())==0) {
-                return $component;
+        $comparator = function (Component $cmp) use ($name) {
+            if (strcmp($name, $cmp->getName())==0) {
+                return TRUE;
             }
-        }
-        throw new Exception("Component with name '$name' not found in this container");
+            return FALSE;
+        };
+        return $this->findBy($comparator);
+
     }
 
-    public function findBy($callback) : Component
+    public function getByClassName(string $name) : Component
+    {
+        $comparator = function (Component $cmp) use ($name) {
+            if (strcmp($name, $cmp->getClassName())==0) {
+                return TRUE;
+            }
+            return FALSE;
+        };
+        return $this->findBy($comparator);
+
+    }
+
+    public function getByAttribute(string $name, string $value) : Component
+    {
+        $comparator = function (Component $cmp) use ($name, $value) {
+            if (strcmp($value, $cmp->getAttribute($name))==0) {
+                return TRUE;
+            }
+            return FALSE;
+        };
+        return $this->findBy($comparator);
+    }
+
+    public function getByAction(string $action_value) : Component
+    {
+        return $this->getByAttribute("action", $action_value);
+    }
+
+    public function findBy($callback) : ?Component
     {
         $indexes = array_keys($this->items);
         foreach ($indexes as $idx=>$index) {
@@ -96,7 +124,7 @@ class Container extends Component
                 return $component;
             }
         }
-        throw new Exception("Component not found");
+        return NULL;
     }
 
     public function renderImpl()

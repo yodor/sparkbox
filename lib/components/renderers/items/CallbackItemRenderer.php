@@ -1,25 +1,12 @@
 <?php
+include_once("components/renderers/items/DataIteratorItem.php");
 
-include_once("components/Component.php");
-include_once("components/ItemView.php");
 
-include_once("components/renderers/IItemRenderer.php");
-
-class CallbackItemRenderer extends Component implements IItemRenderer
+class CallbackItemRenderer extends DataIteratorItem
 {
 
     protected $callback;
-    protected $item;
 
-    public function setItem($item)
-    {
-        $this->item = $item;
-    }
-
-    public function getItem()
-    {
-        return $this->item;
-    }
 
     public function __construct($function_name)
     {
@@ -31,35 +18,12 @@ class CallbackItemRenderer extends Component implements IItemRenderer
         $this->callback = $function_name;
     }
 
-    public function startRender()
-    {
-        $all_attr = $this->prepareAttributes();
-        echo "<div $all_attr >";
-
-    }
-
-    public function finishRender()
-    {
-
-        echo "</div>";
-    }
-
     protected function renderImpl()
     {
 
-        call_user_func_array($this->callback, array(&$this->item, $this->getParent()));
+        call_user_func_array($this->callback, array(&$this->data, $this->getParent()));
     }
 
-    //   public function renderItem($row, ItemView $tc) {
-    // 	  $this->startRender();
-    //
-    // 	  $this->finishRender();
-    //   }
-
-    public function renderSeparator($idx_curr, $items_total)
-    {
-
-    }
 }
 
 ?>

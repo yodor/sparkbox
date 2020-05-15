@@ -5,7 +5,8 @@ include_once("components/renderers/items/DataIteratorItem.php");
 include_once("beans/NestedSetBean.php");
 include_once("iterators/IDataIterator.php");
 
-class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
+//TODO: extend AbstractResultView?
+class NestedSetTreeView extends Component implements IDataIteratorRenderer
 {
 
     const BRANCH_OPENED = "opened";
@@ -54,13 +55,13 @@ class NestedSetTreeView extends Component implements IDataIteratorItemRenderer
         return $arr;
     }
 
-    public function setItemIterator(IDataIterator $query)
+    public function setIterator(IDataIterator $query)
     {
         $this->iterator = $query;
         $this->setAttribute("source", $this->iterator->name());
     }
 
-    public function getItemIterator(): IDataIterator
+    public function getIterator(): IDataIterator
     {
         return $this->iterator;
 

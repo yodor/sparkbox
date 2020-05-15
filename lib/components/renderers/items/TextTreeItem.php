@@ -1,28 +1,25 @@
 <?php
 include_once("components/renderers/items/NestedSetItem.php");
 include_once("components/renderers/IActionsCollection.php");
-include_once("components/renderers/ActionRenderer.php");
+include_once("components/Action.php");
 
 class TextTreeItem extends NestedSetItem implements IActionsCollection
 {
 
     protected $actions = NULL;
     protected $text_action = NULL;
-    protected $action_renderer = NULL;
 
     public function __construct()
     {
         parent::__construct();
 
         //construct default empty action with no parameters
-        $this->text_action = new Action("Text Action", "", array());
+        $this->text_action = new Action();
+
+        $this->text_action->setAttribute("action", "TextTreeItemAction");
 
         $this->actions = array();
-        $this->attribute_actions = array();
 
-        $this->action_renderer = new ActionRenderer(NULL, NULL);
-
-        $this->action_renderer->enableTextTranslation(FALSE);
     }
 
     public function getTextAction()
@@ -37,12 +34,12 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
 
     public function addAction(Action $a)
     {
-        $this->actions[] = $a;
+        $this->actions[$a->getContents()] = $a;
     }
 
-    public function getAction(string $title): Action
+    public function getAction(string $contents): Action
     {
-        return $this->actions[$title];
+        return $this->actions[$contents];
     }
 
     public function setActions(array $actions)
@@ -55,44 +52,45 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
         return $this->actions;
     }
 
-    public function renderActions(array &$row)
+    protected function renderActions()
     {
         if (count($this->actions) < 1) return;
 
         echo "<div class='node_actions'>";
-        $this->action_renderer->enableActionFromLabel(TRUE);
-        foreach ($this->actions as $key => $action) {
-            $this->action_renderer->setAction($action);
 
-            $this->action_renderer->setData($this->data);
-            $this->action_renderer->render();
+        foreach ($this->actions as $key => $action) {
+
+            $action->render();
 
         }
         echo "</div>";
 
     }
 
-    public function renderHandle()
+    public function setData(array $row)
+    {
+        parent::setData($row);
+
+        $this->text_action->setData($row);
+
+        foreach ($this->actions as $cnt => $action) {
+
+            $action->setData($row);
+        }
+    }
+
+    protected function renderHandle()
     {
         echo "<div class='Handle'>";
         echo "<div class='Button'></div>";
         echo "</div> ";
-
     }
 
     public function renderText()
     {
-        // 	    echo "<div class='Control'>";
-        // 	    echo "<input type='checkbox'>";
-        // 	    echo "</div> ";
 
-        $this->text_action->setTitle($this->label);
-
-        $this->action_renderer->setAction($this->text_action);
-        $this->action_renderer->enableActionFromLabel(FALSE);
-        $this->action_renderer->setAttribute("action", "TextTreeItemAction");
-        $this->action_renderer->setData($this->data);
-        $this->action_renderer->render();
+        $this->text_action->setContents($this->label);
+        $this->text_action->render();
 
     }
 
@@ -100,7 +98,7 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
     {
         $this->renderHandle();
         $this->renderText();
-        $this->renderActions($this->data);
+        $this->renderActions();
     }
 
     public function addURLParameter(URLParameter $param)

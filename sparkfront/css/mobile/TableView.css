@@ -78,19 +78,19 @@
     text-align: right;
 }
 
-.TableView .viewport .ActionsTableCellRenderer .actions_list .ActionRenderer {
+.TableView .viewport .ActionsTableCellRenderer .actions_list .Action {
     display: inline-block;
 
 }
 
-.TableView .viewport .ActionsTableCellRenderer .actions_list .ActionRenderer[action*='Separator'] {
+.TableView .viewport .ActionsTableCellRenderer .actions_list .Action[action*='Separator'] {
     color: #cccccc;
     font-weight: bold;
     padding-left: 2px;
     padding-right: 3px;
 }
 
-.TableView .viewport .ActionsTableCellRenderer .actions_list .ActionRenderer[action='RowSeparator'] {
+.TableView .viewport .ActionsTableCellRenderer .actions_list .Action[action='RowSeparator'] {
     display: block;
 }
 

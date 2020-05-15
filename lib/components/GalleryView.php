@@ -3,7 +3,7 @@ include_once("beans/DBTableBean.php");
 include_once("components/TableView.php");
 include_once("components/ItemView.php");
 
-include_once("components/renderers/items/GalleryViewItemRenderer.php");
+include_once("components/renderers/items/GalleryViewItem.php");
 include_once("components/renderers/cells/TableImageCellRenderer.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
@@ -38,6 +38,7 @@ class GalleryView extends Component
         $fields = array($this->bean->key(), "position", "caption", "date_upload");
 
         $qry = $this->bean->query();
+
         $qry->select->fields = implode(",", $fields);
 
         if (strcmp_isset("view", "list")) {
@@ -51,15 +52,13 @@ class GalleryView extends Component
             $view->addColumn(new TableColumn("date_upload", "Date Upload"));
 
             $renderer = new TableImageCellRenderer();
-            $renderer->setBean($this->bean);
+            //$renderer->setBean($this->bean);
 
             $this->photo_renderer = $renderer;
 
             $view->getColumn("photo")->setCellRenderer($renderer);
-            $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(FALSE);
 
             $view->addColumn(new TableColumn("actions", "Actions"));
-
             $this->actionsCollection = new ActionsTableCellRenderer();
 
             $view->getColumn("actions")->setCellRenderer($this->actionsCollection);
@@ -71,16 +70,16 @@ class GalleryView extends Component
             $view = new ItemView($qry);
             $this->view = $view;
 
-            $renderer = new GalleryViewItemRenderer($this);
-            $renderer->setPhotoSize(-1, 256);
+            $renderer = new GalleryViewItem($this);
+            $renderer->setPhotoSize(256, -1);
 
+            $this->photo_renderer = $renderer;
             $this->actionsCollection = $renderer;
 
-            $this->view->setItemRenderer($renderer);
+            $view->setItemRenderer($renderer);
 
             $this->view_mode = GalleryView::MODE_GRID;
 
-            $this->photo_renderer = $renderer;
         }
 
         if ($this->bean instanceof OrderedDataBean) {
@@ -89,11 +88,6 @@ class GalleryView extends Component
 
         $view->getTopPaginator()->view_modes_enabled = TRUE;
 
-    }
-
-    public function getPhotoRenderer() : IPhotoRenderer
-    {
-        return $this->photo_renderer;
     }
 
     public function requiredStyle()
@@ -110,6 +104,11 @@ class GalleryView extends Component
         return $arr;
     }
 
+    public function getPhotoRenderer(): IPhotoRenderer
+    {
+        return $this->photo_renderer;
+    }
+
     public function getViewMode()
     {
         return $this->view_mode;
@@ -118,16 +117,6 @@ class GalleryView extends Component
     public function getActionsCollection()
     {
         return $this->actionsCollection;
-    }
-
-    public function getRefKey()
-    {
-        return $this->refkey;
-    }
-
-    public function getRefVal()
-    {
-        return $this->refval;
     }
 
     /**
@@ -142,50 +131,46 @@ class GalleryView extends Component
     {
         $bkey = $this->bean->key();
 
-        //$ref_param = new ActionParameter($this->refkey, $this->refkey);
+        //default mode for action is to keep the request search parameters
 
-        $edit_params = array(new ActionParameter("editID", $bkey));
-
-        //if (strlen($this->refkey > 0)) $edit_params[] = $ref_param;
+        $edit_params = array(new DataParameter("editID", $bkey));
 
         $collection = $this->actionsCollection;
         $collection->addAction(new Action("Edit", "add.php", $edit_params));
 
-        $collection->addAction(new PipeSeparatorAction());
+        $collection->addAction(new PipeSeparator());
 
-        $delete_params = array(new ActionParameter("item_id", $bkey));
-
-        //if (strlen($this->refkey > 0)) $delete_params[] = $ref_param;
+        $delete_params = array(new DataParameter("item_id", $bkey));
 
         $collection->addAction(new Action("Delete", "?cmd=delete_item", $delete_params));
 
         if ($this->bean instanceof OrderedDataBean) {
 
-            $collection->addAction(new RowSeparatorAction());
-            $collection->addAction(new RowSeparatorAction());
+            $collection->addAction(new RowSeparator());
+            $collection->addAction(new RowSeparator());
 
-            $repos_param = array(new ActionParameter("item_id", $bkey),
+            $repos_param = array(new DataParameter("item_id", $bkey),
                                  new URLParameter("#" . get_class($this->bean) . ".%$bkey%"));
 
             //if (strlen($this->refkey > 0)) $repos_param[] = $ref_param;
 
             $collection->addAction(new Action("First", "?cmd=reposition&type=first", $repos_param));
 
-            $collection->addAction(new PipeSeparatorAction());
+            $collection->addAction(new PipeSeparator());
 
             $collection->addAction(new Action("Last", "?cmd=reposition&type=last", $repos_param));
 
-            $collection->addAction(new RowSeparatorAction());
+            $collection->addAction(new RowSeparator());
 
             $collection->addAction(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
 
-            $collection->addAction(new PipeSeparatorAction());
+            $collection->addAction(new PipeSeparator());
 
             $collection->addAction(new Action("Next", "?cmd=reposition&type=next", $repos_param));
 
-            $collection->addAction(new RowSeparatorAction());
+            $collection->addAction(new RowSeparator());
 
-            $collection->addAction(new Action("Reposition", "javascript:choosePosition(\"%$bkey%\",{$this->refval})", array(new ActionParameter($bkey, $bkey))));
+            $collection->addAction(new Action("Reposition", "?cmd=reposition&type=fixed", $repos_param));
         }
     }
 
@@ -210,7 +195,6 @@ class GalleryView extends Component
     protected function renderImpl()
     {
         $this->view->render();
-
 
     }
 

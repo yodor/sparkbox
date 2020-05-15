@@ -28,6 +28,10 @@ class KeywordSearchComponent extends Container implements IQueryFilter
 
         $this->form = new KeywordSearchForm($this->table_fields);
 
+        $input = $this->form->getInput("keyword");
+        $input->getRenderer()->setInputAttribute("placeholder", $input->getLabel());
+
+
         $qry = $_REQUEST;
 
         if (strcmp_isset(KeywordSearchComponent::SUBMIT_KEY, KeywordSearchComponent::ACTION_CLEAR, $qry) === TRUE) {

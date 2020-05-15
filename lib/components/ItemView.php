@@ -1,15 +1,10 @@
 <?php
-include_once("pages/HTMLPage.php");
 include_once("components/AbstractResultView.php");
-include_once("components/renderers/items/TextItemRenderer.php");
-include_once("components/renderers/IItemRenderer.php");
 include_once("utils/ValueInterleave.php");
-include_once("components/PageResultsPanel.php");
+include_once("iterators/IDataIterator.php");
 
 class ItemView extends AbstractResultView
 {
-
-    protected $item_renderer;
 
     public function __construct(IDataIterator $itr)
     {
@@ -21,17 +16,6 @@ class ItemView extends AbstractResultView
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/ItemView.css";
         return $arr;
-    }
-
-    public function setItemRenderer(IItemRenderer $renderer)
-    {
-        $this->item_renderer = $renderer;
-        $this->item_renderer->setParent($this);
-    }
-
-    public function getItemRenderer()
-    {
-        return $this->item_renderer;
     }
 
     public function startRender()
@@ -52,15 +36,14 @@ class ItemView extends AbstractResultView
 
     public function finishRender()
     {
-        echo "<div class=clear></div>";
+        //        echo "<div class=clear></div>";
         echo "</div>";
 
         parent::finishRender();
 
     }
 
-
-    public function renderImpl()
+    protected function renderImpl()
     {
 
         if (!$this->item_renderer) throw new Exception("ItemRenderer not set");
@@ -69,12 +52,13 @@ class ItemView extends AbstractResultView
 
         $this->position_index = 0;
 
-        while ($row = $this->itr->next()) {
+        while ($row = $this->iterator->next()) {
 
             $cls = $v->value();
 
-            $this->item_renderer->setItem($row);
+            $this->item_renderer->setData($row);
             $this->item_renderer->render();
+
             $this->item_renderer->renderSeparator($this->position_index, $this->total_rows);
 
             $this->position_index++;
@@ -83,9 +67,9 @@ class ItemView extends AbstractResultView
         }
     }
 
-    public function getIterator() : IDataIterator
+    public function getIterator(): IDataIterator
     {
-        return $this->itr;
+        return $this->iterator;
     }
 
 }

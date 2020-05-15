@@ -13,21 +13,6 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
-        $btn_translate = new ColorButton();
-        $btn_translate->setText("Translate");
-        $btn_translate->setAttribute("action", "Translate");
-        $this->appendButton($btn_translate);
-
-        $btn_clear = new ColorButton();
-        $btn_clear->setText("Clear");
-        $btn_clear->setAttribute("action", "Clear");
-        $this->appendButton($btn_clear);
-
-        $btn_close = new ColorButton();
-        $btn_close->setText("Close");
-        $btn_close->setAttribute("action", "Close");
-        $this->appendButton($btn_close);
-
         RequestController::addAjaxHandler(new TranslateBeanAjaxHandler());
     }
 
@@ -48,7 +33,25 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         return $arr;
     }
 
-    public function renderImpl()
+    protected function initButtons()
+    {
+        $btn_translate = new ColorButton();
+        $btn_translate->setText("Translate");
+        $btn_translate->setAttribute("action", "Translate");
+        $this->buttonsBar->append($btn_translate);
+
+        $btn_clear = new ColorButton();
+        $btn_clear->setText("Clear");
+        $btn_clear->setAttribute("action", "Clear");
+        $this->buttonsBar->append($btn_clear);
+
+        $btn_close = new ColorButton();
+        $btn_close->setText("Close");
+        $btn_close->setAttribute("action", "Close");
+        $this->buttonsBar->append($btn_close);
+    }
+
+    protected function renderImpl()
     {
 
         echo tr("Original Text") . ":<BR>";
@@ -70,7 +73,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $lb->select()->where = " langID>1 ";
 
-        $renderer->setItemIterator($lb->query());
+        $renderer->setIterator($lb->query());
         $renderer->getItemRenderer()->setValueKey("langID");
         $renderer->getItemRenderer()->setLabelKey("language");
 

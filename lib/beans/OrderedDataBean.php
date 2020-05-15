@@ -50,18 +50,25 @@ abstract class OrderedDataBean extends DBTableBean
     public function reorderFixed(int $id, int $new_pos)
     {
 
+        $pos = $this->fieldValue($id, "position");
+
+        $maxp = (int)$this->getMaxPosition();
+
+        debug("ID: $id position - current: $pos max: $maxp new: $new_pos");
+
+        if ($new_pos > $maxp) $new_pos = $maxp;
+        if ($new_pos < 1) $new_pos = 1;
+
+        debug("Using pos: $new_pos");
+
         $db = $this->db;
         try {
 
             $db->transaction();
 
-            $pos = $this->fieldValue($id, "position");
-
-            debug("ID: $id - Pos: $pos - New Pos: $new_pos");
-
             $update = new SQLUpdate($this->select);
             $update->set["position"] = "position + 1";
-            $update->appendWhere("position>=$pos");
+            $update->appendWhere("position>=$new_pos");
 
             if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
 
@@ -89,12 +96,12 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at top position");
         }
 
+        debug("ID: $id position - current: $pos new: 1");
+
         $db = $this->db;
         try {
 
             $db->transaction();
-
-            debug("ID: $id - Pos: $pos - New pos: 1");
 
             $update = new SQLUpdate($this->select);
             $update->set["position"] = "position + 1";
@@ -128,23 +135,23 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at bottom position");
         }
 
+        debug("ID: $id position - current: $pos new: $maxp");
+
         $db = $this->db;
         try {
             $db->transaction();
-
-            debug("ID: $id - Pos: $pos - Max Pos: $maxp");
 
             $update = new SQLUpdate($this->select);
             $update->set["position"] = "position-1";
             $update->appendWhere("position>$pos");
 
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(1) Error: " . $db->getError()."<HR>".$update->getSQL());
+            if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(1) Error: " . $db->getError() . "<HR>" . $update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set["position"] = $maxp;
             $update->appendWhere($this->prkey . "=" . $id);
 
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(2) Error: " . $db->getError()."<HR>".$update->getSQL());
+            if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(2) Error: " . $db->getError() . "<HR>" . $update->getSQL());
 
             $db->commit();
         }
@@ -165,11 +172,11 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at top position");
         }
 
+        debug("ID: $id position - current: $pos new: ".($pos - 1));
+
         $db = $this->db;
         try {
             $db->transaction();
-
-            debug("ID: $id - Pos: $pos - New Pos: " . ($pos - 1));
 
             $update = new SQLUpdate($this->select);
             $update->set["position"] = " -1 ";
@@ -206,11 +213,12 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at bottom position");
         }
 
+        debug("ID: $id position - current: $pos new: ".($pos + 1));
+
+
         $db = $this->db;
         try {
             $db->transaction();
-
-            debug("ID: $id - Pos: $pos - New Pos: " . ($pos - 1));
 
             $update = new SQLUpdate($this->select);
             $update->set["position"] = " -1 ";

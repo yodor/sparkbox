@@ -42,6 +42,10 @@ class Component implements IRenderer, IHeadContents
 
     protected $contents = "";
 
+    protected $name = "";
+
+    protected $index = -1;
+
     public function __construct()
     {
         //$this->component_class = get_class($this);
@@ -74,6 +78,15 @@ class Component implements IRenderer, IHeadContents
     public function requiredMeta()
     {
         return array();
+    }
+
+    public function setIndex(int $index)
+    {
+        $this->index = $index;
+    }
+    public function getIndex() : int
+    {
+        return $this->index;
     }
 
     public function setTagName(string $tagName)
@@ -149,12 +162,13 @@ class Component implements IRenderer, IHeadContents
 
     public function setName(string $name)
     {
+        $this->name = $name;
         $this->setAttribute("name", $name);
     }
 
     public function getName(): string
     {
-        return $this->getAttribute("name");
+        return $this->name;
     }
 
     public function setParent(Component $parent)
@@ -165,7 +179,7 @@ class Component implements IRenderer, IHeadContents
     /**
      * @return Component|null
      */
-    public function getParent()
+    public function getParent() : ?Component
     {
         return $this->parent_component;
     }
@@ -180,7 +194,7 @@ class Component implements IRenderer, IHeadContents
         $this->caption = $caption;
     }
 
-    public function getTooltipText()
+    public function getTooltipText() : string
     {
         return $this->getAttribute("tooltip");
     }
@@ -190,7 +204,7 @@ class Component implements IRenderer, IHeadContents
         $this->setAttribute("tooltip", $text);
     }
 
-    public function getAttributes()
+    public function getAttributes() : array
     {
         return $this->attributes;
     }

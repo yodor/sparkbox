@@ -1,67 +1,69 @@
-.ActionRenderer {
+.Action {
     color: #50a9f9;
     text-decoration: none;
     cursor:pointer;
 }
 
-.ActionRenderer[action="PipeSeparator"] {
+.Action.PipeSeparator {
     color: #cccccc;
+    cursor: auto;
 }
 
-.ActionRenderer[action="RowSeparator"] {
+.Action.RowSeparator {
     display: block;
+    cursor: auto;
 }
 
-.ActionRenderer[action="Edit"] {
+.Action[action="Edit"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_edit.png");
     background-repeat: no-repeat;
     background-position: left center;
 }
 
-.ActionRenderer[action="Delete"] {
+.Action[action="Delete"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_delete.png");
     background-repeat: no-repeat;
     background-position: left center;
 }
 
-.ActionRenderer[action="Translate"] {
+.Action[action="Translate"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_edit.png");
     background-repeat: no-repeat;
     background-position: left center;
 }
 
-.ActionRenderer[action="Clear"] {
+.Action[action="Clear"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_delete.png");
     background-repeat: no-repeat;
     background-position: left center;
 }
 
-.ActionRenderer[action="First"] {
+.Action[action="First"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_first.png");
     background-repeat: no-repeat;
     background-position: left center;
 }
 
-.ActionRenderer[action="Last"] {
+.Action[action="Last"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_last.png");
     background-repeat: no-repeat;
     background-position: left center;
 }
 
-.ActionRenderer[action="Previous"] {
+.Action[action="Previous"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_prev.png");
     background-repeat: no-repeat;
     background-position: left center;
 }
 
-.ActionRenderer[action="Next"] {
+.Action[action="Next"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_next.png");
     background-repeat: no-repeat;
@@ -69,7 +71,7 @@
 
 }
 
-.ActionRenderer[action='inline-new'] {
+.Action[action='inline-new'] {
     padding-left: 13px;
     background-image: url("../images/list_actions/inline-new.png");
     background-repeat: no-repeat;
@@ -77,14 +79,14 @@
 
 }
 
-.ActionRenderer[action="Remove"] {
+.Action[action="Remove"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_delete.png");
     background-repeat: no-repeat;
     background-position: left center;
 }
 
-.ColorButton + .ActionRenderer[action='inline-new'] {
+.ColorButton + .Action[action='inline-new'] {
     margin-left: 5px;
 }
 

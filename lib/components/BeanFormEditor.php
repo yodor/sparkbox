@@ -213,8 +213,8 @@ class BeanFormEditor extends Container implements IBeanEditor
                         $page = HTMLPage::Instance();
 
                         $back_action = $page->getAction("back");
-                        if (!is_null($back_action)) {
-                            header("Location: " . $back_action->getHref());
+                        if ($back_action instanceof Action) {
+                            header("Location: " . $back_action->getURL()->url());
                         }
                         else {
                             header("Location: " . $_SERVER["REQUEST_URI"]);

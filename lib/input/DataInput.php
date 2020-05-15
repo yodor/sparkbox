@@ -234,7 +234,12 @@ class DataInput
             $this->validator->validate($this);
         }
         catch (Exception $e) {
-            $this->setError($e->getMessage());
+            if ($this->isRequired()) {
+                $this->setError($e->getMessage());
+            }
+            else {
+                $this->setValue(NULL);
+            }
         }
     }
 

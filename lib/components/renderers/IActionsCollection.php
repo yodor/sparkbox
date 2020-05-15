@@ -1,4 +1,6 @@
 <?php
+include_once("components/Action.php");
+include_once("utils/URLParameter.php");
 
 interface IActionsCollection
 {

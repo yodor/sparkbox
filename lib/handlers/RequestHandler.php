@@ -9,7 +9,9 @@ abstract class RequestHandler implements IRequestProcessor
     protected $cancel_url = "";
     protected $success_url = "";
 
-    protected $need_confirm = false;
+    protected $need_confirm = FALSE;
+
+    protected $need_redirect = TRUE;
 
     const KEY_COMMAND = "cmd";
     const KEY_CONFIRM = "confirm_handler";
@@ -26,7 +28,7 @@ abstract class RequestHandler implements IRequestProcessor
         $this->need_confirm = $mode;
     }
 
-    public function getCommandName() : string
+    public function getCommandName(): string
     {
         return $this->cmd;
     }
@@ -36,7 +38,7 @@ abstract class RequestHandler implements IRequestProcessor
         $this->cancel_url = $url;
     }
 
-    public function getCancelUrl() : string
+    public function getCancelUrl(): string
     {
         return $this->cancel_url;
     }
@@ -46,12 +48,12 @@ abstract class RequestHandler implements IRequestProcessor
         $this->success_url = $url;
     }
 
-    public function getSuccessUrl() : string
+    public function getSuccessUrl(): string
     {
         return $this->success_url;
     }
 
-    public function shouldProcess() : bool
+    public function shouldProcess(): bool
     {
         if (isset($_REQUEST[RequestHandler::KEY_COMMAND]) && strcmp($_REQUEST[RequestHandler::KEY_COMMAND], $this->cmd) == 0) {
 
@@ -64,40 +66,44 @@ abstract class RequestHandler implements IRequestProcessor
     {
         $this->parseParams();
 
-        $do_process = false;
+        $do_process = FALSE;
 
         if ($this->need_confirm && !isset($_POST[RequestHandler::KEY_CONFIRM])) {
 
             $this->processConfirmation();
         }
         else {
-            $do_process = true;
+            $do_process = TRUE;
         }
 
         if (!$do_process) return;
 
-        debug("Calling process ...");
+        debug("Calling process with need_redirect: ".(int)$this->need_redirect);
+
+        $redirectURL = "";
 
         if ($this->process()) {
             debug("Process returned true");
-            if (strlen($this->getSuccessUrl()) > 0) {
-                debug("Redirecting to successURL: " . $this->getSuccessUrl());
-                header("Location: " . $this->getSuccessUrl());
-                exit;
-            }
+            $redirectURL = $this->getSuccessUrl();
         }
         else {
             debug("Process returned false");
-            if (strlen($this->getCancelUrl()) > 0) {
-                debug("Redirecting to cancelURL: " . $this->getSuccessUrl());
-                header("Location: " . $this->getCancelUrl());
-                exit;
-            }
+            $redirectURL = $this->getCancelUrl();
         }
 
+        if ($this->need_redirect) {
+            if ($redirectURL) {
+                debug("Redirecting to URL: $redirectURL");
+                header("Location: " . $redirectURL);
+                exit;
+            }
+            else {
+                debug("Redirect URL is empty");
+            }
+        }
     }
 
-    public function createAction($title = false, $href = false, $check_code = "return 1;", $parameters_array = array())
+    public function createAction($title = FALSE, $href = FALSE, $check_code = NULL, $data_parameters = array())
     {
         return NULL;
     }
@@ -115,16 +121,19 @@ abstract class RequestHandler implements IRequestProcessor
     {
         $md = new ConfirmMessageDialog($title, "msg_confirm");
 
-        $btn_ok = $md->getButtonAt(0);
-        $btn_ok->setText("Confirm");
-        $btn_ok->setHref("javascript:confirmHandler()");
-        $btn_cancel = $md->getButtonAt(1);
-        $btn_cancel->setText("Cancel");
-        $btn_cancel->setHref("javascript:cancelHandler()");
+        $btn_ok = $md->getButtons()->getByAction(MessageDialog::BUTTON_ACTION_CONFIRM);
+        if ($btn_ok instanceof ColorButton) {
+            $btn_ok->setText("Confirm");
+            $btn_ok->setAttribute("onClick", "javascript:confirmHandler()");
+        }
 
+        $btn_cancel = $md->getButtons()->getByAction(MessageDialog::BUTTON_ACTION_CANCEL);
+        if ($btn_ok instanceof ColorButton) {
+            $btn_cancel->setText("Cancel");
+            $btn_cancel->setAttribute("onClick", "javascript:cancelHandler()");
+        }
 
         $md->startRender();
-
 
         echo "<form id=confirm_handler_form method=post>";
 
@@ -132,11 +141,10 @@ abstract class RequestHandler implements IRequestProcessor
 
         echo "<br>";
 
-
         echo "<input type=hidden name=confirm_handler value=1>";
         echo "</form>";
         ?>
-        <script type='text/javascript' >
+        <script type='text/javascript'>
             function confirmHandler() {
                 var frm = document.getElementById("confirm_handler_form");
                 frm.submit();

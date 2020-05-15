@@ -32,9 +32,9 @@ class DeleteItemRequestHandler extends RequestHandler
         return $this->item_id;
     }
 
-    public function createAction($title = "Delete", $href_add = "", $check_code = "return 1;", $parameters_array = array())
+    public function createAction($title = "Delete", $href_add = "", $check_code = NULL, $parameters_array = array())
     {
-        $parameters = array(new ActionParameter("item_id", $this->bean->key()));
+        $parameters = array(new DataParameter("item_id", $this->bean->key()));
         return new Action($title, "?cmd=delete_item$href_add", array_merge($parameters, $parameters_array), $check_code);
     }
 

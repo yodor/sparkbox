@@ -93,7 +93,7 @@
     background-position: 50% 50%;
 }
 
-.TreeView .Node .ActionRenderer[action='TextTreeItemAction'] {
+.TreeView .Node .Action[action='TextTreeItemAction'] {
     display: table-cell;
     vertical-align: middle;
 
@@ -107,7 +107,7 @@
 
 }
 
-.TreeView .Node[active="1"] .ActionRenderer[action='TextTreeItemAction'] {
+.TreeView .Node[active="1"] .Action[action='TextTreeItemAction'] {
 
     text-decoration: underline;
     font-weight: bold;

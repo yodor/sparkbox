@@ -50,6 +50,13 @@ class ChangePositionRequestHandler extends RequestHandler
             $this->position = (int)$arr["position"];
             unset($arr["position"]);
         }
+        if ($this->bean instanceof OrderedDataBean) {
+            if (strcmp($this->type, "fixed") == 0){
+                if ($this->position<1) {
+                    $this->need_redirect = FALSE;
+                }
+            }
+        }
 
         $this->cancel_url = queryString($arr);
         $this->cancel_url = $_SERVER['PHP_SELF'] . $this->cancel_url;
@@ -88,7 +95,38 @@ class ChangePositionRequestHandler extends RequestHandler
                     $this->bean->reorderFixed($this->item_id, $this->position);
                 }
                 else {
-                    throw new Exception("Incorrect position value for fixed reposition type");
+                    $dialog = new ConfirmMessageDialog();
+                    ob_start();
+                    $input = DataInputFactory::Create(DataInputFactory::TEXT, "position", "Input new position", 1);
+                    $cmp = new InputComponent($input);
+                    $cmp->render();
+                    $dialog->setContents(ob_get_contents());
+                    ob_end_clean();
+
+                    ?>
+                    <script type="text/javascript">
+                        function onConfirmMessageDialog(is_confirmed)
+                        {
+                            if (is_confirmed) {
+
+                                let position = document.querySelector(".ModalPane .ConfirmMessageDialog .InputField [name=position]").value
+
+                                var searchParams = new URLSearchParams(location.search);
+                                searchParams.set("position", position);
+
+                                window.location.href = `${location.pathname}?${searchParams}`;
+                            }
+                            else {
+                                window.location.href = "<?php echo $this->cancel_url;?>";
+                            }
+
+                        }
+                        onPageLoad(function(){
+                            showPopupPanel("<?php echo $dialog->getID()?>");
+                        });
+                    </script>
+                    <?php
+
                 }
             }
 

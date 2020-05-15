@@ -44,7 +44,7 @@ class AuthenticatorRequestHandler extends RequestHandler
         $this->remember = isset($_POST["remember"]);
     }
 
-    public function createAction($title = "Toggle", $href_add = "", $check_code = "return 1;", $parameters_array = array())
+    public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array())
     {
 
         return NULL;

@@ -1,16 +1,17 @@
 <?php
 include_once("components/Component.php");
+include_once("components/renderers/IDataIteratorRenderer.php");
 
 include_once("utils/Paginator.php");
 include_once("components/PaginatorTopComponent.php");
 include_once("components/PaginatorBottomComponent.php");
 
-abstract class AbstractResultView extends Component
+abstract class AbstractResultView extends Component implements IDataIteratorRenderer
 {
 
     public $items_per_page = 10;
 
-    protected $itr = NULL;
+    protected $iterator = NULL;
     protected $default_order = "";
     protected $total_rows = 0;
     protected $current_row = array();
@@ -21,11 +22,13 @@ abstract class AbstractResultView extends Component
     protected $paginators_enabled = true;
     protected $select_query = NULL;
 
+    protected $item_renderer;
+
     public function __construct(IDataIterator $itr)
     {
         parent::__construct();
 
-        $this->itr = $itr;
+        $this->iterator = $itr;
         $this->columns = array();
         $this->paginator = new Paginator();
         $this->paginator_top = new PaginatorTopComponent($this->paginator);
@@ -34,7 +37,23 @@ abstract class AbstractResultView extends Component
 
     public function getIterator() : IDataIterator
     {
-        return $this->itr;
+        return $this->iterator;
+    }
+
+    public function setIterator(IDataIterator $itr)
+    {
+        $this->iterator = $itr;
+    }
+
+    public function setItemRenderer(DataIteratorItem $renderer)
+    {
+        $this->item_renderer = $renderer;
+        $this->item_renderer->setParent($this);
+    }
+
+    public function getItemRenderer() : DataIteratorItem
+    {
+        return $this->item_renderer;
     }
 
     public function getTotalRows() : int
@@ -90,7 +109,7 @@ abstract class AbstractResultView extends Component
 
         parent::startRender();
 
-        $this->total_rows = $this->itr->exec();
+        $this->total_rows = $this->iterator->exec();
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
@@ -100,12 +119,12 @@ abstract class AbstractResultView extends Component
         //	echo "Iterator SQL: ".$select->getSQL();
 
         if ($this->paginators_enabled) {
-            $this->itr->select->combine($pageFilter);
+            $this->iterator->select->combine($pageFilter);
         }
 
         //echo "Final SQL: ".$select->getSQL();
 
-        $this->total_rows = $this->itr->exec();
+        $this->total_rows = $this->iterator->exec();
 
         if ($this->paginators_enabled) {
             $this->paginator_top->render();

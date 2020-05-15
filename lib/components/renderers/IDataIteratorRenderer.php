@@ -2,12 +2,12 @@
 include_once("components/renderers/items/DataIteratorItem.php");
 include_once("iterators/IDataIterator.php");
 
-interface IDataIteratorItemRenderer
+interface IDataIteratorRenderer
 {
-    public function setItemIterator(IDataIterator $query);
+    public function setIterator(IDataIterator $query);
 
 
-    public function getItemIterator(): IDataIterator;
+    public function getIterator(): IDataIterator;
 
 
     public function setItemRenderer(DataIteratorItem $item);

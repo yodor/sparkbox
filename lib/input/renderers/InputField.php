@@ -1,13 +1,13 @@
 <?php
 include_once("components/Component.php");
 include_once("input/renderers/IErrorRenderer.php");
-include_once("components/renderers/IDataIteratorItemRenderer.php");
+include_once("components/renderers/IDataIteratorRenderer.php");
 
 /**
  * Class InputField
  * Base class to wraps various input tags into a Component
  */
-abstract class InputField extends Component implements IErrorRenderer, IDataIteratorItemRenderer
+abstract class InputField extends Component implements IErrorRenderer, IDataIteratorRenderer
 {
 
     /**
@@ -28,7 +28,7 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
     /**
      * Render values iterator
      * Implementing classes use this iterator to render their values using data from the iterator
-     * (DataSourceField)
+     * (DataIteratorItem)
      * @var IDataIterator
      */
     protected $iterator = NULL;
@@ -60,22 +60,12 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         return $arr;
     }
 
-    public function setInputAttribute(string $name, string $value)
-    {
-        $this->input_attributes[$name] = $value;
-    }
-
-    public function getInputAttribute(string $name) : string
-    {
-        return $this->input_attributes[$name];
-    }
-
-    public function setItemIterator(IDataIterator $query)
+    public function setIterator(IDataIterator $query)
     {
         $this->iterator = $query;
     }
 
-    public function getItemIterator(): IDataIterator
+    public function getIterator(): IDataIterator
     {
         return $this->iterator;
     }
@@ -87,10 +77,27 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         $this->item->setLabelKey($this->input->getName());
     }
 
-    public function getItemRenderer() : ?DataIteratorItem
+    public function getItemRenderer(): ?DataIteratorItem
     {
         return $this->item;
     }
+
+    public function setInputAttribute(string $name, string $value)
+    {
+        $this->input_attributes[$name] = $value;
+    }
+
+    public function getInputAttribute(string $name): string
+    {
+        return $this->input_attributes[$name];
+    }
+
+    public function getInputAttributes(): array
+    {
+        return $this->input_attributes;
+    }
+
+
 
     public function setInput(DataInput $input)
     {
@@ -100,6 +107,21 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
     public function getInput()
     {
         return $this->input;
+    }
+
+    /**
+     * Set all input attributes before rendering is started.
+     * subclasses use this method to set all attributes to be used on
+     * the actual input element
+     *
+     */
+    protected function processInputAttributes()
+    {
+        $this->setInputAttribute("name", $this->input->getName());
+
+        if (!$this->input->isEditable()) {
+            $this->setInputAttribute("disabled", "true");
+        }
     }
 
     public function processErrorAttributes()
@@ -118,30 +140,31 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         $this->setAttribute("error", 1);
     }
 
-    protected function prepareInputAttributes() : string
+    /**
+     * Subclasses that use the input attributes call this method to
+     * get all the attributes to be used on the actual input field as text
+     * @return string
+     */
+    protected function prepareInputAttributes(): string
     {
-        $this->setInputAttribute("name", $this->input->getName());
 
-        if (!$this->input->isEditable()) {
-            $this->setInputAttribute("disabled", "true");
-        }
         return $this->getAttributesText($this->input_attributes);
 
     }
 
     public function startRender()
     {
-
+        $this->processInputAttributes();
         $this->processErrorAttributes();
 
         parent::startRender();
-
 
     }
 
     public function finishRender()
     {
 
+        //TODO: use Container to render all custom data
         $user_data = $this->input->getUserData();
         if (strlen($user_data) > 0) {
             echo "<div class='UserData'>";
@@ -164,7 +187,6 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         parent::finishRender();
 
     }
-
 
 }
 

@@ -39,7 +39,7 @@ INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
 
     cursor: pointer;
 
-    min-width:4em;
+    min-width:5em;
 }
 
 .ColorButton:link {

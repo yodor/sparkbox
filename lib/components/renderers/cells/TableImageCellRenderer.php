@@ -29,6 +29,8 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     protected $sortable = FALSE;
 
+    protected $error = "";
+
     public static function SetDefaultPhotoSize(int $width, int $height)
     {
         TableImageCellRenderer::$DefaultWidth=$width;
@@ -90,6 +92,15 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $this->action = $action;
     }
 
+    protected function getDataValues(?string $values) : array
+    {
+        if (is_null($values)) return array();
+        $values = explode("|", $values);
+        if ($this->list_limit>0 ) {
+            array_splice($values, $this->list_limit);
+        }
+        return $values;
+    }
     protected function constructItems(array &$data)
     {
 
@@ -105,66 +116,26 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             $item = new StorageItem();
             $item->className = get_class($this->bean);
             $item->id = $data[$this->bean->key()];
+
             $item->field = $this->blob_field;
+
             $this->items[] = $item;
         }
         else {
 
             $fieldName = $this->column->getFieldName();
+            debug("Column '$fieldName' Related bean: '" . get_class($this->bean) . "' Related field: '$this->relateField'", $data);
 
-            debug("Column '$fieldName' Related bean: '" . get_class($this->bean) . "' Related field: '$this->relateField'");
+            if (array_key_exists($fieldName, $data)) {
 
-            $relate_key = $this->bean->key();
-            if ($this->relateField) {
-                $relate_key = $this->relateField;
-            }
-
-            $qry = $this->bean->query();
-            $qry->select->fields = $this->bean->key();
-            if ($this->list_limit > 0) {
-                $qry->select->limit = $this->list_limit;
-            }
-            if ($this->bean->haveField("position")) {
-                $qry->select->order_by = " position ASC ";
-            }
-
-            //if result row contains key named by the column field name then we use the values as primary key values of the bean
-            //else we match reversely if the bean primary key name is found as key in the result row we use this
-            //else try iterators' primary key and value as relation value access
-            $values = "";
-
-            if (isset($data[$fieldName])) {
-                debug("Using column field '$fieldName' as data key");
-                $values = $data[$fieldName];
-            }
-            else if (isset($data[$relate_key])) {
-                debug("Using bean field '$relate_key' as data key");
-                $values = $data[$relate_key];
-            }
-            else {
-                debug("Using iterator key '$relate_key' as data key");
-                $relate_key = $this->column->getView()->getIterator()->key();
-                $values = $data[$relate_key];
-            }
-
-            if (!$values) return;
-
-            debug("Using '$relate_key' as bean access key");
-
-            $values = explode("|", $values);
-            $qry->select->where = " $relate_key IN ( " . implode(",", $values) . " )";
-
-            $qry->exec();
-
-            while ($result = $qry->next()) {
-                $photoID = $result[$this->bean->key()];
-
-                $item = new StorageItem();
-                $item->id = $photoID;
-                $item->className = get_class($this->bean);
-                $item->field = $this->blob_field;
-
-                $this->items[] = $item;
+                $values = $this->getDataValues($data[$fieldName]);
+                foreach ($values as $idx=>$value) {
+                    $item = new StorageItem();
+                    $item->className = get_class($this->bean);
+                    $item->id = $value;
+                    $this->items[] = $item;
+                }
+                return;
             }
 
         }
@@ -192,8 +163,12 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     protected function renderImpl()
     {
-
-        $this->renderImageItems();
+        if ($this->error) {
+            echo $this->error;
+        }
+        else {
+            $this->renderImageItems();
+        }
 
     }
 
@@ -206,10 +181,17 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             $this->bean = $this->column->getView()->getIterator()->bean();
         }
 
-        $this->constructItems($row);
+        try {
+            $this->constructItems($row);
+        }
+        catch (Exception $e) {
+            $this->error = $e->getMessage();
+        }
+
 
         if ($this->action) {
-            $this->image_popup->setAttribute("href", $this->action->getHref($row));
+            $this->action->setData($row);
+            $this->image_popup->setAttribute("href", $this->action->getURL()->url());
         }
         else {
             $this->image_popup->clearAttribute("href");

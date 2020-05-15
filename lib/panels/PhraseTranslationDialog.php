@@ -9,20 +9,8 @@ class PhraseTranslationDialog extends MessageDialog
     {
         parent::__construct("Phrase Translator", "phrase_translator");
 
-
         $this->show_close_button = TRUE;
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
-
-        $btn = new ColorButton();
-        $btn->setText("Translate");
-        $btn->setAttribute("action", "Translate");
-
-        $this->appendButton($btn);
-
-        $btn = new ColorButton();
-        $btn->setText("Close");
-        $btn->setAttribute("action", "Close");
-        $this->appendButton($btn);
 
         $h_translate = new TranslatePhraseAjaxHandler();
         RequestController::addAjaxHandler($h_translate);
@@ -43,9 +31,22 @@ class PhraseTranslationDialog extends MessageDialog
         return $arr;
     }
 
-    public function renderImpl()
+    protected function initButtons()
     {
+        $btn = new ColorButton();
+        $btn->setText("Translate");
+        $btn->setAttribute("action", "Translate");
 
+        $this->buttonsBar->append($btn);
+
+        $btn = new ColorButton();
+        $btn->setText("Close");
+        $btn->setAttribute("action", "Close");
+        $this->buttonsBar->append($btn);
+    }
+
+    protected function renderImpl()
+    {
 
         echo tr("Original Text") . ":<br>";
 
@@ -66,7 +67,6 @@ class PhraseTranslationDialog extends MessageDialog
         echo "</div>";
 
         echo "</form>";
-
 
     }
 

@@ -1,5 +1,5 @@
 
-.GalleryViewItemRenderer {
+.GalleryViewItem {
 
     vertical-align: top;
     border: 1px dotted #efefef;
@@ -16,7 +16,7 @@
 
 }
 
-.GalleryViewItemRenderer .header {
+.GalleryViewItem .header {
     display: block;
     padding: 0.5em;
     background-color: #efefef;
@@ -24,16 +24,16 @@
     text-align:center;
 }
 
-.GalleryViewItemRenderer .header .item_position {
+.GalleryViewItem .header .item_position {
 
 }
 
-.GalleryViewItemRenderer .header .item_actions {
+.GalleryViewItem .header .item_actions {
 
 }
 
 
-.GalleryViewItemRenderer .image_slot {
+.GalleryViewItem .image_slot {
     position: relative;
     /*   display:inline-block; */
     display: table-cell;
@@ -46,46 +46,48 @@
     height:256px;
 }
 
-.GalleryViewItemRenderer .image_slot IMG {
+.GalleryViewItem .image_slot IMG {
     object-fit: cover;
+    max-height:256px;
+    max-width:256px;
 }
 
-.GalleryViewItemRenderer .footer {
+.GalleryViewItem .footer {
     padding-top:0.5em;
     padding-bottom:0.5em;
 }
-.GalleryViewItemRenderer .footer .reposition_action {
+.GalleryViewItem .footer .reposition_action {
     /*display: none;*/
     /*width: 32px;*/
     /*height: 32px;*/
     /*position: absolute;*/
 }
-.GalleryViewItemRenderer .footer [action] {
+.GalleryViewItem .footer [action] {
     width:1.5em;
     height:1.5em;
     display:inline-block;
     background-size:contain;
     /*box-sizing: border-box;*/
 }
-.GalleryViewItemRenderer .footer [action="First"] {
+.GalleryViewItem .footer [action="First"] {
     background-image: url("../images/list_actions/item_move_top.png");
     background-position: center center;
 
 }
 
-.GalleryViewItemRenderer .footer [action="Last"] {
+.GalleryViewItem .footer [action="Last"] {
     background-image: url("../images/list_actions/item_move_bottom.png");
     background-position: center center;
 
 }
 
-.GalleryViewItemRenderer .footer [action="Previous"] {
+.GalleryViewItem .footer [action="Previous"] {
     background-image: url("../images/list_actions/item_move_left.png");
     background-position: center center;
 
 }
 
-.GalleryViewItemRenderer .footer [action="Next"] {
+.GalleryViewItem .footer [action="Next"] {
     background-image: url("../images/list_actions/item_move_right.png");
     background-position: center center;
 

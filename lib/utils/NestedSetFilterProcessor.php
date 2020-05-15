@@ -27,7 +27,7 @@ class NestedSetFilterProcessor
     protected function processGetVars(NestedSetTreeView $view)
     {
 
-        $key = $view->getItemIterator()->key();
+        $key = $view->getIterator()->key();
 
         if (isset($_GET[$key])) {
             $nodeID = (int)$_GET[$key];
@@ -38,20 +38,20 @@ class NestedSetFilterProcessor
 
     protected function createDefaultAction(IDataIterator $iterator)
     {
-        $tv_item_clicked = new Action("TextItemClicked", "", array(new ActionParameter($iterator->key(), $iterator->key())));
+        $tv_item_clicked = new Action("TextItemClicked", "", array(new DataParameter($iterator->key(), $iterator->key())));
 
         //clicking on this will clear the page parameter of the paginator from the href url
-        $tv_item_clicked->setClearPageParam(true);
+        $tv_item_clicked->getURL()->setClearPageParams(true);
 
         return $tv_item_clicked;
     }
 
     protected function processTextAction(NestedSetTreeView $view)
     {
-        $key = $view->getItemIterator()->key();
+        $key = $view->getIterator()->key();
 
         if (!$this->item_clicked_action) {
-            $this->item_clicked_action = $this->createDefaultAction($view->getItemIterator());
+            $this->item_clicked_action = $this->createDefaultAction($view->getIterator());
         }
 
         $view->getItemRenderer()->setTextAction($this->item_clicked_action);

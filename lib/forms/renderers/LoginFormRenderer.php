@@ -5,7 +5,6 @@ include_once("forms/renderers/FormRenderer.php");
 class LoginFormRenderer extends FormRenderer
 {
 
-    public $forgot_password_url = "";
 
     public $fbLoginEnabled = false;
 
@@ -13,7 +12,7 @@ class LoginFormRenderer extends FormRenderer
      * @var AuthenticatorRequestHandler
      */
     protected $handler;
-    protected $actionRenderer;
+    protected $action;
 
     public function __construct(LoginForm $form, AuthenticatorRequestHandler $handler)
     {
@@ -32,9 +31,9 @@ class LoginFormRenderer extends FormRenderer
         $this->setAttribute("autocomplete", "on");
 
 
-        $this->actionRenderer = new ActionRenderer(new Action("Forgot Password", "forgot_password.php"));
+        $this->action = new Action("Forgot Password", "forgot_password.php");
 
-        $this->getTextSpace()->append($this->actionRenderer);
+        $this->getTextSpace()->append($this->action);
 
     }
 

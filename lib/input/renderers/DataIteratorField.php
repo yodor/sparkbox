@@ -10,7 +10,7 @@ abstract class DataIteratorField extends InputField
         parent::__construct($input);
     }
 
-    public function renderImpl()
+    protected function renderImpl()
     {
 
         $num = $this->iterator->exec();
@@ -52,7 +52,7 @@ abstract class DataIteratorField extends InputField
             $item = $this->item;
             //$item = clone $this->item;
 
-            $item->setID($id);
+            $item->setID((int)$id);
             $item->setName($field_name . "[]");
             $item->setIndex($index);
 

@@ -81,7 +81,7 @@ IMG {
     color: #999999;
 }
 
-.admin_layout .admin_header .LocationPath .ActionRenderer {
+.admin_layout .admin_header .LocationPath .Action {
     color: white;
 }
 
@@ -158,7 +158,7 @@ IMG {
     height: 30px;
 }
 
-.admin_layout .page_area .page_caption .page_actions .ActionRenderer {
+.admin_layout .page_area .page_caption .page_actions .Action {
     display: inline-block;
     width: 30px;
     height: 100%;
@@ -168,16 +168,16 @@ IMG {
     margin-right: 3px;
 }
 
-.admin_layout .page_area .page_caption .page_actions .ActionRenderer[action]:not([action='']) {
+.admin_layout .page_area .page_caption .page_actions .Action[action]:not([action='']) {
     background-repeat: no-repeat;
     /*   content: attr(title) ": ";  */
 }
 
-.admin_layout .page_area .page_caption .page_actions .ActionRenderer[action='add'] {
+.admin_layout .page_area .page_caption .page_actions .Action[action='add'] {
     background-image: url("../images/page_actions/green_plus.png");
 }
 
-.admin_layout .page_area .page_caption .page_actions .ActionRenderer[action='back'] {
+.admin_layout .page_area .page_caption .page_actions .Action[action='back'] {
     background-image: url("../images/page_actions/green_left.png");
 }
 
@@ -267,4 +267,13 @@ IMG {
 
 .AdminLoginPage.forgot_password .FormRenderer .SubmitLine .Buttons {
     display:block;
+}
+.admin_layout .KeywordSearchComponent {
+    display:block;
+}
+.admin_layout .KeywordSearchComponent .InputComponent[field='keyword'] .InputLabel {
+    display:none !important;
+}
+.admin_layout .KeywordSearchComponent .SubmitLine .Buttons>* {
+    margin-left: 0.3em;
 }

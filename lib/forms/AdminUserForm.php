@@ -52,7 +52,7 @@ class AdminUserForm extends InputForm
         $rend->na_value = FALSE;
         $rend->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_VALUE);
         $rend->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
-        $rend->setItemIterator($enum);
+        $rend->setIterator($enum);
         $rend->setAttribute("onChange", "toggleRoles()");
 
         $this->addInput($field);
@@ -62,7 +62,7 @@ class AdminUserForm extends InputForm
         $field->getProcessor()->setTransactBean(new AdminAccessBean());
 
         $rend = new CheckField($field);
-        $rend->setItemIterator(new AdminRolesIterator());
+        $rend->setIterator(new AdminRolesIterator());
         $rend->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_ID);
         $rend->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
 

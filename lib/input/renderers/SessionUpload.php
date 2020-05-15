@@ -47,14 +47,16 @@ abstract class SessionUpload extends InputField
         return $arr;
     }
 
-    protected function prepareInputAttributes(): string
+    protected function processInputAttributes()
     {
+        parent::processInputAttributes();
+
         $max_slots = $this->input->getProcessor()->max_slots;
 
         $this->setInputAttribute("type", "file");
         $this->setInputAttribute("max_slots", $max_slots);
 
-        return parent::prepareInputAttributes();
+
     }
 
     public function renderDetails()

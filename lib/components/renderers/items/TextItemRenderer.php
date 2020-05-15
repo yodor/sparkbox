@@ -1,46 +1,37 @@
 <?php
+include_once("components/renderers/items/DataIteratorItem.php");
 
-include_once("components/Component.php");
-include_once("components/renderers/IItemRenderer.php");
 
-class TextItemRenderer extends Component implements IItemRenderer
+class TextItemRenderer extends DataIteratorItem
 {
 
-    private $field_name;
-    protected $item;
+    protected $field_name;
 
-    public function setItem($item)
-    {
-        $this->item = $item;
-    }
-
-    public function getItem()
-    {
-        return $this->item;
-    }
-
-    public function __construct($field_name)
+    public function __construct(string $field_name)
     {
         parent::__construct();
-        $this->setAttribute("align", "left");
-        $this->setAttribute("valign", "middle");
-        $this->setFieldName($field_name);
+
+        $this->field_name = $field_name;
     }
 
-    public function setFieldName($field_name)
+    public function setData(array $item)
+    {
+        parent::setData($item);
+
+        $this->contents = $item[$this->field_name];
+    }
+
+    public function setFieldName(string $field_name)
     {
         $this->field_name = $field_name;
     }
 
-    protected function renderImpl()
+    public function getFieldName() : string
     {
-        echo $this->item[$this->field_name];
+        return $this->field_name;
     }
 
-    public function renderSeparator($idx_curr, $items_total)
-    {
 
-    }
 }
 
 ?>

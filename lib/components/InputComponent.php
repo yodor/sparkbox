@@ -72,7 +72,7 @@ class InputComponent extends Component
 
             if ($editID > 0 && $form->getBean()) {
 
-                echo "<a class='ActionRenderer' action='TranslateBeanField' field='$field_name'>";
+                echo "<a class='Action' action='TranslateBeanField' field='$field_name'>";
                 echo tr("Translate");
                 echo "</a>";
 
