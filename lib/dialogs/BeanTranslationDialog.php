@@ -1,5 +1,5 @@
 <?php
-include_once("panels/MessageDialog.php");
+include_once("dialogs/MessageDialog.php");
 include_once("handlers/TranslateBeanAjaxHandler.php");
 
 //IFinalRenderer delegate rendering to page control does not need to call render

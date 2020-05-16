@@ -5,7 +5,7 @@ include_once("components/renderers/IDataIteratorRenderer.php");
 
 /**
  * Class InputField
- * Base class to wraps various input tags into a Component
+ * Base class wrapping various input tags into a Component
  */
 abstract class InputField extends Component implements IErrorRenderer, IDataIteratorRenderer
 {

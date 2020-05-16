@@ -42,11 +42,11 @@
     background-image: url("../images/list_actions/icon_grid.png");
 }
 
-.PaginatorTopComponent .cell + .cell.caption {
+.PaginatorTopComponent .cell + .cell.Caption {
     text-align: center;
 }
 
-.PaginatorTopComponent .caption {
+.PaginatorTopComponent .Caption {
     font-weight: bold;
     text-align: left;
 

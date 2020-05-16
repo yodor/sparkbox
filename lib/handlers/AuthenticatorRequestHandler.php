@@ -1,7 +1,7 @@
 <?php
 include_once("handlers/RequestHandler.php");
 
-include_once("panels/ConfirmMessageDialog.php");
+include_once("dialogs/ConfirmMessageDialog.php");
 
 class AuthenticatorRequestHandler extends RequestHandler
 {
@@ -51,7 +51,7 @@ class AuthenticatorRequestHandler extends RequestHandler
 
     }
 
-    protected function process()
+    protected function processImpl()
     {
 
         $success = FALSE;

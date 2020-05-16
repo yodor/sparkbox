@@ -71,22 +71,7 @@ INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
 }
 
 
-.buttons_bar {
-    display: table;
-    float: right;
-}
 
-.buttons_bar .button_slot {
-    display: table-cell;
-    vertical-align: middle;
-
-    padding: 0.5em;
-}
-
-.buttons_bar .button_slot A {
-    display: inline-block;
-    text-align: center;
-}
 
 TD.input_field {
     vertical-align: middle;

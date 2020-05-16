@@ -2,7 +2,7 @@
 include_once("components/Component.php");
 include_once("components/TableColumn.php");
 
-class TableCellRenderer extends Component
+class TableCellRenderer extends Component implements IDataResultProcessor
 {
     protected $tagName = "TD";
 
@@ -72,6 +72,7 @@ class TableCellRenderer extends Component
 
     public function setData(array &$row)
     {
+        //debug("setData: ", $row);
 
         foreach ($this->value_attributes as $idx => $field) {
             if (isset($row[$field])) {

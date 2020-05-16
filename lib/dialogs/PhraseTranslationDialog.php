@@ -1,20 +1,18 @@
 <?php
-include_once("panels/MessageDialog.php");
+include_once("dialogs/MessageDialog.php");
 include_once("handlers/TranslatePhraseAjaxHandler.php");
 
 class PhraseTranslationDialog extends MessageDialog
 {
 
+    protected $type = MessageDialog::TYPE_PLAIN;
+
     public function __construct()
     {
         parent::__construct("Phrase Translator", "phrase_translator");
 
-        $this->show_close_button = TRUE;
-        $this->setDialogType(MessageDialog::TYPE_PLAIN);
-
         $h_translate = new TranslatePhraseAjaxHandler();
         RequestController::addAjaxHandler($h_translate);
-
     }
 
     public function requiredStyle()
@@ -48,25 +46,27 @@ class PhraseTranslationDialog extends MessageDialog
     protected function renderImpl()
     {
 
-        echo tr("Original Text") . ":<br>";
+        echo "<table class='Items'>";
 
-        echo "<textarea READONLY class='original_text' rows=5>";
+        echo "<tr><td>";
+        echo "<label>" . tr("Original Text") . ": </label>";
+        echo "</td></tr>";
+
+        echo "<tr><td class='cell phrase'>";
+        echo "<textarea READONLY name='phrase' rows='5' >";
         echo "</textarea>";
+        echo "</td></tr>";
 
-        echo "<br>";
+        echo "<tr><td>";
+        echo "<label>" . tr("Translation") . ": </label>";
+        echo "</td></tr>";
 
-        echo "<form>";
-
-        echo tr("Translation") . ":";
-
-        echo "<div class='AjaxProgress'></div>";
-
-        echo "<div class='InputField TextArea'>";
-        echo "<textarea name='translation' rows=5>";
+        echo "<tr><td class='cell translation'>";
+        echo "<textarea name='translation' rows='5' >";
         echo "</textarea>";
-        echo "</div>";
+        echo "</td></tr>"; //item
 
-        echo "</form>";
+        echo "</table>";
 
     }
 

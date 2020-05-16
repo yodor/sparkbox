@@ -42,7 +42,7 @@ class DeleteItemRequestHandler extends RequestHandler
         $this->drawConfirmDialog("Confirm Delete", "Confirm you want to delete this item?");
     }
 
-    protected function process()
+    protected function processImpl()
     {
 
         $db = DBConnections::Factory();

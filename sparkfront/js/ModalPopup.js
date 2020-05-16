@@ -1,43 +1,12 @@
-(function ($) {
-    $.event.special.destroyed = {
-        remove: function (o) {
-            if (o.handler) {
-                o.handler()
-            }
-        }
-    }
-})(jQuery)
-
-function PopupHandler() {
-
-}
-
-PopupHandler.prototype.popupEventHandler = function (e) {
-    switch (e.message) {
-        case "onPopupVisible":
-            let modal_pane = e.pane;
-            if (e.pane.fullscreen) {
-
-            }
-            else {
-                modal_pane.centerContents();
-            }
-            break;
-    }
-}
-
-let popup_handler = new PopupHandler();
-$(document).on("ModalPopup", popup_handler.popupEventHandler);
-
-
 function ModalPopup() {
-    this.modal_content = "<div class='ModalPane' frameBorder=0 border=0 marginWidth=0 marginHeight=0 scrolling='no'></div>";
+    this.modal_content = "<div class='ModalPane'></div>";
     this.fullscreen = false;
 }
 
 ModalPopup.prototype.popup = function () {
     return this.pane().children().first();
 }
+
 ModalPopup.prototype.pane = function () {
     return $(".ModalPane").last();
 }
@@ -71,9 +40,12 @@ ModalPopup.prototype.showID = function (id) {
     this.show();
 
     elm.bind('destroyed', function () {
+
         let originate_parent = elm.data("originate_parent");
         originate_parent.append(elm);
-        elm.css("visibility", "hidden");
+
+        elm.attr("style", "");
+
     })
 
     //TODO:check if the elment need to go back to the dom after closing the modal pane
@@ -82,10 +54,8 @@ ModalPopup.prototype.showID = function (id) {
 ModalPopup.prototype.show = function () {
 
 
-
     if (this.fullscreen) {
-    }
-    else {
+    } else {
         this.popup().css("display", "block");
     }
 
@@ -101,8 +71,7 @@ ModalPopup.prototype.show = function () {
 
     if (this.fullscreen) {
 
-    }
-    else {
+    } else {
         $(window).resize(function (event) {
             this.centerContents();
         }.bind(this));
@@ -113,7 +82,7 @@ ModalPopup.prototype.show = function () {
     }.bind(this));
 
 
-    let caption = this.popup().find(".caption");
+    let caption = this.popup().find(".Caption");
     if (caption.get(0)) {
         caption.mousedown(function (event) {
             if (event.which != 1) return;
@@ -142,11 +111,16 @@ ModalPopup.prototype.show = function () {
     if (last_pane.get(0)) {
         last_pane.data("control_object", this);
     }
+
+    this.makeResizable();
 }
+
 ModalPopup.prototype.paneClicked = function (event) {
-//   console.log("paneClicked");
+
+   console.log("ModalPopup: paneClicked");
 
 }
+
 ModalPopup.prototype.centerContents = function () {
 
     var windowWidth = $(window).width(); //retrieve current window width
@@ -160,131 +134,91 @@ ModalPopup.prototype.centerContents = function () {
 
     this.popup().css("left", left);
     this.popup().css("top", top);
+    this.popup().css("min-width", width);
+    this.popup().css("min-height", height);
 
 
 }
 
-function showAlert(text, func) {
+/*Make resizable div by Hung Nguyen*/
+ModalPopup.prototype.makeResizable = function () {
 
-    let dialog = new MessageDialog();
-    dialog.setText(text);
-    dialog.setCaption("Alert!");
 
-    dialog.show();
+    let div = ".ModalPane .MessageDialog.resizable";
 
-    dialog.modal_pane.popup().find("[action='confirm']").click(function (event) {
-        if (func) {
-            console.log("Calling func");
-            func(dialog)
-        } else {
-            console.log("Calling remove");
-            dialog.modal_pane.pane().remove();
+    const element = document.querySelector(div);
+
+    const resizers = document.querySelectorAll(div + ' .resizer');
+
+    const minimum_size = 20;
+    let original_width = 0;
+    let original_height = 0;
+    let original_x = 0;
+    let original_y = 0;
+    let original_mouse_x = 0;
+    let original_mouse_y = 0;
+    for (let i = 0; i < resizers.length; i++) {
+        const currentResizer = resizers[i];
+        currentResizer.addEventListener('mousedown', function (e) {
+            e.preventDefault()
+            original_width = parseFloat(getComputedStyle(element, null).getPropertyValue('width').replace('px', ''));
+            original_height = parseFloat(getComputedStyle(element, null).getPropertyValue('height').replace('px', ''));
+            original_x = element.getBoundingClientRect().left;
+            original_y = element.getBoundingClientRect().top;
+            original_mouse_x = e.pageX;
+            original_mouse_y = e.pageY;
+            window.addEventListener('mousemove', resize)
+            window.addEventListener('mouseup', stopResize)
+        })
+
+        function resize(e) {
+            if (currentResizer.classList.contains('bottom-right')) {
+                const width = original_width + (e.pageX - original_mouse_x);
+                const height = original_height + (e.pageY - original_mouse_y)
+                if (width > minimum_size) {
+                    element.style.width = width + 'px'
+                }
+                if (height > minimum_size) {
+                    element.style.height = height + 'px'
+                }
+            } else if (currentResizer.classList.contains('bottom-left')) {
+                const height = original_height + (e.pageY - original_mouse_y)
+                const width = original_width - (e.pageX - original_mouse_x)
+                if (height > minimum_size) {
+                    element.style.height = height + 'px'
+                }
+                if (width > minimum_size) {
+                    element.style.width = width + 'px'
+                    element.style.left = original_x + (e.pageX - original_mouse_x) + 'px'
+                }
+            } else if (currentResizer.classList.contains('top-right')) {
+                const width = original_width + (e.pageX - original_mouse_x)
+                const height = original_height - (e.pageY - original_mouse_y)
+                if (width > minimum_size) {
+                    element.style.width = width + 'px'
+                }
+                if (height > minimum_size) {
+                    element.style.height = height + 'px'
+                    element.style.top = original_y + (e.pageY - original_mouse_y) + 'px'
+                }
+            } else {
+                const width = original_width - (e.pageX - original_mouse_x)
+                const height = original_height - (e.pageY - original_mouse_y)
+                if (width > minimum_size) {
+                    element.style.width = width + 'px'
+                    element.style.left = original_x + (e.pageX - original_mouse_x) + 'px'
+                }
+                if (height > minimum_size) {
+                    element.style.height = height + 'px'
+                    element.style.top = original_y + (e.pageY - original_mouse_y) + 'px'
+                }
+            }
         }
-    });
 
-    dialog.modal_pane.paneClicked = function (event) {
-
+        function stopResize() {
+            window.removeEventListener('mousemove', resize)
+        }
     }
-
 }
 
-function showConfirm(text, func_ok, func_cancel) {
 
-
-    var dialog = new MessageDialog("confirm_dialog");
-    dialog.setText(text);
-    dialog.setCaption("Confirmation");
-    dialog.show();
-
-    dialog.modal_pane.popup().find("[action='confirm']").click(function (event) {
-        if (func_ok) {
-            console.log("Calling func OK");
-            func_ok(dialog)
-        } else {
-            console.log("Calling default remove");
-            dialog.modal_pane.pane().remove();
-        }
-    });
-
-    dialog.modal_pane.popup().find("[action='cancel']").click(function (event) {
-        if (func_cancel) {
-            console.log("Calling func CANCEL");
-            func_cancel(dialog)
-        } else {
-            console.log("Calling default remove");
-            dialog.modal_pane.pane().remove();
-        }
-    });
-
-    dialog.modal_pane.paneClicked = function (event) {
-
-    }
-
-}
-
-function showPopupPanel(popup_id, text) {
-    var modal_pane = new ModalPopup();
-
-    modal_pane.showID(popup_id);
-
-    if (text) {
-        var message_text = modal_pane.popup().find(".message_text");
-        message_text.html(text);
-    }
-
-    modal_pane.centerContents();
-
-    modal_pane.paneClicked = function (event) {
-
-    }
-
-}
-
-
-$(document).bind("keypress", function (event) {
-
-
-    //console.log("Keypress: "+event.which);
-
-    var pane = $(".ModalPane").last();
-
-    if (!pane.get(0)) {
-        return true;
-    }
-
-    var control_object = pane.data("control_object");
-
-    //esc
-    if (event.which == 27) {
-
-
-        var cancel_button = control_object.popup().find("[action='cancel']").first();
-        var confirm_button = control_object.popup().find("[action='confirm']").first();
-
-        if (cancel_button.get(0)) {
-            cancel_button.click();
-            return false;
-        } else if (confirm_button.get(0)) {
-            confirm_button.click();
-            return false;
-        } else {
-            pane.trigger("click");
-            return false;
-        }
-
-    } else if (event.which == 13) {
-
-
-        var defaul_button = control_object.popup().find("[default_action]").first();
-        if (defaul_button.get(0)) {
-
-            defaul_button.click();
-            return false;
-        }
-
-    }
-
-    return true;
-
-
-});

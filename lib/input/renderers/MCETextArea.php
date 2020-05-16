@@ -12,7 +12,7 @@ class MCETextArea extends InputField
 
         //force single instance of the dialog to all MCETextAreas to prevent double session upload
         if (!self::$image_browser) {
-            include_once("panels/MCEImageBrowserDialog.php");
+            include_once("dialogs/MCEImageBrowserDialog.php");
             self::$image_browser = new MCEImageBrowserDialog();
         }
 

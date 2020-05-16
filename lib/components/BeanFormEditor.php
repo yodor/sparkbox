@@ -11,7 +11,7 @@ include_once("handlers/UploadControlAjaxHandler.php");
 
 include_once("handlers/IRequestProcessor.php");
 
-include_once("panels/BeanTranslationDialog.php");
+include_once("dialogs/BeanTranslationDialog.php");
 
 class BeanFormEditor extends Container implements IBeanEditor
 {
@@ -209,7 +209,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
                         $back_action = $page->getAction("back");
                         if ($back_action instanceof Action) {
-                            header("Location: " . $back_action->getURL()->url());
+                            header("Location: " . $back_action->getURLBuilder()->url());
                         }
                         else {
                             header("Location: " . $_SERVER["REQUEST_URI"]);

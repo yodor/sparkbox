@@ -3,7 +3,7 @@
 interface IRequestProcessor
 {
 
-    public function shouldProcess();
+    public function needProcess();
 
     public function processHandler();
 

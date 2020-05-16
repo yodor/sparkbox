@@ -54,12 +54,6 @@ class ActionsTableCellRenderer extends TableCellRenderer implements IActionsColl
         return $this->actions[$title];
     }
 
-    public function setColumn(TableColumn $parent)
-    {
-        parent::setColumn($parent);
-        $parent->setSortable(FALSE);
-    }
-
     public function setData(array &$row)
     {
         parent::setData($row);
@@ -68,7 +62,6 @@ class ActionsTableCellRenderer extends TableCellRenderer implements IActionsColl
         foreach ($actions as $pos => $title) {
             $action = $this->getAction($title);
             $action->setData($row);
-
         }
     }
 

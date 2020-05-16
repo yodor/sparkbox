@@ -1,6 +1,6 @@
 
 .BeanTranslationDialog .Inner {
-    min-width: 400px;
+    min-width: 40%;
 }
 
 .BeanTranslationDialog .Inner .AjaxProgress {
@@ -50,15 +50,15 @@
     -moz-box-sizing: border-box;
 }
 
-.BeanTranslationDialog .Inner .buttons_bar {
+.BeanTranslationDialog .Inner .Container.Buttons {
     display: block;
     width: 100%
 }
 
-.BeanTranslationDialog .Inner .buttons_bar [action='Translate'] {
+.BeanTranslationDialog .Inner .Container.Buttons [action='Translate'] {
     float: left;
 }
 
-.BeanTranslationDialog .Inner .buttons_bar [action='Close'] {
+.BeanTranslationDialog .Inner .Container.Buttons [action='Close'] {
     float: right;
 }

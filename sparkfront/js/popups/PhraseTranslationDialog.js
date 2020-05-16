@@ -22,7 +22,7 @@ PhraseTranslationDialog.prototype.edit = function (textID) {
 
     this.textID = textID;
 
-    var cell = $("[relation='translation'][textID='" + textID + "']");
+    var cell = $("[name='translation'][textID='" + textID + "']");
     var trID = cell.attr("trID");
 
     this.modal_pane.showID(this.cls);
@@ -43,10 +43,6 @@ PhraseTranslationDialog.prototype.edit = function (textID) {
         this.finish();
     }.bind(this));
 
-
-    popup.find(".caption [action='close']").bind("click", function () {
-        this.finish();
-    }.bind(this));
 
     popup.data("textID", textID);
     popup.data("trID", trID);

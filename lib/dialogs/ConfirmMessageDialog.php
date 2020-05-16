@@ -1,5 +1,5 @@
 <?php
-include_once("panels/MessageDialog.php");
+include_once("dialogs/MessageDialog.php");
 
 class ConfirmMessageDialog extends MessageDialog
 {

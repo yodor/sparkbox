@@ -1,5 +1,6 @@
 <?php
 include_once("utils/URLBuilder.php");
+include_once("utils/URLParameter.php");
 include_once("utils/DataParameter.php");
 include_once("components/renderers/items/DataIteratorItem.php");
 
@@ -11,8 +12,6 @@ class Action extends DataIteratorItem
      */
 
     protected $tagName = "A";
-
-    protected $data_parameters;
 
     protected $check_code = NULL;
 
@@ -37,24 +36,14 @@ class Action extends DataIteratorItem
         parent::__construct();
 
         $this->urlbuilder = new URLBuilder();
-        $this->urlbuilder->setHref($href);
+        $this->urlbuilder->buildFrom($href);
 
         $this->contents = $contents;
 
-        $this->data_parameters = array();
-
         foreach ($parameters as $idx => $parameter) {
-            //data row parameter
-            if ($parameter instanceof DataParameter) {
-                $this->data_parameters[$parameter->name()] = $parameter;
-            }
-            //static value parameter
-            else if ($parameter instanceof URLParameter) {
-                $this->urlbuilder->addParameter($parameter);
-            }
-            else {
-                debug("Passing non URLParameter in the parameters array");
-            }
+
+            $this->urlbuilder->addParameter($parameter);
+
         }
 
         $this->check_code = $check_code;
@@ -70,26 +59,16 @@ class Action extends DataIteratorItem
         return $arr;
     }
 
-    public function getURL(): URLBuilder
+    public function getURLBuilder(): URLBuilder
     {
         return $this->urlbuilder;
     }
 
-    public function getDataParameter(string $name): DataParameter
-    {
-        return $this->data_parameters[$name];
-    }
-
-    public function addDataParameter(DataParameter $param)
-    {
-        $this->data_parameters[$param->name()] = $param;
-    }
-
-    public function setData(array $row)
+    public function setData(array &$row)
     {
 
         if ($this->check_code) {
-            debug("Action has check_code anonymous function set: ".$this->getContents());
+            debug("Action has check_code anonymous function set: " . $this->getContents());
             $check_code = $this->check_code;
             if (!$check_code($this, $row)) {
                 debug("check_code disabled rendering of this action");
@@ -101,39 +80,7 @@ class Action extends DataIteratorItem
             }
         }
 
-        $script_name = $this->urlbuilder->getScriptName();
-
-        if (stripos($script_name, "javascript:") !== FALSE) {
-
-            $names = array_keys($this->data_parameters);
-            foreach ($names as $idx => $name) {
-                $param = $this->getDataParameter($name);
-
-                $param->setData($row);
-                //replace "%field%" with $data[$field]
-                $script_name = str_replace("%" . $param->field() . "%", $param->value(), $script_name);
-
-            }
-
-            $this->urlbuilder->setScriptName($script_name);
-            return;
-        }
-
-        $names = array_keys($this->data_parameters);
-        foreach ($names as $idx => $name) {
-            $param = $this->getDataParameter($name);
-            $param->setData($row);
-            $this->urlbuilder->addParameter($param);
-        }
-
-        //        $ret = $script_name . queryString($params);
-        //        if (is_array($row)) {
-        //            foreach ($row as $param_name => $value) {
-        //                $ret = str_replace("%" . $param_name . "%", $value, $ret);
-        //            }
-        //        }
-        //
-        //        return $ret;
+        $this->urlbuilder->setData($row);
 
     }
 
@@ -148,6 +95,7 @@ class Action extends DataIteratorItem
         }
 
         $url = $this->urlbuilder->url();
+
         if ($url) {
             $this->setAttribute("href", $url);
         }

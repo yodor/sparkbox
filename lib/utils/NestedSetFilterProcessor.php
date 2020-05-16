@@ -38,10 +38,10 @@ class NestedSetFilterProcessor
 
     protected function createDefaultAction(IDataIterator $iterator)
     {
-        $tv_item_clicked = new Action("TextItemClicked", "", array(new DataParameter($iterator->key(), $iterator->key())));
+        $tv_item_clicked = new Action("TextItemClicked", "", array(new DataParameter($iterator->key())));
 
         //clicking on this will clear the page parameter of the paginator from the href url
-        $tv_item_clicked->getURL()->setClearPageParams(TRUE);
+        $tv_item_clicked->getURLBuilder()->setClearPageParams(TRUE);
 
         return $tv_item_clicked;
     }

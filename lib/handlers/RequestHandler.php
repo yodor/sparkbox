@@ -28,7 +28,7 @@ abstract class RequestHandler implements IRequestProcessor
         $this->need_confirm = $mode;
     }
 
-    public function getCommandName(): string
+    public function getCommand(): string
     {
         return $this->cmd;
     }
@@ -53,7 +53,7 @@ abstract class RequestHandler implements IRequestProcessor
         return $this->success_url;
     }
 
-    public function shouldProcess(): bool
+    public function needProcess(): bool
     {
         if (isset($_REQUEST[RequestHandler::KEY_COMMAND]) && strcmp($_REQUEST[RequestHandler::KEY_COMMAND], $this->cmd) == 0) {
 
@@ -82,7 +82,7 @@ abstract class RequestHandler implements IRequestProcessor
 
         $redirectURL = "";
 
-        if ($this->process()) {
+        if ($this->processImpl()) {
             debug("Process returned true");
             $redirectURL = $this->getSuccessUrl();
         }
@@ -108,7 +108,7 @@ abstract class RequestHandler implements IRequestProcessor
         return NULL;
     }
 
-    abstract protected function process();
+    abstract protected function processImpl();
 
     abstract protected function parseParams();
 

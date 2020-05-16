@@ -5,6 +5,10 @@ include_once("utils/Paginator.php");
 class URLBuilder
 {
 
+    //the original href that was set to this URLBuilder. Can contain parameterized values
+    //
+    protected $build_string = "";
+
     protected $script_name = "";
     protected $script_query = "";
 
@@ -13,15 +17,17 @@ class URLBuilder
 
     protected $parameters;
 
+    protected $resource = "";
+
     protected $clear_page_param = FALSE;
 
     protected $keep_request_params = TRUE;
 
-    public function __construct(string $href = "")
+    protected $is_script = FALSE;
+
+    public function __construct()
     {
         $this->parameters = array();
-
-        $this->setHref($href);
     }
 
     public function isEmpty()
@@ -50,7 +56,7 @@ class URLBuilder
         $this->parameters[$param->name()] = $param;
     }
 
-    public function getParameter($name): URLParameter
+    public function getParameter(string $name): URLParameter
     {
         return $this->parameters[$name];
     }
@@ -62,26 +68,17 @@ class URLBuilder
 
     public function url()
     {
-        $this->process();
+        if ($this->is_script) {
+            return $this->script_name;
+        }
+
+        $this->processQuery();
 
         $ret = $this->protocol . $this->domain . $this->script_name;
 
-        if (stripos($ret, "javascript:") !== FALSE) {
-
-        }
-        else if (count($this->parameters) > 0) {
+        if ($this->script_query) {
             $ret .= "?";
-
-            $names = array_keys($this->parameters);
-
-            $pairs = array();
-            foreach ($names as $pos => $name) {
-                $param = $this->getParameter($name);
-                $pairs[] = $param->name() . "=" . $param->value();
-            }
-
-            $ret .= implode("&", $pairs);
-
+            $ret .= $this->script_query;
         }
 
         return $ret;
@@ -97,10 +94,9 @@ class URLBuilder
         $this->script_name = $value;
     }
 
-    protected function process()
+    protected function processQuery()
     {
-        //TODO: Check order of parameters
-        //1. parameters from current URL
+
         if ($this->keep_request_params) {
             foreach ($_GET as $key => $param) {
                 if (!isset($this->parameters[$key])) {
@@ -109,9 +105,66 @@ class URLBuilder
             }
         }
 
-        //2. static parameters from passed href
+        //clear parameters from the Paginator
+        if ($this->clear_page_param) {
 
-        $static_pairs = explode("&", $this->script_query);
+            Paginator::clearPageFilter($this->parameters);
+        }
+
+        if (count($this->parameters) > 0) {
+
+            $names = array_keys($this->parameters);
+
+            $pairs = array();
+            foreach ($names as $pos => $name) {
+                $param = $this->getParameter($name);
+                if ($param->isResource()) continue;
+                $pairs[] = $param->text();
+            }
+
+            $this->script_query = implode("&", $pairs);
+
+            foreach ($names as $pos => $name) {
+                $param = $this->getParameter($name);
+                if (!$param->isResource()) continue;
+                $this->resource = $param->value();
+            }
+        }
+
+    }
+
+    public function getBuildFrom(): string
+    {
+        return $this->build_string;
+    }
+
+    public function buildFrom(string $build_string)
+    {
+        //store the original href. might contain parameterized actions
+        $this->build_string = $build_string;
+
+        if (stripos($build_string, "javascript:") !== FALSE) {
+            $this->is_script = TRUE;
+            $this->script_name = $build_string;
+            $this->script_query = "";
+            return;
+        }
+
+        $script_name = $build_string;
+        $script_query = "";
+
+        if (strpos($script_name, "?") !== FALSE) {
+            list($script_name, $script_query) = explode("?", $script_name);
+        }
+        $this->script_name = $script_name;
+
+        $local_name = "";
+        if (strpos($script_query, "#") !== FALSE) {
+            list($script_query, $local_name) = explode("#", $script_query);
+            $this->addParameter(new URLParameter($local_name));
+        }
+
+        $static_pairs = explode("&", $script_query);
         foreach ($static_pairs as $pos => $pair) {
             $param_name = $pair;
             $param_value = "";
@@ -123,43 +176,28 @@ class URLBuilder
             }
         }
 
-        //clear parameters from the Paginator
-        if (strlen($this->script_name) > 0 || $this->clear_page_param) {
-
-            Paginator::clearPageFilter($this->parameters);
-        }
-
-        //        $ret = $this->script_name . queryString($params);
-        //        if (is_array($row)) {
-        //            foreach ($row as $param_name => $value) {
-        //                $ret = str_replace("%" . $param_name . "%", $value, $ret);
-        //            }
-        //        }
-        //
-        //        if (strrpos($ret, "&") === strlen($ret) - 1) {
-        //            $ret = substr_replace($ret, "", -1);
-        //        }
-
     }
 
-    public function setHref(string $href)
+    public function setData(array $row)
     {
-        if (stripos($href, "javascript:") !== FALSE) {
+        //process javascript hrefs directly
+        if ($this->is_script) {
 
-            $this->script_name = $href;
-            $this->script_query = "";
+            $from = $this->build_string;
+            $names = array_keys($row);
+            foreach ($names as $idx => $name) {
+                $replace = array("%" . $name . "%" => $row[$name]);
+                $from = strtr($from, $replace);
+            }
+            $this->script_name = $from;
             return;
         }
 
-        $script_name = $href;
-        $script_query = "";
-
-        if (strpos($script_name, "?") !== FALSE) {
-            list($script_name, $script_query) = explode("?", $script_name);
+        $names = array_keys($this->parameters);
+        foreach ($names as $idx => $name) {
+            $param = $this->getParameter($name);
+            $param->setData($row);
         }
-
-        $this->script_name = $script_name;
-        $this->script_query = $script_query;
 
     }
 

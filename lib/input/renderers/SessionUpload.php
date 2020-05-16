@@ -23,7 +23,7 @@ abstract class SessionUpload extends InputField
 
         RequestController::addAjaxHandler($this->ajax_handler);
 
-        $this->setAttribute("handler_command", $this->ajax_handler->getCommandName());
+        $this->setAttribute("handler_command", $this->ajax_handler->getCommand());
 
     }
 

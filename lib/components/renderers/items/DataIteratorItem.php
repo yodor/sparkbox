@@ -1,7 +1,8 @@
 <?php
 include_once("components/Component.php");
+include_once("utils/IDataResultProcessor.php");
 
-abstract class DataIteratorItem extends Component
+abstract class DataIteratorItem extends Component implements IDataResultProcessor
 {
     //use value of data array key '$value_key' to construct the value of this item
     protected $value_key;
@@ -112,7 +113,7 @@ abstract class DataIteratorItem extends Component
         return $this->selected;
     }
 
-    public function setData(array $data)
+    public function setData(array &$data)
     {
         $this->data = $data;
 

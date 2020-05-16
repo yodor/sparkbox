@@ -5,7 +5,7 @@ include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
 include_once("beans/ConfigBean.php");
 
-include_once("panels/MessageDialog.php");
+include_once("dialogs/MessageDialog.php");
 include_once("components/ImagePopup.php");
 
 class SparkPage extends HTMLPage
@@ -239,9 +239,12 @@ class SparkPage extends HTMLPage
         $this->addMeta("keywords", "%meta_keywords%");
         $this->addMeta("description", "%meta_description%");
 
+        $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
+
+
         $this->addCSS(SPARK_LOCAL . "/css/ModalPane.css");
-        $this->addCSS(SPARK_LOCAL . "/css/Tooltip.css");
         $this->addCSS(SPARK_LOCAL . "/css/ImagePopup.css");
+        $this->addCSS(SPARK_LOCAL . "/css/MessageDialog.css");
         $this->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
 
         $this->addJS(SPARK_LOCAL . "/js/jquery-1.8.0.min.js");
@@ -251,6 +254,8 @@ class SparkPage extends HTMLPage
         $this->addJS(SPARK_LOCAL . "/js/ModalPopup.js");
         $this->addJS(SPARK_LOCAL . "/js/Tooltip.js");
         $this->addJS(SPARK_LOCAL . "/js/ImagePopup.js");
+        $this->addJS(SPARK_LOCAL . "/js/popups/MessageDialog.js");
+        $this->addJS(SPARK_LOCAL . "/js/SparkPage.js");
 
         $dialog = new MessageDialog();
     }

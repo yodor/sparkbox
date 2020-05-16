@@ -5,10 +5,10 @@ include_once("components/ColorButton.php");
 
 class MessageDialog extends Component implements IPageComponent
 {
-    const TYPE_PLAIN = 0;
-    const TYPE_ERROR = 1;
-    const TYPE_INFO = 2;
-    const TYPE_QUESTION = 3;
+    const TYPE_PLAIN = "";
+    const TYPE_ERROR = "Error";
+    const TYPE_INFO = "Info";
+    const TYPE_QUESTION = "Question";
 
     const BUTTON_ACTION_CONFIRM = "confirm";
     const BUTTON_ACTION_CANCEL = "cancel";
@@ -36,9 +36,10 @@ class MessageDialog extends Component implements IPageComponent
         $this->setAttribute("name", $id);
 
         $this->buttonsBar = new Container();
-        $this->buttonsBar->setClassName("buttons_bar");
+        $this->buttonsBar->setClassName("Buttons");
 
         $this->setClassName("PopupPanel");
+        $this->addClassName("resizable");
 
         $this->setDialogType($this->type);
 
@@ -79,25 +80,10 @@ class MessageDialog extends Component implements IPageComponent
         return $this->buttonsBar;
     }
 
-    public function setDialogType($type)
+    public function setDialogType(string $type)
     {
         $this->type = $type;
-
-        $icon_class = "";
-        if ($this->type == MessageDialog::TYPE_ERROR) {
-            $icon_class = "icon_error";
-        }
-        else if ($this->type == MessageDialog::TYPE_QUESTION) {
-            $icon_class = "icon_question";
-        }
-        else if ($this->type == MessageDialog::TYPE_INFO) {
-            $icon_class = "icon_info";
-        }
-        else if ($this->type == MessageDialog::TYPE_PLAIN) {
-            $icon_class = "";
-        }
-
-        $this->icon_class = $icon_class;
+        $this->setAttribute("type", $type);
     }
 
     public function startRender()
@@ -105,49 +91,49 @@ class MessageDialog extends Component implements IPageComponent
 
         parent::startRender();
 
+        echo "<div class='Inner'>";
+
+        echo "<div class='Header'>";
+
         if (strlen($this->title) > 0) {
-            echo "<div class='caption'>";
+            echo "<div class='Caption'>";
 
-            //            if ($this->show_close_button) {
-            //                $b = new ColorButton();
-            //                $b->setText("X");
-            //                $b->setAttribute("action", MessageDialog::BUTTON_ACTION_CLOSE);
-            //                $b->render();
-            //            }
+            echo "<span class='Title'>" . tr($this->title) . "</span>";
 
-            echo "<span class='caption_text'>" . tr($this->title) . "</span>";
-
-            echo "<div class=clear></div>";
             echo "</div>";
         }
 
-        echo "<div class='Inner'>";
+        echo "</div>";
 
-        if ($this->type === MessageDialog::TYPE_PLAIN) {
-            //
-        }
-        else {
-            echo "<div class='message_icon {$this->icon_class}'></div>";
-            echo "<div class='message_text'>";
-        }
+        echo "<div class='Center'>";
+
+        echo "<div class='Contents'>";
+
+        echo "<div class='Icon'></div>";
+
+        echo "<div class='Text'>";
     }
 
     public function finishRender()
     {
-        if ($this->type === MessageDialog::TYPE_PLAIN) {
-            //
-        }
-        else {
-            echo "</div>";//message_text
-        }
+        echo "</div>";
 
-        echo "<div class=clear></div>";
+        echo "</div>";//Contents
 
+        echo "</div>"; //center
+
+        echo "<div class='Footer'>";
         $this->buttonsBar->render();
+        echo "</div>";
 
-        echo "<div class=clear></div>";
+        echo "</div>"; //Inner
 
-        echo "</div>"; //inner
+        ?>
+        <div class='resizer top-left'></div>
+        <div class='resizer top-right'></div>
+        <div class='resizer bottom-left'></div>
+        <div class='resizer bottom-right'></div>
+        <?php
 
         parent::finishRender();
 

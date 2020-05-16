@@ -48,7 +48,7 @@ class ArrayField extends InputField
         $this->addControl($button_add);
 
         $this->action = new Action("Remove","");
-        $this->action->getURL()->setKeepRequestParams(false);
+        $this->action->getURLBuilder()->setKeepRequestParams(false);
 
     }
 

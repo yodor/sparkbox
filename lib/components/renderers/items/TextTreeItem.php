@@ -67,7 +67,7 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
 
     }
 
-    public function setData(array $row)
+    public function setData(array &$row)
     {
         parent::setData($row);
 

@@ -1,5 +1,5 @@
 <?php
-include_once("panels/MessageDialog.php");
+include_once("dialogs/MessageDialog.php");
 include_once("handlers/MCEImageBrowserAjaxHandler.php");
 
 class MCEImageBrowserDialog extends MessageDialog

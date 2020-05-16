@@ -30,5 +30,40 @@ A IMG INPUT {
     background-position: center center;
 }
 
+.PopupPanel {
 
+    color: black;
+    position: absolute;
+    z-index: 100;
+    display: none;
+
+    text-align: left;
+
+    border-radius: 5px;
+
+    /*box-shadow: #333 0 1em 1em;*/
+
+    overflow: hidden;
+
+}
+
+.TooltipPanel {
+    /*background-color: black;*/
+    padding: 0.5em;
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: white;
+    /*font-size:1.2em;*/
+
+    background-color: #102b31;
+    -moz-border-radius: 0.25em;
+    -webkit-border-radius: 0.25em;
+    border-radius: 0.25em;
+    z-Index: 100;
+    vertical-align: top;
+    display: none;
+
+}
 

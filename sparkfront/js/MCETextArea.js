@@ -19,7 +19,7 @@ MCETextArea.prototype.onInsertImage = function (ed) {
 
     this.editor = ed;
 
-    //php side panels/MCEImageBrowserDialog
+    //php side dialogs/MCEImageBrowserDialog
     if ($("#mceImage_browser").get(0)) {
         console.log("MCETextArea.prototype.onInsertImage() Custom image browser found using it");
         this.image_browser.mce = this;

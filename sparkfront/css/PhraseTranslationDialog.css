@@ -1,46 +1,40 @@
-.PhraseTranslationDialog .Inner {
 
-    width: 400px;
+.PhraseTranslationDialog .Contents TABLE {
 
+    width:100%;
+    height:100%;
+}
+.PhraseTranslationDialog .Contents TABLE .cell.translation {
+    height:100%;
 }
 
-.PhraseTranslationDialog .Inner .AjaxProgress {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    float: right;
+.PhraseTranslationDialog .Contents TABLE TEXTAREA {
 
-}
-
-.PhraseTranslationDialog .Inner .original_text {
-    border: 1px solid purple;
     background: white;
     color: black;
-    overflow: visible;
+
     width: 100%;
+    min-width:100%;
+    height:100%;
+
     box-sizing: border-box;
     -moz-box-sizing: border-box;
-}
-
-.PhraseTranslationDialog .Inner .InputField.TextArea {
     display:block;
+    resize: none;
 }
 
-.PhraseTranslationDialog .Inner textarea[name='translation'] {
+.PhraseTranslationDialog .Contents TEXTAREA[name='phrase'] {
 
 }
 
+.PhraseTranslationDialog .Contents TEXTAREA[name='translation'] {
 
-.PhraseTranslationDialog .Inner .buttons_bar {
-    display: block;
-    width: 100%;
-    margin-top: 0.8em;
 }
 
-.PhraseTranslationDialog .Inner .buttons_bar [action='Translate'] {
+.PhraseTranslationDialog .Contents .Container.Buttons [action='Translate'] {
     float: left;
 }
 
-.PhraseTranslationDialog .Inner .buttons_bar [action='Close'] {
+.PhraseTranslationDialog .Contents .Container.Buttons [action='Close'] {
     float: right;
 }

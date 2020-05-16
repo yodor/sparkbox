@@ -62,7 +62,7 @@ class ChangePositionRequestHandler extends RequestHandler
 
     }
 
-    protected function process()
+    protected function processImpl()
     {
 
         if ($this->bean instanceof NestedSetBean) {

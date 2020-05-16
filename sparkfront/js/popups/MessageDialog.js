@@ -11,6 +11,7 @@ function MessageDialog(id) {
     this.icon_enabled = true;
 }
 
+//should already be inside the DOM
 MessageDialog.prototype.createContent = function () {
     this.idx++;
 
@@ -20,13 +21,13 @@ MessageDialog.prototype.createContent = function () {
         cnt.attr("id", this.id + "_" + this.idx);
     }
     if (this.caption) {
-        cnt.find(".caption_text").html(this.caption);
+        cnt.find(".Caption .Title").html(this.caption);
     }
     if (this.text) {
-        cnt.find(".message_text").html(this.text);
+        cnt.find(".Inner .Contents .Text").html(this.text);
     }
     if (!this.icon_enabled) {
-        cnt.find(".message_icon").remove();
+        cnt.find(".Contents .Icon").remove();
 
     }
     return cnt.get(0).outerHTML;

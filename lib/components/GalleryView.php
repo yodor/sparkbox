@@ -150,7 +150,7 @@ class GalleryView extends Component
             $collection->addAction(new RowSeparator());
 
             $repos_param = array(new DataParameter("item_id", $bkey),
-                                 new URLParameter("#" . get_class($this->bean) . ".%$bkey%"));
+                                 new DataParameter("#" . get_class($this->bean) . ".%$bkey%", $bkey));
 
             //if (strlen($this->refkey > 0)) $repos_param[] = $ref_param;
 

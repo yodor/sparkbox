@@ -10,9 +10,14 @@ class RequestController
 
     protected static $working = FALSE;
 
+    public function __construct()
+    {
+
+    }
+
     public static function addAjaxHandler(IRequestProcessor $handler)
     {
-        $command_name = $handler->getCommandName();
+        $command_name = $handler->getCommand();
 
         self::$ajax_handlers[$command_name] = $handler;
     }
@@ -50,7 +55,7 @@ class RequestController
 
                 $handler = RequestController::findAjaxHandler($commandName);
 
-                if ($handler->shouldProcess()) {
+                if ($handler->needProcess()) {
 
                     $ret = new JSONResponse("AjaxHandler");
                     try {
@@ -87,7 +92,7 @@ class RequestController
 
             $requestHandler = RequestController::findRequestHandler($className);
 
-            if ($requestHandler->shouldProcess()) {
+            if ($requestHandler->needProcess()) {
                 $handler = $requestHandler;
                 break;
             }

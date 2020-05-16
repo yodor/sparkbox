@@ -50,7 +50,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
         return $arr;
     }
 
-    public function setData(array $item)
+    public function setData(array &$item)
     {
         parent::setData($item);
 
@@ -175,6 +175,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
 
         $action = $this->actions[$title];
 
+        $action->setAttribute("action", $title);
         $action->setContents("");
         $action->render();
 

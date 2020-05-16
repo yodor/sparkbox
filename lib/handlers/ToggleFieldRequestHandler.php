@@ -1,7 +1,7 @@
 <?php
 include_once("handlers/RequestHandler.php");
 
-include_once("panels/ConfirmMessageDialog.php");
+include_once("dialogs/ConfirmMessageDialog.php");
 
 class ToggleFieldRequestHandler extends RequestHandler
 {
@@ -50,7 +50,7 @@ class ToggleFieldRequestHandler extends RequestHandler
 
     }
 
-    protected function process()
+    protected function processImpl()
     {
 
         $db = DBConnections::Factory();

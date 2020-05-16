@@ -16,7 +16,7 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
     public function renderSeparator($idx_curr, $items_total)
     {
         if ($idx_curr < $items_total - 1) {
-            echo "\n<div class='MenuSeparator' position='$idx_curr'><div></div></div>";
+            echo "<div class='MenuSeparator' position='$idx_curr'><div></div></div>";
         }
     }
 

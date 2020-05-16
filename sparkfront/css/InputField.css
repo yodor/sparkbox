@@ -310,7 +310,7 @@
     border: 0;
 }
 
-.InputField > .caption:first-child {
+.InputField > .Caption:first-child {
 
     background-color: #FFFFFF;
     color: black;

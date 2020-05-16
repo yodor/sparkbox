@@ -41,7 +41,7 @@ abstract class JSONRequestHandler extends RequestHandler
         debug("Requested command type: '{$this->content_type}'");
     }
 
-    protected function process()
+    protected function processImpl()
     {
 
         $ret = new JSONResponse(get_class($this) . "Response");

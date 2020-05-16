@@ -21,7 +21,7 @@ class LoginFormRenderer extends FormRenderer
         $this->setLayout(FormRenderer::FIELD_VBOX);
 
         $this->submitButton->setName($handler::KEY_COMMAND);
-        $this->submitButton->setValue($handler->getCommandName());
+        $this->submitButton->setValue($handler->getCommand());
 
         $this->submitButton->setAttribute("action", "login");
         $this->submitButton->setContents("Login");
