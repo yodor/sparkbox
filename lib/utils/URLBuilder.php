@@ -158,10 +158,11 @@ class URLBuilder
         }
         $this->script_name = $script_name;
 
-        $local_name = "";
+
         if (strpos($script_query, "#") !== FALSE) {
-            list($script_query, $local_name) = explode("#", $script_query);
-            $this->addParameter(new URLParameter($local_name));
+            $resource = "";
+            list($script_query, $resource) = explode("#", $script_query);
+            $this->addParameter(new URLParameter("#".$resource));
         }
 
         $static_pairs = explode("&", $script_query);

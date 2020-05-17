@@ -125,7 +125,7 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         else {
 
             $fieldName = $this->column->getFieldName();
-            debug("Column '$fieldName' Related bean: '" . get_class($this->bean) . "' Related field: '$this->relateField'", $data);
+            //debug("Column '$fieldName' Related bean: '" . get_class($this->bean) . "' Related field: '$this->relateField'", $data);
 
             if (array_key_exists($fieldName, $data)) {
 

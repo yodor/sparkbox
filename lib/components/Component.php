@@ -57,6 +57,7 @@ class Component implements IRenderer, IHeadContents
 
         $this->component_class = implode(" ", $class_chain);
 
+        include_once("pages/SparkPage.php");
         $page = SparkPage::Instance();
 
         if ($page instanceof SparkPage) {

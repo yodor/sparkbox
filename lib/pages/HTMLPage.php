@@ -166,7 +166,18 @@ abstract class HTMLPage implements IRenderer
      */
     public function getPageURL()
     {
-        return $_SERVER["SCRIPT_NAME"] . "?" . $_SERVER["QUERY_STRING"];
+        $ret = $_SERVER["SCRIPT_NAME"];
+        if ($_SERVER["QUERY_STRING"]) {
+            $ret .= "?" . $_SERVER["QUERY_STRING"];
+        }
+        return $ret;
+    }
+
+    public function getURL(): URLBuilder
+    {
+        $url = new URLBuilder();
+        $url->buildFrom($this->getPageURL());
+        return $url;
     }
 
     /**

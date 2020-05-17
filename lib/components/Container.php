@@ -1,4 +1,5 @@
 <?php
+include_once("components/Component.php");
 
 class Container extends Component
 {

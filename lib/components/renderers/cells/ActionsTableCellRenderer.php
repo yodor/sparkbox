@@ -54,6 +54,13 @@ class ActionsTableCellRenderer extends TableCellRenderer implements IActionsColl
         return $this->actions[$title];
     }
 
+    public function removeAction(string $title)
+    {
+        if (isset($this->actions[$title])) {
+            unset($this->actions[$title]);
+        }
+    }
+
     public function setData(array &$row)
     {
         parent::setData($row);

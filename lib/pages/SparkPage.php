@@ -40,15 +40,11 @@ class SparkPage extends HTMLPage
      */
     protected $preferred_title = "";
 
-    /**
-     * @var string
-     */
-    protected $page_title = "";
 
     /**
      * @var string
      */
-    protected $caption = "";
+    protected $name = "";
 
     /**
      * @var array IHeadContents
@@ -195,18 +191,18 @@ class SparkPage extends HTMLPage
      * Sets the value of the $caption property
      * @param string $caption
      */
-    public function setCaption($caption)
+    public function setName(string $caption)
     {
-        $this->caption = $caption;
+        $this->name = $caption;
     }
 
     /**
      * Gets the value of the $caption property
      * @return string
      */
-    public function getCaption(): string
+    public function getName(): string
     {
-        return $this->caption;
+        return $this->name;
     }
 
     protected function renderJS()
@@ -304,12 +300,20 @@ class SparkPage extends HTMLPage
         }
     }
 
-    public function setPreferredTitle(string $page_title)
+    /**
+     * Set the contents of the TITLE tag
+     * @param string $title
+     */
+    public function setTitle(string $title)
     {
-        $this->preferred_title = $page_title;
+        $this->preferred_title = $title;
     }
 
-    public function getPreferredTitle(): string
+    /**
+     * Get the contents of the TITLE tag
+     * @return string
+     */
+    public function getTitle(): string
     {
         return $this->preferred_title;
     }

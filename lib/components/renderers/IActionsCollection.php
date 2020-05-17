@@ -19,4 +19,6 @@ interface IActionsCollection
      */
     public function addURLParameter(URLParameter $param);
 
+    public function removeAction(string $title);
+
 }

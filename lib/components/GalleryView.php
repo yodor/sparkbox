@@ -114,7 +114,7 @@ class GalleryView extends Component
         return $this->view_mode;
     }
 
-    public function getActionsCollection()
+    public function viewActions()
     {
         return $this->actionsCollection;
     }

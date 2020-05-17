@@ -15,20 +15,24 @@ include_once("components/BeanFormEditor.php");
 include_once("components/TableView.php");
 
 include_once("utils/PageSessionMenu.php");
+include_once("utils/Navigation.php");
 
 include_once("auth/AuthContext.php");
 
 class AdminPageLib extends SparkPage
 {
 
-    public $caption = "";
 
     protected $roles = array();
 
     protected $menu_bar = NULL;
 
+    protected $navigation;
+
     public function __construct()
     {
+
+        $this->navigation = new Navigation("AdminPageLib");
 
         $this->auth = new AdminAuthenticator();
         $this->loginURL = LOCAL . "admin/login.php";
@@ -37,14 +41,11 @@ class AdminPageLib extends SparkPage
         parent::__construct();
 
         //control gets here only if authorized
-        $adminID = $this->getUserID();
-
-        $b = new AdminAccessBean();
-        $qry = $b->queryField("userID", $adminID);
-        $n = $qry->exec();
-
+        $admin_access = new AdminAccessBean();
+        $qry = $admin_access->queryField("userID", $this->getUserID());
+        $qry->exec();
         while ($row = $qry->next()) {
-            $this->roles[] = $row["role"];
+            $this->roles[$row["role"]]=1;
         }
 
         $dynmenu = new PageSessionMenu($this->context, $this->initMainMenu());
@@ -59,8 +60,13 @@ class AdminPageLib extends SparkPage
         $this->addCSS(SPARK_LOCAL . "/css/admin.css", FALSE);
         $this->addCSS(SPARK_LOCAL . "/css/admin_buttons.css", FALSE);
         $this->addCSS(SPARK_LOCAL . "/css/admin_menu.css", FALSE);
-        $this->addCSS(SPARK_LOCAL . "/css/admin.css", FALSE);
 
+
+    }
+
+    public function navigation() : Navigation
+    {
+        return $this->navigation;
     }
 
     protected function initMainMenu()
@@ -78,42 +84,33 @@ class AdminPageLib extends SparkPage
         return $admin_menu;
     }
 
-    public function renderPageCaption($str = NULL)
+    public function renderNavigationBar()
     {
 
-        $caption = "";
+        echo "<div class='page_caption'>";
 
-        $dynmenu = $this->menu_bar->getMainMenu();
-        $arr = $dynmenu->getSelectedPath();
+        echo "<div class='page_actions'>";
 
-        //default caption of page from MenuItem
-        if (count($arr) > 0) {
-            $arr = array_reverse($arr);
-            $item = $arr[0];
-            if ($item instanceof MenuItem) {
-                $caption = $item->getTitle();
-            }
+        $back_action = $this->navigation->back();
+
+        if ($back_action instanceof Action) {
+            $back_action->setContents("");
+            $back_action->setAttribute("action", "back");
+            $back_action->render();
         }
 
-        //property caption
-        if ($this->caption) {
-            $caption = $this->caption;
-        }
-        else if ($str) {
-            $caption = $str;
+        if (count($this->actions) > 0) {
+
+            Action::RenderActions($this->actions);
+
         }
 
-        if ($caption) {
-            echo "<div class='page_caption'>";
+        echo "</div>";
 
-            if (count($this->actions) > 0) {
-                echo "<div class='page_actions'>";
-                Action::RenderActions($this->actions);
-                echo "</div>";
-            }
-            echo $caption;
-            echo "</div>";
-        }
+        echo $this->name;
+
+        echo "</div>";
+
     }
 
     public function haveRole($role)
@@ -155,14 +152,21 @@ class AdminPageLib extends SparkPage
 
     }
 
-    public function startRender($arr_menu = array())
+    //local menu items created from the page
+    protected $page_menu = array();
+
+    public function setPageMenu(array $menu_items)
+    {
+        $this->page_menu = $menu_items;
+    }
+
+    public function startRender()
     {
         //allow processing of ajax handlers first
         parent::startRender();
 
         $dynmenu = $this->menu_bar->getMainMenu();
-
-        $dynmenu->update($arr_menu);
+        $dynmenu->update($this->page_menu);
 
         $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());
 
@@ -195,7 +199,21 @@ class AdminPageLib extends SparkPage
         echo "<td class='page_area " . $this->getPageClass() . "'>";
         echo "\n\n";
 
-        $this->renderPageCaption();
+        if (!$this->name) {
+            $arr = $dynmenu->getSelectedPath();
+            //default name of page from MenuItem
+            if (count($arr) > 0) {
+                $arr = array_reverse($arr);
+                $item = $arr[0];
+                if ($item instanceof MenuItem) {
+                    $this->name = $item->getTitle();
+                }
+            }
+        }
+
+        $this->navigation->push($this->name);
+
+        $this->renderNavigationBar();
     }
 
     public function finishRender()

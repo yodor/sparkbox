@@ -70,11 +70,18 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
         $this->image_popup->setID($photoID);
         $this->image_popup->setBeanClass(get_class($this->view->getBean()));
 
-        $tooltip = tr("Upload Date") . ": " . dateFormat($item["date_upload"], TRUE);
+        $tooltip = "";
 
-        if (isset($item["caption"])) {
+        if (isset($item["caption"]) && strlen($item["caption"]) > 0) {
             $this->image_popup->setAttribute("caption", $item["caption"]);
             $tooltip .= tr("Caption") . ": " . $item["caption"] . "<BR>";
+        }
+        else {
+            $this->image_popup->clearAttribute("caption");
+        }
+
+        if (isset($item["date_upload"])) {
+            $tooltip .= tr("Upload Date") . ": " . dateFormat($item["date_upload"], TRUE);
         }
 
         $this->image_popup->setAttribute("tooltip", $tooltip);
@@ -116,6 +123,13 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
     public function getAction(string $contents): Action
     {
         return $this->actions[$contents];
+    }
+
+    public function removeAction(string $title)
+    {
+        if (isset($this->actions[$title])) {
+            unset($this->actions[$title]);
+        }
     }
 
     public function setActions(array $actions)
@@ -195,4 +209,5 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
         //TODO: implement actions
         $this->urlparam = $param;
     }
+
 }

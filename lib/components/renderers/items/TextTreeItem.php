@@ -37,6 +37,13 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
         $this->actions[$a->getContents()] = $a;
     }
 
+    public function removeAction(string $title)
+    {
+        if (isset($this->actions[$title])) {
+            unset($this->actions[$title]);
+        }
+    }
+
     public function getAction(string $contents): Action
     {
         return $this->actions[$contents];
