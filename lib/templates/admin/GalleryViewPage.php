@@ -8,17 +8,7 @@ class GalleryViewPage extends BeanListPage
     {
         parent::__construct();
 
-        //$fields = array($this->bean->key(), "position", "caption", "date_upload");
-
         $this->page->setName("Photo Gallery"); // . ": " . $rc->getData("description"));
-    }
-
-    protected function initPageActions()
-    {
-        $action_add = new Action("", "add.php");
-        $action_add->setAttribute("action", "add");
-        $action_add->setAttribute("title", "Add Item");
-        $this->page->addAction($action_add);
     }
 
     public function initView()
@@ -34,7 +24,7 @@ class GalleryViewPage extends BeanListPage
 
         $this->append($this->view);
 
-        $this->view_actions = $gv->viewActions();
+        $this->view_actions = $gv->getItemActions();
     }
 
 }

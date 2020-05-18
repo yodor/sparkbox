@@ -23,6 +23,14 @@ class SparkAdminPage extends SparkPage
 {
 
 
+    /**
+     *
+     */
+    const ACTION_ADD = "Add";
+    const ACTION_BACK = "Back";
+    const ACTION_EDIT = "Edit";
+    const ACTION_DELETE = "Delete";
+
     protected $roles = array();
 
     protected $menu_bar = NULL;
@@ -95,13 +103,13 @@ class SparkAdminPage extends SparkPage
 
         if ($back_action instanceof Action) {
             $back_action->setContents("");
-            $back_action->setAttribute("action", "back");
+            $back_action->setAttribute("action", SparkAdminPage::ACTION_BACK);
             $back_action->render();
         }
 
-        if (count($this->actions) > 0) {
+        if ($this->actions->count() > 0) {
 
-            Action::RenderActions($this->actions);
+            Action::RenderActions($this->actions->getActions());
 
         }
 
@@ -235,17 +243,7 @@ class SparkAdminPage extends SparkPage
         parent::finishRender();
     }
 
-    const ACTION_ADD = "add";
-    const ACTION_BACK = "back";
 
-    public static function CreateAction(string $action, string $title = "", array $parameters = array()): Action
-    {
-        $action_add = new Action("", "$action.php", $parameters);
-        $action_add->setAttribute("action", $action);
-        if (!$title) $title = ucfirst($action);
-        $action_add->setAttribute("title", $title);
-        return $action_add;
-    }
 
 }
 

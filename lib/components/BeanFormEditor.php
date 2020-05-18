@@ -97,12 +97,6 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->append($this->form_render);
 
-        //        if (Session::Get(SparkPage::IteratorSessionKey($this->bean->getTableName()))) {
-        //            $action_back = new Action("", Session::Get(SparkPage::IteratorSessionKey($this->bean->getTableName())), array());
-        //            $action_back->setAttribute("action", "back");
-        //            $action_back->setAttribute("title", tr("Back"));
-        //            AdminPageLib::Instance()->addAction($action_back);
-        //        }
 
     }
 
@@ -205,9 +199,10 @@ class BeanFormEditor extends Container implements IBeanEditor
                         header("Location: " . $this->reload_url);
                     }
                     else {
-                        $page = HTMLPage::Instance();
+                        $page = SparkPage::Instance();
 
-                        $back_action = $page->getAction("back");
+                        $back_action = $page->getActions()->getByAction("Back");
+
                         if ($back_action instanceof Action) {
                             header("Location: " . $back_action->getURLBuilder()->url());
                         }

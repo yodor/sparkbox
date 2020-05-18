@@ -1,28 +1,35 @@
 <?php
 include_once("components/renderers/items/NestedSetItem.php");
-include_once("components/renderers/IActionsCollection.php");
+include_once("utils/IActionCollection.php");
+include_once("utils/ActionCollection.php");
+
 include_once("components/Action.php");
 
-class TextTreeItem extends NestedSetItem implements IActionsCollection
+class TextTreeItem extends NestedSetItem implements IActionCollection
 {
 
-    protected $actions = NULL;
-    protected $text_action = NULL;
+    /**
+     * @var ActionCollection
+     */
+    protected $actions;
+
+    /**
+     * @var Action
+     */
+    protected $text_action;
 
     public function __construct()
     {
         parent::__construct();
 
         //construct default empty action with no parameters
-        $this->text_action = new Action();
+        $this->text_action = new Action("TextTreeItemAction");
 
-        $this->text_action->setAttribute("action", "TextTreeItemAction");
-
-        $this->actions = array();
+        $this->actions = new ActionCollection();
 
     }
 
-    public function getTextAction()
+    public function getTextAction(): Action
     {
         return $this->text_action;
     }
@@ -32,44 +39,27 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
         $this->text_action = $text_action;
     }
 
-    public function addAction(Action $a)
-    {
-        $this->actions[$a->getContents()] = $a;
-    }
-
-    public function removeAction(string $title)
-    {
-        if (isset($this->actions[$title])) {
-            unset($this->actions[$title]);
-        }
-    }
-
-    public function getAction(string $contents): Action
-    {
-        return $this->actions[$contents];
-    }
-
-    public function setActions(array $actions)
+    public function setActions(ActionCollection $actions)
     {
         $this->actions = $actions;
     }
 
-    public function getActions(): array
+    public function getActions(): ?ActionCollection
     {
         return $this->actions;
     }
 
     protected function renderActions()
     {
-        if (count($this->actions) < 1) return;
+        if ($this->actions->count() < 1) return;
 
         echo "<div class='node_actions'>";
 
-        foreach ($this->actions as $key => $action) {
-
+        $render = function(Action $action, int $idx)  {
             $action->render();
+        };
+        $this->actions->each($render);
 
-        }
         echo "</div>";
 
     }
@@ -80,10 +70,12 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
 
         $this->text_action->setData($row);
 
-        foreach ($this->actions as $cnt => $action) {
-
+        $dataSetter = function(Action $action, int $idx) use($row) {
             $action->setData($row);
-        }
+        };
+        $this->actions->each($dataSetter);
+
+
     }
 
     protected function renderHandle()
@@ -95,10 +87,8 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
 
     public function renderText()
     {
-
         $this->text_action->setContents($this->label);
         $this->text_action->render();
-
     }
 
     protected function renderImpl()
@@ -106,12 +96,6 @@ class TextTreeItem extends NestedSetItem implements IActionsCollection
         $this->renderHandle();
         $this->renderText();
         $this->renderActions();
-    }
-
-    public function addURLParameter(URLParameter $param)
-    {
-        // TODO: Implement addURLParameter() method.
-
     }
 
 }

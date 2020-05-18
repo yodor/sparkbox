@@ -7,6 +7,7 @@ include_once("components/renderers/items/DataIteratorItem.php");
 class Action extends DataIteratorItem
 {
 
+
     /**
      * Generic class for handling action and parametrization of its href
      */
@@ -20,8 +21,11 @@ class Action extends DataIteratorItem
      */
     protected $urlbuilder;
 
-    //set action attribute equal to the contents
-    public $action_from_label = TRUE;
+    /**
+     * Render the action as contents of this Action if contents are not set
+     * @var bool
+     */
+    public $action_as_contents = TRUE;
 
     /**
      * Action constructor.
@@ -31,14 +35,16 @@ class Action extends DataIteratorItem
      * @param array $parameters
      * @param string $check_code this will be eval'ed before rendering
      */
-    public function __construct(string $contents = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
+    public function __construct(string $action = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
     {
         parent::__construct();
 
         $this->urlbuilder = new URLBuilder();
         $this->urlbuilder->buildFrom($href);
 
-        $this->contents = $contents;
+        if ($action) {
+            $this->setAttribute("action", $action);
+        }
 
         foreach ($parameters as $idx => $parameter) {
 
@@ -88,16 +94,31 @@ class Action extends DataIteratorItem
     {
         parent::processAttributes();
 
-        if ($this->action_from_label) {
-            if (!$this->getAttribute("action")) {
-                $this->setAttribute("action", $this->contents);
-            }
-        }
-
         $url = $this->urlbuilder->url();
 
         if ($url) {
             $this->setAttribute("href", $url);
+        }
+
+    }
+
+    protected function renderImpl()
+    {
+        if ($this->contents) {
+            parent::renderImpl();
+            return;
+        }
+        $action = $this->getAttribute("action");
+        if (!$action) return;
+
+        if ($this->action_as_contents) {
+
+            if ($this->translation_enabled) {
+                echo tr($action);
+            }
+            else {
+                echo $action;
+            }
         }
 
     }
@@ -116,7 +137,8 @@ class Action extends DataIteratorItem
     {
         foreach ($actions as $idx => $item) {
             if ($item instanceof MenuItem) {
-                $action = new Action($item->getTitle(), $item->getHref(), array());
+                $action = new Action("", $item->getHref(), array());
+                $action->setContents($item->getTitle());
                 $action->render();
             }
             else if ($item instanceof Action) {
@@ -135,7 +157,8 @@ class PipeSeparator extends Action
 {
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct("Pipe");
+        $this->action_as_contents = false;
         $this->contents = " | ";
         $this->tagName = "SPAN";
         $this->translation_enabled = FALSE;
@@ -146,20 +169,12 @@ class RowSeparator extends Action
 {
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct("Row");
+        $this->action_as_contents = false;
         $this->tagName = "SPAN";
         $this->translation_enabled = FALSE;
     }
 }
 
-class EmptyAction extends Action
-{
-    public function __construct()
-    {
-        parent::__construct("", "");
-        $this->setAttribute("action", "Empty");
-        $this->translation_enabled = FALSE;
-    }
-}
 
 ?>

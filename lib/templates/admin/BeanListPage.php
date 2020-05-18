@@ -1,6 +1,6 @@
 <?php
 include_once("templates/admin/AdminPageTemplate.php");
-include_once("components/renderers/IActionsCollection.php");
+include_once("utils/ActionCollection.php");
 
 class BeanListPage extends AdminPageTemplate
 {
@@ -26,7 +26,7 @@ class BeanListPage extends AdminPageTemplate
     protected $query;
 
     /**
-     * @var IActionsCollection
+     * @var ActionCollection
      */
     protected $view_actions;
 
@@ -35,6 +35,11 @@ class BeanListPage extends AdminPageTemplate
         parent::__construct();
     }
 
+    /**
+     * Set the view columns matching query fields
+     * Array keys are used as column names and values as column labels
+     * @param array $list_fields
+     */
     public function setListFields(array $list_fields)
     {
         $this->fields = $list_fields;
@@ -57,21 +62,20 @@ class BeanListPage extends AdminPageTemplate
 
     protected function initPageActions()
     {
-        $action_add = new Action("", "add.php");
-        $action_add->setAttribute("action", "add");
+        $action_add = new Action(SparkAdminPage::ACTION_ADD, "add.php");
         $action_add->setAttribute("title", "Add Item");
-        $this->page->addAction($action_add);
+        $this->getPage()->getActions()->append($action_add);
     }
 
-    protected function initViewActions(IActionsCollection $act)
+    protected function initViewActions(ActionCollection $act)
     {
         if ($this->bean instanceof DBTableBean) {
             $h_delete = new DeleteItemRequestHandler($this->bean);
             RequestController::addRequestHandler($h_delete);
         }
-        $act->addAction(new Action("Edit", "add.php", array(new DataParameter("editID", $this->view->getIterator()->key()))));
-        $act->addAction(new PipeSeparator());
-        $act->addAction($h_delete->createAction());
+        $act->append(new Action(SparkAdminPage::ACTION_EDIT, "add.php", array(new DataParameter("editID", $this->view->getIterator()->key()))));
+        $act->append(new PipeSeparator());
+        $act->append($h_delete->createAction());
 
     }
 
@@ -98,10 +102,12 @@ class BeanListPage extends AdminPageTemplate
 
         $this->view->addColumn(new TableColumn("actions", "Actions"));
 
-        $this->view_actions = new ActionsTableCellRenderer();
+        $act = new ActionsTableCellRenderer();
+        $this->view_actions = $act->getActions();
+
         $this->initViewActions($this->view_actions);
 
-        $this->view->getColumn("actions")->setCellRenderer($this->view_actions);
+        $this->view->getColumn("actions")->setCellRenderer($act);
 
         $this->append($this->view);
     }

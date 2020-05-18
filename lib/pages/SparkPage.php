@@ -7,9 +7,18 @@ include_once("beans/ConfigBean.php");
 
 include_once("dialogs/MessageDialog.php");
 include_once("components/ImagePopup.php");
+include_once("utils/IActionCollection.php");
+include_once("utils/ActionCollection.php");
 
-class SparkPage extends HTMLPage
+class SparkPage extends HTMLPage implements IActionCollection
 {
+
+    private static $instance = NULL;
+
+    public static function Instance()
+    {
+        return self::$instance;
+    }
 
     /**
      * Require auth success to access the page
@@ -39,7 +48,6 @@ class SparkPage extends HTMLPage
      * The Preferred title of this page for rendering into the <TITLE></TITLE>
      */
     protected $preferred_title = "";
-
 
     /**
      * @var string
@@ -78,7 +86,7 @@ class SparkPage extends HTMLPage
     /**
      * property array of Action objects holding page action buttons
      */
-    protected $actions = array();
+    protected $actions;
 
     /**
      * @return int The numeric ID as from the Authenticator
@@ -91,22 +99,19 @@ class SparkPage extends HTMLPage
         return -1;
     }
 
-    public function addAction(Action $action)
-    {
-        $this->actions[$action->getAttribute("action")] = $action;
-    }
-
-    public function getAction($action_name): ?Action
-    {
-        if (isset($this->actions[$action_name])) {
-            return $this->actions[$action_name];
-        }
-        return NULL;
-    }
-
-    public function getActions()
+    public function getActions(): ?ActionCollection
     {
         return $this->actions;
+    }
+
+    public function setActions(ActionCollection $actions)
+    {
+        $this->actions = $actions;
+    }
+
+    public function addURLParameter(URLParameter $parameter)
+    {
+        //TODO:
     }
 
     public function addOGTag($tag_name, $tag_content)
@@ -225,10 +230,13 @@ class SparkPage extends HTMLPage
 
     public function __construct()
     {
-
         parent::__construct();
 
+        self::$instance = $this;
+
         $this->authorize();
+
+        $this->actions = new ActionCollection();
 
         $this->addMeta("revisit-after", "1 days");
         $this->addMeta("robots", "index, follow");
@@ -236,7 +244,6 @@ class SparkPage extends HTMLPage
         $this->addMeta("description", "%meta_description%");
 
         $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
-
 
         $this->addCSS(SPARK_LOCAL . "/css/ModalPane.css");
         $this->addCSS(SPARK_LOCAL . "/css/ImagePopup.css");

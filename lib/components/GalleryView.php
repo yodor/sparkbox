@@ -7,17 +7,17 @@ include_once("components/renderers/items/GalleryViewItem.php");
 include_once("components/renderers/cells/TableImageCellRenderer.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
-class GalleryView extends Component
+class GalleryView extends Container
 {
     /**
      * @var DBTableBean
      */
-    protected $bean = NULL;
+    protected $bean;
 
     protected $refkey = "";
     protected $refval = -1;
 
-    protected $view = NULL;
+    protected $view;
 
     protected $edit_script;
 
@@ -28,7 +28,7 @@ class GalleryView extends Component
 
     protected $view_mode = GalleryView::MODE_GRID;
 
-    protected $actionsCollection;
+    protected $actions;
 
     public function __construct(DBTableBean $bean)
     {
@@ -52,16 +52,17 @@ class GalleryView extends Component
             $view->addColumn(new TableColumn("date_upload", "Date Upload"));
 
             $renderer = new TableImageCellRenderer();
-            //$renderer->setBean($this->bean);
 
             $this->photo_renderer = $renderer;
 
             $view->getColumn("photo")->setCellRenderer($renderer);
 
             $view->addColumn(new TableColumn("actions", "Actions"));
-            $this->actionsCollection = new ActionsTableCellRenderer();
 
-            $view->getColumn("actions")->setCellRenderer($this->actionsCollection);
+            $act = new ActionsTableCellRenderer();
+            $this->actions = $act->getActions();
+
+            $view->getColumn("actions")->setCellRenderer($act);
 
             $this->view_mode = GalleryView::MODE_LIST;
         }
@@ -74,7 +75,8 @@ class GalleryView extends Component
             $renderer->setPhotoSize(256, -1);
 
             $this->photo_renderer = $renderer;
-            $this->actionsCollection = $renderer;
+
+            $this->actions = $renderer->getActions();
 
             $view->setItemRenderer($renderer);
 
@@ -87,6 +89,12 @@ class GalleryView extends Component
         }
 
         $view->getTopPaginator()->view_modes_enabled = TRUE;
+
+        $this->initActions();
+
+        $this->wrapper_enabled = false;
+
+        $this->append($this->view);
 
     }
 
@@ -114,9 +122,9 @@ class GalleryView extends Component
         return $this->view_mode;
     }
 
-    public function viewActions()
+    public function getItemActions(): ?ActionCollection
     {
-        return $this->actionsCollection;
+        return $this->actions;
     }
 
     /**
@@ -135,42 +143,42 @@ class GalleryView extends Component
 
         $edit_params = array(new DataParameter("editID", $bkey));
 
-        $collection = $this->actionsCollection;
-        $collection->addAction(new Action("Edit", "add.php", $edit_params));
+        $collection = $this->actions;
+        $collection->append(new Action("Edit", "add.php", $edit_params));
 
-        $collection->addAction(new PipeSeparator());
+        $collection->append(new PipeSeparator());
 
         $delete_params = array(new DataParameter("item_id", $bkey));
 
-        $collection->addAction(new Action("Delete", "?cmd=delete_item", $delete_params));
+        $collection->append(new Action("Delete", "?cmd=delete_item", $delete_params));
 
         if ($this->bean instanceof OrderedDataBean) {
 
-            $collection->addAction(new RowSeparator());
-            $collection->addAction(new RowSeparator());
+            $collection->append(new RowSeparator());
+            $collection->append(new RowSeparator());
 
             $repos_param = array(new DataParameter("item_id", $bkey),
                                  new DataParameter("#" . get_class($this->bean) . ".%$bkey%", $bkey));
 
             //if (strlen($this->refkey > 0)) $repos_param[] = $ref_param;
 
-            $collection->addAction(new Action("First", "?cmd=reposition&type=first", $repos_param));
+            $collection->append(new Action("First", "?cmd=reposition&type=first", $repos_param));
 
-            $collection->addAction(new PipeSeparator());
+            $collection->append(new PipeSeparator());
 
-            $collection->addAction(new Action("Last", "?cmd=reposition&type=last", $repos_param));
+            $collection->append(new Action("Last", "?cmd=reposition&type=last", $repos_param));
 
-            $collection->addAction(new RowSeparator());
+            $collection->append(new RowSeparator());
 
-            $collection->addAction(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
+            $collection->append(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
 
-            $collection->addAction(new PipeSeparator());
+            $collection->append(new PipeSeparator());
 
-            $collection->addAction(new Action("Next", "?cmd=reposition&type=next", $repos_param));
+            $collection->append(new Action("Next", "?cmd=reposition&type=next", $repos_param));
 
-            $collection->addAction(new RowSeparator());
+            $collection->append(new RowSeparator());
 
-            $collection->addAction(new Action("Reposition", "?cmd=reposition&type=fixed", $repos_param));
+            $collection->append(new Action("Reposition", "?cmd=reposition&type=fixed", $repos_param));
         }
     }
 
@@ -182,21 +190,6 @@ class GalleryView extends Component
         return $this->view;
     }
 
-    public function startRender()
-    {
-        $this->initActions();
-    }
-
-    public function finishRender()
-    {
-
-    }
-
-    protected function renderImpl()
-    {
-        $this->view->render();
-
-    }
 
 }
 

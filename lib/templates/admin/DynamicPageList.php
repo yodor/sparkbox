@@ -72,33 +72,33 @@ class DynamicPageList extends BeanListPage
             $action_chooser = new Action("Choose", $this->return_url, array(new DataParameter("page_id", $this->bean->key()),
                                                                                       new URLParameter("page_class", get_class($this->bean))));
 
-            $act->addAction($action_chooser);
+            $act->getActions()->append($action_chooser);
 
         }
         else {
 
-            $act->addAction(new Action("Edit", "add.php", array(new DataParameter("editID", $this->bean->key()))));
-            $act->addAction(new PipeSeparator());
-            $act->addAction($h_delete->createAction());
+            $act->getActions()->append(new Action("Edit", "add.php", array(new DataParameter("editID", $this->bean->key()))));
+            $act->getActions()->append(new PipeSeparator());
+            $act->getActions()->append($h_delete->createAction());
 
-            $act->addAction(new RowSeparator());
+            $act->getActions()->append(new RowSeparator());
 
-            $act->addAction(new Action("Photo Gallery", "gallery/list.php", array(new DataParameter($this->bean->key()))));
+            $act->getActions()->append(new Action("Photo Gallery", "gallery/list.php", array(new DataParameter($this->bean->key()))));
 
-            $act->addAction(new RowSeparator());
+            $act->getActions()->append(new RowSeparator());
 
             $bkey = $this->bean->key();
             $repos_param = array(new DataParameter("item_id", $bkey));
 
-            $act->addAction(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
-            $act->addAction(new PipeSeparator());
-            $act->addAction(new Action("Next", "?cmd=reposition&type=next", $repos_param));
+            $act->getActions()->append(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
+            $act->getActions()->append(new PipeSeparator());
+            $act->getActions()->append(new Action("Next", "?cmd=reposition&type=next", $repos_param));
 
-            $act->addAction(new RowSeparator());
+            $act->getActions()->append(new RowSeparator());
 
-            $act->addAction(new Action("First", "?cmd=reposition&type=first", $repos_param));
-            $act->addAction(new PipeSeparator());
-            $act->addAction(new Action("Last", "?cmd=reposition&type=last", $repos_param));
+            $act->getActions()->append(new Action("First", "?cmd=reposition&type=first", $repos_param));
+            $act->getActions()->append(new PipeSeparator());
+            $act->getActions()->append(new Action("Last", "?cmd=reposition&type=last", $repos_param));
 
         }
 

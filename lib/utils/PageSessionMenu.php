@@ -87,7 +87,7 @@ class PageSessionMenu extends MainMenu
 
         if (!$match) {
 
-            $page = HTMLPage::Instance();
+            $page = SparkPage::Instance();
 
             if ($page->getAccessibleTitle()) {
                 $last_selected->clearChildNodes();

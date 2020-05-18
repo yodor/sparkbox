@@ -2,7 +2,7 @@
 include_once("components/renderers/IRenderer.php");
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
-include_once("pages/HTMLPage.php");
+
 
 class Component implements IRenderer, IHeadContents
 {

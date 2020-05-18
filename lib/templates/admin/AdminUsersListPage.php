@@ -13,21 +13,7 @@ class AdminUsersListPage extends BeanListPage
     {
         parent::__construct();
 
-        //TODO
-        //$this->page->checkAccess($access_role);
 
-        $this->page->setName("Administrative Users");
-
-    }
-
-    protected function initPageActions()
-    {
-        parent::initPageActions();
-
-        $action_add = new Action("", "add.php");
-        $action_add->setAttribute("action", "add");
-        $action_add->setAttribute("title", "Add Item");
-        $this->page->addAction($action_add);
     }
 
     public function initView()
@@ -59,9 +45,9 @@ class AdminUsersListPage extends BeanListPage
         //$view->getColumn("access_level")->setCellRenderer(new CallbackTableCellRenderer("draw_access_level"));
 
         $act = new ActionsTableCellRenderer();
-        $act->addAction(new Action("Edit", "add.php", array(new DataParameter("editID", $bean->key()))));
-        $act->addAction(new PipeSeparator());
-        $act->addAction($h_delete->createAction());
+        $act->getActions()->append(new Action("Edit", "add.php", array(new DataParameter("editID", $bean->key()))));
+        $act->getActions()->append(new PipeSeparator());
+        $act->getActions()->append($h_delete->createAction());
 
         $view->getColumn("actions")->setCellRenderer($act);
 
@@ -72,8 +58,8 @@ class AdminUsersListPage extends BeanListPage
         $check_is_not_suspend = function (Action $act, array $data) {
             return ($data['suspend'] > 0);
         };
-        $vis_act->addAction($h_toggle->createAction("Disable", "field=suspend&status=1", $check_is_suspend));
-        $vis_act->addAction($h_toggle->createAction("Enable", "field=suspend&status=0", $check_is_not_suspend));
+        $vis_act->getActions()->append($h_toggle->createAction("Disable", "field=suspend&status=1", $check_is_suspend));
+        $vis_act->getActions()->append($h_toggle->createAction("Enable", "field=suspend&status=0", $check_is_not_suspend));
         $view->getColumn("status")->setCellRenderer($vis_act);
 
         $this->append($view);

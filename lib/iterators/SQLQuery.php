@@ -5,20 +5,40 @@ class SQLQuery implements IDataIterator
 {
 
     /**
-     * @var SQLSelect|null
+     * @var SQLSelect
      */
-    public $select = NULL;
+    public $select;
 
     /**
      * @var DBDriver
      */
-    protected $db = NULL;
-    protected $key = "";
-    protected $name = "";
+    protected $db;
 
-    protected $res = NULL;
+    /**
+     * Primary key for this iterator
+     * @var string
+     */
+    protected $key;
 
-    protected $numResults = 0;
+    /**
+     * Main table
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * DBDriver resource
+     * @var null
+     */
+    protected $res;
+
+    protected $numResults = -1;
+
+    /**
+     * Accessible bean
+     * @var DBTableBean|null
+     */
+    protected $bean;
 
     public function __construct(SQLSelect $select, string $primaryKey = "id", string $tableName = "")
     {
@@ -28,7 +48,7 @@ class SQLQuery implements IDataIterator
         $this->name = $tableName;
 
         $this->db = DBConnections::Get();
-
+        $this->bean = NULL;
     }
 
     public function __destruct()

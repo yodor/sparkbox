@@ -54,14 +54,14 @@ class PhraseTranslatorPage extends BeanListPage
         //
     }
 
-    protected function initViewActions(IActionsCollection $act)
+    protected function initViewActions(ActionCollection $act)
     {
         $action_translate = new Action("Translate", "javascript:phrase_translator.edit(%textID%)");
-        $act->addAction($action_translate);
-        $act->addAction(new PipeSeparator());
+        $act->append($action_translate);
+        $act->append(new PipeSeparator());
 
         $action_clear = new Action("Clear", "javascript:phrase_translator.clear(%textID%)");
-        $act->addAction($action_clear);
+        $act->append($action_clear);
     }
 
     public function initView()
@@ -92,7 +92,10 @@ class PhraseTranslatorPage extends BeanListPage
 
         //command actions edit/delete
         $act = new ActionsTableCellRenderer();
-        $this->initViewActions($act);
+
+        $this->view_actions = $act->getActions();
+
+        $this->initViewActions($this->view_actions);
 
         $view->getColumn("actions")->setCellRenderer($act);
 

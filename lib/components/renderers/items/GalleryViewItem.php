@@ -4,10 +4,10 @@ include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/ItemView.php");
 include_once("components/Action.php");
 
-class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IPhotoRenderer
+class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPhotoRenderer
 {
 
-    protected $actions = array();
+    protected $actions;
 
     /**
      * @var GalleryView
@@ -41,6 +41,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
         $this->action = new Action();
         $this->image_popup = new ImagePopup();
         $this->image_popup->setClassName("image_slot");
+        $this->actions = new ActionCollection();
     }
 
     public function requiredStyle()
@@ -92,11 +93,15 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
             $this->position = $item["position"];
         }
 
-        $actions = array_keys($this->actions);
-        foreach ($actions as $idx => $contents) {
-            $action = $this->getAction($contents);
-            $action->setData($item);
+        $iterator = $this->actions->iterator();
+        while ($iterator->valid()){
+            $action = $iterator->current();
+            if ($action instanceof Action) {
+                $action->setData($item);
+            }
+            $iterator->next();
         }
+
 
     }
 
@@ -115,29 +120,12 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
         return $this->image_popup->getPhotoHeight();
     }
 
-    public function addAction(Action $a)
-    {
-        $this->actions[$a->getContents()] = $a;
-    }
-
-    public function getAction(string $contents): Action
-    {
-        return $this->actions[$contents];
-    }
-
-    public function removeAction(string $title)
-    {
-        if (isset($this->actions[$title])) {
-            unset($this->actions[$title]);
-        }
-    }
-
-    public function setActions(array $actions)
+    public function setActions(ActionCollection $actions)
     {
         $this->actions = $actions;
     }
 
-    public function getActions(): ?array
+    public function getActions(): ?ActionCollection
     {
         return $this->actions;
     }
@@ -155,15 +143,17 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
 
         echo "<div class='item_actions'>";
 
-        if (isset($this->actions["Edit"])) {
-            $this->actions["Edit"]->render();
+        $edit = $this->actions->getByAction("Edit");
+        if ($edit instanceof Action) {
+            $edit->render();
         }
 
         $pipe = new PipeSeparator();
         $pipe->render();
 
-        if (isset($this->actions["Delete"])) {
-            $this->actions["Delete"]->render();
+        $delete = $this->actions->getByAction("Delete");
+        if ($delete instanceof Action) {
+            $delete->render();
         }
 
         echo "</div>"; // item actions
@@ -183,16 +173,13 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
 
     }
 
-    public function renderFooterAction(string $title)
+    public function renderFooterAction(string $action)
     {
-        if (!isset($this->actions[$title])) return;
-
-        $action = $this->actions[$title];
-
-        $action->setAttribute("action", $title);
-        $action->setContents("");
-        $action->render();
-
+        $item = $this->actions->getByAction($action);
+        if ($item instanceof Action) {
+            $item->setContents("");
+            $item->render();
+        }
     }
 
     public function renderSeparator($idx_curr, $items_total)
@@ -200,14 +187,5 @@ class GalleryViewItem extends DataIteratorItem implements IActionsCollection, IP
 
     }
 
-    /**
-     * @param URLParameter $urlparam
-     * @return void
-     */
-    public function addURLParameter(URLParameter $param)
-    {
-        //TODO: implement actions
-        $this->urlparam = $param;
-    }
 
 }

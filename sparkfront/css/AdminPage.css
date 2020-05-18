@@ -7,10 +7,6 @@ HTML {
 
 BODY {
 
-    /*color: black;*/
-    /*font-family: "Arial";*/
-    /*font-size: 12px;*/
-
     padding: 0;
     margin: 0;
 
@@ -18,9 +14,6 @@ BODY {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-
-    /*background-image: none;*/
-    /*background-color: white;*/
 
 }
 
@@ -135,11 +128,15 @@ BODY {
 
 .admin_layout .page_area .page_caption {
     color: #656565;
-    font-size: 20px;
+    font-size: 1.3em;
     /*   font-weight:bold; */
     border-bottom: 1px solid #cccccc;
     padding-bottom: 10px;
     margin-bottom: 10px;
+}
+
+.admin_layout .page_area .page_caption .page_actions:empty {
+    display: none;
 }
 
 .admin_layout .page_area .page_caption .page_actions {
@@ -161,13 +158,14 @@ BODY {
 .admin_layout .page_area .page_caption .page_actions .Action[action]:not([action='']) {
     background-repeat: no-repeat;
     /*   content: attr(title) ": ";  */
+    color: transparent;
 }
 
-.admin_layout .page_area .page_caption .page_actions .Action[action='add'] {
+.admin_layout .page_area .page_caption .page_actions .Action[action='Add'] {
     background-image: url("../images/page_actions/green_plus.png");
 }
 
-.admin_layout .page_area .page_caption .page_actions .Action[action='back'] {
+.admin_layout .page_area .page_caption .page_actions .Action[action='Back'] {
     background-image: url("../images/page_actions/green_left.png");
 }
 
@@ -184,7 +182,6 @@ BODY {
 .AdminLoginPage {
 
 }
-
 
 
 .BeanFormEditor[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
@@ -229,17 +226,6 @@ BODY {
 
 }
 
-.gallery_view_item .item_details {
-    display: inline;
-}
-
-.gallery_view_item .item_details .Title {
-    font-size: 12px;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    display: inline;
-}
 
 .orange {
     color: #f9a541;
@@ -251,18 +237,22 @@ BODY {
 }
 
 .AdminLoginPage.forgot_password .FormRenderer .SubmitLine .TextSpace {
-    display:block;
+    display: block;
 }
 
 .AdminLoginPage.forgot_password .FormRenderer .SubmitLine .Buttons {
-    display:block;
+    display: block;
 }
+
+
 .admin_layout .KeywordSearch {
-    display:block;
+    display: block;
 }
+
 .admin_layout .KeywordSearch .InputComponent[field='keyword'] .InputLabel {
-    display:none !important;
+    display: none !important;
 }
-.admin_layout .KeywordSearch .SubmitLine .Buttons>* {
+
+.admin_layout .KeywordSearch .SubmitLine .Buttons > * {
     margin-left: 0.3em;
 }

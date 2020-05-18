@@ -128,7 +128,7 @@ class Container extends Component
         return $this->getByAttribute("action", $action_value);
     }
 
-    public function findBy($callback): ?Component
+    public function findBy(Closure $callback): ?Component
     {
         $indexes = array_keys($this->items);
         foreach ($indexes as $idx => $index) {

@@ -11,7 +11,7 @@ class TranslatorPage extends BeanListPage
 
         $this->setBean(new SiteTextsBean());
 
-        $this->setListFields(array("value"=>"Phrase", "hash_value"=>"Hash"));
+        $this->setListFields(array("value" => "Phrase", "hash_value" => "Hash"));
 
         $menu = array();
 
@@ -32,12 +32,15 @@ class TranslatorPage extends BeanListPage
         //disable add item
     }
 
-    protected function initViewActions(IActionsCollection $act)
+    protected function initViewActions(ActionCollection $act)
     {
         parent::initViewActions($act);
 
-        $act->removeAction("Edit");
-    }
+        $edit = $act->getByAction("Edit");
+        if ($edit) {
+            $act->remove($act->indexOf($edit));
+        }
 
+    }
 
 }

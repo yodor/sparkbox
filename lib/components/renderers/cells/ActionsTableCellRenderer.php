@@ -1,9 +1,9 @@
 <?php
 include_once("components/renderers/cells/TableCellRenderer.php");
 include_once("components/Action.php");
-include_once("components/renderers/IActionsCollection.php");
+include_once("utils/ActionCollection.php");
 
-class ActionsTableCellRenderer extends TableCellRenderer implements IActionsCollection
+class ActionsTableCellRenderer extends TableCellRenderer implements IActionCollection
 {
     /**
      * @var array
@@ -15,7 +15,7 @@ class ActionsTableCellRenderer extends TableCellRenderer implements IActionsColl
     public function __construct()
     {
         parent::__construct();
-        $this->actions = array();
+        $this->actions = new ActionCollection();
 
     }
 
@@ -26,76 +26,57 @@ class ActionsTableCellRenderer extends TableCellRenderer implements IActionsColl
         return $arr;
     }
 
-    public function setActions(array $actions)
+    public function setActions(ActionCollection $actions)
     {
         $this->actions = $actions;
     }
 
-    public function getActions(): ?array
+    public function getActions(): ?ActionCollection
     {
         return $this->actions;
-    }
-
-    public function addAction(Action $a)
-    {
-        if ($a instanceof RowSeparator) {
-            $this->actions["row_separator_" . count($this->actions)] = $a;
-        }
-        else if ($a instanceof PipeSeparator) {
-            $this->actions["pipe_separator_" . count($this->actions)] = $a;
-        }
-        else {
-            $this->actions[$a->getContents()] = $a;
-        }
-    }
-
-    public function getAction(string $title): Action
-    {
-        return $this->actions[$title];
-    }
-
-    public function removeAction(string $title)
-    {
-        if (isset($this->actions[$title])) {
-            unset($this->actions[$title]);
-        }
     }
 
     public function setData(array &$row)
     {
         parent::setData($row);
 
-        $actions = array_keys($this->actions);
-        foreach ($actions as $pos => $title) {
-            $action = $this->getAction($title);
-            $action->setData($row);
+        $iterator = $this->actions->iterator();
+        while ($iterator->valid()) {
+            $action = $iterator->current();
+            if ($action instanceof Action) {
+                $action->setData($row);
+            }
+            $iterator->next();
         }
+
     }
 
     protected function renderImpl()
     {
         echo "<div class='actions_list'>";
 
-        $actions = array_keys($this->actions);
-        foreach ($actions as $pos => $title) {
-            $action = $this->getAction($title);
-            $action->render();
-
+        $iterator = $this->actions->iterator();
+        while ($iterator->valid()) {
+            $action = $iterator->current();
+            if ($action instanceof Action) {
+                $action->render();
+            }
+            $iterator->next();
         }
 
         echo "</div>";
     }
 
-    /**
-     * Add default query parameter to all actions in this collection
-     * @param URLParameter $param
-     * @return void
-     */
-    public function addURLParameter(URLParameter $param)
-    {
-        // TODO: Implement addURLParameter() method.
-        $this->urlparam = $param;
-    }
+    //    /**
+    //     * Add default query parameter to all actions in this collection
+    //     * @param URLParameter $param
+    //     * @return void
+    //     */
+    //    public function addURLParameter(URLParameter $param)
+    //    {
+    //        // TODO: Implement addURLParameter() method.
+    //        $this->urlparam = $param;
+    //    }
 }
 
 ?>

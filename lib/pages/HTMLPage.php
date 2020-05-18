@@ -1,8 +1,10 @@
 <?php
-include_once("components/renderers/IRenderer.php");
+include_once("components/Container.php");
 
-abstract class HTMLPage implements IRenderer
+abstract class HTMLPage extends Container
 {
+
+    protected $wrapper_enabled = false;
 
     /**
      * property
@@ -21,22 +23,11 @@ abstract class HTMLPage implements IRenderer
      */
     protected $meta = array();
 
-    /**
-     * Abstract class for rendering html pages
-     */
-
-    private static $instance = NULL;
-
-    public static function Instance()
-    {
-        return self::$instance;
-    }
-
     protected $page_class = "";
 
     public function __construct()
     {
-        self::$instance = $this;
+        parent::__construct();
 
         $this->addMeta("Content-Type", "text/html;charset=utf-8");
         $this->addMeta("Content-Style-Type", "text/css");

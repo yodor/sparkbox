@@ -67,6 +67,7 @@
     height:1.5em;
     display:inline-block;
     background-size:contain;
+    color:transparent;
     /*box-sizing: border-box;*/
 }
 .GalleryViewItem .footer [action="First"] {
