@@ -133,7 +133,7 @@ class Component implements IRenderer, IHeadContents
     public function renderCaption()
     {
         if (strlen($this->caption) > 0) {
-            echo "<div class='caption'>";
+            echo "<div class='Caption'>";
             echo $this->caption;
             echo "</div>";
         }

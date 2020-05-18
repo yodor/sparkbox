@@ -23,7 +23,7 @@ class MenuItemForm extends InputForm
 
         // $source = new MenuItemsBean();
         $rend->na_label = "--- TOP ---";
-        $rend->na_value = "-1";
+        $rend->na_value = "0";
 
         $rend->setIterator(new SQLQuery($source->selectTree(array("menu_title")), "menuID", $source->getTableName()));
         $rend->getItemRenderer()->setValueKey("menuID");

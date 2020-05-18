@@ -19,7 +19,7 @@ include_once("utils/Navigation.php");
 
 include_once("auth/AuthContext.php");
 
-class AdminPageLib extends SparkPage
+class SparkAdminPage extends SparkPage
 {
 
 
@@ -57,9 +57,9 @@ class AdminPageLib extends SparkPage
 
         $this->menu_bar->setAttribute("submenu_popup", "0");
 
-        $this->addCSS(SPARK_LOCAL . "/css/admin.css", FALSE);
-        $this->addCSS(SPARK_LOCAL . "/css/admin_buttons.css", FALSE);
-        $this->addCSS(SPARK_LOCAL . "/css/admin_menu.css", FALSE);
+        $this->addCSS(SPARK_LOCAL . "/css/AdminPage.css");
+        $this->addCSS(SPARK_LOCAL . "/css/AdminButtons.css");
+        $this->addCSS(SPARK_LOCAL . "/css/AdminMenu.css");
 
 
     }

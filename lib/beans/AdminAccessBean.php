@@ -6,11 +6,13 @@ class AdminAccessBean extends DBTableBean
 
     protected $createString = "
 CREATE TABLE `admin_access` (
- `aclID` int(10) unsigned NOT NULL AUTO_INCREMENT,
- `userID` int(10) unsigned NOT NULL DEFAULT '0',
- `role` varchar(100) NULL,
+ `aclID` int(11) unsigned NOT NULL AUTO_INCREMENT,
+ `userID` int(11) unsigned NOT NULL,
+ `role` varchar(255) NOT NULL DEFAULT '',
  PRIMARY KEY (`aclID`),
+ UNIQUE KEY `userID_2` (`userID`,`role`),
  KEY `userID` (`userID`),
+ KEY `role` (`role`),
  CONSTRAINT `admin_access_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `admin_users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 ";

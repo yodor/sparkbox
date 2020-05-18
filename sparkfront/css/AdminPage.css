@@ -25,16 +25,6 @@ BODY {
 }
 
 
-IMG {
-    border: 0;
-}
-
-.clear {
-
-    clear: both;
-}
-
-
 .admin_layout {
     border-collapse: collapse;
     width: 100%;
@@ -192,8 +182,7 @@ IMG {
 
 
 .AdminLoginPage {
-    background-image: url("../images/site_back.jpg");
-    background-repeat: repeat-x;
+
 }
 
 

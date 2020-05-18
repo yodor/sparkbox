@@ -7,6 +7,8 @@ class Container extends Component
 
     protected $enabled = TRUE;
 
+    protected $wrapper_enabled = TRUE;
+
     public function __construct()
     {
         parent::__construct();
@@ -23,6 +25,16 @@ class Container extends Component
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/Container.css";
         return $arr;
+    }
+
+    public function setWrapperEnabled(bool $mode)
+    {
+        $this->wrapper_enabled = $mode;
+    }
+
+    public function isWrapperEnabled(): bool
+    {
+        return $this->wrapper_enabled;
     }
 
     public function setEnabled(bool $mode)
@@ -128,12 +140,26 @@ class Container extends Component
         return NULL;
     }
 
+    public function startRender()
+    {
+        if ($this->wrapper_enabled) {
+            parent::startRender();
+        }
+    }
+
     protected function renderImpl()
     {
         $indexes = array_keys($this->items);
         foreach ($indexes as $idx => $index) {
             $component = $this->get($index);
             $component->render();
+        }
+    }
+
+    public function finishRender()
+    {
+        if ($this->wrapper_enabled) {
+            parent::finishRender();
         }
     }
 

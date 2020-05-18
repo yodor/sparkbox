@@ -70,7 +70,7 @@ class BeanFormEditor extends Container implements IBeanEditor
                 $handler = $renderer->getImageBrowser()->getHandler();
 
                 $handler->setSection(get_class($this->form), $fieldName);
-                $handler->setOwnerID(AdminPageLib::Instance()->getUserID());
+                $handler->setOwnerID(SparkAdminPage::Instance()->getUserID());
 
             }
             //            else if ($renderer instanceof SessionImageField) {

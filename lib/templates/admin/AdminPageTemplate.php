@@ -15,11 +15,9 @@ abstract class AdminPageTemplate extends PageTemplate
         $this->page = new AdminPage();
     }
 
-    public function getPage() : AdminPageLib
+    public function getPage() : SparkAdminPage
     {
         return $this->page;
     }
-
-
 
 }
