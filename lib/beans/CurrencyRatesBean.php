@@ -24,51 +24,31 @@ class CurrencyRatesBean extends DBTableBean
     {
         global $currencies;
 
-        $ret = array("price_value" => $price_value, "symbol" => "", "currency_code" => "");
-
-        $dstID = (int)Session::Get("currencyID");
+        $dstID = Session::Get("currencyID");
         $crrow = array();
-
-        $srcID = (int)Session::Get("currency_defaultID");
-
-        $qry = $currencies->queryField("currency_code", DEFAULT_CURRENCY);
-        $qry->exec();
-
-        if ($crrow = $qry->next()) {
-            $srcID = $crrow[$currencies->key()];
-            Session::Set("currency_defaultID", $srcID);
-            $ret["symbol"] = $crrow["symbol"];
-            $ret["currency_code"] = $crrow["currency_code"];
-        }
-        else {
-            //default currency was not found
-            Session::SetAlert("Requested default currency [" . DEFAULT_CURRENCY . "] is not available.");
-            return $ret;
-        }
 
         try {
             $crrow = $currencies->getByID($dstID);
-            $ret["currency_code"] = $crrow["currency_code"];
-            $ret["symbol"] = $crrow["symbol"];
         }
         catch (Exception $e) {
-
-            //Session::Alert("Requested currencyID: $dstID was not found.");
-
-            $dstID = $srcID;
+            $qry = $currencies->query();
+            $qry->exec();
+            if ($crrow = $qry->next()) {
+                $dstID = $crrow[$currencies->key()];
+                Session::Set("currencyID", $dstID);
+            }
         }
 
-        $qry = $this->query();
-        $qry->select->where = " srcID='$dstID' AND dstID='$srcID' ";
-        $qry->exec();
+        $ret["price_value"] = 0;
+        $ret["symbol"] = $crrow["symbol"];
+        $ret["currency_code"] = $crrow["currency_code"];
 
+        $qry = $this->query();
+        $qry->select->where = " srcID='$dstID' AND dstID=1 ";
+        $num = $qry->exec();
         if ($row = $qry->next()) {
             $rate = (float)$row["rate"];
             $ret["price_value"] = $price_value * $rate;
-
-        }
-        else {
-            $ret["price_value"] = $price_value;
         }
         return $ret;
 

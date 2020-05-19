@@ -4,6 +4,9 @@ include_once("utils/SQLStatement.php");
 class SQLSelect extends SQLStatement
 {
 
+    //TODO
+    public $fieldset = array();
+
     public function __construct()
     {
         $this->type = "SELECT ";

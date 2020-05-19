@@ -1,6 +1,9 @@
 function ModalPopup() {
-    this.modal_content = "<div class='ModalPane'></div>";
+    this.className = "ModalPane";
+
+    this.modal_content = "<div class='"+this.className+"'></div>";
     this.fullscreen = false;
+
 }
 
 ModalPopup.prototype.popup = function () {
@@ -144,7 +147,7 @@ ModalPopup.prototype.centerContents = function () {
 ModalPopup.prototype.makeResizable = function () {
 
 
-    let div = ".ModalPane .MessageDialog.resizable";
+    let div = ".ModalPane .resizable";
 
     const element = document.querySelector(div);
 

@@ -474,6 +474,7 @@ abstract class DBTableBean
 
         if ($docommit) $db->commit();
 
+
         $this->manageCache($id);
 
         return $id;

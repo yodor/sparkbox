@@ -9,6 +9,8 @@ function MessageDialog(id) {
     }
     this.idx = 0;
     this.icon_enabled = true;
+
+    this.visible_id = "";
 }
 
 //should already be inside the DOM
@@ -18,7 +20,8 @@ MessageDialog.prototype.createContent = function () {
     let cnt = $("#" + this.id).clone();
 
     if (this.id) {
-        cnt.attr("id", this.id + "_" + this.idx);
+        this.visible_id = this.id + "_" + this.idx;
+        cnt.attr("id", this.visible_id);
     }
     if (this.caption) {
         cnt.find(".Caption .Title").html(this.caption);
@@ -49,4 +52,7 @@ MessageDialog.prototype.show = function () {
 
     this.modal_pane.showContent(this.createContent());
 
+}
+MessageDialog.prototype.remove = function() {
+    this.modal_pane.pane().remove();
 }

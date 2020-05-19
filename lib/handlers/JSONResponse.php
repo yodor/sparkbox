@@ -27,7 +27,7 @@ class JSONResponse
 
     }
 
-    public function response()
+    public function send()
     {
         header("Pragma: no-cache");
         header("Expires: 0");

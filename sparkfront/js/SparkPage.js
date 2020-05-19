@@ -52,6 +52,35 @@ function showAlert(text, func) {
 
 }
 
+function showInput(text, value, func) {
+    let dialog = new MessageDialog();
+    dialog.icon_enabled = false;
+
+    dialog.setText(text + "<BR><div class='InputField TextField'><input type='text' name='user_input' value='"+value+"'></div>");
+    dialog.setCaption("Input");
+
+    dialog.show();
+
+    dialog.modal_pane.popup().find("[action='confirm']").click(function (event) {
+        if (func) {
+            console.log("Calling user function");
+            let dialog_shown = document.querySelector("[id='" + dialog.visible_id + "']");
+            let input = dialog_shown.querySelector("[name='user_input']");
+            func(dialog, input);
+
+        } else {
+            dialog.remove();
+        }
+    });
+
+    dialog.modal_pane.paneClicked = function (event) {
+        //console.log(event.target);
+        if (event.target.className == dialog.modal_pane.className) {
+            dialog.remove();
+        }
+    }
+}
+
 function showConfirm(text, func_ok, func_cancel) {
 
 

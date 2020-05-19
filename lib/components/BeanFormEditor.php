@@ -9,8 +9,6 @@ include_once("db/BeanTransactor.php");
 
 include_once("handlers/UploadControlAjaxHandler.php");
 
-include_once("handlers/IRequestProcessor.php");
-
 include_once("dialogs/BeanTranslationDialog.php");
 
 class BeanFormEditor extends Container implements IBeanEditor

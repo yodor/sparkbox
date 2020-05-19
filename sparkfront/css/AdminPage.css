@@ -256,3 +256,28 @@ BODY {
 .admin_layout .KeywordSearch .SubmitLine .Buttons > * {
     margin-left: 0.3em;
 }
+
+.CurrencyRates {
+
+    border: 1px solid slategrey;
+    position: relative;
+    display: table;
+    border-collapse: collapse;
+
+}
+
+.CurrencyRates .Line {
+    display: table-row;
+}
+
+.CurrencyRates .Item {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    padding:0.5em;
+    border:1px dotted slategrey;
+}
+
+.CurrencyRates .Item.Space {
+    background-color: papayawhip;
+}

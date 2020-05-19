@@ -10,6 +10,8 @@ abstract class JSONRequestHandler extends RequestHandler
     protected $content_type = "";
     protected $response_send = FALSE;
 
+    protected $need_redirect = false;
+
     public function __construct(string $cmd)
     {
         parent::__construct($cmd);
@@ -24,7 +26,7 @@ abstract class JSONRequestHandler extends RequestHandler
             }
         }
 
-        debug("Accepting commands: ", $this->supported_content);
+        debug("Accepting function calls: ", $this->supported_content);
 
     }
 
@@ -38,13 +40,17 @@ abstract class JSONRequestHandler extends RequestHandler
 
         $this->content_type = $content_type;
 
-        debug("Requested command type: '{$this->content_type}'");
+        debug("Requested function call: '{$this->content_type}'");
     }
 
+    /**
+     * Call the _named function passing a JSONResponse object as parameter
+     * All properties set to the response are sent back to the JS as json_object
+     */
     protected function processImpl()
     {
 
-        $ret = new JSONResponse(get_class($this) . "Response");
+        $response = new JSONResponse(get_class($this) . "Response");
 
         ob_start();
 
@@ -55,28 +61,30 @@ abstract class JSONRequestHandler extends RequestHandler
             $function_name = "_" . $this->content_type;
 
             if (is_callable(array($this, $function_name))) {
-                $this->$function_name($ret);
+                $this->$function_name($response);
             }
             else {
-                throw new Exception("Function: $function_name not callable");
+                throw new Exception("Function: '$function_name' not callable");
             }
 
-            $ret->contents = ob_get_contents();
-            $ret->status = JSONResponse::STATUS_OK;
+            $response->contents = ob_get_contents();
+            $response->status = JSONResponse::STATUS_OK;
 
         }
         catch (Exception $e) {
 
             debug("Exception during process: " . $e->getMessage());
 
-            $ret->contents = "";
-            $ret->status = JSONResponse::STATUS_ERROR;
-            $ret->message = $e->getMessage();
+            $response->contents = "";
+            $response->status = JSONResponse::STATUS_ERROR;
+            $response->message = $e->getMessage();
 
         }
 
+        debug("Response buffer: ".ob_get_contents());
+
         ob_end_clean();
-        $ret->response();
+        $response->send();
         $this->response_send = TRUE;
 
     }
@@ -96,11 +104,11 @@ abstract class JSONRequestHandler extends RequestHandler
 
                 @ob_end_clean();
 
-                $ret = new JSONResponse(get_class($this) . "Response");
-                $ret->status = JSONResponse::STATUS_ERROR;
-                $ret->message = "Error: " . $err["type"] . " - " . $err["message"] . "<BR>File: " . $err["file"] . " Line: " . $err["line"];
-                $ret->response();
-                $ret->contents = "";
+                $response = new JSONResponse(get_class($this) . "Response");
+                $response->status = JSONResponse::STATUS_ERROR;
+                $response->message = "Error: " . $err["type"] . " - " . $err["message"] . "<BR>File: " . $err["file"] . " Line: " . $err["line"];
+                $response->send();
+                $response->contents = "";
             }
 
         }

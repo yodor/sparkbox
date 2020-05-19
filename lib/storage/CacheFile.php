@@ -37,7 +37,8 @@ class CacheFile
         $cache_folder = $this->getCacheFolder();
         if (!file_exists($cache_folder)) {
             debug("Creating cache folder: $cache_folder");
-            if (!@mkdir($cache_folder, 0777, TRUE)) throw new Exception("Unable to create cache folder: $cache_folder");
+            @mkdir($cache_folder, 0777, TRUE);
+            if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
         }
 
         $this->fileName = $cache_folder . DIRECTORY_SEPARATOR . $this->getCacheFile();

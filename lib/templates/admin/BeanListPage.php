@@ -1,6 +1,7 @@
 <?php
 include_once("templates/admin/AdminPageTemplate.php");
 include_once("utils/ActionCollection.php");
+include_once("components/KeywordSearch.php");
 
 class BeanListPage extends AdminPageTemplate
 {
@@ -30,26 +31,105 @@ class BeanListPage extends AdminPageTemplate
      */
     protected $view_actions;
 
+    protected $keyword_search;
+
     public function __construct()
     {
         parent::__construct();
+        $this->keyword_search = new KeywordSearch();
+
     }
 
     /**
-     * Set the view columns matching query fields
+     * Called just before rendering is about to start to process the user input
+     */
+    public function processInput()
+    {
+        parent::processInput();
+
+        //keyword is not enabled?
+        if (count($this->keyword_search->getForm()->getFields()) < 1) return;
+
+        $this->keyword_search->processInput();
+
+        $filter = $this->keyword_search->filterSelect();
+        if ($filter) {
+            if ($this->query) {
+                $this->query->select->combine($filter);
+            }
+        }
+
+    }
+
+    /**
+     * Return the KeywordSearch component used
+     * @return KeywordSearch
+     */
+    public function getSearch(): KeywordSearch
+    {
+        return $this->keyword_search;
+    }
+
+    /**
+     * Set the list view column names and labels using the list_fields array
      * Array keys are used as column names and values as column labels
+     * Try to set bean query fields using the names
      * @param array $list_fields
      */
     public function setListFields(array $list_fields)
     {
         $this->fields = $list_fields;
+
+        //query is already set
+        if ($this->query instanceof SQLQuery) return;
+
+        //no bean is set yet
+        if (!$this->bean) return;
+
+        //try set the bean query
+        $this->setBeanQuery();
     }
 
+    protected function setBeanQuery()
+    {
+
+        $fields[] = $this->bean->key();
+
+        foreach($this->fields as $name=>$label) {
+            if ($this->bean->haveField($name)) {
+                $fields[] = $name;
+            }
+        }
+
+        $qry = $this->bean->query();
+        $qry->select->fields = implode(", ", $fields);
+
+        $this->query = $this->bean->query();
+    }
+
+    /**
+     * Set the bean instance to '$bean'
+     * If the view iterator is not set and listFields are set - create iterator using setBeanQuery
+     *
+     * @param DBTableBean $bean
+     */
     public function setBean(DBTableBean $bean)
     {
         $this->bean = $bean;
+
+        //query is already setup nothing to do
+        if ($this->query instanceof SQLQuery) return;
+
+        //no list fields set yet. query fields will be set when setListFields is called
+        if (!is_array($this->fields) || count($this->fields)<1) return;
+
+        $this->setBeanQuery();
     }
 
+    /**
+     * Set the iterator that will be used
+     * @param SQLQuery $qry
+     */
     public function setIterator(SQLQuery $qry)
     {
         $this->query = $qry;
@@ -60,6 +140,9 @@ class BeanListPage extends AdminPageTemplate
         return $this->view;
     }
 
+    /**
+     * Fill the required actions to the local page instance
+     */
     protected function initPageActions()
     {
         $action_add = new Action(SparkAdminPage::ACTION_ADD, "add.php");
@@ -67,30 +150,49 @@ class BeanListPage extends AdminPageTemplate
         $this->getPage()->getActions()->append($action_add);
     }
 
+    /**
+     * Append the default "Edit" and "Delete" actions
+     * If the bean instance is null the delete action is not added
+     * @param ActionCollection $act
+     */
     protected function initViewActions(ActionCollection $act)
     {
+
+        $act->append(new Action(SparkAdminPage::ACTION_EDIT, "add.php", array(new DataParameter("editID", $this->view->getIterator()->key()))));
+        $act->append(new PipeSeparator());
+
         if ($this->bean instanceof DBTableBean) {
             $h_delete = new DeleteItemRequestHandler($this->bean);
             RequestController::addRequestHandler($h_delete);
+            $act->append($h_delete->createAction());
         }
-        $act->append(new Action(SparkAdminPage::ACTION_EDIT, "add.php", array(new DataParameter("editID", $this->view->getIterator()->key()))));
-        $act->append(new PipeSeparator());
-        $act->append($h_delete->createAction());
 
     }
 
+    /**
+     * Get the item view actions collection
+     * @return ActionCollection
+     */
     public function viewActions()
     {
         return $this->view_actions;
     }
 
+    /**
+     * Initialize the contents of the container
+     * Set the main view instance to TableView
+     * Set the view_actions instance as the actions of the ActionsTableCellRenderer
+     * Calls initViewActions
+     *
+     * This method is automatically called from startRender() of PageTemplate , before processInput
+     *
+     */
     public function initView()
     {
+        if (!$this->query) throw new Exception("Query not set yet");
 
-        if (!$this->query instanceof SQLQuery) {
-            $qry = $this->bean->query();
-            $qry->select->fields = $qry->key() . "," . implode(", ", array_keys($this->fields));
-            $this->query = $qry;
+        if (count($this->keyword_search->getForm()->getFields()) > 0) {
+            $this->append($this->keyword_search);
         }
 
         $this->view = new TableView($this->query);
@@ -110,6 +212,7 @@ class BeanListPage extends AdminPageTemplate
         $this->view->getColumn("actions")->setCellRenderer($act);
 
         $this->append($this->view);
+
     }
 
 }

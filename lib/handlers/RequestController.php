@@ -15,7 +15,7 @@ class RequestController
 
     }
 
-    public static function addAjaxHandler(IRequestProcessor $handler)
+    public static function addAjaxHandler(JSONRequestHandler $handler)
     {
         $command_name = $handler->getCommand();
 
@@ -27,7 +27,7 @@ class RequestController
         self::$request_handlers[get_class($handler)] = $handler;
     }
 
-    public static function findAjaxHandler($command_name): IRequestProcessor
+    public static function findAjaxHandler($command_name): JSONRequestHandler
     {
         return self::$ajax_handlers[$command_name];
     }
@@ -65,7 +65,7 @@ class RequestController
                     catch (Exception $e) {
                         $ret->status = JSONResponse::STATUS_ERROR;
                         $ret->message = $e->getMessage();
-                        $ret->response();
+                        $ret->send();
                     }
                     $processed = TRUE;
                 }
@@ -77,7 +77,7 @@ class RequestController
             if (!$processed) {
                 $ret = new JSONResponse("AjaxHandler");
                 $ret->message = "Ajax Response requested but no handler processed this result. DEBUG: " . queryString($_GET);
-                $ret->response();
+                $ret->send();
             }
             exit;
         }

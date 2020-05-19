@@ -1,8 +1,8 @@
 <?php
 include_once("handlers/JSONResponse.php");
-include_once("handlers/IRequestProcessor.php");
 
-abstract class RequestHandler implements IRequestProcessor
+
+abstract class RequestHandler
 {
     protected $cmd = NULL;
 
@@ -19,7 +19,7 @@ abstract class RequestHandler implements IRequestProcessor
     public function __construct(string $cmd)
     {
         $this->cmd = $cmd;
-        debug("Accepting command: '$cmd'");
+        debug("Responding to command: '$cmd'");
 
     }
 

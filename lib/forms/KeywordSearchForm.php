@@ -4,13 +4,19 @@ include_once("forms/InputForm.php");
 class KeywordSearchForm extends InputForm
 {
 
-    protected $table_fields = NULL;
+    /**
+     * @var array
+     */
+    protected $table_fields;
+
     protected $search_expressions = NULL;
 
-    public function __construct(array $table_fields)
+    public function __construct()
     {
         parent::__construct();
-        $this->table_fields = $table_fields;
+
+        $this->table_fields = array();
+
         $this->search_expressions = array();
 
         $field = new DataInput("keyword", "Keyword", 0);
@@ -24,12 +30,12 @@ class KeywordSearchForm extends InputForm
         $this->search_expressions[$field_name] = $expressions;
     }
 
-    public function setSearchFields(array $table_fields)
+    public function setFields(array $table_fields)
     {
         $this->table_fields = $table_fields;
     }
 
-    public function getSearchFields()
+    public function getFields() : array
     {
         return $this->table_fields;
     }
