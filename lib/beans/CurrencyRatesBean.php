@@ -4,11 +4,11 @@ include_once("beans/DBTableBean.php");
 class CurrencyRatesBean extends DBTableBean
 {
     protected $createString = "CREATE TABLE `currency_rates` (
- `ccID` int(10) unsigned NOT NULL AUTO_INCREMENT,
- `srcID` int(10) unsigned NOT NULL,
- `dstID` int(10) unsigned NOT NULL,
+ `crID` int(11) unsigned NOT NULL AUTO_INCREMENT,
+ `srcID` int(11) unsigned NOT NULL,
+ `dstID` int(11) unsigned NOT NULL,
  `rate` float NOT NULL DEFAULT '1',
- PRIMARY KEY (`ccID`),
+ PRIMARY KEY (`crID`),
  KEY `srcID` (`srcID`),
  KEY `dstID` (`dstID`),
  CONSTRAINT `currency_rates_ibfk_1` FOREIGN KEY (`srcID`) REFERENCES `currencies` (`currencyID`) ON DELETE CASCADE ON UPDATE CASCADE,

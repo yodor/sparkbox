@@ -7,7 +7,7 @@ class ImageScaler
     const MODE_CROP = 1;
     const MODE_THUMB = 2;
 
-    //const TYPE_JPEG = "image/jpeg";
+    const TYPE_JPEG = "image/jpeg";
     const TYPE_PNG = "image/png";
 
     protected $mime = ImageScaler::TYPE_PNG;

@@ -14,8 +14,7 @@ class CurrenciesBean extends DBTableBean
     public function __construct()
     {
         parent::__construct("currencies");
-        $this->na_str = FALSE;
-        $this->na_val = "";
+
     }
 
 }

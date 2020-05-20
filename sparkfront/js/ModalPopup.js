@@ -80,10 +80,10 @@ ModalPopup.prototype.show = function () {
         }.bind(this));
     }
 
-    this.pane().click(function (event) {
+
+    this.pane().get(0).addEventListener("click", function (event) {
         this.paneClicked(event);
     }.bind(this));
-
 
     let caption = this.popup().find(".Caption");
     if (caption.get(0)) {
@@ -118,9 +118,10 @@ ModalPopup.prototype.show = function () {
     this.makeResizable();
 }
 
+
 ModalPopup.prototype.paneClicked = function (event) {
 
-   console.log("ModalPopup: paneClicked");
+   console.log("ModalPopup::paneClicked");
 
 }
 

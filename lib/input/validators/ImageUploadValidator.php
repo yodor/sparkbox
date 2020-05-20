@@ -1,13 +1,12 @@
 <?php
 include_once("input/validators/UploadDataValidator.php");
 include_once("storage/ImageStorageObject.php");
-include_once("utils/ImageResizer.php");
 
 class ImageUploadValidator extends UploadDataValidator
 {
 
-    private $resize_width = 0;
-    private $resize_height = 0;
+    private $resize_width = -1;
+    private $resize_height = -1;
     private $resize_enabled = TRUE;
 
     public function __construct()
@@ -42,31 +41,30 @@ class ImageUploadValidator extends UploadDataValidator
     protected function processUploadData(DataInput $field)
     {
 
-        debug("ImageUploadValidator::processUploadData() for field[" . $field->getName() . "]");
+        debug("Input: " . $field->getName());
 
         //field->getValue() contains FileStorageObject as uploaded from user
         $image_storage = new ImageStorageObject($field->getValue());
 
-        $this->process($image_storage);
+        $this->processImageObject($image_storage);
 
         //assign ImageStorageObject to field after processing
         $field->setValue($image_storage);
 
     }
 
-    public function process(ImageStorageObject $image_storage)
+    protected function processImageObject(ImageStorageObject $image_storage)
     {
 
-        debug("------------- ImageUploadValidator::processImage() UID: " . $image_storage->getUID());
+        debug("UID: " . $image_storage->getUID());
 
-        debug("Uploaded Image Size:(" . $image_storage->getWidth() . "," . $image_storage->getHeight() . ")");
+        debug("Image dimension: [" . $image_storage->getWidth() . " x " . $image_storage->getHeight() . "]");
         debug("MIME: " . $image_storage->getMIME());
-        debug("Length: " . $image_storage->getLength());
+        debug("Data size: " . $image_storage->getLength());
 
         //should be disabled during ajax upload and before submit of actual form. original uploaded image is stored in session
         if (!$this->resize_enabled) {
             debug("Resizing is disabled for this validator");
-            debug("----------------------------------------------------------------------");
             return;
         }
 
@@ -74,49 +72,47 @@ class ImageUploadValidator extends UploadDataValidator
         $dst_width = $this->resize_width;
         $dst_height = $this->resize_height;
 
-        if ($dst_width == 0 && $dst_height == 0) throw new Exception("Resize is enabled but resize width or height is not set");
+        if ($dst_width < 1 && $dst_height < 1) throw new Exception("Resize is enabled but resize width or height is not set");
 
         if ($dst_width > 0 && $dst_height > 0) {
 
-            debug("Exact resize dimension requested: ($dst_width, $dst_height)");
+            debug("Mode 'Exact Size' - new dimension is [ $dst_width x $dst_height ]");
 
         }
         else if ($dst_width > 0) {
 
             $ratio = (float)$image_storage->getWidth() / $dst_width;
             $dst_height = $image_storage->getHeight() / $ratio;
-            debug("Autofit Width Result: Size ($dst_width, $dst_height) - Ratio: $ratio");
+            debug("Mode 'Autofit Width' - new dimension is [ $dst_width x $dst_height ] - ratio: $ratio");
 
         }
         else if ($dst_height > 0) {
 
             $ratio = (float)$image_storage->getHeight() / $dst_height;
             $dst_width = $image_storage->getWidth() / $ratio;
-            debug("Autofit Height Result: Size ($dst_width, $dst_height) - Ratio: $ratio");
-
+            debug("Mode 'Autofit Height' - new dimension is [ $dst_width x $dst_height ] - ratio: $ratio");
         }
 
         $scale = min($dst_width / $image_storage->getWidth(), $dst_height / $image_storage->getHeight());
-        debug("Scale: $scale");
 
         if ($scale != 1) {
 
             if ($scale > 1) {
                 if (IMAGE_UPLOAD_UPSCALE) {
-                    debug("IMAGE_UPLOAD_UPSCALE is true. Upscaling is enabled.");
+                    debug("IMAGE_UPLOAD_UPSCALE is true");
                 }
                 else {
-                    debug("IMAGE_UPLOAD_UPSCALE is false. Upscaling is disabled.");
+                    debug("IMAGE_UPLOAD_UPSCALE is false - using scale: 1");
                     //force 1:1 scale
                     $scale = 1;
                 }
             }
             else if ($scale < 1) {
                 if (IMAGE_UPLOAD_DOWNSCALE) {
-                    debug("IMAGE_UPLOAD_DOWNSCALE is true. Downscaling is enabled.");
+                    debug("IMAGE_UPLOAD_DOWNSCALE is true");
                 }
                 else {
-                    debug("IMAGE_UPLOAD_DOWNSCALE is false. Downscaling is disabled.");
+                    debug("IMAGE_UPLOAD_DOWNSCALE is false - using scale: 1");
                     //force 1:1 scale
                     $scale = 1;
                 }
@@ -124,11 +120,11 @@ class ImageUploadValidator extends UploadDataValidator
 
         }
 
-        debug("Scale: " . $scale);
+        debug("Scale is: " . $scale);
 
         if ($scale == 1) {
-            debug("Scale is unity. Finishing processImage without resize.");
-            debug("----------------------------------------------------------------------");
+            debug("Scale is 1 - finishing without resize");
+
             return;
         }
 
@@ -138,7 +134,7 @@ class ImageUploadValidator extends UploadDataValidator
         if ($n_width < 1) $n_width = 1;
         if ($n_height < 1) $n_height = 1;
 
-        debug("Creating scaled image ($n_width, $n_height) | Memory usage before scaling: " . memory_get_usage(TRUE));
+        debug("Creating new image: [ $n_width x $n_height ] | Memory usage before scaling: " . memory_get_usage(TRUE));
 
         $source = FALSE;
 
@@ -149,7 +145,7 @@ class ImageUploadValidator extends UploadDataValidator
             $source = $image_storage->imageFromTemp();
         }
 
-        if (!is_resource($source)) throw new Exception("ImageUploadValidator::processImage() can not create image resource from data");
+        if (!is_resource($source)) throw new Exception("Unable to create image resource from this input data");
 
         $scaled_source = imagecreatetruecolor($n_width, $n_height);
         imagealphablending($scaled_source, FALSE);
@@ -158,15 +154,15 @@ class ImageUploadValidator extends UploadDataValidator
         imagecopyresampled($scaled_source, $source, 0, 0, 0, 0, $n_width, $n_height, $image_storage->getWidth(), $image_storage->getHeight());
         @imagedestroy($source);
 
-        debug("Processing image data to output buffer ...");
+        debug("Saving new image to output buffer ...");
 
         ob_start();
 
-        if (strcmp(strtolower($image_storage->getMIME()), ImageResizer::TYPE_PNG) === 0) {
+        if (strcasecmp($image_storage->getMIME(), ImageScaler::TYPE_PNG) == 0) {
 
-            $image_storage->setMIME(ImageResizer::TYPE_PNG);
+            $image_storage->setMIME(ImageScaler::TYPE_PNG);
 
-            debug("Output Format is PNG");
+            debug("Using PNG output");
 
             imagesavealpha($scaled_source, TRUE);
 
@@ -175,23 +171,22 @@ class ImageUploadValidator extends UploadDataValidator
         }
         else {
 
-            $image_storage->setMIME(ImageResizer::TYPE_JPEG);
+            $image_storage->setMIME(ImageScaler::TYPE_JPEG);
 
-            debug("Output Format is JPEG");
+            debug("Using JPEG output");
 
             imagejpeg($scaled_source, NULL, 95);
 
         }
 
-        // pass output to image_storage
-        debug("Setting output buffer result as image data ...");
+        debug("Output buffer size: " . ob_get_length());
+
         $image_storage->setData(ob_get_contents());
 
         ob_end_clean();
 
         @imagedestroy($scaled_source);
 
-        debug("----------------------------------------------------------------------");
     }
 
 }

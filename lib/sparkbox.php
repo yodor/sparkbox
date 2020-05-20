@@ -108,15 +108,15 @@ include_once("config/defaults.php");
 $site_title = $defines->get("SITE_TITLE");
 if (!$site_title) throw new Exception("SITE_TITLE not defined");
 
-$defines->set("CACHE_PATH", dirname($install_path) . "/sparkcache.".$defines->get("SITE_TITLE"));
+$defines->set("CACHE_PATH", dirname($install_path) . "/sparkcache/".$defines->get("SITE_TITLE"));
 
 $defines->export();
 
-//if (!file_exists(CACHE_PATH)) {
-//    debug("Creating cache folder: ". CACHE_PATH);
-//    @mkdir(CACHE_PATH, 0777, TRUE);
-//    if (!file_exists(CACHE_PATH)) throw new Exception("Unable to create cache folder: ".CACHE_PATH);
-//}
+if (!file_exists(CACHE_PATH)) {
+    debug("Creating cache folder: ". CACHE_PATH);
+    @mkdir(CACHE_PATH, 0777, TRUE);
+    if (!file_exists(CACHE_PATH)) throw new Exception("Unable to create cache folder: ".CACHE_PATH);
+}
 
 //define SKIP_SESSION to skip starting session
 if (!defined("SKIP_SESSION")) {

@@ -173,7 +173,7 @@ class BeanListPage extends AdminPageTemplate
      * Get the item view actions collection
      * @return ActionCollection
      */
-    public function viewActions()
+    public function viewItemActions()
     {
         return $this->view_actions;
     }

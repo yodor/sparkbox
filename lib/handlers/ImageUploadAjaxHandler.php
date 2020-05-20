@@ -61,7 +61,7 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
             throw new Exception("Incorrect storage object received");
         }
 
-        //construct image data in row and pass to ImageResizer to create a temporary thumbnail of the uploaded image.
+        //construct image data in row and pass to ImageScaler to create a temporary thumbnail of the uploaded image.
         $scaler = new ImageScaler($this->width, $this->height);
 
         $mime = $object->getMIME();

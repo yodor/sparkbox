@@ -3,6 +3,11 @@ include_once("components/Container.php");
 
 class DynamicPageView extends Container
 {
+    protected $item;
+
+    protected $bean;
+    protected $pageClass;
+
     public function __construct()
     {
         parent::__construct();
@@ -56,6 +61,11 @@ class DynamicPageView extends Container
             }
         }
 
+        $this->bean = $bean;
+        $this->item = $item;
+
+        $this->pageClass = $page_class;
+
         trbean($page_id, "item_title", $item, $bean->getTableName());
         trbean($page_id, "content", $item, $bean->getTableName());
 
@@ -76,11 +86,23 @@ class DynamicPageView extends Container
 
         $contents->setContents($item["content"]);
 
-
-
         $this->append($contents);
 
     }
 
+    public function getItem(): array
+    {
+        return $this->item;
+    }
+
+    public function getBean(): DBTableBean
+    {
+        return $this->bean;
+    }
+
+    public function getPageCLass(): string
+    {
+        return $this->pageClass;
+    }
 
 }

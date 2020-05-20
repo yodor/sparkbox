@@ -33,7 +33,7 @@ class Paginator
     protected $page_list_end = 0;
     protected $page_list_start = 0;
 
-    public $max_page_list = 7;
+    public $max_page_list = 5;
 
     public static $page_filter_only = FALSE;
 
@@ -208,14 +208,11 @@ class Paginator
         if (isset($arr["orderby"])) unset($arr["orderby"]);
     }
 
-    public function preparePageFilter($default_order = "")
+    public function prepareOrderFilter($default_order = "") : SQLSelect
     {
         $filter = new SQLSelect();
         $filter->from = "";
         $filter->fields = "";
-
-        $page = $this->page;
-        $ipp = $this->ipp;
 
         $order_field = NULL;
         $order_direction = $this->default_order_direction;
@@ -235,6 +232,7 @@ class Paginator
         if (isset($_GET["orderdir"])) {
             $order_direction = DBConnections::Get()->escape($_GET["orderdir"]);
         }
+        $this->order_direction = $order_direction;
 
         if ($order_field) {
             $orderby = "$order_field $order_direction";
@@ -259,7 +257,20 @@ class Paginator
             }
         }
 
-        $this->order_direction = $order_direction;
+
+
+        return $filter;
+    }
+
+    public function preparePageFilter($default_order = "") : SQLSelect
+    {
+        $filter = new SQLSelect();
+        $filter->from = "";
+        $filter->fields = "";
+
+        $page = $this->page;
+        $ipp = $this->ipp;
+
 
         if ($ipp > 0) {
             $filter->limit = " " . ($page * $ipp) . ", $ipp";

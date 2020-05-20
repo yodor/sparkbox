@@ -105,14 +105,20 @@ class MySQLiDriver extends DBDriver
         return $res;
     }
 
-    public function fetch($res)
+    /**
+     * @param $res
+     * @return array|null
+     * @throws Exception
+     */
+    public function fetch($res) : ?array
     {
         $res = $this->assert_resource($res);
 
         return $res->fetch_assoc();
+
     }
 
-    public function fetchArray($res)
+    public function fetchArray($res) : ?array
     {
         $res = $this->assert_resource($res);
 

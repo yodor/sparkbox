@@ -133,8 +133,8 @@ function showPopupPanel(popup_id, text) {
 
 }
 
-
-$(document).bind("keypress", function (event) {
+//default handler for ModalPane dialogs
+$(document).bind("keyup", function (event) {
 
 
     //console.log("Keypress: "+event.which);
@@ -149,7 +149,6 @@ $(document).bind("keypress", function (event) {
 
     //esc
     if (event.which == 27) {
-
 
         var cancel_button = control_object.popup().find("[action='cancel']").first();
         var confirm_button = control_object.popup().find("[action='confirm']").first();
@@ -173,6 +172,9 @@ $(document).bind("keypress", function (event) {
 
             defaul_button.click();
             return false;
+        }
+        else {
+            control_object.popup().remove();
         }
 
     }

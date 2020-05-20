@@ -21,7 +21,8 @@ MessageDialog.prototype.createContent = function () {
 
     if (this.id) {
         this.visible_id = this.id + "_" + this.idx;
-        cnt.attr("id", this.visible_id);
+        cnt.attr("visibleID", this.visible_id);
+        this.selector = "[visibleID="+this.visible_id+"]";
     }
     if (this.caption) {
         cnt.find(".Caption .Title").html(this.caption);
@@ -33,6 +34,7 @@ MessageDialog.prototype.createContent = function () {
         cnt.find(".Contents .Icon").remove();
 
     }
+
     return cnt.get(0).outerHTML;
 }
 
@@ -44,6 +46,7 @@ MessageDialog.prototype.setText = function (text) {
     this.text = text;
 }
 
+//setup dialog to who the contents of DOM Element with ID=id
 MessageDialog.prototype.setID = function (id) {
     this.id = id;
 }
@@ -51,8 +54,42 @@ MessageDialog.prototype.setID = function (id) {
 MessageDialog.prototype.show = function () {
 
     this.modal_pane.showContent(this.createContent());
+    let buttonsBar = document.querySelector(this.selector + " .Buttons");
+    //console.log(buttonsBar);
+    buttonsBar.querySelectorAll("[action]").forEach(function(value,key,parent){
+       //assign default actions
+       value.addEventListener("click", function(event){
+           event.stopPropagation();
+           this.buttonAction(value.getAttribute("action"));
+       }.bind(this));
+
+    }.bind(this));
+
+    // let shown = document.querySelector(this.selector);
+    // shown.addEventListener("click", function(event){
+    //     event.stopPropagation();
+    //     console.log("MessageDialog::click()");
+    // });
+
+    this.modal_pane.paneClicked = function (event) {
+        //console.log(event.target);
+
+        if (event.target.className == this.modal_pane.className) {
+            this.remove();
+        }
+
+    }.bind(this);
+
+    let input = document.querySelector(this.selector + " INPUT");
+    if (input) {
+        input.focus();
+    }
 
 }
 MessageDialog.prototype.remove = function() {
     this.modal_pane.pane().remove();
+}
+
+MessageDialog.prototype.buttonAction = function(action) {
+    console.log("MessageDialog::buttonAction() - " +action);
 }

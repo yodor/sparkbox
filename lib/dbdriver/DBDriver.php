@@ -24,9 +24,9 @@ abstract class DBDriver
 
     abstract public function query(string $str);
 
-    abstract public function fetch($str);
+    abstract public function fetch($str) : ?array;
 
-    abstract public function fetchArray($str);
+    abstract public function fetchArray($str) : ?array;
 
     abstract public function dateTime($add_days = 0, $interval_type = " DAY ");
 

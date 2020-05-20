@@ -113,6 +113,8 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
+        $orderFilter = $this->paginator->prepareOrderFilter($this->default_order);
+
         $pageFilter = $this->paginator->preparePageFilter($this->default_order);
 
         //	echo "PageFilter SQL: ".$pageFilter->getSQL(true);
@@ -120,6 +122,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         if ($this->paginators_enabled) {
             $this->iterator->select->combine($pageFilter);
+            $this->iterator->select->combine($orderFilter);
         }
 
         //echo "Final SQL: ".$select->getSQL();

@@ -62,6 +62,11 @@
     display: block;
 
 }
+.InputField .MCETextArea {
+    min-height:450px;
+
+}
+
 .InputField INPUT, TEXTAREA, .MCETextArea .mce-container {
     box-sizing: border-box;
 }
