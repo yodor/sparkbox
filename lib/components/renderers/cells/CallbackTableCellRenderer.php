@@ -24,10 +24,10 @@ class CallbackTableCellRenderer extends TableCellRenderer
 
     public function setData(array &$row)
     {
-
         parent::setData($row);
         $this->data = $row;
     }
+
 }
 
 ?>

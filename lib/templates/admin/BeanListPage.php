@@ -242,7 +242,12 @@ class BeanListPage extends AdminPageTemplate
 
         $this->initViewActions($this->view_actions);
 
-        $this->view->getColumn("actions")->setCellRenderer($act);
+        if ($this->view_actions->count()>0) {
+            $this->view->getColumn("actions")->setCellRenderer($act);
+        }
+        else {
+            $this->view->removeColumn("actions");
+        }
 
         $this->append($this->view);
 

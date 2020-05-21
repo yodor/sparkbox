@@ -7,27 +7,23 @@ class LinkTableCellRenderer extends TableCellRenderer
 
     protected $action;
 
-    public function __construct(Action $act)
+    public function __construct()
     {
         parent::__construct();
 
-        $this->action = $act;
+        $this->action = new Action();
 
     }
 
     protected function renderImpl()
     {
-        $this->action->render();
+        if ($this->value) {
+            $this->action->getURLBuilder()->buildFrom($this->value);
+            $this->action->setContents($this->value);
+            $this->action->render();
+        }
     }
 
-    public function setData(array &$row)
-    {
-        parent::setData($row);
-
-        $this->action->setData($row);
-        $this->action->setContents($this->value);
-
-    }
 }
 
 ?>
