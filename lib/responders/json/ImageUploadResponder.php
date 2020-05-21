@@ -1,11 +1,11 @@
 <?php
-include_once("handlers/UploadControlAjaxHandler.php");
+include_once("responders/json/UploadControlResponder.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("utils/ImageScaler.php");
 include_once("storage/StorageItem.php");
 include_once("input/validators/ImageUploadValidator.php");
 
-class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoRenderer
+class ImageUploadResponder extends UploadControlResponder implements IPhotoRenderer
 {
 
     //   IPhotoRenderer
@@ -99,12 +99,11 @@ class ImageUploadAjaxHandler extends UploadControlAjaxHandler implements IPhotoR
         return $html;
     }
 
-    public function validator()
+    public function validator() : UploadDataValidator
     {
         $validator = new ImageUploadValidator();
-        //turn off resizing during ajax calls. resizing will be done on the final submit of form
+        //turn off resizing during ajax calls. resizing will be done on the final submit of the form
         $validator->setResizeEnabled(FALSE);
-        //$validator->setResizedSize($this->width, $this->height);
         return $validator;
     }
 

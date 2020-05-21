@@ -1,6 +1,6 @@
 <?php
 include_once("dialogs/MessageDialog.php");
-include_once("handlers/TranslatePhraseAjaxHandler.php");
+include_once("responders/json/TranslatePhraseResponder.php");
 
 class PhraseTranslationDialog extends MessageDialog
 {
@@ -11,8 +11,8 @@ class PhraseTranslationDialog extends MessageDialog
     {
         parent::__construct("Phrase Translator", "phrase_translator");
 
-        $h_translate = new TranslatePhraseAjaxHandler();
-        RequestController::addAjaxHandler($h_translate);
+        $h_translate = new TranslatePhraseResponder();
+
     }
 
     public function requiredStyle()
@@ -52,7 +52,7 @@ class PhraseTranslationDialog extends MessageDialog
         echo "<label>" . tr("Original Text") . ": </label>";
         echo "</td></tr>";
 
-        echo "<tr><td class='cell phrase'>";
+        echo "<tr><td class='cell phrase InputField'>";
         echo "<textarea READONLY name='phrase' rows='5' >";
         echo "</textarea>";
         echo "</td></tr>";
@@ -61,7 +61,7 @@ class PhraseTranslationDialog extends MessageDialog
         echo "<label>" . tr("Translation") . ": </label>";
         echo "</td></tr>";
 
-        echo "<tr><td class='cell translation'>";
+        echo "<tr><td class='cell translation InputField'>";
         echo "<textarea name='translation' rows='5' >";
         echo "</textarea>";
         echo "</td></tr>"; //item

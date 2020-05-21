@@ -1,9 +1,9 @@
 <?php
-include_once("handlers/RequestHandler.php");
+include_once("responders/RequestResponder.php");
 
 include_once("dialogs/ConfirmMessageDialog.php");
 
-class AuthenticatorRequestHandler extends RequestHandler
+class AuthenticatorResponder extends RequestResponder
 {
 
     /**
@@ -21,6 +21,7 @@ class AuthenticatorRequestHandler extends RequestHandler
     {
         parent::__construct($cmd);
         $this->auth = $auth;
+        //success and cancel urls set outside
     }
 
     public function getAuthenticator(): Authenticator
@@ -54,19 +55,17 @@ class AuthenticatorRequestHandler extends RequestHandler
     protected function processImpl()
     {
 
-        $success = FALSE;
         try {
 
             //throws exception on login error
             $this->auth->login($this->email, $this->pass, $this->randsalt, $this->remember);
-            $success = TRUE;
+
         }
         catch (Exception $e) {
+            debug("Login failed");
             sleep(1);
             throw $e;
         }
-
-        return $success;
 
     }
 

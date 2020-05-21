@@ -2,18 +2,20 @@
 include_once("input/renderers/ArrayField.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
-//TODO: lead out as AjaxInputRenderer
+
 abstract class SessionUpload extends InputField
 {
-    protected $ajax_handler = NULL;
+    /**
+     * @var UploadControlResponder
+     */
+    protected $ajax_handler;
 
     /**
-     * SessionUploadField constructor.
-     * Register the handler with the RequestController
-     * set the type attribute to 'file'
-     * @param UploadControlAjaxHandler $ajax_handler
+     * SessionUpload constructor.
+     * @param DataInput $input
+     * @param UploadControlResponder $ajax_handler
      */
-    public function __construct(DataInput $input, UploadControlAjaxHandler $ajax_handler)
+    public function __construct(DataInput $input, UploadControlResponder $ajax_handler)
     {
         parent::__construct($input);
 
@@ -21,13 +23,12 @@ abstract class SessionUpload extends InputField
 
         $this->ajax_handler = $ajax_handler;
 
-        RequestController::addAjaxHandler($this->ajax_handler);
 
         $this->setAttribute("handler_command", $this->ajax_handler->getCommand());
 
     }
 
-    public function assignUploadHandler(UploadControlAjaxHandler $handler)
+    public function assignUploadHandler(UploadControlResponder $handler)
     {
         $this->ajax_handler = $handler;
     }
@@ -106,7 +107,7 @@ abstract class SessionUpload extends InputField
             return;
         }
 
-        $validator = $this->ajax_handler->validator();
+        //$validator = $this->ajax_handler->validator();
 
         echo "<div class='ArrayContents' field='" . $this->input->getName() . "'>";
 
@@ -114,7 +115,7 @@ abstract class SessionUpload extends InputField
 
             if (is_null($storage_object)) continue;
 
-            $validator->process($storage_object);
+            //$validator->processObject($storage_object);
 
             echo $this->ajax_handler->getHTML($storage_object, $field_name);
 

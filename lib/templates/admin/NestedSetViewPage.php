@@ -23,11 +23,9 @@ class NestedSetViewPage extends BeanListPage
      */
     public function initView()
     {
-        $h_repos = new ChangePositionRequestHandler($this->bean);
-        RequestController::addRequestHandler($h_repos);
+        $h_repos = new ChangePositionResponder($this->bean);
 
-        $h_delete = new DeleteItemRequestHandler($this->bean);
-        RequestController::addRequestHandler($h_delete);
+        $h_delete = new DeleteItemResponder($this->bean);
 
         $ir = new TextTreeItem();
         $ir->getActions()->append(new Action("Up", "?cmd=reposition&type=left", array(new DataParameter("item_id", $this->bean->key()))));

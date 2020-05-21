@@ -56,6 +56,8 @@ abstract class UploadDataValidator implements IInputValidator
     }
 
     /**
+     * Check uploaded size is within the set limits.
+     * Check the mime is from accepted mimes
      * @param DataInput $input
      * @throws Exception
      */
@@ -129,14 +131,13 @@ abstract class UploadDataValidator implements IInputValidator
             }
         }
 
-
-        $this->processUploadData($input);
-
     }
 
-    abstract protected function processUploadData(DataInput $field);
 
-    //   abstract protected function getStorageObject();
+    public function processObject(StorageObject $object)
+    {
+
+    }
 
 }
 

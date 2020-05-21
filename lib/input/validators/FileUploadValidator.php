@@ -6,12 +6,9 @@ include_once("input/validators/UploadDataValidator.php");
 class FileUploadValidator extends UploadDataValidator
 {
 
-    protected function processUploadData(DataInput $field)
-    {
 
-    }
 
-    public function process(FileStorageObject $storage_object)
+    public function processObject(StorageObject $storage_object)
     {
 
     }

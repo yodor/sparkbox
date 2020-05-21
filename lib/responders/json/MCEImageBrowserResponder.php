@@ -1,5 +1,5 @@
 <?php
-include_once("handlers/ImageUploadAjaxHandler.php");
+include_once("responders/json/ImageUploadResponder.php");
 include_once("utils/IStorageSection.php");
 include_once("beans/MCEImagesBean.php");
 
@@ -38,7 +38,7 @@ class ImageDimensionForm extends InputForm
     }
 }
 
-class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStorageSection
+class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageSection
 {
 
     protected $field_name = NULL;
@@ -102,7 +102,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
     protected function _find(JSONResponse $resp)
     {
-        debug("MCEImageBrowserAjaxHandler::_find | section_name='{$this->section_name}' AND section_key='{$this->section_key}'");
+        debug("MCEImageBrowserResponder::_find | section_name='{$this->section_name}' AND section_key='{$this->section_key}'");
 
         $bean = new MCEImagesBean();
         $qry = $bean->query();
@@ -133,7 +133,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
     protected function assignUploadObjects(JSONResponse $resp, FileStorageObject $upload_object)
     {
-        debug("MCEImageBrowserAjaxHandler::assignUploadObjects");
+        debug("assignUploadObjects");
 
         $bean = new MCEImagesBean();
         $bean_row = array();
@@ -186,7 +186,7 @@ class MCEImageBrowserAjaxHandler extends ImageUploadAjaxHandler implements IStor
 
         }
 
-        if (!$bean->deleteID($imageID)) throw new Exception(tr("Unable to delete: ") . $bean->getDB()->getError());
+        if (!$bean->delete($imageID)) throw new Exception(tr("Unable to delete: ") . $bean->getDB()->getError());
 
     }
 

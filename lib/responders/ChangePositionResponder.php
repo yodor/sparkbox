@@ -1,7 +1,8 @@
 <?php
-include_once("handlers/RequestHandler.php");
+include_once("responders/RequestResponder.php");
+include_once("dialogs/InputMessageDialog.php");
 
-class ChangePositionRequestHandler extends RequestHandler
+class ChangePositionResponder extends RequestResponder
 {
 
     protected $item_id = -1;
@@ -48,7 +49,11 @@ class ChangePositionRequestHandler extends RequestHandler
         if (isset($arr["position"])) {
             $this->position = (int)$arr["position"];
             unset($arr["position"]);
+            if ($this->position<1) {
+                Session::SetAlert("Incorrect position specified");
+            }
         }
+
         if ($this->bean instanceof OrderedDataBean) {
             if (strcmp($this->type, "fixed") == 0) {
                 if ($this->position < 1) {
@@ -60,6 +65,7 @@ class ChangePositionRequestHandler extends RequestHandler
         $this->cancel_url = queryString($arr);
         $this->cancel_url = $_SERVER['PHP_SELF'] . $this->cancel_url;
 
+        $this->success_url = $this->cancel_url;
     }
 
     protected function processImpl()
@@ -94,34 +100,32 @@ class ChangePositionRequestHandler extends RequestHandler
                     $this->bean->reorderFixed($this->item_id, $this->position);
                 }
                 else {
-                    $dialog = new ConfirmMessageDialog();
-                    ob_start();
-                    $input = DataInputFactory::Create(DataInputFactory::TEXT, "position", "Input new position", 1);
-                    $cmp = new InputComponent($input);
-                    $cmp->render();
-                    $dialog->setContents(ob_get_contents());
-                    ob_end_clean();
+
+                    $dialog = new InputMessageDialog();
+                    $dialog->getInput()->setName("position");
+                    $dialog->getInput()->setLabel("Input new position");
 
                     ?>
                     <script type="text/javascript">
-                        function onConfirmMessageDialog(is_confirmed) {
-                            if (is_confirmed) {
+                        let input_position = new MessageDialog("<?php echo $dialog->getID();?>");
+                        input_position.buttonAction = function (action) {
+                            if (action == "confirm") {
 
-                                let position = document.querySelector(".ModalPane .ConfirmMessageDialog .InputField [name=position]").value
+                                let position = input_position.input.value;
 
                                 var searchParams = new URLSearchParams(location.search);
                                 searchParams.set("position", position);
 
                                 window.location.href = `${location.pathname}?${searchParams}`;
-                            } else {
+                            } else if (action == "cancel") {
                                 window.location.href = "<?php echo $this->cancel_url;?>";
                             }
-
                         }
 
                         onPageLoad(function () {
-                            showPopupPanel("<?php echo $dialog->getID()?>");
+                            input_position.show();
                         });
+
                     </script>
                     <?php
 

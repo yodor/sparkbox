@@ -1,11 +1,11 @@
 <?php
-include_once("handlers/UploadControlAjaxHandler.php");
+include_once("responders/json/UploadControlResponder.php");
 
 include_once("input/validators/FileUploadValidator.php");
 
 include_once("input/renderers/InputField.php");
 
-class FileUploadAjaxHandler extends UploadControlAjaxHandler
+class FileUploadResponder extends UploadControlResponder
 {
 
     public function __construct()
@@ -18,7 +18,7 @@ class FileUploadAjaxHandler extends UploadControlAjaxHandler
 
         //TODO:prepare other style contents for files. render files as alternating rows icon, filename , type, size, X
 
-        debug("UploadControlAjaxHandler::createUploadContents() ...");
+        debug("...");
 
         $filename = $storageObject->getFileName();
 
@@ -26,7 +26,7 @@ class FileUploadAjaxHandler extends UploadControlAjaxHandler
 
         $uid = $storageObject->getUID();
 
-        debug("UploadControlAjaxHandler::createUploadContents() UID:$uid filename:$filename mime:$mime");
+        debug("UID:$uid filename:$filename mime:$mime");
 
         if (!($storageObject instanceof FileStorageObject)) {
             throw new Exception("Incorrect storage object received");
@@ -54,7 +54,7 @@ class FileUploadAjaxHandler extends UploadControlAjaxHandler
         return $html;
     }
 
-    public function validator()
+    public function validator() : UploadDataValidator
     {
         return new FileUploadValidator();
     }

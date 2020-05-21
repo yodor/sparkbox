@@ -2,7 +2,7 @@
 include_once("templates/admin/BeanListPage.php");
 
 include_once("beans/LanguagesBean.php");
-include_once("beans/SiteTextsBean.php");
+include_once("beans/TranslationPhrasesBean.php");
 
 include_once("components/KeywordSearch.php");
 include_once("dialogs/PhraseTranslationDialog.php");
@@ -17,7 +17,8 @@ class PhraseTranslatorPage extends BeanListPage
     {
         parent::__construct();
 
-        $rc = new RequestBeanKey(new LanguagesBean(), "../list.php", array("language"));
+        $rc = new BeanKeyCondition(new LanguagesBean(), "../list.php", array("language"));
+        $this->setRequestCondition($rc);
 
         $langID = $rc->getID();
 
@@ -28,25 +29,14 @@ class PhraseTranslatorPage extends BeanListPage
 
         $this->langID = $langID;
 
-        $search_fields = array("value");
-        //default is POST for this form
-        $scomp = new KeywordSearch($search_fields);
+        $bean = new TranslationPhrasesBean();
 
-        $bean = new SiteTextsBean();
-        $qry = $bean->query();
+        $this->setIterator($bean->queryLanguageID($this->langID));
 
-        $sel = $qry->select;
-        $sel->fields = " st.textID, st.value as phrase, t.translated as translation, coalesce(t.trID,-1) as trID, coalesce(t.langID,$langID) as langID  ";
-        $sel->from = " site_texts st LEFT JOIN translation_phrases t ON st.textID=t.textID ";
-        $sel->having = " langID=$langID ";
+        $search_fields = array("st.value");
+        $this->getSearch()->getForm()->setFields($search_fields);
 
-        $search_qry = $scomp->getForm()->searchFilterSelect();
-
-        $sel->combine($search_qry);
-
-        $this->append($scomp);
-
-        $this->query = $qry;
+        $this->setListFields(array("phrase" => "Phrase", "translation" => "Translation"));
     }
 
     protected function initPageActions()
@@ -67,41 +57,17 @@ class PhraseTranslatorPage extends BeanListPage
     public function initView()
     {
 
+        parent::initView();
 
-        $view = new TableView($this->query);
-        $view->setCaption("Available Phrases For Translation");
-        // $view->setClassName("TranslationPhrases");
-        // $view->setAttribute("langID", $langID);
+        $phrase = $this->view->getColumn("phrase")->getCellRenderer();
+        $phrase->setAttribute("relation", "phrase");
+        $phrase->addValueAttribute("textID");
+        $phrase->addValueAttribute("trID");
 
-        $view->items_per_page = 20;
-
-        $view->addColumn(new TableColumn($this->query->key(), "ID"));
-        $view->addColumn(new TableColumn("phrase", "Phrase"));
-        $view->getColumn("phrase")->getCellRenderer()->setAttribute("relation", "phrase");
-
-        $view->addColumn(new TableColumn("translation", "Translation"));
-        $view->getColumn("translation")->getCellRenderer()->setAttribute("relation", "translation");
-
-        $view->getColumn("phrase")->getCellRenderer()->addValueAttribute("textID");
-        $view->getColumn("phrase")->getCellRenderer()->addValueAttribute("trID");
-
-        $view->getColumn("translation")->getCellRenderer()->addValueAttribute("textID");
-        $view->getColumn("translation")->getCellRenderer()->addValueAttribute("trID");
-
-        $view->addColumn(new TableColumn("actions", "Actions"));
-
-        //command actions edit/delete
-        $act = new ActionsTableCellRenderer();
-
-        $this->view_actions = $act->getActions();
-
-        $this->initViewActions($this->view_actions);
-
-        $view->getColumn("actions")->setCellRenderer($act);
-
-        $this->view = $view;
-
-        $this->append($this->view);
+        $translation = $this->view->getColumn("translation")->getCellRenderer();
+        $translation->setAttribute("relation", "translation");
+        $translation->addValueAttribute("textID");
+        $translation->addValueAttribute("trID");
 
     }
 

@@ -1,8 +1,8 @@
 <?php
-include_once("handlers/JSONRequestHandler.php");
+include_once("responders/json/JSONResponder.php");
 include_once("storage/FileStorageObject.php");
 
-abstract class UploadControlAjaxHandler extends JSONRequestHandler
+abstract class UploadControlResponder extends JSONResponder
 {
 
     public const PARAM_FIELD_NAME = "field_name";
@@ -14,7 +14,7 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
     protected $field_name = NULL;
 
     /**
-     * UploadControlAjaxHandler constructor.
+     * UploadControlResponder constructor.
      *
      * @param string $cmd Having cmd=$cmd in the request makes this handler process the request
      */
@@ -30,8 +30,8 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
     protected function parseParams()
     {
         parent::parseParams();
-        if (!isset($_GET[UploadControlAjaxHandler::PARAM_FIELD_NAME])) throw new Exception("Field name not passed");
-        $field_name = $_GET[UploadControlAjaxHandler::PARAM_FIELD_NAME];
+        if (!isset($_GET[UploadControlResponder::PARAM_FIELD_NAME])) throw new Exception("Field name not passed");
+        $field_name = $_GET[UploadControlResponder::PARAM_FIELD_NAME];
         $this->field_name = str_replace("[]", "", $field_name);
 
     }
@@ -48,7 +48,7 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
      * Create validator for this upload control
      * @return mixed IInputValidator
      */
-    abstract public function validator();
+    abstract public function validator() : UploadDataValidator;
 
     protected function _upload(JSONResponse $resp)
     {
@@ -124,9 +124,9 @@ abstract class UploadControlAjaxHandler extends JSONRequestHandler
     {
         debug("...");
 
-        if (!isset($_GET[UploadControlAjaxHandler::PARAM_UID])) throw new Exception("UID not passed");
+        if (!isset($_GET[UploadControlResponder::PARAM_UID])) throw new Exception("UID not passed");
 
-        $uid = (string)$_GET[UploadControlAjaxHandler::PARAM_UID];
+        $uid = (string)$_GET[UploadControlResponder::PARAM_UID];
 
         if (strlen($uid) > 50) throw new Exception("UID maximum size reached");
 

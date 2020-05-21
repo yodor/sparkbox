@@ -5,39 +5,36 @@ include_once("utils/SQLUpdate.php");
 abstract class OrderedDataBean extends DBTableBean
 {
 
-    public function deleteID(int $id, DBDriver $db = NULL)
+    public function __construct(string $table_name, DBDriver $dbdriver = NULL)
+    {
+        parent::__construct($table_name, $dbdriver);
+
+        if (!$this->haveField("position")) {
+            throw new Exception("Incorrect table fields for OrderedDataBean");
+        }
+    }
+
+    public function delete(int $id, DBDriver $db = NULL)
     {
 
-        $doCommit = FALSE;
-
-        $res = FALSE;
-
-        if (!$db) {
-            $db = $this->db;
-            $db->transaction();
-            $doCommit = TRUE;
-        }
-
-        try {
+        $code = function(DBDriver $db) use($id) {
             $pos = $this->fieldValue($id, "position");
+
+            debug("Deleting item with position: $pos");
+
+            parent::delete($id, $db);
 
             $update = new SQLUpdate($this->select);
             $update->set["position"] = "position-1";
             $update->appendWhere("position>$pos");
 
             $res = $db->query($update->getSQL());
-            if ($res) throw new Exception("DeleteID Error: " . $db->getError());
+            if (!$res) throw new Exception("Delete reposition DBError: " . $db->getError());
 
-            //$res = $db->query("DELETE FROM {$this->table} WHERE {$this->prkey}=$id");
-            $res = parent::deleteID($id, $db);
+        };
 
-            if ($doCommit == TRUE) $db->commit();
-        }
-        catch (Exception $ex) {
-            if ($doCommit == TRUE) $db->rollback();
-        }
+        $this->handleTransaction($code, $db);
 
-        return $res;
     }
 
     public function insert(array &$row, DBDriver $db = NULL): int
@@ -47,7 +44,7 @@ abstract class OrderedDataBean extends DBTableBean
         return parent::insert($row, $db);
     }
 
-    public function reorderFixed(int $id, int $new_pos)
+    public function reorderFixed(int $id, int $new_pos, DBDriver $db = NULL)
     {
 
         $pos = $this->fieldValue($id, "position");
@@ -61,15 +58,16 @@ abstract class OrderedDataBean extends DBTableBean
 
         debug("Using pos: $new_pos");
 
-        $db = $this->db;
-        try {
+        $code = function(DBDriver $db) use($id, $pos, $new_pos) {
 
-            $db->transaction();
+            $update = new SQLUpdate($this->select);
+            $update->set["position"] = "position - 1";
+            $update->appendWhere("position>$pos");
+            if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
 
             $update = new SQLUpdate($this->select);
             $update->set["position"] = "position + 1";
             $update->appendWhere("position>=$new_pos");
-
             if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
 
             $update = new SQLUpdate($this->select);
@@ -77,17 +75,14 @@ abstract class OrderedDataBean extends DBTableBean
             $update->appendWhere($this->prkey . "=" . $id);
 
             if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
+        };
 
-            $db->commit();
-        }
-        catch (Exception $ex) {
-            $db->rollback();
-            throw $ex;
-        }
+        $this->handleTransaction($code, $db);
+
 
     }
 
-    public function reorderTop(int $id)
+    public function reorderTop(int $id, DBDriver $db = NULL)
     {
 
         $pos = (int)$this->fieldValue($id, "position");
@@ -98,11 +93,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         debug("ID: $id position - current: $pos new: 1");
 
-        $db = $this->db;
-        try {
-
-            $db->transaction();
-
+        $code = function(DBDriver $db) use($id, $pos) {
             $update = new SQLUpdate($this->select);
             $update->set["position"] = "position + 1";
             $update->appendWhere("position<$pos");
@@ -114,33 +105,26 @@ abstract class OrderedDataBean extends DBTableBean
             $update->appendWhere($this->prkey . "=" . $id);
 
             if (!$db->query($update->getSQL())) throw new Exception("Reorder Top Error: " . $db->getError());
+        };
 
-            $db->commit();
-        }
-        catch (Exception $e) {
-            $db->rollback();
-            throw $e;
-        }
+        $this->handleTransaction($code, $db);
 
     }
 
-    public function reorderBottom(int $id)
+    public function reorderBottom(int $id, DBDriver $db = NULL)
     {
 
         $pos = (int)$this->fieldValue($id, "position");
 
-        $maxp = (int)$this->getMaxPosition();
+        $max_pos = (int)$this->getMaxPosition();
 
-        if ($pos == $maxp) {
+        if ($pos == $max_pos) {
             throw new Exception("Already at bottom position");
         }
 
-        debug("ID: $id position - current: $pos new: $maxp");
+        debug("ID: $id position - current: $pos new: $max_pos");
 
-        $db = $this->db;
-        try {
-            $db->transaction();
-
+        $code = function(DBDriver $db) use($id, $pos, $max_pos) {
             $update = new SQLUpdate($this->select);
             $update->set["position"] = "position-1";
             $update->appendWhere("position>$pos");
@@ -148,21 +132,17 @@ abstract class OrderedDataBean extends DBTableBean
             if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(1) Error: " . $db->getError() . "<HR>" . $update->getSQL());
 
             $update = new SQLUpdate($this->select);
-            $update->set["position"] = $maxp;
+            $update->set["position"] = $max_pos;
             $update->appendWhere($this->prkey . "=" . $id);
 
             if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(2) Error: " . $db->getError() . "<HR>" . $update->getSQL());
+        };
 
-            $db->commit();
-        }
-        catch (Exception $ex) {
-            $db->rollback();
-            throw $ex;
-        }
+        $this->handleTransaction($code, $db);
 
     }
 
-    public function reorderUp(int $id)
+    public function reorderUp(int $id, DBDriver $db = NULL)
     {
 
         $pos = (int)$this->fieldValue($id, "position");
@@ -174,10 +154,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         debug("ID: $id position - current: $pos new: " . ($pos - 1));
 
-        $db = $this->db;
-        try {
-            $db->transaction();
-
+        $code = function(DBDriver $db) use($id, $pos) {
             $update = new SQLUpdate($this->select);
             $update->set["position"] = " -1 ";
             $update->appendWhere($this->prkey . "=" . $id);
@@ -195,30 +172,24 @@ abstract class OrderedDataBean extends DBTableBean
             $update->appendWhere($this->prkey . "=" . $id);
 
             if (!$db->query($update->getSQL())) throw new Exception("Reorder Up Error: " . $db->getError());
+        };
 
-            $db->commit();
-        }
-        catch (Exception $ex) {
-            $db->rollback();
-            throw $ex;
-        }
+        $this->handleTransaction($code, $db);
+
     }
 
-    public function reorderDown(int $id)
+    public function reorderDown(int $id, DBDriver $db = NULL)
     {
         $pos = (int)$this->fieldValue($id, "position");
 
-        $maxp = (int)$this->getMaxPosition();
-        if ($pos + 1 > $maxp) {
+        $max_pos = (int)$this->getMaxPosition();
+        if ($pos + 1 > $max_pos) {
             throw new Exception("Already at bottom position");
         }
 
         debug("ID: $id position - current: $pos new: " . ($pos + 1));
 
-        $db = $this->db;
-        try {
-            $db->transaction();
-
+        $code = function(DBDriver $db) use($id, $pos) {
             $update = new SQLUpdate($this->select);
             $update->set["position"] = " -1 ";
             $update->appendWhere($this->prkey . "=" . $id);
@@ -236,14 +207,9 @@ abstract class OrderedDataBean extends DBTableBean
             $update->appendWhere($this->prkey . "=" . $id);
 
             if (!$db->query($update->getSQL())) throw new Exception("Reorder Down(3) Error: " . $db->getError());
+        };
 
-            $db->commit();
-
-        }
-        catch (Exception $ex) {
-            $db->rollback();
-            throw $ex;
-        }
+        $this->handleTransaction($code, $db);
 
     }
 
@@ -257,7 +223,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         $res = $db->query($selectMax->getSQL());
 
-        if (!$res) throw new Exception ("Get Max Position DBError: " . $db->getError());
+        if (!$res) throw new Exception ("Error getting max position");
 
         $row = $db->fetch($res);
 

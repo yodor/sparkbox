@@ -38,22 +38,29 @@ class ImageUploadValidator extends UploadDataValidator
         $this->resize_enabled = $mode;
     }
 
-    protected function processUploadData(DataInput $field)
+    public function validate(DataInput $input)
     {
+        parent::validate($input);
 
-        debug("Input: " . $field->getName());
+        debug("Input: " . $input->getName());
 
         //field->getValue() contains FileStorageObject as uploaded from user
-        $image_storage = new ImageStorageObject($field->getValue());
+        $image_storage = new ImageStorageObject($input->getValue());
 
-        $this->processImageObject($image_storage);
+        $this->processObject($image_storage);
 
         //assign ImageStorageObject to field after processing
-        $field->setValue($image_storage);
+        $input->setValue($image_storage);
 
     }
 
-    protected function processImageObject(ImageStorageObject $image_storage)
+    /**
+     * Clamp image size if config options are set
+     * Handle resize of uploaded image before storing to DB
+     * @param ImageStorageObject $image_storage
+     * @throws Exception
+     */
+    public function processObject(StorageObject $image_storage)
     {
 
         debug("UID: " . $image_storage->getUID());

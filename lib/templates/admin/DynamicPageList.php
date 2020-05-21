@@ -35,11 +35,9 @@ class DynamicPageList extends BeanListPage
 
     public function initView()
     {
-        $h_delete = new DeleteItemRequestHandler($this->bean);
-        RequestController::addRequestHandler($h_delete);
+        $h_delete = new DeleteItemResponder($this->bean);
 
-        $h_repos = new ChangePositionRequestHandler($this->bean);
-        RequestController::addRequestHandler($h_repos);
+        $h_repos = new ChangePositionResponder($this->bean);
 
         $view = new TableView($this->bean->query());
         $view->setCaption("Dynamic Pages List");

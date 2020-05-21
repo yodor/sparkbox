@@ -3,7 +3,7 @@ include_once ("templates/PageTemplate.php");
 
 include_once("pages/AdminLoginPage.php");
 include_once("auth/AdminAuthenticator.php");
-include_once("handlers/AuthenticatorRequestHandler.php");
+include_once("responders/AuthenticatorResponder.php");
 
 include_once("forms/LoginForm.php");
 include_once("forms/renderers/LoginFormRenderer.php");
@@ -35,11 +35,9 @@ class AdminLogin extends PageTemplate
 
         $auth = new AdminAuthenticator();
 
-        $req = new AuthenticatorRequestHandler($auth);
+        $req = new AuthenticatorResponder($auth);
         $req->setCancelUrl(LOCAL . "admin/login.php");
         $req->setSuccessUrl(LOCAL . "admin/index.php");
-
-        RequestController::addRequestHandler($req);
 
         $af = new LoginForm();
 

@@ -13,10 +13,13 @@ class GalleryViewPage extends BeanListPage
 
     public function initView()
     {
-        $h_delete = new DeleteItemRequestHandler($this->bean);
-        RequestController::addRequestHandler($h_delete);
-        $h_repos = new ChangePositionRequestHandler($this->bean);
-        RequestController::addRequestHandler($h_repos);
+        if ($this->request_condition instanceof BeanKeyCondition) {
+            $this->bean->select()->where = $this->request_condition->getURLParameter()->text(TRUE);
+        }
+
+        $h_delete = new DeleteItemResponder($this->bean);
+
+        $h_repos = new ChangePositionResponder($this->bean);
 
         $gv = new GalleryView($this->bean);
 

@@ -1,9 +1,18 @@
 
+.PhraseTranslationDialog .Contents .Text {
+    width:100%;
+    height:100%;
+}
 .PhraseTranslationDialog .Contents TABLE {
 
     width:100%;
     height:100%;
 }
+
+.PhraseTranslationDialog .Contents TABLE .cell {
+    display:table-cell !important;
+}
+
 .PhraseTranslationDialog .Contents TABLE .cell.translation {
     height:100%;
 }

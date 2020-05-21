@@ -115,7 +115,11 @@ class BeanListPage extends AdminPageTemplate
      */
     public function setBean(DBTableBean $bean)
     {
-        $this->bean = $bean;
+        parent::setBean($bean);
+
+        if (!$this->page->getName()) {
+            $this->page->setName("List: ".get_class($bean));
+        }
 
         //query is already setup nothing to do
         if ($this->query instanceof SQLQuery) return;
@@ -162,8 +166,7 @@ class BeanListPage extends AdminPageTemplate
         $act->append(new PipeSeparator());
 
         if ($this->bean instanceof DBTableBean) {
-            $h_delete = new DeleteItemRequestHandler($this->bean);
-            RequestController::addRequestHandler($h_delete);
+            $h_delete = new DeleteItemResponder($this->bean);
             $act->append($h_delete->createAction());
         }
 

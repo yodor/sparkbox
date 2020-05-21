@@ -7,12 +7,12 @@ class LoginFormRenderer extends FormRenderer
     public $fbLoginEnabled = FALSE;
 
     /**
-     * @var AuthenticatorRequestHandler
+     * @var AuthenticatorResponder
      */
     protected $handler;
     protected $action;
 
-    public function __construct(LoginForm $form, AuthenticatorRequestHandler $handler)
+    public function __construct(LoginForm $form, AuthenticatorResponder $handler)
     {
         parent::__construct($form);
 

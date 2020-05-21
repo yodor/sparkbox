@@ -1,64 +1,84 @@
 
-.BeanTranslationDialog .Inner {
-    min-width: 40%;
+.BeanTranslationDialog .Contents .Text {
+    width:100%;
+    height:100%;
+}
+.BeanTranslationDialog .Contents TABLE {
+
+    width:100%;
+    height:100%;
 }
 
-.BeanTranslationDialog .Inner .AjaxProgress {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
+.BeanTranslationDialog .Contents TABLE .cell {
+    display:table-cell !important;
+}
+
+.BeanTranslationDialog .Contents TABLE .cell.original_text {
+    width:100%;
+}
+
+.BeanTranslationDialog .Contents TEXTAREA[name='original_text'] {
+    width:100%;
+    resize: vertical;
+}
+
+.BeanTranslationDialog .Contents TABLE .cell.original_text [role='application'] {
+    width:100% !important;
 
 }
 
-.BeanTranslationDialog .Inner TEXTAREA.original_text {
-    border: 1px solid purple;
-    background: white;
-    color: black;
-    overflow: visible;
-    width: 100%;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
+.BeanTranslationDialog .Contents TABLE .cell.translation {
+    height:100%;
+    width:100%;
 }
 
-/*.BeanTranslationDialog .Inner DIV.original_text {
-  border:1px solid purple;
-  background:white;
-  color:black;
-  overflow:scroll;
-  width:500px;
-    box-sizing:border-box;
-  -moz-box-sizing:border-box;
-  height:180px;
-  display:inline-block;
-}*/
-
-.BeanTranslationDialog .Inner .InputComponent[field="langID"] {
-    float: right;
+.BeanTranslationDialog .Contents TABLE .cell.translation [role='application'] {
+    width:100% !important;
+    height:100% !important;
 }
 
-.BeanTranslationDialog .Inner .InputComponent[field="langID"] .InputLabel {
-    display: inline-block;
+
+.BeanTranslationDialog .Contents TEXTAREA[name='translation'] {
+    width:100%;
+    height:100%;
+    resize: none;
 }
 
-.BeanTranslationDialog .Inner .InputComponent[field="langID"] .InputField {
-    display: inline-block;
+
+.BeanTranslationDialog .Container.Buttons .InputComponent[field='langID'] {
+    text-align:left;
+    vertical-align: top;
+
 }
 
-.BeanTranslationDialog .Inner textarea[name='translation'] {
-    width: 100%;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-}
 
-.BeanTranslationDialog .Inner .Container.Buttons {
-    display: block;
-    width: 100%
-}
+/*.BeanTranslationDialog [field="langID"] {*/
+/*    float: right;*/
+/*}*/
 
-.BeanTranslationDialog .Inner .Container.Buttons [action='Translate'] {
-    float: left;
-}
+/*.BeanTranslationDialog .Inner .InputComponent[field="langID"] .InputLabel {*/
+/*    display: inline-block;*/
+/*}*/
 
-.BeanTranslationDialog .Inner .Container.Buttons [action='Close'] {
-    float: right;
-}
+/*.BeanTranslationDialog .Inner .InputComponent[field="langID"] .InputField {*/
+/*    display: inline-block;*/
+/*}*/
+
+/*.BeanTranslationDialog .Inner textarea[name='translation'] {*/
+/*    width: 100%;*/
+/*    box-sizing: border-box;*/
+/*    -moz-box-sizing: border-box;*/
+/*}*/
+
+/*.BeanTranslationDialog .Inner .Container.Buttons {*/
+/*    display: block;*/
+/*    width: 100%*/
+/*}*/
+
+/*.BeanTranslationDialog .Inner .Container.Buttons [action='Translate'] {*/
+/*    float: left;*/
+/*}*/
+
+/*.BeanTranslationDialog .Inner .Container.Buttons [action='Close'] {*/
+/*    float: right;*/
+/*}*/

@@ -4,11 +4,11 @@ include_once("pages/SparkPage.php");
 include_once("auth/AdminAuthenticator.php");
 include_once("beans/AdminAccessBean.php");
 
-include_once("handlers/ChangePositionRequestHandler.php");
-include_once("handlers/DeleteItemRequestHandler.php");
-include_once("handlers/ToggleFieldRequestHandler.php");
+include_once("responders/ChangePositionResponder.php");
+include_once("responders/DeleteItemResponder.php");
+include_once("responders/ToggleFieldResponder.php");
 
-include_once("utils/RequestBeanKey.php");
+include_once("utils/BeanKeyCondition.php");
 include_once("utils/SQLSelect.php");
 
 include_once("components/BeanFormEditor.php");
@@ -170,7 +170,7 @@ class SparkAdminPage extends SparkPage
 
     public function startRender()
     {
-        //allow processing of ajax handlers first
+        //allow processing of ajax responders first
         parent::startRender();
 
         $dynmenu = $this->menu_bar->getMainMenu();

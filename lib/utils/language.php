@@ -3,17 +3,20 @@ include_once("beans/LanguagesBean.php");
 include_once("beans/SiteTextsBean.php");
 include_once("beans/SiteTextUsageBean.php");
 
-include_once("beans/TranslationBeansBean.php");
+include_once("beans/BeanTranslationsBean.php");
 include_once("beans/TranslationPhrasesBean.php");
 include_once("utils/Session.php");
 
 //TODO: check usage when this file is included from js.php files that include the main/top session.php
 
+class Translator {
+
+}
 $g_sp = new SiteTextsBean();
 $g_stu = new SiteTextUsageBean();
 $g_lb = new LanguagesBean();
 $g_tr = new TranslationPhrasesBean();
-$g_bt = new TranslationBeansBean();
+$g_bt = new BeanTranslationsBean();
 
 function setLanguageString(string $str, $page_dir = "LTR")
 {
@@ -31,6 +34,7 @@ function setLanguageString(string $str, $page_dir = "LTR")
         $langID = 1;
         $str = $langrow["language"];
     }
+
     setLanguage($str, $langID, $page_dir);
 }
 
@@ -147,9 +151,8 @@ function trbean(int $id, string $field_name, array &$row, string $tableName)
     $qry->select->where = " langID='$langID' AND field_name='$field_name' AND table_name='$tableName' AND bean_id='$id' ";
     $qry->select->limit = " 1 ";
     $qry->select->fields = " translated ";
-    $num = $qry->exec();
 
-    if ($btrow = $qry->next()) {
+    if ($qry->exec() && $btrow = $qry->next()) {
         $row[$field_name] = $btrow["translated"];
     }
 
@@ -166,7 +169,7 @@ function tr(string $str_original): string
 
     global $g_sp, $g_stu, $g_tr, $g_lb;
 
-    $str = DBConnections::Get()->escape($str_original);
+    //$str = DBConnections::Get()->escape($str_original);
 
     try {
 
@@ -179,37 +182,27 @@ function tr(string $str_original): string
         $sturow["usedby"] = $usedby;
         $sturow["textID"] = $textID;
 
-        // 		$g_stu->insertRecord($sturow);
-
         $langID = getActiveLanguageID();
 
-        //do not try to translate english
-        //if ($langID==1)return $str_original;
         $qry = $g_tr->query();
         $qry->select->where = " langID=$langID and textID=$textID ";
         $qry->select->limit = " 1 ";
         $qry->select->fields = " translated ";
-        $num = $qry->exec();
-        if ($num) {
 
-            if ($trow = $qry->next()) {
-                return $trow["translated"];
-            }
-            else {
-                return $str_original;
-            }
+        if ($qry->exec() && $trow = $qry->next()) {
+
+            return $trow["translated"];
         }
-        else {
-            // 			throw new Exception("This phrase is not yet translated to the requested language");
-            return $str_original;
-        }
+
+        return $str_original;
+
     }
     catch (Exception $e) {
         //
         return $e->getMessage();
 
     }
-    return $str_original;
+
 }
 
 function trnum($val)

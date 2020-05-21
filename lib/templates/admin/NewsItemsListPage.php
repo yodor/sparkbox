@@ -3,8 +3,8 @@ include_once("templates/admin/BeanListPage.php");
 
 include_once("beans/AdminUsersBean.php");
 
-include_once("handlers/DeleteItemRequestHandler.php");
-include_once("handlers/ToggleFieldRequestHandler.php");
+include_once("responders/DeleteItemResponder.php");
+include_once("responders/ToggleFieldResponder.php");
 
 class NewsItemsListPage extends BeanListPage
 {

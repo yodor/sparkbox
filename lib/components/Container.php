@@ -59,7 +59,7 @@ class Container extends Component
 
     public function insert(Component $cmp, int $idx)
     {
-        array_splice($this->items, $idx, 0, $cmp);
+        array_splice($this->items, $idx, 0, array($cmp));
     }
 
     public function prepend(Component $cmp)

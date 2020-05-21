@@ -62,8 +62,8 @@ class SessionUploadInput extends InputProcessor
         $num_files = 0;
 
         $session_files = array();
-        if (isset($_SESSION[UploadControlAjaxHandler::PARAM_CONTROL_NAME][$field_name])) {
-            $session_files = $_SESSION[UploadControlAjaxHandler::PARAM_CONTROL_NAME][$field_name];
+        if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name])) {
+            $session_files = $_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name];
         }
 
         $posted_uids = array();
@@ -121,9 +121,9 @@ class SessionUploadInput extends InputProcessor
     {
         $field_name = $this->input->getName();
 
-        if (isset($_SESSION[UploadControlAjaxHandler::PARAM_CONTROL_NAME][$field_name])) {
+        if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name])) {
 
-            unset($_SESSION[UploadControlAjaxHandler::PARAM_CONTROL_NAME][$field_name]);
+            unset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name]);
             debug("Cleared Session field['$field_name']");
         }
         if (isset($_SESSION["upload_control_removed"][$field_name])) {

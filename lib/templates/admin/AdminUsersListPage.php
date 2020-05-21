@@ -3,8 +3,8 @@ include_once("templates/admin/BeanListPage.php");
 
 include_once("beans/AdminUsersBean.php");
 
-include_once("handlers/DeleteItemRequestHandler.php");
-include_once("handlers/ToggleFieldRequestHandler.php");
+include_once("responders/DeleteItemResponder.php");
+include_once("responders/ToggleFieldResponder.php");
 
 class AdminUsersListPage extends BeanListPage
 {
@@ -19,10 +19,11 @@ class AdminUsersListPage extends BeanListPage
     public function initView()
     {
         $bean = new AdminUsersBean();
-        $h_delete = new DeleteItemRequestHandler($bean);
-        RequestController::addRequestHandler($h_delete);
-        $h_toggle = new ToggleFieldRequestHandler($bean);
-        RequestController::addRequestHandler($h_toggle);
+
+        $h_delete = new DeleteItemResponder($bean);
+
+        $h_toggle = new ToggleFieldResponder($bean);
+
 
         $qry = $bean->query();
         $qry->select->fields =  " userID, email, fullname, date_created, last_active, counter, suspend, (SELECT concat('|', role) FROM admin_access ac WHERE ac.userID=userID) as access_level ";

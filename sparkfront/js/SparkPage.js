@@ -56,7 +56,7 @@ function showInput(text, value, func) {
     let dialog = new MessageDialog();
     dialog.icon_enabled = false;
 
-    dialog.setText(text + "<BR><div class='InputField TextField'><input type='text' name='user_input' value='"+value+"'></div>");
+    dialog.setText(text + "<BR><div class='InputField TextField'><input type='text' name='user_input' value='" + value + "'></div>");
     dialog.setCaption("Input");
 
     dialog.show();
@@ -169,12 +169,8 @@ $(document).bind("keyup", function (event) {
 
         var defaul_button = control_object.popup().find("[default_action]").first();
         if (defaul_button.get(0)) {
-
             defaul_button.click();
             return false;
-        }
-        else {
-            control_object.popup().remove();
         }
 
     }

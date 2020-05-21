@@ -1,13 +1,13 @@
 <?php
 include_once("input/renderers/SessionUpload.php");
-include_once("handlers/ImageUploadAjaxHandler.php");
+include_once("responders/json/ImageUploadResponder.php");
 
 class SessionImage extends SessionUpload
 {
 
     public function __construct(DataInput $input)
     {
-        parent::__construct($input, new ImageUploadAjaxHandler());
+        parent::__construct($input, new ImageUploadResponder());
 
     }
 

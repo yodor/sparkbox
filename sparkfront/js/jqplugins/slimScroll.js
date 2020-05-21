@@ -59,7 +59,7 @@
                     allowPageScroll = o.allowPageScroll,
                     scroll = o.scroll;
 
-                // used in event handlers and for better minification
+                // used in event responders and for better minification
                 var me = $(this);
 
 

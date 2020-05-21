@@ -11,6 +11,8 @@ function MessageDialog(id) {
     this.icon_enabled = true;
 
     this.visible_id = "";
+
+    this.input = null;
 }
 
 //should already be inside the DOM
@@ -65,12 +67,6 @@ MessageDialog.prototype.show = function () {
 
     }.bind(this));
 
-    // let shown = document.querySelector(this.selector);
-    // shown.addEventListener("click", function(event){
-    //     event.stopPropagation();
-    //     console.log("MessageDialog::click()");
-    // });
-
     this.modal_pane.paneClicked = function (event) {
         //console.log(event.target);
 
@@ -83,6 +79,7 @@ MessageDialog.prototype.show = function () {
     let input = document.querySelector(this.selector + " INPUT");
     if (input) {
         input.focus();
+        this.input = input;
     }
 
 }

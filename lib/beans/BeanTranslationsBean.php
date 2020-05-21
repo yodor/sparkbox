@@ -1,7 +1,7 @@
 <?php
 include_once("beans/DBTableBean.php");
 
-class TranslationBeansBean extends DBTableBean
+class BeanTranslationsBean extends DBTableBean
 {
 
     protected $createString = "
@@ -22,6 +22,11 @@ CREATE TABLE `translation_beans` (
     public function __construct()
     {
         parent::__construct("translation_beans");
+    }
+
+    public function queryForBean()
+    {
+
     }
 
 }

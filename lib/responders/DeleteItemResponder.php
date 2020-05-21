@@ -1,7 +1,7 @@
 <?php
-include_once("handlers/RequestHandler.php");
+include_once("responders/RequestResponder.php");
 
-class DeleteItemRequestHandler extends RequestHandler
+class DeleteItemResponder extends RequestResponder
 {
 
     protected $item_id;
@@ -24,6 +24,8 @@ class DeleteItemRequestHandler extends RequestHandler
         $this->cancel_url = queryString($arr);
         $this->cancel_url = $_SERVER['PHP_SELF'] . $this->cancel_url;
 
+        $this->success_url = $this->cancel_url;
+
     }
 
     public function getItemID()
@@ -39,25 +41,18 @@ class DeleteItemRequestHandler extends RequestHandler
 
     protected function processConfirmation()
     {
-        $this->drawConfirmDialog("Confirm Delete", "Confirm you want to delete this item?");
+        $this->drawConfirmDialog("Delete", "Confirm you want to delete this item?");
     }
 
+    /**
+     * @throws Exception
+     */
     protected function processImpl()
     {
 
-        $db = DBConnections::Factory();
+        debug("Deleting ID: {$this->item_id} of DBTableBean: ".get_class($this->bean));
 
-        try {
-
-            $db->transaction();
-            if (!$this->bean->deleteID($this->item_id, $db)) throw new Exception("Unable to delete item: " . $db->getError());
-            $db->commit();
-
-        }
-        catch (Exception $e) {
-            $db->rollback();
-            throw $e;
-        }
+        $this->bean->delete($this->item_id);
 
     }
 

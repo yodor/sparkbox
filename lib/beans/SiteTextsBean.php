@@ -19,7 +19,7 @@ CREATE TABLE `site_texts` (
         parent::__construct("site_texts");
     }
 
-    public function id4phrase($str)
+    public function id4phrase(string $str)
     {
         $textID = -1;
 

@@ -479,10 +479,18 @@ function text4div(&$text)
     return str_replace("\n", "<BR>", $text);
 }
 
-function strcmp_isset($key, $val, $arr = FALSE): bool
+
+/**
+ * Check if key '$key' of array '$arr' is set and have value equal to '$val'
+ * @param string $key
+ * @param string $val
+ * @param array|null $arr
+ * @return bool
+ */
+function strcmp_isset(string $key, string $val, array $arr = NULL): bool
 {
     if (!$arr) $arr = $_GET;
-    return isset($arr[$key]) && (strcmp($arr[$key], $val) == 0);
+    return (isset($arr[$key]) && (strcmp($arr[$key], $val) == 0));
 }
 
 function CalculateAge($date)

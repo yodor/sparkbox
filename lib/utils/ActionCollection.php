@@ -56,7 +56,7 @@ class ActionCollection
 
     public function insert(Action $action, int $idx)
     {
-        array_splice($this->actions, $idx, 0, $action);
+        array_splice($this->actions, $idx, 0, array($action));
     }
 
     public function prepend(Action $action)
@@ -74,7 +74,7 @@ class ActionCollection
 
         $idx = $this->index($this->action_matcher, $action);
 
-        debug("getByAction: $action - idx: $idx");
+        //debug("getByAction: $action - idx: $idx");
 
 
         return $this->get($idx);

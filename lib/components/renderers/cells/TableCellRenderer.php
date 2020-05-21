@@ -87,6 +87,9 @@ class TableCellRenderer extends Component implements IDataResultProcessor
         if (isset($row[$this->field])) {
             $this->value = $row[$this->field];
         }
+        else {
+            $this->value = "";
+        }
 
     }
 

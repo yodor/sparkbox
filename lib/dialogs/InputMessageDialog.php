@@ -3,6 +3,9 @@ include_once ("dialogs/ConfirmMessageDialog.php");
 
 class InputMessageDialog extends ConfirmMessageDialog
 {
+    /**
+     * @var ArrayDataInput|DataInput
+     */
     protected $input;
 
     public function __construct($title = "Message", $id = "input_dialog")
@@ -11,6 +14,11 @@ class InputMessageDialog extends ConfirmMessageDialog
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
         $this->input = DataInputFactory::Create(DataInputFactory::TEXT, "user_input", "Input Data", 0);
+    }
+
+    public function getInput() : DataInput
+    {
+        return $this->input;
     }
 
     protected function renderImpl()

@@ -22,12 +22,12 @@ PhraseTranslationDialog.prototype.edit = function (textID) {
 
     this.textID = textID;
 
-    var cell = $("[name='translation'][textID='" + textID + "']");
-    var trID = cell.attr("trID");
+    let cell = $("[column='translation'][textID='" + textID + "']");
+    let trID = cell.attr("trID");
 
     this.modal_pane.showID(this.cls);
 
-    var popup = this.modal_pane.popup();
+    let popup = this.modal_pane.popup();
 
     this.langID = popup.attr("langID");
 
@@ -47,7 +47,7 @@ PhraseTranslationDialog.prototype.edit = function (textID) {
     popup.data("textID", textID);
     popup.data("trID", trID);
 
-    this.req.progress_display = popup.find(".AjaxProgress");
+    //this.req.progress_display = popup.find(".AjaxProgress");
 
     this.req.setURL("?ajax=1&cmd=translator&type=fetch&langID=" + this.langID + "&textID=" + textID + "&trID=" + trID);
     this.req.post_data = null;
@@ -55,7 +55,7 @@ PhraseTranslationDialog.prototype.edit = function (textID) {
     this.req.start(
         function (request_result) {
             var result = request_result.json_result;
-            popup.find(".original_text").val(result.original_text);
+            popup.find("[name='phrase']").val(result.phrase);
             popup.find("[name='translation']").val(result.translation);
         }
     );
@@ -65,34 +65,37 @@ PhraseTranslationDialog.prototype.edit = function (textID) {
 PhraseTranslationDialog.prototype.store = function () {
 
 
-    var popup = this.modal_pane.popup();
+    let popup = this.modal_pane.popup();
 
-    var textID = popup.data("textID");
-    var trID = popup.data("trID");
+    let textID = popup.data("textID");
+    let trID = popup.data("trID");
 
-    var frm = popup.find("form").get(0);
+    let url = "?ajax=1&cmd=translator&type=store&langID=" + this.langID + "&textID=" + textID + "&trID=" + trID;
+    console.log("Using url: " + url);
 
-    this.req.setURL("?ajax=1&cmd=translator&type=store&langID=" + this.langID + "&textID=" + textID + "&trID=" + trID);
+    this.req.setURL(url);
 
-    this.req.post_data = formtostr(frm);
+    let translation = popup.find("[name=translation]");
 
-//   console.log("trID="+trID);
+    this.req.post_data = "translation="+encodeURIComponent(translation.val());
 
     var cell = $("[relation='translation'][trID='" + trID + "'][textID='" + textID + "']");
 
     this.req.start(
         function (request_result) {
+
             var result = request_result.json_result;
             var message = result.message;
-            var popup = this.modal_pane.popup();
 
-            var html = "<span>" + popup.find("[name='translation']").val() + "</span>";
+            var html = "<span>" + translation.val() + "</span>";
 
             cell.html(html);
             cell.attr("trID", result.trID);
 
             this.modal_pane.pane().remove();
+
             showAlert(message);
+
         }.bind(this)
     );
 

@@ -3,6 +3,7 @@ include_once("templates/PageTemplate.php");
 
 abstract class AdminPageTemplate extends PageTemplate
 {
+    protected $bean;
 
     public function __construct()
     {
@@ -20,4 +21,14 @@ abstract class AdminPageTemplate extends PageTemplate
         return $this->page;
     }
 
+    public function setBean(DBTableBean $bean)
+    {
+        $this->bean = $bean;
+
+    }
+
+    public function getBean(): ?DBTableBean
+    {
+        return $this->bean;
+    }
 }

@@ -33,6 +33,13 @@ class InputComponent extends Component
         $this->label_renderer = new InputLabel($input);
     }
 
+    public function requiredStyle()
+    {
+        $arr = parent::requiredStyle();
+        $arr[] = SPARK_LOCAL."/css/Action.css";
+        return $arr;
+    }
+
     public function setLabelRenderer(InputLabel $label_renderer)
     {
         $this->label_renderer = $label_renderer;

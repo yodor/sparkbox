@@ -1,12 +1,12 @@
 <?php
 include_once("dialogs/MessageDialog.php");
-include_once("handlers/MCEImageBrowserAjaxHandler.php");
+include_once("responders/json/MCEImageBrowserResponder.php");
 
 class MCEImageBrowserDialog extends MessageDialog
 {
 
     /**
-     * @var MCEImageBrowserAjaxHandler
+     * @var MCEImageBrowserResponder
      */
     protected $handler;
 
@@ -21,7 +21,6 @@ class MCEImageBrowserDialog extends MessageDialog
 
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
-        $this->show_close_button = FALSE;
 
         $this->buttons = array();
 
@@ -30,8 +29,8 @@ class MCEImageBrowserDialog extends MessageDialog
         $btn_cancel->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
         $this->buttons[MessageDialog::BUTTON_ACTION_CANCEL] = $btn_cancel;
 
-        $this->handler = new MCEImageBrowserAjaxHandler();
-        RequestController::addAjaxHandler($this->handler);
+        $this->handler = new MCEImageBrowserResponder();
+
 
         $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
         $this->image_input->getRenderer()->assignUploadHandler($this->handler);
@@ -47,12 +46,12 @@ class MCEImageBrowserDialog extends MessageDialog
         return $arr;
     }
 
-    public function getHandler()
+    public function getHandler() : UploadControlResponder
     {
         return $this->handler;
     }
 
-    public function setHandler(UploadControlAjaxHandler $handler)
+    public function setHandler(UploadControlResponder $handler)
     {
         $this->handler = $handler;
     }

@@ -1,6 +1,7 @@
 <?php
+include_once("responders/json/JSONResponder.php");
 
-class CurrencyRateAjaxHandler extends JSONRequestHandler
+class CurrencyRateResponder extends JSONResponder
 {
     protected $srcID;
     protected $dstID;

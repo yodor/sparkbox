@@ -1,6 +1,6 @@
 <?php
 include_once("pages/HTMLPage.php");
-include_once("handlers/RequestController.php");
+include_once("responders/RequestController.php");
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
 include_once("beans/ConfigBean.php");
@@ -368,15 +368,16 @@ class SparkPage extends HTMLPage implements IActionCollection
     /**
      * Start rendering of this page
      *
-     * 1. RequestController processes all Ajax handlers attached to this page
+     * 1. RequestController processes all Ajax responders attached to this page
      * 2. Config section of DB is read to load meta_keywords/description
      * 3. Output buffering is set up
      * 4. All tags including the BODY tag are rendered to the output
-     * 5. RequestController processes all regular handlers(non-ajax)
+     * 5. RequestController processes all regular responders(non-ajax)
      */
     public function startRender()
     {
-        RequestController::processAjaxHandlers();
+        //if any responder process the request, controller will exit the script processing
+        RequestController::processJSONResponders();
 
         //ob_start(array($this, 'obCallback'));
         ob_start();
@@ -404,7 +405,8 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         parent::startRender();
 
-        RequestController::processRequestHandlers();
+        //regular responders to commands
+        RequestController::processResponders();
     }
 
     /**

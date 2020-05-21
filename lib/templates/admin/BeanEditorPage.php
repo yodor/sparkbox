@@ -1,13 +1,18 @@
 <?php
 include_once("templates/admin/AdminPageTemplate.php");
 
+/**
+ * If request condition is BeanKeyCondition will use it to set where filter on the view bean and add field to the transactor
+ * Class BeanEditorPage
+ */
 class BeanEditorPage extends AdminPageTemplate
 {
-    protected $bean;
+
     protected $form;
 
     public function __construct()
     {
+        //init page and page actions
         parent::__construct();
     }
 
@@ -18,15 +23,10 @@ class BeanEditorPage extends AdminPageTemplate
 
     public function setBean(DBTableBean $bean)
     {
-        $this->bean = $bean;
+        parent::setBean($bean);
         if (!$this->page->getName()) {
             $this->page->setName("Item Data: ".get_class($bean));
         }
-    }
-
-    public function getBean(): ?DBTableBean
-    {
-        return $this->bean;
     }
 
     public function setForm(InputForm $form)
@@ -46,11 +46,18 @@ class BeanEditorPage extends AdminPageTemplate
 
     public function initView()
     {
+        if ($this->view) return;
+
         $view = new BeanFormEditor($this->bean, $this->form);
+
+        if ($this->request_condition instanceof BeanKeyCondition) {
+            $this->bean->select()->where = $this->request_condition->getURLParameter()->text(TRUE);
+            $view->getTransactor()->appendURLParameter($this->request_condition->getURLParameter());
+        }
 
         $this->view = $view;
 
-        $this->append($view);
+        $this->append($this->view);
     }
 
     public function getEditor(): BeanFormEditor

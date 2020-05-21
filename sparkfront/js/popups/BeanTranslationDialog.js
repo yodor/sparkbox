@@ -33,9 +33,12 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
 
     this.modal_pane.showID(this.cls);
 
+    let editor = $(".BeanFormEditor");
     //bean_id, field_name, bean_class
-    var bean_id = $(".BeanFormEditor").attr("editID");
-    var bean_class = $(".BeanFormEditor").attr("bean");
+    var bean_id = editor.attr("editID");
+    var bean_class = editor.attr("bean");
+
+    console.log("BeanID: "+ bean_id + " Bean Class: " + bean_class + " FieldName: " + field_name);
 
 
     var popup = this.modal_pane.popup();
@@ -69,9 +72,11 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
     }.bind(this));
 
 
-    var source_content = $("FORM [name='" + field_name + "']").val();
+    var source_content = editor.find("FORM [name='" + field_name + "']").val();
 
-    popup.find(".original_text").val(source_content);
+    //console.log("Source Content: " + source_content);
+
+    popup.find("[name='original_text']").val(source_content);
     popup.find("[name='translation']").val("");
 
     if (is_mce) {
@@ -97,7 +102,7 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
         mce1.onEditorInit = function (editor) {
 
             instance.translator_editor = editor;
-            console.log("Translator Init done: " + editor.id);
+            console.log("Translator init done: " + editor.id);
 
             editor.getBody().setAttribute('contenteditable', false);
 
@@ -121,11 +126,23 @@ BeanTranslationDialog.prototype.store = function () {
 
     var popup = this.modal_pane.popup();
 
-    var frm = popup.find("form").get(0);
 
-    this.req.setURL("?ajax=1&cmd=bean_translator&type=store&langID=" + this.langID + "&field_name=" + this.field_name + "&beanID=" + this.bean_id + "&bean_class=" + this.bean_class);
 
-    this.req.post_data = formtostr(frm);
+    let url = new URL(location.href);
+
+    url.searchParams.set("ajax", 1);
+    url.searchParams.set("cmd", "bean_translator");
+    url.searchParams.set("type", "store");
+    url.searchParams.set("langID", this.langID);
+    url.searchParams.set("field_name", this.field_name);
+    url.searchParams.set("beanID", this.bean_id);
+    url.searchParams.set("bean_class", this.bean_class);
+
+    this.req.setURL(url.href);
+
+    let transaction = popup.find("[name='translation']");
+
+    this.req.post_data = "translation="+encodeURIComponent(transaction.val());
 
     this.req.start(
         function (request_result) {

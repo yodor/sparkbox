@@ -7,7 +7,7 @@ include_once("forms/processors/FormProcessor.php");
 include_once("forms/renderers/FormRenderer.php");
 include_once("db/BeanTransactor.php");
 
-include_once("handlers/UploadControlAjaxHandler.php");
+include_once("responders/json/UploadControlResponder.php");
 
 include_once("dialogs/BeanTranslationDialog.php");
 
@@ -40,6 +40,8 @@ class BeanFormEditor extends Container implements IBeanEditor
     //transfer to this URL on processing finished
     public $reload_url = "";
 
+    protected $bean_translator;
+
     public function __construct(DBTableBean $bean, InputForm $form)
     {
 
@@ -71,18 +73,6 @@ class BeanFormEditor extends Container implements IBeanEditor
                 $handler->setOwnerID(SparkAdminPage::Instance()->getUserID());
 
             }
-            //            else if ($renderer instanceof SessionImageField) {
-            //                $uach = new ImageUploadAjaxHandler();
-            //
-            //                RequestController::addAjaxHandler($uach);
-            //                $renderer->assignUploadHandler($uach);
-            //            }
-            //            else if ($renderer instanceof SessionFileField) {
-            //                $uach = new FileUploadAjaxHandler();
-            //
-            //                RequestController::addAjaxHandler($uach);
-            //                $renderer->assignUploadHandler($uach);
-            //            }
 
         }
 
@@ -149,9 +139,9 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     public function processInput()
     {
-        debug("Processing AjaxHandlers ...");
-
-        RequestController::processAjaxHandlers();
+//        debug("Processing AjaxHandlers ...");
+//
+//        RequestController::processJSONResponders();
 
         //will process external editID only if editID is not set
         if ($this->editID < 1 && isset($_GET["editID"])) {

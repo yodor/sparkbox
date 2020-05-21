@@ -1,13 +1,13 @@
 <?php
 include_once("input/renderers/SessionUpload.php");
-include_once("handlers/FileUploadAjaxHandler.php");
+include_once("responders/json/FileUploadResponder.php");
 
 class SessionFile extends SessionUpload
 {
 
     public function __construct(DataInput $input)
     {
-        parent::__construct($input, new FileUploadAjaxHandler());
+        parent::__construct($input, new FileUploadResponder());
 
         //        $this->setInputAttribute("validator", "file");
     }

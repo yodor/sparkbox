@@ -810,7 +810,7 @@
             .bind('click.form-plugin', options, captureSubmittingElement);
     };
 
-// private event handlers
+// private event responders
     function doAjaxSubmit(e) {
         /*jshint validthis:true */
         var options = e.data;
@@ -854,7 +854,7 @@
     }
 
 
-// ajaxFormUnbind unbinds the event handlers that were bound by ajaxForm
+// ajaxFormUnbind unbinds the event responders that were bound by ajaxForm
     $.fn.ajaxFormUnbind = function () {
         return this.unbind('submit.form-plugin click.form-plugin');
     };

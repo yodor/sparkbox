@@ -289,85 +289,128 @@ abstract class DBTableBean
 
     }
 
-    public function deleteID(int $id, DBDriver $db = NULL)
+    protected function handleTransaction(Closure $code, DBDriver $db = NULL)
     {
-        $docommit = FALSE;
+        $use_transaction = FALSE;
 
         if (!$db) {
+            $use_transaction = TRUE;
             $db = $this->db;
+            debug("Starting DB transaction with local DBDriver instance");
             $db->transaction();
-            $docommit = TRUE;
+        }
+        else {
+            debug("Not starting transaction - using DBDriver from function call paramater");
         }
 
-        $qry = "DELETE FROM {$this->table} WHERE {$this->prkey}=$id";
-        if ($this->select->where) {
-            $qry .= " AND {$this->select->where}";
+        try {
+
+            debug("Executing closure function");
+
+            //either throw or succeed
+            $code($db);
+
+            debug("Closure function executed");
+
+            if ($use_transaction) {
+                debug("Committing DB transaction");
+                $db->commit();
+            }
+
+        }
+        catch (Exception $ex) {
+
+            if ($use_transaction) {
+                debug("Rolling back DB transaction - Exception: " . $ex->getMessage()." - DBError: ".$db->getError());
+                $this->error = $db->getError();
+                $db->rollback();
+            }
+
+            throw $ex;
         }
 
-        $res = $db->query($qry);
-
-        if (!$res) {
-            if ($docommit) $db->rollback();
-            throw new Exception("DBError: " . $db->getError());
-        }
-
-        if ($docommit) $db->commit();
-
-        $this->manageCache($id);
-
-        return $res;
     }
 
-    public function deleteRef(string $refkey, string $refval, $db = FALSE, $keep_ids = array())
+    /**
+     * @param int $id
+     * @param DBDriver|null $db
+     * @throws Exception
+     */
+    public function delete(int $id, DBDriver $db = NULL)
     {
-        $docommit = FALSE;
-        if (!$db) {
-            $db = $this->db;
-            $db->transaction();
-            $docommit = TRUE;
-        }
 
-        $sql = "DELETE FROM {$this->table} WHERE $refkey='$refval'";
+        $code = function (DBDriver $db) use ($id) {
 
-        if (count($keep_ids) > 0) {
-            $keep_list_ids = implode(",", $keep_ids);
-            $sql .= " AND ({$this->prkey} NOT IN ($keep_list_ids)) ";
-        }
+            debug("Going to delete ID: $id");
 
-        debug("Executing SQL: $sql");
+            $sql = "DELETE FROM {$this->table} WHERE {$this->prkey}='$id'";
+            if ($this->select->where) {
+                $sql .= " AND {$this->select->where}";
+            }
 
-        $res = $db->query($sql);
+            debug("Executing SQL: $sql");
 
-        if (!$res) {
-            if ($docommit) $db->rollback();
-            throw new Exception("DBError: " . $db->getError());
-        }
+            if (!$db->query($sql)) throw new Exception("Unable to delete");
 
-        if ($docommit) $db->commit();
+            $this->manageCache($id);
+        };
 
-        $this->manageCache($refval);
+        $this->handleTransaction($code, $db);
+    }
 
-        return $res;
+    /**
+     * Delete where refkey=refval and primary key is not inside keep_ids
+     * @param string $refkey
+     * @param string $refval
+     * @param DBDriver|null $db
+     * @param array $keep_ids
+     * @throws Exception
+     */
+    public function deleteRef(string $refkey, string $refval, DBDriver $db = NULL, $keep_ids = array())
+    {
+        if (!in_array($refkey, $this->fields)) throw new Exception("Field '$refkey' not found in this bean");
+
+        $code = function (DBDriver $db) use ($refkey, $refval, $keep_ids) {
+
+            $sql = "DELETE FROM {$this->table} WHERE $refkey='$refval'";
+
+            if (count($keep_ids) > 0) {
+                $keep_list_ids = implode(",", $keep_ids);
+                $sql .= " AND ({$this->prkey} NOT IN ($keep_list_ids)) ";
+            }
+
+            debug("Executing SQL: $sql");
+
+            if (!$db->query($sql)) throw new Exception("Unable to deleteRef");
+
+            $this->manageCache($refval);
+        };
+
+        $this->handleTransaction($code, $db);
+
     }
 
     public function toggleField(int $id, string $field)
     {
-        if (!in_array($field, $this->fields)) throw new Exception("Field '$field' not found in this bean");
 
         $field = $this->db->escape($field);
+        if (!in_array($field, $this->fields)) throw new Exception("Field '$field' not found in this bean");
 
         try {
 
             $this->db->transaction();
 
-            if (!$this->db->query("UPDATE {$this->table} SET `$field` = NOT `$field` WHERE {$this->prkey}=$id ")) {
-                throw new Exception("toggleField DB Error: " . $this->db->getError());
-            }
+            $update = new SQLUpdate($this->select);
+            $update->set[$field]=" NOT $field ";
+            $update->where = " {$this->prkey} = $id ";
+
+            if (!$this->db->query($update->getSQL())) throw new Exception("toggleField DB Error: " . $this->db->getError());
 
             $this->db->commit();
         }
         catch (Exception $e) {
             $this->db->rollback();
+            $this->error = $this->db->getError();
             throw $e;
         }
     }
@@ -406,82 +449,58 @@ abstract class DBTableBean
     public function insert(array &$row, DBDriver $db = NULL): int
     {
 
-        $last_insert = -1;
-
-        $docommit = FALSE;
-
-        if (!$db) {
-            $db = $this->db;
-            $db->transaction();
-            $docommit = TRUE;
-        }
+        $insertID = -1;
 
         $values = array();
+
         $this->prepareInsertValues($row, $values);
 
-        $sql = "INSERT INTO {$this->table} (" . implode(",", array_keys($values)) . ") VALUES (" . implode(",", $values) . ")";
+        $code = function(DBDriver $db) use(&$values, &$insertID) {
 
-        if (isset($GLOBALS["DEBUG_DBTABLEBEAN_INSERT"])) {
-            debug(get_class($this) . " INSERT SQL: $sql");
-        }
+            $sql = "INSERT INTO {$this->table} (" . implode(",", array_keys($values)) . ") VALUES (" . implode(",", $values) . ")";
 
-        $res = $db->query($sql);
+            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_INSERT"])) {
+                debug(get_class($this) . " INSERT SQL: $sql");
+            }
 
-        if ($res === FALSE) {
-            $this->error = $db->getError();
-            if ($docommit) $db->rollback();
+            if (!$db->query($sql)) throw new Exception("Unable to insert");
 
-            return -1;
-        }
+            //NOTE!!! lastID return the first auto_increment of a multi insert transaction
+            $insertID = $db->lastID();
 
-        //NOTE!!! lastID return the first auto_increment of a multi insert transaction
-        $last_insert = $db->lastID();
+            $this->manageCache($insertID);
+        };
 
-        if ($docommit) $db->commit();
+        $this->handleTransaction($code, $db);
 
-        $this->manageCache($last_insert);
-
-        return $last_insert;
+        return $insertID;
     }
 
     public function update(int $id, array &$row, DBDriver $db = NULL)
     {
 
-        $docommit = FALSE;
-
-        if (!$db) {
-            $db = $this->db;
-            $db->transaction();
-            $docommit = TRUE;
-        }
-
         $values = array();
         $this->prepareUpdateValues($row, $values);
 
-        $sql = "UPDATE {$this->table} SET " . implode(",", $values) . " WHERE {$this->prkey}=$id";
+        $code = function(DBDriver $db) use($id, &$values) {
+            $sql = "UPDATE {$this->table} SET " . implode(",", $values) . " WHERE {$this->prkey}=$id";
 
-        if (isset($GLOBALS["DEBUG_DBTABLEBEAN_UPDATE"])) {
-            debug(get_class($this) . " UPDATE SQL: $sql");
-        }
+            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_UPDATE"])) {
+                debug(get_class($this) . " UPDATE SQL: $sql");
+            }
 
-        $res = $db->query($sql);
+            if (!$db->query($sql)) throw new Exception("Unable to update");
 
-        if ($res === FALSE) {
-            $this->error = $db->getError();
-            if ($docommit) $db->rollback();
-            return FALSE;
-        }
+            $this->manageCache($id);
+        };
 
-        if ($docommit) $db->commit();
+        $this->handleTransaction($code, $db);
 
-
-        $this->manageCache($id);
-
-        return $id;
     }
 
     protected function manageCache($id)
     {
+        //TODO: check path
         $cache_file = CACHE_PATH . "/" . get_class($this) . "/" . $id;
         if (!is_dir($cache_file)) return;
         try {

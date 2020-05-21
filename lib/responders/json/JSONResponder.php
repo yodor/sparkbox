@@ -1,9 +1,8 @@
 <?php
-include_once("beans/SiteTextsBean.php");
-include_once("beans/TranslationBeansBean.php");
-include_once("handlers/RequestHandler.php");
+include_once("responders/RequestResponder.php");
+include_once("responders/json/JSONResponse.php");
 
-abstract class JSONRequestHandler extends RequestHandler
+abstract class JSONResponder extends RequestResponder
 {
 
     protected $supported_content = NULL;
@@ -33,14 +32,14 @@ abstract class JSONRequestHandler extends RequestHandler
     protected function parseParams()
     {
 
-        if (!isset($_GET["type"])) throw new Exception("Command 'type' parameter not passed");
+        if (!isset($_GET["type"])) throw new Exception("Parameter 'type' not specified");
         $content_type = $_GET["type"];
 
-        if (!in_array($content_type, $this->supported_content)) throw new Exception("Command not supported");
+        if (!in_array($content_type, $this->supported_content)) throw new Exception("Function call not supported");
 
         $this->content_type = $content_type;
 
-        debug("Requested function call: '{$this->content_type}'");
+        debug("Using function call: '{$this->content_type}'");
     }
 
     /**
@@ -94,7 +93,7 @@ abstract class JSONRequestHandler extends RequestHandler
         $err = error_get_last();
 
         //if response is sent last error is proably not fatal
-        debug($this, "Response_send = " . (int)$this->response_send);
+        debug($this, "response_send = " . (int)$this->response_send);
 
         if (is_array($err)) {
 

@@ -1,9 +1,9 @@
 <?php
-include_once("handlers/RequestHandler.php");
+include_once("responders/RequestResponder.php");
 
 include_once("dialogs/ConfirmMessageDialog.php");
 
-class ToggleFieldRequestHandler extends RequestHandler
+class ToggleFieldResponder extends RequestResponder
 {
 
     protected $item_id;
@@ -39,6 +39,8 @@ class ToggleFieldRequestHandler extends RequestHandler
         $this->cancel_url = queryString($arr);
         $this->cancel_url = $_SERVER['PHP_SELF'] . $this->cancel_url;
 
+        $this->success_url = $this->cancel_url;
+
     }
 
     public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array())
@@ -53,24 +55,11 @@ class ToggleFieldRequestHandler extends RequestHandler
     protected function processImpl()
     {
 
-        $db = DBConnections::Factory();
+        $field_name = DBConnections::Get()->escape($this->field_name);
 
-        try {
-            $field_name = $db->escape($this->field_name);
+        $update_row[$field_name] = $this->status;
 
-            $update_row[$field_name] = $this->status;
-
-            if (!$this->bean->update($this->item_id, $update_row, $db)) throw new Exception("Unable to toggle field: " . $db->getError());
-            $db->commit();
-            $success = TRUE;
-            header("Location: {$this->cancel_url}");
-            exit;
-        }
-        catch (Exception $e) {
-
-            $db->rollback();
-            throw $e;
-        }
+        $this->bean->update($this->item_id, $update_row);
 
     }
 

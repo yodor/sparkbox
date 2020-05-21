@@ -4,7 +4,7 @@ include_once("input/processors/IDBFieldTransactor.php");
 
 /**
  * TODO: Write better description
- * Takes care to to process the values posted or loaded from DBTableBean
+ * Takes care to process the values posted or loaded from DBTableBean
  *
  * Class InputProcessor
  */

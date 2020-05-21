@@ -202,12 +202,21 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    public function deleteID(int $id, DBDriver $db = NULL)
+    public function delete(int $id, DBDriver $db = NULL) : bool
     {
+
+        debug("Deleting ID: $id");
+
+        $res = FALSE;
 
         if (!$db) {
             $db = $this->db;
+            debug("Using local DBDriver instance");
         }
+        else {
+            debug("Using DBDriver passed as function parameter");
+        }
+
 
         $prow = $this->getByID($id, array("lft", "rgt", "parentID"));
 
@@ -217,10 +226,15 @@ class NestedSetBean extends DBTableBean
         $rgt = $prow["rgt"];
 
         try {
+            debug("Starting transaction");
             $db->transaction();
 
-            $res = parent::deleteID($id, $db);
-            if (!$res) throw new Exception($db->getError());
+            $res = parent::delete($id, $db);
+            if (!$res) throw new Exception("Delete Error(0): ".$db->getError());
+
+            debug("deleted node ID: $id");
+
+            debug("Re-parenting child nodes ...");
 
             $update = new SQLUpdate($this->select);
             $update->set["lft"] = " lft - 1 ";
@@ -245,10 +259,12 @@ class NestedSetBean extends DBTableBean
 
             $db->commit();
         }
-        catch (Exception $e) {
+        catch (Exception $ex) {
+            debug("Rolling back for error: ".$ex->getMessage());
             $db->rollback();
-            throw $e;
+            throw $ex;
         }
+
         return $res;
 
     }
