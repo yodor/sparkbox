@@ -35,6 +35,12 @@
     background-position: left center;
 }
 
+.Action[action="TranslateBeanField"] {
+    padding-left: 24px;
+    background-image: url("../images/list_actions/item_translate.png");
+    background-repeat: no-repeat;
+    background-position: left center;
+}
 .Action[action="Clear"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_delete.png");

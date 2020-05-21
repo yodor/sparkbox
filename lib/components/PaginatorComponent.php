@@ -142,18 +142,18 @@ abstract class PaginatorComponent extends Component
         $a = $this->paginator->getPageListStart();
 
         if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
-            echo "<label>" . tr("Page") . "</label>";
+//            echo "<label>" . tr("Page") . "</label>";
         }
 
         if ($this->paginator->getCurrentPage() > 0) {
 
             $qry["page"] = 0;
             $q = queryString($qry);
-            echo "<a  href='$q'> < " . tr("First") . " </a>";
+            echo "<a  href='$q'> <  </a>";
 
             $qry["page"] = $this->paginator->getCurrentPage() - 1;
             $q = queryString($qry);
-            echo "<a   href='$q'> << " . tr("Prev") . " </a>";
+            echo "<a   href='$q'> <<  </a>";
 
         }
 
@@ -177,11 +177,11 @@ abstract class PaginatorComponent extends Component
             // 		{
             $qry["page"] = ($this->paginator->getCurrentPage() + 1);
             $q = queryString($qry);
-            echo "<a  href='$q'>" . tr("Next") . " >> </a>";
+            echo "<a  href='$q'> >> </a>";
 
             $qry["page"] = (int)($this->paginator->getPagesTotal() - 1);
             $q = queryString($qry);
-            echo "<a  href='$q'>" . tr("Last") . " > </a>";
+            echo "<a  href='$q'> > </a>";
         }
     }
 }

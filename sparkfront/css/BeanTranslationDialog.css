@@ -27,6 +27,8 @@
 
 }
 
+.BeanTranslationDialog .Contents TABLE .cell.original_text [role='application'] .tox-editor-header { display:none; }
+
 .BeanTranslationDialog .Contents TABLE .cell.translation {
     height:100%;
     width:100%;
@@ -47,10 +49,13 @@
 
 .BeanTranslationDialog .Container.Buttons .InputComponent[field='langID'] {
     text-align:left;
-    vertical-align: top;
-
+    vertical-align: middle;
 }
 
+.MessageDialog .Inner .Container.Buttons .ButtonGroup > * {
+
+    margin-left: 0.3em;
+}
 
 /*.BeanTranslationDialog [field="langID"] {*/
 /*    float: right;*/

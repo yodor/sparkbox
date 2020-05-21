@@ -9,9 +9,9 @@ include_once("components/PaginatorBottomComponent.php");
 abstract class AbstractResultView extends Component implements IDataIteratorRenderer
 {
 
-    public $items_per_page = 10;
+    public $items_per_page = 20;
 
-    protected $iterator = NULL;
+
     protected $default_order = "";
     protected $total_rows = 0;
     protected $current_row = array();
@@ -24,6 +24,14 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     protected $item_renderer;
 
+    /**
+     * @var SQLQuery
+     */
+    protected $iterator;
+
+    const TOP_PAGINATOR = 1;
+    const BOTTOM_PAGINATOR = 2;
+
     public function __construct(IDataIterator $itr)
     {
         parent::__construct();
@@ -33,6 +41,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->paginator = new Paginator();
         $this->paginator_top = new PaginatorTopComponent($this->paginator);
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
+        $this->paginators_enabled = self::TOP_PAGINATOR | self::BOTTOM_PAGINATOR;
     }
 
     public function getIterator(): IDataIterator
@@ -42,6 +51,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     public function setIterator(IDataIterator $itr)
     {
+        if (!($itr instanceof SQLQuery)) throw new Exception("Unsuitable iterator. Expecting SQLQuery");
         $this->iterator = $itr;
     }
 
@@ -70,7 +80,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         return $position_index;
     }
 
-    public function enablePaginators($mode)
+    public function enablePaginators(int $mode)
     {
         $this->paginators_enabled = $mode;
     }
@@ -109,7 +119,10 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         parent::startRender();
 
-        $this->total_rows = $this->iterator->exec();
+        $qry = clone $this->iterator;
+        $qry->select->limit = 1;
+
+        $this->total_rows = $qry->exec();
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
@@ -129,8 +142,10 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         $this->total_rows = $this->iterator->exec();
 
-        if ($this->paginators_enabled) {
+        if($this->paginators_enabled & self::TOP_PAGINATOR) {
+
             $this->paginator_top->render();
+
         }
     }
 
@@ -139,7 +154,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      */
     public function finishRender()
     {
-        if ($this->paginators_enabled) {
+        if($this->paginators_enabled & self::BOTTOM_PAGINATOR) {
             $this->paginator_bottom->render();
         }
 

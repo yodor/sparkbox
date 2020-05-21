@@ -56,6 +56,11 @@ class SQLQuery implements IDataIterator
         $this->db->free($this->res);
     }
 
+    public function __clone() {
+        $this->select = clone $this->select;
+
+    }
+
     public function exec(): int
     {
         $this->db->free($this->res);

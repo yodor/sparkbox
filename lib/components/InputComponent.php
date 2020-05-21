@@ -87,12 +87,6 @@ class InputComponent extends Component
 
         }
 
-        //        if ($this->input->content_after) {
-        //            echo "<div class='content_after'>";
-        //            echo $this->input->content_after;
-        //            echo "</div>";
-        //        }
-
         parent::finishRender();
 
     }

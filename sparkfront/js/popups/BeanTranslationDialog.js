@@ -89,12 +89,12 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
             editor.setMode('readonly');
             instance.original_editor = editor;
 
-            popup.find(".original_text").prev().find(".mce-toolbar-grp").css("display", "none");
+
 
         };
 
         mce.attachWith("original_text");
-
+        popup.find(".cell.original_text").removeClass("InputField");
 
         var mce1 = new MCETextArea();
         mce1.component_class = "TEXTAREA";
@@ -109,6 +109,7 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
             editor.setContent("");
         };
 
+        popup.find(".cell.translation").removeClass("InputField");
 
     }
 

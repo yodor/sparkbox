@@ -60,20 +60,25 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     protected function initButtons()
     {
 
+        $container = new Container();
+        $container->setClassName("ButtonGroup");
+
         $btn_translate = new ColorButton();
         $btn_translate->setContents("Translate");
         $btn_translate->setAttribute("action", "Translate");
-        $this->buttonsBar->append($btn_translate);
+        $container->append($btn_translate);
 
         $btn_clear = new ColorButton();
         $btn_clear->setContents("Clear");
         $btn_clear->setAttribute("action", "Clear");
-        $this->buttonsBar->append($btn_clear);
+        $container->append($btn_clear);
 
         $btn_close = new ColorButton();
         $btn_close->setContents("Close");
         $btn_close->setAttribute("action", "Close");
-        $this->buttonsBar->append($btn_close);
+        $container->append($btn_close);
+
+        $this->buttonsBar->append($container);
     }
 
     protected function renderImpl()
@@ -85,7 +90,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         echo "<label>" . tr("Original Text") . ": </label>";
         echo "</td></tr>";
 
-        echo "<tr><td class='cell original_text '>";
+        echo "<tr><td class='cell original_text InputField'>";
         echo "<textarea READONLY name='original_text' rows='5' ></textarea>";
         echo "</td></tr>";
 
@@ -93,7 +98,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         echo "<label>" . tr("Translation") . ": </label>";
         echo "</td></tr>";
 
-        echo "<tr><td class='cell translation '>";
+        echo "<tr><td class='cell translation InputField'>";
         echo "<textarea name='translation' rows='5' >";
         echo "</textarea>";
         echo "</td></tr>"; //item

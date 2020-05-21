@@ -24,6 +24,7 @@ class TableView extends AbstractResultView implements IHeadContents
     public function __construct(IDataIterator $itr)
     {
         parent::__construct($itr);
+        $this->enablePaginators(TableView::BOTTOM_PAGINATOR);
     }
 
     public function requiredStyle()
