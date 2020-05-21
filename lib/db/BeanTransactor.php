@@ -205,7 +205,7 @@ class BeanTransactor implements IBeanEditor
     public function processBean()
     {
 
-        debug("Using DBTableBean: " . get_class($this->bean));
+        debug("Using bean: " . get_class($this->bean));
 
         $db = DBConnections::Factory();
 
@@ -273,10 +273,11 @@ class BeanTransactor implements IBeanEditor
         $this->values = $values;
 
         if ($this->editID > 0) {
-            debug("doing update");
+            debug("doing update: ", $this->values);
 
-            if (!$this->bean->update($this->editID, $this->values, $db)) throw new Exception("Unable to update: " . $this->bean->getError());
+            $this->bean->update($this->editID, $this->values, $db);
             $this->lastID = $this->editID;
+
         }
         else {
             debug("doing insert");

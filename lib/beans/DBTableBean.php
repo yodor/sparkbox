@@ -478,6 +478,12 @@ abstract class DBTableBean
         return $insertID;
     }
 
+    /**
+     * @param int $id
+     * @param array $row
+     * @param DBDriver|null $db
+     * @throws Exception
+     */
     public function update(int $id, array &$row, DBDriver $db = NULL)
     {
 
@@ -485,16 +491,24 @@ abstract class DBTableBean
         $this->prepareUpdateValues($row, $values);
 
         $code = function(DBDriver $db) use($id, &$values) {
-            $sql = "UPDATE {$this->table} SET " . implode(",", $values) . " WHERE {$this->prkey}=$id";
 
-            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_UPDATE"])) {
-                debug(get_class($this) . " UPDATE SQL: $sql");
+            $update = new SQLUpdate($this->select);
+            foreach ($values as $key=>$value) {
+                $update->set[$key] = $value;
             }
+            $update->appendWhere("{$this->prkey} = $id");
+
+            debug("UPDATE executing sql: ".$update->getSQL());
+
+//            $sql = "UPDATE {$this->table} SET " . implode(",", $values) . " WHERE {$this->prkey}=$id";
+//
+//            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_UPDATE"])) {
+//                debug(get_class($this) . " UPDATE SQL: $sql");
+//            }
 
 
-            if (!$db->query($sql)) {
-                debug("Executed SQL: ".$sql);
-                throw new Exception("Unable to update");
+            if (!$db->query($update->getSQL())) {
+                throw new Exception("Unable to update: ".$db->getError());
             }
 
             $this->manageCache($id);
@@ -533,7 +547,7 @@ abstract class DBTableBean
 
         foreach ($keys as $idx => $key) {
             $value = $row[$key];
-            // 	  debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value));
+            //debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value)." is_null: ".is_null($value));
 
             //take first element of an array
             if (is_array($value)) {
@@ -546,11 +560,10 @@ abstract class DBTableBean
             if (is_null($value)) {
                 $values[$key] = "NULL";
             }
+            else if ($this->isNumeric($key) && strlen($value) < 1) {
+                $values[$key] = "NULL";
+            }
             else {
-
-                if ($this->isNumeric($key) && strlen($value) < 1) {
-                    $value = 0;
-                }
 
                 if ($this->needQuotes($key, $value) === TRUE) {
                     $values[$key] = "'" . $value . "'";
@@ -558,13 +571,14 @@ abstract class DBTableBean
                 else {
                     $values[$key] = $value;
                 }
-            }
-
-            if ($for_update === TRUE) {
-
-                $values[$key] = "$key=" . $values[$key];//already quoted
 
             }
+
+//            if ($for_update === TRUE) {
+//
+//                $values[$key] = "$key=" . $values[$key];//already quoted
+//
+//            }
         }
 
     }

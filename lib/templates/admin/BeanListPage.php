@@ -2,6 +2,8 @@
 include_once("templates/admin/AdminPageTemplate.php");
 include_once("utils/ActionCollection.php");
 include_once("components/KeywordSearch.php");
+include_once("responders/DeleteItemResponder.php");
+include_once("responders/ChangePositionResponder.php");
 
 class BeanListPage extends AdminPageTemplate
 {
@@ -169,6 +171,34 @@ class BeanListPage extends AdminPageTemplate
             $h_delete = new DeleteItemResponder($this->bean);
             $act->append($h_delete->createAction());
         }
+
+        if ($this->bean instanceof OrderedDataBean) {
+
+            $h_repos = new ChangePositionResponder($this->bean);
+
+            $bkey = $this->bean->key();
+            $repos_param = array(new DataParameter("item_id", $bkey));
+            //
+            $act->append(new RowSeparator());
+
+            $act->append(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
+            $act->append(new PipeSeparator());
+            $act->append(new Action("Next", "?cmd=reposition&type=next", $repos_param));
+            //
+            $act->append(new RowSeparator());
+            //
+            $act->append(new Action("First", "?cmd=reposition&type=first", $repos_param));
+            $act->append(new PipeSeparator());
+            $act->append(new Action("Last", "?cmd=reposition&type=last", $repos_param));
+
+            $act->append(new RowSeparator());
+
+            $act->append(new Action("Choose position", "?cmd=reposition&type=fixed", $repos_param));
+
+            //
+
+        }
+
 
     }
 
