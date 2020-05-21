@@ -415,7 +415,7 @@ abstract class DBTableBean
         }
     }
 
-    public function needQuotes($key, &$value = "")
+    public function needQuotes(string $key, &$value = "")
     {
         $storage_type = $this->storage_types[$key];
         //        echo "$key=>$storage_type | ";
@@ -426,10 +426,12 @@ abstract class DBTableBean
         // 	  if (strpos($storage_type, "bool")!==false) {
         // 		return true;
         // 	  }
+        if ($this->isNumeric($key))return FALSE;
 
         if (strpos($storage_type, "date") !== FALSE || strpos($storage_type, "timestamp") !== FALSE) {
-            if (endsWith($value, "()")) return FALSE;
-            return TRUE;
+            return FALSE;
+            //if (endsWith($value, "()")) return FALSE;
+            //return TRUE;
         }
         return TRUE;
     }
@@ -489,7 +491,11 @@ abstract class DBTableBean
                 debug(get_class($this) . " UPDATE SQL: $sql");
             }
 
-            if (!$db->query($sql)) throw new Exception("Unable to update");
+
+            if (!$db->query($sql)) {
+                debug("Executed SQL: ".$sql);
+                throw new Exception("Unable to update");
+            }
 
             $this->manageCache($id);
         };
