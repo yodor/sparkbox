@@ -35,20 +35,20 @@ abstract class HTMLPage extends Container
 
     protected function htmlStart()
     {
-        echo "<!DOCTYPE html>";
+        echo "<!DOCTYPE html>\n";
 
         $dir = ' DIR="' . Session::Get("page_dir") . '" ';
 
-        echo "<HTML $dir>";
+        echo "<HTML $dir>\n";
     }
 
     protected function headStart()
     {
-        echo "<HEAD>";
-        echo "\n";
+        echo "<HEAD>\n";
 
-        echo "<TITLE>%title%</TITLE>";
-        echo "\n";
+
+        echo "<TITLE>%title%</TITLE>\n";
+
 
         $this->renderMetaTags();
         echo "\n";
@@ -63,48 +63,48 @@ abstract class HTMLPage extends Container
     protected function renderMetaTags()
     {
         foreach ($this->meta as $name => $content) {
-            echo "<META name='" . htmlentities($name) . "' content='" . htmlentities($content) . "'>";
+            echo "<META name='" . htmlentities($name) . "' content='" . htmlentities($content) . "'>\n";
         }
     }
 
     protected function renderCSS()
     {
-        echo "<!-- CSS Files Start -->";
+        echo "<!-- CSS Files Start -->\n";
 
         foreach ($this->css_files as $href => $usedBy) {
-            echo "<link rel='stylesheet' href='$href' type='text/css' >";
-            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->";
+            echo "<link rel='stylesheet' href='$href' type='text/css' >\n";
+            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
 
-        echo "<!-- CSS Files End -->";
+        echo "<!-- CSS Files End -->\n";
 
     }
 
     protected function renderJS()
     {
-        echo "<!-- JavaScript Files Start -->";
+        echo "<!-- JavaScript Files Start -->\n";
 
         foreach ($this->js_files as $src => $usedBy) {
-            echo "<script type='text/javascript' src='$src'></script>";
-            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->";
+            echo "<script type='text/javascript' src='$src'></script>\n";
+            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
-        echo "<!-- JavaScript Files End -->";
+        echo "<!-- JavaScript Files End -->\n";
 
     }
 
     protected function headEnd()
     {
-        echo "</HEAD>";
+        echo "</HEAD>\n";
     }
 
     protected function bodyStart()
     {
-        echo "<BODY class='{$this->getPageClass()}'>";
+        echo "<BODY class='{$this->getPageClass()}'>\n";
     }
 
     protected function bodyEnd()
     {
-        echo "</BODY>";
+        echo "</BODY>\n";
     }
 
     protected function htmlEnd()

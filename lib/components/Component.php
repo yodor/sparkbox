@@ -125,7 +125,7 @@ class Component implements IRenderer, IHeadContents
 
         $this->processAttributes();
         $attrs = $this->prepareAttributes();
-        echo "<$this->tagName $attrs>";
+        echo "<$this->tagName $attrs>\n";
 
         $this->renderCaption();
     }
@@ -152,7 +152,7 @@ class Component implements IRenderer, IHeadContents
     public function finishRender()
     {
 
-        echo "</$this->tagName>";
+        echo "</$this->tagName>\n";
     }
 
     public function render()

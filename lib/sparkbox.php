@@ -22,17 +22,17 @@ $location = preg_replace("!^${doc_root}!", '', $install_path);
 //app/site deployment (server path)
 $defines->set("INSTALL_PATH", $install_path);
 
-
-//app/site deployment - HTTP accessible
+//app/site deployment - HTTP accessible - without ending slash
 $defines->set("LOCAL", $location);
 
 $location = $defines->get("LOCAL");
 
-//sparkbox frontend classes location - js/css/images HTTP accessible
+//sparkbox frontend classes location (js/css/images) - HTTP accessible - without ending slash
 $defines->set("SPARK_LOCAL", $location . "/sparkfront");
 
-//short url without domain - HTTP accessible
-$defines->set("ADMIN_LOCAL", $location . "/admin/");
+//administrative module location - HTTP accessible - without ending slash
+$defines->set("ADMIN_LOCAL", $location . "/admin");
+//data bean storage location - HTTP accessible - without ending slash
 $defines->set("STORAGE_LOCAL", $location . "/storage.php");
 
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
@@ -102,20 +102,20 @@ $defines->set("DEFAULT_LANGUAGE_ISO3", "eng");
 
 $defines->set("DEFAULT_CURRENCY", "EUR");
 
-//fetch user configuration
+//fetch local deployment configuration
 include_once("config/defaults.php");
 
 $site_title = $defines->get("SITE_TITLE");
 if (!$site_title) throw new Exception("SITE_TITLE not defined");
 
-$defines->set("CACHE_PATH", dirname($install_path) . "/sparkcache/".$defines->get("SITE_TITLE"));
+$defines->set("CACHE_PATH", dirname($install_path) . DIRECTORY_SEPARATOR . "sparkcache" . DIRECTORY_SEPARATOR . $defines->get("SITE_TITLE"));
 
 $defines->export();
 
 if (!file_exists(CACHE_PATH)) {
-    debug("Creating cache folder: ". CACHE_PATH);
+    debug("Creating cache folder: " . CACHE_PATH);
     @mkdir(CACHE_PATH, 0777, TRUE);
-    if (!file_exists(CACHE_PATH)) throw new Exception("Unable to create cache folder: ".CACHE_PATH);
+    if (!file_exists(CACHE_PATH)) throw new Exception("Unable to create cache folder: " . CACHE_PATH);
 }
 
 //define SKIP_SESSION to skip starting session

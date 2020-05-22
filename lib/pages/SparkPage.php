@@ -376,7 +376,7 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function startRender()
     {
-        //if any responder process the request, controller will exit the script processing
+        //if any responder process the request, controller will quit script after
         RequestController::processJSONResponders();
 
         //ob_start(array($this, 'obCallback'));

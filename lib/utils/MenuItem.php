@@ -32,9 +32,9 @@ class MenuItem
     }
     //flag for renderers to handle the title translation themselves - enableTranslation(true) - default - uses tr($title)
     //enableTranslation(false) -  title is already translated translation in MainMenu::constructMenuItems 
-    public function enableTranslation($mode)
+    public function enableTranslation(bool $mode)
     {
-        $this->need_translate = (($mode > 0) ? TRUE : FALSE);
+        $this->need_translate = $mode;
     }
 
     public function needTranslate()

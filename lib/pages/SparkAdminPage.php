@@ -43,7 +43,7 @@ class SparkAdminPage extends SparkPage
         $this->navigation = new Navigation("AdminPageLib");
 
         $this->auth = new AdminAuthenticator();
-        $this->loginURL = LOCAL . "/admin/login.php";
+        $this->loginURL = ADMIN_LOCAL . "/login.php";
         $this->authorized_access = TRUE;
 
         parent::__construct();
@@ -130,7 +130,7 @@ class SparkAdminPage extends SparkPage
     {
         $ret = $this->haveRole($role);
         if (!$ret && $do_redirect) {
-            header("Location: " . ADMIN_LOCAL . "access.php");
+            header("Location: " . ADMIN_LOCAL . "/access.php");
             exit;
         }
         return $ret;
@@ -155,7 +155,7 @@ class SparkAdminPage extends SparkPage
             $fullname = $this->context->getData()->get(SessionData::FULLNAME);
         }
         echo "<span class='text_admin'>Welcome, $fullname</span>";
-        ColorButton::RenderButton("Logout", ADMIN_LOCAL . "logout.php");
+        ColorButton::RenderButton("Logout", ADMIN_LOCAL . "/logout.php");
         echo "</div>";
 
     }

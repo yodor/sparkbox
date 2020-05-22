@@ -38,7 +38,7 @@ class FileUploadResponder extends UploadControlResponder
         $arr = explode("/", $mime, 2);
         $first = $arr[0];
         echo "<div class='Element' tooltip='$filename'>";
-        echo "<span class='thumbnail'><img src='" . SPARK_LOCAL . "images/mimetypes/generic.png'></span>";
+        echo "<span class='thumbnail'><img src='" . SPARK_LOCAL . "/images/mimetypes/generic.png'></span>";
         echo "<div class='details'>";
         echo "<span class='filename'><label>$filename</label></span>";
         echo "<span class='filesize'><label>" . file_size($storageObject->getLength()) . "</label></span>";

@@ -35,13 +35,9 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
     {
 
         $icon = $this->getMenuItem()->getIcon();
-        if (strpos($icon, "class") === 0) {
-            list($a, $icon_class) = explode(":", $icon);
-            echo "<div class='MenuIcon $icon_class'></div>";
-        }
-        else {
-            echo "<img border=0 class='MenuIcon' src='" . MenuItem::$icon_path . "" . $icon . "'>";
-        }
+
+        echo "<div class='MenuIcon $icon' ></div>";
+
     }
 
 }

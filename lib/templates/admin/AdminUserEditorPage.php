@@ -47,7 +47,7 @@ class AdminUserEditorPage extends BeanEditorPage
             });
         </script>
         <script type='text/javascript' src='<?php
-        echo SPARK_LOCAL; ?>js/md5.js'></script>
+        echo SPARK_LOCAL; ?>/js/md5.js'></script>
         <script type='text/javascript'>
             function checkForm(frm) {
                 try {
