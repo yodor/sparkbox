@@ -17,7 +17,7 @@ class PaginatorBottomComponent extends PaginatorComponent
         }
         echo $page;
         echo "&nbsp;";
-        echo tr("of");
+        echo " / ";
         echo "&nbsp;";
         echo $this->paginator->getPagesTotal();
 

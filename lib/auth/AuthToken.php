@@ -61,6 +61,8 @@ class AuthToken
         }
 
         debug("Cookie values mismatch");
+        Session::ClearCookie($contextName . "_" . AuthToken::HASH);
+        Session::ClearCookie($contextName . "_" . AuthToken::ID);
         return FALSE;
     }
 }

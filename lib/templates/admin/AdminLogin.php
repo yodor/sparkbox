@@ -36,8 +36,8 @@ class AdminLogin extends PageTemplate
         $auth = new AdminAuthenticator();
 
         $req = new AuthenticatorResponder($auth);
-        $req->setCancelUrl(LOCAL . "admin/login.php");
-        $req->setSuccessUrl(LOCAL . "admin/index.php");
+        $req->setCancelUrl(LOCAL . "/admin/login.php");
+        $req->setSuccessUrl(LOCAL . "/admin/index.php");
 
         $af = new LoginForm();
 

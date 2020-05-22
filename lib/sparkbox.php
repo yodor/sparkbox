@@ -16,7 +16,7 @@ $defines = new Globals();
 
 include_once("utils/functions.php");
 
-$doc_root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', $_SERVER['SCRIPT_FILENAME']);
+$doc_root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', realpath($_SERVER['SCRIPT_FILENAME']));
 $location = preg_replace("!^${doc_root}!", '', $install_path);
 
 //app/site deployment (server path)
@@ -24,16 +24,16 @@ $defines->set("INSTALL_PATH", $install_path);
 
 
 //app/site deployment - HTTP accessible
-$defines->set("LOCAL", $location . "/");
+$defines->set("LOCAL", $location);
 
 $location = $defines->get("LOCAL");
 
 //sparkbox frontend classes location - js/css/images HTTP accessible
-$defines->set("SPARK_LOCAL", $location . "sparkfront/");
+$defines->set("SPARK_LOCAL", $location . "/sparkfront");
 
 //short url without domain - HTTP accessible
-$defines->set("ADMIN_LOCAL", $location . "admin/");
-$defines->set("STORAGE_LOCAL", $location . "storage.php");
+$defines->set("ADMIN_LOCAL", $location . "/admin/");
+$defines->set("STORAGE_LOCAL", $location . "/storage.php");
 
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 $defines->set("SITE_PROTOCOL", $protocol);

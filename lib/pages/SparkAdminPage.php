@@ -43,7 +43,7 @@ class SparkAdminPage extends SparkPage
         $this->navigation = new Navigation("AdminPageLib");
 
         $this->auth = new AdminAuthenticator();
-        $this->loginURL = LOCAL . "admin/login.php";
+        $this->loginURL = LOCAL . "/admin/login.php";
         $this->authorized_access = TRUE;
 
         parent::__construct();
