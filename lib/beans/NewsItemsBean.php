@@ -1,7 +1,7 @@
 <?php
-include_once("beans/DatedPublicationBean.php");
+include_once("beans/DatedBean.php");
 
-class NewsItemsBean extends DatedPublicationBean
+class NewsItemsBean extends DatedBean
 {
     protected $createString = "
     CREATE TABLE `news_items` (

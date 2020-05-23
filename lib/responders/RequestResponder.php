@@ -1,6 +1,5 @@
 <?php
 
-
 abstract class RequestResponder
 {
     protected $cmd = NULL;
@@ -59,20 +58,26 @@ abstract class RequestResponder
 
     public function processInput()
     {
-        debug("need_redirect: " . (int)$this->need_redirect);
 
-        $process_error = false;
-
+        $process_error = FALSE;
         $redirectURL = "";
+
+        $this->parseParams();
+
+        if ($this instanceof JSONResponder) {
+            //should always exit script or throw error
+            $this->processImpl();
+            return;
+        }
 
         try {
 
-            $this->parseParams();
             $redirectURL = $this->getCancelUrl();
+            debug("need_redirect: " . (int)$this->need_redirect);
 
             if ($this->need_confirm) {
                 if (!isset($_POST[RequestResponder::KEY_CONFIRM])) {
-                    debug("Responder needs confirmation");
+                    debug("Responder needs additional confirmation");
                     $this->processConfirmation();
                     return;
                 }
@@ -83,13 +88,12 @@ abstract class RequestResponder
 
             $this->processImpl();
             $redirectURL = $this->getSuccessUrl();
-
         }
         catch (Exception $ex) {
 
             Session::SetAlert($ex->getMessage());
-            debug("processImpl error: ".$ex->getMessage());
-            $process_error = true;
+            debug("processImpl error: " . $ex->getMessage());
+            $process_error = TRUE;
 
         }
 
@@ -134,17 +138,15 @@ abstract class RequestResponder
 
         $md->render();
 
-
         ?>
         <script type='text/javascript'>
             let confirm_delete = new MessageDialog("msg_confirm");
-            confirm_delete.buttonAction = function(action) {
+            confirm_delete.buttonAction = function (action) {
                 if (action == "confirm") {
                     console.log("Confirm");
                     var frm = document.getElementById("confirm_handler");
                     frm.submit();
-                }
-                else if (action == "cancel") {
+                } else if (action == "cancel") {
                     console.log("Cancel");
                     document.location.replace("<?php echo $this->cancel_url;?>");
                 }

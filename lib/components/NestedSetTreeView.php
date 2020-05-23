@@ -193,7 +193,8 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         <script type='text/javascript'>
             onPageLoad(function () {
                 var tree_view = new TreeView();
-                tree_view.attachWith("<?php echo $this->getName(); ?>");
+                tree_view.setName("<?php echo $this->getName(); ?>");
+                tree_view.initialize();
             });
         </script>
         <?php

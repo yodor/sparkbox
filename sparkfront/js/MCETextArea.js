@@ -1,115 +1,108 @@
-function MCETextArea() {
-    this.component_class = "TEXTAREA.MCETextArea";
-    this.cls = this.component_class;
+class MCETextArea extends Component {
+    constructor() {
+        super();
+        //all TEXTAREA elements having CSS class MCETextArea
+        this.setClass("TEXTAREA.MCETextArea");
 
-    this.image_browser = new MCEImageBrowserDialog();
+        this.image_browser = new MCEImageBrowserDialog();
+        this.editor = null;
 
-    this.editor = null;
+        this.onEditorInit = function (editor) {
 
-    this.onEditorInit = function (editor) {
+            console.log("MCETextArea::onEditorInit() - '" + editor.id + "' initialized");
 
-        console.log("MCETextArea::onEditorInit() - '" + editor.id + "' initialized");
-
-    };
-
-}
-
-//user click on insert image button from toolbar
-MCETextArea.prototype.onInsertImage = function (ed) {
-
-    this.editor = ed;
-
-    //php side dialogs/MCEImageBrowserDialog
-    if ($("#mceImage_browser").get(0)) {
-        console.log("MCETextArea::onInsertImage() - Custom image browser found using it");
-        this.image_browser.mce = this;
-        return this.image_browser.show(this);
+        };
 
     }
+    onInsertImage(ed) {
+        this.editor = ed;
 
-    console.log("MCETextArea::onInsertImage() - Custom image browser not installed. #mceImage_browser not found in DOM");
-    return true;
+        //php side dialogs/MCEImageBrowserDialog
+        if ($("#mceImage_browser").get(0)) {
+            console.log("MCETextArea::onInsertImage() - Custom image browser found using it");
+            this.image_browser.mce = this;
+            return this.image_browser.show(this);
 
-}
-
-//init attach with specified element
-MCETextArea.prototype.attachWith = function (name) {
-
-    if (!name) throw "Element name required for attachWith";
-
-    this.cls = this.component_class + "[name='" + name + "']";
-    this.name = name;
-    console.log("MCETextArea::attachWith() field_name=[" + name + "]");
-
-    var mce_area = $(this.cls);
-
-    if (mce_area.data("mce_init_done") == 1) {
-        console.log("MCETextArea::attachWith() - init already done");
-        return;
-    }
-
-    var instance = this;
-
-    mce_area.tinymce({
-
-
-        // Location of TinyMCE script
-        script_url: SPARK_LOCAL + '/js/tiny_mce/tinymce.min.js',
-
-        strict_loading_mode: true,
-        theme: "silver",
-
-        //
-        entity_encoding: "raw",
-        force_p_newlines: false,
-        force_br_newlines: true,
-
-        ///ver 4
-        menubar: false,
-        toolbar1: 'code | undo redo | fontselect fontsizeselect | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
-        toolbar2: 'link unlink anchor image media code | insertdatetime preview | forecolor backcolor | mybutton | charmap ',
-        plugins: 'code link image lists charmap anchor insertdatetime media textcolor colorpicker',
-
-        resize: 'both',
-
-        branding: false,
-
-        verify_html: 1,
-        media_restrict: false,
-
-        width: '100%',
-
-        setup: function (editor) {
-
-            instance.editor = editor;
-
-            editor.ui.registry.addButton('mybutton', {
-                text: 'Server Image',
-
-                onAction: () =>  {
-
-                    instance.onInsertImage(editor);
-                }
-            });
-
-
-            // editor.on("change keyup", function (e) {
-            //     console.log('change keyup');
-            //     editor.save(); // updates this instance's textarea
-            // });
-
-
-            editor.on('init', function (e) {
-                instance.editor = editor;
-
-                instance.onEditorInit(editor);
-
-            });
         }
 
+        console.log("MCETextArea::onInsertImage() - Custom image browser not installed. #mceImage_browser not found in DOM");
+        return true;
+    }
 
-    });
+    initialize() {
 
-    mce_area.data("mce_init_done", 1);
+        super.initialize();
 
+        var mce_area = $(this.selector());
+
+        if (mce_area.data("mce_init_done") == 1) {
+            console.log("MCETextArea::attachWith() - init already done");
+            return;
+        }
+
+        var instance = this;
+
+        mce_area.tinymce({
+
+
+            // Location of TinyMCE script
+            script_url: SPARK_LOCAL + '/js/tiny_mce/tinymce.min.js',
+
+            strict_loading_mode: true,
+            theme: "silver",
+
+            //
+            entity_encoding: "raw",
+            force_p_newlines: false,
+            force_br_newlines: true,
+
+            ///ver 4
+            menubar: false,
+            toolbar1: 'code | undo redo | fontselect fontsizeselect | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
+            toolbar2: 'link unlink anchor image media code | insertdatetime preview | forecolor backcolor | mybutton | charmap ',
+            plugins: 'code link image lists charmap anchor insertdatetime media textcolor colorpicker',
+
+            resize: 'both',
+
+            branding: false,
+
+            verify_html: 1,
+            media_restrict: false,
+
+            width: '100%',
+
+            setup: function (editor) {
+
+                instance.editor = editor;
+
+                editor.ui.registry.addButton('mybutton', {
+                    text: 'Server Image',
+
+                    onAction: () =>  {
+
+                        instance.onInsertImage(editor);
+                    }
+                });
+
+
+                // editor.on("change keyup", function (e) {
+                //     console.log('change keyup');
+                //     editor.save(); // updates this instance's textarea
+                // });
+
+
+                editor.on('init', function (e) {
+                    instance.editor = editor;
+
+                    instance.onEditorInit(editor);
+
+                });
+            }
+
+
+        });
+
+        mce_area.data("mce_init_done", 1);
+    }
 }
+

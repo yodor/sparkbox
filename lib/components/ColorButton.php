@@ -12,13 +12,19 @@ class ColorButton extends Component
 
     protected static $default_class = "";
 
-    public static function RenderButton($text = "Button", $href = "")
+    public static function RenderButton($text = "Button", $href = "", $action = "")
     {
         $btn = new ColorButton();
 
         $btn->setContents($text);
-        //$btn->setValue();
-        $btn->setAttribute("onClick", "javascript:document.location.href='$href'");
+
+        if ($action) {
+            $btn->setAttribute("action", $action);
+        }
+
+        if ($href) {
+            $btn->setAttribute("onClick", "javascript:document.location.href='$href'");
+        }
         $btn->render();
     }
 

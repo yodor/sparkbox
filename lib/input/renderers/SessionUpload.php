@@ -2,7 +2,6 @@
 include_once("input/renderers/ArrayField.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
-
 abstract class SessionUpload extends InputField
 {
     /**
@@ -21,16 +20,14 @@ abstract class SessionUpload extends InputField
 
         $this->input = $input;
 
-        $this->ajax_handler = $ajax_handler;
-
-
-        $this->setAttribute("handler_command", $this->ajax_handler->getCommand());
+        $this->assignUploadHandler($ajax_handler);
 
     }
 
     public function assignUploadHandler(UploadControlResponder $handler)
     {
         $this->ajax_handler = $handler;
+        $this->setAttribute("handler_command", $this->ajax_handler->getCommand());
     }
 
     public function requiredStyle()
@@ -80,17 +77,20 @@ abstract class SessionUpload extends InputField
     public function renderControls()
     {
         echo "<div class='Controls' >";
+
+        echo "<div class='Buttons'>";
         ColorButton::RenderButton("Browse", "", "browse");
 
         $attr = $this->prepareInputAttributes();
-
         echo "<input $attr>";
+        echo "</div>"; //Buttons
 
-        echo "<div class='progress'>";
+        echo "<div class='Progress'>";
         echo "<div class='bar'></div>";
         echo "<div class='percent'>0%</div>";
-        echo "</div>";
-        echo "</div>";
+        echo "</div>"; //Progress
+
+        echo "</div>"; //Controls
 
     }
 
@@ -138,7 +138,8 @@ abstract class SessionUpload extends InputField
         <script type='text/javascript'>
             onPageLoad(function () {
                 var upload_control = new SessionUpload();
-                upload_control.attachWith("<?php echo $this->input->getName();?>");
+                upload_control.setField("<?php echo $this->input->getName();?>");
+                upload_control.initialize();
 
             });
         </script>

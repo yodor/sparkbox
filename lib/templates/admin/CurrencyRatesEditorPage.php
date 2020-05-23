@@ -95,15 +95,13 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
         ?>
         <script type="text/javascript">
+            //TODO: use InputMessageDialog
             let input_dialog = new MessageDialog();
 
             let req = new JSONRequest();
-            req.post_data = null;
 
-            let url = new URL(location.href);
-            url.searchParams.set("ajax", 1);
-            url.searchParams.set("cmd", "currency_rates");
-            url.searchParams.set("type", "setrate");
+            req.setResponder("currency_rates");
+            req.setFunction("setrate");
 
             onPageLoad(function () {
                 let items = document.querySelectorAll(".Item.rate");
@@ -121,8 +119,8 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
             function cellClicked(elm) {
 
-                url.searchParams.set("srcID", elm.getAttribute("srcID"));
-                url.searchParams.set("dstID", elm.getAttribute("dstID"));
+                req.setParameter("srcID", elm.getAttribute("srcID"));
+                req.setParameter("dstID", elm.getAttribute("dstID"));
 
                 //console.log(elm.innerHTML);
 
@@ -146,8 +144,9 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
                         } else {
                             //proceed with request
 
-                            url.searchParams.set("rate", value);
-                            req.setURL(url.href);
+                            req.setParameter("rate", value);
+
+
                             //console.log(url.href);
                             req.start(
                                 function (request_result) {

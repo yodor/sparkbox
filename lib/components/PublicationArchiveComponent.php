@@ -1,5 +1,5 @@
 <?php
-include_once("beans/DatedPublicationBean.php");
+include_once("beans/DatedBean.php");
 include_once("components/Component.php");
 include_once("utils/ValueInterleave.php");
 
@@ -29,7 +29,7 @@ class PublicationArchiveComponent extends Component
         return $this->have_selection;
     }
 
-    public function __construct(DatedPublicationBean $bean, $link_page)
+    public function __construct(DatedBean $bean, $link_page)
     {
         parent::__construct();
         $this->bean = $bean;
@@ -64,7 +64,7 @@ class PublicationArchiveComponent extends Component
 
         }
         else {
-            $arr_years = $this->bean->getYearsArray();
+            $arr_years = $this->bean->getYears();
             //  print_r($arr_years);
 
             $start = strtotime(date("F"));
@@ -102,7 +102,7 @@ class PublicationArchiveComponent extends Component
         $m = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
                    "November", "December");
 
-        $years_array = $this->bean->getYearsArray();
+        $years_array = $this->bean->getYears();
 
         $v = new ValueInterleave("even", "odd");
 

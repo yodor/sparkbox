@@ -3,10 +3,13 @@ function MessageDialog(id) {
     this.caption = "Message";
 
     this.modal_pane = new ModalPopup();
+
     this.id = "message_dialog";
+
     if (id) {
         this.id = id;
     }
+
     this.idx = 0;
     this.icon_enabled = true;
 
@@ -82,6 +85,7 @@ MessageDialog.prototype.show = function () {
         this.input = input;
     }
 
+    this.showFinished();
 }
 MessageDialog.prototype.remove = function() {
     this.modal_pane.pane().remove();
@@ -89,4 +93,8 @@ MessageDialog.prototype.remove = function() {
 
 MessageDialog.prototype.buttonAction = function(action) {
     console.log("MessageDialog::buttonAction() - " +action);
+}
+
+MessageDialog.prototype.showFinished = function() {
+    console.log("MessageDialog::showFinished()");
 }

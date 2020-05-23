@@ -1,7 +1,7 @@
 <?php
 include_once("beans/DBTableBean.php");
 
-class DatedPublicationBean extends DBTableBean
+class DatedBean extends DBTableBean
 {
 
     protected $datefield;
@@ -12,14 +12,20 @@ class DatedPublicationBean extends DBTableBean
      * @param string $datefield
      * @throws Exception
      */
-    public function __construct($table_name, $datefield = "item_date")
+    public function __construct(string $table_name, string $datefield = "item_date")
     {
         parent::__construct($table_name);
+        if (!$this->haveField($datefield))throw new Exception("Date field not found in this bean table");
         $this->datefield = $datefield;
 
     }
 
-    public function getYearsArray()
+    /**
+     * return array of all years having publications
+     * @return array
+     * @throws Exception
+     */
+    public function getYears() : array
     {
 
         $qry = $this->query();
@@ -27,31 +33,21 @@ class DatedPublicationBean extends DBTableBean
         $qry->select->group_by = " YEAR({$this->datefield}) DESC  ";
         $qry->exec();
 
-        $years_array = array();
+        $data = array();
         while ($row = $qry->next()) {
-            $years_array[] = $row["year"];
+            $data[] = $row["year"];
         }
-        return $years_array;
+        return $data;
     }
 
-    public function filterDayList($d_year, $d_month)
-    {
-
-        $qry = $this->query();
-        $qry->select->fields = " DAY({$this->datefield}) AS day  ";
-        $qry->select->where = " month({$this->datefield})='$d_month' AND  YEAR({$this->datefield})=$d_year ";
-        $qry->exec();
-
-        $ar = array();
-
-        while ($row = $qry->next()) {
-            $ar[] = $row["day"];
-        }
-
-        return $ar;
-    }
-
-    public function filterMonthList($d_year, $d_month)
+    /**
+     * Return array of all publications for given month and year
+     * @param string $d_year
+     * @param string $d_month
+     * @return array
+     * @throws Exception
+     */
+    public function filterMonthList(string $d_year, string $d_month)
     {
 
         $qry = $this->query();
@@ -59,16 +55,47 @@ class DatedPublicationBean extends DBTableBean
         $qry->select->order_by = " {$this->datefield} DESC ";
         $qry->exec();
 
-        $ar = array();
+        $data = array();
 
         while ($row = $qry->next()) {
-            $ar[] = $row;
+            $data[] = $row;
         }
 
-        return $ar;
+        return $data;
     }
 
-    public function containsDataForMonth($d_year, $d_month)
+    /**
+     * Return the day part of the publications date in a given month and year
+     * @param string $d_year
+     * @param string $d_month
+     * @return array
+     * @throws Exception
+     */
+    public function filterDayList(string $d_year, string $d_month)
+    {
+
+        $qry = $this->query();
+        $qry->select->fields = " DAY({$this->datefield}) AS day  ";
+        $qry->select->where = " MONTH({$this->datefield})='$d_month' AND  YEAR({$this->datefield})=$d_year ";
+        $qry->exec();
+
+        $data = array();
+
+        while ($row = $qry->next()) {
+            $data[] = $row["day"];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Return the number of publications in a given month and year
+     * @param string $d_year
+     * @param string $d_month
+     * @return int
+     * @throws Exception
+     */
+    public function containsDataForMonth(string $d_year, string $d_month) :int
     {
         $qry = $this->query();
         $qry->select->where = " MONTHNAME({$this->datefield})='$d_month' AND YEAR({$this->datefield})='$d_year' ";

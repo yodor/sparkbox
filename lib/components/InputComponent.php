@@ -16,9 +16,16 @@ class InputComponent extends Component
      */
     protected $label_renderer;
 
-    public function __construct(DataInput $input)
+    public function __construct(DataInput $input = NULL)
     {
         parent::__construct();
+        if ($input) {
+            $this->setDataInput($input);
+        }
+    }
+
+    public function setDataInput(DataInput $input)
+    {
         $this->input = $input;
 
         $this->attributes["field"] = $input->getName();
@@ -33,10 +40,15 @@ class InputComponent extends Component
         $this->label_renderer = new InputLabel($input);
     }
 
+    public function getDataInput(): DataInput
+    {
+        return $this->input;
+    }
+
     public function requiredStyle()
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL."/css/Action.css";
+        $arr[] = SPARK_LOCAL . "/css/Action.css";
         return $arr;
     }
 

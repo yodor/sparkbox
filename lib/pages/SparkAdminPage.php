@@ -84,8 +84,8 @@ class SparkAdminPage extends SparkPage
         if (!isset($admin_menu)) {
 
             $admin_menu = array();
-            $admin_menu[] = new MenuItem("Content", ADMIN_LOCAL . "/content/index.php", "class:icon_content");
-            $admin_menu[] = new MenuItem("Settings", ADMIN_LOCAL . "/settings/index.php", "class:icon_settings");
+            $admin_menu[] = new MenuItem("Content", ADMIN_LOCAL . "/content/index.php", "content");
+            $admin_menu[] = new MenuItem("Settings", ADMIN_LOCAL . "/settings/index.php", "settings");
 
         }
 

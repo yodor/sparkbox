@@ -26,6 +26,10 @@ class RequestController
     {
 
         $commands = array_keys(self::$responders);
+
+        $ret = new JSONResponse("RequestController");
+        $ret->status = JSONResponse::STATUS_ERROR;
+
         foreach ($commands as $idx => $command) {
 
             $request_responder = RequestController::Get($command);
@@ -33,25 +37,27 @@ class RequestController
 
             if ($request_responder->needProcess()) {
 
-                $ret = new JSONResponse("RequestController");
                 try {
-                    debug("Handler '" . get_class($request_responder) . "' accepted processing");
+                    debug("Responder '" . get_class($request_responder) . "' accepted processing");
                     $request_responder->processInput();
                 }
                 catch (Exception $e) {
-                    //default error response
-                    $ret->status = JSONResponse::STATUS_ERROR;
                     $ret->message = $e->getMessage();
                     $ret->send();
                 }
                 exit;
             }
             else {
-                debug("Handler '" . get_class($request_responder) . "' denied processing");
+                debug("Responder '" . get_class($request_responder) . "' refused processing");
             }
 
         }
 
+        //request contains JSONRequest but no handler accepted it - send error
+        $ret = new JSONResponse("RequestController");
+        $ret->message = "No responder is registered to process this request";
+        $ret->send();
+        exit;
     }
 
     public static function processResponders()
@@ -65,7 +71,13 @@ class RequestController
 
             if ($request_responder->needProcess()) {
                 debug("RequestResponder '" . get_class($request_responder) . "' accepted input processing");
-                $request_responder->processInput();
+                try {
+                    $request_responder->processInput();
+                }
+                catch (Exception $e) {
+                    debug("RequestResponder error: ".$e->getMessage());
+                    Session::SetAlert("Error processing this request: "."<BR>".$e->getMessage());
+                }
                 break;
             }
             else {

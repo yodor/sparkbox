@@ -1,3 +1,4 @@
+//TODO: extends MessageDialog
 function BeanTranslationDialog() {
 
     this.req = new JSONRequest();
@@ -38,7 +39,7 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
     var bean_id = editor.attr("editID");
     var bean_class = editor.attr("bean");
 
-    console.log("BeanID: "+ bean_id + " Bean Class: " + bean_class + " FieldName: " + field_name);
+    console.log("BeanID: " + bean_id + " Bean Class: " + bean_class + " FieldName: " + field_name);
 
 
     var popup = this.modal_pane.popup();
@@ -82,23 +83,24 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
     if (is_mce) {
 
         var mce = new MCETextArea();
-        mce.component_class = "TEXTAREA";
+        mce.setClass("TEXTAREA");
+        mce.setName("original_text");
+        mce.initialize();
 
         mce.onEditorInit = function (editor) {
 
             editor.setMode('readonly');
             instance.original_editor = editor;
 
-
-
         };
 
-        mce.attachWith("original_text");
         popup.find(".cell.original_text").removeClass("InputField");
 
         var mce1 = new MCETextArea();
-        mce1.component_class = "TEXTAREA";
-        mce1.attachWith("translation");
+        mce1.setClass("TEXTAREA");
+        mce1.setName("translation");
+        mce1.initialize();
+
         mce1.onEditorInit = function (editor) {
 
             instance.translator_editor = editor;
@@ -118,32 +120,30 @@ BeanTranslationDialog.prototype.show = function (field_name, is_mce) {
     this.bean_class = bean_class;
     this.bean_id = bean_id;
 
-    this.req.progress_display = popup.find(".AjaxProgress");
 
+    this.req.setResponder("bean_translator");
+
+    this.req.setParameter("langID", this.langID);
+    this.req.setParameter("field_name", this.field_name);
+    this.req.setParameter("beanID", this.bean_id);
+    this.req.setParameter("bean_class", this.bean_class);
 
 }
 
 BeanTranslationDialog.prototype.store = function () {
 
+    if (this.langID < 1) {
+        showAlert(this.language_alert);
+        return;
+    }
+
     var popup = this.modal_pane.popup();
 
-
-
-    let url = new URL(location.href);
-
-    url.searchParams.set("ajax", 1);
-    url.searchParams.set("cmd", "bean_translator");
-    url.searchParams.set("type", "store");
-    url.searchParams.set("langID", this.langID);
-    url.searchParams.set("field_name", this.field_name);
-    url.searchParams.set("beanID", this.bean_id);
-    url.searchParams.set("bean_class", this.bean_class);
-
-    this.req.setURL(url.href);
+    this.req.setFunction("store");
 
     let transaction = popup.find("[name='translation']");
 
-    this.req.post_data = "translation="+encodeURIComponent(transaction.val());
+    this.req.setPostParameter("translation",  transaction.val());
 
     this.req.start(
         function (request_result) {
@@ -163,6 +163,8 @@ BeanTranslationDialog.prototype.changeLanguage = function () {
 
     if (this.langID < 1) return;
 
+    this.req.setParameter("langID", this.langID);
+
     this.fetch();
 
 }
@@ -174,13 +176,10 @@ BeanTranslationDialog.prototype.fetch = function () {
         return;
     }
 
-    //var instance = this;
+    this.req.setFunction("fetch");
 
-    var url = "?ajax=1&cmd=bean_translator&type=fetch&langID=" + this.langID + "&field_name=" + this.field_name + "&beanID=" + this.bean_id + "&bean_class=" + this.bean_class;
+    this.req.clearPostParameters();
 
-    this.req.setURL(url);
-
-    this.req.post_data = null;
     this.req.start(
         function (request_result) {
 
@@ -200,14 +199,16 @@ BeanTranslationDialog.prototype.fetch = function () {
 }
 
 BeanTranslationDialog.prototype.clear = function () {
+
     if (this.langID < 1) {
         showAlert(this.language_alert);
         return;
     }
 
-    this.req.setURL("?ajax=1&cmd=bean_translator&type=clear&langID=" + this.langID + "&field_name=" + this.field_name + "&beanID=" + this.bean_id + "&bean_class=" + this.bean_class);
+    this.req.setFunction("clear");
 
-    this.req.post_data = null;
+    this.req.clearPostParameters();
+
     this.req.start(
         function (request_result) {
 

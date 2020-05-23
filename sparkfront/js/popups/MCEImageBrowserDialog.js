@@ -1,11 +1,57 @@
 function MCEImageBrowserDialog() {
+
     this.modal_pane = new ModalPopup();
 
     this.req = new JSONRequest();
-    this.req.async = true;
+
+    this.req.setResponder("mceImage");
 
     this.mce = null;
 
+}
+
+MCEImageBrowserDialog.prototype.show = function (textarea) {
+    this.mce_textarea = textarea;
+
+    var modal_pane = this.modal_pane;
+
+    modal_pane.showID("mceImage_browser");
+
+    modal_pane.popup().find("[action='cancel']").click(function (event) {
+
+        modal_pane.pane().remove();
+
+    });
+
+    modal_pane.paneClicked = function (event) {
+
+    }
+
+    var field = modal_pane.popup().find(".SessionUpload").first();
+
+    this.field_name = field.attr("field");
+
+    this.req.setParameter("field_name", this.field_name);
+
+    console.log("Using field from dialog: " + this.field_name);
+
+
+    var upload_control = field.data("upload_control");
+
+
+    upload_control.processResult = function (result) {
+
+        for (var a = 0; a < result.result_count; a++) {
+            var image = result.objects[a];
+            var imageID = image.imageID;
+            this.loadImages(imageID);
+        }
+
+    }.bind(this);
+    //
+    this.loadImages();
+
+    return false;
 }
 
 MCEImageBrowserDialog.prototype.onClickImage = function (imageID, event) {
@@ -13,9 +59,10 @@ MCEImageBrowserDialog.prototype.onClickImage = function (imageID, event) {
 
     var dialog = this;
 
-    var url = "?ajax=1&cmd=mceImage&type=renderDimensionDialog&field_name=" + this.field_name + "&imageID=" + imageID;
 
-    this.req.setURL(url);
+    this.req.setFunction("renderDimensionDialog");
+    this.req.setParameter("imageID", imageID);
+
     this.req.start(
         function (request_result) {
 
@@ -74,9 +121,14 @@ MCEImageBrowserDialog.prototype.onClickImage = function (imageID, event) {
                 var final_tag = image_tag;
 
                 if (popup.is(":checked")) {
-                    var popup_href = LOCAL + "/storage.php?cmd=image&class=MCEImagesBean&id=" + imageID;
+
+                    let url = new URL(STORAGE_LOCAL);
+                    url.searchParams.set("cmd", "image");
+                    url.searchParams.set("class", "MCEImagesBean");
+                    url.searchParams.set("id", imageID);
+
                     final_tag = $("<a href='' class='ImagePopup'></a>");
-                    final_tag.attr("href", popup_href);
+                    final_tag.attr("href", url.href);
                     final_tag.html(image_tag);
 
                 }
@@ -103,13 +155,13 @@ MCEImageBrowserDialog.prototype.onClickImage = function (imageID, event) {
 }
 MCEImageBrowserDialog.prototype.onClickRemove = function (imageID, event) {
 
-    var url = "?ajax=1&cmd=mceImage&type=remove&field_name=" + this.field_name + "&imageID=" + imageID;
+    this.req.setFunction("remove");
+    this.req.setParameter("imageID", imageID);
 
-    this.req.setURL(url);
     this.req.start(
         function (request_result) {
 
-            var element = this.modal_pane.popup().find(".ImageStorage .Contents .Element[imageID='" + imageID + "']");
+            var element = this.modal_pane.popup().find(".ImageStorage .Collection .Element[imageID='" + imageID + "']");
             element.remove();
             this.modal_pane.centerContents();
 
@@ -123,10 +175,10 @@ MCEImageBrowserDialog.prototype.processImageResult = function (result) {
 
     for (var a = 0; a < result.result_count; a++) {
         var image = result.objects[a];
-        modal_pane.popup().find(".ImageStorage .Contents").first().append(image.html);
+        modal_pane.popup().find(".ImageStorage .Collection").first().append(image.html);
     }
 
-    modal_pane.popup().find(".ImageStorage .Contents .Element").each(function () {
+    modal_pane.popup().find(".ImageStorage .Collection .Element").each(function () {
 
         var imageID = $(this).attr("imageID");
 
@@ -153,15 +205,16 @@ MCEImageBrowserDialog.prototype.processImageResult = function (result) {
 MCEImageBrowserDialog.prototype.loadImages = function (imageID) {
     var modal_pane = this.modal_pane;
 
-    var url = "?ajax=1&cmd=mceImage&type=find&field_name=" + this.field_name;
+    this.req.setFunction("find");
 
     if (imageID > 0) {
-        url += "&imageID=" + imageID;
+        this.req.setParameter("imageID", imageID);
     } else {
-        modal_pane.popup().find(".ImageStorage .Contents").first().empty();
+        modal_pane.popup().find(".ImageStorage .Collection").first().empty();
     }
 
-    this.req.setURL(url);
+
+
     this.req.start(
         function (request_result) {
             this.processImageResult(request_result.json_result);
@@ -170,39 +223,4 @@ MCEImageBrowserDialog.prototype.loadImages = function (imageID) {
     );
 
 }
-MCEImageBrowserDialog.prototype.show = function (textarea) {
-    this.mce_textarea = textarea;
 
-    var modal_pane = this.modal_pane;
-
-    modal_pane.showID("mceImage_browser");
-
-    modal_pane.popup().find("[action='cancel']").click(function (event) {
-
-        modal_pane.pane().remove();
-
-    });
-
-    modal_pane.paneClicked = function (event) {
-
-    }
-
-    var field = modal_pane.popup().find(".SessionUpload").first();
-    this.field_name = field.attr("field_name");
-
-    var upload_control = field.data("upload_control");
-
-    upload_control.processResult = function (result) {
-
-        for (var a = 0; a < result.result_count; a++) {
-            var image = result.objects[a];
-            var imageID = image.imageID;
-            this.loadImages(imageID);
-        }
-
-    }.bind(this);
-
-    this.loadImages();
-
-    return false;
-}

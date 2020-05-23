@@ -63,7 +63,8 @@ class LoginFormRenderer extends FormRenderer
         <script type='text/javascript'>
             onPageLoad(function () {
                 var auth_form = new LoginForm();
-                auth_form.attachWith("<?php echo $this->form->getName();?>");
+                auth_form.setName("<?php echo $this->form->getName();?>");
+                auth_form.initialize();
             });
         </script>
         <?php

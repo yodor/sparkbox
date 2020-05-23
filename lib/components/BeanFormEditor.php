@@ -18,20 +18,31 @@ class BeanFormEditor extends Container implements IBeanEditor
     public $item_added_message = "Information was added";
 
     /**
-     * @var DBTableBean|null
+     * @var DBTableBean
      */
-    protected $bean = NULL;
+    protected $bean;
 
     protected $editID = -1;
 
     /**
-     * @var InputForm|null
+     * @var InputForm
      */
-    protected $form = NULL;
+    protected $form;
 
-    protected $form_renderer = NULL;
-    protected $processor = NULL;
-    protected $transactor = NULL;
+    /**
+     * @var FormRenderer
+     */
+    protected $form_render;
+
+    /**
+     * @var FormProcessor
+     */
+    protected $processor;
+
+    /**
+     * @var BeanTransactor
+     */
+    protected $transactor;
 
     protected $error = FALSE;
 
@@ -40,6 +51,9 @@ class BeanFormEditor extends Container implements IBeanEditor
     //transfer to this URL on processing finished
     public $reload_url = "";
 
+    /**
+     * @var BeanTranslationDialog
+     */
     protected $bean_translator;
 
     public function __construct(DBTableBean $bean, InputForm $form)
@@ -76,15 +90,11 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         }
 
-        if (TRANSLATOR_ENABLED) {
-            $this->bean_translator = new BeanTranslationDialog();
-
-        }
+        $this->bean_translator = new BeanTranslationDialog();
 
         $this->setEditID(-1);
 
         $this->append($this->form_render);
-
 
     }
 
@@ -139,9 +149,9 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     public function processInput()
     {
-//        debug("Processing AjaxHandlers ...");
-//
-//        RequestController::processJSONResponders();
+        //        debug("Processing AjaxHandlers ...");
+        //
+        //        RequestController::processJSONResponders();
 
         //will process external editID only if editID is not set
         if ($this->editID < 1 && isset($_GET["editID"])) {

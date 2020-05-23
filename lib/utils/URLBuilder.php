@@ -61,6 +61,11 @@ class URLBuilder
         return $this->parameters[$name];
     }
 
+    public function haveParameter(string $name): bool
+    {
+        return isset($this->parameters[$name]);
+    }
+
     public function getParameterNames(): array
     {
         return array_keys($this->parameters);
@@ -158,11 +163,10 @@ class URLBuilder
         }
         $this->script_name = $script_name;
 
-
         if (strpos($script_query, "#") !== FALSE) {
             $resource = "";
             list($script_query, $resource) = explode("#", $script_query);
-            $this->addParameter(new URLParameter("#".$resource));
+            $this->addParameter(new URLParameter("#" . $resource));
         }
 
         $static_pairs = explode("&", $script_query);

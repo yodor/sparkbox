@@ -15,22 +15,15 @@ class MCEImageBrowserDialog extends MessageDialog
      */
     protected $icmp;
 
+    protected $image_input;
+
     public function __construct()
     {
         parent::__construct("MCE Image Browser", "mceImage_browser");
 
-        $this->setDialogType(MessageDialog::TYPE_PLAIN);
-
-
-        $this->buttons = array();
-
-        $btn_cancel = new ColorButton();
-        $btn_cancel->setContents("Close");
-        $btn_cancel->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
-        $this->buttons[MessageDialog::BUTTON_ACTION_CANCEL] = $btn_cancel;
-
         $this->handler = new MCEImageBrowserResponder();
 
+        $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
         $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
         $this->image_input->getRenderer()->assignUploadHandler($this->handler);
@@ -44,6 +37,15 @@ class MCEImageBrowserDialog extends MessageDialog
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/popups/MCEImageBrowserDialog.js";
         return $arr;
+    }
+
+    protected function initButtons()
+    {
+        $btn_close = new ColorButton();
+        $btn_close->setContents("Close");
+        $btn_close->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
+        $btn_close->setAttribute("default_action", 1);
+        $this->buttonsBar->append($btn_close);
     }
 
     public function getHandler() : UploadControlResponder
@@ -61,16 +63,13 @@ class MCEImageBrowserDialog extends MessageDialog
     {
 
         echo "<form method='post' enctype='multipart/form-data'>";
-
         $this->icmp->render();
-
         echo "</form>";
 
-        echo tr("Existing Images") . ": ";
-        echo "<BR>";
-
         echo "<div class='ImageStorage'>";
-        echo "<div class='Contents'>";
+        echo "<div class='Viewport'>";
+        echo "<div class='Collection'>";
+        echo "</div>";
         echo "</div>";
         echo "</div>";
 

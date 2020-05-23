@@ -28,9 +28,9 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
         return $this->height;
     }
 
-    public function __construct()
+    public function __construct(string $cmd = "image_upload")
     {
-        parent::__construct("image_upload");
+        parent::__construct($cmd);
 
         $this->setPhotoSize(-1, 64);
 

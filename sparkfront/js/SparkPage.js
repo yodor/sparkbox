@@ -8,25 +8,24 @@
     }
 })(jQuery)
 
-function PopupHandler() {
+class PopupHandler {
+    handleEvent(e) {
+        switch (e.message) {
+            case "onPopupVisible":
+                let modal_pane = e.pane;
+                if (e.pane.fullscreen) {
 
-}
-
-PopupHandler.prototype.popupEventHandler = function (e) {
-    switch (e.message) {
-        case "onPopupVisible":
-            let modal_pane = e.pane;
-            if (e.pane.fullscreen) {
-
-            } else {
-                modal_pane.centerContents();
-            }
-            break;
+                } else {
+                    modal_pane.centerContents();
+                }
+                break;
+        }
     }
 }
 
+
 let popup_handler = new PopupHandler();
-$(document).on("ModalPopup", popup_handler.popupEventHandler);
+$(document).on("ModalPopup", popup_handler.handleEvent);
 
 function showAlert(text, func) {
 

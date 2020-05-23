@@ -8,7 +8,7 @@ class FAQSectionsBean extends DBTableBean
  `section_name` varchar(255) NOT NULL,
  PRIMARY KEY (`fqsID`),
  UNIQUE KEY `section_name` (`section_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8";
 
     public function __construct()
     {

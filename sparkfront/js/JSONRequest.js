@@ -14,43 +14,156 @@ function JSONRequestError() {
 
 }
 
-function JSONRequest(url) {
-    this.url = url;
-    this.interval = -1;
+/**
+ * @constructor
+ */
+function JSONRequest() {
+
+    /**
+     * @type {XMLHttpRequest}
+     */
     this.req = new XMLHttpRequest();
+    if (!this.req) throw "XMLHttpRequest is not available";
+
+    /**
+     * @type {URL}
+     */
+    this.url = new URL(window.location.href);
+    this.url.searchParams.set("JSONRequest", "1");
+
+    this.interval = -1;
     this.status = 0;
-    this.post_data = null;
-    this.progress_display = null;
+
+    this.post_data = new URLSearchParams();
+
     this.async = true;
     this.request_time = null;
+    this.progress_display = null;
 
-    if (!this.req) throw "Can not instantiate XMLHttpRequest";
+    this.parameters = new URLSearchParams();
+
+    this.command = "";
+    this.function = "";
+
 
 }
 
-JSONRequest.prototype.setPostData = function (params) {
-    this.post_data = params;
+/**
+ * Set the backend responder command name
+ * @param cmd {string}
+ */
+JSONRequest.prototype.setResponder = function (cmd) {
+
+    this.command = cmd;
+}
+
+/**
+ *
+ * @returns {string}
+ */
+JSONRequest.prototype.getResponder = function () {
+    return this.command;
+}
+
+/**
+ * Set the backend responder function call name
+ * @param type {string}
+ */
+JSONRequest.prototype.setFunction = function (type) {
+
+    this.function = type;
+}
+
+JSONRequest.prototype.getFunction = function () {
+    return this.function;
+}
+
+/**
+ * Set parameter for responder function call
+ * @param name {string}
+ * @param value {string}
+ */
+JSONRequest.prototype.setParameter = function (name, value) {
+
+    this.parameters.set(name, value);
 
 }
-JSONRequest.prototype.setURL = function (url) {
-    this.url = url;
+
+JSONRequest.prototype.getParameter = function (name) {
+    return this.parameters.get(name);
 }
-JSONRequest.prototype.appendURL = function (url) {
-    var current_get = window.location.search.substring(1);
-    var append_url = "?" + current_get + "&" + url;
-    this.url = append_url;
+
+/**
+ * Set this request to use POST http method
+ * Sets paramter 'name' with value encodeURIComponent('value') to the post data parameters object
+ * @param name {string}
+ * @param value {string}
+ */
+JSONRequest.prototype.setPostParameter = function (name, value) {
+    this.post_data.set(name, value);
 }
+
+/**
+ *
+ * @param name
+ * @returns {string}
+ */
+JSONRequest.prototype.getPostParameter = function (name) {
+    return this.post_data.get(name);
+}
+
+/**
+ * Remove all post data parameters
+ */
+JSONRequest.prototype.clearPostParameters = function () {
+    this.post_data = new URLSearchParams();
+}
+
+/**
+ * Returns the complete URL including the responder, function, and function parameters
+ * @returns {URL}
+ */
+JSONRequest.prototype.getURL = function () {
+
+    let url = new URL(this.url.href);
+    url.searchParams.set("cmd", this.command);
+    url.searchParams.set("type", this.function);
+
+    this.parameters.forEach(function (value, key, parent) {
+        url.searchParams.set(key, value);
+    });
+
+    return url;
+}
+
 JSONRequest.prototype.setInterval = function (msec) {
     this.interval = msec;
 }
+
 JSONRequest.prototype.stop = function () {
     if (this.req) {
         this.req.abort();
     }
 }
-JSONRequest.prototype.start = function (func_success, func_error) {
 
-    console.log("JSONRequest::start with URL: " + this.url);
+/**
+ * Start the http request
+ * @param on_success {function(JSONRequestResult)}
+ * @param on_error {function(JSONRequestError)}
+ */
+JSONRequest.prototype.start = function (on_success, on_error) {
+
+    let responderURL = this.getURL();
+
+    let logstr = "JSONRequest::start() - Responder: " + this.command + " Function: " + this.function + "\r\n";
+    logstr += "Parameters:\r\n";
+    this.parameters.forEach(function (value, key, parent) {
+        logstr += "\t" + key + " => " + value + "\r\n";
+
+    });
+
+    console.log(logstr);
+
 
     this.req.onreadystatechange = function () {
 
@@ -76,8 +189,8 @@ JSONRequest.prototype.start = function (func_success, func_error) {
             request_result.status = status;
             request_result.response = response;
 
-            if (typeof func_success === "function") {
-                func_success(request_result);
+            if (typeof on_success === "function") {
+                on_success(request_result);
             }
 
 
@@ -85,33 +198,38 @@ JSONRequest.prototype.start = function (func_success, func_error) {
 
             var description = (err.message ? err.message : err);
 
-// 	  console.log("Request Error: " + description);
-
-            if (typeof func_error === "function") {
+            if (typeof on_error === "function") {
                 var request_error = new JSONRequestError();
                 request_error.response = response;
                 request_error.status = status;
                 request_error.description = description; //
-                func_error(request_error);
+                on_error(request_error);
             } else {
                 showAlert(description);
             }
 
         }
-        return;
 
     }.bind(this);
 
     this.request_time = new Date();
 
-    if (this.post_data) {
-        this.req.open("POST", this.url, this.async);
+    if (this.post_data.toString().length > 0) {
+        console.log("Using POST: " + responderURL.href);
+        this.req.open("POST", responderURL.href, this.async);
         this.req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        this.req.setRequestHeader("Content-length", this.post_data.length);
-        this.req.setRequestHeader("Connection", "close");
-        this.req.send(this.post_data);
+
+        let post = "";
+        this.post_data.forEach(function (value, key, parent) {
+            post += key + "=" + encodeURIComponent(value);
+            post += "&";
+        });
+
+        this.req.send(post);
+
     } else {
-        this.req.open("GET", this.url, this.async);
+        console.log("Using GET: " + responderURL.href);
+        this.req.open("GET", responderURL.href, this.async);
         this.req.send(null);
     }
 

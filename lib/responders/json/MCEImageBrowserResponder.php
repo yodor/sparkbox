@@ -50,8 +50,8 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
     public function __construct()
     {
-        parent::__construct();
-        $this->cmd = "mceImage";
+        parent::__construct("mceImage");
+
 
         //do not require thumbnail. just create the imagestorage of the upload data
         $this->setPhotoSize(-1, 64);
@@ -102,7 +102,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
     protected function _find(JSONResponse $resp)
     {
-        debug("MCEImageBrowserResponder::_find | section_name='{$this->section_name}' AND section_key='{$this->section_key}'");
+        debug("Section: '{$this->section_name}' Section Key: '{$this->section_key}'");
 
         $bean = new MCEImagesBean();
         $qry = $bean->query();
@@ -112,6 +112,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $qry->select->where .= " AND ownerID='{$this->ownerID}' ";
 
         }
+
         if (isset($_GET["imageID"])) {
             $imageID = (int)$_GET["imageID"];
             $qry->select->where .= " AND imageID='$imageID' ";
@@ -186,7 +187,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
         }
 
-        if (!$bean->delete($imageID)) throw new Exception(tr("Unable to delete: ") . $bean->getDB()->getError());
+       $bean->delete($imageID);
 
     }
 

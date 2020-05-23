@@ -1,0 +1,10 @@
+class SparkObject {
+
+    constructor() {
+
+
+    }
+
+
+
+}

@@ -1,21 +1,46 @@
-.MCEImageBrowserDialog .InputComponent {
-    display: inline-block;
+.MCEImageBrowserDialog {
+    max-height:90%;
+}
+.MCEImageBrowserDialog .Contents .Text {
+
+    border: 1px dotted green;
+    display: table !important;
+    width:100%;
+    height:100%;
+}
+
+.MCEImageBrowserDialog .Contents .Text FORM {
+    display: table-row;
+}
+
+.MCEImageBrowserDialog .Contents .Text FORM .InputComponent {
+    display: table-cell;
     vertical-align: top;
     margin-right: 10px;
 }
-
-.MCEImageBrowserDialog .ImageStorage {
-    display: inline-block;
-    max-width: 640px;
-    max-height: 310px;
-    overflow: auto;
+.MCEImageBrowserDialog .Contents .Text FORM .InputComponent .InputLabel {
+    display:none;
 }
 
-.MCEImageBrowserDialog .Contents {
-    display: inline-block;
+.MCEImageBrowserDialog .Contents .Text .ImageStorage {
+    display: table-row;
 }
 
-.MCEImageBrowserDialog .Contents .Element {
+
+
+.MCEImageBrowserDialog .ImageStorage .Viewport {
+    display: table-cell;
+    height:100%;
+    max-height:100%;
+    width:100%;
+}
+
+.MCEImageBrowserDialog .ImageStorage .Viewport .Collection {
+    display:inline-block;
+
+}
+
+.MCEImageBrowserDialog .ImageStorage .Collection .Element {
     display: inline-block;
     margin: 10px;
     padding: 2px;
@@ -25,17 +50,17 @@
     position: relative;
 }
 
-.MCEImageBrowserDialog .Contents .Element IMG {
+.MCEImageBrowserDialog .ImageStorage .Collection .Element IMG {
     display: block;
 }
 
-.MCEImageBrowserDialog .Contents .Element[selected] {
+.MCEImageBrowserDialog .ImageStorage .Collection .Element[selected] {
     border: 1px solid black;
 
 }
 
 
-.MCEImageBrowserDialog .Contents .Element .remove_button {
+.MCEImageBrowserDialog .ImageStorage .Collection .Element .remove_button {
     color: white;
     width: 20px;
     height: 20px;

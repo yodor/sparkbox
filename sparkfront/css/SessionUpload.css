@@ -43,38 +43,37 @@
 
 
 .InputField.SessionUpload .Controls {
-    display: inline-block;
-    /*overflow: hidden;*/
+    display: block;
+
     position: relative;
 
     cursor: pointer;
 
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-
-    min-width: 100px;
-    min-height: 30px;
-
     margin-top: 5px;
-
-    text-align: center;
 
 }
 
-.InputField.SessionUpload .Controls BUTTON {
+.InputField.SessionUpload .Controls .Buttons {
+    display: inline-block;
+    position: relative;
+}
+
+.InputField.SessionUpload .Controls[working] .Buttons {
+    display: none;
+}
+
+.InputField.SessionUpload .Controls .Buttons BUTTON {
 
     vertical-align: middle;
 
     text-align: center;
 
-    position: absolute;
-    left: 0px;
-    top: 0px;
-
+    left: 0;
+    top: 0;
 
 }
 
-.InputField.SessionUpload .Controls INPUT[type="file"] {
+.InputField.SessionUpload .Controls .Buttons INPUT[type="file"] {
 
     width: 100%;
     height: 100%;
@@ -84,31 +83,23 @@
     opacity: 0;
     z-index: 2;
     position: absolute;
-    left: 0px;
-    top: 0px;
+    left: 0;
+    top: 0;
     cursor: pointer;
 }
 
-
-.InputField.SessionUpload .Controls .progress {
-    width: 100%;
-
-    display: block;
+.InputField.SessionUpload .Controls .Progress {
+    display: none;
     position: relative;
-
     border: 1px solid #555;
     border-radius: 0.2em;
-
-    visibility: hidden;
-
 }
 
-.InputField.SessionUpload .Controls.working .progress {
-    visibility: visible;
+.InputField.SessionUpload .Controls[working] .Progress {
+    display: block;
 }
 
-
-.InputField.SessionUpload .Controls .progress .bar {
+.InputField.SessionUpload .Controls .Progress .bar {
     background-color: #b4f5b4;
     width: 0;
     height: 100%;
@@ -121,7 +112,7 @@
     z-index: 0;
 }
 
-.InputField.SessionUpload .Controls .progress .percent {
+.InputField.SessionUpload .Controls .Progress .percent {
 
     display: block;
 
@@ -134,20 +125,6 @@
     vertical-align: middle;
 
     padding: 0.3em;
-}
-
-.InputField.SessionUpload .Controls.working {
-    background-image: url("../images/ajax-loader.gif");
-    background-repeat: no-repeat;
-    background-position: right center;
-}
-
-.InputField.SessionUpload .Controls.working INPUT[type="button"] {
-    visibility: hidden;
-}
-
-.InputField.SessionUpload .Controls.working BUTTON[value="browse"] {
-    visibility: hidden;
 }
 
 

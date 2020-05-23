@@ -2,13 +2,14 @@ function PhraseTranslationDialog() {
 
     this.req = new JSONRequest();
 
-    this.req.async = true;
+    this.req.setResponder("translator");
 
     this.modal_pane = new ModalPopup();
 
 }
 
 PhraseTranslationDialog.prototype.attachWith = function (panel_id) {
+
     if (!panel_id) {
         showAlert("PhraseTranslationDialog need panel_id to attach with");
 
@@ -31,6 +32,8 @@ PhraseTranslationDialog.prototype.edit = function (textID) {
 
     this.langID = popup.attr("langID");
 
+    this.req.setParameter("langID", this.langID);
+
     popup.find("[action]").unbind("click");
 
 
@@ -44,13 +47,13 @@ PhraseTranslationDialog.prototype.edit = function (textID) {
     }.bind(this));
 
 
-    popup.data("textID", textID);
-    popup.data("trID", trID);
 
-    //this.req.progress_display = popup.find(".AjaxProgress");
+    this.req.setParameter("textID", textID);
+    this.req.setParameter("trID", trID);
 
-    this.req.setURL("?ajax=1&cmd=translator&type=fetch&langID=" + this.langID + "&textID=" + textID + "&trID=" + trID);
-    this.req.post_data = null;
+    this.req.setFunction("fetch");
+
+    this.req.clearPostParameters();
 
     this.req.start(
         function (request_result) {
@@ -67,17 +70,14 @@ PhraseTranslationDialog.prototype.store = function () {
 
     let popup = this.modal_pane.popup();
 
-    let textID = popup.data("textID");
-    let trID = popup.data("trID");
+    //already set during edit/fetch
+    let textID = this.req.getParameter("textID");
+    let trID = this.req.getParameter("trID");
 
-    let url = "?ajax=1&cmd=translator&type=store&langID=" + this.langID + "&textID=" + textID + "&trID=" + trID;
-    console.log("Using url: " + url);
-
-    this.req.setURL(url);
+    this.req.setFunction("store");
 
     let translation = popup.find("[name=translation]");
-
-    this.req.post_data = "translation="+encodeURIComponent(translation.val());
+    this.req.setPostParameter("translation", translation.val());
 
     var cell = $("[relation='translation'][trID='" + trID + "'][textID='" + textID + "']");
 
@@ -105,8 +105,9 @@ PhraseTranslationDialog.prototype.clear = function (textID) {
     var cell = $("[relation='translation'][textID='" + textID + "']");
     var trID = cell.attr("trID");
 
-    this.req.setURL("?ajax=1&cmd=translator&type=clear&langID=" + this.langID + "&textID=" + textID + "&trID=" + trID);
-    this.req.post_data = null;
+    this.req.setFunction("clear");
+
+    this.req.clearPostParameters();
 
     this.req.start(
         function (request_result) {

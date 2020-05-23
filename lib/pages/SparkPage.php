@@ -251,6 +251,10 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
 
         $this->addJS(SPARK_LOCAL . "/js/jquery-1.8.0.min.js");
+
+        $this->addJS(SPARK_LOCAL . "/js/SparkObject.js");
+        $this->addJS(SPARK_LOCAL . "/js/Component.js");
+
         $this->addJS(SPARK_LOCAL . "/js/utils.js");
         $this->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
 
@@ -376,8 +380,13 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function startRender()
     {
-        //if any responder process the request, controller will quit script after
-        RequestController::processJSONResponders();
+
+
+        if ($this->getURL()->haveParameter("JSONRequest")) {
+            //will 'exit' script always as JSONRequest is found as request URL parameter
+            debug("Handling JSONRequest");
+            RequestController::processJSONResponders();
+        }
 
         //ob_start(array($this, 'obCallback'));
         ob_start();
