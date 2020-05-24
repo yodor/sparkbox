@@ -6,6 +6,11 @@ include_once("responders/json/JSONResponder.php");
 class TranslatePhraseResponder extends JSONResponder
 {
 
+    /**
+     * @var TranslationPhrasesBean
+     */
+    protected $bean;
+
     private $trID = -1;
     private $textID = -1;
     private $langID = -1;
@@ -13,7 +18,7 @@ class TranslatePhraseResponder extends JSONResponder
     public function __construct()
     {
         parent::__construct("translator");
-
+        $this->bean = new TranslationPhrasesBean();
     }
 
     protected function parseParams()
@@ -31,7 +36,6 @@ class TranslatePhraseResponder extends JSONResponder
 
     protected function _store(JSONResponse $ret)
     {
-        $bean = new TranslationPhrasesBean();
 
         $trrow = array();
 
@@ -41,7 +45,7 @@ class TranslatePhraseResponder extends JSONResponder
         try {
             if ($this->trID > 0) {
 
-                $bean->update($this->trID, $trrow);
+                $this->bean->update($this->trID, $trrow);
 
                 $ret->trID = $this->trID;
                 $ret->message = tr("Translation updated");
@@ -52,14 +56,14 @@ class TranslatePhraseResponder extends JSONResponder
                 $trrow["langID"] = $this->langID;
                 $trrow["textID"] = $this->textID;
 
-                $trID = $bean->insert($trrow);
+                $trID = $this->bean->insert($trrow);
 
                 $ret->trID = $trID;
                 $ret->message = tr("Translation stored");
             }
         }
         catch (Exception $ex) {
-            $ret->message = $ex->getMessage()."<HR>".$bean->getError();
+            $ret->message = $ex->getMessage()."<HR>".$this->bean->getError();
         }
 
 
@@ -68,8 +72,7 @@ class TranslatePhraseResponder extends JSONResponder
     protected function _fetch(JSONResponse $response)
     {
 
-        $bean = new TranslationPhrasesBean();
-        $qry = $bean->queryLanguageID($this->langID);
+        $qry = $this->bean->queryLanguageID($this->langID);
 
         $qry->select->where = " st.textID={$this->textID}  ";
 
@@ -91,11 +94,19 @@ class TranslatePhraseResponder extends JSONResponder
 
     }
 
-    protected function _clear(JSONResponse $ret)
+    protected function _clear(JSONResponse $response)
     {
-        $bean = new TranslationPhrasesBean();
-        $bean->delete($this->trID);
-        $ret->message = tr("Translation removed");
+
+        $affectedRows = $this->bean->delete($this->trID);
+
+        $response->trID = $this->trID;
+
+        if ($affectedRows>0) {
+            $response->message = tr("Translation removed");
+        }
+        else {
+            $response->message = tr("No translation removed");
+        }
     }
 
 }

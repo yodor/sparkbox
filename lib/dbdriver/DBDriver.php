@@ -20,6 +20,8 @@ abstract class DBDriver
         $this->shutdown();
     }
 
+    abstract public function affectedRows() : int;
+
     abstract public function getError(): string;
 
     abstract public function query(string $str);

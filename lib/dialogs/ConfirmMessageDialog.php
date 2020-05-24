@@ -9,6 +9,14 @@ class ConfirmMessageDialog extends MessageDialog
         parent::__construct($title, $id);
     }
 
+    public function requiredScript()
+    {
+        $arr = parent::requiredScript();
+        $arr[] = SPARK_LOCAL . "/js/dialogs/ConfirmMessageDialog.js";
+        return $arr;
+    }
+
+
     protected function initButtons()
     {
         $btn_ok = new ColorButton();

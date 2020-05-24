@@ -75,13 +75,6 @@ class PhraseTranslatorPage extends BeanListPage
     {
         parent::renderImpl();
 
-        ?>
-        <script type='text/javascript'>
 
-            var phrase_translator = new PhraseTranslationDialog();
-            phrase_translator.attachWith("phrase_translator");
-
-        </script>
-        <?php
     }
 }

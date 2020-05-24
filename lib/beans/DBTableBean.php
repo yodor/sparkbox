@@ -289,9 +289,19 @@ abstract class DBTableBean
 
     }
 
+    /**
+     * Handle db code wrapped inside transaction/commit
+     *
+     * @param Closure $code Code to execute in transaction
+     * @param DBDriver|null $db parent DBDruver
+     * @return int The number of affected rows after closure execution
+     * @throws Exception
+     */
     protected function handleTransaction(Closure $code, DBDriver $db = NULL)
     {
         $use_transaction = FALSE;
+
+        $affectedRows = 0;
 
         if (!$db) {
             $use_transaction = TRUE;
@@ -310,12 +320,17 @@ abstract class DBTableBean
             //either throw or succeed
             $code($db);
 
+            $affectedRows = $db->affectedRows();
+            debug("Closure Affected Rows: ".$affectedRows);
+
             debug("Closure function executed");
 
             if ($use_transaction) {
                 debug("Committing DB transaction");
                 $db->commit();
             }
+
+            return $affectedRows;
 
         }
         catch (Exception $ex) {
@@ -328,6 +343,7 @@ abstract class DBTableBean
 
             throw $ex;
         }
+
 
     }
 
@@ -355,7 +371,7 @@ abstract class DBTableBean
             $this->manageCache($id);
         };
 
-        $this->handleTransaction($code, $db);
+        return $this->handleTransaction($code, $db);
     }
 
     /**
@@ -482,6 +498,7 @@ abstract class DBTableBean
      * @param int $id
      * @param array $row
      * @param DBDriver|null $db
+     * @return int the number of affected rows from this update
      * @throws Exception
      */
     public function update(int $id, array &$row, DBDriver $db = NULL)
@@ -500,13 +517,6 @@ abstract class DBTableBean
 
             debug("UPDATE executing sql: ".$update->getSQL());
 
-//            $sql = "UPDATE {$this->table} SET " . implode(",", $values) . " WHERE {$this->prkey}=$id";
-//
-//            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_UPDATE"])) {
-//                debug(get_class($this) . " UPDATE SQL: $sql");
-//            }
-
-
             if (!$db->query($update->getSQL())) {
                 throw new Exception("Unable to update: ".$db->getError());
             }
@@ -514,7 +524,7 @@ abstract class DBTableBean
             $this->manageCache($id);
         };
 
-        $this->handleTransaction($code, $db);
+        return $this->handleTransaction($code, $db);
 
     }
 

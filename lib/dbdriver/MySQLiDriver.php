@@ -45,6 +45,11 @@ class MySQLiDriver extends DBDriver
 
     }
 
+    public function connection() : mysqli
+    {
+        return $this->conn;
+    }
+
     public function __destruct()
     {
         $this->shutdown();
@@ -80,6 +85,11 @@ class MySQLiDriver extends DBDriver
         return $this->conn->query($str);
     }
 
+    public function affectedRows(): int
+    {
+        return $this->conn->affected_rows;
+    }
+
     public function numRows($res): int
     {
         $res = $this->assert_resource($res);
@@ -110,7 +120,7 @@ class MySQLiDriver extends DBDriver
      * @return array|null
      * @throws Exception
      */
-    public function fetch($res) : ?array
+    public function fetch($res): ?array
     {
         $res = $this->assert_resource($res);
 
@@ -118,7 +128,7 @@ class MySQLiDriver extends DBDriver
 
     }
 
-    public function fetchArray($res) : ?array
+    public function fetchArray($res): ?array
     {
         $res = $this->assert_resource($res);
 

@@ -5,58 +5,46 @@ class SessionUpload extends Component {
         this.setClass(".SessionUpload");
 
         this.req = new JSONRequest();
-        //jquery wrap of the element
-        this.element = null;
-        //jquery wrap of the input[type='file']
-        this.file_input = null;
 
+    }
 
+    input() {
+        return $(this.selector() + " INPUT[type='file']");
     }
 
     initialize() {
 
         super.initialize();
 
-        this.element = $(this.selector()).first();
 
-        this.element.data("upload_control", this);
+        this.req.setResponder(this.component().attr("handler_command"));
+        this.req.setParameter("field_name", this.field);
 
-        this.file_input = this.element.find("INPUT[type='file']").first();
+        this.component().data("upload_control", this);
 
-        this.file_input.change(function (event) {
 
-            this.uploadFileChanged();
-
+        this.input().on("change", function(event){
+            this.uploadFileChanged(event);
         }.bind(this));
 
         let instance = this;
-
-        let slots = this.element.find(".ArrayContents");
+        let slots = this.component().find(".ArrayContents");
         slots.find("[action='Remove']").each(function (index) {
-            $(this).click(function (event) {
+            $(this).on("click", function (event) {
                 instance.removeSlot($(this));
             });
         })
 
-        let validator = this.file_input.attr("validator");
 
-        this.req.setResponder(this.element.attr("handler_command"));
-        if (validator) {
-            this.req.setParameter("validator", validator);
-        }
-        this.req.setParameter("field_name", this.field);
     }
 
     uploadFileChanged(event) {
 
         console.log("SessionUpload::uploadFileChanged()");
 
-        let max_slots = this.file_input.attr("max_slots");
-        let validator = this.file_input.attr("validator");
-
-        let slots = this.element.find(".ArrayContents");
-        let controls = this.element.find(".Controls");
-        let form = this.element.parents("FORM").first();
+        let max_slots = this.input().attr("max_slots");
+        let slots = this.component().find(".ArrayContents");
+        let controls = this.component().find(".Controls");
 
         //process current number of slots
         let active_slots = slots.children().length;
@@ -66,9 +54,10 @@ class SessionUpload extends Component {
             this.resetFileInput();
             return;
         }
-        if (this.file_input.get(0).files) {
 
-            let upload_count = this.file_input.get(0).files.length;
+        if (this.input().get(0).files) {
+
+            let upload_count = this.input().get(0).files.length;
             if (active_slots + upload_count > max_slots) {
                 showAlert("Select less files");
                 this.resetFileInput();
@@ -76,36 +65,29 @@ class SessionUpload extends Component {
             }
         }
 
-
-        this.prepareUploadForm();
+        let form = this.prepareUploadForm();
 
         this.req.setFunction("upload");
+
+        //let form = this.input().parents("FORM").first();
 
         //copy the request url
         form.attr("action", this.req.getURL().href);
 
-        let submit = form.attr("onSubmit");
-        form.attr("onSubmit", "return true");
+        console.log("Submitting form clone to URL: " + form.attr("action"));
+
         form.submit();
 
-        console.log("Submit Form to URL: " + form.attr("action"));
-
-        form.unbind('submit').find('input:submit,input:image,button:submit').unbind('click');
-        form.attr("onSubmit", submit);
     }
 
+    /**
+     *
+     * @returns {jQuery}
+     */
     prepareUploadForm() {
 
-        let controls = this.element.find(".Controls");
-        let form = this.element.parents("FORM").first();
-
-        let action_stored = form.data("action_stored");
-        if (!action_stored) {
-            form.data("action_stored", 1);
-            let action = form.attr("action");
-            if (!action) action = "";
-            form.data("action", action);
-        }
+        let controls = $(this.selector()).find(".Controls");
+        let form = $(this.selector()).parents("FORM").first().clone();
 
         let progress = controls.find(".Progress");
 
@@ -151,12 +133,14 @@ class SessionUpload extends Component {
 
             }.bind(this),
             complete: function (xhr, textStatus) {
-                form.attr("action", form.data("action"));
+                //form.attr("action", form.data("action"));
+
                 this.resetFileInput();
 
             }.bind(this)
         });
 
+        return form;
     }
 
     /**
@@ -164,7 +148,7 @@ class SessionUpload extends Component {
      * @param result
      */
     processResult(result) {
-        let slots = this.element.find(".ArrayContents");
+        let slots = this.component().find(".ArrayContents");
 
         if (result.contents) showAlert(result.contents);
 
@@ -192,11 +176,9 @@ class SessionUpload extends Component {
 
     resetFileInput() {
 
-        this.file_input.wrap("<form>").closest("form").get(0).reset();
-        this.file_input.unwrap();
+        this.input().wrap("<form>").closest("form").get(0).reset();
+        this.input().unwrap();
 
-        //file_input.replaceWith(file_input.clone(true));
-        console.log("Upload control reset element INPUT[type='file']");
     }
 
     /**
@@ -211,11 +193,11 @@ class SessionUpload extends Component {
 
         this.req.setParameter("uid", uid);
 
-        this.req.start(
-            function (request_result) {
-                elm.parents(".Element").first().remove();
-            }
-        );
+        this.req.onSuccess=function(request_result) {
+            elm.parents(".Element").first().remove();
+        };
+
+        this.req.start();
 
     }
 }

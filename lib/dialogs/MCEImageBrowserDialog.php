@@ -35,7 +35,7 @@ class MCEImageBrowserDialog extends MessageDialog
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/popups/MCEImageBrowserDialog.js";
+        $arr[] = SPARK_LOCAL . "/js/dialogs/MCEImageBrowserDialog.js";
         return $arr;
     }
 

@@ -186,7 +186,8 @@ class ArrayField extends InputField
         <script type='text/javascript'>
             onPageLoad(function () {
                 let array_controls = new ArrayControls();
-                array_controls.attachWith("<?php echo $this->input->getName();?>");
+                array_controls.setField("<?php echo $this->input->getName();?>");
+                array_controls.initialize();
             });
         </script>
         <?php

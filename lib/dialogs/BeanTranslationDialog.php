@@ -51,7 +51,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/popups/BeanTranslationDialog.js";
+        $arr[] = SPARK_LOCAL . "/js/dialogs/BeanTranslationDialog.js";
         $arr[] = SPARK_LOCAL . "/js/MCETextArea.js";
         $arr[] = SPARK_LOCAL . "/js/tiny_mce/jquery.tinymce.min.js";
         return $arr;
@@ -110,7 +110,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         <script type='text/javascript'>
             onPageLoad(function () {
                 var bean_translator = new BeanTranslationDialog();
-                bean_translator.attachWith("bean_translator");
+                bean_translator.initialize();
 
                 $("BODY").find("[action='TranslateBeanField']").each(function (index) {
 

@@ -5,6 +5,8 @@ class MCETextArea extends Component {
         this.setClass("TEXTAREA.MCETextArea");
 
         this.image_browser = new MCEImageBrowserDialog();
+        this.image_browser.setMCETextArea(this);
+
         this.editor = null;
 
         this.onEditorInit = function (editor) {
@@ -13,25 +15,19 @@ class MCETextArea extends Component {
 
         };
 
+
     }
+
     onInsertImage(ed) {
         this.editor = ed;
-
-        //php side dialogs/MCEImageBrowserDialog
-        if ($("#mceImage_browser").get(0)) {
-            console.log("MCETextArea::onInsertImage() - Custom image browser found using it");
-            this.image_browser.mce = this;
-            return this.image_browser.show(this);
-
-        }
-
-        console.log("MCETextArea::onInsertImage() - Custom image browser not installed. #mceImage_browser not found in DOM");
-        return true;
+        this.image_browser.show();
     }
 
     initialize() {
 
         super.initialize();
+
+        this.image_browser.initialize();
 
         var mce_area = $(this.selector());
 
@@ -78,7 +74,7 @@ class MCETextArea extends Component {
                 editor.ui.registry.addButton('mybutton', {
                     text: 'Server Image',
 
-                    onAction: () =>  {
+                    onAction: () => {
 
                         instance.onInsertImage(editor);
                     }
