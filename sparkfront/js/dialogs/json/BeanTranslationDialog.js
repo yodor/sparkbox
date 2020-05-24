@@ -6,11 +6,6 @@ class BeanTranslationDialog extends JSONDialog {
 
         this.setID("bean_translator");
 
-        // this.langID = -1;
-        // this.field_name = "";
-        // this.bean_class = "";
-        // this.bean_id = "";
-
         this.language_alert = "Please select translation language";
 
         this.translator_editor = null;

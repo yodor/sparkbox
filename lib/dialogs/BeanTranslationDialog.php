@@ -51,7 +51,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/dialogs/BeanTranslationDialog.js";
+        $arr[] = SPARK_LOCAL . "/js/dialogs/json/BeanTranslationDialog.js";
         $arr[] = SPARK_LOCAL . "/js/MCETextArea.js";
         $arr[] = SPARK_LOCAL . "/js/tiny_mce/jquery.tinymce.min.js";
         return $arr;

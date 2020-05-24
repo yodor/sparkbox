@@ -68,7 +68,6 @@ class MCEImageBrowserDialog extends JSONDialog {
 
                 md.modal_pane.popup.find(".preview IMG").on("load", function (event) {
                     md.modal_pane.centerContents();
-
                 });
 
                 var confirm_button = md.modal_pane.popup.find("button[action='confirm']");
@@ -105,7 +104,6 @@ class MCEImageBrowserDialog extends JSONDialog {
                     }
                     image_src += "&width=" + width + "&height=" + height;
 
-
                     var caption = form.find("[name='caption']").val();
                     if (caption.length > 0) {
                         image_tag.attr("alt", caption);
@@ -127,9 +125,9 @@ class MCEImageBrowserDialog extends JSONDialog {
 
                     }
 
-                    dialog.mce.editor.execCommand("mceInsertContent", false, final_tag.get(0).outerHTML);
-                    md.modal_pane.pane.remove();
-                    dialog.modal_pane.pane.remove();
+                    dialog.mce_textarea.editor.execCommand("mceInsertContent", false, final_tag.get(0).outerHTML);
+                    md.remove();
+                    dialog.remove();
                     return false;
                 });
 
@@ -139,7 +137,7 @@ class MCEImageBrowserDialog extends JSONDialog {
 
                 cancel_button.insertAfter(confirm_button);
                 cancel_button.on("click", function (event) {
-                    md.modal_pane.pane.remove();
+                    md.remove();
                     return false;
                 });
 

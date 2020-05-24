@@ -25,7 +25,7 @@ class PhraseTranslationDialog extends MessageDialog
     public function requiredScript()
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/dialogs/PhraseTranslationDialog.js";
+        $arr[] = SPARK_LOCAL . "/js/dialogs/json/PhraseTranslationDialog.js";
         return $arr;
     }
 

@@ -63,7 +63,7 @@ class MessageDialog extends Component implements IPageComponent
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/dialogs/MessageDialog.js";
-        $arr[] = SPARK_LOCAL . "/js/dialogs/JSONDialog.js";
+        $arr[] = SPARK_LOCAL . "/js/dialogs/json/JSONDialog.js";
         return $arr;
     }
 
