@@ -4,7 +4,7 @@ include_once("components/TableView.php");
 include_once("components/ItemView.php");
 
 include_once("components/renderers/items/GalleryViewItem.php");
-include_once("components/renderers/cells/TableImageCellRenderer.php");
+include_once("components/renderers/cells/ImageCellRenderer.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
 class GalleryView extends Container
@@ -35,11 +35,10 @@ class GalleryView extends Container
         parent::__construct();
         $this->bean = $bean;
 
-        $fields = array($this->bean->key(), "position", "caption", "date_upload");
 
         $qry = $this->bean->query();
 
-        $qry->select->fields = implode(",", $fields);
+        $qry->select->fields()->set($this->bean->key(), "position", "caption", "date_upload");
 
         if (strcmp_isset("view", "list")) {
 
@@ -51,7 +50,7 @@ class GalleryView extends Container
             $view->addColumn(new TableColumn("caption", "Caption"));
             $view->addColumn(new TableColumn("date_upload", "Date Upload"));
 
-            $renderer = new TableImageCellRenderer();
+            $renderer = new ImageCellRenderer();
 
             $this->photo_renderer = $renderer;
 
@@ -59,7 +58,7 @@ class GalleryView extends Container
 
             $view->addColumn(new TableColumn("actions", "Actions"));
 
-            $act = new ActionsTableCellRenderer();
+            $act = new ActionsCellRenderer();
             $this->actions = $act->getActions();
 
             $view->getColumn("actions")->setCellRenderer($act);

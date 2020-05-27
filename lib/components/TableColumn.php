@@ -1,18 +1,18 @@
 <?php
 include_once("components/Component.php");
 include_once("components/renderers/cells/TableCellRenderer.php");
-include_once("components/renderers/cells/TableHeaderCellRenderer.php");
+include_once("components/renderers/cells/HeaderCellRenderer.php");
 
-class TableColumn extends Component
+class TableColumn
 {
 
     /**
-     * @var TableCellRenderer|null
+     * @var HeaderCellRenderer
      */
     protected $header;
 
     /**
-     * @var TableCellRenderer|null
+     * @var TableCellRenderer
      */
     protected $cell;
 
@@ -21,37 +21,62 @@ class TableColumn extends Component
      */
     protected $view;
 
-    protected $field_name = "";
-    protected $label = "";
+    /**
+     * @var string
+     */
+    protected $field_name;
 
+    /**
+     * @var string
+     */
+    protected $label;
+
+    /**
+     * @var bool
+     */
     protected $sortable = TRUE;
 
-    public function __construct(string $field_name, string $label, TableCellRenderer $cr = NULL, TableCellRenderer $hr = NULL)
+    const ALIGN_LEFT = "left";
+    const ALIGN_RIGHT = "right";
+    const ALIGN_CENTER = "center";
+
+    protected $alignClass = "";
+
+    public function __construct(string $field_name, string $label, string $alignClass = "")
     {
-        parent::__construct();
 
         $this->field_name = $field_name;
         $this->label = $label;
-        $this->cell = $cr;
-        $this->header = $hr;
 
-        if (is_null($hr)) $this->setHeaderCellRenderer(new TableHeaderCellRenderer());
-
-        if (is_null($cr)) $this->setCellRenderer(new TableCellRenderer());
+        $this->setCellRenderer(new TableCellRenderer());
+        $this->setHeaderCellRenderer(new HeaderCellRenderer());
 
         if (strcasecmp($field_name, "actions") == 0) {
             $this->getHeaderCellRenderer()->setSortable(FALSE);
         }
 
+        if ($alignClass) {
+            $this->alignClass = $alignClass;
+        }
     }
 
-    public function setHeaderCellRenderer(TableCellRenderer $renderer)
+    public function setAlignClass(string $alignClass)
+    {
+        $this->alignClass = $alignClass;
+    }
+
+    public function getAlignClass(): string
+    {
+        return $this->alignClass;
+    }
+
+    public function setHeaderCellRenderer(HeaderCellRenderer $renderer)
     {
         $this->header = $renderer;
         $this->header->setColumn($this);
     }
 
-    public function getHeaderCellRenderer(): TableCellRenderer
+    public function getHeaderCellRenderer(): HeaderCellRenderer
     {
         return $this->header;
     }
@@ -66,7 +91,7 @@ class TableColumn extends Component
     {
         $this->cell = $renderer;
         $this->cell->setColumn($this);
-        $this->sortable = $renderer->isSortable();
+        $this->setSortable($renderer->isSortable());
     }
 
     public function getView(): TableView
@@ -89,7 +114,7 @@ class TableColumn extends Component
         return $this->label;
     }
 
-    public function isSortable()
+    public function isSortable(): bool
     {
         return $this->sortable;
     }

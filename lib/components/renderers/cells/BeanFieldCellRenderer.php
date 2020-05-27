@@ -22,7 +22,7 @@ class BeanFieldCellRenderer extends TableCellRenderer
         $field_key = $this->column->getFieldName();
 
         $qry = $this->bean->queryField($field_key, $row[$field_key], 1);
-        $qry->select->fields = $this->field_name;
+        $qry->select->fields()->set($this->field_name);
         $qry->exec();
 
         if ($brow = $qry->next()) {

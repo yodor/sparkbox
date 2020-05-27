@@ -19,16 +19,16 @@ class NewsItemsListPage extends BeanListPage
         $this->page->setName("News Items");
 
         $this->setBean(new NewsItemsBean());
-        $this->setListFields(array("photo"=>"Photo", "item_title"=>"Title", "item_date"=>"Date"));
+        $this->setListFields(array("item_photo"=>"Photo", "item_title"=>"Title", "item_date"=>"Date"));
 
     }
 
     public function initView()
     {
         parent::initView();
-        $ticr = new TableImageCellRenderer();
+        $ticr = new ImageCellRenderer();
         $ticr->setBean($this->bean);
 
-        $this->view->getColumn("photo")->setCellRenderer($ticr);
+        $this->view->getColumn("item_photo")->setCellRenderer($ticr);
     }
 }

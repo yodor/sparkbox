@@ -1,7 +1,7 @@
 <?php
 include_once("components/renderers/cells/TableCellRenderer.php");
 
-class NumericFieldCellRenderer extends TableCellRenderer
+class NumericCellRenderer extends TableCellRenderer
 {
 
     protected $format = "%01.2f";

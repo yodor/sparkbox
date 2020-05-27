@@ -82,6 +82,7 @@ class MySQLiDriver extends DBDriver
 
     public function query(string $str)
     {
+        //debug("Excuting SQL: ".$str);
         return $this->conn->query($str);
     }
 

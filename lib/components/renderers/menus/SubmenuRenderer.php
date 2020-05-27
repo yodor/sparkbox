@@ -35,19 +35,7 @@ class SubmenuRenderer extends Component implements IMenuItemRenderer
 
     }
 
-    public function startRender()
-    {
-
-        $attrs = $this->prepareAttributes();
-        echo "<div $attrs>";
-    }
-
-    public function finishRender()
-    {
-        echo "</div>";
-    }
-
-    public function renderImpl()
+    protected function renderImpl()
     {
         //clone
         $menu_item = clone $this->menu_item;

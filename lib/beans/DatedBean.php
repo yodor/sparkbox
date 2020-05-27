@@ -29,7 +29,7 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query();
-        $qry->select->fields = " YEAR({$this->datefield}) AS year  ";
+        $qry->select->fields()->setExpression(" YEAR({$this->datefield}) ", "year");
         $qry->select->group_by = " YEAR({$this->datefield}) DESC  ";
         $qry->exec();
 
@@ -51,7 +51,7 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query();
-        $qry->select->where = " MONTHNAME({$this->datefield})='$d_month' AND YEAR({$this->datefield})=$d_year ";
+        $qry->select->where()->add("MONTHNAME({$this->datefield})","'$d_month'")->add("YEAR({$this->datefield})", "'$d_year'");
         $qry->select->order_by = " {$this->datefield} DESC ";
         $qry->exec();
 
@@ -75,8 +75,8 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query();
-        $qry->select->fields = " DAY({$this->datefield}) AS day  ";
-        $qry->select->where = " MONTH({$this->datefield})='$d_month' AND  YEAR({$this->datefield})=$d_year ";
+        $qry->select->fields()->setExpression("DAY({$this->datefield})", "day");
+        $qry->select->where()->add("MONTH({$this->datefield})", "'$d_month'")->add("YEAR({$this->datefield})","'$d_year'");
         $qry->exec();
 
         $data = array();
@@ -98,7 +98,7 @@ class DatedBean extends DBTableBean
     public function containsDataForMonth(string $d_year, string $d_month) :int
     {
         $qry = $this->query();
-        $qry->select->where = " MONTHNAME({$this->datefield})='$d_month' AND YEAR({$this->datefield})='$d_year' ";
+        $qry->select->where()->add("MONTHNAME({$this->datefield})", "'$d_month'")->add("YEAR({$this->datefield})", "'$d_year'");
         $qry->select->limit = " 1 ";
         return $qry->exec();
     }

@@ -58,7 +58,6 @@ class SQLQuery implements IDataIterator
 
     public function __clone() {
         $this->select = clone $this->select;
-
     }
 
     public function exec(): int
@@ -72,7 +71,6 @@ class SQLQuery implements IDataIterator
             throw new Exception($this->db->getError());
         }
 
-        //TODO:?
         $res = $this->db->query("SELECT FOUND_ROWS() as total");
         $row = $this->db->fetch($res);
         $this->numResults = (int)$row["total"];

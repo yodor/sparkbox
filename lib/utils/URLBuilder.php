@@ -56,6 +56,11 @@ class URLBuilder
         $this->parameters[$param->name()] = $param;
     }
 
+    public function removeParameter(string $name) {
+        if (!$this->haveParameter($name))return;
+        unset($this->parameters[$name]);
+    }
+
     public function getParameter(string $name): URLParameter
     {
         return $this->parameters[$name];

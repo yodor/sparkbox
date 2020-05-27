@@ -1,4 +1,9 @@
-
+.BeanTranslationDialog {
+    max-height:80%;
+    max-width:80%;
+    width:80%;
+    height:80%;
+}
 .BeanTranslationDialog .Contents .Text {
     width:100%;
     height:100%;

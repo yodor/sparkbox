@@ -9,9 +9,7 @@
 }
 
 
-.TableView .viewport TH {
-
-    padding: 5px;
+.TableView .viewport .HeaderCellRenderer {
 
     text-align: center;
 
@@ -21,69 +19,85 @@
     white-space: nowrap;
     color: #537689;
 
-
+    padding: 0.3em !important;
 }
 
-.TableView .viewport TH A {
+.TableView .viewport .HeaderCellRenderer A {
 
     text-transform: capitalize;
-
     color: #537689;
-
-}
-
-.TableView .viewport TD {
-    padding: 0px;
-    padding-left: 5px;
-    padding-right: 5px;
-
-}
-
-.TableView .viewport TD.odd {
-
-    border: 1px solid #aeaeae;
-    background-color: #f3f6fb;
-}
-
-.TableView .viewport TD.even {
-
-    background: white;
-    border: 1px solid #aeaeae;
 }
 
 .TableView .viewport .TableCellRenderer {
+
+
     text-align: left;
     vertical-align: middle;
+
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+
+    padding-top:0;
+    padding-bottom:0;
 }
 
-.TableView .viewport .TableImageCellRenderer {
+.TableView .viewport .TableCellRenderer.center {
+    text-align:center;
+}
+
+.TableView .viewport .TableCellRenderer.left {
+    text-align:left;
+}
+
+.TableView .viewport .TableCellRenderer.right {
+    text-align:right;
+}
+
+.TableView .viewport TR.odd .TableCellRenderer {
+    background-color: #f3f6fb;
+    border: 1px solid #aeaeae;
+
+}
+
+.TableView .viewport TR.even .TableCellRenderer {
+    border: 1px solid #aeaeae;
+    background-color: white;
+
+}
+
+.TableView .viewport .ImageCellRenderer {
+
     vertical-align: middle;
     text-align: center;
 }
 
-.TableView .viewport .BooleanFieldCellRenderer {
+.TableView .viewport .BooleanCellRenderer {
+
     vertical-align: middle;
     text-align: center;
 
 }
 
-.TableView .viewport .ActionsTableCellRenderer {
+.TableView .viewport .ActionsCellRenderer {
+
     line-height: 180%;
     text-align: center;
     color: #50a9f9;
     white-space: nowrap;
+
 }
 
-.TableView .viewport .ActionsTableCellRenderer .pipe_separator {
+.TableView .viewport .ActionsCellRenderer .pipe_separator {
     color: #cccccc;
 }
 
 
-.TableView .viewport .ActionsTableCellRenderer .actions_list {
+.TableView .viewport .ActionsCellRenderer .actions_list {
     display: inline-block;
     text-align: left;
 }
-.TableView .viewport .ActionsTableCellRenderer .actions_list>* {
+
+.TableView .viewport .ActionsCellRenderer .actions_list>* {
 
 }
 

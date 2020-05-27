@@ -1,6 +1,7 @@
 <?php
 include_once("dialogs/MessageDialog.php");
 include_once("responders/json/MCEImageBrowserResponder.php");
+include_once("dialogs/ConfirmMessageDialog.php");
 
 class MCEImageBrowserDialog extends MessageDialog
 {
@@ -30,11 +31,15 @@ class MCEImageBrowserDialog extends MessageDialog
 
         $this->icmp = new InputComponent($this->image_input);
 
+        //imagedimensiondialog from javascript
+        new ConfirmMessageDialog();
+
     }
 
     public function requiredScript()
     {
         $arr = parent::requiredScript();
+        $arr[] = SPARK_LOCAL . "/js/dialogs/ConfirmMessageDialog.js";
         $arr[] = SPARK_LOCAL . "/js/dialogs/json/MCEImageBrowserDialog.js";
         return $arr;
     }
@@ -67,10 +72,13 @@ class MCEImageBrowserDialog extends MessageDialog
         echo "</form>";
 
         echo "<div class='ImageStorage'>";
+
         echo "<div class='Viewport'>";
-        echo "<div class='Collection'>";
+
+        echo "<div class='Collection'></div>";
+
         echo "</div>";
-        echo "</div>";
+
         echo "</div>";
 
     }

@@ -1,4 +1,5 @@
 class MCETextArea extends Component {
+
     constructor() {
         super();
         //all TEXTAREA elements having CSS class MCETextArea
@@ -9,13 +10,11 @@ class MCETextArea extends Component {
 
         this.editor = null;
 
-        this.onEditorInit = function (editor) {
+    }
 
-            console.log("MCETextArea::onEditorInit() - '" + editor.id + "' initialized");
-
-        };
-
-
+    onEditorInit(editor) {
+        this.editor = editor;
+        console.log("MCETextArea::onEditorInit() - Using editor ID: " + editor.id);
     }
 
     onInsertImage(ed) {
@@ -29,17 +28,16 @@ class MCETextArea extends Component {
 
         this.image_browser.initialize();
 
-        var mce_area = $(this.selector());
+        console.log("MCETextArea::initialize() - Using selector: " + this.selector());
+        let mce_area = $(this.selector());
 
-        if (mce_area.data("mce_init_done") == 1) {
-            console.log("MCETextArea::attachWith() - init already done");
-            return;
-        }
-
-        var instance = this;
+        let instance = this;
 
         mce_area.tinymce({
 
+            schema: 'html5',
+
+            extended_valid_elements: 'img[*],a[*]',
 
             // Location of TinyMCE script
             script_url: SPARK_LOCAL + '/js/tiny_mce/tinymce.min.js',
@@ -49,14 +47,14 @@ class MCETextArea extends Component {
 
             //
             entity_encoding: "raw",
-            force_p_newlines: false,
+            force_p_newlines: true,
             force_br_newlines: true,
 
             ///ver 4
             menubar: false,
             toolbar1: 'code | undo redo | fontselect fontsizeselect | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
-            toolbar2: 'link unlink anchor image media code | insertdatetime preview | forecolor backcolor | mybutton | charmap ',
-            plugins: 'code link image lists charmap anchor insertdatetime media textcolor colorpicker',
+            toolbar2: 'link unlink anchor | image media code | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser |',
+            plugins: 'code link image lists charmap anchor insertdatetime media ',
 
             resize: 'both',
 
@@ -66,16 +64,13 @@ class MCETextArea extends Component {
             media_restrict: false,
 
             width: '100%',
+            height: '300px',
 
             setup: function (editor) {
 
-                instance.editor = editor;
-
-                editor.ui.registry.addButton('mybutton', {
-                    text: 'Server Image',
-
+                editor.ui.registry.addButton('spark_imagebrowser', {
+                    text: 'Image Browser',
                     onAction: () => {
-
                         instance.onInsertImage(editor);
                     }
                 });
@@ -87,9 +82,8 @@ class MCETextArea extends Component {
                 // });
 
 
-                editor.on('init', function (e) {
+                editor.on('init', function (event) {
                     instance.editor = editor;
-
                     instance.onEditorInit(editor);
 
                 });
@@ -98,7 +92,7 @@ class MCETextArea extends Component {
 
         });
 
-        mce_area.data("mce_init_done", 1);
+
     }
 }
 

@@ -1,5 +1,8 @@
 .MCEImageBrowserDialog {
-    max-height:90%;
+    max-height:80%;
+    max-width:80%;
+    width:50%;
+    height:50%;
 }
 .MCEImageBrowserDialog .Contents .Text {
 
@@ -31,23 +34,26 @@
 .MCEImageBrowserDialog .ImageStorage .Viewport {
     display: table-cell;
     height:100%;
-    max-height:100%;
-    width:100%;
+
 }
 
-.MCEImageBrowserDialog .ImageStorage .Viewport .Collection {
-    display:inline-block;
-
+.MCEImageBrowserDialog .ImageStorage .Collection  {
+    overflow-y:scroll;
+    width:100%;
+    height:100%;
 }
 
 .MCEImageBrowserDialog .ImageStorage .Collection .Element {
     display: inline-block;
-    margin: 10px;
-    padding: 2px;
-    border-radius: 4px 4px 4px 4px;
+    margin-top: 0.5em;
+    margin-left:0.5em;
+    margin-right:0.3em;
+    margin-bottom:0.2em;
+
     box-sizing: border-box;
-    border: 1px solid transparent;
+
     position: relative;
+    vertical-align: top;
 }
 
 .MCEImageBrowserDialog .ImageStorage .Collection .Element IMG {
@@ -96,6 +102,7 @@
 .ImageDimensionComponent .preview {
     display: inline-block;
     vertical-align: top;
+    margin-right:0.5em;
 }
 
 .ImageDimensionComponent .dimension {

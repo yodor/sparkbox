@@ -212,7 +212,6 @@ class Paginator
     {
         $filter = new SQLSelect();
         $filter->from = "";
-        $filter->fields = "";
 
         $order_field = NULL;
         $order_direction = $this->default_order_direction;
@@ -266,7 +265,6 @@ class Paginator
     {
         $filter = new SQLSelect();
         $filter->from = "";
-        $filter->fields = "";
 
         $page = $this->page;
         $ipp = $this->ipp;

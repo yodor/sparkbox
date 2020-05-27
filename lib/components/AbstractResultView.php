@@ -37,7 +37,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         parent::__construct();
 
         $this->iterator = $itr;
-        $this->columns = array();
+
         $this->paginator = new Paginator();
         $this->paginator_top = new PaginatorTopComponent($this->paginator);
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);

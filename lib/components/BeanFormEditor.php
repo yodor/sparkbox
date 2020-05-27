@@ -149,15 +149,13 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     public function processInput()
     {
-        //        debug("Processing AjaxHandlers ...");
-        //
-        //        RequestController::processJSONResponders();
 
         //will process external editID only if editID is not set
         if ($this->editID < 1 && isset($_GET["editID"])) {
-            $this->setEditID((int)$_GET["editID"]);
 
+            $this->setEditID((int)$_GET["editID"]);
             debug("Using editID='{$this->editID}' from _GET ");
+
         }
 
         try {
@@ -180,39 +178,25 @@ class BeanFormEditor extends Container implements IBeanEditor
                 debug("Processing bean");
                 $this->transactor->processBean();
 
+                debug("Process status is successful");
+
                 //reload after adding item?
                 if ($this->editID < 1) {
-                    Session::SetAlert($this->item_added_message);
+
+                    debug("Navigating to the edit page");
+
+                    Session::SetAlert(tr($this->item_added_message));
+                    $lastID = $this->transactor->getLastID();
+                    $url = new URLBuilder();
+                    $url->buildFrom(SparkPage::Instance()->getPageURL());
+                    $url->addParameter(new URLParameter("editID", $lastID));
+                    header("Location: ".$url->url());
+                    exit;
+
                 }
                 else {
-                    Session::SetAlert($this->item_updated_message);
+                    Session::SetAlert(tr($this->item_updated_message));
                 }
-
-                if ($this->reload_request === TRUE) {
-                    // 			  Session::set("replace_history", 1);
-                    debug("Finished processing - redirect following");
-
-                    //TODO: remove reload requirement here? session upload files might transact to dbrows changing UID of storage objects
-                    if ($this->reload_url) {
-                        header("Location: " . $this->reload_url);
-                    }
-                    else {
-                        $page = SparkPage::Instance();
-
-                        $back_action = $page->getActions()->getByAction("Back");
-
-                        if ($back_action instanceof Action) {
-                            header("Location: " . $back_action->getURLBuilder()->url());
-                        }
-                        else {
-                            header("Location: " . $_SERVER["REQUEST_URI"]);
-                        }
-                    }
-
-                    exit;
-                }
-
-                debug("Process status is successful");
 
             }
             else if ($process_status === IFormProcessor::STATUS_ERROR) {
@@ -225,10 +209,7 @@ class BeanFormEditor extends Container implements IBeanEditor
             debug("Exception received: " . $e->getMessage());
             Session::SetAlert($e->getMessage());
             $this->error = $e->getMessage();
-
         }
-
-        debug("Finished");
 
     }
 

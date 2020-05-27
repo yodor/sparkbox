@@ -2,7 +2,7 @@
 include_once("components/renderers/cells/TableCellRenderer.php");
 include_once("components/TableColumn.php");
 
-class BooleanFieldCellRenderer extends TableCellRenderer
+class BooleanCellRenderer extends TableCellRenderer
 {
 
     protected $true_value = "Enabled";

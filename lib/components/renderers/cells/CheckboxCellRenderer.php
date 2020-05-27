@@ -1,7 +1,7 @@
 <?php
 include_once("components/renderers/cells/TableCellRenderer.php");
 
-class CheckboxFieldCellRenderer extends TableCellRenderer
+class CheckboxCellRenderer extends TableCellRenderer
 {
     protected $field = "";
 

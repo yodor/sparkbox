@@ -45,13 +45,13 @@ class ConfigBean extends DBTableBean
         $key = DBConnections::Get()->escape($key);
 
         $sel = new SQLSelect();
-        $sel->fields = "config_val";
+        $sel->fields()->set("config_val");
         $sel->from = $this->table;
-        $sel->where = "config_key='$key'";
+        $sel->where()->add("config_key", "'$key'");
         $sel->limit = " 1 ";
 
         if ($this->section) {
-            $sel->where .= " AND section='{$this->section}' ";
+            $sel->where()->add("section", "'{$this->section}'");
         }
 
         $qry = new SQLQuery($sel);

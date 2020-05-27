@@ -9,20 +9,17 @@ class BeanTranslationDialog extends JSONDialog {
         this.language_alert = "Please select translation language";
 
         this.translator_editor = null;
-        this.original_editor = null;
 
         this.req.setResponder("bean_translator");
 
     }
 
     buttonAction(action) {
-        if (action=="Translate"){
+        if (action == "Translate") {
             this.store();
-        }
-        else if (action == "Clear") {
+        } else if (action == "Clear") {
             this.clear();
-        }
-        else if (action == "Close") {
+        } else if (action == "Close") {
             this.remove();
         }
     }
@@ -74,42 +71,48 @@ class BeanTranslationDialog extends JSONDialog {
 
         //console.log("Source Content: " + source_content);
 
-        this.modal_pane.popup.find("[name='original_text']").val(source_content);
-        this.modal_pane.popup.find("[name='translation']").val("");
+        let area_original = this.modal_pane.popup.find("[name='original_text']");
+        let area_translation = this.modal_pane.popup.find("[name='translation']");
+
+        area_original.val(source_content);
+        area_translation.val("");
 
         if (is_mce) {
 
-            var mce = new MCETextArea();
-            mce.setClass("TEXTAREA");
+            let mce = new MCETextArea();
+            mce.setClass(this.visibleSelector() + " TEXTAREA");
             mce.setName("original_text");
             mce.initialize();
 
             mce.onEditorInit = function (editor) {
 
                 editor.setMode('readonly');
-                instance.original_editor = editor;
+                this.modal_pane.centerContents();
 
-            };
+            }.bind(this);
 
             this.modal_pane.popup.find(".cell.original_text").removeClass("InputField");
 
-            var mce1 = new MCETextArea();
-            mce1.setClass("TEXTAREA");
+            let mce1 = new MCETextArea();
+            mce1.setClass(this.visibleSelector() + " TEXTAREA");
             mce1.setName("translation");
             mce1.initialize();
 
             mce1.onEditorInit = function (editor) {
 
-                instance.translator_editor = editor;
-                console.log("Translator init done: " + editor.id);
+                this.translator_editor = editor;
 
-                editor.getBody().setAttribute('contenteditable', false);
+                editor.setMode('readonly');
 
-                editor.setContent("");
-            };
+                this.modal_pane.centerContents();
+
+            }.bind(this);
 
             this.modal_pane.popup.find(".cell.translation").removeClass("InputField");
 
+        } else {
+            //
+            console.log("Not mce");
         }
 
     }
@@ -120,15 +123,22 @@ class BeanTranslationDialog extends JSONDialog {
 
         if (funct == "store") {
             showAlert(message);
-        }
-        else if (funct == "fetch") {
+        } else if (funct == "fetch") {
             if (!jsonResult.translation) showAlert(message);
-            if (this.translator_editor) this.translator_editor.getBody().setAttribute('contenteditable', true);
+
+            if (this.translator_editor) {
+                this.translator_editor.setMode('design');
+                this.translator_editor.setContent(jsonResult.translation);
+            }
+
             this.modal_pane.popup.find("[name='translation']").val(jsonResult.translation);
-        }
-        else if (funct == "clear") {
-            this.modal_pane.popup.find("[name='translation']").val("");
+
+        } else if (funct == "clear") {
+
             if (this.translator_editor) this.translator_editor.setContent("");
+
+            this.modal_pane.popup.find("[name='translation']").val("");
+
             showAlert(message);
         }
     }
@@ -147,7 +157,6 @@ class BeanTranslationDialog extends JSONDialog {
 
         this.req.start();
     }
-
 
 
     fetch() {
@@ -176,28 +185,30 @@ class BeanTranslationDialog extends JSONDialog {
     }
 
 
-    remove() {
-        var popup = this.modal_pane.popup;
-
-        if (this.original_editor) {
-            this.original_editor.remove();
-            this.original_editor.destroy();
-            this.original_editor = null;
-
-            popup.find("[name='original_text']").data("mce_init_done", 0);
-        }
-
-        if (this.translator_editor) {
-            this.translator_editor.remove();
-            this.translator_editor.destroy();
-            this.translator_editor = null;
-            popup.find("[name='translation']").data("mce_init_done", 0);
-        }
-
-        popup.find("[name='langID']").val("");
-
-        super.remove()
-    }
+    // remove() {
+    //     var popup = this.modal_pane.popup;
+    //
+    //     // Remove all editors
+    //
+    //     if (this.original_editor) {
+    //         this.original_editor.remove();
+    //         this.original_editor.destroy();
+    //         this.original_editor = null;
+    //
+    //         popup.find("[name='original_text']").data("mce_init_done", 0);
+    //     }
+    //
+    //     if (this.translator_editor) {
+    //         this.translator_editor.remove();
+    //         this.translator_editor.destroy();
+    //         this.translator_editor = null;
+    //         popup.find("[name='translation']").data("mce_init_done", 0);
+    //     }
+    //
+    //     popup.find("[name='langID']").val("");
+    //
+    //     super.remove()
+    // }
 
 
 }

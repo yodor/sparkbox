@@ -38,7 +38,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     public function __construct()
     {
         parent::__construct();
-        $this->setClassName("TreeView");
+        $this->setComponentClass("TreeView");
     }
 
     public function requiredStyle()

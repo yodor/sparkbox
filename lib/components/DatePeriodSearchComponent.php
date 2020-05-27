@@ -1,111 +1,111 @@
 <?php
 include_once("components/Component.php");
 include_once("input/renderers/DateField.php");
-include_once("components/InputRowComponent.php");
-include_once("utils/SQLSelect.php");
+include_once("components/InputComponent.php");
+include_once("sql/SQLSelect.php");
 
-class DatePeriodSearchComponent extends Component
-{
-
-    protected $pstart = NULL;
-    protected $pend = NULL;
-
-    public $formadd = "";
+class DatePeriodForm extends InputForm {
 
     public function __construct()
     {
         parent::__construct();
+        $this->addInput(DataInputFactory::Create(DataInputFactory::DATE, "period_start", "Period Start", 0));
+        $this->addInput(DataInputFactory::Create(DataInputFactory::DATE, "period_end", "Period End", 0));
 
-        if (isset($_GET["clear_filter"])) {
+    }
+    public function prepareClauseCollection(string $oper = " AND ", string $field=""): ClauseCollection
+    {
+        $where = new ClauseCollection();
+        $psd = $this->getInput("period_start")->getValue();
+        $ped = $this->getInput("period_end")->getValue();
 
-            unset($_GET["period_start_day"]);
-            unset($_GET["period_start_month"]);
-            unset($_GET["period_start_year"]);
-            unset($_GET["period_start"]);
-            unset($_GET["period_end_day"]);
-            unset($_GET["period_end_month"]);
-            unset($_GET["period_end_year"]);
-            unset($_GET["period_end"]);
-            unset($_GET["clear_filter"]);
+        if (strlen($psd) > 0) {
 
-            $qry = queryString($_GET);
-            header("Location: " . $_SERVER["PHP_SELF"] . "$qry");
+            $where->add($value,  "timestamp('$psd 00:00:00')", ">=");
+
+        }
+        if (strlen($ped) > 0) {
+
+            $where->add($value, "timestamp('$ped 23:59:59')", "<=");
+
+        }
+
+    }
+
+}
+class DatePeriodSearchComponent extends FormRenderer implements IQueryFilter, IRequestProcessor
+{
+    protected $processed = false;
+
+
+    //TODO: finish refactoring
+    public function __construct()
+    {
+
+        $this->form = new InputForm();
+
+
+
+        parent::__construct($this->form);
+
+
+        $this->getSubmitLine()->clear();
+
+        $filter_button = new ColorButton();
+        $filter_button->setType(ColorButton::TYPE_SUBMIT);
+        $filter_button->setContents("Filter Dates");
+        $filter_button->setName("filter");
+        $filter_button->setValue("dates");
+        $this->getSubmitLine()->append($filter_button);
+
+        $clear_button = new ColorButton();
+        $clear_button->setType(ColorButton::TYPE_SUBMIT);
+        $clear_button->setContents("Clear Filter");
+        $clear_button->setName("filter");
+        $clear_button->setValue("clear");
+        $this->getSubmitLine()->append($clear_button);
+
+
+
+    }
+
+    public function processInput()
+    {
+        if (strcmp_isset("filter", "clear")) {
+
+            $url = new URLBuilder();
+            $url->buildFrom(SparkPage::Instance()->getPageURL());
+
+            $this->form->clearURLParameters($url);
+
+            header("Location: ".$url->url());
 
             exit;
 
         }
-
-        $this->pstart = new DataInput("period_start", "Period Start", 0);
-        $this->pstart->setRenderer(new DateField());
-        $this->pstart->processPost($_GET);
-        $this->pstart->validate();
-
-        $this->pend = new DataInput("period_end", "Period End", 0);
-        $this->pend->setRenderer(new DateField());
-        $this->pend->processPost($_GET);
-        $this->pend->validate();
-
-    }
-
-    public function startRender()
-    {
-        echo "<form method=get >";
-        echo "<table>";
-    }
-
-    public function finishRender()
-    {
-        echo "</table>";
-        echo $this->formadd;
-        echo "</form>";
-    }
-
-    public function getPeriodStartField()
-    {
-        return $this->pstart;
-    }
-
-    public function getPeriodEndField()
-    {
-        return $this->pend;
-    }
-
-    public function renderImpl()
-    {
-
-        $ir = new InputRowComponent($this->pstart, InputRowComponent::VERTICAL);
-        $ir->render();
-
-        $ir = new InputRowComponent($this->pend, InputRowComponent::VERTICAL);
-        $ir->render();
-
-        echo "<tr><td>";
-        ColorButton::RenderSubmit("Clear Filter", "clear_filter");
-        ColorButton::RenderSubmit("Filter Dates", "filter_dates");
-        echo "</td></tr>";
-
-    }
-
-    public function processSelectQuery(SQLSelect $sqry, $date_field_name = "item_date")
-    {
-        $psd = $this->pstart->getValue();
-        $ped = $this->pend->getValue();
-
-        if (strlen($psd) > 0) {
-
-            $psq = new SQLSelect();
-            $psq->fields = "";
-            $psq->where = " $date_field_name >= timestamp('$psd 00:00:00') ";
-            $sqry = $sqry->combineWith($psq);
-
+        else if (strcmp_isset("filter", "dates")) {
+            $this->form->loadPostData($_GET);
+            $this->form->validate();
+            $this->processed = TRUE;
         }
-        if (strlen($ped) > 0) {
-            $peq = new SQLSelect();
-            $peq->fields = "";
-            $peq->where = " $date_field_name <= timestamp('$ped 23:59:59') ";
-            $sqry = $sqry->combineWith($peq);
-        }
-        return $sqry;
+
     }
 
+
+    public function getForm() : InputForm
+    {
+        return $this->form;
+    }
+
+    public function isProcessed(): bool
+    {
+        return $this->processed;
+
+    }
+
+    public function filterSelect($source = NULL, $value = NULL)
+    {
+
+
+    }
 }

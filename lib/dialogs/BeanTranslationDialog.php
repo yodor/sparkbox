@@ -24,9 +24,10 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         include_once("beans/LanguagesBean.php");
         $lb = new LanguagesBean();
 
-        $lb->select()->where = " langID>1 ";
-
-        $renderer->setIterator($lb->query());
+        $lb->select()->where()->add("langID", 1 ,">");
+        $qry = $lb->query();
+        $qry->select->fields()->set("langID", "language");
+        $renderer->setIterator($qry);
         $renderer->getItemRenderer()->setValueKey("langID");
         $renderer->getItemRenderer()->setLabelKey("language");
 
@@ -61,7 +62,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     {
 
         $container = new Container();
-        $container->setClassName("ButtonGroup");
+        $container->addClassName("ButtonGroup");
 
         $btn_translate = new ColorButton();
         $btn_translate->setContents("Translate");
@@ -109,7 +110,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                var bean_translator = new BeanTranslationDialog();
+                let bean_translator = new BeanTranslationDialog();
                 bean_translator.initialize();
 
                 $("BODY").find("[action='TranslateBeanField']").each(function (index) {
@@ -118,7 +119,11 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
                     console.log("is_mce=" + is_mce);
 
                     $(this).click(function (event) {
-
+                        let editID = $(".BeanFormEditor").first().attr("editID");
+                        if (editID<1) {
+                            showAlert("<?php echo tr("Please submit the form to enable translation");?>");
+                            return;
+                        }
                         bean_translator.show($(this).attr("field"), is_mce);
 
                     });

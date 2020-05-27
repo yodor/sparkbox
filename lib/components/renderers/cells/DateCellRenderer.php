@@ -1,7 +1,7 @@
 <?php
 include_once("components/renderers/cells/TableCellRenderer.php");
 
-class DateFieldCellRenderer extends TableCellRenderer
+class DateCellRenderer extends TableCellRenderer
 {
 
     protected $format = "j, F Y";

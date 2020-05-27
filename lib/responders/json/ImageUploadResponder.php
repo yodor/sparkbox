@@ -84,9 +84,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
         $item->id = $object->id;
 
         echo "<div class='Element' tooltip='$filename' itemID='$itemID' itemClass='$itemClass'>";
-        echo "<a target='_itemGallery' href='{$item->hrefFull()}'>";
         echo "<img class='thumbnail' src='$image_data'>";
-        echo "</a>";
         echo "<span class='remove_button' action='Remove'>X</span>";
         echo "<input type=hidden name='uid_{$field_name}[]' value='$uid' >";
         echo "</div>";

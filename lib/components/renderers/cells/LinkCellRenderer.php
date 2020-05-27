@@ -2,7 +2,7 @@
 include_once("components/renderers/cells/TableCellRenderer.php");
 include_once("components/Action.php");
 
-class LinkTableCellRenderer extends TableCellRenderer
+class LinkCellRenderer extends TableCellRenderer
 {
 
     protected $action;

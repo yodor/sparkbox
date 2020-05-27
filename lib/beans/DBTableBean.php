@@ -1,7 +1,9 @@
 <?php
 include_once("dbdriver/DBDriver.php");
 include_once("iterators/SQLQuery.php");
-include_once("utils/SQLSelect.php");
+include_once("sql/SQLSelect.php");
+include_once("sql/SQLUpdate.php");
+include_once("sql/SQLDelete.php");
 
 abstract class DBTableBean
 {
@@ -57,7 +59,7 @@ abstract class DBTableBean
         }
 
         $this->select = new SQLSelect();
-        $this->select->fields = " * ";
+
         $this->select->from = $this->table;
 
     }
@@ -155,6 +157,10 @@ abstract class DBTableBean
         return $this->storage_types;
     }
 
+    /**
+     * Return the current SQLSelect that is used from the query functions
+     * @return SQLSelect
+     */
     public function select(): SQLSelect
     {
         return $this->select;
@@ -163,7 +169,7 @@ abstract class DBTableBean
     public function getCount(): int
     {
         $qry = $this->query();
-        $qry->select->fields = " {$this->prkey} ";
+        $qry->select->fields()->set($this->prkey);
         return $qry->exec();
     }
 
@@ -177,26 +183,54 @@ abstract class DBTableBean
         return $this->queryField($this->prkey, $id, 1);
     }
 
-    public function queryField(string $field, string $value, int $limit = 0, string $sign = " = "): SQLQuery
+    /**
+     * Create query that select all columns of this bean and using empty where clause
+     * @return SQLQuery
+     */
+    public function queryFull() : SQLQuery
+    {
+        $qry = $this->query();
+
+        foreach ($this->fields as $idx => $value) {
+            $qry->select->fields()->set($value);
+        }
+
+        return $qry;
+    }
+
+    /**
+     * Create query that select this bean primary key and field '$field'
+     * Sets to where clause to match only '$field' with value '$value' using operator '$sign'
+     * Sets the limit of the query select to $limit
+     * @param string $field
+     * @param string $value
+     * @param int $limit
+     * @param string $sign
+     * @return SQLQuery
+     */
+    public function queryField(string $field, string $value, int $limit = 0, string $sign = SQLClause::DEFAULT_OPERATOR): SQLQuery
     {
         $field = $this->db->escape($field);
         $value = $this->db->escape($value);
 
         $qry = $this->query();
-        $qry->select->where = " $field $sign '$value' ";
+        $qry->select->fields()->set($this->prkey);
+        $qry->select->fields()->set($field);
+        $qry->select->where()->add($field, "'$value'", $sign);
         if ($limit > 0) {
             $qry->select->limit = " $limit ";
         }
+
         return $qry;
     }
 
     /**
-     * Clone this select and return as SQLQuery
+     * Clone the current SQLSelect and return new SQLQuery using it
      * @return SQLQuery
      */
     public function query(): SQLQuery
     {
-        $qry = new SQLQuery(clone $this->select(), $this->prkey, $this->getTableName());
+        $qry = new SQLQuery(clone $this->select, $this->prkey, $this->getTableName());
         $qry->setDB($this->db);
         $qry->setBean($this);
         return $qry;
@@ -212,10 +246,11 @@ abstract class DBTableBean
     public function fieldValues(int $id, array $field_names): ?array
     {
         $qry = $this->queryField($this->prkey, $id, 1);
+        $qry->select->fields()->set($this->prkey);
         foreach ($field_names as $idx => $value) {
-            $field_names[$idx] = "`" . $this->db->escape($value) . "`";
+            $qry->select->fields()->set("`" . $this->db->escape($value) . "`");
         }
-        $qry->select->fields = " {$this->prkey}, " . implode(",", $field_names);
+
         $qry->exec();
         if ($row = $qry->next()) {
             return $row;
@@ -228,7 +263,7 @@ abstract class DBTableBean
         $field = $this->db->escape($field);
 
         $qry = $this->queryField($this->prkey, $id, 1);
-        $qry->select->fields = " {$this->prkey}, `$field` ";
+        $qry->select->fields()->set($this->prkey, "`$field`");
         $qry->exec();
         if ($row = $qry->next()) {
             return $row[$field];
@@ -246,14 +281,16 @@ abstract class DBTableBean
     {
         $qry = $this->queryID($id);
 
-        if (count($fields) == 0) {
-            $fields[] = " * ";
+        if (count($fields)>0) {
+            foreach ($fields as $idx => $val) {
+                $qry->select->fields()->set($val);
+            }
         }
         else {
-            $fields[] = $this->prkey;
+            foreach ($this->fields as $idx => $value) {
+                $qry->select->fields()->set($value);
+            }
         }
-
-        $qry->select->fields = implode(",", $fields);
 
         $num = $qry->exec();
         if ($num < 1) throw new Exception("No such ID");
@@ -273,14 +310,16 @@ abstract class DBTableBean
 
         $qry = $this->queryField($refKey, $refID, 1);
 
-        if (count($fields) == 0) {
-            $fields[] = " * ";
+        if (count($fields)>0) {
+            foreach ($fields as $idx => $val) {
+                $qry->select->fields()->set($val);
+            }
         }
         else {
-            $fields[] = $this->prkey;
+            foreach ($this->fields as $idx => $value) {
+                $qry->select->fields()->set($value);
+            }
         }
-
-        $qry->select->fields = implode(",", $fields);
 
         $num = $qry->exec();
         if ($num < 1) throw new Exception("No such ID");
@@ -321,7 +360,7 @@ abstract class DBTableBean
             $code($db);
 
             $affectedRows = $db->affectedRows();
-            debug("Closure Affected Rows: ".$affectedRows);
+            debug("Closure Affected Rows: " . $affectedRows);
 
             debug("Closure function executed");
 
@@ -336,14 +375,13 @@ abstract class DBTableBean
         catch (Exception $ex) {
 
             if ($use_transaction) {
-                debug("Rolling back DB transaction - Exception: " . $ex->getMessage()." - DBError: ".$db->getError());
+                debug("Rolling back DB transaction - Exception: " . $ex->getMessage() . " - DBError: " . $db->getError());
                 $this->error = $db->getError();
                 $db->rollback();
             }
 
             throw $ex;
         }
-
 
     }
 
@@ -359,10 +397,9 @@ abstract class DBTableBean
 
             debug("Going to delete ID: $id");
 
-            $sql = "DELETE FROM {$this->table} WHERE {$this->prkey}='$id'";
-            if ($this->select->where) {
-                $sql .= " AND {$this->select->where}";
-            }
+            $delete = new SQLDelete($this->select);
+            $delete->where()->add($this->prkey, $id);
+            $sql = $delete->getSQL();
 
             debug("Executing SQL: $sql");
 
@@ -388,12 +425,15 @@ abstract class DBTableBean
 
         $code = function (DBDriver $db) use ($refkey, $refval, $keep_ids) {
 
-            $sql = "DELETE FROM {$this->table} WHERE $refkey='$refval'";
+            $delete = new SQLDelete($this->select);
+            $delete->where()->add($refkey, "'$refval'");
 
             if (count($keep_ids) > 0) {
                 $keep_list_ids = implode(",", $keep_ids);
-                $sql .= " AND ({$this->prkey} NOT IN ($keep_list_ids)) ";
+                $delete->where()->add($this->prkey, "($keep_list_ids)", " NOT IN ", " AND ");
             }
+
+            $sql = $delete->getSQL();
 
             debug("Executing SQL: $sql");
 
@@ -417,8 +457,8 @@ abstract class DBTableBean
             $this->db->transaction();
 
             $update = new SQLUpdate($this->select);
-            $update->set[$field]=" NOT $field ";
-            $update->where = " {$this->prkey} = $id ";
+            $update->set($field, " NOT $field ");
+            $update->where()->add($this->prkey, $id);
 
             if (!$this->db->query($update->getSQL())) throw new Exception("toggleField DB Error: " . $this->db->getError());
 
@@ -442,10 +482,10 @@ abstract class DBTableBean
         // 	  if (strpos($storage_type, "bool")!==false) {
         // 		return true;
         // 	  }
-        if ($this->isNumeric($key))return FALSE;
+        if ($this->isNumeric($key)) return FALSE;
 
         if (strpos($storage_type, "date") !== FALSE || strpos($storage_type, "timestamp") !== FALSE) {
-            return FALSE;
+            return TRUE;
             //if (endsWith($value, "()")) return FALSE;
             //return TRUE;
         }
@@ -473,7 +513,7 @@ abstract class DBTableBean
 
         $this->prepareInsertValues($row, $values);
 
-        $code = function(DBDriver $db) use(&$values, &$insertID) {
+        $code = function (DBDriver $db) use (&$values, &$insertID) {
 
             $sql = "INSERT INTO {$this->table} (" . implode(",", array_keys($values)) . ") VALUES (" . implode(",", $values) . ")";
 
@@ -481,7 +521,10 @@ abstract class DBTableBean
                 debug(get_class($this) . " INSERT SQL: $sql");
             }
 
-            if (!$db->query($sql)) throw new Exception("Unable to insert");
+            if (!$db->query($sql)) {
+                debug("Unable to insert: ".$db->getError()." SQL: ".$sql);
+                throw new Exception("Unable to insert: ".$db->getError());
+            }
 
             //NOTE!!! lastID return the first auto_increment of a multi insert transaction
             $insertID = $db->lastID();
@@ -507,18 +550,18 @@ abstract class DBTableBean
         $values = array();
         $this->prepareUpdateValues($row, $values);
 
-        $code = function(DBDriver $db) use($id, &$values) {
+        $code = function (DBDriver $db) use ($id, &$values) {
 
             $update = new SQLUpdate($this->select);
-            foreach ($values as $key=>$value) {
-                $update->set[$key] = $value;
+            foreach ($values as $key => $value) {
+                $update->set($key, $value);
             }
-            $update->appendWhere("{$this->prkey} = $id");
+            $update->where()->add($this->prkey, $id);
 
-            debug("UPDATE executing sql: ".$update->getSQL());
+            debug("UPDATE executing sql: " . $update->getSQL());
 
             if (!$db->query($update->getSQL())) {
-                throw new Exception("Unable to update: ".$db->getError());
+                throw new Exception("Unable to update: " . $db->getError());
             }
 
             $this->manageCache($id);
@@ -584,11 +627,11 @@ abstract class DBTableBean
 
             }
 
-//            if ($for_update === TRUE) {
-//
-//                $values[$key] = "$key=" . $values[$key];//already quoted
-//
-//            }
+            //            if ($for_update === TRUE) {
+            //
+            //                $values[$key] = "$key=" . $values[$key];//already quoted
+            //
+            //            }
         }
 
     }

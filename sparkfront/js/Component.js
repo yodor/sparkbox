@@ -72,10 +72,6 @@ class Component extends SparkObject
         return $(this.selector());
     }
 
-    /**
-     * Attach with DOM element having attribute
-     * @param value {string}
-     */
     initialize() {
 
         if ($(this.selector()).get(0)) {

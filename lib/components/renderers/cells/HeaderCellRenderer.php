@@ -1,7 +1,7 @@
 <?php
 include_once("components/renderers/cells/TableCellRenderer.php");
 
-class TableHeaderCellRenderer extends TableCellRenderer
+class HeaderCellRenderer extends TableCellRenderer
 {
 
     protected $tagName = "TH";

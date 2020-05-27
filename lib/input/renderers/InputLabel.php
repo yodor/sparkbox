@@ -5,9 +5,11 @@ include_once("input/renderers/IErrorRenderer.php");
 class InputLabel extends Component implements IErrorRenderer
 {
 
+    protected $tagName = "LABEL";
+
     protected $input = NULL;
 
-    public $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
+    protected $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
 
     public function __construct(DataInput $input)
     {
@@ -39,7 +41,7 @@ class InputLabel extends Component implements IErrorRenderer
         $this->processErrorAttributes();
 
         parent::startRender();
-        echo "<label>";
+
     }
 
     public function renderImpl()
@@ -60,10 +62,15 @@ class InputLabel extends Component implements IErrorRenderer
 
     }
 
-    public function finishRender()
+
+    public function setErrorRenderMode(int $mode)
     {
-        echo "</label>";
-        parent::finishRender();
+        $this->error_render_mode = $mode;
+    }
+
+    public function getErrorRenderMode(): int
+    {
+        return $this->error_render_mode;
     }
 
 }

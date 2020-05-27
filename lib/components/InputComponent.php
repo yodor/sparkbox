@@ -85,17 +85,11 @@ class InputComponent extends Component
         $field = $this->input;
         $field_name = $field->getName();
 
-        if (TRANSLATOR_ENABLED && $field->translatorEnabled() && $field->getForm()) {
-            $form = $field->getForm();
-            $editID = $form->getEditID();
+        if (TRANSLATOR_ENABLED && $field->translatorEnabled()) {
 
-            if ($editID > 0 && $form->getBean()) {
-
-                echo "<a class='Action' action='TranslateBeanField' field='$field_name'>";
-                echo tr("Translate");
-                echo "</a>";
-
-            }
+            echo "<a class='Action' action='TranslateBeanField' field='$field_name'>";
+            echo tr("Translate");
+            echo "</a>";
 
         }
 

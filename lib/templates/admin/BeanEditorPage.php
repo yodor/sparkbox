@@ -8,6 +8,9 @@ include_once("templates/admin/AdminPageTemplate.php");
 class BeanEditorPage extends AdminPageTemplate
 {
 
+    /**
+     * @var InputForm
+     */
     protected $form;
 
     public function __construct()
@@ -51,7 +54,7 @@ class BeanEditorPage extends AdminPageTemplate
         $view = new BeanFormEditor($this->bean, $this->form);
 
         if ($this->request_condition instanceof BeanKeyCondition) {
-            $this->bean->select()->where = $this->request_condition->getURLParameter()->text(TRUE);
+            $this->bean->select()->where()->addURLParameter($this->request_condition->getURLParameter());
             $view->getTransactor()->appendURLParameter($this->request_condition->getURLParameter());
         }
 

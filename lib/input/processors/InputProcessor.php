@@ -393,7 +393,8 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 debug("Querying transact bean values by $item_key = $editID");
 
                 $source_values = array();
-                $qry = $this->transact_bean->queryField($item_key, $editID);
+                $qry = $this->transact_bean->queryFull();
+                $qry->select->where()->add($item_key, $editID);
                 $qry->exec();
 
                 while ($row = $qry->next()) {
@@ -494,6 +495,11 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             $this->input->clear();
         }
 
+    }
+
+    public function clearURLParameters(URLBuilder $url)
+    {
+        $url->removeParameter($this->input->getName());
     }
 
 }

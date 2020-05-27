@@ -1,36 +1,58 @@
 <?php
-include_once("utils/SQLStatement.php");
+include_once("sql/SQLStatement.php");
+include_once("sql/ColumnCollection.php");
 
 class SQLSelect extends SQLStatement
 {
 
     //TODO
-    public $fieldset = array();
+    protected $fieldset;
 
     public function __construct()
     {
-        $this->type = "SELECT ";
+        parent::__construct();
+        $this->type = "SELECT";
+        $this->fieldset = new ColumnCollection();
+    }
+
+    public function fields(): ColumnCollection
+    {
+        return $this->fieldset;
     }
 
     public function getSQL($where_only = FALSE, $add_calc = TRUE)
     {
+        if ( ($this->fieldset->count()<1) && (!$where_only)) {
+
+            throw new Exception("Empty fieldset");
+        }
+
         $sql = "";
 
         if ($where_only) {
             //
         }
         else {
+            $sql .= $this->type." ";
+
             if ($add_calc) {
-                $sql .= $this->type . " SQL_CALC_FOUND_ROWS {$this->fields} FROM {$this->from} ";
+                $sql .= " SQL_CALC_FOUND_ROWS ";
+
             }
-            else {
-                $sql .= $this->type . "  {$this->fields} FROM {$this->from} ";
+
+            //prefer fields from the fieldset
+            if ($this->fieldset->count() > 0) {
+                $sql .= $this->fieldset->getSQL();
             }
+
+            $sql .= " FROM {$this->from} ";
+
         }
 
-        if (strlen(trim($this->where)) > 0) {
-            $sql .= " WHERE " . $this->where . " ";
+        if ($this->whereset->count()>0) {
+            $sql.=$this->whereset->getSQL(true);
         }
+
         if (strlen(trim($this->group_by)) > 0) {
             $sql .= " GROUP BY " . $this->group_by . " ";
         }
@@ -50,13 +72,8 @@ class SQLSelect extends SQLStatement
     public function combine(SQLSelect $other)
     {
 
-        if (strlen(trim($other->fields)) > 0) {
-
-            if (strlen($this->fields) > 0) {
-                $this->fields .= " , ";
-            }
-            $this->fields .= $other->fields;
-
+        if ($other->fields()->count() > 0) {
+            $other->fields()->copyTo($this->fieldset);
         }
 
         if (strlen(trim($other->from)) > 0) {
@@ -79,14 +96,7 @@ class SQLSelect extends SQLStatement
             }
         }
 
-        if (strlen(trim($this->where)) > 0) {
-            if (strlen(trim($other->where)) > 0) {
-                $this->where = $this->where . " AND " . $other->where;
-            }
-        }
-        else {
-            $this->where = $other->where;
-        }
+        $other->whereset->copyTo($this->whereset);
 
         if (strlen(trim($this->group_by)) > 0) {
             if (strlen(trim($other->group_by)) > 0) {
@@ -129,16 +139,6 @@ class SQLSelect extends SQLStatement
         return $csql;
     }
 
-    public function combineSection($section, $where)
-    {
-        //$where = " parent.parentID='$parentID' ";
-        if (strlen(trim($this->$section)) > 0) {
-            $this->$section .= " AND $where";
-        }
-        else {
-            $this->$section = $where;
-        }
-    }
 }
 
 ?>

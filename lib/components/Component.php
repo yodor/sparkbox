@@ -3,7 +3,6 @@ include_once("components/renderers/IRenderer.php");
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
 
-
 class Component implements IRenderer, IHeadContents
 {
     protected $tagName = "DIV";
@@ -11,9 +10,9 @@ class Component implements IRenderer, IHeadContents
     protected $index = -1;
 
     /**
-     * @var string Additional CSS class name of this component
+     * @var array Collection of CSS classes for this component, in addition to the automatic '$component_class'
      */
-    protected $className = "";
+    protected $classNames = array();
 
     /**
      * @var array Collection of HTML attribute name/values
@@ -36,6 +35,9 @@ class Component implements IRenderer, IHeadContents
      */
     protected $special_attributes = array("tooltip");
 
+    /**
+     * @var string Automatic css class string. Build from all the class hierarchy. Override with setComponentClass
+     */
     protected $component_class = "";
 
     protected $contents = "";
@@ -46,9 +48,12 @@ class Component implements IRenderer, IHeadContents
     public $render_tooltip = TRUE;
     public $render_enabled = TRUE;
 
+    /**
+     * Component constructor.
+     * Creates default component class by using the inheritance chain get_class
+     */
     public function __construct()
     {
-        //$this->component_class = get_class($this);
 
         $class_chain = class_parents($this);
         array_pop($class_chain);
@@ -64,6 +69,20 @@ class Component implements IRenderer, IHeadContents
             $page->addComponent($this);
         }
 
+    }
+
+    /**
+     * Override the automatic class name constructed from the inheritance chain
+     * @param string $componentClass
+     */
+    public function setComponentClass(string $componentClass)
+    {
+        $this->component_class = $componentClass;
+    }
+
+    public function getComponentClass(): string
+    {
+        return $this->component_class;
     }
 
     public function requiredStyle()
@@ -225,17 +244,37 @@ class Component implements IRenderer, IHeadContents
 
     public function getClassName()
     {
-        return $this->className;
+        return implode(" ", array_keys($this->classNames));
     }
 
-    public function setClassName(string $className)
+    /**
+     * Set the CSS class of this component, clearing any previously set class names
+     * @param string $cssClass
+     */
+    public function setClassName(string $cssClass)
     {
-        $this->className = $className;
+        $this->classNames = array();
+        $this->classNames[$cssClass] = "";
     }
 
-    public function addClassName(string $className)
+    /**
+     * Add CSS class name to this components class names
+     * @param string $cssClass
+     */
+    public function addClassName(string $cssClass)
     {
-        $this->className .= " " . $className;
+        $this->classNames[$cssClass] = "";
+    }
+
+    /**
+     * Remove CSS class specified in '$cssClass'
+     * @param string $cssClass
+     */
+    public function removeClassName(string $cssClass)
+    {
+        if (array_key_exists($cssClass, $this->classNames)) {
+            unset($this->classNames[$cssClass]);
+        }
     }
 
     public function setAttribute(string $name, string $value)
@@ -331,14 +370,14 @@ class Component implements IRenderer, IHeadContents
     {
         $attrs = "";
         //$class_names = trim($this->component_class . " " . $this->className);
-        $cssClass = "";
+        $cssClass = array();
         if (strlen($this->component_class) > 0) {
-            $cssClass .= trim($this->component_class);
+            $cssClass[] = trim($this->component_class);
         }
-        if (strlen($this->className) > 0) {
-            $cssClass .= " " . trim($this->className);
-        }
-        $attrs .= " class='$cssClass' ";
+
+        $cssClass[] = $this->getClassName();
+
+        $attrs .= " class='" . implode(" ", $cssClass) . "' ";
 
         $attrs .= $this->getAttributesText();
         $attrs .= $this->getStyleText();

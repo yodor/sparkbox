@@ -57,16 +57,16 @@
     content: attr(title) ": ";
 }
 
-.TableView .viewport .TableImageCellRenderer {
+.TableView .viewport .ImageCellRenderer {
 
 }
 
-.TableView .viewport .TableImageCellRenderer:not([title='']):before {
+.TableView .viewport .ImageCellRenderer:not([title='']):before {
     content: attr(title) ": ";
     display: block;
 }
 
-.TableView .viewport .ActionsTableCellRenderer {
+.TableView .viewport .ActionsCellRenderer {
 
     display: block;
     position: relative;
@@ -74,27 +74,27 @@
 
 }
 
-.TableView .viewport .ActionsTableCellRenderer .actions_list {
+.TableView .viewport .ActionsCellRenderer .actions_list {
     text-align: right;
 }
 
-.TableView .viewport .ActionsTableCellRenderer .actions_list .Action {
+.TableView .viewport .ActionsCellRenderer .actions_list .Action {
     display: inline-block;
 
 }
 
-.TableView .viewport .ActionsTableCellRenderer .actions_list .Action[action*='Separator'] {
+.TableView .viewport .ActionsCellRenderer .actions_list .Action[action*='Separator'] {
     color: #cccccc;
     font-weight: bold;
     padding-left: 2px;
     padding-right: 3px;
 }
 
-.TableView .viewport .ActionsTableCellRenderer .actions_list .Action[action='RowSeparator'] {
+.TableView .viewport .ActionsCellRenderer .actions_list .Action[action='RowSeparator'] {
     display: block;
 }
 
-.TableView .viewport .ActionsTableCellRenderer:not([title='']):before {
+.TableView .viewport .ActionsCellRenderer:not([title='']):before {
     content: attr(title) ": ";
     display: block;
     text-align: center;

@@ -19,7 +19,7 @@ CREATE TABLE `site_texts` (
         parent::__construct("site_texts");
     }
 
-    public function id4phrase(string $str)
+    public function id4phrase(string $str) : int
     {
         $textID = -1;
 
@@ -28,35 +28,23 @@ CREATE TABLE `site_texts` (
         $strdb = $this->db->escape($str);
 
         $qry = $this->query();
-        $qry->select->where = " hash_value = md5('$strdb') ";
+        $qry->select->fields()->set("textID");
+        $qry->select->where()->add("hash_value", "'".md5($strdb)."'");
         $qry->select->limit = " 1 ";
-        $num = $qry->exec();
 
-        // 		debug("SiteTextsBean::id4phrase: $str | is_found: $num");
+        if ($qry->exec() && $data = $qry->next()) {
 
-        if ($num > 0) {
-
-            if ($strow = $qry->next()) {
-                $textID = (int)$strow["textID"];
-            }
-            else {
-                throw new Exception("Could not fetch text for translation: " . $qry->getDB()->getError());
-            }
+            $textID = (int)$data["textID"];
         }
         else {
-            //can not find translatable phrase. insert into table to allow translation from cms
+            debug("Phrase hash not found in DB");
 
-            $strow["hash_value"] = md5($str);
-            $strow["value"] = $strdb;
+            $data = array();
+            $data["hash_value"] = md5($strdb);
+            $data["value"] = $strdb;
 
-            $textID = $this->insert($strow);
+            $textID = $this->insert($data);
 
-            if ($textID < 1) {
-                // 			  debug("SiteTextsBean::id4phrase: $str | DBVALUE: $strdb | HASH: ".$strow["hash_value"]);
-                // 			  debug("SiteTextsBean::id4phrase: insert error: ".$this->getError());
-            }
-
-            //
         }
 
         return $textID;

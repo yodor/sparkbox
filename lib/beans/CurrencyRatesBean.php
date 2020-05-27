@@ -24,6 +24,7 @@ class CurrencyRatesBean extends DBTableBean
     {
         global $currencies;
 
+        //TODO: Set in defines the default currency and convert to the session set currencyID
         $dstID = Session::Get("currencyID");
         $crrow = array();
 
@@ -44,7 +45,7 @@ class CurrencyRatesBean extends DBTableBean
         $ret["currency_code"] = $crrow["currency_code"];
 
         $qry = $this->query();
-        $qry->select->where = " srcID='$dstID' AND dstID=1 ";
+        $qry->select->where()->add("srcID", $dstID)->add("dstID","1");
         $num = $qry->exec();
         if ($row = $qry->next()) {
             $rate = (float)$row["rate"];

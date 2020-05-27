@@ -9,7 +9,7 @@ include_once("responders/DeleteItemResponder.php");
 include_once("responders/ToggleFieldResponder.php");
 
 include_once("utils/BeanKeyCondition.php");
-include_once("utils/SQLSelect.php");
+include_once("sql/SQLSelect.php");
 
 include_once("components/BeanFormEditor.php");
 include_once("components/TableView.php");

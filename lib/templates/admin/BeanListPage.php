@@ -54,12 +54,10 @@ class BeanListPage extends AdminPageTemplate
 
         $this->keyword_search->processInput();
 
-        $filter = $this->keyword_search->filterSelect();
-        if ($filter) {
-            if ($this->query) {
-                $this->query->select->combine($filter);
-            }
+        if ($this->keyword_search->isProcessed()) {
+            $this->keyword_search->getForm()->prepareClauseCollection("OR")->copyTo($this->query->select->where());
         }
+
 
     }
 
@@ -95,18 +93,17 @@ class BeanListPage extends AdminPageTemplate
     protected function setBeanQuery()
     {
 
-        $fields[] = $this->bean->key();
+        $qry = $this->bean->query();
+        $sel = $qry->select;
+        $sel->fields()->set($this->bean->key());
 
         foreach($this->fields as $name=>$label) {
             if ($this->bean->haveField($name)) {
-                $fields[] = $name;
+                $sel->fields()->set($name);
             }
         }
 
-        $qry = $this->bean->query();
-        $qry->select->fields = implode(", ", $fields);
-
-        $this->query = $this->bean->query();
+        $this->query = $qry;
     }
 
     /**
@@ -229,7 +226,7 @@ class BeanListPage extends AdminPageTemplate
         }
 
         $this->view = new TableView($this->query);
-        $this->view->addColumn(new TableColumn($this->query->key(), "ID"));
+        $this->view->addColumn(new TableColumn($this->query->key(), "ID", "center"));
 
         foreach ($this->fields as $name => $label) {
             $this->view->addColumn(new TableColumn($name, $label));
@@ -237,7 +234,7 @@ class BeanListPage extends AdminPageTemplate
 
         $this->view->addColumn(new TableColumn("actions", "Actions"));
 
-        $act = new ActionsTableCellRenderer();
+        $act = new ActionsCellRenderer();
         $this->view_actions = $act->getActions();
 
         $this->initViewActions($this->view_actions);

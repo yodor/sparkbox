@@ -35,22 +35,26 @@ class KeywordSearchForm extends InputForm
         $this->table_fields = $table_fields;
     }
 
-    public function getFields() : array
+    public function getFields(): array
     {
         return $this->table_fields;
     }
 
-    protected function searchFilterForKey(string $key, string $val): string
+    protected function clauseValue(string $key, string $val): SQLClause
     {
+        $clause = new SQLClause();
 
         $val = DBConnections::Get()->escape($val);
         if (strcmp($key, "keyword") == 0) {
+
             $allwords = explode(" ", $val);
 
             $qry = array();
 
             foreach ($allwords as $pos => $keyword) {
+
                 $ret = array();
+
                 foreach ($this->table_fields as $pos1 => $field_name) {
 
                     if (isset($this->search_expressions[$field_name])) {
@@ -60,28 +64,27 @@ class KeywordSearchForm extends InputForm
                         }
                     }
                     else {
+
                         $ret[] = " $field_name LIKE '%$keyword%' ";
+
                     }
 
                 }
-                $qry[] = "( " . implode(" OR ", $ret) . " )";
-            }
 
-            return "( " . implode(" AND ", $qry) . " )";
+                $qry[] = "( " . implode(" OR ", $ret) . " )";
+
+            }
+            $expr = "( " . implode(" AND ", $qry) . " )";
+
+            //set expression directly
+            $clause->setExpression($expr, "", "");
+            return $clause;
         }
         else {
-            return parent::searchFilterForKey($key, $val);
+            return parent::clauseValue($key, $val);
         }
     }
 
-    public function clearQuery(array &$qryarr)
-    {
-        foreach ($this->inputs as $field_name => $field) {
-            if (isset($qryarr[$field_name])) {
-                unset($qryarr[$field_name]);
-            }
-        }
-    }
 }
 
 ?>

@@ -6,14 +6,13 @@ include_once("utils/IRequestProcessor.php");
 include_once("forms/renderers/FormRenderer.php");
 include_once("components/TextComponent.php");
 
-class KeywordSearch extends FormRenderer implements IQueryFilter, IRequestProcessor
+class KeywordSearch extends FormRenderer implements IRequestProcessor
 {
 
     const ACTION_SEARCH = "search";
     const ACTION_CLEAR = "clear";
 
     const SUBMIT_KEY = "filter";
-
 
     protected $have_filter = FALSE;
 
@@ -34,6 +33,9 @@ class KeywordSearch extends FormRenderer implements IQueryFilter, IRequestProces
 
         $this->setLayout(FormRenderer::FIELD_HBOX);
 
+        //in admin pages is preferred POST as there are already some request conditions to be matched
+        $this->setMethod(FormRenderer::METHOD_POST);
+
         $this->getButtons()->clear();
 
         $submit_search = new ColorButton();
@@ -52,27 +54,27 @@ class KeywordSearch extends FormRenderer implements IQueryFilter, IRequestProces
         $submit_clear->setAttribute("action", KeywordSearch::ACTION_CLEAR);
         $this->getButtons()->append($submit_clear);
 
+
+
     }
 
     public function processInput()
     {
 
-        if (count($this->form->getFields())<1)return;
+        if (count($this->form->getFields()) < 1) return;
 
         $qry = $_REQUEST;
 
-        if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_CLEAR, $qry) === TRUE) {
+        if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_CLEAR, $qry)) {
 
-            $this->form->clearQuery($qry);
-            unset($qry[KeywordSearch::SUBMIT_KEY]);
-
-            $qstr = queryString($qry);
-            $loc = $_SERVER["PHP_SELF"] . "$qstr";
-
-            header("Location: $loc");
+            $url = new URLBuilder();
+            $url->buildFrom(SparkPage::Instance()->getPageURL());
+            //$url->removeParameter(KeywordSearch::SUBMIT_KEY);
+            //$this->form->clearURLParameters($url);
+            header("Location: " . $url->url());
             exit;
         }
-        else if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $qry) === TRUE) {
+        else if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $qry)) {
             $this->form->loadPostData($qry);
             $this->form->validate();
             $this->have_filter = TRUE;
@@ -102,7 +104,7 @@ class KeywordSearch extends FormRenderer implements IQueryFilter, IRequestProces
         return $arr;
     }
 
-    public function haveFilter()
+    public function isProcessed() : bool
     {
         return $this->have_filter;
     }
@@ -110,27 +112,6 @@ class KeywordSearch extends FormRenderer implements IQueryFilter, IRequestProces
     public function getForm(): KeywordSearchForm
     {
         return $this->form;
-    }
-
-    public function processSearch(SQLSelect &$select_query)
-    {
-        $search_query = $this->form->searchFilterSelect();
-
-        $select_query = $select_query->combineWith($search_query);
-
-    }
-
-    public function processSearchHaving(SQLSelect &$select_query)
-    {
-        $search_query = $this->form->searchFilterSelect();
-
-        $select_query->having = $search_query->where;
-
-    }
-
-    public function filterSelect($source = NULL, $value = NULL)
-    {
-        return $this->form->searchFilterSelect();
     }
 
 }

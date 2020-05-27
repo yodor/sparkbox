@@ -10,8 +10,16 @@ class ModalPopup {
 
         this.index = -1;
 
+        /**
+         *
+         * @type {jQuery}
+         */
         this.popup = null;
 
+        /**
+         *
+         * @type {jQuery}
+         */
         this.pane = null;
 
     }
@@ -50,7 +58,7 @@ class ModalPopup {
 
     show() {
 
-        this.pane.on("click", function(event) {
+        this.pane.on("click", function (event) {
             this.paneClicked();
         }.bind(this));
 
@@ -93,11 +101,16 @@ class ModalPopup {
 
     centerContents() {
 
+        this.popup.css("min-width", "auto");
+        this.popup.css("min-height", "auto");
+
         var windowWidth = $(window).width(); //retrieve current window width
         var windowHeight = $(window).height(); //retrieve current window height
 
-        var width = this.popup.outerWidth(true);
-        var height = this.popup.outerHeight(true);
+        // var width = this.popup.outerWidth(true);
+        // var height = this.popup.outerHeight(true);
+        let width = this.popup.outerWidth();
+        let height = this.popup.outerHeight();
 
         var left = ((windowWidth - width) / 2);
         var top = ((windowHeight - height) / 2);
@@ -107,6 +120,7 @@ class ModalPopup {
         this.popup.css("min-width", width);
         this.popup.css("min-height", height);
 
+        console.log("Width: "+width+ " Height: " + height);
 
     }
 
@@ -140,12 +154,9 @@ class ModalPopup {
     /*Make resizable div by Hung Nguyen*/
     makeResizable() {
 
+        const element = this.popup.get(0); //document.querySelector(div);
 
-        let div = ".ModalPane .resizable";
-
-        const element = document.querySelector(div);
-
-        const resizers = document.querySelectorAll(div + ' .resizer');
+        const resizers = this.popup.find(".resizer");//document.querySelectorAll(div + ' .resizer');
 
         const minimum_size = 20;
         let original_width = 0;
@@ -154,8 +165,10 @@ class ModalPopup {
         let original_y = 0;
         let original_mouse_x = 0;
         let original_mouse_y = 0;
+
         for (let i = 0; i < resizers.length; i++) {
             const currentResizer = resizers[i];
+
             currentResizer.addEventListener('mousedown', function (e) {
                 e.preventDefault()
                 original_width = parseFloat(getComputedStyle(element, null).getPropertyValue('width').replace('px', ''));
@@ -222,7 +235,7 @@ class ModalPopup {
 }
 
 
-$(document).on("keyup", function(event) {
+$(document).on("keyup", function (event) {
 
     let pane = $(".ModalPane[index]").last();
     if (!pane.get(0)) return true;
@@ -241,15 +254,13 @@ $(document).on("keyup", function(event) {
             pane.click();
         }
         return false;
-    }
-    else if (event.which == 13) {
+    } else if (event.which == 13) {
 
         if (confirm_button.get(0)) {
             confirm_button.click();
         } else if (default_button.get(0)) {
             default_button.click();
-        }
-        else {
+        } else {
             return true;
         }
 

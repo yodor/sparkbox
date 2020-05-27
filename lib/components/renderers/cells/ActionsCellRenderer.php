@@ -3,7 +3,7 @@ include_once("components/renderers/cells/TableCellRenderer.php");
 include_once("components/Action.php");
 include_once("utils/ActionCollection.php");
 
-class ActionsTableCellRenderer extends TableCellRenderer implements IActionCollection
+class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
 {
     /**
      * @var array

@@ -26,14 +26,15 @@ class AdminUsersListPage extends BeanListPage
 
 
         $qry = $bean->query();
-        $qry->select->fields =  " userID, email, fullname, date_created, last_active, counter, suspend, (SELECT concat('|', role) FROM admin_access ac WHERE ac.userID=userID) as access_level ";
+        $qry->select->fields()->set( "userID", "email", "fullname", "date_created", "last_active", "counter", "suspend");
+        $qry->select->fields()->setExpression("(SELECT concat('|', role) FROM admin_access ac WHERE ac.userID=userID)", "access_level");
 
         $view = new TableView($qry);
 
         //TODO: selective enable bottom or top
-        //$view->enablePaginators(false);
+        $view->enablePaginators(TableView::BOTTOM_PAGINATOR);
 
-        $view->addColumn(new TableColumn($bean->key(), "ID"));
+        $view->addColumn(new TableColumn($bean->key(), "ID", TableColumn::ALIGN_CENTER));
         $view->addColumn(new TableColumn("email", "Email"));
         $view->addColumn(new TableColumn("fullname", "Full Name"));
         $view->addColumn(new TableColumn("date_created", "Date Created"));
@@ -45,14 +46,14 @@ class AdminUsersListPage extends BeanListPage
 
         //$view->getColumn("access_level")->setCellRenderer(new CallbackTableCellRenderer("draw_access_level"));
 
-        $act = new ActionsTableCellRenderer();
+        $act = new ActionsCellRenderer();
         $act->getActions()->append(new Action("Edit", "add.php", array(new DataParameter("editID", $bean->key()))));
         $act->getActions()->append(new PipeSeparator());
         $act->getActions()->append($h_delete->createAction());
 
         $view->getColumn("actions")->setCellRenderer($act);
 
-        $vis_act = new ActionsTableCellRenderer();
+        $vis_act = new ActionsCellRenderer();
         $check_is_suspend = function (Action $act, array $data) {
             return ($data['suspend'] < 1);
         };

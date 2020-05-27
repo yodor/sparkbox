@@ -291,3 +291,16 @@ BODY {
 .CurrencyRateEditor .Item.space {
     background-color: papayawhip;
 }
+
+.BeanEditorPage {
+    min-width:50%;
+}
+.BeanFormEditor {
+    width:100%;
+}
+.BeanFormEditor .FormRenderer{
+    width:100%;
+}
+.BeanFormEditor .FormRenderer .TextArea TEXTAREA {
+    min-height:200px;
+}

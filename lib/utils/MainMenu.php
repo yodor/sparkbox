@@ -100,6 +100,7 @@ class MainMenu
         $total_items = 0;
 
         $qry = $this->bean->queryField("parentID", $parentID);
+        $qry->select->fields()->set("menu_title", "link");
         $qry->select->order_by = " lft ";
 
         $total_items = $qry->exec();

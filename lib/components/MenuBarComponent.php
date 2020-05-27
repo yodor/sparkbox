@@ -42,12 +42,12 @@ class MenuBarComponent extends Component
         }
 
         $this->bar = new Component();
-        $this->bar->setClassName("MenuBar");
+        $this->bar->setComponentClass("MenuBar");
 
         $this->toggle = new Component();
         $this->toggle->setTagName("A");
 
-        $this->toggle->setClassName("toggle");
+        $this->toggle->setComponentClass("toggle");
 
     }
 

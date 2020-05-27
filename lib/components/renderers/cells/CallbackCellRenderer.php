@@ -2,7 +2,7 @@
 include_once("components/renderers/cells/TableCellRenderer.php");
 include_once("components/TableColumn.php");
 
-class CallbackTableCellRenderer extends TableCellRenderer
+class CallbackCellRenderer extends TableCellRenderer
 {
 
     protected $callback = FALSE;

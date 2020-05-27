@@ -19,8 +19,11 @@ class URLParameter implements IDataResultProcessor
         $this->value = $value;
     }
 
-    public function value(): string
+    public function value(bool $quoted=false): string
     {
+        if ($quoted) {
+            return "'".$this->value."'";
+        }
         return $this->value;
     }
 

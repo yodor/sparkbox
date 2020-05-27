@@ -1,7 +1,7 @@
 <?php
 include_once("templates/admin/BeanListPage.php");
-include_once("components/renderers/cells/BooleanFieldCellRenderer.php");
-include_once("components/renderers/cells/TableImageCellRenderer.php");
+include_once("components/renderers/cells/BooleanCellRenderer.php");
+include_once("components/renderers/cells/ImageCellRenderer.php");
 include_once("beans/DynamicPagesBean.php");
 
 class DynamicPageList extends BeanListPage
@@ -9,7 +9,9 @@ class DynamicPageList extends BeanListPage
     public function __construct()
     {
         parent::__construct();
+
         $this->setBean(new DynamicPagesBean());
+        $this->setListFields(array("position"=>"Position", "item_photo"=>"Photo", "item_title"=>"Title","item_date"=>"Date", "visible"=>"Visible"));
 
     }
 
@@ -35,77 +37,83 @@ class DynamicPageList extends BeanListPage
 
     public function initView()
     {
-        $h_delete = new DeleteItemResponder($this->bean);
-
-        $h_repos = new ChangePositionResponder($this->bean);
-
-        $view = new TableView($this->bean->query());
-        $view->setCaption("Dynamic Pages List");
-        $view->setDefaultOrder(" position ASC ");
-        // $view->search_filter = " ORDER BY day_num ASC ";
-        $view->addColumn(new TableColumn($this->bean->key(), "ID"));
-        $view->addColumn(new TableColumn("photo", "Photo"));
-        $view->addColumn(new TableColumn("item_title", "Title"));
-        // $view->addColumn(new TableColumn("subtitle","Subtitle"));
-
-        $view->addColumn(new TableColumn("visible", "Visibility"));
-
-        $view->addColumn(new TableColumn("item_date", "Date"));
-
-        $view->addColumn(new TableColumn("position", "Position"));
-
-        $view->addColumn(new TableColumn("actions", "Actions"));
-
-        $view->getColumn("visible")->setCellRenderer(new BooleanFieldCellRenderer("Yes", "No"));
-
-        $ticr = new TableImageCellRenderer();
+        parent::initView();
+        $ticr = new ImageCellRenderer();
         $ticr->setBean($this->bean);
-        $view->getColumn("photo")->setCellRenderer($ticr);
-        $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(FALSE);
 
-        $act = new ActionsTableCellRenderer();
+        $this->view->getColumn("item_photo")->setCellRenderer($ticr);
 
-        if ($this->is_chooser) {
-
-            $action_chooser = new Action("Choose", $this->return_url, array(new DataParameter("page_id", $this->bean->key()),
-                                                                                      new URLParameter("page_class", get_class($this->bean))));
-
-            $act->getActions()->append($action_chooser);
-
-        }
-        else {
-
-            $act->getActions()->append(new Action("Edit", "add.php", array(new DataParameter("editID", $this->bean->key()))));
-            $act->getActions()->append(new PipeSeparator());
-            $act->getActions()->append($h_delete->createAction());
-
-            $act->getActions()->append(new RowSeparator());
-
-            $act->getActions()->append(new Action("Photo Gallery", "gallery/list.php", array(new DataParameter($this->bean->key()))));
-
-            $act->getActions()->append(new RowSeparator());
-
-            $bkey = $this->bean->key();
-            $repos_param = array(new DataParameter("item_id", $bkey));
-
-            $act->getActions()->append(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
-            $act->getActions()->append(new PipeSeparator());
-            $act->getActions()->append(new Action("Next", "?cmd=reposition&type=next", $repos_param));
-
-            $act->getActions()->append(new RowSeparator());
-
-            $act->getActions()->append(new Action("First", "?cmd=reposition&type=first", $repos_param));
-            $act->getActions()->append(new PipeSeparator());
-            $act->getActions()->append(new Action("Last", "?cmd=reposition&type=last", $repos_param));
-
-        }
-
-        $view->getColumn("actions")->setCellRenderer($act);
-
-        $this->view = $view;
-        $this->view_actions = $act;
-
-        $this->append($this->view);
+//        $h_delete = new DeleteItemResponder($this->bean);
+//
+//        $h_repos = new ChangePositionResponder($this->bean);
+//
+//        $view = new TableView($this->bean->query());
+//        $view->setCaption("Dynamic Pages List");
+//        $view->setDefaultOrder(" position ASC ");
+//        // $view->search_filter = " ORDER BY day_num ASC ";
+//        $view->addColumn(new TableColumn($this->bean->key(), "ID"));
+//        $view->addColumn(new TableColumn("photo", "Photo"));
+//        $view->addColumn(new TableColumn("item_title", "Title"));
+//        // $view->addColumn(new TableColumn("subtitle","Subtitle"));
+//
+//        $view->addColumn(new TableColumn("visible", "Visibility"));
+//
+//        $view->addColumn(new TableColumn("item_date", "Date"));
+//
+//        $view->addColumn(new TableColumn("position", "Position"));
+//
+//        $view->addColumn(new TableColumn("actions", "Actions"));
+//
+//        $view->getColumn("visible")->setCellRenderer(new BooleanCellRenderer("Yes", "No"));
+//
+//        $ticr = new ImageCellRenderer();
+//        $ticr->setBean($this->bean);
+//        $view->getColumn("photo")->setCellRenderer($ticr);
+//        $view->getColumn("photo")->getHeaderCellRenderer()->setSortable(FALSE);
+//
+//        $act = new ActionsCellRenderer();
+//
+//        if ($this->is_chooser) {
+//
+//            $action_chooser = new Action("Choose", $this->return_url, array(new DataParameter("page_id", $this->bean->key()),
+//                                                                                      new URLParameter("page_class", get_class($this->bean))));
+//
+//            $act->getActions()->append($action_chooser);
+//
+//        }
+//        else {
+//
+//            $act->getActions()->append(new Action("Edit", "add.php", array(new DataParameter("editID", $this->bean->key()))));
+//            $act->getActions()->append(new PipeSeparator());
+//            $act->getActions()->append($h_delete->createAction());
+//
+//            $act->getActions()->append(new RowSeparator());
+//
+//            $act->getActions()->append(new Action("Photo Gallery", "gallery/list.php", array(new DataParameter($this->bean->key()))));
+//
+//            $act->getActions()->append(new RowSeparator());
+//
+//            $bkey = $this->bean->key();
+//            $repos_param = array(new DataParameter("item_id", $bkey));
+//
+//            $act->getActions()->append(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
+//            $act->getActions()->append(new PipeSeparator());
+//            $act->getActions()->append(new Action("Next", "?cmd=reposition&type=next", $repos_param));
+//
+//            $act->getActions()->append(new RowSeparator());
+//
+//            $act->getActions()->append(new Action("First", "?cmd=reposition&type=first", $repos_param));
+//            $act->getActions()->append(new PipeSeparator());
+//            $act->getActions()->append(new Action("Last", "?cmd=reposition&type=last", $repos_param));
+//
+//        }
+//
+//        $view->getColumn("actions")->setCellRenderer($act);
+//
+//        $this->view = $view;
+//        $this->view_actions = $act;
+//
+//        $this->append($this->view);
     }
 
     protected function renderImpl()

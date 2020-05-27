@@ -25,8 +25,6 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         $this->relation_prkey = $relation_prkey;
 
         $combining_filter = new SQLSelect();
-        $combining_filter->fields = "";
-        $combining_filter->from = "";
 
         $this->filter_all = $combining_filter;
     }
@@ -105,9 +103,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
                 $sel = $value->filterSelect($view, $filter_value);
             }
             else {
-                $sel->fields = "";
-                $sel->from = "";
-                $sel->where = " relation.$name='$filter_value' ";
+                $sel->where()->add("relation.$name", "'$filter_value'");
             }
             if ($sel) {
                 $combining_filter = $combining_filter->combineWith($sel);

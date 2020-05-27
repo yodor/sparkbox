@@ -1,7 +1,7 @@
 <?php
 include_once("beans/DBTableBean.php");
-include_once("utils/SQLSelect.php");
-include_once("utils/SQLUpdate.php");
+include_once("sql/SQLSelect.php");
+include_once("sql/SQLUpdate.php");
 
 class NestedSetBean extends DBTableBean
 {
@@ -49,13 +49,13 @@ class NestedSetBean extends DBTableBean
                 $row["rgt"] = $rgt + 1;
 
                 $update = new SQLUpdate($this->select);
-                $update->set["rgt"] = "rgt+2";
-                $update->appendWhere("rgt>=" . $rgt);
+                $update->set("rgt", "rgt+2");
+                $update->where()->add(" rgt >= $rgt ", "", "");
                 if (!$db->query($update->getSQL())) throw new Exception($db->getError());
 
                 $update = new SQLUpdate($this->select);
-                $update->set["lft"] = "lft+2";
-                $update->appendWhere("lft>" . $rgt);
+                $update->set("lft", "lft+2");
+                $update->where()->add(" lft > $rgt ", "", "");
                 if (!$db->query($update->getSQL())) throw new Exception($db->getError());
 
                 $lastid = parent::insert($row, $db);
@@ -82,7 +82,7 @@ class NestedSetBean extends DBTableBean
     public function getMaxRgt(): int
     {
         $qry = $this->query();
-        $qry->select->fields = " MAX(rgt) as max_rgt ";
+        $qry->select->fields()->setExpression(" MAX(rgt) ", "max_rgt");
         $qry->select->limit = " 1 ";
         $num = $qry->exec();
 
@@ -159,32 +159,32 @@ class NestedSetBean extends DBTableBean
 
                 //make space
                 $update = new SQLUpdate($this->select);
-                $update->set["lft"] = "lft + $extent";
-                $update->appendWhere("lft >= $new_lft ");
+                $update->set("lft", "lft + $extent");
+                $update->where()->append("lft >= $new_lft ");
                 if (!$db->query($update->getSQL())) throw new Exception("Update Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
 
                 $update = new SQLUpdate($this->select);
-                $update->set["rgt"] = "rgt + $extent";
-                $update->appendWhere("rgt >= $new_lft");
+                $update->set("rgt", "rgt + $extent");
+                $update->where()->append("rgt >= $new_lft");
                 if (!$db->query($update->getSQL())) throw new Exception("Update Error(2): " . $db->getError() . "<HR>" . $update->getSQL());
 
                 //move into new space
                 $update = new SQLUpdate($this->select);
-                $update->set["lft"] = "lft + $distance";
-                $update->set["rgt"] = "rgt + $distance";
-                $update->appendWhere(" (lft >= $tmppos AND rgt < $tmppos + $extent)");
+                $update->set("lft", "lft + $distance");
+                $update->set("rgt", "rgt + $distance");
+                $update->where()->append(" (lft >= $tmppos AND rgt < $tmppos + $extent) ");
 
                 if (!$db->query($update->getSQL())) throw new Exception("Update Error(3): " . $db->getError() . "<HR>" . $update->getSQL());
 
                 //remove old space
                 $update = new SQLUpdate($this->select);
-                $update->set["lft"] = "lft - $extent";
-                $update->appendWhere("lft > $rgt");
+                $update->set("lft", "lft - $extent");
+                $update->where()->append("lft > $rgt");
                 if (!$db->query($update->getSQL())) throw new Exception("Update Error(4): " . $db->getError() . "<HR>" . $update->getSQL());
 
                 $update = new SQLUpdate($this->select);
-                $update->set["rgt"] = "rgt - $extent";
-                $update->appendWhere("rgt > $rgt");
+                $update->set("rgt", "rgt - $extent");
+                $update->where()->append("rgt > $rgt");
                 if (!$db->query($update->getSQL())) throw new Exception("Update Error(5): " . $db->getError() . "<HR>" . $update->getSQL());
 
                 $lastid = parent::update($id, $row, $db);
@@ -202,7 +202,7 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    public function delete(int $id, DBDriver $db = NULL) : bool
+    public function delete(int $id, DBDriver $db = NULL): bool
     {
 
         debug("Deleting ID: $id");
@@ -217,7 +217,6 @@ class NestedSetBean extends DBTableBean
             debug("Using DBDriver passed as function parameter");
         }
 
-
         $prow = $this->getByID($id, array("lft", "rgt", "parentID"));
 
         $parentID = (int)$prow["parentID"];
@@ -230,37 +229,39 @@ class NestedSetBean extends DBTableBean
             $db->transaction();
 
             $res = parent::delete($id, $db);
-            if (!$res) throw new Exception("Delete Error(0): ".$db->getError());
+            if (!$res) throw new Exception("Delete Error(0): " . $db->getError());
 
             debug("deleted node ID: $id");
 
             debug("Re-parenting child nodes ...");
 
             $update = new SQLUpdate($this->select);
-            $update->set["lft"] = " lft - 1 ";
-            $update->set["rgt"] = " rgt - 1 ";
-            $update->appendWhere(" (lft BETWEEN $lft AND $rgt) ");
+            $update->set("lft", " lft - 1 ");
+            $update->set("rgt", " rgt - 1 ");
+            $update->where()->append("(lft BETWEEN $lft AND $rgt)");
+
             if (!$db->query($update->getSQL())) throw new Exception("Delete Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
 
             $update = new SQLUpdate($this->select);
-            $update->set["rgt"] = " rgt - 2 ";
-            $update->appendWhere(" rgt > $rgt ");
+            $update->set("rgt", " rgt - 2 ");
+            $update->where()->add("rgt > $rgt", "", "");
+
             if (!$db->query($update->getSQL())) throw new Exception("Delete Error(2): " . $db->getError() . "<HR>" . $update->getSQL());
 
             $update = new SQLUpdate($this->select);
-            $update->set["lft"] = " lft - 2 ";
-            $update->appendWhere(" lft > $rgt ");
+            $update->set("lft", " lft - 2 ");
+            $update->where()->add(" lft > $rgt ", "", "");
             if (!$db->query($update->getSQL())) throw new Exception("Delete Error(3): " . $db->getError() . "<HR>" . $update->getSQL());
 
             $update = new SQLUpdate($this->select);
-            $update->set["parentID"] = $parentID;
-            $update->appendWhere("parentID=$id");
+            $update->set("parentID", $parentID);
+            $update->where()->add("parentID", $id);
             if (!$db->query($update->getSQL())) throw new Exception("Delete Error(4): " . $db->getError() . "<HR>" . $update->getSQL());
 
             $db->commit();
         }
         catch (Exception $ex) {
-            debug("Rolling back for error: ".$ex->getMessage());
+            debug("Rolling back for error: " . $ex->getMessage());
             $db->rollback();
             throw $ex;
         }
@@ -273,8 +274,8 @@ class NestedSetBean extends DBTableBean
     {
 
         $qry = $this->query();
-        $qry->select->fields = " lft, rgt, parentID ";
-        $qry->select->where = " parentID=$parentID  ";
+        $qry->select->fields()->set("lft", "rgt", "parentID");
+        $qry->select->where()->add("parentID", $parentID);
         $qry->select->order_by = " {$this->prkey} ASC , lft ASC ";
 
         $num = $qry->exec();
@@ -285,9 +286,9 @@ class NestedSetBean extends DBTableBean
 
             $this->db->transaction();
             $update = new SQLUpdate($this->select);
-            $update->set["lft"] = $lft;
-            $update->set["rgt"] = $cnt;
-            $update->appendWhere("{$this->prkey}=$nodeID");
+            $update->set("lft", $lft);
+            $update->set("rgt", $cnt);
+            $update->where()->add($this->prkey, $nodeID);
             $this->db->query($update->getSQL());
             $this->db->commit();
 
@@ -296,8 +297,8 @@ class NestedSetBean extends DBTableBean
 
             $this->db->transaction();
             $update = new SQLUpdate($this->select);
-            $update->set["rgt"] = $cnt;
-            $update->appendWhere("{$this->prkey}=$nodeID");
+            $update->set("rgt", $cnt);
+            $update->where()->add($this->prkey, $nodeID);
             $this->db->query($update->getSQL());
             $this->db->commit();
 
@@ -310,9 +311,9 @@ class NestedSetBean extends DBTableBean
     protected function getIDLeft(int $lft): int
     {
         $qry = $this->query();
-        $qry->select->fields = $this->prkey;
+        $qry->select->fields()->set($this->prkey);
         $qry->select->limit = " 1 ";
-        $qry->select->appendWhere("lft = '$lft' ");
+        $qry->select->where()->add("lft", $lft);
 
         if ($qry->exec() && $row = $qry->next()) {
             return $row[$this->prkey];
@@ -323,9 +324,9 @@ class NestedSetBean extends DBTableBean
     protected function getIDRight(int $rgt): int
     {
         $qry = $this->query();
-        $qry->select->fields = $this->prkey;
+        $qry->select->fields()->set($this->prkey);
         $qry->select->limit = " 1 ";
-        $qry->select->appendWhere("rgt = '$rgt' ");
+        $qry->select->where()->add("rgt", $rgt);
 
         if ($qry->exec() && $row = $qry->next()) {
             return $row[$this->prkey];
@@ -353,8 +354,8 @@ class NestedSetBean extends DBTableBean
             $brotherSize = (int)$brother["rgt"] - (int)$brother["lft"] + 1;
 
             $qry = $this->query();
-            $qry->select->fields = $this->prkey;
-            $qry->select->appendWhere(" (lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . " ) ");
+            $qry->select->fields()->set($this->prkey);
+            $qry->select->where()->append("(lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . ")");
             $num = $qry->exec();
 
             $idlist = array();
@@ -364,16 +365,16 @@ class NestedSetBean extends DBTableBean
             $idlist = implode(",", $idlist);
 
             $update = new SQLUpdate($this->select);
-            $update->set["lft"] = " lft - $brotherSize ";
-            $update->set["rgt"] = " rgt - $brotherSize ";
-            $update->appendWhere(" ( lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . " ) ");
+            $update->set("lft", " lft - $brotherSize ");
+            $update->set("rgt", " rgt - $brotherSize ");
+            $update->where()->append(" (lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . ") ");
             if (!$db->query($update->getSQL())) throw new Exception("moveLeft($id) - Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
 
             $update = new SQLUpdate($this->select);
-            $update->set["lft"] = " lft + $nodeSize ";
-            $update->set["rgt"] = " rgt + $nodeSize ";
-            $update->appendWhere(" ( lft BETWEEN " . $brother["lft"] . " AND " . $brother["rgt"] . ") ");
-            $update->appendWhere(" {$this->prkey} NOT IN ( $idlist ) ");
+            $update->set("lft", " lft + $nodeSize ");
+            $update->set("rgt", " rgt + $nodeSize ");
+            $update->where()->append(" (lft BETWEEN " . $brother["lft"] . " AND " . $brother["rgt"] . ") ");
+            $update->where()->add($this->prkey, " ( $idlist ) ", "NOT IN");
 
             if (!$db->query($update->getSQL())) throw new Exception("moveLeft($id) - Error(2): " . $db->getError() . "<HR>" . $update->getSQL());
 
@@ -407,8 +408,9 @@ class NestedSetBean extends DBTableBean
             $brotherSize = (int)$brother["rgt"] - (int)$brother["lft"] + 1;
 
             $qry = $this->query();
-            $qry->select->fields = $this->prkey;
-            $qry->select->appendWhere(" ( lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . " ) ");
+            $qry->select->fields()->set($this->prkey);
+            $qry->select->where()->append("( lft  BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . ") ");
+
             $qry->exec();
             $idlist = array();
             while ($row = $qry->next()) {
@@ -417,16 +419,17 @@ class NestedSetBean extends DBTableBean
             $idlist = implode(" , ", $idlist);
 
             $update = new SQLUpdate($this->select);
-            $update->set["lft"] = " lft + $brotherSize ";
-            $update->set["rgt"] = " rgt + $brotherSize ";
-            $update->appendWhere(" ( lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . " ) ");
+            $update->set("lft", " lft + $brotherSize ");
+            $update->set("rgt", " rgt + $brotherSize ");
+            $update->where()->append("( lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . ") ");
+
             if (!$db->query($update->getSQL())) throw new Exception("moveRight($id) - Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
 
             $update = new SQLUpdate($this->select);
-            $update->set["lft"] = " lft - $nodeSize ";
-            $update->set["rgt"] = " rgt - $nodeSize ";
-            $update->appendWhere(" ( lft BETWEEN " . $brother["lft"] . " AND " . $brother["rgt"] . " ) ");
-            $update->appendWhere("{$this->prkey} NOT IN ($idlist) ");
+            $update->set("lft", " lft - $nodeSize ");
+            $update->set("rgt", " rgt - $nodeSize ");
+            $update->where()->append("( lft BETWEEN " . $brother["lft"] . " AND " . $brother["rgt"] . ") ");
+            $update->where()->add($this->prkey, "($idlist)", "NOT IN");
             if (!$db->query($update->getSQL())) throw new Exception("moveRight($id) - Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
 
             $db->commit();
@@ -449,13 +452,15 @@ class NestedSetBean extends DBTableBean
         }
 
         $sel = new SQLSelect();
-        $sel->fields = implode(" , ", $fields);
+        foreach ($fields as $idx => $val) {
+            $sel->fields()->set($val);
+        }
 
         $sel->from = " {$this->table} AS node, {$this->table} AS parent ";
-        $sel->where = " (node.lft BETWEEN parent.lft AND parent.rgt) ";
-        if ($this->select->where) {
-            $sel->where .= " AND {$this->select->where} ";
-        }
+        $sel->where()->append("( node.lft BETWEEN parent.lft AND parent.rgt )");
+
+        $this->select->where()->copyTo($sel->where());
+
         $sel->group_by = " node." . $this->prkey;
         $sel->order_by = " node.lft ";
 
@@ -468,7 +473,7 @@ class NestedSetBean extends DBTableBean
 
         $sel = $this->selectTree($fieldNames, "parent");
 
-        $sel->where .= " AND node.$prkey = $nodeEquals  ";
+        $sel->where()->add("node.$prkey", "$nodeEquals");
 
         $sel->group_by = " ";
 
@@ -489,7 +494,7 @@ class NestedSetBean extends DBTableBean
         //aggregate relation query
         $sel = $this->selectAggregated("$relation_table.$prkey", $fieldNames);
 
-        $sel->fields .= " , COUNT($relation_table.$count_field) as related_count ";
+        $sel->fields()->setExpression("COUNT($relation_table.$count_field)", "related_count");
 
         $sel->group_by = " parent.$prkey ";
 
@@ -505,16 +510,19 @@ class NestedSetBean extends DBTableBean
 
         $sel = new SQLSelect();
 
-        $sel->fields = " child.$prkey ";
+        $sel->fields()->set("child.$prkey");
 
         $sel->from = " {$this->table} AS node , {$this->table} AS child ";
-        $sel->where = " (child.lft>= node.lft AND child.rgt <=node.rgt) AND relation.$prkey = child.$prkey ";
+
+        $sel->where()->add("child.lft", "node.lft", " >= ");
+        $sel->where()->add("child.rgt", "node.rgt", " <= ");
+        $sel->where()->add("relation.$prkey", "child.$prkey");
+
         if ($nodeID > 0) {
-            $sel->where .= " AND node.$prkey = $nodeID ";
+            $sel->where()->add("node.$prkey", $nodeID, " = ");
         }
-        if ($this->select->where) {
-            $sel->where .= " AND {$this->select->where} ";
-        }
+
+        $this->select->where()->copyTo($sel->where());
 
         return $sel->combineWith($other);
     }
@@ -522,10 +530,7 @@ class NestedSetBean extends DBTableBean
     public function childNodes(int $parentID): SQLSelect
     {
         $sel = clone $this->select();
-        if ($sel->where) {
-            $sel->where .= " AND ";
-        }
-        $sel->where .= " parentID='$parentID' ";
+        $sel->where()->add("parentID", "'$parentID'");
 
         return $sel;
     }

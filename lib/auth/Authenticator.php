@@ -150,7 +150,9 @@ abstract class Authenticator
 
         $username = $db->escape($username);
 
-        $qry = $this->bean->queryField("email", $username, 1);
+        $qry = $this->bean->queryFull();
+        $qry->select->where()->add("email", "'$username'");
+        $qry->select->limit = 1;
 
         try {
             $qry->exec();
@@ -199,11 +201,12 @@ abstract class Authenticator
     protected function updateLastSeen(int $userID)
     {
 
-        $row = array();
-        $row["counter"] = "counter+1";
-        $row["last_active"] = "CURRENT_TIMESTAMP";
+        $update = new SQLUpdate($this->bean->select());
+        $update->set("counter", "counter+1");
+        $update->set("last_active", "CURRENT_TIMESTAMP");
+        $update->where()->add($this->bean->key(), $userID);
+        $this->bean->getDB()->query($update->getSQL());
 
-        $this->bean->update($userID, $row);
 
     }
 

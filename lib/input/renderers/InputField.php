@@ -18,7 +18,7 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
     /**
      * @var int
      */
-    public $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
+    protected $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
 
     /**
      * @var DataInput
@@ -33,7 +33,8 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
      */
     protected $iterator = NULL;
 
-    public $addon_content = "";
+
+    protected $addon_contents;
 
     /**
      * Attributes to be used for the actual input element.
@@ -51,6 +52,8 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
 
         $this->attributes["field"] = $this->input->getName();
 
+        $this->addon_contents = new Container();
+        $this->addon_contents->setClassName("addon");
     }
 
     public function requiredStyle()
@@ -162,18 +165,8 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
     public function finishRender()
     {
 
-        //TODO: use Container to render all custom data
-        $user_data = $this->input->getUserData();
-        if (strlen($user_data) > 0) {
-            echo "<div class='UserData'>";
-            echo $user_data;
-            echo "</div>";
-        }
-
-        if ($this->addon_content) {
-            echo "<div class='addon_content'>";
-            echo $this->addon_content;
-            echo "</div>";
+        if ($this->addon_contents->count()>0) {
+            $this->addon_contents->render();
         }
 
         if ($this->input->haveError() && $this->error_render_mode == IErrorRenderer::MODE_SPAN) {
@@ -186,6 +179,20 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
 
     }
 
+    public function getAddonContainer() : Container
+    {
+        return $this->addon_contents;
+    }
+
+    public function setErrorRenderMode(int $mode)
+    {
+        $this->error_render_mode = $mode;
+    }
+
+    public function getErrorRenderMode(): int
+    {
+        return $this->error_render_mode;
+    }
 }
 
 ?>

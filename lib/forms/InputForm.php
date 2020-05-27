@@ -240,6 +240,14 @@ class InputForm implements IBeanEditor
         }
     }
 
+    /**
+     * Select bean data row by ID specified in $editID
+     * Pass result to each of the inputs processors
+     * @param int $editID
+     * @param DBTableBean $bean
+     * @return array|mixed
+     * @throws Exception
+     */
     public function loadBeanData(int $editID, DBTableBean $bean)
     {
         debug("Loading data from '" . get_class($bean) . "' ID='$editID' ");
@@ -255,15 +263,14 @@ class InputForm implements IBeanEditor
             $item_row = $bean->getByID($editID);
             $item_key = $bean->key();
 
-            //do not validate values comming from db
-            //$this->load($item_row);
+            //do not validate values coming from db
 
             //initial loading of bean data
             $names = $this->getInputNames();
             foreach ($names as $pos => $name) {
 
                 $input = $this->getInput($name);
-                debug("Processing DataInput [$name]");
+                debug("Processing DataInput '$name'");
                 //processor need value set. processor might need other values from the item_row or to parse differently the value
                 $input->getProcessor()->loadBeanData($editID, $bean, $item_row);
             }
@@ -275,11 +282,20 @@ class InputForm implements IBeanEditor
         return $item_row;
     }
 
-    public function searchFilterArray()
+    public function clearURLParameters(URLBuilder $url)
     {
-        $search_filter = array();
+        $names = $this->getInputNames();
+        foreach ($names as $idx=>$name) {
+            $input = $this->getInput($name);
+            $input->getProcessor()->clearURLParameters($url);
+        }
+    }
 
-        $names = array_keys($this->inputs);
+    public function prepareClauseCollection(string $glue = SQLClause::DEFAULT_GLUE) : ClauseCollection
+    {
+        $where = new ClauseCollection();
+
+        $names = $this->getInputNames();
         foreach ($names as $pos => $name) {
 
             $input = $this->getInput($name);
@@ -292,41 +308,39 @@ class InputForm implements IBeanEditor
 
                 $field_name = str_replace("|", ".", $name);
 
-                $search_filter[] = $this->searchFilterForKey($field_name, $val);;
+                $clause = $this->clauseValue($field_name, $val);
+                $clause->setGlue($glue);
+                $where->addClause($clause);
+
             }
         }
-        return $search_filter;
+        return $where;
     }
 
-    protected function searchFilterForKey(string $key, string $val): string
+    protected function clauseValue(string $field_name, string $val): SQLClause
     {
-        return "$key='$val'";
+        $clause = new SQLClause();
+        $clause->setExpression($field_name, $val, "=");
+        return $clause;
     }
 
-    public function searchFilterSelect(string $oper = "AND"): SQLSelect
-    {
-        $sel = new SQLSelect();
-        $sel->fields = "";
-        $sel->from = "";
-
-        $sa = $this->searchFilterArray();
-        $sf = "";
-        if (count($sa) > 0) {
-            $sf = implode(" $oper ", $sa);
-        }
-        $sel->where = $sf;
-        return $sel;
-    }
-
-    public function serializeXML()
+    /**
+     * Serialize all datainputs in this form as XML string
+     * @return string
+     * @throws Exception
+     */
+    public function serializeXML() : string
     {
         ob_start();
         echo "<?xml version='1.0' encoding='utf-8'?>";
         echo "<inputform class='" . get_class($this) . "'>";
         echo "<fields>";
-        foreach ($this->inputs as $name => $input) {
+        $names = $this->getInputNames();
+
+        foreach ($names as $idx => $name) {
+            $input = $this->getInput($name);
             echo "<field>";
-            echo "<name>$name</name>";
+            echo "<name>" . $input->getName() . "</name>";
             echo "<value><![CDATA[" . $input->getValue() . "]]></value>";
             echo "</field>";
         }
@@ -337,7 +351,12 @@ class InputForm implements IBeanEditor
         return $xml;
     }
 
-    public function unserializeXML($xml_string)
+    /**
+     * Unserialize the datainputs values from the XML string
+     * @param $xml_string string
+     * @throws Exception
+     */
+    public function unserializeXML(string $xml_string)
     {
         ob_start();
         $inputform = simplexml_load_string($xml_string);
@@ -348,37 +367,12 @@ class InputForm implements IBeanEditor
         foreach ($inputform->fields->field as $field) {
             $name = (string)$field->name;
             $value = (string)$field->value;
-            // 		echo $name."=>".$value;
+
             if (!$this->haveInput($name)) continue;
 
             $this->getInput($name)->setValue($value);
         }
 
-    }
-
-    public function dumpErrors()
-    {
-        foreach ($this->inputs as $field_name => $field) {
-
-            if ($field->haveError()) {
-                echo "$field_name:";
-                var_dump($field->getValue());
-                echo "<HR>";
-                echo "Error: ";
-                var_dump($field->getError()) . "<BR>";
-            }
-
-        }
-    }
-
-    public function dumpForm()
-    {
-
-        foreach ($this->inputs as $name => $input) {
-            if ($input instanceof PlainUpload) continue;
-            echo $input->getLabel() . ": " . $input->getValue() . "<br><BR>\r\n\r\n";
-
-        }
     }
 
 }

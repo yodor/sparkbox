@@ -116,7 +116,7 @@ $right = Session::Get("right");
 $language = Session::Get("language");
 $languageID = Session::Get("langID");
 
-function getActiveLanguageID()
+function getActiveLanguageID() : int
 {
     global $g_lb;
 
@@ -126,10 +126,12 @@ function getActiveLanguageID()
     $lang = DBConnections::Get()->escape($lang_session);
 
     $qry = $g_lb->queryField("language", $lang, 1);
+    $qry->select->fields()->set("langID");
+
     $num = $qry->exec();
 
     if ($lrow = $qry->next()) {
-        $langID = $lrow["langID"];
+        $langID = (int)$lrow["langID"];
     }
     else {
         //language not in database. return default text
@@ -148,9 +150,15 @@ function trbean(int $id, string $field_name, array &$row, string $tableName)
     $langID = getActiveLanguageID();
 
     $qry = $g_bt->query();
-    $qry->select->where = " langID='$langID' AND field_name='$field_name' AND table_name='$tableName' AND bean_id='$id' ";
+    $qry->select->fields()->set("translated");
+    $where = $qry->select->where();
+    $where->add("langID", $langID);
+    $where->add("field_name", "'$field_name'");
+    $where->add("table_name", "'$tableName'");
+    $where->Add("bean_id", $id);
+
+
     $qry->select->limit = " 1 ";
-    $qry->select->fields = " translated ";
 
     if ($qry->exec() && $btrow = $qry->next()) {
         $row[$field_name] = $btrow["translated"];
@@ -185,9 +193,9 @@ function tr(string $str_original): string
         $langID = getActiveLanguageID();
 
         $qry = $g_tr->query();
-        $qry->select->where = " langID=$langID and textID=$textID ";
+        $qry->select->fields()->set("translated");
+        $qry->select->where()->add("langID", $langID)->add("textID", $textID);
         $qry->select->limit = " 1 ";
-        $qry->select->fields = " translated ";
 
         if ($qry->exec() && $trow = $qry->next()) {
 
@@ -198,9 +206,9 @@ function tr(string $str_original): string
 
     }
     catch (Exception $e) {
-        //
-        return $e->getMessage();
-
+        debug("Language translator exception: ".$e->getMessage());
+        //return $e->getMessage();
+        throw $e;
     }
 
 }

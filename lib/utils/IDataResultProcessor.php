@@ -2,5 +2,7 @@
 
 interface IDataResultProcessor
 {
-    public function setData(array &$result);
+    public function setData(array &$data);
 }
+
+?>

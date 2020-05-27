@@ -47,18 +47,18 @@ class MenuBarItemRenderer extends MenuItemRenderer
         }
     }
 
-    public function startRender()
-    {
-        $attrs = $this->prepareAttributes();
-        echo "<div $attrs>";
-    }
+//    public function startRender()
+//    {
+//        $attrs = $this->prepareAttributes();
+//        echo "<div $attrs>";
+//    }
+//
+//    public function finishRender()
+//    {
+//        echo "</div>";
+//    }
 
-    public function finishRender()
-    {
-        echo "</div>";
-    }
-
-    public function renderImpl()
+    protected function renderImpl()
     {
 
         //

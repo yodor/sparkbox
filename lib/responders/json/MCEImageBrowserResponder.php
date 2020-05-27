@@ -12,14 +12,14 @@ class ImageDimensionForm extends InputForm
     public function __construct()
     {
         parent::__construct();
-        $modes = array("gallery_photo" => "Full", "image_crop" => "Crop", "image_thumb" => "Thumbnail");
+        $modes = array("fit_px" => "Fit Size (px)", "fit_prc"=> "Fit Size (%)");
 
-        $render_modes = new ArrayDataIterator($modes, "id", "label");
+        $render_modes = new ArrayDataIterator($modes);
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "render_mode", "Render Mode", 0);
         $field->getRenderer()->setIterator($render_modes);
-        $field->getRenderer()->getItemRenderer()->setValueKey("id");
-        $field->getRenderer()->getItemRenderer()->setLabelKey("label");
+        $field->getRenderer()->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_ID);
+        $field->getRenderer()->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
         $field->getRenderer()->na_label = "";
 
         $this->addInput($field);
@@ -34,6 +34,7 @@ class ImageDimensionForm extends InputForm
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::CHECKBOX, "enable_popup", "Enable Popup", 0);
+        $field->getRenderer()->setInputAttribute("tooltip", "Enable fullscreen view");
         $this->addInput($field);
     }
 }
@@ -54,7 +55,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
 
         //do not require thumbnail. just create the imagestorage of the upload data
-        $this->setPhotoSize(-1, 64);
+        $this->setPhotoSize(128, -1);
     }
 
     public function setSection(string $section_name, string $section_key)
@@ -91,7 +92,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         ob_start();
         echo "<div class='Element' imageID=$id>";
         echo "<div class='remove_button'>X</div>";
-        $img_href = StorageItem::Image($id, "MCEImagesBean", -1, 128);
+        $img_href = StorageItem::Image($id, "MCEImagesBean", $this->width, $this->height);
         echo "<img class='image_contents' src='$img_href'>";
         echo "</div>";
         $html = ob_get_contents();
@@ -106,19 +107,19 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
         $bean = new MCEImagesBean();
         $qry = $bean->query();
-        $qry->select->where = " section='{$this->section_name}' AND section_key='{$this->section_key}'";
+        $qry->select->where()->add("section", "'{$this->section_name}'")->add("section_key", "'{$this->section_key}'");
 
         if ($this->ownerID > 0) {
-            $qry->select->where .= " AND ownerID='{$this->ownerID}' ";
+            $qry->select->where()->add("ownerID", $this->ownerID);
 
         }
 
         if (isset($_GET["imageID"])) {
             $imageID = (int)$_GET["imageID"];
-            $qry->select->where .= " AND imageID='$imageID' ";
+            $qry->select->where()->add("imageID", $imageID);
         }
 
-        $qry->select->fields = " section, section_key, imageID, ownerID, auth_context ";
+        $qry->select->fields()->set("section", "section_key", "imageID", "ownerID", "auth_context");
 
         $num_images = $qry->exec();
 
@@ -208,7 +209,9 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         echo "</div>";
 
         echo "<div class='dimension'>";
-        $frend->render();
+        $frend->startRender();
+        $frend->renderInputs();
+        $frend->finishRender();
         echo "</div>";
 
         echo "</div>";

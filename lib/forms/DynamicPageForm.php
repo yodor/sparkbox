@@ -10,10 +10,12 @@ class DynamicPageForm extends InputForm
         parent::__construct();
 
         $field = new DataInput("item_title", "Title", 1);
+        $field->enableTranslator(true);
         new TextField($field);
         $this->addInput($field);
 
         $field = new DataInput("content", "Content", 1);
+        $field->enableTranslator(true);
         new MCETextArea($field);
 
         $this->addInput($field);
@@ -45,12 +47,11 @@ class DynamicPageForm extends InputForm
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 0);
-        $field->getProcessor()->transact_mode = InputProcessor::TRANSACT_OBJECT;
+
         $field->getProcessor()->max_slots = 1;
         $this->addInput($field);
 
-        $this->getInput("item_title")->enableTranslator(TRUE);
-        $this->getInput("content")->enableTranslator(TRUE);
+
     }
 
 }

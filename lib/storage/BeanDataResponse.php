@@ -74,15 +74,15 @@ abstract class BeanDataResponse extends HTTPResponse
         }
 
         $qry = $this->bean->queryField($this->bean->key(), $this->id, 1);
-        $fields = array();
 
         $storageTypes = $this->bean->storageTypes();
 
         foreach ($storageTypes as $name => $storageType) {
             if (strpos($storageType, "blob") !== FALSE) continue;
-            $fields[] = $name;
+
+            $qry->select->fields()->set($name);
         }
-        $qry->select->fields = implode(",", $fields);
+
         if (!$qry->exec()) throw new Exception("Unable to query for auth_context");
 
         $row = $qry->next();
@@ -115,6 +115,7 @@ abstract class BeanDataResponse extends HTTPResponse
         else {
             debug("Fetching ID: " . $this->id . " Bean: " . get_class($this->bean));
             $this->row = $this->bean->getByID($this->id);
+            debug("Data: ", $this->row);
         }
 
         if (!isset($this->row[$this->field])) {

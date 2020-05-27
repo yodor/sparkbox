@@ -3,6 +3,9 @@ include_once("templates/PageTemplate.php");
 
 abstract class AdminPageTemplate extends PageTemplate
 {
+    /**
+     * @var DBTableBean
+     */
     protected $bean;
 
     public function __construct()

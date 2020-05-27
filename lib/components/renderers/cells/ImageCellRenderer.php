@@ -4,7 +4,7 @@ include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/TableColumn.php");
 include_once("storage/StorageItem.php");
 
-class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
+class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 {
 
     /**
@@ -33,8 +33,8 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     public static function SetDefaultPhotoSize(int $width, int $height)
     {
-        TableImageCellRenderer::$DefaultWidth = $width;
-        TableImageCellRenderer::$DefaultHeight = $height;
+        ImageCellRenderer::$DefaultWidth = $width;
+        ImageCellRenderer::$DefaultHeight = $height;
     }
 
     public function __construct(int $width = -1, int $height = -1)
@@ -44,8 +44,8 @@ class TableImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $this->list_limit = 1;
 
         if ($width < 1 && $height < 1) {
-            $width = TableImageCellRenderer::$DefaultWidth;
-            $height = TableImageCellRenderer::$DefaultHeight;
+            $width = ImageCellRenderer::$DefaultWidth;
+            $height = ImageCellRenderer::$DefaultHeight;
         }
 
         $this->image_popup = new ImagePopup();

@@ -13,21 +13,25 @@ class FAQItemInputForm extends InputForm
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "fqsID", "Section", 0);
 
-        $source = new FAQSectionsBean();
+        $bean = new FAQSectionsBean();
 
         $rend = $field->getRenderer();
 
-        $rend->setIterator($source->query());
+        $qry = $bean->query();
+        $qry->select->fields()->set($bean->key(), "section_name");
+        $rend->setIterator($qry);
 
-        $rend->getItemRenderer()->setValueKey($source->key());
+        $rend->getItemRenderer()->setValueKey($bean->key());
         $rend->getItemRenderer()->setLabelKey("section_name");
 
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "question", "Question", 1);
+        $field->enableTranslator(true);
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "answer", "Answer", 1);
+        $field->enableTranslator(true);
         $this->addInput($field);
 
     }

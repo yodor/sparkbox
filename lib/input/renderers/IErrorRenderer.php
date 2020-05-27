@@ -7,7 +7,8 @@ interface IErrorRenderer
     const MODE_NONE = 0;
 
     public function processErrorAttributes();
-
+    public function setErrorRenderMode(int $mode);
+    public function getErrorRenderMode():int;
 }
 
 ?>

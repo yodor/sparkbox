@@ -237,7 +237,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 $maID = (int)$attr_row[$attrs->key()];
 
                 $qry1 = $ca->query();
-                $qry1->select->where = " maID = '$maID' AND catID='{$this->catID}' ";
+                $qry1->select->where()->add("maID", "'$maID'")->add("catID", "'{$this->catID}'");
                 $qry1->select->limit = " 1 ";
                 $qry1->exec();
 
