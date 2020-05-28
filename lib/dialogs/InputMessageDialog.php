@@ -16,7 +16,7 @@ class InputMessageDialog extends ConfirmMessageDialog
         $this->input = DataInputFactory::Create(DataInputFactory::TEXT, "user_input", "Input Data", 0);
     }
 
-    public function requiredScript()
+    public function requiredScript(): array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/dialogs/InputMessageDialog.js";

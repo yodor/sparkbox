@@ -48,7 +48,7 @@ class Action extends DataIteratorItem
 
         foreach ($parameters as $idx => $parameter) {
 
-            $this->urlbuilder->addParameter($parameter);
+            $this->urlbuilder->add($parameter);
 
         }
 
@@ -58,7 +58,7 @@ class Action extends DataIteratorItem
 
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/Action.css";

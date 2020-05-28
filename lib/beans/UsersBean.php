@@ -28,18 +28,18 @@ class UsersBean extends DBTableBean
     //email
     public function emailExists($email)
     {
-        return $this->findFieldValue("email", $email);
+        return $this->getResult("email", $email);
     }
 
     public function email($userID)
     {
-        return $this->fieldValue($userID, "email");
+        return $this->getValue($userID, "email");
     }
 
     public function email2id($email)
     {
 
-        $row = $this->findFieldValue("email", $email);
+        $row = $this->getResult("email", $email);
         if (!$row) return -1;
         return $row[$this->key()];
 

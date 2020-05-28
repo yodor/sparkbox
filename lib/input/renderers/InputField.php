@@ -56,7 +56,7 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         $this->addon_contents->setClassName("addon");
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/InputField.css";

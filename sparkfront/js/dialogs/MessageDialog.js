@@ -2,6 +2,9 @@ class MessageDialog extends Component {
 
     static indexCounter = -1;
 
+    /**
+     * Create a DOM element selector for MessageDialog popups
+     */
     constructor() {
         super();
         this.setClass(".MessageDialog");
@@ -57,8 +60,9 @@ class MessageDialog extends Component {
 
     show() {
 
-        //increment the index of this class
+        //increment the global index counter
         MessageDialog.indexCounter++;
+        //set this selector index
         this.index = MessageDialog.indexCounter;
 
         let element = this.createContent();
@@ -70,6 +74,7 @@ class MessageDialog extends Component {
 
         let instance = this;
 
+        //setup button actions
         buttonsBar.find("[action]").each(function(index) {
            $(this).on("click", function (event) {
                let action = $(this).attr("action");

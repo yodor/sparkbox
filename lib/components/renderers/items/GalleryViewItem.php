@@ -44,7 +44,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         $this->actions = new ActionCollection();
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/Action.css";

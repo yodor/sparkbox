@@ -15,6 +15,12 @@ class NumericCellRenderer extends TableCellRenderer
         }
     }
 
+    public function setColumn(TableColumn $tc)
+    {
+        parent::setColumn($tc);
+        $tc->setAlignClass(TableColumn::ALIGN_RIGHT);
+    }
+
     protected function renderImpl()
     {
 

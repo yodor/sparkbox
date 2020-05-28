@@ -16,6 +16,12 @@ class BooleanCellRenderer extends TableCellRenderer
         $this->false_value = $false_value;
     }
 
+    public function setColumn(TableColumn $tc)
+    {
+        parent::setColumn($tc);
+        $tc->setAlignClass(TableColumn::ALIGN_CENTER);
+    }
+
     public function setData(array &$row)
     {
         parent::setData($row);

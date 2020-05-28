@@ -9,34 +9,49 @@ abstract class DBTableBean
 {
 
     /**
-     * Base class to work with DB Tables
-     *
+     * Primary key
+     * @var string
      */
-
-    protected $prkey = "";
-
-    protected $table = "";
-
-    protected $fields = array();
-
-    protected $createString = "";
+    protected $prkey;
 
     /**
-     * @var DBDriver|null
+     * Table
+     * @var string
      */
-    protected $db = NULL;
-
-    protected $storage_types = NULL;
-
-    protected static $instances = array();
+    protected $table;
 
     /**
-     * @var SQLSelect|null
+     * SQL to create this bean table into the DB
+     * @var string
      */
-    protected $select = NULL;
+    protected $createString;
+
+    /**
+     * @var DBDriver
+     */
+    protected $db;
+
+    /**
+     * Column names of this table as keys and the column storage type as value
+     * @var array
+     */
+    protected $columns = array();
+
+
+    /**
+     * @var SQLSelect
+     */
+    protected $select;
 
     protected $error = "";
 
+    /**
+     * DBTableBean constructor. Specify the table name to work with in the '$table_name' parameter.
+     * The default global DBDriver is used unless specified in the '$dbdriver' parameter
+     * @param string $table_name
+     * @param DBDriver|null $dbdriver
+     * @throws Exception
+     */
     public function __construct(string $table_name, DBDriver $dbdriver = NULL)
     {
         $this->table = $table_name;
@@ -54,43 +69,31 @@ abstract class DBTableBean
 
         $this->initFields();
 
-        if (!isset(self::$instances[$bclass])) {
-            self::$instances[$bclass] = $this;
-        }
-
         $this->select = new SQLSelect();
 
         $this->select->from = $this->table;
 
     }
 
-    public static function instance($class)
-    {
-        if (isset(self::$instances[$class])) {
-            return self::$instances[$class];
-        }
-        return new $class();
-    }
-
     public function __destruct()
     {
-        //$this->db->free($this->iterator);
+
     }
 
     protected function initFields()
     {
 
-        $this->storage_types = array();
+        $this->columns = array();
 
         if (!$this->db->tableExists($this->table)) {
             if (strlen($this->createString) < 1) {
-                throw new Exception("Table [{$this->table}] was not found in the active connection and no create string set to recreate the table.");
+                throw new Exception("Table '{$this->table}' was not found in the active connection and no create string is set to recreate the table");
             }
             $this->createTable();
         }
 
         if (!$this->db->tableExists($this->table)) {
-            throw new Exception("Table [{$this->table}] is not available in the active connection.");
+            throw new Exception("Table '{$this->table}' is not available in the active DB connection");
         }
 
         $res = $this->db->queryFields($this->table);
@@ -102,13 +105,11 @@ abstract class DBTableBean
 
             $field_name = $row["Field"];
 
-            $this->fields[] = $field_name;
-
-            $this->storage_types[$field_name] = $row["Type"];
+            $this->columns[$field_name] = $row["Type"];
         }
         if ($res) $this->db->free($res);
 
-        //       debug("Storage Types for Bean: ".get_class($this), $this->storage_types);
+        //debug("Storage Types for Bean: ".get_class($this), $this->storage_types);
 
     }
 
@@ -140,25 +141,35 @@ abstract class DBTableBean
     }
 
     /**
-     * @return string Table primary key
+     * Return the table primary key
+     * @return string
      */
     public function key(): string
     {
         return $this->prkey;
     }
 
-    public function fields(): array
+    /**
+     * Return column names of this table
+     * @return array
+     */
+    public function columnNames(): array
     {
-        return $this->fields;
-    }
-
-    public function storageTypes()
-    {
-        return $this->storage_types;
+        return array_keys($this->columns);
     }
 
     /**
-     * Return the current SQLSelect that is used from the query functions
+     * Return all the column names of this table as keys and the column storage type as value
+     * @return array
+     */
+    public function columns(): array
+    {
+        return $this->columns;
+    }
+
+    /**
+     * SQLSelect that is used from the query functions.
+     * Default fieldset list is empty
      * @return SQLSelect
      */
     public function select(): SQLSelect
@@ -166,6 +177,21 @@ abstract class DBTableBean
         return $this->select;
     }
 
+    /**
+     * Return true if '$column' exist in this table
+     * @param string $column
+     * @return bool
+     */
+    public function haveColumn(string $column): bool
+    {
+        return array_key_exists($column, $this->columns);
+    }
+
+    /**
+     * Return the count of rows of this table
+     * @return int
+     * @throws Exception
+     */
     public function getCount(): int
     {
         $qry = $this->query();
@@ -173,25 +199,35 @@ abstract class DBTableBean
         return $qry->exec();
     }
 
-    public function haveField($field_name): bool
+    /**
+     * Create default query selecting columns specified in the '$columns' list
+     * If no columns are specified the default columns as set in the SQLSelect instance are used
+     * Current SQLSelect is cloned and passed to the SQLQuery constructor
+     * @param string ...$columns
+     * @return SQLQuery
+     */
+    public function query(string ...$columns): SQLQuery
     {
-        return in_array($field_name, $this->fields);
-    }
+        $qry = new SQLQuery(clone $this->select, $this->prkey, $this->getTableName());
+        $qry->setDB($this->db);
+        $qry->setBean($this);
+        foreach ($columns as $column) {
+            $qry->select->fields()->set($column);
+        }
 
-    public function queryID(int $id): SQLQuery
-    {
-        return $this->queryField($this->prkey, $id, 1);
+        return $qry;
     }
 
     /**
-     * Create query that select all columns of this bean and using empty where clause
+     * Create query that select all columns of this table
      * @return SQLQuery
      */
-    public function queryFull() : SQLQuery
+    public function queryFull(): SQLQuery
     {
         $qry = $this->query();
 
-        foreach ($this->fields as $idx => $value) {
+        $columns = $this->columnNames();
+        foreach ($columns as $idx => $value) {
             $qry->select->fields()->set($value);
         }
 
@@ -199,16 +235,15 @@ abstract class DBTableBean
     }
 
     /**
-     * Create query that select this bean primary key and field '$field'
-     * Sets to where clause to match only '$field' with value '$value' using operator '$sign'
-     * Sets the limit of the query select to $limit
+     * Query the table where column '$field' = '$value'
+     * Result columns are the primary key, $field and all column names passed in $columns
      * @param string $field
      * @param string $value
      * @param int $limit
-     * @param string $sign
+     * @param string ...$columns
      * @return SQLQuery
      */
-    public function queryField(string $field, string $value, int $limit = 0, string $sign = SQLClause::DEFAULT_OPERATOR): SQLQuery
+    public function queryField(string $field, string $value, int $limit = 0, string ...$columns): SQLQuery
     {
         $field = $this->db->escape($field);
         $value = $this->db->escape($value);
@@ -216,81 +251,79 @@ abstract class DBTableBean
         $qry = $this->query();
         $qry->select->fields()->set($this->prkey);
         $qry->select->fields()->set($field);
-        $qry->select->where()->add($field, "'$value'", $sign);
+
+        $qry->select->fields()->set(...$columns);
+
+        $qry->select->where()->add($field, "'$value'");
         if ($limit > 0) {
-            $qry->select->limit = " $limit ";
+            $qry->select->limit = $limit;
         }
 
         return $qry;
     }
 
     /**
-     * Clone the current SQLSelect and return new SQLQuery using it
-     * @return SQLQuery
+     * Retrieve single result row where column '$column' has value '$value'
+     * @param string $column
+     * @param string $value
+     * @return array|null
+     * @throws Exception
      */
-    public function query(): SQLQuery
+    public function getResult(string $column, string $value) : ?array
     {
-        $qry = new SQLQuery(clone $this->select, $this->prkey, $this->getTableName());
-        $qry->setDB($this->db);
-        $qry->setBean($this);
-        return $qry;
-    }
-
-    public function findFieldValue(string $field_name, string $field_value)
-    {
-        $qry = $this->queryField($field_name, $field_value, 1);
+        $qry = $this->queryField($column, $value, 1);
         $qry->exec();
         return $qry->next();
     }
 
-    public function fieldValues(int $id, array $field_names): ?array
-    {
-        $qry = $this->queryField($this->prkey, $id, 1);
-        $qry->select->fields()->set($this->prkey);
-        foreach ($field_names as $idx => $value) {
-            $qry->select->fields()->set("`" . $this->db->escape($value) . "`");
-        }
-
-        $qry->exec();
-        if ($row = $qry->next()) {
-            return $row;
-        }
-        return NULL;
-    }
-
-    public function fieldValue(int $id, string $field): ?string
-    {
-        $field = $this->db->escape($field);
-
-        $qry = $this->queryField($this->prkey, $id, 1);
-        $qry->select->fields()->set($this->prkey, "`$field`");
-        $qry->exec();
-        if ($row = $qry->next()) {
-            return $row[$field];
-        }
-        return NULL;
-    }
-
     /**
+     * Retrieve the value of column '$column' where primary key value = '$id'
+     * Return NULL if no matching result is found
      * @param int $id
-     * @param array $fields
-     * @return mixed
+     * @param string $field
+     * @return string|null
      * @throws Exception
      */
-    public function getByID(int $id, array $fields = array())
+    public function getValue(int $id, string $column): ?string
     {
-        $qry = $this->queryID($id);
+        $column = $this->db->escape($column);
 
-        if (count($fields)>0) {
-            foreach ($fields as $idx => $val) {
-                $qry->select->fields()->set($val);
-            }
+        $qry = $this->queryField($this->prkey, $id, 1);
+        $qry->select->fields()->set($this->prkey, "`$column`");
+        $qry->exec();
+        if ($row = $qry->next()) {
+            return $row[$column];
+        }
+        return NULL;
+    }
+
+    /**
+     * Retrieve single result row where primary key value = '$id'
+     * All columns are selected unless $columns is not empty then only primary key + $columns are selected
+     * If ID is not found throws Exception
+     * @param int $id
+     * @param string ...$columns
+     * @return array|null
+     * @throws Exception
+     */
+    public function getByID(int $id, string ...$columns)
+    {
+        $qry = NULL;
+
+        //use only columns passed in columns + the primary key
+        if (count($columns) > 0) {
+            $qry = $this->query();
+            $qry->select->fields()->set($this->prkey);
+            $qry->select->fields()->set(...$columns);
         }
         else {
-            foreach ($this->fields as $idx => $value) {
-                $qry->select->fields()->set($value);
-            }
+            //match all columns
+            $qry = $this->queryFull();
         }
+
+        $qry->select->where()->add($this->prkey, $id);
+
+        $qry->select->limit = 1;
 
         $num = $qry->exec();
         if ($num < 1) throw new Exception("No such ID");
@@ -299,27 +332,17 @@ abstract class DBTableBean
     }
 
     /**
-     * @param string $refKey
-     * @param int $refID
-     * @param array $fields
-     * @return mixed
+     * Retrieve single result row where $column = '$value' , additional '$columns' are used if specified
+     * @param string $column
+     * @param int $value
+     * @param string ...$columns
+     * @return array|null
      * @throws Exception
      */
-    public function getByRef(string $refKey, int $refID, array $fields = array())
+    public function getByRef(string $column, int $value, string ...$columns)
     {
 
-        $qry = $this->queryField($refKey, $refID, 1);
-
-        if (count($fields)>0) {
-            foreach ($fields as $idx => $val) {
-                $qry->select->fields()->set($val);
-            }
-        }
-        else {
-            foreach ($this->fields as $idx => $value) {
-                $qry->select->fields()->set($value);
-            }
-        }
+        $qry = $this->queryField($column, $value, 1, ...$columns);
 
         $num = $qry->exec();
         if ($num < 1) throw new Exception("No such ID");
@@ -329,10 +352,10 @@ abstract class DBTableBean
     }
 
     /**
-     * Handle db code wrapped inside transaction/commit
-     *
+     * Handle code specified in Closure $code wrapped inside transaction/commit
+     * Start new transaction only if $db parameter is NULL
      * @param Closure $code Code to execute in transaction
-     * @param DBDriver|null $db parent DBDruver
+     * @param DBDriver|null $db parent DBDriver
      * @return int The number of affected rows after closure execution
      * @throws Exception
      */
@@ -386,11 +409,14 @@ abstract class DBTableBean
     }
 
     /**
+     * Delete where primary key = '$id'
+     * Returns the number of affected rows
      * @param int $id
      * @param DBDriver|null $db
+     * @return int
      * @throws Exception
      */
-    public function delete(int $id, DBDriver $db = NULL)
+    public function delete(int $id, DBDriver $db = NULL) : int
     {
 
         $code = function (DBDriver $db) use ($id) {
@@ -412,21 +438,23 @@ abstract class DBTableBean
     }
 
     /**
-     * Delete where refkey=refval and primary key is not inside keep_ids
-     * @param string $refkey
-     * @param string $refval
+     * Delete where column '$column' have value '$value'
+     * Specify all primary keys to skip from the delete operation in the $keep_ids array
+     * @param string $column
+     * @param string $value
      * @param DBDriver|null $db
-     * @param array $keep_ids
+     * @param array $keep_ids if not empty would not delete rows with primary keys specified in keep_ids
      * @throws Exception
      */
-    public function deleteRef(string $refkey, string $refval, DBDriver $db = NULL, $keep_ids = array())
+    public function deleteRef(string $column, string $value, DBDriver $db = NULL, array $keep_ids = array()) : int
     {
-        if (!in_array($refkey, $this->fields)) throw new Exception("Field '$refkey' not found in this bean");
+        if (!in_array($column, $this->columnNames())) throw new Exception("Column '$column' not found in this bean table");
 
-        $code = function (DBDriver $db) use ($refkey, $refval, $keep_ids) {
+        $code = function (DBDriver $db) use ($column, $value, $keep_ids) {
 
             $delete = new SQLDelete($this->select);
-            $delete->where()->add($refkey, "'$refval'");
+            $value = $db->escape($value);
+            $delete->where()->add($column, "'$value'");
 
             if (count($keep_ids) > 0) {
                 $keep_list_ids = implode(",", $keep_ids);
@@ -439,41 +467,16 @@ abstract class DBTableBean
 
             if (!$db->query($sql)) throw new Exception("Unable to deleteRef");
 
-            $this->manageCache($refval);
+            $this->manageCache($value);
         };
 
-        $this->handleTransaction($code, $db);
+        return $this->handleTransaction($code, $db);
 
-    }
-
-    public function toggleField(int $id, string $field)
-    {
-
-        $field = $this->db->escape($field);
-        if (!in_array($field, $this->fields)) throw new Exception("Field '$field' not found in this bean");
-
-        try {
-
-            $this->db->transaction();
-
-            $update = new SQLUpdate($this->select);
-            $update->set($field, " NOT $field ");
-            $update->where()->add($this->prkey, $id);
-
-            if (!$this->db->query($update->getSQL())) throw new Exception("toggleField DB Error: " . $this->db->getError());
-
-            $this->db->commit();
-        }
-        catch (Exception $e) {
-            $this->db->rollback();
-            $this->error = $this->db->getError();
-            throw $e;
-        }
     }
 
     public function needQuotes(string $key, &$value = "")
     {
-        $storage_type = $this->storage_types[$key];
+        $storage_type = $this->columns[$key];
         //        echo "$key=>$storage_type | ";
 
         // 	  if (strpos($storage_type,"char")!==false || strpos($storage_type,"text")!==false || strpos($storage_type,"blob")!==false  ||  strpos($storage_type,"enum")!==false) {
@@ -494,7 +497,7 @@ abstract class DBTableBean
 
     public function isNumeric($key): bool
     {
-        $storage_type = $this->storage_types[$key];
+        $storage_type = $this->columns[$key];
         if ((strpos($storage_type, "decimal") !== FALSE) || (strpos($storage_type, "numeric") !== FALSE) || (strpos($storage_type, "integer") !== FALSE) || (strpos($storage_type, "float") !== FALSE) || (strpos($storage_type, "double") !== FALSE) ||
 
             (strpos($storage_type, "tinyint") !== FALSE) || (strpos($storage_type, "small") !== FALSE) || (strpos($storage_type, "mediumint") !== FALSE) || (strpos($storage_type, "int") !== FALSE) || (strpos($storage_type, "bigint") !== FALSE)) {
@@ -504,6 +507,13 @@ abstract class DBTableBean
 
     }
 
+    /**
+     * Insert $row into this table and return the last insert ID
+     * @param array $row
+     * @param DBDriver|null $db
+     * @return int
+     * @throws Exception
+     */
     public function insert(array &$row, DBDriver $db = NULL): int
     {
 
@@ -522,8 +532,8 @@ abstract class DBTableBean
             }
 
             if (!$db->query($sql)) {
-                debug("Unable to insert: ".$db->getError()." SQL: ".$sql);
-                throw new Exception("Unable to insert: ".$db->getError());
+                debug("Unable to insert: " . $db->getError() . " SQL: " . $sql);
+                throw new Exception("Unable to insert: " . $db->getError());
             }
 
             //NOTE!!! lastID return the first auto_increment of a multi insert transaction
@@ -544,7 +554,7 @@ abstract class DBTableBean
      * @return int the number of affected rows from this update
      * @throws Exception
      */
-    public function update(int $id, array &$row, DBDriver $db = NULL)
+    public function update(int $id, array &$row, DBDriver $db = NULL) : int
     {
 
         $values = array();
@@ -592,7 +602,7 @@ abstract class DBTableBean
 
         foreach ($row as $key => $val) {
             //drop keys that are not fields from 'this' table
-            if (!in_array($key, $this->fields)) continue;
+            if (!in_array($key, $this->columnNames())) continue;
             $keys[] = $key;
         }
 

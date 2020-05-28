@@ -32,7 +32,7 @@ class AdminUsersListPage extends BeanListPage
         $view = new TableView($qry);
 
         //TODO: selective enable bottom or top
-        $view->enablePaginators(TableView::BOTTOM_PAGINATOR);
+        $view->enablePaginators(TableView::PAGINATOR_BOTTOM);
 
         $view->addColumn(new TableColumn($bean->key(), "ID", TableColumn::ALIGN_CENTER));
         $view->addColumn(new TableColumn("email", "Email"));

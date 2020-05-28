@@ -97,7 +97,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         return $result;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/KeywordSearch.css";

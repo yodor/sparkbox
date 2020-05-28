@@ -85,17 +85,17 @@ class Component implements IRenderer, IHeadContents
         return $this->component_class;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         return array();
     }
 
-    public function requiredScript()
+    public function requiredScript() : array
     {
         return array();
     }
 
-    public function requiredMeta()
+    public function requiredMeta() : array
     {
         return array();
     }

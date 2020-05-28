@@ -28,13 +28,13 @@ class AdminUsersBean extends DBTableBean
         parent::__construct("admin_users");
     }
 
-    public function delete(int $id, DBDriver $db = NULL)
+    public function delete(int $id, DBDriver $db = NULL) : int
     {
         if ($id == 1) throw new Exception("Root admin user is protected");
         return parent::delete($id, $db);
     }
 
-    public function update(int $id, array &$row, DBDriver $db = NULL)
+    public function update(int $id, array &$row, DBDriver $db = NULL) : int
     {
         if ($id == 1 && (isset($row["suspend"]) && $row["suspend"] > 0)) throw new Exception("Root admin user is protected");
         return parent::update($id, $row, $db);
@@ -44,19 +44,19 @@ class AdminUsersBean extends DBTableBean
     //email
     public function emailExists(string $email)
     {
-        return $this->findFieldValue("email", $email);
+        return $this->getResult("email", $email);
 
     }
 
     public function email(int $userID)
     {
-        return $this->fieldValue($userID, "email");
+        return $this->getValue($userID, "email");
     }
 
     public function email2id(string $email)
     {
 
-        $row = $this->findFieldValue("email", $email);
+        $row = $this->getResult("email", $email);
         if (!$row) return -1;
         return $row[$this->key()];
 

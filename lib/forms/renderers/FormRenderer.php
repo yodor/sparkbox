@@ -107,7 +107,7 @@ class FormRenderer extends Container
         throw new Exception("TextSpace container not found");
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/FormRenderer.css";

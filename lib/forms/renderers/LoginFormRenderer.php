@@ -34,7 +34,7 @@ class LoginFormRenderer extends FormRenderer
 
     }
 
-    public function requiredScript()
+    public function requiredScript() : array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/md5.js";
@@ -42,7 +42,7 @@ class LoginFormRenderer extends FormRenderer
         return $arr;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/LoginForm.css";

@@ -14,6 +14,8 @@ class RequestController
         self::$responders[$command_name] = $responder;
 
         debug("RequestResponder: '" . get_class($responder) . "' accepting command: '$command_name'");
+
+
     }
 
     public static function Get(string $command): RequestResponder

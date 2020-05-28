@@ -27,8 +27,12 @@ class BeanEditorPage extends AdminPageTemplate
     public function setBean(DBTableBean $bean)
     {
         parent::setBean($bean);
-        if (!$this->page->getName()) {
+        if ($this->page->getName()) {
+            $this->page->setName("Item Data: ".$this->page->getName());
+        }
+        else {
             $this->page->setName("Item Data: ".get_class($bean));
+
         }
     }
 

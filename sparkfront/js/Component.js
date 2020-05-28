@@ -1,5 +1,10 @@
 class Component extends SparkObject
 {
+    /**
+     * Create a DOM Element selector
+     * The element attributes can be specified using the setter methods
+     * 
+     */
     constructor() {
         super();
         this.name = "";
@@ -78,7 +83,7 @@ class Component extends SparkObject
             console.log(this.constructor.name + "::initialize() " + this.selector());
         }
         else {
-            throw "Component selector not found in DOM: " + this.selector();
+            throw "DOM element not found: " + this.selector();
         }
 
     }

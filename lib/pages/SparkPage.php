@@ -9,6 +9,7 @@ include_once("dialogs/MessageDialog.php");
 include_once("components/ImagePopup.php");
 include_once("utils/IActionCollection.php");
 include_once("utils/ActionCollection.php");
+include_once("utils/FBPixel.php");
 
 class SparkPage extends HTMLPage implements IActionCollection
 {
@@ -67,12 +68,12 @@ class SparkPage extends HTMLPage implements IActionCollection
     protected $opengraph_tags = array();
 
     /**
-     * Meta tag 'Description' overload. If not empty is used instead of $config_description
+     * Meta tag 'Description' overload. If not empty is used instead of ConfigBean 'seo' section value
      */
     public $description = "";
 
     /**
-     * Meta tag 'Keywords' overload. If not empty is used instead of $config_keywords
+     * Meta tag 'Keywords' overload. If not empty is used instead of ConfigBean 'seo' section value
      */
     public $keywords = "";
 
@@ -87,6 +88,23 @@ class SparkPage extends HTMLPage implements IActionCollection
      * property array of Action objects holding page action buttons
      */
     protected $actions;
+
+    /**
+     * @var FBPixel|null
+     */
+    protected $fbpixel;
+
+    protected $gtag_objects = array();
+
+    public function addGTAGObject(GTAGObject $obj)
+    {
+        $this->gtag_objects[] = $obj;
+    }
+
+    public function getFacebookPixel(): ?FBPixel
+    {
+        return $this->fbpixel;
+    }
 
     /**
      * @return int The numeric ID as from the Authenticator
@@ -165,19 +183,48 @@ class SparkPage extends HTMLPage implements IActionCollection
             $config = ConfigBean::Factory();
             $config->setSection("seo");
 
-            $google_analytics = $config->getValue("google_analytics");
-            if ($google_analytics) {
+            $googleID_analytics = $config->get("googleID_analytics");
+            if ($googleID_analytics) {
+                $this->renderGTAG($googleID_analytics);
+            }
 
-                echo "<script type='text/javascript'>\n";
-                $google_analytics = mysql_real_unescape_string($google_analytics);
-                $google_analytics = str_replace("\r", "", $google_analytics);
-                $google_analytics = str_replace("\n", "", $google_analytics);
-                echo $google_analytics;
-                echo "\n";
-                echo "</script>\n";
+            $googleID_ads = $config->get("googleID_ads");
+            if ($googleID_ads) {
+                $this->renderGTAG($googleID_ads);
             }
         }
+
+        if ($this->fbpixel) {
+            echo $this->fbpixel->script();
+        }
+
+        foreach ($this->gtag_objects as $idx => $object) {
+            if (!($object instanceof GTAGObject)) continue;
+            echo $object->script();
+        }
+
         parent::headEnd();
+    }
+
+    protected function renderGTAG(string $id)
+    {
+        echo "<!-- Start GTAG script for ID: $id -->";
+        ?>
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php
+        echo $id; ?>"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
+            gtag('js', new Date());
+            gtag('config', '<?php echo $id;?>');
+        </script>
+        <?php
+        echo "\r\n<!-- End GTAG script for ID: $id  -->\r\n";
     }
 
     public function addComponent(Component $cmp)
@@ -213,21 +260,22 @@ class SparkPage extends HTMLPage implements IActionCollection
     protected function renderJS()
     {
         parent::renderJS();
-        global $left, $right;
 
         ?>
+        <!-- SparkPage local script start -->
         <script type='text/javascript'>
             let LOCAL = "<?php echo LOCAL;?>";
             let SPARK_LOCAL = "<?php echo SPARK_LOCAL;?>";
             let STORAGE_LOCAL = "<?php echo STORAGE_LOCAL;?>";
-            let ajax_loader = "<div class='AjaxLoader'></div>";
-            let ajax_loader_src = SPARK_LOCAL + "/images/ajax-loader.gif";
-            let left = "<?php echo $left;?>";
-            let right = "<?php echo $right;?>";
         </script>
+        <!-- SparkPage local script end -->
         <?php
     }
 
+    /**
+     * SparkPage constructor.
+     * @throws Exception
+     */
     public function __construct()
     {
         parent::__construct();
@@ -265,6 +313,16 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->addJS(SPARK_LOCAL . "/js/SparkPage.js");
 
         $dialog = new MessageDialog();
+
+        if (DB_ENABLED) {
+            $config = ConfigBean::Factory();
+            $config->setSection("seo");
+
+            $facebookID_pixel = $config->get("facebookID_pixel");
+            if ($facebookID_pixel) {
+                $this->fbpixel = new FBPixel($facebookID_pixel);
+            }
+        }
     }
 
     protected function authorize()
@@ -333,29 +391,24 @@ class SparkPage extends HTMLPage implements IActionCollection
     {
         $title = $this->preferred_title . TITLE_PATH_SEPARATOR . SITE_TITLE;
 
-        //$buffer = str_replace("%%title%%", strip_tags($title), $buffer);
-
         $meta_keywords = "";
         $meta_description = "";
 
-        try {
-            if (DB_ENABLED) {
-                $config = ConfigBean::Factory();
-                $config->setSection("seo");
+        if (DB_ENABLED) {
+            $config = ConfigBean::Factory();
+            $config->setSection("seo");
 
-                $meta_keywords = $config->getValue("meta_keywords");
-                $meta_description = $config->getValue("meta_description");
-            }
-        }
-        catch (Exception $e) {
-            //
+            $meta_keywords = $config->get("meta_keywords");
+            $meta_description = $config->get("meta_description");
         }
 
         if ($this->keywords) {
+
             $meta_keywords = $this->keywords;
         }
 
         if ($this->description) {
+
             $meta_description = $this->description;
         }
 
@@ -363,9 +416,6 @@ class SparkPage extends HTMLPage implements IActionCollection
                          "%meta_description%" => strip_tags($meta_description));
 
         $buffer = strtr($buffer, $replace);
-
-        //$buffer = str_replace("%meta_keywords%", , $buffer);
-        //$buffer = str_replace("%meta_description%", strip_tags($meta_description), $buffer);
 
     }
 
@@ -381,8 +431,7 @@ class SparkPage extends HTMLPage implements IActionCollection
     public function startRender()
     {
 
-
-        if ($this->getURL()->haveParameter("JSONRequest")) {
+        if ($this->getURL()->contains("JSONRequest")) {
             //will 'exit' script always as JSONRequest is found as request URL parameter
             debug("Handling JSONRequest");
             RequestController::processJSONResponders();

@@ -11,11 +11,8 @@ include_once("components/renderers/cells/BooleanCellRenderer.php");
 
 include_once("components/Action.php");
 
-
-
 class TableView extends AbstractResultView implements IHeadContents
 {
-
 
     /**
      * @var array TableColumn
@@ -42,7 +39,7 @@ class TableView extends AbstractResultView implements IHeadContents
     public function __construct(IDataIterator $itr)
     {
         parent::__construct($itr);
-        $this->enablePaginators(TableView::BOTTOM_PAGINATOR);
+        $this->enablePaginators(TableView::PAGINATOR_BOTTOM);
 
         $this->row = new Component();
         $this->row->setTagName("TR");
@@ -57,7 +54,7 @@ class TableView extends AbstractResultView implements IHeadContents
         $this->table->setComponentClass("viewport");
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/TableView.css";
@@ -106,6 +103,11 @@ class TableView extends AbstractResultView implements IHeadContents
         return $this->columns[$name];
     }
 
+    public function haveColumn(string $name): bool
+    {
+        return array_key_exists($name, $this->columns);
+    }
+
     public function setHeaderCellsEnabled(bool $mode)
     {
         $this->header_cells_enabled = $mode;
@@ -142,10 +144,7 @@ class TableView extends AbstractResultView implements IHeadContents
 
         }
 
-
-
     }
-
 
     protected function renderImpl()
     {

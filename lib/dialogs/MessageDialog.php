@@ -52,14 +52,14 @@ class MessageDialog extends Component implements IPageComponent
         return $this->id;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/MessageDialog.css";
         return $arr;
     }
 
-    public function requiredScript()
+    public function requiredScript() : array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/dialogs/MessageDialog.js";

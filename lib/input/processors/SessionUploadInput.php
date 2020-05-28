@@ -148,40 +148,7 @@ class SessionUploadInput extends InputProcessor
             return;
         }
 
-        if ($this->transact_mode == InputProcessor::TRANSACT_DBROW) {
-
-            debug("Transact Mode: TRANSACT_DBROW");
-
-            if (count($values) > 1) {
-                throw new Exception("Could not transact multiple objects to the main transaction using TRANSACT_DBROW mode.");
-            }
-            if (count($values) < 1) {
-                throw new Exception("Could not transact empty object to the main transaction using TRANSACT_DBROW mode. (effective result will be delete of the main transaction row)");
-            }
-            //expecting single object
-            foreach ($values as $idx => $storage_object) {
-                $uid = $storage_object->getUID();
-
-                //this object is the same as the one that was loaded
-                if (array_key_exists($uid, $this->loaded_uids)) {
-                    debug("Object with UID: $uid as the same UID as the bean loaded one. Not transacting this object.");
-                }
-                else {
-                    debug("Transacting StorageObject UID: $uid merged with the main transaction row ");
-                    $dbrow = array();
-                    $storage_object->setDataKey($field_name);
-                    $storage_object->deconstruct($dbrow);
-                    foreach ($dbrow as $key => $field_value) {
-                        $transactor->appendValue($key, $field_value);
-                    }
-                    debug("Deconstructed UID: $uid as fields in the main transaction row");
-
-                }
-                break;
-            }
-
-        }
-        else if ($this->transact_mode == InputProcessor::TRANSACT_OBJECT) {
+        if ($this->transact_mode == InputProcessor::TRANSACT_OBJECT) {
             debug("Transact Mode: MODE_OBJECT");
 
             if (count($values) > 1) {

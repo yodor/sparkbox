@@ -5,6 +5,8 @@ include_once("components/ItemView.php");
 
 include_once("components/renderers/items/GalleryViewItem.php");
 include_once("components/renderers/cells/ImageCellRenderer.php");
+include_once("components/renderers/cells/DateCellRenderer.php");
+
 include_once("components/renderers/IPhotoRenderer.php");
 
 class GalleryView extends Container
@@ -51,10 +53,10 @@ class GalleryView extends Container
             $view->addColumn(new TableColumn("date_upload", "Date Upload"));
 
             $renderer = new ImageCellRenderer();
-
             $this->photo_renderer = $renderer;
 
             $view->getColumn("photo")->setCellRenderer($renderer);
+            $view->getColumn("date_upload")->setCellRenderer(new DateCellRenderer());
 
             $view->addColumn(new TableColumn("actions", "Actions"));
 
@@ -97,14 +99,14 @@ class GalleryView extends Container
 
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/GalleryView.css";
         return $arr;
     }
 
-    public function requiredScript()
+    public function requiredScript() : array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/GalleryView.js";
@@ -138,12 +140,16 @@ class GalleryView extends Container
     {
         $bkey = $this->bean->key();
 
-        //default mode for action is to keep the request search parameters
+        //default mode for action is to keep the request search parameters if script name is empty ie starts with ?
 
         $edit_params = array(new DataParameter("editID", $bkey));
 
+        $url = SparkPage::Instance()->getURL();
+        $url->setScriptName("add.php");
+
         $collection = $this->actions;
-        $collection->append(new Action("Edit", "add.php", $edit_params));
+
+        $collection->append(new Action("Edit", $url->url(), $edit_params));
 
         $collection->append(new PipeSeparator());
 

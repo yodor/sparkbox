@@ -46,7 +46,7 @@ class BeanKeyCondition extends RequestParameterCondition
 
         $this->id = (int)$this->value;
 
-        $this->data = $this->bean->getByID($this->id, $this->fields);
+        $this->data = $this->bean->getByID($this->id, ...$this->fields);
 
         $this->urlparam = new URLParameter($this->bean->key(), $this->id);
     }

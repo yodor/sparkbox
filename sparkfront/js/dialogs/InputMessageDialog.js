@@ -12,8 +12,12 @@ class InputMessageDialog extends MessageDialog {
         this.input().focus();
     }
 
+    /**
+     * The input field of this dialog
+     * @returns {jQuery}
+     */
     input() {
-        return $(this.visibleSelector()).find("[name='user_input']").first();
+        return $(this.visibleSelector() + " INPUT").first();
     }
 
 }

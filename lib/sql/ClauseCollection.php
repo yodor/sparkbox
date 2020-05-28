@@ -13,10 +13,11 @@ class ClauseCollection
 
     public function __clone()
     {
-        foreach ($this->clauses as $idx=>$clause) {
+        foreach ($this->clauses as $idx => $clause) {
             $this->clauses[$idx] = clone $clause;
         }
     }
+
     public function count(): int
     {
         return count($this->clauses);
@@ -76,7 +77,7 @@ class ClauseCollection
         }
     }
 
-    public function getSQL($with_where_text = TRUE) : string
+    public function getSQL($with_where_text = TRUE): string
     {
         $result = "";
 

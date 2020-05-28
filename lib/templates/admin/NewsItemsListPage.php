@@ -1,10 +1,7 @@
 <?php
 include_once("templates/admin/BeanListPage.php");
-
-include_once("beans/AdminUsersBean.php");
-
-include_once("responders/DeleteItemResponder.php");
-include_once("responders/ToggleFieldResponder.php");
+include_once("components/renderers/cells/ImageCellRenderer.php");
+include_once("components/renderers/cells/DateCellRenderer.php");
 
 class NewsItemsListPage extends BeanListPage
 {
@@ -30,5 +27,6 @@ class NewsItemsListPage extends BeanListPage
         $ticr->setBean($this->bean);
 
         $this->view->getColumn("item_photo")->setCellRenderer($ticr);
+        $this->view->getColumn("item_date")->setCellRenderer(new DateCellRenderer());
     }
 }

@@ -9,7 +9,7 @@ include_once("components/PaginatorBottomComponent.php");
 abstract class AbstractResultView extends Component implements IDataIteratorRenderer
 {
 
-    public $items_per_page = 20;
+    protected $items_per_page = 20;
 
 
     protected $default_order = "";
@@ -29,8 +29,9 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      */
     protected $iterator;
 
-    const TOP_PAGINATOR = 1;
-    const BOTTOM_PAGINATOR = 2;
+    const PAGINATOR_NONE = 0;
+    const PAGINATOR_TOP = 1;
+    const PAGINATOR_BOTTOM = 2;
 
     public function __construct(IDataIterator $itr)
     {
@@ -41,7 +42,15 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->paginator = new Paginator();
         $this->paginator_top = new PaginatorTopComponent($this->paginator);
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
-        $this->paginators_enabled = self::TOP_PAGINATOR | self::BOTTOM_PAGINATOR;
+        $this->paginators_enabled = AbstractResultView::PAGINATOR_TOP | AbstractResultView::PAGINATOR_BOTTOM;
+    }
+
+    public function setItemsPerPage(int $item_count) {
+        $this->items_per_page = $item_count;
+    }
+
+    public function getItemsPerPage() : int {
+        $this->items_per_page;
     }
 
     public function getIterator(): IDataIterator
@@ -142,7 +151,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         $this->total_rows = $this->iterator->exec();
 
-        if($this->paginators_enabled & self::TOP_PAGINATOR) {
+        if($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
 
             $this->paginator_top->render();
 
@@ -154,7 +163,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      */
     public function finishRender()
     {
-        if($this->paginators_enabled & self::BOTTOM_PAGINATOR) {
+        if($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) {
             $this->paginator_bottom->render();
         }
 

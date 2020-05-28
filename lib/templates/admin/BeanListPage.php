@@ -98,7 +98,7 @@ class BeanListPage extends AdminPageTemplate
         $sel->fields()->set($this->bean->key());
 
         foreach($this->fields as $name=>$label) {
-            if ($this->bean->haveField($name)) {
+            if ($this->bean->haveColumn($name)) {
                 $sel->fields()->set($name);
             }
         }
@@ -148,14 +148,18 @@ class BeanListPage extends AdminPageTemplate
      */
     protected function initPageActions()
     {
-        $action_add = new Action(SparkAdminPage::ACTION_ADD, "add.php");
+        $url = SparkPage::Instance()->getURL();
+        $url->setScriptName("add.php");
+        $action_add = new Action(SparkAdminPage::ACTION_ADD, $url->url());
         $action_add->setAttribute("title", "Add Item");
         $this->getPage()->getActions()->append($action_add);
     }
 
     /**
+     * Initialize the item actions collection
      * Append the default "Edit" and "Delete" actions
      * If the bean instance is null the delete action is not added
+     *
      * @param ActionCollection $act
      */
     protected function initViewActions(ActionCollection $act)
@@ -190,7 +194,7 @@ class BeanListPage extends AdminPageTemplate
 
             $act->append(new RowSeparator());
 
-            $act->append(new Action("Choose position", "?cmd=reposition&type=fixed", $repos_param));
+            $act->append(new Action("Set position", "?cmd=reposition&type=fixed", $repos_param));
 
             //
 
@@ -247,6 +251,17 @@ class BeanListPage extends AdminPageTemplate
         }
 
         $this->append($this->view);
+
+        if ($this->bean instanceof OrderedDataBean) {
+            $this->view->setDefaultOrder(" position ASC ");
+
+            if ($this->view->haveColumn("position")) {
+                $this->view->removeColumn($this->query->key());
+                $this->view->getColumn("position")->setAlignClass("center");
+            }
+
+
+        }
 
     }
 

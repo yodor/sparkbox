@@ -8,7 +8,7 @@ class GalleryViewPage extends BeanListPage
     {
         parent::__construct();
 
-        $this->page->setName("Photo Gallery"); // . ": " . $rc->getData("description"));
+        $this->page->setName("Photo Gallery");
     }
 
     public function initView()

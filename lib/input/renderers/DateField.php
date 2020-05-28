@@ -21,14 +21,14 @@ class DateField extends InputField
         $this->y_end = $y_end;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/CalendarPopup.css";
         return $arr;
     }
 
-    public function requiredScript()
+    public function requiredScript() : array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/CalendarPopup.js";

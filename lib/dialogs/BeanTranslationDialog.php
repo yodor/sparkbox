@@ -41,7 +41,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $responder = new TranslateBeanResponder();
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/BeanTranslationDialog.css";
@@ -49,7 +49,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         return $arr;
     }
 
-    public function requiredScript()
+    public function requiredScript() : array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/dialogs/json/BeanTranslationDialog.js";

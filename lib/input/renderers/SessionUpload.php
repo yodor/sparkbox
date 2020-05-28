@@ -30,14 +30,14 @@ abstract class SessionUpload extends InputField
         $this->setAttribute("handler_command", $this->ajax_handler->getCommand());
     }
 
-    public function requiredStyle()
+    public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/SessionUpload.css";
         return $arr;
     }
 
-    public function requiredScript()
+    public function requiredScript(): array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/jqplugins/jquery.form.js";

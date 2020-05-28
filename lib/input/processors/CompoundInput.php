@@ -79,9 +79,9 @@ class CompoundInput extends InputProcessor
     {
         parent::clearURLParameters($url);
 
-        $url->removeParameter($this->input->getName());
+        $url->remove($this->input->getName());
         foreach ($this->compound_names as $key=>$val) {
-            $url->removeParameter($val."_".$this->input->getName());
+            $url->remove($val."_".$this->input->getName());
         }
     }
 }

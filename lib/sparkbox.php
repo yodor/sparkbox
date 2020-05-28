@@ -141,7 +141,7 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
     DBConnections::Set($driver);
 }
 
-if (TRANSLATOR_ENABLED && !defined("SKIP_DB") && !defined("SKIP_TRANSLATOR")) {
+if (TRANSLATOR_ENABLED && !defined("SKIP_DB") && !defined("SKIP_TRANSLATOR") && !defined("STORAGE_REQUEST")) {
     include_once("utils/language.php");
 }
 else {

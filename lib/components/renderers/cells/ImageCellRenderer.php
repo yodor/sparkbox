@@ -53,6 +53,12 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     }
 
+    public function setColumn(TableColumn $tc)
+    {
+        parent::setColumn($tc);
+        $tc->setAlignClass(TableColumn::ALIGN_CENTER);
+    }
+
     public function setBean(DBTableBean $bean, string $relateField = "")
     {
         $this->bean = $bean;

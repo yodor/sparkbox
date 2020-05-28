@@ -142,7 +142,7 @@ abstract class HTMLPage extends Container
      * corresponding to the php filename this page is running from
      * @return string Automatic class naming - The php class name + the folder this php script is in + the php script file name
      */
-    public function getPageClass()
+    public function getPageClass() : string
     {
         if ($this->page_class) return $this->page_class;
 
@@ -155,13 +155,9 @@ abstract class HTMLPage extends Container
      * Return the full URL this page is running from
      * @return string
      */
-    public function getPageURL()
+    public function getPageURL() : string
     {
-        $ret = $_SERVER["SCRIPT_NAME"];
-        if ($_SERVER["QUERY_STRING"]) {
-            $ret .= "?" . $_SERVER["QUERY_STRING"];
-        }
-        return $ret;
+        return currentURL();
     }
 
     public function getURL(): URLBuilder
@@ -186,7 +182,7 @@ abstract class HTMLPage extends Container
      * @param $name string The name attribute to
      * @return string The content attribute as set to the $name
      */
-    public function getMeta(string $name)
+    public function getMeta(string $name) : string
     {
         return isset($this->meta[$name]) ? $this->meta[$name] : "";
     }

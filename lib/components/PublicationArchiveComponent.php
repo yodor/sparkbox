@@ -40,7 +40,7 @@ class PublicationArchiveComponent extends Component
         // 	  $this->setClassName("panel_list_outer");
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/PublicationArchiveComponent.css";

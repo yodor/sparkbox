@@ -1,17 +1,14 @@
 <?php
-include_once("components/Component.php");
 
-class FBPixel extends Component
+class FBPixel
 {
     protected $pixelID = "";
     protected $trackEvents = NULL;
 
-    public function __construct($pixelID)
+    public function __construct(string $pixelID)
     {
-        parent::__construct();
-        $this->pixelID = $pixelID;//685152751918503
+        $this->pixelID = $pixelID;
         $this->trackEvents = array();
-
     }
 
     public function addTrackEvent($eventName, $eventParam)
@@ -19,11 +16,16 @@ class FBPixel extends Component
         $this->trackEvents[$eventName] = $eventParam;
     }
 
-    public function requiredScript()
+    public function addTrackObject(FBTrackObject $fbtrack)
+    {
+        $this->trackEvents[$fbtrack->getEvent()] = $fbtrack->getParameters();
+    }
+
+    public function script()
     {
         ob_start();
         ?>
-        <!-- Facebook Pixel Code -->
+        <!-- Facebook Pixel Code Start -->
         <script>
             !function (f, b, e, v, n, t, s) {
                 if (f.fbq) return;
@@ -60,10 +62,6 @@ class FBPixel extends Component
         return $contents;
     }
 
-    protected function renderImpl()
-    {
-        //
-    }
 }
 
 ?>

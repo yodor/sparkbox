@@ -58,7 +58,7 @@ abstract class BeanDataResponse extends HTTPResponse
         }
 
         //sub-classes set $this->field
-        if (!$this->bean->haveField($this->field)) {
+        if (!$this->bean->haveColumn($this->field)) {
             throw new Exception("Bean does not support this field");
         }
 
@@ -68,14 +68,14 @@ abstract class BeanDataResponse extends HTTPResponse
 
     protected function authorizeAccess()
     {
-        if (!$this->bean->haveField("auth_context")) {
+        if (!$this->bean->haveColumn("auth_context")) {
             debug("No auth_context defined");
             return;
         }
 
         $qry = $this->bean->queryField($this->bean->key(), $this->id, 1);
 
-        $storageTypes = $this->bean->storageTypes();
+        $storageTypes = $this->bean->columns();
 
         foreach ($storageTypes as $name => $storageType) {
             if (strpos($storageType, "blob") !== FALSE) continue;

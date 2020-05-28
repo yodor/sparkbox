@@ -35,14 +35,14 @@ class ImagePopup extends Component implements IPhotoRenderer
         $this->mode = $mode;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/ImagePopup.css";
         return $arr;
     }
 
-    public function requiredScript()
+    public function requiredScript() : array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/ImagePopup.js";

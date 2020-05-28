@@ -6,12 +6,7 @@ class DynamicPagePhotosBean extends OrderedDataBean
 
     protected $createString = "CREATE TABLE `page_photos` (
  `ppID` int(10) unsigned NOT NULL AUTO_INCREMENT,
- `filename` varchar(255) NOT NULL DEFAULT '',
- `mime` varchar(255) NOT NULL DEFAULT '',
- `size` int(11) NOT NULL DEFAULT '0',
  `photo` longblob NOT NULL,
- `width` int(11) NOT NULL DEFAULT '0',
- `height` int(11) NOT NULL DEFAULT '0',
  `date_upload` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  `caption` text,
  `dpID` int(11) unsigned NOT NULL DEFAULT '0',

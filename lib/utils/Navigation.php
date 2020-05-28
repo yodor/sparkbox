@@ -16,15 +16,13 @@ class Navigation
     public function push(string $pageName)
     {
 
-
         $pageURL = SparkPage::instance()->getURL();
 
-        debug("Navigated to: ".SparkPage::instance()->getPageURL()." - Navigation content: ", array_keys($this->urls));
+        debug("Navigated to: ".SparkPage::instance()->getPageURL()." - Navigation content: ", array_values($this->urls));
 
         $stored_urls = new ArrayIterator($this->urls, true);
 
         $urlbuild = new URLBuilder();
-        $urlbuild->setKeepRequestParams(false);
 
         $urls = array();
 
@@ -43,19 +41,19 @@ class Navigation
                 }
 
                 //add back
-                $urls[$title] = $href;
+                $urls[$title] = $urlbuild->url();
 
                 $stored_urls->next();
             }
         }
 
-
+        //navigation entries are constructed by using $pagename as unique key not the url
         $urls[$pageName] = $pageURL->url();
 
         $this->urls = $urls;
 
         Session::Set($this->name, $this->urls);
-        debug("Adding page to navigation '$pageName' => {$pageURL->url()} - Naviagtion contents: ", array_keys($this->urls));
+        debug("Adding page to navigation '$pageName' => {$pageURL->url()} - Naviagtion contents: ", array_values($this->urls));
     }
 
     public function clear()
@@ -66,7 +64,7 @@ class Navigation
 
     public function back() : ?Action
     {
-        debug("Navigation entries: ", array_keys($this->urls));
+        debug("Navigation entries: ", array_values($this->urls));
 
         if (count($this->urls)<1)return NULL;
 
@@ -89,7 +87,8 @@ class Navigation
             }
             else {
                 $action = new Action($title, $href);
-                $action->getURLBuilder()->setKeepRequestParams(FALSE);
+                debug("Using href: ".$href);
+                //$action->getURLBuilder()->setKeepRequestParams(FALSE);
                 break;
             }
 

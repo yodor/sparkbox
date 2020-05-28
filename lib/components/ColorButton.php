@@ -54,7 +54,7 @@ class ColorButton extends Component
         $this->translation_enabled = TRUE;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/ColorButton.css";

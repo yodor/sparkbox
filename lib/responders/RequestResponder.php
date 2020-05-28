@@ -19,6 +19,16 @@ abstract class RequestResponder
         $this->cmd = $cmd;
 
         RequestController::Add($this);
+        $this->url = new URLBuilder();
+        $this->url->buildFrom(currentURL());
+    }
+
+    /**
+     * Clear the request url from the parameters of this responder
+     */
+    protected function buildRedirectURL()
+    {
+        $this->url->remove("cmd");
     }
 
     public function setNeedConfirm(bool $mode)
@@ -72,7 +82,13 @@ abstract class RequestResponder
 
         try {
 
+            //redirect URL is already set?
             $redirectURL = $this->getCancelUrl();
+            if (!$redirectURL) {
+                $this->buildRedirectURL();
+                $redirectURL = $this->url->url();
+                $this->cancel_url = $redirectURL;
+            }
             debug("need_redirect: " . (int)$this->need_redirect);
 
             if ($this->need_confirm) {
@@ -87,7 +103,12 @@ abstract class RequestResponder
             }
 
             $this->processImpl();
-            $redirectURL = $this->getSuccessUrl();
+
+            //success URL is set - use it for redirection
+            if ($this->getSuccessUrl()) {
+                $redirectURL = $this->getSuccessUrl();
+            }
+
         }
         catch (Exception $ex) {
 
@@ -130,7 +151,7 @@ abstract class RequestResponder
 
         ob_start();
         echo $text;
-        echo "<form id=confirm_handler method=post>";
+        echo "<form method=post>";
         echo "<input type=hidden name=confirm_handler value=1>";
         echo "</form>";
         $md->setContents(ob_get_contents());
@@ -140,19 +161,22 @@ abstract class RequestResponder
 
         ?>
         <script type='text/javascript'>
-            let confirm_delete = new MessageDialog("msg_confirm");
-            confirm_delete.buttonAction = function (action) {
-                if (action == "confirm") {
-                    console.log("Confirm");
-                    var frm = document.getElementById("confirm_handler");
-                    frm.submit();
-                } else if (action == "cancel") {
-                    console.log("Cancel");
-                    document.location.replace("<?php echo $this->cancel_url;?>");
-                }
-            };
 
             onPageLoad(function () {
+
+                let confirm_delete = new MessageDialog();
+                confirm_delete.setID("msg_confirm");
+                confirm_delete.buttonAction = function (action) {
+                    if (action == "confirm") {
+                        console.log("Confirm");
+                        var frm = $(confirm_delete.visibleSelector()+" FORM");
+                        frm.submit();
+                    } else if (action == "cancel") {
+                        console.log("Cancel");
+                        document.location.replace("<?php echo $this->cancel_url;?>");
+                    }
+                };
+
                 confirm_delete.show();
             });
 
@@ -160,7 +184,6 @@ abstract class RequestResponder
 
         <?php
 
-        unset($_GET["cmd"]);
     }
 }
 

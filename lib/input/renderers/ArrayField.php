@@ -48,7 +48,7 @@ class ArrayField extends InputField
         $this->addControl($button_add);
 
         $this->action = new Action("Remove","");
-        $this->action->getURLBuilder()->setKeepRequestParams(false);
+        //$this->action->getURLBuilder()->setKeepRequestParams(false);
 
     }
 
@@ -62,14 +62,14 @@ class ArrayField extends InputField
         return $this->element_renderer;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/ArrayField.css";
         return $arr;
     }
 
-    public function requiredScript()
+    public function requiredScript() : array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/ArrayControls.js";

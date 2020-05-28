@@ -15,7 +15,7 @@ class DatedBean extends DBTableBean
     public function __construct(string $table_name, string $datefield = "item_date")
     {
         parent::__construct($table_name);
-        if (!$this->haveField($datefield))throw new Exception("Date field not found in this bean table");
+        if (!$this->haveColumn($datefield))throw new Exception("Date field not found in this bean table");
         $this->datefield = $datefield;
 
     }

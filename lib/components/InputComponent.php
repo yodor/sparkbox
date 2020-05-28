@@ -45,7 +45,7 @@ class InputComponent extends Component
         return $this->input;
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/Action.css";

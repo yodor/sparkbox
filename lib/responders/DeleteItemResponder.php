@@ -16,16 +16,18 @@ class DeleteItemResponder extends RequestResponder
 
     protected function parseParams()
     {
-        if (!isset($_GET["item_id"])) throw new Exception("Item ID not passed");
-        $this->item_id = (int)$_GET["item_id"];
-        $arr = $_GET;
-        unset($arr["cmd"]);
-        unset($arr["item_id"]);
-        $this->cancel_url = queryString($arr);
-        $this->cancel_url = $_SERVER['PHP_SELF'] . $this->cancel_url;
+        if (!$this->url->contains("item_id")) {
+            throw new Exception("Item ID not passed");
+        }
 
-        $this->success_url = $this->cancel_url;
+        $this->item_id = (int)$this->url->get("item_id")->value();
 
+    }
+
+    protected function buildRedirectURL()
+    {
+        parent::buildRedirectURL();
+        $this->url->remove("item_id");
     }
 
     public function getItemID()

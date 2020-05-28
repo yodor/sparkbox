@@ -14,8 +14,10 @@ include_once("dialogs/BeanTranslationDialog.php");
 class BeanFormEditor extends Container implements IBeanEditor
 {
 
-    public $item_updated_message = "Information was updated";
-    public $item_added_message = "Information was added";
+    protected $messages = array();
+
+    const MESSAGE_ADD = 1;
+    const MESSAGE_UPDATE = 2;
 
     /**
      * @var DBTableBean
@@ -44,12 +46,14 @@ class BeanFormEditor extends Container implements IBeanEditor
      */
     protected $transactor;
 
-    protected $error = FALSE;
+    protected $error = "";
 
-    public $reload_request = TRUE;
 
-    //transfer to this URL on processing finished
-    public $reload_url = "";
+    /**
+     * Redirect to this URL on successful processing
+     * @var URLBuilder|null
+     */
+    protected $redirect_url;
 
     /**
      * @var BeanTranslationDialog
@@ -60,6 +64,9 @@ class BeanFormEditor extends Container implements IBeanEditor
     {
 
         parent::__construct();
+
+        $this->setMessage("Information was updated", BeanFormEditor::MESSAGE_UPDATE);
+        $this->setMessage("Information was added", BeanFormEditor::MESSAGE_ADD);
 
         $this->bean = $bean;
         $this->form = $form;
@@ -96,6 +103,37 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->append($this->form_render);
 
+    }
+
+    public function setRedirectURL(URLBuilder $url)
+    {
+        $this->redirect_url = $url;
+    }
+
+    public function getRedirectURL(): ?URLBuilder
+    {
+        return $this->redirect_url;
+    }
+
+    /**
+     * Set the message to show after successful add or update
+     * '$message' will be tr()'ed before setting it to Session::SetAlert
+     * @param string $message
+     * @param int $type MESSAGE_ADD or MESSAGE_UPDATE
+     */
+    public function setMessage(string $message, int $type)
+    {
+        $this->messages[$type] = $message;
+    }
+
+    /**
+     * Use BeanFormEditor::MESSAGE_ADD or MESSAGE_UPDATE for type
+     * @param int $type
+     * @return string
+     */
+    public function getMessage(int $type): string
+    {
+        return $this->messages[$type];
     }
 
     public function getEditID(): int
@@ -180,22 +218,36 @@ class BeanFormEditor extends Container implements IBeanEditor
 
                 debug("Process status is successful");
 
+                $redirectURL = $this->redirect_url;
+
                 //reload after adding item?
                 if ($this->editID < 1) {
 
-                    debug("Navigating to the edit page");
+                    Session::SetAlert(tr($this->getMessage(BeanFormEditor::MESSAGE_ADD)));
 
-                    Session::SetAlert(tr($this->item_added_message));
-                    $lastID = $this->transactor->getLastID();
-                    $url = new URLBuilder();
-                    $url->buildFrom(SparkPage::Instance()->getPageURL());
-                    $url->addParameter(new URLParameter("editID", $lastID));
-                    header("Location: ".$url->url());
-                    exit;
+                    if (!$redirectURL) {
+                        debug("RedirectURL is not set - Setting redirectURL to the edit location");
+                        $lastID = $this->transactor->getLastID();
+                        $redirectURL = new URLBuilder();
+                        $redirectURL->buildFrom(SparkPage::Instance()->getPageURL());
+                        $redirectURL->add(new URLParameter("editID", $lastID));
+                    }
 
                 }
                 else {
-                    Session::SetAlert(tr($this->item_updated_message));
+                    Session::SetAlert(tr($this->getMessage(BeanFormEditor::MESSAGE_UPDATE)));
+
+                    if (!$redirectURL) {
+                        debug("RedirectURL is not set - Setting redirectURL to the current location");
+                        $redirectURL = new URLBuilder();
+                        $redirectURL->buildFrom(SparkPage::Instance()->getPageURL());
+                    }
+                }
+
+                if ($redirectURL instanceof URLBuilder) {
+                    debug("Using redirectURL: ".$redirectURL->url());
+                    header("Location: " . $redirectURL->url());
+                    exit;
                 }
 
             }

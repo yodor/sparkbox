@@ -21,7 +21,7 @@ abstract class PaginatorComponent extends Component
         //parent::renderCaption();
     }
 
-    public function requiredStyle()
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/PaginatorComponent.css";

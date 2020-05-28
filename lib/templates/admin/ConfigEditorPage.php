@@ -29,6 +29,8 @@ class ConfigEditorPage extends AdminPageTemplate
 
         $this->processor = new ConfigFormProcessor();
 
+        $this->config = ConfigBean::Factory();
+        $this->processor->setBean($this->config);
     }
 
     public function setForm(InputForm $form)
@@ -37,19 +39,14 @@ class ConfigEditorPage extends AdminPageTemplate
 
         $rend = new FormRenderer($form);
 
-        $rend->setClassName("config_form");
+        $this->config->loadForm($form);
 
-        if ($this->config) {
-            $this->config->loadForm($form);
-        }
     }
 
     public function setConfigSection(string $section)
     {
-        $this->config = ConfigBean::Factory();
-        $this->config->setSection($section);
 
-        $this->processor->setBean($this->config);
+        $this->config->setSection($section);
 
         if ($this->form) {
             $this->config->loadForm($this->form);

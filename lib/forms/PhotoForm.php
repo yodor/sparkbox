@@ -11,6 +11,7 @@ class PhotoForm extends InputForm
 
         $field = new DataInput("caption", "Caption", 0);
         new TextField($field);
+        $field->enableTranslator(true);
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 1);

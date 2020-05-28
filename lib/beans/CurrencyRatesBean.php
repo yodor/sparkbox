@@ -32,7 +32,7 @@ class CurrencyRatesBean extends DBTableBean
             $crrow = $currencies->getByID($dstID);
         }
         catch (Exception $e) {
-            $qry = $currencies->query();
+            $qry = $currencies->queryFull();
             $qry->exec();
             if ($crrow = $qry->next()) {
                 $dstID = $crrow[$currencies->key()];
@@ -44,7 +44,7 @@ class CurrencyRatesBean extends DBTableBean
         $ret["symbol"] = $crrow["symbol"];
         $ret["currency_code"] = $crrow["currency_code"];
 
-        $qry = $this->query();
+        $qry = $this->queryFull();
         $qry->select->where()->add("srcID", $dstID)->add("dstID","1");
         $num = $qry->exec();
         if ($row = $qry->next()) {

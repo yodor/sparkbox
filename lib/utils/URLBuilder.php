@@ -21,7 +21,7 @@ class URLBuilder
 
     protected $clear_page_param = FALSE;
 
-    protected $keep_request_params = TRUE;
+    //protected $keep_request_params = TRUE;
 
     protected $is_script = FALSE;
 
@@ -30,7 +30,7 @@ class URLBuilder
         $this->parameters = array();
     }
 
-    public function isEmpty()
+    public function isEmpty() : bool
     {
         return (count($this->parameters) < 1 && strlen($this->script_name) < 1);
     }
@@ -41,34 +41,39 @@ class URLBuilder
         $this->clear_page_param = $mode;
     }
 
-    /**
-     * prependRequestParams
-     *
-     * @param boolean $mode If set to true will prepend the current request query parameters to this link href
-     */
-    public function setKeepRequestParams(bool $mode)
-    {
-        $this->keep_request_params = $mode;
-    }
+    //    /**
+    //     * prependRequestParams
+    //     *
+    //     * @param boolean $mode If set to true will prepend the current request query parameters to this link href
+    //     */
+    //    public function setKeepRequestParams(bool $mode)
+    //    {
+    //        $this->keep_request_params = $mode;
+    //    }
 
-    public function addParameter(URLParameter $param)
+    public function add(URLParameter $param)
     {
         $this->parameters[$param->name()] = $param;
     }
 
-    public function removeParameter(string $name) {
-        if (!$this->haveParameter($name))return;
+    /**
+     * Remove the parameter '$name' from this url builder
+     * @param string $name
+     */
+    public function remove(string $name)
+    {
+        if (!$this->contains($name)) return;
         unset($this->parameters[$name]);
     }
 
-    public function getParameter(string $name): URLParameter
+    public function get(string $name): URLParameter
     {
         return $this->parameters[$name];
     }
 
-    public function haveParameter(string $name): bool
+    public function contains(string $name): bool
     {
-        return isset($this->parameters[$name]);
+        return array_key_exists($name, $this->parameters);
     }
 
     public function getParameterNames(): array
@@ -76,7 +81,29 @@ class URLBuilder
         return array_keys($this->parameters);
     }
 
-    public function url()
+//    /**
+//     * Return the value of parameter '$name'
+//     * @param string $name
+//     * @return string
+//     */
+//    public function getValue(string $name): string
+//    {
+//        if (!$this->contains($name)) return "";
+//        return $this->getParameter($name)->value();
+//    }
+//
+//    /**
+//     * Set the value of parameter '$name' to '$value'
+//     * @param string $name
+//     * @param string $value
+//     */
+//    public function setValue(string $name, string $value)
+//    {
+//        $this->addParameter(new URLParameter($name, $value));
+//    }
+
+
+    public function url(): string
     {
         if ($this->is_script) {
             return $this->script_name;
@@ -94,7 +121,7 @@ class URLBuilder
         return $ret;
     }
 
-    public function getScriptName()
+    public function getScriptName() : string
     {
         return $this->script_name;
     }
@@ -107,13 +134,13 @@ class URLBuilder
     protected function processQuery()
     {
 
-        if ($this->keep_request_params) {
-            foreach ($_GET as $key => $param) {
-                if (!isset($this->parameters[$key])) {
-                    $this->addParameter(new URLParameter($key, $param));
-                }
-            }
-        }
+        //        if ($this->keep_request_params) {
+        //            foreach ($_GET as $key => $param) {
+        //                if (!isset($this->parameters[$key])) {
+        //                    $this->addParameter(new URLParameter($key, $param));
+        //                }
+        //            }
+        //        }
 
         //clear parameters from the Paginator
         if ($this->clear_page_param) {
@@ -127,7 +154,7 @@ class URLBuilder
 
             $pairs = array();
             foreach ($names as $pos => $name) {
-                $param = $this->getParameter($name);
+                $param = $this->get($name);
                 if ($param->isResource()) continue;
                 $pairs[] = $param->text();
             }
@@ -135,7 +162,7 @@ class URLBuilder
             $this->script_query = implode("&", $pairs);
 
             foreach ($names as $pos => $name) {
-                $param = $this->getParameter($name);
+                $param = $this->get($name);
                 if (!$param->isResource()) continue;
                 $this->resource = $param->value();
             }
@@ -171,9 +198,17 @@ class URLBuilder
         if (strpos($script_query, "#") !== FALSE) {
             $resource = "";
             list($script_query, $resource) = explode("#", $script_query);
-            $this->addParameter(new URLParameter("#" . $resource));
+            $this->add(new URLParameter("#" . $resource));
         }
 
+        //copy current query parameters if script name is not set - ie local page request
+        if (strlen($script_name) < 1) {
+            foreach ($_GET as $key => $param) {
+                $this->add(new URLParameter($key, $param));
+            }
+        }
+
+        //overwrite with pairs from the $build_string
         $static_pairs = explode("&", $script_query);
         foreach ($static_pairs as $pos => $pair) {
             $param_name = $pair;
@@ -182,7 +217,7 @@ class URLBuilder
                 list($param_name, $param_value) = explode("=", $pair);
             }
             if (strlen($param_name) > 0) {
-                $this->addParameter(new URLParameter($param_name, $param_value));
+                $this->add(new URLParameter($param_name, $param_value));
             }
         }
 
@@ -205,7 +240,7 @@ class URLBuilder
 
         $names = array_keys($this->parameters);
         foreach ($names as $idx => $name) {
-            $param = $this->getParameter($name);
+            $param = $this->get($name);
             $param->setData($row);
         }
 

@@ -24,32 +24,40 @@ class ChangePositionResponder extends RequestResponder
             $this->supported_content = array("left", "right");
         }
         else {
-            throw new Exception("Hanlder requires OrderedDataBean or NestedSetBean source");
+            throw new Exception("Responder requires OrderedDataBean or NestedSetBean");
         }
 
         $this->bean = $bean;
+
+        //define early so it can be catched in the page rendering
+        $dialog = new InputMessageDialog();
+        $dialog->getInput()->setName("position");
+        $dialog->getInput()->setLabel("Input new position");
+
     }
 
     protected function parseParams()
     {
-        if (!isset($_GET["item_id"])) throw new Exception("Item ID not passed");
-        $this->item_id = (int)$_GET["item_id"];
+        if (!$this->url->contains("item_id")) {
+            throw new Exception("Item ID not passed");
+        }
 
-        if (!isset($_GET["type"])) throw new Exception("Position not passed");
-        $type = $_GET["type"];
+        $this->item_id = (int)$this->url->get("item_id")->value();
 
-        if (!in_array($type, $this->supported_content)) throw new Exception("Position not supported");
+        if (!$this->url->contains("type")) {
+            throw new Exception("Position not passed");
+        }
+
+        $type = $this->url->get("type")->value();
+
+        if (!in_array($type, $this->supported_content)) throw new Exception("Type not supported");
 
         $this->type = $type;
 
-        $arr = $_GET;
-        unset($arr["cmd"]);
-        unset($arr["item_id"]);
-        unset($arr["type"]);
-        if (isset($arr["position"])) {
-            $this->position = (int)$arr["position"];
-            unset($arr["position"]);
-            if ($this->position<1) {
+        if ($this->url->contains("position")) {
+            $this->position = (int)$this->url->get("position")->value();
+
+            if ($this->position < 1) {
                 Session::SetAlert("Incorrect position specified");
             }
         }
@@ -61,11 +69,15 @@ class ChangePositionResponder extends RequestResponder
                 }
             }
         }
+    }
 
-        $this->cancel_url = queryString($arr);
-        $this->cancel_url = $_SERVER['PHP_SELF'] . $this->cancel_url;
+    protected function buildRedirectURL()
+    {
+        parent::buildRedirectURL();
 
-        $this->success_url = $this->cancel_url;
+        $this->url->remove("item_id");
+        $this->url->remove("type");
+        $this->url->remove("position");
     }
 
     protected function processImpl()
@@ -101,28 +113,29 @@ class ChangePositionResponder extends RequestResponder
                 }
                 else {
 
-                    $dialog = new InputMessageDialog();
-                    $dialog->getInput()->setName("position");
-                    $dialog->getInput()->setLabel("Input new position");
-
                     ?>
                     <script type="text/javascript">
-                        let input_position = new MessageDialog("<?php echo $dialog->getID();?>");
-                        input_position.buttonAction = function (action) {
-                            if (action == "confirm") {
-
-                                let position = input_position.input.value;
-
-                                var searchParams = new URLSearchParams(location.search);
-                                searchParams.set("position", position);
-
-                                window.location.href = `${location.pathname}?${searchParams}`;
-                            } else if (action == "cancel") {
-                                window.location.href = "<?php echo $this->cancel_url;?>";
-                            }
-                        }
 
                         onPageLoad(function () {
+
+                            let input_position = new InputMessageDialog();
+
+                            input_position.buttonAction = function (action) {
+                                if (action == "confirm") {
+
+                                    let position = input_position.input().val();
+
+                                    let url = new URL(window.location.href);
+                                    url.searchParams.set("position", position);
+
+                                    window.location.href = url.href;
+
+                                } else if (action == "cancel") {
+
+                                    window.location.href = "<?php echo $this->cancel_url;?>";
+                                }
+                            }
+
                             input_position.show();
                         });
 

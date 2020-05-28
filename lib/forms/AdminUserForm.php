@@ -106,7 +106,7 @@ class AdminUserForm extends InputForm
         }
 
         $req_email = $this->getInput("email")->getValue();
-        $existing = $this->getBean()->findFieldValue("email", $req_email);
+        $existing = $this->getBean()->getResult("email", $req_email);
 
         if ($existing) {
 

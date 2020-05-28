@@ -36,7 +36,7 @@ class MCEImageBrowserDialog extends MessageDialog
 
     }
 
-    public function requiredScript()
+    public function requiredScript(): array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/dialogs/ConfirmMessageDialog.js";

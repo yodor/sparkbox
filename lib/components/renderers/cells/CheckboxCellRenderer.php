@@ -13,6 +13,12 @@ class CheckboxCellRenderer extends TableCellRenderer
 
     }
 
+    public function setColumn(TableColumn $tc)
+    {
+        parent::setColumn($tc);
+        $tc->setAlignClass(TableColumn::ALIGN_CENTER);
+    }
+
     protected function renderImpl()
     {
         echo "<div class='value'>";

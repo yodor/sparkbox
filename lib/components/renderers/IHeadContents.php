@@ -4,19 +4,19 @@
 interface IHeadContents
 {
     /**
-     * @return mixed All required CSS URLs. or inline e<style></style> string
+     * @return array All required CSS URLs.
      */
-    public function requiredStyle();
+    public function requiredStyle() : array;
 
     /**
-     * @return array All required JavaScript URLs or inline <script></script> string
+     * @return array All required JavaScript URLs
      */
-    public function requiredScript();
+    public function requiredScript() : array;
 
     /**
      * @return array All required meta tags
      */
-    public function requiredMeta();
+    public function requiredMeta() : array;
 }
 
 ?>

@@ -40,14 +40,14 @@ class DynamicPageView extends Container
             return;
         }
 
-        $bean->fields();
+        $bean->columnNames();
         //TODO: check item_title, content, visible is present in this bean
 
         $prkey = $bean->key();
-        $qry = $bean->query();
-        $qry->where = " $prkey='$page_id' ";
-        $qry->fields = " item_title, content, visible ";
-        $qry->limit = 1;
+        $qry = $bean->query($prkey, "item_title", "content", "visible");
+        $qry->select->where()->add($prkey , $page_id);
+        $qry->select->limit = 1;
+
         $num = $qry->exec();
         if ($num < 1) {
             Session::SetAlert("Page not found");

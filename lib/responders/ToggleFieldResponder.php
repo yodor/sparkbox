@@ -22,25 +22,29 @@ class ToggleFieldResponder extends RequestResponder
 
     protected function parseParams()
     {
-        if (!isset($_GET["item_id"])) throw new Exception("Item ID not passed");
-        if (!isset($_GET["status"])) throw new Exception("Status not passed");
-        if (!isset($_GET["field"])) throw new Exception("Field not passed");
+        if (!$this->url->contains("item_id")) {
+            throw new Exception("Item ID not passed");
+        }
+        $this->item_id = (int)$this->url->get("item_id")->value();
 
-        $this->item_id = (int)$_GET["item_id"];
-        $this->status = ((int)$_GET["status"] > 0) ? 1 : 0;
-        $this->field_name = $_GET["field"];
+        if (!$this->url->contains("status")) {
+            throw new Exception("Status not passed");
+        }
+        $this->status = ((int)$this->url->get("status")->value() > 0) ? 1 : 0;
 
-        $arr = $_GET;
-        unset($arr["cmd"]);
-        unset($arr["item_id"]);
-        unset($arr["status"]);
-        unset($arr["field"]);
+        if (!$this->url->contains("field")) {
+            throw new Exception("Field not passed");
+        }
+        $this->field_name = (int)$this->url->get("field")->value();
 
-        $this->cancel_url = queryString($arr);
-        $this->cancel_url = $_SERVER['PHP_SELF'] . $this->cancel_url;
+    }
 
-        $this->success_url = $this->cancel_url;
-
+    protected function buildRedirectURL()
+    {
+        parent::buildRedirectURL();
+        $this->url->remove("item_id");
+        $this->url->remove("status");
+        $this->url->remove("field");
     }
 
     public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array())

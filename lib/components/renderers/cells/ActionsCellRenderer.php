@@ -19,7 +19,13 @@ class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
 
     }
 
-    public function requiredStyle()
+    public function setColumn(TableColumn $tc)
+    {
+        parent::setColumn($tc);
+        $tc->setAlignClass(TableColumn::ALIGN_CENTER);
+    }
+
+    public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/Action.css";

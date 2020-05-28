@@ -19,7 +19,7 @@ class NestedSetBean extends DBTableBean
     public function __construct(string $table_name, DBDriver $dbdriver = NULL)
     {
         parent::__construct($table_name, $dbdriver);
-        if (!$this->haveField("lft") || !$this->haveField("rgt") || !$this->haveField("parentID")) {
+        if (!$this->haveColumn("lft") || !$this->haveColumn("rgt") || !$this->haveColumn("parentID")) {
             throw new Exception("Incorrect table fields for NestedSetBean");
         }
     }
@@ -40,7 +40,7 @@ class NestedSetBean extends DBTableBean
 
             if ($parentID > 0) {
 
-                $parent_row = $this->getByID($parentID, array("lft", "rgt", "parentID"));
+                $parent_row = $this->getByID($parentID, "lft", "rgt", "parentID");
 
                 $lft = $parent_row["lft"];
                 $rgt = $parent_row["rgt"];
@@ -101,14 +101,14 @@ class NestedSetBean extends DBTableBean
         return $lastid;
     }
 
-    public function update(int $id, array &$row, DBDriver $db = NULL)
+    public function update(int $id, array &$row, DBDriver $db = NULL) : int
     {
 
         if (!$db) {
             $db = $this->db;
         }
 
-        $old_row = $this->getByID($id, array("parentID", "lft", "rgt"));
+        $old_row = $this->getByID($id, "parentID", "lft", "rgt");
 
         $old_parentID = (int)$old_row["parentID"];
         $new_parentID = (int)$row["parentID"];
@@ -130,7 +130,7 @@ class NestedSetBean extends DBTableBean
                 $parent_rgt = -1;
 
                 if ($new_parentID > 0) {
-                    $parent_row = $this->getByID($new_parentID, array("rgt"));
+                    $parent_row = $this->getByID($new_parentID, "rgt");
                     $parent_rgt = $parent_row["rgt"];
                 }
                 else {
@@ -187,11 +187,11 @@ class NestedSetBean extends DBTableBean
                 $update->where()->append("rgt > $rgt");
                 if (!$db->query($update->getSQL())) throw new Exception("Update Error(5): " . $db->getError() . "<HR>" . $update->getSQL());
 
-                $lastid = parent::update($id, $row, $db);
+                $affectedRows = parent::update($id, $row, $db);
 
                 $db->commit();
 
-                return $lastid;
+                return $affectedRows;
             }
             catch (Exception $e) {
                 $db->rollback();
@@ -202,12 +202,12 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    public function delete(int $id, DBDriver $db = NULL): bool
+    public function delete(int $id, DBDriver $db = NULL): int
     {
 
         debug("Deleting ID: $id");
 
-        $res = FALSE;
+        $affectedRows = 0;
 
         if (!$db) {
             $db = $this->db;
@@ -217,7 +217,7 @@ class NestedSetBean extends DBTableBean
             debug("Using DBDriver passed as function parameter");
         }
 
-        $prow = $this->getByID($id, array("lft", "rgt", "parentID"));
+        $prow = $this->getByID($id, "lft", "rgt", "parentID");
 
         $parentID = (int)$prow["parentID"];
 
@@ -228,8 +228,7 @@ class NestedSetBean extends DBTableBean
             debug("Starting transaction");
             $db->transaction();
 
-            $res = parent::delete($id, $db);
-            if (!$res) throw new Exception("Delete Error(0): " . $db->getError());
+            $affectedRows = parent::delete($id, $db);
 
             debug("deleted node ID: $id");
 
@@ -266,7 +265,7 @@ class NestedSetBean extends DBTableBean
             throw $ex;
         }
 
-        return $res;
+        return $affectedRows;
 
     }
 
@@ -342,13 +341,13 @@ class NestedSetBean extends DBTableBean
 
             $db->transaction();
 
-            $node = $this->getByID($id, array("lft", "rgt", "parentID"));
+            $node = $this->getByID($id, "lft", "rgt", "parentID");
 
             $brotherID = $this->getIDRight($node["lft"] - 1);
 
             if (!$brotherID) throw new Exception("Already at first position");
 
-            $brother = $this->getByID($brotherID, array("lft", "rgt", "parentID"));
+            $brother = $this->getByID($brotherID, "lft", "rgt", "parentID");
 
             $nodeSize = (int)$node["rgt"] - (int)$node["lft"] + 1;
             $brotherSize = (int)$brother["rgt"] - (int)$brother["lft"] + 1;
@@ -397,12 +396,12 @@ class NestedSetBean extends DBTableBean
 
             $db->transaction();
 
-            $node = $this->getByID($id, array("lft", "rgt", "parentID"));
+            $node = $this->getByID($id, "lft", "rgt", "parentID");
 
             $brotherId = $this->getIDLeft($node["rgt"] + 1);
             if (!$brotherId) throw new Exception("Already in last position");
 
-            $brother = $this->getByID($brotherId, array("lft", "rgt", "parentID"));
+            $brother = $this->getByID($brotherId, "lft", "rgt", "parentID");
 
             $nodeSize = (int)$node["rgt"] - (int)$node["lft"] + 1;
             $brotherSize = (int)$brother["rgt"] - (int)$brother["lft"] + 1;
@@ -556,9 +555,9 @@ class NestedSetBean extends DBTableBean
     {
         $prkey = $this->prkey;
 
-        $fields = $related_source->fields();
+        $fields = $related_source->columnNames();
 
-        if (!in_array($prkey, $fields)) throw new Exception("Could not find relation by '{$this->prkey}' with this DBTableBean");
+        if (!in_array($prkey, $fields)) throw new Exception("Related bean column '{$this->prkey}' not found");
 
         $related_table = $related_source->getTableName();
         $related_prkey = $related_source->key();

@@ -9,16 +9,16 @@ abstract class OrderedDataBean extends DBTableBean
     {
         parent::__construct($table_name, $dbdriver);
 
-        if (!$this->haveField("position")) {
+        if (!$this->haveColumn("position")) {
             throw new Exception("Incorrect table fields for OrderedDataBean");
         }
     }
 
-    public function delete(int $id, DBDriver $db = NULL)
+    public function delete(int $id, DBDriver $db = NULL) : int
     {
 
         $code = function (DBDriver $db) use ($id) {
-            $pos = $this->fieldValue($id, "position");
+            $pos = $this->getValue($id, "position");
 
             debug("Deleting item with position: $pos");
 
@@ -33,7 +33,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         };
 
-        $this->handleTransaction($code, $db);
+        return $this->handleTransaction($code, $db);
 
     }
 
@@ -47,7 +47,7 @@ abstract class OrderedDataBean extends DBTableBean
     public function reorderFixed(int $id, int $new_pos, DBDriver $db = NULL)
     {
 
-        $pos = $this->fieldValue($id, "position");
+        $pos = $this->getValue($id, "position");
 
         $maxp = (int)$this->getMaxPosition();
 
@@ -84,7 +84,7 @@ abstract class OrderedDataBean extends DBTableBean
     public function reorderTop(int $id, DBDriver $db = NULL)
     {
 
-        $pos = (int)$this->fieldValue($id, "position");
+        $pos = (int)$this->getValue($id, "position");
 
         if ($pos == 1) {
             throw new Exception("Already at top position");
@@ -113,7 +113,7 @@ abstract class OrderedDataBean extends DBTableBean
     public function reorderBottom(int $id, DBDriver $db = NULL)
     {
 
-        $pos = (int)$this->fieldValue($id, "position");
+        $pos = (int)$this->getValue($id, "position");
 
         $max_pos = (int)$this->getMaxPosition();
 
@@ -144,7 +144,7 @@ abstract class OrderedDataBean extends DBTableBean
     public function reorderUp(int $id, DBDriver $db = NULL)
     {
 
-        $pos = (int)$this->fieldValue($id, "position");
+        $pos = (int)$this->getValue($id, "position");
 
         if ($pos - 1 < 1) {
             //already at top
@@ -179,7 +179,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     public function reorderDown(int $id, DBDriver $db = NULL)
     {
-        $pos = (int)$this->fieldValue($id, "position");
+        $pos = (int)$this->getValue($id, "position");
 
         $max_pos = (int)$this->getMaxPosition();
         if ($pos + 1 > $max_pos) {

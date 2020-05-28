@@ -14,15 +14,14 @@ class ConfigFormProcessor extends FormProcessor
     {
         parent::processImpl($form);
 
-        global $config;
+        if (!($this->bean instanceof ConfigBean)) throw new Exception("ConfigBean not set yet");
 
         $input_names = $form->getInputNames();
         foreach ($input_names as $idx => $name) {
             $input = $form->getInput($name);
             if ($this->bean instanceof ConfigBean) {
-                $this->bean->setValue($name, $input->getValue());
+                $this->bean->set($name, $input->getValue());
             }
-
         }
     }
 

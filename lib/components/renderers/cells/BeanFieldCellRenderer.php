@@ -15,6 +15,12 @@ class BeanFieldCellRenderer extends TableCellRenderer
         $this->field_name = $field_name;
     }
 
+    public function setColumn(TableColumn $tc)
+    {
+        parent::setColumn($tc);
+        $tc->setAlignClass(TableColumn::ALIGN_CENTER);
+    }
+
     public function setData(array &$row)
     {
         parent::setData($row);
