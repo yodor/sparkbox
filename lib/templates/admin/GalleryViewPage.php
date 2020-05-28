@@ -27,7 +27,7 @@ class GalleryViewPage extends BeanListPage
 
         $this->append($this->view);
 
-        $this->view_actions = $gv->getItemActions();
+        $this->view_item_actions = $gv->getItemActions();
     }
 
 }

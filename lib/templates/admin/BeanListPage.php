@@ -31,7 +31,7 @@ class BeanListPage extends AdminPageTemplate
     /**
      * @var ActionCollection
      */
-    protected $view_actions;
+    protected $view_item_actions;
 
     protected $keyword_search;
 
@@ -70,6 +70,14 @@ class BeanListPage extends AdminPageTemplate
         return $this->keyword_search;
     }
 
+    public function removeListFields(string ...$names)
+    {
+        foreach ($names as $name) {
+            if (isset($this->fields[$name])) {
+                unset($this->fields[$name]);
+            }
+        }
+    }
     /**
      * Set the list view column names and labels using the list_fields array
      * Array keys are used as column names and values as column labels
@@ -209,17 +217,19 @@ class BeanListPage extends AdminPageTemplate
      */
     public function viewItemActions()
     {
-        return $this->view_actions;
+        return $this->view_item_actions;
     }
+
 
     /**
      * Initialize the contents of the container
-     * Set the main view instance to TableView
-     * Set the view_actions instance as the actions of the ActionsTableCellRenderer
+     * Set the $this->view instance to TableView
+     * Set the $this->view_item_actions instance as ActionsTableCellRenderer
      * Calls initViewActions
-     *
+     * Return the initialized TableView (Used when initView is called externaly) before startRender()
      * This method is automatically called from startRender() of PageTemplate , before processInput
-     *
+     * @return TableView
+     * @throws Exception
      */
     public function initView()
     {
@@ -239,11 +249,11 @@ class BeanListPage extends AdminPageTemplate
         $this->view->addColumn(new TableColumn("actions", "Actions"));
 
         $act = new ActionsCellRenderer();
-        $this->view_actions = $act->getActions();
+        $this->view_item_actions = $act->getActions();
 
-        $this->initViewActions($this->view_actions);
+        $this->initViewActions($this->view_item_actions);
 
-        if ($this->view_actions->count()>0) {
+        if ($this->view_item_actions->count()>0) {
             $this->view->getColumn("actions")->setCellRenderer($act);
         }
         else {
@@ -262,6 +272,8 @@ class BeanListPage extends AdminPageTemplate
 
 
         }
+
+        return $this->view;
 
     }
 

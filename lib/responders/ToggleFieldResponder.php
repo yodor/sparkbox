@@ -35,7 +35,7 @@ class ToggleFieldResponder extends RequestResponder
         if (!$this->url->contains("field")) {
             throw new Exception("Field not passed");
         }
-        $this->field_name = (int)$this->url->get("field")->value();
+        $this->field_name = $this->url->get("field")->value();
 
     }
 
@@ -61,6 +61,7 @@ class ToggleFieldResponder extends RequestResponder
 
         $field_name = DBConnections::Get()->escape($this->field_name);
 
+        $update_row = array();
         $update_row[$field_name] = $this->status;
 
         $this->bean->update($this->item_id, $update_row);

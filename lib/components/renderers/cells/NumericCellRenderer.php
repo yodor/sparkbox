@@ -4,15 +4,14 @@ include_once("components/renderers/cells/TableCellRenderer.php");
 class NumericCellRenderer extends TableCellRenderer
 {
 
-    protected $format = "%01.2f";
+    protected $format;
 
-    public function __construct(string $format = "")
+    public function __construct(string $format = "%01.2f")
     {
         parent::__construct();
 
-        if ($format) {
-            $this->format = $format;
-        }
+        $this->format = $format;
+
     }
 
     public function setColumn(TableColumn $tc)
