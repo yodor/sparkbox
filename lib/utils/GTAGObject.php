@@ -1,7 +1,8 @@
 <?php
 include_once("utils/DataObject.php");
+include_once("utils/IHeadScript.php");
 
-class GTAGObject extends DataObject
+class GTAGObject extends DataObject implements IHeadScript
 {
     const COMMAND_CONFIG = "config";
     const COMMAND_SET = "set";
@@ -58,7 +59,7 @@ class GTAGObject extends DataObject
         return $this->param_template;
     }
 
-    public function script()
+    public function script() : string
     {
         ob_start();
         ?>

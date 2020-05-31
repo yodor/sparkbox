@@ -132,71 +132,61 @@ class BeanTransactor implements IBeanEditor
 
             $proc = $field->getProcessor();
 
-            if ($proc) {
+            debug("DataInput '$fieldName' using processor: " . get_class($proc));
 
-                debug("DataInput ['$fieldName'] Using processor: " . get_class($proc));
-
-                if ($proc->skip_transaction) {
-                    debug("InputProcessor has the skip_transaction flag is set. Not calling transactValue()");
-                    continue;
-                }
-
-                $proc->transactValue($this);
+            if ($proc->skip_transaction) {
+                debug("InputProcessor 'skip_transaction' flag is set. Not calling transactValue()");
+                continue;
             }
-            else {
-                debug("DataInput ['$fieldName'] no input processor set - Skipping ...");
-            }
+
+            $proc->transactValue($this);
 
         }
 
     }
 
+    /**
+     *
+     * @param DBDriver $db
+     * @throws Exception
+     */
     public function beforeCommit(DBDriver $db)
     {
 
-        debug("Using DBTableBean: " . get_class($this->bean));
         if (!$this->form) throw new Exception("Expected InputForm is null");
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
-        $fieldNames = $this->form->getInputNames();
-        foreach ($fieldNames as $pos => $fieldName) {
+        $names = $this->form->getInputNames();
+        foreach ($names as $pos => $name) {
 
-            $field = $this->form->getInput($fieldName);
+            $input = $this->form->getInput($name);
 
-            $proc = $field->getProcessor();
+            $proc = $input->getProcessor();
 
-            if ($proc) {
-                debug("DataInput ['$fieldName'] Using transactor: " . get_class($proc));
+            if ($proc->getTransactBean()) {
+
                 $proc->beforeCommit($this, $db, $this->bean->key());
+
             }
             else {
-                debug("DataInput ['$fieldName'] transactor is not set. Skipping ...");
+                debug("DataInput '$name' does not use transact_bean");
             }
-
         }
 
     }
 
     public function afterCommit()
     {
-        debug("DBTableBean: " . get_class($this->bean));
+
         if (!$this->form) throw new Exception("Expected InputForm is null");
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
-        $fieldNames = $this->form->getInputNames();
-        foreach ($fieldNames as $pos => $fieldName) {
+        $names = $this->form->getInputNames();
+        foreach ($names as $pos => $name) {
 
-            $field = $this->form->getInput($fieldName);
+            $input = $this->form->getInput($name);
 
-            $proc = $field->getProcessor();
-
-            if ($proc) {
-                debug("DataInput ['$fieldName'] Using transactor: " . get_class($proc));
-                $proc->afterCommit($this);
-            }
-            else {
-                debug("DataInput ['$fieldName'] transactor is not set. Skipping ...");
-            }
+            $input->getProcessor()->afterCommit($this);
 
         }
 
@@ -205,14 +195,12 @@ class BeanTransactor implements IBeanEditor
     public function processBean()
     {
 
-        debug("Using bean: " . get_class($this->bean));
-
         $db = DBConnections::Factory();
 
         try {
             $db->transaction();
 
-            debug("DB Transaction Started");
+            debug("DB Transaction started for bean: ".get_class($this->bean));
 
             $this->processBeanTransaction($db);
 
@@ -224,7 +212,7 @@ class BeanTransactor implements IBeanEditor
 
             $db->commit();
 
-            debug("DB Transaction Committed");
+            debug("DB Transaction committed for bean: ".get_class($this->bean));
 
             try {
                 $this->afterCommit();
@@ -273,7 +261,7 @@ class BeanTransactor implements IBeanEditor
         $this->values = $values;
 
         if ($this->editID > 0) {
-            debug("doing update: ", $this->values);
+            debug("doing update");
 
             $this->bean->update($this->editID, $this->values, $db);
             $this->lastID = $this->editID;
@@ -284,7 +272,6 @@ class BeanTransactor implements IBeanEditor
 
             $lastID = $this->bean->insert($this->values, $db);
             if ($lastID < 1) {
-
                 throw new Exception("Unable to insert: " . $this->bean->getError());
             }
             $this->lastID = $lastID;

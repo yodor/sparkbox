@@ -20,10 +20,10 @@ class SEOConfigForm extends InputForm
         $rend->setInputAttribute("cols", 80);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "googleID_analytics", "Google Analytics ID (eg: UA-111111111-1)", 0);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "googleID_analytics", "Google Analytics ID (eg: UA-123456789-1)", 0);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "googleID_ads", "Google Ads ID (eg: AW-111111111)", 0);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "googleID_ads", "Google Ads ID (eg: AW-123456789)", 0);
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "facebookID_pixel", "Facebook Pixel ID", 0);

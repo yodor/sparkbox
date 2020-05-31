@@ -265,12 +265,15 @@ class InputForm implements IBeanEditor
 
             //do not validate values coming from db
 
+            debug("Loading form using bean '" . get_class($bean) . "' where " . $bean->key()." = ".$editID);
+
             //initial loading of bean data
             $names = $this->getInputNames();
             foreach ($names as $pos => $name) {
 
                 $input = $this->getInput($name);
                 debug("Processing DataInput '$name'");
+
                 //processor need value set. processor might need other values from the item_row or to parse differently the value
                 $input->getProcessor()->loadBeanData($editID, $bean, $item_row);
             }

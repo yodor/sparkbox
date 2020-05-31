@@ -92,15 +92,15 @@ function getArrayText(array $arr)
     foreach ($arr as $key => $val) {
         if ($val instanceof StorageObject) {
             if ($val instanceof ImageStorageObject) {
-                $val = get_class($val) . ":UID:" . $val->getUID() . " | Dimension: (" . $val->getWidth() . "," . $val->getHeight() . ")";
+                $val = get_class($val) . " UID: " . $val->getUID() . " Dimension: (" . $val->getWidth() . "," . $val->getHeight() . ")";
             }
             else {
-                $val = get_class($val) . ":UID:" . $val->getUID();
+                $val = get_class($val) . " UID:" . $val->getUID();
             }
         }
         if (is_array($val)) $val = "Array(" . implode(",", $val) . ")";
 
-        $msg[] = "[$key]=>$val";
+        $msg[] = "[$key] => $val";
     }
     return implode("; ", $msg);
 

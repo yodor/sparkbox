@@ -4,6 +4,10 @@ include_once("components/Container.php");
 abstract class HTMLPage extends Container
 {
 
+    /**
+     * Do not wrap with DIV
+     * @var bool
+     */
     protected $wrapper_enabled = false;
 
     /**
@@ -129,7 +133,7 @@ abstract class HTMLPage extends Container
     }
 
     /**
-     * Set the preferred CSS class name of this page
+     * Set the preferred CSS class name of this page and override the automatic class name
      * @param string $cls
      */
     public function setPageClass(string $cls)

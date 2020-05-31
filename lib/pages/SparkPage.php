@@ -10,6 +10,7 @@ include_once("components/ImagePopup.php");
 include_once("utils/IActionCollection.php");
 include_once("utils/ActionCollection.php");
 include_once("utils/FBPixel.php");
+include_once("utils/GTAG.php");
 
 class SparkPage extends HTMLPage implements IActionCollection
 {
@@ -84,8 +85,9 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     protected $accessible_parent = "";
 
+
     /**
-     * property array of Action objects holding page action buttons
+     * @var ActionCollection
      */
     protected $actions;
 
@@ -117,7 +119,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         return -1;
     }
 
-    public function getActions(): ?ActionCollection
+    public function getActions(): ActionCollection
     {
         return $this->actions;
     }
@@ -183,14 +185,18 @@ class SparkPage extends HTMLPage implements IActionCollection
             $config = ConfigBean::Factory();
             $config->setSection("seo");
 
+            $gtag = new GTAG();
+
             $googleID_analytics = $config->get("googleID_analytics");
             if ($googleID_analytics) {
-                $this->renderGTAG($googleID_analytics);
+                $gtag->setID($googleID_analytics);
+                echo $gtag->script();
             }
 
             $googleID_ads = $config->get("googleID_ads");
             if ($googleID_ads) {
-                $this->renderGTAG($googleID_ads);
+                $gtag->setID($googleID_ads);
+                echo $gtag->script();
             }
         }
 
@@ -204,27 +210,6 @@ class SparkPage extends HTMLPage implements IActionCollection
         }
 
         parent::headEnd();
-    }
-
-    protected function renderGTAG(string $id)
-    {
-        echo "<!-- Start GTAG script for ID: $id -->";
-        ?>
-
-        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php
-        echo $id; ?>"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-
-            function gtag() {
-                dataLayer.push(arguments);
-            }
-
-            gtag('js', new Date());
-            gtag('config', '<?php echo $id;?>');
-        </script>
-        <?php
-        echo "\r\n<!-- End GTAG script for ID: $id  -->\r\n";
     }
 
     public function addComponent(Component $cmp)

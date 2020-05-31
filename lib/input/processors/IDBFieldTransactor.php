@@ -9,6 +9,10 @@ interface IDBFieldTransactor
     public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key);
 
     public function afterCommit(BeanTransactor $transactor);
+
+    public function setTargetColumn(string $name);
+
+
 }
 
 ?>

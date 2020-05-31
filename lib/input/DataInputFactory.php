@@ -88,7 +88,6 @@ class DataInputFactory
 
         $input->setValidator(new EmptyValueValidator());
         $processor = new InputProcessor($input);
-        $processor->transact_mode = InputProcessor::TRANSACT_VALUE;
 
         switch ($type) {
 
@@ -183,13 +182,10 @@ class DataInputFactory
 
                 $input = new ArrayDataInput($name, $label, $required);
 
-                $input->allow_dynamic_addition = FALSE;
-
                 new SessionImage($input);
 
                 $processor = new SessionUploadInput($input);
                 $processor->max_slots = 1;
-                $processor->transact_mode = InputProcessor::TRANSACT_OBJECT;
 
                 $validator = new ImageUploadValidator();
                 $validator->skip_is_uploaded_check = TRUE;
@@ -200,13 +196,10 @@ class DataInputFactory
 
                 $input = new ArrayDataInput($name, $label, $required);
 
-                $input->allow_dynamic_addition = FALSE;
-
                 new SessionFile($input);
 
                 $processor = new SessionUploadInput($input);
                 $processor->max_slots = 1;
-                $processor->transact_mode = InputProcessor::TRANSACT_OBJECT;
 
                 $validator = new FileUploadValidator();
                 $validator->skip_is_uploaded_check = TRUE;

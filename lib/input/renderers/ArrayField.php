@@ -29,6 +29,8 @@ class ArrayField extends InputField
      */
     protected $element_renderer = NULL;
 
+    protected $dynamic_addition = TRUE;
+
     public function __construct(InputField $field)
     {
         parent::__construct($field->getInput());
@@ -44,12 +46,21 @@ class ArrayField extends InputField
         $button_add->setAttribute("action", ArrayField::DEFAULT_CONTROL_ACTION);
         $button_add->setContents(ArrayField::DEFAULT_CONTROL_TEXT);
 
-
         $this->addControl($button_add);
 
-        $this->action = new Action("Remove","");
+        $this->action = new Action("Remove", "");
         //$this->action->getURLBuilder()->setKeepRequestParams(false);
 
+    }
+
+    public function enableDynamicAddition(bool $mode)
+    {
+        $this->dynamic_addition = $mode;
+    }
+
+    public function isDynamicAdditionEnabled(): bool
+    {
+        return $this->dynamic_addition;
     }
 
     public function setElementRenderer(InputField $renderer)
@@ -62,20 +73,24 @@ class ArrayField extends InputField
         return $this->element_renderer;
     }
 
-    public function requiredStyle() : array
+    public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/ArrayField.css";
         return $arr;
     }
 
-    public function requiredScript() : array
+    public function requiredScript(): array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/ArrayControls.js";
         return $arr;
     }
 
+    /**
+     * Add component to the controls container
+     * @param Component $cmp
+     */
     public function addControl(Component $cmp)
     {
         $this->controls->append($cmp);
@@ -105,7 +120,7 @@ class ArrayField extends InputField
 
     public function renderControls()
     {
-        if (!$this->input->allow_dynamic_addition) return;
+        if (!$this->dynamic_addition) return;
 
         $this->controls->setAttribute("field", $this->input->getName());
 
@@ -115,7 +130,7 @@ class ArrayField extends InputField
 
     public function renderElementSource()
     {
-        if (!$this->input->allow_dynamic_addition) return;
+        if (!$this->dynamic_addition) return;
 
         echo "<div class='ElementSource'>";
 
@@ -160,7 +175,7 @@ class ArrayField extends InputField
 
                 $renderer->render();
 
-                if ($this->input->allow_dynamic_addition) {
+                if ($this->dynamic_addition) {
                     echo "<div class='Controls' >";
 
                     $this->action->render();

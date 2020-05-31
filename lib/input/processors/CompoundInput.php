@@ -8,6 +8,8 @@ include_once("input/processors/InputProcessor.php");
 class CompoundInput extends InputProcessor
 {
 
+    const POST_CHAR = "_";
+
     protected $concat_char = "-";
     protected $compound_names = array();
     protected $compound_values = array();

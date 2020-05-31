@@ -113,6 +113,11 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         return $this->selected;
     }
 
+    public function getDataValue(string $key) : string
+    {
+        return $this->data[$key];
+    }
+
     public function setData(array &$data)
     {
         $this->data = $data;
@@ -141,6 +146,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
     {
 
     }
+
 }
 
 ?>

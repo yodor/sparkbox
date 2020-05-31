@@ -7,8 +7,6 @@ class ArrayDataInput extends DataInput
 
     public const ERROR_TEXT = "This input collection have errors";
 
-    public $allow_dynamic_addition = FALSE;
-
     public function __construct(string $name, string $label, bool $required)
     {
         parent::__construct($name, $label, $required);
@@ -52,38 +50,38 @@ class ArrayDataInput extends DataInput
 
     }
 
-    public function getValuesCount()
-    {
-        return count($this->value);
-    }
+//    public function getValuesCount()
+//    {
+//        return count($this->value);
+//    }
+//
+//    public function appendElement($val)
+//    {
+//        $this->value[] = $val;
+//    }
 
-    public function appendElement($val)
-    {
-        $this->value[] = $val;
-    }
-
-    public function removeElementAt($idx)
-    {
-
-        if (isset($this->value[$idx])) {
-            unset($this->value[$idx]);
-            $new_vals = array();
-            foreach ($this->value as $key => $val) {
-                $new_vals[] = $val;
-            }
-            $this->value = $new_vals;
-        }
-
-        if (isset($this->error[$idx])) {
-            unset($this->error[$idx]);
-            $new_vals = array();
-            foreach ($this->error as $key => $val) {
-                $new_vals[] = $val;
-            }
-            $this->error = $new_vals;
-        }
-
-    }
+//    public function removeElementAt($idx)
+//    {
+//
+//        if (isset($this->value[$idx])) {
+//            unset($this->value[$idx]);
+//            $new_vals = array();
+//            foreach ($this->value as $key => $val) {
+//                $new_vals[] = $val;
+//            }
+//            $this->value = $new_vals;
+//        }
+//
+//        if (isset($this->error[$idx])) {
+//            unset($this->error[$idx]);
+//            $new_vals = array();
+//            foreach ($this->error as $key => $val) {
+//                $new_vals[] = $val;
+//            }
+//            $this->error = $new_vals;
+//        }
+//
+//    }
 
     public function haveError(): bool
     {

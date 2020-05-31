@@ -8,73 +8,108 @@ class SessionUploadInput extends InputProcessor
 
     public $max_slots = 1;
 
+    //uids as keys -
+    //loaded objects from the main transaction row
     protected $loaded_uids = array();
 
+    //keeps map of storage_object UID to data_source primary key value
+    protected $source_loaded_uids = array();
+
+    public function __construct(DataInput $input)
+    {
+        if ($input instanceof ArrayDataInput) {
+            parent::__construct($input);
+        }
+        else {
+            throw new Exception("Expecting ArrayDataInput");
+        }
+
+    }
+
+    //only one storage object can be loaded from the main transaction result row
     public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)
     {
-        parent::loadBeanData($editID, $bean, $item_row);
-        //now value contains array of this item row storage objects or referenced source data values
-        //
 
-        $field_name = $this->input->getName();
+        parent::loadBeanData($editID, $bean, $item_row);
+
+        //now input->getValue() contains serialized data from target bean or single item from this transact row
 
         $values = $this->input->getValue();
-        $this->loaded_uids = array();
 
-        //trying to load field that does not have corresponding value in table. reset the value to empty array
-        if (is_null($values)) {
-            $values = array();
-        }
+        //no values loaded
+        if (is_null($values)) return;
 
-        foreach ($values as $idx => $storage_object) {
+        //DataInput should be ArrayDataInput for this processor. InputProcessor::loadBeanData takes care to do this
+        if (!is_array($values)) throw new Exception("Expecting array value");
 
-            //non required fields holding storage objects can load NULL values, remove them as they dont need presentation
-            if (is_null($storage_object)) {
-                unset($values[$idx]);
-                continue;
+        //incorrect max_slots usage
+        if (count($values) > 1 && !$this->transact_bean) throw new Exception("Incorrect array size - can only load one StorageObject from the main result bean");
+
+        foreach ($values as $idx=>$value) {
+
+            @$object = unserialize($value);
+            if ($object) {
+                $value = $object;
             }
+            if ($value instanceof StorageObject) {
 
-            $uid = $storage_object->getUID();
-            $this->loaded_uids[$uid] = 1;
+                $uid = $value->getUID();
 
+                if ($this->transact_bean) {
+                    $value->id = $this->target_loaded_keys[$idx];
+                    $value->className = get_class($this->transact_bean);
+
+                    $this->source_loaded_uids[$uid] = $value->id;
+                }
+                else {
+                    $value->id = $item_row[$bean->key()];
+                    $value->className = get_class($bean);
+
+                    $this->loaded_uids = array();
+                    $this->loaded_uids[$uid] = 1;
+                }
+                $values[$idx] = $value;
+
+            }
+            else {
+                //TODO throw or debug only but clear the target loaded keys
+                throw new Exception("De-serialized object is not instance of StorageObject: " . get_class($value));
+            }
         }
 
-        $values = array_values($values);
+
         $this->input->setValue($values);
 
-        debug("Final value type: " . getType($values));
-        debug("Final UIDs Dump: ", $values);
     }
+
 
     public function loadPostData(array &$arr)
     {
-
         //
         //arr holds the posted UIDs
         //
+        $name = $this->input->getName();
 
-        debug("DataInput class: " . get_class($this->input));
-
-        $field_name = $this->input->getName();
+        debug("DataInput '{$name}' Type: " . get_class($this->input));
 
         $values = $this->input->getValue();
 
         $num_files = 0;
 
         $session_files = array();
-        if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name])) {
-            $session_files = $_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name];
+        if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$name])) {
+            $session_files = $_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$name];
         }
 
         $posted_uids = array();
-        if (isset($arr["uid_$field_name"])) {
+        if (isset($arr["uid_$name"])) {
 
-            debug("Found posted UIDs for field['$field_name']");
-            if (is_array($arr["uid_$field_name"])) {
-                $posted_uids = $arr["uid_$field_name"];
+            debug("Found posted UIDs for DataInput '$name'");
+            if (is_array($arr["uid_$name"])) {
+                $posted_uids = $arr["uid_$name"];
             }
             else {
-                $posted_uids[] = $arr["uid_$field_name"];
+                $posted_uids[] = $arr["uid_$name"];
             }
         }
 
@@ -86,7 +121,7 @@ class SessionUploadInput extends InputProcessor
             if (!in_array($uid, $posted_uids)) unset($session_files[$uid]);
 
         }
-        //remove from field values objects with non posted uids
+        //remove from field objects with non posted uids
         foreach ($values as $idx => $storage_object) {
             $uid = $storage_object->getUID();
             if (!in_array($uid, $posted_uids)) unset($values[$idx]);
@@ -98,11 +133,11 @@ class SessionUploadInput extends InputProcessor
             @$storage_object = unserialize($file);
             if ($storage_object instanceof StorageObject) {
                 $values[] = $storage_object;
-                debug("Deserialized UID: " . $storage_object->getUID() . " append to field values");
+                debug("De-serialized UID: " . $storage_object->getUID() . " append to field values");
 
             }
             else {
-                debug("[$uid] could not be deserialized as StorageObject - removing from session array");
+                debug("[$uid] could not be de-serialized as StorageObject - removing from session array");
                 unset($session_files[$uid]);
             }
 
@@ -113,12 +148,17 @@ class SessionUploadInput extends InputProcessor
 
         $this->input->setValue($values);
 
-        debug("Final field values including session fiels:", $values);
+        debug("Final values including session files: ", $values);
 
     }
 
+
+
+
     public function afterCommit(BeanTransactor $transactor)
     {
+        parent::afterCommit($transactor);
+
         $field_name = $this->input->getName();
 
         if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name])) {
@@ -136,52 +176,109 @@ class SessionUploadInput extends InputProcessor
     public function transactValue(BeanTransactor $transactor)
     {
 
-        $values = $this->input->getValue();
-        $field_name = $this->input->getName();
-
-        //transact only UIDs found inside the session array i.e. the new ones
-        debug("DataInput ['$field_name'] Value Type: " . gettype($values) . " #" . count($values) . " values to transact");
+        $name = $this->input->getName();
+        debug("DataInput: '{$name}'");
 
         if ($this->transact_bean) {
-
-            debug("Using transact bean: '" . get_class($this->transact_bean) . "' will commit values in beforeCommit() ...");
+            debug("DataInput: '{$name}' uses transact bean - values will be transacted in beforeCommit() ...");
             return;
         }
 
-        if ($this->transact_mode == InputProcessor::TRANSACT_OBJECT) {
-            debug("Transact Mode: MODE_OBJECT");
+        $value = $this->input->getValue();
 
-            if (count($values) > 1) {
-                throw new Exception("Could not transact multiple objects to the main transaction using TRANSACT_OBJECT mode.");
+        if (is_array($value)) {
+
+            if (count($value) > 1) {
+                throw new Exception("Not possible to transact array of objects during to the main transaction row");
             }
-
-            if (count($values) < 1) {
-                debug("Field does not contain values. Transacting NULL value to the main transaction row");
+            if (count($value) < 1) {
+                debug("Array count is 0. Transacting NULL value to the main transaction row");
                 $value = NULL;
-                $transactor->appendValue($field_name, $value);
             }
-
-            //transact the first value if it is not the same as the loaded one
-            foreach ($values as $idx => $storage_object) {
-                $uid = $storage_object->getUID();
-
-                if (array_key_exists($uid, $this->loaded_uids)) {
-                    debug("StorageObject UID: $uid is the same UID as the bean loaded one. Not transacting this object to the main transaction row.");
-                }
-                else {
-                    debug("Transacting StorageObject UID: $uid serialized to the main transaction row");
-                    $value = DBConnections::Get()->escape(serialize($storage_object));
-                    $transactor->appendValue($field_name, $value);
-                }
-                break;
+            else {
+                $value = $value[0];
             }
+        }
 
+        if (is_null($value)) {
+            return;
+        }
+
+        if (! ($value instanceof StorageObject)) {
+            throw new Exception("Value to transact is not instance of StorageObject");
+        }
+
+        $uid = $value->getUID();
+
+        if (array_key_exists($uid, $this->loaded_uids)) {
+            //Skip the value as this is edit and the object is not changed
+            debug("StorageObject UID: $uid is the same UID as the bean loaded one.");
+            //$transactor->removeValue($column);
         }
         else {
-            throw new Exception("Could not transact this field using mode TRANSACT_VALUE");
+            //serialize
+            debug("Serializing object of type: '" . get_class($value) . "'");
+            $value = DBConnections::Get()->escape(serialize($value));
+            $transactor->appendValue($this->transact_column, $value);
         }
 
-        debug("field['$field_name'] finished values");
+    }
+
+    public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key)
+    {
+
+        if (!$this->transact_bean) {
+            debug("transact_bean is null - nothing to do in beforeCommit");
+            return;
+        }
+
+        $name = $this->input->getName();
+
+        debug("UIDs loaded from bean '".get_class($this->transact_bean)."': ", $this->source_loaded_uids);
+
+        $processed_ids = array();
+
+        $foreign_transacted = 0;
+
+        $values = $this->input->getValue();
+
+        debug("Values count: ".count($values));
+
+        foreach ($values as $idx => $value) {
+
+            if (!($value instanceof StorageObject)) throw new Exception("Value at position $idx not instance of StorageObject");
+
+            $uid = $value->getUID();
+
+            debug("Processing UID: $uid");
+
+            if (!array_key_exists($uid, $this->source_loaded_uids)) {
+                debug("Found new UID: $uid for insert");
+
+                $data = array();
+                $data[$item_key] = $transactor->getLastID();
+
+                $data[$name] = $db->escape(serialize($value));
+
+                $refID = $this->transact_bean->insert($data, $db);
+                if ($refID < 1) throw new Exception("Unable to insert into transact_bean. Error: " . $db->getError());
+                $foreign_transacted++;
+
+                $processed_ids[] = $refID;
+
+                debug("StorageObject UID: $uid transacted to transact_bean. ID: " . $refID);
+            }
+            else {
+                //skip transaction. same uid
+                $processed_ids[] = $this->source_loaded_uids[$uid];
+            }
+
+        }
+
+        //delete remaining values - transact_bean primary key values not found in processed_ids
+        $this->transact_bean->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
+
+        debug("Remaining transact_bean values removed");
 
     }
 }

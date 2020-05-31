@@ -1,9 +1,10 @@
 <?php
+include_once ("utils/IHeadScript.php");
 
-class FBPixel
+class FBPixel implements IHeadScript
 {
-    protected $pixelID = "";
-    protected $trackEvents = NULL;
+    protected $pixelID;
+    protected $trackEvents;
 
     public function __construct(string $pixelID)
     {
@@ -11,17 +12,17 @@ class FBPixel
         $this->trackEvents = array();
     }
 
-    public function addTrackEvent($eventName, $eventParam)
+    public function addTrackEvent(string $eventName, string $eventParam)
     {
         $this->trackEvents[$eventName] = $eventParam;
     }
 
     public function addTrackObject(FBTrackObject $fbtrack)
     {
-        $this->trackEvents[$fbtrack->getEvent()] = $fbtrack->getParameters();
+        $this->addTrackEvent($fbtrack->getEvent(), $fbtrack->getParameters());
     }
 
-    public function script()
+    public function script() : string
     {
         ob_start();
         ?>

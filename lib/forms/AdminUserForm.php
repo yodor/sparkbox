@@ -38,7 +38,7 @@ class AdminUserForm extends InputForm
 
         //
         $field = DataInputFactory::Create(DataInputFactory::HIDDEN, "password_hash", "Password Hash", 1);
-        $field->getProcessor()->transact_field_name = "password";
+        $field->getProcessor()->setTargetColumn("password");
         $this->addInput($field);
 
         //

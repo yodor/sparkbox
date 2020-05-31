@@ -25,6 +25,15 @@ class ClauseCollection
 
     public function addClause(SQLClause $clause)
     {
+        foreach ($this->clauses as $idx=>$clause_existing) {
+            if (!($clause_existing instanceof SQLClause))continue;
+
+            if ($clause == $clause_existing) {
+                //debug("Clause already exists: ".$clause->getSQL());
+                return;
+            }
+        }
+
         $this->clauses[] = $clause;
     }
 
