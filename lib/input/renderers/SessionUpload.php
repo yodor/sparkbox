@@ -2,7 +2,7 @@
 include_once("input/renderers/ArrayField.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
-abstract class SessionUpload extends InputField
+abstract class SessionUpload extends ArrayField
 {
     /**
      * @var UploadControlResponder
@@ -16,11 +16,12 @@ abstract class SessionUpload extends InputField
      */
     public function __construct(DataInput $input, UploadControlResponder $ajax_handler)
     {
-        parent::__construct($input);
 
         $this->input = $input;
 
         $this->assignUploadHandler($ajax_handler);
+
+        parent::__construct($this);
 
     }
 
@@ -49,16 +50,22 @@ abstract class SessionUpload extends InputField
     {
         parent::processInputAttributes();
 
-        $max_slots = $this->input->getProcessor()->max_slots;
+        $proc = $this->input->getProcessor();
+        if ($proc instanceof SessionUploadInput) {
+            $this->setInputAttribute("max_slots", $proc->getMaxSlots());
+            //TODO: set accepts attribute
+        }
 
         $this->setInputAttribute("type", "file");
-        $this->setInputAttribute("max_slots", $max_slots);
-
     }
 
     public function renderDetails()
     {
-        $max_slots = $this->input->getProcessor()->max_slots;
+        $max_slots = -1;
+        $proc = $this->input->getProcessor();
+        if ($proc instanceof SessionUploadInput) {
+            $max_slots = $proc->getMaxSlots();
+        }
 
         echo "<div class='Details'>";
 
@@ -79,10 +86,12 @@ abstract class SessionUpload extends InputField
         echo "<div class='Controls' >";
 
         echo "<div class='Buttons'>";
-        ColorButton::RenderButton("Browse", "", "browse");
 
         $attr = $this->prepareInputAttributes();
         echo "<input $attr>";
+
+        ColorButton::RenderButton("Browse", "", "browse");
+
         echo "</div>"; //Buttons
 
         echo "<div class='Progress'>";

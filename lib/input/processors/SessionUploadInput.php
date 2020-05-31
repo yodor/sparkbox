@@ -26,6 +26,16 @@ class SessionUploadInput extends InputProcessor
 
     }
 
+    public function setMaxSlots(int $limit)
+    {
+        $this->max_slots = $limit;
+    }
+
+    public function getMaxSlots(): int
+    {
+        return $this->max_slots;
+    }
+
     //only one storage object can be loaded from the main transaction result row
     public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)
     {
@@ -45,7 +55,7 @@ class SessionUploadInput extends InputProcessor
         //incorrect max_slots usage
         if (count($values) > 1 && !$this->transact_bean) throw new Exception("Incorrect array size - can only load one StorageObject from the main result bean");
 
-        foreach ($values as $idx=>$value) {
+        foreach ($values as $idx => $value) {
 
             @$object = unserialize($value);
             if ($object) {
@@ -77,11 +87,9 @@ class SessionUploadInput extends InputProcessor
             }
         }
 
-
         $this->input->setValue($values);
 
     }
-
 
     public function loadPostData(array &$arr)
     {
@@ -152,9 +160,6 @@ class SessionUploadInput extends InputProcessor
 
     }
 
-
-
-
     public function afterCommit(BeanTransactor $transactor)
     {
         parent::afterCommit($transactor);
@@ -204,7 +209,7 @@ class SessionUploadInput extends InputProcessor
             return;
         }
 
-        if (! ($value instanceof StorageObject)) {
+        if (!($value instanceof StorageObject)) {
             throw new Exception("Value to transact is not instance of StorageObject");
         }
 
@@ -234,7 +239,7 @@ class SessionUploadInput extends InputProcessor
 
         $name = $this->input->getName();
 
-        debug("UIDs loaded from bean '".get_class($this->transact_bean)."': ", $this->source_loaded_uids);
+        debug("UIDs loaded from bean '" . get_class($this->transact_bean) . "': ", $this->source_loaded_uids);
 
         $processed_ids = array();
 
@@ -242,7 +247,7 @@ class SessionUploadInput extends InputProcessor
 
         $values = $this->input->getValue();
 
-        debug("Values count: ".count($values));
+        debug("Values count: " . count($values));
 
         foreach ($values as $idx => $value) {
 

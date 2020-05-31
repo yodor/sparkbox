@@ -44,13 +44,8 @@
 
 .InputField.SessionUpload .Controls {
     display: block;
-
     position: relative;
-
-    cursor: pointer;
-
     margin-top: 5px;
-
 }
 
 .InputField.SessionUpload .Controls .Buttons {
