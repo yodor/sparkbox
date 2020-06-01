@@ -109,12 +109,6 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         return $this->paginator_bottom;
     }
 
-    public function setCaption(string $caption)
-    {
-        //parent::setCaption($caption);
-        $this->paginator_top->setCaption($caption);
-    }
-
     public function setDefaultOrder($default_order)
     {
         $this->default_order = $default_order;

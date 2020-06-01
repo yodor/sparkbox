@@ -50,22 +50,22 @@ abstract class SessionUpload extends ArrayField
     {
         parent::processInputAttributes();
 
-        $proc = $this->input->getProcessor();
-        if ($proc instanceof SessionUploadInput) {
-            $this->setInputAttribute("max_slots", $proc->getMaxSlots());
-            //TODO: set accepts attribute
+        $transact_max = $this->input->getProcessor()->getTransactBeanItemLimit();
+        $max_slots = 1;
+        if ($transact_max>0) {
+            $max_slots = $transact_max;
         }
+        $this->setInputAttribute("max_slots", $max_slots);
+
+
+        //TODO: set accepts attribute
 
         $this->setInputAttribute("type", "file");
     }
 
     public function renderDetails()
     {
-        $max_slots = -1;
-        $proc = $this->input->getProcessor();
-        if ($proc instanceof SessionUploadInput) {
-            $max_slots = $proc->getMaxSlots();
-        }
+
 
         echo "<div class='Details'>";
 
@@ -74,7 +74,13 @@ abstract class SessionUpload extends ArrayField
         echo "<div field='max_size'><label>UPLOAD_MAX_FILESIZE: </label><span>" . file_size(UPLOAD_MAX_FILESIZE) . "</span></div>";
         echo "<div field='max_post_size'><label>POST_MAX_FILESIZE: </label><span>" . file_size(POST_MAX_FILESIZE) . "</span></div>";
         echo "<div field='memory_limit'><label>MEMORY_LIMIT: </label><span>" . file_size(MEMORY_LIMIT) . "</span></div>";
+        $transact_max = $this->input->getProcessor()->getTransactBeanItemLimit();
+        $max_slots = 1;
+        if ($transact_max>0) {
+                $max_slots = $transact_max;
+        }
         echo "<div field='max_slots'><label>Available Slots: </label><span>" . $max_slots . "</span></div>";
+
 
         echo "</div>";
 

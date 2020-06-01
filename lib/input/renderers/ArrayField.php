@@ -4,6 +4,7 @@ include_once("components/Action.php");
 
 class ArrayField extends InputField
 {
+
     /**
      * @var DataInput
      */
@@ -142,7 +143,6 @@ class ArrayField extends InputField
         $renderer->render();
 
         echo "<div class='Controls'>";
-
         $this->action->render();
         echo "</div>";
 
@@ -177,9 +177,7 @@ class ArrayField extends InputField
 
                 if ($this->dynamic_addition) {
                     echo "<div class='Controls' >";
-
                     $this->action->render();
-
                     echo "</div>";
                 }
 

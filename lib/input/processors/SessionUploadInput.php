@@ -6,7 +6,7 @@ include_once("storage/ImageStorageObject.php");
 class SessionUploadInput extends InputProcessor
 {
 
-    public $max_slots = 1;
+
 
     //uids as keys -
     //loaded objects from the main transaction row
@@ -26,15 +26,7 @@ class SessionUploadInput extends InputProcessor
 
     }
 
-    public function setMaxSlots(int $limit)
-    {
-        $this->max_slots = $limit;
-    }
 
-    public function getMaxSlots(): int
-    {
-        return $this->max_slots;
-    }
 
     //only one storage object can be loaded from the main transaction result row
     public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)

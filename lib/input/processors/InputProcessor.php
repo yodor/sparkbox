@@ -11,6 +11,7 @@ include_once("input/processors/IDBFieldTransactor.php");
 class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 {
 
+    protected $max_transact_bean_items = -1;
     /**
      * DataInput value will not be transacted if this flag is true
      * @var bool
@@ -90,9 +91,20 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         return $this->transact_bean;
     }
 
-    public function setTransactBean(DBTableBean $bean)
+    public function setTransactBean(DBTableBean $bean, int $max_items=-1)
     {
         $this->transact_bean = $bean;
+        $this->max_transact_bean_items = $max_items;
+    }
+
+    public function getTransactBeanItemLimit() : int
+    {
+        return $this->max_transact_bean_items;
+    }
+
+    public function setTransactBeanItemLimit(int $max_items)
+    {
+        $this->max_transact_bean_items = $max_items;
     }
 
     public function setTargetColumn(string $name)

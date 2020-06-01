@@ -185,7 +185,6 @@ class DataInputFactory
                 new SessionImage($input);
 
                 $processor = new SessionUploadInput($input);
-                $processor->max_slots = 1;
 
                 $validator = new ImageUploadValidator();
                 $validator->skip_is_uploaded_check = TRUE;
@@ -199,7 +198,6 @@ class DataInputFactory
                 new SessionFile($input);
 
                 $processor = new SessionUploadInput($input);
-                $processor->max_slots = 1;
 
                 $validator = new FileUploadValidator();
                 $validator->skip_is_uploaded_check = TRUE;

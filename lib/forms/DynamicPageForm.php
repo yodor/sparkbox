@@ -47,8 +47,6 @@ class DynamicPageForm extends InputForm
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 0);
-
-        $field->getProcessor()->max_slots = 1;
         $this->addInput($field);
 
 

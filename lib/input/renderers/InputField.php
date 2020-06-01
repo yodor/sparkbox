@@ -6,6 +6,7 @@ include_once("components/renderers/IDataIteratorRenderer.php");
 /**
  * Class InputField
  * Base class wrapping various input tags into a Component
+ * Use to get visual representation of DataInput values
  */
 abstract class InputField extends Component implements IErrorRenderer, IDataIteratorRenderer
 {

@@ -214,6 +214,7 @@ abstract class DBTableBean
         foreach ($columns as $column) {
             $qry->select->fields()->set($column);
         }
+        $this->select->fields()->set($this->prkey);
 
         return $qry;
     }

@@ -4,7 +4,7 @@ include_once("beans/DBTableBean.php");
 class DatedBean extends DBTableBean
 {
 
-    protected $datefield;
+    protected $date_column;
 
     /**
      * DatedPublicationBean constructor.
@@ -15,9 +15,14 @@ class DatedBean extends DBTableBean
     public function __construct(string $table_name, string $datefield = "item_date")
     {
         parent::__construct($table_name);
-        if (!$this->haveColumn($datefield))throw new Exception("Date field not found in this bean table");
-        $this->datefield = $datefield;
+        if (!$this->haveColumn($datefield)) throw new Exception("Date field not found in this bean table");
+        $this->date_column = $datefield;
 
+    }
+
+    public function getDateColumn(): string
+    {
+        return $this->date_column;
     }
 
     /**
@@ -25,12 +30,13 @@ class DatedBean extends DBTableBean
      * @return array
      * @throws Exception
      */
-    public function getYears() : array
+    public function getYears(): array
     {
 
         $qry = $this->query();
-        $qry->select->fields()->setExpression(" YEAR({$this->datefield}) ", "year");
-        $qry->select->group_by = " YEAR({$this->datefield}) DESC  ";
+        $qry->select->fields()->setExpression(" YEAR({$this->date_column}) ", "year");
+        $qry->select->order_by = " {$this->date_column} DESC ";
+        $qry->select->group_by = " YEAR({$this->date_column}) DESC  ";
         $qry->exec();
 
         $data = array();
@@ -51,8 +57,8 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query();
-        $qry->select->where()->add("MONTHNAME({$this->datefield})","'$d_month'")->add("YEAR({$this->datefield})", "'$d_year'");
-        $qry->select->order_by = " {$this->datefield} DESC ";
+        $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
+        $qry->select->order_by = " {$this->date_column} DESC ";
         $qry->exec();
 
         $data = array();
@@ -75,8 +81,8 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query();
-        $qry->select->fields()->setExpression("DAY({$this->datefield})", "day");
-        $qry->select->where()->add("MONTH({$this->datefield})", "'$d_month'")->add("YEAR({$this->datefield})","'$d_year'");
+        $qry->select->fields()->setExpression("DAY({$this->date_column})", "day");
+        $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
         $qry->exec();
 
         $data = array();
@@ -95,10 +101,10 @@ class DatedBean extends DBTableBean
      * @return int
      * @throws Exception
      */
-    public function containsDataForMonth(string $d_year, string $d_month) :int
+    public function publicationsCount(string $d_year, string $d_month): int
     {
         $qry = $this->query();
-        $qry->select->where()->add("MONTHNAME({$this->datefield})", "'$d_month'")->add("YEAR({$this->datefield})", "'$d_year'");
+        $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
         $qry->select->limit = " 1 ";
         return $qry->exec();
     }

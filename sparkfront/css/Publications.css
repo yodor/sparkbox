@@ -1,0 +1,117 @@
+/*latest news*/
+.PublicationsComponent .ItemView  {
+    display:block;
+}
+.PublicationsComponent .ItemView .viewport {
+    display:table;
+    border-spacing: 0;
+    width:100%;
+}
+
+.PublicationsComponent .ItemView .item {
+    display: table-row;
+    text-decoration: none;
+}
+
+.PublicationsComponent .ItemView .item .cell {
+    display: table-cell;
+    vertical-align: top;
+    padding-bottom:0.5em;
+}
+
+.PublicationsComponent .ItemView  .item .cell.image {
+
+}
+
+.PublicationsComponent .ItemView  .item .cell.image IMG {
+    display: block;
+}
+
+.PublicationsComponent .ItemView .item .cell.details {
+    width:100%;
+    box-sizing: border-box;
+    padding-left:0.3em;
+}
+.PublicationsComponent .ItemView .item .cell.details SPAN {
+    display: block;
+    text-decoration: none;
+    color: black;
+}
+
+.PublicationsComponent .ItemView  .item .cell.details SPAN.Title {
+    font-size: 100%;
+    font-weight: bold;
+}
+
+.PublicationsComponent .ItemView  .cell.details SPAN.date {
+    font-size: 50%;
+    font-style: italic;
+
+}
+
+
+/*archive items*/
+
+.PublicationsComponent .archive {
+
+    display:block;
+}
+
+.PublicationsComponent .archive .archive_year {
+
+}
+
+.PublicationsComponent .archive .archive_year.even {
+
+}
+
+.PublicationsComponent .archive .archive_year.odd {
+
+}
+
+.PublicationsComponent .archive .archive_year A {
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.PublicationsComponent .archive .months {
+    display: none;
+}
+
+.PublicationsComponent .archive .months .list {
+    display: table;
+    border-spacing: 0.5em;
+    border-collapse: separate;
+    width: 100%;
+    border: 0;
+}
+
+.PublicationsComponent .archive .months .list .row {
+    display: table-row;
+    padding: 0;
+
+    border: 0;
+}
+.PublicationsComponent .archive .months .list .row .item {
+    width:33%;
+    display: table-cell;
+}
+.PublicationsComponent .archive .months .list .row .item span {
+
+}
+
+.PublicationsComponent .archive .months .list .row a {
+    display: table-cell;
+
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
+}
+
+.PublicationsComponent .archive .months .list .row a[selected] {
+    text-decoration: underline;
+}
+
+
+

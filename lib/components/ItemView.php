@@ -24,19 +24,11 @@ class ItemView extends AbstractResultView
 
         echo "<div class='viewport'>";
 
-        if (!$this->paginators_enabled) {
-            if (strlen($this->caption) > 0) {
-                echo "<div class='caption'>";
-                echo $this->caption;
-                echo "</div>";
-            }
-        }
-
     }
 
     public function finishRender()
     {
-        //        echo "<div class=clear></div>";
+
         echo "</div>";
 
         parent::finishRender();
@@ -56,6 +48,7 @@ class ItemView extends AbstractResultView
 
             $cls = $v->value();
 
+            $this->item_renderer->setID($row[$this->iterator->key()]);
             $this->item_renderer->setData($row);
             $this->item_renderer->render();
 

@@ -18,6 +18,10 @@ class ClauseCollection
         }
     }
 
+    public function clear() {
+        $this->clauses = array();
+    }
+
     public function count(): int
     {
         return count($this->clauses);
