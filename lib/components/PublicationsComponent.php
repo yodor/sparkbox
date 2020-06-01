@@ -153,17 +153,19 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
         $qry = $this->bean->query(...$this->columns);
         $qry->select->order_by = $this->bean->getDateColumn() . " DESC";
+        $qry->select->limit = 3;
 
         $this->itemView = new ItemView($qry);
         $this->itemView->setCaption(tr("Latest News"));
         $this->itemView->enablePaginators(0);
+        $this->itemView->setItemsPerPage(0);
 
         $this->itemRenderer = new PublicationItem(get_class($this->bean));
         $this->itemRenderer->getURL()->add(new DataParameter($bean->key()));
 
         $this->itemView->setItemRenderer($this->itemRenderer);
 
-        $this->itemView->setItemsPerPage(3);
+
 
         $this->append($this->itemView);
 
