@@ -70,10 +70,13 @@ class Translator implements IRequestProcessor
 
         if (Session::Contains("langID")) {
             $langID = (int)Session::Get("langID");
+            debug("Using session langID: ".$langID);
         }
-        if (Session::HaveCookie("langID")) {
+        else if (Session::HaveCookie("langID")) {
             $langID = (int)Session::GetCookie("langID");
+            debug("Using cookies langID: ".$langID);
         }
+
 
         //no session or cookie set
         if ($langID > 0) {
@@ -149,6 +152,7 @@ class Translator implements IRequestProcessor
     {
         $this->language = $this->languages->getByID($langID);
         $this->langID = $langID;
+        $this->storeLanguage();
     }
 
     protected function loadDefaultLanguage()

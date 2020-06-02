@@ -55,12 +55,17 @@ class Session
 
     public static function SetCookie($key, $val, $expire = 0)
     {
+        $_COOKIE[$key] = $val;
         setcookie($key, $val, $expire, LOCAL, COOKIE_DOMAIN);
+
     }
 
     public static function ClearCookie($key)
     {
         setcookie($key, "", 1, LOCAL, COOKIE_DOMAIN);
+        if (isset($_COOKIE[$key])) {
+            unset($_COOKIE[$key]);
+        }
     }
 
     public static function GetCookie($key, $default = FALSE)
