@@ -47,14 +47,10 @@ class SparkPage extends HTMLPage implements IActionCollection
     protected $context = NULL;
 
     /**
-     * The Preferred title of this page for rendering into the <TITLE></TITLE>
+     * The Preferred title of this page for rendering into the <TITLE></TITLE> tag
      */
     protected $preferred_title = "";
 
-    /**
-     * @var string
-     */
-    protected $name = "";
 
     /**
      * @var array IHeadContents
@@ -77,13 +73,6 @@ class SparkPage extends HTMLPage implements IActionCollection
      * Meta tag 'Keywords' overload. If not empty is used instead of ConfigBean 'seo' section value
      */
     public $keywords = "";
-
-    /**
-     * property used to connect the current page with menus
-     */
-    protected $accessible_title = "";
-
-    protected $accessible_parent = "";
 
 
     /**
@@ -139,26 +128,6 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->opengraph_tags[$tag_name] = $tag_content;
     }
 
-    /**
-     * gets the accessible title
-     *
-     * @return string the accessible title of this page object. Default none.
-     */
-    public function getAccessibleTitle()
-    {
-        return $this->accessible_title;
-    }
-
-    /**
-     * sets the accessible title of this page
-     *
-     * @param $menu_title string Tht title to set
-     *
-     */
-    public function setAccessibleTitle($menu_title)
-    {
-        $this->accessible_title = $menu_title;
-    }
 
     /**
      * Render all meta tags for the HEAD section of the page
@@ -222,24 +191,6 @@ class SparkPage extends HTMLPage implements IActionCollection
             $this->head_components[] = $cmp;
         }
 
-    }
-
-    /**
-     * Sets the value of the $caption property
-     * @param string $caption
-     */
-    public function setName(string $caption)
-    {
-        $this->name = $caption;
-    }
-
-    /**
-     * Gets the value of the $caption property
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     protected function renderJS()

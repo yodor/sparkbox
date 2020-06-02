@@ -342,7 +342,6 @@ class MainMenu
      * Select active MenuItem by matching the current page URL with the MenuItem url
      * Matches by full url, then scriptName only, then scriptPath only
      * Constructs a selection path array containing MenuItems - from top parent MenuItem to selected MenuItem
-     * @param int $find_mode
      * @throws Exception
      */
     public function selectActive()
