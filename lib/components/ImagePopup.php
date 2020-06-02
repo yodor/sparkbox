@@ -25,6 +25,16 @@ class ImagePopup extends Component implements IPhotoRenderer
 
     }
 
+    public function setRelation(string $relation)
+    {
+        $this->setAttribute("relation", $relation);
+    }
+
+    public function getRelation(): ?string
+    {
+        return $this->getAttribute("relation");
+    }
+
     public function setStorageItem(StorageItem $storageItem)
     {
         $this->storageItem = $storageItem;
@@ -35,14 +45,14 @@ class ImagePopup extends Component implements IPhotoRenderer
         $this->mode = $mode;
     }
 
-    public function requiredStyle() : array
+    public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/ImagePopup.css";
         return $arr;
     }
 
-    public function requiredScript() : array
+    public function requiredScript(): array
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/ImagePopup.js";

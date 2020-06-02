@@ -75,14 +75,17 @@ class ImagePopup {
             return;
         }
 
-        let relation = aelm.attr("relation");
+        this.relation = itemClass;
 
+        let collection_selector = "A.ImagePopup[itemClass='" + itemClass + "']";
+
+        let relation = aelm.attr("relation");
         if (relation) {
-            this.collection = $("A.ImagePopup[itemClass='" + itemClass + "'][relation='" + relation + "']");
+            collection_selector += "[relation='" + relation + "']";
             this.relation = relation;
-        } else {
-            this.collection = aelm;
         }
+
+        this.collection = $(collection_selector);
 
         this.pos = this.collection.index(aelm);
 
