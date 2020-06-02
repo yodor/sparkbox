@@ -53,6 +53,7 @@ class GalleryView extends Container
             $view->addColumn(new TableColumn("date_upload", "Date Upload"));
 
             $renderer = new ImageCellRenderer();
+
             $this->photo_renderer = $renderer;
 
             $view->getColumn("photo")->setCellRenderer($renderer);

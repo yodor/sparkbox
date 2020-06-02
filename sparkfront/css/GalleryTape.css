@@ -1,6 +1,6 @@
-.GalleryTape {
-    border-top: 1px solid #4a176e;
-    border-bottom: 1px solid #4a176e;
+
+.GalleryTape .contents {
+
     display: table;
     padding-top: 15px;
     padding-bottom: 15px;
@@ -11,54 +11,51 @@
 
 }
 
-.GalleryTape .viewport {
-    display: table-cell;
-    overflow: hidden;
-}
-
-.GalleryTape .button {
+.GalleryTape .contents .button {
     display: table-cell;
 
     background-repeat: no-repeat;
     vertical-align: middle;
     cursor: pointer;
     position: relative;
-    min-width: 22px;
 
+    background-position: center center;
+    width: 32px;
+    min-height: 44px;
 }
 
-.GalleryTape .button.left {
+.GalleryTape .contents .button.left {
     background-image: url("../images/gallery_tape_left.png");
-    background-position: center center;
-    width: 32px;
-    min-height: 44px;
 }
 
-.GalleryTape .button.right {
+.GalleryTape .contents .button.right {
     background-image: url("../images/gallery_tape_right.png");
-    background-position: center center;
-    width: 32px;
-    min-height: 44px;
 }
 
-.GalleryTape .slots {
+
+.GalleryTape .contents .viewport {
+    display: table-cell;
+    width:100%;
+    vertical-align: middle;
+    overflow:hidden;
+}
+
+.GalleryTape .contents .viewport .slots {
     display: block;
-    vertical-align: top;
+    vertical-align: middle;
     position: relative;
-    overflow: hidden;
-    height: 174px;
-    max-height: 174px;
+    /*overflow: hidden;*/
     white-space: nowrap;
-
 }
 
-.GalleryTape .slots .slot {
+.GalleryTape .contents .viewport .slots .slot {
 
-    background-color: #f2f2f2;
+    /*background-color: #f2f2f2;*/
     padding: 5px;
 
     display: inline-block;
-    vertical-align: top;
+
+    vertical-align: middle;
 
     border: 1px solid #dcdedb;
     -webkit-border-radius: 3px;
@@ -72,7 +69,7 @@
     /*   float:left; */
 }
 
-.GalleryTape .slots .slot IMG {
-    border: 1px solid #dcdedb;
+.GalleryTape .contents .viewport .slots .slot IMG {
+    /*border: 1px solid #dcdedb;*/
     display: block;
 }

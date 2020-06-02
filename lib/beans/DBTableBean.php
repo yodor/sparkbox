@@ -202,6 +202,7 @@ abstract class DBTableBean
     /**
      * Create default query selecting columns specified in the '$columns' list
      * If no columns are specified the default columns as set in the SQLSelect instance are used
+     * and the primary key column is set
      * Current SQLSelect is cloned and passed to the SQLQuery constructor
      * @param string ...$columns
      * @return SQLQuery

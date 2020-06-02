@@ -1,115 +1,108 @@
-function GalleryTape(cls) {
-    if (!cls) cls = ".GalleryTape";
-    this.cls = cls;
+class GalleryTape extends Component {
 
-    $(this.cls + " .button.left").on("click", function () {
-        this.prevImage();
-    }.bind(this));
-    $(this.cls + " .button.right").on("click", function () {
-        this.nextImage();
-    }.bind(this));
+    constructor() {
+        super();
+        this.setClass(".GalleryTape");
+        this.duration = 200;
+    }
 
-//   console.log("GalleryTape for "+this.cls);
+    initialize() {
+        super.initialize();
+        $(this.selector() + " .button.left").on("click", this.prevImage.bind(this));
+        $(this.selector() + " .button.right").on("click", this.nextImage.bind(this));
 
-    this.duration_left = 500;
-    this.duration_right = 500;
+        $(document).on("ImagePopup", function (e) {
 
-}
+            //console.log("ImagePopup::event - Relation: " + e.relation + " Message: " + e.message);
 
-GalleryTape.prototype.connectGalleryView = function (relation) {
-    $(document).on("GalleryView", function (e) {
+            if (e.relation != this.name) return;
 
-//   console.log("GalleryTape::GalleryViewEventHandler EventRaltion: "+e.rel+" Message: "+e.message + " ConnectedRelation: "+relation);
+            switch (e.message) {
+                case "onPrevImage":
+                    this.prevImage();
+                    break;
+                case "onNextImage":
+                    this.nextImage();
+                    break;
 
-        if (e.rel != relation) return;
-
-        switch (e.message) {
-            case "onPrevImage":
-                this.prevImage();
-                break;
-            case "onNextImage":
-                this.nextImage();
-                break;
-
-        }
+            }
 
 
-    }.bind(this));
+        }.bind(this));
+    }
 
-}
+    setDuration(duration) {
+        this.duration = duration;
+    }
 
-GalleryTape.prototype.nextImage = function () {
-    if ($(this.cls).data("execute")) return;
+    prevImage() {
+        if ($(this.selector()).data("execute")) return;
 
-    $(this.cls).data("execute", true);
+        $(this.selector()).data("execute", true);
 
-    var slots = $(this.cls + " .slots");
-    var first = $(this.cls + " .slots .slot:first");
+        let slots = $(this.selector() + " .slots");
+        let last = $(this.selector() + " .slots .slot:last");
 
-    var w = first.outerWidth(true);
+        let w = last.outerWidth(true);
 
-    var duration = this.duration_right;
+        last.prependTo(slots);
 
-    first.animate({
-        left: -w
-    }, {
-        duration: duration,
-        step: function (now, fx) {
-            $(this.cls + " .slot:gt(0)").css("left", now);
-        }.bind(this),
-        complete: function () {
+        slots.css("left", -w);
 
-            first.appendTo(slots);
 
-            $(this.cls + " .slot").css("left", "");
-            $(this.cls).data("execute", false);
+        let first = $(this.selector() + " .slots .slot:first");
 
-            $.event.trigger({
-                type: "GalleryTape",
-                message: "onNextImage",
-                time: new Date(),
-            });
+        slots.animate({
+            left: 0
+        }, {
+            duration: this.duration,
 
-        }.bind(this)
-    });
+            step: function (now, fx) {
+                slots.css("left", now);
+            }.bind(this),
 
-}
+            easing: "swing",
 
-GalleryTape.prototype.prevImage = function () {
-    if ($(this.cls).data("execute")) return;
+            complete: function () {
 
-    $(this.cls).data("execute", true);
+                $(this.selector()).data("execute", false);
 
-    let slots = $(this.cls + " .slots");
-    let last = $(this.cls + " .slots .slot:last");
+            }.bind(this)
+        });
 
-    let w = last.outerWidth(true);
+    }
 
-    last.prependTo(slots);
+    nextImage() {
 
-    $(this.cls + " .slot").css("left", -w);
+        if ($(this.selector()).data("execute")) return;
+        $(this.selector()).data("execute", true);
 
-    let duration = this.duration_left;
+        let slots = $(this.selector() + " .slots");
+        let first = $(this.selector() + " .slots .slot:first");
 
-    let first = $(this.cls + " .slots .slot:first");
-    first.animate({
-        left: 0
-    }, {
-        duration: duration,
-        step: function (now, fx) {
-            $(this.cls + " .slot:gt(0)").css("left", now);
-        }.bind(this),
-        complete: function () {
-            $(this.cls).data("execute", false);
-            $.event.trigger({
-                type: "GalleryTape",
-                message: "prevImage",
-                time: new Date(),
-            });
+        let w = first.outerWidth(true);
 
-        }.bind(this)
-    });
+        slots.animate({
+            left: -w
+        }, {
+            duration: this.duration,
+
+            step: function (now, fx) {
+                slots.css("left", now);
+            }.bind(this),
+
+            easing: "swing",
+
+            complete: function () {
+
+                first.appendTo(slots);
+
+                slots.css("left", "");
+                $(this.selector()).data("execute", false);
+
+            }.bind(this)
+        });
+    }
 
 
 }
-

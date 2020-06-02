@@ -9,6 +9,7 @@ class ImagePopup {
         this.modal_pane.fullscreen = true;
 
         this.modal_pane.paneClicked = this.onClickPane.bind(this);
+        this.relation = "";
     }
 
     onClickImage(event) {
@@ -30,6 +31,13 @@ class ImagePopup {
         if (this.pos >= this.collection.length) this.pos = 0;
         this.showImage();
 
+        $.event.trigger({
+            type: "ImagePopup",
+            message: "onNextImage",
+            time: new Date(),
+            relation: this.relation
+        });
+
         return false;
     }
 
@@ -42,6 +50,13 @@ class ImagePopup {
 
         this.showImage();
 
+        $.event.trigger({
+            type: "ImagePopup",
+            message: "onPrevImage",
+            time: new Date(),
+            relation: this.relation
+        });
+
         return false;
     }
 
@@ -51,11 +66,20 @@ class ImagePopup {
      */
     popupImage(aelm) {
 
-        let related = aelm.attr("itemClass");
 
-        if (related) {
-            this.collection = $("A.ImagePopup[itemClass='" + related + "']");
-            this.related = related;
+        let itemClass = aelm.attr("itemClass");
+        let itemID = aelm.attr("itemID");
+
+        if (!itemClass || !itemID) {
+            showAlert("itemClass or itemID attribute not found");
+            return;
+        }
+
+        let relation = aelm.attr("relation");
+
+        if (relation) {
+            this.collection = $("A.ImagePopup[itemClass='" + itemClass + "'][relation='" + relation + "']");
+            this.relation = relation;
         } else {
             this.collection = aelm;
         }

@@ -42,6 +42,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         $this->image_popup = new ImagePopup();
         $this->image_popup->setClassName("image_slot");
         $this->actions = new ActionCollection();
+        $this->image_popup->setAttribute("relation", "GalleryViewItem");
     }
 
     public function requiredStyle() : array
@@ -87,7 +88,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
         $this->image_popup->setAttribute("tooltip", $tooltip);
 
-        $this->image_popup->setName($this->image_popup->getBeanClass() . "." . $this->image_popup->getID());
+
 
         if (isset($item["position"])) {
             $this->position = $item["position"];

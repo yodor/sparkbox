@@ -50,6 +50,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
         $this->image_popup = new ImagePopup();
         $this->image_popup->setPhotoSize($width, $height);
+        $this->image_popup->setAttribute("relation", "ImageCellRenderer");
 
     }
 
