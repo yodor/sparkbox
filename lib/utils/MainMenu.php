@@ -4,47 +4,51 @@ include_once("utils/MenuItem.php");
 class MainMenu
 {
 
-    protected $debug_matching = FALSE;
-
-    protected $bean_class = NULL;
-    protected $prefix_root = "";
-
     protected $selected_item = NULL;
 
     protected $name = "";
 
-    const FIND_INDEX_NORMAL = 1;
-    const FIND_INDEX_LOOSE = 2;
-    const FIND_INDEX_LOOSE_REVERSE = 3;
-    const FIND_INDEX_LEVENSHTEIN = 4;
-    const FIND_INDEX_PATHCHECK = 5;
+    /**
+     * @var NestedSetBean|null
+     */
+    protected $bean;
 
     /**
-     * @var DBTableBean
+     * Top parents of this MenuItem collection
+     * @var array
      */
-    protected $bean = NULL;
-
-    protected $menu_map = array();
-
     protected $main_menu = array();
 
+    /**
+     * Indexed array holding the selection path from top parent MenuItem to selected MenuItem
+     * @var array
+     */
     protected $selected_path = array();
 
-    public $uri_match_variable = "REQUEST_URI";
+    /**
+     * During construct() is used to set the href of the MenuItem using DataParameter ($value_key)
+     * @var URLBuilder|null
+     */
+    protected $target_url;
 
-    protected $link_page = NULL;
+    /**
+     * During construct() is used to set the MenuItem title
+     * Default "menu_title"
+     * @var string
+     */
+    protected $label_key;
 
-    protected $last_match_value = "";
-
-    public function getLastMatchValue()
-    {
-        return $this->last_match_value;
-    }
+    /**
+     * During construct() is used to set the data parameter of target_url
+     * Default "menuID". Should correspond to the NestedSetBean primary key
+     * @var string
+     */
+    protected $value_key;
 
     public function __construct()
     {
-        $this->bean_class = NULL;
-        $this->prefix_root = "";
+        $this->label_key = "menu_title";
+        $this->value_key = "menuID";
     }
 
     public function setName(string $name)
@@ -52,7 +56,7 @@ class MainMenu
         $this->name = $name;
     }
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -60,7 +64,6 @@ class MainMenu
     public function setMenuItems(array $arr_menu)
     {
         $this->main_menu = $arr_menu;
-
     }
 
     public function getMenuItems(): ?array
@@ -68,271 +71,416 @@ class MainMenu
         return $this->main_menu;
     }
 
+    /**
+     * Return the currently selected MenuItem
+     * @return MenuItem|null
+     */
     public function getSelectedItem(): ?MenuItem
     {
         return $this->selected_item;
-
     }
 
+
+    public function getBySelectedState() :?MenuItem
+    {
+        $result = null;
+
+        $items = array();
+        $this->flattenMenu($items, $this->main_menu);
+
+        for ($a = 0; $a < count($items); $a++) {
+
+            $item = $items[$a];
+            //debug("MenuItem: ".$item->getTitle()." is_selected: ".(int)$item->isSelected());
+            if (!($item instanceof MenuItem)) throw new Exception("Element is not instance of MenuItem");
+            if ($item->isSelected()) {
+                $result = $item;
+            }
+            //continue until end node is selected
+        }
+        return $result;
+    }
+
+    /**
+     * Manually set the active MenuItem
+     * @param MenuItem $item
+     */
     public function setSelectedItem(MenuItem $item)
     {
         $this->selected_item = $item;
+        $this->unselectAll();
+        $this->selected_item->setSelected(true);
+        $this->constructSelectedPath();
     }
 
-    public function setMenuBeanClass(string $menu_items_class, $prefix_root = "", $link_page = "")
+    /**
+     * Return the first MenuItem after '$index' having getTitle()=$title
+     * @param string $title
+     */
+    public function getIndexByTitle(string $title, $index = 0): int
     {
-        $this->bean_class = $menu_items_class;
-        $this->bean = new $this->bean_class();
-        $this->prefix_root = $prefix_root;
-        $this->link_page = $link_page;
-
+        $items = array();
+        $this->flattenMenu($items, $this->main_menu);
+        for ($a = $index; $a < count($items); $a++) {
+            $item = $items[$a];
+            if (!($item instanceof MenuItem)) throw new Exception("Element is not instance of MenuItem");
+            if (strcmp($title, $item->getTitle()) == 0) return $a;
+        }
+        return -1;
     }
 
-    public function getMenuBeanClass()
+    public function getIndexByHref(string $href, int $index = 0): int
     {
-        return $this->bean_class;
+        if (startsWith($href, LOCAL)) {
+
+        }
+        else {
+            $href = LOCAL . $href;
+        }
+
+        $items = array();
+        $this->flattenMenu($items, $this->main_menu);
+        for ($a = $index; $a < count($items); $a++) {
+            $item = $items[$a];
+            if (!($item instanceof MenuItem)) throw new Exception("Element is not instance of MenuItem");
+            if (strcmp($href, $item->getHref()) == 0) return $a;
+        }
+        return -1;
     }
 
-    public function constructMenuItems($parentID = 0, MenuItem $parent_item = NULL, $key = "menuID", $title = "menu_title")
+    /**
+     * Get the MenuItem with index '$index' from the flattened menu list
+     * @param int $index
+     * @return MenuItem
+     * @throws Exception
+     */
+    public function get(int $index): MenuItem
     {
-        $arr_menu = array();
+        $items = array();
+        $this->flattenMenu($items, $this->main_menu);
+        if (isset($items[$index])) return $items[$index];
+        throw new Exception("Index out of range");
+    }
 
-        $total_items = 0;
+    /**
+     * Use this href to set the MenuItem $href during construct()
+     * The url is parametrized with query parameter = $this->bean->key() if the bean is not set it would be parameterized
+     * during the setBean call
+     * @param string $build_href
+     */
+    public function setTargetURL(string $build_href)
+    {
+        $this->target_url = new URLBuilder();
+        $this->target_url->buildFrom($build_href);
+
+        if ($this->bean) {
+            $this->target_url->add(new DataParameter($this->bean->key()));
+        }
+    }
+
+    /**
+     * Set the bean to be used during construct() call
+     * @param NestedSetBean $bean
+     * @throws Exception
+     */
+    public function setBean(NestedSetBean $bean)
+    {
+        $this->bean = $bean;
+
+        if ($this->target_url) {
+            $this->target_url->add(new DataParameter($this->bean->key()));
+        }
+
+        if (!$this->bean->haveColumn($this->value_key)) throw new Exception("Value key '{$this->value_key}' not found in bean columns");
+        if (!$this->bean->haveColumn($this->label_key)) throw new Exception("Label key '{$this->label_key}' not found in bean columns");
+    }
+
+    /**
+     *
+     * @param string $key
+     * @throws Exception
+     */
+    public function setValueKey(string $key)
+    {
+        $this->value_key = $key;
+        if ($this->bean) {
+            if (!$this->bean->haveColumn($this->value_key)) throw new Exception("Value key '{$this->value_key}' not found in bean columns");
+        }
+    }
+
+    /**
+     * Used as key to set the MenuItem title value
+     * @param string $key
+     * @throws Exception
+     */
+    public function setLabelKey(string $key)
+    {
+        $this->label_key = $key;
+        if ($this->bean) {
+            if (!$this->bean->haveColumn($this->label_key)) throw new Exception("Value key '{$this->label_key}' not found in bean columns");
+        }
+    }
+
+    public function getMenuBeanClass(): string
+    {
+        if ($this->bean) return get_class($this->bean);
+        return "";
+    }
+
+    /**
+     * Construct MenuItems using the bean set
+     * @param int $parentID
+     * @param MenuItem|null $parent
+     * @throws Exception
+     */
+    public function construct(int $parentID = 0, MenuItem $parent = NULL)
+    {
+        if (!$this->bean) throw new Exception("No bean assigned");
+
+        $items_top = array();
 
         $qry = $this->bean->queryField("parentID", $parentID);
-        $qry->select->fields()->set("menu_title", "link");
-        $qry->select->order_by = " lft ";
+        $qry->select->fields()->set($this->value_key, $this->label_key);
+
+        if ($this->bean->haveColumn("link")) {
+            $qry->select->fields()->set("link");
+        }
+
+        $qry->select->order_by = " lft ASC ";
 
         $total_items = $qry->exec();
 
+        //debug("Total #$total_items MenuItems with parentID=$parentID");
+
         if ($total_items < 1) return;
 
-        while ($row = $qry->next()) {
+        while ($data = $qry->next()) {
 
-            $menuID = (int)$row[$key];
+            $menuID = (int)$data[$this->value_key];
 
-            trbean($menuID, $title, $row, $this->bean->getTableName());
+            trbean($menuID, $this->label_key, $data, $this->bean->getTableName());
 
             $menu_link = "";
-            if (isset($row["link"])) {
-                $menu_link = $row["link"];
+            if (isset($data["link"])) {
+                $menu_link = $data["link"];
+
+                if (strpos($menu_link, "//") === 0) {
+                    debug("Using external URL");
+                }
+                // - url is internal root
+                else if (strpos($menu_link, "/") === 0) {
+                    $menu_link = LOCAL . $menu_link;
+                }
             }
-            else if (strlen($this->link_page) > 0) {
-                $menu_link = $this->link_page . "?" . $key . "=" . $menuID;
-            }
-
-            if ($this->prefix_root) {
-                $menu_link = $this->prefix_root . $menu_link;
-            }
-
-            //debug("MenuLink is: $menu_link");
-
-            // - url is external
-            if (strpos($menu_link, "//") === 0) {
-
-            }
-            // - url is internal root
-            else if (strpos($menu_link, "/") === 0) {
-
-                $menu_link = ltrim($menu_link, "/");
-                $local = rtrim(LOCAL, "/");
-                $menu_link = $local . "/" . $menu_link;
-
+            else if ($this->target_url instanceof URLBuilder) {
+                $this->target_url->setData($data);
+                $menu_link = $this->target_url->url();
             }
 
-            //debug("MenuLink is: $menu_link");
+            //debug("MenuItem ID:$menuID using menu_link: " . $menu_link);
 
-            $item = new MenuItem($row[$title], $menu_link);
+            $item = new MenuItem($data[$this->label_key], $menu_link);
+            //ID?
             $item->enableTranslation(FALSE);
-            // 		    $item->setMenuID($menuID);
+
             if ($parentID == 0) {
-                $arr_menu[] = $item;
+                $items_top[] = $item;
             }
-            if ($parent_item) {
-                $parent_item->addMenuItem($item);
+            if ($parent) {
+                $parent->addMenuItem($item);
             }
-            $this->constructMenuItems($menuID, $item, $key, $title);
+
+            $this->construct($menuID, $item);
         }
 
         if ($parentID == 0) {
-            $this->main_menu = $arr_menu;
+            $this->main_menu = $items_top;
         }
 
     }
 
-    public function flattenMenu(&$arr, $current_menu)
+    /**
+     * Return all MenuItems and their children as indexed array in '$items'
+     * @param array $items the resulting array
+     * @param array|null $current_menu start from this MenuItem
+     * @throws Exception
+     */
+    public function flattenMenu(array &$items, array $current_menu = NULL)
     {
         if (!$current_menu || count($current_menu) < 1) return;
 
         for ($a = 0; $a < count($current_menu); $a++) {
-            $curr = $current_menu[$a];
-            $arr[] = $curr;
-            $this->flattenMenu($arr, $curr->getSubmenu());
+
+            $item = $current_menu[$a];
+
+            if (!($item instanceof MenuItem)) throw new Exception("Element not instance of MenuItem");
+
+            $items[] = $item;
+
+            $this->flattenMenu($items, $item->getSubmenu());
         }
     }
 
-    public function findMenuIndex($find_mode = MainMenu::FIND_INDEX_NORMAL, $find_arr = FALSE)
+    /**
+     * Set all MenuItems to selected = false
+     * @param array|null $items
+     * @throws Exception
+     */
+    public function unselectAll(array &$items = NULL)
     {
-        $this->selindex = -1;
-
-        $match_min = PHP_INT_MAX;
-        $closest = NULL;
-
-        if (!$find_arr) $find_arr = $this->main_menu;
-
-        $position = -1;
-
-        for ($a = 0; $a < count($find_arr); $a++) {
-            $curr = $find_arr[$a];
-
-            $match = $this->matchItem($find_mode, $curr);
-
-            if ($match === TRUE) {
-                $this->selected_item = $curr;
-                $position = $a;
-                break;
-            }
-            else if ($match !== FALSE) {
-                if ($match < $match_min) {
-                    $match_min = $match;
-                    $closest = $curr;
-                    $position = $a;
-                }
-                else if ($match == $match_min) {
-                    $match1 = $this->matchItem(MainMenu::FIND_INDEX_LOOSE_REVERSE, $closest);
-                    $match2 = $this->matchItem(MainMenu::FIND_INDEX_LOOSE_REVERSE, $curr);
-                    $closest = ($match1) ? $closest : $curr;
-                    $position = $a;
-                }
-
-            }
+        if (!$items) {
+            $items = array();
+            $this->flattenMenu($items, $this->main_menu);
         }
 
-        if ($match_min < PHP_INT_MAX && $closest) {
-            $this->selected_item = $closest;
-        }
-        if ($find_mode === MainMenu::FIND_INDEX_PATHCHECK) {
-            if ($position > -1) {
-                $this->selected_item = $find_arr[$position];
-            }
-        }
-        return $position;
-
-    }
-
-    public function matchItem($find_mode, MenuItem $item)
-    {
-        $href = $item->getHref();
-
-        $request = urldecode($_SERVER[$this->uri_match_variable]);
-
-        $match = (strcmp($request, $href) == 0);
-
-        if ($this->debug_matching) {
-            debug("matchItem  Mode: $find_mode | Request: $request Mathing with MenuItem(href): $href");
-        }
-
-        //href is found inside request
-        if ($find_mode === MainMenu::FIND_INDEX_LOOSE) {
-            $match = (mb_strpos($request, $href) !== FALSE);
-        }
-        //request is found inside href
-        else if ($find_mode === MainMenu::FIND_INDEX_LOOSE_REVERSE) {
-            $match = (mb_strpos($href, $request) !== FALSE);
-        }
-        else if ($find_mode === MainMenu::FIND_INDEX_LEVENSHTEIN) {
-            $match = @levenshtein($request, $href);
-
-        }
-        else if ($find_mode === MainMenu::FIND_INDEX_PATHCHECK) {
-
-            $href = explode("?", $href);
-            if (is_array($href) && count($href) > 0) {
-                $href = $href[0];
-            }
-            $request = explode("?", $request);
-            if (is_array($request) && count($request) > 0) {
-                $request = $request[0];
-            }
-            $this->last_match_value = $request;
-            if (strcmp($request, $href) == 0) return TRUE;
-
-            $breq = dirname($request);
-            if (endsWith($request, "/") === TRUE) {
-                $breq = $request;
-            }
-
-            $hreq = dirname($href);
-            if (mb_strpos($breq, $hreq) === FALSE) return FALSE;
-
-            $match = @levenshtein($request, $href);
-
-        }
-
-        $this->last_match_value = $request;
-
-        if ($this->debug_matching) {
-            debug("matchItem Result: " . (int)$match);
-        }
-        return $match;
-    }
-
-    public function unselectAll()
-    {
-        $arr = array();
-        $this->flattenMenu($arr, $this->main_menu);
-
-        foreach ($arr as $index => $sub) {
+        foreach ($items as $index => $sub) {
             $sub->setSelected(FALSE);
         }
     }
 
-    public function selectActiveMenus($find_mode = MainMenu::FIND_INDEX_LEVENSHTEIN)
+    /**
+     * Select active MenuItem by matching the current page URL with the MenuItem url
+     * Matches by full url, then scriptName only, then scriptPath only
+     * Constructs a selection path array containing MenuItems - from top parent MenuItem to selected MenuItem
+     * @param int $find_mode
+     * @throws Exception
+     */
+    public function selectActive()
     {
         $this->selected_path = array();
 
-        $arr = array();
-        $this->flattenMenu($arr, $this->main_menu);
+        $items = array();
+        $this->flattenMenu($items, $this->main_menu);
 
-        debug("Flattened menu length: " . count($arr));
+        $this->unselectAll($items);
 
-        $this->findMenuIndex($find_mode, $arr);
+        $pageURL = new URLBuilder();
+        $pageURL->buildFrom(currentURL());
 
-        $this->unselectAll();
+        debug("Current URL: " . $pageURL->url());
 
-        $this->updateSelectedMenu();
+        $match_full = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
+            $match = (strcmp($itemURL->url(), $pageURL->url()) == 0);
+            if ($match) {
+                debug("Match full URL: " . $itemURL->url() . " - matches");
+            }
+            return $match;
+        };
+
+        $match_script = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
+            $match = (strcmp($itemURL->getScriptName(), $pageURL->getScriptName()) == 0);
+            if ($match) {
+                debug("Match scriptName: " . $itemURL->getScriptName() . " - matches");
+            }
+            return $match;
+        };
+
+        $match_path = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
+            $match = (strcmp($itemURL->getScriptPath(), $pageURL->getScriptPath()) == 0);
+            if ($match) {
+                debug("Match scriptPath: " . $itemURL->getScriptPath() . " - matches");
+            }
+            return $match;
+        };
+
+        $this->selected_item = $this->matchItems($items, $match_full);
+
+        if (!$this->selected_item) {
+            $this->selected_item = $this->matchItems($items, $match_script);
+        }
+
+        if (!$this->selected_item) {
+            $this->selected_item = $this->matchItems($items, $match_path);
+        }
+
+        $this->constructSelectedPath();
+    }
+
+    /**
+     * Execute the matching using Closure '$matcher'
+     *
+     * @param array $items MenuItems to match
+     * @param Closure $matcher Closure function to execute during matching
+     * @return MenuItem|null The matching MenuItem or NULL if none of the MenuItems '$items' match
+     * @throws Exception Throws exception if element from items is not instance of MenuItem
+     */
+    protected function matchItems(array &$items, Closure $matcher)
+    {
+
+        $result = NULL;
+
+        $itemURL = new URLBuilder();
+
+        foreach ($items as $idx => $item) {
+            if (!($item instanceof MenuItem)) throw new Exception("Element is not instance of MenuItem");
+
+            $item_href = $item->getHref();
+
+            if (endsWith($item_href, "/")) {
+                $item_href .= "index.php";
+            }
+
+            $itemURL->buildFrom($item_href);
+
+            $is_match = $matcher($item, $itemURL);
+
+            if ($is_match) {
+                $result = $item;
+                break;
+            }
+        }
+
+        return $result;
 
     }
 
-    public function updateSelectedMenu()
+    /**
+     * Construct selection path if $this->selected_item is MenuItem
+     * this function is executed from selectActive()
+     * Can be used if manually setting the selected MenuItem using setSelectedMenuItem
+     */
+    public function constructSelectedPath()
     {
-        if ($this->selected_item) {
+        if (!$this->selected_item) {
+            debug("Selected item is null - no selection path to construct");
+            return;
+        }
 
-            $this->selected_item->setSelected(TRUE);
+        $this->selected_item->setSelected(TRUE);
 
-            $current = $this->selected_item;
+        $current = $this->selected_item;
+
+        $this->selected_path[] = $current;
+
+        while ($current->getParent()) {
+
+            $parent = $current->getParent();
+            $parent->setSelected(TRUE);
+
+            $current = $parent;
 
             $this->selected_path[] = $current;
 
-            while ($current->getParent()) {
-
-                $parent = $current->getParent();
-                $parent->setSelected(TRUE);
-
-                $current = $parent;
-
-                $this->selected_path[] = $current;
-
-            }
-
         }
+
+        $this->selected_path = array_reverse($this->selected_path);
     }
 
+    /**
+     * Returns the current selection path from top parent MenuItem to selected MenuItem
+     * @return array
+     */
     public function getSelectedPath(): array
     {
         return $this->selected_path;
     }
 
+    /**
+     * construct selection path using MenuItem isSelected()
+     * Return array of MenuItems from top selected to inner selected
+     * @param $path
+     * @param $menu_items
+     */
     public static function findSelectedPath(&$path, $menu_items)
     {
         // 	    if (!$search_items) $search_items = $this->main_menu;

@@ -166,6 +166,7 @@ class SparkAdminPage extends SparkPage
     public function setPageMenu(array $menu_items)
     {
         $this->page_menu = $menu_items;
+
     }
 
     public function startRender()
@@ -174,6 +175,7 @@ class SparkAdminPage extends SparkPage
         parent::startRender();
 
         $dynmenu = $this->menu_bar->getMainMenu();
+
         $dynmenu->update($this->page_menu);
 
         $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());

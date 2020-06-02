@@ -1,6 +1,6 @@
 <?php
 
-function currentURL() : string
+function currentURL(): string
 {
     $ret = $_SERVER["SCRIPT_NAME"];
     if ($_SERVER["QUERY_STRING"]) {
@@ -42,11 +42,23 @@ function file_size($size)
     return $size ? round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i] : '0 Bytes';
 }
 
+/**
+ * Check if '$haystack' starts with '$needle'
+ * @param $haystack
+ * @param $needle
+ * @return bool
+ */
 function startsWith($haystack, $needle)
 {
     return !strncmp($haystack, $needle, strlen($needle));
 }
 
+/**
+ * Check if '$haystack' ends with '$needle'
+ * @param $haystack
+ * @param $needle
+ * @return bool
+ */
 function endsWith($haystack, $needle)
 {
     $length = strlen($needle);
@@ -488,7 +500,6 @@ function text4div(&$text)
 {
     return str_replace("\n", "<BR>", $text);
 }
-
 
 /**
  * Check if key '$key' of array '$arr' is set and have value equal to '$val'

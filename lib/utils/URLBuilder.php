@@ -27,9 +27,28 @@ class URLBuilder
 
     public function __construct()
     {
-        $this->parameters = array();
+        $this->reset();
     }
 
+    public function reset()
+    {
+        $this->build_string = "";
+
+        $this->script_name = "";
+        $this->script_query = "";
+
+        $this->domain = "";
+        $this->protocol = "";
+
+        $this->parameters = array();
+
+        $this->resource = "";
+
+        $this->clear_page_param = FALSE;
+
+        $this->is_script = FALSE;
+
+    }
     public function isEmpty() : bool
     {
         return (count($this->parameters) < 1 && strlen($this->script_name) < 1);
@@ -131,6 +150,11 @@ class URLBuilder
         $this->script_name = $value;
     }
 
+    public function getScriptPath() : string
+    {
+        return dirname($this->script_name);
+    }
+
     protected function processQuery()
     {
 
@@ -177,6 +201,8 @@ class URLBuilder
 
     public function buildFrom(string $build_string)
     {
+        $this->reset();
+
         //store the original href. might contain parameterized actions
         $this->build_string = $build_string;
 

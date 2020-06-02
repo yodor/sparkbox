@@ -3,32 +3,38 @@ include_once("utils/MainMenu.php");
 
 class MenuItem
 {
-    protected $href = "";
-    protected $title = "";
-    protected $icon = "";
+    protected $href;
+    protected $title;
+    protected $icon;
 
     protected $w = 0;
     protected $h = 0;
 
-    protected $selected = FALSE;
-    protected $disabled = FALSE;
+    protected $selected;
+    protected $disabled;
 
-    protected $parent_item = NULL;
+    protected $parent_item;
 
-    protected $target = "";
+    protected $target;
 
-    protected $childNodes = array();
+    protected $childNodes;
 
-    protected $need_translate = TRUE;
+    protected $need_translate;
 
     public static $icon_path = SPARK_LOCAL . "/images/admin/spark_icons/";
 
-    public function __construct($title, $href = "", $icon = "")
+    public function __construct(string $title, string $href = "", string $icon = "")
     {
         $this->title = $title;
         $this->href = $href;
         $this->icon = $icon;
+        $this->target = "";
         $this->need_translate = TRUE;
+        $this->childNodes = array();
+        $this->selected = false;
+        $this->disabled = false;
+        $this->parent_item = NULL;
+
     }
     //flag for renderers to handle the title translation themselves - enableTranslation(true) - default - uses tr($title)
     //enableTranslation(false) -  title is already translated translation in MainMenu::constructMenuItems 
@@ -37,37 +43,37 @@ class MenuItem
         $this->need_translate = $mode;
     }
 
-    public function needTranslate()
+    public function needTranslate() : bool
     {
         return $this->need_translate;
     }
 
-    public function setDisabled($mode)
+    public function setDisabled(bool $mode)
     {
-        $this->disabled = (($mode > 0) ? TRUE : FALSE);
+        $this->disabled = $mode;
     }
 
-    public function isDisabled()
+    public function isDisabled() : bool
     {
         return $this->disabled;
     }
 
-    public function isSelected()
+    public function isSelected() : bool
     {
         return $this->selected;
     }
 
-    public function setSelected($mode)
+    public function setSelected(bool $mode)
     {
-        $this->selected = (($mode > 0) ? TRUE : FALSE);
+        $this->selected = $mode;
     }
 
-    public function setTarget($target)
+    public function setTarget(string $target)
     {
         $this->target = $target;
     }
 
-    public function getTarget()
+    public function getTarget() : string
     {
         return $this->target;
     }
@@ -89,27 +95,27 @@ class MenuItem
         $this->parent_item = $m;
     }
 
-    public function getParent()
+    public function getParent() : ?MenuItem
     {
         return $this->parent_item;
     }
 
-    public function getSubmenu()
+    public function getSubmenu() : array
     {
         return $this->childNodes;
     }
 
-    public function getTitle()
+    public function getTitle() : string
     {
         return $this->title;
     }
 
-    public function getHref()
+    public function getHref() : string
     {
         return $this->href;
     }
 
-    public function setHref($href)
+    public function setHref(string $href)
     {
         $this->href = $href;
     }
@@ -129,7 +135,7 @@ class MenuItem
         return $this->h;
     }
 
-    public function setSize($width, $height)
+    public function setSize(int $width, int $height)
     {
         $this->w = $width;
         $this->h = $height;
