@@ -20,6 +20,12 @@ class SQLSelect extends SQLStatement
         return $this->fieldset;
     }
 
+    public function __clone()
+    {
+        parent::__clone();
+        $this->fieldset = clone $this->fieldset;
+    }
+
     public function getSQL($where_only = FALSE, $add_calc = TRUE)
     {
         if ( ($this->fieldset->count()<1) && (!$where_only)) {
