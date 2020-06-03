@@ -56,7 +56,8 @@ class SQLQuery implements IDataIterator
         $this->db->free($this->res);
     }
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->select = clone $this->select;
     }
 
@@ -86,7 +87,7 @@ class SQLQuery implements IDataIterator
         $ret = $this->db->fetch($this->res);
         if (!$ret) {
             $this->db->free($this->res);
-            $this->res = null;
+            $this->res = NULL;
         }
         return $ret;
     }
@@ -94,6 +95,11 @@ class SQLQuery implements IDataIterator
     public function key(): string
     {
         return $this->key;
+    }
+
+    public function setKey(string $key)
+    {
+        $this->key = $key;
     }
 
     public function getDB(): DBDriver
