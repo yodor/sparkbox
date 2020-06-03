@@ -212,10 +212,10 @@ abstract class DBTableBean
         $qry = new SQLQuery(clone $this->select, $this->prkey, $this->getTableName());
         $qry->setDB($this->db);
         $qry->setBean($this);
-        foreach ($columns as $column) {
-            $qry->select->fields()->set($column);
-        }
-        $this->select->fields()->set($this->prkey);
+
+        $qry->select->fields()->set($this->prkey);
+        $qry->select->fields()->set(...$columns);
+
 
         return $qry;
     }
@@ -229,9 +229,8 @@ abstract class DBTableBean
         $qry = $this->query();
 
         $columns = $this->columnNames();
-        foreach ($columns as $idx => $value) {
-            $qry->select->fields()->set($value);
-        }
+
+        $qry->select->fields()->set(...$columns);
 
         return $qry;
     }

@@ -20,7 +20,7 @@ class NestedSetBean extends DBTableBean
     {
         parent::__construct($table_name, $dbdriver);
         if (!$this->haveColumn("lft") || !$this->haveColumn("rgt") || !$this->haveColumn("parentID")) {
-            throw new Exception("Incorrect table fields for NestedSetBean");
+            throw new Exception("Incorrect table columns for NestedSetBean");
         }
     }
 
@@ -441,68 +441,100 @@ class NestedSetBean extends DBTableBean
         return TRUE;
     }
 
-    public function selectTree(array $fieldNames = array(), string $prefix = "node"): SQLSelect
+    /**
+     * When doing simple tree list use $prefix='node'
+     * When doing aggregate tree list use $prefix='parent'
+     * @param array $columns Columns to select from this bean prefixed with '$prefix.'
+     * @param string $prefix 'node' or 'parent'
+     * @return SQLSelect
+     * @throws Exception
+     */
+    public function selectTree(array $columns = array(), string $prefix = "node"): SQLSelect
     {
+        if (strcmp($prefix, "node") != 0 && strcmp($prefix, "parent") != 0) {
+            throw new Exception("Prefix should be 'node' or 'parent'");
+        }
+
         $prkey = $this->prkey;
 
         $fields = array("$prefix.$prkey", "$prefix.lft", "$prefix.rgt");
-        foreach ($fieldNames as $idx => $field) {
+
+        foreach ($columns as $idx => $field) {
             $fields[] = "$prefix.$field";
         }
 
         $sel = new SQLSelect();
-        foreach ($fields as $idx => $val) {
-            $sel->fields()->set($val);
-        }
+
+        $sel->fields()->set(...$fields);
 
         $sel->from = " {$this->table} AS node, {$this->table} AS parent ";
         $sel->where()->append("( node.lft BETWEEN parent.lft AND parent.rgt )");
 
         $this->select->where()->copyTo($sel->where());
 
-        $sel->group_by = " node." . $this->prkey;
-        $sel->order_by = " node.lft ";
+        $sel->group_by = " $prefix." . $this->prkey;
+        $sel->order_by = " $prefix.lft ";
 
         return $sel;
     }
 
+    /**
+     * @param string $nodeEquals
+     * @param array $fieldNames
+     * @return SQLSelect
+     * @throws Exception
+     */
     public function selectAggregated(string $nodeEquals, array $fieldNames = array()): SQLSelect
     {
         $prkey = $this->prkey;
 
+        //select the parent.prkey and lft/rgt
+        //add where clause
         $sel = $this->selectTree($fieldNames, "parent");
 
         $sel->where()->add("node.$prkey", "$nodeEquals");
 
-        $sel->group_by = " ";
+       // $sel->group_by = " ";
 
-        $sel->order_by = " parent.lft ";
+        //$sel->order_by = " node.lft ";
 
         return $sel;
     }
 
-    public function selectTreeRelation(SQLSelect $relation, string $relation_table, string $relation_prkey, $count_field = "", array $fieldNames = array())
+    /**
+     * Aggregate the tree select counting items from '$relation_table' contained in each branch of the tree
+     * '$relation_table' should have column name equal to this bean prkey
+     * The count is returned in column named 'related_count'
+     * '$relation' is cloned first
+     * @param SQLSelect $relation The complete select for the other table that will be combined with the tree select
+     * @param string $relation_table DB table name used in '$relation'
+     * @param string $relation_prkey DB table primary key used in '$relation'
+     * @param array $columns Columns to be selected from this bean
+     * @return SQLSelect
+     */
+    public function selectTreeRelation(SQLSelect $relation, string $relation_table, string $relation_prkey, array $columns = array()) : SQLSelect
     {
+        //relation SQLSelect might have WHERE clauses filled when search is applied to products first we then count the
+        //results after the $relation is filtered
+        $result = clone $relation;
+        //reset the fields but keep the where clauses
+        //resulting select is only for drawing the tree
+        $result->fields()->reset();
+
         $prkey = $this->prkey;
 
-        //relation table count field
-        if (!$count_field) {
-            $count_field = $relation_prkey;
-        }
+        $sel = $this->selectAggregated("$relation_table.$prkey", $columns);
 
-        //aggregate relation query
-        $sel = $this->selectAggregated("$relation_table.$prkey", $fieldNames);
+        $sel->fields()->setExpression("COUNT($relation_table.$relation_prkey)", "related_count");
 
-        $sel->fields()->setExpression("COUNT($relation_table.$count_field)", "related_count");
+        //$sel->group_by = " parent.$prkey ";
 
-        $sel->group_by = " parent.$prkey ";
-
-        return $sel->combineWith($relation);
+        return $sel->combineWith($result);
 
     }
 
     //used with aggregate table. selects node and its child nodes for aggregation
-    public function selectChildNodesWith(SQLSelect $other, $nodeID = -1): SQLSelect
+    public function selectChildNodesWith(SQLSelect $other, string $relation_table, $nodeID = -1): SQLSelect
     {
         //other 'from' should be selected as TABLE as relation
         $prkey = $this->prkey;
@@ -515,7 +547,7 @@ class NestedSetBean extends DBTableBean
 
         $sel->where()->add("child.lft", "node.lft", " >= ");
         $sel->where()->add("child.rgt", "node.rgt", " <= ");
-        $sel->where()->add("relation.$prkey", "child.$prkey");
+        $sel->where()->add("$relation_table.$prkey", "child.$prkey");
 
         if ($nodeID > 0) {
             $sel->where()->add("node.$prkey", $nodeID, " = ");
@@ -549,23 +581,6 @@ class NestedSetBean extends DBTableBean
             $ret[] = $row;
         }
         return $ret;
-    }
-
-    public function selectTreeRelationBean(DBTableBean $related_source, $count_field = "", array $fieldNames = array()): SQLSelect
-    {
-        $prkey = $this->prkey;
-
-        $fields = $related_source->columnNames();
-
-        if (!in_array($prkey, $fields)) throw new Exception("Related bean column '{$this->prkey}' not found");
-
-        $related_table = $related_source->getTableName();
-        $related_prkey = $related_source->key();
-
-        $sel = $related_source->select();
-
-        return $this->selectTreeRelation($sel, $related_table, $related_prkey, $count_field, $fieldNames);
-
     }
 
 }

@@ -207,7 +207,7 @@ onPageLoad(function () {
 
     let gallery_view = new ImagePopup();
 
-    $("A.ImagePopup").on("click", function () {
+    $("A.ImagePopup:not([href])").on("click", function () {
         gallery_view.popupImage($(this));
         return false;
     });

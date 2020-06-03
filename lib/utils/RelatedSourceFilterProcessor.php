@@ -69,7 +69,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         return $this->filter_value;
     }
 
-    public function addFilter($filter_name, $filter_key)
+    public function addFilter(string $filter_name, $filter_key)
     {
         if ($filter_key instanceof IQueryFilter) {
 
@@ -121,12 +121,16 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
 
         $text_action = $view->getItemRenderer()->getTextAction();
 
-        foreach ($this->filter_value as $name => $value) {
-            $text_action->addParameter(new DataParameter($name, $value));
+        if ($text_action instanceof Action) {
+            foreach ($this->filter_value as $name => $value) {
+                $text_action->getURLBuilder()->add(new DataParameter($name, $value));
+
+            }
         }
+
     }
 
-    public function applyFiltersOn(NestedSetTreeView $view, SQLSelect &$sel, $filter_name, $skip_self = FALSE)
+    public function applyFiltersOn(NestedSetTreeView $view, SQLSelect &$sel, string $filter_name, $skip_self = FALSE)
     {
         if (!$view) throw new Exception("Filter processing not finished");
 

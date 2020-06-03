@@ -109,7 +109,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
         $open_tags = 0;
 
-        //        echo $this->iterator->select->getSQL();
+        //echo $this->iterator->select->getSQL();
 
         $num = $this->iterator->exec();
 
@@ -124,6 +124,14 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             $rgt = $row["rgt"];
 
             $nodeID = $row[$source_key];
+
+            $branch_type = NestedSetTreeView::BRANCH_CLOSED;
+            if ($this->open_all) {
+                $branch_type = NestedSetTreeView::BRANCH_OPENED;
+            }
+            if ($rgt == $lft + 1) {
+                $branch_type = NestedSetTreeView::BRANCH_LEAF;
+            }
 
             trbean($nodeID, $this->item->getLabelKey(), $row, $this->iterator->name());
 
@@ -148,22 +156,17 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
                 $selected = TRUE;
             }
 
+
             echo "<li class='NodeOuter'>";
             $open_tags++;
 
-            $render_mode = NestedSetTreeView::BRANCH_CLOSED;
-            if ($this->open_all) {
-                $render_mode = NestedSetTreeView::BRANCH_OPENED;
-            }
-            if ($rgt == $lft + 1) {
-                $render_mode = NestedSetTreeView::BRANCH_LEAF;
-            }
+            //$selected = ($nodeID == $this->selected_nodeID) ? true : false;
 
-            $item = clone $this->item;
+            $item = $this->item;
             $item->setID($nodeID);
             $item->setData($row);
 
-            $item->setAttribute("branch_type", $render_mode);
+            $item->setAttribute("branch_type", $branch_type);
 
             $item->setSelected($selected);
 
