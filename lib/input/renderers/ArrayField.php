@@ -8,7 +8,7 @@ class ArrayField extends InputField
     /**
      * @var DataInput
      */
-    protected $input = NULL;
+    protected $input;
 
     /**
      * @var Container
@@ -19,7 +19,7 @@ class ArrayField extends InputField
      * Remove element action of the element source
      * @var Action
      */
-    protected $action = NULL;
+    protected $remove_action;
 
     const DEFAULT_CONTROL_ACTION = "Add";
     const DEFAULT_CONTROL_NAME = "Add";
@@ -49,7 +49,7 @@ class ArrayField extends InputField
 
         $this->addControl($button_add);
 
-        $this->action = new Action("Remove", "");
+        $this->remove_action = new Action("Remove");
         //$this->action->getURLBuilder()->setKeepRequestParams(false);
 
     }
@@ -84,7 +84,7 @@ class ArrayField extends InputField
     public function requiredScript(): array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/ArrayControls.js";
+        $arr[] = SPARK_LOCAL . "/js/ArrayField.js";
         return $arr;
     }
 
@@ -143,7 +143,7 @@ class ArrayField extends InputField
         $renderer->render();
 
         echo "<div class='Controls'>";
-        $this->action->render();
+        $this->remove_action->render();
         echo "</div>";
 
         echo "</div>";
@@ -177,7 +177,7 @@ class ArrayField extends InputField
 
                 if ($this->dynamic_addition) {
                     echo "<div class='Controls' >";
-                    $this->action->render();
+                    $this->remove_action->render();
                     echo "</div>";
                 }
 
@@ -198,9 +198,10 @@ class ArrayField extends InputField
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                let array_controls = new ArrayControls();
-                array_controls.setField("<?php echo $this->input->getName();?>");
-                array_controls.initialize();
+                let array_field = new ArrayField();
+                array_field.setField("<?php echo $this->input->getName();?>");
+                array_field.initialize();
+                //array_field selector is now .ArrayField[field='$this->input->getName()']
             });
         </script>
         <?php

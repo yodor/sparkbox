@@ -23,7 +23,7 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
         $responder = new CurrencyRateResponder();
 
         $cb = new CurrenciesBean();
-        $cb_qry = $cb->query();
+        $cb_qry = $cb->queryFull();
         $num = $cb_qry->exec();
         $this->curr = array();
         while ($row = $cb_qry->next()) {
@@ -31,7 +31,7 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
         }
 
         $cr = new CurrencyRatesBean();
-        $cr_qry = $cr->query();
+        $cr_qry = $cr->queryFull();
         $cr_qry->exec();
         $this->rates = array();
         while ($row = $cr_qry->next()) {
