@@ -4,7 +4,7 @@ function currentURL(): string
 {
     $ret = $_SERVER["SCRIPT_NAME"];
     if ($_SERVER["QUERY_STRING"]) {
-        $ret .= "?" . $_SERVER["QUERY_STRING"];
+        $ret .= "?" . rawurldecode($_SERVER["QUERY_STRING"]);
     }
     return $ret;
 }

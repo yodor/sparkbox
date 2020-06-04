@@ -366,6 +366,14 @@ class MainMenu
             return $match;
         };
 
+        $match_partial = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
+            $match = (startsWith($pageURL->url(), $itemURL->url()));
+            if ($match) {
+                debug("Match partial URL: " . $itemURL->url() . " - matches");
+            }
+            return $match;
+        };
+
         $match_script = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
             $match = (strcmp($itemURL->getScriptName(), $pageURL->getScriptName()) == 0);
             if ($match) {
@@ -383,6 +391,10 @@ class MainMenu
         };
 
         $this->selected_item = $this->matchItems($items, $match_full);
+
+        if (!$this->selected_item) {
+            $this->selected_item = $this->matchItems($items, $match_partial);
+        }
 
         if (!$this->selected_item) {
             $this->selected_item = $this->matchItems($items, $match_script);
