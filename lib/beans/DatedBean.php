@@ -33,7 +33,7 @@ class DatedBean extends DBTableBean
     public function getYears(): array
     {
 
-        $qry = $this->query();
+        $qry = $this->query($this->key());
         $qry->select->fields()->setExpression(" YEAR({$this->date_column}) ", "year");
         $qry->select->order_by = " {$this->date_column} DESC ";
         $qry->select->group_by = " YEAR({$this->date_column}) DESC  ";
@@ -56,7 +56,7 @@ class DatedBean extends DBTableBean
     public function filterMonthList(string $d_year, string $d_month)
     {
 
-        $qry = $this->query();
+        $qry = $this->query($this->key());
         $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
         $qry->select->order_by = " {$this->date_column} DESC ";
         $qry->exec();
@@ -80,7 +80,7 @@ class DatedBean extends DBTableBean
     public function filterDayList(string $d_year, string $d_month)
     {
 
-        $qry = $this->query();
+        $qry = $this->query($this->key());
         $qry->select->fields()->setExpression("DAY({$this->date_column})", "day");
         $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
         $qry->exec();
@@ -103,7 +103,7 @@ class DatedBean extends DBTableBean
      */
     public function publicationsCount(string $d_year, string $d_month): int
     {
-        $qry = $this->query();
+        $qry = $this->query($this->key());
         $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
         $qry->select->limit = " 1 ";
         return $qry->exec();
