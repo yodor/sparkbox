@@ -115,7 +115,7 @@ abstract class BeanDataResponse extends HTTPResponse
         else {
             debug("Fetching ID: " . $this->id . " Bean: " . get_class($this->bean));
             $this->row = $this->bean->getByID($this->id);
-            debug("Data: ", $this->row);
+            debug("Data: ", array_keys($this->row));
         }
 
         if (!isset($this->row[$this->field])) {

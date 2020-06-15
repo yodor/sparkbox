@@ -88,12 +88,14 @@ function constructSiteTitle($path)
     $title = array();
     foreach ($path as $key => $item) {
         if ($item instanceof MenuItem) {
-            $title[] = tr(strip_tags($item->getTitle()));
+            $title[] = mb_convert_case(strip_tags($item->getTitle()), MB_CASE_TITLE, "UTF-8");
         }
         else {
-            $title[] = tr($item);
+            $title[] = mb_convert_case($item, MB_CASE_TITLE, "UTF-8");
         }
     }
+    debug("Constructed Title");
+
     return implode(TITLE_PATH_SEPARATOR, $title);
 }
 

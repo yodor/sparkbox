@@ -240,7 +240,9 @@ class BeanListPage extends AdminPageTemplate
         }
 
         $this->view = new TableView($this->query);
-        $this->view->addColumn(new TableColumn($this->query->key(), "ID", "center"));
+        $this->view->setDefaultOrder($this->query->key()." DESC");
+
+        $this->view->addColumn(new TableColumn($this->query->key(), "ID", TableColumn::ALIGN_CENTER));
 
         foreach ($this->fields as $name => $label) {
             $this->view->addColumn(new TableColumn($name, $label));

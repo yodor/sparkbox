@@ -150,5 +150,6 @@ else {
 
 // $constants = get_defined_constants(true);
 // debug("Exported Globals: ",$constants["user"]);
+@include_once("config/globals.php");
 
 ?>

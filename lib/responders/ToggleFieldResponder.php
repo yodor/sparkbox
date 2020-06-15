@@ -47,7 +47,7 @@ class ToggleFieldResponder extends RequestResponder
         $this->url->remove("field");
     }
 
-    public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array())
+    public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array()) : Action
     {
 
         $parameters = array(new DataParameter("item_id", $this->bean->key()));

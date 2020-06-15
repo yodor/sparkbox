@@ -23,8 +23,8 @@
 .admin_menu .MenuBarItemRenderer {
     display: block;
     height: auto;
-    padding-left: 0px;
-    padding-right: 0px;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .admin_menu .MenuSeparator {
@@ -65,7 +65,7 @@
 
     display: block;
     position: relative;
-    border: 0px;
+    border: 0;
     padding-left: 10px;
 }
 
@@ -80,7 +80,7 @@
 
 .admin_menu .SubmenuRenderer .SubmenuItemOuter {
     padding: 5px;
-    margin-left: 15px;
+
     background-image: url("../images/admin/submenu_item_bullet.png");
     background-repeat: no-repeat;
     background-position: left center;
@@ -91,8 +91,8 @@
 }
 
 .admin_menu .MenuBarItemRenderer[active="1"] .MenuItemLink + .SubmenuRenderer {
-    margin-left: 0px;
-    padding-left: 0px;
+    margin-left: 0;
+    padding-left: 0;
 }
 
 .admin_menu .SubmenuItemRenderer[selected="1"] > .SubmenuItemOuter .SubmenuItemLink {
@@ -110,8 +110,7 @@
 }
 
 .admin_menu .MenuIcon {
-    width: 26px;
-    height: 26px;
+
     display: inline-block;
     vertical-align: middle;
 }

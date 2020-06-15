@@ -40,13 +40,15 @@
     right: -5px;
     bottom: -5px;
     cursor: nwse-resize;
-    background: repeating-linear-gradient(
-    -45deg,
 
-    #606dbc 2px,
-    #465298 2px
 
-    );
+    background-image: linear-gradient(135deg, #ffffff 25%, #808080 25%, #808080 50%, #ffffff 50%, #ffffff 75%, #808080 75%, #808080 100%);
+    background-size: 5.00px 5.00px;
+    border-style: solid;
+    /*border-width: 0 0 6px 6px;*/
+    border-bottom-right-radius:50%;
+    border-top-width:0;
+    border-left-width:0;
 }
 
 .MessageDialog .Inner {
