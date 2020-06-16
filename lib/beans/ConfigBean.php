@@ -42,14 +42,14 @@ class ConfigBean extends DBTableBean
         return $this->section;
     }
 
-    public function get(string $key, $def_value = "")
+    public function get(string $key, $default_value = "")
     {
 
         $key = DBConnections::Get()->escape($key);
 
         $qry = $this->queryField("config_key", $key, 1, "config_val");
         $qry->select->where()->add("section", "'" . $this->section . "'");
-        $result = $def_value;
+        $result = $default_value;
 
         if ($qry->exec() && $data = $qry->next()) {
             $result = $data["config_val"];
