@@ -218,8 +218,6 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         self::$instance = $this;
 
-        $this->authorize();
-
         $this->actions = new ActionCollection();
 
         $this->addMeta("revisit-after", "1 days");
@@ -261,7 +259,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         }
     }
 
-    protected function authorize()
+    public function authorize()
     {
         if ($this->auth) {
 

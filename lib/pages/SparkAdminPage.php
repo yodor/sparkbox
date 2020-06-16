@@ -48,6 +48,8 @@ class SparkAdminPage extends SparkPage
 
         parent::__construct();
 
+        $this->authorize();
+
         //control gets here only if authorized
         $admin_access = new AdminAccessBean();
         $qry = $admin_access->queryField("userID", $this->getUserID());
