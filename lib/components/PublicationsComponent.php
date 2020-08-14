@@ -17,7 +17,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
     protected $beanClass;
 
-    protected $dateFormat = "M j, Y";
+    protected $dateFormat = "%e %b %Y";
 
     public function __construct(string $beanClass)
     {
@@ -57,7 +57,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
         echo "<div class='cell details'>";
         echo "<span class='title'>" . $this->data["item_title"] . "</span>";
-        echo "<span class='date'>" . date($this->dateFormat, strtotime($this->data["item_date"])) . "</span>";
+        echo "<span class='date'>" . strftime($this->dateFormat, strtotime($this->data["item_date"])) . "</span>";
         echo "</div>";
 
         echo "</a>";
@@ -97,8 +97,8 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
     protected $bean;
 
-    protected $selected_year;
-    protected $selected_month;
+    protected $selected_year = -1;
+    protected $selected_month = -1;
 
     protected $columns;
 
@@ -116,7 +116,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
         return $this->selected_year;
     }
 
-    public function getSelectedMonth(): string
+    public function getSelectedMonth(): int
     {
         return $this->selected_month;
     }
@@ -208,7 +208,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
             $num = $qry->exec();
         }
         else if (isset($_GET["year"]) && isset($_GET["month"])) {
-            $qry->select->where()->add("MONTHNAME({$this->bean->getDateColumn()})", "'" . DBConnections::Get()->escape($_GET["month"]) . "'");
+            $qry->select->where()->add("MONTH({$this->bean->getDateColumn()})", (int)$_GET["month"]);
             $qry->select->where()->add("YEAR({$this->bean->getDateColumn()})", (int)$_GET["year"]);
             $num = $qry->exec();
         }
@@ -223,7 +223,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
         while ($item = $qry->next()) {
             $this->selected_ID[] = $item[$this->bean->key()];
             if (!$this->selected_month || $this->selected_year) {
-                $this->selected_month = date("F", strtotime($item[$this->bean->getDateColumn()]));
+                $this->selected_month = date("n", strtotime($item[$this->bean->getDateColumn()]));
                 $this->selected_year = date("Y", strtotime($item[$this->bean->getDateColumn()]));
             }
 
@@ -241,8 +241,13 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
         echo "<div class='archive'>";
 
-        $month_list = array("January", "February", "March", "April", "May", "June", "July", "August", "September",
-                            "October", "November", "December");
+        $month_list = array();
+
+        for ($a=1;$a<=12;$a++) {
+            $month_list[] = strftime("%b", mktime(0, 0, 0, $a));
+        }
+        //$month_list = array("January", "February", "March", "April", "May", "June", "July", "August", "September",
+         //                   "October", "November", "December");
 
         $v = new ValueInterleave("even", "odd");
 
@@ -267,14 +272,15 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
                 if ($c == 0) echo "<div class='row'>";
 
-                $have_data = $this->bean->publicationsCount($year, $month);
+                $have_data = $this->bean->publicationsCount($year, $b+1);
+
                 if ($have_data > 0) {
                     $url = new URLBuilder();
                     $url->buildFrom($this->url->getBuildFrom());
                     $url->add(new URLParameter("year", $year));
-                    $url->add(new URLParameter("month", $month));
+                    $url->add(new URLParameter("month", $b+1));
                     $active = "";
-                    if (strcmp($month, $this->selected_month) == 0) {
+                    if ( $b+1 == $this->selected_month) {
                         $active = "selected";
                     }
                     echo "<a href='{$url->url()}' $active class='item'>";

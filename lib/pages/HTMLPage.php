@@ -1,5 +1,6 @@
 <?php
 include_once("components/Container.php");
+include_once("utils/URLBuilder.php");
 
 abstract class HTMLPage extends Container
 {

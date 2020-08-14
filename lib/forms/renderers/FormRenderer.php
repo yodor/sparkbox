@@ -134,7 +134,7 @@ class FormRenderer extends Container
     }
 
     /**
-     * Will set this component name as the form name or form class
+     * Will set this component name as the form name
      */
     protected function processAttributes()
     {

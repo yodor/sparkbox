@@ -34,6 +34,11 @@ class LoginFormRenderer extends FormRenderer
 
     }
 
+    public function forgotPasswordAction() : Action
+    {
+        return $this->action;
+    }
+
     public function requiredScript() : array
     {
         $arr = parent::requiredScript();

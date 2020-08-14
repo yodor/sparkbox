@@ -1,73 +1,6 @@
 <?php
-
-class CartItem
-{
-    protected $line_total;
-    protected $price;
-    protected $qty;
-    protected $id;
-
-    public function __construct()
-    {
-        $this->id = -1;
-        $this->qty = 0;
-        $this->price = 0.0;
-        $this->line_total = 0.0;
-    }
-
-    public function getID(): int
-    {
-        return $this->id;
-    }
-
-    public function setID(int $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getQuantity(): int
-    {
-        return $this->qty;
-    }
-
-    public function setQuantity(int $qty)
-    {
-        $this->qty = $qty;
-        $this->calculate();
-    }
-
-    public function increment()
-    {
-        $this->qty = $this->qty + 1;
-        $this->calculate();
-    }
-    public function decrement()
-    {
-        $this->qty = $this->qty - 1;
-        $this->calculate();
-    }
-
-    public function getPrice(): float
-    {
-        return $this->price;
-    }
-
-    public function setPrice(float $price)
-    {
-        $converter = CurrencyConverter::Instance();
-        $this->price = $converter->getValue($price);
-        $this->calculate();
-    }
-    public function getLineTotal(): float
-    {
-        return $this->line_total;
-    }
-    protected function calculate()
-    {
-        $this->line_total = $this->qty * $this->price;
-    }
-
-}
+include_once("beans/ConfigBean.php");
+include_once("utils/CartItem.php");
 
 class Cart
 {
@@ -79,8 +12,8 @@ class Cart
 
     static public function Instance(): Cart
     {
-        if (isset($_SESSION["cart"])) {
-            self::$instance = unserialize($_SESSION["cart"]);
+        if (Session::Contains("cart")) {
+            self::$instance = unserialize(Session::Get("cart"));
         }
         if (self::$instance instanceof Cart) {
             return self::$instance;
@@ -105,13 +38,13 @@ class Cart
 
     public function store()
     {
-        $_SESSION["cart"] = serialize($this);
+        Session::Set("cart", serialize($this));
     }
 
     public function set(CartItem $item)
     {
         $itemID = $item->getID();
-        if ($item->getQuantity()>0) {
+        if ($item->getQuantity() > 0) {
             $this->items[$itemID] = $item;
         }
         else {
@@ -126,7 +59,7 @@ class Cart
         return $this->items[$itemID];
     }
 
-    public function remove(int $itemID)
+    protected function remove(int $itemID)
     {
         if (isset($this->items[$itemID])) {
             unset($this->items[$itemID]);
@@ -151,14 +84,13 @@ class Cart
     public function clear()
     {
         $this->items = array();
-
+        $this->store();
     }
 
     public function setDeliveryPrice(float $price)
     {
-        $converter = CurrencyConverter::Instance();
-
-        $this->delivery_price = $converter->getValue($price);
+        $this->delivery_price = $price;
+        $this->store();
     }
 
     public function getDeliveryPrice(): float

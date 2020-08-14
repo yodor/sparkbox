@@ -637,14 +637,14 @@ function dateFormat($date, $time = TRUE)
 {
     $tm = "H:i";
     if (!$time) $tm = "";
-    return date("M j, Y $tm", strtotime($date));
+    return strftime("%e %B %Y $tm", strtotime($date));
 }
 
 function dateFormatFromUnix($unixtime, $time = TRUE)
 {
     $tm = "H:i";
     if (!$time) $tm = "";
-    return date("M j, Y $tm", $unixtime);
+    return date("%e %B %Y $tm", $unixtime);
 }
 
 function date2time($date, $format = '%a, %d %b %Y %H:%M:%S %z')

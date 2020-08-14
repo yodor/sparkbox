@@ -1,6 +1,7 @@
 <?php
 include_once("components/Component.php");
 include_once("components/renderers/IPhotoRenderer.php");
+include_once("storage/StorageItem.php");
 
 class ImagePopup extends Component implements IPhotoRenderer
 {

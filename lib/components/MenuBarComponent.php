@@ -27,6 +27,8 @@ class MenuBarComponent extends Component
 
     public $toggle_first = FALSE;
 
+    protected $separator_enabled = true;
+
     public function __construct(MainMenu $menu)
     {
         parent::__construct();
@@ -64,6 +66,11 @@ class MenuBarComponent extends Component
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/MenuBarComponent.js";
         return $arr;
+    }
+
+    public function setSeparatorEnabled(bool $mode)
+    {
+        $this->separator_enabled = $mode;
     }
 
     public function getMainMenu(): MainMenu
@@ -109,8 +116,11 @@ class MenuBarComponent extends Component
             $item = $menu_items[$a];
 
             $this->ir_baritem->setMenuItem($item);
+            $this->ir_baritem->setAttribute("position",$a);
             $this->ir_baritem->render();
-            $this->ir_baritem->renderSeparator($a, $total_items);
+            if ($this->separator_enabled) {
+                $this->ir_baritem->renderSeparator($a, $total_items);
+            }
 
         }
 

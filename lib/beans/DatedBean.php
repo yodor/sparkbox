@@ -57,7 +57,7 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query($this->key());
-        $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
+        $qry->select->where()->add("MONTH({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
         $qry->select->order_by = " {$this->date_column} DESC ";
         $qry->exec();
 
@@ -82,7 +82,7 @@ class DatedBean extends DBTableBean
 
         $qry = $this->query($this->key());
         $qry->select->fields()->setExpression("DAY({$this->date_column})", "day");
-        $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
+        $qry->select->where()->add("MONTH({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
         $qry->exec();
 
         $data = array();
@@ -96,15 +96,16 @@ class DatedBean extends DBTableBean
 
     /**
      * Return the number of publications in a given month and year
-     * @param string $d_year
-     * @param string $d_month
+     *
+     * @param string $d_year Year ex.2020
+     * @param string $d_month Month ex.6
      * @return int
      * @throws Exception
      */
     public function publicationsCount(string $d_year, string $d_month): int
     {
         $qry = $this->query($this->key());
-        $qry->select->where()->add("MONTHNAME({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
+        $qry->select->where()->add("MONTH({$this->date_column})", "'$d_month'")->add("YEAR({$this->date_column})", "'$d_year'");
         $qry->select->limit = " 1 ";
         return $qry->exec();
     }
