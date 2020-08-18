@@ -343,7 +343,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         return $values;
     }
 
-    protected function loadTargetBeanData(array &$target_data): string
+    protected function loadTargetBeanData(array &$target_data): ?string
     {
         $value = NULL;
         $name = $this->input->getName();
