@@ -26,7 +26,7 @@ abstract class UploadDataValidator implements IInputValidator
         $this->accept_mimes = $accept_mimes;
     }
 
-    public static function errString(int $err, int $maxsize = 0)
+    public static function errString(int $err, int $maxsize = 0) : string
     {
         $ret = "Undefined error: $err";
         switch ($err) {
@@ -89,9 +89,10 @@ abstract class UploadDataValidator implements IInputValidator
         //UploadDataInputProcessor always create one FileStroageObject with error_status UPLOAD_ERR_NO_FILE
         $file_storage = $input->getValue();
 
-        $upload_status = $file_storage->getUploadStatus();
+        //
+        $upload_status = (int)$file_storage->getUploadStatus();
 
-        debug("StorageObject class: " . get_class($file_storage) . " | Upload status: $upload_status - " . UploadDataValidator::errString($upload_status));
+        debug("StorageObject class: " . get_class($file_storage) . " | Upload status: $upload_status " . UploadDataValidator::errString($upload_status));
 
         if ($upload_status === UPLOAD_ERR_NO_FILE) {
             if ($input->isRequired()) {

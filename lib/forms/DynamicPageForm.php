@@ -22,6 +22,7 @@ class DynamicPageForm extends InputForm
 
         $field = new DataInput("item_date", "Date", 0);
         new DateField($field);
+        new DateInput($field);
         $field->setValidator(new DateValidator());
 
         $this->addInput($field);

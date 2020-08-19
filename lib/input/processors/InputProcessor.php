@@ -302,7 +302,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             $value = $item_row[$name];
         }
 
-        if ($value) {
+        if ($value !== NULL) {
             if ($this->input instanceof ArrayDataInput && !is_array($value)) {
                 $value = array($value);
             }
