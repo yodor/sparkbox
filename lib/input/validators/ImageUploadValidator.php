@@ -21,6 +21,9 @@ class ImageUploadValidator extends UploadDataValidator
             $this->resize_width = IMAGE_UPLOAD_DEFAULT_WIDTH;
             $this->resize_height = IMAGE_UPLOAD_DEFAULT_HEIGHT;
         }
+        else {
+            $this->resize_enabled = FALSE;
+        }
     }
 
     public function setResizedSize($width, $height)
