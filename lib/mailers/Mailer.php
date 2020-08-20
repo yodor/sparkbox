@@ -10,6 +10,10 @@ abstract class Mailer
 
     protected $body = "";
 
+    public function __construct()
+    {
+    }
+
     public function send()
     {
 
