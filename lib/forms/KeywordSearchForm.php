@@ -10,6 +10,7 @@ class KeywordSearchForm extends InputForm
     protected $table_fields;
 
     protected $search_expressions = NULL;
+    protected $compare_operators = NULL;
 
     public function __construct()
     {
@@ -19,15 +20,18 @@ class KeywordSearchForm extends InputForm
 
         $this->search_expressions = array();
 
+        $this->compare_operators = array();
+
         $field = new DataInput("keyword", "Keyword", 0);
         new TextField($field);
         $this->addInput($field);
 
     }
 
-    public function setCompareExpression(string $field_name, array $expressions)
+    public function setCompareExpression(string $field_name, array $expressions, string $compare_operator = "LIKE")
     {
         $this->search_expressions[$field_name] = $expressions;
+        $this->compare_operators[$field_name] = $compare_operator;
     }
 
     public function setFields(array $table_fields)
@@ -60,7 +64,8 @@ class KeywordSearchForm extends InputForm
                     if (isset($this->search_expressions[$field_name])) {
                         foreach ($this->search_expressions[$field_name] as $idx => $expression) {
                             $expression = str_replace("{keyword}", $keyword, $expression);
-                            $ret[] = " $field_name LIKE '$expression' ";
+                            $operator = $this->compare_operators[$field_name];
+                            $ret[] = " $field_name $operator '$expression' ";
                         }
                     }
                     else {

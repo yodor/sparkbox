@@ -32,15 +32,22 @@ class GalleryView extends Container
 
     protected $actions;
 
-    public function __construct(DBTableBean $bean)
+    public function __construct(DBTableBean $bean, SQLQuery $query=NULL)
     {
         parent::__construct();
         $this->bean = $bean;
 
-
+        //default query for bean
         $qry = $this->bean->query();
-
         $qry->select->fields()->set($this->bean->key(), "position", "caption", "date_upload");
+
+        //use already prepared query
+        if ($query !== NULL) {
+            $qry = $query;
+        }
+
+
+
 
         if (strcmp_isset("view", "list")) {
 
