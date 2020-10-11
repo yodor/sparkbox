@@ -128,7 +128,8 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
                 input_dialog.setID("input_dialog");
                 input_dialog.show();
-                let input = document.querySelector(input_dialog.selector + " INPUT");
+
+                let input = document.querySelector(input_dialog.selector() + " INPUT");
                 input.value = old_value;
 
                 input_dialog.buttonAction = function (action) {
