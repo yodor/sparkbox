@@ -11,7 +11,7 @@ class FAQItemInputForm extends InputForm
 
         parent::__construct();
 
-        $field = DataInputFactory::Create(DataInputFactory::SELECT, "fqsID", "Section", 0);
+        $field = DataInputFactory::Create(DataInputFactory::SELECT, "fqsID", "Section", 1);
 
         $bean = new FAQSectionsBean();
 
