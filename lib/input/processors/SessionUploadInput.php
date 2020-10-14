@@ -191,6 +191,8 @@ class SessionUploadInput extends InputProcessor
             if (count($value) < 1) {
                 debug("Array count is 0. Transacting NULL value to the main transaction row");
                 $value = NULL;
+
+                $transactor->appendValue($this->transact_column, $value);
             }
             else {
                 $value = $value[0];
@@ -198,6 +200,7 @@ class SessionUploadInput extends InputProcessor
         }
 
         if (is_null($value)) {
+
             return;
         }
 
