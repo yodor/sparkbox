@@ -172,9 +172,9 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
             $item_label = $item->getLabel();
 
-            if (isset($row["related_count"])) {
-                $item_label .= " (" . $row["related_count"] . ")";
-            }
+//            if (isset($row["related_count"])) {
+//                $item_label .= " (" . $row["related_count"] . ")";
+//            }
 
             $item->setLabel($item_label);
 

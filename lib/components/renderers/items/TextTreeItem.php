@@ -18,6 +18,11 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
      */
     protected $text_action;
 
+    /**
+     * @var bool
+     */
+    protected $render_related_count;
+
     public function __construct()
     {
         parent::__construct();
@@ -27,6 +32,14 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
 
         $this->actions = new ActionCollection();
 
+        //show related count in parenthesis inside the label
+        $this->render_related_count = true;
+
+    }
+
+    public function renderRelatedCount(bool $mode) : void
+    {
+        $this->render_related_count = $mode;
     }
 
     public function getTextAction(): Action
@@ -87,7 +100,12 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
 
     public function renderText()
     {
-        $this->text_action->setContents($this->label);
+        if ($this->render_related_count && $this->data["related_count"]) {
+            $this->text_action->setContents($this->label." (".$this->data["related_count"].")");
+        }
+        else {
+            $this->text_action->setContents($this->label);
+        }
         $this->text_action->render();
     }
 
