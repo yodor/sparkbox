@@ -23,6 +23,11 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
      */
     protected $render_related_count;
 
+    /**
+     * @var string
+     */
+    protected $key_related_count;
+
     public function __construct()
     {
         parent::__construct();
@@ -34,12 +39,22 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
 
         //show related count in parenthesis inside the label
         $this->render_related_count = true;
-
+        $this->key_related_count = "related_count";
     }
 
     public function renderRelatedCount(bool $mode) : void
     {
         $this->render_related_count = $mode;
+    }
+
+    public function setKeyRelatedCount(string $key) : void
+    {
+        $this->key_related_count = $key;
+    }
+
+    public function getKeyRelatedCount() : string
+    {
+        return $this->key_related_count;
     }
 
     public function getTextAction(): Action
@@ -100,8 +115,8 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
 
     public function renderText()
     {
-        if ($this->render_related_count && $this->data["related_count"]) {
-            $this->text_action->setContents($this->label." (".$this->data["related_count"].")");
+        if ($this->render_related_count && isset($this->data[$this->key_related_count])) {
+            $this->text_action->setContents($this->label." (".$this->data[$this->key_related_count].")");
         }
         else {
             $this->text_action->setContents($this->label);
