@@ -1,5 +1,6 @@
 <?php
 include_once("templates/admin/BeanListPage.php");
+include_once("beans/FAQSectionsBean.php");
 include_once("beans/FAQItemsBean.php");
 
 class FAQItemsListPage extends BeanListPage
@@ -8,7 +9,7 @@ class FAQItemsListPage extends BeanListPage
     {
         parent::__construct();
 
-
+        $sections = new FAQSectionsBean();
         $bean = new FAQItemsBean();
 
         $qry = $bean->query();
