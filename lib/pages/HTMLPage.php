@@ -214,7 +214,7 @@ abstract class HTMLPage extends Container
 
     /**
      * Adds a JavaScript file to page JavaScripts collection
-     * @param string $filename The filename of the CSS script.
+     * @param string $filename The filename of the javascript.
      */
     public function addJS(string $filename, string $className = "", bool $prepend = FALSE)
     {
