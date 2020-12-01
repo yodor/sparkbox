@@ -1,5 +1,6 @@
 <?php
 include_once("components/Component.php");
+include_once("components/renderers/IDataIteratorRenderer.php");
 include_once("components/renderers/items/DataIteratorItem.php");
 
 include_once("beans/NestedSetBean.php");
