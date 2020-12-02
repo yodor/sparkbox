@@ -4,26 +4,38 @@
 }
 
 .MenuBar .toggle {
-    background-size: contain;
-    background-image: url("../../images/menu.png");
-    /*   width:24px; */
-    /*   height:1em; */
-    display: block;
-    background-position: center right;
-    background-repeat: no-repeat;
-    font-size: 1.3em;
 
-    padding-top: 5px;
-    padding-bottom: 5px;
+    display: inline-block;
 
     text-align: right;
-    padding-right: 35px;
+
     box-sizing: border-box;
 
     min-height: 35px;
     margin-right: 5px;
     margin-left: 5px;
+
+
 }
+
+.MenuBar .toggle {
+    cursor:pointer;
+    display:inline-block;
+    vertical-align:middle;
+    width:1.5em;
+}
+
+.MenuBar .toggle:after,
+.MenuBar .toggle:before,
+.MenuBar .toggle DIV {
+    background-color: #000;
+    border-radius: 3px;
+    content: '';
+    display: block;
+    height: 5px;
+    margin: 5px 0;
+}
+
 
 .MenuBar .MenuSeparator {
     display: none !important;
