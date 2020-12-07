@@ -79,7 +79,9 @@ class ConfigBean extends DBTableBean
         if (is_object($val) || is_array($val)) {
             $val = serialize($val);
         }
-        $val = DBConnections::Get()->escape($val);
+        if (!is_null($val)) {
+            $val = DBConnections::Get()->escape($val);
+        }
         $section = DBConnections::Get()->escape($this->section);
         $data = array("config_key" => $key, "config_val" => $val, "section" => $section);
         $this->insert($data);
