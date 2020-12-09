@@ -33,7 +33,10 @@ class HeaderCellRenderer extends TableCellRenderer
     {
         if ($this->column->isSortable()) {
 
-            echo "<a href='$this->sort_href'>" . $this->value . "</a>";
+            echo "<a href='$this->sort_href'>";
+            parent::renderImpl();
+            echo "</a>";
+
             $arr = "&darr;";
             if (isset($_GET["orderdir"]) && strcmp($_GET["orderdir"], "DESC") == 0) {
                 $arr = "&uarr;";
