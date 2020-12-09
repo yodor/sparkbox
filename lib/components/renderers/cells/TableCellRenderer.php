@@ -29,6 +29,7 @@ class TableCellRenderer extends Component implements IDataResultProcessor
     public function __construct()
     {
         parent::__construct();
+
     }
 
     public function isSortable(): bool
@@ -57,7 +58,12 @@ class TableCellRenderer extends Component implements IDataResultProcessor
 
     protected function renderImpl()
     {
-        echo $this->value;
+        if ($this->translation_enabled) {
+            echo tr($this->value);
+        }
+        else {
+            echo $this->value;
+        }
     }
 
     public function setColumn(TableColumn $tc)

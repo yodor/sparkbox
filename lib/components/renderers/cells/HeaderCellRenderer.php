@@ -11,7 +11,7 @@ class HeaderCellRenderer extends TableCellRenderer
     public function __construct($is_sortable = TRUE)
     {
         parent::__construct();
-
+        $this->translation_enabled = true;
     }
 
     public function isSortable(): bool
