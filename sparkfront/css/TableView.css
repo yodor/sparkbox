@@ -16,15 +16,17 @@
     border: 1px solid #aeaeae;
     background-color: #e7e7e7;
 
-    white-space: nowrap;
+    white-space: normal;
     color: #537689;
 
     padding: 0.3em !important;
+
+    vertical-align:middle;
+
 }
 
 .TableView .viewport .HeaderCellRenderer A {
 
-    text-transform: capitalize;
     color: #537689;
 }
 
