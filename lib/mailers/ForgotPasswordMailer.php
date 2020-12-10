@@ -18,12 +18,6 @@ class ForgotPasswordMailer extends Mailer
 
         $this->to = $email;
 
-        // 		$server_file = INSTALL_PATH."/emails/admin_forgot_password.html";
-        //
-        // 		$this->setTemplateHTML($server_file);
-        //
-        // 		$this->replaceBody("Base HREF", SITE_URL.LOCAL."system/token/");
-
         $message = "";
         $message .= tr("Hello").",\r\n";
         $message .= tr("This email is sent in relation to your forgot password request at") . " - ".SITE_URL . "\r\n";
@@ -31,7 +25,8 @@ class ForgotPasswordMailer extends Mailer
         $message .= "\r\n";
         $message .= tr("Sincerely").",\r\n";
         $message .= SITE_TITLE;
-        $this->body = $message;
+
+        $this->body = $this->templateMessage($message);
 
     }
 
