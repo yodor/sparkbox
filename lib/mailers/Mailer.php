@@ -4,8 +4,8 @@ abstract class Mailer
 {
 
     protected $to = "";
-    protected $from_name = DEFAULT_EMAIL_NAME; //senders name
-    protected $from_email = DEFAULT_EMAIL_ADDRESS; //senders e-mail adress
+    protected $from_name = DEFAULT_SERVICE_NAME; //senders name
+    protected $from_email = DEFAULT_SERVICE_EMAIL; //senders e-mail address
     protected $subject = "";
 
     protected $body = "";

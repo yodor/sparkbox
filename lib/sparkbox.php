@@ -92,6 +92,7 @@ $defines->set("IMAGE_UPLOAD_UPSCALE", FALSE);
 
 $defines->set("DEFAULT_EMAIL_NAME", $site_domain . " Administration");
 $defines->set("DEFAULT_EMAIL_ADDRESS", "info@" . $site_domain);
+$defines->set("DEFAULT_SERVICE_NAME", $site_domain . " Administration");
 $defines->set("DEFAULT_SERVICE_EMAIL", "info@" . $site_domain);
 
 $defines->set("TRANSLATOR_ENABLED", FALSE);
