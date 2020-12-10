@@ -6,11 +6,11 @@ class ForgotPasswordMailer extends Mailer
 
     /**
      * ForgotPasswordMailer constructor.
-     * @param $email string Recipient email
-     * @param $random_pass string the password
-     * @param $login_url string url of the login page
+     * @param string $email Recipient email
+     * @param string $random_pass the password
+     * @param string|null $login_url url of the login page
      */
-    public function __construct(string $email, string $random_pass, string $login_url)
+    public function __construct(string $email, string $random_pass, ?string $login_url)
     {
         parent::__construct();
 
@@ -23,8 +23,13 @@ class ForgotPasswordMailer extends Mailer
         $message .= tr("This email is sent in relation to your forgot password request at") . " - ".SITE_URL . "\r\n";
         $message .= tr("Your new password is").": ".$random_pass."\r\n";
         $message .= "\r\n";
+        if ($login_url) {
+            $message .= tr("Use the following link to log into your account").": "."\r\n";
+            $message .= "<a href='$login_url'>$login_url</a>";
+        }
         $message .= tr("Sincerely").",\r\n";
         $message .= SITE_TITLE;
+        $message .= "<a href='".SITE_URL."'>".SITE_TITLE."</a>";
 
         $this->body = $this->templateMessage($message);
 
