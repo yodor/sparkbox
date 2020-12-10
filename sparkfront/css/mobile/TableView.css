@@ -28,8 +28,8 @@
     padding-top: 1px;
     padding-bottom: 1px;
     font-size: 1.2em;
-    padding-left: 0px;
-    padding-right: 0px;
+    padding-left: 0;
+    padding-right: 0;
 
 }
 
@@ -76,6 +76,7 @@
 
 .TableView .viewport .ActionsCellRenderer .actions_list {
     text-align: right;
+    white-space: normal;
 }
 
 .TableView .viewport .ActionsCellRenderer .actions_list .Action {
