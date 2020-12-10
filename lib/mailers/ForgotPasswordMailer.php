@@ -27,7 +27,7 @@ class ForgotPasswordMailer extends Mailer
         $message .= "\r\n";
         if ($login_url) {
             $message .= tr("Use the following link to log into your account").": "."\r\n";
-            $message .= "<a href='$login_url'>$login_url</a>";
+            $message .= "<a href='$login_url'>$login_url</a>\r\n";
             $message .= "\r\n";
         }
         $message .= tr("Sincerely").",\r\n";
