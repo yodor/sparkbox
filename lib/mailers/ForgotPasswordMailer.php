@@ -21,7 +21,7 @@ class ForgotPasswordMailer extends Mailer
         $message = "";
         $message .= tr("Hello").",\r\n";
         $message .= "\r\n";
-        $message .= tr("This email is sent in relation to your forgot password request at") . " - ".SITE_URL . "\r\n";
+        $message .= tr("This email is sent in relation to your forgot password request at") . " - ".SITE_TITLE . "\r\n";
         $message .= "\r\n";
         $message .= tr("Your new password is").": ".$random_pass."\r\n";
         $message .= "\r\n";
