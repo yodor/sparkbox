@@ -534,14 +534,23 @@ class NestedSetBean extends DBTableBean
     }
 
     //used with aggregate table. selects node and its child nodes for aggregation
-    public function selectChildNodesWith(SQLSelect $other, string $relation_table, $nodeID = -1): SQLSelect
+    public function selectChildNodesWith(SQLSelect $other, string $relation_table, $nodeID = -1, array $columns = array()): SQLSelect
     {
         //other 'from' should be selected as TABLE as relation
         $prkey = $this->prkey;
 
+        $prefix = "child";
+
+        $fields = array("$prefix.$prkey");
+
+        foreach ($columns as $idx => $field) {
+            $fields[] = "$prefix.$field";
+        }
+
         $sel = new SQLSelect();
 
-        $sel->fields()->set("child.$prkey");
+        $sel->fields()->set(...$fields);
+        //
 
         $sel->from = " {$this->table} AS node , {$this->table} AS child ";
 
