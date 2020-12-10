@@ -21,7 +21,7 @@ class ForgotPasswordProcessor extends FormProcessor
         $users = new AdminUsersBean();
 
         $random_pass = Authenticator::RandomToken(8);
-        $fpm = new ForgotPasswordMailer($email, $random_pass, SITE_DOMAIN . LOCAL . "admin/login.php");
+        $fpm = new ForgotPasswordMailer($email, $random_pass, SITE_DOMAIN . ADMIN_LOCAL . "/login.php");
         $db = DBConnections::Factory();
         try {
             $db->transaction();
