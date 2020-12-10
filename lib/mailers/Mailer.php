@@ -25,7 +25,7 @@ abstract class Mailer
         return mail($this->to, $this->subject, $this->body, $headers);
     }
 
-    protected function processHeaders()
+    protected function processHeaders() : string
     {
 
         $headers = "From: " . $this->from_name . " <" . $this->from_email . ">\r\n"; //optional headerfields
@@ -39,13 +39,15 @@ abstract class Mailer
 
     }
 
-    protected function templateMessage($message)
+    protected function templateMessage($message) : string
     {
         $str = "<html>";
         $str .= "<head>";
         $str .= "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+        $str .= "</head>";
         $str .= "<body>" . $message . "</body>";
         $str .= "</html>";
+        $str = str_replace("\r\n", "<BR>", $str);
         return $str;
     }
 }
