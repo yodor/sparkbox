@@ -20,16 +20,20 @@ class ForgotPasswordMailer extends Mailer
 
         $message = "";
         $message .= tr("Hello").",\r\n";
+        $message .= "\r\n";
         $message .= tr("This email is sent in relation to your forgot password request at") . " - ".SITE_URL . "\r\n";
+        $message .= "\r\n";
         $message .= tr("Your new password is").": ".$random_pass."\r\n";
         $message .= "\r\n";
         if ($login_url) {
             $message .= tr("Use the following link to log into your account").": "."\r\n";
             $message .= "<a href='$login_url'>$login_url</a>";
+            $message .= "\r\n";
         }
         $message .= tr("Sincerely").",\r\n";
-        $message .= SITE_TITLE;
-        $message .= "<a href='".SITE_URL."'>".SITE_TITLE."</a>";
+        $message .= SITE_TITLE."\r\n";
+        $message .= "\r\n";
+        $message .= "<a href='".SITE_URL."'>".SITE_URL."</a>";
 
         $this->body = $this->templateMessage($message);
 
