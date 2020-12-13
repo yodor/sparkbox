@@ -13,8 +13,8 @@ class UsersBean extends DBTableBean
  `counter` int(11) unsigned NOT NULL DEFAULT '0',
  `fullname` varchar(255) NOT NULL DEFAULT '',
  `date_signup` datetime NOT NULL,
- `suspend` tinyint(1) NOT NULL DEFAULT '0',
- `is_confirmed` tinyint(1) NOT NULL DEFAULT '0',
+ `suspended` tinyint(1) NOT NULL DEFAULT '0',
+ `confirmed` tinyint(1) NOT NULL DEFAULT '0',
  `confirm_code` varchar(32) DEFAULT '',
  PRIMARY KEY (`userID`),
  UNIQUE KEY `email` (`email`)
@@ -66,6 +66,53 @@ class UsersBean extends DBTableBean
         if (!$row) return -1;
         return $row[$this->key()];
     }
+
+    /**
+     * @param string $email
+     * @param string $confirm_code
+     * @param DBDriver|null $db
+     * @return int The number of rows affected
+     * @throws Exception
+     */
+    public function activate(string $email, string $confirm_code, DBDriver $db = NULL) : int
+    {
+        if (!$email || !$confirm_code) throw new Exception("Unable to activate with empty 'email' or 'confirm code'");
+
+        $userID_email = $this->email2id($email);
+        if ($userID_email<1) throw new Exception(tr("Unknown email address. Please register to create a new profile."));
+
+        $userID_code = $this->confirm2id($confirm_code);
+        if ($userID_code<1) throw new Exception(tr("Incorrect activation code. Please check the activation code and try again."));
+
+        if ($userID_email != $userID_code) throw new Exception(tr("This activation code does not match the email address."));
+
+        $is_confirmed = (int)$this->getValue($userID_email, "confirmed");
+        if ($is_confirmed>0) throw new Exception(tr("This profile is already activated."));
+
+
+        $email = "'".DBConnections::Get()->escape(strtolower(trim($email)))."'";
+        $confirm_code = "'".DBConnections::Get()->escape(strtolower(trim($confirm_code)))."'";
+
+
+        $code = function (DBDriver $db) use ($email, $confirm_code) {
+
+            $update = new SQLUpdate($this->select);
+
+            $update->set("confirmed", 1);
+
+            $update->where()->add("email", $email);
+            $update->where()->add("confirm_code", $confirm_code);
+
+            debug("UPDATE executing sql: " . $update->getSQL());
+
+            if (!$db->query($update->getSQL())) {
+                throw new Exception("Unable to update: " . $db->getError());
+            }
+        };
+
+        return $this->handleTransaction($code, $db);
+    }
+
 }
 
 ?>
