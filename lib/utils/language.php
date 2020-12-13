@@ -232,7 +232,7 @@ class Translator implements IRequestProcessor
         }
         else {
             //Capture new phrase. Insert into SiteTextsBean
-            $phrase_data = array("value"=>$phrase, "hash_value"=>$phrase_hash);
+            $phrase_data = array("value"=>DBConnections::Get()->escape($phrase), "hash_value"=>$phrase_hash);
             try {
                 $this->phrases->insert($phrase_data);
             }
