@@ -34,7 +34,10 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
      */
     protected $iterator = NULL;
 
+    public const ADDON_MODE_INSIDE = 1;
+    public const ADDON_MODE_OUSIDE = 2;
 
+    protected $addon_render_mode = InputField::ADDON_MODE_INSIDE;
     protected $addon_contents;
 
     /**
@@ -165,9 +168,8 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
 
     public function finishRender()
     {
-
-        if ($this->addon_contents->count()>0) {
-            $this->addon_contents->render();
+        if ($this->addon_render_mode == InputField::ADDON_MODE_INSIDE) {
+            $this->renderAddonContents();
         }
 
         if ($this->input->haveError() && $this->error_render_mode == IErrorRenderer::MODE_SPAN) {
@@ -177,6 +179,24 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         }
 
         parent::finishRender();
+
+        if ($this->addon_render_mode == InputField::ADDON_MODE_OUSIDE) {
+            $this->renderAddonContents();
+        }
+
+    }
+
+    protected function renderAddonContents()
+    {
+        if ($this->addon_contents->count()>0) {
+            $this->addon_contents->render();
+        }
+
+    }
+
+    public function setAddonRenderMode(int $mode) {
+
+        $this->addon_render_mode = $mode;
 
     }
 
