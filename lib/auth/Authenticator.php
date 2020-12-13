@@ -168,13 +168,13 @@ abstract class Authenticator
             }
 
             if (isset($row["confirmed"])) {
-                $is_confirmed = (int)$row["is_confirmed"];
+                $is_confirmed = (int)$row["confirmed"];
                 if ($is_confirmed < 1) {
-                    $msg = tr("Your account is not confirmed yet.");
+                    $msg = tr("Your account is not activated yet.");
                     if (defined(ACCOUNT_CONFIRM_URL)) {
                         $link = ACCOUNT_CONFIRM_URL;
                         $msg .= "<BR>";
-                        $msg .= tr("For more details visit the account confirmation page") . ": ";
+                        $msg .= tr("For more details visit the account activation page") . ": ";
                         $msg .= "<a href='$link'>" . tr("here") . "</a>";
                     }
                     throw new Exception($msg);
