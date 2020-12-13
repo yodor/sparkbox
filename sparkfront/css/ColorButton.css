@@ -16,7 +16,7 @@ INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
     text-align: center;
     vertical-align: bottom;
 
-    padding-top: 0.1em;
+    padding-top: 0.2em;
     padding-bottom: 0.2em;
     padding-left: 0.5em;
     padding-right: 0.5em;
