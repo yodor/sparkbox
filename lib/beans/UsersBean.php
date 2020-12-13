@@ -26,17 +26,27 @@ class UsersBean extends DBTableBean
     }
 
     //email
-    public function emailExists($email)
+    public function emailExists(string $email)
     {
         return $this->getResult("email", $email);
     }
 
-    public function email($userID)
+    /**
+     * @param int $userID The userID to get the email field form
+     * @return string email address field matching this userID
+     * @throws Exception
+     */
+    public function email(int $userID) : string
     {
         return $this->getValue($userID, "email");
     }
 
-    public function email2id($email)
+    /**
+     * @param string $email The email to look for
+     * @return int userID matching the email or -1 of email is not found
+     * @throws Exception
+     */
+    public function email2id(string $email) : int
     {
 
         $row = $this->getResult("email", $email);
@@ -45,6 +55,17 @@ class UsersBean extends DBTableBean
 
     }
 
+    /**
+     * @param $confirm_code string The confirmation code to look for
+     * @return int userID matching the confirmation code
+     * @throws Exception
+     */
+    public function confirm2id(string $confirm_code) : int
+    {
+        $row = $this->getResult("confirm_code", $confirm_code);
+        if (!$row) return -1;
+        return $row[$this->key()];
+    }
 }
 
 ?>
