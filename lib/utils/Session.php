@@ -55,14 +55,20 @@ class Session
 
     public static function SetCookie($key, $val, $expire = 0)
     {
+        $cookie_path = LOCAL;
+        if (!$cookie_path) $cookie_path = "/";
+
         $_COOKIE[$key] = $val;
-        setcookie($key, $val, $expire, LOCAL, COOKIE_DOMAIN);
+        setcookie($key, $val, $expire, $cookie_path, COOKIE_DOMAIN);
 
     }
 
     public static function ClearCookie($key)
     {
-        setcookie($key, "", 1, LOCAL, COOKIE_DOMAIN);
+        $cookie_path = LOCAL;
+        if (!$cookie_path) $cookie_path = "/";
+
+        setcookie($key, "", 1, $cookie_path, COOKIE_DOMAIN);
         if (isset($_COOKIE[$key])) {
             unset($_COOKIE[$key]);
         }
