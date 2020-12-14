@@ -12,6 +12,7 @@ class DynamicPagesBean extends OrderedDataBean
  `content` text NOT NULL,
  `position` int(11) unsigned DEFAULT NULL,
  `photo` longblob NOT NULL,
+ `keywords` text null default '',
  PRIMARY KEY (`dpID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 

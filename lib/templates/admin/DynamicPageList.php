@@ -13,7 +13,7 @@ class DynamicPageList extends BeanListPage
 
         $this->setBean(new DynamicPagesBean());
         $this->setListFields(array("position"  => "#", "item_photo" => "Photo", "item_title" => "Title",
-                                   "item_date" => "Date", "visible" => "Visible"));
+                                   "item_date" => "Date", "visible" => "Visible", "keywords" => "Keywords"));
 
     }
 

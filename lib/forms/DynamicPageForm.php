@@ -20,6 +20,10 @@ class DynamicPageForm extends InputForm
 
         $this->addInput($field);
 
+        $field = new DataInput("keywords", "Keywords", 0);
+        new TextField($field);
+        $this->addInput($field);
+
         $field = new DataInput("item_date", "Date", 0);
         new DateField($field);
         new DateInput($field);
