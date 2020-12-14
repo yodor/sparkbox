@@ -54,7 +54,7 @@ class MCETextArea extends Component {
             menubar: false,
             toolbar1: 'code | undo redo | fontselect fontsizeselect | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
             toolbar2: 'link unlink anchor | image media code | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser |',
-            plugins: 'code link image lists charmap anchor insertdatetime media ',
+            plugins: 'code link image lists charmap anchor insertdatetime media paste code',
 
             resize: 'both',
 
