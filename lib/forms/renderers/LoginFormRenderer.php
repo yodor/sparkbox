@@ -28,7 +28,7 @@ class LoginFormRenderer extends FormRenderer
 
         $this->setAttribute("autocomplete", "on");
 
-        $this->action = new Action("Forgot Password", "forgot_password.php");
+        $this->action = new Action("Forgot Password?", "forgot_password.php");
 
         $this->getTextSpace()->append($this->action);
 

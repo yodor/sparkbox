@@ -1,5 +1,35 @@
 <?php
+function stripAttributes(string $data_str, string $allowable_tags = "<center><p><span><div><br>", array $allowable_attrs = array('href','src','alt','title')) : string
+{
+    // define allowable tags
+    // define allowable attributes
 
+    // strip collector
+    $strip_arr = array();
+
+    // load XHTML with SimpleXML
+    $data_sxml = simplexml_load_string('<root>'. $data_str .'</root>', 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOXMLDECL);
+
+    if ($data_sxml ) {
+        // loop all elements with an attribute
+        foreach ($data_sxml->xpath('descendant::*[@*]') as $tag) {
+            // loop attributes
+            foreach ($tag->attributes() as $name=>$value) {
+                // check for allowable attributes
+                if (!in_array($name, $allowable_attrs)) {
+                    // set attribute value to empty string
+                    $tag->attributes()->$name = '';
+                    // collect attribute patterns to be stripped
+                    $strip_arr[$name] = '/ '. $name .'=""/';
+                }
+            }
+        }
+    }
+
+    // strip unallowed attributes and root tag
+    return strip_tags(preg_replace($strip_arr,array(''),$data_sxml->asXML()), $allowable_tags);
+
+}
 function currentURL(): string
 {
     $ret = $_SERVER["SCRIPT_NAME"];
