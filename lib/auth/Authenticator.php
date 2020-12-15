@@ -303,21 +303,22 @@ abstract class Authenticator
     public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK = TRUE)
     {
         debug("AuthorizeContext using contextName: $contextName");
-        //
-        //        if ($adminOK) {
-        //            debug("Trying AdminAuthenticator first");
-        //
-        //            include_once("auth/AdminAuthenticator.php");
-        //            $auth_admin = new AdminAuthenticator();
-        //            $context = $auth_admin->authorize();
-        //            if ($auth_admin->authorize()) {
-        //                debug("AdminAuthenticator authorization success");
-        //                return;
-        //            }
-        //            else {
-        //                debug("AdminAuthenticator authorization failed");
-        //            }
-        //        }
+
+                //administrator access
+                if ($adminOK) {
+                    debug("Trying AdminAuthenticator first");
+
+                    include_once("auth/AdminAuthenticator.php");
+                    $auth_admin = new AdminAuthenticator();
+                    $context = $auth_admin->authorize();
+                    if ($auth_admin->authorize()) {
+                        debug("AdminAuthenticator authorization success");
+                        return $context;
+                    }
+                    else {
+                        debug("AdminAuthenticator authorization failed");
+                    }
+                }
 
         $auth_class = "auth/$contextName.php";
         @include_once($auth_class);
