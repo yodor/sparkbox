@@ -90,8 +90,11 @@ $defines->set("IMAGE_UPLOAD_DOWNSCALE", TRUE);
 //IMAGE_UPLOAD_UPSCALE = false | uploaded images are not upscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 $defines->set("IMAGE_UPLOAD_UPSCALE", FALSE);
 
+//generic contact name and email
 $defines->set("DEFAULT_EMAIL_NAME", $site_domain . " Administration");
 $defines->set("DEFAULT_EMAIL_ADDRESS", "info@" . $site_domain);
+
+//dafult name and email for the Mailer class
 $defines->set("DEFAULT_SERVICE_NAME", $site_domain . " Administration");
 $defines->set("DEFAULT_SERVICE_EMAIL", "info@" . $site_domain);
 
@@ -104,6 +107,7 @@ $defines->set("DEFAULT_LANGUAGE_ISO3", "eng");
 $defines->set("DEFAULT_CURRENCY", "EUR");
 
 //fetch local deployment configuration
+//can override stuff in defines
 include_once("config/defaults.php");
 
 $site_title = $defines->get("SITE_TITLE");
@@ -151,6 +155,7 @@ else {
 
 // $constants = get_defined_constants(true);
 // debug("Exported Globals: ",$constants["user"]);
+//global site wide function
 @include_once("config/globals.php");
 
 ?>
