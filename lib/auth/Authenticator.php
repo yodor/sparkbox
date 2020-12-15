@@ -189,7 +189,7 @@ abstract class Authenticator
 
             $this->createAuthToken($userID);
 
-            $this->updateLastSeen($userID);
+            $this->updateLastSeen($userID, $db);
 
         }
         catch (Exception $e) {
@@ -198,16 +198,17 @@ abstract class Authenticator
         }
     }
 
-    protected function updateLastSeen(int $userID)
+    protected function updateLastSeen(int $userID, DBDriver $db)
     {
 
         $update = new SQLUpdate($this->bean->select());
         $update->set("counter", "counter+1");
         $update->set("last_active", "CURRENT_TIMESTAMP");
         $update->where()->add($this->bean->key(), $userID);
-        $this->bean->getDB()->query($update->getSQL());
 
-
+        $db->transaction();
+        $db->query($update->getSQL());
+        $db->commit();
     }
 
     /**
