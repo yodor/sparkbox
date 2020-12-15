@@ -57,7 +57,10 @@ class MySQLiDriver extends DBDriver
 
     public function shutdown()
     {
-        if ($this->conn) $this->conn->close();
+        if ($this->conn) {
+            $this->conn->close();
+            $this->conn = null;
+        }
 
     }
 
