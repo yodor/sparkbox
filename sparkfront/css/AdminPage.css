@@ -143,6 +143,7 @@ BODY {
     display: inline-block;
     margin-right: 10px;
     height: 30px;
+    vertical-align: top;
 }
 
 .admin_layout .page_area .page_caption .page_actions .Action {
@@ -153,6 +154,7 @@ BODY {
     margin-bottom: -7px;
     margin-left: 2px;
     margin-right: 3px;
+    vertical-align: top;
 }
 
 .admin_layout .page_area .page_caption .page_actions .Action[action]:not([action='']) {
@@ -163,6 +165,10 @@ BODY {
 
 .admin_layout .page_area .page_caption .page_actions .Action[action='Add'] {
     background-image: url("../images/page_actions/green_plus.png");
+}
+
+.admin_layout .page_area .page_caption .page_actions .Action[action='Multi-Add'] {
+    background-image: url("../images/page_actions/green_multi_plus.png");
 }
 
 .admin_layout .page_area .page_caption .page_actions .Action[action='Back'] {
