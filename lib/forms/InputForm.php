@@ -378,6 +378,19 @@ class InputForm implements IBeanEditor
 
     }
 
+    public function renderPlain()
+    {
+        echo "<div class='FormValueList' name='".$this->getName()."'>";
+
+        foreach ($this->getInputs() as $index => $field) {
+            echo "<div class='item'>";
+            echo "<label>" . tr($field->getLabel()) . ": </label>";
+            echo "<span>" . strip_tags(stripslashes($field->getValue())) . "</span>";
+            echo "</div>";
+        }
+
+        echo "</div>";
+    }
 }
 
 ?>
