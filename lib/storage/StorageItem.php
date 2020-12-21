@@ -6,12 +6,24 @@ class StorageItem
     public $id = -1;
     public $className = "";
     public $field = "";
+    public $storageURL = "";
 
     public function __construct(int $id = -1, string $className = "", string $field = "")
     {
         $this->id = $id;
         $this->className = $className;
         $this->field = $field;
+        $this->storageURL = STORAGE_LOCAL;
+    }
+
+    public function enableExternalURL(bool $mode)
+    {
+        if ($mode) {
+            $this->storageURL = STORAGE_EXTERNAL;
+        }
+        else {
+            $this->storageURL = STORAGE_LOCAL;
+        }
     }
 
     public function hrefImage(int $width = -1, int $height = -1)
@@ -28,22 +40,22 @@ class StorageItem
 
     public function hrefFull()
     {
-        return STORAGE_LOCAL . "?cmd=image&" . $this->getParameters();
+        return $this->storageURL . "?cmd=image&" . $this->getParameters();
     }
 
     public function hrefCrop($width, $height)
     {
-        return STORAGE_LOCAL . "?cmd=image&" . $this->getParameters() . "&width=$width&height=$height";
+        return $this->storageURL . "?cmd=image&" . $this->getParameters() . "&width=$width&height=$height";
     }
 
     public function hrefThumb($width)
     {
-        return STORAGE_LOCAL . "?cmd=image&" . $this->getParameters() . "&size=$width";
+        return $this->storageURL . "?cmd=image&" . $this->getParameters() . "&size=$width";
     }
 
     public function hrefFile()
     {
-        return STORAGE_LOCAL . "?cmd=data&" . $this->getParameters();
+        return $this->storageURL . "?cmd=data&" . $this->getParameters();
     }
 
     public function getParameters()

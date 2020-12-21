@@ -41,6 +41,11 @@ class ImagePopup extends Component implements IPhotoRenderer
         $this->storageItem = $storageItem;
     }
 
+    public function getStorageItem() : StorageItem
+    {
+        return $this->storageItem;
+    }
+
     public function setRenderMode(int $mode)
     {
         $this->mode = $mode;
