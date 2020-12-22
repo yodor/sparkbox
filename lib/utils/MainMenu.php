@@ -344,8 +344,15 @@ class MainMenu
      * Constructs a selection path array containing MenuItems - from top parent MenuItem to selected MenuItem
      * @throws Exception
      */
-    public function selectActive()
+    const MATCH_FULL = 0;
+    const MATCH_PARTIAL = 1;
+    const MATCH_SCRIPT = 2;
+    const MATCH_PATH = 3;
+
+    public function selectActive($mode_mask = array(MainMenu::MATCH_FULL,MainMenu::MATCH_PARTIAL,MainMenu::MATCH_SCRIPT,MainMenu::MATCH_PATH))
     {
+
+
         $this->selected_path = array();
 
         $items = array();
@@ -358,6 +365,8 @@ class MainMenu
 
         debug("Current URL: " . $pageURL->url());
 
+        $match_code = array();
+
         $match_full = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
             $match = (strcmp($itemURL->url(), $pageURL->url()) == 0);
             if ($match) {
@@ -365,6 +374,7 @@ class MainMenu
             }
             return $match;
         };
+        $match_code[MainMenu::MATCH_FULL] = $match_full;
 
         $match_partial = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
             $match = (startsWith($pageURL->url(), $itemURL->url()));
@@ -373,6 +383,7 @@ class MainMenu
             }
             return $match;
         };
+        $match_code[MainMenu::MATCH_PARTIAL] = $match_partial;
 
         $match_script = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
             $match = (strcmp($itemURL->getScriptName(), $pageURL->getScriptName()) == 0);
@@ -381,6 +392,7 @@ class MainMenu
             }
             return $match;
         };
+        $match_code[MainMenu::MATCH_SCRIPT] = $match_script;
 
         $match_path = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
             $match = (strcmp($itemURL->getScriptPath(), $pageURL->getScriptPath()) == 0);
@@ -389,19 +401,16 @@ class MainMenu
             }
             return $match;
         };
+        $match_code[MainMenu::MATCH_PATH] = $match_path;
 
-        $this->selected_item = $this->matchItems($items, $match_full);
+        foreach ($mode_mask as $pos=>$mode) {
+            $code = $match_code[$pos];
 
-        if (!$this->selected_item) {
-            $this->selected_item = $this->matchItems($items, $match_partial);
-        }
+            $this->selected_item = $this->matchItems($items, $code);
 
-        if (!$this->selected_item) {
-            $this->selected_item = $this->matchItems($items, $match_script);
-        }
-
-        if (!$this->selected_item) {
-            $this->selected_item = $this->matchItems($items, $match_path);
+            if ($this->selected_item) {
+                break;
+            }
         }
 
         $this->constructSelectedPath();
