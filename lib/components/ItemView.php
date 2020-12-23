@@ -60,11 +60,6 @@ class ItemView extends AbstractResultView
         }
     }
 
-    public function getIterator(): IDataIterator
-    {
-        return $this->iterator;
-    }
-
 }
 
 ?>
