@@ -2,7 +2,7 @@
 
 /**
  * Interface IRequestProcessor
- * Object that handle Request/Get/Post
+ * Implemented from objects that handle Request/Get/Post variables
  */
 interface IRequestProcessor
 {
