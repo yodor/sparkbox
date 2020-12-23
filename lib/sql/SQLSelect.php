@@ -145,6 +145,20 @@ class SQLSelect extends SQLStatement
         return $csql;
     }
 
+    /**
+     * Return new SQLSelect selecting this SQLSelect as a derived table
+     * @param string $as_name
+     * @return SQLSelect
+     * @throws Exception
+     */
+    public function getAsDerived(string $as_name="relation") : SQLSelect
+    {
+        $sel = new SQLSelect();
+
+        $sel->from = " (".$this->getSQL(false, false).") AS $as_name ";
+
+        return $sel;
+    }
 }
 
 ?>
