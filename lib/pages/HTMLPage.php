@@ -54,8 +54,6 @@ abstract class HTMLPage extends Container
 
         echo "<TITLE>%title%</TITLE>\n";
 
-        $href = SITE_URL;
-        echo "<base href='$href' target='_self'>";
 
         $this->renderMetaTags();
         echo "\n";
