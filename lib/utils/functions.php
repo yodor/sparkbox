@@ -1,4 +1,11 @@
 <?php
+function prepareMeta(string $value)
+{
+    $value = strip_tags($value);
+    $value = str_replace("\\r\\n", " ", $value);
+    return preg_replace("/[^A-Za-z0-9\-\%\?\!\;\:\.\, ]/", "",$value);
+}
+
 function stripAttributes(string $data_str, string $allowable_tags = "<center><p><span><div><br>", array $allowable_attrs = array('href','src','alt','title')) : string
 {
     // define allowable tags

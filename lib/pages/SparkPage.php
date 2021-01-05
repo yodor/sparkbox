@@ -346,8 +346,8 @@ class SparkPage extends HTMLPage implements IActionCollection
             $meta_description = $this->description;
         }
 
-        $replace = array("%title%"            => strip_tags($title), "%meta_keywords%" => strip_tags($meta_keywords),
-                         "%meta_description%" => strip_tags($meta_description));
+        $replace = array("%title%"            => strip_tags($title), "%meta_keywords%" => prepareMeta($meta_keywords),
+                         "%meta_description%" => prepareMeta($meta_description));
 
         $buffer = strtr($buffer, $replace);
 
