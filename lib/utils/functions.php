@@ -1,4 +1,25 @@
 <?php
+
+//extract src attribute value from google maps embed HTML
+function googleMapURL($iframe_html)
+{
+    $data_sxml = simplexml_load_string('<root>'. $iframe_html .'</root>', 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOXMLDECL);
+
+    if ($data_sxml ) {
+        // loop all elements with an attribute
+        foreach ($data_sxml->xpath('descendant::*[@*]') as $tag) {
+            // loop attributes
+            foreach ($tag->attributes() as $name=>$value) {
+                if (strcmp($name, "src")===0) {
+                    return $value;
+                }
+            }
+        }
+    }
+
+    return $iframe_html;
+}
+
 function prepareMeta(string $value)
 {
     $value = strip_tags($value);
