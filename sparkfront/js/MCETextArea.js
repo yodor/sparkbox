@@ -56,6 +56,8 @@ class MCETextArea extends Component {
             toolbar2: 'link unlink anchor | image media code | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser |',
             plugins: 'code link image lists charmap anchor insertdatetime media paste code',
 
+            invalid_elements: 'iframe,object,embed',
+
             resize: 'both',
 
             branding: false,
