@@ -73,7 +73,6 @@ class TableCellRenderer extends Component implements IDataResultProcessor
         $this->field = $tc->getFieldName();
 
         $this->setAttribute("column", $this->field);
-        $this->setAttribute("title", $tc->getLabel());
     }
 
     public function setData(array &$data)
