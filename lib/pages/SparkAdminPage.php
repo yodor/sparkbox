@@ -106,6 +106,7 @@ class SparkAdminPage extends SparkPage
         if ($back_action instanceof Action) {
             $back_action->setContents("");
             $back_action->setAttribute("action", SparkAdminPage::ACTION_BACK);
+            $back_action->setTooltipText("Go back");
             $back_action->render();
         }
 
@@ -182,7 +183,7 @@ class SparkAdminPage extends SparkPage
 
         $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());
 
-        echo "\n<!-- startRender AdminPageLib -->\n";
+        echo "\n<!-- startRender SparkAdminPage -->\n";
 
         echo "<table class='admin_layout'>";
 
@@ -242,7 +243,7 @@ class SparkAdminPage extends SparkPage
         echo "</td></tr>";
         echo "</table>";
 
-        echo "\n<!-- finishRender AdminPageLib -->\n";
+        echo "\n<!-- finishRender SparkAdminPage -->\n";
 
         parent::finishRender();
     }
