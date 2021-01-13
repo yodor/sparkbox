@@ -23,7 +23,9 @@ class MenuItem
 
     public static $icon_path = SPARK_LOCAL . "/images/admin/spark_icons/";
 
-    public function __construct(string $title, string $href = "", string $icon = "")
+    protected $tooltip = "";
+
+    public function __construct(string $title, string $href = "", string $icon = "", string $tooltip="")
     {
         $this->title = $title;
         $this->href = $href;
@@ -34,8 +36,20 @@ class MenuItem
         $this->selected = false;
         $this->disabled = false;
         $this->parent_item = NULL;
+        $this->tooltip = $tooltip;
 
     }
+
+    public function getTooltip() : string
+    {
+        return $this->tooltip;
+    }
+
+    public function setTooltip(string $text)
+    {
+        $this->tooltip = $text;
+    }
+
     //flag for renderers to handle the title translation themselves - enableTranslation(true) - default - uses tr($title)
     //enableTranslation(false) -  title is already translated translation in MainMenu::constructMenuItems 
     public function enableTranslation(bool $mode)

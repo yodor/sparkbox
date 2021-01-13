@@ -45,13 +45,12 @@ function processTooltipContent(elm) {
             str = "Error: " + str;
         }
 
-        if (!trig.hasClass("MCETextArea")) {
-            var fields = $(this).children().last();
-            if (fields.get(0)) trig = fields;
+        if (trig.hasClass("MCETextArea")) {
+            var fields = trig.children().last();
+            if (fields.get(0)) trig = $(fields);
         }
 
-
-        $(trig).hover(
+        trig.hover(
             function (event) {
                 showTooltip(str, event);
             },

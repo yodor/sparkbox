@@ -33,63 +33,28 @@ class MenuBarItemRenderer extends MenuItemRenderer
         $submenu = $item->getSubmenu();
 
         if (is_array($submenu) && count($submenu) > 0) {
-            $this->attributes["have_submenu"] = "1";
+            $this->setAttribute("have_submenu", "1");
         }
         else {
-            if (isset($this->attributes["have_submenu"])) unset($this->attributes["have_submenu"]);
+            $this->clearAttribute("have_submenu");
         }
 
         if ($item->isSelected()) {
-            $this->attributes["active"] = 1;
+            $this->setAttribute("active", "1");
         }
         else {
-            if (isset($this->attributes["active"])) unset($this->attributes["active"]);
+            $this->clearAttribute("active");
         }
-    }
 
-//    public function startRender()
-//    {
-//        $attrs = $this->prepareAttributes();
-//        echo "<div $attrs>";
-//    }
-//
-//    public function finishRender()
-//    {
-//        echo "</div>";
-//    }
+    }
 
     protected function renderImpl()
     {
 
-        //
-
-        $href = $this->item->getHref();
-        $title = $this->item->getTitle();
-
-        $target = "";
-
-        if (strlen($this->item->getTarget()) > 0) {
-            $target = "target=\"" . $this->item->getTarget() . "\"";
-
-        }
-
         echo "<div class='MenuItemOuter'>";
-        echo "\n<a class='MenuItemLink' href='$href'  $target>";
 
-        if ($this->getMenuItem()->getIcon()) {
-            $this->renderIcon();
-        }
+        $this->linkTag->render();
 
-        if ($this->getMenuItem()->needTranslate()) {
-            $title = tr($title);
-        }
-        echo $title;
-
-        echo "</a>";
-
-        if (count($this->item->getSubmenu()) > 0) {
-            echo "<div class='handle'></div>";
-        }
         echo "</div>";
 
         if (count($this->item->getSubmenu()) > 0) {
