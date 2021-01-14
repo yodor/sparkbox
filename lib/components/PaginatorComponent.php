@@ -125,10 +125,9 @@ abstract class PaginatorComponent extends Component
         echo "</div>";
 
         ?>
-        <script language=javascript>
+        <script type='text/javascript'>
             function changeSort(sel) {
                 var href = sel.options[sel.options.selectedIndex].value;
-// alert(href);
                 window.location.href = href;
             }
         </script>
@@ -173,8 +172,7 @@ abstract class PaginatorComponent extends Component
         }
 
         if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
-            // 		if ($this->paginator->haveNextPage())
-            // 		{
+
             $qry["page"] = ($this->paginator->getCurrentPage() + 1);
             $q = queryString($qry);
             echo "<a  href='$q' title='".tr("Next")."'> > </a>";
