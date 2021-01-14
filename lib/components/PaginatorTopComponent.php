@@ -46,8 +46,10 @@ class PaginatorTopComponent extends PaginatorComponent
         echo "&nbsp;";
         echo $this->paginator->getPagesTotal();
 
+        echo "<span class='nav_buttons'>";
         $this->drawPrevButton();
         $this->drawNextButton();
+        echo "</span>";
 
         echo "</div>";
 
