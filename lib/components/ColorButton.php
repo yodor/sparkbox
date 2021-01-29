@@ -74,6 +74,7 @@ class ColorButton extends Component
     public function setValue(string $value)
     {
         $this->setAttribute("value", $value);
+        $this->setAttribute("aria-label", $value);
     }
 
     public function getValue(): string
