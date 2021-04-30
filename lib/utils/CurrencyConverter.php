@@ -160,7 +160,12 @@ class CurrencyConverter
     {
         $front_symbol = $this->symbol;
         $back_symbol = $this->symbol;
-        if ((int)$this->symbol_back>0) $front_symbol = "";
+        if ((int)$this->symbol_back>0) {
+            $front_symbol = "";
+        }
+        else {
+            $back_symbol = "";
+        }
 
         return $front_symbol . " " . sprintf("%0.2f",$converted_price) . " " . $back_symbol;
     }
