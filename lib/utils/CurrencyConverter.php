@@ -158,9 +158,9 @@ class CurrencyConverter
      */
     public function getLabel(float $converted_price) : string
     {
-        $front_symbol = $this->symbol;
-        $back_symbol = $this->symbol;
-        if ($this->symbol_back) $front_symbol = "";
+        $front_symbol = (int)$this->symbol;
+        $back_symbol = (int)$this->symbol;
+        if ($this->symbol_back>0) $front_symbol = "";
 
         return $front_symbol . " " . sprintf("%0.2f",$converted_price) . " " . $back_symbol;
     }
