@@ -94,7 +94,7 @@ class CurrencyConverter
         $this->dstID = (int)$data["currencyID"];
         $this->rate = $rate;
         $this->symbol = $data["symbol"];
-        $this->symbol_back = $data["symbol_back"];
+        $this->symbol_back = (int)$data["symbol_back"];
         $this->code = $data["currency_code"];
     }
 
@@ -158,9 +158,9 @@ class CurrencyConverter
      */
     public function getLabel(float $converted_price) : string
     {
-        $front_symbol = (int)$this->symbol;
-        $back_symbol = (int)$this->symbol;
-        if ($this->symbol_back>0) $front_symbol = "";
+        $front_symbol = $this->symbol;
+        $back_symbol = $this->symbol;
+        if ((int)$this->symbol_back>0) $front_symbol = "";
 
         return $front_symbol . " " . sprintf("%0.2f",$converted_price) . " " . $back_symbol;
     }
