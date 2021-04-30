@@ -94,7 +94,7 @@ class CurrencyConverter
         $this->dstID = (int)$data["currencyID"];
         $this->rate = $rate;
         $this->symbol = $data["symbol"];
-        $this->symbol_back = (int)$data["symbol_back"];
+        $this->symbol_back = $data["symbol_back"];
         $this->code = $data["currency_code"];
     }
 
@@ -160,7 +160,7 @@ class CurrencyConverter
     {
         $front_symbol = $this->symbol;
         $back_symbol = $this->symbol;
-        if ((int)$this->symbol_back>0) {
+        if ($this->isSymbolBack()) {
             $front_symbol = "";
         }
         else {
