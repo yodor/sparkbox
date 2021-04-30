@@ -138,7 +138,7 @@ class CurrencyConverter
 
     public function isSymbolBack(): bool
     {
-        return $this->symbol_back;
+        return (bool)$this->symbol_back;
     }
 
     /**
