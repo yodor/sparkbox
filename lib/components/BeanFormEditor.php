@@ -56,6 +56,12 @@ class BeanFormEditor extends Container implements IBeanEditor
     protected $redirect_url;
 
     /**
+     * Enable/Disable redirect logic during processInput
+     * @var boolean
+     */
+    protected $redirect_enabled;
+
+    /**
      * @var BeanTranslationDialog
      */
     protected $bean_translator;
@@ -64,6 +70,8 @@ class BeanFormEditor extends Container implements IBeanEditor
     {
 
         parent::__construct();
+
+        $this->redirect_enabled = true;
 
         $this->setMessage("Information was updated", BeanFormEditor::MESSAGE_UPDATE);
         $this->setMessage("Information was added", BeanFormEditor::MESSAGE_ADD);
@@ -103,6 +111,16 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->append($this->form_render);
 
+    }
+
+    public function setRedirectEnabled(bool $mode)
+    {
+        $this->redirect_enabled = $mode;
+    }
+
+    public function isRedirectEnabled() : bool
+    {
+        return $this->redirect_enabled;
     }
 
     public function setRedirectURL(URLBuilder $url)
@@ -244,11 +262,18 @@ class BeanFormEditor extends Container implements IBeanEditor
                     }
                 }
 
-                if ($redirectURL instanceof URLBuilder) {
-                    debug("Using redirectURL: ".$redirectURL->url());
-                    header("Location: " . $redirectURL->url());
-                    exit;
+                if ($this->redirect_enabled) {
+                    debug("Redirect logic enabled");
+                    if ($redirectURL instanceof URLBuilder) {
+                        debug("Using redirectURL: ".$redirectURL->url());
+                        header("Location: " . $redirectURL->url());
+                        exit;
+                    }
                 }
+                else {
+                    debug("Redirect logic disabled");
+                }
+
 
             }
             else if ($process_status === IFormProcessor::STATUS_ERROR) {

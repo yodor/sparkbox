@@ -26,7 +26,7 @@ class CaptchaInputField extends InputField
             $options["show_audio_button"] = FALSE;
             $options["captcha_type"] = Securimage::SI_CAPTCHA_MATHEMATIC;
 
-            $options['securimage_path'] = "/securimage/";
+            $options['securimage_path'] = LOCAL."/securimage/";
 
             $this->options = $options;
         }
