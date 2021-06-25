@@ -140,7 +140,7 @@ class SparkPage extends HTMLPage implements IActionCollection
             echo "<meta property='og:$tag_name' content='" . attributeValue($tag_content) . "' />\n";
         }
 
-        echo "<link rel='shortcut icon' href='//" . SITE_DOMAIN . "/favicon.ico'>";
+        echo "<link rel='shortcut icon' href='//" . SITE_DOMAIN . LOCAL."/favicon.ico'>";
         echo "\n";
     }
 
