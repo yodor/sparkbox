@@ -440,7 +440,9 @@ class MainMenu
                 $item_href .= "index.php";
             }
 
-            $itemURL->buildFrom($item_href);
+            debug("URLBuilder from MenuItem href: ".$item_href);
+
+            $itemURL->buildFrom(urldecode($item_href));
 
             $is_match = $matcher($item, $itemURL);
 
