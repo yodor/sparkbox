@@ -420,8 +420,11 @@ abstract class DBTableBean
         $code = function (DBDriver $db) use ($id) {
 
             debug("Going to delete ID: $id");
+            //TODO: select with joins clause needs table specification before the FROM statement in the DELETE statement
+            $select = new SQLSelect();
+            $select->from = $this->table;
 
-            $delete = new SQLDelete($this->select);
+            $delete = new SQLDelete($select);
             $delete->where()->add($this->prkey, $id);
             $sql = $delete->getSQL();
 
