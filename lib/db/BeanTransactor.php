@@ -207,7 +207,7 @@ class BeanTransactor implements IBeanEditor
             $this->beforeCommit($db);
 
             if (is_callable("DBTransactor_onBeforeCommit")) {
-                call_user_func("DBTransactor_onBeforeCommit", $this->bean, $db, $this->lastID, $this->values);
+                call_user_func("DBTransactor_onBeforeCommit", $this, $db);
             }
 
             $db->commit();
@@ -218,7 +218,7 @@ class BeanTransactor implements IBeanEditor
                 $this->afterCommit();
 
                 if (is_callable("DBTransactor_onAfterCommit")) {
-                    call_user_func("DBTransactor_onAfterCommit", $this->bean, $db, $this->lastID, $this->values);
+                    call_user_func("DBTransactor_onAfterCommit", $this, $db);
                 }
             }
             catch (Exception $exx) {
