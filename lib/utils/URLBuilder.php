@@ -20,6 +20,7 @@ class URLBuilder
     protected $resource = "";
 
     protected $clear_page_param = FALSE;
+    protected $clear_params = array();
 
     //protected $keep_request_params = TRUE;
 
@@ -58,6 +59,10 @@ class URLBuilder
     public function setClearPageParams(bool $mode)
     {
         $this->clear_page_param = $mode;
+    }
+    public function setClearParams(string ...$params)
+    {
+        $this->clear_params = $params;
     }
 
     //    /**
@@ -173,6 +178,13 @@ class URLBuilder
         }
 
         if (count($this->parameters) > 0) {
+
+
+            foreach ($this->clear_params as $val) {
+                if (array_key_exists($val, $this->parameters)) {
+                    unset($this->parameters[$val]);
+                }
+            }
 
             $names = array_keys($this->parameters);
 
