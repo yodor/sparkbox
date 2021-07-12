@@ -77,7 +77,7 @@ class ImagePopup {
 
         this.relation = itemClass;
 
-        let collection_selector = "A.ImagePopup[itemClass='" + itemClass + "']";
+        let collection_selector = ".ImagePopup[itemClass='" + itemClass + "']";
 
         let relation = aelm.attr("relation");
         if (relation) {
@@ -85,9 +85,30 @@ class ImagePopup {
             this.relation = relation;
         }
 
-        this.collection = $(collection_selector);
+        this.collection = $(collection_selector).toArray();
 
-        this.pos = this.collection.index(aelm);
+        //remove duplicates
+        let reduced = this.collection.reduce(function (item, e1) {
+            var matches = item.filter(function (e2)
+            { return $(e1).attr("itemid") == $(e2).attr("itemid")});
+            if (matches.length == 0) {
+                item.push(e1);
+            }
+            return item;
+        }, []);
+
+        this.collection = reduced;
+
+        this.pos = 0;
+
+        for (var a=0;a<this.collection.length;a++) {
+            let item = this.collection[a];
+            if ($(item).attr("itemid") == aelm.attr("itemid")) {
+                this.pos = a;
+                break;
+            }
+        }
+
 
         this.modal_pane.showContent($(this.createPopupContents()));
 
@@ -148,7 +169,7 @@ class ImagePopup {
     fetchImage() {
 
 
-        let aelm = this.collection.slice(this.pos, this.pos + 1);
+        let aelm = $(this.collection.slice(this.pos, this.pos + 1));
 
         if (!aelm) {
             console.log("Requested position: " + this.pos + " out of bounds for this image collection.");
