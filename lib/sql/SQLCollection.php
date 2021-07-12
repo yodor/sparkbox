@@ -42,6 +42,19 @@ abstract class SQLCollection
         $this->fields[trim($name)] = trim($value);
     }
 
+    /**
+     * remvove from the collection all items having value=$remove_value
+     * @param string $remove_value
+     */
+    public function removeValue(string $remove_value)
+    {
+        foreach ($this->fields as $name => $value) {
+            if (strcmp($value, $remove_value)==0) {
+                $this->unset($name);
+            }
+        }
+    }
+
     public function value(string $name): string
     {
         return $this->fields[$name];
