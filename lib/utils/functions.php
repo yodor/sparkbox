@@ -27,7 +27,7 @@ function prepareMeta(string $value)
     return preg_replace("/[^\wA-Za-z0-9\-\%\?\!\;\:\.\, ]/u", "",$value);
 }
 
-function stripAttributes(string $data_str, string $allowable_tags = "<center><p><span><div><br>", array $allowable_attrs = array('href','src','alt','title')) : string
+function stripAttributes(string $data_str, string $allowable_tags = "<center><p><span><div><br><a>", array $allowable_attrs = array('href','src','alt','title')) : string
 {
     // define allowable tags
     // define allowable attributes
@@ -38,7 +38,7 @@ function stripAttributes(string $data_str, string $allowable_tags = "<center><p>
     // load XHTML with SimpleXML
     $data_sxml = simplexml_load_string('<root>'. $data_str .'</root>', 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOXMLDECL);
 
-    if ($data_sxml ) {
+    if ($data_sxml instanceof SimpleXMLElement) {
         // loop all elements with an attribute
         foreach ($data_sxml->xpath('descendant::*[@*]') as $tag) {
             // loop attributes
@@ -52,10 +52,13 @@ function stripAttributes(string $data_str, string $allowable_tags = "<center><p>
                 }
             }
         }
-    }
 
-    // strip unallowed attributes and root tag
-    return strip_tags(preg_replace($strip_arr,array(''),$data_sxml->asXML()), $allowable_tags);
+        // strip unallowed attributes and root tag
+        return strip_tags(preg_replace($strip_arr,array(''),$data_sxml->asXML()), $allowable_tags);
+    }
+    else {
+        return $data_str;
+    }
 
 }
 function currentURL(): string
