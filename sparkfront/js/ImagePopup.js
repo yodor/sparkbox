@@ -330,7 +330,7 @@ class ImagePopup {
                     mY = $(viewport).height();
                 }
 
-                console.log("mX="+mX+" mY="+mY);
+                //console.log("mX="+mX+" mY="+mY);
 
                 let bX = $(viewport).data("bX");
                 let bY = $(viewport).data("bY");
