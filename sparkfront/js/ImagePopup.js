@@ -311,9 +311,9 @@ class ImagePopup {
 
                 if ($(viewport).data("down") != 1) return false;
 
-                var mX = event.pageX;
-                if (event.pageX == null) {
-                    mX = event.touches[0].pageX;
+                var mX = event.clientX;
+                if (event.clientX == null) {
+                    mX = event.touches[0].clientX;
                 }
                 if (mX<0)mX=0;
 
@@ -321,16 +321,16 @@ class ImagePopup {
                     mX = $(viewport).width();
                 }
 
-                var mY = event.pageY;
-                if (event.pageY == null) {
-                    mY = event.touches[0].pageY;
+                var mY = event.clientY;
+                if (event.clientY == null) {
+                    mY = event.touches[0].clientY;
                 }
                 if (mY<0)mY=0;
                 if (mY>$(viewport).height()) {
                     mY = $(viewport).height();
                 }
 
-                //console.log("mX="+mX+" mY="+mY);
+                console.log("mX="+mX+" mY="+mY);
 
                 let bX = $(viewport).data("bX");
                 let bY = $(viewport).data("bY");
