@@ -289,16 +289,16 @@ class ImagePopup {
             $(viewport).css("background-position", bX+"px "+ bY + "px");
 
             $(viewport).on("touchstart mousedown", function(event){
-                event.stopPropagation();
-                event.preventDefault();
+                //event.stopPropagation();
+                //event.preventDefault();
 
                 $(viewport).data("down", 1);
                 //console.log("Touch start");
             }.bind(viewport));
 
             $(viewport).on("touchend mouseup", function(event){
-                event.stopPropagation();
-                event.preventDefault();
+                //event.stopPropagation();
+                //event.preventDefault();
 
                 $(viewport).data("down", 0);
                 //console.log("Touch end");
