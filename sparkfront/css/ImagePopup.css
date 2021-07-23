@@ -130,9 +130,16 @@ A.ImagePopup {
 
     background-image: url("../images/close.png");
 
+    background-position:right 20px center !important;
+    width:50% !important;
+}
 
-    left:0;
-    background-position:left center;
+.ModalPane .ImagePopup .Button[action="ZoomImage"] {
+
+    background-image: url("../images/zoom.png");
+
+    background-position:left 20px center !important;
+    width:50% !important;
 }
 
 .ModalPane .cover-spin {

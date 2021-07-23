@@ -13,11 +13,17 @@ class ImagePopup {
     }
 
     onClickImage(event) {
+        let viewport = this.modal_pane.popup;
+        let zoom_enabled = $(viewport).attr("zoom-enabled");
+        if (zoom_enabled==1) return;
 
         this.remove();
     }
 
     onClickPane(event) {
+        let viewport = this.modal_pane.popup;
+        let zoom_enabled = $(viewport).attr("zoom-enabled");
+        if (zoom_enabled==1) return;
 
         this.remove();
 
@@ -112,15 +118,19 @@ class ImagePopup {
 
         this.modal_pane.showContent($(this.createPopupContents()));
 
-
         let buttonNext = this.modal_pane.popup.find("[action='NextImage']");
         buttonNext.on("click", this.nextImage.bind(this));
 
         let buttonPrev = this.modal_pane.popup.find("[action='PrevImage']");
         buttonPrev.on("click", this.prevImage.bind(this));
 
+        let buttonZoom = this.modal_pane.popup.find("[action='ZoomImage']");
+        buttonZoom.on("click", this.zoomImage.bind(this));
+
         let buttonClose = this.modal_pane.popup.find("[action='CloseImage']");
         buttonClose.on("click", this.remove.bind(this));
+
+        $("body").css("overflow", "hidden");
 
         this.showImage();
 
@@ -134,7 +144,7 @@ class ImagePopup {
         let html = "";
         html += "<div class='ImagePopup'>";
 
-        html += "<div class='Header'><div class='Contents'><a class='Button' action='CloseImage' default_action></a></div></div>";
+        html += "<div class='Header'><div class='Contents'><a class='Button' action='ZoomImage'></a><a class='Button' action='CloseImage' default_action></a></div></div>";
 
         html += "<div class='Base'>";
 
@@ -163,6 +173,8 @@ class ImagePopup {
     }
 
     remove() {
+        $("body").css("overflow", "");
+        this.disableZoom();
         this.modal_pane.close();
     }
 
@@ -196,10 +208,13 @@ class ImagePopup {
         let viewport = this.modal_pane.popup;
         let loader = this.modal_pane.popup.find(".Base .Contents");
 
+        $(viewport).data("imageURL", url.href);
+
         $(viewport).css("background-image", "url(" + url.href + ")");
         $(viewport).css("background-size", "contain");
 
         $(loader).removeClass("cover-spin");
+
 
         // $('<img/>').attr('src', href).load(function() {
         //
@@ -212,6 +227,119 @@ class ImagePopup {
         // })
     }
 
+    disableZoom() {
+        console.log("Disable zoom");
+        let viewport = this.modal_pane.popup;
+
+        $(viewport).css("background-position", "");
+        $(viewport).css("background-size", "contain");
+        $(viewport).attr("zoom-enabled", 0);
+
+        this.modal_pane.popup.find(".Button[action='PrevImage']").css("display","");
+        this.modal_pane.popup.find(".Button[action='NextImage']").css("display","");
+
+        $(viewport).off("touchstart mousedown");
+        $(viewport).off("touchend mouseup");
+        $(viewport).off("touchmove mousemove");
+    }
+
+    zoomImage(event) {
+
+        event.stopPropagation();
+
+        let viewport = this.modal_pane.popup;
+
+        let zoom_enabled = $(viewport).attr("zoom-enabled");
+
+        if (zoom_enabled==1) {
+
+            this.disableZoom();
+
+        }
+        else {
+            console.log("Enabling zoom");
+            $(viewport).css("background-size", "");
+            $(viewport).attr("zoom-enabled", 1);
+
+            this.modal_pane.popup.find(".Button[action='PrevImage']").css("display","none");
+            this.modal_pane.popup.find(".Button[action='NextImage']").css("display","none");
+
+            //center image inside the background area
+            let image = new Image();
+            image.src = $(viewport).data("imageURL");
+            //console.log("Image size ["+image.width + "," + image.height+"]");
+            //console.log("Viewport size ["+$(viewport).width() + "," + $(viewport).height()+"]");
+
+            $(viewport).data("imageWidth", image.width);
+            $(viewport).data("imageHeight", image.height);
+
+
+            let bX = ($(viewport).width() / 2.0) - (image.width / 2.0);
+            let bY = ($(viewport).height() / 2.0) - (image.height / 2.0);
+            $(viewport).data("bX", bX);
+            $(viewport).data("bY", bY);
+
+            $(viewport).css("background-position", bX+"px "+ bY + "px");
+
+            $(viewport).on("touchstart mousedown", function(event){
+                $(viewport).data("down", 1);
+                //console.log("Touch start");
+            }.bind(viewport));
+
+            $(viewport).on("touchend mouseup", function(event){
+                $(viewport).data("down", 0);
+                //console.log("Touch end");
+            }.bind(viewport));
+
+            $(viewport).on("touchmove mousemove", function(event){
+
+
+                if ($(viewport).data("down") != 1) return false;
+
+                var mX = event.pageX;
+                if (event.pageX == null) {
+                    mX = event.touches[0].pageX;
+                }
+                if (mX<0)mX=0;
+
+                if (mX>$(viewport).width()) {
+                    mX = $(viewport).width();
+                }
+
+                var mY = event.pageY;
+                if (event.pageY == null) {
+                    mY = event.touches[0].pageY;
+                }
+                if (mY<0)mY=0;
+                if (mY>$(viewport).height()) {
+                    mY = $(viewport).height();
+                }
+
+                //console.log("mX="+mX+" mY="+mY);
+
+                let bX = $(viewport).data("bX");
+                let bY = $(viewport).data("bY");
+
+                if ($(viewport).data("imageWidth")> $(viewport).width()) {
+                    let dX = ($(viewport).data("imageWidth") - $(viewport).width()) / $(viewport).width();
+                    bX = dX * mX * -1;
+                }
+
+                if ($(viewport).data("imageHeight")> $(viewport).height()) {
+                    let dY = ($(viewport).data("imageHeight") - $(viewport).height()) / $(viewport).height();
+                    bY = dY * mY * -1;
+                }
+
+                $(viewport).css("background-position", bX+"px "+ bY + "px");
+                return true;
+
+            }.bind(viewport));
+
+
+        }
+
+
+    }
     showImage() {
 
         let loader = this.modal_pane.popup.find(".Base .Contents");
