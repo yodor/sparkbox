@@ -130,7 +130,9 @@ class ImagePopup {
         let buttonClose = this.modal_pane.popup.find("[action='CloseImage']");
         buttonClose.on("click", this.remove.bind(this));
 
+        $("html").css("overflow", "hidden");
         $("body").css("overflow", "hidden");
+
 
         this.showImage();
 
@@ -173,9 +175,13 @@ class ImagePopup {
     }
 
     remove() {
+
+        $("html").css("overflow", "");
         $("body").css("overflow", "");
+
         this.disableZoom();
         this.modal_pane.close();
+
     }
 
     fetchImage() {
@@ -246,6 +252,7 @@ class ImagePopup {
     zoomImage(event) {
 
         event.stopPropagation();
+        event.preventDefault();
 
         let viewport = this.modal_pane.popup;
 
