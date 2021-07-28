@@ -280,7 +280,8 @@ class MainMenu
             //debug("MenuItem ID:$menuID using menu_link: " . $menu_link);
 
             $item = new MenuItem($data[$this->label_key], $menu_link);
-            //ID?
+            $item->setID($menuID);
+
             $item->enableTranslation(FALSE);
 
             if ($parentID == 0) {
