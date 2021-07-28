@@ -25,6 +25,8 @@ class MenuItem
 
     protected $tooltip = "";
 
+    protected $id = -1;
+
     public function __construct(string $title, string $href = "", string $icon = "", string $tooltip="")
     {
         $this->title = $title;
@@ -37,7 +39,17 @@ class MenuItem
         $this->disabled = false;
         $this->parent_item = NULL;
         $this->tooltip = $tooltip;
+        $this->id = -1;
+    }
 
+    public function setID(int $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getID(): int
+    {
+        return $this->id;
     }
 
     public function getTooltip() : string
