@@ -109,9 +109,15 @@ function file_size($size)
  * @param $needle
  * @return bool
  */
-function startsWith($haystack, $needle)
+function startsWith($haystack, $needle, bool $casecmp = true)
 {
-    return !strncmp($haystack, $needle, strlen($needle));
+    if (!$casecmp) {
+        return !strncmp($haystack, $needle, strlen($needle));
+    }
+    else {
+        return !strncasecmp($haystack, $needle, strlen($needle));
+    }
+
 }
 
 /**
