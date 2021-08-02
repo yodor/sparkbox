@@ -369,7 +369,7 @@ class MainMenu
         $match_code = array();
 
         $match_full = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
-            $match = (strcasecmp($itemURL->url(), $pageURL->url()) == 0);
+            $match = (strcmp(mb_strtolower($itemURL->url()), mb_strtolower($pageURL->url())) == 0);
             if ($match) {
                 debug("Match full URL: " . $itemURL->url() . " - matches");
             }
@@ -378,7 +378,7 @@ class MainMenu
         $match_code[MainMenu::MATCH_FULL] = $match_full;
 
         $match_partial = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
-            $match = (startsWith($pageURL->url(), $itemURL->url(), false));
+            $match = (startsWith(mb_strtolower($pageURL->url()), mb_strtolower($itemURL->url())));
             if ($match) {
                 debug("Match partial URL: " . $itemURL->url() . " - matches");
             }
@@ -387,7 +387,7 @@ class MainMenu
         $match_code[MainMenu::MATCH_PARTIAL] = $match_partial;
 
         $match_script = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
-            $match = (strcasecmp($itemURL->getScriptName(), $pageURL->getScriptName()) == 0);
+            $match = (strcmp(mb_strtolower($itemURL->getScriptName()), mb_strtolower($pageURL->getScriptName())) == 0);
             if ($match) {
                 debug("Match scriptName: " . $itemURL->getScriptName() . " - matches");
             }
@@ -396,7 +396,7 @@ class MainMenu
         $match_code[MainMenu::MATCH_SCRIPT] = $match_script;
 
         $match_path = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
-            $match = (strcasecmp($itemURL->getScriptPath(), $pageURL->getScriptPath()) == 0);
+            $match = (strcmp(mb_strtolower($itemURL->getScriptPath()), mb_strtolower($pageURL->getScriptPath())) == 0);
             if ($match) {
                 debug("Match scriptPath: " . $itemURL->getScriptPath() . " - matches");
             }
