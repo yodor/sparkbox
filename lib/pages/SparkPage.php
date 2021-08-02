@@ -225,7 +225,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->addMeta("keywords", "%meta_keywords%");
         $this->addMeta("description", "%meta_description%");
 
-        $this->addMeta("viewport", "width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0");
+        $this->addMeta("viewport", "width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes");
 
         $this->addCSS(SPARK_LOCAL . "/css/ModalPane.css");
         $this->addCSS(SPARK_LOCAL . "/css/ImagePopup.css");
