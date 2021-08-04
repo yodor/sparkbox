@@ -91,6 +91,9 @@ $defines->set("IMAGE_UPLOAD_DOWNSCALE", TRUE);
 //IMAGE_UPLOAD_UPSCALE = false | uploaded images are not upscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 $defines->set("IMAGE_UPLOAD_UPSCALE", FALSE);
 
+//force output to webp
+$defines->set("IMAGE_OUTPUT_WEBP_QUALITY", 50);
+
 //generic contact name and email
 $defines->set("DEFAULT_EMAIL_NAME", $site_domain . " Administration");
 $defines->set("DEFAULT_EMAIL_ADDRESS", "info@" . $site_domain);

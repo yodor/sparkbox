@@ -164,13 +164,7 @@ class ImageScaler
         }
 
         ob_start(NULL, 0);
-        if (strcmp($this->mime, ImageScaler::TYPE_PNG) == 0) {
-            imagesavealpha($h_source, TRUE);
-            imagepng($h_source);
-        }
-        else {
-            imagejpeg($h_source, NULL, 95);
-        }
+        imagewebp($h_source, NULL, IMAGE_OUTPUT_WEBP_QUALITY);
         $this->data = ob_get_contents();
         $this->dataSize = ob_get_length();
 
