@@ -34,6 +34,7 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
 
         //construct default empty action with no parameters
         $this->text_action = new Action("TextTreeItemAction");
+        $this->text_action->translation_enabled = FALSE;
 
         $this->actions = new ActionCollection();
 

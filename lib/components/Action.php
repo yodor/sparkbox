@@ -133,11 +133,12 @@ class Action extends DataIteratorItem
         $this->check_code = $check_code;
     }
 
-    public static function RenderActions(array $actions, bool $separator = FALSE)
+    public static function RenderActions(array $actions, bool $separator = FALSE, bool $translate = FALSE)
     {
         foreach ($actions as $idx => $item) {
             if ($item instanceof MenuItem) {
                 $action = new Action("", $item->getHref(), array());
+                $action->translation_enabled = $translate;
                 $action->setContents($item->getTitle());
                 $action->render();
             }
