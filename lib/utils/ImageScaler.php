@@ -9,7 +9,18 @@ class ImageScaler
 
     const TYPE_JPEG = "image/jpeg";
     const TYPE_PNG = "image/png";
+    const TYPE_WEBP = "image/webp";
 
+    protected $supported_mimes = array(ImageScaler::TYPE_JPEG, ImageScaler::TYPE_PNG, ImageScaler::TYPE_WEBP);
+
+    /**
+     * @var string Output image format
+     */
+    protected $output_format = ImageScaler::TYPE_WEBP;
+
+    /**
+     * @var string Input image mime type
+     */
     protected $mime = ImageScaler::TYPE_PNG;
 
     protected $mode = ImageScaler::MODE_FULL;
@@ -38,6 +49,25 @@ class ImageScaler
                 $this->mode = ImageScaler::MODE_THUMB;
             }
         }
+        $this->output_format = IMAGE_SCALER_OUTPUT_FORMAT;
+    }
+
+    /**
+     * @param string $mime Set the output format from mime type string
+     */
+    public function setOutputFormat(string $mime)
+    {
+        if (!in_array($mime, $this->supported_mimes)) throw new RuntimeException("Unsupported output format type");
+
+        $this->output_format = $mime;
+    }
+
+    /**
+     * @return string Return the output format mime type string
+     */
+    public function getOutputFormat() : string
+    {
+        return $this->output_format;
     }
 
     public function getMode(): int
@@ -164,7 +194,16 @@ class ImageScaler
         }
 
         ob_start(NULL, 0);
-        imagewebp($h_source, NULL, IMAGE_OUTPUT_WEBP_QUALITY);
+        if (strcmp($this->output_format, ImageScaler::TYPE_PNG) == 0) {
+            imagesavealpha($h_source, TRUE);
+            imagepng($h_source);
+        }
+        else if (strcmp($this->output_format, ImageScaler::TYPE_JPEG) == 0){
+            imagejpeg($h_source, NULL, IMAGE_SCALER_OUTPUT_QUALITY);
+        }
+        else {
+            imagewebp($h_source, NULL, IMAGE_SCALER_OUTPUT_QUALITY);
+        }
         $this->data = ob_get_contents();
         $this->dataSize = ob_get_length();
 

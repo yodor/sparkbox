@@ -42,6 +42,7 @@ class ImageDataResponse extends BeanDataResponse
         $this->etag_parts[] = $this->scaler->getWidth();
         $this->etag_parts[] = $this->scaler->getHeight();
         $this->etag_parts[] = $this->scaler->getMode();
+        $this->etag_parts[] = $this->scaler->getOutputFormat();
 
         $this->etag_parts[] = $this->scaler->grayFilter;
 
@@ -53,6 +54,12 @@ class ImageDataResponse extends BeanDataResponse
     {
         $this->scaler->process($this->row[$this->field], $this->row["size"], $this->row["mime"]);
         $this->setData($this->scaler->getData(), $this->scaler->getDataSize());
+    }
+
+    protected function fillHeaders()
+    {
+        parent::fillHeaders();
+        $this->setHeader("Content-Type", $this->scaler->getOutputFormat());
     }
 
 }

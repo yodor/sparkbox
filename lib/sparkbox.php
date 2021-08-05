@@ -92,7 +92,8 @@ $defines->set("IMAGE_UPLOAD_DOWNSCALE", TRUE);
 $defines->set("IMAGE_UPLOAD_UPSCALE", FALSE);
 
 //force output to webp
-$defines->set("IMAGE_OUTPUT_WEBP_QUALITY", 50);
+$defines->set("IMAGE_SCALER_OUTPUT_FORMAT", "image/webp");
+$defines->set("IMAGE_SCALER_OUTPUT_QUALITY", 60);
 
 //generic contact name and email
 $defines->set("DEFAULT_EMAIL_NAME", $site_domain . " Administration");

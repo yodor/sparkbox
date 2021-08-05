@@ -192,7 +192,7 @@ abstract class BeanDataResponse extends HTTPResponse
         $this->setHeader("Last-Modified", $last_modified);
 
         $mime = "application/octet-stream";
-        //TODO: use image scaler output mime type
+
         if (isset($this->row["mime"])) {
             $mime = $this->row["mime"];
         }
