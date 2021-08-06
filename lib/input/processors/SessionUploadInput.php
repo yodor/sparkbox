@@ -74,8 +74,12 @@ class SessionUploadInput extends InputProcessor
 
             }
             else {
-                //TODO throw or debug only but clear the target loaded keys
-                throw new Exception("De-serialized object is not instance of StorageObject: " . get_class($value));
+
+                //De-serialized object is not instance of StorageObject");
+                //do not throw here just unset
+                unset($values[$idx]);
+                debug("De-serialized object is not instance of StorageObject");
+
             }
         }
 

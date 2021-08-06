@@ -128,7 +128,9 @@ abstract class SessionUpload extends ArrayField
 
         foreach ($images as $idx => $storage_object) {
 
-            if (is_null($storage_object)) continue;
+            if (is_null($storage_object))continue;
+
+            if (!($storage_object instanceof StorageObject)) continue;
 
             //$validator->processObject($storage_object);
 
