@@ -2,6 +2,63 @@
 include_once("input/DataInputFactory.php");
 include_once("beans/IBeanEditor.php");
 
+class InputGroup {
+
+    /**
+     * @var string The name of this input group
+     */
+    protected $name;
+    /**
+     * @var string Description of this input group
+     */
+    protected $description;
+
+    /**
+     * @var array Names of all inputs in this input group
+     */
+    protected $contents;
+
+    public function __construct(string $name, string $description="")
+    {
+        $this->name = $name;
+        $this->description = $description;
+        $this->contents = array();
+    }
+
+    public function containsInput(DataInput $input)
+    {
+        return array_key_exists($input->getName(), $this->contents);
+    }
+
+    public function inputNames() : array
+    {
+        return array_keys($this->contents);
+    }
+
+    public function addInput(DataInput $input)
+    {
+        $this->contents[$input->getName()] = 1;
+    }
+
+    public function removeInput(DataInput $input)
+    {
+        if ($this->containsInput($input)) {
+            unset($this->contents[$input->getName()]);
+        }
+    }
+
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
+    public function getDescription() : string
+    {
+        return $this->description;
+    }
+
+
+}
 /**
  * Class InputForm
  * Generic HTML "Form" implementation
@@ -49,6 +106,10 @@ class InputForm implements IBeanEditor
 
     protected $name = "";
 
+    const DEFAULT_GROUP = "default";
+
+    protected $groups = NULL;
+
     /**
      * InputForm constructor.
      * @throws Exception
@@ -58,8 +119,54 @@ class InputForm implements IBeanEditor
         $this->bean = NULL;
         $this->beanID = -1;
         $this->name = get_class($this);
+
+        $default_group = new InputGroup(InputForm::DEFAULT_GROUP);
+
+        $this->groups[$default_group->getName()] = $default_group;
     }
 
+    public function addGroup(InputGroup $group)
+    {
+        $this->groups[$group->getName()] = $group;
+    }
+
+    public function getGroupNames(): array
+    {
+        return array_keys($this->groups);
+    }
+
+    public function getGroup(string $name): InputGroup
+    {
+        if (array_key_exists($name, $this->groups)) return $this->groups[$name];
+        throw new Exception("InputGroup name not found");
+    }
+
+
+    /**
+     * Return the InputGroup name this DataInput $input is part of
+     * @param DataInput $input
+     * @return string The group name this DataInput is part of or NULL if this input is not part of any group.
+     * By default all input should be part of the default group - InputForm::DEFAULT_GROUP
+     */
+    public function groupName(DataInput $input) : string
+    {
+        $result = NULL;
+
+        foreach ($this->groups as $groupName=>$inputNames)
+        {
+            if (!is_array($inputNames)) continue;
+            if (array_key_exists($input->getName(), $inputNames)) {
+                $result = $groupName;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $name The name of this form
+     */
     public function setName(string $name)
     {
         $this->name = $name;
@@ -91,25 +198,38 @@ class InputForm implements IBeanEditor
         return $this->processor;
     }
 
-    public function addInput(DataInput $input)
+    public function addInput(DataInput $input, string $groupName = InputForm::DEFAULT_GROUP)
     {
         $input->setForm($this);
         $this->inputs[$input->getName()] = $input;
+
+        $inputGroup = $this->getGroup($groupName);
+        $inputGroup->addInput($input);
+
     }
 
     public function insertFieldAfter(DataInput $input, string $after_name)
     {
+
         $index = array_search($after_name, array_keys($this->inputs));
 
         $this->inputs = array_slice($this->inputs, 0, $index + 1, TRUE) + array($input->getName() => $input) + array_slice($this->inputs, $index + 1, count($this->inputs) - 1, TRUE);
+
+        $afterInput = $this->getInput($after_name);
+        $groupName = $this->groupName($afterInput);
+
+        $inputGroup = $this->getGroup($groupName);
+        $inputGroup->addInput($input);
 
     }
 
     public function removeInput(string $name)
     {
-        if (isset($this->inputs[$name])) {
-            unset($this->inputs[$name]);
-        }
+        $input = $this->getInput($name);
+        $groupName = $this->groupName($input);
+        $inputGroup = $this->getGroup($groupName);
+        $inputGroup->removeInput($input);
+        unset($this->inputs[$name]);
     }
 
     public function setBean(DBTableBean $bean)
