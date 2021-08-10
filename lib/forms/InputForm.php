@@ -57,7 +57,6 @@ class InputGroup {
         return $this->description;
     }
 
-
 }
 /**
  * Class InputForm
@@ -110,6 +109,7 @@ class InputForm implements IBeanEditor
 
     protected $groups = NULL;
 
+    protected $default_group = NULL;
     /**
      * InputForm constructor.
      * @throws Exception
@@ -120,14 +120,23 @@ class InputForm implements IBeanEditor
         $this->beanID = -1;
         $this->name = get_class($this);
 
-        $default_group = new InputGroup(InputForm::DEFAULT_GROUP);
+        $this->default_group = new InputGroup(InputForm::DEFAULT_GROUP, "Default Group");
 
-        $this->groups[$default_group->getName()] = $default_group;
+        $this->groups[InputForm::DEFAULT_GROUP] = $this->default_group;
     }
 
     public function addGroup(InputGroup $group)
     {
         $this->groups[$group->getName()] = $group;
+    }
+
+    public function insertGroupAfter(InputGroup $group, string $after_name)
+    {
+
+        $index = array_search($after_name, array_keys($this->groups));
+
+        $this->groups = array_slice($this->groups, 0, $index + 1, TRUE) + array($group->getName() => $group) + array_slice($this->groups, $index + 1, count($this->groups) - 1, TRUE);
+
     }
 
     public function getGroupNames(): array
@@ -141,6 +150,21 @@ class InputForm implements IBeanEditor
         throw new Exception("InputGroup name not found");
     }
 
+    public function getInputGroup(DataInput $input) : InputGroup
+    {
+        $result = NULL;
+
+        foreach ($this->groups as $groupName=>$inputNames)
+        {
+            if (!is_array($inputNames)) continue;
+            if (array_key_exists($input->getName(), $inputNames)) {
+                $result = $this->groups[$groupName];
+                break;
+            }
+        }
+
+        return $result;
+    }
 
     /**
      * Return the InputGroup name this DataInput $input is part of
@@ -198,14 +222,23 @@ class InputForm implements IBeanEditor
         return $this->processor;
     }
 
-    public function addInput(DataInput $input, string $groupName = InputForm::DEFAULT_GROUP)
+    public function addInput(DataInput $input, InputGroup $group = NULL)
     {
+        if (is_null($group)) $group = $this->default_group;
+
         $input->setForm($this);
         $this->inputs[$input->getName()] = $input;
 
-        $inputGroup = $this->getGroup($groupName);
-        $inputGroup->addInput($input);
+        $group->addInput($input);
 
+    }
+
+    public function setInputGroup(DataInput $input, InputGroup $group)
+    {
+        $groupName = $this->groupName($input);
+        $inputGroup = $this->getGroup($groupName);
+        $inputGroup->removeInput($input);
+        $group->addInput($input);
     }
 
     public function insertFieldAfter(DataInput $input, string $after_name)

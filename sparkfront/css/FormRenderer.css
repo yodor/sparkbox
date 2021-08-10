@@ -1,4 +1,13 @@
 @import url("FormRendererHBox.css");
 @import url("FormRendererVBox.css");
 
+.InputGroupRenderer {
+    margin-bottom:30px;
+    padding-top:20px;
+    border:1px solid #bababa;
+}
+
+.InputGroupRenderer LEGEND {
+
+}
 
