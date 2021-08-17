@@ -123,7 +123,17 @@ class SparkPage extends HTMLPage implements IActionCollection
         //TODO:
     }
 
-    public function addOGTag($tag_name, $tag_content)
+    /**
+     * Well known tag names
+     * og:title	The title of the web page.
+     * og:description	The description of the web page.
+     * og:url	The canonical url of the web page.
+     * og:image	URL to an image attached to the shared post.
+     * og:type	A string that indicates the type of the web page. You can find one that is suitable for your web page here.
+     * @param string $tag_name The name of the tag without the leading 'og:'
+     * @param string $tag_content The contents of this tag
+     */
+    public function addOGTag(string $tag_name, string $tag_content)
     {
         $this->opengraph_tags[$tag_name] = $tag_content;
     }

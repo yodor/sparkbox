@@ -2,7 +2,14 @@
 
 class SQLClause
 {
+    /**
+     * Connect the value to the expression using this operator by default
+     */
     const DEFAULT_OPERATOR = "=";
+
+    /**
+     * Connect this clause to the rest of the clauses using this operator by default
+     */
     const DEFAULT_GLUE = "AND";
 
     protected $expr;
@@ -10,7 +17,7 @@ class SQLClause
     protected $operator;
     protected $glue;
 
-    public function __construct()
+    public function __construct(string $operator=SQLClause::DEFAULT_OPERATOR, string $glue=SQLClause::DEFAULT_GLUE)
     {
         $this->glue = SQLClause::DEFAULT_GLUE;
         $this->operator = SQLClause::DEFAULT_OPERATOR;
