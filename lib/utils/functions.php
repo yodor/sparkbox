@@ -70,6 +70,11 @@ function currentURL(): string
     return $ret;
 }
 
+function fullURL(string $url) : string
+{
+    return SITE_PROTOCOL.SITE_DOMAIN.$url;
+}
+
 function normalize($str)
 {
     $content = htmlentities($str, NULL, 'utf-8');
