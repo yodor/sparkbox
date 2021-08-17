@@ -138,6 +138,8 @@ abstract class PaginatorComponent extends Component
     {
         $qry = $_GET;
 
+        echo "<div class='pager'>";
+
         $a = $this->paginator->getPageListStart();
 
         if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
@@ -181,6 +183,8 @@ abstract class PaginatorComponent extends Component
             $q = queryString($qry);
             echo "<a  href='$q' title='".tr("Last")."'> >> </a>";
         }
+
+        echo "</div>";
     }
 }
 

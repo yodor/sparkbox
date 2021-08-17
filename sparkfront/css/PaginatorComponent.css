@@ -96,3 +96,8 @@
     text-align: right;
     white-space: nowrap;
 }
+.PaginatorComponent .pager {
+    display: table;
+    text-align: center;
+    width: 100%;
+}
