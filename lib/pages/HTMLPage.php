@@ -42,9 +42,13 @@ abstract class HTMLPage extends Container
     {
         echo "<!DOCTYPE html>\n";
 
-        $dir = ' DIR="' . Session::Get("page_dir") . '" ';
+        $dir_attr = " DIR='" . Session::Get("page_dir") . "'";
 
-        echo "<HTML $dir>\n";
+        $lang = substr(DEFAULT_LANGUAGE_ISO3, 0,2);
+
+        $lang_attr = " LANG='".$lang."'";
+
+        echo "<HTML $dir_attr $lang_attr>\n";
     }
 
     protected function headStart()
