@@ -30,8 +30,6 @@ class PaginatorTopComponent extends PaginatorComponent
 
         $this->renderSortFields();
 
-        $this->renderSortComponents();
-
         echo "<div class='cell page_navigation short' nowrap>";
 
         echo "<label>" . tr("Page") . "</label>";

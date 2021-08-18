@@ -12,8 +12,6 @@ abstract class PaginatorComponent extends Component
 
         $this->paginator = $paginator;
 
-        //$this->component_class = "PaginatorComponent";
-
     }
 
     public function renderCaption()
@@ -58,19 +56,6 @@ abstract class PaginatorComponent extends Component
             $q = queryString($qry);
             echo "<a  class='next_page' href='$q'>" . tr("Next") . " > </a>";
         }
-    }
-
-    protected function renderSortComponents()
-    {
-        $sort_components = $this->paginator->getSortComponents();
-
-        if (count($sort_components) < 1) return;
-
-        echo "<div class='cell sort_components' nowrap>";
-        foreach ($sort_components as $idx => $cmp) {
-            $cmp->render();
-        }
-        echo "</div>";
     }
 
     protected function renderSortFields()
