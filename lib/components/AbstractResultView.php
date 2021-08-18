@@ -50,7 +50,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     }
 
     public function getItemsPerPage() : int {
-        $this->items_per_page;
+        return $this->items_per_page;
     }
 
     public function getIterator(): IDataIterator
