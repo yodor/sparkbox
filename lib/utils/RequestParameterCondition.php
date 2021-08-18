@@ -1,10 +1,10 @@
 <?php
-
+include_once("utils/IGETConsumer.php");
 /**
  * Ensure the parameter '$name' exists in the current request data
  * Class RequestParameterCondition
  */
-class RequestParameterCondition
+class RequestParameterCondition implements IGETConsumer
 {
     protected $parameter;
     protected $redirectURL;
@@ -30,6 +30,11 @@ class RequestParameterCondition
             }
         }
 
+    }
+
+    public function getParameterNames(): array
+    {
+        return array($this->parameter);
     }
 
     public function getValue()

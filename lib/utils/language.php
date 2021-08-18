@@ -11,7 +11,7 @@ include_once("utils/Session.php");
 
 //TODO: check usage when this file is included from js.php files that include the main/top session.php
 
-class Translator implements IRequestProcessor
+class Translator implements IRequestProcessor, IGETConsumer
 {
 
     //$defines->set("TRANSLATOR_ENABLED", FALSE);
@@ -56,6 +56,10 @@ class Translator implements IRequestProcessor
      */
     protected $language = array();
 
+    const KEY_LANGUAGE_ID = "langID";
+    const KEY_CHANGE_LANGUAGE = "change_language";
+    const KEY_LANGUAGE = "language";
+
     public function __construct()
     {
 
@@ -68,19 +72,19 @@ class Translator implements IRequestProcessor
         //prefer cookie langID
         $langID = -1;
 
-        if (Session::Contains("langID")) {
-            $langID = (int)Session::Get("langID");
-            debug("Using session langID: ".$langID);
+        if (Session::Contains(Translator::KEY_LANGUAGE_ID)) {
+            $langID = (int)Session::Get(Translator::KEY_LANGUAGE_ID);
+            debug("Using session ".Translator::KEY_LANGUAGE_ID.": ".$langID);
         }
-        else if (Session::HaveCookie("langID")) {
-            $langID = (int)Session::GetCookie("langID");
-            debug("Using cookies langID: ".$langID);
+        else if (Session::HaveCookie(Translator::KEY_LANGUAGE_ID)) {
+            $langID = (int)Session::GetCookie(Translator::KEY_LANGUAGE_ID);
+            debug("Using cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
         }
 
 
         //no session or cookie set
         if ($langID > 0) {
-            debug("Using Session/Cookies langID: ".$langID);
+            debug("Using Session/Cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
             try {
                 $this->loadLanguageID($langID);
             }
@@ -96,6 +100,13 @@ class Translator implements IRequestProcessor
 
     }
 
+    public function getParameterNames(): array
+    {
+        return array(Translator::KEY_LANGUAGE_ID,
+                     Translator::KEY_LANGUAGE,
+                     Translator::KEY_CHANGE_LANGUAGE);
+    }
+
     protected function storeLanguage()
     {
         debug("Storing langID: ".$this->langID. " in session and cookies");
@@ -105,26 +116,26 @@ class Translator implements IRequestProcessor
 
     public function processInput()
     {
-        if (isset($_GET["change_language"])) {
+        if (isset($_GET[Translator::KEY_CHANGE_LANGUAGE])) {
             debug("Processing change_language request");
 
             $language = "";
             $langID = -1;
 
-            if (isset($_GET["language"])) {
-                $language = $_GET["language"];
+            if (isset($_GET[Translator::KEY_LANGUAGE])) {
+                $language = $_GET[Translator::KEY_LANGUAGE];
             }
-            if (isset($_GET["langID"])) {
-                $langID = (int)$_GET["langID"];
+            if (isset($_GET[Translator::KEY_LANGUAGE_ID])) {
+                $langID = (int)$_GET[Translator::KEY_LANGUAGE_ID];
             }
 
             $this->changeLanguage($language, $langID);
 
             $url = new URLBuilder();
             $url->buildFrom(currentURL());
-            $url->remove("change_language");
-            $url->remove("langID");
-            $url->remove("language");
+            $url->remove(Translator::KEY_CHANGE_LANGUAGE);
+            $url->remove(Translator::KEY_LANGUAGE_ID);
+            $url->remove(Translator::KEY_LANGUAGE);
             debug("Redirecting to: ".$url->url());
 
             header("Location: ".$url->url());

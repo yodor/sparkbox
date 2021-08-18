@@ -1,28 +1,35 @@
 <?php
 include_once("utils/URLParameter.php");
 include_once("utils/Paginator.php");
+include_once("utils/IGETConsumer.php");
 
-class URLBuilder
+class URLBuilder implements IGETConsumer
 {
 
-    //the original href that was set to this URLBuilder. Can contain parameterized values
-    //
+    /**
+     * @var string The original href that was set to this URLBuilder. Can contain parameterized values
+     */
     protected $build_string = "";
 
     protected $script_name = "";
+
+    /**
+     * @var string The query part of this query.
+     */
     protected $script_query = "";
 
     protected $domain = "";
     protected $protocol = "";
 
-    protected $parameters;
+    /**
+     * @var array  All url parameters name/value pairs
+     */
+    protected $parameters = null;
 
     protected $resource = "";
 
     protected $clear_page_param = FALSE;
     protected $clear_params = array();
-
-    //protected $keep_request_params = TRUE;
 
     protected $is_script = FALSE;
 
@@ -50,6 +57,7 @@ class URLBuilder
         $this->is_script = FALSE;
 
     }
+
     public function isEmpty() : bool
     {
         return (count($this->parameters) < 1 && strlen($this->script_name) < 1);
@@ -60,20 +68,11 @@ class URLBuilder
     {
         $this->clear_page_param = $mode;
     }
+
     public function setClearParams(string ...$params)
     {
         $this->clear_params = $params;
     }
-
-    //    /**
-    //     * prependRequestParams
-    //     *
-    //     * @param boolean $mode If set to true will prepend the current request query parameters to this link href
-    //     */
-    //    public function setKeepRequestParams(bool $mode)
-    //    {
-    //        $this->keep_request_params = $mode;
-    //    }
 
     public function add(URLParameter $param)
     {
@@ -90,6 +89,10 @@ class URLBuilder
         unset($this->parameters[$name]);
     }
 
+    /**
+     * @param string $name The $name of the URL parameter
+     * @return URLParameter Return the URLParameter object for this $name
+     */
     public function get(string $name): URLParameter
     {
         return $this->parameters[$name];
@@ -105,28 +108,9 @@ class URLBuilder
         return array_keys($this->parameters);
     }
 
-//    /**
-//     * Return the value of parameter '$name'
-//     * @param string $name
-//     * @return string
-//     */
-//    public function getValue(string $name): string
-//    {
-//        if (!$this->contains($name)) return "";
-//        return $this->getParameter($name)->value();
-//    }
-//
-//    /**
-//     * Set the value of parameter '$name' to '$value'
-//     * @param string $name
-//     * @param string $value
-//     */
-//    public function setValue(string $name, string $value)
-//    {
-//        $this->addParameter(new URLParameter($name, $value));
-//    }
-
-
+    /**
+     * @return string Processed this builder and return a matching string representation of this URLBuilder and its parameters.
+     */
     public function url(): string
     {
         if ($this->is_script) {
@@ -163,18 +147,12 @@ class URLBuilder
     protected function processQuery()
     {
 
-        //        if ($this->keep_request_params) {
-        //            foreach ($_GET as $key => $param) {
-        //                if (!isset($this->parameters[$key])) {
-        //                    $this->addParameter(new URLParameter($key, $param));
-        //                }
-        //            }
-        //        }
-
         //clear parameters from the Paginator
         if ($this->clear_page_param) {
-
-            Paginator::clearPageFilter($this->parameters);
+            $paginator_parameters = Paginator::Instance()->getParameterNames();
+            foreach($paginator_parameters as $value) {
+                $this->clear_params[] = $value;
+            }
         }
 
         if (count($this->parameters) > 0) {
@@ -261,9 +239,15 @@ class URLBuilder
 
     }
 
+    /**
+     * @param array $row Parametrise this URLBuilder parameter values using $row associative array as source.
+     * JavaScript code is replaced using %parameter_name% as a match.
+     * $row[$parameter_name] value is used as a replacement.
+     *
+     */
     public function setData(array $row)
     {
-        //process javascript hrefs directly
+        //
         if ($this->is_script) {
 
             $from = $this->build_string;

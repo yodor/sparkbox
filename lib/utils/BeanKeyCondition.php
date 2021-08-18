@@ -12,7 +12,6 @@ class BeanKeyCondition extends RequestParameterCondition
 
     protected $id;
     protected $data;
-    //protected $query;
 
     protected $urlparam;
 

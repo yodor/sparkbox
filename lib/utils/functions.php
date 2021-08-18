@@ -576,7 +576,8 @@ function text4div(&$text)
 }
 
 /**
- * Check if key '$key' of array '$arr' is set and have value equal to '$val'
+ * Check if key '$key' of the associative array '$arr' is set and have value equal to '$val'.
+ * If $arr is NULL or not specified the $_GET array is used.
  * @param string $key
  * @param string $val
  * @param array|null $arr

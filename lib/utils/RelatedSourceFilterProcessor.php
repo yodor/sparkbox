@@ -1,8 +1,9 @@
 <?php
 include_once("components/NestedSetTreeView.php");
 include_once("utils/NestedSetFilterProcessor.php");
+include_once("utils/IGETConsumer.php");
 
-class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
+class RelatedSourceFilterProcessor extends NestedSetFilterProcessor implements IGETConsumer
 {
     protected $relation_prkey = NULL;
 
@@ -27,6 +28,11 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor
         $combining_filter = new SQLSelect();
 
         $this->filter_all = $combining_filter;
+    }
+
+    public function getParameterNames(): array
+    {
+        return array_keys($this->filters);
     }
 
     public function numFilters()
