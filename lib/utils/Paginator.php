@@ -18,7 +18,7 @@ class PaginatorSortField
     }
 }
 
-class Paginator
+class Paginator implements IGETConsumer
 {
 
     protected $ipp = 10;
@@ -38,12 +38,36 @@ class Paginator
     public static $page_filter_only = FALSE;
 
     protected $sort_fields = array();
-    protected $sort_components = array();
 
     public $default_order_direction = "DESC";
 
     protected $order_direction = NULL;
     protected $order_field = NULL;
+
+    const KEY_ORDER_BY = "orderby";
+    const KEY_ORDER_DIR = "orderdir";
+    const KEY_PAGE = "page";
+
+    static protected $instance = NULL;
+
+    public function __construct()
+    {
+        self::$instance = $this;
+    }
+
+    static public function Instance() : Paginator
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new Paginator();
+        }
+
+        return self::$instance;
+    }
+
+    public function getParameterNames(): array
+    {
+        return array(self::KEY_ORDER_BY, self::KEY_ORDER_DIR, self::KEY_PAGE);
+    }
 
     public function getOrderDirection()
     {
@@ -53,17 +77,6 @@ class Paginator
     public function getOrderField()
     {
         return $this->order_field;
-    }
-
-    public function __construct()
-    {
-
-    }
-
-    public function addSortComponent(Component $cmp)
-    {
-        $cmp->setParent($this);
-        $this->sort_components[] = $cmp;
     }
 
     public function addSortField(PaginatorSortField $sort_field)
@@ -76,15 +89,10 @@ class Paginator
         return $this->sort_fields;
     }
 
-    public function getSortComponents()
-    {
-        return $this->sort_components;
-    }
-
     public function getSelectedSortField()
     {
         foreach ($this->sort_fields as $field_name => $sort_field) {
-            if (isset($_GET["orderby"]) && strcmp($_GET["orderby"], $sort_field->value) == 0) {
+            if (strcmp_isset(Paginator::KEY_ORDER_BY, $sort_field->value, $_GET)) {
                 return $sort_field;
             }
 
@@ -100,48 +108,48 @@ class Paginator
         }
     }
 
-    public function getItemsPerPage()
+    public function getItemsPerPage() : int
     {
         return $this->ipp;
     }
 
-    public function getPageListStart()
+    public function getPageListStart() : int
     {
         return $this->page_list_start;
     }
 
-    public function getPageListEnd()
+    public function getPageListEnd() : int
     {
         return $this->page_list_end;
     }
 
-    public function haveNextPage()
+    public function haveNextPage() : bool
     {
         return $this->show_next;
     }
 
-    public function havePreviousPage()
+    public function havePreviousPage() : bool
     {
         return $this->show_prev;
     }
 
-    public function getPagesTotal()
+    public function getPagesTotal() : int
     {
         if ($this->total_pages == (int)$this->total_pages) return $this->total_pages;
         return ((int)$this->total_pages) + 1;
     }
 
-    public function getResultsTotal()
+    public function getResultsTotal() : int
     {
         return $this->total_rows;
     }
 
-    public function getCurrentPage()
+    public function getCurrentPage() : int
     {
         return $this->page;
     }
 
-    public function calculate($total_rows, $ipp)
+    public function calculate(int $total_rows, int $ipp)
     {
         $this->ipp = $ipp;
         $this->total_rows = $total_rows;
@@ -156,8 +164,8 @@ class Paginator
             $qry = $_GET;
 
             $page = 0;
-            if (isset($_GET["page"])) {
-                $page = (int)$_GET["page"];
+            if (isset($_GET[Paginator::KEY_PAGE])) {
+                $page = (int)$_GET[Paginator::KEY_PAGE];
             }
 
             if ($page > $total_pages) $page = $total_pages - 1;
@@ -177,11 +185,11 @@ class Paginator
             if ($cend > $total_pages) {
                 $cend = $total_pages;
             }
-            $show_next = FALSE;
+            $this->show_next = FALSE;
             if ($cend < $total_pages) {
                 $this->show_next = TRUE;
             }
-            $show_prev = FALSE;
+            $this->show_prev = FALSE;
             if ($cstart > 0) {
                 $this->show_prev = TRUE;
 
@@ -203,9 +211,9 @@ class Paginator
 
     public static function clearPageFilter(array &$arr)
     {
-        if (isset($arr["page"])) unset($arr["page"]);
-        if (isset($arr["orderdir"])) unset($arr["orderdir"]);
-        if (isset($arr["orderby"])) unset($arr["orderby"]);
+        if (isset($arr[Paginator::KEY_PAGE])) unset($arr[Paginator::KEY_PAGE]);
+        if (isset($arr[Paginator::KEY_ORDER_DIR])) unset($arr[Paginator::KEY_ORDER_DIR]);
+        if (isset($arr[Paginator::KEY_ORDER_BY])) unset($arr[Paginator::KEY_ORDER_BY]);
     }
 
     public function prepareOrderFilter($default_order = "") : SQLSelect
@@ -224,12 +232,12 @@ class Paginator
             $order_direction = "DESC";
         }
 
-        if (isset($_GET["orderby"])) {
-            $order_field = DBConnections::Get()->escape($_GET["orderby"]);
+        if (isset($_GET[Paginator::KEY_ORDER_BY])) {
+            $order_field = DBConnections::Get()->escape($_GET[Paginator::KEY_ORDER_BY]);
             $this->order_field = $order_field;
         }
-        if (isset($_GET["orderdir"])) {
-            $order_direction = DBConnections::Get()->escape($_GET["orderdir"]);
+        if (isset($_GET[Paginator::KEY_ORDER_DIR])) {
+            $order_direction = DBConnections::Get()->escape($_GET[Paginator::KEY_ORDER_DIR]);
         }
         $this->order_direction = $order_direction;
 
@@ -261,7 +269,7 @@ class Paginator
         return $filter;
     }
 
-    public function preparePageFilter($default_order = "") : SQLSelect
+    public function preparePageFilter(string $default_order = "") : SQLSelect
     {
         $filter = new SQLSelect();
         $filter->from = "";
@@ -273,6 +281,8 @@ class Paginator
         if ($ipp > 0) {
             $filter->limit = " " . ($page * $ipp) . ", $ipp";
         }
+
+        $filter->order_by = $default_order;
 
         return $filter;
     }
