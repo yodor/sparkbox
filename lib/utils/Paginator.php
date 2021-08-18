@@ -1,4 +1,5 @@
 <?php
+include_once("utils/IGETConsumer.php");
 
 class PaginatorSortField
 {
