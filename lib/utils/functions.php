@@ -154,7 +154,7 @@ function renderExceptionDetails($error)
 
 }
 
-function constructSiteTitle($path)
+function constructSiteTitleArray($path) : array
 {
     $path = array_reverse($path);
     $title = array();
@@ -167,6 +167,12 @@ function constructSiteTitle($path)
         }
     }
     debug("Constructed Title");
+    return $title;
+}
+
+function constructSiteTitle($path)
+{
+    $title = constructSiteTitleArray($path);
 
     return implode(TITLE_PATH_SEPARATOR, $title);
 }
