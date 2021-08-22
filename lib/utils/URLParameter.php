@@ -27,6 +27,10 @@ class URLParameter implements IDataResultProcessor
         return $this->value;
     }
 
+    public function setValue(string $value)
+    {
+        $this->value = $value;
+    }
     public function name(): string
     {
         return $this->name;
