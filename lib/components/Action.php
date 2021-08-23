@@ -72,6 +72,7 @@ class Action extends DataIteratorItem
 
     public function setData(array &$row)
     {
+        parent::setData($row);
 
         if ($this->check_code) {
             debug("Action has check_code anonymous function set: " . $this->getContents());
