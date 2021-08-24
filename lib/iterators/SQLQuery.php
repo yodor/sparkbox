@@ -92,6 +92,12 @@ class SQLQuery implements IDataIterator
         return $ret;
     }
 
+    public function free()
+    {
+        $this->db->free($this->res);
+        $this->res = NULL;
+    }
+
     public function key(): string
     {
         return $this->key;
