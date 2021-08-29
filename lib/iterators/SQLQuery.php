@@ -80,11 +80,28 @@ class SQLQuery implements IDataIterator
         return $this->numResults;
     }
 
+    /**
+     * TODO: Deprecated use nextResult
+     * @return array|null
+     * @throws Exception
+     */
     public function next()
     {
         if (!$this->res) throw new Exception("Not executed yet or no valid resource");
 
         $ret = $this->db->fetch($this->res);
+        if (!$ret) {
+            $this->db->free($this->res);
+            $this->res = NULL;
+        }
+        return $ret;
+    }
+
+    public function nextResult() : ?RawResult
+    {
+        if (!$this->res) throw new Exception("Not executed yet or no valid resource");
+
+        $ret = $this->db->fetchResult($this->res);
         if (!$ret) {
             $this->db->free($this->res);
             $this->res = NULL;

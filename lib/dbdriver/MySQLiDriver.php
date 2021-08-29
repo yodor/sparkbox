@@ -2,6 +2,7 @@
 
 include_once("dbdriver/DBDriver.php");
 
+
 class MySQLiDriver extends DBDriver
 {
     /**
@@ -45,7 +46,7 @@ class MySQLiDriver extends DBDriver
 
     }
 
-    public function connection() : mysqli
+    public function connection(): mysqli
     {
         return $this->conn;
     }
@@ -59,7 +60,7 @@ class MySQLiDriver extends DBDriver
     {
         if ($this->conn) {
             $this->conn->close();
-            $this->conn = null;
+            $this->conn = NULL;
         }
 
     }
@@ -138,6 +139,17 @@ class MySQLiDriver extends DBDriver
 
         return $res->fetch_array(MYSQLI_NUM);
 
+    }
+
+    public function fetchResult($res): ?RawResult
+    {
+        $res = $this->assert_resource($res);
+
+        $record = $res->fetch_assoc();
+
+        if (is_null($record)) return NULL;
+
+        return new RawResult($record);
     }
 
     public function free($res)

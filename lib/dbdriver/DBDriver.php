@@ -1,5 +1,6 @@
 <?php
 include_once("dbdriver/DBConnections.php");
+include_once("dbdriver/RawResult.php");
 
 abstract class DBDriver
 {
@@ -29,6 +30,8 @@ abstract class DBDriver
     abstract public function fetch($str) : ?array;
 
     abstract public function fetchArray($str) : ?array;
+
+    abstract public function fetchResult($str) : ?RawResult;
 
     abstract public function dateTime($add_days = 0, $interval_type = " DAY ");
 
