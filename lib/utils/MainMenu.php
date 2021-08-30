@@ -345,14 +345,15 @@ class MainMenu
      * Constructs a selection path array containing MenuItems - from top parent MenuItem to selected MenuItem
      * @throws Exception
      */
-    const MATCH_FULL = 0;
-    const MATCH_PARTIAL = 1;
-    const MATCH_SCRIPT = 2;
-    const MATCH_PATH = 3;
+    const MATCH_FULL = "MATCH_FULL";
+    const MATCH_PARTIAL = "MATCH_PARTIAL";
+    const MATCH_SCRIPT = "MATCH_SCRIPT";
+    const MATCH_PATH = "MATCH_PATH";
 
-    public function selectActive($mode_mask = array(MainMenu::MATCH_FULL,MainMenu::MATCH_PARTIAL,MainMenu::MATCH_SCRIPT,MainMenu::MATCH_PATH))
+    public function selectActive($mode_mask = array(MainMenu::MATCH_FULL,MainMenu::MATCH_PARTIAL,MainMenu::MATCH_SCRIPT,MainMenu::MATCH_PATH), bool $match_first=true)
     {
 
+        debug("Mode mask: ", $mode_mask);
 
         $this->selected_path = array();
 
@@ -404,13 +405,20 @@ class MainMenu
         };
         $match_code[MainMenu::MATCH_PATH] = $match_path;
 
-        foreach ($mode_mask as $pos=>$mode) {
-            $code = $match_code[$pos];
+        foreach ($mode_mask as $idx=>$mode) {
+            $code = $match_code[$mode];
 
-            $this->selected_item = $this->matchItems($items, $code);
+            debug("Using: ".$mode);
 
-            if ($this->selected_item) {
-                break;
+            $match_item = $this->matchItems($items, $code);
+
+            if ($match_item) {
+                $this->selected_item = $match_item;
+                //keep matching
+                if ($match_first) {
+                    break;
+                }
+
             }
         }
 
