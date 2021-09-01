@@ -44,19 +44,19 @@
 
 
 .TreeView .Node .Handle .Button {
-    border: 1px solid #cccccc;
-    text-align: left;
-    text-align: center;
-    font-family: "Consolas", "Mono";
+    /*border: 1px solid #cccccc;*/
 
-    width: 16px;
-    height: 16px;
+    width: 32px;
+    height: 32px;
 
     display: block;
 
-    color: gray;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
 
+    background-size:50%;
 
+    filter: invert(.5);
 }
 
 .TreeView .Node[branch_type='opened'] + .NodeChilds {
@@ -67,30 +67,18 @@
     display: none;
 }
 
-/*.TreeView .NodeOuter .Node .Handle[branch_type='opened'] .Button {*/
+
 .TreeView .Node[branch_type='opened'] .Handle .Button {
-    background-image: url('../images/tree_node_close.png');
-
-    display: block;
-
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
+    background-image: url('../images/tree_node_close.svg');
 }
 
 .TreeView .Node[branch_type='closed'] .Handle .Button {
-    background-image: url('../images/tree_node_open.png');
-    display: block;
-
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
+    background-image: url('../images/tree_node_open.svg');
 }
 
 .TreeView .Node[branch_type='leaf'] .Handle .Button {
-    background-image: url('../images/tree_node_leaf.png');
-    display: block;
-
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
+    background-image: url('../images/tree_node_leaf.svg');
+    background-size:12%;
 }
 
 .TreeView .Node .Action[action='TextTreeItemAction'] {

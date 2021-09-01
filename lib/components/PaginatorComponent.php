@@ -1,7 +1,8 @@
 <?php
 include_once("components/Component.php");
+include_once("utils/IGETConsumer.php");
 
-abstract class PaginatorComponent extends Component
+abstract class PaginatorComponent extends Component implements IGETConsumer
 {
     protected $paginator = FALSE;
 
@@ -12,6 +13,14 @@ abstract class PaginatorComponent extends Component
 
         $this->paginator = $paginator;
 
+    }
+
+    /**
+     * @return array The parameter names this object is interacting with
+     */
+    public function getParameterNames(): array
+    {
+        return Paginator::Instance()->getParameterNames();
     }
 
     public function renderCaption()
@@ -38,23 +47,25 @@ abstract class PaginatorComponent extends Component
 
     public function drawPrevButton()
     {
-        $qry = $_GET;
+        $link = new URLBuilder();
+        $link->buildFrom(SparkPage::Instance()->getPageURL());
+        $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if ($this->paginator->getCurrentPage() > 0) {
-            $qry["page"] = $this->paginator->getCurrentPage() - 1;
-            $q = queryString($qry);
-            echo "<a class='previous_page' href='$q'> < " . tr("Prev") . " </a>";
+            $link->get(Paginator::KEY_PAGE)->setValue((int)($this->paginator->getCurrentPage() - 1));
+            echo "<a class='previous_page' href='{$link->url()}'> < " . tr("Prev") . " </a>";
         }
     }
 
     public function drawNextButton()
     {
-        $qry = $_GET;
+        $link = new URLBuilder();
+        $link->buildFrom(SparkPage::Instance()->getPageURL());
+        $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
-            $qry["page"] = ($this->paginator->getCurrentPage() + 1);
-            $q = queryString($qry);
-            echo "<a  class='next_page' href='$q'>" . tr("Next") . " > </a>";
+            $link->get(Paginator::KEY_PAGE)->setValue((int)($this->paginator->getCurrentPage() + 1));
+            echo "<a  class='next_page' href='{$link->url()}'>" . tr("Next") . " > </a>";
         }
     }
 
@@ -66,46 +77,45 @@ abstract class PaginatorComponent extends Component
 
         echo "<div class='cell sort_fields' nowrap>";
 
-        echo "<label>";
-        echo tr("Sort By");
-        echo "</label>";
+            echo "<label>";
+            echo tr("Sort By");
+            echo "</label>";
 
-        echo "<select name=orderby onChange='javascript:changeSort(this)'>";
+            echo "<select name=orderby onChange='javascript:changeSort(this)'>";
 
-        foreach ($sort_fields as $field_name => $sort_field) {
+            $link = new URLBuilder();
+            $link->buildFrom(SparkPage::Instance()->getPageURL());
+            $link->add(new URLParameter(Paginator::KEY_ORDER_BY, ""));
+            $link->add(new URLParameter(Paginator::KEY_ORDER_DIR, ""));
 
-            $selected = "";
+            foreach ($sort_fields as $field_name => $sort_field) {
 
-            if (strcmp($sort_field->value, $this->paginator->getOrderField()) == 0) {
-                $selected = " SELECTED ";
+                $selected = "";
+
+                if (strcmp($sort_field->value, $this->paginator->getOrderField()) == 0) {
+                    $selected = " SELECTED ";
+                }
+
+                $link->get(Paginator::KEY_ORDER_BY)->setValue($sort_field->value);
+                $link->get(Paginator::KEY_ORDER_DIR)->setValue($sort_field->order_direction);
+
+                echo "<option $selected value='{$link->url()}' >" . tr($sort_field->label) . "</option>";
+
             }
+            echo "</select>";
 
-            $dir_qry = $_GET;
-            $dir_qry["orderby"] = $sort_field->value;
-            $dir_qry["orderdir"] = $this->paginator->default_order_direction;
+            $active_field = $this->paginator->getOrderField();
+            $active_direction = $this->paginator->getOrderDirection();
 
-            $dir_href = queryString($dir_qry);
+            $link->get(Paginator::KEY_ORDER_BY)->setValue($this->paginator->getOrderField());
 
-            echo "<option $selected value='$dir_href' >" . tr($sort_field->label) . "</option>";
+            $direction = "ASC";
+            if (strcmp($active_direction, "ASC") == 0) {
+                $direction = "DESC";
+            }
+            $link->get(Paginator::KEY_ORDER_DIR)->setValue($direction);
 
-        }
-        echo "</select>";
-
-        $order_field = $this->paginator->getOrderField();
-        $order_direction = $this->paginator->getOrderDirection();
-
-        $dir_qry = $_GET;
-        $dir_qry["orderby"] = $this->paginator->getOrderField();
-        $dir_label = "&#11014;";
-        $direction = "ASC";
-        if (strcmp($order_direction, "ASC") == 0) {
-            $dir_label = "&#11015;";
-            $direction = "DESC";
-        }
-        $dir_qry["orderdir"] = $direction;
-        $dir_href = queryString($dir_qry);
-
-        echo "<a class='direction' href='$dir_href'>$dir_label</a>";
+            echo "<a class='direction' direction='$active_direction' href='{$link->url()}'></a>";
 
         echo "</div>";
 
@@ -121,7 +131,10 @@ abstract class PaginatorComponent extends Component
 
     protected function renderPageSelector()
     {
-        $qry = $_GET;
+
+        $link = new URLBuilder();
+        $link->buildFrom(SparkPage::Instance()->getPageURL());
+        $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         echo "<div class='pager'>";
 
@@ -133,40 +146,34 @@ abstract class PaginatorComponent extends Component
 
         if ($this->paginator->getCurrentPage() > 0) {
 
-            $qry["page"] = 0;
-            $q = queryString($qry);
-            echo "<a  href='$q' title='".tr("First")."'> <<  </a>";
+            $link->get(Paginator::KEY_PAGE)->setValue(0);
+            echo "<a  href='{$link->url()}' title='".tr("First")."'> <<  </a>";
 
-            $qry["page"] = $this->paginator->getCurrentPage() - 1;
-            $q = queryString($qry);
-            echo "<a   href='$q' title='".tr("Prev")."'> <  </a>";
+            $link->get(Paginator::KEY_PAGE)->setValue($this->paginator->getCurrentPage() - 1);
+            echo "<a   href='{$link->url()}' title='".tr("Prev")."'> <  </a>";
 
         }
 
         while ($a < $this->paginator->getPageListEnd()) {
-            $qry["page"] = $a;
 
-            $q = queryString($qry);
+            $link->get(Paginator::KEY_PAGE)->setValue($a);
 
             $link_class = "";
             if ($this->paginator->getCurrentPage() == $a) {
                 $link_class = "class=selected";
-
             }
 
-            echo "<a $link_class  href='$q'>" . ($a + 1) . "</a>";
+            echo "<a $link_class  href='{$link->url()}'>" . ($a + 1) . "</a>";
             $a++;
         }
 
         if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
 
-            $qry["page"] = ($this->paginator->getCurrentPage() + 1);
-            $q = queryString($qry);
-            echo "<a  href='$q' title='".tr("Next")."'> > </a>";
+            $link->get(Paginator::KEY_PAGE)->setValue((int)($this->paginator->getCurrentPage() + 1));
+            echo "<a  href='{$link->url()}' title='".tr("Next")."'> > </a>";
 
-            $qry["page"] = (int)($this->paginator->getPagesTotal() - 1);
-            $q = queryString($qry);
-            echo "<a  href='$q' title='".tr("Last")."'> >> </a>";
+            $link->get(Paginator::KEY_PAGE)->setValue((int)($this->paginator->getPagesTotal() - 1));
+            echo "<a  href='{$link->url()}' title='".tr("Last")."'> >> </a>";
         }
 
         echo "</div>";

@@ -11,18 +11,44 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     protected $items_per_page = 20;
 
-
+    /**
+     * SQL order by clause
+     * @var string
+     */
     protected $default_order = "";
-    protected $total_rows = 0;
-    protected $current_row = array();
-    protected $paginator = NULL;
-    protected $paginator_top = NULL;
-    protected $paginator_bottom = NULL;
-    protected $position_index = -1;
-    protected $paginators_enabled = TRUE;
-    protected $select_query = NULL;
 
-    protected $item_renderer;
+    /**
+     * Total results row after executing the query
+     * @var int
+     */
+    protected $total_rows = 0;
+
+    protected $current_row = array();
+
+    /**
+     * @var Paginator|null
+     */
+    protected $paginator = NULL;
+
+    /**
+     * @var PaginatorTopComponent|null
+     */
+    protected $paginator_top = NULL;
+
+    /**
+     * @var PaginatorBottomComponent|null
+     */
+    protected $paginator_bottom = NULL;
+
+
+    protected $position_index = -1;
+
+    protected $paginators_enabled = TRUE;
+
+    /**
+     *  @var DataIteratorItem
+     */
+    protected $item_renderer = null;
 
     /**
      * @var SQLQuery
@@ -129,19 +155,17 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
+
         $orderFilter = $this->paginator->prepareOrderFilter($this->default_order);
 
-        $pageFilter = $this->paginator->preparePageFilter($this->default_order);
-
-        //	echo "PageFilter SQL: ".$pageFilter->getSQL(true);
-        //	echo "Iterator SQL: ".$select->getSQL();
+        $pageFilter = $this->paginator->preparePageFilter();
 
         if ($this->paginators_enabled) {
             $this->iterator->select->combine($pageFilter);
             $this->iterator->select->combine($orderFilter);
         }
 
-        //echo "Final SQL: ".$select->getSQL();
+        //echo "Final SQL: ".$this->iterator->select->getSQL();
 
         $this->total_rows = $this->iterator->exec();
 

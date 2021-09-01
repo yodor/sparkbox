@@ -38,12 +38,23 @@ class Paginator implements IGETConsumer
 
     public static $page_filter_only = FALSE;
 
+    /**
+     * Container for PaginatorSortField
+     * @var array
+     */
     protected $sort_fields = array();
 
-    public $default_order_direction = "DESC";
+    /**
+     * SQL order by direction ASC|DESC
+     * @var null
+     */
+    protected $order_direction = "";
 
-    protected $order_direction = NULL;
-    protected $order_field = NULL;
+    /**
+     * SQL order field name
+     * @var null
+     */
+    protected $order_field = "";
 
     const KEY_ORDER_BY = "orderby";
     const KEY_ORDER_DIR = "orderdir";
@@ -85,28 +96,31 @@ class Paginator implements IGETConsumer
         $this->sort_fields[$sort_field->value] = $sort_field;
     }
 
-    public function getSortFields()
+    public function getSortFields() : array
     {
         return $this->sort_fields;
     }
 
-    public function getSelectedSortField()
+    public function getSelectedSortField() : ?PaginatorSortField
     {
-        foreach ($this->sort_fields as $field_name => $sort_field) {
+        if (count($this->sort_fields) == 0) return null;
+
+        $result = null;
+
+        //check if the query parameter matches the sort field
+        foreach ($this->sort_fields as $field_value => $sort_field) {
             if (strcmp_isset(Paginator::KEY_ORDER_BY, $sort_field->value, $_GET)) {
-                return $sort_field;
+                $result = $sort_field;
             }
-
         }
 
-        if (count($this->sort_fields) > 0) {
+        //return the first sort field
+        if (is_null($result)) {
             $values = array_values($this->sort_fields);
-            $sf = array_shift($values);
-            return $sf;
+            $result = array_shift($values);
         }
-        else {
-            return NULL;
-        }
+
+        return $result;
     }
 
     public function getItemsPerPage() : int
@@ -217,60 +231,48 @@ class Paginator implements IGETConsumer
         if (isset($arr[Paginator::KEY_ORDER_BY])) unset($arr[Paginator::KEY_ORDER_BY]);
     }
 
-    public function prepareOrderFilter($default_order = "") : SQLSelect
+    public function prepareOrderFilter(string $default_order = "") : SQLSelect
     {
+
         $filter = new SQLSelect();
         $filter->from = "";
+        $filter->order_by = $default_order;
 
-        $order_field = NULL;
-        $order_direction = $this->default_order_direction;
-        $orderby = $default_order;
+        $sort_field = $this->getSelectedSortField();
 
-        if (endsWith(trim($default_order), "ASC")) {
-            $order_direction = "ASC";
-        }
-        else if (endsWith(trim($default_order), "DESC")) {
-            $order_direction = "DESC";
-        }
+        if ($sort_field) {
 
-        if (isset($_GET[Paginator::KEY_ORDER_BY])) {
-            $order_field = DBConnections::Get()->escape($_GET[Paginator::KEY_ORDER_BY]);
-            $this->order_field = $order_field;
-        }
-        if (isset($_GET[Paginator::KEY_ORDER_DIR])) {
-            $order_direction = DBConnections::Get()->escape($_GET[Paginator::KEY_ORDER_DIR]);
-        }
-        $this->order_direction = $order_direction;
+            $this->order_direction = $sort_field->order_direction;
 
-        if ($order_field) {
-            $orderby = "$order_field $order_direction";
+            if ($sort_field->extended_sort_sql) {
+                $this->order_field = $sort_field->extended_sort_sql;
+            }
+            else {
+                $this->order_field = $sort_field->value;
+            }
         }
         else {
-            $order_field = $this->getSelectedSortField();
-            if ($order_field) {
-                if ($order_field->extended_sort_sql) {
-                    $orderby = $order_field->extended_sort_sql;
-                }
-                else {
-                    $orderby = $order_field->value . " " . $order_direction;
-                    $this->order_field = $order_field->value;
-                }
+
+            if (isset($_GET[Paginator::KEY_ORDER_BY])) {
+                $this->order_field = DBConnections::Get()->escape($_GET[Paginator::KEY_ORDER_BY]);
             }
+
+        }
+
+        if (isset($_GET[Paginator::KEY_ORDER_DIR])) {
+            $this->order_direction = DBConnections::Get()->escape($_GET[Paginator::KEY_ORDER_DIR]);
         }
 
         if (!self::$page_filter_only) {
-            if ($orderby) {
-                $filter->order_by = $orderby;
-
+            if ($this->order_field && $this->order_direction) {
+                $filter->order_by = $this->order_field. " " .$this->order_direction;
             }
         }
-
-
 
         return $filter;
     }
 
-    public function preparePageFilter(string $default_order = "") : SQLSelect
+    public function preparePageFilter() : SQLSelect
     {
         $filter = new SQLSelect();
         $filter->from = "";
@@ -282,8 +284,6 @@ class Paginator implements IGETConsumer
         if ($ipp > 0) {
             $filter->limit = " " . ($page * $ipp) . ", $ipp";
         }
-
-        $filter->order_by = $default_order;
 
         return $filter;
     }
