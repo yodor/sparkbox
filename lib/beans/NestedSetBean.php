@@ -113,7 +113,17 @@ class NestedSetBean extends DBTableBean
         $old_parentID = (int)$old_row["parentID"];
         $new_parentID = (int)$row["parentID"];
 
-        if ($new_parentID == $id) throw new Exception("Can not reparent to self");
+        if ($new_parentID == $id) throw new Exception("Can not re-parent to self");
+
+        //check if is really a parent category
+        $resultset = $this->getChildNodes($id, array($this->prkey));
+        foreach ($resultset as $idx=>$result) {
+            $nodeID = $result[$this->prkey];
+            if ($new_parentID == $nodeID) {
+                throw new Exception("Can not re-parent to child category");
+            }
+        }
+
 
         if ($old_parentID == $new_parentID) {
 
@@ -591,6 +601,27 @@ class NestedSetBean extends DBTableBean
             $ret[] = $row;
         }
         return $ret;
+    }
+
+    //list the nodeID and its child nodes
+    public function getChildNodes(int $nodeID, array $fieldNames = null) : array
+    {
+        if (is_null($fieldNames)) {
+            $fieldNames = array($this->prkey);
+        }
+
+        $sel = $this->selectTree($fieldNames);
+        $sel->where()->add("parent.".$this->prkey, $nodeID);
+
+        $resultset = array();
+
+        $qry = new SQLQuery($sel, $this->prkey, $this->table);
+        $num = $qry->exec();
+        while ($result = $qry->next()) {
+            $resultset[] = $result;
+        }
+
+        return $resultset;
     }
 
 }
