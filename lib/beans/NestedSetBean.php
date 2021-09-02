@@ -273,7 +273,7 @@ class NestedSetBean extends DBTableBean
     {
 
         $qry = $this->query();
-        $qry->select->fields()->set("lft", "rgt", "parentID");
+        $qry->select->fields()->set($this->prkey, "lft", "rgt", "parentID");
         $qry->select->where()->add("parentID", $parentID);
         $qry->select->order_by = " {$this->prkey} ASC , lft ASC ";
 
@@ -317,7 +317,7 @@ class NestedSetBean extends DBTableBean
         if ($qry->exec() && $row = $qry->next()) {
             return $row[$this->prkey];
         }
-        return FALSE;
+        throw new Exception("Unable to query: ".$qry->select->getSQL());
     }
 
     protected function getIDRight(int $rgt): int
@@ -328,9 +328,10 @@ class NestedSetBean extends DBTableBean
         $qry->select->where()->add("rgt", $rgt);
 
         if ($qry->exec() && $row = $qry->next()) {
-            return $row[$this->prkey];
+            return (int)$row[$this->prkey];
         }
-        return FALSE;
+        throw new Exception("Unable to query: ".$qry->select->getSQL());
+
     }
 
     public function moveLeft(int $id, DBDriver $db = NULL)
