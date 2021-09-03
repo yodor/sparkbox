@@ -232,6 +232,17 @@ class Component implements IRenderer, IHeadContents
         $this->setAttribute("tooltip", $text);
     }
 
+    public function getTitle(): string
+    {
+        return $this->getAttribute("title");
+    }
+
+    public function setTitle(string $text)
+    {
+        $this->setAttribute("title", $text);
+    }
+
+
     public function getAttributes(): array
     {
         return $this->attributes;
