@@ -120,13 +120,16 @@ class InputForm implements IBeanEditor
         $this->beanID = -1;
         $this->name = get_class($this);
 
+        //create default group
         $this->default_group = new InputGroup(InputForm::DEFAULT_GROUP, "Default Group");
-
-        $this->groups[InputForm::DEFAULT_GROUP] = $this->default_group;
+        $this->groups[$this->default_group->getName()] = $this->default_group;
     }
 
     public function addGroup(InputGroup $group)
     {
+        if (strcmp($group->getName(), InputForm::DEFAULT_GROUP)==0) {
+            throw new Exception("InputGroup name '".InputForm::DEFAULT_GROUP."' is reserved");
+        }
         $this->groups[$group->getName()] = $group;
     }
 
@@ -150,15 +153,21 @@ class InputForm implements IBeanEditor
         throw new Exception("InputGroup name not found");
     }
 
+    /**
+     * Return the InputGroup object of DataInput $input
+     * @param DataInput $input
+     * @return InputGroup
+     */
     public function getInputGroup(DataInput $input) : InputGroup
     {
         $result = NULL;
 
-        foreach ($this->groups as $groupName=>$inputNames)
+        foreach ($this->groups as $groupName=>$inputGroup)
         {
-            if (!is_array($inputNames)) continue;
-            if (array_key_exists($input->getName(), $inputNames)) {
-                $result = $this->groups[$groupName];
+            if (!($inputGroup instanceof InputGroup))continue;
+
+            if ($inputGroup->containsInput($input)) {
+                $result = $inputGroup;
                 break;
             }
         }
@@ -167,22 +176,24 @@ class InputForm implements IBeanEditor
     }
 
     /**
-     * Return the InputGroup name this DataInput $input is part of
+     * Return the name of the InputGroup object this DataInput $input is part of
      * @param DataInput $input
-     * @return string The group name this DataInput is part of or NULL if this input is not part of any group.
-     * By default all input should be part of the default group - InputForm::DEFAULT_GROUP
+     * @return string The group name this DataInput is part of
+     * Non group objects are part of the 'Default group' specified with name InputForm::DEFAULT_GROUP
      */
     public function groupName(DataInput $input) : string
     {
         $result = NULL;
 
-        foreach ($this->groups as $groupName=>$inputNames)
+        foreach ($this->groups as $groupName=>$inputGroup)
         {
-            if (!is_array($inputNames)) continue;
-            if (array_key_exists($input->getName(), $inputNames)) {
-                $result = $groupName;
+            if (!($inputGroup instanceof InputGroup))continue;
+
+            if ($inputGroup->containsInput($input)) {
+                $result = $inputGroup->getName();
                 break;
             }
+
         }
 
         return $result;
@@ -243,7 +254,6 @@ class InputForm implements IBeanEditor
 
     public function insertFieldAfter(DataInput $input, string $after_name)
     {
-
         $index = array_search($after_name, array_keys($this->inputs));
 
         $this->inputs = array_slice($this->inputs, 0, $index + 1, TRUE) + array($input->getName() => $input) + array_slice($this->inputs, $index + 1, count($this->inputs) - 1, TRUE);
@@ -260,6 +270,7 @@ class InputForm implements IBeanEditor
     {
         $input = $this->getInput($name);
         $groupName = $this->groupName($input);
+
         $inputGroup = $this->getGroup($groupName);
         $inputGroup->removeInput($input);
         unset($this->inputs[$name]);
