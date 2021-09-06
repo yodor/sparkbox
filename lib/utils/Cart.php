@@ -264,7 +264,7 @@ class Cart
 
     public function store()
     {
-        Session::Set("cart", serialize($this));
+        Session::Set(SESSION_KEY, serialize($this));
     }
 
     public function addItem(CartItem $item)
