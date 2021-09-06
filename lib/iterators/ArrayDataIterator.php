@@ -12,16 +12,18 @@ class ArrayDataIterator implements IDataIterator
 
     protected $pos = -1;
 
-    public function __construct(array $arr, string $prkey = ArrayDataIterator::KEY_ID, string $value_key = ArrayDataIterator::KEY_VALUE)
+    protected $values = array();
+
+    public function __construct(array $result, string $id_key = ArrayDataIterator::KEY_ID, string $value_key = ArrayDataIterator::KEY_VALUE)
     {
 
-        $this->id_key = $prkey;
+        $this->id_key = $id_key;
         $this->value_key = $value_key;
 
         $this->values = array();
 
-        foreach ($arr as $key => $val) {
-            $this->values[] = array($this->id_key => $key, $this->value_key => $val);
+        foreach ($result as $idx => $value) {
+            $this->values[] = array($this->id_key => $idx, $this->value_key => $value);
         }
     }
 
