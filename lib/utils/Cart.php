@@ -230,25 +230,52 @@ class Cart
 
     protected $data = array();
 
+    /**
+     * @var null|Cart
+     */
     protected static $instance = NULL;
 
     const SESSION_KEY = "spark_cart";
 
+    const VERSION = "1.0";
+
+    const NOTE_MAX_LENGTH = 255;
+
     static public function Instance(): Cart
     {
         if (self::$instance instanceof Cart) {
+            debug("Returning already assigned instance");
             return self::$instance;
         }
-        if (Session::Contains(Cart::SESSION_KEY)) {
-            self::$instance = unserialize(Session::Get(Cart::SESSION_KEY));
+
+        $cart = NULL;
+        if (Session::Contains(Cart::SessionKey())) {
+            debug("Trying to de-serialize Cart object from session");
+            @$cart = unserialize(Session::Get(Cart::SessionKey()));
+
+            if ($cart instanceof Cart) {
+                debug("de-serialize success - calling delivery option initalization");
+                $cart->getDelivery()->initialize();
+            }
+            else {
+                $cart = NULL;
+            }
         }
 
-        if (! (self::$instance instanceof Cart)) {
-            self::$instance = new Cart();
-            self::$instance->store();
+        if (is_null($cart)) {
+            debug("Creating new instance of Cart");
+            $cart = new Cart();
+            $cart->store();
         }
+
+        self::$instance = $cart;
 
         return self::$instance;
+    }
+
+    static public function SessionKey() : string
+    {
+        return Cart::SESSION_KEY."-".Cart::VERSION."-".SITE_DOMAIN;
     }
 
     private function __construct()
@@ -264,7 +291,7 @@ class Cart
 
     public function store()
     {
-        Session::Set(Cart::SESSION_KEY, serialize($this));
+        Session::Set(Cart::SessionKey(), serialize($this));
     }
 
     public function addItem(CartItem $item)
@@ -354,7 +381,7 @@ class Cart
 
     public function setNote(string $text)
     {
-        $this->note = mb_substr($text, 0, 255);
+        $this->note = mb_substr($text, 0, Cart::NOTE_MAX_LENGTH);
     }
 
     public function getNote() : string

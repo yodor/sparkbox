@@ -206,7 +206,7 @@ class ImagePopup {
 
         let contents = this.modal_pane.popup.find(".Footer .Contents");
         if (caption) {
-            contents.html("<div class='Caption'>" + caption + "</div>");
+            contents.html("<h1 class='Caption'>" + caption + "</h1>");
         } else {
             contents.html("");
         }
