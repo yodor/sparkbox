@@ -173,6 +173,9 @@ class Delivery {
 
                 if (!$enabled[0]) {
                     unset($this->couriers[$id]);
+                    if ($this->selected_courier && $this->selected_courier->getID()==$id) {
+                        $this->selected_courier = null;
+                    }
                 }
                 else {
                     $courier->initialize();
@@ -180,6 +183,7 @@ class Delivery {
 
             }
         }
+
 
     }
 
@@ -256,6 +260,7 @@ class Cart
             if ($cart instanceof Cart) {
                 debug("de-serialize success - calling delivery option initalization");
                 $cart->getDelivery()->initialize();
+                $cart->store();
             }
             else {
                 $cart = NULL;
@@ -275,7 +280,7 @@ class Cart
 
     static public function SessionKey() : string
     {
-        return Cart::SESSION_KEY."-".Cart::VERSION."-".SITE_DOMAIN;
+        return Cart::SESSION_KEY."-".Cart::VERSION."-".SITE_TITLE;
     }
 
     private function __construct()
