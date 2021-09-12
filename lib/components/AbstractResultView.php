@@ -59,7 +59,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     const PAGINATOR_TOP = 1;
     const PAGINATOR_BOTTOM = 2;
 
-    public function __construct(IDataIterator $itr)
+    public function __construct(?IDataIterator $itr=null)
     {
         parent::__construct();
 
@@ -147,6 +147,11 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     {
 
         parent::startRender();
+
+        if (is_null($this->iterator)) {
+            echo "No iterator set";
+            return;
+        }
 
         $qry = clone $this->iterator;
         $qry->select->limit = 1;

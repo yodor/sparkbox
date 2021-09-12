@@ -6,7 +6,7 @@ include_once("iterators/IDataIterator.php");
 class ItemView extends AbstractResultView
 {
 
-    public function __construct(IDataIterator $itr)
+    public function __construct(?IDataIterator $itr=null)
     {
         parent::__construct($itr);
     }
