@@ -115,9 +115,19 @@ abstract class DBTableBean
 
     protected function createTable()
     {
-        $this->db->transaction();
-        $this->db->query($this->createString);
-        $this->db->commit();
+
+        try {
+            $this->db->transaction();
+            $res = $this->db->query($this->createString);
+            if (!$res) throw new Exception("Unable to create the table structure: " . $this->db->getError());
+            $this->db->commit();
+            $this->db->free($res);
+        }
+        catch (Exception $e) {
+            $this->db->rollback();
+            throw $e;
+        }
+
     }
 
     public function getTableName()
