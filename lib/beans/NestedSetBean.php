@@ -544,7 +544,15 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    //used with aggregate table. selects node and its child nodes for aggregation
+    /**
+     * Used to do table aggregation.
+     * Selects node and its child nodes for aggregation
+     * @param SQLSelect $other
+     * @param string $relation_table
+     * @param int $nodeID
+     * @param array $columns
+     * @return SQLSelect
+     */
     public function selectChildNodesWith(SQLSelect $other, string $relation_table, $nodeID = -1, array $columns = array()): SQLSelect
     {
         //other 'from' should be selected as TABLE as relation
@@ -586,7 +594,13 @@ class NestedSetBean extends DBTableBean
         return $sel;
     }
 
-    ////
+    /**
+     * Query nodeID and its parent nodes
+     * @param int $nodeID
+     * @param array $fieldNames
+     * @return array
+     * @throws Exception
+     */
     public function getParentNodes(int $nodeID, array $fieldNames = array()): array
     {
         $prkey = $this->prkey;
@@ -603,7 +617,13 @@ class NestedSetBean extends DBTableBean
         return $ret;
     }
 
-    //list the nodeID and its child nodes
+    /**
+     * Query nodeID and its child nodes
+     * @param int $nodeID
+     * @param array|null $fieldNames
+     * @return array
+     * @throws Exception
+     */
     public function getChildNodes(int $nodeID, array $fieldNames = null) : array
     {
         if (is_null($fieldNames)) {
