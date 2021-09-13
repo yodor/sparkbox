@@ -9,6 +9,8 @@ class ItemView extends AbstractResultView
     public function __construct(?IDataIterator $itr=null)
     {
         parent::__construct($itr);
+        $this->setAttribute("itemscope", "");
+        $this->setAttribute("itemtype", "https://schema.org/ItemList");
     }
 
     public function requiredStyle() : array
@@ -21,7 +23,6 @@ class ItemView extends AbstractResultView
     public function startRender()
     {
         parent::startRender();
-
         echo "<div class='viewport'>";
 
     }
@@ -30,7 +31,6 @@ class ItemView extends AbstractResultView
     {
 
         echo "</div>";
-
         parent::finishRender();
 
     }
@@ -39,6 +39,15 @@ class ItemView extends AbstractResultView
     {
 
         if (!$this->item_renderer) throw new Exception("ItemRenderer not set");
+
+        $url = fullURL(SparkPage::Instance()->getPageURL());
+
+        echo "<link itemprop='url' href='$url'>";
+        echo "<meta itemprop='numberOfItems' content='{$this->total_rows}'>";
+
+        if ($this->getName()) {
+            echo "<meta itemprop='name' content='{$this->getName()}'>";
+        }
 
         $v = new ValueInterleave("even", "odd");
 
