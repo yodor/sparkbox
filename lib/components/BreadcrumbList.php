@@ -1,4 +1,6 @@
 <?php
+include_once("components/Container.php");
+
 class BreadcrumbListItem extends Component {
 
 
@@ -10,8 +12,6 @@ class BreadcrumbListItem extends Component {
         $this->setAttribute("itemscope", "");
         $this->setAttribute("itemprop", "itemListElement");
         $this->setAttribute("itemtype", "https://schema.org/ListItem");
-
-
     }
 
 }

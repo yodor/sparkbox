@@ -11,8 +11,13 @@
 
 if (!$install_path) throw new Exception("Install path is not defined");
 
-include_once("utils/Globals.php");
-$defines = new Globals();
+include_once("utils/SparkGlobals.php");
+$defines = SparkGlobals::Instance();
+
+$defines->addIncludeLocation("beans/");
+$defines->addIncludeLocation("auth/");
+$defines->addIncludeLocation("class/beans/");
+$defines->addIncludeLocation("class/auth/");
 
 include_once("utils/functions.php");
 
@@ -158,9 +163,13 @@ else {
     include_once("utils/language_notranslator.php");
 }
 
+
+
+
 // $constants = get_defined_constants(true);
 // debug("Exported Globals: ",$constants["user"]);
 //global site wide function
 @include_once("config/globals.php");
+
 
 ?>

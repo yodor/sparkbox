@@ -6,6 +6,11 @@ include_once("utils/ImageScaler.php");
 class ImageDataResponse extends BeanDataResponse
 {
 
+    const KEY_WIDTH = "width";
+    const KEY_HEIGHT = "height";
+    const KEY_SIZE = "size";
+    const KEY_FILTER = "filter";
+
     protected $disposition = "inline";
     protected $field = "photo";
 
@@ -18,23 +23,23 @@ class ImageDataResponse extends BeanDataResponse
         $width = -1;
         $height = -1;
 
-        if (isset($_GET["width"])) {
-            $width = (int)$_GET["width"];
+        if (isset($_GET[ImageDataResponse::KEY_WIDTH])) {
+            $width = (int)$_GET[ImageDataResponse::KEY_WIDTH];
         }
 
-        if (isset($_GET["height"])) {
-            $height = (int)$_GET["height"];
+        if (isset($_GET[ImageDataResponse::KEY_HEIGHT])) {
+            $height = (int)$_GET[ImageDataResponse::KEY_HEIGHT];
         }
 
-        if (isset($_GET["size"])) {
-            $size = (int)$_GET["size"];
+        if (isset($_GET[ImageDataResponse::KEY_SIZE])) {
+            $size = (int)$_GET[ImageDataResponse::KEY_SIZE];
             $width = $size;
             $height = $size;
         }
 
         $this->scaler = new ImageScaler($width, $height);
 
-        if (isset($_GET["gray_filter"])) {
+        if (isset($_GET[ImageDataResponse::KEY_FILTER])) {
             $this->scaler->grayFilter = TRUE;
 
         }

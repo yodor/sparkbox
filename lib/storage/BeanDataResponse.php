@@ -37,14 +37,8 @@ abstract class BeanDataResponse extends HTTPResponse
         $this->id = $id;
         $this->className = $className;
 
-        @include_once("class/beans/" . $this->className . ".php");
-        if (!class_exists($this->className, FALSE)) {
-            //try sparkbox beans
-            @include_once("beans/" . $this->className . ".php");
-            if (!class_exists($this->className, FALSE)) {
-                throw new Exception("Bean class not found: " . $this->className);
-            }
-        }
+        $globals = SparkGlobals::Instance();
+        $globals->includeBeanClass($className);
 
         $this->bean = new $this->className();
 

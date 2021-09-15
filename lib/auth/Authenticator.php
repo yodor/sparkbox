@@ -301,38 +301,36 @@ abstract class Authenticator
         return $this->session->get(SessionData::LOGIN_TOKEN);
     }
 
-    public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK = TRUE)
+    public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK = TRUE) : ?AuthContext
     {
         debug("AuthorizeContext using contextName: $contextName");
 
-                //administrator access
-                if ($adminOK) {
-                    debug("Trying AdminAuthenticator first");
+        //administrator access
+        if ($adminOK) {
+            debug("Trying AdminAuthenticator first");
 
-                    include_once("auth/AdminAuthenticator.php");
-                    $auth_admin = new AdminAuthenticator();
-                    $context = $auth_admin->authorize();
-                    if ($auth_admin->authorize()) {
-                        debug("AdminAuthenticator authorization success");
-                        return $context;
-                    }
-                    else {
-                        debug("AdminAuthenticator authorization failed");
-                    }
-                }
-
-        $auth_class = "auth/$contextName.php";
-        @include_once($auth_class);
-        if (!class_exists($contextName, FALSE)) {
-            $auth_class = "class/auth/$contextName.php";
-            @include_once($auth_class);
-            if (!class_exists($contextName, FALSE)) {
-                debug("Authenticator class can not be loaded");
-                throw new Exception("Unable to locate the authorization class");
+            include_once("auth/AdminAuthenticator.php");
+            $auth_admin = new AdminAuthenticator();
+            $context = $auth_admin->authorize();
+            if ($auth_admin->authorize()) {
+                debug("AdminAuthenticator authorization success");
+                return $context;
+            }
+            else {
+                debug("AdminAuthenticator authorization failed");
             }
         }
 
-        $auth = new $contextName;
+        try {
+            $globals = SparkGlobals::Instance();
+            $globals->includeBeanClass($contextName);
+        }
+        catch (Exception $e) {
+            debug("Authenticator class can not be loaded");
+            throw new Exception("Unable to locate the authorization class");
+        }
+
+        $auth = new $contextName();
 
         if ($auth instanceof Authenticator) {
 

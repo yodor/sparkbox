@@ -1,6 +1,6 @@
 <?php
-include_once("input/DataInput.php");
 include_once("db/BeanTransactor.php");
+include_once("dbdriver/DBDriver.php");
 
 interface IDBFieldTransactor
 {
