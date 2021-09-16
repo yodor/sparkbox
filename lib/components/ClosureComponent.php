@@ -1,13 +1,16 @@
 <?php
 
-class ClosureComponent extends Component
+class ClosureComponent extends Container
 {
+    protected $wrapper_enabled = true;
+
     protected $closure = null;
 
-    public function __construct(Closure $callback)
+    public function __construct(Closure $callback, bool $wrapper_enabled = true)
     {
         parent::__construct();
         $this->closure = $callback;
+        $this->wrapper_enabled = $wrapper_enabled;
     }
 
     public function getCloser() : Closure
