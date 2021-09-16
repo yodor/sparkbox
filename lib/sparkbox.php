@@ -21,8 +21,10 @@ $defines->addIncludeLocation("class/auth/");
 
 include_once("utils/functions.php");
 
-$doc_root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', realpath($_SERVER['SCRIPT_FILENAME']));
-$location = preg_replace("!^${doc_root}!", '', $install_path);
+//$doc_root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', realpath($_SERVER['SCRIPT_FILENAME']));
+//$location = preg_replace("!^${doc_root}!", '', $install_path);
+$doc_full = realpath($_SERVER['DOCUMENT_ROOT']);
+$location = preg_replace("!^${doc_full}!", "", $install_path);
 
 //app/site deployment (server path)
 $defines->set("INSTALL_PATH", $install_path);
