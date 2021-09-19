@@ -81,7 +81,7 @@ abstract class HTMLPage extends Container
         echo "<!-- CSS Files Start -->\n";
 
         foreach ($this->css_files as $href => $usedBy) {
-            echo "<link rel='stylesheet' href='$href' type='text/css' >\n";
+            echo "<link rel='stylesheet' href='$href'>\n";
             echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
 
