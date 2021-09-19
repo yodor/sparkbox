@@ -218,7 +218,7 @@ abstract class HTMLPage extends Container
      * Adds a CSS file to this page CSS scripts collection
      * @param string $filename The filename of the CSS script.
      */
-    public function addCSS(string $filename, string $className = "", bool $prepend = FALSE, bool $preload = TRUE)
+    public function addCSS(string $filename, string $className = "", bool $prepend = FALSE, bool $preload = FALSE)
     {
         if (!$className) $className = get_class($this);
         $usedBy = array();
