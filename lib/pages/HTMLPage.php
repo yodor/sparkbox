@@ -23,6 +23,10 @@ abstract class HTMLPage extends Container
      */
     protected $js_files = array();
 
+
+    protected $async_defer = array();
+    protected $preload = array();
+
     /**
      * property array of key=>value strings used to render all meta tags of this page
      */
@@ -81,7 +85,14 @@ abstract class HTMLPage extends Container
         echo "<!-- CSS Files Start -->\n";
 
         foreach ($this->css_files as $href => $usedBy) {
-            echo "<link rel='stylesheet' href='$href'>\n";
+            $rel = "rel='stylesheet'";
+            if (isset($this->preload[$href])) {
+                $preload = $this->preload[$href];
+                if ($preload["preload"]) {
+                    $rel = "rel='preload' as='style' onload='this.rel=\"stylesheet\"'";
+                }
+            }
+            echo "<link $rel href='$href'>\n";
             echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
 
@@ -94,7 +105,14 @@ abstract class HTMLPage extends Container
         echo "<!-- JavaScript Files Start -->\n";
 
         foreach ($this->js_files as $src => $usedBy) {
-            echo "<script type='text/javascript' src='$src'></script>\n";
+            $async = "";
+            $defer = "";
+            if (isset($this->async_defer[$src])) {
+                $async_defer = $this->async_defer[$src];
+                $async = ($async_defer["async"]) ? "async" : "";
+                $defer = ($async_defer["defer"]) ? "defer" : "";
+            }
+            echo "<script $async $defer type='text/javascript' src='$src'></script>\n";
             echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
         echo "<!-- JavaScript Files End -->\n";
@@ -200,7 +218,7 @@ abstract class HTMLPage extends Container
      * Adds a CSS file to this page CSS scripts collection
      * @param string $filename The filename of the CSS script.
      */
-    public function addCSS(string $filename, string $className = "", bool $prepend = FALSE)
+    public function addCSS(string $filename, string $className = "", bool $prepend = FALSE, bool $preload = TRUE)
     {
         if (!$className) $className = get_class($this);
         $usedBy = array();
@@ -214,13 +232,16 @@ abstract class HTMLPage extends Container
             unset($this->css_files[$filename]);
             $this->css_files = array($filename => $usedBy) + $this->css_files;
         }
+
+        $this->preload[$filename] = array("preload"=>$preload);
+
     }
 
     /**
      * Adds a JavaScript file to page JavaScripts collection
      * @param string $filename The filename of the javascript.
      */
-    public function addJS(string $filename, string $className = "", bool $prepend = FALSE)
+    public function addJS(string $filename, string $className = "", bool $prepend = FALSE, bool $async = FALSE, bool $defer = FALSE)
     {
         if (!$className) $className = get_class($this);
         $usedBy = array();
@@ -235,6 +256,8 @@ abstract class HTMLPage extends Container
             unset($this->js_files[$filename]);
             $this->js_files = array($filename => $usedBy) + $this->js_files;
         }
+
+        $this->async_defer[$filename] = array("async"=>$async, "defer"=>$defer);
     }
 
 }

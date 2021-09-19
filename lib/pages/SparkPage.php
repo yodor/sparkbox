@@ -242,12 +242,13 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->addCSS(SPARK_LOCAL . "/css/MessageDialog.css");
         $this->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
 
+        $this->addJS(SPARK_LOCAL . "/js/utils.js");
         $this->addJS(SPARK_LOCAL . "/js/jquery-3.6.0.min.js");
 
         $this->addJS(SPARK_LOCAL . "/js/SparkObject.js");
         $this->addJS(SPARK_LOCAL . "/js/Component.js");
 
-        $this->addJS(SPARK_LOCAL . "/js/utils.js");
+
         $this->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
 
         $this->addJS(SPARK_LOCAL . "/js/ModalPopup.js");

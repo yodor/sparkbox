@@ -80,7 +80,7 @@ class Component extends SparkObject
     initialize() {
 
         if ($(this.selector()).get(0)) {
-            console.log(this.constructor.name + "::initialize() " + this.selector());
+            //console.log(this.constructor.name + "::initialize() " + this.selector());
         }
         else {
             throw "DOM element not found: " + this.selector();
