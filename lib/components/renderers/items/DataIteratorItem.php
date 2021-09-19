@@ -22,6 +22,19 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
 
     protected $selected = FALSE;
 
+    protected $position = 0;
+
+
+    public function setPosition(int $position)
+    {
+        $this->position = $position;
+    }
+
+    public function getPosition(int $position) : int
+    {
+        return $this->position;
+    }
+
     /**
      * During setData set the attribute '$name' to the value of $row[$field]
      * @param string $name
