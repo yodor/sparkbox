@@ -172,6 +172,9 @@ class SessionUploadInput extends InputProcessor
             debug("Cleared Session Removed UIDs for field['$field_name']");
         }
 
+        if ($this->transact_bean instanceof OrderedDataBean) {
+            $this->transact_bean->rebuildReferentialOrdering($transactor->getBean()->key(), $transactor->getLastID());
+        }
     }
 
     public function transactValue(BeanTransactor $transactor)

@@ -229,6 +229,47 @@ abstract class OrderedDataBean extends DBTableBean
         return (int)$row["max_position"];
 
     }
+
+    public function rebuildReferentialOrdering(string $ref_key, string $ref_val)
+    {
+
+        $query = $this->query("position", "$ref_key", $this->prkey);
+
+        $query->select->where()->add($ref_key, $ref_val);
+        $num = $query->exec();
+
+        $positions = array();
+        $position = 0;
+        while ($result = $query->nextResult()) {
+            $id = $result->get($this->prkey);
+            $position++;
+            $positions[$id] = $position;
+        }
+
+        try {
+            $this->db->transaction();
+
+            foreach ($positions as $id=>$pos)
+            {
+
+                $update = new SQLUpdate($query->select);
+                $update->set("position", $pos);
+                $update->where()->add($this->prkey, $id);
+
+                if (!$this->db->query($update->getSQL())) {
+                    throw new Exception("Unable to rebuild referential ordering: " . $this->db->getError());
+                }
+
+            }
+            $this->db->commit();
+        }
+        catch (Exception $e) {
+            $this->db->rollback();
+            throw $e;
+        }
+
+    }
+
 }
 
 ?>
