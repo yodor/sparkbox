@@ -30,7 +30,7 @@ class GTAG implements IHeadScript
 
             gtag('consent', 'default', {
                 'ad_storage': 'consent',
-                'analytics_storage': 'consent'
+                'analytics_storage': 'consent',
                 'wait_for_update': 5000
             });
 
