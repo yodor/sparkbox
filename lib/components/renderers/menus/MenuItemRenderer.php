@@ -63,6 +63,8 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
         }
         $this->linkTag->setContents($contents);
 
+        $this->setAttribute("title", $item->getTitle());
+
     }
 
     public function getMenuItem()
