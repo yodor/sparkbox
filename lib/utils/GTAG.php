@@ -28,14 +28,15 @@ class GTAG implements IHeadScript
                 dataLayer.push(arguments);
             }
 
+            gtag('js', new Date());
+            gtag('config', '<?php echo $this->id;?>');
+
             gtag('consent', 'default', {
                 'ad_storage': 'consent',
                 'analytics_storage': 'consent',
                 'wait_for_update': 5000
             });
 
-            gtag('js', new Date());
-            gtag('config', '<?php echo $this->id;?>');
         </script>
         <?php
         echo "\r\n<!-- End GTAG script for ID: $this->id  -->\r\n";
