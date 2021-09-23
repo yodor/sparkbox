@@ -107,7 +107,7 @@ class ImagePopup extends Component implements IPhotoRenderer
     protected function renderImpl()
     {
         if ($this->mode == ImagePopup::MODE_IMAGETAG) {
-            echo "<img src='{$this->thumb_url}'>";
+            echo "<img loading='lazy' src='{$this->thumb_url}'>";
         }
 
     }
