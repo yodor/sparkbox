@@ -153,10 +153,20 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
             return;
         }
 
-        $qry = clone $this->iterator;
-        $qry->select->limit = 1;
+        $select = clone $this->iterator->select;
+        $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
+        $select->setMode(SQLSelect::SQL_CACHE);
+        $select->limit = 1;
 
-        $this->total_rows = $qry->exec();
+        $db = $this->iterator->getDB();
+        if (!$db->query($select->getSQL())) {
+            debug("Error selecting all number of records: " . $db->getError() . " SQL: " . $select->getSQL());
+            throw new Exception($db->getError());
+        }
+        $res = $db->query("SELECT FOUND_ROWS() as total");
+        $result = $db->fetch($res);
+        $this->total_rows = (int)$result["total"];
+        $db->free($res);
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
@@ -170,9 +180,11 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
             $this->iterator->select->combine($orderFilter);
         }
 
+        $this->iterator->select->setMode(SQLSelect::SQL_CACHE);
         //echo "Final SQL: ".$this->iterator->select->getSQL();
 
-        $this->total_rows = $this->iterator->exec();
+        //number of results for the current page - limited by $this->items_per_page
+        $pageResults = $this->iterator->exec();
 
         if($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
 

@@ -24,7 +24,7 @@ class SQLUpdate extends SQLStatement
         $this->set[$column] = $value;
     }
 
-    public function getSQL($where_only = FALSE)
+    public function getSQL()
     {
         $sql = $this->type . " " . $this->from;
         $sql .= " SET ";

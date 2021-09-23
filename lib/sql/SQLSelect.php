@@ -8,11 +8,35 @@ class SQLSelect extends SQLStatement
     //TODO
     protected $fieldset;
 
+
+    const SQL_CALC_FOUND_ROWS = 1;
+    const SQL_CACHE = 2;
+    const SQL_NO_CACHE = 3;
+
+    protected $modeMask = array();
+
     public function __construct()
     {
         parent::__construct();
         $this->type = "SELECT";
         $this->fieldset = new ColumnCollection();
+    }
+
+    public function setMode(int $mode_clause)
+    {
+        $this->modeMask[$mode_clause] = 1;
+    }
+
+    public function unsetMode(int $mode_clause)
+    {
+        if (isset($this->modeMask[$mode_clause])) {
+            unset($this->modeMask[$mode_clause]);
+        }
+    }
+
+    public function haveMode(int $mode_clause) : bool
+    {
+        return isset($this->modeMask[$mode_clause]);
     }
 
     public function fields(): ColumnCollection
@@ -26,34 +50,34 @@ class SQLSelect extends SQLStatement
         $this->fieldset = clone $this->fieldset;
     }
 
-    public function getSQL($where_only = FALSE, $add_calc = TRUE)
+    public function getSQL()
     {
-        if ( ($this->fieldset->count()<1) && (!$where_only)) {
+        if ( ($this->fieldset->count()<1) ) {
 
             throw new Exception("Empty fieldset");
         }
 
         $sql = "";
 
-        if ($where_only) {
-            //
+
+        $sql .= $this->type." ";
+
+        if (isset($this->modeMask[SQLSelect::SQL_CALC_FOUND_ROWS])) {
+            $sql .= " SQL_CALC_FOUND_ROWS ";
         }
-        else {
-            $sql .= $this->type." ";
-
-            if ($add_calc) {
-                $sql .= " SQL_CALC_FOUND_ROWS ";
-
-            }
-
-            //prefer fields from the fieldset
-            if ($this->fieldset->count() > 0) {
-                $sql .= $this->fieldset->getSQL();
-            }
-
-            $sql .= " FROM {$this->from} ";
-
+        if (isset($this->modeMask[SQLSelect::SQL_CACHE])) {
+            $sql .= " SQL_CACHE ";
         }
+        if (isset($this->modeMask[SQLSelect::SQL_NO_CACHE])) {
+            $sql .= " SQL_NO_CACHE ";
+        }
+
+        //prefer fields from the fieldset
+        if ($this->fieldset->count() > 0) {
+            $sql .= $this->fieldset->getSQL();
+        }
+
+        $sql .= " FROM {$this->from} ";
 
         if ($this->whereset->count()>0) {
             $sql.=$this->whereset->getSQL(true);
@@ -155,7 +179,7 @@ class SQLSelect extends SQLStatement
     {
         $sel = new SQLSelect();
 
-        $sel->from = " (".$this->getSQL(false, false).") AS $as_name ";
+        $sel->from = " (".$this->getSQL().") AS $as_name ";
 
         return $sel;
     }

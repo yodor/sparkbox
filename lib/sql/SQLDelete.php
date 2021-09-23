@@ -18,7 +18,7 @@ class SQLDelete extends SQLStatement
         }
     }
 
-    public function getSQL($where_only = FALSE)
+    public function getSQL()
     {
         $sql = $this->type . " FROM " . $this->from;
 

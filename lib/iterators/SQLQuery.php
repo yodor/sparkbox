@@ -72,10 +72,7 @@ class SQLQuery implements IDataIterator
             throw new Exception($this->db->getError());
         }
 
-        $res = $this->db->query("SELECT FOUND_ROWS() as total");
-        $row = $this->db->fetch($res);
-        $this->numResults = (int)$row["total"];
-        $this->db->free($res);
+        $this->numResults = $this->db->numRows($this->res);
 
         return $this->numResults;
     }

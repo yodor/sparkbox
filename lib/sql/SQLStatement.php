@@ -21,7 +21,7 @@ abstract class SQLStatement
     public $limit = "";
     public $having = "";
 
-    public abstract function getSQL($where_only = FALSE);
+    public abstract function getSQL();
 
     public function __construct()
     {
