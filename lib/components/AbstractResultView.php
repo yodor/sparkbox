@@ -162,7 +162,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->iterator->select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
         $this->iterator->select->setMode(SQLSelect::SQL_CACHE);
 
-        echo "Final SQL: ".$this->iterator->select->getSQL();
+        //echo "Final SQL: ".$this->iterator->select->getSQL();
 
         $pageResults = $this->iterator->exec();
 
