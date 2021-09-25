@@ -6,11 +6,17 @@ include_once("iterators/IDataIterator.php");
 class ItemView extends AbstractResultView
 {
 
+    protected $items_per_group = 0;
+    protected $group_container = NULL;
+
     public function __construct(?IDataIterator $itr=null)
     {
         parent::__construct($itr);
         $this->setAttribute("itemscope", "");
         $this->setAttribute("itemtype", "https://schema.org/ItemList");
+        $this->group_container = new Container();
+        $this->group_container->setComponentClass("group");
+
     }
 
     public function requiredStyle() : array
@@ -35,6 +41,11 @@ class ItemView extends AbstractResultView
 
     }
 
+    public function setItemsPerGroup(int $number)
+    {
+        $this->items_per_group = $number;
+    }
+
     protected function renderImpl()
     {
 
@@ -49,13 +60,24 @@ class ItemView extends AbstractResultView
             echo "<meta itemprop='name' content='{$this->getName()}'>";
         }
 
-        $v = new ValueInterleave("even", "odd");
+        $v = new ValueInterleave();
 
         $this->position_index = 0;
+
+        $group_listed = 0;
+
+        if ($this->items_per_group>0 && $this->paged_rows<$this->items_per_group) {
+            $this->group_container->setAttribute("single", "");
+        }
 
         while ($row = $this->iterator->next()) {
 
             $cls = $v->value();
+
+            $this->item_renderer->setAttribute("parity", $cls);
+            if ($this->items_per_group>0 && $group_listed==0) {
+                $this->group_container->startRender();
+            }
 
             $this->item_renderer->setPosition($this->position_index+1);
             $this->item_renderer->setID($row[$this->iterator->key()]);
@@ -65,8 +87,18 @@ class ItemView extends AbstractResultView
             $this->item_renderer->renderSeparator($this->position_index, $this->total_rows);
 
             $this->position_index++;
+            $group_listed++;
+
+            if ($this->items_per_group>0 && $group_listed==$this->items_per_group) {
+                $this->group_container->finishRender();
+                $group_listed=0;
+            }
 
             $v->advance();
+        }
+
+        if ($this->items_per_group>0 && $group_listed>0 && $group_listed<$this->items_per_group) {
+            $this->group_container->finishRender();
         }
     }
 

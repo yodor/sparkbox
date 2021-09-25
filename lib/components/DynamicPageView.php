@@ -40,7 +40,7 @@ class DynamicPageView extends Container
             return;
         }
 
-        $bean->columnNames();
+        //$bean->columns();
         //TODO: check item_title, content, visible is present in this bean
 
         $prkey = $bean->key();

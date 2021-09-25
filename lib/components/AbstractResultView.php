@@ -23,6 +23,8 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      */
     protected $total_rows = 0;
 
+    protected $paged_rows = 0;
+
     protected $current_row = array();
 
     /**
@@ -178,7 +180,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         //echo "Final SQL: ".$this->iterator->select->getSQL();
 
-        $pageResults = $this->iterator->exec();
+        $this->paged_rows = $this->iterator->exec();
 
         if($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
             $this->paginator_top->render();

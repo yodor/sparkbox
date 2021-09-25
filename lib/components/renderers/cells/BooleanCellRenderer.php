@@ -8,7 +8,7 @@ class BooleanCellRenderer extends TableCellRenderer
     protected $true_value = "Enabled";
     protected $false_value = "Disabled";
 
-    public function __construct($true_value = "Enabled", $false_value = "Disabled")
+    public function __construct(string $true_value = "Enabled", string $false_value = "Disabled")
     {
         parent::__construct();
 

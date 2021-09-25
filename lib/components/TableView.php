@@ -177,7 +177,7 @@ class TableView extends AbstractResultView implements IHeadContents
     protected function renderImpl()
     {
 
-        $v = new ValueInterleave("even", "odd");
+        $v = new ValueInterleave();
         $this->position_index = 0;
 
         while ($data = $this->iterator->next()) {

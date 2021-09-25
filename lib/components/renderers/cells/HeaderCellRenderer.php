@@ -1,17 +1,29 @@
 <?php
 include_once("components/renderers/cells/TableCellRenderer.php");
 
-class HeaderCellRenderer extends TableCellRenderer
+class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
 {
 
     protected $tagName = "TH";
-    protected $sort_field = "";
-    protected $sort_href = "";
+    protected $sortField = "";
+    protected $sortLink = NULL;
 
-    public function __construct($is_sortable = TRUE)
+    const KEY_ORDER_BY = "orderby";
+    const KEY_ORDER_DIR = "orderdir";
+
+    public function __construct()
     {
         parent::__construct();
         $this->translation_enabled = true;
+        $this->sortLink = new URLBuilder();
+        $this->sortLink->add(new URLParameter(HeaderCellRenderer::KEY_ORDER_BY));
+        $this->sortLink->add(new URLParameter(HeaderCellRenderer::KEY_ORDER_DIR, "ASC"));
+
+    }
+
+    public function setDefaultOrderDirection(string $order_dir)
+    {
+        $this->sortLink->get(self::KEY_ORDER_DIR)->setValue($order_dir);
     }
 
     public function isSortable(): bool
@@ -26,24 +38,33 @@ class HeaderCellRenderer extends TableCellRenderer
 
     public function setSortField(string $field)
     {
-        $this->sort_field = $field;
+        $this->sortField = $field;
     }
 
     protected function renderImpl()
     {
         if ($this->column->isSortable()) {
 
-            echo "<a href='$this->sort_href'>";
+            //default order by field name asc
+            echo "<a href='{$this->sortLink->url()}'>";
             parent::renderImpl();
             echo "</a>";
 
-            $arr = "&darr;";
-            if (isset($_GET["orderdir"]) && strcmp($_GET["orderdir"], "DESC") == 0) {
-                $arr = "&uarr;";
+            //current page is using sort by 'this' column
+            if (strcmp_isset(self::KEY_ORDER_BY, $this->sortField, $_GET)) {
+                //show the arrow link to change order direction
+                if (strcmp_isset(self::KEY_ORDER_DIR, "ASC", $_GET)) {
+                    //current list is ordered ASC show up arrow and href with opposite direction
+                    $this->sortLink->get(self::KEY_ORDER_DIR)->setValue("DESC");
+                    echo "<a class='direction' direction='ASC' href='{$this->sortLink->url()}'></a>";
+                }
+                else {
+                    $this->sortLink->get(self::KEY_ORDER_DIR)->setValue("ASC");
+                    echo "<a class='direction' direction='DESC' href='{$this->sortLink->url()}'></a>";
+                }
+
             }
-            if (isset($_GET["orderby"]) && strcmp($_GET["orderby"], $this->sort_field) == 0) {
-                echo "<span class='sort_direction'>$arr</span>";
-            }
+
         }
         else {
             parent::renderImpl();
@@ -59,32 +80,23 @@ class HeaderCellRenderer extends TableCellRenderer
 
         if ($this->isSortable()) {
 
-            $qry = $_GET;
-
-            if (!$this->sort_field) {
-                $this->sort_field = $this->column->getFieldName();
+            if (!$this->sortField) {
+                $this->sortField = $this->column->getFieldName();
             }
 
-            $odir = "ASC";
-
-            if (isset($qry["orderdir"]) && (isset($qry["orderby"]) && strcmp($qry["orderby"], $this->sort_field) == 0)) {
-                if (strcmp($qry["orderdir"], "ASC") == 0) {
-                    $odir = "DESC";
-                }
-                else {
-                    $odir = "ASC";
-                }
-            }
-
-            $qry["orderby"] = $this->sort_field;
-            $qry["orderdir"] = $odir;
-
-            $this->sort_href = queryString($qry);
+            $this->sortLink->get(HeaderCellRenderer::KEY_ORDER_BY)->setValue($this->sortField);
 
         }
 
     }
 
+    /**
+     * @return array The parameter names this object is interacting with
+     */
+    public function getParameterNames(): array
+    {
+        return array(HeaderCellRenderer::KEY_ORDER_BY, HeaderCellRenderer::KEY_ORDER_DIR);
+    }
 }
 
 ?>

@@ -73,16 +73,6 @@ class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
         echo "</div>";
     }
 
-    //    /**
-    //     * Add default query parameter to all actions in this collection
-    //     * @param URLParameter $param
-    //     * @return void
-    //     */
-    //    public function addURLParameter(URLParameter $param)
-    //    {
-    //        // TODO: Implement addURLParameter() method.
-    //        $this->urlparam = $param;
-    //    }
 }
 
 ?>

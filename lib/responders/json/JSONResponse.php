@@ -2,8 +2,6 @@
 
 class JSONResponse
 {
-
-    //   $ret = array("status"=>"error", "message"=>"", "name"=>"RatingPostResponse");
     const STATUS_ERROR = "error";
     const STATUS_OK = "OK";
 
@@ -11,20 +9,15 @@ class JSONResponse
     public $message = "";
     public $name = "";
 
-    //holds contents to be rendered
-    // 	public $contents = "";
-
     public function __construct($name)
     {
         $this->status = JSONResponse::STATUS_ERROR;
-
         $this->name = $name;
     }
 
     public function setName($name)
     {
         $this->name = $name;
-
     }
 
     public function send()

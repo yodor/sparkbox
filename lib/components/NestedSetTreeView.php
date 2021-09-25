@@ -6,7 +6,7 @@ include_once("components/renderers/items/DataIteratorItem.php");
 include_once("beans/NestedSetBean.php");
 include_once("iterators/IDataIterator.php");
 
-//TODO: extend AbstractResultView?
+
 class NestedSetTreeView extends Component implements IDataIteratorRenderer
 {
 
@@ -14,26 +14,22 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     const BRANCH_CLOSED = "closed";
     const BRANCH_LEAF = "leaf";
 
-    //    const ICON_HANDLE_OPEN = "+";
-    //    const ICON_HANDLE_CLOSE = "-";
-    //    const ICON_HANDLE_LEAF = "&middot";
+    const MODE_BRANCHES_FOLDED = 1;
+    const MODE_BRANCHES_UNFOLDED = 2;
 
-    public $open_all = FALSE;
-
-    //    protected $data_source = NULL;
-    //    protected $select_qry = NULL;
+    protected $branch_render_mode = NestedSetTreeView::MODE_BRANCHES_FOLDED;
 
     /**
      * @var IDataIterator
      */
-    public $iterator = NULL;
+    protected $iterator = NULL;
 
     /**
      * @var DataIteratorItem
      */
     protected $item = NULL;
 
-    protected $selected_nodeID = NULL;
+    protected $selected_nodeID = -1;
     protected $selection_path = array();
 
     public function __construct()
@@ -65,30 +61,25 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     public function getIterator(): IDataIterator
     {
         return $this->iterator;
-
     }
 
-    public function setSelectedID($nodeID)
+    public function setSelectedID(int $nodeID)
     {
         $this->selected_nodeID = (int)$nodeID;
-
-        //        $this->selection_path = $this->data_source->constructPath($this->selected_nodeID);
     }
 
     /**
      * Available after rendering and selected_nodeID is > -1
      * @return array
      */
-    public function getSelectionPath()
+    public function getSelectionPath() : array
     {
-
         return $this->selection_path;
-
     }
 
-    public function getSelectedID()
+    public function getSelectedID() : int
     {
-        return $this->selected_nodeID;
+        return (int)$this->selected_nodeID;
     }
 
     public function setItemRenderer(DataIteratorItem $renderer)
@@ -101,6 +92,16 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         return $this->item;
     }
 
+    public function setBranchRenderMode(int $mode)
+    {
+        $this->branch_render_mode = $mode;
+    }
+
+    public function getBranchRenderMode() : int
+    {
+        return $this->branch_render_mode;
+    }
+
     protected function renderImpl()
     {
 
@@ -110,8 +111,9 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
         $open_tags = 0;
 
-        //echo $this->iterator->select->getSQL();
-        $this->iterator->select->setMode(SQLSelect::SQL_CACHE);
+        if ($this->iterator instanceof SQLQuery) {
+            $this->iterator->select->setMode(SQLSelect::SQL_CACHE);
+        }
 
         $num = $this->iterator->exec();
 
@@ -128,7 +130,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             $nodeID = $row[$source_key];
 
             $branch_type = NestedSetTreeView::BRANCH_CLOSED;
-            if ($this->open_all) {
+            if ($this->branch_render_mode == NestedSetTreeView::MODE_BRANCHES_UNFOLDED) {
                 $branch_type = NestedSetTreeView::BRANCH_OPENED;
             }
             if ($rgt == $lft + 1) {
@@ -158,28 +160,18 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
                 $selected = TRUE;
             }
 
-
             echo "<li class='NodeOuter'>";
             $open_tags++;
-
-            //$selected = ($nodeID == $this->selected_nodeID) ? true : false;
 
             $item = $this->item;
             $item->setID($nodeID);
             $item->setData($row);
-
             $item->setAttribute("branch_type", $branch_type);
-
             $item->setSelected($selected);
 
             $item_label = $item->getLabel();
 
-//            if (isset($row["related_count"])) {
-//                $item_label .= " (" . $row["related_count"] . ")";
-//            }
-
             $item->setLabel($item_label);
-
             $item->render();
 
             echo "<ul class='NodeChilds'>";

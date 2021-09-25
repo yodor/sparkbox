@@ -249,7 +249,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
         //$month_list = array("January", "February", "March", "April", "May", "June", "July", "August", "September",
          //                   "October", "November", "December");
 
-        $v = new ValueInterleave("even", "odd");
+        $v = new ValueInterleave();
 
         $cls = $v->value();
 

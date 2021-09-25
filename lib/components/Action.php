@@ -7,11 +7,6 @@ include_once("components/renderers/items/DataIteratorItem.php");
 class Action extends DataIteratorItem
 {
 
-
-    /**
-     * Generic class for handling action and parametrization of its href
-     */
-
     protected $tagName = "A";
 
     protected $check_code = NULL;
@@ -28,12 +23,10 @@ class Action extends DataIteratorItem
     public $action_as_contents = TRUE;
 
     /**
-     * Action constructor.
-     *
-     * @param string $contents
+     * @param string $action
      * @param string $href
      * @param array $parameters
-     * @param string $check_code this will be eval'ed before rendering
+     * @param Closure|null $check_code
      */
     public function __construct(string $action = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
     {
@@ -124,12 +117,12 @@ class Action extends DataIteratorItem
 
     }
 
-    public function getCheckCode()
+    public function getCheckCode() : ?Closure
     {
         return $this->check_code;
     }
 
-    public function setCheckCode($check_code)
+    public function setCheckCode(?Closure $check_code)
     {
         $this->check_code = $check_code;
     }

@@ -3,30 +3,28 @@
 class ValueInterleave
 {
 
-    private $iter;
 
-    public function __construct($cls_even, $cls_odd = FALSE)
+    protected $obj = NULL;
+    protected $iterator = NULL;
+
+    public function __construct(array $items=array("even", "odd"))
     {
-        if (is_array($cls_even)) {
-            $this->iter = new ArrayIterator($cls_even);
-        }
-        else {
-            $this->iter = new ArrayIterator(array($cls_even, $cls_odd));
-        }
-
+        $this->obj = new ArrayObject( $items );
+        $this->iterator = $this->obj->getIterator();
     }
+
 
     public function advance()
     {
-        $this->iter->next();
-        if (!$this->iter->valid()) $this->iter->rewind();
+        $this->iterator->next();
+        if (!$this->iterator->valid()) {
+            $this->iterator->rewind();
+        }
     }
 
-    public function value()
+    public function value() : string
     {
-        if (!$this->iter->valid()) $this->iter->rewind();
-
-        return $this->iter->current();
+        return $this->iterator->current();
     }
 
 }
