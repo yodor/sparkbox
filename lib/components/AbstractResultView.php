@@ -153,26 +153,32 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
             return;
         }
 
+        $select = clone $this->iterator->select;
+        $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
+        $select->setMode(SQLSelect::SQL_CACHE);
+        $select->fields()->reset();
+        $select->fields()->set("count(*)");
+        $select->limit = "";
+
+        //echo "Count SQL: ".$select->getSQL();
+        $db = $this->iterator->getDB();
+        $res = $db->query($select->getSQL());
+        $this->total_rows = $db->numRows($res);
+        $db->free($res);
+
+        $this->paginator->calculate($this->total_rows, $this->items_per_page);
+
         $orderFilter = $this->paginator->prepareOrderFilter($this->default_order);
-        $pageFilter = $this->paginator->preparePageFilter($this->items_per_page);
+        $pageFilter = $this->paginator->preparePageFilter();
 
         $this->iterator->select->combine($pageFilter);
         $this->iterator->select->combine($orderFilter);
 
-        $this->iterator->select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
-        $this->iterator->select->setMode(SQLSelect::SQL_CACHE);
+        $this->iterator->select->setMode(SQLSelect::SQL_NO_CACHE);
 
         //echo "Final SQL: ".$this->iterator->select->getSQL();
 
         $pageResults = $this->iterator->exec();
-
-        $db = $this->iterator->getDB();
-        $res = $db->query("SELECT FOUND_ROWS() as total");
-        $result = $db->fetch($res);
-        $this->total_rows = (int)$result["total"];
-        $db->free($res);
-
-        $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
         if($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
             $this->paginator_top->render();

@@ -272,21 +272,11 @@ class Paginator implements IGETConsumer
         return $filter;
     }
 
-    public function preparePageFilter(int $items_per_page) : SQLSelect
+    public function preparePageFilter() : SQLSelect
     {
-        $this->ipp = $items_per_page;
 
         $filter = new SQLSelect();
         $filter->from = "";
-
-        $page = 0;
-        if (isset($_GET[Paginator::KEY_PAGE])) {
-            $page = (int)$_GET[Paginator::KEY_PAGE];
-        }
-
-        if ($page < 0) $page = 0;
-
-        $this->page = $page;
 
         if ($this->ipp > 0) {
             $filter->limit = " " . ($this->page * $this->ipp) . ", {$this->ipp}";
