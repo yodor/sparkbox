@@ -154,7 +154,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         }
 
         $orderFilter = $this->paginator->prepareOrderFilter($this->default_order);
-        $pageFilter = $this->paginator->preparePageFilter();
+        $pageFilter = $this->paginator->preparePageFilter($this->items_per_page);
 
         $this->iterator->select->combine($pageFilter);
         $this->iterator->select->combine($orderFilter);
