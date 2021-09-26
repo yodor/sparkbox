@@ -110,6 +110,7 @@ abstract class BeanDataResponse extends HTTPResponse
             debug("Fetching ID: " . $this->id . " Bean: " . get_class($this->bean));
             $this->row = $this->bean->getByID($this->id);
             debug("Data: ", array_keys($this->row));
+
         }
 
         if (!isset($this->row[$this->field])) {
@@ -127,8 +128,8 @@ abstract class BeanDataResponse extends HTTPResponse
 
             debug("Unpacked: " . get_class($object));
 
-            //replace result with storageobject data
-            $this->row = array();
+            //replace result with storageobject data?
+            //$this->row = array();
             //image resizer expects row["photo"]
             $object->setDataKey($this->field);
             $object->deconstruct($this->row, FALSE);
@@ -163,14 +164,22 @@ abstract class BeanDataResponse extends HTTPResponse
         // set headers and etag
         $last_modified = gmdate(BeanDataResponse::DATE_FORMAT);
 
-        if (isset($this->row["date_upload"])) {
+        //use timestamp from storage object
+        if (isset($this->row["timestamp"]) && $this->row["timestamp"]) {
+            $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["timestamp"]));
+            debug("Using last-modified from [timestamp]: ".$last_modified);
+        }
+        else if (isset($this->row["date_upload"])) {
             $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["date_upload"]));
+            debug("Using last-modified from [date_upload]: ".$last_modified);
         }
         else if (isset($this->row["date_updated"])) {
             $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["date_updated"]));
+            debug("Using last-modified from [date_updated]: ".$last_modified);
         }
-
-        debug("last-modified: $last_modified");
+        else {
+            debug("Using last-modified from current date/time: ".$last_modified);
+        }
 
         //always keep one year ahead from request time
         $expires = gmdate(BeanDataResponse::DATE_FORMAT, strtotime("+1 year"));
@@ -195,7 +204,9 @@ abstract class BeanDataResponse extends HTTPResponse
 
         $this->setHeader("Cache-Control", "no-cache, must-revalidate");
 
-        //header("Pragma: ".$this->headers["etag"]);
+        //$this->setHeader("Vary", "User-Agent");
+
+        //header("Pragma: ".$etag);
 
         $filename = $etag;
         if (isset($this->row["filename"])) {
@@ -207,37 +218,6 @@ abstract class BeanDataResponse extends HTTPResponse
         $this->setHeader("Content-Transfer-Encoding", "binary");
 
     }
-
-    protected function requestETag()
-    {
-        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
-            return $_SERVER['HTTP_IF_NONE_MATCH'];
-        }
-        return "";
-    }
-
-    //    protected function isBrowserCached()
-    //    {
-    //
-    //        // error_log("Storage::checkCache last_modified: $last_modified | expire: $expire | etag: $etag",4);
-    //
-    //        // check if the last modified date sent by the client is the the same as
-    //        // the last modified date of the requested file. If so, return 304 header
-    //        // and exit.
-    //
-    //        // check if the Etag sent by the client is the same as the Etag of the
-    //        // requested file. If so, return 304 header and exit.
-    //
-    //        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
-    //            //error_log("Storage::checkCache HTTP_IF_NONE_MATCH: ".$_SERVER['HTTP_IF_NONE_MATCH'],4);
-    //            $pos = strpos($_SERVER['HTTP_IF_NONE_MATCH'], $this->getHeader("ETag"));
-    //            if ($pos !== FALSE) {
-    //                return TRUE;
-    //            }
-    //        }
-    //
-    //        return FALSE;
-    //    }
 
     /**
      * @throws Exception

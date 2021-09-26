@@ -105,7 +105,7 @@ class StorageObject
 
         }
         $row["size"] = $this->length;
-        $row["date_upload"] = $this->timestamp;
+        $row["timestamp"] = $this->timestamp;
     }
 
     public static function reconstruct(&$row, $field_name): StorageObject

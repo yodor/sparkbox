@@ -63,14 +63,44 @@ class HTTPResponse
 
     public function sendNotModified()
     {
+        //RFC https://datatracker.ietf.org/doc/html/rfc7232#section-4.1
+        //Cache-Control, Content-Location, Date, ETag, Expires, and Vary
         $this->clearHeaders();
         $this->setHeader("HTTP/1.1 304 Not Modified");
-        $this->setHeader("Last-Modified", gmdate("D, d M Y H:i:s T"));
         $this->setHeader("Cache-Control", "no-cache, must-revalidate");
+
+        $expires = gmdate(BeanDataResponse::DATE_FORMAT, strtotime("+1 year"));
+        $this->setHeader("Expires", $expires);
+
+        $req_modified = $this->requestModifiedSince();
+        if ($req_modified) {
+            $this->setHeader("Last-Modified", $req_modified);
+        }
+
+        $etag = $this->requestETag();
+        if ($etag) {
+            $this->setHeader("ETag", $etag);
+        }
+
+
         $this->sendHeaders();
         exit;
     }
 
+    protected function requestETag()
+    {
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+            return $_SERVER['HTTP_IF_NONE_MATCH'];
+        }
+        return "";
+    }
+    protected function requestModifiedSince()
+    {
+        if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+            return $_SERVER['HTTP_IF_MODIFIED_SINCE'];
+        }
+        return "";
+    }
     protected function sendHeaders()
     {
         foreach ($this->headers as $key => $val) {
