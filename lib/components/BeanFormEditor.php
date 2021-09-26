@@ -241,7 +241,8 @@ class BeanFormEditor extends Container implements IBeanEditor
                 //reload after adding item?
                 if ($this->editID < 1) {
 
-                    Session::SetAlert(tr($this->getMessage(BeanFormEditor::MESSAGE_ADD)));
+                    $msg = $this->getMessage(BeanFormEditor::MESSAGE_ADD);
+                    if ($msg) Session::SetAlert(tr($msg));
 
                     if (!$redirectURL) {
                         debug("RedirectURL is not set - Setting redirectURL to the edit location");
@@ -253,7 +254,9 @@ class BeanFormEditor extends Container implements IBeanEditor
 
                 }
                 else {
-                    Session::SetAlert(tr($this->getMessage(BeanFormEditor::MESSAGE_UPDATE)));
+
+                    $msg = $this->getMessage(BeanFormEditor::MESSAGE_UPDATE);
+                    if ($msg) Session::SetAlert(tr($msg));
 
                     if (!$redirectURL) {
                         debug("RedirectURL is not set - Setting redirectURL to the current location");
