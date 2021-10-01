@@ -159,13 +159,29 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
         $select->setMode(SQLSelect::SQL_CACHE);
         $select->fields()->reset();
-        $select->fields()->set("count(*)");
+        $select->fields()->set("count(*) as total");
         $select->limit = "";
 
         //echo "Count SQL: ".$select->getSQL();
         $db = $this->iterator->getDB();
         $res = $db->query($select->getSQL());
-        $this->total_rows = $db->numRows($res);
+        if (!$res) {
+            debug("Error fetching result count: " . $db->getError() . " SQL: " . $select->getSQL());
+            throw new Exception($db->getError());
+        }
+        $numRows = $db->numRows($res);
+        if ($numRows==1) {
+            if ($result = $db->fetch($res)) {
+                $this->total_rows = $result["total"];
+            }
+        }
+        else {
+            $this->total_rows = $numRows;
+        }
+
+        //
+
+        //echo $this->total_rows;
         $db->free($res);
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
