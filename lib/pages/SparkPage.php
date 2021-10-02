@@ -11,6 +11,8 @@ include_once("utils/IActionCollection.php");
 include_once("utils/ActionCollection.php");
 include_once("utils/FBPixel.php");
 include_once("utils/GTAG.php");
+include_once("utils/GTAGObject.php");
+
 
 class SparkPage extends HTMLPage implements IActionCollection
 {
@@ -268,6 +270,20 @@ class SparkPage extends HTMLPage implements IActionCollection
             if ($facebookID_pixel) {
                 $this->fbpixel = new FBPixel($facebookID_pixel);
             }
+
+            $adsID = $config->get("googleID_ads", "");
+            $conversionID = $config->get("googleID_ads_conversion", "");
+            if ($adsID && $conversionID) {
+                $obj = new GTAGObject();
+                $obj->setCommand(GTAGObject::COMMAND_EVENT);
+                $obj->setType("conversion");
+                $obj->setParamTemplate("{'send_to': '%googleID_ads_conversion%'}");
+                $obj->setName("googleID_ads_conversion");
+                $data = array("googleID_ads_conversion"=>$conversionID);
+                $obj->setData($data);
+                $this->addGTAGObject($obj);
+            }
+
         }
     }
 
