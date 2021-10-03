@@ -270,21 +270,23 @@ function showExceptonDetails(lnk) {
     showAlert($(lnk).next().html());
 }
 
-
-function validateEmail(fld) {
-    var error = "";
-    fld.value = trim(fld.value);
-    var tfld = fld.value; // value of field with whitespace trimmed off
+function validateEmailText(value) {
+    let error = "";
+    value = trim(value);
 
     var emailFilter = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-
-    if (fld.value == "") {
+    if (!value) {
         //  fld.style.color = '#FFAFAF';
         error = "You didn't enter an email address.\n";
 
-    } else if (!emailFilter.test(tfld)) {              //test email for illegal 
+    } else if (!emailFilter.test(value)) {              //test email for illegal
         error = "Please enter a valid email address.\n";
     }
     return error;
+}
+
+function validateEmail(fld) {
+    let value = trim(fld.value);
+    return validateEmailText(value);
 }
