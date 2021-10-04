@@ -144,6 +144,7 @@ class Container extends Component
 
     protected function renderImpl()
     {
+        parent::renderImpl();
         $indexes = array_keys($this->items);
         foreach ($indexes as $idx => $index) {
             $component = $this->get($index);
