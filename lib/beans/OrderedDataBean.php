@@ -53,7 +53,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         debug("ID: $id position - current: $pos max: $maxp new: $new_pos");
 
-        if ($new_pos > $maxp) $new_pos = $maxp;
+        //if ($new_pos > $maxp) $new_pos = $maxp;
         if ($new_pos < 1) $new_pos = 1;
 
         debug("Using pos: $new_pos");
