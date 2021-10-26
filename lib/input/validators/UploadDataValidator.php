@@ -26,6 +26,11 @@ abstract class UploadDataValidator implements IInputValidator
         $this->accept_mimes = $accept_mimes;
     }
 
+    public function getAcceptMimes() : array
+    {
+        return $this->accept_mimes;
+    }
+
     public static function errString(int $err, int $maxsize = 0) : string
     {
         $ret = "Undefined error: $err";
