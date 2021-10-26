@@ -1,4 +1,10 @@
-
+:root {
+    --spark-button-background-color: #506266;
+    --spark-submit-button-background-color: #f1af5b;
+    --spark-submit-button-border-color: #ac5c05;
+    --spark-submit-button-background-from: #f9a541;
+    --spark-submit-button-background-to: #f78f14;
+}
 INPUT[type="submit"]::-moz-focus-inner, INPUT[type="button"]::-moz-focus-inner, A {
     border: 0;
 }
@@ -35,7 +41,7 @@ INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
     text-decoration: none;
 
     color: #fff;
-    background-color: #506266;
+    background-color: var(--spark-button-background-color);
 
     cursor: pointer;
 
@@ -83,12 +89,12 @@ TD.input_field {
 }
 
 .ColorButton[action="submit"]  {
-    border-color: #ac5c05;
-    background-color: #f1af5b;
-    background: -webkit-gradient(linear, 0 0, 0 bottom, from(#f9a541), to(#f78f14));
-    background: -webkit-linear-gradient(#f9a541, #f78f14);
-    background: -moz-linear-gradient(#f9a541, #f78f14);
-    background: -ms-linear-gradient(#f9a541, #f78f14);
-    background: -o-linear-gradient(#f9a541, #f78f14);
-    background: linear-gradient(#f9a541, #f78f14);
+    border-color: var(--spark-submit-button-border-color);
+    background-color: var(--spark-button-background-color);
+    background: -webkit-gradient(linear, 0 0, 0 bottom, from(var(--spark-submit-button-background-from)), to(var(--spark-submit-button-background-to)));
+    background: -webkit-linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
+    background: -moz-linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
+    background: -ms-linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
+    background: -o-linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
+    background: linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
 }

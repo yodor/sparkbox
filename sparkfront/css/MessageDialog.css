@@ -1,4 +1,9 @@
-
+:root {
+    --spark-dialog-background: #ffffff;
+    --spark-dialog-title-background: #000000;
+    --spark-dialog-title-fontsize: 1em;
+    --spark-dialog-title-color: #ffffff;
+}
 .PopupPanel.MessageDialog {
     box-sizing: border-box;
 }
@@ -53,7 +58,7 @@
 
 .MessageDialog .Inner {
 
-    background-color: #eeeeee;
+    background-color: var(--spark-dialog-background);
 
     height: 100%;
     width: 100%;
@@ -62,11 +67,8 @@
 
     box-sizing: border-box;
 
-    /*border-collapse: collapse;*/
+    border-spacing: 0.15em;
 
-    border-spacing: 0.2em;
-
-    border-color: greenyellow;
 }
 
 .MessageDialog .Inner .Header {
@@ -94,11 +96,11 @@
 .MessageDialog .Header .Caption {
 
     font-weight: bold;
-    font-size: 1.1em;
+    font-size: var(--spark-dialog-title-fontsize);
 
-    color: white;
+    color: var(--spark-dialog-title-color);
 
-    background-color: #525252;
+    background-color: var(--spark-dialog-title-background);
 
     cursor: move;
 
