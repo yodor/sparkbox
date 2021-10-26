@@ -79,6 +79,13 @@ abstract class SessionUpload extends ArrayField
         if ($transact_max>0) {
                 $max_slots = $transact_max;
         }
+        if ($this instanceof SessionFile) {
+            $validator = $this->input->getValidator()->getItemValidator();
+            if ($validator instanceof UploadDataValidator) {
+
+                echo "<div field='accept_mimes'><label>Accept MIMEs: </label><span>" . implode(";",$validator->getAcceptMimes()) . "</span></div>";
+            }
+        }
         echo "<div field='max_slots'><label>Available Slots: </label><span>" . $max_slots . "</span></div>";
 
 
