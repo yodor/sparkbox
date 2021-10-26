@@ -30,6 +30,16 @@ class ArrayDataInput extends DataInput
         $this->value[$idx] = $value;
     }
 
+    public function getValues(): array
+    {
+        return $this->value;
+    }
+
+    public function getValuesCount(): int
+    {
+        return count($this->value);
+    }
+
     public function getErrorAt($idx)
     {
         if (isset($this->error[$idx])) return $this->error[$idx];
@@ -105,6 +115,23 @@ class ArrayDataInput extends DataInput
     {
         $this->value = array();
         $this->error = array();
+    }
+
+    /**
+     * Return error text for all values having error
+     * @return string
+     */
+    public function getErrorText() : string
+    {
+        $error_text = tr(ArrayDataInput::ERROR_TEXT);
+        $values_count = count($this->value);
+
+        for ($idx=0; $idx<$values_count; $idx++) {
+            if ($this->haveErrorAt($idx)) {
+                $error_text.= "<BR>[$idx]: ".$this->getErrorAt($idx);
+            }
+        }
+        return $error_text;
     }
 
 }
