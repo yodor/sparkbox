@@ -135,11 +135,14 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
 
         if ($this->error_render_mode == IErrorRenderer::MODE_TOOLTIP) {
 
-            $error = $this->input->getError();
+            $error = "";
             if ($this->input instanceof ArrayDataInput) {
-                $error = ArrayDataInput::ERROR_TEXT;
+                $error = $this->input->getErrorText();
             }
-            $this->setAttribute("tooltip", tr($error));
+            else {
+                $error = tr($this->input->getError());
+            }
+            $this->setAttribute("tooltip", $error);
 
         }
         $this->setAttribute("error", 1);
