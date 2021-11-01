@@ -39,8 +39,11 @@ abstract class OrderedDataBean extends DBTableBean
 
     public function insert(array &$row, DBDriver $db = NULL): int
     {
-        $pos = $this->getMaxPosition();
-        $row["position"] = ($pos + 1);
+        if (!isset($row["position"])) {
+            debug("Position field is missing - using max(position) + 1");
+            $pos = $this->getMaxPosition();
+            $row["position"] = ($pos + 1);
+        }
         return parent::insert($row, $db);
     }
 
@@ -245,6 +248,8 @@ abstract class OrderedDataBean extends DBTableBean
             $position++;
             $positions[$id] = $position;
         }
+
+        debug("Using positions: ", $positions);
 
         try {
             $this->db->transaction();
