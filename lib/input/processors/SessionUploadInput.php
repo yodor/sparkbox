@@ -172,9 +172,6 @@ class SessionUploadInput extends InputProcessor
             debug("Cleared Session Removed UIDs for field['$field_name']");
         }
 
-        if ($this->transact_bean instanceof OrderedDataBean) {
-            $this->transact_bean->rebuildReferentialOrdering($transactor->getBean()->key(), $transactor->getLastID());
-        }
     }
 
     public function transactValue(BeanTransactor $transactor)
@@ -251,6 +248,9 @@ class SessionUploadInput extends InputProcessor
 
         debug("Values count: " . count($values));
 
+        //order position for OrderedDataBean
+        $position = 1;
+
         foreach ($values as $idx => $value) {
 
             if (!($value instanceof StorageObject)) throw new Exception("Value at position $idx not instance of StorageObject");
@@ -267,8 +267,13 @@ class SessionUploadInput extends InputProcessor
 
                 $data[$name] = $db->escape(serialize($value));
 
+                $data["position"] = $position;
+
                 $refID = $this->transact_bean->insert($data, $db);
                 if ($refID < 1) throw new Exception("Unable to insert into transact_bean. Error: " . $db->getError());
+
+                $position++;
+
                 $foreign_transacted++;
 
                 $processed_ids[] = $refID;
