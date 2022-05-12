@@ -44,5 +44,20 @@ class SQLClause
     {
         return $this->expr . " " . $this->operator . " " . $this->value;
     }
+
+    public function getExpression() : string
+    {
+        return $this->expr;
+    }
+
+    public function getValue() : string
+    {
+        return $this->value;
+    }
+
+    public function getOperator() : string
+    {
+        return $this->operator;
+    }
 }
 ?>

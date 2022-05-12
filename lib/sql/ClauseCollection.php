@@ -75,6 +75,25 @@ class ClauseCollection
         return $this;
     }
 
+    /**
+     * @param string $expression The expresion part of this clause collection to search for
+     * @return SQLClause|null The sqlclause that was removed or null if expression is not found in any of the clauses in this collection
+     */
+    public function remove(string $expression) : ?SQLClause
+    {
+        $ret = null;
+
+        foreach ($this->clauses as $idx=>$clause) {
+            if (!($clause instanceof SQLClause))continue;
+            if (strcmp($clause->getExpression(), $expression)==0) {
+                $ret = $clause;
+                unset($this->clauses[$idx]);
+            }
+        }
+
+        return $ret;
+    }
+
     public function append(string $expression, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
     {
         return $this->add($expression, "", "", $glue);
