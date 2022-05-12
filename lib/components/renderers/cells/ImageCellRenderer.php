@@ -143,7 +143,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
                     $item->id = $value;
                     $this->items[] = $item;
                 }
-                return;
+
             }
 
         }
