@@ -33,8 +33,13 @@ class NestedSetBean extends DBTableBean
         }
         $prkey = $this->prkey;
 
-        $parentID = (int)$row["parentID"];
-
+        //defaults to the top level if not specified
+        $parentID = 0;
+        if (isset($row["parentID"])) {
+            //use the parentID specified
+            $parentID = (int)$row["parentID"];
+        }
+	
         try {
             $db->transaction();
 
