@@ -61,6 +61,11 @@ class SQLQuery implements IDataIterator
         $this->select = clone $this->select;
     }
 
+    /**
+     * Execute the query and return the number of result rows
+     * @return int Number of result rows
+     * @throws Exception
+     */
     public function exec(): int
     {
         $this->db->free($this->res);
