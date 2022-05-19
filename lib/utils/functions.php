@@ -1,5 +1,8 @@
 <?php
-
+function enclose(string $value, string $char = "'") : string
+{
+    return $char.$value.$char;
+}
 //extract src attribute value from google maps embed HTML
 function googleMapURL($iframe_html)
 {
