@@ -80,6 +80,7 @@ class InputForm implements IBeanEditor
     public $star_required = TRUE;
 
     /**
+     * Associative array with key = DataInput name and value = DataInput object
      * @var array
      */
     protected $inputs = array();
