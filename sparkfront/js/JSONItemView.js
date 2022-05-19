@@ -10,8 +10,12 @@ function loadMoreResults(button_source)
 
     if (isNaN(currentPage)) currentPage = 0;
 
+
+
+
     if (currentPage < pagesTotal) {
         currentPage++;
+
 
         let request = new JSONRequest();
         request.setResponder("ItemViewResponder");
@@ -24,12 +28,20 @@ function loadMoreResults(button_source)
             itemView.attr("page", currentPage);
             $(button_source).removeAttr("working", "");
 
+            let url = new URL(document.location.href);
+            url.searchParams.set("page", currentPage);
+            window.history.replaceState({}, "", url.href);
+
+
         };
         $(button_source).attr("working", "");
+
+
         request.start();
     }
     if (currentPage == pagesTotal-1) {
         $(button_source).remove();
     }
+
 
 }
