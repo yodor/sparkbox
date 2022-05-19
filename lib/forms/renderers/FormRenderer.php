@@ -235,7 +235,7 @@ class FormRenderer extends Container
         echo "<input type=hidden name='" . FormRenderer::SUBMIT_NAME . "' value='" . $this->getSubmitValue() . "'>";
     }
 
-    public function getSubmitValue()
+    public function getSubmitValue() : string
     {
         $submit_value = $this->submitButton->getValue();
         if (!$submit_value) {
