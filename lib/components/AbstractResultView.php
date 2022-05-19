@@ -155,6 +155,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->processIterator();
 
         $this->setAttribute("pagesTotal", $this->paginator->getPagesTotal());
+        $this->setAttribute("page", $this->paginator->getCurrentPage());
 
         parent::startRender();
 
