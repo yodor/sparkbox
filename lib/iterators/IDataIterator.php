@@ -21,6 +21,13 @@ interface IDataIterator
     public function count(): int;
 
     public function bean(): ?DBTableBean;
+
+    /**
+     * Check if the iterator is already executed
+     * @return bool
+     */
+    public function isActive() : bool;
+
 }
 
 ?>

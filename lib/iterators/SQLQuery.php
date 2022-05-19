@@ -117,6 +117,11 @@ class SQLQuery implements IDataIterator
         $this->res = NULL;
     }
 
+    public function isActive() : bool
+    {
+        return (!is_null($this->res));
+    }
+
     public function key(): string
     {
         return $this->key;

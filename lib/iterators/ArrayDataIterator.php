@@ -37,6 +37,11 @@ class ArrayDataIterator implements IDataIterator
         return count($this->values);
     }
 
+    public function isActive() : bool
+    {
+        return true;
+    }
+
     public function key(): string
     {
         return $this->id_key;
