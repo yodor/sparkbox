@@ -9,6 +9,8 @@ class ItemView extends AbstractResultView
     protected $items_per_group = 0;
     protected $group_container = NULL;
 
+    protected $viewport;
+
     public function __construct(?IDataIterator $itr=null)
     {
         parent::__construct($itr);
@@ -17,6 +19,8 @@ class ItemView extends AbstractResultView
         $this->group_container = new Container();
         $this->group_container->setComponentClass("group");
 
+        $this->viewport = new Container();
+        $this->viewport->setClassName("viewport");
     }
 
     public function requiredStyle() : array
@@ -29,14 +33,17 @@ class ItemView extends AbstractResultView
     public function startRender()
     {
         parent::startRender();
-        echo "<div class='viewport'>";
+        $this->viewport->startRender();
+
+        //echo "<div class='viewport'>";
 
     }
 
     public function finishRender()
     {
 
-        echo "</div>";
+        //echo "</div>";
+        $this->viewport->finishRender();
         parent::finishRender();
 
     }
@@ -60,6 +67,12 @@ class ItemView extends AbstractResultView
             echo "<meta itemprop='name' content='{$this->getName()}'>";
         }
 
+        $this->renderResults();
+
+    }
+
+    protected function renderResults()
+    {
         $v = new ValueInterleave();
 
         $this->position_index = 0;
@@ -101,7 +114,6 @@ class ItemView extends AbstractResultView
             $this->group_container->finishRender();
         }
     }
-
 }
 
 ?>

@@ -147,11 +147,39 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      */
     public function startRender()
     {
+        if (is_null($this->iterator)) {
+            echo "No iterator set";
+            return;
+        }
+
+        $this->processIterator();
+
+        $this->setAttribute("pagesTotal", $this->paginator->getPagesTotal());
 
         parent::startRender();
 
-        if (is_null($this->iterator)) {
-            echo "No iterator set";
+        if($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
+            $this->paginator_top->render();
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function finishRender()
+    {
+        if($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) {
+            $this->paginator_bottom->render();
+        }
+
+        parent::finishRender();
+
+    }
+
+    protected function processIterator()
+    {
+        if ($this->iterator->isActive()) {
+            debug("Already active");
             return;
         }
 
@@ -197,25 +225,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         //echo "Final SQL: ".$this->iterator->select->getSQL();
 
         $this->paged_rows = $this->iterator->exec();
-
-        if($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
-            $this->paginator_top->render();
-        }
     }
-
-    /**
-     * @throws Exception
-     */
-    public function finishRender()
-    {
-        if($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) {
-            $this->paginator_bottom->render();
-        }
-
-        parent::finishRender();
-
-    }
-
 }
 
 ?>
