@@ -12,6 +12,40 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     protected $editID = -1;
     protected $bean = NULL;
 
+    protected $sessionEnabled = false;
+
+    //redirect to clean the url after storing session data. only works if session is enabled
+    protected $redirectEnabled = true;
+
+    /**
+     * Store/Restore the form input values to session during process call
+     *
+     * @param bool $mode
+     */
+    public function enableSession(bool $mode)
+    {
+        $this->sessionEnabled = $mode;
+    }
+
+    public function isSessionEnabled() : bool
+    {
+        return $this->sessionEnabled;
+    }
+
+    /**
+     * Enable redirection to the same url cleaned from GET variables after successful process
+     * @param bool $mode
+     */
+    public function setRedirectEnabled(bool $mode)
+    {
+        $this->redirectEnabled = $mode;
+    }
+
+    public function isRedirectEnabled() : bool
+    {
+        return $this->redirectEnabled;
+    }
+
     /**
      * @return string
      */
@@ -77,18 +111,39 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
         $form_name = $form->getName();
 
+
+        if ($this->sessionEnabled) {
+            $this->restoreSessionData($form);
+        }
+
         if (strcmp($submitValue, $form_name) == 0) {
             debug("Loading form with _REQUEST values - key '$submitKey' value = Form name: '$form_name' ");
 
             try {
 
-                //validate values comming from user input
+                //validate values coming from user input
                 $form->loadPostData($_REQUEST);
                 $form->validate();
 
                 $this->processImpl($form);
 
                 $this->setStatus(IFormProcessor::STATUS_OK);
+
+                if ($this->sessionEnabled) {
+                    $this->storeSessionData($form);
+
+                    if ($this->redirectEnabled) {
+                        $url = new URLBuilder();
+                        $url->buildFrom(SparkPage::Instance()->getPageURL());
+                        foreach ($form->getInputs() as $inputName=>$input){
+                            $url->remove($inputName);
+                        }
+                        $url->remove(FormRenderer::SUBMIT_NAME);
+                        header("Location: ".$url->url());
+                        exit;
+                    }
+                }
+
             }
             catch (Exception $e) {
 
@@ -101,6 +156,53 @@ class FormProcessor implements IFormProcessor, IBeanEditor
             debug("Setting STATUS_NOT_PROCESSED - _REQUEST key '$submitKey' not found or not equal to '{$form->getName()}' ");
             $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
         }
+
+    }
+
+    protected function restoreSessionData(InputForm $form)
+    {
+        $form_name = $form->getName();
+        debug("Restoring values from session - InputForm['$form_name']");
+
+        if (Session::Contains($form_name)) {
+            $values = Session::Get($form_name);
+            $values = unserialize($values);
+
+            try {
+
+                //validate values coming from user input
+                foreach($values as $inputName=>$inputValue) {
+                    if ($form->haveInput($inputName)) {
+                        $form->getInput($inputName)->setValue($inputValue);
+                    }
+                }
+                $form->validate();
+
+            }
+            catch (Exception $e) {
+                $form->clear();
+                debug("Session data could not be restored for this form '$form_name'");
+
+            }
+        }
+    }
+
+    protected function storeSessionData(InputForm $form)
+    {
+
+        $values = array();
+
+        $form_name = $form->getName();
+        debug("Storing values to session - InputForm['$form_name']");
+
+        foreach ($form->getInputs() as $inputName=>$input){
+            if (!($input instanceof DataInput)) continue;
+            $inputValue = $input->getValue();
+            $values[$inputName] = $inputValue;
+
+        }
+
+        Session::Set($form_name, serialize($values));
 
     }
 
