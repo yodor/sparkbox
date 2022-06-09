@@ -15,7 +15,10 @@ class MenuItemForm extends InputForm
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "link", "Link", 1);
-        $field->content_after = "<a class='Action DynamicPageChooser' href='" . ADMIN_LOCAL . "/content/pages/list.php?chooser=1'>" . tr("Choose Dynamic Page") . "</a>";
+
+        $link = SparkPage::Instance()->getURL();
+        $action = new Action("Choose Dynamic Page", ADMIN_LOCAL . "/content/pages/list.php?chooser=".base64_encode($link->url()));
+        $field->getRenderer()->getAddonContainer()->append($action);
         $this->addInput($field);
 
         $field = new DataInput("parentID", "Parent Menu", 1);
@@ -50,12 +53,11 @@ class MenuItemForm extends InputForm
     public function load()
     {
 
-        if (isset($_GET["page_class"]) && isset($_GET["page_id"])) {
+        if (isset($_GET["page_id"])) {
 
-            $page_class = $_GET["page_class"];
             $page_id = (int)$_GET["page_id"];
 
-            $link_url = LOCAL . "/content/index.php?page_class=$page_class&page_id=$page_id";
+            $link_url = "/pages.php?id=$page_id";
 
             $this->getInput("link")->setValue($link_url);
         }

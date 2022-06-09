@@ -28,7 +28,7 @@ class DynamicPageList extends BeanListPage
 
             $this->page->setName("Choose Dynamic Page");
             $this->is_chooser = TRUE;
-            $this->chooser_return_url = $_GET["chooser"];
+            $this->chooser_return_url = base64_decode($_GET["chooser"]);
         }
         else {
 
@@ -48,8 +48,14 @@ class DynamicPageList extends BeanListPage
 
         if ($this->is_chooser) {
             $act->append(new RowSeparator());
-            $act->append(new Action("Choose", $this->chooser_return_url, array(new DataParameter("page_id", $this->bean->key()),
-                                                                               new URLParameter("page_class", get_class($this->bean)))));
+            $act->append(
+                new Action("Choose", $this->chooser_return_url,
+                    array(
+                        new DataParameter("page_id", $this->bean->key()),
+                        //new URLParameter("page_class", get_class($this->bean))
+                    )
+                )
+            );
         }
     }
 
