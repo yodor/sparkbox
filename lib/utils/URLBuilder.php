@@ -74,6 +74,10 @@ class URLBuilder implements IGETConsumer
         $this->clear_params = $params;
     }
 
+    /**
+     * Add/Set query parameter
+     * @param URLParameter $param
+     */
     public function add(URLParameter $param)
     {
         $this->parameters[$param->name()] = $param;

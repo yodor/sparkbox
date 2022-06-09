@@ -59,6 +59,7 @@ class Paginator implements IGETConsumer
     const KEY_ORDER_BY = "orderby";
     const KEY_ORDER_DIR = "orderdir";
     const KEY_PAGE = "page";
+    const KEY_VIEW = "view";
 
     static protected $instance = NULL;
 

@@ -10,16 +10,18 @@ class PaginatorTopComponent extends PaginatorComponent
         if ($this->view_modes_enabled) {
             echo "<div class='cell view_mode'>";
 
-            $qry = $_GET;
-            if (isset($qry["page"])) unset($qry["page"]);
+                $link = new URLBuilder();
+                $link->buildFrom(SparkPage::Instance()->getPageURL());
+                $link->remove(Paginator::KEY_PAGE);
 
-            $qry["view"] = "list";
-            $qrystr = queryString($qry);
-            echo "<a class='icon list' href='$qrystr'></a>";
+                $link->add(new URLParameter(Paginator::KEY_VIEW, "list"));
 
-            $qry["view"] = "grid";
-            $qrystr = queryString($qry);
-            echo "<a class='icon grid' href='$qrystr'></a>";
+                $listURL = $link->url();
+                echo "<a class='icon list' href='$listURL'></a>";
+
+                $link->get(Paginator::KEY_VIEW)->setValue("grid");
+                $gridURL = $link->url();
+                echo "<a class='icon grid' href='$gridURL'></a>";
 
             echo "</div>";
         }
