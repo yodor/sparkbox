@@ -22,7 +22,7 @@ abstract class Mailer
         if (!$this->subject) throw new Exception("Subject missing.");
         if (!$this->body) throw new Exception("Body missing.");
 
-        return mail($this->to, $this->subject, $this->body, $headers);
+        return mb_send_mail($this->to, $this->subject, $this->body, $headers);
     }
 
     protected function processHeaders() : string
