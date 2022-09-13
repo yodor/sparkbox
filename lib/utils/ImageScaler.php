@@ -105,7 +105,7 @@ class ImageScaler
 
     protected function processCrop()
     {
-        $h_source = imagecreatefromstring($this->data);
+        $h_source = @imagecreatefromstring($this->data);
         if ($h_source === FALSE) {
             throw new Exception("Image can not be created from this input data");
         }
@@ -163,7 +163,7 @@ class ImageScaler
     protected function processThumb()
     {
 
-        $h_source = imagecreatefromstring($this->data);
+        $h_source = @imagecreatefromstring($this->data);
         if ($h_source === FALSE) {
             throw new Exception("Image can not be created from this input data");
         }
