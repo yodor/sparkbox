@@ -447,8 +447,31 @@ function safeVal($val, $accepted_tags = NULL)
 
     $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
-    return DBConnections::Get()->escape($ret);
+    if (DBConnections::connectionCount()>0) {
+        return DBConnections::Get()->escape($ret);
+    }
+    else {
+        return escapeHelper($ret);
+    }
+}
 
+function escapeHelper(string $unescaped_string): string
+{
+    $replacementMap = [
+        "\0" => "\\0",
+        "\n" => "\\n",
+        "\r" => "\\r",
+        "\t" => "\\t",
+        chr(26) => "\\Z",
+        chr(8) => "\\b",
+        '"' => '\"',
+        "'" => "\'",
+        '_' => "\_",
+        "%" => "\%",
+        '\\' => '\\\\'
+    ];
+
+    return strtr($unescaped_string, $replacementMap);
 }
 
 function attributeValue($value)

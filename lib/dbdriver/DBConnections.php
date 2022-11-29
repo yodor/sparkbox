@@ -60,6 +60,11 @@ class DBConnections
         return self::$available_connections[$connection_name];
     }
 
+    public static function connectionCount() : int
+    {
+        return count(DBConnections::$available_connections);
+    }
+
     /**
      * Get the default global connection
      * @var DBDriver
