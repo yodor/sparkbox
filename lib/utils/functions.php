@@ -447,7 +447,7 @@ function safeVal($val, $accepted_tags = NULL)
 
     $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
-    if (DBConnections::connectionCount()>0) {
+    if (DBConnections::count()>0) {
         return DBConnections::Get()->escape($ret);
     }
     else {

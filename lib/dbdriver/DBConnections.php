@@ -60,7 +60,7 @@ class DBConnections
         return self::$available_connections[$connection_name];
     }
 
-    public static function connectionCount() : int
+    public static function count() : int
     {
         return count(DBConnections::$available_connections);
     }
