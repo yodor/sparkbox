@@ -207,8 +207,6 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     protected function renderJS()
     {
-        parent::renderJS();
-
         ?>
         <!-- SparkPage local script start -->
         <script type='text/javascript'>
@@ -218,6 +216,8 @@ class SparkPage extends HTMLPage implements IActionCollection
         </script>
         <!-- SparkPage local script end -->
         <?php
+
+        parent::renderJS();
     }
 
     /**
@@ -315,6 +315,7 @@ class SparkPage extends HTMLPage implements IActionCollection
                     if (strlen($this->loginURL) > 0) {
 
                         debug("Redirecting to login page URL: " . $this->loginURL);
+                        Session::Set("login.redirect", $this->getPageURL());
 
                         header("Location: {$this->loginURL}");
                         exit;
