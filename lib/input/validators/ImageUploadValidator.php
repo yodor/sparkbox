@@ -13,7 +13,7 @@ class ImageUploadValidator extends UploadDataValidator
     {
         parent::__construct();
 
-        $accept_mimes = array("image/jpeg", "image/jpg", "image/png", "image/gif", "application/octet-stream");
+        $accept_mimes = array("image/webp", "image/jpeg", "image/jpg", "image/png", "image/gif", "application/octet-stream");
         $this->setAcceptMimes($accept_mimes);
 
         if (IMAGE_UPLOAD_UPSCALE || IMAGE_UPLOAD_DOWNSCALE) {
