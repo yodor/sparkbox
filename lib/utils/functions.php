@@ -83,7 +83,8 @@ function normalize($str)
     $content = htmlentities($str, NULL, 'utf-8');
     $content = str_replace("&nbsp;", " ", $content);
     $content = str_replace("\r\n", "<BR>", $content);
-
+    $content = str_replace("\n", "<BR>", $content);
+    $content = str_replace("\r", "<BR>", $content);
     $content = html_entity_decode($content);
     return $content;
 }
