@@ -12,29 +12,8 @@ class MCETextArea extends Component {
 
     }
 
-    onEditorInit(editor) {
-        this.editor = editor;
-        console.log("MCETextArea::onEditorInit() - Using editor ID: " + editor.id);
-    }
-
-    onInsertImage(ed) {
-        this.editor = ed;
-        this.image_browser.show();
-    }
-
-    initialize() {
-
-        super.initialize();
-
-        this.image_browser.initialize();
-
-        console.log("MCETextArea::initialize() - Using selector: " + this.selector());
-        let mce_area = $(this.selector());
-
-        let instance = this;
-
-        mce_area.tinymce({
-
+    defaultSetup() {
+        let mce_setup_object = {
             schema: 'html5',
 
             extended_valid_elements: 'img[*],a[*]',
@@ -68,31 +47,64 @@ class MCETextArea extends Component {
             width: '100%',
             height: '300px',
 
-            setup: function (editor) {
 
-                editor.ui.registry.addButton('spark_imagebrowser', {
-                    text: 'Image Browser',
-                    onAction: () => {
-                        instance.onInsertImage(editor);
-                    }
-                });
+        };
+        return mce_setup_object;
+    }
+
+    onEditorInit(editor) {
+        this.editor = editor;
+        console.log("MCETextArea::onEditorInit() - Using editor ID: " + editor.id);
+    }
+
+    onInsertImage(ed) {
+        this.editor = ed;
+        this.image_browser.show();
+    }
+
+    initialize() {
+
+        super.initialize();
+
+        this.image_browser.initialize();
+
+        console.log("MCETextArea::initialize() - Using selector: " + this.selector());
+        let mce_area = $(this.selector());
+
+        let instance = this;
+
+        let mce_setup_object = null;
+
+        if (typeof getMCESetupObject === "function") {
+            mce_setup_object = getMCESetupObject();
+        }
+        else {
+            mce_setup_object = this.defaultSetup();
+        }
+
+        mce_setup_object.setup = function (editor) {
+
+            editor.ui.registry.addButton('spark_imagebrowser', {
+                text: 'Image Browser',
+                onAction: () => {
+                    instance.onInsertImage(editor);
+                }
+            });
 
 
-                // editor.on("change keyup", function (e) {
-                //     console.log('change keyup');
-                //     editor.save(); // updates this instance's textarea
-                // });
+            // editor.on("change keyup", function (e) {
+            //     console.log('change keyup');
+            //     editor.save(); // updates this instance's textarea
+            // });
 
 
-                editor.on('init', function (event) {
-                    instance.editor = editor;
-                    instance.onEditorInit(editor);
+            editor.on('init', function (event) {
+                instance.editor = editor;
+                instance.onEditorInit(editor);
 
-                });
-            }
-
-
-        });
+            });
+        };
+        mce_area.tinymce(mce_setup_object);
 
 
     }
