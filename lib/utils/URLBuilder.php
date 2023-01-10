@@ -102,11 +102,20 @@ class URLBuilder implements IGETConsumer
         return $this->parameters[$name];
     }
 
+    /**
+     * Check if this url contains query paramter named $name
+     * @param string $name The query parameter to check for
+     * @return bool True if this url string have parameter with name $name
+     */
     public function contains(string $name): bool
     {
         return array_key_exists($name, $this->parameters);
     }
 
+    /**
+     * Return all query parameter names
+     * @return array
+     */
     public function getParameterNames(): array
     {
         return array_keys($this->parameters);
