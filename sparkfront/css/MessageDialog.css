@@ -161,6 +161,7 @@
 
 .MessageDialog .Center .Contents .Text {
     display: inline-block;
+    margin-left:15px;
 }
 
 .MessageDialog .Center .Contents .Text .exception_link {
