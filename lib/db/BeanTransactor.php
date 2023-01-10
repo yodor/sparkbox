@@ -27,6 +27,9 @@ class BeanTransactor implements IBeanEditor
     protected $insert_values = array();
     protected $update_values = array();
 
+    protected ?Closure $beforeCommitClosure = null;
+    protected ?Closure $afterCommitClosure = null;
+
     /**
      * @var int
      */
@@ -46,6 +49,14 @@ class BeanTransactor implements IBeanEditor
         $this->editID = $editID;
     }
 
+    public function setClosureBeforeCommit(Closure $closure)
+    {
+        $this->beforeCommitClosure = $closure;
+    }
+    public function setClosureAfterCommit(Closure $closure)
+    {
+        $this->afterCommitClosure = $closure();
+    }
     public function getEditID(): int
     {
         return $this->editID;
@@ -206,6 +217,11 @@ class BeanTransactor implements IBeanEditor
 
             $this->beforeCommit($db);
 
+            if ($this->beforeCommitClosure instanceof Closure) {
+                $callback = $this->beforeCommitClosure;
+                $callback($this,$db);
+            }
+
             if (is_callable("DBTransactor_onBeforeCommit")) {
                 call_user_func("DBTransactor_onBeforeCommit", $this, $db);
             }
@@ -216,6 +232,11 @@ class BeanTransactor implements IBeanEditor
 
             try {
                 $this->afterCommit();
+
+                if ($this->afterCommitClosure instanceof Closure) {
+                    $callback = $this->afterCommitClosure;
+                    $callback($this,$db);
+                }
 
                 if (is_callable("DBTransactor_onAfterCommit")) {
                     call_user_func("DBTransactor_onAfterCommit", $this, $db);
