@@ -488,20 +488,12 @@ abstract class DBTableBean
     public function needQuotes(string $key, &$value = "")
     {
         $storage_type = $this->columns[$key];
-        //        echo "$key=>$storage_type | ";
 
-        // 	  if (strpos($storage_type,"char")!==false || strpos($storage_type,"text")!==false || strpos($storage_type,"blob")!==false  ||  strpos($storage_type,"enum")!==false) {
-        // 		return true;
-        // 	  }
-        // 	  if (strpos($storage_type, "bool")!==false) {
-        // 		return true;
-        // 	  }
         if ($this->isNumeric($key)) return FALSE;
 
-        if (strpos($storage_type, "date") !== FALSE || strpos($storage_type, "timestamp") !== FALSE) {
+        if (strpos($storage_type, "datetime") !== FALSE || strpos($storage_type, "date") !== FALSE || strpos($storage_type, "timestamp") !== FALSE) {
+            if (endsWith(trim($value), ")")) return FALSE;
             return TRUE;
-            //if (endsWith($value, "()")) return FALSE;
-            //return TRUE;
         }
         return TRUE;
     }
