@@ -53,6 +53,11 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     protected $item_renderer = null;
 
     /**
+     * @var Component|null
+     */
+    protected $list_empty = null;
+
+    /**
      * @var SQLQuery
      */
     protected $iterator;
@@ -71,8 +76,28 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->paginator_top = new PaginatorTopComponent($this->paginator);
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
         $this->paginators_enabled = AbstractResultView::PAGINATOR_TOP | AbstractResultView::PAGINATOR_BOTTOM;
+
+        $this->list_empty = new Component();
+        $this->list_empty->addClassName("ListEmpty");
     }
 
+    /**
+     * Rendered if list results are zero ie only shown for empty lists
+     * @return Component
+     */
+    public function getListEmpty() : Component
+    {
+        return $this->list_empty;
+    }
+    public function setListEmpty(Component $cmp)
+    {
+        $this->list_empty = $cmp;
+    }
+    /**
+     * Max number of results per page
+     * set to -1 to disable paged results
+     * @param int $item_count
+     */
     public function setItemsPerPage(int $item_count) {
         $this->items_per_page = $item_count;
     }
@@ -159,8 +184,12 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         parent::startRender();
 
-        if($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
+        if(($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) && $this->total_rows>0) {
             $this->paginator_top->render();
+        }
+
+        if ($this->total_rows<1) {
+            $this->list_empty->render();
         }
     }
 
@@ -169,7 +198,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      */
     public function finishRender()
     {
-        if($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) {
+        if(($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) && $this->total_rows>0) {
             $this->paginator_bottom->render();
         }
 
@@ -177,7 +206,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     }
 
-    protected function processIterator()
+    public function processIterator()
     {
         if ($this->iterator->isActive()) {
             debug("Already active");
