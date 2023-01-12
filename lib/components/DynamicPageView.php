@@ -1,98 +1,87 @@
 <?php
 include_once("components/Container.php");
 
-class DynamicPageView extends Container
+class DynamicPageView extends Container implements IRequestProcessor
 {
-    protected $item;
 
-    protected $bean;
-    protected $pageClass;
+    protected ?RawResult $result = null;
+
+    /**
+     * @var DBTableBean|null
+     */
+    protected ?DBTableBean $bean = NULL;
+
+    protected bool $processing_done = false;
 
     public function __construct()
     {
         parent::__construct();
 
-        //$this->setClassName("DynamicPage");
-
-        if (!isset($_GET["page_id"]) || !isset($_GET["page_class"])) {
-            Session::SetAlert("Required parameters 'page_id' and 'page_class' was not found");
-            return;
-        }
-
-        $page_class = DBConnections::Get()->escape($_GET["page_class"]);
-        $page_id = (int)$_GET["page_id"];
-
-        $item = array();
-
-        @include_once("class/beans/$page_class.php");
-        if (!class_exists($page_class)) {
-            @include_once("beans/$page_class.php");
-            if (!class_exists($page_class)) {
-                Session::SetAlert("Required class can not be loaded");
-                return;
-            }
-        }
-
-        $bean = new $page_class;
-
-        if (!($bean instanceof DBTableBean)) {
-            Session::SetAlert("Incorrect bean class - Expecting DBTableBean");
-            return;
-        }
-
-        //$bean->columns();
-        //TODO: check item_title, content, visible is present in this bean
-
-        $prkey = $bean->key();
-        $qry = $bean->query($prkey, "item_title", "content", "visible");
-        $qry->select->where()->add($prkey , $page_id);
-        $qry->select->limit = 1;
-
-        $num = $qry->exec();
-        if ($num < 1) {
-            Session::SetAlert("Page not found");
-            return;
-        }
-
-        if ($item = $qry->next()) {
-            if (!$item["visible"]) {
-                Session::SetAlert("Page is currently unavailable.");
-                return;
-            }
-        }
-
-        $this->bean = $bean;
-        $this->item = $item;
-
-        $this->pageClass = $page_class;
-
-        trbean($page_id, "item_title", $item, $bean->getTableName());
-        trbean($page_id, "content", $item, $bean->getTableName());
-
-        //$this->setWrapperEnabled(false);
-
-        $this->setAttribute("itemClass", $page_class);
-        $this->setAttribute("itemID", $page_id);
-
         $heading = new Component();
-        $heading->setContents($item["item_title"]);
-        $heading->setClassName("item_title");
+        $heading->setName("title");
+
+       // $heading->setContents($item["item_title"]);
+        $heading->addClassName("title");
 
         $this->append($heading);
 
         $contents = new Component();
+        $contents->setName("content");
 
         $contents->addClassName("content");
 
-        $contents->setContents($item["content"]);
+        //$contents->setContents($item["content"]);
 
         $this->append($contents);
 
     }
 
-    public function getItem(): array
+    public function processInput()
     {
-        return $this->item;
+
+        try {
+            if (! ($this->bean instanceof DBTableBean)) throw new Exception("Bean not set yet");
+
+            $id = -1;
+
+            if (isset($_GET["id"]) ) {
+                $id = (int)$id;
+            }
+
+            //$bean->columns();
+            //TODO: check item_title, content, visible is present in this bean
+            $query = $this->bean->query("item_title", "content", "visible");
+            $query->select->fields()->setExpression("!isNull(photo)", "have_photo");
+            $query->select->where()->add($this->bean->key(), $id);
+            $query->select->limit = 1;
+
+            $num = $query->exec();
+            if ($num < 1) {
+                throw new Exception("Page not found");
+            }
+
+            if ($this->result = $query->nextResult()) {
+                if (!$this->result->get("visible")) throw new Exception("Page is currently unavailable");
+            }
+
+            $title_cmp = $this->getByName("title");
+            $title_cmp->setContents($this->result->get("item_title"));
+
+            $content_cmp = $this->getByName("content");
+            $content_cmp->setContents($this->result->get("content"));
+
+        }
+        catch (Exception $e) {
+            Session::Set(Session::ALERT, $e->getMessage());
+        }
+
+        $this->processing_done = true;
+
+    }
+
+    public function setBean(DBTableBean $bean)
+    {
+        $this->bean = $bean;
     }
 
     public function getBean(): DBTableBean
@@ -100,9 +89,13 @@ class DynamicPageView extends Container
         return $this->bean;
     }
 
-    public function getPageCLass(): string
+    /**
+     * Return true if request data has loaded into this processor
+     * @return bool
+     */
+    public function isProcessed(): bool
     {
-        return $this->pageClass;
+        // TODO: Implement isProcessed() method.
+        return $this->processing_done;
     }
-
 }
