@@ -492,6 +492,10 @@ abstract class DBTableBean
         if ($this->isNumeric($key)) return FALSE;
 
         if (strpos($storage_type, "datetime") !== FALSE || strpos($storage_type, "date") !== FALSE || strpos($storage_type, "timestamp") !== FALSE) {
+            if (strlen(trim($value))==0) {
+                $value = "NULL";
+                return FALSE;
+            }
             if (endsWith(trim($value), ")")) return FALSE;
             return TRUE;
         }
