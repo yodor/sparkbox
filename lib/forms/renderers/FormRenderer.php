@@ -148,6 +148,11 @@ class FormRenderer extends Container
 
     }
 
+    public function getForm() : InputForm
+    {
+        return $this->form;
+    }
+
     /**
      * Will set this component name as the form name
      */
