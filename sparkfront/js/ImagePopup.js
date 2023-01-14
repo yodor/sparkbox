@@ -41,7 +41,8 @@ class ImagePopup {
             type: "ImagePopup",
             message: "onNextImage",
             time: new Date(),
-            relation: this.relation
+            relation: this.relation,
+            source: this
         });
 
         return false;
@@ -60,7 +61,8 @@ class ImagePopup {
             type: "ImagePopup",
             message: "onPrevImage",
             time: new Date(),
-            relation: this.relation
+            relation: this.relation,
+            source: this
         });
 
         return false;
@@ -115,6 +117,13 @@ class ImagePopup {
             }
         }
 
+        $.event.trigger({
+            type: "ImagePopup",
+            message: "popupImage",
+            time: new Date(),
+            relation: this.relation,
+            source: this
+        });
 
         this.modal_pane.showContent($(this.createPopupContents()));
 
@@ -220,6 +229,7 @@ class ImagePopup {
         $(viewport).css("background-size", "contain");
 
         $(loader).removeClass("cover-spin");
+
 
 
         // $('<img/>').attr('src', href).load(function() {
