@@ -128,6 +128,7 @@
 
     vertical-align: top;
 
+    text-align:center;
 }
 
 .MessageDialog .Center .Contents .Icon {
@@ -162,6 +163,7 @@
 .MessageDialog .Center .Contents .Text {
     display: inline-block;
     margin-left:15px;
+    text-align:left;
 }
 
 .MessageDialog .Center .Contents .Text .exception_link {
