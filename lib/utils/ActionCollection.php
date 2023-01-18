@@ -193,12 +193,29 @@ class ActionCollection
     }
 
     /**
-     * Add default query parameter to all actions in this collection
+     * Add URLParameter $param to all actions in this collection
      * @param URLParameter $param
-     * @return mixed
      */
     public function addURLParameter(URLParameter $param)
     {
         // TODO: Implement addURLParameter() method.
+        foreach ($this->actions as $idx=>$action) {
+            if ($action instanceof Action) {
+                $action->getURLBuilder()->add($param);
+            }
+        }
+    }
+
+    /**
+     * Call set data method on each of the actions in this collection
+     * @param array $data
+     */
+    public function setData(array $data)
+    {
+        foreach ($this->actions as $idx=>$action) {
+            if ($action instanceof Action) {
+                $action->setData($data);
+            }
+        }
     }
 }
