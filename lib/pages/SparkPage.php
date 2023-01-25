@@ -308,8 +308,15 @@ class SparkPage extends HTMLPage implements IActionCollection
 
                     debug("'authorized_access' is set for this page");
 
-                    if (isset($_GET["ajax"])) {
-                        throw new Exception("Your session is expired");
+                    if (isset($_GET["ajax"]) || isset($_GET["JSONRequest"])) {
+                        $response = new JSONResponse("RequestController");
+                        $message = tr("Your session has expired");
+                        $message.= "<BR>";
+                        $message.= tr("Please log into your profile again");
+                        $message.= "<BR>";
+                        $response->message = $message;
+                        $response->send();
+                        exit;
                     }
 
                     if (strlen($this->loginURL) > 0) {
