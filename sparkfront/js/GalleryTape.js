@@ -29,6 +29,20 @@ class GalleryTape extends Component {
 
 
         }.bind(this));
+        $(this.selector()).data("handler", this);
+
+        let elm = $(this.selector());
+        const listener = new SwipeListener(elm);
+        elm.on("SwipeAction", function(e) {
+
+            if (e.message == "right") {
+                this.nextImage();
+            }
+            else if (e.message == "left") {
+                this.prevImage();
+            }
+
+        }.bind(this));
     }
 
     setDuration(duration) {
