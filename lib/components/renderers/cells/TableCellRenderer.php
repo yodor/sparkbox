@@ -103,6 +103,11 @@ class TableCellRenderer extends Component implements IDataResultProcessor
         $this->tooltip_field = $field;
     }
 
+    public function getValue()
+    {
+        return $this->value;
+    }
+
 }
 
 ?>

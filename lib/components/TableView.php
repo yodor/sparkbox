@@ -193,13 +193,14 @@ class TableView extends AbstractResultView implements IHeadContents
                 $column = $this->getColumn($name);
 
                 $cell = $column->getCellRenderer();
-
+                $header = $column->getHeaderCellRenderer();
+                $label = $header->getValue();
                 if ($column->getAlignClass()) {
                     $cell->setClassName($column->getAlignClass());
                 }
 
                 $cell->setData($data);
-
+                $cell->setAttribute("title", $label);
                 $cell->render();
             }
 
