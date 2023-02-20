@@ -94,6 +94,12 @@ class ClauseCollection
         return $ret;
     }
 
+    /**
+     * Append the expression to this clause collection using $glue as operator 
+     * @param string $expression
+     * @param string $glue
+     * @return $this
+     */
     public function append(string $expression, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
     {
         return $this->add($expression, "", "", $glue);
