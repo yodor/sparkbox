@@ -216,8 +216,11 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $select = clone $this->iterator->select;
         $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
         $select->setMode(SQLSelect::SQL_CACHE);
-        $select->fields()->reset();
-        $select->fields()->set("count(*) as total");
+
+        //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
+        //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
+        //$select->fields()->reset();
+        //$select->fields()->set("count(*) as total");
         $select->limit = "";
 
         //echo "Count SQL: ".$select->getSQL();
@@ -228,16 +231,8 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
             throw new Exception($db->getError());
         }
         $numRows = $db->numRows($res);
-        if ($numRows==1) {
-            if ($result = $db->fetch($res)) {
-                $this->total_rows = $result["total"];
-            }
-        }
-        else {
-            $this->total_rows = $numRows;
-        }
 
-        //
+        $this->total_rows = $numRows;
 
         //echo $this->total_rows;
         $db->free($res);
