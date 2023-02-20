@@ -48,3 +48,7 @@
     display: block;
     height: auto;
 }
+
+.admin_layout .page_area .PageTemplate {
+    display:block;
+}
