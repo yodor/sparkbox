@@ -5,8 +5,11 @@ include_once("utils/ActionCollection.php");
 
 include_once("components/Action.php");
 
-class TextTreeItem extends NestedSetItem implements IActionCollection
+class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRenderer
 {
+
+    protected $icon_width = -1;
+    protected $icon_height = -1;
 
     /**
      * @var ActionCollection
@@ -28,6 +31,8 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
      */
     protected $key_related_count;
 
+    protected $icon = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -41,6 +46,15 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
         //show related count in parenthesis inside the label
         $this->render_related_count = true;
         $this->key_related_count = "related_count";
+    }
+
+    public function setIcon(StorageItem $si)
+    {
+        $this->icon = $si;
+    }
+    public function getIcon() :?StorageItem
+    {
+        return $this->icon;
     }
 
     public function renderRelatedCount(bool $mode) : void
@@ -104,7 +118,9 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
         };
         $this->actions->each($dataSetter);
 
-
+        if ($this->icon instanceof StorageItem) {
+            $this->icon->setData($row);
+        }
     }
 
     protected function renderHandle()
@@ -112,6 +128,18 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
         echo "<div class='Handle'>";
         echo "<div class='Button'></div>";
         echo "</div> ";
+    }
+
+    public function renderIcon()
+    {
+        if ($this->icon instanceof StorageItem) {
+            echo "<span class='Icon'>";
+            if ($this->icon->id > 0) {
+                $src = $this->icon->hrefImage($this->icon_width, $this->icon_height);
+                echo "<img src='$src'>";
+            }
+            echo "</span>";
+        }
     }
 
     public function renderText()
@@ -128,8 +156,24 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
     protected function renderImpl()
     {
         $this->renderHandle();
+        $this->renderIcon();
         $this->renderText();
         $this->renderActions();
     }
 
+    public function setPhotoSize(int $width, int $height)
+    {
+        $this->icon_width = $width;
+        $this->icon_height = $height;
+    }
+
+    public function getPhotoWidth(): int
+    {
+        return $this->icon_width;
+    }
+
+    public function getPhotoHeight(): int
+    {
+        return $this->icon_height;
+    }
 }

@@ -41,7 +41,18 @@
     width: 16px;
 
 }
+.TreeView .Node .Icon {
+    display:table-cell;
 
+    box-sizing: border-box;
+    width:32px;
+    height:32px;
+}
+.TreeView .Node .Icon IMG {
+    display:block;
+    max-width:32px;
+    max-height:32px;
+}
 
 .TreeView .Node .Handle .Button {
     /*border: 1px solid #cccccc;*/

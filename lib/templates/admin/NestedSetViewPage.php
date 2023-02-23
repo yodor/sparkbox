@@ -47,5 +47,7 @@ class NestedSetViewPage extends BeanListPage
         $this->append($this->view);
 
         $this->view_item_actions = $ir;
+
+        return $this->view;
     }
 }
