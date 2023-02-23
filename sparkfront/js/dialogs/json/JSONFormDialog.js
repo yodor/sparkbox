@@ -11,6 +11,8 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
         this.req = new JSONRequest();
 
+        //Which selector holds the loaded content ie the view space
+        this.contentSelector = " .Text";
 
     }
 
@@ -35,8 +37,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
         this.req.onSuccess = function(request_result) {
             let result = request_result.json_result;
-            $(this.visibleSelector()+" .Text").html(result.contents)
-            this.modal_pane.centerContents();
+            this.loadContent(result.contents);
         }.bind(this);
 
         this.req.start();
@@ -84,12 +85,22 @@ class JSONFormDialog extends ConfirmMessageDialog {
     processSubmitResult(request_result, form_name) {
         let result = request_result.json_result;
         if (result.contents) {
-            $(this.visibleSelector()+" .Text").html(result.contents);
+            this.loadContent(result.contents)
             showAlert(result.message);
         }
         else {
             this.remove();
             showAlert(result.message);
+        }
+    }
+
+    loadContent(contents)
+    {
+        $(this.visibleSelector() + " " + this.contentSelector).html(contents);
+        this.modal_pane.centerContents();
+
+        if (window.onload) {
+            window.onload();
         }
     }
 }
