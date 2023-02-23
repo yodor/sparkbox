@@ -1,9 +1,10 @@
 <?php
+include_once("objects/SparkObservable.php");
 include_once("components/renderers/IRenderer.php");
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
 
-class Component implements IRenderer, IHeadContents
+class Component extends SparkObservable implements IRenderer, IHeadContents
 {
     protected $tagName = "DIV";
 
@@ -54,6 +55,8 @@ class Component implements IRenderer, IHeadContents
      */
     public function __construct()
     {
+
+        parent::__construct();
 
         $class_chain = class_parents($this);
         array_pop($class_chain);
@@ -194,23 +197,19 @@ class Component implements IRenderer, IHeadContents
         $this->setAttribute("name", $name);
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setParent(Component $parent)
-    {
-        $this->parent = $parent;
-    }
-
-    /**
-     * @return Component|null
-     */
-    public function getParent(): ?Component
-    {
-        return $this->parent;
-    }
+//
+//    public function setParent(Component $parent)
+//    {
+//        $this->parent = $parent;
+//    }
+//
+//    /**
+//     * @return Component|null
+//     */
+//    public function getParent(): ?Component
+//    {
+//        return $this->parent;
+//    }
 
     public function getCaption(): string
     {
