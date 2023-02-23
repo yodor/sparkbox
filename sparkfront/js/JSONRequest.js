@@ -46,6 +46,8 @@ class JSONRequest {
 
         this.command = "";
         this.function = "";
+
+        this.form_data = null;
     }
 
     /**
@@ -136,10 +138,30 @@ class JSONRequest {
     }
 
     /**
+     *
+     * @param form_data FormData
+     */
+    setPostFormData(form_data) {
+        this.form_data = form_data;
+    }
+
+    /**
+     * FormData
+     * @returns {FormData}
+     */
+    getPostFormData() {
+        return this.form_data;
+    }
+
+    /**
      * Remove all POST parameters
      */
     clearPostParameters() {
         this.post_data = new URLSearchParams();
+    }
+
+    clearPostFormData() {
+        this.form_data = null;
     }
 
     /**
@@ -189,7 +211,7 @@ class JSONRequest {
 
         this.request_time = new Date();
 
-        if (this.post_data.toString().length > 0) {
+        if (this.post_data.toString().length > 0 || this.form_data != null) {
 
             console.log("Using POST: " + responderURL.href);
             this.xmlRequest.open("POST", responderURL.href, this.async);
@@ -200,6 +222,11 @@ class JSONRequest {
                 post += key + "=" + encodeURIComponent(value);
                 post += "&";
             });
+
+            for (let [key, value] of this.form_data) {
+                post += key + "=" + encodeURIComponent(value);
+                post += "&";
+            }
 
             this.xmlRequest.send(post);
 
@@ -241,13 +268,13 @@ class JSONRequest {
                 throw "HTTP Error: " + status;
             }
 
-            var json_result = JSON && JSON.parse(response) || $.parseJSON(response); //json_parse(ret);
+            let json_result = JSON && JSON.parse(response) || $.parseJSON(response); //json_parse(ret);
 
             if (json_result.status != "OK") {
                 throw json_result.message;
             }
 
-            var request_result = new JSONRequestResult();
+            let request_result = new JSONRequestResult();
             request_result.json_result = json_result;
             request_result.status = status;
             request_result.response = response;
@@ -256,9 +283,9 @@ class JSONRequest {
 
         } catch (err) {
 
-            var description = (err.message ? err.message : err);
+            let description = (err.message ? err.message : err);
 
-            var request_error = new JSONRequestError();
+            let request_error = new JSONRequestError();
             request_error.response = response;
             request_error.status = status;
             request_error.description = description; //
