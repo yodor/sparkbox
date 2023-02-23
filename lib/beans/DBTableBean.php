@@ -575,7 +575,9 @@ abstract class DBTableBean
             }
             $update->where()->add($this->prkey, $id);
 
-            debug("UPDATE executing sql: " . $update->getSQL());
+            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_UPDATE"])) {
+                debug(get_class($this) . " UPDATE SQL: ".$update->getSQL());
+            }
 
             if (!$db->query($update->getSQL())) {
                 throw new Exception("Unable to update: " . $db->getError());
