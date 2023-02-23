@@ -12,6 +12,7 @@ abstract class OrderedDataBean extends DBTableBean
         if (!$this->haveColumn("position")) {
             throw new Exception("Incorrect table fields for OrderedDataBean");
         }
+        $this->select->order_by = " position ASC ";
     }
 
     public function delete(int $id, DBDriver $db = NULL) : int
