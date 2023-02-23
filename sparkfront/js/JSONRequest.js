@@ -223,9 +223,11 @@ class JSONRequest {
                 post += "&";
             });
 
-            for (let [key, value] of this.form_data) {
-                post += key + "=" + encodeURIComponent(value);
-                post += "&";
+            if (this.form_data != null) {
+                for (let [key, value] of this.form_data) {
+                    post += key + "=" + encodeURIComponent(value);
+                    post += "&";
+                }
             }
 
             this.xmlRequest.send(post);
