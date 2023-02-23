@@ -11,6 +11,17 @@ include_once("responders/json/UploadControlResponder.php");
 
 include_once("dialogs/BeanTranslationDialog.php");
 
+include_once("objects/SparkObserver.php");
+
+
+class BeanFormEditorEvent extends SparkEvent {
+    const FORM_BEAN_LOADED = "FORM_BEAN_LOADED";
+    const FORM_PROCESSED = "FORM_PROCESSED";
+    const FORM_VALUES_TRANSACTED = "FORM_VALUES_TRANSACTED";
+    const FORM_BEAN_TRANSACED = "FORM_BEAN_TRANSACED";
+};
+
+
 class BeanFormEditor extends Container implements IBeanEditor
 {
 
@@ -71,6 +82,8 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         parent::__construct();
 
+
+
         $this->redirect_enabled = true;
 
         $this->setMessage("Information was updated", BeanFormEditor::MESSAGE_UPDATE);
@@ -110,6 +123,8 @@ class BeanFormEditor extends Container implements IBeanEditor
         $this->setEditID(-1);
 
         $this->append($this->form_render);
+
+        $this->setObserver(new SparkObserver());
 
     }
 
@@ -218,9 +233,10 @@ class BeanFormEditor extends Container implements IBeanEditor
 
             debug("Loading bean data into form");
             $this->form->loadBeanData($this->getEditID(), $this->getBean());
-
+            $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_LOADED, $this));
             debug("Calling form processor");
             $this->processor->process($this->form);
+            $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_PROCESSED, $this));
 
             $process_status = $this->processor->getStatus();
             debug("FormProcessor status => " . (int)$process_status);
@@ -230,11 +246,12 @@ class BeanFormEditor extends Container implements IBeanEditor
 
                 debug("Transacting form values");
                 $this->transactor->processForm($this->form);
+                $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_VALUES_TRANSACTED, $this));
 
                 debug("Processing bean");
                 $this->transactor->processBean();
-
                 debug("Process status is successful");
+                $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_TRANSACED, $this));
 
                 $redirectURL = $this->redirect_url;
 

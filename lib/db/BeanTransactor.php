@@ -1,14 +1,43 @@
 <?php
+include_once("objects/SparkEvent.php");
 include_once("forms/InputForm.php");
 include_once("beans/IBeanEditor.php");
 
+class BeanTransactorEvent extends SparkEvent
+{
+
+    const BEFORE_COMMIT = "BEFORE_COMMIT";
+    const AFTER_COMMIT = "AFTER_COMMIT";
+
+    /**
+     * @var DBDriver
+     */
+    protected $db;
+
+    public function __construct(string $name = "", SparkObject $source = NULL, DBDriver $db = NULL)
+    {
+        parent::__construct($name, $source);
+        $this->db = $db;
+    }
+
+    public function setDB(DBDriver $db)
+    {
+        $this->db = $db;
+    }
+
+    public function getDB(): ?DBDriver
+    {
+        return $this->db;
+    }
+
+}
 /**
  * Process all DataInput controls from an InputForm and prepare values to be stored in a DBTableBean
  * Allows data to be stored into other DBTableBeans as set from the form DataInput fields
  * Handles add data to 'DBTableBean' and edit data from 'DBTableBean'
  * Class BeanTransactor
  */
-class BeanTransactor implements IBeanEditor
+class BeanTransactor extends SparkObservable implements IBeanEditor
 {
 
     protected $values = array();
@@ -27,9 +56,6 @@ class BeanTransactor implements IBeanEditor
     protected $insert_values = array();
     protected $update_values = array();
 
-    protected ?Closure $beforeCommitClosure = null;
-    protected ?Closure $afterCommitClosure = null;
-
     /**
      * @var int
      */
@@ -41,22 +67,17 @@ class BeanTransactor implements IBeanEditor
 
     public function __construct(DBTableBean $bean, int $editID)
     {
+        parent::__construct();
+
         $this->values = array();
         $this->insert_values = array();
         $this->update_values = array();
 
         $this->bean = $bean;
         $this->editID = $editID;
+        $this->setObserver(new SparkObserver());
     }
 
-    public function setClosureBeforeCommit(Closure $closure)
-    {
-        $this->beforeCommitClosure = $closure;
-    }
-    public function setClosureAfterCommit(Closure $closure)
-    {
-        $this->afterCommitClosure = $closure();
-    }
     public function getEditID(): int
     {
         return $this->editID;
@@ -217,14 +238,7 @@ class BeanTransactor implements IBeanEditor
 
             $this->beforeCommit($db);
 
-            if ($this->beforeCommitClosure instanceof Closure) {
-                $callback = $this->beforeCommitClosure;
-                $callback($this,$db);
-            }
-
-            if (is_callable("DBTransactor_onBeforeCommit")) {
-                call_user_func("DBTransactor_onBeforeCommit", $this, $db);
-            }
+            $this->notify(new BeanTransactorEvent(BeanTransactorEvent::BEFORE_COMMIT, $this, $db));
 
             $db->commit();
 
@@ -233,14 +247,7 @@ class BeanTransactor implements IBeanEditor
             try {
                 $this->afterCommit();
 
-                if ($this->afterCommitClosure instanceof Closure) {
-                    $callback = $this->afterCommitClosure;
-                    $callback($this,$db);
-                }
-
-                if (is_callable("DBTransactor_onAfterCommit")) {
-                    call_user_func("DBTransactor_onAfterCommit", $this, $db);
-                }
+                $this->notify(new BeanTransactorEvent(BeanTransactorEvent::AFTER_COMMIT, $this, $db));
             }
             catch (Exception $exx) {
                 debug("afterCommit() failed: " . $exx->getMessage());
