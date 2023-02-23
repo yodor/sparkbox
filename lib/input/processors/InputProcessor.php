@@ -91,6 +91,16 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         return $this->transact_bean;
     }
 
+    /**
+     * Set the 'transact bean' to be used for this field.
+     * Data from this field will be stored into '$bean' DBTableBean instead of the main
+     * transaction bean.
+     * Multiple values are loaded using the default SQLSelect returned from by the select() method of '$bean'
+     * Ordering might be adjusted by modifying the select of '$bean' before passing it here
+     * ie. $bean->select()->order_by = " position ASC "
+     * @param DBTableBean $bean
+     * @param int $max_items
+     */
     public function setTransactBean(DBTableBean $bean, int $max_items=-1)
     {
         $this->transact_bean = $bean;
@@ -338,7 +348,25 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             $values[] = $this->loadTargetBeanData($target_data);
         }
 
-        debug("Transact bean values loaded #".count($values)." : ", $values);
+        debug("Transact bean values loaded #".count($values));
+        foreach ($values as $idx=>$item) {
+            @$obj = unserialize($item);
+
+            if ($obj === FALSE) {
+                $type = gettype($item);
+                debug("Item[$idx] => Type: $type | '$item'");
+            }
+            else {
+                $type = get_class($obj);
+                if ($obj instanceof StorageObject) {
+                    debug("Item[$idx] => Type: $type | UID: ".$obj->getUID());
+                }
+                else {
+                    debug("Item[$idx] => Type: $type");
+                }
+
+            }
+        }
 
         return $values;
     }
