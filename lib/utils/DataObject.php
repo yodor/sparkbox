@@ -1,10 +1,10 @@
 <?php
 include_once ("utils/IDataResultProcessor.php");
 
-class DataObject implements IDataResultProcessor
+class DataObject  implements IDataResultProcessor
 {
-    protected $name;
-    protected $value;
+    protected $name = "";
+    protected $value = "";
 
     /**
      * DataObject constructor.
@@ -39,5 +39,9 @@ class DataObject implements IDataResultProcessor
         if (isset($data[$this->name])) {
             $this->value = $data[$this->name];
         }
+        else {
+            $this->value = "";
+        }
     }
 }
+?>
