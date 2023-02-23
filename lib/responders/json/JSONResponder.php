@@ -80,7 +80,9 @@ abstract class JSONResponder extends RequestResponder
 
         }
 
-        debug("Response buffer: ".ob_get_contents());
+        if (isset($GLOBALS["DEBUG_JSONRESPONDER_OUTPUT"])) {
+            debug("Response buffer: ".ob_get_contents());
+        }
 
         ob_end_clean();
         $response->send();
