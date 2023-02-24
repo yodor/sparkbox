@@ -98,9 +98,6 @@ class JSONFormDialog extends ConfirmMessageDialog {
     {
         $(this.visibleSelector() + " " + this.contentSelector).html(contents);
         this.modal_pane.centerContents();
-
-        if (window.onload) {
-            window.onload();
-        }
+        dispatchEvent(new Event('load'));
     }
 }
