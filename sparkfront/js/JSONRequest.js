@@ -201,12 +201,6 @@ class JSONRequest {
         let responderURL = this.getURL();
 
         let logstr = "JSONRequest::start() - Responder: " + this.command + " Function: " + this.function + "\r\n";
-        logstr += "Parameters:\r\n";
-        this.parameters.forEach(function (value, key, parent) {
-            logstr += "\t" + key + " => " + value + "\r\n";
-
-        });
-
         console.log(logstr);
 
         this.request_time = new Date();
@@ -215,22 +209,14 @@ class JSONRequest {
 
             console.log("Using POST: " + responderURL.href);
             this.xmlRequest.open("POST", responderURL.href, this.async);
-            this.xmlRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-            let post = "";
-            this.post_data.forEach(function (value, key, parent) {
-                post += key + "=" + encodeURIComponent(value);
-                post += "&";
-            });
-
-            if (this.form_data != null) {
-                for (let [key, value] of this.form_data) {
-                    post += key + "=" + encodeURIComponent(value);
-                    post += "&";
-                }
+            if (this.form_data == null) {
+                this.form_data = new FormData();
             }
-
-            this.xmlRequest.send(post);
+            this.post_data.forEach(function (value, key, parent) {
+                this.form_data.append(key, value);
+            }.bind(this));
+            this.xmlRequest.send(this.form_data);
 
         } else {
             console.log("Using GET: " + responderURL.href);
