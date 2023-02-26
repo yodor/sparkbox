@@ -448,9 +448,9 @@ class MainMenu
             if (endsWith($item_href, "/")) {
                 $item_href .= "index.php";
             }
-
-            debug("URLBuilder from MenuItem href: ".$item_href);
-
+            if (isset($GLOBALS["DEBUG_MAINMENU_MATCHITEM"])) {
+                debug("URLBuilder from MenuItem href: " . $item_href);
+            }
             $itemURL->buildFrom(urldecode($item_href));
 
             $is_match = $matcher($item, $itemURL);
