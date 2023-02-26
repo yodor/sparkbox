@@ -19,8 +19,9 @@ abstract class JSONFormResponder extends JSONResponder
      */
     protected $proc;
 
-    public function __construct(string $cmd)
+    public function __construct(string $cmd="")
     {
+        if (!$cmd) $cmd = get_class($this);
         parent::__construct($cmd);
 
         $this->form = $this->createForm();
