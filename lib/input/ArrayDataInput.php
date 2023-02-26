@@ -60,39 +60,6 @@ class ArrayDataInput extends DataInput
 
     }
 
-//    public function getValuesCount()
-//    {
-//        return count($this->value);
-//    }
-//
-//    public function appendElement($val)
-//    {
-//        $this->value[] = $val;
-//    }
-
-//    public function removeElementAt($idx)
-//    {
-//
-//        if (isset($this->value[$idx])) {
-//            unset($this->value[$idx]);
-//            $new_vals = array();
-//            foreach ($this->value as $key => $val) {
-//                $new_vals[] = $val;
-//            }
-//            $this->value = $new_vals;
-//        }
-//
-//        if (isset($this->error[$idx])) {
-//            unset($this->error[$idx]);
-//            $new_vals = array();
-//            foreach ($this->error as $key => $val) {
-//                $new_vals[] = $val;
-//            }
-//            $this->error = $new_vals;
-//        }
-//
-//    }
-
     public function haveError(): bool
     {
 
