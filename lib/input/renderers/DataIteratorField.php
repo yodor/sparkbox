@@ -5,6 +5,8 @@ include_once("components/renderers/items/DataIteratorItem.php");
 abstract class DataIteratorField extends InputField
 {
 
+    protected $array_key_field = "";
+
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
@@ -13,13 +15,14 @@ abstract class DataIteratorField extends InputField
     protected function renderImpl()
     {
 
-        $num = $this->iterator->exec();
+        if ($this->iterator instanceof IDataIterator) {
+            $num = $this->iterator->exec();
+        }
 
         $this->startRenderItems();
-
         $this->renderItems();
-
         $this->finishRenderItems();
+
 
     }
 
@@ -45,23 +48,30 @@ abstract class DataIteratorField extends InputField
 
         $index = 0;
 
-        while ($data_row = $this->iterator->next()) {
+        if ($this->iterator instanceof IDataIterator) {
+            while ($data_row = $this->iterator->next()) {
 
-            $id = $data_row[$this->iterator->key()];
+                $id = $data_row[$this->iterator->key()];
 
-            $item = $this->item;
-            //$item = clone $this->item;
+                $item = $this->item;
+                //$item = clone $this->item;
 
-            $item->setID((int)$id);
-            $item->setName($field_name . "[]");
-            $item->setIndex($index);
+                $item->setID((int)$id);
 
-            $item->setData($data_row);
+                $array_key_value = "";
+                if ($this->array_key_field && isset($data_row[$this->array_key_field])) {
+                    $array_key_value = $data_row[$this->array_key_field];
+                }
+                $item->setName($field_name . "[".$array_key_value."]");
+                $item->setIndex($index);
 
-            $item->setSelected($this->isModelSelected());
-            $item->render();
+                $item->setData($data_row);
 
-            $index++;
+                $item->setSelected($this->isModelSelected());
+                $item->render();
+
+                $index++;
+            }
         }
     }
 
@@ -81,6 +91,10 @@ abstract class DataIteratorField extends InputField
         return (in_array($this->item->getValue(), $field_values));
     }
 
+    public function setArrayKeyDataField(string $field_name)
+    {
+        $this->array_key_field = $field_name;
+    }
 }
 
 ?>
