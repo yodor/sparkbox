@@ -36,6 +36,8 @@ class ImageScaler
     protected $data = NULL;
     protected $dataSize = 0;
 
+    protected $output_quality = 60;
+
     //resulting image width and height
     public function __construct(int $width, int $height)
     {
@@ -50,8 +52,16 @@ class ImageScaler
             }
         }
         $this->output_format = IMAGE_SCALER_OUTPUT_FORMAT;
+        $this->output_quality = IMAGE_SCALER_OUTPUT_QUALITY;
     }
 
+    public function setOutputQuality(int $output_quality)
+    {
+        $this->output_quality = $output_quality;
+    }
+    public function getOutputQuality() : int {
+        return $this->output_quality;
+    }
     /**
      * @param string $mime Set the output format from mime type string
      */
@@ -199,10 +209,10 @@ class ImageScaler
             imagepng($h_source);
         }
         else if (strcmp($this->output_format, ImageScaler::TYPE_JPEG) == 0){
-            imagejpeg($h_source, NULL, IMAGE_SCALER_OUTPUT_QUALITY);
+            imagejpeg($h_source, NULL, $this->output_quality);
         }
         else {
-            imagewebp($h_source, NULL, IMAGE_SCALER_OUTPUT_QUALITY);
+            imagewebp($h_source, NULL, $this->output_quality);
         }
         $this->data = ob_get_contents();
         $this->dataSize = ob_get_length();
