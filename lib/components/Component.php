@@ -193,7 +193,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents
 
     public function setName(string $name)
     {
-        $this->name = $name;
+        parent::setName($name);
         $this->setAttribute("name", $name);
     }
 
