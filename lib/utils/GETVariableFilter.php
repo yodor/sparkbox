@@ -46,9 +46,12 @@ class GETVariableFilter implements IRequestProcessor
     public function processInput()
     {
         if (isset($_GET[$this->name])) {
-            $this->value = sanitizeInput($_GET[$this->name]);
-            $this->is_active = TRUE;
-            $this->processSelect();
+            $value = $_GET[$this->name];
+            if ($value) {
+                $this->value = sanitizeInput($value);
+                $this->is_active = TRUE;
+                $this->processSelect();
+            }
         }
     }
 
