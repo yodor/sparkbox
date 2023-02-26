@@ -315,3 +315,11 @@ BODY {
     padding-top:1em;
     padding-bottom:1em;
 }
+
+.admin_layout .page_area .PageTemplate {
+    vertical-align:top;
+}
+.admin_layout .page_area .PageTemplate .Container {
+    vertical-align:top;
+    display:block;
+}
