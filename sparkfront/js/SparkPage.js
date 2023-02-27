@@ -8,25 +8,6 @@
     }
 })(jQuery)
 
-// class PopupHandler {
-//     handleEvent(e) {
-//         switch (e.message) {
-//             case "onPopupVisible":
-//                 let modal_pane = e.pane;
-//                 if (e.pane.fullscreen) {
-//
-//                 } else {
-//                     modal_pane.centerContents();
-//                 }
-//                 break;
-//         }
-//     }
-// }
-
-
-// let popup_handler = new PopupHandler();
-// $(document).on("ModalPane", popup_handler.handleEvent);
-
 /**
  * Show the default message dialog with text 'text'
  * If onConfirm function is passed call it when confirm action is triggered
@@ -48,5 +29,4 @@ function showAlert(text) {
     return dialog;
 
 }
-
 
