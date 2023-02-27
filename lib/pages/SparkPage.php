@@ -233,8 +233,6 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         self::$instance = $this;
 
-        $this->actions = new ActionCollection();
-
         $this->addMeta("revisit-after", "1 days");
         $this->addMeta("robots", "index, follow");
         $this->addMeta("keywords", "%meta_keywords%");
@@ -252,6 +250,8 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $this->addJS(SPARK_LOCAL . "/js/js.cookie.min.js");
 
+        $this->addJS(SPARK_LOCAL . "/js/CallStack.js");
+
         $this->addJS(SPARK_LOCAL . "/js/SparkObject.js");
         $this->addJS(SPARK_LOCAL . "/js/Component.js");
 
@@ -261,7 +261,10 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->addJS(SPARK_LOCAL . "/js/Tooltip.js");
         $this->addJS(SPARK_LOCAL . "/js/ImagePopup.js");
         $this->addJS(SPARK_LOCAL . "/js/dialogs/MessageDialog.js");
+
         $this->addJS(SPARK_LOCAL . "/js/SparkPage.js");
+
+        $this->actions = new ActionCollection();
 
         $dialog = new MessageDialog();
 
@@ -480,25 +483,17 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     protected function processMessages()
     {
-
         $alert = Session::GetAlert();
-
         if ($alert) {
-
-            $alert = json_encode($alert);
             ?>
             <script type='text/javascript'>
-                let alert = <?php echo $alert;?>;
                 onPageLoad(function () {
-                    showAlert(alert);
+                    showAlert(<?php echo json_encode($alert);?>);
                 });
             </script>
             <?php
-
         }
-
-        Session::SetAlert("");
-
+        Session::ClearAlert();
     }
 
 }

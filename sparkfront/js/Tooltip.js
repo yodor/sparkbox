@@ -64,4 +64,4 @@ function processTooltipContent(elm) {
 
 onPageLoad(function () {
     processTooltipContent();
-});
+}, true);
