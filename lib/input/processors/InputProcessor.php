@@ -76,6 +76,8 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      */
     protected $transact_bean;
 
+    public $transact_bean_skip_empty_values = FALSE;
+
     public function __construct(DataInput $input)
     {
         $this->input = $input;
@@ -180,6 +182,9 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             if (is_array($value)) throw new Exception("Could not transact Array to target_bean");
             if (is_object($value)) throw new Exception("Could not transact Object to target_bean");
+
+            //check flag for empty value transacting
+            if ($this->transact_bean_skip_empty_values && !$value) continue;
 
             $data[$name] = $value;
 
