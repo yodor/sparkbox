@@ -196,13 +196,16 @@ class SparkPage extends HTMLPage implements IActionCollection
     public function addComponent(Component $cmp)
     {
         if ($cmp instanceof IPageComponent) {
-            $this->page_components[] = $cmp;
+            $key = $cmp->hash();
+            $found = array_key_exists($key, $this->page_components);
+            if (!$found) $this->page_components[$key] = $cmp;
         }
 
         if ($cmp instanceof IHeadContents) {
-            $this->head_components[] = $cmp;
+            $key = $cmp->hash();
+            $found = array_key_exists($key, $this->head_components);
+            if (!$found) $this->head_components[$key] = $cmp;
         }
-
     }
 
     protected function renderJS()
