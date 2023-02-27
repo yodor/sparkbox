@@ -95,13 +95,18 @@ class Session
             Session::Set(Session::ALERT, $msg);
         }
         else {
-            Session::Clear(Session::ALERT);
+            Session::ClearAlert();
         }
     }
 
     public static function GetAlert()
     {
         return Session::Get(Session::ALERT, "");
+    }
+
+    public static function ClearAlert()
+    {
+        Session::Clear(Session::ALERT);
     }
 }
 
