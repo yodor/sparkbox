@@ -129,6 +129,15 @@ class JSONRequest {
     }
 
     /**
+     * Append POST parameter named 'name' with value 'value'
+     * @param name {string}
+     * @param value {string}
+     */
+    addPostParameter(name, value) {
+        this.post_data.append(name, value);
+    }
+
+    /**
      * Get the POST parameter named 'name' value
      * @param name
      * @returns {string}
