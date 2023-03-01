@@ -2,7 +2,7 @@
 include_once("utils/DataObject.php");
 include_once("utils/URLBuilder.php");
 
-class StorageItem extends DataObject
+class StorageItem extends DataObject implements JsonSerializable
 {
 
     public $id = -1;
@@ -12,6 +12,12 @@ class StorageItem extends DataObject
 
     protected $urlbuilder;
 
+    protected $serializedURL = "";
+
+    const TYPE_IMAGE = 1;
+    const TYPE_FILE = 2;
+
+    protected $type = StorageItem::TYPE_IMAGE;
 
     public function __construct(int $id = -1, string $className = "", string $field = "")
     {
@@ -24,6 +30,12 @@ class StorageItem extends DataObject
 
         $this->urlbuilder = new URLBuilder();
         $this->urlbuilder->buildFrom($this->storageURL);
+
+    }
+
+    public function setType(int $type)
+    {
+        $this->type = $type;
     }
 
     public function enableExternalURL(bool $mode)
@@ -51,12 +63,14 @@ class StorageItem extends DataObject
 
     public function hrefFull()
     {
+        $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
         return $this->urlbuilder->url();
     }
 
     public function hrefCrop($width, $height) : string
     {
+        $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
         $this->urlbuilder->add(new URLParameter("width", $width));
         $this->urlbuilder->add(new URLParameter("height", $height));
@@ -66,6 +80,7 @@ class StorageItem extends DataObject
 
     public function hrefThumb($width) : string
     {
+        $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
         $this->urlbuilder->add(new URLParameter("size", $width));
         return $this->urlbuilder->url();
@@ -73,14 +88,28 @@ class StorageItem extends DataObject
 
     public function hrefFile() : string
     {
+        $this->setType(StorageItem::TYPE_FILE);
         $this->buildURL();
-        $this->urlbuilder->get("cmd")->setValue("data");
+        return $this->urlbuilder->url();
+    }
+
+    public function href() : string
+    {
+        $this->buildURL();
         return $this->urlbuilder->url();
     }
 
     protected function buildURL()
     {
-        $this->urlbuilder->add(new URLParameter("cmd", "image"));
+        $cmd = "image";
+        if ($this->type == StorageItem::TYPE_IMAGE) {
+            $cmd = "image";
+        }
+        else if ($this->type == StorageItem::TYPE_FILE) {
+            $cmd = "data";
+        }
+
+        $this->urlbuilder->add(new URLParameter("cmd", $cmd));
         $this->urlbuilder->add(new URLParameter("class", $this->className));
         $this->urlbuilder->add(new URLParameter("id", (string)$this->id));
 
@@ -116,6 +145,18 @@ class StorageItem extends DataObject
         $this->id = (int)$this->value;
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4
+     */
+    public function jsonSerialize()
+    {
+        $this->serializedURL = $this->href();
+        return get_object_vars($this);
+    }
 }
 
 ?>
