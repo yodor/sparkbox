@@ -16,9 +16,19 @@ class JSONRequestError extends JSONRequestResult {
 
 }
 
-class JSONRequest {
+class JSONRequest extends SparkObject {
+
+    static EVENT_STARTING = "starting";
+    static EVENT_STARTED = "started";
+    static EVENT_SUCCESS = "success";
+    static EVENT_ERROR = "error";
 
     constructor() {
+        super();
+
+        this.request_result = null;
+        this.request_error = null;
+
         /**
          * @type {XMLHttpRequest}
          */
@@ -207,6 +217,11 @@ class JSONRequest {
      */
     start() {
 
+        this.request_result = null;
+        this.request_error = null;
+
+        this.notify(new SparkEvent(JSONRequest.EVENT_STARTING, this));
+
         let responderURL = this.getURL();
 
         let logstr = "JSONRequest::start() - Responder: " + this.command + " Function: " + this.function + "\r\n";
@@ -226,11 +241,13 @@ class JSONRequest {
                 this.form_data.append(key, value);
             }.bind(this));
             this.xmlRequest.send(this.form_data);
+            this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
 
         } else {
             console.log("Using GET: " + responderURL.href);
             this.xmlRequest.open("GET", responderURL.href, this.async);
             this.xmlRequest.send(null);
+            this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
         }
 
     }
@@ -275,7 +292,9 @@ class JSONRequest {
             request_result.json_result = json_result;
             request_result.status = status;
             request_result.response = response;
+            this.request_result = request_result;
 
+            this.notify(new SparkEvent(JSONRequest.EVENT_SUCCESS, this));
             this.onSuccess(request_result);
 
         } catch (err) {
@@ -286,7 +305,9 @@ class JSONRequest {
             request_error.response = response;
             request_error.status = status;
             request_error.description = description; //
+            this.request_error = request_error;
 
+            this.notify(new SparkEvent(JSONRequest.EVENT_ERROR, this));
             this.onError(request_error);
         }
     }
