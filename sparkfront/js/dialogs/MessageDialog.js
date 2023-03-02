@@ -46,10 +46,12 @@ class MessageDialog extends Component {
 
     setCaption(caption) {
         this.caption = caption;
+        $(this.visibleSelector()).find(".Caption .Title").html(this.caption);
     }
 
     setText(text) {
         this.text = text;
+        $(this.visibleSelector()).find(".Inner .Contents .Text").html(this.text);
     }
 
     visibleSelector() {
