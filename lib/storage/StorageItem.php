@@ -65,6 +65,9 @@ class StorageItem extends DataObject implements JsonSerializable
     {
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
+        $this->urlbuilder->remove("width");
+        $this->urlbuilder->remove("height");
+        $this->urlbuilder->remove("size");
         return $this->urlbuilder->url();
     }
 
@@ -72,6 +75,7 @@ class StorageItem extends DataObject implements JsonSerializable
     {
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
+        $this->urlbuilder->remove("size");
         $this->urlbuilder->add(new URLParameter("width", $width));
         $this->urlbuilder->add(new URLParameter("height", $height));
         return $this->urlbuilder->url();
@@ -82,6 +86,8 @@ class StorageItem extends DataObject implements JsonSerializable
     {
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
+        $this->urlbuilder->remove("width");
+        $this->urlbuilder->remove("height");
         $this->urlbuilder->add(new URLParameter("size", $width));
         return $this->urlbuilder->url();
     }
