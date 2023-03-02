@@ -2,8 +2,9 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
     constructor() {
         super();
+        this.loader = "<div class='lds-facebook'><div></div><div></div><div></div></div>";
         this.icon_enabled = false;
-        this.text = "Loading please wait ...";
+        this.text = this.loader;
 
         this.setID("json_dialog");
 
@@ -14,6 +15,18 @@ class JSONFormDialog extends ConfirmMessageDialog {
         //Which selector holds the loaded content ie the view space
         this.contentSelector = " .Text";
 
+        this.req.addObserver(this.onRequestEvent.bind(this));
+    }
+
+    /**
+     *
+     * @param sparkEvent {SparkEvent}
+     */
+    onRequestEvent(event)
+    {
+        if (event.isEvent(JSONRequest.EVENT_STARTING)) {
+            this.setText(this.loader);
+        }
     }
 
     /**
@@ -61,9 +74,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
     submitForm()  {
 
         //console.log("Submitting form");
-
         this.req.setFunction("submit");
-
 
         let form = $(this.visibleSelector()+" FORM").get(0);
         let name = form.getAttribute("name");
