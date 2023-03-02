@@ -19,6 +19,9 @@ class ColumnCollection extends SQLCollection
                 if (strlen($val) > 0) {
                     $field .= " AS " . $val;
                 }
+                if ($this->prefix) {
+                    $field = $this->prefix.".".$field;
+                }
                 $fieldset_data[] = $field;
             }
             $result = implode(" , ", $fieldset_data);

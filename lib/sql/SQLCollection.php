@@ -4,10 +4,21 @@ abstract class SQLCollection
 {
 
     protected $fields = array();
+    protected string $prefix = "";
 
     public function __construct()
     {
 
+    }
+
+    public function setPrefix(string $prefix)
+    {
+        $this->prefix = $prefix;
+    }
+
+    public function clearPrefix()
+    {
+        $this->prefix = "";
     }
 
     public function copyTo(SQLCollection $other)
@@ -81,6 +92,7 @@ abstract class SQLCollection
     }
 
     abstract public function getSQL();
+
 }
 
 ?>
