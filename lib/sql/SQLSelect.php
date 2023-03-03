@@ -1,13 +1,11 @@
 <?php
 include_once("sql/SQLStatement.php");
-include_once("sql/ColumnCollection.php");
+include_once("sql/SQLCollection.php");
 
 class SQLSelect extends SQLStatement
 {
 
-    //TODO
-    protected $fieldset;
-
+    protected SQLCollection $fieldset;
 
     const SQL_CALC_FOUND_ROWS = 1;
     const SQL_CACHE = 2;
@@ -19,7 +17,7 @@ class SQLSelect extends SQLStatement
     {
         parent::__construct();
         $this->type = "SELECT";
-        $this->fieldset = new ColumnCollection();
+        $this->fieldset = new SQLCollection();
     }
 
     public function setMode(int $mode_clause)
@@ -39,7 +37,7 @@ class SQLSelect extends SQLStatement
         return isset($this->modeMask[$mode_clause]);
     }
 
-    public function fields(): ColumnCollection
+    public function fields(): SQLCollection
     {
         return $this->fieldset;
     }
