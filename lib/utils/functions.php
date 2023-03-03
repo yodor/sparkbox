@@ -194,7 +194,7 @@ function getArrayText(array $arr)
                 $val = get_class($val) . " UID:" . $val->getUID();
             }
         }
-        if (is_array($val)) $val = "Array(" . implode(",", $val) . ")";
+        if (is_array($val)) $val = print_r($val, true);//"Array(" . implode(",", $val) . ")";
 
         $msg[] = "[$key] => $val";
     }
