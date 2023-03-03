@@ -174,9 +174,22 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         debug("Values count: " . count($values));
         // 	    debug("Post Values: ", $_POST);
 
+
+        //TODO: fix mismatch of posted count to datasource loaded count
+        //possible fix: delete all values and insert again only if mismatch of count
+
+        if (count($this->target_loaded_keys)!=count($values)) {
+            //delete all and insert
+            debug("Values count does not match posted values count - deleting all values and inserting posted ones");
+            $this->transact_bean->deleteRef($item_key, $transactor->getLastID(), $db);
+            $this->target_loaded_keys = array();
+        }
+
         foreach ($values as $idx => $value) {
 
             $data = array();
+            $skip_insert = false;
+
             //referencing key is the primary key of the bean from main transaction
             $data[$item_key] = $transactor->getLastID();
 
@@ -184,7 +197,11 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             if (is_object($value)) throw new Exception("Could not transact Object to target_bean");
 
             //check flag for empty value transacting
-            if ($this->transact_bean_skip_empty_values && !$value) continue;
+            if ($this->transact_bean_skip_empty_values && !$value) {
+                //TODO: check
+                if (count($this->target_loaded_keys)>0) array_shift($this->target_loaded_keys);
+                continue;
+            }
 
             $data[$name] = $value;
 
@@ -210,20 +227,27 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
                 }
             }
 
-            $sourceID = array_shift($this->target_loaded_keys);
-            if ($sourceID > 0) {
-                debug("DataSourceID: " . $sourceID);
+            //try update on 1:1 load vs post values
+            if (count($this->target_loaded_keys)>0) {
+                $sourceID = array_shift($this->target_loaded_keys);
+                if ($sourceID > 0) {
+                    debug("DataSourceID: " . $sourceID);
 
-                $this->transact_bean->update($sourceID, $data, $db);
-                //throw new Exception("Unable to update  data source bean. Error: " . $db->getError());
-                $processed_ids[] = $sourceID;
+                    $this->transact_bean->update($sourceID, $data, $db);
+                    //Do not throw here - might return 0 updated rows
+                    // new Exception("Unable to update  data source bean. Error: " . $db->getError());
+                    $processed_ids[] = $sourceID;
+                    $skip_insert = true;
+                }
+
             }
-            else {
 
+            if (!$skip_insert) {
                 $refID = $this->transact_bean->insert($data, $db);
                 if ($refID < 1) throw new Exception("Unable to insert into data source bean. Error: " . $db->getError());
                 $processed_ids[] = $refID;
             }
+
             $foreign_transacted++;
 
         }
