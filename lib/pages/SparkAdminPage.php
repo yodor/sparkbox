@@ -157,7 +157,7 @@ class SparkAdminPage extends SparkPage
         if ($this->context->getData()->contains(SessionData::FULLNAME)) {
             $fullname = $this->context->getData()->get(SessionData::FULLNAME);
         }
-        echo "<span class='text_admin'>Welcome, $fullname</span>";
+        echo "<span class='text_admin'>".tr("Welcome").", $fullname</span>";
         ColorButton::RenderButton("Logout", ADMIN_LOCAL . "/logout.php");
         echo "</div>";
 

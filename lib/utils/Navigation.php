@@ -18,7 +18,7 @@ class Navigation
 
         $pageURL = SparkPage::instance()->getURL();
 
-        debug("Navigated to: ".SparkPage::instance()->getPageURL()." - Navigation content: ", array_values($this->urls));
+        debug("Navigated to: ".SparkPage::instance()->getPageURL()." - Navigation contents: ".print_r($this->urls,true));
 
         $stored_urls = new ArrayIterator($this->urls, true);
 
@@ -53,18 +53,19 @@ class Navigation
         $this->urls = $urls;
 
         Session::Set($this->name, $this->urls);
-        debug("Adding page to navigation '$pageName' => {$pageURL->url()} - Naviagtion contents: ", array_values($this->urls));
+        debug("Adding page to navigation '$pageName' => {$pageURL->url()} - Naviagtion contents: ".print_r($this->urls,true));
     }
 
     public function clear()
     {
+        debug("Before clear - Naviagtion contents: ".print_r($this->urls,true));
         $this->urls = array();
         Session::Set($this->name, $this->urls);
     }
 
     public function back() : ?Action
     {
-        debug("Navigation entries: ", array_values($this->urls));
+        debug("Navigation entries: ".print_r($this->urls,true));
 
         if (count($this->urls)<1)return NULL;
 
