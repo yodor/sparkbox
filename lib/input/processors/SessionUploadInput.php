@@ -26,7 +26,13 @@ class SessionUploadInput extends InputProcessor
 
     }
 
-
+    public function clear()
+    {
+        $name = $this->input->getName();
+        if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$name])) {
+            unset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$name]);
+        }
+    }
 
     //only one storage object can be loaded from the main transaction result row
     public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)

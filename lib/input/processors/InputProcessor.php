@@ -94,7 +94,8 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
     }
 
     /**
-     * Set the 'transact bean' to be used for this field.
+     * Set the 'transact bean' to be used for this DataInput
+     * Loading of values is done in loadTargetBean and storing is done in beforeCommit
      * Data from this field will be stored into '$bean' DBTableBean instead of the main
      * transaction bean.
      * Multiple values are loaded using the default SQLSelect returned from by the select() method of '$bean'
