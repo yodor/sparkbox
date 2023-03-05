@@ -157,33 +157,35 @@ abstract class BeanDataResponse extends HTTPResponse
         return $this->etag_parts;
     }
 
-    public const DATE_FORMAT = "D, d M Y H:i:s T";
+
 
     protected function fillHeaders()
     {
         // set headers and etag
-        $last_modified = gmdate(BeanDataResponse::DATE_FORMAT);
+        $last_modified = time();
 
         //use timestamp from storage object
         if (isset($this->row["timestamp"]) && $this->row["timestamp"]) {
-            $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["timestamp"]));
+            $last_modified = strtotime($this->row["timestamp"]);
             debug("Using last-modified from [timestamp]: ".$last_modified);
         }
         else if (isset($this->row["date_upload"])) {
-            $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["date_upload"]));
+            $last_modified = strtotime($this->row["date_upload"]);
             debug("Using last-modified from [date_upload]: ".$last_modified);
         }
         else if (isset($this->row["date_updated"])) {
-            $last_modified = gmdate(BeanDataResponse::DATE_FORMAT, strtotime($this->row["date_updated"]));
+            $last_modified = strtotime($this->row["date_updated"]);
             debug("Using last-modified from [date_updated]: ".$last_modified);
         }
         else {
             debug("Using last-modified from current date/time: ".$last_modified);
         }
 
+        $modified = gmdate(HTTPResponse::DATE_FORMAT, strtotime($last_modified));
+        debug("Last-Modified: $modified");
         //always keep one year ahead from request time
-        $expires = gmdate(BeanDataResponse::DATE_FORMAT, strtotime("+1 year"));
-        debug("expires: $expires");
+        $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year", $last_modified));
+        debug("Expires: $expires");
 
         $etag = md5(implode("|", $this->getETagParts()) . "-" . $last_modified);
         debug("ETag: $etag");
@@ -192,7 +194,7 @@ abstract class BeanDataResponse extends HTTPResponse
 
         $this->setHeader("Expires", $expires);
 
-        $this->setHeader("Last-Modified", $last_modified);
+        $this->setHeader("Last-Modified", $modified);
 
         $mime = "application/octet-stream";
 

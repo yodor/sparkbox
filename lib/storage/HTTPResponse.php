@@ -9,6 +9,8 @@ class HTTPResponse
     protected $data = "";
     protected $dataSize = -1;
 
+    public const DATE_FORMAT = "D, d M Y H:i:s T";
+
     public function __construct()
     {
 
@@ -69,7 +71,7 @@ class HTTPResponse
         $this->setHeader("HTTP/1.1 304 Not Modified");
         $this->setHeader("Cache-Control", "no-cache, must-revalidate");
 
-        $expires = gmdate(BeanDataResponse::DATE_FORMAT, strtotime("+1 year"));
+        $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year"));
         $this->setHeader("Expires", $expires);
 
         $req_modified = $this->requestModifiedSince();
@@ -81,7 +83,6 @@ class HTTPResponse
         if ($etag) {
             $this->setHeader("ETag", $etag);
         }
-
 
         $this->sendHeaders();
         exit;
