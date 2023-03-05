@@ -6,13 +6,20 @@ class SparkFile {
     protected finfo $finfo;
     protected $handle = NULL;
 
-    public function __construct(string $filename)
+    /**
+     * @param string $absolute_filename If not empty calls setAbsoluteFilename
+     */
+    public function __construct(string $absolute_filename="")
     {
-        $this->filename = $filename;
-        $this->path = INSTALL_PATH;
         $this->finfo = new finfo(FILEINFO_MIME_TYPE);
+        if ($absolute_filename) {
+            $this->setAbsoluteFilename($absolute_filename);
+        }
     }
 
+    /**
+     * @param string $filename set the filename to '$filename'
+     */
     public function setFilename(string $filename)
     {
         $this->filename = $filename;
@@ -28,6 +35,11 @@ class SparkFile {
         $this->path = $path."/";
     }
 
+    public function getPath() : string
+    {
+        return $this->path;
+    }
+
     public function getContents() : string
     {
         $ret = @file_get_contents($this->getAbsoluteFilename());
@@ -35,9 +47,23 @@ class SparkFile {
         return $ret;
     }
 
+    /**
+     * @return string The absolute filename path + filename
+     */
     public function getAbsoluteFilename() : string
     {
         return $this->path.$this->filename;
+    }
+
+    /**
+     * @param string $absolute_file The absolute filename path + filename
+     */
+    public function setAbsoluteFilename(string $absolute_file)
+    {
+        $path_parts = pathinfo($absolute_file);
+        $this->filename = $path_parts["basename"];
+        $this->path = $path_parts["dirname"];
+
     }
 
     public function getMIME() : string
