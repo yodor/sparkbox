@@ -104,35 +104,45 @@ class SparkFile {
         return $result;
     }
 
-    /**
-     * Pass-through the file as a HTML response using additional headers passed in the '$headers' parameter
-     * where header names are the keys and values are the value.
-     * Default headers are content-type content-length and content-disposition that can be overwritten with the passed headers
-     * @param array $headers
-     * @throws Exception
-     */
-    public function response(array $user_headers=array())
-    {
-        $headers = array();
-        $headers["Content-Type"] = $this->getMIME();
-        $headers["Content-Length"] = $this->length();
-        $headers["Content-Disposition"] = "inline; filename='\"'{$this->getAbsoluteFilename()}\"";
-        foreach ($user_headers as $key=>$val) {
-            $headers[$key] = $val;
-        }
-
-        foreach ($headers as $key=>$val) {
-            header($key.": ".$val);
-        }
-        $this->open("r");
-        $this->passthrough();
-        $this->close();
-
-    }
+//    /**
+//     * Pass-through the file as a HTML response using additional headers passed in the '$headers' parameter
+//     * where header names are the keys and values are the value.
+//     * Default headers are content-type content-length and content-disposition that can be overwritten with the passed headers
+//     * @param array $headers
+//     * @throws Exception
+//     */
+//    public function response(array $user_headers=array())
+//    {
+//        $headers = array();
+//        $headers["Content-Type"] = $this->getMIME();
+//        $headers["Content-Length"] = $this->length();
+//        $headers["Content-Disposition"] = "inline; filename='\"{$this->getAbsoluteFilename()}\"";
+//        $headers["Content-Transfer-Encoding"] = "binary";
+//
+//        foreach ($user_headers as $key=>$val) {
+//            $headers[$key] = $val;
+//        }
+//
+//        foreach ($headers as $key=>$val) {
+//            header($key.": ".$val);
+//        }
+//        $this->open("r");
+//        $this->passthrough();
+//        $this->close();
+//
+//    }
 
     public function remove() : bool
     {
         return unlink($this->getAbsoluteFilename());
+    }
+
+    /**
+     * @return int timestamp unix
+     */
+    public function dateCreated() : int
+    {
+        return filemtime($this->getAbsoluteFilename());
     }
 }
 ?>
