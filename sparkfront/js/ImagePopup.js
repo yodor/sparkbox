@@ -73,25 +73,30 @@ class ImagePopup extends SparkObject {
             return;
         }
 
+        let collection_selector = ".ImagePopup[itemClass='" + itemClass + "']";
+
         let relation = aelm.attr("relation");
         //select all tags having attribute = 'relation'
         if (relation) {
-
             this.relation = relation;
-            this.collection = $("[" + relation + "]").toArray();
-
-            //remove duplicates
-            let reduced = this.collection.reduce(function (item, e1) {
-                var matches = item.filter(function (e2)
-                { return $(e1).attr("itemid") == $(e2).attr("itemid")});
-                if (matches.length == 0) {
-                    item.push(e1);
-                }
-                return item;
-            }, []);
-
-            this.collection = reduced;
         }
+        else {
+            this.relation = "itemClass='" + itemClass + "'";
+        }
+
+        this.collection = $("[" + this.relation + "]").toArray();
+
+        //remove duplicates
+        let reduced = this.collection.reduce(function (item, e1) {
+            var matches = item.filter(function (e2)
+            { return $(e1).attr("itemid") == $(e2).attr("itemid")});
+            if (matches.length == 0) {
+                item.push(e1);
+            }
+            return item;
+        }, []);
+
+        this.collection = reduced;
 
         this.pos = 0;
 
