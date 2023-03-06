@@ -1,7 +1,8 @@
 class ImagePopup extends SparkObject {
 
     static EVENT_POSITION_CHANGED = "position_changed";
-    static EVENT_FETCH_COMPLETE = "image_shown"
+    static EVENT_FETCH_COMPLETE = "fetch_complete";
+    static EVENT_CLOSED = "closed";
 
     constructor() {
         super();
@@ -40,6 +41,14 @@ class ImagePopup extends SparkObject {
         let sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_CHANGED,this);
         this.notify(sparkEvent);
 
+        $.event.trigger({
+            type: "ImagePopup",
+            message: "onNextImage",
+            time: new Date(),
+            relation: this.relation,
+            source: this
+        });
+
         return false;
     }
 
@@ -54,6 +63,14 @@ class ImagePopup extends SparkObject {
 
         let sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_CHANGED,this);
         this.notify(sparkEvent);
+
+        $.event.trigger({
+            type: "ImagePopup",
+            message: "onPrevImage",
+            time: new Date(),
+            relation: this.relation,
+            source: this
+        });
 
         return false;
     }
@@ -73,30 +90,37 @@ class ImagePopup extends SparkObject {
             return;
         }
 
-        let collection_selector = ".ImagePopup[itemClass='" + itemClass + "']";
-
         let relation = aelm.attr("relation");
+        let list = aelm.attr("list-relation");
+        let collection_selector = "";
+
+        if (list) {
+            this.relation = list;
+            collection_selector = "relation='" + list + "'";
+        }
         //select all tags having attribute = 'relation'
-        if (relation) {
+        else if (relation) {
             this.relation = relation;
+            collection_selector = "relation='" + relation + "'";
         }
         else {
-            this.relation = "itemClass='" + itemClass + "'";
+            this.relation = itemClass;
+            collection_selector  = "itemClass='" + itemClass + "'";
         }
 
-        this.collection = $("[" + this.relation + "]").toArray();
+        this.collection = $("[" + collection_selector + "]").toArray();
 
-        //remove duplicates
-        let reduced = this.collection.reduce(function (item, e1) {
-            var matches = item.filter(function (e2)
-            { return $(e1).attr("itemid") == $(e2).attr("itemid")});
-            if (matches.length == 0) {
-                item.push(e1);
-            }
-            return item;
-        }, []);
+        // //remove duplicates
+        // let reduced = this.collection.reduce(function (item, e1) {
+        //     var matches = item.filter(function (e2)
+        //     { return $(e1).attr("itemid") == $(e2).attr("itemid")});
+        //     if (matches.length == 0) {
+        //         item.push(e1);
+        //     }
+        //     return item;
+        // }, []);
 
-        this.collection = reduced;
+        // this.collection = reduced;
 
         this.pos = 0;
 
@@ -174,6 +198,17 @@ class ImagePopup extends SparkObject {
         this.disableZoom();
         this.modal_pane.close();
 
+        let sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
+        this.notify(sparkEvent);
+
+        $.event.trigger({
+            type: "ImagePopup",
+            message: "close",
+            time: new Date(),
+            relation: this.relation,
+            source: this
+        });
+
     }
 
     fetchImage() {
@@ -214,6 +249,14 @@ class ImagePopup extends SparkObject {
         $(loader).removeClass("cover-spin");
 
         this.notify(new SparkEvent(ImagePopup.EVENT_FETCH_COMPLETE,this));
+
+        $.event.trigger({
+            type: "ImagePopup",
+            message: "popupImage",
+            time: new Date(),
+            relation: this.relation,
+            source: this
+        });
 
     }
 
