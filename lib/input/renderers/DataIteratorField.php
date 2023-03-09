@@ -5,7 +5,8 @@ include_once("components/renderers/items/DataIteratorItem.php");
 abstract class DataIteratorField extends InputField
 {
 
-    protected $array_key_field = "";
+    protected $array_key_field_name = "";
+    protected $array_key_model_id = false;
 
     public function __construct(DataInput $input)
     {
@@ -57,17 +58,29 @@ abstract class DataIteratorField extends InputField
                 //$item = clone $this->item;
 
                 $item->setID((int)$id);
-
-                $array_key_value = "";
-                if ($this->array_key_field && isset($data_row[$this->array_key_field])) {
-                    $array_key_value = $data_row[$this->array_key_field];
-                }
-                $item->setName($field_name . "[".$array_key_value."]");
                 $item->setIndex($index);
-
+                //sets the actual value of the item being rendered
                 $item->setData($data_row);
 
-                $item->setSelected($this->isModelSelected());
+                $isSelected = $this->isModelSelected();
+                $item->setSelected($isSelected);
+
+                $array_key_value = "";
+                if ($isSelected) {
+                    if ($this->array_key_model_id) {
+                        //the corresponding ID of the value from transact-bean of DataInput
+                        $modelID = $this->getModelValueID();
+                        if ($modelID > -1) {
+                            $array_key_value = "modelID:" . $modelID;
+                        }
+                    }
+                }
+                //override key
+                if ($this->array_key_field_name && isset($data_row[$this->array_key_field_name])) {
+                    $array_key_value = $data_row[$this->array_key_field_name];
+                }
+                $item->setName($field_name . "[".$array_key_value."]");
+
                 $item->render();
 
                 $index++;
@@ -76,10 +89,7 @@ abstract class DataIteratorField extends InputField
     }
 
     /**
-     * Iterator values construct the array
-     * Checkboxes post values directly
-     * Search inside values if iterator value is found
-     * @param DataInput $input
+     * Search 'this' item value inside DataInput values.
      * @return bool
      */
     protected function isModelSelected(): bool
@@ -91,10 +101,39 @@ abstract class DataIteratorField extends InputField
         return (in_array($this->item->getValue(), $field_values));
     }
 
-    public function setArrayKeyDataField(string $field_name)
+    /**
+     * Return the key of the DataInput value.
+     * Return -1 if 'this' item value is not inside 'this' DataInput values.
+     * @return int
+     */
+    protected function getModelValueID() : int
     {
-        $this->array_key_field = $field_name;
+        $field_values = $this->input->getValue();
+        if (!is_array($field_values)) return -1;
+        $found = array_search($this->item->getValue(), $field_values);
+        if ($found === FALSE) return -1;
+        return $found;
     }
+
+    /**
+     * Set flag to enable using the modelID as array key. Actual value of the key will be prefixed with string - 'modelID:'
+     * @param bool $mode
+     */
+    public function useArrayKeyModelID(bool $mode)
+    {
+        $this->array_key_model_id = $mode;
+    }
+
+    /**
+     * Use iterator result value with key=$field_name as the array key
+     * Overrides any other key naming like modelID
+     * @param string $field_name
+     */
+    public function setArrayKeyFieldName(string $field_name)
+    {
+        $this->array_key_field_name = $field_name;
+    }
+
 }
 
 ?>
