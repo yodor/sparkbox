@@ -47,14 +47,29 @@ class InputGroup {
         }
     }
 
+    public function removeAll()
+    {
+        $this->contents = array();
+    }
+
     public function getName() : string
     {
         return $this->name;
     }
 
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
     public function getDescription() : string
     {
         return $this->description;
+    }
+
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
     }
 
 }
@@ -366,6 +381,11 @@ class InputForm implements IBeanEditor
         foreach ($this->inputs as $name => $input) {
             $input->clear();
         }
+    }
+
+    public function removeAll()
+    {
+        $this->inputs = array();
     }
 
     /**
