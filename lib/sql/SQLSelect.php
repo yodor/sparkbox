@@ -20,6 +20,11 @@ class SQLSelect extends SQLStatement
         $this->fieldset = new SQLCollection();
     }
 
+    public function clearMode()
+    {
+        $this->modeMask = array();
+    }
+
     public function setMode(int $mode_clause)
     {
         $this->modeMask[$mode_clause] = 1;
@@ -176,8 +181,9 @@ class SQLSelect extends SQLStatement
     public function getAsDerived(string $as_name="relation") : SQLSelect
     {
         $sel = new SQLSelect();
-
-        $sel->from = " (".$this->getSQL().") AS $as_name ";
+        $tsel = clone $this;
+        $tsel->clearMode();
+        $sel->from = " (".$tsel->getSQL().") AS $as_name ";
 
         return $sel;
     }
