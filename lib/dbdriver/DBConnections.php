@@ -106,7 +106,7 @@ class DBConnections
 
         }
         if ($currDriver instanceof DBDriver) return $currDriver;
-        throw new Exception("Unsupoorted DBDriver: " . $props->driver);
+        throw new Exception("Unsupported DBDriver: " . $props->driver);
     }
 
 }
