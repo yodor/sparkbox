@@ -53,7 +53,10 @@ class SessionUploadInput extends InputProcessor
         //incorrect max_slots usage
         if (count($values) > 1 && !$this->transact_bean) throw new Exception("Incorrect array size - can only load one StorageObject from the main result bean");
 
-        foreach ($values as $idx => $value) {
+        //
+        $position = -1;
+        foreach ($values as $id => $value) {
+            $position++;
 
             @$object = unserialize($value);
             if ($object) {
@@ -64,7 +67,7 @@ class SessionUploadInput extends InputProcessor
                 $uid = $value->getUID();
 
                 if ($this->transact_bean) {
-                    $value->id = $this->target_loaded_keys[$idx];
+                    $value->id = $id;
                     $value->className = get_class($this->transact_bean);
 
                     $this->source_loaded_uids[$uid] = $value->id;
@@ -76,15 +79,16 @@ class SessionUploadInput extends InputProcessor
                     $this->loaded_uids = array();
                     $this->loaded_uids[$uid] = 1;
                 }
-                $values[$idx] = $value;
+                //update the value
+                $values[$id] = $value;
 
             }
             else {
 
                 //De-serialized object is not instance of StorageObject");
                 //do not throw here just unset
-                unset($values[$idx]);
-                debug("De-serialized object is not instance of StorageObject");
+                unset($values[$id]);
+                debug("Cleaning up non StorageObject: #$position - ID($id) - Value($value)");
 
             }
         }
