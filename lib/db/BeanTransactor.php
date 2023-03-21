@@ -1,5 +1,6 @@
 <?php
 include_once("objects/SparkEvent.php");
+include_once("objects/SparkObserver.php");
 include_once("forms/InputForm.php");
 include_once("beans/IBeanEditor.php");
 
