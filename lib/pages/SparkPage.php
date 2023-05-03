@@ -199,7 +199,7 @@ class SparkPage extends HTMLPage implements IActionCollection
             foreach ($this->canonical_disabled_params as $idx=>$name) {
                 $builder->remove($name);
             }
-            $canonical_href = $builder->url();
+            $canonical_href = fullURL($builder->url());
             echo "<link rel='canonical' href='$canonical_href' />";
         }
         parent::headEnd();
