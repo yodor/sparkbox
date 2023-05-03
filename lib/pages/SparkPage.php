@@ -89,6 +89,10 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     protected $gtag_objects = array();
 
+    protected $canonical_enabled = false;
+
+    protected $canonical_disabled_params = array();
+
     public function addGTAGObject(GTAGObject $obj)
     {
         $this->gtag_objects[] = $obj;
@@ -190,6 +194,14 @@ class SparkPage extends HTMLPage implements IActionCollection
             echo $object->script();
         }
 
+        if ($this->canonical_enabled) {
+            $builder = $this->getURL();
+            foreach ($this->canonical_disabled_params as $idx=>$name) {
+                $builder->remove($name);
+            }
+            $canonical_href = $builder->url();
+            echo "<link rel='canonical' href='$canonical_href' />";
+        }
         parent::headEnd();
     }
 
