@@ -20,7 +20,7 @@ class TextCaptchaValidator implements IInputValidator
             throw new Exception("Incorrect validator for this field");
         }
         $value = $input->getValue();
-        echo $value."-".$rend->getResult();
+
         if ($value == $rend->getResult()) {
             $rend->resetResult();
         }
