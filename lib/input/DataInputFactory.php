@@ -21,6 +21,7 @@ include_once("input/renderers/SessionImage.php");
 include_once("input/renderers/SessionFile.php");
 include_once("input/renderers/ColorCodeField.php");
 include_once("input/renderers/CaptchaInputField.php");
+include_once("input/renderers/TextCaptchaField.php");
 
 include_once("input/validators/EmailValidator.php");
 include_once("input/validators/DateValidator.php");
@@ -32,6 +33,7 @@ include_once("input/validators/ImageUploadValidator.php");
 include_once("input/validators/FileUploadValidator.php");
 include_once("input/validators/EmptyValueValidator.php");
 include_once("input/validators/CaptchaInputValidator.php");
+include_once("input/validators/TextCaptchaValidator.php");
 
 include_once("input/processors/DateInput.php");
 include_once("input/processors/TimeInput.php");
@@ -67,6 +69,7 @@ class DataInputFactory
     const COLOR_CODE = 21;
 
     const CAPTCHA = 22;
+    const CAPTCHA_TEXT = 23;
 
     const HIDDEN_ARRAY = 100;
     const TEXT_ARRAY = 101;
@@ -209,6 +212,12 @@ class DataInputFactory
                 $input = new DataInput($name, $label, $required);
                 new CaptchaInputField($input);
                 $input->setValidator(new CaptchaInputValidator());
+                break;
+            case DataInputFactory::CAPTCHA_TEXT:
+
+                $input = new DataInput($name, $label, $required);
+                new TextCaptchaField($input);
+                $input->setValidator(new TextCaptchaValidator());
                 break;
 
             default:
