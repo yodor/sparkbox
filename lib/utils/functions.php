@@ -30,6 +30,23 @@ function prepareMeta(string $value)
     return preg_replace("/[^\wA-Za-z0-9\-\%\?\!\;\:\.\, ]/u", "",$value);
 }
 
+function replace_tags(string $text, string $replacement=" ") : string {
+
+    // ----- remove HTML TAGs -----
+    $text = preg_replace ('/<[^>]*>/', $replacement, $text);
+
+    // ----- remove control characters -----
+    //$string = str_replace("\r", $replacement, $string);    // --- replace with empty space
+    //$string = str_replace("\n", $replacement, $string);   // --- replace with space
+    //$string = str_replace("\t", $replacement, $string);   // --- replace with space
+
+    // ----- remove multiple spaces -----
+    //$string = trim(preg_replace('/ {2,}/', $replacement, $string));
+
+    return $text;
+
+}
+
 function stripAttributes(string $data_str, string $allowable_tags = "<center><p><span><div><br><a>", array $allowable_attrs = array('href','src','alt','title')) : string
 {
     // define allowable tags
