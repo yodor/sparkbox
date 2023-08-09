@@ -41,7 +41,7 @@ function replace_tags(string $text, string $replacement=" ") : string {
     //$string = str_replace("\t", $replacement, $string);   // --- replace with space
 
     // ----- remove multiple spaces -----
-    //$string = trim(preg_replace('/ {2,}/', $replacement, $string));
+    $text = trim(preg_replace('/ {2,}/', $replacement, $text));
 
     return $text;
 
