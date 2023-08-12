@@ -36,9 +36,9 @@ function replace_tags(string $text, string $replacement=" ") : string {
     $text = preg_replace ('/<[^>]*>/', $replacement, $text);
 
     // ----- remove control characters -----
-    //$string = str_replace("\r", $replacement, $string);    // --- replace with empty space
-    //$string = str_replace("\n", $replacement, $string);   // --- replace with space
-    //$string = str_replace("\t", $replacement, $string);   // --- replace with space
+    $text = str_replace("\r", $replacement, $text);    // --- replace with empty space
+    $text = str_replace("\n", $replacement, $text);   // --- replace with space
+    $text = str_replace("\t", $replacement, $text);   // --- replace with space
 
     // ----- remove multiple spaces -----
     $text = trim(preg_replace('/ {2,}/', $replacement, $text));
