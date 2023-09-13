@@ -213,7 +213,8 @@ class DataInput
 
     public function haveError(): bool
     {
-        return (strlen($this->error) > 0);
+        if ($this->error && strlen($this->error)>0) return true;
+        return false;
     }
 
     public function clear()

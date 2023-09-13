@@ -602,7 +602,7 @@ function object2array($object)
     return $arr;
 }
 
-function mysql_real_unescape_string($input, $checkbr = 0)
+function mysql_real_unescape_string(?string $input, $checkbr = 0) : string
 {
 
     // mysql_real_escape_string() calls MySQL's library function mysql_real_escape_string, which prepends backslashes to the following characters: \x00, \n, \r, \, ', " and \x1a.
@@ -611,13 +611,12 @@ function mysql_real_unescape_string($input, $checkbr = 0)
     // $output = str_replace("\\\\", "\\", $output);
     // $output = str_replace("\'", "'", $output);
     // $output = str_replace('\"', '"', $output);
-
-    $search = array("\\\\", "\\0", "\\n", "\\r", "\Z", "\'", '\"');
-    $replace = array("\\", "\0", "\n", "\r", "\x1a", "'", '"');
-    return str_replace($search, $replace, $input);
-
-    // return $output;
-
+    if (!is_null($input)) {
+        $search = array("\\\\", "\\0", "\\n", "\\r", "\Z", "\'", '\"');
+        $replace = array("\\", "\0", "\n", "\r", "\x1a", "'", '"');
+        return str_replace($search, $replace, $input);
+    }
+    return "";
 }
 
 function text4div(&$text)
@@ -760,14 +759,14 @@ function dateFormat($date, $time = TRUE)
 {
     $tm = "H:i";
     if (!$time) $tm = "";
-    return strftime("%e %B %Y $tm", strtotime($date));
+    return date("j F Y $tm", strtotime($date));
 }
 
 function dateFormatFromUnix($unixtime, $time = TRUE)
 {
     $tm = "H:i";
     if (!$time) $tm = "";
-    return date("%e %B %Y $tm", $unixtime);
+    return date("j F Y $tm", $unixtime);
 }
 
 function date2time($date, $format = '%a, %d %b %Y %H:%M:%S %z')
