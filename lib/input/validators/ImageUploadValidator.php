@@ -147,15 +147,18 @@ class ImageUploadValidator extends UploadDataValidator
         debug("Creating new image: [ $n_width x $n_height ] | Memory usage before scaling: " . memory_get_usage(TRUE));
 
         $source = FALSE;
-
+        $error = "";
         if ($image_storage->haveData()) {
+            ob_start();
             $source = imagecreatefromstring($image_storage->getData());
+            $error = ob_get_contents();
+            ob_end_clean();
         }
         else {
             $source = $image_storage->imageFromTemp();
         }
 
-        if (!is_resource($source)) throw new Exception("Unable to create image resource from this input data");
+        if (!is_resource($source)) throw new Exception("Unable to create image resource from this input data: ".$error);
 
         $scaled_source = imagecreatetruecolor($n_width, $n_height);
         imagealphablending($scaled_source, FALSE);
