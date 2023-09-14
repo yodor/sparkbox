@@ -41,11 +41,11 @@ class SparkObject
 
     /**
      * Return hash of the serialized value of this object
-     * @return string Currently uses the crc32c algorithm
+     * @return string Currently uses the xxh128 algorithm
      */
     public function hash(): string
     {
-        return crc32(serialize($this));
+        return hash('xxh128', serialize($this));
     }
 
     /**
