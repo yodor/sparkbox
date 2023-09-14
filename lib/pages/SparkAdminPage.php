@@ -13,6 +13,7 @@ include_once("sql/SQLSelect.php");
 
 include_once("components/BeanFormEditor.php");
 include_once("components/TableView.php");
+include_once("components/ClosureComponent.php");
 
 include_once("utils/PageSessionMenu.php");
 include_once("utils/Navigation.php");

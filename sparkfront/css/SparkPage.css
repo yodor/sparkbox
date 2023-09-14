@@ -16,7 +16,9 @@ A IMG INPUT {
     border: none;
 
 }
-
+H1 {
+    margin:0;
+}
 .clear {
     clear: both;
 }
@@ -66,4 +68,3 @@ A IMG INPUT {
     display: none;
 
 }
-
