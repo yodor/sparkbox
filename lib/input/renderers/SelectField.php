@@ -88,14 +88,14 @@ class SelectField extends DataIteratorField
         $selected = FALSE;
         if (is_array($field_values)) {
             foreach ($field_values as $idx => $field_value) {
-                if (strcmp((string)$this->item->getValue(), (string)$field_value) == 0) {
+                if (strcmp($this->item->getValue(), $field_value) == 0) {
                     $selected = TRUE;
                     break;
                 }
             }
         }
         else {
-            if (strcmp((string)$this->item->getValue(), (string)$field_values) == 0) {
+            if (strcmp($this->item->getValue(), $field_values) == 0) {
                 $selected = TRUE;
             }
         }
