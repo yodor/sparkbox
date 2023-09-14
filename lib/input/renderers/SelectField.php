@@ -88,18 +88,19 @@ class SelectField extends DataIteratorField
         $selected = FALSE;
         if (is_array($field_values)) {
             foreach ($field_values as $idx => $field_value) {
-                if (strcmp($this->item->getValue(), $field_value) == 0) {
-                    $selected = TRUE;
-                    break;
-                }
+                $selected = $this->compareValue((string)$field_value);
+                if ($selected) break;
             }
         }
         else {
-            if (strcmp($this->item->getValue(), $field_values) == 0) {
-                $selected = TRUE;
-            }
+            $selected = $this->compareValue((string)$field_values);
         }
         return $selected;
+    }
+
+    protected function compareValue(string $field_value) : bool
+    {
+        return (strcmp((string)$this->item->getValue(), $field_value)==0);
     }
 
 }
