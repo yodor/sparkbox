@@ -32,22 +32,22 @@ class ImageStorageObject extends FileStorageObject
         }
     }
 
-    public function getWidth()
+    public function getWidth() : int
     {
         return $this->width;
     }
 
-    public function getHeight()
+    public function getHeight() : int
     {
         return $this->height;
     }
 
-    public function setWidth($width)
+    public function setWidth(int $width)
     {
         $this->width = $width;
     }
 
-    public function setHeight($height)
+    public function setHeight(int $height)
     {
         $this->height = $height;
     }

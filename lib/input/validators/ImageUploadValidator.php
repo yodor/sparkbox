@@ -149,13 +149,16 @@ class ImageUploadValidator extends UploadDataValidator
         $source = FALSE;
 
         if ($image_storage->haveData()) {
-            $source = imagecreatefromstring($image_storage->getData());
+            $source = @imagecreatefromstring($image_storage->getData());
         }
         else {
             $source = $image_storage->imageFromTemp();
         }
 
         if (!$source) throw new Exception("Unable to create image resource from this input data");
+
+        $n_width = (int)$n_width;
+        $n_height = (int)$n_height;
 
         $scaled_source = imagecreatetruecolor($n_width, $n_height);
         imagealphablending($scaled_source, FALSE);
