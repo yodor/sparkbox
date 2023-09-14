@@ -68,7 +68,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     /**
      * Enable/Disable redirect logic during processInput
-     * @var boolean
+     * @var bool
      */
     protected $redirect_enabled;
 
