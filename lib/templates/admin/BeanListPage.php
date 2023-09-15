@@ -84,7 +84,7 @@ class BeanListPage extends AdminPageTemplate
      * Try to set bean query fields using the names
      * @param array $list_fields
      */
-    public function setListFields(array $list_fields)
+    public function setListFields(array $list_fields): void
     {
         $this->fields = $list_fields;
 

@@ -80,17 +80,12 @@ class SparkAdminPage extends SparkPage
         return $this->navigation;
     }
 
-    protected function initMainMenu()
+    protected function initMainMenu() : array
     {
-        global $admin_menu;
 
-        if (!isset($admin_menu)) {
-
-            $admin_menu = array();
-            $admin_menu[] = new MenuItem("Content", ADMIN_LOCAL . "/content/index.php", "content");
-            $admin_menu[] = new MenuItem("Settings", ADMIN_LOCAL . "/settings/index.php", "settings");
-
-        }
+        $admin_menu = array();
+        $admin_menu[] = new MenuItem("Content", ADMIN_LOCAL . "/content/index.php", "content");
+        $admin_menu[] = new MenuItem("Settings", ADMIN_LOCAL . "/settings/index.php", "settings");
 
         return $admin_menu;
     }
