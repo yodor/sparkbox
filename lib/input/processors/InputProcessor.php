@@ -18,7 +18,6 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      */
     public $skip_transaction = FALSE;
 
-    public $merge_with_target_loaded = FALSE;
     /**
      * Search the $_REQUEST data for items with keys =  fk_$name where name is the DataInput name
      * and use them as values during beforeCommit
@@ -177,7 +176,8 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         debug("Transact-bean loaded keys: ", $this->target_loaded_keys);
         debug("Values #".count($values).": ", $values);
 
-        if (count($this->target_loaded_keys)!=count($values) && !$this->merge_with_target_loaded) {
+        //dropped merging
+        if (count($this->target_loaded_keys)!=count($values)) {
             //delete all and insert
             debug("Values count does not match posted values count - deleting all values and inserting posted ones");
             $this->transact_bean->deleteRef($item_key, $transactor->getLastID(), $db);
