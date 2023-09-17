@@ -39,6 +39,15 @@ class KeywordSearchForm extends InputForm
         $this->table_fields = $table_fields;
     }
 
+    public function removeField(string ...$names)
+    {
+        foreach ($this->table_fields as $idx=>$name)
+        {
+            if (in_array($name, $names)) unset($this->table_fields[$idx]);
+        }
+
+    }
+
     public function getFields(): array
     {
         return $this->table_fields;
