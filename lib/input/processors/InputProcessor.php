@@ -152,7 +152,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         $name = $this->input->getName();
 
         $values = $this->input->getValue();
-        if (!is_array($values)) throw new Exception("DataInput value is not array");
+        if (!is_array($values)) throw new Exception("DataInput '{$name}' value is not array");
 
         debug("DataInput '{$name}' transact-bean: " . get_class($this->transact_bean) . " lastID: $lastID | Transact bean primary key: $source_key | DataInput values count: " . count($values));
 
