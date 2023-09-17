@@ -42,6 +42,10 @@ class BeanListPage extends AdminPageTemplate
 
     }
 
+    public function getIterator() : SQLQuery
+    {
+        return $this->query;
+    }
     /**
      * Called just before rendering is about to start to process the user input
      */
