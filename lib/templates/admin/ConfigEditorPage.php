@@ -43,6 +43,16 @@ class ConfigEditorPage extends AdminPageTemplate
 
     }
 
+    public function getForm() : InputForm
+    {
+        return $this->form;
+    }
+
+    public function getProcessor() : FormProcessor
+    {
+        return $this->processor;
+    }
+
     public function setConfigSection(string $section)
     {
 

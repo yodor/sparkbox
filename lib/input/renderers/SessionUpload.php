@@ -31,6 +31,11 @@ abstract class SessionUpload extends ArrayField
         $this->setAttribute("handler_command", $this->ajax_handler->getCommand());
     }
 
+    public function getAjaxHandler() : UploadControlResponder
+    {
+        return $this->ajax_handler;
+    }
+
     public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
