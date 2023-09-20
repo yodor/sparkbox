@@ -20,7 +20,7 @@ class NewsItemsListPage extends BeanListPage
 
     }
 
-    public function initView()
+    public function initView() : TableView
     {
         parent::initView();
         $ticr = new ImageCellRenderer();
@@ -28,5 +28,6 @@ class NewsItemsListPage extends BeanListPage
 
         $this->view->getColumn("item_photo")->setCellRenderer($ticr);
         $this->view->getColumn("item_date")->setCellRenderer(new DateCellRenderer());
+        return $this->view;
     }
 }

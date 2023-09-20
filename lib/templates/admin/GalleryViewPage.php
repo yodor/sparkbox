@@ -11,7 +11,7 @@ class GalleryViewPage extends BeanListPage
         $this->page->setName("Photo Gallery");
     }
 
-    public function initView()
+    public function initView() : TableView
     {
 
         $this->setListFields(array($this->bean->key()=>"ID", "position"=>"Position", "caption"=>"Caption", "date_upload"=>"Date Upload"));
@@ -37,6 +37,8 @@ class GalleryViewPage extends BeanListPage
         $this->append($this->view);
 
         $this->view_item_actions = $gv->getItemActions();
+
+        return $this->view;
     }
 
 }
