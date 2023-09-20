@@ -78,6 +78,8 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     public $transact_bean_skip_empty_values = FALSE;
 
+    public $merge_with_target_loaded = TRUE;
+
     public function __construct(DataInput $input)
     {
         $this->input = $input;
