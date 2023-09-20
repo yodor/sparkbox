@@ -250,7 +250,7 @@ class BeanListPage extends AdminPageTemplate
      * @return TableView
      * @throws Exception
      */
-    public function initView()
+    public function initView() : TableView
     {
         if (!$this->query) throw new Exception("Query not set yet");
 

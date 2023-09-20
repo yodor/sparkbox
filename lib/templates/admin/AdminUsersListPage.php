@@ -18,7 +18,7 @@ class AdminUsersListPage extends BeanListPage
 
     }
 
-    public function initView()
+    public function initView() : TableView
     {
         $bean = new AdminUsersBean();
 
@@ -75,5 +75,9 @@ class AdminUsersListPage extends BeanListPage
         $view->getColumn("status")->setCellRenderer($vis_act);
 
         $this->append($view);
+
+        $this->view = $view;
+
+        return $this->view;
     }
 }
