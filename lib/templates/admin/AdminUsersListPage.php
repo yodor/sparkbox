@@ -18,7 +18,7 @@ class AdminUsersListPage extends BeanListPage
 
     }
 
-    public function initView() : TableView
+    public function initView()
     {
         $bean = new AdminUsersBean();
 

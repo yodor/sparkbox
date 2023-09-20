@@ -21,7 +21,7 @@ class NestedSetViewPage extends BeanListPage
      * Will use the first element from the $this->fields as a list label for the tree
      * @throws Exception
      */
-    public function initView() : TableView
+    public function initView()
     {
         $h_repos = new ChangePositionResponder($this->bean);
 
