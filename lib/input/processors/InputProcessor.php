@@ -177,7 +177,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         debug("Values #".count($values).": ", $values);
 
         //dropped merging
-        if (count($this->target_loaded_keys)!=count($values)) {
+        if (count($this->target_loaded_keys)!=count($values) && !$this->merge_with_target_loaded) {
             //delete all and insert
             debug("Values count does not match posted values count - deleting all values and inserting posted ones");
             $this->transact_bean->deleteRef($item_key, $transactor->getLastID(), $db);
