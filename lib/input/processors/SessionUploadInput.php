@@ -135,10 +135,17 @@ class SessionUploadInput extends InputProcessor
             if (!in_array($uid, $posted_uids)) unset($session_files[$uid]);
 
         }
-        //remove from field objects with non posted uids
-        foreach ($values as $idx => $storage_object) {
-            $uid = $storage_object->getUID();
-            if (!in_array($uid, $posted_uids)) unset($values[$idx]);
+
+        if (is_array($values)) {
+            //remove from field objects with non posted uids
+            foreach ($values as $idx => $storage_object) {
+                $uid = $storage_object->getUID();
+                if (!in_array($uid, $posted_uids)) unset($values[$idx]);
+            }
+        }
+        else {
+            //single input for same bean row
+            $values = array();
         }
 
         //merge remaining session files
@@ -149,8 +156,7 @@ class SessionUploadInput extends InputProcessor
                 $values[] = $storage_object;
                 debug("De-serialized UID: " . $storage_object->getUID() . " append to field values");
 
-            }
-            else {
+            } else {
                 debug("[$uid] could not be de-serialized as StorageObject - removing from session array");
                 unset($session_files[$uid]);
             }
@@ -259,9 +265,11 @@ class SessionUploadInput extends InputProcessor
         debug("Values count: " . count($values));
 
         //order position for OrderedDataBean
-        $position = 1;
+        $position = 0;
 
         foreach ($values as $idx => $value) {
+
+            $position++;
 
             if (!($value instanceof StorageObject)) throw new Exception("Value at position $idx not instance of StorageObject");
 
@@ -281,10 +289,6 @@ class SessionUploadInput extends InputProcessor
 
                 $refID = $this->transact_bean->insert($data, $db);
                 if ($refID < 1) throw new Exception("Unable to insert into transact_bean. Error: " . $db->getError());
-
-                $position++;
-
-                $foreign_transacted++;
 
                 $processed_ids[] = $refID;
 

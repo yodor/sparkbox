@@ -133,9 +133,13 @@ abstract class SessionUpload extends ArrayField
 
         echo "<div class='ArrayContents' field='" . $this->input->getName() . "'>";
 
+        if (!is_array($images)) {
+            $images = array($this->input->getValue());
+        }
+
         foreach ($images as $idx => $storage_object) {
 
-            if (is_null($storage_object))continue;
+            if (is_null($storage_object)) continue;
 
             if (!($storage_object instanceof StorageObject)) continue;
 
