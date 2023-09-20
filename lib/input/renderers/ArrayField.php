@@ -158,9 +158,12 @@ class ArrayField extends InputField
 
         if (is_array($values)) {
 
+            $pos = -1;
             foreach ($values as $idx => $value) {
 
                 //class ElementSource is renamed to class Element from ArrayControls.js
+
+                $pos++;
 
                 $element_input = new DataInput($this->input->getName() . "[$idx]", $this->input->getLabel(), $this->input->isRequired());
 
@@ -168,7 +171,7 @@ class ArrayField extends InputField
 
                 $element_input->setValue($value);
 
-                echo "<div class='Element' pos='$idx'>";
+                echo "<div class='Element' pos='$pos' key='$idx'>";
 
                 $renderer = clone $this->element_renderer;
                 $renderer->setInput($element_input);
