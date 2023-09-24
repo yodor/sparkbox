@@ -17,7 +17,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
     protected $beanClass;
 
-    protected $dateFormat = "%e %b %Y";
+    protected $dateFormat = "j M Y";
 
     public function __construct(string $beanClass)
     {
@@ -57,7 +57,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
         echo "<div class='cell details'>";
         echo "<span class='title'>" . $this->data["item_title"] . "</span>";
-        echo "<span class='date'>" . strftime($this->dateFormat, strtotime($this->data["item_date"])) . "</span>";
+        echo "<span class='date'>" . date($this->dateFormat, strtotime($this->data["item_date"])) . "</span>";
         echo "</div>";
 
         echo "</a>";
@@ -244,7 +244,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
         $month_list = array();
 
         for ($a=1;$a<=12;$a++) {
-            $month_list[] = strftime("%b", mktime(0, 0, 0, $a));
+            $month_list[] = date("F", mktime(0, 0, 0, $a));
         }
         //$month_list = array("January", "February", "March", "April", "May", "June", "July", "August", "September",
          //                   "October", "November", "December");
