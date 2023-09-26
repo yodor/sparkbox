@@ -5,8 +5,8 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
 {
 
     protected $tagName = "TH";
-    protected $sortField = "";
-    protected $sortLink = NULL;
+    protected string $sortField = "";
+    protected ?URLBuilder $sortLink = NULL;
 
     const KEY_ORDER_BY = "orderby";
     const KEY_ORDER_DIR = "orderdir";
@@ -16,9 +16,15 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
         parent::__construct();
         $this->translation_enabled = true;
         $this->sortLink = new URLBuilder();
+        $this->sortLink->buildFrom(SparkPage::Instance()->getURL()->url());
         $this->sortLink->add(new URLParameter(HeaderCellRenderer::KEY_ORDER_BY));
         $this->sortLink->add(new URLParameter(HeaderCellRenderer::KEY_ORDER_DIR, "ASC"));
 
+    }
+
+    public function getSortURL(): ?URLBuilder
+    {
+        return $this->sortLink;
     }
 
     public function setDefaultOrderDirection(string $order_dir)
@@ -71,10 +77,10 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
         }
     }
 
-    public function setData(array &$row)
+    public function setData(array &$data)
     {
 
-        parent::setData($row);
+        parent::setData($data);
 
         $this->value = $this->column->getLabel();
 

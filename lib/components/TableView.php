@@ -58,7 +58,7 @@ class TableView extends AbstractResultView implements IHeadContents
         $this->table->setTagName("TABLE");
         $this->table->setComponentClass("viewport");
 
-        $this->list_empty_message = tr("No elements in this collection yet");
+        $this->list_empty_message = "No elements in this collection yet";
     }
 
     public function setListEmptyMessage(string $message)
@@ -142,7 +142,7 @@ class TableView extends AbstractResultView implements IHeadContents
 
         if ($this->total_rows<1 && strlen($this->list_empty_message)>0) {
             echo "<div class='caption empty_list'>";
-            echo $this->list_empty_message;
+            echo tr($this->list_empty_message);
             echo "</div>";
         }
 
