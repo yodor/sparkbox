@@ -15,6 +15,13 @@ class JSONFormDialog extends ConfirmMessageDialog {
         return $arr;
     }
 
+    public function requiredStyle() : array
+    {
+        $arr = parent::requiredStyle();
+        $arr[] = SPARK_LOCAL . "/css/JSONFormDialog.css";
+        return $arr;
+    }
+
     protected function initButtons()
     {
         $btn_ok = new ColorButton();
