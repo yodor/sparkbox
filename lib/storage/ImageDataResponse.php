@@ -57,6 +57,20 @@ class ImageDataResponse extends BeanDataResponse
 
     protected function processData()
     {
+
+        if (isset($this->row["watermark_enabled"]) && ($this->row["watermark_enabled"]>0)) {
+            debug("Object requires watermark");
+
+            if ($this->scaler->isWatermarkEnabled()) {
+                debug("Scaler watermark is enabled and can be used");
+                $this->scaler->watermark_required = true;
+                $this->etag_parts[] = "watermark|".$this->scaler->getWatermarkPosition();
+            }
+            else {
+                debug("Scaler watermark is unavailable");
+                $this->scaler->watermark_required = false;
+            }
+        }
         $this->scaler->process($this->row[$this->field], $this->row["size"], $this->row["mime"]);
         $this->setData($this->scaler->getData(), $this->scaler->getDataSize());
     }

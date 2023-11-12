@@ -3,6 +3,11 @@
 class ImageScaler
 {
 
+    const WATERMARK_POSITION_TOP_LEFT = 1;
+    const WATERMARK_POSITION_TOP_RIGHT = 2;
+    const WATERMARK_POSITION_BOTTOM_LEFT = 3;
+    const WATERMARK_POSITION_BOTTOM_RIGHT = 4;
+
     const MODE_FULL = 0;
     const MODE_CROP = 1;
     const MODE_THUMB = 2;
@@ -30,6 +35,19 @@ class ImageScaler
 
     public $grayFilter = FALSE;
 
+    public $watermark_required = FALSE;
+
+    protected $watermark_enabled = FALSE;
+    protected $watermark_data = FALSE;
+
+    protected $watermark_margin_x = 10;
+    protected $watermark_margin_y = 10;
+
+    protected $watermark_position = ImageScaler::WATERMARK_POSITION_BOTTOM_RIGHT;
+    //watermark square size percent over height of image default 1/5 of height
+    protected $watermark_size = 5;
+
+
     public $upscale_enabled = FALSE;
     public $downscale_enabled = FALSE;
 
@@ -53,6 +71,40 @@ class ImageScaler
         }
         $this->output_format = IMAGE_SCALER_OUTPUT_FORMAT;
         $this->output_quality = IMAGE_SCALER_OUTPUT_QUALITY;
+
+        if (defined("IMAGE_SCALER_WATERMARK_POSITION")) {
+            $this->watermark_position = (int)IMAGE_SCALER_WATERMARK_POSITION;
+        }
+
+        //disabled in config
+        if (defined("IMAGE_SCALER_WATERMARK_ENABLED")) {
+            if (IMAGE_SCALER_WATERMARK_ENABLED) {
+                //no watermark filename in config
+                if (defined("IMAGE_SCALER_WATERMARK_FILENAME")) {
+                    $this->watermark_data = @imagecreatefromstring(file_get_contents(IMAGE_SCALER_WATERMARK_FILENAME, true));
+                    if ($this->watermark_data !== FALSE) {
+                        $this->watermark_enabled = true;
+                    }
+                }
+            }
+        }
+
+    }
+    public function __destruct()
+    {
+        if ($this->watermark_data !== FALSE) {
+            @imagedestroy($this->watermark_data);
+        }
+    }
+
+    public function getWatermarkPosition() : int
+    {
+        return $this->watermark_position;
+    }
+
+    public function isWatermarkEnabled() : bool
+    {
+        return $this->watermark_enabled;
     }
 
     public function setOutputQuality(int $output_quality)
@@ -103,13 +155,25 @@ class ImageScaler
         $this->dataSize = $length;
 
         if ($this->mode == ImageScaler::MODE_CROP) {
+            debug("Using CROP mode");
             $this->processCrop();
         }
         else if ($this->mode == ImageScaler::MODE_THUMB) {
+            debug("Using THUMB mode");
             $this->processThumb();
         }
         else {
             //as is
+            debug("Using as-is mode");
+            if ($this->watermark_required && $this->watermark_enabled) {
+                $h_source = @imagecreatefromstring($this->data);
+                if ($h_source === FALSE) {
+                    throw new Exception("Image can not be created from this input data");
+                }
+
+                $this->setImageData($h_source);
+                imagedestroy($h_source);
+            }
         }
     }
 
@@ -197,10 +261,60 @@ class ImageScaler
         imagedestroy($h_thumbnail);
     }
 
+    protected function processWatermark($h_source)
+    {
+
+
+            $width = imagesx($h_source);
+            $height = imagesy($h_source);
+
+            $sx = imagesx($this->watermark_data);
+            $sy = imagesy($this->watermark_data);
+
+            $wtsize = (int)($height / $this->watermark_size);
+
+            $margin_x = (int)($wtsize/$this->watermark_margin_x);
+            $margin_y = (int)($wtsize/$this->watermark_margin_y);
+
+            if ($this->watermark_position == self::WATERMARK_POSITION_TOP_LEFT) {
+                $dst_x = $margin_x;
+                $dst_y = $margin_y;
+            }
+            else if ($this->watermark_position == self::WATERMARK_POSITION_TOP_RIGHT) {
+                $dst_x = $width - $margin_x - $wtsize;
+                $dst_y = $margin_y;
+            }
+            else if ($this->watermark_position == self::WATERMARK_POSITION_BOTTOM_LEFT) {
+                $dst_x = $margin_x;
+                $dst_y = $height - $margin_y - $wtsize;
+            }
+            else {
+
+                //if ($this->watermark_position == self::WATERMARK_POSITION_BOTTOM_RIGHT) {
+                $dst_x = $width - $margin_x - $wtsize;
+                $dst_y = $height - $margin_y - $wtsize;
+                //}
+            }
+
+            debug("Processing watermark on source");
+            //imagecopy($h_source, $stamp, imagesx($h_source) - $sx - $marge_right, imagesy($h_source) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
+            //imagecopyresized($h_source, $stamp, $this->width - $marge_right - $wtsize, $this->height - $marge_bottom - $wtsize, 0, 0, imagesx($stamp), imagesy($stamp));
+            imagecopyresampled($h_source, $this->watermark_data, $dst_x, $dst_y,
+                0,0,
+                $wtsize, $wtsize,
+                $sx, $sy);
+
+
+    }
     protected function setImageData($h_source)
     {
+        debug("Set image data ...");
         if ($this->grayFilter) {
             imagefilter($h_source, IMG_FILTER_GRAYSCALE);
+        }
+
+        if ($this->watermark_required && $this->watermark_enabled) {
+            $this->processWatermark($h_source);
         }
 
         ob_start(NULL, 0);
