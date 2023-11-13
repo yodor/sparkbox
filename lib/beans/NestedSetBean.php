@@ -565,7 +565,7 @@ class NestedSetBean extends DBTableBean
 
         $prefix = "child";
 
-        $fields = array("$prefix.$prkey");
+        $fields = array("DISTINCT $prefix.$prkey");
 
         foreach ($columns as $idx => $field) {
             $fields[] = "$prefix.$field";
@@ -578,8 +578,8 @@ class NestedSetBean extends DBTableBean
 
         $sel->from = " {$this->table} AS node , {$this->table} AS child ";
 
-        $sel->where()->add("child.lft", "node.lft", " >= ");
-        $sel->where()->add("child.rgt", "node.rgt", " <= ");
+        $sel->where()->append("(child.lft BETWEEN node.lft AND node.rgt)");
+
         $sel->where()->add("$relation_table.$prkey", "child.$prkey");
 
         if ($nodeID > 0) {
