@@ -565,10 +565,21 @@ class NestedSetBean extends DBTableBean
 
         $prefix = "child";
 
-        $fields = array("DISTINCT $prefix.$prkey");
+        $fields = array();
 
+        //prepend primary key to columns
+        if (!in_array($prkey, $columns)) {
+            array_unshift($columns, $prkey);
+        }
+
+        //prepend prefix to column names
         foreach ($columns as $idx => $field) {
-            $fields[] = "$prefix.$field";
+            if (strcmp($field, $prkey)==0) {
+                $fields[] = "DISTINCT $prefix.$field";
+            }
+            else {
+                $fields[] = "$prefix.$field";
+            }
         }
 
         $sel = new SQLSelect();
