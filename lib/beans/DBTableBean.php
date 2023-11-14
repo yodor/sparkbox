@@ -221,9 +221,10 @@ abstract class DBTableBean
         $qry = new SQLQuery(clone $this->select, $this->prkey, $this->getTableName());
         $qry->setDB($this->db);
         $qry->setBean($this);
-
-        $qry->select->fields()->set(...$columns);
-
+        if (sizeof($columns)>0) {
+            $qry->select->fields()->reset();
+            $qry->select->fields()->set(...$columns);
+        }
         return $qry;
     }
 
@@ -233,13 +234,7 @@ abstract class DBTableBean
      */
     public function queryFull(): SQLQuery
     {
-        $qry = $this->query();
-
-        $columns = $this->columnNames();
-
-        $qry->select->fields()->set(...$columns);
-
-        return $qry;
+        return $this->query(...$this->columnNames());
     }
 
     /**
