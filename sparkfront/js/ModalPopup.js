@@ -112,8 +112,8 @@ class ModalPopup {
 
         if (width==0 || height==0) return;
 
-        console.log("WW Width: "+windowWidth+ "WW Height: " + windowHeight);
-        console.log("Width: "+width+ " Height: " + height);
+
+        //console.log("Width: "+width+ " Height: " + height);
 
         let left = ((windowWidth - width) / 2.0);
         let top = ((windowHeight - height) / 2.0);
