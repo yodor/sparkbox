@@ -51,8 +51,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
         this.req.setFunction("render");
 
         this.req.onSuccess = function(request_result) {
-            let result = request_result.json_result;
-            this.loadContent(result.contents);
+            this.processRenderResult(request_result);
         }.bind(this);
 
         this.req.start();
@@ -94,7 +93,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
         this.remove();
     }
 
-    //default implementation
+    //subsequent rendering after form submit
     processSubmitResult(request_result, form_name) {
         let result = request_result.json_result;
         if (result.contents) {
@@ -107,12 +106,21 @@ class JSONFormDialog extends ConfirmMessageDialog {
         }
     }
 
+    //inital rendering during show()
+    processRenderResult(request_result)
+    {
+        let result = request_result.json_result;
+        this.loadContent(result.contents);
+    }
+
     loadContent(contents)
     {
-        $(this.visibleSelector() + " " + this.contentSelector).replaceWith(contents);
+        $(this.visibleSelector() + " " + this.contentSelector).html(contents);
 
+        //trigger ModalPopup centerContents()
         $(window).resize();
 
+        //trigger onPageLoad() handlers
         dispatchEvent(new Event('load'));
     }
 
