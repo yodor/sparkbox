@@ -16,6 +16,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
         this.contentSelector = " .Text";
 
         this.req.addObserver(this.onRequestEvent.bind(this));
+
     }
 
     /**
@@ -26,6 +27,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
     {
         if (event.isEvent(JSONRequest.EVENT_STARTING)) {
             this.setText(this.loader);
+            $(window).resize();
         }
     }
 
@@ -107,8 +109,12 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
     loadContent(contents)
     {
-        $(this.visibleSelector() + " " + this.contentSelector).html(contents);
-        this.modal_pane.centerContents();
+        $(this.visibleSelector() + " " + this.contentSelector).replaceWith(contents);
+
+        $(window).resize();
+
         dispatchEvent(new Event('load'));
     }
+
+
 }

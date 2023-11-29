@@ -22,6 +22,9 @@ class ModalPopup {
          */
         this.pane = null;
 
+        $(window).on("resize", function (event) {
+            this.centerContents();
+        }.bind(this));
     }
 
     /**
@@ -49,7 +52,6 @@ class ModalPopup {
 
         this.show();
 
-
     }
 
     visualSelector() {
@@ -58,21 +60,16 @@ class ModalPopup {
 
     show() {
 
+        this.pane.data("control_object", this);
+
         this.pane.on("click", function (event) {
             this.paneClicked();
         }.bind(this));
 
-        this.pane.data("control_object", this);
 
         if (!this.fullscreen) {
             this.popup.css("display", "block");
         }
-
-        this.centerContents();
-
-        $(window).resize(function (event) {
-            this.centerContents();
-        }.bind(this));
 
         this.makeResizable();
 
@@ -101,26 +98,32 @@ class ModalPopup {
 
     centerContents() {
 
-        this.popup.css("min-width", "auto");
-        this.popup.css("min-height", "auto");
+        $(this.popup).css("width", "auto");
+        $(this.popup).css("height", "auto");
+        // this.popup.css({});
 
-        var windowWidth = $(window).width(); //retrieve current window width
-        var windowHeight = $(window).height(); //retrieve current window height
+        if (!this.popup)return;
 
-        // var width = this.popup.outerWidth(true);
-        // var height = this.popup.outerHeight(true);
-        let width = this.popup.outerWidth();
-        let height = this.popup.outerHeight();
+        let windowWidth = $(window).width(); //retrieve current window width
+        let windowHeight = $(window).height(); //retrieve current window height
 
-        var left = ((windowWidth - width) / 2);
-        var top = ((windowHeight - height) / 2);
+        let width = $(this.popup).width();
+        let height = $(this.popup).height();
+
+        if (width==0 || height==0) return;
+
+        console.log("WW Width: "+windowWidth+ "WW Height: " + windowHeight);
+        console.log("Width: "+width+ " Height: " + height);
+
+        let left = ((windowWidth - width) / 2.0);
+        let top = ((windowHeight - height) / 2.0);
 
         this.popup.css("left", left);
         this.popup.css("top", top);
-        this.popup.css("min-width", width);
-        this.popup.css("min-height", height);
+        this.popup.css("width", width);
+        //this.popup.css("height", height);
 
-        console.log("Width: "+width+ " Height: " + height);
+
 
     }
 

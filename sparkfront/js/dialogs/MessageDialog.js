@@ -86,6 +86,7 @@ class MessageDialog extends Component {
 
         buttonsBar.find("[default_action]").first().focus();
 
+        $(window).resize();
     }
 
     remove() {
@@ -110,5 +111,3 @@ class MessageDialog extends Component {
 
 
 }
-
-
