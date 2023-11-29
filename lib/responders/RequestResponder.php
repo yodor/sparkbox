@@ -23,6 +23,10 @@ abstract class RequestResponder
         $this->url->buildFrom(currentURL());
     }
 
+    public function __destruct()
+    {
+        RequestController::Remove($this);
+    }
     /**
      * Clear the request url from the parameters of this responder
      */
