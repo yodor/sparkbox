@@ -13,9 +13,17 @@ class RequestController
         $command_name = $responder->getCommand();
         self::$responders[$command_name] = $responder;
 
-        debug("RequestResponder: '" . get_class($responder) . "' accepting command: '$command_name'");
+        debug("Adding RequestResponder: '" . get_class($responder) . "' for command: '$command_name'");
 
 
+    }
+
+    public static function Remove(RequestResponder $responder)
+    {
+        $command_name = $responder->getCommand();
+        if (isset(self::$responders[$command_name])) {
+            debug("Removing RequestResponder: '" . get_class($responder) . "' for command: '$command_name'");
+        }
     }
 
     public static function Get(string $command): RequestResponder
