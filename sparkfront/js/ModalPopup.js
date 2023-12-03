@@ -122,9 +122,6 @@ class ModalPopup {
         this.popup.css("top", top);
         this.popup.css("width", width);
         //this.popup.css("height", height);
-
-
-
     }
 
     makeMovable() {
@@ -133,16 +130,12 @@ class ModalPopup {
             caption.mousedown(function (event) {
                 if (event.which != 1) return;
 
-                let pos = this.popup.offset();
-                let deltaX = event.pageX - pos.left;
-                let deltaY = event.pageY - pos.top;
-
                 $(window).mousemove(function (event1) {
 
                     if (event1.which != 1) return;
 
-                    this.popup.css("left", event1.pageX - deltaX);
-                    this.popup.css("top", event1.pageY - deltaY);
+                    this.popup.css("left", event1.clientX - event.offsetX );
+                    this.popup.css("top", event1.clientY - event.offsetY);
 
                 }.bind(this));
 
