@@ -40,7 +40,7 @@ class DateField extends InputField
 
         echo "<div class='FieldElements'>";
 
-        $field_value = $this->input->getValue();
+        $field_value = (string)$this->input->getValue();
         $field_name = $this->input->getName();
 
         $pieces = explode("-", $field_value);
