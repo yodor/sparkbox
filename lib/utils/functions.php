@@ -1,4 +1,22 @@
 <?php
+
+function slugify($text){
+
+    $rules = <<<'RULES'
+    :: Any-Latin;
+    :: NFD;
+    :: [:Nonspacing Mark:] Remove;
+    :: NFC;
+    :: [^-[:^Punctuation:]] Remove;
+    :: Lower();
+    [:^L:] { [-] > ;
+    [-] } [:^L:] > ;
+    [-[:Separator:]]+ > '-';
+RULES;
+
+    return Transliterator::createFromRules($rules)->transliterate($text);
+}
+
 function enclose(string $value, string $char = "'") : string
 {
     return $char.$value.$char;
