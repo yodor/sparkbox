@@ -1,6 +1,7 @@
 <?php
 
-function slugify($text){
+function slugify(string $text) : false|string
+{
 
     $rules = <<<'RULES'
     :: Any-Latin;
@@ -15,6 +16,17 @@ function slugify($text){
 RULES;
 
     return Transliterator::createFromRules($rules)->transliterate($text);
+}
+
+function transliterate(string $text) : false|string
+{
+    $id = "Bulgarian-Latin/BGN";
+    if (defined("TRANSLITERATOR_ID")) {
+        $id = TRANSLITERATOR_ID;
+    }
+    $result = Transliterator::create($id)->transliterate($text);
+    $result = slugify($result);
+    return $result;
 }
 
 function enclose(string $value, string $char = "'") : string

@@ -134,6 +134,16 @@ class URLBuilder implements IGETConsumer
 
         $ret = $this->protocol . $this->domain . $this->script_name;
 
+        if (count($this->parameters) > 0) {
+
+            foreach ($this->parameters as $idx => $parameter) {
+                if ($parameter instanceof DataParameter) {
+                    if (!$parameter->isSlugEnabled()) continue;
+                    $ret.=transliterate($parameter->value())."/";
+                }
+            }
+        }
+
         if ($this->script_query) {
             $ret .= "?";
             $ret .= $this->script_query;
@@ -183,6 +193,7 @@ class URLBuilder implements IGETConsumer
             foreach ($names as $pos => $name) {
                 $param = $this->get($name);
                 if ($param->isResource()) continue;
+                if ($param->isSlugEnabled()) continue;
                 $pairs[] = $param->text();
             }
 
