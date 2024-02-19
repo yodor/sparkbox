@@ -217,7 +217,6 @@ function constructSiteTitleArray($path) : array
             $title[] = mb_convert_case($item, MB_CASE_TITLE, "UTF-8");
         }
     }
-    debug("Constructed Title");
     return $title;
 }
 

@@ -378,7 +378,7 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     public function obCallback(string &$buffer)
     {
-        $title = $this->preferred_title . TITLE_PATH_SEPARATOR . SITE_TITLE;
+        $title = $this->preferred_title;
 
         $meta_keywords = "";
         $meta_description = "";
