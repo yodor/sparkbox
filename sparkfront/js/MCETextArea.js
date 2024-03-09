@@ -47,7 +47,8 @@ class MCETextArea extends Component {
             width: '100%',
             height: '300px',
 
-
+            //content_css: "/mycontent.css",
+            content_style: "p { margin: 0; } body { line-height: 1; }",
         };
         return mce_setup_object;
     }
@@ -109,4 +110,3 @@ class MCETextArea extends Component {
 
     }
 }
-
