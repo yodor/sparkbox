@@ -20,6 +20,8 @@ class ImageDataResponse extends BeanDataResponse
     {
         parent::__construct($id, $className);
 
+        $this->skip_cache = false;
+
         $width = -1;
         $height = -1;
 
