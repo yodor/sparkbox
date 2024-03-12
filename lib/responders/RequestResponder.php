@@ -14,6 +14,12 @@ abstract class RequestResponder
     const KEY_COMMAND = "cmd";
     const KEY_CONFIRM = "confirm_handler";
 
+    /**
+     * Current URL
+     * @var URLBuilder
+     */
+    protected $url;
+
     public function __construct(string $cmd)
     {
         $this->cmd = $cmd;
