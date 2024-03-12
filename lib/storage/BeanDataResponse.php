@@ -60,40 +60,46 @@ abstract class BeanDataResponse extends HTTPResponse
 
     }
 
+    /**
+     * @throws Exception
+     */
     protected function authorizeAccess()
     {
         if (!$this->bean->haveColumn("auth_context")) {
-            debug("No auth_context defined");
+            debug("No auth_context column defined");
             return;
         }
 
-        $qry = $this->bean->queryField($this->bean->key(), $this->id, 1);
-
-        $storageTypes = $this->bean->columns();
-
-        foreach ($storageTypes as $name => $storageType) {
-            if (strpos($storageType, "blob") !== FALSE) continue;
-
-            $qry->select->fields()->set($name);
+        //exclude blob type columns
+        $beanColumns = $this->bean->columns();
+        foreach ($beanColumns as $columnName => $storageType) {
+            if (strpos($storageType, "blob") !== FALSE) {
+                unset($beanColumns[$columnName]);
+            }
         }
 
-        if (!$qry->exec()) throw new Exception("Unable to query for auth_context");
+        $data = $this->bean->getByID($this->id, ...$beanColumns);
 
-        $row = $qry->next();
+        $auth_context = $data["auth_context"];
 
-        $auth_context = $row["auth_context"];
+        if (strlen($auth_context) < 1) {
+            debug("auth_context not set for this id");
+            return;
+        }
 
-        if (strlen($auth_context) < 1) return;
-
-        debug("Protected resource requested - auth_context: $auth_context");
+        debug("Protected resource requested. Using auth_context: $auth_context");
 
         Session::Start();
-
-        Authenticator::AuthorizeResource($auth_context, $row, TRUE);
-
+        Authenticator::AuthorizeResource($auth_context, $data, TRUE);
         Session::Close();
     }
 
+    /**
+     * Load full result from database into $this->row.
+     * If requested id=-1 try to call function 'Default_$this->className' to construct default data result and set as $this->row.
+     * @return void
+     * @throws Exception
+     */
     protected function loadBeanData()
     {
         if ($this->id == -1) {
@@ -107,13 +113,15 @@ abstract class BeanDataResponse extends HTTPResponse
             throw new Exception("No default value for this class");
         }
 
-        debug("Fetching ID: " . $this->id . " Bean: " . get_class($this->bean));
-        $this->row = $this->bean->getByID($this->id);
-        debug("Data: ", array_keys($this->row));
+        debug("Loading ID: " . $this->id . " from " . $this->className);
 
-        if (!isset($this->row[$this->field])) {
-            throw new Exception("No data for this blob field");
+        if (!$this->bean->haveColumn($this->field)) {
+            throw new Exception("Incorrect bean requested. Required bean field not found.");
         }
+
+        $this->row = $this->bean->getByID($this->id);
+        debug("Data keys loaded: ", array_keys($this->row));
+
     }
 
     protected function unpackStorageObject()
@@ -147,15 +155,11 @@ abstract class BeanDataResponse extends HTTPResponse
     }
 
     /**
-     * All content will be hashed and used as ETag header field
-     * @return array
+     * Prepare and set 'ETag', 'Last-Modified' and 'Expires' HTML header fields.
+     * If ETag is already set do nothing.
+     * @return void
      */
-    protected function getETagParts(): array
-    {
-        return $this->etag_parts;
-    }
-
-    protected function fillETag()
+    protected function fillCacheHeaders() : void
     {
         if (isset($this->headers["ETag"])) {
             debug("ETag already set. Nothing to do ...");
@@ -170,7 +174,7 @@ abstract class BeanDataResponse extends HTTPResponse
         $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year", $last_modified));
         debug("Expires: $expires");
 
-        $etag = md5(implode("|", $this->getETagParts()) . "-" . $last_modified);
+        $etag = md5(implode("|", $this->etag_parts) . "-" . $last_modified);
         debug("ETag: $etag");
 
         $this->setHeader("ETag", $etag);
@@ -178,12 +182,16 @@ abstract class BeanDataResponse extends HTTPResponse
         $this->setHeader("Expires", $expires);
 
         $this->setHeader("Last-Modified", $modified);
+
+        $this->setHeader("Cache-Control", "no-cache, must-revalidate");
     }
 
-    protected function fillHeaders()
+    /**
+     * Set content type headers (content-type, content-disposition, content-transfer-encoding)
+     * @return void
+     */
+    protected function fillContentHeaders() : void
     {
-        if (!isset($this->headers["ETag"])) throw new Exception("ETag headers not set yet");
-
         $mime = "application/octet-stream";
 
         if (isset($this->row["mime"])) {
@@ -192,23 +200,29 @@ abstract class BeanDataResponse extends HTTPResponse
 
         $this->setHeader("Content-Type", $mime);
 
-        $this->setHeader("Cache-Control", "no-cache, must-revalidate");
-
-        //$this->setHeader("Vary", "User-Agent");
-
-        //header("Pragma: ".$etag);
-
-        $filename = $this->getHeader("ETag");
-
-        if (isset($this->row["filename"])) {
+        if (isset($this->headers["ETag"])) {
+            $filename = $this->headers["ETag"];
+        }
+        elseif (isset($this->row["filename"])) {
             $filename = $this->row["filename"];
+        }
+        else {
+            $filename = md5(microtime_float());
         }
 
         $this->setHeader("Content-Disposition", "{$this->disposition}; filename=\"$filename\"");
 
         $this->setHeader("Content-Transfer-Encoding", "binary");
-
     }
+
+
+    /**
+     * Return the last modified time for the requested row 'id'
+     * Fetches columns timestamp, date_upload or date_updated of this bean to construct the last modified time
+     * If these columns are not present in this bean, use time() as result
+     * @return int
+     * @throws Exception
+     */
     protected function getBeanLastModified() : int
     {
 
@@ -253,6 +267,8 @@ abstract class BeanDataResponse extends HTTPResponse
         return $last_modified;
     }
     /**
+     * Return the contents of bean data with key '$this->field'.
+     * Using ETag logic - checks the disk cache and return 304
      * @throws Exception
      */
     public function send(bool $doExit = TRUE)
@@ -284,7 +300,7 @@ abstract class BeanDataResponse extends HTTPResponse
         }
 
         //calculate the ETag
-        $this->fillETag();
+        $this->fillCacheHeaders();
 
         if ($requestETag && strcmp($this->headers["ETag"], $requestETag)==0) {
             debug("ETag match - sending 304 not modified only");
@@ -292,22 +308,22 @@ abstract class BeanDataResponse extends HTTPResponse
             $this->sendNotModified();
         }
 
-        //fully load the bean data
+        //fully load the bean data including the blob field
         $this->loadBeanData();
         $this->unpackStorageObject();
 
-        //fill remaining headers - requires etag already filled in
-        $this->fillHeaders();
+        //fill remaining headers
+        $this->fillContentHeaders();
 
         if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
             $cacheFile = new CacheFile($this->headers["ETag"], $this->className, $this->id);
+
             //check if we have the ETag in cache so to skip image processing
             if ($cacheFile->exists()) {
                 debug("Sending matched ETag file from cache");
                 $this->setHeader("X-Tag", "SparkCache");
                 //will exit after sending
                 $this->sendFile($cacheFile->fileName());
-
             }
 
             //do the magic - ie image resize; also set content length header

@@ -92,20 +92,30 @@ class HTTPResponse
         exit;
     }
 
-    protected function requestETag()
+    /**
+     * Return contents of the ETag request header field (HTTP_IF_NONE_MATCH)
+     * @return string
+     */
+    protected function requestETag() : string
     {
         if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
             return $_SERVER['HTTP_IF_NONE_MATCH'];
         }
         return "";
     }
-    protected function requestModifiedSince()
+
+    protected function requestModifiedSince() : string
     {
         if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
             return $_SERVER['HTTP_IF_MODIFIED_SINCE'];
         }
         return "";
     }
+
+    /**
+     * Set all the headers to this response using $this->headers as source data
+     * @return void
+     */
     protected function sendHeaders()
     {
         foreach ($this->headers as $key => $val) {
@@ -118,9 +128,14 @@ class HTTPResponse
             }
         }
 
-        debug("Headers sent");
+        debug("Response headers sent");
     }
 
+    /**
+     * Write contents of file '$fileName' and exit. Calls sendHeaders()
+     * @param string $fileName
+     * @return void
+     */
     protected function sendFile(string $fileName)
     {
 
@@ -137,6 +152,10 @@ class HTTPResponse
         exit;
     }
 
+    /**
+     * Write contents of $this->data and continue
+     * @return void
+     */
     protected function sendData()
     {
         if ($this->dataSize < 1) return;
