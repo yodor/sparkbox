@@ -130,6 +130,8 @@ $defines->set("DEFAULT_LANGUAGE_ISO3", "eng");
 
 $defines->set("DEFAULT_CURRENCY", "EUR");
 
+$defines->set("STORAGE_CACHE_ENABLED", TRUE);
+
 //fetch local deployment configuration
 //can override stuff in defines
 include_once("config/defaults.php");
