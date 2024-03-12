@@ -63,6 +63,10 @@ class HTTPResponse
         }
     }
 
+    /**
+     * Send 304 not modified and exit
+     * @return void
+     */
     public function sendNotModified()
     {
         //RFC https://datatracker.ietf.org/doc/html/rfc7232#section-4.1
