@@ -5,9 +5,24 @@ class CacheFile
     const KEY_DATA = "data";
     const KEY_SIZE = "size";
 
-    protected $fileExists = FALSE;
+    protected bool $fileExists = FALSE;
 
-    protected $fileName = "";
+    protected string $fileName = "";
+
+    /**
+     * @var string
+     */
+    protected string $etag = "";
+
+    /**
+     * @var string
+     */
+    protected string $className = "";
+
+    /**
+     * @var int
+     */
+    protected int $id = -1;
 
     public function __construct(string $etag, string $className, int $id)
     {
