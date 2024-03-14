@@ -49,11 +49,8 @@ abstract class BeanDataResponse extends HTTPResponse
         if (isset($_GET["field"])) {
             $this->field = $_GET["field"];
             $this->field_requested = TRUE;
-        }
 
-        //sub-classes set $this->field
-        if (!$this->bean->haveColumn($this->field)) {
-            throw new Exception("Bean does not support this field");
+            debug("Requested bean field: {$this->field}");
         }
 
         $this->etag_parts[] = $this->field;
@@ -115,10 +112,6 @@ abstract class BeanDataResponse extends HTTPResponse
 
         debug("Loading ID: " . $this->id . " from " . $this->className);
 
-        if (!$this->bean->haveColumn($this->field)) {
-            throw new Exception("Incorrect bean requested. Required bean field not found.");
-        }
-
         $this->row = $this->bean->getByID($this->id);
         debug("Data keys loaded: ", array_keys($this->row));
 
@@ -134,9 +127,6 @@ abstract class BeanDataResponse extends HTTPResponse
 
             debug("Unpacked: " . get_class($object));
 
-            //replace result with storageobject data?
-            //$this->row = array();
-            //image resizer expects row["photo"]
             $object->setDataKey($this->field);
             $object->deconstruct($this->row, FALSE);
 
@@ -275,6 +265,10 @@ abstract class BeanDataResponse extends HTTPResponse
     {
         debug("Class: " . $this->className . " ID: " . $this->id . " Field: " . $this->field);
 
+        if (!$this->bean->haveColumn($this->field)) {
+            throw new Exception("Bean does not support this field");
+        }
+
         //check auth_context field exists for this bean and authorize
         $this->authorizeAccess();
 
@@ -283,18 +277,17 @@ abstract class BeanDataResponse extends HTTPResponse
 
         debug("Request ETag is: $requestETag");
 
-        //decide early for 304 only if cache is enabled
-
+        //early 304
         if ($requestETag) {
 
             if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
                 $cacheFile = new CacheFile($requestETag, $this->className, $this->id);
                 if ($cacheFile->exists()) {
-                    debug("Cache file exists for this ETag className and ID - sending 304 not modified only");
+                    debug("Matching cache file found for this request ETag - responding with HTTP/304");
                     //exit with 304 not modified
                     $this->sendNotModified();
                 }
-                debug("Cache file does not exists for this ETag className and ID");
+                debug("No cache file matches this request ETag");
             }
 
         }
@@ -303,9 +296,12 @@ abstract class BeanDataResponse extends HTTPResponse
         $this->fillCacheHeaders();
 
         if ($requestETag && strcmp($this->headers["ETag"], $requestETag)==0) {
-            debug("ETag match - sending 304 not modified only");
+            debug("Request ETag match current bean ETag - responding with HTTP/304");
             //exit with 304 not modified
             $this->sendNotModified();
+        }
+        else {
+            debug("Request ETag missing or not matching");
         }
 
         //fully load the bean data including the blob field

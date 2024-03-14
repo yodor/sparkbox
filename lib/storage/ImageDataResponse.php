@@ -53,8 +53,6 @@ class ImageDataResponse extends BeanDataResponse
 
         $this->etag_parts[] = $this->scaler->grayFilter;
 
-        debug("Using field: {$this->field}");
-
     }
 
     protected function processData()
@@ -77,9 +75,9 @@ class ImageDataResponse extends BeanDataResponse
         $this->setData($this->scaler->getData(), $this->scaler->getDataSize());
     }
 
-    protected function fillHeaders()
+    protected function fillContentHeaders() : void
     {
-        parent::fillHeaders();
+        parent::fillContentHeaders();
         $this->setHeader("Content-Type", $this->scaler->getOutputFormat());
     }
 
