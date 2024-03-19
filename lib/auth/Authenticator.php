@@ -171,7 +171,7 @@ abstract class Authenticator
                 $is_confirmed = (int)$row["confirmed"];
                 if ($is_confirmed < 1) {
                     $msg = tr("Your account is not activated yet.");
-                    if (defined(ACCOUNT_CONFIRM_URL)) {
+                    if (defined("ACCOUNT_CONFIRM_URL")) {
                         $link = ACCOUNT_CONFIRM_URL;
                         $msg .= "<BR>";
                         $msg .= tr("For more details visit the account activation page") . ": ";
