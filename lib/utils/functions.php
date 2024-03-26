@@ -1,5 +1,33 @@
 <?php
 
+function sanitizeKeywords(string $text) : string
+{
+    $keywords = trim(mb_strtolower($text));
+    if (mb_strlen($keywords)<1) return "";
+
+    $keywords = str_replace("етикети: ", "", $keywords);
+    $keywords = str_replace("етикет: ", "", $keywords);
+
+    $keywords = preg_replace("/\\r\\n/", ", ", $keywords);
+    //!!
+    $keywords = str_replace("\\r\\n", ", ", $keywords);
+
+    $keywords_all = explode(",", $keywords);
+
+    foreach ($keywords_all as $idx=>$item) {
+        $item = trim($item);
+        if (mb_strlen($item)>0) {
+            $keywords_all[$idx] = $item;
+        }
+        else {
+            unset($keywords_all[$idx]);
+        }
+    }
+    $keywords = implode(", ", $keywords_all);
+
+    return $keywords;
+}
+
 function slugify(string $text) : false|string
 {
 

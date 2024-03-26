@@ -387,17 +387,15 @@ class SparkPage extends HTMLPage implements IActionCollection
             $config = ConfigBean::Factory();
             $config->setSection("seo");
 
-            $meta_keywords = $config->get("meta_keywords");
+            $meta_keywords = sanitizeKeywords($config->get("meta_keywords"));
             $meta_description = $config->get("meta_description");
         }
 
         if ($this->keywords) {
-
             $meta_keywords = $this->keywords;
         }
 
         if ($this->description) {
-
             $meta_description = $this->description;
         }
 
