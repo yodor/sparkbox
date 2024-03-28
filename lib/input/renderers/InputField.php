@@ -47,6 +47,8 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
      */
     protected $input_attributes = array();
 
+    protected bool $is_compound = false;
+
     public function __construct(DataInput $input)
     {
         parent::__construct();

@@ -21,14 +21,13 @@ class RadioItem extends DataIteratorItem
 class RadioField extends DataIteratorField
 {
 
+    protected bool $is_compound = true;
+
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
 
         $this->setItemRenderer(new RadioItem());
-
-        $this->is_compound = TRUE;
-
     }
 
 }

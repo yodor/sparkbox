@@ -4,10 +4,11 @@ include_once("input/renderers/InputField.php");
 class PhoneField extends InputField
 {
 
+    protected bool $is_compound = true;
+
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-        $this->is_compound = TRUE;
     }
 
     public function renderImpl()
@@ -16,7 +17,7 @@ class PhoneField extends InputField
         $field_name = $this->input->getName();
         $field_value = $this->input->getValue();
 
-        $pieces = explode("|", $field_value);
+        $pieces = explode("|", (string)$field_value);
 
         $country_code = "";
         $city_code = "";

@@ -4,12 +4,11 @@ include_once("input/renderers/InputField.php");
 class TimeField extends InputField
 {
 
+    protected bool $is_compound = true;
+
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-
-        $this->is_compound = TRUE;
-
     }
 
     protected function renderImpl()
@@ -19,7 +18,7 @@ class TimeField extends InputField
 
         $hour = -1;
         $minute = -1;
-        if (strpos($field_value, ":") !== FALSE) {
+        if (strpos((string)$field_value, ":") !== FALSE) {
             list($hour, $minute) = explode(":", $field_value);
         }
         echo "<div class='FieldElements'>";
