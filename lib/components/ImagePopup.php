@@ -19,11 +19,22 @@ class ImagePopup extends Component implements IPhotoRenderer
 
     protected $storageItem;
 
+    protected bool $lazyLoad = true;
+
     public function __construct()
     {
         parent::__construct();
         $this->storageItem = new StorageItem();
 
+    }
+
+    public function setLazyLoadEnabled(bool $mode) : void
+    {
+        $this->lazyLoad = $mode;
+    }
+    public function isLazyLoadEnabled() : bool
+    {
+        return $this->lazyLoad;
     }
 
     public function setRelation(string $relation)
@@ -112,8 +123,12 @@ class ImagePopup extends Component implements IPhotoRenderer
             if ($titleValue) {
                 $alt_attr = "alt='".attributeValue($titleValue)."'";
             }
+            $lazyLoad = "loading='lazy'";
+            if (!$this->lazyLoad) {
+                $lazyLoad = "";
+            }
 
-            echo "<img itemprop='image' loading='lazy' src='{$this->thumb_url}' $alt_attr>";
+            echo "<img itemprop='image' $lazyLoad src='{$this->thumb_url}' $alt_attr>";
         }
 
     }
