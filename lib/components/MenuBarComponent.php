@@ -45,6 +45,9 @@ class MenuBarComponent extends Component
 
         $this->bar = new Component();
         $this->bar->setComponentClass("MenuBar");
+        $this->bar->setAttribute("itemscope", "");
+        $this->bar->setAttribute("itemtype","https://schema.org/SiteNavigationElement");
+        $this->bar->setAttribute("role", "menu");
 
         $this->toggle = new Component();
         $this->toggle->setTagName("A");

@@ -15,7 +15,7 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
         $this->linkTag = new Component();
         $this->linkTag->setTagName("A");
         $this->linkTag->setComponentClass("MenuItemLink");
-
+        $this->linkTag->setAttribute("role", "menuitem");
     }
 
     public function renderSeparator($idx_curr, $items_total)
@@ -45,9 +45,11 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
 
         if ($item->getHref()) {
             $this->linkTag->setAttribute("href", $item->getHref());
+            $this->linkTag->setAttribute("itemprop","url");
         }
 
-        $contents = $item->getTitle();
+        $contents = "<meta itemprop='name' content='".$item->getTitle()."'>";
+        $contents.= $item->getTitle();
 
         if ($item->needTranslate()) {
             $contents = tr($item->getTitle());
