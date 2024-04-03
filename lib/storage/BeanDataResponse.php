@@ -62,6 +62,8 @@ abstract class BeanDataResponse extends HTTPResponse
      */
     protected function authorizeAccess()
     {
+        debug("authorizeAccess ...");
+
         if (!$this->bean->haveColumn("auth_context")) {
             debug("No auth_context column defined");
             return;
@@ -75,9 +77,10 @@ abstract class BeanDataResponse extends HTTPResponse
             }
         }
 
-        $data = $this->bean->getByID($this->id, ...$beanColumns);
+        $dataColumns = array_keys($beanColumns);
+        $data = $this->bean->getByID($this->id, ...$dataColumns);
 
-        $auth_context = $data["auth_context"];
+        $auth_context = (string)$data["auth_context"];
 
         if (strlen($auth_context) < 1) {
             debug("auth_context not set for this id");
