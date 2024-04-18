@@ -8,6 +8,8 @@ class Component extends SparkObservable implements IRenderer, IHeadContents
 {
     protected $tagName = "DIV";
 
+    protected $closingTagRequired = true;
+
     protected $index = -1;
 
     /**
@@ -118,6 +120,14 @@ class Component extends SparkObservable implements IRenderer, IHeadContents
         $this->tagName = $tagName;
     }
 
+    public function setClosingTagRequired(bool $mode) : void
+    {
+        $this->closingTagRequired = $mode;
+    }
+    public function isClosingTagRequired() : bool
+    {
+        return $this->closingTagRequired;
+    }
     public function getTagName(): string
     {
         return $this->tagName;
@@ -173,8 +183,9 @@ class Component extends SparkObservable implements IRenderer, IHeadContents
 
     public function finishRender()
     {
-
-        echo "</$this->tagName>\n";
+        if ($this->closingTagRequired) {
+            echo "</$this->tagName>\n";
+        }
     }
 
     public function render()
