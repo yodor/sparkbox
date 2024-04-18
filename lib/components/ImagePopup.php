@@ -21,17 +21,34 @@ class ImagePopup extends Component implements IPhotoRenderer
 
     protected bool $lazyLoad = true;
 
+    protected Component $image;
+
     public function __construct()
     {
         parent::__construct();
         $this->storageItem = new StorageItem();
+        $this->image = new Component();
+        $this->image->setClosingTagRequired(false);
+        $this->image->setTagName("IMG");
+        $this->image->setAttribute("itemprop", "image");
+    }
 
+    public function getImage() : Component
+    {
+        return $this->image;
     }
 
     public function setLazyLoadEnabled(bool $mode) : void
     {
         $this->lazyLoad = $mode;
+        if ($mode) {
+            $this->image->setAttribute("loading", "lazy");
+        }
+        else {
+            $this->image->clearAttribute("loading");
+        }
     }
+
     public function isLazyLoadEnabled() : bool
     {
         return $this->lazyLoad;
@@ -118,17 +135,17 @@ class ImagePopup extends Component implements IPhotoRenderer
     protected function renderImpl()
     {
         if ($this->mode == ImagePopup::MODE_IMAGETAG) {
-            $alt_attr = "";
+
             $titleValue = $this->getAttribute("title");
-            if ($titleValue) {
-                $alt_attr = "alt='".attributeValue($titleValue)."'";
-            }
-            $lazyLoad = "loading='lazy'";
-            if (!$this->lazyLoad) {
-                $lazyLoad = "";
+            $alt = $this->image->getAttribute("alt");
+            if (!$alt) {
+                if ($titleValue) {
+                    $this->image->setAttribute("alt", $titleValue);
+                }
             }
 
-            echo "<img itemprop='image' $lazyLoad src='{$this->thumb_url}' $alt_attr>";
+            $this->image->setAttribute("src", $this->thumb_url);
+            $this->image->render();
         }
 
     }
