@@ -91,7 +91,11 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     protected $canonical_enabled = false;
 
-    protected $canonical_disabled_params = array();
+    /**
+     * Array holding the url parameter names that will be present in the canonical url version of 'this' page
+     * @var array
+     */
+    protected $canonical_params = array();
 
     public function addGTAGObject(GTAGObject $obj)
     {
@@ -196,8 +200,10 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         if ($this->canonical_enabled) {
             $builder = $this->getURL();
-            foreach ($this->canonical_disabled_params as $idx=>$name) {
-                $builder->remove($name);
+            $url_parameters = $builder->getParameterNames();
+            foreach ($url_parameters as $idx=>$parameter_name) {
+                if (in_array($parameter_name, $this->canonical_params)) continue;
+                $builder->remove($parameter_name);
             }
             $canonical_href = fullURL($builder->url());
             echo "<link rel='canonical' href='$canonical_href' />";
