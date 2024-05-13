@@ -19,12 +19,15 @@ class NumericValidator implements IInputValidator
     {
         $value = $input->getValue();
 
-        if (strlen($value) === 0) {
+        if (mb_strlen($value) == 0) {
             if ($input->isRequired()) throw new Exception("Input numeric value");
         }
         else {
 
-            if (!preg_match("/^([0-9.\ ])+$/", $value)) throw new Exception("Input numeric value");
+            $check = filter_var($value, FILTER_VALIDATE_FLOAT);
+            if ($check === false) throw new Exception("Input numeric value");
+            if (!$this->allow_zero && $check == 0) throw new Exception("Input non-zero value");
+            if (!$this->allow_negative && $check < 0) throw new Exception("Input non-negative value");
 
         }
 
