@@ -215,7 +215,6 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         echo "<link rel='alternate' hreflang='".DEFAULT_LOCALE."' href='$url'/>";
 
-        echo locale_get_default();
         parent::headEnd();
     }
 
