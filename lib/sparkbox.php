@@ -127,7 +127,7 @@ $defines->set("DB_ENABLED", FALSE);
 
 $defines->set("DEFAULT_LANGUAGE", "english");
 $defines->set("DEFAULT_LANGUAGE_ISO3", "eng");
-$defines->set("DEFAULT_LOCALE", "en_US");
+$defines->set("DEFAULT_LOCALE", "en-us");
 
 $defines->set("DEFAULT_CURRENCY", "EUR");
 
