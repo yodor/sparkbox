@@ -208,6 +208,14 @@ class SparkPage extends HTMLPage implements IActionCollection
             $canonical_href = fullURL($builder->url());
             echo "<link rel='canonical' href='$canonical_href' />";
         }
+
+        $url = fullURL($this->getURL()->url());
+        //X-default tags are recommended, but not mandatory
+        echo "<link rel='alternate' hreflang='x-default' href='$url'/>";
+
+        echo "<link rel='alternate' hreflang='".DEFAULT_LOCALE."' href='$url'/>";
+
+        echo locale_get_default();
         parent::headEnd();
     }
 

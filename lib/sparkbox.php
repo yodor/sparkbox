@@ -127,6 +127,7 @@ $defines->set("DB_ENABLED", FALSE);
 
 $defines->set("DEFAULT_LANGUAGE", "english");
 $defines->set("DEFAULT_LANGUAGE_ISO3", "eng");
+$defines->set("DEFAULT_LOCALE", "en_US");
 
 $defines->set("DEFAULT_CURRENCY", "EUR");
 
@@ -140,6 +141,8 @@ $site_title = $defines->get("SITE_TITLE");
 if (!$site_title) throw new Exception("SITE_TITLE not defined");
 
 $defines->set("CACHE_PATH", dirname($install_path) . DIRECTORY_SEPARATOR . "sparkcache" . DIRECTORY_SEPARATOR . $defines->get("SITE_TITLE"));
+
+ini_set('intl.default_locale', $defines->get("DEFAULT_LOCALE"));
 
 $defines->export();
 
