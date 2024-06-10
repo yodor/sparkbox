@@ -496,7 +496,7 @@ function sanitizeInput($value, $accepted_tags = NULL)
 
 function safeArray($arr, $accepted_tags = NULL)
 {
-    if (!$accepted_tags) $accepted_tags = DefaultAcceptedTags();
+    if (is_null($accepted_tags)) $accepted_tags = DefaultAcceptedTags();
 
     $safe_ret = array();
     foreach ($arr as $key => $val) {
@@ -518,7 +518,7 @@ function safeArray($arr, $accepted_tags = NULL)
 //if get_magic_quotes_gpc();         // 1 then post data is already escaped
 function safeVal($val, $accepted_tags = NULL)
 {
-    if (!$accepted_tags) $accepted_tags = DefaultAcceptedTags();
+    if (is_null($accepted_tags)) $accepted_tags = DefaultAcceptedTags();
 
     $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
