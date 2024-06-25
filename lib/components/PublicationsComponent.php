@@ -157,7 +157,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
         $qry->select->limit = 3;
 
         $this->itemView = new ItemView($qry);
-        $this->itemView->setCaption(tr("Latest News"));
+
         $this->itemView->enablePaginators(0);
         $this->itemView->setItemsPerPage(0);
 
@@ -327,10 +327,11 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
     protected function renderImpl()
     {
-
-        $this->renderArchive();
-
+        echo "<div class='Caption'>".tr("Latest News")."</div>";
         parent::renderImpl();
+
+        echo "<div class='Caption'>".tr("News Archive")."</div>";
+        $this->renderArchive();
     }
 
 }
