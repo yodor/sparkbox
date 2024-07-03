@@ -1,5 +1,4 @@
 <?php
-include_once("ratelimit.php");
 
 // $base_dir  = __DIR__; // Absolute path to your installation, ex: /var/www/mywebsite
 // $doc_root  = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', $_SERVER['SCRIPT_FILENAME']); # ex: /var/www
@@ -11,6 +10,11 @@ include_once("ratelimit.php");
 // $full_url  = "${protocol}://${domain}${disp_port}${base_url}"; # Ex: 'http://example.com', 'https://example.com/mywebsite', etc.
 
 if (!$install_path) throw new Exception("Install path is not defined");
+
+if (defined("REQUEST_THROTTLE_USERAGENT")) {
+    include_once("ratelimit.php");
+}
+
 
 if (isset($GLOBALS["FORCE_HTTPS"]) && $GLOBALS["FORCE_HTTPS"]==0) {
 

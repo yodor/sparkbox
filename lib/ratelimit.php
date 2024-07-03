@@ -1,26 +1,45 @@
 <?php
-define('FACEBOOK_REQUEST_THROTTLE', 15); // Number of seconds permitted between each hit from facebookexternalhit
+$userAgent = $_SERVER['HTTP_USER_AGENT'];
+if (!empty($userAgent)) {
+    $names = explode("|", REQUEST_THROTTLE_USERAGENT);
 
-if (!empty($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'facebookexternalhit') === 0) {
-    $fbTmpFile = sys_get_temp_dir() . '/facebookexternalhit-sparkbox.txt';
-    if ($fh = fopen($fbTmpFile, 'c+')) {
-        $lastTime = fread($fh, 100);
-        $lastTimeFloat = (float)$lastTime; // Convert string to float
-        $microTime = microtime(true);
-        // check current microtime with microtime of last access
-        if ($microTime - $lastTimeFloat < FACEBOOK_REQUEST_THROTTLE) {
-            // bail if requests are coming too quickly with http 429 Too Many Requests
-            header($_SERVER["SERVER_PROTOCOL"] . ' 429');
-            die;
-        } else {
-            // write out the microsecond time of last access
-            rewind($fh);
-            fwrite($fh, (string)$microTime);
+    foreach ($names as $nameMatch) {
+
+        if (!str_contains($userAgent, $nameMatch)) continue;
+
+        $installID = hash('xxh3',   $install_path);
+
+        $tmpFile = sys_get_temp_dir() . "/". $nameMatch."-".$installID;
+
+        if ($fh = fopen($tmpFile, 'c+')) {
+
+            $microTime = microtime(true);
+
+            flock($fh, LOCK_SH);
+            $lastTime = fread($fh, 15);
+            flock($fh, LOCK_UN);
+
+            $lastTimeFloat = (float)$lastTime; // Convert string to float
+
+            $timeDiff = $microTime - $lastTimeFloat;
+
+            // check current microtime with microtime of last access
+            if ($timeDiff < REQUEST_THROTTLE_SECONDS) {
+                // bail if requests are coming too quickly with http 429 Too Many Requests
+                header($_SERVER["SERVER_PROTOCOL"] . ' 429');
+                exit;
+            } else {
+                // write out the microsecond time of last access
+                flock($fh, LOCK_EX);
+                rewind($fh);
+                fwrite($fh, (string)$microTime);
+                fflush($fh);
+                flock($fh, LOCK_UN);
+            }
+            fclose($fh);
+
         }
-        fclose($fh);
-    } else {
-        header($_SERVER["SERVER_PROTOCOL"] . ' 429');
-        die;
     }
+
 }
 ?>
