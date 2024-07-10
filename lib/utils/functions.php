@@ -81,11 +81,16 @@ function googleMapURL($iframe_html)
     return $iframe_html;
 }
 
-function prepareMeta(string $value)
+function prepareMeta(string $value, int $max_length = -1)
 {
-    $value = strip_tags($value);
+
     $value = str_replace("\\r\\n", " ", $value);
-    return preg_replace("/[^\wA-Za-z0-9\-\%\?\!\;\:\.\, ]/u", "",$value);
+    $value = replace_tags($value);
+    $value = preg_replace("/[^\wA-Za-z0-9\-\%\?\!\;\:\.\, ]/u", "",$value);
+    if ($max_length>0) {
+        $value = mb_substr($value, 0, $max_length);
+    }
+    return $value;
 }
 
 function replace_tags(string $text, string $replacement=" ") : string {
