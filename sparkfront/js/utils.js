@@ -3,14 +3,6 @@ var console = console || {
     }
 };
 
-Function.prototype.bind = function (scope) {
-    var _function = this;
-
-    return function () {
-        return _function.apply(scope, arguments);
-    }
-}
-
 if (typeof String.prototype.startsWith != 'function') {
 
     String.prototype.startsWith = function (prefix) {
