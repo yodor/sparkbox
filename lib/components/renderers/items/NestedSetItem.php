@@ -18,6 +18,19 @@ abstract class NestedSetItem extends DataIteratorItem
         $this->setAttribute("active", (($this->selected) ? 1 : 0));
     }
 
+
+    protected bool $checked = false;
+
+    public function setChecked(bool $mode) : void
+    {
+        $this->checked = $mode;
+    }
+
+    public function isChecked() : bool
+    {
+        return $this->checked;
+    }
+
 }
 
 ?>

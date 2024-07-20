@@ -33,6 +33,11 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
 
     protected $icon = null;
 
+    /**
+     * @var string checkbox input name
+     */
+    protected string $inputName = "";
+
     public function __construct()
     {
         parent::__construct();
@@ -43,9 +48,24 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
 
         $this->actions = new ActionCollection();
 
-        //show related count in parenthesis inside the label
+        //show related count in parentheses inside the label
         $this->render_related_count = true;
         $this->key_related_count = "related_count";
+    }
+
+    public function enableCheckbox(string $inputName) : void
+    {
+        $this->inputName = $inputName;
+    }
+
+    public function disableCheckbox() : void
+    {
+        $this->inputName = "";
+    }
+
+    public function isCheckboxEnabled() : bool
+    {
+        return (!empty($this->inputName));
     }
 
     public function setIcon(StorageItem $si)
@@ -142,6 +162,20 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
         }
     }
 
+    public function renderCheckbox()
+    {
+        if ($this->isCheckboxEnabled()) {
+            echo "<div class='node_checkbox'>";
+            echo "<input type='hidden' name='{$this->inputName}' value=''>";
+
+            echo "<input type='checkbox' value='{$this->getID()}' name='{$this->inputName}'  ";
+            if ($this->isChecked()) echo "CHECKED";
+            echo ">";
+            echo "</div>";
+
+        }
+    }
+
     public function renderText()
     {
         if ($this->render_related_count && isset($this->data[$this->key_related_count])) {
@@ -156,6 +190,7 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
     protected function renderImpl()
     {
         $this->renderHandle();
+        $this->renderCheckbox();
         $this->renderIcon();
         $this->renderText();
         $this->renderActions();

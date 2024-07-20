@@ -47,6 +47,7 @@
     box-sizing: border-box;
     width:32px;
     height:32px;
+    vertical-align:middle;
 }
 .TreeView .Node .Icon IMG {
     display:block;
@@ -141,4 +142,13 @@
 
     width: 16px;
     height: 16px;
+}
+
+.TreeView .node_checkbox {
+    display:inline-block;
+
+}
+.TreeView .node_checkbox INPUT {
+    height:32px;
+    width:auto;
 }
