@@ -68,14 +68,28 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         return $this->iterator;
     }
 
+    /**
+     * Set the checked nodes ID
+     * @param ...$selection array of IDs
+     * @return void
+     */
+    public function setCheckedNodes(...$selection) : void
+    {
+        $this->checked_nodes = $selection;
+    }
+
+    /**
+     * Return the checked nodes ID array
+     * @return array
+     */
+    public function getCheckedNodes() : array
+    {
+        return $this->checked_nodes;
+    }
+
     public function setSelectedID(int $nodeID)
     {
         $this->selected_nodeID = (int)$nodeID;
-    }
-
-    public function setCheckedNodes(...$selection)
-    {
-        $this->checked_nodes = $selection;
     }
 
     /**
@@ -178,6 +192,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             $item->setData($row);
             $item->setAttribute("branch_type", $branch_type);
             $item->setSelected($selected);
+            $item->setChecked(false);
             if (is_array($this->checked_nodes)) {
                 $item->setChecked(in_array($nodeID, $this->checked_nodes));
             }
