@@ -20,17 +20,19 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
     //render html attributes from data_row
     protected $data_attributes = array();
 
-    protected $selected = FALSE;
+    protected bool $selected = false;
+
+    protected bool $checked = false;
 
     protected $position = 0;
 
 
-    public function setPosition(int $position)
+    public function setPosition(int $position) : void
     {
         $this->position = $position;
     }
 
-    public function getPosition(int $position) : int
+    public function getPosition() : int
     {
         return $this->position;
     }
@@ -40,7 +42,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
      * @param string $name
      * @param string $field
      */
-    public function addDataAttribute(string $name, string $field = "")
+    public function addDataAttribute(string $name, string $field = "") : void
     {
         if (!$field) $field = $name;
         $this->data_attributes[$name] = $field;
@@ -61,7 +63,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         return $this->label;
     }
 
-    public function setID(int $id)
+    public function setID(int $id) : void
     {
         $this->id = $id;
     }
@@ -71,7 +73,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         return $this->id;
     }
 
-    public function setValueKey(string $field)
+    public function setValueKey(string $field) : void
     {
         $this->value_key = $field;
     }
@@ -81,7 +83,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         return $this->value_key;
     }
 
-    public function setLabelKey(string $field)
+    public function setLabelKey(string $field) : void
     {
         $this->label_key = $field;
     }
@@ -91,7 +93,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         return $this->label_key;
     }
 
-    public function setValue($value)
+    public function setValue($value) : void
     {
         $this->value = $value;
     }
@@ -123,14 +125,24 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         }
     }
 
-    public function setSelected(bool $mode)
+    public function setSelected(bool $mode) : void
     {
         $this->selected = $mode;
     }
 
-    public function isSelected()
+    public function isSelected() : bool
     {
         return $this->selected;
+    }
+
+    public function setChecked(bool $mode) : void
+    {
+        $this->checked = $mode;
+    }
+
+    public function isChecked() : bool
+    {
+        return $this->checked;
     }
 
     public function getDataValue(string $key) : string
