@@ -16,19 +16,7 @@ abstract class NestedSetItem extends DataIteratorItem
         parent::processAttributes();
         $this->setAttribute("nodeID", $this->id);
         $this->setAttribute("active", (($this->selected) ? 1 : 0));
-    }
-
-
-    protected bool $checked = false;
-
-    public function setChecked(bool $mode) : void
-    {
-        $this->checked = $mode;
-    }
-
-    public function isChecked() : bool
-    {
-        return $this->checked;
+        $this->setAttribute("checked", (($this->checked) ? 1 : 0));
     }
 
 }
