@@ -22,6 +22,7 @@ include_once("input/renderers/SessionFile.php");
 include_once("input/renderers/ColorCodeField.php");
 include_once("input/renderers/CaptchaInputField.php");
 include_once("input/renderers/TextCaptchaField.php");
+include_once("input/renderers/CheckboxTreeView.php");
 
 include_once("input/validators/EmailValidator.php");
 include_once("input/validators/DateValidator.php");
@@ -76,6 +77,8 @@ class DataInputFactory
     const SELECT_ARRAY = 102;
 
     const SLIDER = 200;
+
+    const CHECKBOX_TREEVIEW = 201;
 
     /**
      * @param int $type
@@ -218,6 +221,13 @@ class DataInputFactory
                 $input = new DataInput($name, $label, $required);
                 new TextCaptchaField($input);
                 $input->setValidator(new TextCaptchaValidator());
+                break;
+
+            case DataInputFactory::CHECKBOX_TREEVIEW:
+
+                $input = new ArrayDataInput($name, $label, $required);
+                $input->getValidator()->require_array_value = TRUE;
+                new CheckboxTreeView($input);
                 break;
 
             default:
