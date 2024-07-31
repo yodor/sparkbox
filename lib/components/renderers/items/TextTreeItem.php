@@ -166,9 +166,8 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
     {
         if ($this->isCheckboxEnabled()) {
             echo "<div class='node_checkbox'>";
-            echo "<input type='hidden' name='{$this->inputName}' value=''>";
 
-            echo "<input type='checkbox' value='{$this->getID()}' name='{$this->inputName}'  ";
+            echo "<input type='checkbox' value='{$this->getID()}' name='{$this->inputName}[]'  ";
             if ($this->isChecked()) echo "CHECKED";
             echo ">";
             echo "</div>";
