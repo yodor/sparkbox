@@ -73,7 +73,7 @@ class HTTPResponse
         //Cache-Control, Content-Location, Date, ETag, Expires, and Vary
         $this->clearHeaders();
         $this->setHeader("HTTP/1.1 304 Not Modified");
-        $this->setHeader("Cache-Control", "no-cache, must-revalidate");
+        $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
 
         $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year"));
         $this->setHeader("Expires", $expires);
