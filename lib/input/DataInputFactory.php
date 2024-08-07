@@ -20,7 +20,6 @@ include_once("input/renderers/SliderField.php");
 include_once("input/renderers/SessionImage.php");
 include_once("input/renderers/SessionFile.php");
 include_once("input/renderers/ColorCodeField.php");
-include_once("input/renderers/CaptchaInputField.php");
 include_once("input/renderers/TextCaptchaField.php");
 include_once("input/renderers/CheckboxTreeView.php");
 
@@ -33,7 +32,6 @@ include_once("input/validators/ArrayInputValidator.php");
 include_once("input/validators/ImageUploadValidator.php");
 include_once("input/validators/FileUploadValidator.php");
 include_once("input/validators/EmptyValueValidator.php");
-include_once("input/validators/CaptchaInputValidator.php");
 include_once("input/validators/TextCaptchaValidator.php");
 
 include_once("input/processors/DateInput.php");
@@ -210,12 +208,7 @@ class DataInputFactory
                 $input->setValidator($validator);
 
                 break;
-            case DataInputFactory::CAPTCHA:
 
-                $input = new DataInput($name, $label, $required);
-                new CaptchaInputField($input);
-                $input->setValidator(new CaptchaInputValidator());
-                break;
             case DataInputFactory::CAPTCHA_TEXT:
 
                 $input = new DataInput($name, $label, $required);
