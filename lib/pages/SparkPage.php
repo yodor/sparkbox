@@ -488,7 +488,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         ob_end_clean();
         $this->obCallback($buffer);
 
-        print $buffer;
+        echo $buffer;
     }
 
     /**
