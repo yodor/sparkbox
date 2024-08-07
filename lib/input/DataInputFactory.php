@@ -67,7 +67,6 @@ class DataInputFactory
     const SESSION_FILE = 20;
     const COLOR_CODE = 21;
 
-    const CAPTCHA = 22;
     const CAPTCHA_TEXT = 23;
 
     const HIDDEN_ARRAY = 100;
