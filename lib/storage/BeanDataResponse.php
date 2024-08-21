@@ -167,7 +167,8 @@ abstract class BeanDataResponse extends HTTPResponse
         $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year", $last_modified));
         debug("Expires: $expires");
 
-        $etag = md5(implode("|", $this->etag_parts) . "-" . $last_modified);
+        //$etag = md5(implode("|", $this->etag_parts) . "-" . $last_modified);
+        $etag = md5(implode("|", $this->etag_parts));
         debug("ETag: $etag");
 
         $this->setHeader("ETag", $etag);
