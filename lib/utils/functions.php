@@ -986,10 +986,10 @@ function unset_multi(&$arr, $fields)
     }
 }
 
-function deleteDir($dirPath)
+function deleteDir(string $dirPath) : void
 {
     if (!is_dir($dirPath)) {
-        throw new InvalidArgumentException("$dirPath must be a directory");
+        throw new RuntimeException("$dirPath must be a directory");
     }
     if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
         $dirPath .= '/';
