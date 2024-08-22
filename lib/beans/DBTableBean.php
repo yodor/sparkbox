@@ -177,6 +177,11 @@ abstract class DBTableBean
         return $this->columns;
     }
 
+    public function columnType(string $columnName): string
+    {
+        if (!$this->haveColumn($columnName)) throw new RuntimeException("Column does not exist in this bean");
+        return $this->columns[$columnName];
+    }
     /**
      * SQLSelect that is used from the query functions.
      * Default fieldset list is empty
@@ -585,17 +590,23 @@ abstract class DBTableBean
 
     }
 
-    protected function manageCache($id)
+    protected function manageCache(int $id) : void
     {
         //TODO: check path
         $cache_file = CACHE_PATH . "/" . get_class($this) . "/" . $id;
-        if (!is_dir($cache_file)) return;
+        debug("Checking cache folder: '$cache_file'");
+        if (!is_dir($cache_file)) {
+            debug("'$cache_file' not a folder");
+            return;
+        }
         try {
-            @deleteDir($cache_file);
+            debug("Removing folder '$cache_file'");
+            deleteDir($cache_file);
+            debug("Removing folder '$cache_file' complete");
         }
         catch (Exception $e) {
             //
-            debug("Unable to delete old cache directory: $cache_file");
+            debug("Unable to delete cache folder: $cache_file");
         }
     }
 
