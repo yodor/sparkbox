@@ -161,14 +161,16 @@ abstract class BeanDataResponse extends HTTPResponse
         // set headers and etag
         $last_modified = $this->getBeanLastModified();
 
-        $modified = gmdate(HTTPResponse::DATE_FORMAT, strtotime($last_modified));
+        //set last modified from bean
+        $modified = gmdate(HTTPResponse::DATE_FORMAT, $last_modified);
         debug("Last-Modified: $modified");
-        //always keep one year ahead from request time
-        $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year", $last_modified));
+
+        //keep one year ahead from request time
+        $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year"));
         debug("Expires: $expires");
 
-        //$etag = md5(implode("|", $this->etag_parts) . "-" . $last_modified);
-        $etag = md5(implode("|", $this->etag_parts));
+        //add last modified to etag calculation
+        $etag = md5(implode("|", $this->etag_parts) . "-" . $last_modified);
         debug("ETag: $etag");
 
         $this->setHeader("ETag", $etag);
@@ -177,7 +179,7 @@ abstract class BeanDataResponse extends HTTPResponse
 
         $this->setHeader("Last-Modified", $modified);
 
-        $this->setHeader("Cache-Control", "no-cache, must-revalidate");
+        $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
     }
 
     /**
@@ -242,20 +244,27 @@ abstract class BeanDataResponse extends HTTPResponse
 
             $row = $this->bean->getByID($this->id, ...$columns);
 
-            //use timestamp from storage object
-            if (isset($row["timestamp"]) && $row["timestamp"]) {
-                $last_modified = strtotime($row["timestamp"]);
-                debug("Using last-modified from [timestamp]: " . $last_modified);
-            } else if (isset($row["date_upload"])) {
-                $last_modified = strtotime($row["date_upload"]);
-                debug("Using last-modified from [date_upload]: " . $last_modified);
-            } else if (isset($row["date_updated"])) {
-                $last_modified = strtotime($row["date_updated"]);
-                debug("Using last-modified from [date_updated]: " . $last_modified);
+            $found_time = false;
+            foreach ($columns as $idx=>$name) {
+                if (isset($row[$name]) && $row[$name]) {
+
+                    if (strcasecmp($this->bean->columnType($name), "TIMESTAMP")==0) {
+                        debug("Found timestamp column: ".$row[$name]);
+                        $last_modified = strtotime($row[$name]);
+                    }
+                    else {
+                        $last_modified = strtotime($row[$name]);
+                    }
+
+                    debug("Using last-modified from [$name]: " . $last_modified);
+                    $found_time = true;
+                    break;
+                }
             }
-            else {
+            if (!$found_time) {
                 debug("Using last-modified from current date/time: " . $last_modified);
             }
+
         }
 
         return $last_modified;
