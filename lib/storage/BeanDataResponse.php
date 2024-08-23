@@ -184,30 +184,33 @@ abstract class BeanDataResponse extends HTTPResponse
 
     /**
      * Set content type headers (content-type, content-disposition, content-transfer-encoding)
+     * Called after data is set
      * @return void
      */
     protected function fillContentHeaders() : void
     {
-        $mime = "application/octet-stream";
 
-        if (isset($this->row["mime"])) {
-            $mime = $this->row["mime"];
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->buffer($this->data);
+
+        if ($mime) {
+            $this->setHeader("Content-Type", $mime);
+        }
+        else {
+            $this->setHeader("Content-Type", "application/octet-stream");
         }
 
-        $this->setHeader("Content-Type", $mime);
-
-        if (isset($this->headers["ETag"])) {
-            $filename = $this->headers["ETag"];
-        }
-        elseif (isset($this->row["filename"])) {
+        if (isset($this->row["filename"])) {
             $filename = $this->row["filename"];
+        }
+        elseif (isset($this->headers["ETag"])) {
+            $filename = $this->headers["ETag"];
         }
         else {
             $filename = md5(microtime_float());
         }
 
         $this->setHeader("Content-Disposition", "{$this->disposition}; filename=\"$filename\"");
-
         $this->setHeader("Content-Transfer-Encoding", "binary");
     }
 
@@ -224,13 +227,13 @@ abstract class BeanDataResponse extends HTTPResponse
 
         $last_modified = time();
 
-        //!
+        //default value
         if ($this->id==-1) {
-            debug("Default value using last-modified from current date/time: " . $last_modified);
+            debug("'Default value'");
             return $last_modified;
         }
 
-        $columns = array("timestamp", "date_upload", "date_updated");
+        $columns = array("date_upload", "date_updated");
         foreach($columns as $idx=>$name) {
             if (!$this->bean->haveColumn($name)) {
                 unset($columns[$idx]);
@@ -238,33 +241,30 @@ abstract class BeanDataResponse extends HTTPResponse
         }
 
         if (count($columns)<1) {
-            debug("Using last-modified from current date/time: " . $last_modified);
+            debug("No suitable column found");
+            return $last_modified;
         }
-        else {
 
-            $row = $this->bean->getByID($this->id, ...$columns);
+        $row = $this->bean->getByID($this->id, ...$columns);
 
-            $found_time = false;
-            foreach ($columns as $idx=>$name) {
-                if (isset($row[$name]) && $row[$name]) {
+        $found = false;
+        foreach ($columns as $idx=>$name) {
+            if (isset($row[$name]) && $row[$name]) {
 
-                    if (strcasecmp($this->bean->columnType($name), "TIMESTAMP")==0) {
-                        debug("Found timestamp column: ".$row[$name]);
-                        $last_modified = strtotime($row[$name]);
-                    }
-                    else {
-                        $last_modified = strtotime($row[$name]);
-                    }
-
-                    debug("Using last-modified from [$name]: " . $last_modified);
-                    $found_time = true;
-                    break;
+                $value = strtotime($row[$name]);
+                if ($value === FALSE) {
+                    continue;
                 }
-            }
-            if (!$found_time) {
-                debug("Using last-modified from current date/time: " . $last_modified);
-            }
 
+                $last_modified = $value;
+                debug("Using value from column [$name]");
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            debug("No suitable column value found");
         }
 
         return $last_modified;
@@ -290,67 +290,76 @@ abstract class BeanDataResponse extends HTTPResponse
 
         debug("Request ETag is: $requestETag");
 
+
         //early 304
         if ($requestETag) {
 
             if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
                 $cacheFile = new CacheFile($requestETag, $this->className, $this->id);
                 if ($cacheFile->exists()) {
-                    debug("Matching cache file found for this request ETag - responding with HTTP/304");
+                    debug("Cache file exists - responding with HTTP/304");
                     //exit with 304 not modified
                     $this->sendNotModified();
                 }
-                debug("No cache file matches this request ETag");
+                debug("Cache file not found matching this request ETag");
             }
 
         }
 
-        //calculate the ETag
+        //client is not sending ETag or cache file does not exist yet - calculate the ETag fetching small data from bean (date_upload)
         $this->fillCacheHeaders();
 
-        if ($requestETag && strcmp($this->headers["ETag"], $requestETag)==0) {
-            debug("Request ETag match current bean ETag - responding with HTTP/304");
-            //exit with 304 not modified
-            $this->sendNotModified();
+        if ($requestETag) {
+
+            if (strcmp($this->headers["ETag"], $requestETag) == 0) {
+                debug("Request ETag match bean ETag - responding with HTTP/304");
+                //exit with 304 not modified
+                $this->sendNotModified();
+            } else {
+                debug("Request ETag does not match bean ETag");
+            }
+
         }
-        else {
-            debug("Request ETag missing or not matching");
+
+        if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
+            $cacheFile = new CacheFile($this->headers["ETag"], $this->className, $this->id);
+            //check if we have the bean ETag in cache (skip fetching blob data from DB and image processing if found)
+
+            if ($cacheFile->exists()) {
+
+                debug("Bean ETag found in cache - sending cache file as a response");
+                $this->setHeader("X-Tag", "SparkCache");
+                //will exit after sending
+                $this->sendFile($cacheFile->fileName());
+            }
         }
 
         //fully load the bean data including the blob field
         $this->loadBeanData();
         $this->unpackStorageObject();
 
-        //fill remaining headers
+        //do the magic - ie image resize; also set content length header
+        $this->processData();
+
+        //fill remaining headers - call after data is already set
         $this->fillContentHeaders();
 
+        //store to cache
         if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
+            debug("Storing cache file for this bean ETag");
             $cacheFile = new CacheFile($this->headers["ETag"], $this->className, $this->id);
-
-            //check if we have the ETag in cache so to skip image processing
-            if ($cacheFile->exists()) {
-                debug("Sending matched ETag file from cache");
-                $this->setHeader("X-Tag", "SparkCache");
-                //will exit after sending
-                $this->sendFile($cacheFile->fileName());
-            }
-
-            //do the magic - ie image resize; also set content length header
-            $this->processData();
-
-            //store to cache
             $cacheFile->store($this->data);
-
+            debug("Sending cache file as a response");
             $this->sendFile($cacheFile->fileName());
         }
         else {
-            //do the magic - ie image resize; also set content length header
-            $this->processData();
-            debug("Sending data");
+            debug("Using sendData as a response");
+            $this->sendHeaders();
             $this->sendData();
+            exit;
         }
 
-        exit;
+
     }
 
     abstract protected function processData();
