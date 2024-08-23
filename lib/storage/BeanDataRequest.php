@@ -18,7 +18,6 @@ class BeanDataRequest
 
     public function __construct()
     {
-        debug("...");
 
         try {
 
