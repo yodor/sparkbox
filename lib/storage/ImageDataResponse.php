@@ -11,7 +11,7 @@ class ImageDataResponse extends BeanDataResponse
     const KEY_SIZE = "size";
     const KEY_FILTER = "filter";
 
-    protected $disposition = "inline";
+
     protected $field = "photo";
 
     protected $scaler = NULL;
@@ -19,8 +19,6 @@ class ImageDataResponse extends BeanDataResponse
     public function __construct(int $id, string $className)
     {
         parent::__construct($id, $className);
-
-        $this->skip_cache = false;
 
         $width = -1;
         $height = -1;
@@ -75,10 +73,5 @@ class ImageDataResponse extends BeanDataResponse
         $this->setData($this->scaler->getData(), $this->scaler->getDataSize());
     }
 
-    protected function fillContentHeaders() : void
-    {
-        parent::fillContentHeaders();
-        $this->setHeader("Content-Type", $this->scaler->getOutputFormat());
-    }
 
 }
