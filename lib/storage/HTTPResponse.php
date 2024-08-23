@@ -72,7 +72,7 @@ class HTTPResponse
         //RFC https://datatracker.ietf.org/doc/html/rfc7232#section-4.1
         //Cache-Control, Content-Location, Date, ETag, Expires, and Vary
         $this->clearHeaders();
-        $this->setHeader("HTTP/1.1 304 Not Modified");
+        $this->setHeader("HTTP/2 304 Not Modified");
         $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
 
         $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year"));
@@ -122,9 +122,11 @@ class HTTPResponse
             if (strlen($key) < 1) continue;
             if (strlen($val) < 1) {
                 header($key);
+                //debug("Header: $key");
             }
             else {
                 header("$key: $val");
+                //debug("Header: $key: $val");
             }
         }
 
@@ -136,15 +138,27 @@ class HTTPResponse
      * @param string $fileName
      * @return void
      */
-    protected function sendFile(string $fileName)
+    protected function sendFile(string $fileName, string $disposition="inline")
     {
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($fileName);
+
+        if ($mime) {
+            $this->setHeader("Content-Type", $mime);
+        }
+        else {
+            $this->setHeader("Content-Type", "application/octet-stream");
+        }
+
+        $this->setHeader("Content-Length", filesize($fileName));
+        $this->setHeader("Content-Disposition", "$disposition; filename=\"".basename($fileName)."\"");
+        $this->setHeader("Content-Transfer-Encoding", "binary");
 
         $this->sendHeaders();
 
         $handle = fopen($fileName, 'r');
         flock($handle, LOCK_SH);
         fpassthru($handle);
-
         flock($handle, LOCK_UN);
         fclose($handle);
 
