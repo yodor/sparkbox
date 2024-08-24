@@ -150,9 +150,6 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $bean_row["auth_context"] = get_class($this->auth_context);
         }
 
-        $temp_name = $upload_object->getTempName();
-        $upload_object->setData(file_get_contents($temp_name));
-
         $bean_row["photo"] = $upload_object->serializeDB();
 
         $imageID = $bean->insert($bean_row);
@@ -182,7 +179,8 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $authClass = $image_row["auth_context"];
             $ownerID = (int)$image_row["ownerID"];
 
-            $context = Authenticator::AuthorizeResource($image_row["auth_context"], NULL, FALSE);
+            $user_data = array();
+            $context = Authenticator::AuthorizeResource($image_row["auth_context"], $user_data, FALSE);
 
             if ($ownerID > 0 && $context->getID() != $ownerID) throw new Exception(tr("Authorization failed"));
 
