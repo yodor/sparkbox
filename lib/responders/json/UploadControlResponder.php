@@ -42,7 +42,7 @@ abstract class UploadControlResponder extends JSONResponder
      * @param string $field_name
      * @return string the html contents
      */
-    abstract public function getHTML(FileStorageObject &$storageObject, string $field_name);
+    abstract public function getHTML(FileStorageObject &$object, string $field_name) : string;
 
     /**
      * Create validator for this upload control
