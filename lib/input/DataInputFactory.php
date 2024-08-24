@@ -190,7 +190,6 @@ class DataInputFactory
                 $processor = new SessionUploadInput($input);
 
                 $validator = new ImageUploadValidator();
-                $validator->skip_is_uploaded_check = TRUE;
                 $input->setValidator($validator);
 
                 break;
@@ -203,7 +202,6 @@ class DataInputFactory
                 $processor = new SessionUploadInput($input);
 
                 $validator = new FileUploadValidator();
-                $validator->skip_is_uploaded_check = TRUE;
                 $input->setValidator($validator);
 
                 break;
