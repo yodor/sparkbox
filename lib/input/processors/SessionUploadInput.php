@@ -177,10 +177,7 @@ class SessionUploadInput extends InputProcessor
             unset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name]);
             debug("Cleared Session field['$field_name']");
         }
-        if (isset($_SESSION["upload_control_removed"][$field_name])) {
-            unset($_SESSION["upload_control_removed"][$field_name]);
-            debug("Cleared Session Removed UIDs for field['$field_name']");
-        }
+
 
     }
 
