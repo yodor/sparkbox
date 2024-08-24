@@ -4,22 +4,21 @@ include_once("storage/FileStorageObject.php");
 class ImageStorageObject extends FileStorageObject
 {
 
-    protected $dataKey = "photo";
-
-    protected $width = -1;
-    protected $height = -1;
+    protected int $width = -1;
+    protected int $height = -1;
 
     public function __construct(FileStorageObject $file_storage = NULL)
     {
         parent::__construct();
+        $this->dataKey = "photo";
 
         //copy FileStorageObject as ImageStorageObject
         if ($file_storage) {
 
-            $this->setUploadStatus($file_storage->getUploadStatus());
+
             $this->setMIME($file_storage->getMIME());
             $this->setTimestamp($file_storage->getTimestamp());
-            $this->setTempName($file_storage->getTempName());
+
             $this->setFilename($file_storage->getFilename());
             $this->setUID($file_storage->getUID());
 
@@ -42,17 +41,17 @@ class ImageStorageObject extends FileStorageObject
         return $this->height;
     }
 
-    public function setWidth(int $width)
+    public function setWidth(int $width) : void
     {
         $this->width = $width;
     }
 
-    public function setHeight(int $height)
+    public function setHeight(int $height) : void
     {
         $this->height = $height;
     }
 
-    public function setData($data)
+    public function setData(string $data) : void
     {
         debug("Querying image dimensions. Data Length: " . strlen($data));
 
@@ -127,7 +126,7 @@ class ImageStorageObject extends FileStorageObject
         return $source;
     }
 
-    public function deconstruct(array &$row, $doEscape = TRUE)
+    public function deconstruct(array &$row, $doEscape = TRUE) : void
     {
         parent::deconstruct($row, $doEscape);
 
@@ -135,6 +134,21 @@ class ImageStorageObject extends FileStorageObject
         $row["height"] = $this->height;
     }
 
+    public function __serialize(): array
+    {
+        $result = parent::__serialize();
+        $result["width"] = $this->width;
+        $result["height"] = $this->height;
+        return $result;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+
+        $this->width = (int)$data[$this->keyName("width")];
+        $this->height = (int)$data[$this->keyName("height")];
+    }
 }
 
 ?>

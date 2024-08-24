@@ -4,56 +4,57 @@ include_once("storage/StorageObject.php");
 class FileStorageObject extends StorageObject
 {
 
-    protected $dataKey = "data";
+    protected string $mime = "application/octet-stream";
+    protected string $filename = "";
 
-    protected $mime = "application/octet-stream";
-    protected $filename = NULL;
-    protected $temp_name = NULL;
 
     public function __construct()
     {
         parent::__construct();
+        $this->dataKey = "data";
     }
 
-    public function setFilename($name)
+    public function setFilename(string $name) : void
     {
         $this->filename = $name;
     }
 
-    public function getFilename()
+    public function getFilename() : string
     {
         return $this->filename;
     }
 
-    public function getMIME()
+    public function getMIME() : string
     {
         return $this->mime;
     }
 
-    public function setMIME($mime)
+    public function setMIME(string $mime) : void
     {
         $this->mime = $mime;
     }
 
-    public function setTempName($temp_name)
-    {
-        $this->temp_name = $temp_name;
-    }
-
-    public function getTempName()
-    {
-        return $this->temp_name;
-    }
-
-    public function deconstruct(array &$row, $doEscape = TRUE)
+    public function deconstruct(array &$row, $doEscape = TRUE) : void
     {
         parent::deconstruct($row, $doEscape);
 
         $row["mime"] = $this->mime;
         $row["filename"] = $this->filename;
-        $row["temp_name"] = $this->temp_name;
-        $row["upload_status"] = $this->upload_status;
+    }
 
+    public function __serialize(): array
+    {
+        $result = parent::__serialize();
+        $result["mime"] = $this->mime;
+        $result["filename"] = $this->filename;
+        return $result;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+        $this->mime = (string)$data[$this->keyName("mime")];
+        $this->filename = (string)$data[$this->keyName("filename")];
     }
 }
 

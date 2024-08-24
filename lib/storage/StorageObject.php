@@ -3,67 +3,52 @@
 class StorageObject
 {
 
-    protected $dataKey = "data";
+    final public const Serial = 1.0;
 
-    protected $data = NULL;
-    protected $length = -1;
-    protected $timestamp = 0; //date_time
-    protected $uid = -1;
-    protected $upload_status = NULL;
+    protected string $dataKey = "";
+    protected string $data = "";
+    protected int $length = 0;
+    protected int $timestamp = 0; //unix time
+    protected string $uid = "";
 
-    public $id = -1;
-    public $className = "";
+    protected bool $compatUnserialize = false;
 
     public function __construct()
     {
-        $this->data = NULL;
-        $this->length = -1;
+        $this->dataKey = "data";
+        $this->data = "";
+        $this->length = 0;
         $this->timestamp = 0;
         $this->uid = microtime(TRUE) . "." . rand();
     }
 
-    public function getUploadStatus()
-    {
-        return $this->upload_status;
-    }
-
-    public function setUploadStatus($status)
-    {
-        $this->upload_status = $status;
-    }
-
-    public function setTimestamp($timestamp)
+    public function setTimestamp(int $timestamp) : void
     {
         $this->timestamp = $timestamp;
     }
 
-    public function getTimestamp()
+    public function getTimestamp() : int
     {
         return $this->timestamp;
     }
 
-    public function getData()
+    public function getData() : string
     {
         return $this->data;
     }
 
-    public function getLength()
+    public function getLength() : int
     {
         return $this->length;
     }
 
-    public function setLength($length)
-    {
-        $this->length = $length;
-    }
-
-    public function setData($data)
+    public function setData(string $data)
     {
         $this->data = $data;
         $this->length = strlen($data);
     }
 
-    public function haveData()
+    public function haveData() : bool
     {
         return (strlen($this->data) > 0);
     }
@@ -75,17 +60,17 @@ class StorageObject
 
     }
 
-    public function getUID()
+    public function getUID() : string
     {
-        return (string)$this->uid;
+        return $this->uid;
     }
 
-    public function setUID($uid)
+    public function setUID(string $uid)
     {
         $this->uid = $uid;
     }
 
-    public function setDataKey(string $dataKey)
+    public function setDataKey(string $dataKey) : void
     {
         $this->dataKey = $dataKey;
     }
@@ -95,7 +80,7 @@ class StorageObject
         return $this->dataKey;
     }
 
-    public function deconstruct(array &$row, $doEscape = TRUE)
+    public function deconstruct(array &$row, $doEscape = TRUE) : void
     {
         $row[$this->dataKey] = $this->data;
 
@@ -129,13 +114,13 @@ class StorageObject
 
             $storage_object->setMIME($row["mime"]);
             $storage_object->setFilename($row["filename"]);
-            $storage_object->setTimestamp($row["date_upload"]);
+            $storage_object->setTimestamp(strtotime($row["date_upload"]));
 
-            $storage_object->setUploadStatus(UPLOAD_ERR_OK);
+
 
             $reconstructed_uid = $row[$field_name] . $row["mime"] . "|" . $row["size"] . "|" . $row["filename"];
 
-            $storage_object->setUID(strtotime($storage_object->getTimestamp()) . "." . md5($reconstructed_uid));
+            $storage_object->setUID($storage_object->getTimestamp() . "." . md5($reconstructed_uid));
 
             debug("StorageObject::reconstruct | Reconstructed properties: UID: " . $storage_object->getUID() . " MIME: " . $row["mime"] . " Filename: " . $row["filename"] . " Length: " . $row["size"]);
 
@@ -146,6 +131,50 @@ class StorageObject
         }
 
     }
+
+
+    public function __serialize(): array
+    {
+        $result = array();
+        $result["Serial"] = StorageObject::Serial;
+
+        $result["data"] = $this->data;
+        $result["length"] = $this->length;
+        $result["timestamp"] = $this->timestamp;
+        $result["uid"] = $this->uid;
+
+        return $result;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        if (!array_key_exists("Serial", $data)) {
+            $this->compatUnserialize = true;
+            debug("Using compatibility key names");
+        }
+
+        $this->data = (string)$data[$this->keyName("data")];
+        $this->length = (int)$data[$this->keyName("length")];
+        $value = $data[$this->keyName("timestamp")];
+        $timestamp = strtotime($value);
+        if ($timestamp === FALSE) {
+            $timestamp = intVal($value);
+        }
+        $this->timestamp = $timestamp;
+
+        $this->uid = (string)$data[$this->keyName("uid")];
+    }
+
+    protected function keyName(string $keyName) : string
+    {
+        if ($this->compatUnserialize) {
+            return "\0*\0".$keyName;
+        }
+        else {
+            return $keyName;
+        }
+    }
+
 }
 
 ?>
