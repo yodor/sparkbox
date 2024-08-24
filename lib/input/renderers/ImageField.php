@@ -1,13 +1,13 @@
 <?php
-include_once("input/renderers/UploadField.php");
+include_once("input/renderers/PlainUpload.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("utils/ImageScaler.php");
 
 class ImageField extends PlainUpload implements IPhotoRenderer
 {
 
-    protected $width = -1;
-    protected $height = 64;
+    protected int $width = -1;
+    protected int $height = 64;
 
     public function __construct(DataInput $input)
     {
