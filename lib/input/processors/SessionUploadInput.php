@@ -67,15 +67,9 @@ class SessionUploadInput extends InputProcessor
                 $uid = $value->getUID();
 
                 if ($this->transact_bean) {
-                    $value->id = $id;
-                    $value->className = get_class($this->transact_bean);
-
-                    $this->source_loaded_uids[$uid] = $value->id;
+                    $this->source_loaded_uids[$uid] = $id;
                 }
                 else {
-                    $value->id = $item_row[$bean->key()];
-                    $value->className = get_class($bean);
-
                     $this->loaded_uids = array();
                     $this->loaded_uids[$uid] = 1;
                 }
