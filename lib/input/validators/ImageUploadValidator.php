@@ -49,12 +49,10 @@ class ImageUploadValidator extends UploadDataValidator
 
         //field->getValue() contains FileStorageObject as uploaded from user
         $image_storage = new ImageStorageObject($input->getValue());
-
         $this->processObject($image_storage);
 
         //assign ImageStorageObject to field after processing
         $input->setValue($image_storage);
-
     }
 
     /**
@@ -63,18 +61,19 @@ class ImageUploadValidator extends UploadDataValidator
      * @param ImageStorageObject $image_storage
      * @throws Exception
      */
-    public function processObject(StorageObject $image_storage)
+    public function processObject(StorageObject $image_storage) : void
     {
 
-        debug("UID: " . $image_storage->getUID());
+        if (!($image_storage instanceof ImageStorageObject)) throw new Exception("Invalid argument (Not an ImageStorageObject)");
 
+        debug("UID: " . $image_storage->getUID());
         debug("Image dimension: [" . $image_storage->getWidth() . " x " . $image_storage->getHeight() . "]");
         debug("MIME: " . $image_storage->getMIME());
         debug("Data size: " . $image_storage->getLength());
 
         //should be disabled during ajax upload and before submit of actual form. original uploaded image is stored in session
         if (!$this->resize_enabled) {
-            debug("Resizing is disabled for this validator");
+            debug("Resizing is not enabled for this validator");
             return;
         }
 
@@ -146,14 +145,7 @@ class ImageUploadValidator extends UploadDataValidator
 
         debug("Creating new image: [ $n_width x $n_height ] | Memory usage before scaling: " . memory_get_usage(TRUE));
 
-        $source = FALSE;
-
-        if ($image_storage->haveData()) {
-            $source = @imagecreatefromstring($image_storage->getData());
-        }
-        else {
-            $source = $image_storage->imageFromTemp();
-        }
+        $source = @imagecreatefromstring($image_storage->getData());
 
         if (!$source) throw new Exception("Unable to create image resource from this input data");
 
