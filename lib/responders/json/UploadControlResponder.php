@@ -53,20 +53,19 @@ abstract class UploadControlResponder extends JSONResponder
     protected function _upload(JSONResponse $resp)
     {
 
-        debug("Creating temporary DataInput object to handle input data posted");
+        debug("Creating temporary DataInput object ... ");
         $validator = $this->validator();
 
         //virtual input field to process ajax posted data
-
         $input = new DataInput($this->field_name, "Upload Control", 1);
 
         $input->setValidator($validator);
         new UploadDataInput($input);
 
-        debug("DataInput object loading _POST data");
+        debug("Loading input processor with _POST data");
         $input->getProcessor()->loadPostData($_POST);
 
-        debug("DataInput object validating data");
+        debug("Validating ...");
         $input->validate();
 
         //FileStorageObject
@@ -76,7 +75,7 @@ abstract class UploadControlResponder extends JSONResponder
         $num_files = 0;
 
         if ($input->haveError()) {
-            throw new Exception("There was error processing file <B>" . $uploadObject->getFileName() . "</b> Error: " . $input->getError());
+            throw new Exception(tr("Error").": ".$input->getError());
         }
 
         $this->assignUploadObjects($resp, $uploadObject);
@@ -96,25 +95,9 @@ abstract class UploadControlResponder extends JSONResponder
         //JSONResponse returns all dynamically assigned properties in its result
         $resp->objects[] = $jsonObject;
 
-        //prepare the original data for storing into the session
-        $fileData = new FileStorageObject();
-        $fileData->setUploadStatus(UPLOAD_ERR_OK);
-
-        //do not set tempName as it is valid only during current request
-        //$file_storage->setTempName($upload_object->getTempName());
-        $fileData->setTimestamp($uploadObject->getTimestamp());
-        $fileData->setUID($uploadObject->getUID());
-
-        //assign original contents of the uploaded file. so it can be accessed during final form submit - not in this ajax context
-        $fileData->setData(file_get_contents($uploadObject->getTempName()));
-        $fileData->setFilename($uploadObject->getFileName());
-        $fileData->setMIME($uploadObject->getMIME());
-
         //store the original data in the session array by the field name and UID
-        $_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][(string)$uploadObject->getUID()] = serialize($fileData);
+        $_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uploadObject->getUID()] = serialize($uploadObject);
         debug("Stored FileStorageObject to session using UID: " . $uploadObject->getUID() . " for field['" . $this->field_name . "']");
-
-        //       $num_files++;
 
         //JSONResponse.response() returns dynamically assigned properties in its result
         $resp->object_count = 1;
