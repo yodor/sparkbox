@@ -80,9 +80,9 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
     }
 
-    public function getHTML(FileStorageObject &$object, $field_name)
+    public function getHTML(FileStorageObject &$object, $field_name) : string
     {
-
+        return "";
     }
 
     public function createUploadElement(array $imgrow)
