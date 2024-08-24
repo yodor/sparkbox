@@ -402,7 +402,12 @@ class InputForm implements IBeanEditor
             $input = $this->getInput($name);
 
             if ($input->isEditable()) {
-                $input->getProcessor()->loadPostData($arr);
+                try {
+                    $input->getProcessor()->loadPostData($arr);
+                }
+                catch (Exception $e) {
+                    $input->setError($e->getMessage());
+                }
             }
         }
 
