@@ -35,6 +35,8 @@ abstract class DBDriver
 
     abstract public function dateTime($add_days = 0, $interval_type = " DAY ");
 
+    abstract public function timestamp() : int;
+
     abstract public function lastID(): int;
 
     abstract public function commit();
