@@ -1,5 +1,5 @@
 <?php
-include_once("input/renderers/InputField.php");
+include_once("input/renderers/PlainUpload.php");
 
 class FileField extends PlainUpload
 {
@@ -8,7 +8,7 @@ class FileField extends PlainUpload
     {
         parent::__construct($input);
 
-        //$this->setInputAttribute("validator", "file");
+        $this->setInputAttribute("validator", "file");
 
     }
 
