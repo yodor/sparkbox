@@ -96,6 +96,11 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         $this->input_attributes[$name] = $value;
     }
 
+    public function haveInputAttribute(string $name) : bool
+    {
+        return isset($this->input_attributes[$name]);
+    }
+
     public function getInputAttribute(string $name): string
     {
         return $this->input_attributes[$name];
