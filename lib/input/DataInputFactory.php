@@ -222,7 +222,6 @@ class DataInputFactory
 
             default:
                 throw new Exception("Unknown input type: " . $type);
-                break;
 
         }
         return $input;
