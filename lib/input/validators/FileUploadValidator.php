@@ -8,7 +8,7 @@ class FileUploadValidator extends UploadDataValidator
 
 
 
-    public function processObject(StorageObject $storage_object)
+    public function processObject(StorageObject $storage_object) : void
     {
 
     }
