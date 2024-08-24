@@ -314,8 +314,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 $finfo = new finfo(FILEINFO_MIME_TYPE);
                 $fstorage->setMIME($finfo->buffer($filedata));
 
-                $fstorage->setUploadStatus(UPLOAD_ERR_OK);
-
                 $field = new DataInput("image", "Image", 0);
                 $field->setValue($fstorage);
 
