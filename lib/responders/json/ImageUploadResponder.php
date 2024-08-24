@@ -36,10 +36,9 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
 
     }
 
-    public function getHTML(FileStorageObject &$object, string $field_name)
+    public function getHTML(FileStorageObject &$object, string $field_name) : string
     {
-
-        debug("...");
+        if (!($object instanceof FileStorageObject)) throw new Exception("Expecting FileStorageObject");
 
         $filename = $object->getFileName();
         $mime = $object->getMIME();
