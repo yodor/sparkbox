@@ -1,8 +1,6 @@
 <?php
 include_once("responders/json/UploadControlResponder.php");
-
 include_once("input/validators/FileUploadValidator.php");
-
 include_once("input/renderers/InputField.php");
 
 class FileUploadResponder extends UploadControlResponder
@@ -13,24 +11,16 @@ class FileUploadResponder extends UploadControlResponder
         parent::__construct("file_upload");
     }
 
-    public function getHTML(FileStorageObject &$storageObject, string $field_name)
+    public function getHTML(FileStorageObject &$object, string $field_name) : string
     {
 
-        //TODO:prepare other style contents for files. render files as alternating rows icon, filename , type, size, X
+        if (!($object instanceof FileStorageObject)) throw new Exception("Expecting FileStorageObject");
 
-        debug("...");
-
-        $filename = $storageObject->getFileName();
-
-        $mime = $storageObject->getMIME();
-
-        $uid = $storageObject->getUID();
+        $filename = $object->getFileName();
+        $mime = $object->getMIME();
+        $uid = $object->getUID();
 
         debug("UID:$uid filename:$filename mime:$mime");
-
-        if (!($storageObject instanceof FileStorageObject)) {
-            throw new Exception("Incorrect storage object received");
-        }
 
         ob_start();
 
@@ -41,7 +31,7 @@ class FileUploadResponder extends UploadControlResponder
         echo "<span class='thumbnail'><img src='" . SPARK_LOCAL . "/images/mimetypes/generic.png'></span>";
         echo "<div class='details'>";
         echo "<span class='filename'><label>$filename</label></span>";
-        echo "<span class='filesize'><label>" . file_size($storageObject->getLength()) . "</label></span>";
+        echo "<span class='filesize'><label>" . file_size($object->getLength()) . "</label></span>";
         echo "</div>";
         echo "<span class='remove_button' action='Remove'>X</span>";
         echo "<input type=hidden name='uid_{$field_name}[]' value='$uid' >";
