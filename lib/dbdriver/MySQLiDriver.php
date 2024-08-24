@@ -77,11 +77,11 @@ class MySQLiDriver extends DBDriver
         return $row["datetime"];
     }
 
-    public function timestamp()
+    public function timestamp() : int
     {
         $res = $this->query("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP) as datetime");
         $row = $this->fetch($res);
-        return $row["datetime"];
+        return intval($row["datetime"]);
     }
 
     public function query(string $str)
