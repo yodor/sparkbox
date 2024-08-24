@@ -4,12 +4,12 @@ include_once("input/DataInput.php");
 
 abstract class UploadDataValidator implements IInputValidator
 {
-    protected $maxsize = -1;
+    protected int $maxsize = -1;
 
     //fill with mime strings to accept only these mimes to be uploaded
-    protected $accept_mimes = array();
+    protected array $accept_mimes = array();
 
-    public $skip_is_uploaded_check = FALSE;
+    //public bool $skip_is_uploaded_check = FALSE;
 
     //in ArrayInputField case Processors get called only once, but validators are called for each array value
     public function __construct()
@@ -42,7 +42,7 @@ abstract class UploadDataValidator implements IInputValidator
                 $ret = "The uploaded file exceeds the init limit of " . UPLOAD_MAX_FILESIZE;
                 break;
             case UPLOAD_ERR_FORM_SIZE:
-                $ret = "The uploaded file exceeds the form limit of $maxsize";
+                $ret = "The uploaded file exceeds the form limit of ".file_size($maxsize);
                 break;
             case UPLOAD_ERR_PARTIAL:
                 $ret = "The uploaded file was only partially uploaded";
@@ -88,59 +88,50 @@ abstract class UploadDataValidator implements IInputValidator
 
         //$_FILES array is always empty if post size > maxsize so check additionally here to be able to give correct error message
         if ($content_length > $this->maxsize) {
-            throw new Exception(UploadDataValidator::errString(UPLOAD_ERR_FORM_SIZE, file_size($this->maxsize)));
+            throw new Exception(UploadDataValidator::errString(UPLOAD_ERR_FORM_SIZE, $this->maxsize));
         }
 
-        //UploadDataInputProcessor always create one FileStroageObject with error_status UPLOAD_ERR_NO_FILE
+        //UploadDataInput always create default empty FileStorageObject
         $file_storage = $input->getValue();
 
-        //
-        $upload_status = (int)$file_storage->getUploadStatus();
+        if (! ($file_storage instanceof StorageObject)) {
+            throw new Exception("Value not instance of StorageObject");
+        }
 
-        debug("StorageObject class: " . get_class($file_storage) . " | Upload status: $upload_status " . UploadDataValidator::errString($upload_status));
+        debug("StorageObject class: " . get_class($file_storage));
 
-        if ($upload_status === UPLOAD_ERR_NO_FILE) {
+        if ($file_storage->getLength()<1 || empty($file_storage->getUID())) {
+            debug("FileStorageObject is empty ...");
             if ($input->isRequired()) {
                 if (!$input->getForm() || $input->getForm()->getEditID() < 1) {
-                    throw new Exception(UploadDataValidator::errString($upload_status));
+                    throw new Exception("No file uploaded");
                 }
             }
             return;
         }
 
-        if ($upload_status !== UPLOAD_ERR_OK) {
-            throw new Exception(tr("Upload error:") . "<br> " . UploadDataValidator::errString($upload_status, $this->maxsize));
-        }
-
-        if ($this->skip_is_uploaded_check) {
-            //
-            debug("skip_is_uploaded_check is TRUE");
-        }
-        else {
-            if (!is_uploaded_file($file_storage->getTempName())) {
-                debug("This is not an uploaded file: ".$file_storage->getTempName());
-                throw new Exception(tr("Not an uploaded file"));
-            }
-        }
-
         if ($file_storage->getLength() > $this->maxsize) {
             // if the file is not less than the maximum allowed, print an error
-            debug("Upload data lenght exceeds the maximum allowed");
-            throw new Exception(tr("Uploaded file exceeds the maxmimum allowed size") . "<BR>" . "Max data size: " . file_size($this->maxsize));
+            debug("Upload data size exceeds the maximum allowed");
+            throw new Exception(tr("Uploaded file size exceeds the maximum allowed size") . "<BR>" . "Max data size: " . file_size($this->maxsize));
         }
 
         if (count($this->accept_mimes)>0) {
-            debug("Accepting mimes: ", $this->accept_mimes);
-            debug("Uploaded mime: ".$file_storage->getMIME());
+            debug("Accepting mime types: ", $this->accept_mimes);
+            debug("Uploaded mime type: ".$file_storage->getMIME());
             if (!in_array($file_storage->getMIME(), $this->accept_mimes)) {
-                throw new Exception(tr("Wrong mime type: ") . $file_storage->getMIME() . "<Br>".tr("Accepted mimes: ") . implode(';', $this->accept_mimes));
+                debug("Wrong mime type ...");
+                throw new Exception(tr("Wrong mime type: ") . $file_storage->getMIME() . "<Br>".tr("Accepted mime types: ") . implode(';', $this->accept_mimes));
             }
+        }
+        else {
+            debug("Accepting all mime types");
         }
 
     }
 
 
-    public function processObject(StorageObject $object)
+    public function processObject(StorageObject $object) : void
     {
 
     }
