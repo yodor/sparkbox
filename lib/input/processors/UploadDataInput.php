@@ -2,6 +2,10 @@
 include_once("input/processors/InputProcessor.php");
 include_once("storage/FileStorageObject.php");
 
+/**
+ * Handle plain file uploads using the _FILES super array
+ * Also handle the virtual input in UploadControlResponder
+ */
 class UploadDataInput extends InputProcessor
 {
 
@@ -9,83 +13,71 @@ class UploadDataInput extends InputProcessor
     {
 
         $name = $this->input->getName();
+        debug("DataInput name: " . $name);
 
-        $file_storage = new FileStorageObject();
-        $file_storage->setUploadStatus(UPLOAD_ERR_NO_FILE);
+        //set default empty file storage
+        $this->input->setValue(new FileStorageObject());
+        debug("Setting default empty FileStorageObject ...");
 
         debug("_FILES array keys: " . implode("|", array_keys($_FILES)));
 
-        if (isset($_FILES[$name])) {
-
-            debug("Processing _FILES value for key: " . $name);
-
-            if (is_array($_FILES[$name]["name"])) {
-
-                debug("Value is array");
-
-                $file_storage = array();
-
-                $upload = $this->diverse_array($_FILES[$name]);
-
-                foreach ($upload as $idx => $file) {
-                    $storage = new FileStorageObject();
-                    $storage->setUploadStatus(UPLOAD_ERR_NO_FILE);
-                    $this->processImpl($file, $storage);
-                    $file_storage[] = $storage;
-
-                }
-            }
-            else {
-                debug("Value is not array");
-                $this->processImpl($_FILES[$name], $file_storage);
-            }
-
-        }
-        else {
-            debug("Key '$name' not found in _FILES");
+        if (!isset($_FILES[$name])) {
+            debug("_FILES array does not have key '$name' - no file uploaded from this control...");
+            return;
         }
 
-        $this->input->setValue($file_storage);
+        debug("Processing _FILES array data");
+
+        if (!is_array($_FILES[$name]["name"])) {
+            debug("Processing single uploaded file ...");
+            $file_storage = new FileStorageObject();
+            $this->processImpl($_FILES[$name], $file_storage);
+            $this->input->setValue($file_storage);
+            return;
+        }
+
+        debug("Processing multiple uploaded files ...");
+
+        $files = array();
+
+        $upload = $this->diverse_array($_FILES[$name]);
+
+        foreach ($upload as $idx => $file) {
+            $storage = new FileStorageObject();
+            $this->processImpl($file, $storage);
+            $files[] = $storage;
+        }
+
+        $this->input->setValue($files);
 
     }
 
     protected function processImpl($file, FileStorageObject $file_storage)
     {
 
-        $upload_status = $file["error"];
+        debug("Populating FileStorageObject with data from _FILES");
 
-        $file_storage->setUploadStatus($upload_status);
+        $upload_status = $file["error"];
 
         debug("upload_status: " . $upload_status);
 
-        if ($upload_status === UPLOAD_ERR_OK) {
-            $temp_name = $file['tmp_name'];
-            $file_storage->setTempName($temp_name);
-
-            //do not set data while tmp_name is valid to lower memory usage
-            $file_storage->setData(file_get_contents($temp_name));
-
-            $file_storage->setFilename($file['name']);
-            $file_storage->setLength($file['size']);
-            $file_storage->setMIME($file['type']);
-
-            if (DB_ENABLED) {
-                $file_storage->setTimestamp(DBConnections::Get()->dateTime());
-            }
-            else {
-                $file_storage->setTimestamp(date("Y-m-d H:m:i"));
-
-            }
-
-            $dump = array();
-            $dump["Filename"] = $file_storage->getFilename();
-            $dump["Length"] = $file_storage->getLength();
-            $dump["MIME"] = $file_storage->getMIME();
-            $dump["TempName"] = $file_storage->getTempName();
-
-            debug("FileStorageObject populated with data: ", $dump);
-
+        if ($upload_status == UPLOAD_ERR_NO_FILE) {
+            debug("No file selected for upload");
+            return;
         }
+
+        if ($upload_status !== UPLOAD_ERR_OK) throw new Exception(UploadDataValidator::errString($upload_status));
+
+        $temp_name = $file['tmp_name'];
+        if (!is_uploaded_file($temp_name)) throw new Exception("Temp file is not an upload file");
+
+        $file_storage->setData(file_get_contents($temp_name));
+        $file_storage->setFilename($file['name']);
+        $file_storage->setMIME($file['type']);
+        $file_storage->setTimestamp(time());
+
+        debug("FileStorageObject populated. Length: ". $file_storage->getLength() . " | Name: ".$file['name']);
+
     }
 
     protected function diverse_array($vector)
