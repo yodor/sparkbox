@@ -5,9 +5,9 @@ include_once("storage/ImageStorageObject.php");
 class ImageUploadValidator extends UploadDataValidator
 {
 
-    private $resize_width = -1;
-    private $resize_height = -1;
-    private $resize_enabled = TRUE;
+    protected int $resize_width = -1;
+    protected int $resize_height = -1;
+    protected bool $resize_enabled = TRUE;
 
     public function __construct()
     {
@@ -17,16 +17,14 @@ class ImageUploadValidator extends UploadDataValidator
         $this->setAcceptMimes($accept_mimes);
 
         if (IMAGE_UPLOAD_UPSCALE || IMAGE_UPLOAD_DOWNSCALE) {
-            $this->resize_enabled = TRUE;
-            $this->resize_width = IMAGE_UPLOAD_DEFAULT_WIDTH;
-            $this->resize_height = IMAGE_UPLOAD_DEFAULT_HEIGHT;
+            $this->setResizedSize(IMAGE_UPLOAD_DEFAULT_WIDTH, IMAGE_UPLOAD_DEFAULT_HEIGHT);
         }
         else {
-            $this->resize_enabled = FALSE;
+            $this->setResizeEnabled(false);
         }
     }
 
-    public function setResizedSize($width, $height)
+    public function setResizedSize(int $width, int $height) : void
     {
         $this->resize_width = $width;
         $this->resize_height = $height;
@@ -36,7 +34,7 @@ class ImageUploadValidator extends UploadDataValidator
     /**
      * @param bool $mode
      */
-    public function setResizeEnabled(bool $mode)
+    public function setResizeEnabled(bool $mode) : void
     {
         $this->resize_enabled = $mode;
     }
