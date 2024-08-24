@@ -309,7 +309,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 $fstorage->setFilename($imgname);
                 $fstorage->setData($filedata);
 
-                $fstorage->setTimestamp($this->db->dateTime());
+                $fstorage->setTimestamp($this->db->timestamp());
 
                 $finfo = new finfo(FILEINFO_MIME_TYPE);
                 $fstorage->setMIME($finfo->buffer($filedata));
@@ -320,7 +320,6 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 $field->setValue($fstorage);
 
                 $validator = new ImageUploadValidator();
-                $validator->skip_is_uploaded_check = TRUE;
 
                 $validator->validate($field);
 
