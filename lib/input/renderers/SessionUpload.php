@@ -62,9 +62,6 @@ abstract class SessionUpload extends ArrayField
         }
         $this->setInputAttribute("max_slots", $max_slots);
 
-
-        //TODO: set accepts attribute
-
         $this->setInputAttribute("type", "file");
     }
 
@@ -134,8 +131,6 @@ abstract class SessionUpload extends ArrayField
             return;
         }
 
-        //$validator = $this->ajax_handler->validator();
-
         echo "<div class='ArrayContents' field='" . $this->input->getName() . "'>";
 
         if (!is_array($images)) {
@@ -147,8 +142,6 @@ abstract class SessionUpload extends ArrayField
             if (is_null($storage_object)) continue;
 
             if (!($storage_object instanceof StorageObject)) continue;
-
-            //$validator->processObject($storage_object);
 
             echo $this->ajax_handler->getHTML($storage_object, $field_name);
 
