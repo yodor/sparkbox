@@ -4,12 +4,10 @@ include_once("input/renderers/InputField.php");
 abstract class PlainUpload extends InputFieldTag
 {
 
-    protected function processInputAttributes()
+    public function __construct(DataInput $input)
     {
-        parent::processInputAttributes();
-
+        parent::__construct($input);
         $this->setInputAttribute("type", "file");
-
     }
 
     public function requiredStyle(): array
