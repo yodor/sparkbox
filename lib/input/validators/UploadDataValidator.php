@@ -91,7 +91,7 @@ abstract class UploadDataValidator implements IInputValidator
             throw new Exception(UploadDataValidator::errString(UPLOAD_ERR_FORM_SIZE, $this->maxsize));
         }
 
-        //UploadDataInput always create default empty FileStorageObject
+        //UploadDataInput processor always create default empty FileStorageObject
         $file_storage = $input->getValue();
 
         if (! ($file_storage instanceof StorageObject)) {
