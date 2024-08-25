@@ -17,7 +17,7 @@ class PageSessionMenu extends MainMenu
         //assign initial menu
         $this->main_menu = $main_menu;
 
-        $this->dataKey = md5(SessionData::MENU . "|" . get_class($this) . SITE_TITLE);
+        $this->dataKey = sparkHash(SessionData::MENU . "|" . get_class($this) . SITE_TITLE);
 
         //check if there is already a menu in session and use it instead or put the inital menu to the session
         if ($context->getData()->contains($this->dataKey)) {
