@@ -1,6 +1,6 @@
 <?php
 
-class HTTPResponse
+class SparkHTTPResponse
 {
     const SEND_BUFFER = 4096;
 
@@ -10,6 +10,9 @@ class HTTPResponse
     protected $dataSize = -1;
 
     public const DATE_FORMAT = "D, d M Y H:i:s T";
+
+    protected string $disposition = "inline";
+
 
     public function __construct()
     {
@@ -64,7 +67,7 @@ class HTTPResponse
     }
 
     /**
-     * Send 304 not modified and exit
+     * Set 304 not modified headers
      * @return void
      */
     public function sendNotModified()
@@ -75,7 +78,7 @@ class HTTPResponse
         $this->setHeader("HTTP/2 304 Not Modified");
         $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
 
-        $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year"));
+        $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
         $this->setHeader("Expires", $expires);
 
         $req_modified = $this->requestModifiedSince();
@@ -89,7 +92,6 @@ class HTTPResponse
         }
 
         $this->sendHeaders();
-        exit;
     }
 
     /**
@@ -130,7 +132,7 @@ class HTTPResponse
             }
         }
 
-        debug("Response headers sent");
+        debug("Response headers set");
     }
 
     /**
@@ -138,10 +140,10 @@ class HTTPResponse
      * @param string $fileName
      * @return void
      */
-    protected function sendFile(string $fileName, string $disposition="inline")
+    protected function sendFile(string $file, string $name="")
     {
         $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($fileName);
+        $mime = $finfo->file($file);
 
         if ($mime) {
             $this->setHeader("Content-Type", $mime);
@@ -150,20 +152,26 @@ class HTTPResponse
             $this->setHeader("Content-Type", "application/octet-stream");
         }
 
-        $this->setHeader("Content-Length", filesize($fileName));
-        $this->setHeader("Content-Disposition", "$disposition; filename=\"".basename($fileName)."\"");
+        if (empty($name)) {
+            $name = $file;
+        }
+        $this->setHeader("Content-Length", filesize($file));
+        $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".basename($name)."\"");
         $this->setHeader("Content-Transfer-Encoding", "binary");
 
         $this->sendHeaders();
 
-        $handle = fopen($fileName, 'r');
-        flock($handle, LOCK_SH);
-        fpassthru($handle);
-        flock($handle, LOCK_UN);
-        fclose($handle);
-
-        debug("Sending complete: $fileName");
-        exit;
+        $handle = fopen($file, 'r');
+        if ($handle !== FALSE) {
+            flock($handle, LOCK_SH);
+            fpassthru($handle);
+            flock($handle, LOCK_UN);
+            fclose($handle);
+            debug("Sending complete: $file");
+        }
+        else {
+            throw new Exception("Unable to open file");
+        }
     }
 
     /**
