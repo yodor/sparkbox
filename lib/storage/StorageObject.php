@@ -120,7 +120,7 @@ class StorageObject
 
             $reconstructed_uid = $row[$field_name] . $row["mime"] . "|" . $row["size"] . "|" . $row["filename"];
 
-            $storage_object->setUID($storage_object->getTimestamp() . "." . md5($reconstructed_uid));
+            $storage_object->setUID($storage_object->getTimestamp() . "." . sparkHash($reconstructed_uid));
 
             debug("StorageObject::reconstruct | Reconstructed properties: UID: " . $storage_object->getUID() . " MIME: " . $row["mime"] . " Filename: " . $row["filename"] . " Length: " . $row["size"]);
 
