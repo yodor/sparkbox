@@ -170,7 +170,7 @@ abstract class BeanDataResponse extends HTTPResponse
         debug("Expires: $expires");
 
         //add last modified to etag calculation
-        $etag = md5(implode("|", $this->etag_parts) . "-" . $last_modified);
+        $etag = sparkHash(implode("|", $this->etag_parts) . "-" . $last_modified);
         debug("ETag: $etag");
 
         $this->setHeader("ETag", $etag);
@@ -207,7 +207,7 @@ abstract class BeanDataResponse extends HTTPResponse
             $filename = $this->headers["ETag"];
         }
         else {
-            $filename = md5(microtime_float());
+            $filename = sparkHash(microtime_float());
         }
 
         $this->setHeader("Content-Disposition", "{$this->disposition}; filename=\"$filename\"");
