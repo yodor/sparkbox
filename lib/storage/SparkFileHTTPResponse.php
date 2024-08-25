@@ -1,7 +1,7 @@
 <?php
-include_once("storage/HTTPResponse.php");
+include_once("storage/SparkHTTPResponse.php");
 
-class SparkFileHTTPResponse extends HTTPResponse
+class SparkFileHTTPResponse extends SparkHTTPResponse
 {
     protected SparkFile $file;
 
@@ -12,10 +12,10 @@ class SparkFileHTTPResponse extends HTTPResponse
         $this->setHeader("Content-Transfer-Encoding", "binary");
         $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
 
-        $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year"));
+        $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
         $this->setHeader("Expires", $expires);
 
-        if (!is_null($this->setFile($file))) {
+        if (!is_null($file)) {
             $this->setFile($file);
         }
     }
@@ -29,7 +29,7 @@ class SparkFileHTTPResponse extends HTTPResponse
         $this->setHeader("Content-Type", $this->file->getMIME());
         $this->setHeader("Content-Length",  $this->file->length());
 
-        $last_modified = gmdate(HTTPResponse::DATE_FORMAT, $this->file->lastModified());
+        $last_modified = gmdate(SparkHTTPResponse::DATE_FORMAT, $this->file->lastModified());
         $this->setHeader("Last-Modified", $last_modified);
 
         $etag = sparkHash($this->file->getAbsoluteFilename()."|".$last_modified);
@@ -64,6 +64,7 @@ class SparkFileHTTPResponse extends HTTPResponse
 
         if (strcasecmp($requestETag, $this->getHeader("ETag"))==0) {
             $this->sendNotModified();
+            exit;
         }
 
         $this->sendFile($this->file->getAbsoluteFilename());
