@@ -102,9 +102,17 @@ class CacheEntry
         return CACHE_PATH . DIRECTORY_SEPARATOR . $this->className . DIRECTORY_SEPARATOR . $this->id;
     }
 
-    public function store($data)
+    public function store($data, int $lastModified=0)
     {
         file_put_contents($this->fileName, $data, LOCK_EX);
         debug("Stored " . filesize($this->fileName) . " bytes");
+        if ($lastModified>0) {
+            touch($this->fileName, $lastModified);
+        }
+    }
+
+    public function lastModified() : int
+    {
+        return filemtime($this->fileName);
     }
 }

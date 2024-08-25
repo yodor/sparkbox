@@ -23,8 +23,5 @@ class FileDataResponse extends BeanDataResponse
         $parts[] = $this->field;
         return implode("-", $parts);
     }
-    protected function ETag() : string
-    {
-        return sparkHash($this->cacheName()."-".$this->getLastModified());
-    }
+
 }

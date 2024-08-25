@@ -37,13 +37,6 @@ class ImageDataResponse extends BeanDataResponse
 
         $this->scaler = new ImageScaler($width, $height);
 
-//        if (isset($_GET[ImageDataResponse::KEY_FILTER])) {
-//            $this->scaler->grayFilter = TRUE;
-//
-//        }
-
-
-
     }
 
     protected function processData()
@@ -75,9 +68,6 @@ class ImageDataResponse extends BeanDataResponse
         $parts[] = $this->scaler->getMode();
         return implode("-", $parts);
     }
-    protected function ETag() : string
-    {
-        return sparkHash($this->cacheName()."-".$this->getLastModified());
-    }
+
 
 }

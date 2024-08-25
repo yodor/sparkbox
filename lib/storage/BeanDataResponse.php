@@ -208,16 +208,14 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     {
         if ($this->last_modified!=-1) return $this->last_modified;
 
-        $cacheEntry = new CacheEntry("last-modified", $this->className, $this->id);
+        $cacheEntry = new CacheEntry($this->cacheName(), $this->className, $this->id);
         if ($cacheEntry->exists()) {
             debug("Reading last-modified from filesystem");
-            $result = $cacheEntry->load();
-            $last_modified = $result[CacheEntry::KEY_DATA];
+            $last_modified = $cacheEntry->lastModified();
         }
         else {
             debug("Reading last-modified from bean");
             $last_modified = $this->getBeanLastModified();
-            $cacheEntry->store($last_modified);
         }
 
         $this->last_modified = $last_modified;
@@ -295,6 +293,19 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         //check auth_context field exists for this bean and authorize
         $this->authorizeAccess();
 
+        $modifiedSince = strtotime($this->requestModifiedSince());
+        $lastModified = $this->getLastModified();
+
+        debug("Bean last_modified: ".$lastModified);
+        if ($modifiedSince !== FALSE) {
+            debug("Request IF_MODIFIED_SINCE: ".$modifiedSince);
+            if ($lastModified<=$modifiedSince) {
+                debug("Request IF_MODIFIED_SINCE matching - responding with HTTP/304");
+                $this->sendNotModified();
+                exit;
+            }
+        }
+
         //browser is sending ETag?
         $requestETag = $this->requestETag();
         $beanETag = $this->ETag();
@@ -338,7 +349,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
             debug("Storing cache file for this bean request");
             $cacheEntry = new CacheEntry($cacheName, $this->className, $this->id);
-            $cacheEntry->store($this->data);
+            $cacheEntry->store($this->data, $lastModified);
             debug("Sending cache file as a response");
             $this->sendFile($cacheEntry->fileName(), $beanETag);
         }
@@ -354,8 +365,13 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
     }
 
+    protected function ETag() : string
+    {
+        return sparkHash($this->cacheName()."-".$this->getLastModified());
+    }
+
     abstract protected function processData();
     abstract protected function cacheName() : string;
-    abstract protected function ETag() : string;
+
 
 }
