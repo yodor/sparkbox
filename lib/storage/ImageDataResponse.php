@@ -9,12 +9,10 @@ class ImageDataResponse extends BeanDataResponse
     const KEY_WIDTH = "width";
     const KEY_HEIGHT = "height";
     const KEY_SIZE = "size";
-    const KEY_FILTER = "filter";
 
+    protected string $field = "photo";
 
-    protected $field = "photo";
-
-    protected $scaler = NULL;
+    protected ImageScaler $scaler;
 
     public function __construct(int $id, string $className)
     {
@@ -39,17 +37,12 @@ class ImageDataResponse extends BeanDataResponse
 
         $this->scaler = new ImageScaler($width, $height);
 
-        if (isset($_GET[ImageDataResponse::KEY_FILTER])) {
-            $this->scaler->grayFilter = TRUE;
+//        if (isset($_GET[ImageDataResponse::KEY_FILTER])) {
+//            $this->scaler->grayFilter = TRUE;
+//
+//        }
 
-        }
 
-        $this->etag_parts[] = $this->scaler->getWidth();
-        $this->etag_parts[] = $this->scaler->getHeight();
-        $this->etag_parts[] = $this->scaler->getMode();
-        $this->etag_parts[] = $this->scaler->getOutputFormat();
-
-        $this->etag_parts[] = $this->scaler->grayFilter;
 
     }
 
@@ -62,7 +55,7 @@ class ImageDataResponse extends BeanDataResponse
             if ($this->scaler->isWatermarkEnabled()) {
                 debug("Scaler watermark is enabled and can be used");
                 $this->scaler->watermark_required = true;
-                $this->etag_parts[] = "watermark|".$this->scaler->getWatermarkPosition();
+                //$this->etag_parts[] = "watermark|".$this->scaler->getWatermarkPosition();
             }
             else {
                 debug("Scaler watermark is unavailable");
@@ -73,5 +66,18 @@ class ImageDataResponse extends BeanDataResponse
         $this->setData($this->scaler->getData(), $this->scaler->getDataSize());
     }
 
+    protected function cacheName() : string
+    {
+        $parts = array();
+        $parts[] = $this->field;
+        $parts[] = $this->scaler->getWidth();
+        $parts[] = $this->scaler->getHeight();
+        $parts[] = $this->scaler->getMode();
+        return implode("-", $parts);
+    }
+    protected function ETag() : string
+    {
+        return sparkHash($this->cacheName()."-".$this->getLastModified());
+    }
 
 }
