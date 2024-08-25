@@ -37,22 +37,22 @@ abstract class Authenticator
      * @param int $length
      * @return false|string
      */
-    public static function RandomToken(int $length = 32)
+    public static function RandomToken(int $length = 64)
     {
-        $md5_size = 32;
+        $sha256_size = 64;
 
-        if ($length > $md5_size) {
-            $length = $md5_size;
+        if ($length > $sha256_size) {
+            $length = $sha256_size;
         }
 
         // Generate string with random data (max length $md5_size)
-        $string = md5(microtime(TRUE) . "|" . rand());
+        $string = hash('sha256', microtime(TRUE) . "|" . rand());
 
         // Position Limiting
-        $start_point = 32 - $length;
+        $start_point = $sha256_size - $length;
 
         // Take a random starting point in the randomly
-        // Generated String, not going any higher then $start_point
+        // Generated String, not going any higher than $start_point
         return substr($string, rand(0, $start_point), $length);
     }
 
