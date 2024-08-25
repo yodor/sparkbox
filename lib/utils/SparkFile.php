@@ -18,11 +18,12 @@ class SparkFile {
     }
 
     /**
+     * Set this file name to basename($filename)
      * @param string $filename set the filename to '$filename'
      */
     public function setFilename(string $filename)
     {
-        $this->filename = $filename;
+        $this->filename = basename($filename);
     }
 
     public function getFilename() : string
@@ -43,7 +44,7 @@ class SparkFile {
     public function getContents() : string
     {
         $ret = @file_get_contents($this->getAbsoluteFilename());
-        if ($ret === FALSE) throw new Exception("Unable to read file: $this->path.$this->filename");
+        if ($ret === FALSE) throw new Exception("Unable to read file: ".$this->getAbsoluteFilename());
         return $ret;
     }
 
