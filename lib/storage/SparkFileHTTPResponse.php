@@ -3,17 +3,39 @@ include_once("storage/HTTPResponse.php");
 
 class SparkFileHTTPResponse extends HTTPResponse
 {
-    protected $file = null;
+    protected SparkFile $file;
 
     public function __construct(SparkFile $file = null)
     {
         parent::__construct();
-        $this->file = $file;
+
+        $this->setHeader("Content-Transfer-Encoding", "binary");
+        $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
+
+        $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year"));
+        $this->setHeader("Expires", $expires);
+
+        if (!is_null($this->setFile($file))) {
+            $this->setFile($file);
+        }
     }
 
     public function setFile(SparkFile $file)
     {
         $this->file = $file;
+
+        $filename = basename($this->file->getAbsoluteFilename());
+        $this->setHeader("Content-Disposition", "inline; filename='$filename'");
+        $this->setHeader("Content-Type", $this->file->getMIME());
+        $this->setHeader("Content-Length",  $this->file->length());
+
+        $last_modified = gmdate(HTTPResponse::DATE_FORMAT, $this->file->lastModified());
+        $this->setHeader("Last-Modified", $last_modified);
+
+        $etag = sparkHash($this->file->getAbsoluteFilename()."|".$last_modified);
+        debug("ETag: $etag");
+
+        $this->setHeader("ETag", $etag);
     }
 
     public function setData(string $data, int $dataSize)
@@ -33,16 +55,14 @@ class SparkFileHTTPResponse extends HTTPResponse
 
     public function send(bool $doExit = TRUE)
     {
-        $this->fillHeaders();
 
         debug("Headers: ".print_r($this->headers, true));
 
         //browser is sending ETag
         $requestETag = $this->requestETag();
-
         debug("Request ETag is: $requestETag");
 
-        if (strcmp($requestETag, $this->getHeader("ETag"))==0) {
+        if (strcasecmp($requestETag, $this->getHeader("ETag"))==0) {
             $this->sendNotModified();
         }
 
@@ -52,31 +72,4 @@ class SparkFileHTTPResponse extends HTTPResponse
 
     }
 
-    protected function fillHeaders()
-    {
-
-        //use timestamp from file
-        $last_modified = gmdate(HTTPResponse::DATE_FORMAT, $this->file->dateCreated());
-        debug("Using last-modified from [dateCreated]: ".$last_modified);
-
-        //always keep one year ahead from request time
-        $expires = gmdate(HTTPResponse::DATE_FORMAT, strtotime("+1 year", $this->file->dateCreated()));
-        debug("expires: $expires");
-
-        $etag = md5($last_modified);
-        debug("ETag: $etag");
-
-        $this->setHeader("Content-Type", $this->file->getMIME());
-        $this->setHeader("Content-Length",  $this->file->length());
-
-        $this->setHeader("ETag", $etag);
-        $this->setHeader("Expires", $expires);
-        $this->setHeader("Last-Modified", $last_modified);
-
-        $this->setHeader("Cache-Control", "no-cache, must-revalidate");
-        $this->setHeader("Content-Disposition", "inline; filename='{$this->file->getAbsoluteFilename()}'");
-        $this->setHeader("Content-Transfer-Encoding", "binary");
-
-
-    }
 }
