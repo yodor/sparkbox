@@ -1,18 +1,11 @@
 <?php
 
-class CacheFile
+class CacheEntry
 {
     const KEY_DATA = "data";
     const KEY_SIZE = "size";
 
-    protected bool $fileExists = FALSE;
-
     protected string $fileName = "";
-
-    /**
-     * @var string
-     */
-    protected string $etag = "";
 
     /**
      * @var string
@@ -24,14 +17,14 @@ class CacheFile
      */
     protected int $id = -1;
 
-    public function __construct(string $etag, string $className, int $id)
+    public function __construct(string $name, string $className, int $id)
     {
-        $this->etag = $etag;
+
         $this->className = $className;
         $this->id = $id;
 
-        if (strlen($this->etag) < 1) {
-            throw new Exception("Empty ETag");
+        if (strlen($name) < 1) {
+            throw new Exception("Empty entry name");
         }
 
         if (strlen($this->className) < 1) {
@@ -56,37 +49,50 @@ class CacheFile
             if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
         }
 
-        $this->fileName = $cache_folder . DIRECTORY_SEPARATOR . $this->getCacheFile();
+        $this->fileName = $cache_folder . DIRECTORY_SEPARATOR . basename($name);
 
-        debug("Using filename: $this->fileName");
+        //debug("Using filename: $this->fileName");
     }
 
+    /**
+     * @return bool True if this cache entry file exists
+     */
     public function exists(): bool
     {
         return file_exists($this->fileName);
     }
 
+    /**
+     * @return string Absolute file name of this cache entry
+     */
     public function fileName(): string
     {
         return $this->fileName;
     }
 
+    /**
+     * Return contents of the file inside array
+     * CacheFile::KEY_DATA holds the contents of the file
+     * CacheFile::KEY_SIZE holds the size of the file
+     * @return array
+     * @throws Exception
+     */
     public function load(): array
     {
         if (!$this->exists()) throw new Exception("Cache file does not exist");
 
         $ret = array();
 
-        $ret[CacheFile::KEY_DATA] = "";
-        $ret[CacheFile::KEY_SIZE] = -1;
+        $ret[CacheEntry::KEY_DATA] = "";
+        $ret[CacheEntry::KEY_SIZE] = -1;
 
         $handle = fopen($this->fileName, 'r');
         flock($handle, LOCK_SH);
-        $ret[CacheFile::KEY_DATA] = fread($handle, filesize($this->fileName));
+        $ret[CacheEntry::KEY_DATA] = fread($handle, filesize($this->fileName));
         flock($handle, LOCK_UN);
         fclose($handle);
 
-        $ret[CacheFile::KEY_SIZE] = filesize($this->fileName);
+        $ret[CacheEntry::KEY_SIZE] = filesize($this->fileName);
 
         return $ret;
     }
@@ -94,11 +100,6 @@ class CacheFile
     protected function getCacheFolder(): string
     {
         return CACHE_PATH . DIRECTORY_SEPARATOR . $this->className . DIRECTORY_SEPARATOR . $this->id;
-    }
-
-    protected function getCacheFile(): string
-    {
-        return $this->etag . ".bin";
     }
 
     public function store($data)
