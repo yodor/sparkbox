@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * Non-cryptographic hashing
+ * @param string $data
+ * @return string
+ */
+function sparkHash(string $data) : string
+{
+    return hash('xxh3', $data);
+}
+
 function sanitizeKeywords(string $text) : string
 {
     $keywords = trim(mb_strtolower($text));
