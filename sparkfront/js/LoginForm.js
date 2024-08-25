@@ -65,7 +65,7 @@ class LoginForm extends Component {
 
     }
 
-    processPassword() {
+    async processPassword() {
 
         let p = this.password.val();
         let r = this.rand.val();
@@ -74,11 +74,40 @@ class LoginForm extends Component {
         if (p.length < 6) throw "Minimum password of 6 symbols required.";
 
         this.password.val("");
-        this.pass.val(hex_hmac_md5(hex_md5(p), r));
+
+        let result = hex_hmac_md5(hex_md5(p), r);
+        //const result = await this.hmac(hmac_key, hmac_message);
+
+        this.pass.val(result);
         this.rand.val("");
 
     }
 
+    async hmac(hmac_key, hmac_message) {
+        // encoder to convert string to Uint8Array
+        var enc = new TextEncoder("utf-8");
+
+        const key = await window.crypto.subtle.importKey(
+            "raw", // raw format of the key - should be Uint8Array
+            enc.encode(hmac_key),
+            { // algorithm details
+                name: "HMAC",
+                hash: {name: "SHA-256"}
+            },
+            false, // export = false
+            ["sign", "verify"] // what this key can do
+        );
+        const signature =  await  window.crypto.subtle.sign(
+            "HMAC",
+            key,
+            enc.encode(hmac_message)
+        );
+
+        let signature_uint8 = new Uint8Array(signature);
+        //hex
+        return Array.prototype.map.call(signature_uint8, x => x.toString(16).padStart(2, '0')).join("");
+
+    }
 
     processEmail() {
         let u = this.email.val();
@@ -91,4 +120,3 @@ class LoginForm extends Component {
 
     }
 }
-
