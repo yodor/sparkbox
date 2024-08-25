@@ -1,13 +1,16 @@
 <?php
-include_once("storage/HTTPResponse.php");
+include_once("storage/SparkHTTPResponse.php");
 
-class ErrorResponse extends HTTPResponse
+class ErrorResponse extends SparkHTTPResponse
 {
     public function __construct($message)
     {
+        parent::__construct();
+
         if ($message instanceof Exception) {
             $message = $message->getMessage();
         }
+
         $this->setHeader("Content-Type", "text/html");
         $this->setData($message, strlen($message));
     }
