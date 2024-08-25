@@ -13,8 +13,8 @@ class BeanDataRequest
     const CMD_DATA = "data";
     const CMD_PHOTO = "image";
 
-    protected $cmd = "";
-    protected $supported_commands = array(BeanDataRequest::CMD_DATA, BeanDataRequest::CMD_PHOTO);
+    protected string $cmd = "";
+    protected array $supported_commands = array(BeanDataRequest::CMD_DATA, BeanDataRequest::CMD_PHOTO);
 
     public function __construct()
     {
