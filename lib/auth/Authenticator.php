@@ -22,38 +22,32 @@ abstract class Authenticator
         $this->session = new SessionData($contextName);
     }
 
-    public static function HMAC($key, $data, $hash = 'md5', $blocksize = 64)
+    public static function HMAC(string $key, string $data, string $hash_algo = 'md5')
     {
-        if (strlen($key) > $blocksize) {
-            $key = pack('H*', $hash($key));
-        }
-        $key = str_pad($key, $blocksize, chr(0));
-        $ipad = str_repeat(chr(0x36), $blocksize);
-        $opad = str_repeat(chr(0x5c), $blocksize);
-        return $hash(($key ^ $opad) . pack('H*', $hash(($key ^ $ipad) . $data)));
+        return hash_hmac($hash_algo, $data, $key);
     }
 
     /**
      * @param int $length
-     * @return false|string
+     * @return string
      */
-    public static function RandomToken(int $length = 64)
+    public static function RandomToken(int $length = 8)
     {
-        $sha256_size = 64;
+        // Generate string with random data
+        $hash_result = hash('sha256', microtime_float() . "|" . rand());
 
-        if ($length > $sha256_size) {
-            $length = $sha256_size;
+        $hash_len = strlen($hash_result);
+
+        if ($length>$hash_len) {
+            $length = $hash_len;
         }
 
-        // Generate string with random data (max length $md5_size)
-        $string = hash('sha256', microtime(TRUE) . "|" . rand());
-
         // Position Limiting
-        $start_point = $sha256_size - $length;
+        $start_point = $hash_len - $length;
 
         // Take a random starting point in the randomly
         // Generated String, not going any higher than $start_point
-        return substr($string, rand(0, $start_point), $length);
+        return substr($hash_result, rand(0, $start_point), $length);
     }
 
     /**
@@ -115,27 +109,26 @@ abstract class Authenticator
 
         $token = unserialize($auth);
 
-        if ($token instanceof AuthToken) {
-            debug($this, "AuthToken un-serialized from session");
-
-            if ($token->validateCookies($this->session->name()) === TRUE) {
-                debug($this, "Cookie validation success");
-                return new AuthContext($token->getID(), $this->session);
-            }
-            else {
-                debug($this, "AuthContext validation failed");
-            }
-        }
-        else {
+        if (!($token instanceof AuthToken)) {
             debug($this, "AuthContext un-serialize failed");
+            return NULL;
         }
 
-        return NULL;
+        debug($this, "AuthToken un-serialized from session");
+
+        if ($token->validateCookies($this->session->name()) !== TRUE) {
+            debug($this, "AuthContext validation failed");
+            return NULL;
+        }
+
+        debug($this, "Cookie validation success");
+        return new AuthContext($token->getID(), $this->session);
+
     }
 
     /**
      * @param string $username
-     * @param string $pass
+     * @param string $pass - HMAC of rand from client
      * @param $rand
      * @param bool $remember_me
      * @param bool $check_password_only
@@ -161,6 +154,7 @@ abstract class Authenticator
             $userID = $row[$this->bean->key()];
 
             $stored_user = $row["email"];
+            //compute HMAC of $rand using hash of the password from $row["password"] as key
             $stored_pass = Authenticator::HMAC($row["password"], $rand);
 
             if (strcmp($stored_user, $username) !== 0 || strcmp($stored_pass, $pass) !== 0) {
