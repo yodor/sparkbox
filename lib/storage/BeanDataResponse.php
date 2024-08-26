@@ -167,11 +167,8 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         $this->setHeader("ETag", $this->ETag());
 
-        $this->setHeader("Expires", $expires);
-
         $this->setHeader("Last-Modified", $modified);
 
-        $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
     }
 
     /**

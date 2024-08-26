@@ -15,9 +15,8 @@ class SparkHTTPResponse
     public function __construct()
     {
         $this->setHeader("Content-Transfer-Encoding", "binary");
-        //one hour expiration 216000 seconds
-        $this->setHeader("Cache-Control", "public, must-revalidate, max-age=216000");
-
+        //one hour expiration
+        $this->setHeader("Cache-Control", "public, max-age=3600, stale-while-revalidate=3600");
     }
 
     public function setDispositionFilename(string $disposition_filename)
@@ -155,14 +154,8 @@ class SparkHTTPResponse
      */
     public function sendNotModified()
     {
-        //RFC https://datatracker.ietf.org/doc/html/rfc7232#section-4.1
-        //Cache-Control, Content-Location, Date, ETag, Expires, and Vary
-        $this->clearHeaders();
-        $this->setHeader("HTTP/2 304 Not Modified");
-        $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
 
-//        $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
-//        $this->setHeader("Expires", $expires);
+        $this->setHeader("HTTP/2 304 Not Modified");
 
         $req_modified = $this->requestModifiedSince();
         if ($req_modified) {
