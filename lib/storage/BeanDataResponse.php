@@ -12,6 +12,8 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     protected string $field = "";
     protected array $row = array();
 
+    protected ?CacheEntry $cacheEntry;
+
     /**
      * @var DBTableBean
      */
@@ -46,6 +48,13 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
             debug("Requested bean field: {$this->field}");
         }
+
+        $this->cacheEntry = NULL;
+
+        if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
+            $this->cacheEntry = new CacheEntry($this->cacheName(), $this->className, $this->id);
+        }
+
 
     }
 
@@ -208,10 +217,9 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     {
         if ($this->last_modified!=-1) return $this->last_modified;
 
-        $cacheEntry = new CacheEntry($this->cacheName(), $this->className, $this->id);
-        if ($cacheEntry->exists()) {
+        if ($this->cacheEntry && $this->cacheEntry->getFile()->exists()) {
             debug("Reading last-modified from filesystem");
-            $last_modified = $cacheEntry->lastModified();
+            $last_modified = $this->cacheEntry->lastModified();
         }
         else {
             debug("Reading last-modified from bean");
@@ -278,8 +286,9 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     }
 
     /**
-     * Return the contents of bean data with key '$this->field'.
-     * Using ETag logic - checks the disk cache and return 304
+     * Output contents of bean data with key '$this->field'.
+     * Using ETag/IF_MODIFIED_SINCE logic - checks the disk cache and return 304
+     * Store to filesystem cache for reuse if cache is enabled
      * @throws Exception
      */
     public function send(bool $doExit = TRUE)
@@ -293,46 +302,22 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         //check auth_context field exists for this bean and authorize
         $this->authorizeAccess();
 
-        $modifiedSince = strtotime($this->requestModifiedSince());
         $lastModified = $this->getLastModified();
+        $this->checkCacheLastModifed($lastModified);
 
-        debug("Request IF_MODIFIED_SINCE: ".$modifiedSince);
-        debug("Bean last_modified: ".$lastModified);
-        if ($modifiedSince !== FALSE) {
-            if ($lastModified<=$modifiedSince) {
-                debug("Request IF_MODIFIED_SINCE matching - responding with HTTP/304");
-                $this->sendNotModified();
-                exit;
-            }
-        }
-
-        //browser is sending ETag?
-        $requestETag = $this->requestETag();
         $beanETag = $this->ETag();
-        debug("Request ETag is: ".$requestETag);
-        debug("Bean ETag is: ".$this->ETag());
-
-        if (strcmp($beanETag, $requestETag) == 0) {
-            debug("Request ETag match bean ETag - responding with HTTP/304");
-            $this->sendNotModified();
-            exit;
-        } else {
-            debug("Request ETag does not match bean ETag");
-        }
+        $this->checkCacheETag($this->ETag());
 
         $cacheName = $this->cacheName();
         debug("Cache name is: ".$cacheName);
 
-        if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
-            $cacheEntry = new CacheEntry($cacheName, $this->className, $this->id);
+        if ($this->cacheEntry && $this->cacheEntry->getFile()->exists()) {
             //check if we have the data in cache (skip fetching blob data from DB and image processing if found)
-            if ($cacheEntry->exists()) {
-                debug("Bean data found in cache - sending cache file as a response");
-                $this->fillCacheHeaders();
-                $this->setHeader("X-Tag", "SparkCache");
-                $this->sendFile($cacheEntry->fileName(), $beanETag);
-                exit;
-            }
+            debug("Bean data found in cache - sending cache file as a response");
+            $this->fillCacheHeaders();
+            $this->setHeader("X-Tag", "SparkCache");
+            $this->sendFile($this->cacheEntry->getFile(), $beanETag);
+            exit;
         }
 
         //fully load the bean data including the blob field
@@ -346,12 +331,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->fillCacheHeaders();
 
         //store to cache
-        if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
+        if ($this->cacheEntry) {
             debug("Storing cache file for this bean request");
-            $cacheEntry = new CacheEntry($cacheName, $this->className, $this->id);
-            $cacheEntry->store($this->data, $lastModified);
+            $this->cacheEntry->store($this->data, $lastModified);
             debug("Sending cache file as a response");
-            $this->sendFile($cacheEntry->fileName(), $beanETag);
+            $this->sendFile($this->cacheEntry->getFile(), $beanETag);
         }
         else {
             debug("Using sendData as a response");

@@ -16,8 +16,6 @@ class ImageDataResponse extends BeanDataResponse
 
     public function __construct(int $id, string $className)
     {
-        parent::__construct($id, $className);
-
         $width = -1;
         $height = -1;
 
@@ -37,6 +35,8 @@ class ImageDataResponse extends BeanDataResponse
 
         $this->scaler = new ImageScaler($width, $height);
 
+        //call last - cache entry needs cacheName
+        parent::__construct($id, $className);
     }
 
     protected function processData()

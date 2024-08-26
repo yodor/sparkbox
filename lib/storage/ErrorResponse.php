@@ -10,8 +10,11 @@ class ErrorResponse extends SparkHTTPResponse
         if ($message instanceof Exception) {
             $message = $message->getMessage();
         }
+        debug("ErrorResponse: ".$message);
 
+        $this->setHeader("Cache-Control", "no-cache, must-revalidate");
         $this->setHeader("Content-Type", "text/html");
+
         $this->setData($message, strlen($message));
     }
 

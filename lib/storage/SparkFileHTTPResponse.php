@@ -43,12 +43,12 @@ class SparkFileHTTPResponse extends SparkHTTPResponse
         throw new Exception("setData unsupported");
     }
 
-    public function getData()
+    public function getData() : string
     {
         return $this->file->getContents();
     }
 
-    public function getSize()
+    public function getSize() : int
     {
         return $this->file->length();
     }
@@ -58,30 +58,12 @@ class SparkFileHTTPResponse extends SparkHTTPResponse
 
         debug("Headers: ".print_r($this->headers, true));
 
-        $modifiedSince = strtotime($this->requestModifiedSince());
-        $lastModified = $this->file->lastModified();
+        //match cache data
+        $this->checkCacheLastModifed($this->file->lastModified());
+        $this->checkCacheETag($this->getHeader("ETag"));
 
-        debug("Request IF_MODIFIED_SINCE: ".$modifiedSince);
-        debug("File last_modified: ".$lastModified);
-        if ($modifiedSince !== FALSE) {
-            if ($lastModified<=$modifiedSince) {
-                debug("Request IF_MODIFIED_SINCE matching - responding with HTTP/304");
-                $this->sendNotModified();
-                exit;
-            }
-        }
-
-        //browser is sending ETag
-        $requestETag = $this->requestETag();
-        debug("Request ETag is: ".$requestETag);
-        debug("File ETag is: ". $this->getHeader("ETag"));
-        if (strcasecmp($requestETag, $this->getHeader("ETag"))==0) {
-            debug("Request ETag match file ETag - responding with HTTP/304");
-            $this->sendNotModified();
-            exit;
-        }
-
-        $this->sendFile($this->file->getAbsoluteFilename());
+        //send data if no cache match
+        $this->sendFile($this->file);
 
         if ($doExit) exit;
 

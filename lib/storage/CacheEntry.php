@@ -1,16 +1,14 @@
 <?php
+include_once ("utils/SparkFile.php");
 
 class CacheEntry
 {
-    const KEY_DATA = "data";
-    const KEY_SIZE = "size";
-
-    protected string $fileName = "";
-
     /**
      * @var string
      */
     protected string $className = "";
+
+    protected SparkFile $file;
 
     /**
      * @var int
@@ -49,50 +47,17 @@ class CacheEntry
             if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
         }
 
-        $this->fileName = $cache_folder . DIRECTORY_SEPARATOR . basename($name);
+        $this->file = new SparkFile($cache_folder . DIRECTORY_SEPARATOR . basename($name));
 
-        //debug("Using filename: $this->fileName");
+        debug("Using Cach Folder: ".$cache_folder);
+        debug("Using Filename: ".$this->file->getFilename());
+        debug("Using Path: ".$this->file->getPath());
+
     }
 
-    /**
-     * @return bool True if this cache entry file exists
-     */
-    public function exists(): bool
+    public function getFile() : SparkFile
     {
-        return file_exists($this->fileName);
-    }
-
-    /**
-     * @return string Absolute file name of this cache entry
-     */
-    public function fileName(): string
-    {
-        return $this->fileName;
-    }
-
-    /**
-     * Return contents of the file inside array
-     * CacheFile::KEY_DATA holds the contents of the file
-     * CacheFile::KEY_SIZE holds the size of the file
-     * @return array
-     * @throws Exception
-     */
-    public function load(): array
-    {
-        if (!$this->exists()) throw new Exception("Cache file does not exist");
-
-        $ret = array(CacheEntry::KEY_DATA => "", CacheEntry::KEY_SIZE => -1);
-
-        $handle = fopen($this->fileName, 'r');
-        if (!is_resource($handle)) throw new Exception("Unable to open file");
-        flock($handle, LOCK_SH);
-        $ret[CacheEntry::KEY_DATA] = fread($handle, filesize($this->fileName));
-        flock($handle, LOCK_UN);
-        fclose($handle);
-
-        $ret[CacheEntry::KEY_SIZE] = filesize($this->fileName);
-
-        return $ret;
+        return $this->file;
     }
 
     protected function getCacheFolder(): string
@@ -100,17 +65,22 @@ class CacheEntry
         return CACHE_PATH . DIRECTORY_SEPARATOR . $this->className . DIRECTORY_SEPARATOR . $this->id;
     }
 
-    public function store($data, int $lastModified=0)
+    public function store(string $data, int $lastModified=0)
     {
-        file_put_contents($this->fileName, $data, LOCK_EX);
-        debug("Stored " . filesize($this->fileName) . " bytes");
+        $this->file->open('w');
+        $this->file->lock(LOCK_EX);
+        $this->file->write($data);
+        $this->file->lock(LOCK_UN);
+        $this->file->close();
+        debug("Stored " . $this->file->length() . " bytes");
         if ($lastModified>0) {
-            touch($this->fileName, $lastModified);
+            $this->file->setLastModified($lastModified);
+            debug("File last-modified set to: " . $lastModified);
         }
     }
 
     public function lastModified() : int
     {
-        return filemtime($this->fileName);
+        return $this->file->lastModified();
     }
 }

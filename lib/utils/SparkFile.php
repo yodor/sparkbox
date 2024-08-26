@@ -45,8 +45,9 @@ class SparkFile {
 
     public function getContents() : string
     {
+        if (!$this->exists()) throw new Exception("File not found");
         $ret = @file_get_contents($this->getAbsoluteFilename());
-        if ($ret === FALSE) throw new Exception("Unable to read file: ".$this->getAbsoluteFilename());
+        if ($ret === FALSE) throw new Exception("Unable to read file: ".error_get_last()["message"]);
         return $ret;
     }
 
@@ -65,10 +66,11 @@ class SparkFile {
     {
         $this->close();
         $path_parts = pathinfo($absolute_file);
-        $this->filename = $path_parts["basename"];
+        $this->setFilename($path_parts["basename"]);
 
-        $this->path = $path_parts["dirname"];
-        if (empty($this->path))throw new Exception("Path empty");
+        $path = $path_parts["dirname"];
+        if (empty($path))throw new Exception("Path empty");
+        $this->setPath($path);
     }
 
     public function getMIME() : string
@@ -86,16 +88,12 @@ class SparkFile {
         return file_exists($this->getAbsoluteFilename());
     }
 
-    public function getLength() : int
-    {
-        return filesize($this->getAbsoluteFilename());
-    }
-
     public function open(string $mode)
     {
+        $this->close();
         $resource = @fopen($this->getAbsoluteFilename(), $mode);
-        if ($resource === FALSE) {
-            throw new Exception("Unable to open file for this mode: ".$mode);
+        if (!is_resource($resource)) {
+            throw new Exception("Unable to open file: ".error_get_last()["message"]);
         }
         $this->handle = $resource;
     }
@@ -103,7 +101,7 @@ class SparkFile {
     public function close()
     {
         if (is_resource($this->handle)) {
-            @fclose($this->handle);
+            fclose($this->handle);
         }
     }
 
@@ -112,16 +110,16 @@ class SparkFile {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         $result = @fwrite($this->handle, $buffer);
         if ($result === FALSE) {
-            throw new Exception("Unable to write to file");
+            throw new Exception("Unable to write to file: ".error_get_last()["message"]);
         }
     }
 
     public function read(int $length = 0) : ?string
     {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
-        $res = fread($this->handle, $length);
+        $res = @fread($this->handle, $length);
         if ($res === FALSE) {
-            throw new Exception("Unable to read from file");
+            throw new Exception("Unable to read from file: ".error_get_last()["message"]);
         }
         return $res;
     }
@@ -129,9 +127,9 @@ class SparkFile {
     public function lock(int $operation, int &$would_block = null) : bool
     {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
-        return flock($this->handle, $would_block);
+        return flock($this->handle, $operation, $would_block);
     }
-    public function passthrough()
+    public function passthru()
     {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         fpassthru($this->handle);
@@ -139,6 +137,7 @@ class SparkFile {
 
     public function length() : int
     {
+        if (!$this->exists()) throw new Exception("File not found");
         $result = filesize($this->getAbsoluteFilename());
         if ($result === FALSE) throw new Exception("Unable to get filesize");
         return $result;
@@ -146,6 +145,7 @@ class SparkFile {
 
     public function remove() : bool
     {
+        if (!$this->exists()) throw new Exception("File not found");
         return unlink($this->getAbsoluteFilename());
     }
 
@@ -154,10 +154,12 @@ class SparkFile {
      */
     public function lastModified() : int
     {
+        if (!$this->exists()) throw new Exception("File not found");
         return filemtime($this->getAbsoluteFilename());
     }
     public function setLastModified(int $lastModified) : void
     {
+        if (!$this->exists()) throw new Exception("File not found");
         touch($this->getAbsoluteFilename(), $lastModified);
     }
 }

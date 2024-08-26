@@ -2,12 +2,10 @@
 
 class SparkHTTPResponse
 {
-    const SEND_BUFFER = 4096;
+    protected array $headers = array();
 
-    protected $headers = array();
-
-    protected $data = "";
-    protected $dataSize = -1;
+    protected string $data = "";
+    protected int $dataSize = -1;
 
     public const DATE_FORMAT = "D, d M Y H:i:s T";
 
@@ -19,11 +17,21 @@ class SparkHTTPResponse
 
     }
 
+    /**
+     * Clear all assigned headers
+     * @return void
+     */
     public function clearHeaders()
     {
         $this->headers = array();
     }
 
+    /**
+     * Assign http response header for sending during sendHeaders call
+     * @param string $field Response header name
+     * @param string $value Response header value
+     * @return void
+     */
     public function setHeader(string $field, string $value = "")
     {
         $this->headers[$field] = $value;
@@ -43,25 +51,71 @@ class SparkHTTPResponse
         }
     }
 
-    public function getData()
+    /**
+     * Return current data assigned
+     * @return string
+     */
+    public function getData() : string
     {
         return $this->data;
     }
 
-    public function getSize()
+    /**
+     * Return size of current data
+     * @return int
+     */
+    public function getSize() : int
     {
         return $this->dataSize;
     }
 
     /**
-     * Send headers and data
-     * @param bool Exit after sending if is set to true
+     * Default implementation - send all headers assigned and data
+     * @param bool Default true - Exit after sending
      */
     public function send(bool $doExit = TRUE)
     {
         $this->sendHeaders();
         $this->sendData();
         if ($doExit) {
+            exit;
+        }
+    }
+
+    /**
+     * Check request IF_MODIFIED_SINCE matches current last-modified and call sendNotModified
+     * @param int $lastModified - Current data last modified timestamp
+     * @return void
+     */
+    protected function checkCacheLastModifed(int $lastModified)
+    {
+        $modifiedSince = strtotime($this->requestModifiedSince());
+
+        debug("Request IF_MODIFIED_SINCE: ".$modifiedSince);
+        debug("Response last_modified: ".$lastModified);
+        if ($modifiedSince !== FALSE) {
+            if ($lastModified<=$modifiedSince) {
+                debug("Request IF_MODIFIED_SINCE matching - responding with HTTP/304");
+                $this->sendNotModified();
+                exit;
+            }
+        }
+    }
+
+    /**
+     * Check if request ETag matches current data ETag and call sendNotModified
+     * @param string $etag Current data ETag
+     * @return void
+     */
+    protected function checkCacheETag(string $etag)
+    {
+        //browser is sending ETag
+        $requestETag = $this->requestETag();
+        debug("Request ETag is: ".$requestETag);
+        debug("Response ETag is: ".$etag);
+        if (strcasecmp($requestETag, $etag)==0) {
+            debug("Request ETag match response ETag - responding with HTTP/304");
+            $this->sendNotModified();
             exit;
         }
     }
@@ -95,7 +149,7 @@ class SparkHTTPResponse
     }
 
     /**
-     * Return contents of the ETag request header field (HTTP_IF_NONE_MATCH)
+     * Return contents of request header (HTTP_IF_NONE_MATCH) - ETag
      * @return string
      */
     protected function requestETag() : string
@@ -106,6 +160,10 @@ class SparkHTTPResponse
         return "";
     }
 
+    /**
+     * Return contents of request header (HTTP_IF_MODIFIED_SINCE) - last-modified
+     * @return string
+     */
     protected function requestModifiedSince() : string
     {
         if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
@@ -136,46 +194,37 @@ class SparkHTTPResponse
     }
 
     /**
-     * Write contents of file '$fileName' and exit. Calls sendHeaders()
-     * @param string $fileName
+     * Output contents of file
+     * @param SparkFile $file Contents of file to output
+     * @param string $name If set used as filename in the content disposition header
      * @return void
+     * @throws Exception
      */
-    protected function sendFile(string $file, string $name="")
+    protected function sendFile(SparkFile $file, string $name="")
     {
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->file($file);
 
-        if ($mime) {
-            $this->setHeader("Content-Type", $mime);
-        }
-        else {
-            $this->setHeader("Content-Type", "application/octet-stream");
-        }
-
+        $this->setHeader("Content-Type", $file->getMIME());
         if (empty($name)) {
-            $name = $file;
+            $name = $file->getFilename();
         }
-        $this->setHeader("Content-Length", filesize($file));
+
+        $this->setHeader("Content-Length", $file->length());
         $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".basename($name)."\"");
         $this->setHeader("Content-Transfer-Encoding", "binary");
 
         $this->sendHeaders();
 
-        $handle = fopen($file, 'r');
-        if ($handle !== FALSE) {
-            flock($handle, LOCK_SH);
-            fpassthru($handle);
-            flock($handle, LOCK_UN);
-            fclose($handle);
-            debug("Sending complete: $file");
-        }
-        else {
-            throw new Exception("Unable to open file");
-        }
+        $file->open('r');
+        $file->lock(LOCK_SH);
+        $file->passthru();
+        $file->lock(LOCK_UN);
+        $file->close();
+        debug("Sending complete: ".$name);
+
     }
 
     /**
-     * Write contents of $this->data and continue
+     * Output contents of $this->data
      * @return void
      */
     protected function sendData()
