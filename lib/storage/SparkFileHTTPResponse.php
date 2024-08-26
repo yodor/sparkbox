@@ -5,37 +5,20 @@ class SparkFileHTTPResponse extends SparkHTTPResponse
 {
     protected SparkFile $file;
 
-    public function __construct(SparkFile $file = null)
+
+    public function __construct()
     {
         parent::__construct();
-
-        $this->setHeader("Content-Transfer-Encoding", "binary");
-        $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
-
-        $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
-        $this->setHeader("Expires", $expires);
-
-        if (!is_null($file)) {
-            $this->setFile($file);
-        }
     }
 
     public function setFile(SparkFile $file)
     {
         $this->file = $file;
+    }
 
-        $filename = basename($this->file->getAbsoluteFilename());
-        $this->setHeader("Content-Disposition", "inline; filename='$filename'");
-        $this->setHeader("Content-Type", $this->file->getMIME());
-        $this->setHeader("Content-Length",  $this->file->length());
-
-        $last_modified = gmdate(SparkHTTPResponse::DATE_FORMAT, $this->file->lastModified());
-        $this->setHeader("Last-Modified", $last_modified);
-
-        $etag = sparkHash($this->file->getAbsoluteFilename()."|".$last_modified);
-        debug("ETag: $etag");
-
-        $this->setHeader("ETag", $etag);
+    public function getFile() : SparkFile
+    {
+        return $this->file;
     }
 
     public function setData(string $data, int $dataSize)
@@ -45,7 +28,7 @@ class SparkFileHTTPResponse extends SparkHTTPResponse
 
     public function getData() : string
     {
-        return $this->file->getContents();
+        throw new Exception("setData unsupported");
     }
 
     public function getSize() : int

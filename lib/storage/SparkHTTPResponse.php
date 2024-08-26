@@ -10,13 +10,32 @@ class SparkHTTPResponse
     public const DATE_FORMAT = "D, d M Y H:i:s T";
 
     protected string $disposition = "inline";
-
+    protected string $disposition_filename = "";
 
     public function __construct()
     {
+        $this->setHeader("Content-Transfer-Encoding", "binary");
+        //one hour expiration 216000 seconds
+        $this->setHeader("Cache-Control", "public, must-revalidate, max-age=216000");
 
     }
 
+    public function setDispositionFilename(string $disposition_filename)
+    {
+        $this->disposition_filename = $disposition_filename;
+    }
+    public function getDispositionFilename() : string
+    {
+        return $this->disposition_filename;
+    }
+    public function setDisposition(string $disposition)
+    {
+        $this->disposition = $disposition;
+    }
+    public function getDisposition() : string
+    {
+        return $this->disposition;
+    }
     /**
      * Clear all assigned headers
      * @return void
@@ -40,6 +59,16 @@ class SparkHTTPResponse
     public function getHeader(string $field): string
     {
         return $this->headers[$field];
+    }
+
+    public function removeHeader(string $field) : void
+    {
+        if (isset($this->headers[$field])) unset($this->headers[$field]);
+    }
+
+    public function haveHeader(string $field) : bool
+    {
+        return isset($this->headers[$field]);
     }
 
     public function setData(string $data, int $dataSize)
@@ -132,8 +161,8 @@ class SparkHTTPResponse
         $this->setHeader("HTTP/2 304 Not Modified");
         $this->setHeader("Cache-Control", "max-age=31556952, must-revalidate");
 
-        $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
-        $this->setHeader("Expires", $expires);
+//        $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
+//        $this->setHeader("Expires", $expires);
 
         $req_modified = $this->requestModifiedSince();
         if ($req_modified) {
@@ -196,21 +225,33 @@ class SparkHTTPResponse
     /**
      * Output contents of file
      * @param SparkFile $file Contents of file to output
-     * @param string $name If set used as filename in the content disposition header
      * @return void
      * @throws Exception
      */
-    protected function sendFile(SparkFile $file, string $name="")
+    protected function sendFile(SparkFile $file)
     {
 
+        debug("Sending file: ".$file->getAbsoluteFilename());
+
         $this->setHeader("Content-Type", $file->getMIME());
-        if (empty($name)) {
-            $name = $file->getFilename();
+        $this->setHeader("Content-Length", $file->length());
+
+        $filename = $this->disposition_filename;
+        if (empty($filename)) {
+            $filename = $file->getFilename();
         }
 
-        $this->setHeader("Content-Length", $file->length());
-        $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".basename($name)."\"");
-        $this->setHeader("Content-Transfer-Encoding", "binary");
+        debug("Using disposition filename: ".$filename);
+
+        $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
+
+        $last_modified = gmdate(SparkHTTPResponse::DATE_FORMAT, $file->lastModified());
+        $this->setHeader("Last-Modified", $last_modified);
+
+        if (!$this->haveHeader("ETag")) {
+            $etag = sparkHash($file->getFilename()."-".$last_modified);
+            $this->setHeader("ETag", $etag);
+        }
 
         $this->sendHeaders();
 
@@ -219,8 +260,7 @@ class SparkHTTPResponse
         $file->passthru();
         $file->lock(LOCK_UN);
         $file->close();
-        debug("Sending complete: ".$name);
-
+        debug("Sending complete ...");
     }
 
     /**

@@ -488,6 +488,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         ob_end_clean();
         $this->obCallback($buffer);
 
+        header("Cache-Control", "public, must-revalidate, max-age=216000");
         echo $buffer;
     }
 

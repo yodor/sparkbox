@@ -308,15 +308,18 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $beanETag = $this->ETag();
         $this->checkCacheETag($this->ETag());
 
+        $this->setHeader("ETag", $beanETag);
+        //prefer ETag as disposition filename
+        $this->setDispositionFilename($beanETag);
+
         $cacheName = $this->cacheName();
         debug("Cache name is: ".$cacheName);
 
+        //check if we have the data in cache (skip fetching blob data from DB and image processing if found)
         if ($this->cacheEntry && $this->cacheEntry->getFile()->exists()) {
-            //check if we have the data in cache (skip fetching blob data from DB and image processing if found)
             debug("Bean data found in cache - sending cache file as a response");
-            $this->fillCacheHeaders();
             $this->setHeader("X-Tag", "SparkCache");
-            $this->sendFile($this->cacheEntry->getFile(), $beanETag);
+            $this->sendFile($this->cacheEntry->getFile());
             exit;
         }
 
@@ -327,19 +330,18 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         //do the magic - ie image resize; also set content length header
         $this->processData();
 
-        //cache headers
-        $this->fillCacheHeaders();
-
         //store to cache
         if ($this->cacheEntry) {
             debug("Storing cache file for this bean request");
             $this->cacheEntry->store($this->data, $lastModified);
             debug("Sending cache file as a response");
-            $this->sendFile($this->cacheEntry->getFile(), $beanETag);
+            $this->sendFile($this->cacheEntry->getFile());
         }
         else {
             debug("Using sendData as a response");
             //fill remaining headers - call after data is already set
+            //cache headers
+            $this->fillCacheHeaders();
             $this->fillContentHeaders();
             $this->sendHeaders();
             $this->sendData();
