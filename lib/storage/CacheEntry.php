@@ -81,12 +81,10 @@ class CacheEntry
     {
         if (!$this->exists()) throw new Exception("Cache file does not exist");
 
-        $ret = array();
-
-        $ret[CacheEntry::KEY_DATA] = "";
-        $ret[CacheEntry::KEY_SIZE] = -1;
+        $ret = array(CacheEntry::KEY_DATA => "", CacheEntry::KEY_SIZE => -1);
 
         $handle = fopen($this->fileName, 'r');
+        if (!is_resource($handle)) throw new Exception("Unable to open file");
         flock($handle, LOCK_SH);
         $ret[CacheEntry::KEY_DATA] = fread($handle, filesize($this->fileName));
         flock($handle, LOCK_UN);

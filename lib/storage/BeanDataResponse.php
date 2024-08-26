@@ -296,9 +296,9 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $modifiedSince = strtotime($this->requestModifiedSince());
         $lastModified = $this->getLastModified();
 
+        debug("Request IF_MODIFIED_SINCE: ".$modifiedSince);
         debug("Bean last_modified: ".$lastModified);
         if ($modifiedSince !== FALSE) {
-            debug("Request IF_MODIFIED_SINCE: ".$modifiedSince);
             if ($lastModified<=$modifiedSince) {
                 debug("Request IF_MODIFIED_SINCE matching - responding with HTTP/304");
                 $this->sendNotModified();

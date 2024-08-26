@@ -1,8 +1,8 @@
 <?php
 class SparkFile {
 
-    protected string $filename;
-    protected string $path;
+    protected string $filename = "";
+    protected string $path = "";
     protected finfo $finfo;
     protected $handle = NULL;
 
@@ -23,6 +23,7 @@ class SparkFile {
      */
     public function setFilename(string $filename)
     {
+        $this->close();
         $this->filename = basename($filename);
     }
 
@@ -33,6 +34,7 @@ class SparkFile {
 
     public function setPath(string $path)
     {
+        $this->close();
         $this->path = $path."/";
     }
 
@@ -61,10 +63,12 @@ class SparkFile {
      */
     public function setAbsoluteFilename(string $absolute_file)
     {
+        $this->close();
         $path_parts = pathinfo($absolute_file);
         $this->filename = $path_parts["basename"];
-        $this->path = $path_parts["dirname"];
 
+        $this->path = $path_parts["dirname"];
+        if (empty($this->path))throw new Exception("Path empty");
     }
 
     public function getMIME() : string
@@ -91,18 +95,21 @@ class SparkFile {
     {
         $resource = @fopen($this->getAbsoluteFilename(), $mode);
         if ($resource === FALSE) {
-            throw new Exception("Unable to open file for this mode");
+            throw new Exception("Unable to open file for this mode: ".$mode);
         }
         $this->handle = $resource;
     }
 
     public function close()
     {
-        @fclose($this->handle);
+        if (is_resource($this->handle)) {
+            @fclose($this->handle);
+        }
     }
 
     public function write(string $buffer)
     {
+        if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         $result = @fwrite($this->handle, $buffer);
         if ($result === FALSE) {
             throw new Exception("Unable to write to file");
@@ -111,6 +118,7 @@ class SparkFile {
 
     public function read(int $length = 0) : ?string
     {
+        if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         $res = fread($this->handle, $length);
         if ($res === FALSE) {
             throw new Exception("Unable to read from file");
@@ -118,9 +126,14 @@ class SparkFile {
         return $res;
     }
 
+    public function lock(int $operation, int &$would_block = null) : bool
+    {
+        if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
+        return flock($this->handle, $would_block);
+    }
     public function passthrough()
     {
-        if (!$this->handle) throw new Exception("Empty handle for file: ".$this->getAbsoluteFilename());
+        if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         fpassthru($this->handle);
     }
 
@@ -142,6 +155,10 @@ class SparkFile {
     public function lastModified() : int
     {
         return filemtime($this->getAbsoluteFilename());
+    }
+    public function setLastModified(int $lastModified) : void
+    {
+        touch($this->getAbsoluteFilename(), $lastModified);
     }
 }
 ?>

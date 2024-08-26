@@ -58,11 +58,25 @@ class SparkFileHTTPResponse extends SparkHTTPResponse
 
         debug("Headers: ".print_r($this->headers, true));
 
+        $modifiedSince = strtotime($this->requestModifiedSince());
+        $lastModified = $this->file->lastModified();
+
+        debug("Request IF_MODIFIED_SINCE: ".$modifiedSince);
+        debug("File last_modified: ".$lastModified);
+        if ($modifiedSince !== FALSE) {
+            if ($lastModified<=$modifiedSince) {
+                debug("Request IF_MODIFIED_SINCE matching - responding with HTTP/304");
+                $this->sendNotModified();
+                exit;
+            }
+        }
+
         //browser is sending ETag
         $requestETag = $this->requestETag();
-        debug("Request ETag is: $requestETag");
-
+        debug("Request ETag is: ".$requestETag);
+        debug("File ETag is: ". $this->getHeader("ETag"));
         if (strcasecmp($requestETag, $this->getHeader("ETag"))==0) {
+            debug("Request ETag match file ETag - responding with HTTP/304");
             $this->sendNotModified();
             exit;
         }
