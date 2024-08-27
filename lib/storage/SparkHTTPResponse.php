@@ -17,7 +17,7 @@ class SparkHTTPResponse
     {
         $this->setHeader("Content-Transfer-Encoding", "binary");
         //one hour expiration
-        $this->setHeader("Cache-Control", "public, max-age=3600, stale-while-revalidate=3600");
+        $this->setHeader("Cache-Control", "public, must-revalidate, must-understand, max-age=3600, stale-while-revalidate=3600");
     }
 
     public function setDispositionFilename(string $disposition_filename)
