@@ -2,6 +2,7 @@
 
 class SparkHTTPResponse
 {
+
     protected array $headers = array();
 
     protected string $data = "";
@@ -57,6 +58,7 @@ class SparkHTTPResponse
 
     public function getHeader(string $field): string
     {
+        if ($this->haveHeader($field)) throw new Exception("Header not set");
         return $this->headers[$field];
     }
 
@@ -111,11 +113,12 @@ class SparkHTTPResponse
     }
 
     /**
-     * Check request IF_MODIFIED_SINCE matches current last-modified and call sendNotModified
-     * @param int $lastModified - Current data last modified timestamp
+     * Compare request IF_MODIFIED_SINCE (lastModified) with '$lastModified' timestamp
+     * Call sendNotModified on match
+     * @param int $lastModified Compare with this timestamp
      * @return void
      */
-    protected function checkCacheLastModifed(int $lastModified)
+    protected function checkCacheLastModifed(int $lastModified) : void
     {
         $modifiedSince = strtotime($this->requestModifiedSince());
 
@@ -130,41 +133,48 @@ class SparkHTTPResponse
         }
     }
 
+
     /**
-     * Check if request ETag matches current data ETag and call sendNotModified
-     * @param string $etag Current data ETag
+     * Compare request ETag with this response ETag
+     * Call sendNotModified on match
+     * @param string $ETag Compare with this ETag
      * @return void
      */
-    protected function checkCacheETag(string $etag)
+    protected function checkCacheETag(string $ETag)
     {
         //browser is sending ETag
         $requestETag = $this->requestETag();
         debug("Request ETag is: ".$requestETag);
-        debug("Response ETag is: ".$etag);
-        if (strcasecmp($requestETag, $etag)==0) {
+        debug("Response ETag is: ".$ETag);
+        if (strcasecmp($requestETag, $ETag)==0) {
             debug("Request ETag match response ETag - responding with HTTP/304");
             $this->sendNotModified();
             exit;
         }
     }
 
+
     /**
-     * Set 304 not modified headers
+     * Send 304 response
+     * Set headers Last-Modified and ETag using parameters $lastModifiedDate and $ETag
+     * Send all headers set by calling sendHeaders()
+     * @param string $lastModifiedDate Value to use for Last-Modified header field. If empty try Last-Modified from request if set
+     * @param string $ETag Value to use for ETag header field. If empty try ETag from request if set
      * @return void
      */
-    public function sendNotModified()
+    public function sendNotModified() : void
     {
 
         $this->setHeader("HTTP/2 304 Not Modified");
 
-        $req_modified = $this->requestModifiedSince();
-        if ($req_modified) {
-            $this->setHeader("Last-Modified", $req_modified);
+        $requestModifiedSince = $this->requestModifiedSince();
+        if ($requestModifiedSince) {
+            $this->setHeader("Last-Modified", $requestModifiedSince);
         }
 
-        $etag = $this->requestETag();
-        if ($etag) {
-            $this->setHeader("ETag", $etag);
+        $requestETag = $this->requestETag();
+        if ($requestETag) {
+            $this->setHeader("ETag", $requestETag);
         }
 
         $this->sendHeaders();
@@ -238,11 +248,12 @@ class SparkHTTPResponse
 
         $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
 
-        $last_modified = gmdate(SparkHTTPResponse::DATE_FORMAT, $file->lastModified());
-        $this->setHeader("Last-Modified", $last_modified);
+        if (!$this->haveHeader("Last-Modified")) {
+            $this->setHeader("Last-Modified", gmdate(SparkHTTPResponse::DATE_FORMAT, $file->lastModified()));
+        }
 
         if (!$this->haveHeader("ETag")) {
-            $etag = sparkHash($file->getFilename()."-".$last_modified);
+            $etag = sparkHash($file->getFilename()."-".$file->lastModified());
             $this->setHeader("ETag", $etag);
         }
 

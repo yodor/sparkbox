@@ -42,8 +42,14 @@ class SparkFileHTTPResponse extends SparkHTTPResponse
         debug("Headers: ".print_r($this->headers, true));
 
         //match cache data
-        $this->checkCacheLastModifed($this->file->lastModified());
-        $this->checkCacheETag($this->getHeader("ETag"));
+        $lastModified = $this->file->lastModified();
+        $this->checkCacheLastModifed($lastModified);
+
+        $etag = sparkHash($this->file->getFilename()."-".$lastModified);
+        $this->checkCacheETag($etag);
+
+        $this->setHeader("Last-Modified", gmdate(SparkHTTPResponse::DATE_FORMAT, $lastModified));
+        $this->setHeader("ETag", $etag);
 
         //send data if no cache match
         $this->sendFile($this->file);

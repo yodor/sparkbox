@@ -303,9 +303,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->checkCacheLastModifed($lastModified);
 
         $beanETag = $this->ETag();
-        $this->checkCacheETag($this->ETag());
+        $this->checkCacheETag($beanETag);
 
+        $this->setHeader("Last-Modified", gmdate(SparkHTTPResponse::DATE_FORMAT, $lastModified));
         $this->setHeader("ETag", $beanETag);
+
         //prefer ETag as disposition filename
         $this->setDispositionFilename($beanETag);
 
