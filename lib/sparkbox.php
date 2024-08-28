@@ -137,6 +137,7 @@ $defines->set("DEFAULT_LOCALE", "en-us");
 $defines->set("DEFAULT_CURRENCY", "EUR");
 
 $defines->set("STORAGE_CACHE_ENABLED", TRUE);
+$defines->set("PAGE_CACHE_TTL", 3600);
 
 //fetch local deployment configuration
 //can override stuff in defines
