@@ -2,6 +2,10 @@
 
 interface ICacheable
 {
-    public function outputBufferStart() : void;
-    public function outputBufferFinish() : void;
+    public function setCacheable(bool $mode) : void;
+    public function isCacheable() : bool;
+
+    public function getCacheName() : string;
 }
+
+?>

@@ -3,9 +3,15 @@ include_once("objects/SparkObservable.php");
 include_once("components/renderers/IRenderer.php");
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
+include_once("components/renderers/ICacheable.php");
+include_once("storage/CacheEntry.php");
 
-class Component extends SparkObservable implements IRenderer, IHeadContents
+class Component extends SparkObservable implements IRenderer, IHeadContents, ICacheable
 {
+
+    protected CacheEntry $cacheEntry;
+    protected bool $cacheable = false;
+
     protected $tagName = "DIV";
 
     protected $closingTagRequired = true;
@@ -76,6 +82,14 @@ class Component extends SparkObservable implements IRenderer, IHeadContents
 
     }
 
+    public function setCacheable(bool $mode) : void
+    {
+        $this->cacheable = true;
+    }
+    public function isCacheable() : bool
+    {
+        return $this->cacheable;
+    }
     /**
      * Override the automatic class name constructed from the inheritance chain
      * @param string $componentClass
@@ -154,7 +168,6 @@ class Component extends SparkObservable implements IRenderer, IHeadContents
 
     public function startRender()
     {
-
         $this->processAttributes();
         $attrs = $this->prepareAttributes();
         echo "<$this->tagName $attrs>\n";
@@ -192,14 +205,55 @@ class Component extends SparkObservable implements IRenderer, IHeadContents
     {
         if (!$this->render_enabled) return;
 
+        if ($this->cacheable) {
+            debug("Cacheable component: ".$this->getComponentClass());
+
+            $this->cacheEntry = CacheEntry::PageCacheEntry(get_class($this)."-".$this->getCacheName());
+            if ($this->cacheEntry->getFile()->exists()) {
+
+                $entryStamp = $this->cacheEntry->lastModified();
+                $timeStamp = time();
+                $entryAge = ($timeStamp - $entryStamp);
+                $remainingTTL = PAGE_CACHE_TTL - $entryAge;
+
+                debug("CacheEntry exists - lastModified: " . $entryStamp . " | Remaining TTL: " . $remainingTTL);
+
+                if ($remainingTTL > 0) {
+                    //output cached data
+                    $this->cacheEntry->output();
+                    return;
+                }
+            }
+        }
+
+        ob_start();
+        $haveError = false;
         try {
+
             $this->startRender();
             $this->renderImpl();
             $this->finishRender();
+
         }
         catch (Exception $e) {
             echo $e->getMessage();
+            $haveError = true;
         }
+
+        $buffer = ob_get_contents();
+        ob_end_clean();
+
+        if ($this->cacheable && !$haveError) {
+            $this->cacheEntry->store($buffer, time());
+        }
+
+        echo $buffer;
+
+    }
+
+    public function getCacheName() : string
+    {
+        return sparkHash($this->getComponentClass());
     }
 
     public function setName(string $name)
@@ -207,20 +261,6 @@ class Component extends SparkObservable implements IRenderer, IHeadContents
         parent::setName($name);
         $this->setAttribute("name", $name);
     }
-
-//
-//    public function setParent(Component $parent)
-//    {
-//        $this->parent = $parent;
-//    }
-//
-//    /**
-//     * @return Component|null
-//     */
-//    public function getParent(): ?Component
-//    {
-//        return $this->parent;
-//    }
 
     public function getCaption(): string
     {
