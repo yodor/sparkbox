@@ -205,7 +205,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     {
         if (!$this->render_enabled) return;
 
-        if ($this->cacheable) {
+        if ($this->cacheable && PAGE_CACHE_ENABLED) {
             debug("Cacheable component: ".$this->getComponentClass());
 
             $this->cacheEntry = CacheEntry::PageCacheEntry(get_class($this)."-".$this->getCacheName());
@@ -243,7 +243,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         $buffer = ob_get_contents();
         ob_end_clean();
 
-        if ($this->cacheable && !$haveError) {
+        if ($this->cacheable && PAGE_CACHE_ENABLED && !$haveError) {
             $this->cacheEntry->store($buffer, time());
         }
 
@@ -253,7 +253,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     public function getCacheName() : string
     {
-        return sparkHash($this->getComponentClass());
+        return sparkHash(SparkPage::Instance()->getPageURL() . $this->getComponentClass());
     }
 
     public function setName(string $name)
