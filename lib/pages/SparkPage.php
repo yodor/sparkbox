@@ -436,7 +436,7 @@ class SparkPage extends HTMLPage implements IActionCollection
             RequestController::processJSONResponders();
         }
 
-        $this->outputBufferStart();
+        ob_start();
 
         foreach ($this->head_components as $idx => $cmp) {
             $css_files = $cmp->requiredStyle();
@@ -481,21 +481,12 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         parent::finishRender();
 
-        $this->outputBufferFinish();
-    }
-
-    protected function outputBufferStart()
-    {
-        ob_start();
-    }
-
-    protected function outputBufferFinish()
-    {
         $buffer = ob_get_contents();
         ob_end_clean();
         $this->obCallback($buffer);
         echo $buffer;
     }
+
     /**
      * Render all component implementing the IFinalRenderer before closing the BODY
      */
