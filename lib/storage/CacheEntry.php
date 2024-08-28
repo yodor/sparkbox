@@ -80,6 +80,19 @@ class CacheEntry
 
 
     /**
+     * Output file using shared read lock
+     * @return void
+     * @throws Exception
+     */
+    public function output() : void
+    {
+        $this->file->open('r');
+        $this->file->lock(LOCK_SH);
+        $this->file->passthru();
+        $this->file->lock(LOCK_UN);
+        $this->file->close();
+    }
+    /**
      * Store data to this cache entry file and set the last modified time (if non-zero)
      * @param string $data
      * @param int $lastModified
