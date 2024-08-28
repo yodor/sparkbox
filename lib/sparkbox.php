@@ -138,6 +138,7 @@ $defines->set("DEFAULT_CURRENCY", "EUR");
 
 $defines->set("STORAGE_CACHE_ENABLED", TRUE);
 $defines->set("PAGE_CACHE_TTL", 3600);
+$defines->set("PAGE_CACHE_ENABLED", FALSE);
 
 //fetch local deployment configuration
 //can override stuff in defines
@@ -195,6 +196,5 @@ else {
 // debug("Exported Globals: ",$constants["user"]);
 //global site wide function
 @include_once("config/globals.php");
-
 
 ?>
