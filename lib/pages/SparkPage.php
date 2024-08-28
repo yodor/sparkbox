@@ -13,7 +13,6 @@ include_once("utils/FBPixel.php");
 include_once("utils/GTAG.php");
 include_once("utils/GTAGObject.php");
 
-
 class SparkPage extends HTMLPage implements IActionCollection
 {
 
@@ -437,9 +436,7 @@ class SparkPage extends HTMLPage implements IActionCollection
             RequestController::processJSONResponders();
         }
 
-        //ob_start(array($this, 'obCallback'));
-        ob_start();
-        //ob_implicit_flush (0 );
+        $this->outputBufferStart();
 
         foreach ($this->head_components as $idx => $cmp) {
             $css_files = $cmp->requiredStyle();
@@ -484,14 +481,21 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         parent::finishRender();
 
+        $this->outputBufferFinish();
+    }
+
+    protected function outputBufferStart()
+    {
+        ob_start();
+    }
+
+    protected function outputBufferFinish()
+    {
         $buffer = ob_get_contents();
         ob_end_clean();
         $this->obCallback($buffer);
-
-        //header("Cache-Control", "public, must-revalidate, max-age=216000");
         echo $buffer;
     }
-
     /**
      * Render all component implementing the IFinalRenderer before closing the BODY
      */
