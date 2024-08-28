@@ -4,7 +4,7 @@ include_once("sql/SQLClause.php");
 class ClauseCollection
 {
 
-    protected $clauses;
+    protected array $clauses;
 
     public function __construct()
     {
@@ -22,6 +22,10 @@ class ClauseCollection
         $this->clauses = array();
     }
 
+    public function getAll() : array
+    {
+        return $this->clauses;
+    }
     public function count(): int
     {
         return count($this->clauses);
