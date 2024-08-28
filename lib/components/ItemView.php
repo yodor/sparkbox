@@ -34,18 +34,12 @@ class ItemView extends AbstractResultView
     {
         parent::startRender();
         $this->viewport->startRender();
-
-        //echo "<div class='viewport'>";
-
     }
 
     public function finishRender()
     {
-
-        //echo "</div>";
         $this->viewport->finishRender();
         parent::finishRender();
-
     }
 
     public function setItemsPerGroup(int $number)
