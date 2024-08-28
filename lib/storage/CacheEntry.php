@@ -4,17 +4,28 @@ include_once ("utils/SparkFile.php");
 class CacheEntry
 {
     /**
+     * Bean class name
      * @var string
      */
     protected string $className = "";
 
-    protected SparkFile $file;
-
     /**
+     * Bean id
      * @var int
      */
     protected int $id = -1;
 
+
+    /**
+     * Cache file used for this entry
+     * @var SparkFile
+     */
+    protected SparkFile $file;
+
+
+    /**
+     * @throws Exception
+     */
     public function __construct(string $name, string $className, int $id)
     {
 
@@ -60,11 +71,22 @@ class CacheEntry
         return $this->file;
     }
 
+    /**
+     * Get the folder containing this cache entry file
+     * @return string
+     */
     protected function getCacheFolder(): string
     {
         return CACHE_PATH . DIRECTORY_SEPARATOR . $this->className . DIRECTORY_SEPARATOR . $this->id;
     }
 
+    /**
+     * Store data to this cache entry file and set the last modified time (if non-zero)
+     * @param string $data
+     * @param int $lastModified
+     * @return void
+     * @throws Exception
+     */
     public function store(string $data, int $lastModified=0)
     {
         $this->file->open('w');
@@ -79,6 +101,10 @@ class CacheEntry
         }
     }
 
+    /**
+     * @return int Unix timestamp of this cache entry file
+     * @throws Exception
+     */
     public function lastModified() : int
     {
         return $this->file->lastModified();
