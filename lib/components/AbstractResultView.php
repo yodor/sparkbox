@@ -81,6 +81,10 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->list_empty->addClassName("ListEmpty");
     }
 
+    public function getCacheName() : string
+    {
+        return sparkHash(SparkPage::Instance()->getPageURL() . $this->getComponentClass());
+    }
     /**
      * Rendered if list results are zero ie only shown for empty lists
      * @return Component
