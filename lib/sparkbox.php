@@ -160,7 +160,7 @@ if (!file_exists(CACHE_PATH)) {
 //define SKIP_SESSION to skip starting session
 if (!defined("SKIP_SESSION")) {
     include_once("utils/Session.php");
-    Session::Start();
+//    Session::Start();
 
 }
 
