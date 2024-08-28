@@ -129,14 +129,9 @@ class MenuBarComponent extends Component
         }
 
     }
-
-    public function finishRender()
+    public function render()
     {
-        parent::finishRender();
-        if (!$this->toggle_first) {
-            $this->toggle->render();
-        }
-        $this->bar->finishRender();
+        parent::render();
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
@@ -146,6 +141,15 @@ class MenuBarComponent extends Component
             });
         </script>
         <?php
+    }
+
+    public function finishRender()
+    {
+        parent::finishRender();
+        if (!$this->toggle_first) {
+            $this->toggle->render();
+        }
+        $this->bar->finishRender();
     }
 }
 

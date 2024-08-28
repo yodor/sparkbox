@@ -61,9 +61,10 @@ class LoginFormRenderer extends FormRenderer
         parent::startRender();
     }
 
-    public function finishRender()
+    public function render()
     {
-        parent::finishRender();
+        parent::render();
+
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {

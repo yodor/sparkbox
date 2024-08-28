@@ -206,22 +206,26 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         if (!$this->render_enabled) return;
 
         if ($this->cacheable && PAGE_CACHE_ENABLED) {
-            debug("Cacheable component: ".$this->getComponentClass());
 
-            $this->cacheEntry = CacheEntry::PageCacheEntry(get_class($this)."-".$this->getCacheName());
-            if ($this->cacheEntry->getFile()->exists()) {
+            $cacheName = $this->getCacheName();
+            if (!empty($cacheName)) {
+                debug("Cacheable component: ".get_class($this)." | Cache name: ".$cacheName);
 
-                $entryStamp = $this->cacheEntry->lastModified();
-                $timeStamp = time();
-                $entryAge = ($timeStamp - $entryStamp);
-                $remainingTTL = PAGE_CACHE_TTL - $entryAge;
+                $this->cacheEntry = CacheEntry::PageCacheEntry(get_class($this) . "-" . sparkHash($cacheName));
+                if ($this->cacheEntry->getFile()->exists()) {
 
-                debug("CacheEntry exists - lastModified: " . $entryStamp . " | Remaining TTL: " . $remainingTTL);
+                    $entryStamp = $this->cacheEntry->lastModified();
+                    $timeStamp = time();
+                    $entryAge = ($timeStamp - $entryStamp);
+                    $remainingTTL = PAGE_CACHE_TTL - $entryAge;
 
-                if ($remainingTTL > 0) {
-                    //output cached data
-                    $this->cacheEntry->output();
-                    return;
+                    debug("CacheEntry exists - lastModified: " . $entryStamp . " | Remaining TTL: " . $remainingTTL);
+
+                    if ($remainingTTL > 0) {
+                        //output cached data
+                        $this->cacheEntry->output();
+                        return;
+                    }
                 }
             }
         }
@@ -253,7 +257,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     public function getCacheName() : string
     {
-        return sparkHash(SparkPage::Instance()->getPageURL() . $this->getComponentClass());
+        return basename($_SERVER["SCRIPT_FILENAME"])."-".get_class($this)."-".$this->getName();
     }
 
     public function setName(string $name)

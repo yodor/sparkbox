@@ -4,6 +4,43 @@ class TreeView extends Component {
         this.setClass(".TreeView");
     }
 
+    setSelectedID(selectedID) {
+
+        var tree_instance = this;
+
+        //deselect any selected (from cache)
+        $(this.selector() + " .Node").each(function () {
+            $(this).attr("active", "0");
+        });
+
+        //open the active branch to top
+        $(this.selector() + " .Node[nodeID='"+selectedID+"']").each(function () {
+
+            $(this).parents(".NodeOuter").each(function () {
+
+                $(this).children(".Node").each(function () {
+                    var nodeID = $(this).attr("nodeID");
+                    var branch_type = $(this).attr("branch_type");
+
+                    if (nodeID > 0 && branch_type == "closed") {
+
+                        tree_instance.handleClicked(nodeID);
+
+                    }
+
+                });
+
+
+            });
+
+        });
+
+        $(this.selector() + " .Node[nodeID='"+selectedID+"']").each(function () {
+            //var nodeID = $(this).attr("nodeID");
+            $(this).attr("active", "1");
+        });
+    }
+
     initialize() {
 
         super.initialize();
@@ -37,28 +74,6 @@ class TreeView extends Component {
         });
 
 
-        //open the active branch to top
-        $(this.selector() + " .Node[active='1']").each(function () {
-            var nodeID = $(this).attr("nodeID");
-
-            $(this).parents(".NodeOuter").each(function () {
-
-                $(this).children(".Node").each(function () {
-                    var nodeID = $(this).attr("nodeID");
-                    var branch_type = $(this).attr("branch_type");
-
-                    if (nodeID > 0 && branch_type == "closed") {
-
-                        tree_instance.handleClicked(nodeID);
-
-                    }
-
-                });
-
-
-            });
-
-        });
     }
 
     handleClicked(id, event) {

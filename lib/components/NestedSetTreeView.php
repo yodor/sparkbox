@@ -126,6 +126,14 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         return $this->branch_render_mode;
     }
 
+    public function getCacheName() : string
+    {
+        if (!($this->iterator instanceof SQLQuery)) return "";
+
+        return parent::getCacheName()."-".$this->iterator->select->getSQL();
+
+    }
+
     protected function renderImpl()
     {
 
@@ -191,7 +199,8 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             $item->setID($nodeID);
             $item->setData($row);
             $item->setAttribute("branch_type", $branch_type);
-            $item->setSelected($selected);
+            //move selection to javascript
+            //$item->setSelected($selected);
             $item->setChecked(false);
             if (is_array($this->checked_nodes)) {
                 $item->setChecked(in_array($nodeID, $this->checked_nodes));
@@ -210,19 +219,19 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
     }
 
-    public function finishRender()
+    //do not cache script code
+    public function render()
     {
-        parent::finishRender();
-
+        parent::render();
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                var tree_view = new TreeView();
+                let tree_view = new TreeView();
                 tree_view.setName("<?php echo $this->getName(); ?>");
                 tree_view.initialize();
+                tree_view.setSelectedID(<?php echo $this->getSelectedID();?>);
             });
         </script>
         <?php
     }
-
 }
