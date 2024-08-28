@@ -13,11 +13,11 @@ class SparkHTTPResponse
     protected string $disposition = "inline";
     protected string $disposition_filename = "";
 
-    public function __construct()
+    public function __construct(int $max_age=3600, int $stale_while_revalidate=3600)
     {
         $this->setHeader("Content-Transfer-Encoding", "binary");
         //one hour expiration
-        $this->setHeader("Cache-Control", "public, must-revalidate, must-understand, max-age=3600, stale-while-revalidate=3600");
+        $this->setHeader("Cache-Control", "public, must-revalidate, must-understand, max-age=$max_age, stale-while-revalidate=$stale_while_revalidate");
     }
 
     public function setDispositionFilename(string $disposition_filename)
@@ -118,7 +118,7 @@ class SparkHTTPResponse
      * @param int $lastModified Compare with this timestamp
      * @return void
      */
-    protected function checkCacheLastModifed(int $lastModified) : void
+    public function checkCacheLastModifed(int $lastModified) : void
     {
         $modifiedSince = strtotime($this->requestModifiedSince());
 
@@ -140,7 +140,7 @@ class SparkHTTPResponse
      * @param string $ETag Compare with this ETag
      * @return void
      */
-    protected function checkCacheETag(string $ETag)
+    public function checkCacheETag(string $ETag)
     {
         //browser is sending ETag
         $requestETag = $this->requestETag();
@@ -184,7 +184,7 @@ class SparkHTTPResponse
      * Return contents of request header (HTTP_IF_NONE_MATCH) - ETag
      * @return string
      */
-    protected function requestETag() : string
+    public function requestETag() : string
     {
         if (isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
             return $_SERVER['HTTP_IF_NONE_MATCH'];
@@ -196,7 +196,7 @@ class SparkHTTPResponse
      * Return contents of request header (HTTP_IF_MODIFIED_SINCE) - last-modified
      * @return string
      */
-    protected function requestModifiedSince() : string
+    public function requestModifiedSince() : string
     {
         if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
             return $_SERVER['HTTP_IF_MODIFIED_SINCE'];
@@ -231,7 +231,7 @@ class SparkHTTPResponse
      * @return void
      * @throws Exception
      */
-    protected function sendFile(SparkFile $file)
+    public function sendFile(SparkFile $file)
     {
 
         debug("Sending file: ".$file->getAbsoluteFilename());
@@ -253,8 +253,7 @@ class SparkHTTPResponse
         }
 
         if (!$this->haveHeader("ETag")) {
-            $etag = sparkHash($file->getFilename()."-".$file->lastModified());
-            $this->setHeader("ETag", $etag);
+            $this->setHeader("ETag", $file->getEtag());
         }
 
         $this->sendHeaders();
