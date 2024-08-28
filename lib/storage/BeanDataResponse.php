@@ -52,7 +52,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->cacheEntry = NULL;
 
         if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
-            $this->cacheEntry = new CacheEntry($this->cacheName(), $this->className, $this->id);
+            $this->cacheEntry = CacheEntry::BeanCacheEntry($this->cacheName(), $this->className, $this->id);
         }
 
 
@@ -73,7 +73,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         //exclude blob type columns
         $beanColumns = $this->bean->columns();
         foreach ($beanColumns as $columnName => $storageType) {
-            if (strpos($storageType, "blob") !== FALSE) {
+            if (str_contains($storageType, "blob")) {
                 unset($beanColumns[$columnName]);
             }
         }
