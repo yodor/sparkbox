@@ -23,47 +23,54 @@ class CacheEntry
     protected SparkFile $file;
 
 
+    private function __construct(SparkFile $file)
+    {
+        $this->file = $file;
+
+        debug("Using Cache Folder: ".basename($this->file->getPath()));
+        debug("Using Filename: ".$this->file->getFilename());
+        debug("Using Path: ".$this->file->getPath());
+    }
+
     /**
      * @throws Exception
      */
-    public function __construct(string $name, string $className, int $id)
+    public static function BeanCacheEntry(string $name, string $className, int $id) : CacheEntry
     {
 
-        $this->className = $className;
-        $this->id = $id;
-
-        if (strlen($name) < 1) {
-            throw new Exception("Empty entry name");
+        if (empty($name)) {
+            throw new Exception("Empty name");
         }
 
-        if (strlen($this->className) < 1) {
+        if (empty($className)) {
             throw new Exception("Empty className");
         }
 
-        if ($this->id < 1) {
+        if ($id < 1) {
             throw new Exception("Incorrect ID");
         }
 
-        if (!defined("CACHE_PATH")) {
-            throw new Exception("CACHE_PATH is undefined");
-        }
-        if (strlen(CACHE_PATH) < 1) {
-            throw new Exception("CACHE_PATH is empty");
-        }
-
-        $cache_folder = $this->getCacheFolder();
+        $cache_folder = CACHE_PATH . DIRECTORY_SEPARATOR . $className . DIRECTORY_SEPARATOR . $id;
         if (!file_exists($cache_folder)) {
             debug("Creating cache folder: $cache_folder");
             @mkdir($cache_folder, 0777, TRUE);
             if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
         }
 
-        $this->file = new SparkFile($cache_folder . DIRECTORY_SEPARATOR . basename($name));
+        return new CacheEntry(new SparkFile($cache_folder . DIRECTORY_SEPARATOR . $name));
 
-        debug("Using Cach Folder: ".$cache_folder);
-        debug("Using Filename: ".$this->file->getFilename());
-        debug("Using Path: ".$this->file->getPath());
+    }
 
+    public static function PageCacheEntry(string $name)
+    {
+        $cache_folder = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache";
+        if (!file_exists($cache_folder)) {
+            debug("Creating cache folder: $cache_folder");
+            @mkdir($cache_folder, 0777, TRUE);
+            if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
+        }
+
+        return new CacheEntry(new SparkFile($cache_folder . DIRECTORY_SEPARATOR . $name));
     }
 
     public function getFile() : SparkFile
@@ -71,14 +78,6 @@ class CacheEntry
         return $this->file;
     }
 
-    /**
-     * Get the folder containing this cache entry file
-     * @return string
-     */
-    protected function getCacheFolder(): string
-    {
-        return CACHE_PATH . DIRECTORY_SEPARATOR . $this->className . DIRECTORY_SEPARATOR . $this->id;
-    }
 
     /**
      * Store data to this cache entry file and set the last modified time (if non-zero)
