@@ -18,6 +18,11 @@ class SparkFile {
         }
     }
 
+    public function getETag() : string
+    {
+        return sparkHash($this->getFilename()."-".$this->lastModified());
+    }
+
     /**
      * Set this file name to basename($filename)
      * @param string $filename set the filename to '$filename'
