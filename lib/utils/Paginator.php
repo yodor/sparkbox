@@ -279,8 +279,16 @@ class Paginator implements IGETConsumer
         $filter = new SQLSelect();
         $filter->from = "";
 
+        //temporary page select for caching
+        $page = 0;
+        if (isset($_GET[Paginator::KEY_PAGE])) {
+            $page = (int)$_GET[Paginator::KEY_PAGE];
+        }
+        if ($page<0) $page = 0;
+
+
         if ($this->ipp > 0) {
-            $filter->limit = " " . ($this->page * $this->ipp) . ", {$this->ipp}";
+            $filter->limit = " " . ($page * $this->ipp) . ", {$this->ipp}";
         }
 
         return $filter;

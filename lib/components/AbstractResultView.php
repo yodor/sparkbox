@@ -171,15 +171,15 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     {
         if (!($this->iterator instanceof SQLQuery)) return "";
 
-        $cacheIterator = clone $this->iterator;
+        $select = clone $this->iterator->select;
 
         $orderFilter = $this->paginator->prepareOrderFilter($this->default_order);
         $pageFilter = $this->paginator->preparePageFilter();
 
-        $cacheIterator->select->combine($pageFilter);
-        $cacheIterator->select->combine($orderFilter);
+        $select->combine($pageFilter);
+        $select->combine($orderFilter);
 
-        return parent::getCacheName()."-".$cacheIterator->select->getSQL();
+        return parent::getCacheName()."-".$select->getSQL();
     }
     /**
      * @throws Exception
