@@ -5,7 +5,7 @@ include_once("components/renderers/items/DataIteratorItem.php");
 
 include_once("beans/NestedSetBean.php");
 include_once("iterators/IDataIterator.php");
-
+include_once("iterators/SQLQuery.php");
 
 class NestedSetTreeView extends Component implements IDataIteratorRenderer
 {
@@ -22,20 +22,26 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     /**
      * @var IDataIterator
      */
-    protected $iterator = NULL;
+    protected ?SQLQuery $iterator = NULL;
 
     /**
      * @var DataIteratorItem
      */
-    protected $item = NULL;
+    protected ?DataIteratorItem $item = NULL;
 
-    protected $selected_nodeID = -1;
-    protected $selection_path = array();
+    protected int $selected_nodeID = -1;
+
+    /**
+     * Available after rendering, empty if caching is enabled
+     * @var array Holds the IDs of the selected nodes and the label from the iterator
+     *
+     */
+    protected array $selection_path = array();
 
     /**
      * @var array Holds the IDs of the checked nodes
      */
-    protected $checked_nodes = array();
+    protected array $checked_nodes = array();
 
     public function __construct()
     {
@@ -59,6 +65,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
     public function setIterator(IDataIterator $query)
     {
+        if (!$query instanceof SQLQuery) throw new Exception("Incorrect iterator");
         $this->iterator = $query;
         $this->setAttribute("source", $this->iterator->name());
     }
@@ -87,13 +94,15 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         return $this->checked_nodes;
     }
 
-    public function setSelectedID(int $nodeID)
+    public function setSelectedID(int $nodeID) : void
     {
         $this->selected_nodeID = (int)$nodeID;
     }
 
     /**
      * Available after rendering and selected_nodeID is > -1
+     * empty if caching is enabled
+     * ID=>LABEL
      * @return array
      */
     public function getSelectionPath() : array
@@ -106,9 +115,9 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         return (int)$this->selected_nodeID;
     }
 
-    public function setItemRenderer(DataIteratorItem $renderer)
+    public function setItemRenderer(DataIteratorItem $item)
     {
-        $this->item = $renderer;
+        $this->item = $item;
     }
 
     public function getItemRenderer(): DataIteratorItem
@@ -116,7 +125,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         return $this->item;
     }
 
-    public function setBranchRenderMode(int $mode)
+    public function setBranchRenderMode(int $mode) : void
     {
         $this->branch_render_mode = $mode;
     }
