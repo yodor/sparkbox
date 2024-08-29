@@ -52,7 +52,11 @@ abstract class DataIteratorField extends InputField
         if ($this->iterator instanceof IDataIterator) {
             while ($data_row = $this->iterator->next()) {
 
-                $id = $data_row[$this->iterator->key()];
+                //TODO
+                $id = 0;
+                if (isset($data_row[$this->iterator->key()])) {
+                    $id = $data_row[$this->iterator->key()];
+                }
 
                 $item = $this->item;
                 //$item = clone $this->item;
