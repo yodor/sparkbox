@@ -397,7 +397,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             else {
                 $type = get_class($obj);
                 if ($obj instanceof StorageObject) {
-                    debug("#$position - Type($type) - ID($id) - UID({$obj->getUID()})");
+                    debug("#$position - Type($type) - ID($id) - UID({$obj->UID()})");
                 }
                 //other class type
                 else {

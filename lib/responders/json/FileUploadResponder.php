@@ -17,8 +17,8 @@ class FileUploadResponder extends UploadControlResponder
         if (!($object instanceof FileStorageObject)) throw new Exception("Expecting FileStorageObject");
 
         $filename = $object->getFileName();
-        $mime = $object->getMIME();
-        $uid = $object->getUID();
+        $mime = $object->buffer()->mime();
+        $uid = $object->UID();
 
         debug("UID:$uid filename:$filename mime:$mime");
 
@@ -31,7 +31,7 @@ class FileUploadResponder extends UploadControlResponder
         echo "<span class='thumbnail'><img src='" . SPARK_LOCAL . "/images/mimetypes/generic.png'></span>";
         echo "<div class='details'>";
         echo "<span class='filename'><label>$filename</label></span>";
-        echo "<span class='filesize'><label>" . file_size($object->getLength()) . "</label></span>";
+        echo "<span class='filesize'><label>" . file_size($object->buffer()->length()) . "</label></span>";
         echo "</div>";
         echo "<span class='remove_button' action='Remove'>X</span>";
         echo "<input type=hidden name='uid_{$field_name}[]' value='$uid' >";

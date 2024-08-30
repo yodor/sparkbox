@@ -129,7 +129,7 @@ class CacheEntry
     {
         $this->file->open('w');
         $this->file->lock(LOCK_EX);
-        $this->file->write($data->getData());
+        $this->file->write($data->data());
         $this->file->lock(LOCK_UN);
         $this->file->close();
         debug("Stored " . $this->file->length() . " bytes");

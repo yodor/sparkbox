@@ -3,11 +3,11 @@
 class ActionCollection
 {
 
-    protected $actions;
+    protected array $actions;
 
-    protected $action_matcher;
-    protected $content_matcher;
-    protected $name_matcher;
+    protected Closure $action_matcher;
+    protected Closure $content_matcher;
+    protected Closure $name_matcher;
 
     public function __construct()
     {

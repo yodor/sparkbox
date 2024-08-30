@@ -34,9 +34,10 @@ class StorageItemCellRenderer extends TableCellRenderer
         $this->idField = $idField;
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
         parent::setData($data);
+        $this->id = -1;
         if (isset($data[$this->idField])) {
             $this->id = (int)$data[$this->idField];
         }

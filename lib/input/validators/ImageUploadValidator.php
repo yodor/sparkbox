@@ -59,15 +59,15 @@ class ImageUploadValidator extends UploadDataValidator
      * @param ImageStorageObject $image_storage
      * @throws Exception
      */
-    public function processObject(StorageObject $image_storage) : void
+    public function processObject(StorageObject $object) : void
     {
 
-        if (!($image_storage instanceof ImageStorageObject)) throw new Exception("Invalid argument (Not an ImageStorageObject)");
+        if (!($object instanceof ImageStorageObject)) throw new Exception("Invalid argument (Not an ImageStorageObject)");
 
-        debug("UID: " . $image_storage->getUID());
-        debug("Image dimension: [" . $image_storage->getWidth() . " x " . $image_storage->getHeight() . "]");
-        debug("MIME: " . $image_storage->getMIME());
-        debug("Data size: " . $image_storage->getLength());
+        debug("UID: " . $object->UID());
+        debug("Image dimension: [" . $object->getWidth() . " x " . $object->getHeight() . "]");
+        debug("MIME: " . $object->buffer()->mime());
+        debug("Length: " . $object->buffer()->length());
 
         //should be disabled during ajax upload and before submit of actual form. original uploaded image is stored in session
         if (!$this->resize_enabled) {
@@ -75,120 +75,8 @@ class ImageUploadValidator extends UploadDataValidator
             return;
         }
 
-        $scale = 1;
-        $dst_width = $this->resize_width;
-        $dst_height = $this->resize_height;
-
-        if ($dst_width < 1 && $dst_height < 1) throw new Exception("Resize is enabled but resize width or height is not set");
-
-        if ($dst_width > 0 && $dst_height > 0) {
-
-            debug("Mode 'Exact Size' - new dimension is [ $dst_width x $dst_height ]");
-
-        }
-        else if ($dst_width > 0) {
-
-            $ratio = (float)$image_storage->getWidth() / $dst_width;
-            $dst_height = $image_storage->getHeight() / $ratio;
-            debug("Mode 'Autofit Width' - new dimension is [ $dst_width x $dst_height ] - ratio: $ratio");
-
-        }
-        else if ($dst_height > 0) {
-
-            $ratio = (float)$image_storage->getHeight() / $dst_height;
-            $dst_width = $image_storage->getWidth() / $ratio;
-            debug("Mode 'Autofit Height' - new dimension is [ $dst_width x $dst_height ] - ratio: $ratio");
-        }
-
-        $scale = min($dst_width / $image_storage->getWidth(), $dst_height / $image_storage->getHeight());
-
-        if ($scale != 1) {
-
-            if ($scale > 1) {
-                if (IMAGE_UPLOAD_UPSCALE) {
-                    debug("IMAGE_UPLOAD_UPSCALE is true");
-                }
-                else {
-                    debug("IMAGE_UPLOAD_UPSCALE is false - using scale: 1");
-                    //force 1:1 scale
-                    $scale = 1;
-                }
-            }
-            else if ($scale < 1) {
-                if (IMAGE_UPLOAD_DOWNSCALE) {
-                    debug("IMAGE_UPLOAD_DOWNSCALE is true");
-                }
-                else {
-                    debug("IMAGE_UPLOAD_DOWNSCALE is false - using scale: 1");
-                    //force 1:1 scale
-                    $scale = 1;
-                }
-            }
-
-        }
-
-        debug("Scale is: " . $scale);
-
-        if ($scale == 1) {
-            debug("Scale is 1 - finishing without resize");
-
-            return;
-        }
-
-        $n_width = $image_storage->getWidth() * $scale;
-        $n_height = $image_storage->getHeight() * $scale;
-
-        if ($n_width < 1) $n_width = 1;
-        if ($n_height < 1) $n_height = 1;
-
-        debug("Creating new image: [ $n_width x $n_height ] | Memory usage before scaling: " . memory_get_usage(TRUE));
-
-        $source = @imagecreatefromstring($image_storage->getData());
-
-        if (!$source) throw new Exception("Unable to create image resource from this input data");
-
-        $n_width = (int)$n_width;
-        $n_height = (int)$n_height;
-
-        $scaled_source = imagecreatetruecolor($n_width, $n_height);
-        imagealphablending($scaled_source, FALSE);
-
-        // Resize
-        imagecopyresampled($scaled_source, $source, 0, 0, 0, 0, $n_width, $n_height, $image_storage->getWidth(), $image_storage->getHeight());
-        @imagedestroy($source);
-
-        debug("Saving new image to output buffer ...");
-
-        ob_start();
-
-        if (strcasecmp($image_storage->getMIME(), ImageScaler::TYPE_PNG) == 0) {
-
-            $image_storage->setMIME(ImageScaler::TYPE_PNG);
-
-            debug("Using PNG output");
-
-            imagesavealpha($scaled_source, TRUE);
-
-            imagepng($scaled_source);
-
-        }
-        else {
-
-            $image_storage->setMIME(ImageScaler::TYPE_JPEG);
-
-            debug("Using JPEG output");
-
-            imagejpeg($scaled_source, NULL, 95);
-
-        }
-
-        debug("Output buffer size: " . ob_get_length());
-
-        $image_storage->setData(ob_get_contents());
-
-        ob_end_clean();
-
-        @imagedestroy($scaled_source);
+        $scaler = new ImageScaler($this->resize_width, $this->resize_height);
+        $scaler->process($object->buffer());
 
     }
 

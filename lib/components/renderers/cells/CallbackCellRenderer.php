@@ -22,10 +22,10 @@ class CallbackCellRenderer extends TableCellRenderer
         call_user_func_array($this->callback, array($this->data, $this->column));
     }
 
-    public function setData(array &$row)
+    public function setData(array $data) : void
     {
-        parent::setData($row);
-        $this->data = $row;
+        parent::setData($data);
+        $this->data = $data;
     }
 
 }

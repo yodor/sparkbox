@@ -63,14 +63,14 @@ class Action extends DataIteratorItem
         return $this->urlbuilder;
     }
 
-    public function setData(array &$row)
+    public function setData(array $data) : void
     {
-        parent::setData($row);
+        parent::setData($data);
 
         if ($this->check_code) {
             debug("Action has check_code anonymous function set: " . $this->getContents());
             $check_code = $this->check_code;
-            if (!$check_code($this, $row)) {
+            if (!$check_code($this, $data)) {
                 debug("check_code disabled rendering of this action");
                 $this->render_enabled = FALSE;
                 return;
@@ -80,7 +80,7 @@ class Action extends DataIteratorItem
             }
         }
 
-        $this->urlbuilder->setData($row);
+        $this->urlbuilder->setData($data);
 
     }
 

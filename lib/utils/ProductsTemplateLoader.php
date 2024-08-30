@@ -309,10 +309,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 $fstorage->setFilename($imgname);
                 $fstorage->setData($filedata);
 
-                $fstorage->setTimestamp($this->db->timestamp());
-
-                $finfo = new finfo(FILEINFO_MIME_TYPE);
-                $fstorage->setMIME($finfo->buffer($filedata));
+                $fstorage->setTimestamp(time());
 
                 $field = new DataInput("image", "Image", 0);
                 $field->setValue($fstorage);

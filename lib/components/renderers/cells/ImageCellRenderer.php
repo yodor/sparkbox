@@ -181,23 +181,23 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
     }
 
     //default rendering fetch from source bean linking with current 'view' iterator prkey
-    public function setData(array &$row)
+    public function setData(array $data) : void
     {
-        parent::setData($row);
+        parent::setData($data);
 
         if (!$this->bean) {
             $this->bean = $this->column->getView()->getIterator()->bean();
         }
 
         try {
-            $this->constructItems($row);
+            $this->constructItems($data);
         }
         catch (Exception $e) {
             $this->error = $e->getMessage();
         }
 
         if ($this->action) {
-            $this->action->setData($row);
+            $this->action->setData($data);
             $this->image_popup->setAttribute("href", $this->action->getURL()->url());
         }
         else {

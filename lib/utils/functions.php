@@ -277,10 +277,10 @@ function getArrayText(array $arr)
     foreach ($arr as $key => $val) {
         if ($val instanceof StorageObject) {
             if ($val instanceof ImageStorageObject) {
-                $val = get_class($val) . " UID: " . $val->getUID() . " Dimension: (" . $val->getWidth() . "," . $val->getHeight() . ")";
+                $val = get_class($val) . " UID: " . $val->UID() . " Dimension: (" . $val->getWidth() . "," . $val->getHeight() . ")";
             }
             else {
-                $val = get_class($val) . " UID:" . $val->getUID();
+                $val = get_class($val) . " UID:" . $val->UID();
             }
         }
         if (is_array($val)) $val = print_r($val, true);//"Array(" . implode(",", $val) . ")";

@@ -57,7 +57,7 @@ class FBTrackObject extends DataObject
         return $this->dataKey;
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
         parent::setData($data);
 

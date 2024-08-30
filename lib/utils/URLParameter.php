@@ -13,7 +13,7 @@ class URLParameter implements IDataResultProcessor
     {
         $this->name = $name;
 
-        if (strpos($value, "%") === 0 && strrpos($value, "%")===0) {
+        if (str_starts_with($value, "%") && str_ends_with($value, "%")) {
             // It starts with 'http'
             $this->field = substr($value, 1, strlen($value)-1);
         }
@@ -63,7 +63,7 @@ class URLParameter implements IDataResultProcessor
         return $ret;
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
         if ($this->field) {
             if (isset($data[$this->field])) {

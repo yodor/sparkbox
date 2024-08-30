@@ -41,17 +41,17 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
         if (!($object instanceof FileStorageObject)) throw new Exception("Expecting FileStorageObject");
 
         $filename = $object->getFileName();
-        $mime = $object->getMIME();
-        $uid = $object->getUID();
+        $mime = $object->buffer()->mime();
+        $uid = $object->UID();
 
         debug("UID:$uid filename:$filename mime:$mime");
 
         //create a temporary thumbnail of the uploaded image
         $scaler = new ImageScaler($this->width, $this->height);
         //copy upload data to new buffer
-        $buffer = clone $object->getBuffer();
+        $buffer = clone $object->buffer();
         $scaler->process($buffer);
-        $image_data = "data:$mime;base64," . base64_encode($buffer->getData());
+        $image_data = "data:$mime; base64," . $buffer->base64();
 
         ob_start();
         echo "<div class='Element' tooltip='$filename' >";

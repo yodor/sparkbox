@@ -92,15 +92,15 @@ abstract class UploadDataValidator implements IInputValidator
         }
 
         //UploadDataInput processor always create default empty FileStorageObject
-        $file_storage = $input->getValue();
+        $object = $input->getValue();
 
-        if (! ($file_storage instanceof StorageObject)) {
+        if (! ($object instanceof StorageObject)) {
             throw new Exception("Value not instance of StorageObject");
         }
 
-        debug("StorageObject class: " . get_class($file_storage));
+        debug("StorageObject class: " . get_class($object));
 
-        if ($file_storage->getLength()<1 || empty($file_storage->getUID())) {
+        if ($object->buffer()->length()<1 || empty($object->UID())) {
             debug("FileStorageObject is empty ...");
             if ($input->isRequired()) {
                 if (!$input->getForm() || $input->getForm()->getEditID() < 1) {
@@ -110,7 +110,7 @@ abstract class UploadDataValidator implements IInputValidator
             return;
         }
 
-        if ($file_storage->getLength() > $this->maxsize) {
+        if ($object->buffer()->length() > $this->maxsize) {
             // if the file is not less than the maximum allowed, print an error
             debug("Upload data size exceeds the maximum allowed");
             throw new Exception(tr("Uploaded file size exceeds the maximum allowed size") . "<BR>" . "Max data size: " . file_size($this->maxsize));
@@ -118,10 +118,10 @@ abstract class UploadDataValidator implements IInputValidator
 
         if (count($this->accept_mimes)>0) {
             debug("Accepting mime types: ", $this->accept_mimes);
-            debug("Uploaded mime type: ".$file_storage->getMIME());
-            if (!in_array($file_storage->getMIME(), $this->accept_mimes)) {
+            debug("Uploaded mime type: ".$object->buffer()->mime());
+            if (!in_array($object->buffer()->mime(), $this->accept_mimes)) {
                 debug("Wrong mime type ...");
-                throw new Exception(tr("Wrong mime type: ") . $file_storage->getMIME() . "<Br>".tr("Accepted mime types: ") . implode(';', $this->accept_mimes));
+                throw new Exception(tr("Wrong mime type: ") . $object->buffer()->mime() . "<Br>".tr("Accepted mime types: ") . implode(';', $this->accept_mimes));
             }
         }
         else {

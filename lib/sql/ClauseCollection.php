@@ -26,6 +26,15 @@ class ClauseCollection
     {
         return $this->clauses;
     }
+    public function iterator() : ArrayIterator
+    {
+        return new ArrayIterator($this->clauses);
+    }
+    public function keys() : array
+    {
+        return array_keys($this->clauses);
+    }
+
     public function count(): int
     {
         return count($this->clauses);

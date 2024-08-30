@@ -27,15 +27,15 @@ class CheckboxCellRenderer extends TableCellRenderer
         echo "</div>";
     }
 
-    public function setData(array &$row)
+    public function setData(array $data) : void
     {
-        parent::setData($row);
+        parent::setData($data);
 
         if (!$this->field) {
             $this->field = $this->column->getFieldName();
         }
 
-        $this->value = $row[$this->field];
+        $this->value = $data[$this->field];
 
     }
 }

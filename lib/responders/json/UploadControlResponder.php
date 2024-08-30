@@ -89,15 +89,15 @@ abstract class UploadControlResponder extends JSONResponder
 
         $html = $this->getHTML($uploadObject, $this->field_name);
         //
-        $jsonObject = array("name" => $uploadObject->getFilename(), "uid" => $uploadObject->getUID(),
-                            "mime" => $uploadObject->getMIME(), "html" => $html,);
+        $jsonObject = array("name" => $uploadObject->getFilename(), "uid" => $uploadObject->UID(),
+                            "mime" => $uploadObject->buffer()->mime(), "html" => $html,);
 
         //JSONResponse returns all dynamically assigned properties in its result
         $resp->objects[] = $jsonObject;
 
         //store the original data in the session array by the field name and UID
-        $_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uploadObject->getUID()] = serialize($uploadObject);
-        debug("Stored FileStorageObject to session using UID: " . $uploadObject->getUID() . " for field['" . $this->field_name . "']");
+        $_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uploadObject->UID()] = serialize($uploadObject);
+        debug("Stored FileStorageObject to session using UID: " . $uploadObject->UID() . " for field['" . $this->field_name . "']");
 
         //JSONResponse.response() returns dynamically assigned properties in its result
         $resp->object_count = 1;

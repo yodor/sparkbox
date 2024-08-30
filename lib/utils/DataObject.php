@@ -34,14 +34,10 @@ class DataObject  implements IDataResultProcessor
         return $this->value;
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
-        if (isset($data[$this->name])) {
-            $this->value = $data[$this->name];
-        }
-        else {
-            $this->value = "";
-        }
+        $this->value = $data[$this->name] ?? "";
+
     }
 }
 ?>

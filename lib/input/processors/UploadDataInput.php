@@ -52,7 +52,7 @@ class UploadDataInput extends InputProcessor
 
     }
 
-    protected function processImpl($file, FileStorageObject $file_storage)
+    protected function processImpl($file, FileStorageObject $object) : void
     {
 
         debug("Populating FileStorageObject with data from _FILES");
@@ -69,14 +69,13 @@ class UploadDataInput extends InputProcessor
         if ($upload_status !== UPLOAD_ERR_OK) throw new Exception(UploadDataValidator::errString($upload_status));
 
         $temp_name = $file['tmp_name'];
-        if (!is_uploaded_file($temp_name)) throw new Exception("Temp file is not an upload file");
+        if (!is_uploaded_file($temp_name)) throw new Exception("File is not an upload file");
 
-        $file_storage->setData(file_get_contents($temp_name));
-        $file_storage->setFilename($file['name']);
-        $file_storage->setMIME($file['type']);
-        $file_storage->setTimestamp(time());
+        $object->setData(file_get_contents($temp_name));
+        $object->setFilename($file['name']);
+        $object->setTimestamp(time());
 
-        debug("FileStorageObject populated. Length: ". $file_storage->getLength() . " | Name: ".$file['name']);
+        debug("FileStorageObject populated. Length: ". $object->buffer()->length() . " | Name: ".$file['name']);
 
     }
 

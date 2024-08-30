@@ -91,9 +91,12 @@ class GETProcessor implements IRequestProcessor, ISQLSelectProcessor, IGETConsum
     protected function processClauseCollection()
     {
         if ($this->select instanceof SQLSelect) {
-            foreach ($this->collection->getAll() as $clause) {
+            $iterator = $this->collection->iterator();
+            while ($iterator->valid()) {
+                $clause = $iterator->current();
                 if (!$clause instanceof SQLClause) continue;
                 $this->select->where()->addClause($clause);
+                $iterator->next();
             }
         }
     }

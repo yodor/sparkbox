@@ -32,16 +32,16 @@ class ImageField extends PlainUpload implements IPhotoRenderer
         return $this->height;
     }
 
-    public function renderContents(StorageObject $object)
+    public function renderContents(StorageObject $object) : void
     {
 
         if ($object instanceof ImageStorageObject) {
 
             $scaler = new ImageScaler($this->width, $this->height);
-            $buffer = clone $object->getBuffer();
+            $buffer = clone $object->buffer();
             $scaler->process($buffer);
 
-            $image_data = "data:" . $object->getMIME() . ";base64," . base64_encode($buffer->getData());
+            $image_data = "data:" . $buffer->mime() . ";base64," . $buffer->base64();
 
             echo "<img class='thumbnail' src='$image_data'>";
 

@@ -77,7 +77,7 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
         }
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
 
         parent::setData($data);

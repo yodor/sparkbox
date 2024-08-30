@@ -13,11 +13,11 @@ class TextItemRenderer extends DataIteratorItem
         $this->field_name = $field_name;
     }
 
-    public function setData(array &$item)
+    public function setData(array $data) : void
     {
-        parent::setData($item);
+        parent::setData($data);
 
-        $this->contents = $item[$this->field_name];
+        $this->contents = $data[$this->field_name];
     }
 
     public function setFieldName(string $field_name)

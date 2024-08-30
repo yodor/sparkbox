@@ -25,10 +25,10 @@ class ClosureCellRenderer extends TableCellRenderer
         $closure($this->data, $this->column);
     }
 
-    public function setData(array &$row)
+    public function setData(array $data) : void
     {
-        parent::setData($row);
-        $this->data = $row;
+        parent::setData($data);
+        $this->data = $data;
     }
 
 }

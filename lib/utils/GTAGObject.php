@@ -72,7 +72,7 @@ class GTAGObject extends DataObject implements IHeadScript
         return $contents;
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
         parent::setData($data);
 

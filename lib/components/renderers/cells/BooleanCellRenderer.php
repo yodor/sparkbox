@@ -22,11 +22,11 @@ class BooleanCellRenderer extends TableCellRenderer
         $tc->setAlignClass(TableColumn::ALIGN_CENTER);
     }
 
-    public function setData(array &$row)
+    public function setData(array $data) : void
     {
-        parent::setData($row);
+        parent::setData($data);
 
-        $this->value = ($row[$this->column->getFieldName()]) ? tr($this->true_value) : tr($this->false_value);
+        $this->value = ($data[$this->column->getFieldName()]) ? tr($this->true_value) : tr($this->false_value);
 
     }
 }

@@ -14,15 +14,13 @@ class ImageStorageObject extends FileStorageObject
 
         //copy
         if ($file_storage) {
-            $this->setMIME($file_storage->getMIME());
-            $this->setTimestamp($file_storage->getTimestamp());
 
+            $this->setTimestamp($file_storage->timestamp());
             $this->setFilename($file_storage->getFilename());
-            $this->setUID($file_storage->getUID());
+            $this->setUID($file_storage->UID());
+            $this->setData($file_storage->data());
 
-            $this->setData($file_storage->getData());
-
-            debug("Copied data from FileStorageObject UID: " . $file_storage->getUID());
+            debug("Copied data from FileStorageObject UID: " . $file_storage->UID());
         }
     }
 
@@ -36,17 +34,7 @@ class ImageStorageObject extends FileStorageObject
         return $this->height;
     }
 
-    public function setWidth(int $width) : void
-    {
-        $this->width = $width;
-    }
-
-    public function setHeight(int $height) : void
-    {
-        $this->height = $height;
-    }
-
-    public function setData(string $data) : void
+    protected function processData(string $data) : void
     {
         debug("Querying image dimensions. Data Length: " . strlen($data));
 
@@ -63,8 +51,11 @@ class ImageStorageObject extends FileStorageObject
         if ($this->width < 1 || $this->height < 1) {
             throw new Exception("Invalid image dimensions from input data");
         }
+    }
+    public function setData(string $data) : void
+    {
+        $this->processData($data);
         parent::setData($data);
-
     }
 
     public function deconstruct(array &$row, $doEscape = TRUE) : void

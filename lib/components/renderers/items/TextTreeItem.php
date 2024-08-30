@@ -127,19 +127,19 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
 
     }
 
-    public function setData(array &$row)
+    public function setData(array $data) : void
     {
-        parent::setData($row);
+        parent::setData($data);
 
-        $this->text_action->setData($row);
+        $this->text_action->setData($data);
 
-        $dataSetter = function(Action $action, int $idx) use($row) {
-            $action->setData($row);
+        $dataSetter = function(Action $action, int $idx) use($data) {
+            $action->setData($data);
         };
         $this->actions->each($dataSetter);
 
         if ($this->icon instanceof StorageItem) {
-            $this->icon->setData($row);
+            $this->icon->setData($data);
         }
     }
 

@@ -39,7 +39,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
         return $this->url;
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
         parent::setData($data);
         $this->url->setData($data);

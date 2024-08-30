@@ -28,19 +28,14 @@ class StorageObject
         $this->timestamp = $timestamp;
     }
 
-    public function getTimestamp() : int
+    public function timestamp() : int
     {
         return $this->timestamp;
     }
 
-    public function getData() : string
+    public function data() : string
     {
-        return $this->buffer->getData();
-    }
-
-    public function getLength() : int
-    {
-        return $this->buffer->length();
+        return $this->buffer->data();
     }
 
     public function setData(string $data) : void
@@ -48,14 +43,9 @@ class StorageObject
         $this->buffer->setData($data);
     }
 
-    public function getBuffer() : DataBuffer
+    public function buffer() : DataBuffer
     {
         return $this->buffer;
-    }
-
-    public function haveData() : bool
-    {
-        return ($this->buffer->length() > 0);
     }
 
     public function serializeDB() : string
@@ -65,12 +55,12 @@ class StorageObject
 
     }
 
-    public function getUID() : string
+    public function UID() : string
     {
         return $this->uid;
     }
 
-    public function setUID(string $uid)
+    public function setUID(string $uid) : void
     {
         $this->uid = $uid;
     }
@@ -80,18 +70,18 @@ class StorageObject
         $this->dataKey = $dataKey;
     }
 
-    public function getDataKey(): string
+    public function dataKey(): string
     {
         return $this->dataKey;
     }
 
     public function deconstruct(array &$row, $doEscape = TRUE) : void
     {
-        $row[$this->dataKey] = $this->buffer->getData();
+        $row[$this->dataKey] = $this->buffer->data();
 
         if ($doEscape) {
 
-            $row[$this->dataKey] = DBConnections::Get()->escape($this->buffer->getData());
+            $row[$this->dataKey] = DBConnections::Get()->escape($this->buffer->data());
 
         }
         $row["mime"] = $this->buffer->mime();
@@ -121,11 +111,11 @@ class StorageObject
 
         if (isset($result["width"]) && isset($result["height"])) {
             $object = new ImageStorageObject();
-            $object->setData($result[$blob_field]);
+            $object->buffer()->setData($result[$blob_field]);
         }
         else {
             $object = new FileStorageObject();
-            $object->setData($result[$blob_field]);
+            $object->buffer()->setData($result[$blob_field]);
         }
 
         $object->setFilename($result["filename"]);
@@ -137,13 +127,13 @@ class StorageObject
             $object->setTimestamp(strtotime($result["date_upload"]));
         }
 
-        $object->setUID(sparkHash($object->getFilename()."|".$object->getTimestamp()));
+        $object->setUID(sparkHash($object->getFilename()."|".$object->timestamp()));
 
         debug("Reconstructed: ". get_class($object).
-            " UID: " . $object->getUID() .
-            " MIME: " . $object->getMIME() .
-            " Filename: " . $object->getFilename() .
-            " Length: " . $object->getLength());
+            " UID: " . $object->UID() .
+            " MIME: " . $object->buffer()->mime() .
+            " Length: " . $object->buffer->length()) .
+            " Filename: " . $object->getFilename();
 
         return $object;
 
@@ -155,7 +145,7 @@ class StorageObject
         $result = array();
         $result["Serial"] = StorageObject::Serial;
 
-        $result["data"] = $this->buffer->getData();
+        $result["data"] = $this->buffer->data();
 
         $result["timestamp"] = $this->timestamp;
         $result["uid"] = $this->uid;

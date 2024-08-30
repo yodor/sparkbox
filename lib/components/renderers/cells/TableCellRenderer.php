@@ -75,27 +75,20 @@ class TableCellRenderer extends Component implements IDataResultProcessor
         $this->setAttribute("column", $this->field);
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
         //debug("setData: ", $data);
+        $this->value = $data[$this->field] ?? "";
+        $this->setTooltipText($data[$this->tooltip_field] ?? "");
 
         foreach ($this->value_attributes as $idx => $field) {
             if (isset($data[$field])) {
                 $this->setAttribute($field, $data[$field]);
             }
+            else {
+                $this->clearAttribute($field);
+            }
         }
-
-        if (isset($data[$this->tooltip_field])) {
-            $this->setTooltipText($data[$this->tooltip_field]);
-        }
-
-        if (isset($data[$this->field])) {
-            $this->value = $data[$this->field];
-        }
-        else {
-            $this->value = "";
-        }
-
     }
 
     public function setTooltipFromField(string $field)

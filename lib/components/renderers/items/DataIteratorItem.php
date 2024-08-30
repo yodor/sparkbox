@@ -150,11 +150,12 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         return $this->data[$key];
     }
 
-    public function setData(array &$data)
+    public function setData(array $data) : void
     {
         $this->data = $data;
         //This class is reused during sequential render calls. Clear all state variables below
-
+        $this->value = $data[$this->value_key] ?? "";
+        $this->label = $data[$this->label_key] ?? "";
 
         foreach ($this->data_attributes as $attributeName => $fieldName) {
             if (isset($this->data[$fieldName])) {
@@ -162,24 +163,6 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
             }
             else {
                 $this->clearAttribute($attributeName);
-            }
-        }
-
-        if ($this->value_key) {
-            if (isset($data[$this->value_key])) {
-                $this->value = isset($data[$this->value_key]) ? $data[$this->value_key] : "";
-            }
-            else {
-                $this->value = "";
-            }
-        }
-
-        if ($this->label_key) {
-            if (isset($data[$this->label_key])) {
-                $this->label = $data[$this->label_key];
-            }
-            else {
-                $this->label = "";
             }
         }
 

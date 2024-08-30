@@ -292,7 +292,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         //store to cache
         if ($this->cacheEntry) {
             debug("Storing cache file for this bean request");
-            $this->cacheEntry->storeBuffer($this->object->getBuffer(), $lastModified);
+            $this->cacheEntry->storeBuffer($this->object->buffer(), $lastModified);
             debug("Sending cache file as a response");
             $this->sendFile($this->cacheEntry->getFile());
         }
@@ -301,7 +301,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
             debug("Using sendData as a response");
             //cache headers
             $this->fillCacheHeaders();
-            $this->sendData($this->object->getBuffer());
+            $this->sendData($this->object->buffer());
 
         }
 

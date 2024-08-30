@@ -28,5 +28,10 @@ class RawResult
     {
         return array_keys($this->result);
     }
+
+    public function iterator() : ArrayIterator
+    {
+        return new ArrayIterator($this->result);
+    }
 }
 ?>

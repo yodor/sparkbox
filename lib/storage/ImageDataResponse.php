@@ -55,7 +55,7 @@ class ImageDataResponse extends BeanDataResponse
             }
         }
 
-        $buffer = $this->object->getBuffer();
+        $buffer = $this->object->buffer();
         if ($buffer->length()<1) throw new Exception("Empty data");
 
         $mime = $buffer->mime();

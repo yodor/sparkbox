@@ -24,7 +24,7 @@ abstract class PlainUpload extends InputFieldTag
         return $arr;
     }
 
-    protected abstract function renderContents(StorageObject $storage_object);
+    protected abstract function renderContents(StorageObject $object) : void;
 
     protected function renderImpl()
     {

@@ -246,7 +246,7 @@ class SparkHTTPResponse
 
         $this->sendHeaders();
 
-        echo $buffer->getData();
+        echo $buffer->data();
 
         debug("Data sending completed: ".$buffer->length()." bytes sent");
 

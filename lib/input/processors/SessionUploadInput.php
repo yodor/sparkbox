@@ -64,7 +64,7 @@ class SessionUploadInput extends InputProcessor
             }
             if ($value instanceof StorageObject) {
 
-                $uid = $value->getUID();
+                $uid = $value->UID();
 
                 if ($this->transact_bean) {
                     $this->source_loaded_uids[$uid] = $id;
@@ -133,7 +133,7 @@ class SessionUploadInput extends InputProcessor
         if (is_array($values)) {
             //remove from field objects with non posted uids
             foreach ($values as $idx => $storage_object) {
-                $uid = $storage_object->getUID();
+                $uid = $storage_object->uid();
                 if (!in_array($uid, $posted_uids)) unset($values[$idx]);
             }
         }
@@ -148,7 +148,7 @@ class SessionUploadInput extends InputProcessor
             @$storage_object = unserialize($file);
             if ($storage_object instanceof StorageObject) {
                 $values[] = $storage_object;
-                debug("De-serialized UID: " . $storage_object->getUID() . " append to field values");
+                debug("De-serialized UID: " . $storage_object->UID() . " append to field values");
 
             } else {
                 debug("[$uid] could not be de-serialized as StorageObject - removing from session array");
@@ -219,7 +219,7 @@ class SessionUploadInput extends InputProcessor
             throw new Exception("Value to transact is not instance of StorageObject");
         }
 
-        $uid = $value->getUID();
+        $uid = $value->UID();
 
         if (array_key_exists($uid, $this->loaded_uids)) {
             //Skip the value as this is edit and the object is not changed
@@ -264,7 +264,7 @@ class SessionUploadInput extends InputProcessor
 
             if (!($value instanceof StorageObject)) throw new Exception("Value at position $idx not instance of StorageObject");
 
-            $uid = $value->getUID();
+            $uid = $value->UID();
 
             debug("Processing UID: $uid");
 

@@ -42,15 +42,15 @@ class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
         return $this->actions;
     }
 
-    public function setData(array &$row)
+    public function setData(array $data) : void
     {
-        parent::setData($row);
+        parent::setData($data);
 
         $iterator = $this->actions->iterator();
         while ($iterator->valid()) {
             $action = $iterator->current();
             if ($action instanceof Action) {
-                $action->setData($row);
+                $action->setData($data);
             }
             $iterator->next();
         }

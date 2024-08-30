@@ -283,7 +283,12 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     public function setTooltipText(string $text)
     {
-        $this->setAttribute("tooltip", $text);
+        if (!empty($text)) {
+            $this->setAttribute("tooltip", $text);
+        }
+        else {
+            $this->clearAttribute("tooltip");
+        }
     }
 
     public function getTitle(): string

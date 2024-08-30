@@ -52,15 +52,15 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         return $arr;
     }
 
-    public function setData(array &$item)
+    public function setData(array $data) : void
     {
-        parent::setData($item);
+        parent::setData($data);
 
-        if (isset($item["position"])) {
-            $this->setAttribute("position", $item["position"]);
+        if (isset($data["position"])) {
+            $this->setAttribute("position", $data["position"]);
         }
 
-        $photoID = (int)$item[$this->view->getBean()->key()];
+        $photoID = (int)$data[$this->view->getBean()->key()];
 
         $this->setAttribute("itemID", $photoID);
 
@@ -74,31 +74,31 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
         $tooltip = "";
 
-        if (isset($item["caption"]) && strlen($item["caption"]) > 0) {
-            $this->image_popup->setAttribute("caption", $item["caption"]);
-            $tooltip .= tr("Caption") . ": " . $item["caption"] . "<BR>";
+        if (isset($data["caption"]) && strlen($data["caption"]) > 0) {
+            $this->image_popup->setAttribute("caption", $data["caption"]);
+            $tooltip .= tr("Caption") . ": " . $data["caption"] . "<BR>";
         }
         else {
             $this->image_popup->clearAttribute("caption");
         }
 
-        if (isset($item["date_upload"])) {
-            $tooltip .= tr("Upload Date") . ": " . dateFormat($item["date_upload"], TRUE);
+        if (isset($data["date_upload"])) {
+            $tooltip .= tr("Upload Date") . ": " . dateFormat($data["date_upload"], TRUE);
         }
 
         $this->image_popup->setAttribute("tooltip", $tooltip);
 
 
 
-        if (isset($item["position"])) {
-            $this->position = $item["position"];
+        if (isset($data["position"])) {
+            $this->position = $data["position"];
         }
 
         $iterator = $this->actions->iterator();
         while ($iterator->valid()){
             $action = $iterator->current();
             if ($action instanceof Action) {
-                $action->setData($item);
+                $action->setData($data);
             }
             $iterator->next();
         }

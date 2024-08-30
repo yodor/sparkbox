@@ -4,9 +4,7 @@ include_once("storage/StorageObject.php");
 class FileStorageObject extends StorageObject
 {
 
-    protected string $mime = "application/octet-stream";
     protected string $filename = "";
-
 
     public function __construct()
     {
@@ -24,28 +22,15 @@ class FileStorageObject extends StorageObject
         return $this->filename;
     }
 
-    public function getMIME() : string
-    {
-        return $this->mime;
-    }
-
-    public function setMIME(string $mime) : void
-    {
-        $this->mime = $mime;
-    }
-
     public function deconstruct(array &$row, $doEscape = TRUE) : void
     {
         parent::deconstruct($row, $doEscape);
-
-        $row["mime"] = $this->mime;
         $row["filename"] = $this->filename;
     }
 
     public function __serialize(): array
     {
         $result = parent::__serialize();
-        $result["mime"] = $this->mime;
         $result["filename"] = $this->filename;
         return $result;
     }
@@ -53,7 +38,6 @@ class FileStorageObject extends StorageObject
     public function __unserialize(array $data): void
     {
         parent::__unserialize($data);
-        $this->mime = (string)$data[$this->keyName("mime")];
         $this->filename = (string)$data[$this->keyName("filename")];
     }
 }
