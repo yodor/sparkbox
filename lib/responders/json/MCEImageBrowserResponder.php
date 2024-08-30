@@ -91,7 +91,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
         ob_start();
         echo "<div class='Element' imageID=$id>";
-        echo "<div class='remove_button'>X</div>";
+        echo "<div class='remove_button'></div>";
         $img_href = StorageItem::Image($id, "MCEImagesBean", $this->width, $this->height);
         echo "<img class='image_contents' src='$img_href'>";
         echo "</div>";

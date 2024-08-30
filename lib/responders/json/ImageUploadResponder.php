@@ -32,6 +32,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
     {
         parent::__construct($cmd);
 
+        //default thumbnail size
         $this->setPhotoSize(-1, 64);
 
     }
@@ -48,6 +49,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
 
         //create a temporary thumbnail of the uploaded image
         $scaler = new ImageScaler($this->width, $this->height);
+        $scaler->setOutputQuality(50);
         //copy upload data to new buffer
         $buffer = clone $object->buffer();
         $scaler->process($buffer);
@@ -56,7 +58,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
         ob_start();
         echo "<div class='Element' tooltip='$filename' >";
         echo "<img class='thumbnail' src='$image_data'>";
-        echo "<span class='remove_button' action='Remove'>X</span>";
+        echo "<span class='remove_button' action='Remove'></span>";
         echo "<input type=hidden name='uid_{$field_name}[]' value='$uid' >";
         echo "</div>";
         $html = ob_get_contents();

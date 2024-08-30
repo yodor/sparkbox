@@ -56,7 +56,7 @@ class ImageUploadValidator extends UploadDataValidator
     /**
      * Clamp image size if config options are set
      * Handle resize of uploaded image before storing to DB
-     * @param ImageStorageObject $image_storage
+     * @param StorageObject $object
      * @throws Exception
      */
     public function processObject(StorageObject $object) : void
@@ -69,13 +69,15 @@ class ImageUploadValidator extends UploadDataValidator
         debug("MIME: " . $object->buffer()->mime());
         debug("Length: " . $object->buffer()->length());
 
-        //should be disabled during ajax upload and before submit of actual form. original uploaded image is stored in session
+        //do not resize during ajax calls. original uploaded file is stored in session
         if (!$this->resize_enabled) {
             debug("Resizing is not enabled for this validator");
             return;
         }
 
+        //final image that goes to DB
         $scaler = new ImageScaler($this->resize_width, $this->resize_height);
+        $scaler->setOutputQuality(IMAGE_UPLOAD_STORE_QUALITY);
         $scaler->process($object->buffer());
 
     }

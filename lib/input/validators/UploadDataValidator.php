@@ -131,10 +131,8 @@ abstract class UploadDataValidator implements IInputValidator
     }
 
 
-    public function processObject(StorageObject $object) : void
-    {
+    abstract public function processObject(StorageObject $object) : void;
 
-    }
 
 }
 

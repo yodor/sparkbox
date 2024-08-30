@@ -180,6 +180,7 @@ class MCEImageBrowserDialog extends JSONDialog {
 
             }); //each image
 
+            this.modal_pane.centerContents();
         } //find
     }
 

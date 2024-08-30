@@ -121,7 +121,8 @@ class ModalPopup {
         this.popup.css("left", left);
         this.popup.css("top", top);
         this.popup.css("width", width);
-        //this.popup.css("height", height);
+        //?
+        this.popup.css("height", height);
     }
 
     makeMovable() {

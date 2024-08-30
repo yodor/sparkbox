@@ -38,6 +38,7 @@ class ImageField extends PlainUpload implements IPhotoRenderer
         if ($object instanceof ImageStorageObject) {
 
             $scaler = new ImageScaler($this->width, $this->height);
+            $scaler->setOutputQuality(50);
             $buffer = clone $object->buffer();
             $scaler->process($buffer);
 

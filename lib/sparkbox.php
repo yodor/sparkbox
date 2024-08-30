@@ -114,10 +114,12 @@ $defines->set("IMAGE_UPLOAD_DOWNSCALE", TRUE);
 //IMAGE_UPLOAD_UPSCALE = true  | uploaded images with different size from 'base size' are upscaled to size (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 //IMAGE_UPLOAD_UPSCALE = false | uploaded images are not upscaled even if dimension differ from (DEFAULT_WIDTH,DEFAULT_HEIGHT)
 $defines->set("IMAGE_UPLOAD_UPSCALE", FALSE);
+$defines->set("IMAGE_UPLOAD_STORE_QUALITY", 80);
 
 //force output to webp
 $defines->set("IMAGE_SCALER_OUTPUT_FORMAT", "image/webp");
-$defines->set("IMAGE_SCALER_OUTPUT_QUALITY", 60);
+$defines->set("IMAGE_SCALER_OUTPUT_QUALITY", 80);
+
 
 //generic contact name and email
 $defines->set("DEFAULT_EMAIL_NAME", $site_domain . " Administration");

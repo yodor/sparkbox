@@ -1,8 +1,6 @@
 .MCEImageBrowserDialog {
-    max-height:80%;
-    max-width:80%;
-    width:50%;
-    height:50%;
+    min-width:50%;
+    min-height:80%
 }
 .MCEImageBrowserDialog .Contents .Text {
 
@@ -67,33 +65,22 @@
 
 
 .MCEImageBrowserDialog .ImageStorage .Collection .Element .remove_button {
-    color: white;
-    width: 20px;
-    height: 20px;
     display: block;
-    border-radius: 20px;
-    background-color: black;
-    color: white;
-    border: 2px solid white;
-    text-align: center;
-    text-decoration: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 25px;
+
     position: absolute;
+    left: 0;
+    top: 0;
+    margin-left: -0.5em;
+    margin-top: -0.5em;
 
-    left: 0px;
-    top: 0px;
-    margin-left: -10px;
-    margin-top: -10px;
-
-    box-sizing: border-box;
-    -moz-box-sizing: border-box; /* Firefox */
-
-    padding-right: 1px;
-
-    font-size: 12px;
-    font-family: "Consolas", "Mono";
-
-    font-weight: bold;
-    text-transform: lowercase;
+    background-color: white;
+    background-image:url("../images/delete.svg");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
 
     cursor: pointer;
 }

@@ -33,7 +33,7 @@ class FileUploadResponder extends UploadControlResponder
         echo "<span class='filename'><label>$filename</label></span>";
         echo "<span class='filesize'><label>" . file_size($object->buffer()->length()) . "</label></span>";
         echo "</div>";
-        echo "<span class='remove_button' action='Remove'>X</span>";
+        echo "<span class='remove_button' action='Remove'></span>";
         echo "<input type=hidden name='uid_{$field_name}[]' value='$uid' >";
         echo "</div>";
 
