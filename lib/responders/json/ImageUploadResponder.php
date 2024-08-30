@@ -51,7 +51,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
         //copy upload data to new buffer
         $buffer = clone $object->getBuffer();
         $scaler->process($buffer);
-        $image_data = "data:$mime;base64," . base64_encode($buffer->getRef());
+        $image_data = "data:$mime;base64," . base64_encode($buffer->getData());
 
         ob_start();
         echo "<div class='Element' tooltip='$filename' >";

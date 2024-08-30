@@ -157,7 +157,7 @@ class ImageScaler
             //as is
             debug("Using as-is mode");
             if ($this->watermark_required && $this->watermark_enabled) {
-                $h_source = @imagecreatefromstring($buffer->getRef());
+                $h_source = @imagecreatefromstring($buffer->getData());
                 if ($h_source === FALSE) {
                     throw new Exception("Image can not be created from this input data");
                 }
@@ -169,7 +169,7 @@ class ImageScaler
 
     protected function processCrop(DataBuffer $buffer) : void
     {
-        $h_source = @imagecreatefromstring($buffer->getRef());
+        $h_source = @imagecreatefromstring($buffer->getData());
         if ($h_source === FALSE) {
             throw new Exception("Image can not be created from this input data");
         }
@@ -224,7 +224,7 @@ class ImageScaler
     protected function processThumb(DataBuffer $buffer) : void
     {
 
-        $h_source = @imagecreatefromstring($buffer->getRef());
+        $h_source = @imagecreatefromstring($buffer->getData());
         if ($h_source === FALSE) {
             throw new Exception("Image can not be created from this input data");
         }

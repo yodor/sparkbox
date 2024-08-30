@@ -7,18 +7,9 @@ class DataBuffer
     {
 
     }
-    public function setRef(string &$data)
-    {
-        $this->data = $data;
-    }
-    public function &getRef() : string
-    {
-        return $this->data;
-    }
 
     public function getData() : string
     {
-
         return $this->data;
     }
 

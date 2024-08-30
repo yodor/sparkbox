@@ -91,9 +91,10 @@ class StorageObject
 
         if ($doEscape) {
 
-            $row[$this->dataKey] = DBConnections::Get()->escape($this->buffer->getRef());
+            $row[$this->dataKey] = DBConnections::Get()->escape($this->buffer->getData());
 
         }
+        $row["mime"] = $this->buffer->mime();
         $row["size"] = $this->buffer->length();
         $row["timestamp"] = $this->timestamp;
         $row["uid"] = $this->uid;
@@ -154,7 +155,7 @@ class StorageObject
         $result = array();
         $result["Serial"] = StorageObject::Serial;
 
-        $result["data"] = $this->buffer->getRef();
+        $result["data"] = $this->buffer->getData();
 
         $result["timestamp"] = $this->timestamp;
         $result["uid"] = $this->uid;

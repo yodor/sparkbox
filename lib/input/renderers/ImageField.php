@@ -41,7 +41,7 @@ class ImageField extends PlainUpload implements IPhotoRenderer
             $buffer = clone $object->getBuffer();
             $scaler->process($buffer);
 
-            $image_data = "data:" . $object->getMIME() . ";base64," . base64_encode($buffer->getRef());
+            $image_data = "data:" . $object->getMIME() . ";base64," . base64_encode($buffer->getData());
 
             echo "<img class='thumbnail' src='$image_data'>";
 
