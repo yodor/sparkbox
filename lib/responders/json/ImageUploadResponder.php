@@ -36,7 +36,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
 
     }
 
-    public function getHTML(FileStorageObject &$object, string $field_name) : string
+    public function getHTML(StorageObject $object, string $field_name) : string
     {
         if (!($object instanceof FileStorageObject)) throw new Exception("Expecting FileStorageObject");
 
@@ -48,9 +48,10 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
 
         //create a temporary thumbnail of the uploaded image
         $scaler = new ImageScaler($this->width, $this->height);
-        $scaler->process($object->getData(), $object->getLength(), $mime);
-
-        $image_data = "data:$mime;base64," . base64_encode($scaler->getData());
+        //copy upload data to new buffer
+        $buffer = clone $object->getBuffer();
+        $scaler->process($buffer);
+        $image_data = "data:$mime;base64," . base64_encode($buffer->getRef());
 
         ob_start();
         echo "<div class='Element' tooltip='$filename' >";

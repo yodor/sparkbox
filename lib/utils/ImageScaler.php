@@ -1,4 +1,5 @@
 <?php
+include_once("storage/DataBuffer.php");
 
 class ImageScaler
 {
@@ -22,11 +23,7 @@ class ImageScaler
      * @var string Output image format
      */
     protected $output_format = ImageScaler::TYPE_WEBP;
-
-    /**
-     * @var string Input image mime type
-     */
-    protected $mime = ImageScaler::TYPE_PNG;
+    protected $output_quality = 60;
 
     protected $mode = ImageScaler::MODE_FULL;
 
@@ -51,10 +48,6 @@ class ImageScaler
     public $upscale_enabled = FALSE;
     public $downscale_enabled = FALSE;
 
-    protected $data = NULL;
-    protected $dataSize = 0;
-
-    protected $output_quality = 60;
 
     //resulting image width and height
     public function __construct(int $width, int $height)
@@ -90,6 +83,7 @@ class ImageScaler
         }
 
     }
+
     public function __destruct()
     {
         if ($this->watermark_data !== FALSE) {
@@ -97,12 +91,12 @@ class ImageScaler
         }
     }
 
-    public function getWatermarkPosition() : int
+    public function getWatermarkPosition(): int
     {
         return $this->watermark_position;
     }
 
-    public function isWatermarkEnabled() : bool
+    public function isWatermarkEnabled(): bool
     {
         return $this->watermark_enabled;
     }
@@ -111,9 +105,12 @@ class ImageScaler
     {
         $this->output_quality = $output_quality;
     }
-    public function getOutputQuality() : int {
+
+    public function getOutputQuality(): int
+    {
         return $this->output_quality;
     }
+
     /**
      * @param string $mime Set the output format from mime type string
      */
@@ -127,7 +124,7 @@ class ImageScaler
     /**
      * @return string Return the output format mime type string
      */
-    public function getOutputFormat() : string
+    public function getOutputFormat(): string
     {
         return $this->output_format;
     }
@@ -147,39 +144,32 @@ class ImageScaler
         return $this->height;
     }
 
-    public function process(string $data, int $length, string $mime)
+    public function process(DataBuffer $buffer)
     {
-
-        $this->mime = $mime;
-        $this->data = $data;
-        $this->dataSize = $length;
 
         if ($this->mode == ImageScaler::MODE_CROP) {
             debug("Using CROP mode");
-            $this->processCrop();
-        }
-        else if ($this->mode == ImageScaler::MODE_THUMB) {
+            $this->processCrop($buffer);
+        } else if ($this->mode == ImageScaler::MODE_THUMB) {
             debug("Using THUMB mode");
-            $this->processThumb();
-        }
-        else {
+            $this->processThumb($buffer);
+        } else {
             //as is
             debug("Using as-is mode");
             if ($this->watermark_required && $this->watermark_enabled) {
-                $h_source = @imagecreatefromstring($this->data);
+                $h_source = @imagecreatefromstring($buffer->getRef());
                 if ($h_source === FALSE) {
                     throw new Exception("Image can not be created from this input data");
                 }
-
-                $this->setImageData($h_source);
+                $this->setImageData($buffer, $h_source);
                 imagedestroy($h_source);
             }
         }
     }
 
-    protected function processCrop()
+    protected function processCrop(DataBuffer $buffer) : void
     {
-        $h_source = @imagecreatefromstring($this->data);
+        $h_source = @imagecreatefromstring($buffer->getRef());
         if ($h_source === FALSE) {
             throw new Exception("Image can not be created from this input data");
         }
@@ -198,22 +188,19 @@ class ImageScaler
             //upscale
             if ($pix_req > $pix_img) {
 
-            }
-            //downscale
+            } //downscale
             else {
 
             }
 
-        }
-        else {
+        } else {
             if ($this->height > 0) {
                 //scale to height , width auto
                 $ratio = $image_height / $this->height;
                 $this->width = (int)($image_width / $ratio);
 
                 debug("Using fit to height");
-            }
-            else if ($this->width > 0) {
+            } else if ($this->width > 0) {
                 $ratio = $image_width / $this->width;
                 $this->height = (int)($image_height / $ratio);
 
@@ -228,16 +215,16 @@ class ImageScaler
         imagecopyresampled($h_crop, $h_source, 0, 0, 0, 0, $this->width, $this->height, $image_width, $image_height);
         imagedestroy($h_source);
 
-        $this->setImageData($h_crop);
+        $this->setImageData($buffer, $h_crop);
 
         imagedestroy($h_crop);
 
     }
 
-    protected function processThumb()
+    protected function processThumb(DataBuffer $buffer) : void
     {
 
-        $h_source = @imagecreatefromstring($this->data);
+        $h_source = @imagecreatefromstring($buffer->getRef());
         if ($h_source === FALSE) {
             throw new Exception("Image can not be created from this input data");
         }
@@ -246,9 +233,9 @@ class ImageScaler
         $image_height = imagesy($h_source);
         $image_size = min($image_width, $image_height);
 
-        $h_crop = imagecrop($h_source, ['x'      => ($image_width - $image_size) / 2,
-                                        'y'      => ($image_height - $image_size) / 2, 'width' => $image_size,
-                                        'height' => $image_size]);
+        $h_crop = imagecrop($h_source, ['x' => ($image_width - $image_size) / 2,
+            'y' => ($image_height - $image_size) / 2, 'width' => $image_size,
+            'height' => $image_size]);
         imagedestroy($h_source);
 
         $h_thumbnail = $this->createImage($this->width, $this->width);
@@ -256,57 +243,55 @@ class ImageScaler
         imagecopyresampled($h_thumbnail, $h_crop, 0, 0, 0, 0, $this->width, $this->width, $image_size, $image_size);
         imagedestroy($h_crop);
 
-        $this->setImageData($h_thumbnail);
+        $this->setImageData($buffer, $h_thumbnail);
 
         imagedestroy($h_thumbnail);
     }
 
-    protected function processWatermark($h_source)
+    protected function processWatermark(GdImage $h_source) : void
     {
 
 
-            $width = imagesx($h_source);
-            $height = imagesy($h_source);
+        $width = imagesx($h_source);
+        $height = imagesy($h_source);
 
-            $sx = imagesx($this->watermark_data);
-            $sy = imagesy($this->watermark_data);
+        $sx = imagesx($this->watermark_data);
+        $sy = imagesy($this->watermark_data);
 
-            $wtsize = (int)($height / $this->watermark_size);
+        $wtsize = (int)($height / $this->watermark_size);
 
-            $margin_x = (int)($wtsize/$this->watermark_margin_x);
-            $margin_y = (int)($wtsize/$this->watermark_margin_y);
+        $margin_x = (int)($wtsize / $this->watermark_margin_x);
+        $margin_y = (int)($wtsize / $this->watermark_margin_y);
 
-            if ($this->watermark_position == self::WATERMARK_POSITION_TOP_LEFT) {
-                $dst_x = $margin_x;
-                $dst_y = $margin_y;
-            }
-            else if ($this->watermark_position == self::WATERMARK_POSITION_TOP_RIGHT) {
-                $dst_x = $width - $margin_x - $wtsize;
-                $dst_y = $margin_y;
-            }
-            else if ($this->watermark_position == self::WATERMARK_POSITION_BOTTOM_LEFT) {
-                $dst_x = $margin_x;
-                $dst_y = $height - $margin_y - $wtsize;
-            }
-            else {
+        if ($this->watermark_position == self::WATERMARK_POSITION_TOP_LEFT) {
+            $dst_x = $margin_x;
+            $dst_y = $margin_y;
+        } else if ($this->watermark_position == self::WATERMARK_POSITION_TOP_RIGHT) {
+            $dst_x = $width - $margin_x - $wtsize;
+            $dst_y = $margin_y;
+        } else if ($this->watermark_position == self::WATERMARK_POSITION_BOTTOM_LEFT) {
+            $dst_x = $margin_x;
+            $dst_y = $height - $margin_y - $wtsize;
+        } else {
 
-                //if ($this->watermark_position == self::WATERMARK_POSITION_BOTTOM_RIGHT) {
-                $dst_x = $width - $margin_x - $wtsize;
-                $dst_y = $height - $margin_y - $wtsize;
-                //}
-            }
+            //if ($this->watermark_position == self::WATERMARK_POSITION_BOTTOM_RIGHT) {
+            $dst_x = $width - $margin_x - $wtsize;
+            $dst_y = $height - $margin_y - $wtsize;
+            //}
+        }
 
-            debug("Processing watermark on source");
-            //imagecopy($h_source, $stamp, imagesx($h_source) - $sx - $marge_right, imagesy($h_source) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
-            //imagecopyresized($h_source, $stamp, $this->width - $marge_right - $wtsize, $this->height - $marge_bottom - $wtsize, 0, 0, imagesx($stamp), imagesy($stamp));
-            imagecopyresampled($h_source, $this->watermark_data, $dst_x, $dst_y,
-                0,0,
-                $wtsize, $wtsize,
-                $sx, $sy);
+        debug("Processing watermark on source");
+        //imagecopy($h_source, $stamp, imagesx($h_source) - $sx - $marge_right, imagesy($h_source) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
+        //imagecopyresized($h_source, $stamp, $this->width - $marge_right - $wtsize, $this->height - $marge_bottom - $wtsize, 0, 0, imagesx($stamp), imagesy($stamp));
+        imagecopyresampled($h_source, $this->watermark_data, $dst_x, $dst_y,
+            0, 0,
+            $wtsize, $wtsize,
+            $sx, $sy);
 
 
     }
-    protected function setImageData($h_source)
+
+    protected function setImageData(DataBuffer $buffer, GdImage $h_source): void
     {
         debug("Set image data ...");
         if ($this->grayFilter) {
@@ -321,34 +306,23 @@ class ImageScaler
         if (strcmp($this->output_format, ImageScaler::TYPE_PNG) == 0) {
             imagesavealpha($h_source, TRUE);
             imagepng($h_source);
-        }
-        else if (strcmp($this->output_format, ImageScaler::TYPE_JPEG) == 0){
+        } else if (strcmp($this->output_format, ImageScaler::TYPE_JPEG) == 0) {
             imagejpeg($h_source, NULL, $this->output_quality);
-        }
-        else {
+        } else {
             imagewebp($h_source, NULL, $this->output_quality);
         }
-        $this->data = ob_get_contents();
-        $this->dataSize = ob_get_length();
+
+        $buffer->setData(ob_get_contents());
 
         ob_end_clean();
     }
 
-    public function getData(): string
-    {
-        return $this->data;
-    }
-
-    public function getDataSize(): int
-    {
-        return $this->dataSize;
-    }
-
-    protected function createImage(int $width, int $height)
+    protected function createImage(int $width, int $height) : GdImage
     {
         $h_thumbnail = imagecreatetruecolor($width, $height);
         imageantialias($h_thumbnail, TRUE);
         imagealphablending($h_thumbnail, TRUE);
         return $h_thumbnail;
     }
+
 }

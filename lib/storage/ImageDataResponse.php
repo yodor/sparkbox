@@ -10,7 +10,7 @@ class ImageDataResponse extends BeanDataResponse
     const KEY_HEIGHT = "height";
     const KEY_SIZE = "size";
 
-    protected string $field = "photo";
+    protected string $field = BeanDataResponse::FIELD_PHOTO;
 
     protected ImageScaler $scaler;
 
@@ -39,7 +39,7 @@ class ImageDataResponse extends BeanDataResponse
         parent::__construct($id, $className);
     }
 
-    protected function processData()
+    protected function process()
     {
 
         if (isset($this->row["watermark_enabled"]) && ($this->row["watermark_enabled"]>0)) {
@@ -48,15 +48,22 @@ class ImageDataResponse extends BeanDataResponse
             if ($this->scaler->isWatermarkEnabled()) {
                 debug("Scaler watermark is enabled and can be used");
                 $this->scaler->watermark_required = true;
-                //$this->etag_parts[] = "watermark|".$this->scaler->getWatermarkPosition();
             }
             else {
                 debug("Scaler watermark is unavailable");
                 $this->scaler->watermark_required = false;
             }
         }
-        $this->scaler->process($this->row[$this->field], $this->row["size"], $this->row["mime"]);
-        $this->setData($this->scaler->getData(), $this->scaler->getDataSize());
+
+        $buffer = $this->object->getBuffer();
+        if ($buffer->length()<1) throw new Exception("Empty data");
+
+        $mime = $buffer->mime();
+        if (!str_contains($mime, "image")) throw new Exception("Not an image data: $mime");
+
+        //place result in buffer
+        $this->scaler->process($buffer);
+
     }
 
     protected function cacheName() : string

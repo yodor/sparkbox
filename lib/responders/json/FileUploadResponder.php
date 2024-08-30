@@ -11,7 +11,7 @@ class FileUploadResponder extends UploadControlResponder
         parent::__construct("file_upload");
     }
 
-    public function getHTML(FileStorageObject &$object, string $field_name) : string
+    public function getHTML(StorageObject $object, string $field_name) : string
     {
 
         if (!($object instanceof FileStorageObject)) throw new Exception("Expecting FileStorageObject");

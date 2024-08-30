@@ -5,9 +5,6 @@ class SparkHTTPResponse
 
     protected array $headers = array();
 
-    protected string $data = "";
-    protected int $dataSize = -1;
-
     public const DATE_FORMAT = "D, d M Y H:i:s T";
 
     protected string $disposition = "inline";
@@ -70,46 +67,6 @@ class SparkHTTPResponse
     public function haveHeader(string $field) : bool
     {
         return isset($this->headers[$field]);
-    }
-
-    public function setData(string $data, int $dataSize)
-    {
-        $this->data = $data;
-        $this->dataSize = $dataSize;
-        if ($this->dataSize > 0) {
-            $this->setHeader("Content-Length", $this->dataSize);
-        }
-    }
-
-    /**
-     * Return current data assigned
-     * @return string
-     */
-    public function getData() : string
-    {
-        return $this->data;
-    }
-
-    /**
-     * Return size of current data
-     * @return int
-     */
-    public function getSize() : int
-    {
-        return $this->dataSize;
-    }
-
-    /**
-     * Default implementation - send all headers assigned and data
-     * @param bool Default true - Exit after sending
-     */
-    public function send(bool $doExit = TRUE)
-    {
-        $this->sendHeaders();
-        $this->sendData();
-        if ($doExit) {
-            exit;
-        }
     }
 
     /**
@@ -231,7 +188,7 @@ class SparkHTTPResponse
      * @return void
      * @throws Exception
      */
-    public function sendFile(SparkFile $file)
+    public function sendFile(SparkFile $file) : void
     {
 
         debug("Sending file: ".$file->getAbsoluteFilename());
@@ -270,13 +227,28 @@ class SparkHTTPResponse
      * Output contents of $this->data
      * @return void
      */
-    protected function sendData()
+    public function sendData(DataBuffer $buffer) : void
     {
-        if ($this->dataSize < 1) return;
+        if ($buffer->length()<1) return;
 
-        echo $this->data;
+        debug("Sending DataBuffer ...");
 
-        debug("Data sending completed: $this->dataSize bytes sent");
+        $filename = $this->disposition_filename;
+        if(empty($filename)) {
+            throw new Exception("Disposition filename empty");
+        }
+        debug("Using disposition filename: ".$filename);
+
+        $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
+
+        $this->setHeader("Content-Type", $buffer->mime());
+        $this->setHeader("Content-Length", $buffer->length());
+
+        $this->sendHeaders();
+
+        echo $buffer->getRef();
+
+        debug("Data sending completed: ".$buffer->length()." bytes sent");
 
     }
 }

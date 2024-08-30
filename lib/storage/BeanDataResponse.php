@@ -3,14 +3,20 @@ include_once("storage/SparkHTTPResponse.php");
 include_once("storage/CacheEntry.php");
 include_once("storage/FileStorageObject.php");
 include_once("auth/Authenticator.php");
+include_once("storage/DataBuffer.php");
 
 abstract class BeanDataResponse extends SparkHTTPResponse
 {
 
+    const FIELD_PHOTO = "photo";
+    const FIELD_DATA = "data";
+
     protected string $className = "";
     protected int $id = -1;
     protected string $field = "";
-    protected array $row = array();
+
+
+    protected StorageObject $object;
 
     protected ?CacheEntry $cacheEntry;
 
@@ -96,44 +102,29 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     }
 
     /**
-     * Load full result from database into $this->row.
-     * If requested id=-1 try to call function 'Default_$this->className' to construct default data result and set as $this->row.
+     * Create and set the StorageObject with data from DB
      * @return void
      * @throws Exception
      */
-    protected function loadBeanData()
+    protected function loadBean()
     {
-        if ($this->id == -1) {
-
-            $funcname = "Default_" . $this->className;
-
-            if (is_callable($funcname)) {
-                $funcname($this->row);
-                return;
-            }
-            throw new Exception("No default value for this class");
-        }
 
         debug("Loading ID: " . $this->id . " from " . $this->className);
 
-        $this->row = $this->bean->getByID($this->id);
-        debug("Data keys loaded: ", array_keys($this->row));
+        $result = $this->bean->getByID($this->id);
+        debug("Data keys loaded: ", array_keys($result));
 
-    }
+        if (!isset($result[$this->field])) {
+            debug("Required field name not found");
+            throw new Exception("Field name not found");
+        }
 
-    protected function unpackStorageObject()
-    {
-        debug("...");
-
-        $object = @unserialize($this->row[$this->field]);
+        $object = @unserialize($result[$this->field]);
 
         if ($object instanceof StorageObject) {
-
             debug("Unpacked: " . get_class($object));
-
             $object->setDataKey($this->field);
-            $object->deconstruct($this->row, FALSE);
-
+            $this->object = $object;
         }
         else {
 
@@ -141,9 +132,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
             //Limit arbitrary data access from the result row
             if ($this->field_requested) {
-                throw new Exception("Field does not contain StorageObject");
+                throw new Exception("Named field access restricted to StorageObject types only");
             }
-            //continue for objects transacted to db as dbrow and the default key name will be used (photo or data)
+
+            //Create storage object using the default data key
+            $this->object = StorageObject::CreateFrom($result, $this->field);
 
         }
     }
@@ -171,42 +164,10 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
     }
 
-    /**
-     * Set content type headers (content-type, content-disposition, content-transfer-encoding)
-     * Called after data is set and if cache is disabled
-     * @return void
-     */
-    protected function fillContentHeaders() : void
-    {
-
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mime = $finfo->buffer($this->data);
-
-        if ($mime) {
-            $this->setHeader("Content-Type", $mime);
-        }
-        else {
-            $this->setHeader("Content-Type", "application/octet-stream");
-        }
-
-        if (isset($this->row["filename"])) {
-            $filename = $this->row["filename"];
-        }
-        elseif (isset($this->headers["ETag"])) {
-            $filename = $this->headers["ETag"];
-        }
-        else {
-            $filename = sparkHash(microtime_float());
-        }
-
-        $this->setHeader("Content-Disposition", "{$this->disposition}; filename=\"$filename\"");
-        $this->setHeader("Content-Transfer-Encoding", "binary");
-    }
-
 
     /**
      * Get last modified from cache file or from bean
-     *
+     * Reuse this value further during this request call
      * @return int
      * @throws Exception
      */
@@ -229,7 +190,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     }
     /**
      * Return the last modified time for the requested row 'id'
-     * Fetches columns timestamp, date_upload or date_updated of this bean to construct the last modified time
+     * Fetches columns date_upload or date_updated of this bean to construct the last modified time
      * If these columns are not present in this bean, use time() as result
      * @return int
      * @throws Exception
@@ -288,7 +249,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      * Store to filesystem cache for reuse if cache is enabled
      * @throws Exception
      */
-    public function send(bool $doExit = TRUE)
+    public function send()
     {
         debug("Class: " . $this->className . " ID: " . $this->id . " Field: " . $this->field);
 
@@ -323,30 +284,28 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         }
 
         //fully load the bean data including the blob field
-        $this->loadBeanData();
-        $this->unpackStorageObject();
+        $this->loadBean();
 
         //do the magic - ie image resize; also set content length header
-        $this->processData();
+        $this->process();
 
         //store to cache
         if ($this->cacheEntry) {
             debug("Storing cache file for this bean request");
-            $this->cacheEntry->store($this->data, $lastModified);
+            $this->cacheEntry->store($this->object->getData(), $lastModified);
             debug("Sending cache file as a response");
             $this->sendFile($this->cacheEntry->getFile());
         }
         else {
+            //debug case only when cache is disabled
             debug("Using sendData as a response");
-            //fill remaining headers - call after data is already set
             //cache headers
             $this->fillCacheHeaders();
-            $this->fillContentHeaders();
-            $this->sendHeaders();
-            $this->sendData();
-            exit;
+            $this->sendData($this->object->getBuffer());
+
         }
 
+        exit;
 
     }
 
@@ -355,7 +314,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         return sparkHash($this->cacheName()."-".$this->getLastModified());
     }
 
-    abstract protected function processData();
+    abstract protected function process();
     abstract protected function cacheName() : string;
 
 

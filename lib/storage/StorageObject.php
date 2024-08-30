@@ -1,4 +1,5 @@
 <?php
+include_once("storage/DataBuffer.php");
 
 class StorageObject
 {
@@ -6,18 +7,18 @@ class StorageObject
     final public const Serial = 1.0;
 
     protected string $dataKey = "";
-    protected string $data = "";
-    protected int $length = 0;
+
     protected int $timestamp = 0; //unix time
     protected string $uid = "";
+
+    protected DataBuffer $buffer;
 
     protected bool $compatUnserialize = false;
 
     public function __construct()
     {
         $this->dataKey = "data";
-        $this->data = "";
-        $this->length = 0;
+        $this->buffer = new DataBuffer();
         $this->timestamp = 0;
         $this->uid = microtime(TRUE) . "." . rand();
     }
@@ -34,26 +35,30 @@ class StorageObject
 
     public function getData() : string
     {
-        return $this->data;
+        return $this->buffer->getData();
     }
 
     public function getLength() : int
     {
-        return $this->length;
+        return $this->buffer->length();
     }
 
-    public function setData(string $data)
+    public function setData(string $data) : void
     {
-        $this->data = $data;
-        $this->length = strlen($data);
+        $this->buffer->setData($data);
+    }
+
+    public function getBuffer() : DataBuffer
+    {
+        return $this->buffer;
     }
 
     public function haveData() : bool
     {
-        return (strlen($this->data) > 0);
+        return ($this->buffer->length() > 0);
     }
 
-    public function serializeDB()
+    public function serializeDB() : string
     {
 
         return DBConnections::Get()->escape(serialize($this));
@@ -82,53 +87,64 @@ class StorageObject
 
     public function deconstruct(array &$row, $doEscape = TRUE) : void
     {
-        $row[$this->dataKey] = $this->data;
+        $row[$this->dataKey] = $this->buffer->getData();
 
         if ($doEscape) {
 
-            $row[$this->dataKey] = DBConnections::Get()->escape($this->data);
+            $row[$this->dataKey] = DBConnections::Get()->escape($this->buffer->getRef());
 
         }
-        $row["size"] = $this->length;
+        $row["size"] = $this->buffer->length();
         $row["timestamp"] = $this->timestamp;
+        $row["uid"] = $this->uid;
     }
 
-    public static function reconstruct(&$row, $field_name): StorageObject
+    /**
+     * Create storage object form DB result row
+     *
+     * @param array $row
+     * @param string $field_name
+     * @return StorageObject
+     * @throws Exception
+     */
+    public static function CreateFrom(array &$result, string $blob_field): StorageObject
     {
 
-        $storage_object = NULL;
-        if (isset($row["mime"]) && isset($row["size"]) && isset($row[$field_name]) && isset($row["filename"]) && isset($row["date_upload"])) {
+        $object = NULL;
 
-            debug("StorageObject::reconstruct | Found needed array key to reconstruct a storage object");
-
-            if (isset($row["width"]) && isset($row["height"])) {
-                $storage_object = new ImageStorageObject();
-                $storage_object->setData($row[$field_name]);
-                debug("StorageObject::reconstruct | Reconstructed ImageStorageObject: Dimensions (" . $row["width"] . "x" . $row["height"] . ")");
-            }
-            else {
-                $storage_object = new FileStorageObject();
-                $storage_object->setData($row[$field_name]);
-                debug("StorageObject::reconstruct | Reconstructed FileStorageObject");
-            }
-
-            $storage_object->setMIME($row["mime"]);
-            $storage_object->setFilename($row["filename"]);
-            $storage_object->setTimestamp(strtotime($row["date_upload"]));
-
-
-
-            $reconstructed_uid = $row[$field_name] . $row["mime"] . "|" . $row["size"] . "|" . $row["filename"];
-
-            $storage_object->setUID($storage_object->getTimestamp() . "." . sparkHash($reconstructed_uid));
-
-            debug("StorageObject::reconstruct | Reconstructed properties: UID: " . $storage_object->getUID() . " MIME: " . $row["mime"] . " Filename: " . $row["filename"] . " Length: " . $row["size"]);
-
-            return $storage_object;
-        }
-        else {
+        if (!(isset($result["mime"]) && isset($result["size"]) && isset($result[$blob_field]) && isset($result["filename"]) && isset($result["date_upload"]))) {
             throw new Exception("Unable to reconstruct from this row. Required fields not found");
         }
+
+        debug("Found needed array keys to create StorageObject");
+
+        if (isset($result["width"]) && isset($result["height"])) {
+            $object = new ImageStorageObject();
+            $object->setData($result[$blob_field]);
+        }
+        else {
+            $object = new FileStorageObject();
+            $object->setData($result[$blob_field]);
+        }
+
+        $object->setFilename($result["filename"]);
+
+        if (isset($result["date_updated"])) {
+            $object->setTimestamp(strtotime($result["date_updated"]));
+        }
+        else {
+            $object->setTimestamp(strtotime($result["date_upload"]));
+        }
+
+        $object->setUID(sparkHash($object->getFilename()."|".$object->getTimestamp()));
+
+        debug("Reconstructed: ". get_class($object).
+            " UID: " . $object->getUID() .
+            " MIME: " . $object->getMIME() .
+            " Filename: " . $object->getFilename() .
+            " Length: " . $object->getLength());
+
+        return $object;
 
     }
 
@@ -138,8 +154,8 @@ class StorageObject
         $result = array();
         $result["Serial"] = StorageObject::Serial;
 
-        $result["data"] = $this->data;
-        $result["length"] = $this->length;
+        $result["data"] = $this->buffer->getRef();
+
         $result["timestamp"] = $this->timestamp;
         $result["uid"] = $this->uid;
 
@@ -153,8 +169,9 @@ class StorageObject
             debug("Using compatibility key names");
         }
 
-        $this->data = (string)$data[$this->keyName("data")];
-        $this->length = (int)$data[$this->keyName("length")];
+        $this->buffer = new DataBuffer();
+
+        $this->buffer->setData((string)$data[$this->keyName("data")]);
         $value = $data[$this->keyName("timestamp")];
         $timestamp = strtotime($value);
         if ($timestamp === FALSE) {
