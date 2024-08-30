@@ -71,7 +71,7 @@ class URLParameter implements IDataResultProcessor
             }
         }
 
-        if (strpos($this->name, "#")===0) {
+        if (str_starts_with($this->name, "#")) {
             $names = array_keys($data);
             foreach ($names as $idx=>$name) {
                 $replace = array("%$name%"=>$data[$name]);

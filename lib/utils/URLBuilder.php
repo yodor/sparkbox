@@ -230,12 +230,12 @@ class URLBuilder implements IGETConsumer
         $script_name = $build_string;
         $script_query = "";
 
-        if (strpos($script_name, "?") !== FALSE) {
+        if (str_contains($script_name, "?")) {
             list($script_name, $script_query) = explode("?", $script_name);
         }
         $this->script_name = $script_name;
 
-        if (strpos($script_query, "#") !== FALSE) {
+        if (str_contains($script_query, "#")) {
             $resource = "";
             list($script_query, $resource) = explode("#", $script_query);
             $this->add(new URLParameter("#" . $resource));
@@ -253,7 +253,7 @@ class URLBuilder implements IGETConsumer
         foreach ($static_pairs as $pos => $pair) {
             $param_name = $pair;
             $param_value = "";
-            if (strpos($pair, "=") !== FALSE) {
+            if (str_contains($pair, "=")) {
                 list($param_name, $param_value) = explode("=", $pair);
             }
             if (strlen($param_name) > 0) {

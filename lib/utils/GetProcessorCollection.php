@@ -30,5 +30,10 @@ class GetProcessorCollection {
     {
         return $this->contents;
     }
+
+    public function iterator() : ArrayIterator
+    {
+        return new ArrayIterator($this->contents);
+    }
 }
 ?>
