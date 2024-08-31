@@ -177,8 +177,6 @@ class Paginator implements IGETConsumer
                 $total_pages = (int)$total_pages + 1;
             }
 
-            $qry = $_GET;
-
             $page = 0;
             if (isset($_GET[Paginator::KEY_PAGE])) {
                 $page = (int)$_GET[Paginator::KEY_PAGE];
@@ -186,8 +184,6 @@ class Paginator implements IGETConsumer
 
             if ($page > $total_pages) $page = $total_pages - 1;
             if ($page < 0) $page = 0;
-
-            echo " ";
 
             $max_page = $this->max_page_list;
 
@@ -225,13 +221,6 @@ class Paginator implements IGETConsumer
         $this->total_pages = (int)$total_pages;
     }
 
-    public static function clearPageFilter(array &$arr)
-    {
-        if (isset($arr[Paginator::KEY_PAGE])) unset($arr[Paginator::KEY_PAGE]);
-        if (isset($arr[Paginator::KEY_ORDER_DIR])) unset($arr[Paginator::KEY_ORDER_DIR]);
-        if (isset($arr[Paginator::KEY_ORDER_BY])) unset($arr[Paginator::KEY_ORDER_BY]);
-    }
-
     public function prepareOrderFilter(string $default_order = "") : SQLSelect
     {
 
@@ -255,13 +244,13 @@ class Paginator implements IGETConsumer
         else {
 
             if (isset($_GET[Paginator::KEY_ORDER_BY])) {
-                $this->order_field = DBConnections::Get()->escape($_GET[Paginator::KEY_ORDER_BY]);
+                $this->order_field = DBConnections::Get()->escape(sanitizeInput($_GET[Paginator::KEY_ORDER_BY]));
             }
 
         }
 
         if (isset($_GET[Paginator::KEY_ORDER_DIR])) {
-            $this->order_direction = DBConnections::Get()->escape($_GET[Paginator::KEY_ORDER_DIR]);
+            $this->order_direction = DBConnections::Get()->escape(sanitizeInput($_GET[Paginator::KEY_ORDER_DIR]));
         }
 
         if (!self::$page_filter_only) {

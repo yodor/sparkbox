@@ -85,6 +85,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
             $link = new URLBuilder();
             $link->buildFrom(SparkPage::Instance()->getPageURL());
+            $link->setClearParams(Paginator::KEY_PAGE);
             $link->add(new URLParameter(Paginator::KEY_ORDER_BY, ""));
             $link->add(new URLParameter(Paginator::KEY_ORDER_DIR, ""));
 

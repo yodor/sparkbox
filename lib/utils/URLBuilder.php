@@ -9,29 +9,29 @@ class URLBuilder implements IGETConsumer
     /**
      * @var string The original href that was set to this URLBuilder. Can contain parameterized values
      */
-    protected $build_string = "";
+    protected string $build_string = "";
 
-    protected $script_name = "";
+    protected string $script_name = "";
 
     /**
      * @var string The query part of this query.
      */
-    protected $script_query = "";
+    protected string $script_query = "";
 
-    protected $domain = "";
-    protected $protocol = "";
+    protected string $domain = "";
+    protected string $protocol = "";
 
     /**
      * @var array  All url parameters name/value pairs
      */
-    protected $parameters = null;
+    protected array $parameters = array();
 
-    protected $resource = "";
+    protected string $resource = "";
 
-    protected $clear_page_param = FALSE;
-    protected $clear_params = array();
+    protected bool $clear_page_param = FALSE;
+    protected array $clear_params = array();
 
-    protected $is_script = FALSE;
+    protected bool $is_script = FALSE;
 
     public function __construct()
     {
@@ -292,4 +292,25 @@ class URLBuilder implements IGETConsumer
 
     }
 
+    public function copyParametersTo(URLBuilder $url)
+    {
+        $parameters = $this->getParameterNames();
+        foreach ($parameters as $idx=>$name) {
+            $url->add($this->get($name));
+        }
+
+    }
+
+    public function copyParametersFrom(URLBuilder $url)
+    {
+        $parameters = $url->getParameterNames();
+        foreach ($parameters as $idx=>$name) {
+            $this->add($url->get($name));
+        }
+
+    }
+    public function clearParameters()
+    {
+        $this->parameters = array();
+    }
 }
