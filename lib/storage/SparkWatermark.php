@@ -135,11 +135,5 @@ class SparkWatermark
 
     }
 
-    public function __destruct()
-    {
-        if ($this->image !== FALSE) {
-            @imagedestroy($this->image);
-        }
-    }
 }
 ?>
