@@ -8,6 +8,9 @@ include_once("components/PaginatorBottomComponent.php");
 
 abstract class AbstractResultView extends Component implements IDataIteratorRenderer
 {
+    const PAGINATOR_NONE = 0;
+    const PAGINATOR_TOP = 1;
+    const PAGINATOR_BOTTOM = 2;
 
     protected int $items_per_page = 20;
 
@@ -43,7 +46,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     protected int $position_index = -1;
 
-    protected bool $paginators_enabled = TRUE;
+    protected int $paginators_enabled = AbstractResultView::PAGINATOR_NONE;
 
     /**
      *  @var DataIteratorItem
@@ -61,9 +64,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      */
     protected ?SQLQuery $iterator;
 
-    const PAGINATOR_NONE = 0;
-    const PAGINATOR_TOP = 1;
-    const PAGINATOR_BOTTOM = 2;
+
 
     public function __construct(?IDataIterator $itr=null)
     {
@@ -74,7 +75,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->paginator = new Paginator();
         $this->paginator_top = new PaginatorTopComponent($this->paginator);
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
-        $this->paginators_enabled = AbstractResultView::PAGINATOR_TOP | AbstractResultView::PAGINATOR_BOTTOM;
+        $this->paginators_enabled = (AbstractResultView::PAGINATOR_TOP | AbstractResultView::PAGINATOR_BOTTOM);
 
         $this->list_empty = new Component();
         $this->list_empty->addClassName("ListEmpty");
