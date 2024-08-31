@@ -10,12 +10,12 @@ class AuthToken
     /**
      * @var int
      */
-    protected $id = -1;
+    protected int $id = -1;
 
     /**
      * @var string
      */
-    protected $hash = "";
+    protected string $hash = "";
 
     public function __construct(int $id)
     {
@@ -28,7 +28,7 @@ class AuthToken
         return $this->id;
     }
 
-    public function getHash()
+    public function getHash() : string
     {
         return $this->hash;
     }
@@ -55,7 +55,7 @@ class AuthToken
         $cookie_hash = Session::GetCookie($contextName . "_" . AuthToken::HASH);
         $cookie_id = (int)Session::GetCookie($contextName . "_" . AuthToken::ID);
 
-        if (strcmp($cookie_hash, $this->hash) == 0 && $cookie_id == (int)$this->id) {
+        if (strcmp($cookie_hash, $this->hash) == 0 && $cookie_id == $this->id) {
             debug("Cookie values matched successfully");
             return TRUE;
         }

@@ -6,31 +6,23 @@ class ArrayField extends InputField
 {
 
     /**
-     * @var DataInput
-     */
-    protected $input;
-
-    /**
      * @var Container
      */
-    protected $controls;
+    protected Container $controls;
 
     /**
      * Remove element action of the element source
      * @var Action
      */
-    protected $remove_action;
+    protected Action $remove_action;
 
     const DEFAULT_CONTROL_ACTION = "Add";
     const DEFAULT_CONTROL_NAME = "Add";
     const DEFAULT_CONTROL_TEXT = "Add";
 
-    /**
-     * @var InputField
-     */
-    protected $element_renderer = NULL;
+    protected InputField $element_renderer;
 
-    protected $dynamic_addition = TRUE;
+    protected bool $dynamic_addition = TRUE;
 
     public function __construct(InputField $field)
     {

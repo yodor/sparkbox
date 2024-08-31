@@ -66,7 +66,7 @@ abstract class UploadDataValidator implements IInputValidator
      * @param DataInput $input
      * @throws Exception
      */
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
         debug("Using input: '{$input->getName()}'");
 

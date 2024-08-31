@@ -44,7 +44,7 @@ class RequestParameterCondition implements IGETConsumer
 
     protected function process()
     {
-        if (!isset($_GET[$this->parameter])) throw new Exception("Key: {$this->parameter} not received in GET");
+        if (!isset($_GET[$this->parameter])) throw new Exception("Key: $this->parameter not received in GET");
 
         $this->value = $_GET[$this->parameter];
     }

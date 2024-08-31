@@ -21,7 +21,7 @@ class DatePeriodForm extends InputForm {
 
         if (strlen($psd) > 0) {
 
-            $where->add($value,  "timestamp('$psd 00:00:00')", ">=");
+            $where->append($value,  "timestamp('$psd 00:00:00')", ">=");
 
         }
         if (strlen($ped) > 0) {

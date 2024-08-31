@@ -8,7 +8,7 @@ class ColorButton extends Component
     const TYPE_RESET = "reset";
     const TYPE_BUTTON = "button";
 
-    protected static $default_class = "";
+    protected static string $default_class = "";
 
     public static function RenderButton($text = "Button", $href = "", $action = "")
     {

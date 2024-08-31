@@ -7,20 +7,29 @@ class SelectOption extends DataIteratorItem
     public function __construct()
     {
         parent::__construct();
+        $this->tagName = "OPTION";
     }
 
-    public function startRender()
+    public function setSelected(bool $mode) : void
     {
-        //$attribs = $this->prepareAttributes();
-
-        echo "<option value='{$this->value}'  ";
-        if ($this->selected) echo "SELECTED";
-        echo ">";
+        parent::setSelected($mode);
+        if ($mode) {
+            $this->setAttribute("SELECTED", "");
+        }
+        else {
+            $this->clearAttribute("SELECTED");
+        }
     }
 
-    public function finishRender()
+    public function processAttributes()
     {
-        echo "</option>";
+        $this->setAttribute("value", (string)$this->value);
+        if ($this->isSelected()) {
+            $this->setAttribute("SELECTED", "");
+        }
+        else {
+            $this->clearAttribute("SELECTED");
+        }
     }
 
     public function renderImpl()

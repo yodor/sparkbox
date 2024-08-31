@@ -199,7 +199,7 @@ class ActionCollection
     public function addURLParameter(URLParameter $param)
     {
         // TODO: Implement addURLParameter() method.
-        foreach ($this->actions as $idx=>$action) {
+        foreach ($this->actions as $action) {
             if ($action instanceof Action) {
                 $action->getURLBuilder()->add($param);
             }
@@ -210,9 +210,9 @@ class ActionCollection
      * Call set data method on each of the actions in this collection
      * @param array $data
      */
-    public function setData(array $data)
+    public function setData(array $data) : void
     {
-        foreach ($this->actions as $idx=>$action) {
+        foreach ($this->actions as $action) {
             if ($action instanceof Action) {
                 $action->setData($data);
             }

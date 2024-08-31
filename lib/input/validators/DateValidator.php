@@ -71,7 +71,7 @@ class DateValidator implements IInputValidator
 
     }
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
 
         $pieces = explode("-", $input->getValue());
@@ -92,9 +92,9 @@ class DateValidator implements IInputValidator
                 throw  $e;
             }
             else {
-                if (!$input->isRequired()) {
-                    $input->clear();
-                }
+                //is required already false
+                $input->clear();
+
             }
         }
 

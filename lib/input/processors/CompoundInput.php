@@ -10,9 +10,9 @@ class CompoundInput extends InputProcessor
 
     const POST_CHAR = "_";
 
-    protected $concat_char = "-";
-    protected $compound_names = array();
-    protected $compound_values = array();
+    protected string $concat_char = "-";
+    protected array $compound_names = array();
+    protected array $compound_values = array();
 
     public function __construct(DataInput $input)
     {
@@ -21,21 +21,21 @@ class CompoundInput extends InputProcessor
         $this->compound_values = array();
 
         //reset to default value -1
-        foreach ($this->compound_names as $idx => $subname) {
+        foreach ($this->compound_names as $subname) {
             $this->compound_values[$subname] = -1;
         }
     }
 
-    public function loadPostData(array &$arr)
+    public function loadPostData(array $data) : void
     {
 
         $field_name = $this->input->getName();
 
-        foreach ($this->compound_names as $idx => $subname) {
+        foreach ($this->compound_names as $subname) {
             $compound_name = $subname . "_" . $field_name; //ex for field birthdate => year_birthdate, month_birthdate, day_birthdate
 
-            if (array_key_exists($compound_name, $arr)) {
-                $value = $arr[$compound_name];
+            if (array_key_exists($compound_name, $data)) {
+                $value = $data[$compound_name];
 
                 $value = sanitizeInput($value);
 
@@ -58,7 +58,7 @@ class CompoundInput extends InputProcessor
             for ($a = 0; $a < $compound_count; $a++) {
 
                 $compound = array();
-                foreach ($this->compound_names as $key => $val) {
+                foreach ($this->compound_names as $val) {
 
                     $compound[] = $this->compound_values[$val][$a];
                 }
@@ -82,7 +82,7 @@ class CompoundInput extends InputProcessor
         parent::clearURLParameters($url);
 
         $url->remove($this->input->getName());
-        foreach ($this->compound_names as $key=>$val) {
+        foreach ($this->compound_names as $val) {
             $url->remove($val."_".$this->input->getName());
         }
     }

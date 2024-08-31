@@ -6,7 +6,7 @@ include_once("responders/json/TranslateBeanResponder.php");
 class BeanTranslationDialog extends MessageDialog implements IPageComponent
 {
 
-    protected $input;
+    protected DataInput $input;
 
     public function __construct()
     {

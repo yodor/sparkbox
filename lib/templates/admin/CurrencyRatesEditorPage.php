@@ -55,7 +55,7 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
         echo "<div class='Line'>"; //top line
         echo "<div class='Item space'></div>";
-        foreach ($this->curr as $pos => $row) {
+        foreach ($this->curr as $row) {
             $currencyID = (int)$row["currencyID"];
             $code = $row["currency_code"];
             echo "<div class='Item code' dstID='$currencyID'>$code</div>";

@@ -10,18 +10,18 @@ class ConfigFormProcessor extends FormProcessor
     }
 
 
-    protected function processImpl(InputForm $form)
+    protected function processImpl(InputForm $form) : void
     {
         parent::processImpl($form);
 
         if (!($this->bean instanceof ConfigBean)) throw new Exception("ConfigBean not set yet");
 
         $input_names = $form->getInputNames();
-        foreach ($input_names as $idx => $name) {
+        foreach ($input_names as $name) {
+
             $input = $form->getInput($name);
-            if ($this->bean instanceof ConfigBean) {
-                $this->bean->set($name, $input->getValue());
-            }
+            $this->bean->set($name, $input->getValue());
+
         }
     }
 

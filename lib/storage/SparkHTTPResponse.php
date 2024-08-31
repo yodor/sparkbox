@@ -234,12 +234,13 @@ class SparkHTTPResponse
         debug("Sending DataBuffer ...");
 
         $filename = $this->disposition_filename;
-        if(empty($filename)) {
-            throw new Exception("Disposition filename empty");
+        if(!empty($filename)) {
+            debug("Using disposition filename: ".$filename);
+            $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
         }
-        debug("Using disposition filename: ".$filename);
-
-        $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
+        else {
+            debug("Disposition filename not set - not using disposition header");
+        }
 
         $this->setHeader("Content-Type", $buffer->mime());
         $this->setHeader("Content-Length", $buffer->length());

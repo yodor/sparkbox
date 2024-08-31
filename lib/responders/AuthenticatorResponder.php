@@ -9,13 +9,13 @@ class AuthenticatorResponder extends RequestResponder
     /**
      * @var Authenticator
      */
-    protected $auth;
+    protected Authenticator $auth;
 
-    protected $randsalt = "";
+    protected string $randsalt = "";
 
-    protected $email = "";
-    protected $pass = "";
-    protected $remember = FALSE;
+    protected string $email = "";
+    protected string $pass = "";
+    protected bool $remember = FALSE;
 
     public function __construct(Authenticator $auth, $cmd = "doLogin")
     {

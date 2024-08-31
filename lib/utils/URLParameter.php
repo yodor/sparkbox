@@ -45,7 +45,7 @@ class URLParameter implements IDataResultProcessor
     }
 
     public function isResource() {
-        if (strpos($this->name, "#")===0) {
+        if (str_starts_with($this->name, "#")) {
             return true;
         }
         return false;

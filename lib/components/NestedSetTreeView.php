@@ -96,7 +96,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
     public function setSelectedID(int $nodeID) : void
     {
-        $this->selected_nodeID = (int)$nodeID;
+        $this->selected_nodeID = $nodeID;
     }
 
     /**
@@ -112,7 +112,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
     public function getSelectedID() : int
     {
-        return (int)$this->selected_nodeID;
+        return $this->selected_nodeID;
     }
 
     public function setItemRenderer(DataIteratorItem $item)
@@ -211,9 +211,9 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             //move selection to javascript
             //$item->setSelected($selected);
             $item->setChecked(false);
-            if (is_array($this->checked_nodes)) {
-                $item->setChecked(in_array($nodeID, $this->checked_nodes));
-            }
+
+            $item->setChecked(in_array($nodeID, $this->checked_nodes));
+
 
             $item_label = $item->getLabel();
 

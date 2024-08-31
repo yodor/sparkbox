@@ -46,7 +46,7 @@ class ImageStorageObject extends FileStorageObject
 
         @imagedestroy($source);
 
-        debug("Image dimensions [{$this->width} x {$this->height}]");
+        debug("Image dimension [$this->width x $this->height]");
 
         if ($this->width < 1 || $this->height < 1) {
             throw new Exception("Invalid image dimensions from input data");

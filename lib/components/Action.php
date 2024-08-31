@@ -20,7 +20,7 @@ class Action extends DataIteratorItem
      * Render the action as contents of this Action if contents are not set
      * @var bool
      */
-    public $action_as_contents = TRUE;
+    public bool $action_as_contents = TRUE;
 
     /**
      * @param string $action
@@ -41,7 +41,7 @@ class Action extends DataIteratorItem
             $this->setAttribute("action", $action);
         }
 
-        foreach ($parameters as $idx => $parameter) {
+        foreach ($parameters as $parameter) {
 
             $this->urlbuilder->add($parameter);
 
@@ -131,7 +131,7 @@ class Action extends DataIteratorItem
 
     public static function RenderActions(array $actions, bool $separator = FALSE, bool $translate = FALSE)
     {
-        foreach ($actions as $idx => $item) {
+        foreach ($actions as $item) {
             if ($item instanceof MenuItem) {
                 $action = new Action("", $item->getHref(), array());
                 $action->translation_enabled = $translate;

@@ -9,9 +9,9 @@ include_once("input/DataInput.php");
 class AnyValueValidator implements IInputValidator
 {
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
-        return true;
+
     }
 
 }

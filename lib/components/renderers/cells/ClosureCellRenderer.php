@@ -6,12 +6,12 @@ class ClosureCellRenderer extends TableCellRenderer
     /**
      * @var Closure
      */
-    protected $closure;
+    protected Closure $closure;
 
     /**
      * @var array
      */
-    protected $data;
+    protected array $data = array();
 
     public function __construct(Closure $closure)
     {
@@ -21,8 +21,7 @@ class ClosureCellRenderer extends TableCellRenderer
 
     protected function renderImpl()
     {
-        $closure = $this->closure;
-        $closure($this->data, $this->column);
+        ($this->closure)($this->data, $this->column);
     }
 
     public function setData(array $data) : void

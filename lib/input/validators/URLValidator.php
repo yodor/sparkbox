@@ -5,21 +5,26 @@ include_once("input/DataInput.php");
 class URLValidator implements IInputValidator
 {
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
-        $val = $input->getValue();
+        $value = $input->getValue();
 
-        $proto_http = substr($val, 0, 7);
-        $proto_https = substr($val, 0, 8);
+        $result = filter_var($value, FILTER_VALIDATE_URL);
 
-        if (strcasecmp($proto_http, "http://") == 0 || strcasecmp($proto_https, "https://") == 0) {
-            //
+        if (!$result && $input->isRequired()) {
+            throw new Exception("URL Requred");
         }
-        else {
-            if ($input->isRequired()) {
-                throw new Exception("HTTP or HTTPS :// required");
-            }
-        }
+
+
+//        $proto_http = substr($val, 0, 7);
+//        $proto_https = substr($val, 0, 8);
+
+//        if (strcasecmp($proto_http, "http://") == 0 || strcasecmp($proto_https, "https://") == 0) {
+//            //
+//        }
+//        else {
+//
+//        }
 
     }
 

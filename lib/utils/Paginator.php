@@ -277,7 +277,7 @@ class Paginator implements IGETConsumer
 
 
         if ($this->ipp > 0) {
-            $filter->limit = " " . ($page * $this->ipp) . ", {$this->ipp}";
+            $filter->limit = " " . ($page * $this->ipp) . ", $this->ipp ";
         }
 
         return $filter;

@@ -3,25 +3,29 @@ include_once("sql/ClauseCollection.php");
 
 abstract class SQLStatement
 {
+    protected array $set = array();
     /**
      * SELECT, UPDATE, DELETE, INSERT
      * @var string
      */
-    protected $type = "";
+    protected string $type = "";
 
     /**
      * @var ClauseCollection
      */
-    protected $whereset;
+    protected ClauseCollection $whereset;
 
-    public $from = "";
+    /**
+     * @var string Table name
+     */
+    public string $from = "";
 
-    public $group_by = "";
-    public $order_by = "";
-    public $limit = "";
-    public $having = "";
+    public string $group_by = "";
+    public string $order_by = "";
+    public string $limit = "";
+    public string $having = "";
 
-    public abstract function getSQL();
+    public abstract function getSQL() : string;
 
     public function __construct()
     {
@@ -43,7 +47,10 @@ abstract class SQLStatement
         return $this->type;
     }
 
-
+    public function set(string $column, string $value) : void
+    {
+        $this->set[$column] = $value;
+    }
 }
 
 ?>

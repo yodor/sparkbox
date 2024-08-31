@@ -15,7 +15,7 @@ class SimplePhoneValidator implements IInputValidator
      * @param DataInput $input
      * @throws Exception
      */
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
 
         $value = $input->getValue();

@@ -92,7 +92,7 @@ class DBConnections
      * @return DBDriver
      * @throws Exception
      */
-    static public function Factory($conn_name = DBConnectionProperties::DEFAULT_NAME, $persistent = FALSE): DBDriver
+    static public function Factory($conn_name = DBConnectionProperties::DEFAULT_NAME, bool $persistent = FALSE): DBDriver
     {
         //DBConnectionProperties
         $props = DBConnections::getProperties($conn_name);

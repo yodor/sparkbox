@@ -25,7 +25,7 @@ class BeanFormEditorEvent extends SparkEvent {
 class BeanFormEditor extends Container implements IBeanEditor
 {
 
-    protected $messages = array();
+    protected array $messages = array();
 
     const MESSAGE_ADD = 1;
     const MESSAGE_UPDATE = 2;
@@ -33,49 +33,49 @@ class BeanFormEditor extends Container implements IBeanEditor
     /**
      * @var DBTableBean
      */
-    protected $bean;
+    protected DBTableBean $bean;
 
-    protected $editID = -1;
+    protected int $editID = -1;
 
     /**
      * @var InputForm
      */
-    protected $form;
+    protected InputForm $form;
 
     /**
      * @var FormRenderer
      */
-    protected $form_render;
+    protected FormRenderer $form_render;
 
     /**
      * @var FormProcessor
      */
-    protected $processor;
+    protected FormProcessor $processor;
 
     /**
      * @var BeanTransactor
      */
-    protected $transactor;
+    protected BeanTransactor $transactor;
 
-    protected $error = "";
+    protected string $error = "";
 
 
     /**
      * Redirect to this URL on successful processing
      * @var URLBuilder|null
      */
-    protected $redirect_url;
+    protected ?URLBuilder $redirect_url = null;
 
     /**
      * Enable/Disable redirect logic during processInput
      * @var bool
      */
-    protected $redirect_enabled;
+    protected bool $redirect_enabled = false;
 
     /**
      * @var BeanTranslationDialog
      */
-    protected $bean_translator;
+    protected BeanTranslationDialog $bean_translator;
 
     public function __construct(DBTableBean $bean, InputForm $form)
     {
@@ -102,7 +102,7 @@ class BeanFormEditor extends Container implements IBeanEditor
         $this->transactor = new BeanTransactor($this->bean, $this->editID);
 
         $fieldNames = $this->form->getInputNames();
-        foreach ($fieldNames as $pos => $fieldName) {
+        foreach ($fieldNames as $fieldName) {
 
             $field = $this->form->getInput($fieldName);
             $renderer = $field->getRenderer();
@@ -176,7 +176,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     public function setEditID(int $editID)
     {
-        $this->editID = (int)$editID;
+        $this->editID = $editID;
         $this->attributes["editID"] = $this->editID;
         $this->transactor->setEditID($editID);
 
@@ -225,7 +225,7 @@ class BeanFormEditor extends Container implements IBeanEditor
         if ($this->editID < 1 && isset($_GET["editID"])) {
 
             $this->setEditID((int)$_GET["editID"]);
-            debug("Using editID='{$this->editID}' from _GET ");
+            debug("Using editID='$this->editID' from _GET ");
 
         }
 
@@ -239,7 +239,7 @@ class BeanFormEditor extends Container implements IBeanEditor
             $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_PROCESSED, $this));
 
             $process_status = $this->processor->getStatus();
-            debug("FormProcessor status => " . (int)$process_status);
+            debug("FormProcessor status => " . $process_status);
 
             //form is ok transact to db using the bean
             if ($process_status === IFormProcessor::STATUS_OK) {

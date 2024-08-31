@@ -117,7 +117,7 @@ class ImagePopup extends Component implements IPhotoRenderer
         $this->popup_url = $this->storageItem->hrefImage();
 
         //if ($this->mode == ImagePopup::MODE_BACKGROUND) {
-            $this->setStyleAttribute("background-image", "url({$this->thumb_url})");
+        //    $this->setStyleAttribute("background-image", "url({$this->thumb_url})");
         //}
 
         $this->setAttribute("itemID", $this->storageItem->id);

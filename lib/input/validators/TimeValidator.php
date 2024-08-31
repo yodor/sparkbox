@@ -42,7 +42,7 @@ class TimeValidator implements IInputValidator
 
     }
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
 
         $pieces = explode(":", $input->getValue());

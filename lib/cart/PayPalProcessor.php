@@ -274,13 +274,13 @@ class PayPalProcessor
 
             "&L_PAYMENTREQUEST_0_NAME0=" . urlencode($sale->getItemName()) . "&L_PAYMENTREQUEST_0_NUMBER0=" . urlencode($sale->getItemNumber()) . "&L_PAYMENTREQUEST_0_DESC0=" . urlencode($sale->getItemDesc()) . "&L_PAYMENTREQUEST_0_AMT0=" . urlencode($sale->getItemPrice()) . "&L_PAYMENTREQUEST_0_QTY0=" . urlencode($sale->getItemQty()) .
 
-            "&NOSHIPPING={$no_shipping}" . //set 1 to hide buyer"s shipping address, in-case products that does not require shipping
+            "&NOSHIPPING=$no_shipping" . //set 1 to hide buyer"s shipping address, in-case products that does not require shipping
 
             "&PAYMENTREQUEST_0_ITEMAMT=" . urlencode($sale->getTotalPrice()) . "&PAYMENTREQUEST_0_TAXAMT=" . urlencode($sale->getTaxAmount()) . "&PAYMENTREQUEST_0_SHIPPINGAMT=" . urlencode($sale->getShippingCost()) . "&PAYMENTREQUEST_0_HANDLINGAMT=" . urlencode($sale->getHandlingCost()) . "&PAYMENTREQUEST_0_INSURANCEAMT=" . urlencode($sale->getInsuranceCost()) . "&PAYMENTREQUEST_0_AMT=" . urlencode($sale->getGrandTotal()) . "&PAYMENTREQUEST_0_CURRENCYCODE=" . urlencode($this->currency_code) . "&LOCALECODE=GB" . //PayPal pages to match the language on your website.
             "&CARTBORDERCOLOR=FFFFFF" . //border color of cart
             "&ALLOWNOTE=1";
         if ($this->logo_image) {
-            $padata .= "&LOGOIMG={$this->logo_image}";
+            $padata .= "&LOGOIMG=$this->logo_image";
         }
 
         $httpParsedResponseAr = $this->PPHttpPost("SetExpressCheckout", $padata);
@@ -390,7 +390,7 @@ class PayPalProcessor
         }
 
         if ((0 == sizeof($httpParsedResponseAr)) || !array_key_exists("ACK", $httpParsedResponseAr)) {
-            throw new Exception("Invalid HTTP Response for POST request($nvpreq) to {$this->api_endpoint}.");
+            throw new Exception("Invalid HTTP Response for POST request($nvpreq) to $this->api_endpoint.");
         }
 
         return $httpParsedResponseAr;

@@ -186,11 +186,11 @@ function quoteArray(&$item, $key, $user_data = "")
 
 function KMG(&$umf)
 {
-    if (strpos($umf, "M") !== FALSE) {
+    if (str_contains($umf, "M")) {
         str_replace("M", "", $umf);
         $umf = (int)$umf * 1024 * 1024;
     }
-    else if (strpos($umf, "K") !== FALSE) {
+    else if (str_contains($umf, "K")) {
         str_replace("K", "", $umf);
         $umf = (int)$umf * 1024;
     }
@@ -360,7 +360,7 @@ function debug($obj, $msg = NULL, $arr = NULL)
 
     $time = "";
     if (isset($GLOBALS["DEBUG_OUTPUT_MICROTIME"])) {
-        $time = microtime_float(TRUE);
+        $time = microtime_float();
     }
 
     if (is_array($array)) {
@@ -564,7 +564,7 @@ function escapeHelper(string $unescaped_string): string
     return strtr($unescaped_string, $replacementMap);
 }
 
-function attributeValue($value)
+function attributeValue(string $value)
 {
     return htmlentities(mysql_real_unescape_string($value), ENT_QUOTES, "UTF-8");
 }
@@ -1001,7 +1001,7 @@ function deleteDir(string $dirPath) : void
     if (!is_dir($dirPath)) {
         throw new RuntimeException("$dirPath must be a directory");
     }
-    if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
+    if (!str_ends_with($dirPath, '/')) {
         $dirPath .= '/';
     }
     $files = glob($dirPath . '*', GLOB_MARK);

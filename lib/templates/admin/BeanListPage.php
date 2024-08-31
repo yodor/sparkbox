@@ -11,35 +11,29 @@ class BeanListPage extends AdminPageTemplate
     /**
      * @var DBTableBean
      */
-    protected $bean;
+    protected ?DBTableBean $bean = null;
 
     /**
      * @var array
      */
-    protected $fields;
+    protected array $fields = array();
 
     /**
-     * @var TableView
+     * @var SQLQuery|null
      */
-    protected $view;
-
-    /**
-     * @var SQLQuery
-     */
-    protected $query;
+    protected ?SQLQuery $query = null;
 
     /**
      * @var ActionCollection
      */
-    protected $view_item_actions;
+    protected ?ActionCollection $view_item_actions = null;
 
-    protected $keyword_search;
+    protected KeywordSearch $keyword_search;
 
     public function __construct()
     {
         parent::__construct();
         $this->keyword_search = new KeywordSearch();
-
     }
 
     public function getIterator() : SQLQuery
@@ -234,7 +228,7 @@ class BeanListPage extends AdminPageTemplate
      * Get the item view actions collection
      * @return ActionCollection
      */
-    public function viewItemActions()
+    public function viewItemActions() : ActionCollection
     {
         return $this->view_item_actions;
     }

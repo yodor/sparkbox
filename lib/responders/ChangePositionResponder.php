@@ -5,13 +5,13 @@ include_once("dialogs/InputMessageDialog.php");
 class ChangePositionResponder extends RequestResponder
 {
 
-    protected $item_id = -1;
-    protected $bean = NULL;
-    protected $type = "";
+    protected int $item_id = -1;
+    protected DBTableBean $bean;
+    protected string $type = "";
 
-    protected $position = -1;
+    protected int $position = -1;
 
-    protected $supported_content = array();
+    protected array $supported_content = array();
 
     public function __construct(DBTableBean $bean)
     {

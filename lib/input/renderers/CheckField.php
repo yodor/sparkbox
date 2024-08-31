@@ -11,13 +11,13 @@ class CheckItem extends DataIteratorItem
         $attrs = $this->prepareAttributes();
 
         //hackish! - force submit of unchecked checkbox
-        echo "<input type='hidden' name='{$this->name}' value=''>";
+        echo "<input type='hidden' name='$this->name' value=''>";
 
-        echo "<input type='checkbox' value='{$this->value}' name='{$this->name}' $attrs ";
+        echo "<input type='checkbox' value='$this->value' name='$this->name' $attrs ";
         if ($this->isSelected()) echo "CHECKED";
 
         echo ">";
-        echo "<span>{$this->label}</span>";
+        echo "<span>$this->label</span>";
     }
 
 }

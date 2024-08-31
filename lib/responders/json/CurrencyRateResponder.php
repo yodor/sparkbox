@@ -3,10 +3,10 @@ include_once("responders/json/JSONResponder.php");
 
 class CurrencyRateResponder extends JSONResponder
 {
-    protected $srcID;
-    protected $dstID;
-    protected $crID;
-    protected $rate;
+    protected int $srcID = -1;
+    protected int $dstID = -1;
+    protected int $crID = -1;
+    protected float $rate = 0.0;
 
     public function __construct()
     {
@@ -40,7 +40,7 @@ class CurrencyRateResponder extends JSONResponder
         $db = DBConnections::Get();
         try {
             $db->transaction();
-            $sel = "DELETE FROM currency_rates WHERE (srcID='{$this->srcID}' AND dstID='$this->dstID') OR (dstID='$this->srcID' AND srcID='$this->dstID')";
+            $sel = "DELETE FROM currency_rates WHERE (srcID='$this->srcID' AND dstID='$this->dstID') OR (dstID='$this->srcID' AND srcID='$this->dstID')";
             if (!$db->query($sel)) throw new Exception("Error deleting old quote"."<HR>".$db->getError());
 
             //forward rate
@@ -48,7 +48,7 @@ class CurrencyRateResponder extends JSONResponder
 
             if (!$bean->insert($data_forward, $db)) throw new Exception("Error updating forward quote:"."<HR>".$bean->getError());
 
-            $data_backward = array("dstID"=>$this->srcID, "srcID"=>$this->dstID, "rate"=>round(1.0/(float)$this->rate,2));
+            $data_backward = array("dstID"=>$this->srcID, "srcID"=>$this->dstID, "rate"=>round(1.0/$this->rate,2));
 
             if (!$bean->insert($data_backward, $db)) throw new Exception("Error updating backward quote:"."<HR>".$bean->getError());
 

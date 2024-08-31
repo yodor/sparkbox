@@ -4,21 +4,20 @@ include_once("input/validators/IInputValidator.php");
 class SimpleTextValidator implements IInputValidator
 {
 
+
     /**
-     * Validate value of DataInput is correct
      * @param DataInput $input
-     * @return mixed
+     * @return void
+     * @throws Exception
      */
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
-        $value = $input->getValue();
+        $value = (string)$input->getValue();
 
-        if (strcmp($value, attributeValue($value)) == 0) {
-
-        }
-        else {
+        if (strcmp($value, attributeValue($value)) != 0) {
             throw new Exception("Only letters and space accepted here");
         }
+
     }
 }
 ?>

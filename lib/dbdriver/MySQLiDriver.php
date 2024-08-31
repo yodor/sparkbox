@@ -8,16 +8,15 @@ class MySQLiDriver extends DBDriver
     /**
      * @var mysqli
      */
-    private $conn = NULL;
+    private mysqli $conn;
+
 
     /**
-     * MySQLiDriver constructor.
      * @param DBConnectionProperties $props
-     * @param bool $open_new
-     * @param bool $need_persistent
+     * @param bool $persistent
      * @throws Exception
      */
-    public function __construct(DBConnectionProperties $props, $persistent = FALSE)
+    public function __construct(DBConnectionProperties $props, bool $persistent = FALSE)
     {
 
         $host = $props->host;
@@ -60,7 +59,6 @@ class MySQLiDriver extends DBDriver
     {
         if ($this->conn) {
             $this->conn->close();
-            $this->conn = NULL;
         }
 
     }
@@ -114,7 +112,7 @@ class MySQLiDriver extends DBDriver
         return $arr[$pos];
     }
 
-    protected function assert_resource(&$res): mysqli_result
+    protected function assert_resource($res): mysqli_result
     {
         if (!($res instanceof mysqli_result)) throw new Exception("No valid mysqli_resource passed");
         return $res;
@@ -179,7 +177,7 @@ class MySQLiDriver extends DBDriver
         return $this->conn->begin_transaction();
     }
 
-    public function escape(string $data)
+    public function escape(string $data) : string
     {
         return $this->conn->real_escape_string($data);
     }

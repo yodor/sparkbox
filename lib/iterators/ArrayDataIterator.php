@@ -7,12 +7,12 @@ class ArrayDataIterator implements IDataIterator
     const KEY_ID = "id";
     const KEY_VALUE = "value";
 
-    protected $id_key = ArrayDataIterator::KEY_ID;
-    protected $value_key = ArrayDataIterator::KEY_VALUE;
+    protected string $id_key = ArrayDataIterator::KEY_ID;
+    protected string $value_key = ArrayDataIterator::KEY_VALUE;
 
-    protected $pos = -1;
+    protected int $pos = -1;
 
-    protected $values = array();
+    protected array $values = array();
 
     public function __construct(array $result, string $id_key = ArrayDataIterator::KEY_ID, string $value_key = ArrayDataIterator::KEY_VALUE)
     {

@@ -3,7 +3,7 @@
 class MCETextArea extends InputField
 {
 
-    protected static MCEImageBrowserDialog $image_browser;
+    protected static ?MCEImageBrowserDialog $image_browser = null;
 
     public function __construct(DataInput $input)
     {
@@ -13,7 +13,7 @@ class MCETextArea extends InputField
         $this->tagName = "TEXTAREA";
 
         //force single instance of the dialog to all MCETextAreas to prevent double session upload
-        if (!MCETextArea::$image_browser) {
+        if (is_null(MCETextArea::$image_browser)) {
             include_once("dialogs/MCEImageBrowserDialog.php");
             MCETextArea::$image_browser = new MCEImageBrowserDialog();
         }

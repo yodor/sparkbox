@@ -8,33 +8,34 @@ class CurrencyConverter
     /**
      * @var float
      */
-    protected $rate = 1.0;
+    protected float $rate = 1.0;
+
     /**
      * @var string ISO3 currency code
      */
-    protected $code;
+    protected string $code;
 
     /**
      * @var string
      */
-    protected $symbol;
+    protected string $symbol;
 
     /**
      * @var bool
      */
-    protected $symbol_back = FALSE;
+    protected bool $symbol_back = FALSE;
 
     /**
      * @var int
      */
-    protected $srcID = -1;
+    protected int $srcID = -1;
 
     /**
      * @var int
      */
-    protected $dstID = -1;
+    protected int $dstID = -1;
 
-    protected static $instance;
+    protected static CurrencyConverter $instance;
 
     static public function Instance(): CurrencyConverter
     {

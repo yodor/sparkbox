@@ -4,7 +4,7 @@ include_once("components/renderers/cells/TableCellRenderer.php");
 class ColorCodeCellRenderer extends TableCellRenderer
 {
 
-    protected $color = "";
+    protected string $color = "";
 
     protected function renderImpl()
     {

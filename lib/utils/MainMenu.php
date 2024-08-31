@@ -131,10 +131,7 @@ class MainMenu
 
     public function getIndexByHref(string $href, int $index = 0): int
     {
-        if (startsWith($href, LOCAL)) {
-
-        }
-        else {
+        if (!startsWith($href, LOCAL)) {
             $href = LOCAL . $href;
         }
 
@@ -191,8 +188,8 @@ class MainMenu
             $this->target_url->add(new DataParameter($this->bean->key()));
         }
 
-        if (!$this->bean->haveColumn($this->value_key)) throw new Exception("Value key '{$this->value_key}' not found in bean columns");
-        if (!$this->bean->haveColumn($this->label_key)) throw new Exception("Label key '{$this->label_key}' not found in bean columns");
+        if (!$this->bean->haveColumn($this->value_key)) throw new Exception("Value key '$this->value_key' not found in bean columns");
+        if (!$this->bean->haveColumn($this->label_key)) throw new Exception("Label key '$this->label_key' not found in bean columns");
     }
 
     /**
@@ -204,7 +201,7 @@ class MainMenu
     {
         $this->value_key = $key;
         if ($this->bean) {
-            if (!$this->bean->haveColumn($this->value_key)) throw new Exception("Value key '{$this->value_key}' not found in bean columns");
+            if (!$this->bean->haveColumn($this->value_key)) throw new Exception("Value key '$this->value_key' not found in bean columns");
         }
     }
 
@@ -217,7 +214,7 @@ class MainMenu
     {
         $this->label_key = $key;
         if ($this->bean) {
-            if (!$this->bean->haveColumn($this->label_key)) throw new Exception("Value key '{$this->label_key}' not found in bean columns");
+            if (!$this->bean->haveColumn($this->label_key)) throw new Exception("Value key '$this->label_key' not found in bean columns");
         }
     }
 
@@ -264,11 +261,11 @@ class MainMenu
             if (isset($data["link"])) {
                 $menu_link = $data["link"];
 
-                if (strpos($menu_link, "//") === 0) {
+                if (str_starts_with($menu_link, "//")) {
                     debug("Using external URL");
                 }
                 // - url is internal root
-                else if (strpos($menu_link, "/") === 0) {
+                else if (str_starts_with($menu_link, "/")) {
                     $menu_link = LOCAL . $menu_link;
                 }
             }
@@ -433,7 +430,7 @@ class MainMenu
      * @return MenuItem|null The matching MenuItem or NULL if none of the MenuItems '$items' match
      * @throws Exception Throws exception if element from items is not instance of MenuItem
      */
-    protected function matchItems(array &$items, Closure $matcher)
+    protected function matchItems(array $items, Closure $matcher)
     {
 
         $result = NULL;

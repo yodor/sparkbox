@@ -13,7 +13,7 @@ class EnumFieldValidator implements IInputValidator
         $this->field_name = $field_name;
     }
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
         if (!$this->field_name) $this->field_name = $input->getName();
 

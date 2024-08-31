@@ -24,7 +24,7 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
     /**
      * @var DataInput
      */
-    protected $input;
+    protected DataInput $input;
 
     /**
      * Render values iterator

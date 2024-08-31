@@ -9,7 +9,7 @@ class PhoneValidator implements IInputValidator
      * @param DataInput $input
      * @throws Exception
      */
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
 
         $pieces = explode("|", $input->getValue());

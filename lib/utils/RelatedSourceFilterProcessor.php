@@ -138,9 +138,6 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor implements I
 
     public function applyFiltersOn(NestedSetTreeView $view, SQLSelect &$sel, string $filter_name, $skip_self = FALSE)
     {
-        if (!$view) throw new Exception("Filter processing not finished");
-
-        // $sel = $sel->combineWith($this->getFilterAll());
 
         foreach ($this->filter_select as $name => $qry) {
             if ($skip_self && strcmp($filter_name, $name) === 0) continue;

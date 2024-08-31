@@ -72,7 +72,7 @@ class CSVTemplateLoader
 
         if (!$handle) {
 
-            throw new Exception("Error loading bundle. Could not open template temp file: {$this->temp_filename}");
+            throw new Exception("Error loading bundle. Could not open template temp file: $this->temp_filename");
         }
 
         $this->currentRow = 1;

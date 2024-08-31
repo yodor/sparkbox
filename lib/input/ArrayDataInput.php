@@ -7,7 +7,7 @@ class ArrayDataInput extends DataInput
 
     public const ERROR_TEXT = "This input collection have errors";
 
-    public $source_label_visible = false;
+    public bool $source_label_visible = false;
 
     public function __construct(string $name, string $label, bool $required)
     {

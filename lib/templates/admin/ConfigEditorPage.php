@@ -11,17 +11,17 @@ class ConfigEditorPage extends AdminPageTemplate
     /**
      * @var ConfigFormProcessor
      */
-    protected $processor;
+    protected ConfigFormProcessor $processor;
 
     /**
      * @var InputForm
      */
-    protected $form;
+    protected ?InputForm $form = null;
 
     /**
      * @var ConfigBean
      */
-    protected $config;
+    protected ConfigBean $config;
 
     public function __construct()
     {

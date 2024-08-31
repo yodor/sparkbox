@@ -103,11 +103,11 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
     protected function _find(JSONResponse $resp)
     {
-        debug("Section: '{$this->section_name}' Section Key: '{$this->section_key}'");
+        debug("Section: '$this->section_name' Section Key: '$this->section_key'");
 
         $bean = new MCEImagesBean();
         $qry = $bean->query();
-        $qry->select->where()->add("section", "'{$this->section_name}'")->add("section_key", "'{$this->section_key}'");
+        $qry->select->where()->add("section", "'$this->section_name'")->add("section_key", "'$this->section_key'");
 
         if ($this->ownerID > 0) {
             $qry->select->where()->add("ownerID", $this->ownerID);

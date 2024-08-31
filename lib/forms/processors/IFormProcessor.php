@@ -8,24 +8,24 @@ interface IFormProcessor
     const STATUS_NOT_PROCESSED = 0;
     const STATUS_OK = 1;
 
-    public function process(InputForm $form);
+    public function process(InputForm $form) : void;
 
     /**
      * @return string
      */
-    public function getMessage();
+    public function getMessage() : string;
 
-    public function setMessage(string $message);
+    public function setMessage(string $message) : void;
 
     /**
      * @return int
      */
-    public function getStatus();
+    public function getStatus() : int;
 
     /**
      * @param int $status
      */
-    public function setStatus(int $status);
+    public function setStatus(int $status) : void;
 
 }
 

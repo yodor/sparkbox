@@ -6,7 +6,7 @@ class EmptyValueValidator implements IInputValidator
 {
     public $require_array_value = FALSE;
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
 
         $value = $input->getValue();
@@ -17,7 +17,7 @@ class EmptyValueValidator implements IInputValidator
             if ($input->isRequired()) {
                 if (count($value) < 1) throw new Exception("Input value");
                 $empty_count = 0;
-                foreach ($value as $idx => $val) {
+                foreach ($value as $val) {
                     if (strlen(trim($val)) == 0 && $this->require_array_value) $empty_count++;
                 }
                 if ($empty_count == count($value)) throw new Exception("Input value");

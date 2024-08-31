@@ -18,7 +18,7 @@ class TimeField extends InputField
 
         $hour = -1;
         $minute = -1;
-        if (strpos((string)$field_value, ":") !== FALSE) {
+        if (str_contains((string)$field_value, ":")) {
             list($hour, $minute) = explode(":", $field_value);
         }
         echo "<div class='FieldElements'>";

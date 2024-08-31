@@ -20,14 +20,14 @@ class DBViewBean extends DBTableBean
     }
 
 
-    public function update($id, array &$row, DBDriver $db = NULL) : int
+    public function update($id, array $row, DBDriver $db = NULL) : int
     {
         throw new Exception("View not writable");
     }
 
     //
 
-    public function insert(array &$row, DBDriver $db = NULL): int
+    public function insert(array $row, DBDriver $db = NULL): int
     {
         throw new Exception("View not writable");
     }

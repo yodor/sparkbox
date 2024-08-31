@@ -2,14 +2,14 @@
 
 class ArrayInputValidator implements IInputValidator
 {
-    protected $item_validator = NULL;
+    protected IInputValidator $item_validator;
 
     public function __construct(IInputValidator $validator_private)
     {
         $this->item_validator = $validator_private;
     }
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
         //input processor passes ordered values to the field
         //from arrayinputprocessor

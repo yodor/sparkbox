@@ -15,7 +15,9 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     protected int $id = -1;
     protected string $field = "";
 
-
+    /**
+     * @var StorageObject
+     */
     protected StorageObject $object;
 
     protected ?CacheEntry $cacheEntry;
@@ -27,14 +29,19 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
     protected bool $skip_cache = FALSE;
 
+    /**
+     * Timestamp
+     * @var int
+     */
     protected int $last_modified = -1;
+
     /**
      * This flag is set when request URI contains specific field name to return from the result row.
      * Custom key name from the result row is allowed only if contents are of type StorageObject
      * To limit arbitrary data access
      * @var bool
      */
-    protected $field_requested = FALSE;
+    protected bool $field_requested = FALSE;
 
     public function __construct(int $id, string $className)
     {
@@ -52,7 +59,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
             $this->field = $_GET["field"];
             $this->field_requested = TRUE;
 
-            debug("Requested bean field: {$this->field}");
+            debug("Requested bean field: $this->field");
         }
 
         $this->cacheEntry = NULL;
@@ -221,7 +228,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $row = $this->bean->getByID($this->id, ...$columns);
 
         $found = false;
-        foreach ($columns as $idx=>$name) {
+        foreach ($columns as $name) {
             if (isset($row[$name]) && $row[$name]) {
 
                 $value = strtotime($row[$name]);

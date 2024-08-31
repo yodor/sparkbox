@@ -2,9 +2,8 @@
 
 class ClosureComponent extends Container
 {
-    protected $wrapper_enabled = true;
 
-    protected $closure = null;
+    protected Closure $closure;
 
     public function __construct(Closure $callback, bool $wrapper_enabled = true)
     {
@@ -26,8 +25,7 @@ class ClosureComponent extends Container
     protected function renderImpl()
     {
         parent::renderImpl();
-        $closure = $this->closure;
-        $closure($this);
+        ($this->closure)($this);
     }
 }
 

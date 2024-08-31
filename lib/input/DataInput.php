@@ -22,36 +22,28 @@ include_once("input/processors/InputProcessor.php");
 class DataInput
 {
 
-    public $skip_search_filter_processing = FALSE;
+    public bool $skip_search_filter_processing = FALSE;
 
     /**
      * @var string
      */
-    protected $name;
+    protected string $name;
     /**
      * @var string
      */
-    protected $label;
+    protected string $label;
     /**
      * @var bool
      */
-    protected $required;
+    protected bool $required;
 
     protected $value;
 
     protected $error;
 
-    /**
-     * DataInput is part of form
-     * @var InputForm
-     */
-    protected $form = NULL;
+    protected ?InputForm $form = NULL;
 
-    /**
-     * Value rendering is done using InputField
-     * @var InputField|null
-     */
-    protected $renderer = NULL;
+    protected ?InputField $renderer = NULL;
 
     //IInputValidator is responsible for validation of the $value data
     protected $validator = NULL;

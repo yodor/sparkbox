@@ -4,8 +4,8 @@ include_once("utils/SessionData.php");
 class AuthContext
 {
 
-    protected $id = -1;
-    protected $data = array();
+    protected int $id = -1;
+    protected SessionData $data;
 
     public function __construct(int $id, SessionData $data)
     {

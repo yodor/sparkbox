@@ -5,21 +5,20 @@ include_once("responders/json/JSONResponse.php");
 abstract class JSONResponder extends RequestResponder
 {
 
-    protected $supported_content = NULL;
-    protected $content_type = "";
-    protected $response_send = FALSE;
-
-    protected $need_redirect = false;
+    protected array $supported_content = array();
+    protected string $content_type = "";
+    protected bool $response_send = FALSE;
 
     public function __construct(string $cmd)
     {
         parent::__construct($cmd);
 
+        $this->need_redirect = false;
         $this->supported_content = array();
 
         $class_methods = get_class_methods($this);
         foreach ($class_methods as $key => $fname) {
-            if (strpos($fname, "_") === 0 && strpos($fname, "__") === FALSE) {
+            if (str_starts_with($fname, "_") && !str_contains($fname, "__")) {
                 $supported_content = str_replace("_", "", $fname);
                 $this->supported_content[] = $supported_content;
             }
@@ -39,7 +38,7 @@ abstract class JSONResponder extends RequestResponder
 
         $this->content_type = $content_type;
 
-        debug("Using function call: '{$this->content_type}'");
+        debug("Using function call: '$this->content_type'");
     }
 
     /**

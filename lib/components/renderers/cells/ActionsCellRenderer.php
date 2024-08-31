@@ -5,11 +5,15 @@ include_once("utils/ActionCollection.php");
 
 class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
 {
-    /**
-     * @var array
-     */
-    protected $actions;
 
+    /**
+     * @var ActionCollection
+     */
+    protected ActionCollection $actions;
+
+    /**
+     * @var bool
+     */
     protected $sortable = FALSE;
 
     public function __construct()

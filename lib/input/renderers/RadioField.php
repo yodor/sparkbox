@@ -10,10 +10,9 @@ class RadioItem extends DataIteratorItem
         //hackish! - force submit of unchecked checkbox
         //echo "<input type='hidden' name='{$this->name}' value=''>";
 
-        echo "<input type='radio' value='{$this->value}' name='{$this->name}'  ";
-        if ($this->selected) echo "CHECKED ";
-        echo ">";
-        echo "<span>{$this->label}</span>";
+        $checked = ($this->selected) ? " CHECKED " : "";
+        echo "<input type='radio' value='$this->value' name='$this->name' $checked >";
+        echo "<span>$this->label</span>";
     }
 
 }

@@ -53,15 +53,11 @@ class SQLSelect extends SQLStatement
         $this->fieldset = clone $this->fieldset;
     }
 
-    public function getSQL()
+    public function getSQL() : string
     {
-        if ( ($this->fieldset->count()<1) ) {
-
-            throw new Exception("Empty fieldset");
-        }
+        if ($this->fieldset->count() < 1) throw new Exception("Empty fieldset");
 
         $sql = "";
-
 
         $sql .= $this->type." ";
 
@@ -75,12 +71,9 @@ class SQLSelect extends SQLStatement
             $sql .= " SQL_NO_CACHE ";
         }
 
-        //prefer fields from the fieldset
-        if ($this->fieldset->count() > 0) {
-            $sql .= $this->fieldset->getSQL();
-        }
+        $sql .= $this->fieldset->getSQL();
 
-        $sql .= " FROM {$this->from} ";
+        $sql .= " FROM $this->from ";
 
         if ($this->whereset->count()>0) {
             $sql.=$this->whereset->getSQL(true);
@@ -111,7 +104,10 @@ class SQLSelect extends SQLStatement
 
         if (strlen(trim($other->from)) > 0) {
             $check = strtolower(trim($other->from));
-            if (strpos($check, "join") === 0 || strpos($check, "left join") === 0 || strpos($check, "right join") === 0 || strpos($check, "inner join") === 0) {
+            if (str_starts_with($check, "join") ||
+                str_starts_with($check, "left join") ||
+                str_starts_with($check, "right join") ||
+                str_starts_with($check, "inner join")) {
                 if (strlen(trim($this->from))) {
                     $this->from .= $other->from;
                 }

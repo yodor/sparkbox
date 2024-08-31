@@ -2,6 +2,7 @@
 include_once("dbdriver/DBDriver.php");
 include_once("iterators/SQLQuery.php");
 include_once("sql/SQLSelect.php");
+include_once("sql/SQLInsert.php");
 include_once("sql/SQLUpdate.php");
 include_once("sql/SQLDelete.php");
 
@@ -12,13 +13,13 @@ abstract class DBTableBean
      * Primary key
      * @var string
      */
-    protected $prkey;
+    protected string $prkey = "";
 
     /**
      * Table
      * @var string
      */
-    protected $table;
+    protected string $table = "";
 
     /**
      * SQL to create this bean table into the DB
@@ -29,21 +30,21 @@ abstract class DBTableBean
     /**
      * @var DBDriver
      */
-    protected $db;
+    protected DBDriver $db;
 
     /**
      * Column names of this table as keys and the column storage type as value
      * @var array
      */
-    protected $columns = array();
+    protected array $columns = array();
 
 
     /**
      * @var SQLSelect
      */
-    protected $select;
+    protected SQLSelect $select;
 
-    protected $error = "";
+    protected string $error = "";
 
     /**
      * DBTableBean constructor. Specify the table name to work with in the '$table_name' parameter.
@@ -62,10 +63,6 @@ abstract class DBTableBean
         else {
             $this->db = DBConnections::Get();
         }
-
-        $bclass = get_class($this);
-
-        if (!$this->db) throw new Exception("$bclass could not attach with DBDriver");
 
         $this->initFields();
 
@@ -87,13 +84,13 @@ abstract class DBTableBean
 
         if (!$this->db->tableExists($this->table)) {
             if (strlen($this->createString) < 1) {
-                throw new Exception("Table '{$this->table}' was not found in the active connection and no create string is set to recreate the table");
+                throw new Exception("Table '$this->table' was not found in the active connection and no create string is set to recreate the table");
             }
             $this->createTable();
         }
 
         if (!$this->db->tableExists($this->table)) {
-            throw new Exception("Table '{$this->table}' is not available in the active DB connection");
+            throw new Exception("Table '$this->table' is not available in the active DB connection");
         }
 
         $res = $this->db->queryFields($this->table);
@@ -367,7 +364,7 @@ abstract class DBTableBean
      * @return int The number of affected rows after closure execution
      * @throws Exception
      */
-    protected function handleTransaction(Closure $code, DBDriver $db = NULL)
+    protected function handleTransaction(Closure $code, DBDriver $db = NULL) : int
     {
         $use_transaction = FALSE;
 
@@ -431,16 +428,20 @@ abstract class DBTableBean
 
             debug("Going to delete ID: $id");
             //TODO: select with joins clause needs table specification before the FROM statement in the DELETE statement
-            $select = new SQLSelect();
-            $select->from = $this->table;
-
-            $delete = new SQLDelete($select);
+            $delete = new SQLDelete();
+            $delete->from = $this->table;
             $delete->where()->add($this->prkey, $id);
+
             $sql = $delete->getSQL();
 
-            debug("Executing SQL: $sql");
+            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_DELETE"])) {
+                debug(get_class($this) . " DELETE SQL: ". $sql);
+            }
 
-            if (!$db->query($sql)) throw new Exception("Unable to delete");
+            if (!$db->query($sql)) {
+                debug("Unable to delete: " . $db->getError() . " SQL: " . $sql);
+                throw new Exception("Unable to delete: " . $db->getError());
+            }
 
             $this->manageCache($id);
         };
@@ -465,7 +466,12 @@ abstract class DBTableBean
 
             $delete = new SQLDelete($this->select);
             $value = $db->escape($value);
-            $delete->where()->add($column, "'$value'");
+            if ($this->needQuotes($column, $value)) {
+                $delete->where()->add($column, "'$value'");
+            }
+            else {
+                $delete->where()->add($column, $value);
+            }
 
             if (count($keep_ids) > 0) {
                 $keep_list_ids = implode(",", $keep_ids);
@@ -474,9 +480,14 @@ abstract class DBTableBean
 
             $sql = $delete->getSQL();
 
-            debug("Executing SQL: $sql");
+            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_DELETE"])) {
+                debug(get_class($this) . " DELETE SQL: ". $sql);
+            }
 
-            if (!$db->query($sql)) throw new Exception("Unable to deleteRef");
+            if (!$db->query($sql)) {
+                debug("Unable to delete: " . $db->getError() . " SQL: " . $sql);
+                throw new Exception("Unable to delete: " . $db->getError());
+            }
 
             $this->manageCache($value);
         };
@@ -491,7 +502,9 @@ abstract class DBTableBean
 
         if ($this->isNumeric($key)) return FALSE;
 
-        if (strpos($storage_type, "datetime") !== FALSE || strpos($storage_type, "date") !== FALSE || strpos($storage_type, "timestamp") !== FALSE) {
+        if (str_contains($storage_type, "datetime") ||
+            str_contains($storage_type, "date") ||
+            str_contains($storage_type, "timestamp")) {
             if (strlen(trim($value))==0) {
                 $value = "NULL";
                 return FALSE;
@@ -505,9 +518,18 @@ abstract class DBTableBean
     public function isNumeric($key): bool
     {
         $storage_type = $this->columns[$key];
-        if ((strpos($storage_type, "decimal") !== FALSE) || (strpos($storage_type, "numeric") !== FALSE) || (strpos($storage_type, "integer") !== FALSE) || (strpos($storage_type, "float") !== FALSE) || (strpos($storage_type, "double") !== FALSE) ||
+        if ((str_contains($storage_type, "decimal")) ||
+            (str_contains($storage_type, "numeric")) ||
+            (str_contains($storage_type, "integer")) ||
+            (str_contains($storage_type, "float")) ||
+            (str_contains($storage_type, "double")) ||
 
-            (strpos($storage_type, "tinyint") !== FALSE) || (strpos($storage_type, "small") !== FALSE) || (strpos($storage_type, "mediumint") !== FALSE) || (strpos($storage_type, "int") !== FALSE) || (strpos($storage_type, "bigint") !== FALSE)) {
+            (str_contains($storage_type, "tinyint")) ||
+            (str_contains($storage_type, "small")) ||
+            (str_contains($storage_type, "mediumint")) ||
+            (str_contains($storage_type, "int")) ||
+            (str_contains($storage_type, "bigint"))) {
+
             return TRUE;
         }
         return FALSE;
@@ -515,27 +537,26 @@ abstract class DBTableBean
     }
 
     /**
-     * Insert $row into this table and return the last insert ID
+     * Try to insert $row data into this table and return the last insert ID
      * @param array $row
      * @param DBDriver|null $db
-     * @return int
+     * @return int last insert ID
      * @throws Exception
      */
-    public function insert(array &$row, DBDriver $db = NULL): int
+    public function insert(array $row, DBDriver $db = NULL): int
     {
 
         $insertID = -1;
 
-        $values = array();
+        $insert = new SQLInsert();
+        $insert->from = $this->table;
+        $this->prepareValues($row, $insert);
 
-        $this->prepareInsertValues($row, $values);
+        $code = function (DBDriver $db) use (&$insertID , $insert) {
 
-        $code = function (DBDriver $db) use (&$values, &$insertID) {
-
-            $sql = "INSERT INTO {$this->table} (" . implode(",", array_keys($values)) . ") VALUES (" . implode(",", $values) . ")";
-
+            $sql = $insert->getSQL();
             if (isset($GLOBALS["DEBUG_DBTABLEBEAN_INSERT"])) {
-                debug(get_class($this) . " INSERT SQL: $sql");
+                debug(get_class($this) . " INSERT SQL: ". $sql);
             }
 
             if (!$db->query($sql)) {
@@ -555,37 +576,36 @@ abstract class DBTableBean
     }
 
     /**
+     * Try to update $id of this table with row data
      * @param int $id
      * @param array $row
      * @param DBDriver|null $db
      * @return int the number of affected rows from this update
      * @throws Exception
      */
-    public function update(int $id, array &$row, DBDriver $db = NULL) : int
+    public function update(int $id, array $row, DBDriver $db = NULL) : int
     {
+        $update = new SQLUpdate($this->select);
+        $update->where()->add($this->prkey, $id);
+        $this->prepareValues($row, $update);
 
-        $values = array();
-        $this->prepareUpdateValues($row, $values);
+        $code = function (DBDriver $db) use ($id, $update) {
 
-        $code = function (DBDriver $db) use ($id, &$values) {
-
-            $update = new SQLUpdate($this->select);
-            foreach ($values as $key => $value) {
-                $update->set($key, $value);
-            }
-            $update->where()->add($this->prkey, $id);
-
+            $sql = $update->getSQL();
             if (isset($GLOBALS["DEBUG_DBTABLEBEAN_UPDATE"])) {
-                debug(get_class($this) . " UPDATE SQL: ".$update->getSQL());
+                debug(get_class($this) . " UPDATE SQL: ".$sql);
             }
 
-            if (!$db->query($update->getSQL())) {
+            if (!$db->query($sql)) {
+                debug("Unable to update: " . $db->getError() . " SQL: " . $sql);
                 throw new Exception("Unable to update: " . $db->getError());
             }
 
             $this->manageCache($id);
+
         };
 
+        //handle transaction returns the number of affected rows
         return $this->handleTransaction($code, $db);
 
     }
@@ -610,65 +630,40 @@ abstract class DBTableBean
         }
     }
 
-    protected function prepareValues(&$row, &$values, $for_update)
+    protected function prepareValues(array $row, SQLStatement $statement)
     {
 
         $keys = array();
 
         foreach ($row as $key => $val) {
-            //drop keys that are not fields from 'this' table
+            //drop keys that are not columns of 'this' table
             if (!in_array($key, $this->columnNames())) continue;
             $keys[] = $key;
         }
 
-        $values = array();
-
-        foreach ($keys as $idx => $key) {
+        foreach ($keys as $key) {
             $value = $row[$key];
             //debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value)." is_null: ".is_null($value));
 
-            //take first element of an array
+            //TODO check usage
             if (is_array($value)) {
-
                 if (count($value) < 1) continue;
                 $value = $value[0];
-
             }
 
             if (is_null($value)) {
-                $values[$key] = "NULL";
+                $value = "NULL";
             }
             else if ($this->isNumeric($key) && strlen($value) < 1) {
-                $values[$key] = "NULL";
+                $value = "NULL";
             }
-            else {
-
-                if ($this->needQuotes($key, $value) === TRUE) {
-                    $values[$key] = "'" . $value . "'";
-                }
-                else {
-                    $values[$key] = $value;
-                }
-
+            else if ($this->needQuotes($key, $value) === TRUE) {
+                $value = "'" . $value . "'";
             }
 
-            //            if ($for_update === TRUE) {
-            //
-            //                $values[$key] = "$key=" . $values[$key];//already quoted
-            //
-            //            }
+            $statement->set($key, $value);
         }
 
-    }
-
-    protected function prepareInsertValues(&$row, &$values)
-    {
-        $this->prepareValues($row, $values, FALSE);
-    }
-
-    protected function prepareUpdateValues(&$row, &$values)
-    {
-        $this->prepareValues($row, $values, TRUE);
     }
 
 }

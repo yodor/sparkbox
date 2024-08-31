@@ -5,24 +5,24 @@ include_once("beans/IBeanEditor.php");
 class FormProcessor implements IFormProcessor, IBeanEditor
 {
 
-    protected $status = IFormProcessor::STATUS_NOT_PROCESSED;
+    protected int $status = IFormProcessor::STATUS_NOT_PROCESSED;
 
-    protected $message = "";
+    protected string $message = "";
 
-    protected $editID = -1;
-    protected $bean = NULL;
+    protected int $editID = -1;
+    protected ?DBTableBean $bean = NULL;
 
-    protected $sessionEnabled = false;
+    protected bool $sessionEnabled = false;
 
     //redirect to clean the url after storing session data. only works if session is enabled
-    protected $redirectEnabled = true;
+    protected bool $redirectEnabled = true;
 
     /**
      * Store/Restore the form input values to session during process call
      *
      * @param bool $mode
      */
-    public function enableSession(bool $mode)
+    public function enableSession(bool $mode) : void
     {
         $this->sessionEnabled = $mode;
     }
@@ -36,7 +36,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
      * Enable redirection to the same url cleaned from GET variables after successful process
      * @param bool $mode
      */
-    public function setRedirectEnabled(bool $mode)
+    public function setRedirectEnabled(bool $mode) : void
     {
         $this->redirectEnabled = $mode;
     }
@@ -54,12 +54,12 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         return $this->message;
     }
 
-    public function setMessage(string $message)
+    public function setMessage(string $message) : void
     {
         $this->message = $message;
     }
 
-    public function setStatus(int $status)
+    public function setStatus(int $status) : void
     {
         $this->status = $status;
     }
@@ -82,7 +82,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         return $this->editID;
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean) : void
     {
         $this->bean = $bean;
     }
@@ -101,7 +101,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
     }
 
-    public function process(InputForm $form)
+    public function process(InputForm $form) : void
     {
         $submitKey = FormRenderer::SUBMIT_NAME;
         $submitValue = "";
@@ -206,7 +206,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
     }
 
-    protected function processImpl(InputForm $form)
+    protected function processImpl(InputForm $form) : void
     {
 
         if ($form->haveErrors()) {

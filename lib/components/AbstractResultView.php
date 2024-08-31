@@ -9,58 +9,57 @@ include_once("components/PaginatorBottomComponent.php");
 abstract class AbstractResultView extends Component implements IDataIteratorRenderer
 {
 
-    protected $items_per_page = 20;
+    protected int $items_per_page = 20;
 
     /**
      * SQL order by clause
      * @var string
      */
-    protected $default_order = "";
+    protected string $default_order = "";
 
     /**
      * Total results row after executing the query
      * @var int
      */
-    protected $total_rows = 0;
+    protected int $total_rows = 0;
 
-    protected $paged_rows = 0;
-
-    protected $current_row = array();
+    protected int $paged_rows = 0;
 
     /**
      * @var Paginator|null
      */
-    protected $paginator = NULL;
+    protected ?Paginator $paginator = NULL;
 
     /**
      * @var PaginatorTopComponent|null
      */
-    protected $paginator_top = NULL;
+    protected ?PaginatorTopComponent $paginator_top = NULL;
 
     /**
      * @var PaginatorBottomComponent|null
      */
-    protected $paginator_bottom = NULL;
+    protected ?PaginatorBottomComponent $paginator_bottom = NULL;
 
 
-    protected $position_index = -1;
+    protected int $position_index = -1;
 
-    protected $paginators_enabled = TRUE;
+    protected bool $paginators_enabled = TRUE;
 
     /**
      *  @var DataIteratorItem
      */
-    protected $item_renderer = null;
+    protected ?DataIteratorItem $item_renderer = null;
 
     /**
      * @var Component|null
      */
-    protected $list_empty = null;
+    protected ?Component $list_empty = null;
+
 
     /**
-     * @var SQLQuery
+     * @var SQLQuery|IDataIterator|null
      */
-    protected $iterator;
+    protected ?SQLQuery $iterator;
 
     const PAGINATOR_NONE = 0;
     const PAGINATOR_TOP = 1;
@@ -111,6 +110,9 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         return $this->iterator;
     }
 
+    /**
+     * @throws Exception
+     */
     public function setIterator(IDataIterator $itr)
     {
         if (!($itr instanceof SQLQuery)) throw new Exception("Unsuitable iterator. Expecting SQLQuery");
@@ -137,9 +139,8 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     {
         $paginator = $this->paginator;
 
-        $position_index = ($paginator->getCurrentPage() * $paginator->getItemsPerPage()) + $this->position_index;
+        return ($paginator->getCurrentPage() * $paginator->getItemsPerPage()) + $this->position_index;
 
-        return $position_index;
     }
 
     public function enablePaginators(int $mode)
@@ -167,6 +168,10 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->default_order = $default_order;
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     public function getCacheName() : string
     {
         if (!($this->iterator instanceof SQLQuery)) return "";
@@ -220,7 +225,11 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     }
 
-    public function processIterator()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    public function processIterator() : void
     {
         if ($this->iterator->isActive()) {
             debug("Already active");

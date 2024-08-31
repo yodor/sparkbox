@@ -6,7 +6,7 @@ class ColorCodeField extends InputFieldTag
     /**
      * @var string
      */
-    protected $chooser_name = "";
+    protected string $chooser_name = "";
 
     public function __construct(DataInput $input)
     {
@@ -26,7 +26,7 @@ class ColorCodeField extends InputFieldTag
 
     public function renderImpl()
     {
-        echo "<input type='color' name='{$this->chooser_name}' onChange='this.form.".$this->input->getName().".value=this.value;'>";
+        echo "<input type='color' name='$this->chooser_name' onChange='this.form.{$this->input->getName()}.value=this.value;'>";
         parent::renderImpl();
 ?>
         <script type="text/javascript">

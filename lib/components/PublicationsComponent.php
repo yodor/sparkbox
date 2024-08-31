@@ -197,7 +197,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
     public function processInput()
     {
 
-        $qry = $this->bean->query(...array($this->bean->key(), $this->bean->getDateColumn()));
+        $qry = $this->bean->query($this->bean->key(), $this->bean->getDateColumn());
 
 
         $num = -1;

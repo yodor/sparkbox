@@ -393,7 +393,7 @@ class InputForm implements IBeanEditor
      * @param array $arr
      * @throws Exception
      */
-    public function loadPostData(array $arr)
+    public function loadPostData(array $data) : void
     {
 
         $names = array_keys($this->inputs);
@@ -403,7 +403,7 @@ class InputForm implements IBeanEditor
 
             if ($input->isEditable()) {
                 try {
-                    $input->getProcessor()->loadPostData($arr);
+                    $input->getProcessor()->loadPostData($data);
                 }
                 catch (Exception $e) {
                     $input->setError($e->getMessage());

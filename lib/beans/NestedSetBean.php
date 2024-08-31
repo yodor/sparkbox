@@ -24,7 +24,7 @@ class NestedSetBean extends DBTableBean
         }
     }
 
-    public function insert(array &$row, DBDriver $db = NULL): int
+    public function insert(array $row, DBDriver $db = NULL): int
     {
         $lastid = -1;
 
@@ -106,7 +106,7 @@ class NestedSetBean extends DBTableBean
         return $lastid;
     }
 
-    public function update(int $id, array &$row, DBDriver $db = NULL) : int
+    public function update(int $id, array $row, DBDriver $db = NULL) : int
     {
 
         if (!$db) {
@@ -290,7 +290,7 @@ class NestedSetBean extends DBTableBean
         $qry = $this->query();
         $qry->select->fields()->set($this->prkey, "lft", "rgt", "parentID");
         $qry->select->where()->add("parentID", $parentID);
-        $qry->select->order_by = " {$this->prkey} ASC , lft ASC ";
+        $qry->select->order_by = " $this->prkey ASC , lft ASC ";
 
         $num = $qry->exec();
 
@@ -483,7 +483,7 @@ class NestedSetBean extends DBTableBean
 
         $sel->fields()->set(...$fields);
 
-        $sel->from = " {$this->table} AS node, {$this->table} AS parent ";
+        $sel->from = " $this->table AS node, $this->table AS parent ";
         $sel->where()->append("( node.lft BETWEEN parent.lft AND parent.rgt )");
 
         $this->select->where()->copyTo($sel->where());
@@ -558,7 +558,7 @@ class NestedSetBean extends DBTableBean
      * @param array $columns
      * @return SQLSelect
      */
-    public function selectChildNodesWith(SQLSelect $other, string $relation_table, $nodeID = -1, array $columns = array()): SQLSelect
+    public function selectChildNodesWith(SQLSelect $other, string $relation_table, int $nodeID = -1, array $columns = array()): SQLSelect
     {
         //other 'from' should be selected as TABLE as relation
         $prkey = $this->prkey;
@@ -587,7 +587,7 @@ class NestedSetBean extends DBTableBean
         $sel->fields()->set(...$fields);
         //
 
-        $sel->from = " {$this->table} AS node , {$this->table} AS child ";
+        $sel->from = " $this->table AS node , $this->table AS child ";
 
         $sel->where()->append("(child.lft BETWEEN node.lft AND node.rgt)");
 

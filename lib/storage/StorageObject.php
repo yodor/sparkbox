@@ -98,7 +98,7 @@ class StorageObject
      * @return StorageObject
      * @throws Exception
      */
-    public static function CreateFrom(array &$result, string $blob_field): StorageObject
+    public static function CreateFrom(array $result, string $blob_field): StorageObject
     {
 
         $object = NULL;

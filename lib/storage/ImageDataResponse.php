@@ -42,18 +42,7 @@ class ImageDataResponse extends BeanDataResponse
     protected function process()
     {
 
-        if (isset($this->row["watermark_enabled"]) && ($this->row["watermark_enabled"]>0)) {
-            debug("Object requires watermark");
 
-            if ($this->scaler->isWatermarkEnabled()) {
-                debug("Scaler watermark is enabled and can be used");
-                $this->scaler->watermark_required = true;
-            }
-            else {
-                debug("Scaler watermark is unavailable");
-                $this->scaler->watermark_required = false;
-            }
-        }
 
         $buffer = $this->object->buffer();
         if ($buffer->length()<1) throw new Exception("Empty data");
@@ -73,8 +62,34 @@ class ImageDataResponse extends BeanDataResponse
         $parts[] = $this->scaler->getWidth();
         $parts[] = $this->scaler->getHeight();
         $parts[] = $this->scaler->getMode();
+
         return implode("-", $parts);
     }
 
+    protected function ETag() : string
+    {
+        $parts = array();
+        $parts[] = $this->scaler->grayFilter;
+
+        if ($this->scaler->getWatermark()->isEnabled()) {
+
+            $watermark = $this->scaler->getWatermark();
+            $parts[] = $watermark->getMarginX();
+            $parts[] = $watermark->getMarginY();
+            $parts[] = $watermark->getPosition();
+
+            $file = $watermark->getFile();
+            $parts[] = $file->getAbsoluteFilename();
+            $parts[] = $file->length();
+            $parts[] = $file->getMIME();
+            $parts[] = $file->lastModified();
+
+        }
+
+        $parts[] = $this->cacheName();
+        $parts[] = $this->getLastModified();
+
+        return sparkHash(implode("-", $parts));
+    }
 
 }

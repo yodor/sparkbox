@@ -44,7 +44,7 @@ class TableView extends AbstractResultView implements IHeadContents
     public function __construct(IDataIterator $itr)
     {
         parent::__construct($itr);
-        $this->enablePaginators(TableView::PAGINATOR_BOTTOM);
+        $this->enablePaginators(AbstractResultView::PAGINATOR_BOTTOM);
 
         $this->row = new Component();
         $this->row->setTagName("TR");

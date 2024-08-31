@@ -45,9 +45,9 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     protected string $contents = "";
 
-    public $translation_enabled = FALSE;
-    public $render_tooltip = TRUE;
-    public $render_enabled = TRUE;
+    public bool $translation_enabled = FALSE;
+    public bool $render_tooltip = TRUE;
+    public bool $render_enabled = TRUE;
 
     /**
      * Component constructor.

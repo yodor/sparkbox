@@ -35,10 +35,10 @@ class SessionUploadInput extends InputProcessor
     }
 
     //only one storage object can be loaded from the main transaction result row
-    public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)
+    public function loadBeanData(int $editID, DBTableBean $bean, array $data) : void
     {
 
-        parent::loadBeanData($editID, $bean, $item_row);
+        parent::loadBeanData($editID, $bean, $data);
 
         //now input->getValue() contains serialized data from target bean or single item from this transact row
 
@@ -91,14 +91,14 @@ class SessionUploadInput extends InputProcessor
 
     }
 
-    public function loadPostData(array &$arr)
+    public function loadPostData(array $data) : void
     {
         //
         //arr holds the posted UIDs
         //
         $name = $this->input->getName();
 
-        debug("DataInput '{$name}' Type: " . get_class($this->input));
+        debug("DataInput '$name' Type: " . get_class($this->input));
 
         $values = $this->input->getValue();
 
@@ -110,14 +110,14 @@ class SessionUploadInput extends InputProcessor
         }
 
         $posted_uids = array();
-        if (isset($arr["uid_$name"])) {
+        if (isset($data["uid_$name"])) {
 
             debug("Found posted UIDs for DataInput '$name'");
-            if (is_array($arr["uid_$name"])) {
-                $posted_uids = $arr["uid_$name"];
+            if (is_array($data["uid_$name"])) {
+                $posted_uids = $data["uid_$name"];
             }
             else {
-                $posted_uids[] = $arr["uid_$name"];
+                $posted_uids[] = $data["uid_$name"];
             }
         }
 
@@ -166,7 +166,7 @@ class SessionUploadInput extends InputProcessor
 
     }
 
-    public function afterCommit(BeanTransactor $transactor)
+    public function afterCommit(BeanTransactor $transactor) : void
     {
         parent::afterCommit($transactor);
 
@@ -181,14 +181,14 @@ class SessionUploadInput extends InputProcessor
 
     }
 
-    public function transactValue(BeanTransactor $transactor)
+    public function transactValue(BeanTransactor $transactor) : void
     {
 
         $name = $this->input->getName();
-        debug("DataInput: '{$name}'");
+        debug("DataInput: '$name'");
 
         if ($this->transact_bean) {
-            debug("DataInput: '{$name}' uses transact bean - values will be transacted in beforeCommit() ...");
+            debug("DataInput: '$name' uses transact bean - values will be transacted in beforeCommit() ...");
             return;
         }
 
@@ -235,7 +235,7 @@ class SessionUploadInput extends InputProcessor
 
     }
 
-    public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key)
+    public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key) : void
     {
 
         if (!$this->transact_bean) {

@@ -9,9 +9,9 @@ class BeanEditorPage extends AdminPageTemplate
 {
 
     /**
-     * @var InputForm
+     * @var InputForm|null
      */
-    protected $form;
+    protected ?InputForm $form = null;
 
     public function __construct()
     {

@@ -57,7 +57,7 @@ abstract class PlainUpload extends InputFieldTag
 
         echo "<div class='Slots'><div class='Contents'>";
 
-        if ($storage_object && $storage_object instanceof StorageObject) {
+        if ($storage_object instanceof StorageObject) {
             $this->renderContents($storage_object);
         }
 

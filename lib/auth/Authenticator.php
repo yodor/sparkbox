@@ -12,9 +12,9 @@ abstract class Authenticator
     /**
      * @var DBTableBean
      */
-    protected $bean = NULL;
+    protected DBTableBean $bean;
 
-    protected $session = NULL;
+    protected SessionData $session;
 
     public function __construct(string $contextName, DBTableBean $bean)
     {
@@ -66,7 +66,7 @@ abstract class Authenticator
     {
         $this->session->clear();
         foreach ($_COOKIE as $key => $val) {
-            if (strpos($key, $this->session->name()) === 0) {
+            if (str_starts_with($key, $this->session->name())) {
                 Session::ClearCookie($key);
             }
         }

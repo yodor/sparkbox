@@ -4,7 +4,7 @@ include_once("sql/SQLSelect.php");
 
 class SQLUpdate extends SQLStatement
 {
-    protected $set = array();
+    protected array $set = array();
 
     public function __construct(SQLSelect $other = NULL)
     {
@@ -14,17 +14,12 @@ class SQLUpdate extends SQLStatement
 
         //copy the where clause collection
         if ($other) {
-
             $this->from = $other->from;
             $other->where()->copyTo($this->whereset);
         }
     }
 
-    public function set(string $column, string $value) {
-        $this->set[$column] = $value;
-    }
-
-    public function getSQL()
+    public function getSQL() : string
     {
         $sql = $this->type . " " . $this->from;
         $sql .= " SET ";
@@ -37,7 +32,6 @@ class SQLUpdate extends SQLStatement
         if ($this->whereset->count()>0) {
             $sql.= $this->whereset->getSQL(true);
         }
-
 
         return $sql;
     }

@@ -6,37 +6,32 @@ class HTMLPage extends Container
 {
 
     /**
-     * Do not wrap with DIV
-     * @var bool
-     */
-    protected $wrapper_enabled = false;
-
-    /**
      * property
      * array of Strings representing URL of all css files used
      */
-    protected $css_files = array();
+    protected array $css_files = array();
 
     /**
      * property
      * array of Strings representing URLs of all JavaScript that are used in this page
      */
-    protected $js_files = array();
+    protected array $js_files = array();
 
 
-    protected $async_defer = array();
-    protected $preload = array();
+    protected array $async_defer = array();
+    protected array $preload = array();
 
     /**
      * property array of key=>value strings used to render all meta tags of this page
      */
-    protected $meta = array();
+    protected array $meta = array();
 
-    protected $page_class = "";
+    protected string $page_class = "";
 
     public function __construct()
     {
         parent::__construct();
+        $this->wrapper_enabled = false;
 
         $this->addMeta("charset","UTF-8");
         $this->addMeta("Content-Type", "text/html;charset=utf-8");

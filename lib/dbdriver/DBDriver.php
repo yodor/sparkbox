@@ -14,7 +14,7 @@ abstract class DBDriver
         return explode(",", $enum_str);
     }
 
-    abstract function __construct(DBConnectionProperties $conn, $persistent = FALSE);
+    abstract function __construct(DBConnectionProperties $conn, bool $persistent = FALSE);
 
     public function __destruct()
     {
@@ -51,7 +51,7 @@ abstract class DBDriver
 
     abstract public function fieldName($res, int $pos);
 
-    abstract public function escape(string $data);
+    abstract public function escape(string $data) : string;
 
     abstract public function shutdown();
 

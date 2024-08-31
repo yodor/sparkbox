@@ -30,10 +30,6 @@ class DynamicPageList extends BeanListPage
             $this->is_chooser = TRUE;
             $this->chooser_return_url = base64_decode($_GET["chooser"]);
         }
-        else {
-
-            //$this->return_url = $_SESSION["chooser_return"];
-        }
 
     }
 

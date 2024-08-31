@@ -5,8 +5,8 @@ include_once("components/TableColumn.php");
 class BooleanCellRenderer extends TableCellRenderer
 {
 
-    protected $true_value = "Enabled";
-    protected $false_value = "Disabled";
+    protected string $true_value = "Enabled";
+    protected string $false_value = "Disabled";
 
     public function __construct(string $true_value = "Enabled", string $false_value = "Disabled")
     {

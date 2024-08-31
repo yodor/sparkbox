@@ -52,7 +52,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if ($this->paginator->getCurrentPage() > 0) {
-            $link->get(Paginator::KEY_PAGE)->setValue((int)($this->paginator->getCurrentPage() - 1));
+            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() - 1));
             echo "<a class='previous_page' href='{$link->url()}'> < " . tr("Prev") . " </a>";
         }
     }
@@ -64,7 +64,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
-            $link->get(Paginator::KEY_PAGE)->setValue((int)($this->paginator->getCurrentPage() + 1));
+            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() + 1));
             echo "<a  class='next_page' href='{$link->url()}'>" . tr("Next") . " > </a>";
         }
     }
@@ -141,9 +141,9 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
         $a = $this->paginator->getPageListStart();
 
-        if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
+//        if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
 //            echo "<label>" . tr("Page") . "</label>";
-        }
+//        }
 
         if ($this->paginator->getCurrentPage() > 0) {
 
@@ -170,10 +170,10 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
         if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
 
-            $link->get(Paginator::KEY_PAGE)->setValue((int)($this->paginator->getCurrentPage() + 1));
+            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() + 1));
             echo "<a  href='{$link->url()}' title='".tr("Next")."'> > </a>";
 
-            $link->get(Paginator::KEY_PAGE)->setValue((int)($this->paginator->getPagesTotal() - 1));
+            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getPagesTotal() - 1));
             echo "<a  href='{$link->url()}' title='".tr("Last")."'> >> </a>";
         }
 

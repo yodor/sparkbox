@@ -122,7 +122,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         $this->max_transact_bean_items = $max_items;
     }
 
-    public function setTargetColumn(string $name)
+    public function setTargetColumn(string $name) : void
     {
         $this->transact_column = $name;
     }
@@ -136,7 +136,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      * @param string $item_key Main transaction bean primary key
      * @throws Exception
      */
-    public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key)
+    public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key) : void
     {
 
         if (!$this->transact_bean) {
@@ -154,9 +154,9 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         $name = $this->input->getName();
 
         $values = $this->input->getValue();
-        if (!is_array($values)) throw new Exception("DataInput '{$name}' value is not array");
+        if (!is_array($values)) throw new Exception("DataInput '$name' value is not array");
 
-        debug("DataInput '{$name}' transact-bean: " . get_class($this->transact_bean) . " lastID: $lastID | Transact bean primary key: $source_key | DataInput values count: " . count($values));
+        debug("DataInput '$name' transact-bean: " . get_class($this->transact_bean) . " lastID: $lastID | Transact bean primary key: $source_key | DataInput values count: " . count($values));
 
         if (count($values) < 1) {
 
@@ -264,7 +264,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     }
 
-    public function afterCommit(BeanTransactor $transactor)
+    public function afterCommit(BeanTransactor $transactor) : void
     {
         //
     }
@@ -276,14 +276,14 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      * @return mixed|null
      * @throws Exception
      */
-    public function transactValue(BeanTransactor $transactor)
+    public function transactValue(BeanTransactor $transactor) : void
     {
 
         $name = $this->input->getName();
-        debug("DataInput: '{$name}'");
+        debug("DataInput: '$name'");
 
         if ($this->transact_bean) {
-            debug("DataInput: '{$name}' uses transact bean - values will be transacted in beforeCommit() ...");
+            debug("DataInput: '$name' uses transact bean - values will be transacted in beforeCommit() ...");
             return;
         }
 
@@ -321,11 +321,10 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      * BeanFormEditor calls this method to load the field data from bean fields
      * @param int $editID
      * @param DBTableBean $bean
-     * @param DataInput $input
-     * @param array $item_row
+     * @param array $data
      * @throws Exception
      */
-    public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)
+    public function loadBeanData(int $editID, DBTableBean $bean, array $data) : void
     {
 
         $name = $this->input->getName();
@@ -338,12 +337,12 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             $value = $this->loadTransactBean($bean->key(), $editID);
         }
         else {
-            if (!array_key_exists($name, $item_row)) {
+            if (!array_key_exists($name, $data)) {
                 debug("No values to load for this DataInput - key '$name' does not exist in the result data row");
                 return;
             }
             //load single value from the main bean
-            $value = $item_row[$name];
+            $value = $data[$name];
         }
 
         if ($value !== NULL) {
@@ -411,11 +410,12 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
     }
 
     /**
-     * Load value using arr as input
-     * Match input name to array key name and set the value to this datainput from it
+     * Load value using $data as input
+     * Match input name to array key name and set the value to this input from it
+     * Calls sanitize input with this->accepted_tags
      * @param array $data Posted data array
      */
-    public function loadPostData(array &$data)
+    public function loadPostData(array $data) : void
     {
 
         $name = $this->input->getName();

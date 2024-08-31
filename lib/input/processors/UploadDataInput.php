@@ -9,7 +9,7 @@ include_once("storage/FileStorageObject.php");
 class UploadDataInput extends InputProcessor
 {
 
-    public function loadPostData(array &$arr)
+    public function loadPostData(array $data) : void
     {
 
         $name = $this->input->getName();

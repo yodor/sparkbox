@@ -3,11 +3,11 @@ include_once("input/DataInput.php");
 
 interface IInputValidator
 {
+
     /**
-     * Validate value of DataInput is correct
      * @param DataInput $input
-     * @return mixed
+     * @return void
      */
-    public function validate(DataInput $input);
+    public function validate(DataInput $input) : void;
 
 }

@@ -2,14 +2,14 @@
 
 abstract class RequestResponder
 {
-    protected $cmd = NULL;
+    protected string $cmd = "";
 
-    protected $cancel_url = "";
-    protected $success_url = "";
+    protected string $cancel_url = "";
+    protected string $success_url = "";
 
-    protected $need_confirm = FALSE;
+    protected bool $need_confirm = FALSE;
 
-    protected $need_redirect = TRUE;
+    protected bool $need_redirect = TRUE;
 
     const KEY_COMMAND = "cmd";
     const KEY_CONFIRM = "confirm_handler";

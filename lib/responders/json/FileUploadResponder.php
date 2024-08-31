@@ -24,9 +24,6 @@ class FileUploadResponder extends UploadControlResponder
 
         ob_start();
 
-        //show just icon depending on mime type
-        $arr = explode("/", $mime, 2);
-        $first = $arr[0];
         echo "<div class='Element' tooltip='$filename'>";
         echo "<span class='thumbnail'><img src='" . SPARK_LOCAL . "/images/mimetypes/generic.png'></span>";
         echo "<div class='details'>";

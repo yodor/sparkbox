@@ -23,7 +23,7 @@ class CheckboxCellRenderer extends TableCellRenderer
     {
         echo "<div class='value'>";
         echo "<input type=checkbox name='select_{$this->field}[]'  value='" . attributeValue($this->value) . "'>";
-        echo "<span>{$this->value}</span>";
+        echo "<span>$this->value</span>";
         echo "</div>";
     }
 

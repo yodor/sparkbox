@@ -6,7 +6,7 @@ abstract class AdminPageTemplate extends PageTemplate
     /**
      * @var DBTableBean
      */
-    protected $bean;
+    protected ?DBTableBean $bean = null;
 
     public function __construct()
     {

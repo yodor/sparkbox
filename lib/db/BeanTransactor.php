@@ -13,7 +13,7 @@ class BeanTransactorEvent extends SparkEvent
     /**
      * @var DBDriver
      */
-    protected $db;
+    protected ?DBDriver $db;
 
     public function __construct(string $name = "", SparkObject $source = NULL, DBDriver $db = NULL)
     {
@@ -161,7 +161,7 @@ class BeanTransactor extends SparkObservable implements IBeanEditor
 
         $fieldNames = $form->getInputNames();
 
-        foreach ($fieldNames as $pos => $fieldName) {
+        foreach ($fieldNames as $fieldName) {
             $field = $form->getInput($fieldName);
 
             $proc = $field->getProcessor();
@@ -191,7 +191,7 @@ class BeanTransactor extends SparkObservable implements IBeanEditor
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
         $names = $this->form->getInputNames();
-        foreach ($names as $pos => $name) {
+        foreach ($names as $name) {
 
             $input = $this->form->getInput($name);
 
@@ -216,7 +216,7 @@ class BeanTransactor extends SparkObservable implements IBeanEditor
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
         $names = $this->form->getInputNames();
-        foreach ($names as $pos => $name) {
+        foreach ($names as $name) {
 
             $input = $this->form->getInput($name);
 

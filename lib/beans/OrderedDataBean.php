@@ -38,7 +38,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function insert(array &$row, DBDriver $db = NULL): int
+    public function insert(array $row, DBDriver $db = NULL): int
     {
         if (!isset($row["position"])) {
             debug("Position field is missing - using max(position) + 1");
@@ -53,7 +53,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         $pos = $this->getValue($id, "position");
 
-        $maxp = (int)$this->getMaxPosition();
+        $maxp = $this->getMaxPosition();
 
         debug("ID: $id position - current: $pos max: $maxp new: $new_pos");
 
@@ -119,7 +119,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         $pos = (int)$this->getValue($id, "position");
 
-        $max_pos = (int)$this->getMaxPosition();
+        $max_pos = $this->getMaxPosition();
 
         if ($pos == $max_pos) {
             throw new Exception("Already at bottom position");
@@ -185,7 +185,7 @@ abstract class OrderedDataBean extends DBTableBean
     {
         $pos = (int)$this->getValue($id, "position");
 
-        $max_pos = (int)$this->getMaxPosition();
+        $max_pos = $this->getMaxPosition();
         if ($pos + 1 > $max_pos) {
             throw new Exception("Already at bottom position");
         }

@@ -55,7 +55,7 @@ class ItemView extends AbstractResultView
         $url = fullURL(SparkPage::Instance()->getPageURL());
 
         echo "<link itemprop='url' href='$url'>";
-        echo "<meta itemprop='numberOfItems' content='{$this->total_rows}'>";
+        echo "<meta itemprop='numberOfItems' content='$this->total_rows'>";
 
         if ($this->getName()) {
             echo "<meta itemprop='name' content='{$this->getName()}'>";

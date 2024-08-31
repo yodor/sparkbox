@@ -160,7 +160,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
         foreach ($data as $pos => $value) {
             $field = $this->fields[$pos];
             //optional attributes
-            if (strpos($field, "opt:") === 0) {
+            if (str_starts_with($field, "opt:")) {
                 list($tmp, $opt_name) = explode(":", $field);
                 $opt_name = str_replace("_", " ", $opt_name);
 
@@ -168,17 +168,17 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                 unset($data[$pos]);
             }
             //features
-            else if (strpos($field, "product:features") === 0) {
+            else if (str_starts_with($field, "product:features")) {
                 $features = explode(";", $value);
                 unset($data[$pos]);
             }
             //images
-            else if (strpos($field, "product:images") === 0) {
+            else if (str_starts_with($field, "product:images")) {
                 $images = explode(";", $value);
                 unset($data[$pos]);
             }
 
-            else if (strpos($field, "gnID") === 0) {
+            else if (str_starts_with($field, "gnID")) {
                 $genderID = GendersBean::gender2id($value);
                 $prod_row["gnID"] = (int)$genderID;
             }

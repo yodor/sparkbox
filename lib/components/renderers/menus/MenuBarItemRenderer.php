@@ -32,7 +32,7 @@ class MenuBarItemRenderer extends MenuItemRenderer
 
         $submenu = $item->getSubmenu();
 
-        if (is_array($submenu) && count($submenu) > 0) {
+        if (count($submenu) > 0) {
             $this->setAttribute("have_submenu", "1");
         }
         else {

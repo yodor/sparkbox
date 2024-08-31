@@ -3,11 +3,11 @@ include_once("components/Component.php");
 
 class Container extends Component
 {
-    protected $items;
+    protected array $items = array();
 
-    protected $enabled = TRUE;
+    protected bool $enabled = TRUE;
 
-    protected $wrapper_enabled = TRUE;
+    protected bool $wrapper_enabled = TRUE;
 
     public function __construct()
     {
@@ -62,15 +62,14 @@ class Container extends Component
         $this->insert($cmp, 0);
     }
 
+
     /**
-     * Add component to this Container
      * @param Component $cmp
-     * @return int the index position for this component
+     * @return void
      */
-    public function append(Component $cmp)
+    public function append(Component $cmp) : void
     {
         $this->items[] = $cmp;
-
     }
 
     /**
@@ -126,7 +125,7 @@ class Container extends Component
     public function findBy(Closure $callback): ?Component
     {
         $indexes = array_keys($this->items);
-        foreach ($indexes as $idx => $index) {
+        foreach ($indexes as $index) {
             $component = $this->get($index);
             if ($callback($component)) {
                 return $component;
@@ -146,7 +145,7 @@ class Container extends Component
     {
         parent::renderImpl();
         $indexes = array_keys($this->items);
-        foreach ($indexes as $idx => $index) {
+        foreach ($indexes as $index) {
             $component = $this->get($index);
             $component->render();
         }

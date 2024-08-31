@@ -10,14 +10,14 @@ include_once("utils/RequestParameterCondition.php");
 class BeanKeyCondition extends RequestParameterCondition
 {
 
-    protected $id;
-    protected $data;
+    protected int $id;
+    protected array $data = array();
 
-    protected $urlparam;
+    protected URLParameter $urlparam;
 
-    protected $bean;
+    protected DBTableBean $bean;
 
-    protected $fields;
+    protected array $fields = array();
 
     /**
      * Will fetch the bean fields specified in the $fields array parameter that can be accessed later from getData

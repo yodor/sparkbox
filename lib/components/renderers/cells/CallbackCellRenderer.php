@@ -7,7 +7,7 @@ class CallbackCellRenderer extends TableCellRenderer
 
     protected $callback = FALSE;
 
-    protected $data = NULL;
+    protected array $data = array();
 
     public function __construct($function_name)
     {

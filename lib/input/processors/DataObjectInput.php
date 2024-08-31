@@ -27,17 +27,17 @@ class DataObjectInput extends InputProcessor
         return NULL;
     }
 
-    public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key)
+    public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key) : void
     {
 
     }
 
-    public function afterCommit(BeanTransactor $transactor)
+    public function afterCommit(BeanTransactor $transactor) : void
     {
 
     }
 
-    public function transactValue(BeanTransactor $transactor)
+    public function transactValue(BeanTransactor $transactor) : void
     {
         $name = $this->input->getName();
 
@@ -51,17 +51,17 @@ class DataObjectInput extends InputProcessor
 
     }
 
-    public function loadPostData(array &$data)
+    public function loadPostData(array $data) : void
     {
         parent::loadPostData($data);
         $this->object->setData($data);
     }
 
-    public function loadBeanData(int $editID, DBTableBean $bean, array &$item_row)
+    public function loadBeanData(int $editID, DBTableBean $bean, array $data) : void
     {
-        if (!isset($item_row[$this->input->getName()])) return;
+        if (!isset($data[$this->input->getName()])) return;
 
-        $object = $item_row[$this->input->getName()];
+        $object = $data[$this->input->getName()];
 
         $object = @unserialize($object);
         if (!($object instanceof DataObject)) {

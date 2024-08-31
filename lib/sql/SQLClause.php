@@ -1,6 +1,7 @@
 <?php
+include_once("objects/SparkObject.php");
 
-class SQLClause
+class SQLClause extends SparkObject
 {
     /**
      * Connect the value to the expression using this operator by default
@@ -12,13 +13,15 @@ class SQLClause
      */
     const DEFAULT_GLUE = "AND";
 
-    protected $expr;
-    protected $value;
-    protected $operator;
-    protected $glue;
+    protected string $expr = "";
+    protected string $value = "";
+    protected string $operator = "";
+    protected string $glue = "";
 
     public function __construct(string $operator=SQLClause::DEFAULT_OPERATOR, string $glue=SQLClause::DEFAULT_GLUE)
     {
+        parent::__construct();
+
         $this->glue = SQLClause::DEFAULT_GLUE;
         $this->operator = SQLClause::DEFAULT_OPERATOR;
     }

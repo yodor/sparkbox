@@ -12,17 +12,15 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
      */
     protected $bean = NULL;
 
-    protected $list_limit = 0;
+    protected int $list_limit = 0;
 
-    protected $blob_field = "";
+    protected string $blob_field = "";
 
-    protected $relateField = "";
+    protected string $relateField = "";
 
-    protected $items = array();
+    protected array $items = array();
 
-    protected $action = NULL;
-
-    protected $image_popup = NULL;
+    protected ImagePopup $image_popup;
 
     protected static $DefaultWidth = 128;
     protected static $DefaultHeight = -1;
@@ -71,7 +69,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     public function setLimit(int $num)
     {
-        $this->list_limit = (int)$num;
+        $this->list_limit = $num;
     }
 
     public function setBlobField(string $blob_field)
@@ -109,7 +107,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         return $values;
     }
 
-    protected function constructItems(array &$data)
+    protected function constructItems(array $data)
     {
 
         $this->items = array();

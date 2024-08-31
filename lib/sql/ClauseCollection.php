@@ -42,11 +42,11 @@ class ClauseCollection
 
     public function addClause(SQLClause $clause)
     {
-        foreach ($this->clauses as $idx=>$clause_existing) {
+        foreach ($this->clauses as $clause_existing) {
             if (!($clause_existing instanceof SQLClause))continue;
 
-            if ($clause == $clause_existing) {
-                //debug("Clause already exists: ".$clause->getSQL());
+            if ($clause->equals($clause_existing)) {
+                debug("Clause already exists: ".$clause->getSQL());
                 return;
             }
         }
@@ -122,7 +122,7 @@ class ClauseCollection
     {
         $keys = array_keys($this->clauses);
 
-        foreach ($keys as $idx => $pos) {
+        foreach ($keys as $pos) {
             $clause = $this->get($pos);
             $other->addClause($clause);
         }
@@ -142,7 +142,7 @@ class ClauseCollection
 
             $keys = array_keys($this->clauses);
 
-            foreach ($keys as $idx => $pos) {
+            foreach ($keys as $pos) {
                 $clause = $this->get($pos);
                 if ($last_clause instanceof SQLClause) {
                     $result .= " " . $last_clause->getGlue() . " ";

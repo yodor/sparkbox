@@ -2,12 +2,12 @@
 
 class PaymentResult
 {
-    private $orderID = -1;
-    private $reference = "";
-    private $transactionTime = -1;
-    private $gateway = "";
+    private int $orderID;
+    private string $reference;
+    private int $transactionTime;
+    private string $gateway;
 
-    public function __construct($orderID, $reference, $transactionTime, $gateway)
+    public function __construct(int $orderID, string $reference, int $transactionTime, string $gateway)
     {
         $this->orderID = $orderID;
         $this->reference = $reference;
@@ -15,22 +15,22 @@ class PaymentResult
         $this->gateway = $gateway;
     }
 
-    public function getReference()
+    public function getReference() : string
     {
         return $this->reference;
     }
 
-    public function getTransactionTime()
+    public function getTransactionTime() : int
     {
         return $this->transactionTime;
     }
 
-    public function getOrderID()
+    public function getOrderID() : int
     {
         return $this->orderID;
     }
 
-    public function getGateway()
+    public function getGateway() : string
     {
         return $this->gateway;
     }

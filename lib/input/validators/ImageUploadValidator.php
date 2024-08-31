@@ -39,7 +39,7 @@ class ImageUploadValidator extends UploadDataValidator
         $this->resize_enabled = $mode;
     }
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
         parent::validate($input);
 

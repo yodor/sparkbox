@@ -6,7 +6,12 @@ include_once("mailers/ForgotPasswordMailer.php");
 
 class ForgotPasswordProcessor extends FormProcessor
 {
-    protected function processImpl(InputForm $form)
+    /**
+     * @param InputForm $form
+     * @return void
+     * @throws Exception
+     */
+    protected function processImpl(InputForm $form) : void
     {
         parent::processImpl($form);
 
@@ -45,7 +50,7 @@ class ForgotPasswordProcessor extends FormProcessor
 
 class AdminLoginForgotPassword extends AdminLogin
 {
-    protected $form;
+    protected InputForm $form;
 
     public function __construct()
     {

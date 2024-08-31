@@ -15,9 +15,9 @@ class ConfigBean extends DBTableBean
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
 ";
 
-    private static $instance = FALSE;
+    private static ?ConfigBean $instance = null;
 
-    protected $section = "";
+    protected string $section = "";
 
     public function __construct()
     {
@@ -26,13 +26,12 @@ class ConfigBean extends DBTableBean
 
     public static function Factory()
     {
-        if (self::$instance === FALSE) {
-            self::$instance = new ConfigBean();
-        }
+        if (self::$instance instanceof ConfigBean) return self::$instance;
+        self::$instance = new ConfigBean();
         return self::$instance;
     }
 
-    public function setSection(string $section)
+    public function setSection(string $section) : void
     {
         $this->section = $section;
     }
@@ -42,7 +41,7 @@ class ConfigBean extends DBTableBean
         return $this->section;
     }
 
-    public function get(string $key, $default_value = "")
+    public function get(string $key, $default_value = "") : mixed
     {
 
         $key = DBConnections::Get()->escape($key);
@@ -53,7 +52,7 @@ class ConfigBean extends DBTableBean
 
         if ($qry->exec() && $data = $qry->next()) {
             $result = $data["config_val"];
-            @$serial = unserialize($result);
+            $serial = @unserialize($result);
             if ($serial) {
                 $result = $serial;
             }
@@ -62,17 +61,17 @@ class ConfigBean extends DBTableBean
         return $result;
     }
 
-    public function clear(string $key)
+    public function clear(string $key) : void
     {
 
         $this->deleteRef("config_key", $key);
 
     }
 
-    public function set(string $key, $val)
+    public function set(string $key, $val) : void
     {
 
-        $db = DBConnections::Get()->escape($key);
+        $key = DBConnections::Get()->escape($key);
 
         $this->deleteRef("config_key", $key);
 

@@ -15,7 +15,7 @@ class NumericValidator implements IInputValidator
 
     }
 
-    public function validate(DataInput $input)
+    public function validate(DataInput $input) : void
     {
         $value = $input->getValue();
 

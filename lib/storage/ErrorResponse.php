@@ -3,19 +3,24 @@ include_once("storage/SparkHTTPResponse.php");
 
 class ErrorResponse extends SparkHTTPResponse
 {
-    public function __construct($message)
+    protected DataBuffer $buffer;
+    public function __construct()
     {
         parent::__construct();
 
-        if ($message instanceof Exception) {
-            $message = $message->getMessage();
-        }
-        debug("ErrorResponse: ".$message);
+        $this->buffer = new DataBuffer();
 
         $this->setHeader("Cache-Control", "no-cache, must-revalidate");
-        $this->setHeader("Content-Type", "text/html");
 
-        $this->setData($message, strlen($message));
+    }
+    public function sendException(Exception $ex) : void
+    {
+        $this->sendMessage($ex->getMessage());
+    }
+    public function sendMessage(string $message) : void
+    {
+        $this->buffer->setData($message);
+        $this->sendData($this->buffer);
     }
 
 }
