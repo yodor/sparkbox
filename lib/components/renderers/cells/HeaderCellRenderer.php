@@ -4,7 +4,7 @@ include_once("components/renderers/cells/TableCellRenderer.php");
 class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
 {
 
-    protected $tagName = "TH";
+
     protected string $sortField = "";
     protected ?URLBuilder $sortLink = NULL;
 
@@ -14,6 +14,8 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
     public function __construct()
     {
         parent::__construct();
+        $this->tagName = "TH";
+
         $this->translation_enabled = true;
         $this->sortLink = new URLBuilder();
         $this->sortLink->buildFrom(SparkPage::Instance()->getURL()->url());

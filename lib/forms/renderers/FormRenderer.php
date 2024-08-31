@@ -5,13 +5,13 @@ include_once("components/Container.php");
 
 class InputGroupRenderer extends Component
 {
-    protected $tagName = "fieldset";
 
-    protected $group = NULL;
+    protected InputGroup $group;
 
     public function __construct(InputGroup $group)
     {
         parent::__construct();
+        $this->tagName = "fieldset";
         $this->group = $group;
         $this->setName($group->getName());
     }
@@ -28,21 +28,20 @@ class InputGroupRenderer extends Component
 
 class FormRenderer extends Container
 {
-    protected $form;
-    protected $submitButton;
+    protected InputForm $form;
+    protected ColorButton $submitButton;
 
+    //TODO
     protected $render_field_callback = NULL;
-
-    protected $tagName = "FORM";
 
     const FIELD_HBOX = "HBox";
     const FIELD_VBOX = "VBox";
 
     const SUBMIT_NAME = "SubmitForm";
 
-    protected $layout = FormRenderer::FIELD_VBOX;
+    protected string $layout = FormRenderer::FIELD_VBOX;
 
-    protected $method;
+    protected string $method;
 
     protected $submitLine;
 
@@ -52,6 +51,7 @@ class FormRenderer extends Container
     public function __construct(InputForm $form)
     {
         parent::__construct();
+        $this->tagName = "FORM";
 
         $this->form = $form;
         $form->setRenderer($this);

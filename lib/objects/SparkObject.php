@@ -2,18 +2,19 @@
 class SparkObject
 {
     /**
-     * @var SparkObject
+     * @var SparkObject|null
      */
-    protected $parent = NULL;
+    protected ?SparkObject $parent;
 
     /**
      * @var string
      */
-    protected $name = "";
+    protected string $name = "";
 
     public function __construct()
     {
         $this->name = "";
+        $this->parent = null;
     }
 
     public function getName(): string
@@ -21,12 +22,12 @@ class SparkObject
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name) : void
     {
         $this->name = $name;
     }
 
-    public function setParent(?SparkObject $parent)
+    public function setParent(?SparkObject $parent) : void
     {
         $this->parent = $parent;
     }
@@ -41,11 +42,11 @@ class SparkObject
 
     /**
      * Return hash of the serialized value of this object
-     * @return string Currently uses the xxh128 algorithm
+     * @return string Currently uses the sparkHash function that use xxh3 algorithm
      */
     public function hash(): string
     {
-        return hash('xxh128', serialize($this));
+        return sparkHash(serialize($this));
     }
 
     /**

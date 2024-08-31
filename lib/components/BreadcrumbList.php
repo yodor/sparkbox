@@ -19,7 +19,7 @@ class BreadcrumbListItem extends Component {
 class BreadcrumbList extends Container implements IHeadContents
 {
 
-    protected $renderer = NULL;
+    protected BreadcrumbListItem $renderer;
 
     public function __construct()
     {

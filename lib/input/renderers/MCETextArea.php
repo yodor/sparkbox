@@ -3,13 +3,14 @@
 class MCETextArea extends InputField
 {
 
-    protected static $image_browser = NULL;
-    protected $tagName = "TEXTAREA";
+    protected static MCEImageBrowserDialog $image_browser;
 
     public function __construct(DataInput $input)
     {
 
         parent::__construct($input);
+
+        $this->tagName = "TEXTAREA";
 
         //force single instance of the dialog to all MCETextAreas to prevent double session upload
         if (!MCETextArea::$image_browser) {

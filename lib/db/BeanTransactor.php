@@ -41,30 +41,30 @@ class BeanTransactorEvent extends SparkEvent
 class BeanTransactor extends SparkObservable implements IBeanEditor
 {
 
-    protected $values = array();
+    protected array $values = array();
 
     /**
      * @var DBTableBean
      */
-    protected $bean = NULL;
+    protected DBTableBean $bean;
 
     /**
      * @var int
      */
-    protected $editID = -1;
+    protected int $editID = -1;
 
     //external assigned
-    protected $insert_values = array();
-    protected $update_values = array();
+    protected array $insert_values = array();
+    protected array $update_values = array();
 
     /**
      * @var int
      */
-    protected $lastID = -1;
+    protected int $lastID = -1;
     /**
-     * @var InputForm
+     * @var InputForm|null
      */
-    protected $form = NULL;
+    protected ?InputForm $form;
 
     public function __construct(DBTableBean $bean, int $editID)
     {
@@ -74,6 +74,7 @@ class BeanTransactor extends SparkObservable implements IBeanEditor
         $this->insert_values = array();
         $this->update_values = array();
 
+        $this->form = null;
         $this->bean = $bean;
         $this->editID = $editID;
         $this->setObserver(new SparkObserver());

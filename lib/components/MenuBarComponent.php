@@ -93,7 +93,7 @@ class MenuBarComponent extends Component
         return $this->ir_baritem;
     }
 
-    public function setName(string $name)
+    public function setName(string $name) : void
     {
         parent::setName($name);
         $this->bar->setName($name);

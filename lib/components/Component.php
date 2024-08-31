@@ -9,49 +9,41 @@ include_once("storage/CacheEntry.php");
 class Component extends SparkObservable implements IRenderer, IHeadContents, ICacheable
 {
 
-    protected CacheEntry $cacheEntry;
     protected bool $cacheable = false;
 
-    protected $tagName = "DIV";
+    protected string $tagName = "DIV";
 
-    protected $closingTagRequired = true;
+    protected bool $closingTagRequired = true;
 
-    protected $index = -1;
+    protected int $index = -1;
 
     /**
      * @var array Collection of CSS classes for this component, in addition to the automatic '$component_class'
      */
-    protected $classNames = array();
+    protected array $classNames = array();
 
     /**
      * @var array Collection of HTML attribute name/values
      */
-    protected $attributes = array();
+    protected array $attributes = array();
 
-    protected $style = array();
+    protected array $style = array();
 
-    /**
-     * @var Component
-     */
-    protected $parent = NULL;
+    protected string $caption = "";
 
-    protected $caption = "";
-
-    protected $json_attributes = array();
+    protected array $json_attributes = array();
 
     /**
      * @var string[] values of these attributes will be handled using htmlspecialchars.
      */
-    protected $special_attributes = array("tooltip");
+    protected array $special_attributes = array("tooltip");
 
     /**
      * @var string Automatic css class string. Build from all the class hierarchy. Override with setComponentClass
      */
-    protected $component_class = "";
+    protected string $component_class = "";
 
-    protected $contents = "";
-
-    protected $name = "";
+    protected string $contents = "";
 
     public $translation_enabled = FALSE;
     public $render_tooltip = TRUE;
@@ -205,16 +197,18 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     {
         if (!$this->render_enabled) return;
 
+        $cacheEntry = null;
+
         if ($this->cacheable && PAGE_CACHE_ENABLED) {
 
             $cacheName = $this->getCacheName();
             if (!empty($cacheName)) {
                 debug("Cacheable component: ".get_class($this)." | Cache name: ".$cacheName);
 
-                $this->cacheEntry = CacheEntry::PageCacheEntry(get_class($this) . "-" . sparkHash($cacheName));
-                if ($this->cacheEntry->getFile()->exists()) {
+                $cacheEntry = CacheEntry::PageCacheEntry(get_class($this) . "-" . sparkHash($cacheName));
+                if ($cacheEntry->getFile()->exists()) {
 
-                    $entryStamp = $this->cacheEntry->lastModified();
+                    $entryStamp = $cacheEntry->lastModified();
                     $timeStamp = time();
                     $entryAge = ($timeStamp - $entryStamp);
                     $remainingTTL = PAGE_CACHE_TTL - $entryAge;
@@ -223,7 +217,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
                     if ($remainingTTL > 0) {
                         //output cached data
-                        $this->cacheEntry->output();
+                        $cacheEntry->output();
                         return;
                     }
                 }
@@ -247,8 +241,8 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         $buffer = ob_get_contents();
         ob_end_clean();
 
-        if ($this->cacheable && PAGE_CACHE_ENABLED && !$haveError) {
-            $this->cacheEntry->store($buffer, time());
+        if ($this->cacheable && PAGE_CACHE_ENABLED && !$haveError && ($cacheEntry instanceof CacheEntry)) {
+            $cacheEntry->store($buffer, time());
         }
 
         echo $buffer;
@@ -260,7 +254,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return basename($_SERVER["SCRIPT_FILENAME"])."-".get_class($this)."-".$this->getName();
     }
 
-    public function setName(string $name)
+    public function setName(string $name) : void
     {
         parent::setName($name);
         $this->setAttribute("name", $name);

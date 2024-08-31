@@ -4,8 +4,6 @@ include_once("components/Component.php");
 class ColorButton extends Component
 {
 
-    protected $tagName = "BUTTON";
-
     const TYPE_SUBMIT = "submit";
     const TYPE_RESET = "reset";
     const TYPE_BUTTON = "button";
@@ -47,6 +45,8 @@ class ColorButton extends Component
     public function __construct()
     {
         parent::__construct();
+
+        $this->tagName = "BUTTON";
 
         $this->setType(ColorButton::TYPE_BUTTON);
         $this->setClassName(self::$default_class);

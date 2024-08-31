@@ -5,15 +5,14 @@ include_once("input/renderers/IErrorRenderer.php");
 class InputLabel extends Component implements IErrorRenderer
 {
 
-    protected $tagName = "LABEL";
+    protected DataInput $input;
 
-    protected $input = NULL;
-
-    protected $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
+    protected int $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
 
     public function __construct(DataInput $input)
     {
         parent::__construct();
+        $this->tagName = "LABEL";
         $this->input = $input;
     }
 

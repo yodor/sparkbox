@@ -8,7 +8,7 @@ class SparkObservable extends SparkObject implements IObservable
     /**
      * @var IObserver|null
      */
-    protected $observer = null;
+    protected ?IObserver $observer;
 
     public function __construct()
     {

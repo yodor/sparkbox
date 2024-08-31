@@ -16,8 +16,8 @@
 
 .admin_menu .MenuItemOuter {
     display: block !important;
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 .admin_menu .MenuBarItemRenderer {
@@ -41,7 +41,6 @@
     /*   border-bottom:1px solid #cccccc; */
     border-top: 1px solid #cccccc;
 
-    padding-left: 5px;
     padding-right: 15px;
 
 
@@ -49,9 +48,9 @@
 
 .admin_menu .MenuBarItemRenderer[active="1"] .MenuItemLink {
     background-color: #b9b3a3;
-    -webkit-border-radius: 0px 20px 20px 0px;
-    -moz-border-radius: 0px 20px 20px 0px;
-    border-radius: 0px 20px 20px 0px;
+    -webkit-border-radius: 0 20px 20px 0;
+    -moz-border-radius: 0 20px 20px 0;
+    border-radius: 0 20px 20px 0;
     margin-right: -15px;
     color: white;
     background-image: none;

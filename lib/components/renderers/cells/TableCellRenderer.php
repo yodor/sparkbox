@@ -4,7 +4,7 @@ include_once("components/TableColumn.php");
 
 class TableCellRenderer extends Component implements IDataResultProcessor
 {
-    protected $tagName = "TD";
+
 
     protected $tooltip_field = "";
 
@@ -29,7 +29,7 @@ class TableCellRenderer extends Component implements IDataResultProcessor
     public function __construct()
     {
         parent::__construct();
-
+        $this->tagName = "TD";
     }
 
     public function isSortable(): bool

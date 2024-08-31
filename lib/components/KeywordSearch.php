@@ -14,12 +14,8 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
     const SUBMIT_KEY = "filter";
 
-    protected $have_filter = FALSE;
+    protected bool $have_filter = FALSE;
 
-    /**
-     * @var KeywordSearchForm
-     */
-    protected $form;
 
     public function __construct()
     {

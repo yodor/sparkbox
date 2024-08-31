@@ -8,24 +8,24 @@ include_once("components/renderers/items/DataIteratorItem.php");
 class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 {
 
-    protected $tagName = "A";
+    protected URLBuilder $url;
 
-    protected $url;
+    protected int $width = 64;
+    protected int $height = 64;
 
-    protected $width = 64;
-    protected $height = 64;
-
-    protected $beanClass;
+    protected string $beanClass = "";
 
     protected $dateFormat = "j M Y";
 
     public function __construct(string $beanClass)
     {
         parent::__construct();
+        $this->tagName = "A";
 
         $this->setClassName("item");
         $this->url = new URLBuilder();
 
+        if (empty($beanClass)) throw new Exception("Empty bean class");
         $this->beanClass = $beanClass;
     }
 

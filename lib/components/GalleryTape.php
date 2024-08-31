@@ -51,7 +51,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
      * Sets the component name and set the ImagePopup relation attribute
      * @param string $name
      */
-    public function setName(string $name)
+    public function setName(string $name) : void
     {
         //parent::setName($name);
 
@@ -130,7 +130,7 @@ class GalleryTape extends Component implements IDataIteratorRenderer
      * Sets the component name and set the ImagePopup relation attribute
      * @param string $name
      */
-    public function setName(string $name)
+    public function setName(string $name) : void
     {
         parent::setName($name);
 

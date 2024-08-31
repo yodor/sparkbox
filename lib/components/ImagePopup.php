@@ -5,19 +5,14 @@ include_once("storage/StorageItem.php");
 
 class ImagePopup extends Component implements IPhotoRenderer
 {
-    public const MODE_IMAGETAG = 1;
-    public const MODE_BACKGROUND = 2;
 
-    protected $tagName = "A";
-    protected $thumb_url = "";
-    protected $popup_url = "";
+    protected string $thumb_url = "";
+    protected string $popup_url = "";
 
-    protected $width = -1;
-    protected $height = 256;
+    protected int $width = -1;
+    protected int $height = 256;
 
-    protected $mode = ImagePopup::MODE_IMAGETAG;
-
-    protected $storageItem;
+    protected StorageItem $storageItem;
 
     protected bool $lazyLoad = true;
 
@@ -26,6 +21,8 @@ class ImagePopup extends Component implements IPhotoRenderer
     public function __construct()
     {
         parent::__construct();
+        $this->tagName = "A";
+
         $this->storageItem = new StorageItem();
         $this->image = new Component();
         $this->image->setClosingTagRequired(false);
@@ -74,11 +71,6 @@ class ImagePopup extends Component implements IPhotoRenderer
         return $this->storageItem;
     }
 
-    public function setRenderMode(int $mode)
-    {
-        $this->mode = $mode;
-    }
-
     public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
@@ -124,9 +116,9 @@ class ImagePopup extends Component implements IPhotoRenderer
         $this->thumb_url = $this->storageItem->hrefImage($this->width, $this->height);
         $this->popup_url = $this->storageItem->hrefImage();
 
-        if ($this->mode == ImagePopup::MODE_BACKGROUND) {
+        //if ($this->mode == ImagePopup::MODE_BACKGROUND) {
             $this->setStyleAttribute("background-image", "url({$this->thumb_url})");
-        }
+        //}
 
         $this->setAttribute("itemID", $this->storageItem->id);
         $this->setAttribute("itemClass", $this->storageItem->className);
@@ -134,19 +126,17 @@ class ImagePopup extends Component implements IPhotoRenderer
 
     protected function renderImpl()
     {
-        if ($this->mode == ImagePopup::MODE_IMAGETAG) {
 
-            $titleValue = $this->getAttribute("title");
-            $alt = $this->image->getAttribute("alt");
-            if (!$alt) {
-                if ($titleValue) {
-                    $this->image->setAttribute("alt", $titleValue);
-                }
+        $titleValue = $this->getAttribute("title");
+        $alt = $this->image->getAttribute("alt");
+        if (!$alt) {
+            if ($titleValue) {
+                $this->image->setAttribute("alt", $titleValue);
             }
-
-            $this->image->setAttribute("src", $this->thumb_url);
-            $this->image->render();
         }
+
+        $this->image->setAttribute("src", $this->thumb_url);
+        $this->image->render();
 
     }
 

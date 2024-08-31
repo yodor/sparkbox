@@ -6,15 +6,15 @@ include_once("components/renderers/items/DataIteratorItem.php");
 
 class Action extends DataIteratorItem
 {
-
-    protected $tagName = "A";
-
-    protected $check_code = NULL;
+    /**
+     * @var Closure|null
+     */
+    protected ?Closure $check_code = NULL;
 
     /**
      * @var URLBuilder
      */
-    protected $urlbuilder;
+    protected URLBuilder $urlbuilder;
 
     /**
      * Render the action as contents of this Action if contents are not set
@@ -31,6 +31,8 @@ class Action extends DataIteratorItem
     public function __construct(string $action = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
     {
         parent::__construct();
+
+        $this->tagName = "A";
 
         $this->urlbuilder = new URLBuilder();
         $this->urlbuilder->buildFrom($href);
