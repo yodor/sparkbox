@@ -3,7 +3,7 @@ include_once ("utils/IHeadScript.php");
 
 class GTAG implements IHeadScript
 {
-    protected $id;
+    protected string $id = "";
 
     public function __construct()
     {

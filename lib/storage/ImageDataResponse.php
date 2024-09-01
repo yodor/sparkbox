@@ -10,6 +10,10 @@ class ImageDataResponse extends BeanDataResponse
     const KEY_HEIGHT = "height";
     const KEY_SIZE = "size";
 
+    const KEY_FILTER = "filter";
+
+    const FILTER_GRAY = "gray";
+
     protected string $field = BeanDataResponse::FIELD_PHOTO;
 
     protected ImageScaler $scaler;
@@ -35,14 +39,17 @@ class ImageDataResponse extends BeanDataResponse
 
         $this->scaler = new ImageScaler($width, $height);
 
+        if (isset($_GET[ImageDataResponse::KEY_FILTER])) {
+            if (str_contains($_GET[ImageDataResponse::KEY_FILTER],self::FILTER_GRAY)) {
+                $this->scaler->setGrayFilterEnabled(true);
+            }
+        }
         //call last - cache entry needs cacheName
         parent::__construct($id, $className);
     }
 
     protected function process()
     {
-
-
 
         $buffer = $this->object->buffer();
         if ($buffer->length()<1) throw new Exception("Empty data");
@@ -62,14 +69,15 @@ class ImageDataResponse extends BeanDataResponse
         $parts[] = $this->scaler->getWidth();
         $parts[] = $this->scaler->getHeight();
         $parts[] = $this->scaler->getMode();
-
+        if ($this->scaler->isGrayFilterEnabled()) {
+            $parts[] = ImageDataResponse::FILTER_GRAY;
+        }
         return implode("-", $parts);
     }
 
     protected function ETag() : string
     {
         $parts = array();
-        $parts[] = $this->scaler->grayFilter;
 
         if ($this->scaler->getWatermark()->isEnabled()) {
 

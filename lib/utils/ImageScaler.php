@@ -13,20 +13,21 @@ class ImageScaler
     const TYPE_PNG = "image/png";
     const TYPE_WEBP = "image/webp";
 
-    protected $supported_mimes = array(ImageScaler::TYPE_JPEG, ImageScaler::TYPE_PNG, ImageScaler::TYPE_WEBP);
+    protected array $supported_mimes = array(ImageScaler::TYPE_JPEG, ImageScaler::TYPE_PNG, ImageScaler::TYPE_WEBP);
+
 
     /**
-     * @var string Output image format
+     * @var string
      */
-    protected $output_format = ImageScaler::TYPE_WEBP;
-    protected $output_quality = 60;
+    protected string $output_format = ImageScaler::TYPE_WEBP;
+    protected int $output_quality = 60;
 
-    protected $mode = ImageScaler::MODE_FULL;
+    protected int $mode = ImageScaler::MODE_FULL;
 
-    protected $width = -1;
-    protected $height = -1;
+    protected int $width = -1;
+    protected int $height = -1;
 
-    public $grayFilter = FALSE;
+    protected bool $grayFilterEnabled = false;
 
     protected SparkWatermark $watermark;
 
@@ -50,7 +51,15 @@ class ImageScaler
 
     }
 
+    public function setGrayFilterEnabled(bool $mode) : void
+    {
+        $this->grayFilterEnabled = $mode;
+    }
 
+    public function isGrayFilterEnabled() : bool
+    {
+        return $this->grayFilterEnabled;
+    }
 
     public function getWatermark(): SparkWatermark
     {
@@ -58,7 +67,12 @@ class ImageScaler
     }
 
 
-    public function setOutputQuality(int $output_quality)
+    /**
+     * Set output compression quality percentage
+     * @param int $output_quality
+     * @return void
+     */
+    public function setOutputQuality(int $output_quality) : void
     {
         $this->output_quality = $output_quality;
     }
@@ -68,12 +82,17 @@ class ImageScaler
         return $this->output_quality;
     }
 
+
     /**
-     * @param string $mime Set the output format from mime type string
+     * Set output format mime type. Throws exception if the required format is not supported
+     * ImageScaler->$supported_mimes holds the output formats
+     * @param string $mime
+     * @return void
+     * @throws Exception
      */
     public function setOutputFormat(string $mime)
     {
-        if (!in_array($mime, $this->supported_mimes)) throw new RuntimeException("Unsupported output format type");
+        if (!in_array($mime, $this->supported_mimes)) throw new Exception("Unsupported output format type");
 
         $this->output_format = $mime;
     }
@@ -124,7 +143,16 @@ class ImageScaler
         }
         return $h_source;
     }
-    protected function processFull(DataBuffer $buffer)
+
+    /**
+     * Return the full image without scaling
+     * If watermark is enabled it is applied otherways does nothing with the buffer
+     *
+     * @param DataBuffer $buffer Source/Destination of the image data
+     * @return void
+     * @throws Exception
+     */
+    protected function processFull(DataBuffer $buffer) : void
     {
         if ($this->watermark->isEnabled()) {
             $h_source = $this->imageFromBuffer($buffer);
@@ -133,6 +161,14 @@ class ImageScaler
         }
 
     }
+
+    /**
+     * Create resized version (CROP to square) of the image found in the DataBuffer
+     *
+     * @param DataBuffer $buffer Source/Destination of the image data
+     * @return void
+     * @throws Exception
+     */
     protected function processCrop(DataBuffer $buffer) : void
     {
         $h_source = $this->imageFromBuffer($buffer);
@@ -171,13 +207,17 @@ class ImageScaler
 
     }
 
+    /**
+     * Create resized version (SCALE-CROP to square) of the image found in the DataBuffer
+     *
+     * @param DataBuffer $buffer Source/Destination of the image data
+     * @return void
+     * @throws Exception
+     */
     protected function processThumb(DataBuffer $buffer) : void
     {
 
-        $h_source = @imagecreatefromstring($buffer->data());
-        if ($h_source === FALSE) {
-            throw new Exception("Image can not be created from this input data");
-        }
+        $h_source = $this->imageFromBuffer($buffer);
 
         $image_width = imagesx($h_source);
         $image_height = imagesy($h_source);
@@ -199,12 +239,19 @@ class ImageScaler
     }
 
 
-
-    protected function setImageData(DataBuffer $buffer, GdImage $h_source): void
+    /**
+     * Put the image into the databuffer using the configured output format
+     * Default output format is image/webp but is overriden from config define IMAGE_SCALER_OUTPUT_FORMAT
+     * If watermark is enabled it is applied here
+     * @param DataBuffer $buffer Destination
+     * @param GdImage $h_source Source image to be put into the buffer
+     * @return void
+     */
+    protected function setImageData(DataBuffer $buffer, GdImage $h_source) : void
     {
         debug("Set image data ...");
 
-        if ($this->grayFilter) {
+        if ($this->grayFilterEnabled) {
             imagefilter($h_source, IMG_FILTER_GRAYSCALE);
         }
 
@@ -212,7 +259,7 @@ class ImageScaler
             $this->watermark->applyTo($h_source);
         }
 
-        ob_start(NULL, 0);
+        ob_start();
         if (strcmp($this->output_format, ImageScaler::TYPE_PNG) == 0) {
             imagesavealpha($h_source, TRUE);
             imagepng($h_source);
@@ -227,6 +274,12 @@ class ImageScaler
         ob_end_clean();
     }
 
+    /**
+     * Create new empty image with given width and height
+     * @param int $width
+     * @param int $height
+     * @return GdImage
+     */
     protected function createImage(int $width, int $height) : GdImage
     {
         $h_thumbnail = imagecreatetruecolor($width, $height);

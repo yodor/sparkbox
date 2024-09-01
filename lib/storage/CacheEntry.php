@@ -125,6 +125,13 @@ class CacheEntry
         }
     }
 
+    /**
+     * Store data from this buffer and set last modified time (if non-sero))
+     * @param DataBuffer $data
+     * @param int $lastModified
+     * @return void
+     * @throws Exception
+     */
     public function storeBuffer(DataBuffer $data, int $lastModified=0)
     {
         $this->file->open('w');

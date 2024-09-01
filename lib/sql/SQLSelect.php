@@ -57,9 +57,7 @@ class SQLSelect extends SQLStatement
     {
         if ($this->fieldset->count() < 1) throw new Exception("Empty fieldset");
 
-        $sql = "";
-
-        $sql .= $this->type." ";
+        $sql = $this->type . " ";
 
         if (isset($this->modeMask[SQLSelect::SQL_CALC_FOUND_ROWS])) {
             $sql .= " SQL_CALC_FOUND_ROWS ";

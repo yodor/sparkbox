@@ -43,6 +43,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      */
     protected bool $field_requested = FALSE;
 
+    /**
+     * @param int $id
+     * @param string $className
+     * @throws Exception
+     */
     public function __construct(int $id, string $className)
     {
         parent::__construct();
@@ -74,7 +79,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     /**
      * @throws Exception
      */
-    protected function authorizeAccess()
+    protected function authorizeAccess(): void
     {
         debug("authorizeAccess ...");
 
@@ -113,7 +118,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      * @return void
      * @throws Exception
      */
-    protected function loadBean()
+    protected function loadBean() : void
     {
 
         debug("Loading ID: " . $this->id . " from " . $this->className);
@@ -148,10 +153,12 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         }
     }
 
+
     /**
      * Prepare and set 'ETag', 'Last-Modified' and 'Expires' HTML header fields.
      * If ETag is already set do nothing.
      * @return void
+     * @throws Exception
      */
     protected function fillCacheHeaders() : void
     {
@@ -195,6 +202,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         return $this->last_modified;
     }
+
     /**
      * Return the last modified time for the requested row 'id'
      * Fetches columns date_upload or date_updated of this bean to construct the last modified time
@@ -254,9 +262,10 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      * Output contents of bean data with key '$this->field'.
      * Using ETag/IF_MODIFIED_SINCE logic - checks the disk cache and return 304
      * Store to filesystem cache for reuse if cache is enabled
+     * @return void
      * @throws Exception
      */
-    public function send()
+    public function send() : void
     {
         debug("Class: " . $this->className . " ID: " . $this->id . " Field: " . $this->field);
 
@@ -316,6 +325,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
     }
 
+    /**
+     * Prepare default ETag using cacheName() and getLastModified()
+     * @return string
+     * @throws Exception
+     */
     protected function ETag() : string
     {
         return sparkHash($this->cacheName()."-".$this->getLastModified());

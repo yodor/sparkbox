@@ -18,8 +18,7 @@ class ForgotPasswordMailer extends Mailer
 
         $this->to = $email;
 
-        $message = "";
-        $message .= tr("Hello").",\r\n";
+        $message = tr("Hello") . ",\r\n";
         $message .= "\r\n";
         $message .= tr("This email is sent in relation to your forgot password request at") . " - ".SITE_TITLE . "\r\n";
         $message .= "\r\n";

@@ -3,8 +3,8 @@ include_once ("utils/IHeadScript.php");
 
 class FBPixel implements IHeadScript
 {
-    protected $pixelID;
-    protected $trackEvents;
+    protected string $pixelID;
+    protected array $trackEvents;
 
     public function __construct(string $pixelID)
     {
