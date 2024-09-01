@@ -7,7 +7,7 @@ class ItemViewResponder extends JSONResponder
     /**
      * @var JSONItemView
      */
-    protected $view;
+    protected JSONItemView $view;
 
     public function __construct(string $cmd, JSONItemView $view)
     {
@@ -29,11 +29,11 @@ class JSONItemView extends ItemView
     /**
      * @var ItemViewResponder
      */
-    protected $responder;
+    protected ItemViewResponder $responder;
 
-    protected $button;
+    protected ColorButton $button;
 
-    protected $container;
+    protected Container $container;
 
     public function __construct(?IDataIterator $itr = NULL)
     {

@@ -43,6 +43,8 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      */
     protected bool $field_requested = FALSE;
 
+    protected bool $require_watermark = FALSE;
+
     /**
      * @param int $id
      * @param string $className
@@ -150,6 +152,10 @@ abstract class BeanDataResponse extends SparkHTTPResponse
             //Create storage object using the default data key
             $this->object = StorageObject::CreateFrom($result, $this->field);
 
+        }
+
+        if (isset($result["watermark_enabled"])) {
+            $this->require_watermark = (bool)$result["watermark_enabled"];
         }
     }
 

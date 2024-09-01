@@ -4,7 +4,7 @@ include_once("utils/IGETConsumer.php");
 
 abstract class PaginatorComponent extends Component implements IGETConsumer
 {
-    protected $paginator = FALSE;
+    protected Paginator $paginator;
 
     public function __construct(Paginator $paginator)
     {
@@ -23,10 +23,6 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         return Paginator::Instance()->getParameterNames();
     }
 
-    public function renderCaption()
-    {
-        //parent::renderCaption();
-    }
 
     public function requiredStyle() : array
     {
@@ -35,7 +31,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         return $arr;
     }
 
-    public function setPaginator(Paginator $paginator)
+    public function setPaginator(Paginator $paginator) : void
     {
         $this->paginator = $paginator;
     }
@@ -45,7 +41,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         return $this->paginator;
     }
 
-    public function drawPrevButton()
+    public function drawPrevButton() : void
     {
         $link = new URLBuilder();
         $link->buildFrom(SparkPage::Instance()->getPageURL());
@@ -57,7 +53,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         }
     }
 
-    public function drawNextButton()
+    public function drawNextButton() : void
     {
         $link = new URLBuilder();
         $link->buildFrom(SparkPage::Instance()->getPageURL());
@@ -69,7 +65,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         }
     }
 
-    protected function renderSortFields()
+    protected function renderSortFields() : void
     {
         $sort_fields = $this->paginator->getSortFields();
 
@@ -130,7 +126,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         <?php
     }
 
-    protected function renderPageSelector()
+    protected function renderPageSelector() : void
     {
 
         $link = new URLBuilder();

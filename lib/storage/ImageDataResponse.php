@@ -57,6 +57,10 @@ class ImageDataResponse extends BeanDataResponse
         $mime = $buffer->mime();
         if (!str_contains($mime, "image")) throw new Exception("Not an image data: $mime");
 
+        //disable watermark for this request if bean does not require it
+        if (!$this->require_watermark) {
+            $this->scaler->getWatermark()->disable();
+        }
         //place result in buffer
         $this->scaler->process($buffer);
 

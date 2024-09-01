@@ -11,6 +11,10 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     protected bool $cacheable = false;
 
+    /**
+     * HTML tag of this component
+     * @var string
+     */
     protected string $tagName = "DIV";
 
     protected bool $closingTagRequired = true;
@@ -49,6 +53,8 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     public bool $render_tooltip = TRUE;
     public bool $render_enabled = TRUE;
 
+    protected ?Component $caption_component = null;
+
     /**
      * Component constructor.
      * Creates default component class by using the inheritance chain get_class
@@ -86,7 +92,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
      * Override the automatic class name constructed from the inheritance chain
      * @param string $componentClass
      */
-    public function setComponentClass(string $componentClass)
+    public function setComponentClass(string $componentClass) : void
     {
         $this->component_class = $componentClass;
     }
@@ -111,7 +117,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return array();
     }
 
-    public function setIndex(int $index)
+    public function setIndex(int $index) : void
     {
         $this->index = $index;
     }
@@ -121,7 +127,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->index;
     }
 
-    public function setTagName(string $tagName)
+    public function setTagName(string $tagName) : void
     {
         $this->tagName = $tagName;
     }
@@ -130,16 +136,18 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     {
         $this->closingTagRequired = $mode;
     }
+
     public function isClosingTagRequired() : bool
     {
         return $this->closingTagRequired;
     }
+
     public function getTagName(): string
     {
         return $this->tagName;
     }
 
-    public function setContents(string $contents)
+    public function setContents(string $contents) : void
     {
         $this->contents = $contents;
     }
@@ -167,12 +175,18 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         $this->renderCaption();
     }
 
-    public function renderCaption()
+    /**
+     *
+     * @return void
+     * @throws Exception
+     */
+    protected function renderCaption() : void
     {
-        if (strlen($this->caption) > 0) {
-            echo "<div class='Caption'>";
-            echo $this->caption;
-            echo "</div>";
+        if ($this->caption_component instanceof Component) {
+            $this->caption_component->render();
+        }
+        else if ($this->caption) {
+            echo "<div class='Caption'>$this->caption</div>";
         }
     }
 
@@ -193,6 +207,11 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         }
     }
 
+    /**
+     * Render this component. Use cached version if found
+     * @return void
+     * @throws Exception
+     */
     public function render()
     {
         if (!$this->render_enabled) return;
@@ -241,7 +260,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         $buffer = ob_get_contents();
         ob_end_clean();
 
-        if ($this->cacheable && PAGE_CACHE_ENABLED && !$haveError && ($cacheEntry instanceof CacheEntry)) {
+        if (($cacheEntry instanceof CacheEntry) && !$haveError) {
             $cacheEntry->store($buffer, time());
         }
 
@@ -265,9 +284,22 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->caption;
     }
 
-    public function setCaption(string $caption)
+    public function setCaption(string $caption) : void
     {
         $this->caption = $caption;
+        if ($this->caption_component instanceof Component) {
+            $this->caption_component->setContents($caption);
+        }
+    }
+
+    public function getCaptionComponent() : ?Component
+    {
+        return $this->caption_component;
+    }
+
+    public function setCaptionComponent(Component $component) : void
+    {
+        $this->caption_component = $component;
     }
 
     public function getTooltipText(): string

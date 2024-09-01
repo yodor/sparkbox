@@ -74,6 +74,11 @@ class SparkWatermark
         return $this->enabled;
     }
 
+    public function disable() : void
+    {
+        $this->enabled = false;
+    }
+
     public function getSize() : int
     {
         return $this->size;
@@ -95,6 +100,7 @@ class SparkWatermark
     public function applyTo(GdImage $h_source) : void
     {
 
+        if (!$this->enabled) throw new Exception("Watermark is not enabled");
 
         $width = imagesx($h_source);
         $height = imagesy($h_source);
