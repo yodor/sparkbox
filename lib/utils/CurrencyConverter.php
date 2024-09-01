@@ -18,7 +18,7 @@ class CurrencyConverter
     /**
      * @var string
      */
-    protected string $symbol;
+    protected string $symbol = "";
 
     /**
      * @var bool
@@ -35,7 +35,7 @@ class CurrencyConverter
      */
     protected int $dstID = -1;
 
-    protected static CurrencyConverter $instance;
+    protected static ?CurrencyConverter $instance = null;
 
     static public function Instance(): CurrencyConverter
     {
@@ -58,7 +58,7 @@ class CurrencyConverter
         return $result;
     }
 
-    protected function loadConversion()
+    protected function loadConversion() : void
     {
         if (!Session::Contains("currencyID")) {
             return;
@@ -90,12 +90,12 @@ class CurrencyConverter
 
     }
 
-    protected function setCurrency(array $data, float $rate = 1.0)
+    protected function setCurrency(array $data, float $rate = 1.0) : void
     {
         $this->dstID = (int)$data["currencyID"];
         $this->rate = $rate;
         $this->symbol = $data["symbol"];
-        $this->symbol_back = $data["symbol_back"];
+        $this->symbol_back = (bool)$data["symbol_back"];
         $this->code = $data["currency_code"];
     }
 
