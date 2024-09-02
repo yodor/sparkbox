@@ -1,6 +1,6 @@
 <?php
 
-class JSONResponse
+#[AllowDynamicProperties] class JSONResponse
 {
     const STATUS_ERROR = "error";
     const STATUS_OK = "OK";
