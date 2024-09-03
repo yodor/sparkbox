@@ -120,7 +120,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             $langID = -1;
 
             if (isset($_GET[Translator::KEY_LANGUAGE])) {
-                $language = $_GET[Translator::KEY_LANGUAGE];
+                $language = sanitizeInput($_GET[Translator::KEY_LANGUAGE]);
             }
             if (isset($_GET[Translator::KEY_LANGUAGE_ID])) {
                 $langID = (int)$_GET[Translator::KEY_LANGUAGE_ID];
