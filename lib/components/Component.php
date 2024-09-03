@@ -322,7 +322,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->getAttribute("title");
     }
 
-    public function setTitle(string $text)
+    public function setTitle(string $text) : void
     {
         $this->setAttribute("title", $text);
     }
@@ -338,7 +338,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->style;
     }
 
-    public function getClassName()
+    public function getClassName() : string
     {
         return implode(" ", array_keys($this->classNames));
     }
@@ -350,7 +350,9 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     public function setClassName(string $cssClass)
     {
         $this->classNames = array();
-        $this->classNames[$cssClass] = "";
+        if (!empty($cssClass)) {
+            $this->classNames[$cssClass] = "";
+        }
     }
 
     /**
@@ -359,7 +361,9 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
      */
     public function addClassName(string $cssClass)
     {
-        $this->classNames[$cssClass] = "";
+        if (!empty($cssClass)) {
+            $this->classNames[$cssClass] = "";
+        }
     }
 
     /**
@@ -386,6 +390,12 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         }
     }
 
+    /**
+     * Get value of attribute '$name'
+     * If attribute is not set return empty string
+     * @param string $name Name of attribte
+     * @return string Value of attribute
+     */
     public function getAttribute(string $name): string
     {
         if (isset($this->attributes[$name])) return $this->attributes[$name];
@@ -465,15 +475,21 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     protected function prepareAttributes()
     {
         $attrs = "";
-        //$class_names = trim($this->component_class . " " . $this->className);
+
         $cssClass = array();
+
         if (strlen($this->component_class) > 0) {
             $cssClass[] = trim($this->component_class);
         }
 
-        $cssClass[] = $this->getClassName();
+        $className = $this->getClassName();
+        if (strlen($className) > 0) {
+            $cssClass[] = $this->getClassName();
+        }
 
-        $attrs .= " class='" . implode(" ", $cssClass) . "' ";
+        if (count($cssClass)>0) {
+            $attrs .= " class='" . implode(" ", $cssClass) . "' ";
+        }
 
         $attrs .= $this->getAttributesText();
         $attrs .= $this->getStyleText();

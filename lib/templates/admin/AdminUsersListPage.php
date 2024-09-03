@@ -74,7 +74,7 @@ class AdminUsersListPage extends BeanListPage
         $vis_act->getActions()->append($h_toggle->createAction("Enable", "field=suspend&status=0", $check_is_not_suspend));
         $view->getColumn("status")->setCellRenderer($vis_act);
 
-        $this->append($view);
+        $this->items()->append($view);
 
         $this->view = $view;
 

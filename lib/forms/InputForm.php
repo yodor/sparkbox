@@ -503,7 +503,7 @@ class InputForm implements IBeanEditor
 
                 $clause = $this->clauseValue($field_name, $val);
                 $clause->setGlue($glue);
-                $where->addClause($clause);
+                $where->append($clause);
 
             }
         }

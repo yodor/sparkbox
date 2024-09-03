@@ -168,7 +168,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
 
 
-        $this->append($this->itemView);
+        $this->items()->append($this->itemView);
 
     }
 

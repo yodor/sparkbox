@@ -122,7 +122,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->setEditID(-1);
 
-        $this->append($this->form_render);
+        $this->items()->append($this->form_render);
 
         $this->setObserver(new SparkObserver());
 

@@ -4,7 +4,6 @@ include_once("sql/SQLSelect.php");
 
 class SQLUpdate extends SQLStatement
 {
-    protected array $set = array();
 
     public function __construct(SQLSelect $other = NULL)
     {
@@ -30,7 +29,7 @@ class SQLUpdate extends SQLStatement
         $sql .= implode(", ", $set);
 
         if ($this->whereset->count()>0) {
-            $sql.= $this->whereset->getSQL(true);
+            $sql.= $this->whereset->getSQL();
         }
 
         return $sql;

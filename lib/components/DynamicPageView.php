@@ -24,14 +24,14 @@ class DynamicPageView extends Container implements IRequestProcessor
 
         $heading->addClassName("title");
 
-        $this->append($heading);
+        $this->items()->append($heading);
 
         $contents = new Component();
         $contents->setName("content");
 
         $contents->addClassName("content");
 
-        $this->append($contents);
+        $this->items()->append($contents);
 
     }
 
@@ -68,10 +68,10 @@ class DynamicPageView extends Container implements IRequestProcessor
                 if (!$this->result->get("visible")) throw new Exception("Page is currently unavailable");
             }
 
-            $title_cmp = $this->getByName("title");
+            $title_cmp = $this->items()->getByName("title");
             $title_cmp->setContents($this->result->get("item_title"));
 
-            $content_cmp = $this->getByName("content");
+            $content_cmp = $this->items()->getByName("content");
             $content_cmp->setContents($this->result->get("content"));
 
             if ($this->result->get("have_photo")) {

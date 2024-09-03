@@ -68,9 +68,9 @@ class SparkAdminPage extends SparkPage
 
         $this->menu_bar->setAttribute("submenu_popup", "0");
 
-        $this->addCSS(SPARK_LOCAL . "/css/AdminPage.css");
-        $this->addCSS(SPARK_LOCAL . "/css/AdminButtons.css");
-        $this->addCSS(SPARK_LOCAL . "/css/AdminMenu.css");
+        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminPage.css");
+        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminButtons.css");
+        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminMenu.css");
 
 
     }
@@ -108,7 +108,7 @@ class SparkAdminPage extends SparkPage
 
         if ($this->actions->count() > 0) {
 
-            Action::RenderActions($this->actions->getActions());
+            Action::RenderActions($this->actions->toArray());
 
         }
 
@@ -205,7 +205,7 @@ class SparkAdminPage extends SparkPage
 
         echo "</td>";
 
-        echo "<td class='page_area " . $this->getPageClass() . "'>";
+        echo "<td class='page_area'>";
         echo "\n\n";
 
         if (!$this->name) {

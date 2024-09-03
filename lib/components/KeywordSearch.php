@@ -32,7 +32,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         //in admin pages is preferred POST as there are already some request conditions to be matched
         $this->setMethod(FormRenderer::METHOD_POST);
 
-        $this->getButtons()->clear();
+        $this->getButtons()->items()->clear();
 
         $submit_search = new ColorButton();
         $submit_search->setType(ColorButton::TYPE_SUBMIT);
@@ -40,7 +40,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         $submit_search->setName(KeywordSearch::SUBMIT_KEY);
         $submit_search->setValue(KeywordSearch::ACTION_SEARCH);
         $submit_search->setAttribute("action", KeywordSearch::ACTION_SEARCH);
-        $this->getButtons()->append($submit_search);
+        $this->getButtons()->items()->append($submit_search);
 
         $submit_clear = new ColorButton();
         $submit_clear->setType(ColorButton::TYPE_SUBMIT);
@@ -48,7 +48,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         $submit_clear->setName(KeywordSearch::SUBMIT_KEY);
         $submit_clear->setValue(KeywordSearch::ACTION_CLEAR);
         $submit_clear->setAttribute("action", KeywordSearch::ACTION_CLEAR);
-        $this->getButtons()->append($submit_clear);
+        $this->getButtons()->items()->append($submit_clear);
 
 
 
@@ -80,19 +80,14 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
     }
 
-    //TODO: check usage
-    public function getButton(string $action): ColorButton
-    {
-        $comparator = function (Component $cmp) use ($action) {
-            if (strcmp($cmp->getAttribute("action"), $action) == 0) {
-                return TRUE;
-            }
-            return FALSE;
-        };
 
-        $result = $this->getButtons()->findBy($comparator);
+    public function getButton(string $action): ?ColorButton
+    {
+        $result = $this->getButtons()->items()->getByAction($action);
+
         if ($result instanceof ColorButton) return $result;
-        return $result;
+
+        return null;
     }
 
     public function requiredStyle() : array

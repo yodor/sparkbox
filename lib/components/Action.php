@@ -104,10 +104,11 @@ class Action extends DataIteratorItem
             parent::renderImpl();
             return;
         }
-        $action = $this->getAttribute("action");
-        if (!$action) return;
 
         if ($this->action_as_contents) {
+
+            $action = $this->getAttribute("action");
+            if (!$action) return;
 
             if ($this->translation_enabled) {
                 echo tr($action);

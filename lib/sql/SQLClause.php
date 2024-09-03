@@ -1,7 +1,10 @@
 <?php
 include_once("objects/SparkObject.php");
-
-class SQLClause extends SparkObject
+include_once("sql/ISQLGet.php");
+/**
+ * Where clause
+ */
+class SQLClause extends SparkObject implements ISQLGet
 {
     /**
      * Connect the value to the expression using this operator by default
@@ -26,7 +29,7 @@ class SQLClause extends SparkObject
         $this->operator = SQLClause::DEFAULT_OPERATOR;
     }
 
-    public function setGlue(string $glue)
+    public function setGlue(string $glue) : void
     {
         $this->glue = $glue;
     }
@@ -36,14 +39,14 @@ class SQLClause extends SparkObject
         return $this->glue;
     }
 
-    public function setExpression(string $expr, string $value, string $operator = SQLClause::DEFAULT_OPERATOR)
+    public function setExpression(string $expr, string $value, string $operator = SQLClause::DEFAULT_OPERATOR) : void
     {
         $this->expr = $expr;
         $this->value = $value;
         $this->operator = $operator;
     }
 
-    public function getSQL(): string
+    public function getSQL() : string
     {
         return $this->expr . " " . $this->operator . " " . $this->value;
     }

@@ -36,7 +36,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         include_once("components/InputComponent.php");
         $cmp = new InputComponent($this->input);
-        $this->buttonsBar->prepend($cmp);
+        $this->buttonsBar->items()->prepend($cmp);
 
         $responder = new TranslateBeanResponder();
     }
@@ -67,19 +67,19 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $btn_translate = new ColorButton();
         $btn_translate->setContents("Translate");
         $btn_translate->setAttribute("action", "Translate");
-        $container->append($btn_translate);
+        $container->items()->append($btn_translate);
 
         $btn_clear = new ColorButton();
         $btn_clear->setContents("Clear");
         $btn_clear->setAttribute("action", "Clear");
-        $container->append($btn_clear);
+        $container->items()->append($btn_clear);
 
         $btn_close = new ColorButton();
         $btn_close->setContents("Close");
         $btn_close->setAttribute("action", "Close");
-        $container->append($btn_close);
+        $container->items()->append($btn_close);
 
-        $this->buttonsBar->append($container);
+        $this->buttonsBar->items()->append($container);
     }
 
     protected function renderImpl()

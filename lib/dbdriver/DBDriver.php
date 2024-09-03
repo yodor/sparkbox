@@ -27,29 +27,29 @@ abstract class DBDriver
 
     abstract public function query(string $str);
 
-    abstract public function fetch($str) : ?array;
+    abstract public function fetch($result) : ?array;
 
-    abstract public function fetchArray($str) : ?array;
+    abstract public function fetchArray($result) : ?array;
 
-    abstract public function fetchResult($str) : ?RawResult;
+    abstract public function fetchResult($result) : ?RawResult;
 
-    abstract public function dateTime($add_days = 0, $interval_type = " DAY ");
+    abstract public function dateTime(int $add_days = 0, string $interval_type = " DAY ") : string;
 
     abstract public function timestamp() : int;
 
+    abstract public function free($result) : void;
+
     abstract public function lastID(): int;
 
-    abstract public function commit();
+    abstract public function commit(?string $name = null) : bool;
 
-    abstract public function rollback();
+    abstract public function rollback(?string $name = null) : bool;
 
-    abstract public function transaction();
+    abstract public function transaction(?string $name = null) : bool;
 
-    abstract public function numRows($res): int;
+    abstract public function numRows($result): int;
 
-    abstract public function numFields($res): int;
-
-    abstract public function fieldName($res, int $pos);
+    abstract public function fields($result) : array;
 
     abstract public function escape(string $data) : string;
 

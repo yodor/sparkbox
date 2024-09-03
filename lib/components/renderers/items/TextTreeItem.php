@@ -118,7 +118,7 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
 
         echo "<div class='node_actions'>";
 
-        $render = function(Action $action, int $idx)  {
+        $render = function(Action $action, int|string|null $idx)  {
             $action->render();
         };
         $this->actions->each($render);
@@ -133,10 +133,7 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
 
         $this->text_action->setData($data);
 
-        $dataSetter = function(Action $action, int $idx) use($data) {
-            $action->setData($data);
-        };
-        $this->actions->each($dataSetter);
+        $this->actions->setData($data);
 
         if ($this->icon instanceof StorageItem) {
             $this->icon->setData($data);

@@ -64,7 +64,7 @@ class BeanEditorPage extends AdminPageTemplate
 
         $this->view = $view;
 
-        $this->append($this->view);
+        $this->items()->append($this->view);
     }
 
     public function getEditor(): BeanFormEditor

@@ -1,6 +1,7 @@
 <?php
+include_once("sql/ISQLGet.php");
 
-class SQLColumn
+class SQLColumn implements ISQLGet
 {
     protected string $prefix = "";
     protected string $name = "";
@@ -12,9 +13,9 @@ class SQLColumn
 
     }
 
-    public function setName(string $name)
+    public function setName(string $name) : void
     {
-        if (!$name) throw new Exception("SQLColumn name can not be empty");
+        if (empty($name)) throw new Exception("SQLColumn name can not be empty");
         $this->name = trim($name);
     }
 
@@ -23,7 +24,7 @@ class SQLColumn
         return $this->name;
     }
 
-    public function setAlias(string $alias)
+    public function setAlias(string $alias) : void
     {
         $this->alias = trim($alias);
     }
@@ -33,7 +34,7 @@ class SQLColumn
         return $this->alias;
     }
 
-    public function setPrefix(string $prefix)
+    public function setPrefix(string $prefix) : void
     {
         $this->prefix = trim($prefix);
     }
@@ -43,20 +44,20 @@ class SQLColumn
         return $this->prefix;
     }
 
-    public function setExpression(string $expression, string $alias_name)
+    public function setExpression(string $expression, string $alias_name) : void
     {
         $alias_name = trim($alias_name);
-        if (!$alias_name) throw new Exception("SQLColumn expression alias can not be empty");
+        if (empty($alias_name)) throw new Exception("SQLColumn alias can not be empty");
 
         $expression = trim($expression);
-        if (!$expression) throw new Exception("SQLColumn expression can not be empty");
+        if (empty($expression)) throw new Exception("SQLColumn expression can not be empty");
 
         $this->expression = $expression;
         $this->name = $alias_name;
         $this->alias = $alias_name;
     }
 
-    public function getSQL()
+    public function getSQL() : string
     {
         if ($this->expression) {
             return $this->expression." AS ".$this->alias;

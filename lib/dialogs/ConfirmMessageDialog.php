@@ -22,12 +22,12 @@ class ConfirmMessageDialog extends MessageDialog
         $btn_ok->setContents("OK");
         $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
         $btn_ok->setAttribute("default_action", 1);
-        $this->buttonsBar->append($btn_ok);
+        $this->buttonsBar->items()->append($btn_ok);
 
         $btn_cancel = new ColorButton();
         $btn_cancel->setContents("Cancel");
         $btn_cancel->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
-        $this->buttonsBar->append($btn_cancel);
+        $this->buttonsBar->items()->append($btn_cancel);
     }
 
 }

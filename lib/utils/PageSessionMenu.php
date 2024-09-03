@@ -58,7 +58,7 @@ class PageSessionMenu extends MainMenu
                     if ($item instanceof MenuItem) {
                         $href = $item->getHref();
 
-                        if (!startsWith($href, "/")) {
+                        if (!str_starts_with($href, "/")) {
                             $item->setHref($selectedURL->getScriptPath() . "/" . $href);
                         }
                         $selectedItem->addMenuItem($item);

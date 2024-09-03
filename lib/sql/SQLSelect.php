@@ -1,36 +1,36 @@
 <?php
 include_once("sql/SQLStatement.php");
-include_once("sql/SQLCollection.php");
+include_once("sql/SQLColumnSet.php");
 
 class SQLSelect extends SQLStatement
 {
 
-    protected SQLCollection $fieldset;
+    protected SQLColumnSet $fieldset;
 
     const SQL_CALC_FOUND_ROWS = 1;
     const SQL_CACHE = 2;
     const SQL_NO_CACHE = 3;
 
-    protected $modeMask = array();
+    protected array $modeMask = array();
 
     public function __construct()
     {
         parent::__construct();
         $this->type = "SELECT";
-        $this->fieldset = new SQLCollection();
+        $this->fieldset = new SQLColumnSet();
     }
 
-    public function clearMode()
+    public function clearMode() : void
     {
         $this->modeMask = array();
     }
 
-    public function setMode(int $mode_clause)
+    public function setMode(int $mode_clause) : void
     {
         $this->modeMask[$mode_clause] = 1;
     }
 
-    public function unsetMode(int $mode_clause)
+    public function unsetMode(int $mode_clause) : void
     {
         if (isset($this->modeMask[$mode_clause])) {
             unset($this->modeMask[$mode_clause]);
@@ -42,12 +42,12 @@ class SQLSelect extends SQLStatement
         return isset($this->modeMask[$mode_clause]);
     }
 
-    public function fields(): SQLCollection
+    public function fields(): SQLColumnSet
     {
         return $this->fieldset;
     }
 
-    public function __clone()
+    public function __clone() : void
     {
         parent::__clone();
         $this->fieldset = clone $this->fieldset;
@@ -74,7 +74,7 @@ class SQLSelect extends SQLStatement
         $sql .= " FROM $this->from ";
 
         if ($this->whereset->count()>0) {
-            $sql.=$this->whereset->getSQL(true);
+            $sql.=$this->whereset->getSQL();
         }
 
         if (strlen(trim($this->group_by)) > 0) {
@@ -93,7 +93,7 @@ class SQLSelect extends SQLStatement
         return $sql;
     }
 
-    public function combine(SQLSelect $other)
+    public function combine(SQLSelect $other) : void
     {
 
         if ($other->fields()->count() > 0) {

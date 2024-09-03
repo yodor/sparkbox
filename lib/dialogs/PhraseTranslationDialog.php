@@ -34,13 +34,13 @@ class PhraseTranslationDialog extends MessageDialog
         $btn = new ColorButton();
         $btn->setContents("Cancel");
         $btn->setAttribute("action", "Close");
-        $this->buttonsBar->append($btn);
+        $this->buttonsBar->items()->append($btn);
 
         $btn = new ColorButton();
         $btn->setContents("Translate");
         $btn->setAttribute("action", "Translate");
         $btn->setAttribute("default_action", 1);
-        $this->buttonsBar->append($btn);
+        $this->buttonsBar->items()->append($btn);
     }
 
     protected function renderImpl()

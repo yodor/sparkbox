@@ -57,7 +57,7 @@ class AdminLoginForgotPassword extends AdminLogin
         parent::__construct();
 
         $this->page->setTitle(tr("Forgot Password"));
-        $this->page->addCSS(SPARK_LOCAL . "/css/LoginForm.css");
+        $this->page->head()->addCSS(SPARK_LOCAL . "/css/LoginForm.css");
 
         $this->form = new InputForm();
         $this->form->addInput(DataInputFactory::Create(DataInputFactory::EMAIL, "email", "Input your registered email", 1));
@@ -76,7 +76,7 @@ class AdminLoginForgotPassword extends AdminLogin
 
         $this->view = $frend;
 
-        $this->append($this->view);
+        $this->items()->append($this->view);
     }
 
     public function startRender()

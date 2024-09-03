@@ -73,7 +73,7 @@ class MessageDialog extends Component implements IPageComponent
         $btn_ok->setContents("OK");
         $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
         $btn_ok->setAttribute("default_action", 1);
-        $this->buttonsBar->append($btn_ok);
+        $this->buttonsBar->items()->append($btn_ok);
     }
 
     public function getButtons(): Container

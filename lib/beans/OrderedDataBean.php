@@ -27,7 +27,7 @@ abstract class OrderedDataBean extends DBTableBean
 
             $update = new SQLUpdate($this->select);
             $update->set("position", "position-1");
-            $update->where()->append("position>$pos");
+            $update->where()->addExpression("position>$pos");
 
             $res = $db->query($update->getSQL());
             if (!$res) throw new Exception("Delete reposition DBError: " . $db->getError());
@@ -66,12 +66,12 @@ abstract class OrderedDataBean extends DBTableBean
 
             $update = new SQLUpdate($this->select);
             $update->set("position", "position - 1");
-            $update->where()->append("position>$pos");
+            $update->where()->addExpression("position>$pos");
             if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", "position + 1");
-            $update->where()->append("position>=$new_pos");
+            $update->where()->addExpression("position>=$new_pos");
             if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
 
             $update = new SQLUpdate($this->select);
@@ -99,7 +99,7 @@ abstract class OrderedDataBean extends DBTableBean
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
             $update->set("position", "position + 1");
-            $update->where()->append("position<$pos");
+            $update->where()->addExpression("position<$pos");
 
             if (!$db->query($update->getSQL())) throw new Exception("Reorder Top Error: " . $db->getError());
 
@@ -130,7 +130,7 @@ abstract class OrderedDataBean extends DBTableBean
         $code = function (DBDriver $db) use ($id, $pos, $max_pos) {
             $update = new SQLUpdate($this->select);
             $update->set("position", "position-1");
-            $update->where()->append("position>$pos");
+            $update->where()->addExpression("position>$pos");
 
             if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(1) Error: " . $db->getError() . "<HR>" . $update->getSQL());
 

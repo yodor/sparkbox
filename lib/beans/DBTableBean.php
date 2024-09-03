@@ -509,7 +509,7 @@ abstract class DBTableBean
                 $value = "NULL";
                 return FALSE;
             }
-            if (endsWith(trim($value), ")")) return FALSE;
+            if (str_ends_with(trim($value), ")")) return FALSE;
             return TRUE;
         }
         return TRUE;

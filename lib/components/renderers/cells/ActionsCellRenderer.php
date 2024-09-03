@@ -49,30 +49,17 @@ class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
     public function setData(array $data) : void
     {
         parent::setData($data);
-
-        $iterator = $this->actions->iterator();
-        while ($iterator->valid()) {
-            $action = $iterator->current();
-            if ($action instanceof Action) {
-                $action->setData($data);
-            }
-            $iterator->next();
-        }
-
+        $this->actions->setData($data);
     }
 
     protected function renderImpl()
     {
         echo "<div class='actions_list'>";
 
-        $iterator = $this->actions->iterator();
-        while ($iterator->valid()) {
-            $action = $iterator->current();
-            if ($action instanceof Action) {
-                $action->render();
-            }
-            $iterator->next();
-        }
+        $closure = function(Component $object, int|string|null $idx) {
+            $object->render();
+        };
+        $this->actions->each($closure);
 
         echo "</div>";
     }

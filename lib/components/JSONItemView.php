@@ -49,7 +49,7 @@ class JSONItemView extends ItemView
         $this->button->setAttribute("onClick", "loadMoreResults(this)");
         $this->button->setName("fetchResults");
 
-        $this->container->append($this->button);
+        $this->container->items()->append($this->button);
     }
 
     public function requiredStyle() : array

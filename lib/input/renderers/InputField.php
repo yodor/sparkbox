@@ -198,7 +198,7 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
 
     protected function renderAddonContents()
     {
-        if ($this->addon_contents->count()>0) {
+        if ($this->addon_contents->items()->count()>0) {
             $this->addon_contents->render();
         }
 

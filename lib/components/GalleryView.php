@@ -103,7 +103,7 @@ class GalleryView extends Container
 
         $this->wrapper_enabled = false;
 
-        $this->append($this->view);
+        $this->items()->append($this->view);
 
     }
 

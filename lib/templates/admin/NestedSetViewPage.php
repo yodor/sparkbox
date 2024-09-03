@@ -44,7 +44,7 @@ class NestedSetViewPage extends BeanListPage
 
         $this->view = $tv;
 
-        $this->append($this->view);
+        $this->items()->append($this->view);
 
         $this->view_item_actions = $ir->getActions();
 

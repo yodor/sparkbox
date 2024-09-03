@@ -131,7 +131,7 @@ class MainMenu
 
     public function getIndexByHref(string $href, int $index = 0): int
     {
-        if (!startsWith($href, LOCAL)) {
+        if (!str_starts_with($href, LOCAL)) {
             $href = LOCAL . $href;
         }
 
@@ -376,7 +376,7 @@ class MainMenu
         $match_code[MainMenu::MATCH_FULL] = $match_full;
 
         $match_partial = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
-            $match = (startsWith(mb_strtolower($pageURL->url()), mb_strtolower($itemURL->url())));
+            $match = (str_starts_with(mb_strtolower($pageURL->url()), mb_strtolower($itemURL->url())));
             if ($match) {
                 debug("Match partial URL: " . $itemURL->url() . " - matches");
             }
@@ -442,7 +442,7 @@ class MainMenu
 
             $item_href = $item->getHref();
 
-            if (endsWith($item_href, "/")) {
+            if (str_ends_with($item_href, "/")) {
                 $item_href .= "index.php";
             }
             if (isset($GLOBALS["DEBUG_MAINMENU_MATCHITEM"])) {

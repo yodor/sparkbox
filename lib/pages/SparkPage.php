@@ -63,7 +63,7 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     protected $head_components = array();
 
-    protected $opengraph_tags = array();
+
 
     /**
      * Meta tag 'Description' overload. If not empty is used instead of ConfigBean 'seo' section value
@@ -130,37 +130,6 @@ class SparkPage extends HTMLPage implements IActionCollection
     public function addURLParameter(URLParameter $parameter)
     {
         //TODO:
-    }
-
-    /**
-     * Well known tag names
-     * og:title	The title of the web page.
-     * og:description	The description of the web page.
-     * og:url	The canonical url of the web page.
-     * og:image	URL to an image attached to the shared post.
-     * og:type	A string that indicates the type of the web page. You can find one that is suitable for your web page here.
-     * @param string $tag_name The name of the tag without the leading 'og:'
-     * @param string $tag_content The contents of this tag
-     */
-    public function addOGTag(string $tag_name, string $tag_content)
-    {
-        $this->opengraph_tags[$tag_name] = $tag_content;
-    }
-
-
-    /**
-     * Render all meta tags for the HEAD section of the page
-     */
-    protected function renderMetaTags()
-    {
-        parent::renderMetaTags();
-
-        foreach ($this->opengraph_tags as $tag_name => $tag_content) {
-            echo "<meta property='og:$tag_name' content='" . attributeValue($tag_content) . "' />\n";
-        }
-
-        echo "<link rel='shortcut icon' href='//" . SITE_DOMAIN . LOCAL."/favicon.ico'>";
-        echo "\n";
     }
 
     /**
@@ -232,20 +201,6 @@ class SparkPage extends HTMLPage implements IActionCollection
         }
     }
 
-    protected function renderJS()
-    {
-        ?>
-        <!-- SparkPage local script start -->
-        <script type='text/javascript'>
-            let LOCAL = "<?php echo LOCAL;?>";
-            let SPARK_LOCAL = "<?php echo SPARK_LOCAL;?>";
-            let STORAGE_LOCAL = "<?php echo STORAGE_LOCAL;?>";
-        </script>
-        <!-- SparkPage local script end -->
-        <?php
-
-        parent::renderJS();
-    }
 
     /**
      * SparkPage constructor.
@@ -257,37 +212,37 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         self::$instance = $this;
 
-        $this->addMeta("revisit-after", "1 days");
-        $this->addMeta("robots", "index, follow");
-        $this->addMeta("keywords", "%meta_keywords%");
-        $this->addMeta("description", "%meta_description%");
+        $this->head()->addMeta("revisit-after", "1 days");
+        $this->head()->addMeta("robots", "index, follow");
+        $this->head()->addMeta("keywords", "%meta_keywords%");
+        $this->head()->addMeta("description", "%meta_description%");
 
-        $this->addMeta("viewport", "width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes");
+        $this->head()->addMeta("viewport", "width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes");
 
-        $this->addCSS(SPARK_LOCAL . "/css/ModalPane.css");
-        $this->addCSS(SPARK_LOCAL . "/css/ImagePopup.css");
-        $this->addCSS(SPARK_LOCAL . "/css/MessageDialog.css");
-        $this->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
+        $this->head()->addCSS(SPARK_LOCAL . "/css/ModalPane.css");
+        $this->head()->addCSS(SPARK_LOCAL . "/css/ImagePopup.css");
+        $this->head()->addCSS(SPARK_LOCAL . "/css/MessageDialog.css");
+        $this->head()->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
 
-        $this->addJS(SPARK_LOCAL . "/js/utils.js");
-        $this->addJS(SPARK_LOCAL . "/js/jquery-3.7.1.min.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/utils.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/jquery-3.7.1.min.js");
 
-        $this->addJS(SPARK_LOCAL . "/js/js.cookie.min.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/js.cookie.min.js");
 
-        $this->addJS(SPARK_LOCAL . "/js/CallStack.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/CallStack.js");
 
-        $this->addJS(SPARK_LOCAL . "/js/SparkObject.js");
-        $this->addJS(SPARK_LOCAL . "/js/SparkEvent.js");
-        $this->addJS(SPARK_LOCAL . "/js/Component.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/SparkObject.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/SparkEvent.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/Component.js");
 
-        $this->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
 
-        $this->addJS(SPARK_LOCAL . "/js/ModalPopup.js");
-        $this->addJS(SPARK_LOCAL . "/js/Tooltip.js");
-        $this->addJS(SPARK_LOCAL . "/js/ImagePopup.js");
-        $this->addJS(SPARK_LOCAL . "/js/dialogs/MessageDialog.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/ModalPopup.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/Tooltip.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/ImagePopup.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/dialogs/MessageDialog.js");
 
-        $this->addJS(SPARK_LOCAL . "/js/SparkPage.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/SparkPage.js");
 
         $this->actions = new ActionCollection();
 
@@ -372,11 +327,11 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     /**
      * Set the contents of the TITLE tag
-     * @param string $title
+     * @param string $text
      */
-    public function setTitle(string $title)
+    public function setTitle(string $text) : void
     {
-        $this->preferred_title = $title;
+        $this->preferred_title = $text;
     }
 
     /**
@@ -444,7 +399,7 @@ class SparkPage extends HTMLPage implements IActionCollection
                 echo $css_files;
             }
             foreach ($css_files as $key => $url) {
-                $this->addCSS($url, get_class($cmp), TRUE);
+                $this->head()->addCSS($url, get_class($cmp), TRUE);
             }
             $js_files = $cmp->requiredScript();
             if (!is_array($js_files)) {
@@ -453,7 +408,7 @@ class SparkPage extends HTMLPage implements IActionCollection
             else {
                 foreach ($js_files as $key => $url) {
                     //no prepend here
-                    $this->addJS($url, get_class($cmp), FALSE);
+                    $this->head()->addJS($url, get_class($cmp), FALSE);
                 }
             }
         }

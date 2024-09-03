@@ -86,7 +86,7 @@ class ArrayField extends InputField
      */
     public function addControl(Component $cmp)
     {
-        $this->controls->append($cmp);
+        $this->controls->items()->append($cmp);
     }
 
     /**'
@@ -95,7 +95,7 @@ class ArrayField extends InputField
      */
     public function getControl(string $name)
     {
-        return $this->controls->getByName($name);
+        return $this->controls->items()->getByName($name);
     }
 
     /**

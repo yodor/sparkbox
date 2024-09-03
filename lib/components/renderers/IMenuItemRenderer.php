@@ -2,7 +2,7 @@
 include_once("components/renderers/IRenderer.php");
 include_once("utils/MenuItem.php");
 
-interface IMenuItemRenderer extends IRenderer
+interface IMenuItemRenderer
 {
     public function setMenuItem(MenuItem $item);
 

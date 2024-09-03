@@ -1,7 +1,7 @@
 <?php
 include_once("sql/SQLColumn.php");
 
-class SQLCollection
+class SQLColumnSet implements ISQLGet
 {
 
     /**
@@ -26,7 +26,7 @@ class SQLCollection
      * Add prefix value to all columns in this collection
      * @param string $prefix the prefix to add
      */
-    public function setPrefix(string $prefix)
+    public function setPrefix(string $prefix) : void
     {
         foreach ($this->fields as $name => $col) {
             if ($col instanceof SQLColumn) {
@@ -38,7 +38,7 @@ class SQLCollection
     /**
      * Clear prefix value from the columns in this collection
      */
-    public function clearPrefix()
+    public function clearPrefix() : void
     {
         foreach ($this->fields as $name => $col) {
             if ($col instanceof SQLColumn) {
@@ -60,7 +60,7 @@ class SQLCollection
         $this->fields[$column->getName()] = $column;
     }
 
-    public function copyTo(SQLCollection $other)
+    public function copyTo(SQLColumnSet $other) : void
     {
         foreach ($this->fields as $key => $col) {
             if ($col instanceof SQLColumn) {
@@ -76,7 +76,7 @@ class SQLCollection
      * @param string ...$columns Array of column names to set to this collection
      * @throws Exception
      */
-    public function set(string ...$columns)
+    public function set(string ...$columns) : void
     {
         $this->unset("*");
 
@@ -94,7 +94,7 @@ class SQLCollection
         }
     }
 
-    public function setColumn(SQLColumn $column)
+    public function setColumn(SQLColumn $column) : void
     {
         $this->fields[$column->getName()] = $column;
     }
@@ -104,12 +104,12 @@ class SQLCollection
         return array_key_exists($name, $this->fields);
     }
 
-    public function unset(string $name)
+    public function unset(string $name) : void
     {
         if ($this->isSet($name)) unset($this->fields[$name]);
     }
 
-    public function reset()
+    public function reset() : void
     {
         $this->fields = array();
     }
@@ -119,7 +119,7 @@ class SQLCollection
         return count(array_keys($this->fields));
     }
 
-    public function getSQL()
+    public function getSQL() : string
     {
         $result = array();
 

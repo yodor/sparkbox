@@ -50,7 +50,7 @@ class MCEImageBrowserDialog extends MessageDialog
         $btn_close->setContents("Close");
         $btn_close->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
         $btn_close->setAttribute("default_action", 1);
-        $this->buttonsBar->append($btn_close);
+        $this->buttonsBar->items()->append($btn_close);
     }
 
     public function getHandler() : UploadControlResponder

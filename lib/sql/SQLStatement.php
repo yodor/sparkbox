@@ -1,7 +1,8 @@
 <?php
 include_once("sql/ClauseCollection.php");
+include_once("sql/ISQLGet.php");
 
-abstract class SQLStatement
+abstract class SQLStatement implements ISQLGet
 {
     protected array $set = array();
     /**
@@ -32,7 +33,7 @@ abstract class SQLStatement
         $this->whereset = new ClauseCollection();
     }
 
-    public function __clone()
+    public function __clone() : void
     {
         $this->whereset = clone $this->whereset;
     }
@@ -51,6 +52,7 @@ abstract class SQLStatement
     {
         $this->set[$column] = $value;
     }
+
 }
 
 ?>

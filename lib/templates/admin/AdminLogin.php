@@ -21,7 +21,7 @@ class AdminLogin extends PageTemplate
     protected function initPage()
     {
         $this->page = new AdminLoginPage();
-        //$this->page->addCSS(SPARK_LOCAL . "/css/LoginForm.css");
+        //$this->page->head()->addCSS(SPARK_LOCAL . "/css/LoginForm.css");
 
     }
 
@@ -46,7 +46,7 @@ class AdminLogin extends PageTemplate
         $afr->setCaption(SITE_TITLE . "<BR><small>" . tr("Administration") . "</small>");
 
         $this->view = $afr;
-        $this->append($afr);
+        $this->items()->append($afr);
     }
 
     public function startRender()

@@ -18,7 +18,7 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
         $dialog = new InputMessageDialog();
 
-        $this->getPage()->addCSS(SPARK_LOCAL . "/css/InputField.css");
+        $this->getPage()->head()->addCSS(SPARK_LOCAL . "/css/InputField.css");
 
         $responder = new CurrencyRateResponder();
 

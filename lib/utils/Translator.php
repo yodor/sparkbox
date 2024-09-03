@@ -14,41 +14,35 @@ include_once("utils/Session.php");
 class Translator implements IRequestProcessor, IGETConsumer
 {
 
-    //$defines->set("TRANSLATOR_ENABLED", FALSE);
-    //$defines->set("DB_ENABLED", FALSE);
-    //
-    //$defines->set("DEFAULT_LANGUAGE", "english");
-    //$defines->set("DEFAULT_LANGUAGE_ISO3", "eng");
-
     /**
      * All captured texts for translation during translatePhrase()
      * @var SiteTextsBean
      */
-    protected $phrases;
+    protected SiteTextsBean $phrases;
 
     /**
      * Translated content of the captured phrases
      * @var TranslationPhrasesBean
      */
-    protected $translated_phrases;
+    protected TranslationPhrasesBean $translated_phrases;
 
     /**
      * Translated bean content
      * @var BeanTranslationsBean
      */
-    protected $translated_beans;
+    protected BeanTranslationsBean $translated_beans;
 
     /**
      * Available languages
      * @var LanguagesBean
      */
-    protected $languages;
+    protected LanguagesBean $languages;
 
     /**
      * The currently active language - Primary key value from LanguagesBean
      * @var int
      */
-    protected $langID = -1;
+    protected int $langID = -1;
 
     /**
      * The currently active language - 'language' column value from LanguagesBean
@@ -171,7 +165,7 @@ class Translator implements IRequestProcessor, IGETConsumer
         debug("Loading default language");
         if (defined("DEFAULT_LANGUAGE")) {
             //query default language from define
-            $qry = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1);
+            $qry = $this->languages->queryField("language", "'".DEFAULT_LANGUAGE."'", 1);
             if ($qry->exec() && $data = $qry->next()) {
                 $this->language = $data;
                 $this->langID = $data[$this->languages->key()];

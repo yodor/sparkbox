@@ -249,7 +249,7 @@ class BeanListPage extends AdminPageTemplate
         if (!$this->query) throw new Exception("Query not set yet");
 
         if (count($this->keyword_search->getForm()->getFields()) > 0) {
-            $this->append($this->keyword_search);
+            $this->items()->append($this->keyword_search);
         }
 
         $this->view = new TableView($this->query);
@@ -275,7 +275,7 @@ class BeanListPage extends AdminPageTemplate
             $this->view->removeColumn("actions");
         }
 
-        $this->append($this->view);
+        $this->items()->append($this->view);
 
         if ($this->bean instanceof OrderedDataBean) {
             $this->view->setDefaultOrder(" position ASC ");

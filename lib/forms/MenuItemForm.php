@@ -18,7 +18,7 @@ class MenuItemForm extends InputForm
 
         $link = SparkPage::Instance()->getURL();
         $action = new Action("Choose Dynamic Page", ADMIN_LOCAL . "/content/pages/list.php?chooser=".base64_encode($link->url()));
-        $field->getRenderer()->getAddonContainer()->append($action);
+        $field->getRenderer()->getAddonContainer()->items()->append($action);
         $this->addInput($field);
 
         $field = new DataInput("parentID", "Parent Menu", 1);

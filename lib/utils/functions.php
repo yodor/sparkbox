@@ -202,39 +202,6 @@ function file_size($size)
     return $size ? round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i] : '0 Bytes';
 }
 
-/**
- * Check if '$haystack' starts with '$needle'
- * @param $haystack
- * @param $needle
- * @return bool
- */
-function startsWith($haystack, $needle, bool $casecmp = true)
-{
-    if (!$casecmp) {
-        return !strncmp($haystack, $needle, strlen($needle));
-    }
-    else {
-        return !strncasecmp($haystack, $needle, strlen($needle));
-    }
-
-}
-
-/**
- * Check if '$haystack' ends with '$needle'
- * @param $haystack
- * @param $needle
- * @return bool
- */
-function endsWith($haystack, $needle)
-{
-    $length = strlen($needle);
-    if ($length == 0) {
-        return TRUE;
-    }
-
-    return (substr($haystack, -$length) === $needle);
-}
-
 function renderExceptionDetails($error)
 {
 
@@ -581,18 +548,6 @@ function json_string($text)
 
 function listFiles($dir, $callback)
 {
-    //   if (is_dir($dir)) {
-    // 	  if ($dh = opendir($dir)) {
-    // 		  while (($file = readdir($dh)) !== false) {
-    //
-    // 			  if (strcmp($file,".")==0)continue;
-    // 			  if (strcmp($file,"..")==0)continue;
-    // 			  if (is_dir($file))continue;
-    // 			  call_user_func($callback, $file);
-    // 		  }
-    // 		  closedir($dh);
-    // 	  }
-    //   }
     $all_files = scandir($dir);
     foreach ($all_files as $pos => $file) {
         if (strcmp($file, ".") == 0) continue;
@@ -853,105 +808,6 @@ function date2time($date, $format = '%a, %d %b %Y %H:%M:%S %z')
     $rday = (int)$arr["tm_mday"];
     $ryear = (1900 + (int)$arr["tm_year"]);
     return mktime($rhour, $rminute, $rsecond, $rmonth, $rday, $ryear);
-}
-
-function outputCSV($sql_query, $filename = 'export.csv')
-{
-
-    header("Content-type: text/csv");
-    header("Content-Disposition: attachment; filename=$filename");
-    header("Pragma: no-cache");
-    header("Expires: 0");
-
-    $outstream = fopen("php://output", "w");
-    function __outputCSV(&$vals, $key, $filehandler)
-    {
-
-        fputcsv($filehandler, $vals); // add parameters if you want
-    }
-
-    $db = DBConnections::Get();
-    // Gets the data from the database
-    $result = $db->query($sql_query);
-    $fields_cnt = $db->numFields($result);
-
-    $fields = array();
-    for ($i = 0; $i < $fields_cnt; $i++) {
-        $fields[] = $db->fieldName($result, $i);
-    } // end for
-
-    $data = array($fields);
-    array_walk($data, "__outputCSV", $outstream);
-
-    while ($row = $db->fetchRow($result)) {
-        $data = array($row);
-        array_walk($data, "__outputCSV", $outstream);
-    }
-
-    fclose($outstream);
-
-}
-
-function exportMysqlToCsv($sql_query, $filename = 'export.csv')
-{
-    $csv_terminated = "\n";
-    $csv_separator = ",";
-    $csv_enclosed = '"';
-    $csv_escaped = "\\";
-    //     $sql_query = "select * from $table";
-
-    $db = DBConnections::Get();
-    // Gets the data from the database
-    $result = $db->query($sql_query);
-    $fields_cnt = $db->numFields($result);
-
-    $schema_insert = '';
-
-    for ($i = 0; $i < $fields_cnt; $i++) {
-        $l = $csv_enclosed . str_replace($csv_enclosed, $csv_escaped . $csv_enclosed, stripslashes($db->fieldName($result, $i))) . $csv_enclosed;
-        $schema_insert .= $l;
-        $schema_insert .= $csv_separator;
-    } // end for
-
-    $out = trim(substr($schema_insert, 0, -1));
-    $out .= $csv_terminated;
-
-    // Format the data
-    while ($row = $db->fetchRow($result)) {
-        $schema_insert = '';
-        for ($j = 0; $j < $fields_cnt; $j++) {
-            if ($row[$j] == '0' || $row[$j] != '') {
-
-                if ($csv_enclosed == '') {
-                    $schema_insert .= $row[$j];
-                }
-                else {
-                    $schema_insert .= $csv_enclosed . str_replace($csv_enclosed, $csv_escaped . $csv_enclosed, $row[$j]) . $csv_enclosed;
-                }
-            }
-            else {
-                $schema_insert .= '';
-            }
-
-            if ($j < $fields_cnt - 1) {
-                $schema_insert .= $csv_separator;
-            }
-        } // end for
-
-        $out .= $schema_insert;
-        $out .= $csv_terminated;
-    } // end while
-
-    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-    header("Content-Length: " . strlen($out));
-    // Output to browser with appropriate mime type, you choose ;)
-    header("Content-type: text/x-csv");
-    //header("Content-type: text/csv");
-    //header("Content-type: application/csv");
-    header("Content-Disposition: attachment; filename=$filename");
-    echo $out;
-    exit;
-
 }
 
 function dumpVal($val)

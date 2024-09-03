@@ -92,12 +92,9 @@ class GETProcessor implements IRequestProcessor, ISQLSelectProcessor, IGETConsum
     {
         if ($this->select instanceof SQLSelect) {
             $iterator = $this->collection->iterator();
-            while ($iterator->valid()) {
-                $clause = $iterator->current();
-                if ($clause instanceof SQLClause) {
-                    $this->select->where()->addClause($clause);
-                }
-                $iterator->next();
+            while ($clause = $iterator->next()) {
+                if (!($clause instanceof SQLClause)) continue;
+                $this->select->where()->append($clause);
             }
         }
     }

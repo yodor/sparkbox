@@ -73,13 +73,13 @@ class FormRenderer extends Container
 
         $textSpace = new Container();
         $textSpace->setClassName("TextSpace");
-        $this->submitLine->append($textSpace);
+        $this->submitLine->items()->append($textSpace);
 
         $buttons = new Container();
         $buttons->setClassName("Buttons");
 
-        $buttons->append($this->submitButton);
-        $this->submitLine->append($buttons);
+        $buttons->items()->append($this->submitButton);
+        $this->submitLine->items()->append($buttons);
 
         $this->setLayout($this->layout);
 
@@ -103,7 +103,7 @@ class FormRenderer extends Container
 
     public function getButtons(): Container
     {
-        $buttons = $this->submitLine->getByClassName("Buttons");
+        $buttons = $this->submitLine->items()->getByClassName("Buttons");
         if ($buttons instanceof Container) return $buttons;
 
         throw new Exception("Buttons container not found");
@@ -116,7 +116,7 @@ class FormRenderer extends Container
 
     public function getTextSpace(): Container
     {
-        $textSpace = $this->submitLine->getByClassName("TextSpace");
+        $textSpace = $this->submitLine->items()->getByClassName("TextSpace");
         if ($textSpace instanceof Container) return $textSpace;
 
         throw new Exception("TextSpace container not found");

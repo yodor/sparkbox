@@ -30,7 +30,7 @@ class LoginFormRenderer extends FormRenderer
 
         $this->action = new Action("Forgot Password?", "forgot_password.php");
 
-        $this->getTextSpace()->append($this->action);
+        $this->getTextSpace()->items()->append($this->action);
 
     }
 

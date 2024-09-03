@@ -68,7 +68,7 @@ class MySQLiDriver extends DBDriver
         return $this->conn->error;
     }
 
-    public function dateTime($add_days = 0, $interval_type = " DAY ")
+    public function dateTime(int $add_days = 0, $interval_type = " DAY ") : string
     {
         $res = $this->query("SELECT DATE_ADD(now(), INTERVAL $add_days $interval_type) as datetime");
         $row = $this->fetch($res);
@@ -93,23 +93,16 @@ class MySQLiDriver extends DBDriver
         return $this->conn->affected_rows;
     }
 
-    public function numRows($res): int
+    public function numRows($result): int
     {
-        $res = $this->assert_resource($res);
-        return $res->num_rows;
+        $result = $this->assert_resource($result);
+        return $result->num_rows;
     }
 
-    public function numFields($res): int
+    public function fields($result) : array
     {
-        $res = $this->assert_resource($res);
-        return $res->field_count;
-    }
-
-    public function fieldName($res, int $pos)
-    {
-        $res = $this->assert_resource($res);
-        $arr = $res->fetch_fields();
-        return $arr[$pos];
+        $result = $this->assert_resource($result);
+        return $result->fetch_fields();
     }
 
     protected function assert_resource($res): mysqli_result
@@ -119,41 +112,52 @@ class MySQLiDriver extends DBDriver
     }
 
     /**
-     * @param $res
+     * Fetch the next row of the result set $result as associative array
+     * @param $result mysqli_result
+     * @return array|null Associative array of the current result record or null if there are no more records
+     * @throws Exception
+     */
+    public function fetch($result): ?array
+    {
+        $result = $this->assert_resource($result);
+
+        //null indicates no more records from this resource
+        $record = $result->fetch_array(MYSQLI_ASSOC);
+
+        if ($record === false) throw new Exception("Error fetching the result: ".$this->getError());
+
+        return $record;
+    }
+
+    /**
+     * Fetch the next row of the result set $result as associative array
+     * @param $result
      * @return array|null
      * @throws Exception
      */
-    public function fetch($res): ?array
+    public function fetchArray($result): ?array
     {
-        $res = $this->assert_resource($res);
+        $result = $this->assert_resource($result);
 
-        return $res->fetch_assoc();
+        //null indicates no more records from this resource
+        $record = $result->fetch_array(MYSQLI_NUM);
 
+        if ($record === false) throw new Exception("Error fetching the result: ".$this->getError());
+
+        return $record;
     }
 
-    public function fetchArray($res): ?array
+    public function fetchResult($result): ?RawResult
     {
-        $res = $this->assert_resource($res);
-
-        return $res->fetch_array(MYSQLI_NUM);
-
+        $record = $this->fetch($result);
+        if (is_array($record)) return new RawResult($record);
+        return null;
     }
 
-    public function fetchResult($res): ?RawResult
+    public function free($result) : void
     {
-        $res = $this->assert_resource($res);
-
-        $record = $res->fetch_assoc();
-
-        if (is_null($record)) return NULL;
-
-        return new RawResult($record);
-    }
-
-    public function free($res)
-    {
-        if ($res instanceof mysqli_result) {
-            @$res->free();
+        if ($result instanceof mysqli_result) {
+            @$result->free();
         }
     }
 
@@ -162,19 +166,19 @@ class MySQLiDriver extends DBDriver
         return $this->conn->insert_id;
     }
 
-    public function commit()
+    public function commit(?string $name = null) : bool
     {
-        return $this->conn->commit();
+        return $this->conn->commit(0 , $name);
     }
 
-    public function rollback()
+    public function rollback(?string $name = null) : bool
     {
-        return $this->conn->rollback();
+        return $this->conn->rollback(0 , $name);
     }
 
-    public function transaction()
+    public function transaction(?string $name = null) : bool
     {
-        return $this->conn->begin_transaction();
+        return $this->conn->begin_transaction(0, $name);
     }
 
     public function escape(string $data) : string
@@ -203,8 +207,6 @@ class MySQLiDriver extends DBDriver
         if (!$found) throw new Exception("Field [$field_name] does not exist in table: $table");
         return $ret;
     }
-
-    //enum('T1','TIR','CIM')
 
     public function tableExists(string $table)
     {

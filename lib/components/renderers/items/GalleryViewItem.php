@@ -94,15 +94,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
             $this->position = $data["position"];
         }
 
-        $iterator = $this->actions->iterator();
-        while ($iterator->valid()){
-            $action = $iterator->current();
-            if ($action instanceof Action) {
-                $action->setData($data);
-            }
-            $iterator->next();
-        }
-
+        $this->actions->setData($data);
 
     }
 

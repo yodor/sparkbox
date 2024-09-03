@@ -1,5 +1,5 @@
 <?php
-interface ISQLProducer {
+interface ISQLGet {
     public function getSQL() : string;
 }
 ?>
