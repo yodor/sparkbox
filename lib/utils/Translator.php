@@ -9,8 +9,6 @@ include_once("utils/IRequestProcessor.php");
 include_once("utils/URLBuilder.php");
 include_once("utils/Session.php");
 
-//TODO: check usage when this file is included from js.php files that include the main/top session.php
-
 class Translator implements IRequestProcessor, IGETConsumer
 {
 
@@ -42,13 +40,13 @@ class Translator implements IRequestProcessor, IGETConsumer
      * The currently active language - Primary key value from LanguagesBean
      * @var int
      */
-    protected int $langID = -1;
+    protected int $langID = 1;
 
     /**
      * The currently active language - 'language' column value from LanguagesBean
      * @var string
      */
-    protected $language = array();
+    protected array $language = array();
 
     const KEY_LANGUAGE_ID = "langID";
     const KEY_CHANGE_LANGUAGE = "change_language";
@@ -68,13 +66,12 @@ class Translator implements IRequestProcessor, IGETConsumer
 
         if (Session::Contains(Translator::KEY_LANGUAGE_ID)) {
             $langID = (int)Session::Get(Translator::KEY_LANGUAGE_ID);
-            debug("Using session ".Translator::KEY_LANGUAGE_ID.": ".$langID);
+            debug("Session ".Translator::KEY_LANGUAGE_ID.": ".$langID);
         }
         else if (Session::HaveCookie(Translator::KEY_LANGUAGE_ID)) {
             $langID = (int)Session::GetCookie(Translator::KEY_LANGUAGE_ID);
-            debug("Using cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
+            debug("Cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
         }
-
 
         //no session or cookie set
         if ($langID > 0) {
@@ -85,13 +82,19 @@ class Translator implements IRequestProcessor, IGETConsumer
             catch (Exception $e) {
                 debug("Session/Cookies contain unavailable language ID - Setting DEFAULT_LANGUAGE language");
                 $this->loadDefaultLanguage();
-
             }
         }
         else {
             $this->loadDefaultLanguage();
         }
 
+    }
+
+    protected function loadLanguageID(int $langID) : void
+    {
+        $this->language = $this->languages->getByID($langID);
+        $this->langID = $langID;
+        $this->storeLanguage();
     }
 
     public function getParameterNames(): array
@@ -101,7 +104,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             Translator::KEY_CHANGE_LANGUAGE);
     }
 
-    protected function storeLanguage()
+    protected function storeLanguage() : void
     {
         debug("Storing langID: ".$this->langID. " in session and cookies");
         Session::SetCookie("langID", $this->langID);
@@ -123,7 +126,12 @@ class Translator implements IRequestProcessor, IGETConsumer
                 $langID = (int)$_GET[Translator::KEY_LANGUAGE_ID];
             }
 
-            $this->changeLanguage($language, $langID);
+            try {
+                $this->changeLanguage($language, $langID);
+            }
+            catch (Exception $e) {
+                debug("Error: ".$e->getMessage());
+            }
 
             $url = new URLBuilder();
             $url->buildFrom(currentURL());
@@ -138,7 +146,7 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     }
 
-    protected function changeLanguage(string $language, int $langID)
+    protected function changeLanguage(string $language, int $langID) : void
     {
         $qry = $this->languages->queryFull();
         $qry->select->where()->add("langID", $langID, "=", "OR");
@@ -153,19 +161,13 @@ class Translator implements IRequestProcessor, IGETConsumer
         }
     }
 
-    protected function loadLanguageID(int $langID)
-    {
-        $this->language = $this->languages->getByID($langID);
-        $this->langID = $langID;
-        $this->storeLanguage();
-    }
 
-    protected function loadDefaultLanguage()
+    protected function loadDefaultLanguage() : void
     {
         debug("Loading default language");
         if (defined("DEFAULT_LANGUAGE")) {
             //query default language from define
-            $qry = $this->languages->queryField("language", "'".DEFAULT_LANGUAGE."'", 1);
+            $qry = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1);
             if ($qry->exec() && $data = $qry->next()) {
                 $this->language = $data;
                 $this->langID = $data[$this->languages->key()];
@@ -196,57 +198,61 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     public function translateBean(int $id, string $field_name, array &$data, string $tableName)
     {
+        try {
+            $qry = $this->translated_beans->query();
+            $qry->select->fields()->set("translated");
+            $where = $qry->select->where();
+            $where->add("langID", $this->langID);
+            $where->add("field_name", "'$field_name'");
+            $where->add("table_name", "'$tableName'");
+            $where->Add("bean_id", $id);
 
-        $qry = $this->translated_beans->query();
-        $qry->select->fields()->set("translated");
-        $where = $qry->select->where();
-        $where->add("langID", $this->langID);
-        $where->add("field_name", "'$field_name'");
-        $where->add("table_name", "'$tableName'");
-        $where->Add("bean_id", $id);
+            $qry->select->limit = " 1 ";
 
-        $qry->select->limit = " 1 ";
-
-        if ($qry->exec() && $result = $qry->next()) {
-            $data[$field_name] = $result["translated"];
+            if ($qry->exec() && $result = $qry->next()) {
+                $data[$field_name] = $result["translated"];
+            }
+        }
+        catch (Exception $e) {
+            debug("Unable to translate: ".$e->getMessage());
         }
 
     }
 
     public function translatePhrase(string $phrase): string
     {
+        $result = $phrase;
 
-        if (strlen(trim($phrase)) == 0) return $phrase;
+        if (strlen(trim($phrase)) == 0) return $result;
 
-        $phrase_hash = md5($phrase);
+        try {
+            $phrase_hash = md5($phrase);
 
-        $qry = $this->translated_phrases->queryLanguageID($this->langID);
-        $qry->select->where()->add("hash_value", "'$phrase_hash'");
-        $qry->select->limit = 1;
+            $qry = $this->translated_phrases->queryLanguageID($this->langID);
+            $qry->select->where()->add("hash_value", "'$phrase_hash'");
+            $qry->select->limit = 1;
 
-        $num = $qry->exec();
-
-        if ($data = $qry->next()) {
-
-            if ($data["trID"]>0) {
-                return $data["translation"];
+            if ($qry->exec() && $data = $qry->next()) {
+                if ($data["trID"]>0) {
+                    $result = $data["translation"];
+                }
             }
-
-            //not translated yet
-            return $phrase;
-        }
-        else {
-            //Capture new phrase. Insert into SiteTextsBean
-            $phrase_data = array("value"=>DBConnections::Get()->escape($phrase), "hash_value"=>$phrase_hash);
-            try {
-                $this->phrases->insert($phrase_data);
-            }
-            catch (Exception $ex) {
-                debug("Unable to capture new phrase: ". $ex->getMessage());
+            else {
+                //Capture new phrase. Insert into SiteTextsBean
+                $phrase_data = array("value"=>DBConnections::Get()->escape($phrase), "hash_value"=>$phrase_hash);
+                try {
+                    $this->phrases->insert($phrase_data);
+                }
+                catch (Exception $ex) {
+                    throw new Exception("Unable to capture new phrase: ". $ex->getMessage());
+                }
             }
         }
+        catch (Exception $e) {
+            debug("Error: ".$e->getMessage());
+        }
 
-        return $phrase;
+        return $result;
     }
 
     public function translateNumber($val)

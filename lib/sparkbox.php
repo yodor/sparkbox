@@ -184,15 +184,7 @@ if (DB_ENABLED && !defined("SKIP_DB")) {
     DBConnections::Set($driver);
 }
 
-if (TRANSLATOR_ENABLED && !defined("SKIP_DB") && !defined("SKIP_TRANSLATOR") && !defined("STORAGE_REQUEST")) {
-    include_once("utils/language.php");
-}
-else {
-    include_once("utils/language_notranslator.php");
-}
-
-
-
+include_once("utils/language.php");
 
 // $constants = get_defined_constants(true);
 // debug("Exported Globals: ",$constants["user"]);
