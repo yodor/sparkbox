@@ -114,7 +114,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     public function setCacheable(bool $mode) : void
     {
-        $this->cacheable = true;
+        $this->cacheable = $mode;
     }
 
     public function isCacheable() : bool
