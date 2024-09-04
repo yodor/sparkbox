@@ -19,8 +19,9 @@ class ItemView extends AbstractResultView
         $this->group_container = new Container(false);
         $this->group_container->setClassName("group");
 
-        $this->viewport = new Container(false);
-        $this->viewport->setClassName("viewport");
+        $this->viewport = new Container(true);
+        $this->viewport->setComponentClass("viewport");
+
     }
 
     public function requiredStyle() : array
