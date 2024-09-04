@@ -16,10 +16,10 @@ class ItemView extends AbstractResultView
         parent::__construct($itr);
         $this->setAttribute("itemscope", "");
         $this->setAttribute("itemtype", "https://schema.org/ItemList");
-        $this->group_container = new Container();
-        $this->group_container->setComponentClass("group");
+        $this->group_container = new Container(false);
+        $this->group_container->setClassName("group");
 
-        $this->viewport = new Container();
+        $this->viewport = new Container(false);
         $this->viewport->setClassName("viewport");
     }
 

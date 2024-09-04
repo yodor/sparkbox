@@ -6,7 +6,9 @@ class SelectOption extends DataIteratorItem
 {
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct(false);
+        $this->setComponentClass("");
+
         $this->tagName = "OPTION";
     }
 
@@ -21,7 +23,7 @@ class SelectOption extends DataIteratorItem
         }
     }
 
-    public function processAttributes()
+    public function processAttributes(): void
     {
         $this->setAttribute("value", (string)$this->value);
         if ($this->isSelected()) {
@@ -119,6 +121,8 @@ class SelectMultipleField extends SelectField
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
+        //use SelectField css
+        $this->setClassName("SelectField");
 
         $this->setInputAttribute("multiple", "");
 

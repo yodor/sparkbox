@@ -5,6 +5,12 @@ class PaginatorTopComponent extends PaginatorComponent
 {
     public $view_modes_enabled = FALSE;
 
+    public function __construct(Paginator $paginator)
+    {
+        parent::__construct($paginator);
+        $this->addClassName("PaginatorTopComponent");
+    }
+
     public function renderImpl()
     {
         if ($this->view_modes_enabled) {

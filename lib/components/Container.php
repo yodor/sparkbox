@@ -9,9 +9,9 @@ class Container extends Component
 
     protected bool $wrapper_enabled = true;
 
-    public function __construct()
+    public function __construct(bool $chained_component_class = true)
     {
-        parent::__construct();
+        parent::__construct($chained_component_class);
         $this->items = new ComponentCollection();
 
     }

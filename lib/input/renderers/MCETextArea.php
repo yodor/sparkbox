@@ -35,7 +35,7 @@ class MCETextArea extends InputField
         return $arr;
     }
 
-    public function setAttribute($name, $value)
+    public function setAttribute($name, $value) : void
     {
         $this->setInputAttribute($name, $value);
         self::$image_browser->setAttribute($name, $value);
@@ -48,7 +48,7 @@ class MCETextArea extends InputField
 
     public function startRender()
     {
-        $this->setContents(attributeValue($this->input->getValue()));
+        $this->setContents((string)$this->input->getValue());
         parent::startRender();
     }
 

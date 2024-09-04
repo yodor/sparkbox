@@ -18,7 +18,8 @@ class InputComponent extends Component
 
     public function __construct(DataInput $input = NULL)
     {
-        parent::__construct();
+        parent::__construct(false);
+
         if ($input) {
             $this->setDataInput($input);
         }

@@ -26,7 +26,8 @@ class MessageDialog extends Component implements IPageComponent
 
     public function __construct($title = "Message", $id = "message_dialog")
     {
-        parent::__construct();
+        parent::__construct(true);
+        //$this->setComponentClass("MessageDialog");
 
         $this->title = $title;
         $this->id = $id;
@@ -35,10 +36,10 @@ class MessageDialog extends Component implements IPageComponent
 
         $this->setAttribute("name", $id);
 
-        $this->buttonsBar = new Container();
+        $this->buttonsBar = new Container(false);
         $this->buttonsBar->setClassName("Buttons");
 
-        $this->setClassName("PopupPanel");
+        $this->addClassName("PopupPanel");
         $this->addClassName("resizable");
 
         $this->setDialogType($this->type);

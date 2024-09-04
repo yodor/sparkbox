@@ -110,7 +110,7 @@ class ImagePopup extends Component implements IPhotoRenderer
         return $this->storageItem->className;
     }
 
-    protected function processAttributes()
+    protected function processAttributes(): void
     {
         parent::processAttributes();
         $this->thumb_url = $this->storageItem->hrefImage($this->width, $this->height);

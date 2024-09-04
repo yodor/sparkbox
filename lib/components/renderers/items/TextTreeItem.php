@@ -40,7 +40,7 @@ class TextTreeItem extends NestedSetItem implements IActionCollection, IPhotoRen
 
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct(false);
 
         //construct default empty action with no parameters
         $this->text_action = new Action();

@@ -4,12 +4,12 @@
     cursor:pointer;
 }
 
-.Action.PipeSeparator {
+.Action[action='Pipe'] {
     color: #cccccc;
     cursor: auto;
 }
 
-.Action.RowSeparator {
+.Action[action='Row'] {
     display: block;
     cursor: auto;
 }

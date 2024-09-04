@@ -6,8 +6,8 @@ class BreadcrumbListItem extends Component {
 
     public function __construct()
     {
+        parent::__construct(false);
         $this->tagName = "LI";
-        parent::__construct();
 
         $this->setAttribute("itemscope", "");
         $this->setAttribute("itemprop", "itemListElement");
@@ -25,7 +25,7 @@ class BreadcrumbList extends Container implements IHeadContents
     {
         $this->tagName = "UL";
 
-        parent::__construct();
+        parent::__construct(false);
 
         $this->setAttribute("itemscope", "");
         $this->setAttribute("itemtype", "https://schema.org/BreadcrumbList");
@@ -43,18 +43,25 @@ class BreadcrumbList extends Container implements IHeadContents
 
     protected function renderImpl()
     {
-        foreach ($this->items as $pos=>$act) {
-            if ($act instanceof Action) {
-                $this->renderer->startRender();
+        $iterator = $this->items->iterator();
+        $pos = 1;
+        while ($act = $iterator->next()) {
 
-                $act->setAttribute("itemprop", "item");
-                $act->setContents("<span itemprop='name'>".$act->getAttribute("action")."</span>");
-                $act->render();
-
-                echo "<meta itemprop='position' content='".($pos+1)."' />";
-
-                $this->renderer->finishRender();
+            if (!($act instanceof Action)) {
+                var_dump($act);
+                continue;
             }
+
+            $this->renderer->startRender();
+
+            $act->setAttribute("itemprop", "item");
+            $act->setContents("<span itemprop='name'>".$act->getAttribute("action")."</span>");
+            $act->render();
+
+            echo "<meta itemprop='position' content='".($pos++)."' />";
+
+            $this->renderer->finishRender();
+
         }
     }
 

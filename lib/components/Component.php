@@ -24,54 +24,79 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     protected int $index = -1;
 
-    /**
-     * @var array Collection of CSS classes for this component, in addition to the automatic '$component_class'
-     */
-    protected array $classNames = array();
+
 
     /**
-     * @var array Collection of HTML attribute name/values
+     * Collection of HTML attribute name/values
+     * @var array
      */
     protected array $attributes = array();
 
+    /**
+     * Collection oh CSS style name/values
+     * @var array
+     */
     protected array $style = array();
 
-    protected string $caption = "";
 
+    /**
+     * Collection of atrribue names that require json encoded value
+     * @var array
+     */
     protected array $json_attributes = array();
 
-    /**
-     * @var string[] values of these attributes will be handled using htmlspecialchars.
-     */
-    protected array $special_attributes = array("tooltip");
 
     /**
-     * @var string Automatic css class string. Build from all the class hierarchy. Override with setComponentClass
+     * If true the component class is set to this object class name + all parent object class names
+     * If false only this object class name is set as $component_class
+     * @var bool
+     */
+    protected bool $chained_component_class = true;
+
+    /**
+     * CSS component class
+     * @var string
      */
     protected string $component_class = "";
+
+    /**
+     * Additional CSS class names
+     * @var array
+     */
+    protected array $classNames = array();
 
     public bool $translation_enabled = FALSE;
     public bool $render_tooltip = TRUE;
     public bool $render_enabled = TRUE;
 
+    protected string $caption = "";
     protected ?Component $caption_component = null;
+
 
     /**
      * Component constructor.
      * Creates default component class by using the inheritance chain get_class
      */
-    public function __construct()
+    public function __construct(bool $chained_component_class = true)
     {
         parent::__construct();
 
         $this->buffer = new OutputBuffer();
 
-        $class_chain = class_parents($this);
-        array_pop($class_chain);
-        $class_chain = array_reverse($class_chain);
-        $class_chain[] = get_class($this);
+        $this->chained_component_class = $chained_component_class;
 
-        $this->component_class = implode(" ", $class_chain);
+        if ($this->chained_component_class) {
+            $class_chain = class_parents($this);
+            array_pop($class_chain);
+            $class_chain = array_reverse($class_chain);
+            $class_chain[] = get_class($this);
+            $this->setComponentClass(implode(" ", $class_chain));
+        }
+
+        else {
+            $this->setComponentClass(get_class($this));
+        }
+
 
         include_once("pages/SparkPage.php");
         $page = SparkPage::Instance();
@@ -96,13 +121,14 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     {
         return $this->cacheable;
     }
+
     /**
-     * Override the automatic class name constructed from the inheritance chain
-     * @param string $componentClass
+     * Set component css class name
+     * @param string $name
      */
-    public function setComponentClass(string $componentClass) : void
+    public function setComponentClass(string $name) : void
     {
-        $this->component_class = $componentClass;
+        $this->component_class = $name;
     }
 
     public function getComponentClass(): string
@@ -169,7 +195,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
      * Called in start render before prepareAttributes
      * Can be used from sub classess to set all required attributes
      */
-    protected function processAttributes()
+    protected function processAttributes(): void
     {
 
     }
@@ -318,7 +344,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->getAttribute("tooltip");
     }
 
-    public function setTooltipText(string $text)
+    public function setTooltipText(string $text) : void
     {
         if (!empty($text)) {
             $this->setAttribute("tooltip", $text);
@@ -328,11 +354,20 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         }
     }
 
+    /**
+     * Get title attrobite
+     * @return string
+     */
     public function getTitle(): string
     {
         return $this->getAttribute("title");
     }
 
+    /**
+     * Set title attribute
+     * @param string $text
+     * @return void
+     */
     public function setTitle(string $text) : void
     {
         $this->setAttribute("title", $text);
@@ -388,7 +423,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         }
     }
 
-    public function setAttribute(string $name, string $value)
+    public function setAttribute(string $name, string $value) : void
     {
         $this->attributes[$name] = trim($value);
     }
@@ -412,7 +447,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return "";
     }
 
-    public function setStyleAttribute(string $name, string $value)
+    public function setStyleAttribute(string $name, string $value) : void
     {
         $this->style[$name] = $value;
     }
@@ -423,7 +458,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return "";
     }
 
-    public function getAttributesText(array $src_attributes = NULL): string
+    protected function getAttributesText(array $src_attributes = NULL): string
     {
         if (!$src_attributes) $src_attributes = $this->attributes;
 
@@ -451,7 +486,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     }
 
-    public function getStyleText(): string
+    protected function getStyleText(): string
     {
 
         $result = "";
@@ -473,19 +508,22 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     {
         $css = array();
 
-        //automatic class inheritance
+        //component class
         $componentClass = trim($this->getComponentClass());
         if (!empty($componentClass)) {
             $css[] = $componentClass;
         }
-        //this component class
+
+        //this class names
         $className = trim($this->getClassName());
         if (!empty($className)) {
             $css[] = $className;
         }
 
         $attrs = array();
-        $attrs[] = "class='".attributeValue(implode(" ", $css))."'";
+        if (count($css)>0) {
+            $attrs[] = "class='" . attributeValue(implode(" ", $css)) . "'";
+        }
         $attrs[] = $this->getAttributesText();
         $attrs[] = $this->getStyleText();
 

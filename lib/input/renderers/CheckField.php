@@ -28,7 +28,7 @@ class CheckField extends DataIteratorField
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-        $this->setItemRenderer(new CheckItem());
+        $this->setItemRenderer(new CheckItem(false));
     }
 
     public function renderImpl()

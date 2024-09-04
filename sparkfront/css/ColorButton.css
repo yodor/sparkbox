@@ -20,7 +20,7 @@ INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
     position: relative;
 
     text-align: center;
-    vertical-align: bottom;
+    vertical-align: text-bottom;
 
     padding-top: 0.2em;
     padding-bottom: 0.2em;
@@ -47,12 +47,15 @@ INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
 
     min-width:5em;
 }
-
-.ColorButton:link {
+A.ColorButton {
+    padding-top: 0.2em;
+    text-decoration:none !important;
+}
+A.ColorButton:link {
 
 }
 
-.ColorButton:visited {
+A.ColorButton:visited {
     color: #fff;
 }
 

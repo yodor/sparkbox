@@ -5,27 +5,40 @@ include_once("utils/IDataResultProcessor.php");
 abstract class DataIteratorItem extends Component implements IDataResultProcessor
 {
     //use value of data array key '$value_key' to construct the value of this item
-    protected $value_key;
+    protected string $value_key = "";
 
     //use value of data array key '$label_key' to construct the label of this item
-    protected $label_key;
+    protected string $label_key = "";
 
-    protected $data = array();
+    protected array $data = array();
 
-    protected $label = "";
-    protected $value = "";
+    protected string $label = "";
 
-    protected $id = -1;
+    protected $value = null;
+
+    protected int $id = -1;
 
     //render html attributes from data_row
-    protected $data_attributes = array();
+    protected array $data_attributes = array();
 
     protected bool $selected = false;
 
     protected bool $checked = false;
 
-    protected $position = 0;
+    protected int $position = 0;
 
+
+    public function __construct(bool $chained_component_class = true)
+    {
+        parent::__construct($chained_component_class);
+    }
+
+    protected function resetData()
+    {
+        $this->value = "";
+        $this->label = "";
+
+    }
 
     public function setPosition(int $position) : void
     {
@@ -53,7 +66,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         return $this->data_attributes;
     }
 
-    public function setLabel(string $label)
+    public function setLabel(string $label) : void
     {
         $this->label = $label;
     }
@@ -103,20 +116,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
         return $this->value;
     }
 
-    public function __construct()
-    {
-        parent::__construct();
-        //$this->component_class = "";
-    }
-
-    protected function resetData()
-    {
-        $this->value = "";
-        $this->label = "";
-
-    }
-
-    protected function processAttributes()
+    protected function processAttributes(): void
     {
         parent::processAttributes();
 

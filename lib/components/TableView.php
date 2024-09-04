@@ -46,15 +46,15 @@ class TableView extends AbstractResultView implements IHeadContents
         parent::__construct($itr);
         $this->enablePaginators(AbstractResultView::PAGINATOR_BOTTOM);
 
-        $this->row = new Component();
+        $this->row = new Component(false);
         $this->row->setTagName("TR");
         $this->row->setComponentClass("");
 
-        $this->header_row = new Component();
+        $this->header_row = new Component(false);
         $this->header_row->setTagName("TR");
         $this->header_row->setComponentClass("sort");
 
-        $this->table = new Component();
+        $this->table = new Component(false);
         $this->table->setTagName("TABLE");
         $this->table->setComponentClass("viewport");
 

@@ -68,7 +68,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     public function __construct(?IDataIterator $itr=null)
     {
-        parent::__construct();
+        parent::__construct(false);
 
         $this->iterator = $itr;
 
@@ -77,7 +77,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
         $this->paginators_enabled = (AbstractResultView::PAGINATOR_TOP | AbstractResultView::PAGINATOR_BOTTOM);
 
-        $this->list_empty = new Component();
+        $this->list_empty = new Component(false);
         $this->list_empty->addClassName("ListEmpty");
     }
 

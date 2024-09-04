@@ -58,7 +58,7 @@ class AdminUsersListPage extends BeanListPage
 
         $act = new ActionsCellRenderer();
         $act->getActions()->append(new Action("Edit", "add.php", array(new DataParameter("editID", $bean->key()))));
-        $act->getActions()->append(new PipeSeparator());
+        $act->getActions()->append(Action::PipeSeparator());
         $act->getActions()->append($h_delete->createAction());
 
         $view->getColumn("actions")->setCellRenderer($act);

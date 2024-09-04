@@ -16,6 +16,8 @@ class LoginFormRenderer extends FormRenderer
     {
         parent::__construct($form);
 
+        $this->setClassName("LoginFormRenderer");
+
         $this->handler = $handler;
 
         $this->setLayout(FormRenderer::FIELD_VBOX);

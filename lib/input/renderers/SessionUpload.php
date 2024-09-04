@@ -23,6 +23,8 @@ abstract class SessionUpload extends ArrayField
 
         parent::__construct($this);
 
+
+        $this->addClassName("SessionUpload");
     }
 
     public function assignUploadHandler(UploadControlResponder $handler)

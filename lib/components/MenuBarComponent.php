@@ -3,35 +3,35 @@ include_once("components/Component.php");
 include_once("utils/MainMenu.php");
 include_once("components/renderers/menus/MenuBarItemRenderer.php");
 
-class MenuBarComponent extends Component
+class MenuBarComponent extends Container
 {
     /**
      * @var MainMenu
      */
-    protected $main_menu;
+    protected MainMenu $main_menu;
 
     /**
      * @var MenuBarItemRenderer
      */
-    protected $ir_baritem;
+    protected MenuBarItemRenderer $ir_baritem;
 
     /**
      * @var Component
      */
-    protected $bar;
+    protected Component $bar;
 
     /**
      * @var Component
      */
-    protected $toggle;
+    protected Component $toggle;
 
-    public $toggle_first = FALSE;
+    public bool $toggle_first = FALSE;
 
-    protected $separator_enabled = true;
+    protected bool $separator_enabled = true;
 
     public function __construct(MainMenu $menu)
     {
-        parent::__construct();
+        parent::__construct(false);
 
         $this->main_menu = $menu;
         $this->ir_baritem = new MenuBarItemRenderer();
@@ -43,18 +43,29 @@ class MenuBarComponent extends Component
             $this->setAttribute("source", $bean_name);
         }
 
-        $this->bar = new Component();
+        $this->bar = new Component(false);
         $this->bar->setComponentClass("MenuBar");
+
         $this->bar->setAttribute("itemscope", "");
         $this->bar->setAttribute("itemtype","https://schema.org/SiteNavigationElement");
         $this->bar->setAttribute("role", "menu");
 
-        $this->toggle = new Component();
+        $this->toggle = new Component(false);
         $this->toggle->setTagName("A");
         $this->toggle->setContents( "<div></div>");
         $this->toggle->setComponentClass("toggle");
 
 
+    }
+
+    public function setToggleFirst() : void
+    {
+        $this->toggle_first = true;
+    }
+
+    public function setToggleLast() : void
+    {
+        $this->toggle_first = false;
     }
 
     public function requiredStyle() : array

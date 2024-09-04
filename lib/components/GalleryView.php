@@ -159,7 +159,7 @@ class GalleryView extends Container
 
         $collection->append(new Action("Edit", $url->url(), $edit_params));
 
-        $collection->append(new PipeSeparator());
+        $collection->append(Action::PipeSeparator());
 
         $delete_params = array(new DataParameter("item_id", $bkey));
 
@@ -167,8 +167,8 @@ class GalleryView extends Container
 
         if ($this->bean instanceof OrderedDataBean) {
 
-            $collection->append(new RowSeparator());
-            $collection->append(new RowSeparator());
+            $collection->append(Action::RowSeparator());
+            $collection->append(Action::RowSeparator());
 
             $repos_param = array(new DataParameter("item_id", $bkey),
                                  new DataParameter("#" . get_class($this->bean) . ".%$bkey%", $bkey));
@@ -177,19 +177,19 @@ class GalleryView extends Container
 
             $collection->append(new Action("First", "?cmd=reposition&type=first", $repos_param));
 
-            $collection->append(new PipeSeparator());
+            $collection->append(Action::PipeSeparator());
 
             $collection->append(new Action("Last", "?cmd=reposition&type=last", $repos_param));
 
-            $collection->append(new RowSeparator());
+            $collection->append(Action::RowSeparator());
 
             $collection->append(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
 
-            $collection->append(new PipeSeparator());
+            $collection->append(Action::PipeSeparator());
 
             $collection->append(new Action("Next", "?cmd=reposition&type=next", $repos_param));
 
-            $collection->append(new RowSeparator());
+            $collection->append(Action::RowSeparator());
 
             $collection->append(new Action("Reposition", "?cmd=reposition&type=fixed", $repos_param));
         }

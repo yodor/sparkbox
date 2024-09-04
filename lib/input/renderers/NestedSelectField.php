@@ -8,6 +8,7 @@ class NestedSelectField extends SelectField
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
+        $this->setClassName("SelectField");
     }
 
     protected function renderItems()

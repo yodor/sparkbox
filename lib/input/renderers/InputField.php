@@ -51,7 +51,11 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
 
     public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct(false);
+        $this->setComponentClass("InputField");
+
+        $this->setClassName(get_class($this));
+
         $this->input = $input;
 
         $input->setRenderer($this);

@@ -22,6 +22,7 @@ class Action extends DataIteratorItem
      */
     public bool $action_as_contents = TRUE;
 
+
     /**
      * @param string $action
      * @param string $href
@@ -30,7 +31,8 @@ class Action extends DataIteratorItem
      */
     public function __construct(string $action = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
     {
-        parent::__construct();
+        parent::__construct(false);
+        $this->setComponentClass("Action");
 
         $this->tagName = "A";
 
@@ -39,6 +41,7 @@ class Action extends DataIteratorItem
 
         if ($action) {
             $this->setAttribute("action", $action);
+            $this->setContents($action);
         }
 
         foreach ($parameters as $parameter) {
@@ -85,21 +88,23 @@ class Action extends DataIteratorItem
         $this->urlbuilder->setData($data);
 
         //set contents from DataIteratorItem
-        $this->setContents($this->value);
-
-        //override only if not empty
-        if ($this->action_as_contents) {
-
-            $action = $this->getAttribute("action");
-
-            if ($action) {
-                $this->setContents($action);
-            }
+        if ($this->value_key) {
+            $this->setContents($this->value);
         }
+
+//        //override only if not empty
+//        if ($this->action_as_contents) {
+//
+//            $action = $this->getAttribute("action");
+//
+//            if ($action) {
+//                $this->setContents($action);
+//            }
+//        }
 
     }
 
-    protected function processAttributes()
+    protected function processAttributes(): void
     {
         parent::processAttributes();
 
@@ -132,6 +137,7 @@ class Action extends DataIteratorItem
                 $action->render();
             }
             else if ($item instanceof Action) {
+
                 $item->render();
             }
 
@@ -141,31 +147,35 @@ class Action extends DataIteratorItem
         }
     }
 
-}
-
-class PipeSeparator extends Action
-{
-    public function __construct()
+    public function setAction(string $action) : void
     {
-        parent::__construct("Pipe");
-        $this->action_as_contents = false;
-        $this->setContents(" | ");
-        $this->tagName = "SPAN";
-        $this->translation_enabled = FALSE;
+        $this->setAttribute("action", $action);
+    }
+    public function getAction() : string
+    {
+        return $this->getAttribute("action");
+    }
+
+    public static function PipeSeparator() : Action
+    {
+        $action = new Action();
+        $action->translation_enabled = FALSE;
+        $action->action_as_contents = false;
+        $action->setTagName("SPAN");
+        $action->setContents(" | ");
+        $action->setAction("Pipe");
+        return $action;
+    }
+
+    public static function RowSeparator() : Action
+    {
+        $action = new Action();
+        $action->action_as_contents = false;
+        $action->translation_enabled = FALSE;
+        $action->setTagName("SPAN");
+        $action->setAction("Row");
+        return $action;
     }
 }
-
-class RowSeparator extends Action
-{
-    public function __construct()
-    {
-        parent::__construct("Row");
-        $this->action_as_contents = false;
-        $this->tagName = "SPAN";
-        $this->translation_enabled = FALSE;
-        $this->setContents("");
-    }
-}
-
 
 ?>

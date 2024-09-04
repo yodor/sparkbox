@@ -11,7 +11,8 @@ class InputLabel extends Component implements IErrorRenderer
 
     public function __construct(DataInput $input)
     {
-        parent::__construct();
+        parent::__construct(false);
+
         $this->tagName = "LABEL";
         $this->input = $input;
     }

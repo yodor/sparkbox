@@ -48,7 +48,7 @@ class PhraseTranslatorPage extends BeanListPage
     {
         $action_translate = new Action("Translate", "javascript:phrase_translator.edit(%textID%)");
         $act->append($action_translate);
-        $act->append(new PipeSeparator());
+        $act->append(Action::PipeSeparator());
 
         $action_clear = new Action("Clear", "javascript:phrase_translator.clear(%textID%)");
         $act->append($action_clear);

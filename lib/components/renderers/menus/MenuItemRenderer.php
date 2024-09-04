@@ -11,8 +11,8 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
 
     public function __construct()
     {
-        parent::__construct();
-        $this->linkTag = new Component();
+        parent::__construct(false);
+        $this->linkTag = new Component(false);
         $this->linkTag->setTagName("A");
         $this->linkTag->setComponentClass("MenuItemLink");
         $this->linkTag->setAttribute("role", "menuitem");

@@ -172,7 +172,7 @@ class BeanListPage extends AdminPageTemplate
     {
 
         $act->append(new Action(SparkAdminPage::ACTION_EDIT, "add.php", array(new DataParameter("editID", $this->view->getIterator()->key()))));
-        $act->append(new PipeSeparator());
+        $act->append(Action::PipeSeparator());
 
         if ($this->bean instanceof DBTableBean) {
             $h_delete = new DeleteItemResponder($this->bean);
@@ -186,32 +186,32 @@ class BeanListPage extends AdminPageTemplate
             $bkey = $this->bean->key();
             $repos_param = array(new DataParameter("item_id", $bkey));
             //
-            $act->append(new RowSeparator());
+            $act->append(Action::RowSeparator());
 
             $action_prev = new Action("Previous", "?cmd=reposition&type=previous", $repos_param);
             $action_prev->setTooltipText("Move element one position backward");
             $act->append($action_prev);
 
-            $act->append(new PipeSeparator());
+            $act->append(Action::PipeSeparator());
 
             $action_next = new Action("Next", "?cmd=reposition&type=next", $repos_param);
             $action_next->setTooltipText("Move element one position forward");
             $act->append($action_next);
             //
-            $act->append(new RowSeparator());
+            $act->append(Action::RowSeparator());
             //
 
             $action_first = new Action("First", "?cmd=reposition&type=first", $repos_param);
             $action_first->setTooltipText("Move element to first position");
             $act->append($action_first);
 
-            $act->append(new PipeSeparator());
+            $act->append(Action::PipeSeparator());
 
             $action_last = new Action("Last", "?cmd=reposition&type=last", $repos_param);
             $action_last->setTooltipText("Move element to last position");
             $act->append($action_last);
 
-            $act->append(new RowSeparator());
+            $act->append(Action::RowSeparator());
 
             $action_choose = new Action("Set position", "?cmd=reposition&type=fixed", $repos_param);
             $action_choose->setTooltipText("Input element position");

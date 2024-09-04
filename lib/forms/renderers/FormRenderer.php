@@ -50,7 +50,10 @@ class FormRenderer extends Container
 
     public function __construct(InputForm $form)
     {
-        parent::__construct();
+        parent::__construct(false);
+
+        $this->setComponentClass("FormRenderer");
+
         $this->tagName = "FORM";
 
         $this->form = $form;
@@ -68,14 +71,14 @@ class FormRenderer extends Container
 
         $this->submitButton = $button;
 
-        $this->submitLine = new Container();
+        $this->submitLine = new Container(false);
         $this->submitLine->setClassName("SubmitLine");
 
-        $textSpace = new Container();
+        $textSpace = new Container(false);
         $textSpace->setClassName("TextSpace");
         $this->submitLine->items()->append($textSpace);
 
-        $buttons = new Container();
+        $buttons = new Container(false);
         $buttons->setClassName("Buttons");
 
         $buttons->items()->append($this->submitButton);
@@ -156,7 +159,7 @@ class FormRenderer extends Container
     /**
      * Will set this component name as the form name
      */
-    protected function processAttributes()
+    protected function processAttributes(): void
     {
         parent::processAttributes();
         $this->setName($this->form->getName());

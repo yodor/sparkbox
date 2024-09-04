@@ -29,7 +29,7 @@ class HTMLHead extends Component
 
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct(false);
         $this->tagName = "head";
 
         $this->addMeta("charset","UTF-8");

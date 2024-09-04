@@ -8,9 +8,8 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
     public function __construct(Paginator $paginator)
     {
-
-        parent::__construct();
-
+        parent::__construct(false);
+        $this->setComponentClass("PaginatorComponent");
         $this->paginator = $paginator;
 
     }

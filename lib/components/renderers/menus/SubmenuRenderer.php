@@ -10,9 +10,10 @@ class SubmenuRenderer extends Component implements IMenuItemRenderer
 
     protected $ir_menuitem = NULL;
 
+
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct(false);
         $this->ir_menuitem = new SubmenuItemRenderer();
 
     }

@@ -27,7 +27,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
     /**
      * @var int
      */
-    protected $position = -1;
+    protected int $position = -1;
 
     /**
      * @var URLParameter
@@ -141,7 +141,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
             $edit->render();
         }
 
-        $pipe = new PipeSeparator();
+        $pipe = Action::PipeSeparator();
         $pipe->render();
 
         $delete = $this->actions->getByAction("Delete");
