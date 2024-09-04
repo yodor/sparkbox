@@ -9,6 +9,7 @@ class SessionImage extends SessionUpload
     {
         parent::__construct($input, new ImageUploadResponder());
 
+        $this->setInputAttribute("accept", implode(",", ImageScaler::SupportedMimes));
     }
 
 }

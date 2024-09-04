@@ -9,11 +9,12 @@ class ImageScaler
     const MODE_CROP = 1;
     const MODE_THUMB = 2;
 
+    const TYPE_JPG = "image/jpg";
     const TYPE_JPEG = "image/jpeg";
     const TYPE_PNG = "image/png";
     const TYPE_WEBP = "image/webp";
 
-    protected array $supported_mimes = array(ImageScaler::TYPE_JPEG, ImageScaler::TYPE_PNG, ImageScaler::TYPE_WEBP);
+    const SupportedMimes  = array(ImageScaler::TYPE_JPG, ImageScaler::TYPE_JPEG, ImageScaler::TYPE_PNG, ImageScaler::TYPE_WEBP);
 
 
     /**
@@ -92,7 +93,7 @@ class ImageScaler
      */
     public function setOutputFormat(string $mime)
     {
-        if (!in_array($mime, $this->supported_mimes)) throw new Exception("Unsupported output format type");
+        if (!in_array($mime, ImageScaler::SupportedMimes)) throw new Exception("Unsupported output format type");
 
         $this->output_format = $mime;
     }
