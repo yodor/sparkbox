@@ -8,9 +8,17 @@ class OutputBuffer {
 
     }
 
+    /**
+     * Clear the output buffer doing ob_end_clean if it is started
+     * @return void
+     */
     public function clear()
     {
         $this->data = "";
+        if ($this->started) {
+            ob_end_clean();
+            $this->started = false;
+        }
     }
 
     public function &data() : string
@@ -40,7 +48,7 @@ class OutputBuffer {
         $this->data .= $data;
     }
 
-    public function end(bool $append=true) : void
+    public function end(bool $append=false) : void
     {
         if (!$this->started) return;
 
