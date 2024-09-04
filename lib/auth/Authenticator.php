@@ -28,10 +28,11 @@ abstract class Authenticator
     }
 
     /**
-     * @param int $length
+     * Return random string from sha256 hash of random data
+     * @param int $length Default 8 symbols
      * @return string
      */
-    public static function RandomToken(int $length = 8)
+    public static function RandomToken(int $length = 8) : string
     {
         // Generate string with random data
         $hash_result = hash('sha256', microtime_float() . "|" . rand());
@@ -276,9 +277,9 @@ abstract class Authenticator
     /**
      * Create new random token and store as variable 'LOGIN_TOKEN' in SessionData
      * Use this token in AuthForm HIDDEN field (rand)
-     * @return false|string
+     * @return string
      */
-    public function createLoginToken()
+    public function createLoginToken() : string
     {
         $token = Authenticator::RandomToken(32);
         $this->session->set(SessionData::LOGIN_TOKEN, $token);
