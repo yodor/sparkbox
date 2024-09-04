@@ -51,7 +51,7 @@ class MenuBarComponent extends Component
 
         $this->toggle = new Component();
         $this->toggle->setTagName("A");
-        $this->toggle->contents = "<div></div>";
+        $this->toggle->setContents( "<div></div>");
         $this->toggle->setComponentClass("toggle");
 
 

@@ -162,7 +162,7 @@ abstract class DataIteratorItem extends Component implements IDataResultProcesso
                 $this->setAttribute($attributeName, $this->data[$fieldName]);
             }
             else {
-                $this->clearAttribute($attributeName);
+                $this->removeAttribute($attributeName);
             }
         }
 

@@ -74,7 +74,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
         return $this->dateFormat;
     }
 
-    public function setPhotoSize(int $width, int $height)
+    public function setPhotoSize(int $width, int $height): void
     {
         $this->width = $width;
         $this->height = $height;

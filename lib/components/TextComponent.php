@@ -8,7 +8,7 @@ class TextComponent extends Component
     {
         parent::__construct();
         $this->tagName = "SPAN";
-        $this->contents = $text;
+        $this->setContents($text);
     }
 
 }

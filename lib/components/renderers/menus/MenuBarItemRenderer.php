@@ -36,14 +36,14 @@ class MenuBarItemRenderer extends MenuItemRenderer
             $this->setAttribute("have_submenu", "1");
         }
         else {
-            $this->clearAttribute("have_submenu");
+            $this->removeAttribute("have_submenu");
         }
 
         if ($item->isSelected()) {
             $this->setAttribute("active", "1");
         }
         else {
-            $this->clearAttribute("active");
+            $this->removeAttribute("active");
         }
 
     }

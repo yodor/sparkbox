@@ -84,6 +84,19 @@ class Action extends DataIteratorItem
 
         $this->urlbuilder->setData($data);
 
+        //set contents from DataIteratorItem
+        $this->setContents($this->value);
+
+        //override only if not empty
+        if ($this->action_as_contents) {
+
+            $action = $this->getAttribute("action");
+
+            if ($action) {
+                $this->setContents($action);
+            }
+        }
+
     }
 
     protected function processAttributes()
@@ -94,28 +107,6 @@ class Action extends DataIteratorItem
 
         if ($url) {
             $this->setAttribute("href", $url);
-        }
-
-    }
-
-    protected function renderImpl()
-    {
-        if ($this->contents) {
-            parent::renderImpl();
-            return;
-        }
-
-        if ($this->action_as_contents) {
-
-            $action = $this->getAttribute("action");
-            if (!$action) return;
-
-            if ($this->translation_enabled) {
-                echo tr($action);
-            }
-            else {
-                echo $action;
-            }
         }
 
     }
@@ -134,7 +125,8 @@ class Action extends DataIteratorItem
     {
         foreach ($actions as $item) {
             if ($item instanceof MenuItem) {
-                $action = new Action("", $item->getHref(), array());
+                $action = new Action();
+                $action->getURLBuilder()->buildFrom($item->getHref());
                 $action->translation_enabled = $translate;
                 $action->setContents($item->getTitle());
                 $action->render();
@@ -157,7 +149,7 @@ class PipeSeparator extends Action
     {
         parent::__construct("Pipe");
         $this->action_as_contents = false;
-        $this->contents = " | ";
+        $this->setContents(" | ");
         $this->tagName = "SPAN";
         $this->translation_enabled = FALSE;
     }
@@ -171,6 +163,7 @@ class RowSeparator extends Action
         $this->action_as_contents = false;
         $this->tagName = "SPAN";
         $this->translation_enabled = FALSE;
+        $this->setContents("");
     }
 }
 

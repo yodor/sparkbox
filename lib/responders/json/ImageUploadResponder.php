@@ -12,7 +12,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
     protected $width = -1;
     protected $height = -1;
 
-    public function setPhotoSize(int $width, int $height)
+    public function setPhotoSize(int $width, int $height): void
     {
         $this->width = $width;
         $this->height = $height;

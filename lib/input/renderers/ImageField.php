@@ -17,7 +17,7 @@ class ImageField extends PlainUpload implements IPhotoRenderer
         $this->setInputAttribute("accept", implode(",", ImageScaler::SupportedMimes));
     }
 
-    public function setPhotoSize(int $width, int $height)
+    public function setPhotoSize(int $width, int $height): void
     {
         $this->width = $width;
         $this->height = $height;

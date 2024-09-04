@@ -24,7 +24,7 @@ class SubmenuItemRenderer extends MenuItemRenderer
             $this->setAttribute("selected", 1);
         }
         else {
-            $this->clearAttribute("selected");
+            $this->removeAttribute("selected");
         }
     }
 

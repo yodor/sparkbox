@@ -17,7 +17,7 @@ class SelectOption extends DataIteratorItem
             $this->setAttribute("SELECTED", "");
         }
         else {
-            $this->clearAttribute("SELECTED");
+            $this->removeAttribute("SELECTED");
         }
     }
 
@@ -28,7 +28,7 @@ class SelectOption extends DataIteratorItem
             $this->setAttribute("SELECTED", "");
         }
         else {
-            $this->clearAttribute("SELECTED");
+            $this->removeAttribute("SELECTED");
         }
     }
 

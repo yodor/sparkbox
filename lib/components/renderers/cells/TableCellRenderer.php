@@ -86,7 +86,7 @@ class TableCellRenderer extends Component implements IDataResultProcessor
                 $this->setAttribute($field, $data[$field]);
             }
             else {
-                $this->clearAttribute($field);
+                $this->removeAttribute($field);
             }
         }
     }

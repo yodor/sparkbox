@@ -42,7 +42,7 @@ class ImagePopup extends Component implements IPhotoRenderer
             $this->image->setAttribute("loading", "lazy");
         }
         else {
-            $this->image->clearAttribute("loading");
+            $this->image->removeAttribute("loading");
         }
     }
 
@@ -140,7 +140,7 @@ class ImagePopup extends Component implements IPhotoRenderer
 
     }
 
-    public function setPhotoSize(int $width, int $height)
+    public function setPhotoSize(int $width, int $height): void
     {
         // TODO: Implement setPhotoSize() method.
         $this->width = $width;

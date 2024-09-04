@@ -48,7 +48,7 @@ class MCETextArea extends InputField
 
     public function startRender()
     {
-        $this->contents = htmlentities(mysql_real_unescape_string($this->input->getValue()), ENT_QUOTES, "UTF-8");
+        $this->setContents(attributeValue($this->input->getValue()));
         parent::startRender();
     }
 
@@ -66,7 +66,7 @@ class MCETextArea extends InputField
         <?php
     }
 
-    protected function prepareAttributes()
+    protected function prepareAttributes() : string
     {
         $ret = parent::prepareAttributes();
         $ret.= parent::prepareInputAttributes();

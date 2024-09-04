@@ -77,7 +77,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $this->blob_field = $blob_field;
     }
 
-    public function setPhotoSize(int $width, int $height)
+    public function setPhotoSize(int $width, int $height): void
     {
         $this->image_popup->setPhotoSize($width, $height);
     }
@@ -199,14 +199,14 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             $this->image_popup->setAttribute("href", $this->action->getURL()->url());
         }
         else {
-            $this->image_popup->clearAttribute("href");
+            $this->image_popup->removeAttribute("href");
         }
 
         if (isset($row["caption"])) {
             $this->image_popup->setAttribute("caption", $row["caption"]);
         }
         else {
-            $this->image_popup->clearAttribute("caption");
+            $this->image_popup->removeAttribute("caption");
         }
 
     }

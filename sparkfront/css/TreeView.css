@@ -93,7 +93,7 @@
     background-size:12%;
 }
 
-.TreeView .Node .Action[action='TextTreeItemAction'] {
+.TreeView .Node .Action {
     display: table-cell;
     vertical-align: middle;
 
@@ -107,13 +107,13 @@
 
 }
 
-.TreeView .Node[active="1"] .Action[action='TextTreeItemAction'] {
+.TreeView .Node[active="1"] .Action {
 
     text-decoration: underline;
     font-weight: bold;
 }
 
-.TreeView .node_actions {
+.TreeView .Node .node_actions {
     display: table-cell;
 
     vertical-align: middle;
@@ -121,7 +121,7 @@
 
 }
 
-.TreeView .node_actions A {
+.TreeView .Node .node_actions .Action {
 
     display: inline-block;
     margin-left: 5px;

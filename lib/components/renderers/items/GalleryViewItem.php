@@ -79,7 +79,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
             $tooltip .= tr("Caption") . ": " . $data["caption"] . "<BR>";
         }
         else {
-            $this->image_popup->clearAttribute("caption");
+            $this->image_popup->removeAttribute("caption");
         }
 
         if (isset($data["date_upload"])) {
@@ -98,7 +98,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
     }
 
-    public function setPhotoSize(int $width, int $height)
+    public function setPhotoSize(int $width, int $height): void
     {
         $this->image_popup->setPhotoSize($width, $height);
     }

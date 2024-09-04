@@ -5,9 +5,12 @@ include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
 include_once("components/renderers/ICacheable.php");
 include_once("storage/CacheEntry.php");
+include_once("utils/OutputBuffer.php");
 
 class Component extends SparkObservable implements IRenderer, IHeadContents, ICacheable
 {
+
+    protected OutputBuffer $buffer;
 
     protected bool $cacheable = false;
 
@@ -47,8 +50,6 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
      */
     protected string $component_class = "";
 
-    protected string $contents = "";
-
     public bool $translation_enabled = FALSE;
     public bool $render_tooltip = TRUE;
     public bool $render_enabled = TRUE;
@@ -61,8 +62,9 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
      */
     public function __construct()
     {
-
         parent::__construct();
+
+        $this->buffer = new OutputBuffer();
 
         $class_chain = class_parents($this);
         array_pop($class_chain);
@@ -80,10 +82,16 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     }
 
+    public function buffer() : OutputBuffer
+    {
+        return $this->buffer;
+    }
+
     public function setCacheable(bool $mode) : void
     {
         $this->cacheable = true;
     }
+
     public function isCacheable() : bool
     {
         return $this->cacheable;
@@ -149,12 +157,12 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     public function setContents(string $contents) : void
     {
-        $this->contents = $contents;
+        $this->buffer->set($contents);
     }
 
     public function getContents(): string
     {
-        return $this->contents;
+        return $this->buffer->get();
     }
 
     /**
@@ -170,7 +178,10 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     {
         $this->processAttributes();
         $attrs = $this->prepareAttributes();
-        echo "<$this->tagName $attrs>\n";
+        echo "<";
+        echo $this->tagName;
+        if (!empty($attrs)) echo " ".$attrs;
+        echo ">";
 
         $this->renderCaption();
     }
@@ -193,10 +204,10 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     protected function renderImpl()
     {
         if ($this->translation_enabled) {
-            echo tr($this->contents);
+            echo tr($this->buffer->get());
         }
         else {
-            echo $this->contents;
+            echo $this->buffer->get();
         }
     }
 
@@ -313,7 +324,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
             $this->setAttribute("tooltip", $text);
         }
         else {
-            $this->clearAttribute("tooltip");
+            $this->removeAttribute("tooltip");
         }
     }
 
@@ -333,7 +344,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->attributes;
     }
 
-    public function getStyles()
+    public function getStyles() : array
     {
         return $this->style;
     }
@@ -379,11 +390,10 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
     public function setAttribute(string $name, string $value)
     {
-
-        $this->attributes[$name] = $value;
+        $this->attributes[$name] = trim($value);
     }
 
-    public function clearAttribute(string $name)
+    public function removeAttribute(string $name) : void
     {
         if (isset($this->attributes[$name])) {
             unset($this->attributes[$name]);
@@ -407,7 +417,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         $this->style[$name] = $value;
     }
 
-    public function getStyleAttribute($name): string
+    public function getStyleAttribute(string $name): string
     {
         if (isset($this->style[$name])) return $this->style[$name];
         return "";
@@ -422,28 +432,19 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
             if (!$this->render_tooltip && strcmp($name, "tooltip") == 0) continue;
 
-            if (is_array($value)) {
-                debug("component attribute value is array: " . get_class($this) . ": $name");
-            }
-            else if (is_null($value) || strlen($value) < 1) {
-
+            //value can be "0"
+            if (is_null($value) || strlen($value) < 1) {
                 $attributes[] = $name;
-
+                continue;
             }
-            else {
 
-                $attribute_value = attributeValue($value);
-
-                if (in_array($name, $this->json_attributes)) {
-                    $attributes[] = $name . "=" . json_string($attribute_value);
-                }
-                //                else if (in_array($name, $this->special_attributes)) {
-                //                    $attributes[] = $name . "='" . htmlspecialchars(trim($attribute_value)) . "'";
-                //                }
-                else {
-                    $attributes[] = $name . "='" . $attribute_value . "'";
-                }
+            if (is_array($value) || in_array($name, $this->json_attributes)) {
+                //debug("component attribute value is array: " . get_class($this) . ": $name");
+                $value = json_encode($value);
             }
+
+            $attributes[] = $name . "='" . attributeValue($value) . "'";
+
         }
 
         return implode(" ", $attributes);
@@ -453,51 +454,45 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     public function getStyleText(): string
     {
 
+        $result = "";
+
         $styles = array();
-
         foreach ($this->style as $style_name => $value) {
-            if (strlen($value) < 1) continue;
-
+            if (empty($value)) continue;
             $styles[] = $style_name . ":" . $value;
         }
 
         if (count($styles) > 0) {
-            $style_text = implode(";", $styles);
-
-            return " style='$style_text' ";
+            $result = "style='".attributeValue(implode("; ", $styles))."'";
         }
-        else {
-            return "";
-        }
+        return $result;
 
     }
 
-    protected function prepareAttributes()
+    protected function prepareAttributes() : string
     {
-        $attrs = "";
+        $css = array();
 
-        $cssClass = array();
-
-        if (strlen($this->component_class) > 0) {
-            $cssClass[] = trim($this->component_class);
+        //automatic class inheritance
+        $componentClass = trim($this->getComponentClass());
+        if (!empty($componentClass)) {
+            $css[] = $componentClass;
+        }
+        //this component class
+        $className = trim($this->getClassName());
+        if (!empty($className)) {
+            $css[] = $className;
         }
 
-        $className = $this->getClassName();
-        if (strlen($className) > 0) {
-            $cssClass[] = $this->getClassName();
-        }
+        $attrs = array();
+        $attrs[] = "class='".attributeValue(implode(" ", $css))."'";
+        $attrs[] = $this->getAttributesText();
+        $attrs[] = $this->getStyleText();
 
-        if (count($cssClass)>0) {
-            $attrs .= " class='" . implode(" ", $cssClass) . "' ";
-        }
-
-        $attrs .= $this->getAttributesText();
-        $attrs .= $this->getStyleText();
-
-        return $attrs;
+        return implode(" ", $attrs);
     }
 
-    public function appendAttributes(array $attributes)
+    public function appendAttributes(array $attributes) : void
     {
         foreach ($attributes as $name => $value) {
             $this->attributes[$name] = $value;

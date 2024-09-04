@@ -58,7 +58,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
         $this->image_popup->setRelation($name);
     }
 
-    public function setPhotoSize(int $width, int $height)
+    public function setPhotoSize(int $width, int $height): void
     {
         $this->image_popup->setPhotoSize($width, $height);
     }

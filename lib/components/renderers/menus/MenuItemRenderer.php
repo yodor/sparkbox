@@ -30,9 +30,9 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
 
         $this->item = $item;
 
-        $this->linkTag->clearAttribute("target");
-        $this->linkTag->clearAttribute("tooltip");
-        $this->linkTag->clearAttribute("href");
+        $this->linkTag->removeAttribute("target");
+        $this->linkTag->removeAttribute("tooltip");
+        $this->linkTag->removeAttribute("href");
         $this->linkTag->setContents("");
 
         if ($item->getTooltip()) {
