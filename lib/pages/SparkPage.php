@@ -333,9 +333,10 @@ class SparkPage extends HTMLPage implements IActionCollection
         return $this->preferred_title;
     }
 
-    public function obCallback(string &$buffer)
+    protected function prepareMetaTitle()
     {
-        $title = $this->preferred_title;
+
+        $this->head()->setTitle($this->preferred_title);
 
         $meta_keywords = "";
         $meta_description = "";
@@ -356,13 +357,10 @@ class SparkPage extends HTMLPage implements IActionCollection
             $meta_description = $this->description;
         }
 
-        $replace = array("%title%"            => strip_tags($title), "%meta_keywords%" => prepareMeta($meta_keywords, 150),
-                         "%meta_description%" => prepareMeta($meta_description, 150));
-
-        $buffer = strtr($buffer, $replace);
+        $this->head()->addMeta("keywords", $meta_keywords);
+        $this->head()->addMeta("description", $meta_description);
 
     }
-
     /**
      * Start rendering of this page
      *
@@ -374,14 +372,19 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function startRender()
     {
-
+        //try JSONResponders first
         if ($this->getURL()->contains("JSONRequest")) {
             //will 'exit' script always as JSONRequest is found as request URL parameter
             debug("Handling JSONRequest");
             RequestController::processJSONResponders();
         }
 
-        ob_start();
+        //prepare the title
+        $this->constructTitle();
+
+        $this->prepareMetaTitle();
+
+        //ob_start();
 
         parent::startRender();
 
@@ -406,10 +409,10 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         parent::finishRender();
 
-        $buffer = ob_get_contents();
-        ob_end_clean();
-        $this->obCallback($buffer);
-        echo $buffer;
+       // $buffer = ob_get_contents();
+       // ob_end_clean();
+        //$this->obCallback($buffer);
+       // echo $buffer;
     }
 
     /**

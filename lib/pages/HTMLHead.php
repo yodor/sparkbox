@@ -4,6 +4,8 @@ include_once("components/Component.php");
 class HTMLHead extends Component
 {
 
+    protected string $title = "%title%";
+
     /**
      * @var array IPageComponent
      */
@@ -57,7 +59,7 @@ class HTMLHead extends Component
 
         parent::startRender();
 
-        echo "<TITLE>%title%</TITLE>\n";
+        echo "<TITLE>$this->title</TITLE>\n";
 
         foreach ($this->head_components as $idx => $cmp) {
             $css_files = $cmp->requiredStyle();
@@ -160,6 +162,15 @@ class HTMLHead extends Component
 
     }
 
+    public function setTitle(string $text) : void
+    {
+        $this->title = $text;
+    }
+
+    public function getTitle() : string
+    {
+        return $this->title;
+    }
     /**
      * Adds a JavaScript file to page JavaScripts collection
      * @param string $filename The filename of the javascript.

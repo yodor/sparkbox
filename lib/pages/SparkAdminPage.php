@@ -1,5 +1,5 @@
 <?php
-include_once("pages/SparkPage.php");
+include_once("pages/BufferedPage.php");
 
 include_once("auth/AdminAuthenticator.php");
 include_once("beans/AdminAccessBean.php");
@@ -20,7 +20,7 @@ include_once("utils/Navigation.php");
 
 include_once("auth/AuthContext.php");
 
-class SparkAdminPage extends SparkPage
+class SparkAdminPage extends BufferedPage
 {
 
 

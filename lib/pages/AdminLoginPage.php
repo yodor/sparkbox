@@ -1,7 +1,7 @@
 <?php
-include_once("pages/SparkPage.php");
+include_once("pages/BufferedPage.php");
 
-class AdminLoginPage extends SparkPage
+class AdminLoginPage extends BufferedPage
 {
 
     public function __construct()
