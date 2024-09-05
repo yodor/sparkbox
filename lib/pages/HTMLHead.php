@@ -237,7 +237,7 @@ class HTMLHead extends Component
      */
     public function addCSS(string $filename, string $className = "", bool $prepend = FALSE, bool $preload = FALSE)
     {
-        debug("Adding CSS: ".$filename." - Prepend: $prepend");
+        //debug("Adding CSS: ".$filename." - Prepend: $prepend");
         //debug
 //        if (!$className) $className = get_class($this);
 //        $usedBy = array();

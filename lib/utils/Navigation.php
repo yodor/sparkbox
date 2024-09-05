@@ -18,9 +18,15 @@ class Navigation
         return $this->urls;
     }
 
-    public function push(string $pageName)
+    /**
+     * Push current page URL to the stack using key $pageName
+     * @param string $pageName
+     * @return void
+     */
+    public function push(string $pageName) : void
     {
 
+        //current URL
         $pageURL = SparkPage::instance()->getURL();
 
         debug("Navigated to: ".SparkPage::instance()->getPageURL()." - Navigation contents: ".print_r($this->urls,true));
@@ -38,9 +44,10 @@ class Navigation
                 $title = $stored_urls->key();
                 $href = $stored_urls->current();
 
+                //same page ?
                 $urlbuild->buildFrom($href);
 
-                if (strcmp($urlbuild->getScriptName(), $pageURL->getScriptName()) == 0) {
+                if ($urlbuild == $pageURL) {
                     debug("Current page url is already in the navigation: '$title' - Clearing remaining entries");
                     break;
                 }

@@ -172,16 +172,14 @@ class SparkAdminPage extends SparkPage
         //previous entries
         //$navItems = $this->navigation->entries();
         //echo ("NavEntry count: ".count($navItems));
+        $dynmenu = $this->menu_bar->getMainMenu();
+        $dynmenu->update($this->page_menu);
 
         //this page caption
         if ($this->name) {
             $this->preferred_title = $this->name;
         }
         else {
-            $dynmenu = $this->menu_bar->getMainMenu();
-
-            $dynmenu->update($this->page_menu);
-
             $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());
         }
 
