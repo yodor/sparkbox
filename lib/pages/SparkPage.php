@@ -54,33 +54,28 @@ class SparkPage extends HTMLPage implements IActionCollection
 
 
     /**
-     * @var array IHeadContents
+     * @var array IPageComponent
      */
-    protected $page_components = array();
+    protected array $page_components = array();
 
 
     /**
      * Meta tag 'Description' overload. If not empty is used instead of ConfigBean 'seo' section value
      */
-    public $description = "";
+    protected string $description = "";
 
     /**
      * Meta tag 'Keywords' overload. If not empty is used instead of ConfigBean 'seo' section value
      */
-    public $keywords = "";
+    protected string $keywords = "";
 
 
     /**
      * @var ActionCollection
      */
-    protected $actions;
+    protected ActionCollection $actions;
 
-    /**
-     * @var FBPixel|null
-     */
-    protected $fbpixel;
 
-    protected $gtag_objects = array();
 
     protected $canonical_enabled = false;
 
@@ -88,16 +83,17 @@ class SparkPage extends HTMLPage implements IActionCollection
      * Array holding the url parameter names that will be present in the canonical url version of 'this' page
      * @var array
      */
-    protected $canonical_params = array();
+    protected array $canonical_params = array();
 
-    public function addGTAGObject(GTAGObject $obj)
+
+    public function setMetaKeywords(string $keywords) : void
     {
-        $this->gtag_objects[] = $obj;
+        $this->keywords = $keywords;
     }
 
-    public function getFacebookPixel(): ?FBPixel
+    public function setMetaDescription(string $description) : void
     {
-        return $this->fbpixel;
+        $this->description = $description;
     }
 
     /**
@@ -127,73 +123,40 @@ class SparkPage extends HTMLPage implements IActionCollection
     }
 
     /**
-     * Finish rendering of the HEAD section
-     * This overload enables the google analytics script to be read from the config section from DB
+     * Component constructor calls this method
+     *
+     * Adds required CSS and JS files to the head for components implementing IHeadContents
+     * Adds component to page_components if implementing IPageComponent
+     *
+     * @param Component $cmp
+     * @return void
      */
-    protected function headEnd()
-    {
-        if (DB_ENABLED) {
-            $config = ConfigBean::Factory();
-            $config->setSection("seo");
-
-            $gtag = new GTAG();
-
-            $googleID_analytics = $config->get("googleID_analytics");
-            if ($googleID_analytics) {
-                $gtag->setID($googleID_analytics);
-                echo $gtag->script();
-            }
-
-            $googleID_ads = $config->get("googleID_ads");
-            if ($googleID_ads) {
-                $gtag->setID($googleID_ads);
-                echo $gtag->script();
-            }
-        }
-
-        if ($this->fbpixel) {
-            echo $this->fbpixel->script();
-        }
-
-        foreach ($this->gtag_objects as $idx => $object) {
-            if (!($object instanceof GTAGObject)) continue;
-            echo $object->script();
-        }
-
-        if ($this->canonical_enabled) {
-            $builder = $this->getURL();
-            $url_parameters = $builder->getParameterNames();
-            foreach ($url_parameters as $idx=>$parameter_name) {
-                if (in_array($parameter_name, $this->canonical_params)) continue;
-                $builder->remove($parameter_name);
-            }
-            $canonical_href = fullURL($builder->url());
-            echo "<link rel='canonical' href='$canonical_href' />";
-        }
-
-        $url = fullURL($this->getURL()->url());
-        //X-default tags are recommended, but not mandatory
-        echo "<link rel='alternate' hreflang='x-default' href='$url'/>";
-
-        echo "<link rel='alternate' hreflang='".DEFAULT_LOCALE."' href='$url'/>";
-
-        parent::headEnd();
-    }
-
     public function componentCreated(Component $cmp)
     {
         if ($cmp instanceof IPageComponent) {
             $this->page_components[] = $cmp;
         }
 
+        //page constructors add css files directly to the head section
+        //use prepend to allow overload of component defined styles
         if ($cmp instanceof IHeadContents) {
-            $this->head()->addHeadComponent($cmp);
+            $css_files = $cmp->requiredStyle();
+            foreach ($css_files as $key => $url) {
+                $this->head()->addCSS($url, "", true);
+            }
+
+            $js_files = $cmp->requiredScript();
+            foreach ($js_files as $key => $url) {
+                //no prepend here
+                $this->head()->addJS($url, "", FALSE);
+            }
         }
     }
 
 
     /**
-     * SparkPage constructor.
+     * Set the default static instance
+     * Sets default css / js
      * @throws Exception
      */
     public function __construct()
@@ -238,29 +201,6 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $dialog = new MessageDialog();
 
-        if (DB_ENABLED) {
-            $config = ConfigBean::Factory();
-            $config->setSection("seo");
-
-            $facebookID_pixel = $config->get("facebookID_pixel");
-            if ($facebookID_pixel) {
-                $this->fbpixel = new FBPixel($facebookID_pixel);
-            }
-
-            $adsID = $config->get("googleID_ads", "");
-            $conversionID = $config->get("googleID_ads_conversion", "");
-            if ($adsID && $conversionID) {
-                $obj = new GTAGObject();
-                $obj->setCommand(GTAGObject::COMMAND_EVENT);
-                $obj->setType("conversion");
-                $obj->setParamTemplate("{'send_to': '%googleID_ads_conversion%'}");
-                $obj->setName("googleID_ads_conversion");
-                $data = array("googleID_ads_conversion"=>$conversionID);
-                $obj->setData($data);
-                $this->addGTAGObject($obj);
-            }
-
-        }
     }
 
     public function authorize()
@@ -333,10 +273,27 @@ class SparkPage extends HTMLPage implements IActionCollection
         return $this->preferred_title;
     }
 
-    protected function prepareMetaTitle()
+    /**
+     * Override to set the page title
+     * Final place to set the contents of $this->preferred_title before head output is started
+     * @return void
+     */
+    protected function constructTitle() : void
+    {
+
+    }
+
+    /**
+     * Assign the title, keywords and description to the head section
+     * Read DB for default values of keywords and description if empty
+     * Process the meta values to max 150 symbols
+     * @return void
+     */
+    protected function prepareMetaTitle() : void
     {
 
         $this->head()->setTitle($this->preferred_title);
+        $this->head()->addOGTag("title", $this->preferred_title);
 
         $meta_keywords = "";
         $meta_description = "";
@@ -357,8 +314,12 @@ class SparkPage extends HTMLPage implements IActionCollection
             $meta_description = $this->description;
         }
 
+        $meta_keywords = prepareMeta($meta_keywords, 150);
+        $meta_description = prepareMeta($meta_description, 150);
+
         $this->head()->addMeta("keywords", $meta_keywords);
         $this->head()->addMeta("description", $meta_description);
+        $this->head()->addOGTag("description", $meta_description);
 
     }
     /**
@@ -386,7 +347,9 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         //ob_start();
 
+        //
         parent::startRender();
+        //body started here
 
         //regular responders to commands
         RequestController::processResponders();
@@ -403,8 +366,10 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function finishRender()
     {
+        //append message dialog templates
         $this->renderPageComponents();
 
+        //show session alerts
         $this->processMessages();
 
         parent::finishRender();

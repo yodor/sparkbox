@@ -20,7 +20,7 @@ include_once("utils/Navigation.php");
 
 include_once("auth/AuthContext.php");
 
-class SparkAdminPage extends BufferedPage
+class SparkAdminPage extends SparkPage
 {
 
 
@@ -36,7 +36,7 @@ class SparkAdminPage extends BufferedPage
 
     protected $menu_bar = NULL;
 
-    protected $navigation;
+    protected Navigation $navigation;
 
     public function __construct()
     {
@@ -168,16 +168,22 @@ class SparkAdminPage extends BufferedPage
 
     }
 
-    public function startRender()
+    protected function constructTitle(): void
     {
-        //allow processing of ajax responders first
-        parent::startRender();
-
         $dynmenu = $this->menu_bar->getMainMenu();
 
         $dynmenu->update($this->page_menu);
 
         $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());
+    }
+
+    public function startRender()
+    {
+
+        //allow processing of ajax responders first
+        parent::startRender();
+
+
 
         echo "\n<!-- startRender SparkAdminPage -->\n";
 
@@ -207,6 +213,8 @@ class SparkAdminPage extends BufferedPage
 
         echo "<td class='page_area'>";
         echo "\n\n";
+
+        $dynmenu = $this->menu_bar->getMainMenu();
 
         if (!$this->name) {
             $arr = $dynmenu->getSelectedPath();

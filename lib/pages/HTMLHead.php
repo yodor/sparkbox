@@ -6,14 +6,6 @@ class HTMLHead extends Component
 
     protected string $title = "%title%";
 
-    /**
-     * @var array IPageComponent
-     */
-    protected $head_components = array();
-
-
-
-
     protected array $opengraph_tags = array();
 
     /**
@@ -27,31 +19,126 @@ class HTMLHead extends Component
      * array of Strings representing URLs of all JavaScript that are used in this page
      */
     protected array $js_files = array();
-
-
     protected array $async_defer = array();
     protected array $preload = array();
 
     protected string $favicon = "";
+
     /**
      * property array of key=>value strings used to render all meta tags of this page
      */
     protected array $meta = array();
 
+    /**
+     * Array holding the url parameter names that will be present in the canonical url version of 'this' page
+     * @var array
+     */
+    protected array $canonical_params = array();
+
+    /**
+     * @var FBPixel|null
+     */
+    protected ?FBPixel $fbpixel = null;
+
+    protected array $gtag_objects = array();
+
+
+
     public function __construct()
     {
         parent::__construct(false);
+        //no css class
+        $this->setClassName("");
+        $this->setComponentClass("");
+
         $this->tagName = "head";
 
         $this->addMeta("charset","UTF-8");
         $this->addMeta("Content-Type", "text/html;charset=utf-8");
         $this->addMeta("Content-Style-Type", "text/css");
 
+        //default favicon
         $this->favicon = "//" . SITE_DOMAIN . LOCAL."/favicon.ico";
 
-        //no css class
-        $this->setClassName("");
-        $this->setComponentClass("");
+
+
+        if (DB_ENABLED) {
+            $config = ConfigBean::Factory();
+            $config->setSection("seo");
+
+            $facebookID_pixel = $config->get("facebookID_pixel");
+            if ($facebookID_pixel) {
+                $this->fbpixel = new FBPixel($facebookID_pixel);
+            }
+
+            $adsID = $config->get("googleID_ads", "");
+            $conversionID = $config->get("googleID_ads_conversion", "");
+            if ($adsID && $conversionID) {
+                $obj = new GTAGObject();
+                $obj->setCommand(GTAGObject::COMMAND_EVENT);
+                $obj->setType("conversion");
+                $obj->setParamTemplate("{'send_to': '%googleID_ads_conversion%'}");
+                $obj->setName("googleID_ads_conversion");
+                $data = array("googleID_ads_conversion"=>$conversionID);
+                $obj->setData($data);
+                $this->addGTAGObject($obj);
+            }
+
+        }
+    }
+
+    public function setTitle(string $text) : void
+    {
+        $this->title = $text;
+    }
+
+    public function getTitle() : string
+    {
+        return $this->title;
+    }
+
+    /**
+     *  Add meta tag to be rendered into this page.
+     * @param $name string The name attribute to add to the Meta collection
+     * @param $content string The content attribute
+     */
+    public function addMeta(string $name, string $content)
+    {
+        $this->meta[$name] = $content;
+    }
+    /**
+     *  Get the content attribute of the meta
+     * @param $name string The name attribute to
+     * @return string The content attribute as set to the $name
+     */
+    public function getMeta(string $name) : string
+    {
+        return $this->meta[$name] ?? "";
+    }
+
+    public function addCanonicalParameter(string ...$name) : void
+    {
+        $this->canonical_params[] = $name;
+    }
+
+    public function canonicalParameters() : array
+    {
+        return $this->canonical_params;
+    }
+
+    public function addGTAGObject(GTAGObject $obj)
+    {
+        $this->gtag_objects[] = $obj;
+    }
+
+    public function getFacebookPixel(): ?FBPixel
+    {
+        return $this->fbpixel;
+    }
+
+    protected function renderImpl()
+    {
+
     }
 
     public function startRender()
@@ -60,26 +147,6 @@ class HTMLHead extends Component
         parent::startRender();
 
         echo "<TITLE>$this->title</TITLE>\n";
-
-        foreach ($this->head_components as $idx => $cmp) {
-            $css_files = $cmp->requiredStyle();
-            if (!is_array($css_files)) {
-                echo $css_files;
-            }
-            foreach ($css_files as $key => $url) {
-                $this->addCSS($url, get_class($cmp), TRUE);
-            }
-            $js_files = $cmp->requiredScript();
-            if (!is_array($js_files)) {
-                echo $js_files;
-            }
-            else {
-                foreach ($js_files as $key => $url) {
-                    //no prepend here
-                    $this->addJS($url, get_class($cmp), FALSE);
-                }
-            }
-        }
 
         $this->renderMeta();
         echo "\n";
@@ -96,6 +163,53 @@ class HTMLHead extends Component
         echo "<link rel='shortcut icon' href='$this->favicon'>";
         echo "\n";
 
+        if (DB_ENABLED) {
+            $config = ConfigBean::Factory();
+            $config->setSection("seo");
+
+            $gtag = new GTAG();
+
+            $googleID_analytics = $config->get("googleID_analytics");
+            if ($googleID_analytics) {
+                $gtag->setID($googleID_analytics);
+                echo $gtag->script();
+            }
+
+            $googleID_ads = $config->get("googleID_ads");
+            if ($googleID_ads) {
+                $gtag->setID($googleID_ads);
+                echo $gtag->script();
+            }
+        }
+
+        if ($this->fbpixel) {
+            echo $this->fbpixel->script();
+        }
+
+        foreach ($this->gtag_objects as $idx => $object) {
+            if (!($object instanceof GTAGObject)) continue;
+            echo $object->script();
+        }
+
+        $url = fullURL(SparkPage::Instance()->getURL()->url());
+        //X-default tags are recommended, but not mandatory
+        echo "<link rel='alternate' hreflang='x-default' href='$url'>";
+
+        echo "<link rel='alternate' hreflang='".DEFAULT_LOCALE."' href='$url'>";
+
+
+        if (count($this->canonical_params)>0) {
+            $builder = SparkPage::Instance()->getURL();
+            $parameters = $builder->getParameterNames();
+            foreach ($parameters as $name) {
+                if (in_array($name, $this->canonical_params)) continue;
+                $builder->remove($name);
+            }
+            $canonical_href = fullURL($builder->url());
+            echo "<link rel='canonical' href='$canonical_href'>";
+        }
+
+
         ?>
         <!-- SparkPage local script start -->
         <script type='text/javascript'>
@@ -107,34 +221,12 @@ class HTMLHead extends Component
         <?php
     }
 
-    public function addHeadComponent(Component $component) : void
-    {
-        $this->head_components[] = $component;
 
-    }
-    protected function renderImpl()
+    protected function renderMeta() : void
     {
-
-    }
-
-    /**
-     *  Add meta tag to be rendered into this page.
-     * @param $name string The name attribute to add to the Meta collection
-     * @param $content string The content attribute
-     */
-    public function addMeta(string $name, string $content)
-    {
-        $this->meta[$name] = $content;
-    }
-
-    /**
-     *  Get the content attribute of the meta
-     * @param $name string The name attribute to
-     * @return string The content attribute as set to the $name
-     */
-    public function getMeta(string $name) : string
-    {
-        return isset($this->meta[$name]) ? $this->meta[$name] : "";
+        foreach ($this->meta as $name => $content) {
+            echo "<META name='" . attributeValue($name) . "' content='" . attributeValue($content) . "'>\n";
+        }
     }
 
     /**
@@ -143,6 +235,7 @@ class HTMLHead extends Component
      */
     public function addCSS(string $filename, string $className = "", bool $prepend = FALSE, bool $preload = FALSE)
     {
+        debug("Adding CSS: ".$filename." - Prepend: $prepend");
         //debug
 //        if (!$className) $className = get_class($this);
 //        $usedBy = array();
@@ -162,15 +255,7 @@ class HTMLHead extends Component
 
     }
 
-    public function setTitle(string $text) : void
-    {
-        $this->title = $text;
-    }
 
-    public function getTitle() : string
-    {
-        return $this->title;
-    }
     /**
      * Adds a JavaScript file to page JavaScripts collection
      * @param string $filename The filename of the javascript.
@@ -212,19 +297,13 @@ class HTMLHead extends Component
         $this->opengraph_tags[$tag_name] = $tag_content;
     }
 
-    protected function renderMeta() : void
-    {
-        foreach ($this->meta as $name => $content) {
-            echo "<META name='" . htmlentities($name) . "' content='" . htmlentities($content) . "'>\n";
-        }
-    }
-
     protected function renderOGMeta() : void
     {
         foreach ($this->opengraph_tags as $tag_name => $tag_content) {
             echo "<META property='og:$tag_name' content='" . attributeValue($tag_content) . "'>\n";
         }
     }
+
 
     protected function renderCSS()
     {
