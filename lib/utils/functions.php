@@ -97,8 +97,12 @@ function prepareMeta(string $value, int $max_length = -1)
     $value = str_replace("\\r\\n", " ", $value);
     $value = replace_tags($value);
     $value = preg_replace("/[^\wA-Za-z0-9\-\%\?\!\;\:\.\, ]/u", "",$value);
+
     if ($max_length>0) {
+        //cut to the exact size
         $value = mb_substr($value, 0, $max_length);
+        //reverse to the last space
+        $value = mb_substr($value, 0, mb_strrpos($value, " "));
     }
     return $value;
 }

@@ -58,12 +58,6 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     protected $page_components = array();
 
-    /**
-     * @var array IPageComponent
-     */
-    protected $head_components = array();
-
-
 
     /**
      * Meta tag 'Description' overload. If not empty is used instead of ConfigBean 'seo' section value
@@ -186,18 +180,14 @@ class SparkPage extends HTMLPage implements IActionCollection
         parent::headEnd();
     }
 
-    public function addComponent(Component $cmp)
+    public function componentCreated(Component $cmp)
     {
         if ($cmp instanceof IPageComponent) {
-            $key = $cmp->hash();
-            $found = array_key_exists($key, $this->page_components);
-            if (!$found) $this->page_components[$key] = $cmp;
+            $this->page_components[] = $cmp;
         }
 
         if ($cmp instanceof IHeadContents) {
-            $key = $cmp->hash();
-            $found = array_key_exists($key, $this->head_components);
-            if (!$found) $this->head_components[$key] = $cmp;
+            $this->head()->addHeadComponent($cmp);
         }
     }
 
@@ -366,8 +356,8 @@ class SparkPage extends HTMLPage implements IActionCollection
             $meta_description = $this->description;
         }
 
-        $replace = array("%title%"            => strip_tags($title), "%meta_keywords%" => prepareMeta($meta_keywords),
-                         "%meta_description%" => prepareMeta($meta_description));
+        $replace = array("%title%"            => strip_tags($title), "%meta_keywords%" => prepareMeta($meta_keywords, 150),
+                         "%meta_description%" => prepareMeta($meta_description, 150));
 
         $buffer = strtr($buffer, $replace);
 
@@ -392,26 +382,6 @@ class SparkPage extends HTMLPage implements IActionCollection
         }
 
         ob_start();
-
-        foreach ($this->head_components as $idx => $cmp) {
-            $css_files = $cmp->requiredStyle();
-            if (!is_array($css_files)) {
-                echo $css_files;
-            }
-            foreach ($css_files as $key => $url) {
-                $this->head()->addCSS($url, get_class($cmp), TRUE);
-            }
-            $js_files = $cmp->requiredScript();
-            if (!is_array($js_files)) {
-                echo $js_files;
-            }
-            else {
-                foreach ($js_files as $key => $url) {
-                    //no prepend here
-                    $this->head()->addJS($url, get_class($cmp), FALSE);
-                }
-            }
-        }
 
         parent::startRender();
 

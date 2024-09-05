@@ -102,7 +102,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         $page = SparkPage::Instance();
 
         if ($page instanceof SparkPage) {
-            $page->addComponent($this);
+            $page->componentCreated($this);
         }
 
     }

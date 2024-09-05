@@ -3,6 +3,15 @@ include_once("components/Component.php");
 
 class HTMLHead extends Component
 {
+
+    /**
+     * @var array IPageComponent
+     */
+    protected $head_components = array();
+
+
+
+
     protected array $opengraph_tags = array();
 
     /**
@@ -45,9 +54,30 @@ class HTMLHead extends Component
 
     public function startRender()
     {
+
         parent::startRender();
 
         echo "<TITLE>%title%</TITLE>\n";
+
+        foreach ($this->head_components as $idx => $cmp) {
+            $css_files = $cmp->requiredStyle();
+            if (!is_array($css_files)) {
+                echo $css_files;
+            }
+            foreach ($css_files as $key => $url) {
+                $this->addCSS($url, get_class($cmp), TRUE);
+            }
+            $js_files = $cmp->requiredScript();
+            if (!is_array($js_files)) {
+                echo $js_files;
+            }
+            else {
+                foreach ($js_files as $key => $url) {
+                    //no prepend here
+                    $this->addJS($url, get_class($cmp), FALSE);
+                }
+            }
+        }
 
         $this->renderMeta();
         echo "\n";
@@ -75,6 +105,11 @@ class HTMLHead extends Component
         <?php
     }
 
+    public function addHeadComponent(Component $component) : void
+    {
+        $this->head_components[] = $component;
+
+    }
     protected function renderImpl()
     {
 
@@ -106,12 +141,14 @@ class HTMLHead extends Component
      */
     public function addCSS(string $filename, string $className = "", bool $prepend = FALSE, bool $preload = FALSE)
     {
-        if (!$className) $className = get_class($this);
-        $usedBy = array();
-        if (isset($this->css_files[$filename])) {
-            $usedBy = $this->css_files[$filename];
-        }
-        $usedBy[$className] = 1;
+        //debug
+//        if (!$className) $className = get_class($this);
+//        $usedBy = array();
+//        if (isset($this->css_files[$filename])) {
+//            $usedBy = $this->css_files[$filename];
+//        }
+//        $usedBy[$className] = 1;
+        $usedBy = 1;
         $this->css_files[$filename] = $usedBy;
 
         if ($prepend) {
@@ -129,13 +166,15 @@ class HTMLHead extends Component
      */
     public function addJS(string $filename, string $className = "", bool $prepend = FALSE, bool $async = FALSE, bool $defer = FALSE)
     {
-        if (!$className) $className = get_class($this);
-        $usedBy = array();
-        if (isset($this->js_files[$filename])) {
-            $usedBy = $this->js_files[$filename];
-
-        }
-        $usedBy[$className] = 1;
+        //debug
+//        if (!$className) $className = get_class($this);
+//        $usedBy = array();
+//        if (isset($this->js_files[$filename])) {
+//            $usedBy = $this->js_files[$filename];
+//
+//        }
+//        $usedBy[$className] = 1;
+        $usedBy = 1;
         $this->js_files[$filename] = $usedBy;
 
         if ($prepend) {
@@ -189,7 +228,8 @@ class HTMLHead extends Component
                 }
             }
             echo "<link $rel href='$href'>\n";
-            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
+            //debug
+            //echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
 
         echo "<!-- CSS Files End -->\n";
@@ -209,7 +249,8 @@ class HTMLHead extends Component
                 $defer = ($async_defer["defer"]) ? "defer" : "";
             }
             echo "<script $async $defer type='text/javascript' src='$src'></script>\n";
-            echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
+            //debug
+            //echo "<!-- Used by: " . implode("; ", array_keys($usedBy)) . " -->\n";
         }
         echo "<!-- JavaScript Files End -->\n";
 
