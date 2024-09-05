@@ -116,9 +116,11 @@ class HTMLHead extends Component
         return $this->meta[$name] ?? "";
     }
 
-    public function addCanonicalParameter(string ...$name) : void
+    public function addCanonicalParameter(...$names) : void
     {
-        $this->canonical_params[] = $name;
+        foreach ($names as $name) {
+            $this->canonical_params[$name] = 1;
+        }
     }
 
     public function canonicalParameters() : array
@@ -202,7 +204,7 @@ class HTMLHead extends Component
             $builder = SparkPage::Instance()->getURL();
             $parameters = $builder->getParameterNames();
             foreach ($parameters as $name) {
-                if (in_array($name, $this->canonical_params)) continue;
+                if (array_key_exists($name, $this->canonical_params)) continue;
                 $builder->remove($name);
             }
             $canonical_href = fullURL($builder->url());
