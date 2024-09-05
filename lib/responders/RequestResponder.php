@@ -157,17 +157,14 @@ abstract class RequestResponder
 
     public function drawConfirmDialog($title = "Confirm Action", $text = "Confirm action?")
     {
+        //will be added as IPageComponent
         $md = new ConfirmMessageDialog($title, "msg_confirm");
 
-        ob_start();
+        $md->buffer()->start();
         echo $text;
         echo "<form method=post>";
         echo "<input type=hidden name=confirm_handler value=1>";
         echo "</form>";
-        $md->setContents(ob_get_contents());
-        ob_end_clean();
-
-        $md->render();
 
         ?>
         <script type='text/javascript'>
@@ -193,6 +190,9 @@ abstract class RequestResponder
         </script>
 
         <?php
+        $md->buffer()->end();
+
+
 
     }
 }
