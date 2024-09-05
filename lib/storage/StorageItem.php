@@ -10,9 +10,9 @@ class StorageItem extends DataObject implements JsonSerializable
     public $field = "";
     public $storageURL = "";
 
-    protected $urlbuilder;
+    protected URLBuilder $urlbuilder;
 
-    protected $serializedURL = "";
+    protected string $serializedURL = "";
 
     const TYPE_IMAGE = 1;
     const TYPE_FILE = 2;
@@ -28,9 +28,7 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->field = $field;
         $this->storageURL = STORAGE_LOCAL;
 
-        $this->urlbuilder = new URLBuilder();
-        $this->urlbuilder->buildFrom($this->storageURL);
-
+        $this->urlbuilder = URLBuilder::Create($this->storageURL);
     }
 
     public function setType(int $type)
@@ -46,7 +44,7 @@ class StorageItem extends DataObject implements JsonSerializable
         else {
             $this->storageURL = STORAGE_LOCAL;
         }
-        $this->urlbuilder->buildFrom($this->storageURL);
+        $this->urlbuilder = URLBuilder::Create($this->storageURL);
     }
 
     public function hrefImage(int $width = -1, int $height = -1)

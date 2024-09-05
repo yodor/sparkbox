@@ -6,70 +6,45 @@ include_once("utils/IGETConsumer.php");
 class URLBuilder implements IGETConsumer
 {
 
-    /**
-     * @var string The original href that was set to this URLBuilder. Can contain parameterized values
-     */
-    protected string $build_string = "";
-
+    protected bool $is_script = FALSE;
     protected string $script_name = "";
-
-    /**
-     * @var string The query part of this query.
-     */
-    protected string $script_query = "";
-
-    protected string $domain = "";
-    protected string $protocol = "";
 
     /**
      * @var array  All url parameters name/value pairs
      */
     protected array $parameters = array();
 
-    protected string $resource = "";
-
     protected bool $clear_page_param = FALSE;
     protected array $clear_params = array();
-
-    protected bool $is_script = FALSE;
 
     public function __construct()
     {
         $this->reset();
     }
 
-    public function reset()
+    public function reset() : void
     {
-        $this->build_string = "";
-
+        //URL = > http://domain.com/some/other/script.php?param1=1&param2=2#atresource
+        //protocol - http; domain - domain.com; script_name /some/other/script.php
+        //parameters(param1=>1, param2=>2), resource = atresource
+        //
         $this->script_name = "";
-        $this->script_query = "";
-
-        $this->domain = "";
-        $this->protocol = "";
 
         $this->parameters = array();
 
-        $this->resource = "";
+        $this->clear_params = array();
+        $this->clear_page_param = false;
+        $this->is_script = false;
 
-        $this->clear_page_param = FALSE;
-
-        $this->is_script = FALSE;
-
-    }
-
-    public function isEmpty() : bool
-    {
-        return (count($this->parameters) < 1 && strlen($this->script_name) < 1);
     }
 
     //remove paginator page=? parameter from this href
-    public function setClearPageParams(bool $mode)
+    public function setClearPageParams(bool $mode) : void
     {
         $this->clear_page_param = $mode;
     }
 
-    public function setClearParams(string ...$params)
+    public function setClearParams(...$params) : void
     {
         $this->clear_params = $params;
     }
@@ -78,28 +53,31 @@ class URLBuilder implements IGETConsumer
      * Add/Set query parameter
      * @param URLParameter $param
      */
-    public function add(URLParameter $param)
+    public function add(URLParameter $param) : void
     {
         $this->parameters[$param->name()] = $param;
     }
 
     /**
-     * Remove the parameter '$name' from this url builder
-     * @param string $name
+     * Remove the parameter from this url builder
+     * @param string $name Name of parameter to remove
      */
-    public function remove(string $name)
+    public function remove(string $name) : void
     {
         if (!$this->contains($name)) return;
         unset($this->parameters[$name]);
     }
 
+
     /**
-     * @param string $name The $name of the URL parameter
-     * @return URLParameter Return the URLParameter object for this $name
+     * Get URLParamter with name $name
+     * @param string $name
+     * @return URLParameter|null
      */
-    public function get(string $name): URLParameter
+    public function get(string $name): ?URLParameter
     {
-        return $this->parameters[$name];
+        if (isset($this->parameters[$name])) return $this->parameters[$name];
+        return null;
     }
 
     /**
@@ -122,7 +100,8 @@ class URLBuilder implements IGETConsumer
     }
 
     /**
-     * @return string Processed this builder and return a matching string representation of this URLBuilder and its parameters.
+     * Return string representation of this url builder
+     * @return string
      */
     public function url(): string
     {
@@ -130,26 +109,61 @@ class URLBuilder implements IGETConsumer
             return $this->script_name;
         }
 
-        $this->processQuery();
+        $parameters = $this->parameters;
 
-        $ret = $this->protocol . $this->domain . $this->script_name;
-
-        if (count($this->parameters) > 0) {
-
-            foreach ($this->parameters as $idx => $parameter) {
-                if ($parameter instanceof DataParameter) {
-                    if (!$parameter->isSlugEnabled()) continue;
-                    $ret.=transliterate($parameter->value())."/";
-                }
+        //clear parameters from the Paginator
+        if ($this->clear_page_param) {
+            $paginator_parameters = Paginator::Instance()->getParameterNames();
+            foreach($paginator_parameters as $name) {
+                if (array_key_exists($name, $parameters)) unset($parameters[$name]);
             }
         }
 
-        if ($this->script_query) {
-            $ret .= "?";
-            $ret .= $this->script_query;
+        $script_query = "";
+        $resource = "";
+
+        if (count($parameters) > 0) {
+            //remove parameter names found in the clear_params array
+            foreach ($this->clear_params as $key) {
+                if (array_key_exists($key, $parameters)) unset($parameters[$key]);
+            }
+
+            $names = array_keys($parameters);
+            //consctruct pairs to be imploded using &
+            $pairs = array();
+            foreach ($names as $idx => $name) {
+                $param = $this->get($name);
+                if ($param->isSlugEnabled()) continue;
+                if ($param->isResource()) {
+                    $resource = $param->name();
+                }
+                else {
+                    $pairs[] = $param->text();
+                }
+            }
+
+            $script_query = implode("&", $pairs);
         }
 
-        return $ret;
+        $result = $this->script_name;
+        //sluged parameters
+        foreach ($parameters as $idx => $parameter) {
+            if ($parameter instanceof DataParameter) {
+                if (!$parameter->isSlugEnabled()) continue;
+                $result.=transliterate($parameter->value())."/";
+            }
+        }
+
+        if (strlen($script_query)>0) {
+            $result .= "?";
+            $result .= $script_query;
+        }
+
+        if (strlen($resource)>0) {
+            $result .= $resource;
+        }
+
+        return $result;
     }
 
     public function getScriptName() : string
@@ -157,7 +171,7 @@ class URLBuilder implements IGETConsumer
         return $this->script_name;
     }
 
-    public function setScriptName(string $value)
+    public function setScriptName(string $value) : void
     {
         $this->script_name = $value;
     }
@@ -167,99 +181,77 @@ class URLBuilder implements IGETConsumer
         return dirname($this->script_name);
     }
 
-    protected function processQuery()
+
+    public static function Create(string $build_string) : URLBuilder
     {
-
-        //clear parameters from the Paginator
-        if ($this->clear_page_param) {
-            $paginator_parameters = Paginator::Instance()->getParameterNames();
-            foreach($paginator_parameters as $value) {
-                $this->clear_params[] = $value;
-            }
-        }
-
-        if (count($this->parameters) > 0) {
-
-
-            foreach ($this->clear_params as $val) {
-                if (array_key_exists($val, $this->parameters)) {
-                    unset($this->parameters[$val]);
-                }
-            }
-
-            $names = array_keys($this->parameters);
-
-            $pairs = array();
-            foreach ($names as $pos => $name) {
-                $param = $this->get($name);
-                if ($param->isResource()) continue;
-                if ($param->isSlugEnabled()) continue;
-                $pairs[] = $param->text();
-            }
-
-            $this->script_query = implode("&", $pairs);
-
-            foreach ($names as $pos => $name) {
-                $param = $this->get($name);
-                if (!$param->isResource()) continue;
-                $this->resource = $param->value();
-            }
-        }
-
+        $result = new URLBuilder();
+        $result->buildFrom($build_string);
+        return $result;
     }
-
-    public function getBuildFrom(): string
+    /**
+     * Parse contents of $build_string and construct the URLBuilder
+     *
+     * @param string $build_string
+     * @return void
+     */
+    public function buildFrom(string $build_string) : void
     {
-        return $this->build_string;
-    }
 
-    public function buildFrom(string $build_string)
-    {
         $this->reset();
 
-        //store the original href. might contain parameterized actions
-        $this->build_string = $build_string;
+        $build_string = trim($build_string);
 
-        if (stripos($build_string, "javascript:") !== FALSE) {
+        if (strlen($build_string)<1) return;
+
+        if (str_starts_with($build_string, "javascript:")) {
             $this->is_script = TRUE;
             $this->script_name = $build_string;
-            $this->script_query = "";
             return;
         }
 
-        $script_name = $build_string;
-        $script_query = "";
 
-        if (str_contains($script_name, "?")) {
-            list($script_name, $script_query) = explode("?", $script_name);
-        }
-        $this->script_name = $script_name;
-
-        if (str_contains($script_query, "#")) {
-            $resource = "";
-            list($script_query, $resource) = explode("#", $script_query);
-            $this->add(new URLParameter("#" . $resource));
-        }
-
-        //copy current query parameters if script name is not set - ie local page request
-        if (strlen($script_name) < 1) {
-            foreach ($_GET as $key => $param) {
-                $this->add(new URLParameter($key, $param));
+        $resource_param = null;
+        //have #resource
+        if (str_contains($build_string, "#")) {
+            list($build_string, $resource) = explode("#", $build_string);
+            if (isset($resource) && strlen($resource) > 0) {
+                $resource_param = new URLParameter("#$resource");
             }
         }
+
+        $script_query = "";
+        $script_name = $build_string;
+
+        if (str_contains($build_string, "?")) {
+            //overwrite
+            list($script_name, $script_query) = explode("?", $build_string);
+        }
+
+        $this->script_name = $script_name;
+
+        //if (!$this->script_name)throw new Exception("Emptry Script name");
+
+        //TODO: Check usage is correct during buildFrom
+        //copy current query parameters if script name is not set - ie local page request
+//        if (strlen($this->script_name) < 1) {
+//            foreach ($_GET as $key => $param) {
+//                $this->add(new URLParameter($key, $param));
+//            }
+//        }
 
         //overwrite with pairs from the $build_string
         $static_pairs = explode("&", $script_query);
-        foreach ($static_pairs as $pos => $pair) {
-            $param_name = $pair;
-            $param_value = "";
-            if (str_contains($pair, "=")) {
-                list($param_name, $param_value) = explode("=", $pair);
-            }
-            if (strlen($param_name) > 0) {
-                $this->add(new URLParameter($param_name, $param_value));
-            }
+        foreach ($static_pairs as $idx => $pair) {
+            if (strlen(trim($pair))<1) continue;
+            if (!str_contains($pair, "=")) continue;
+
+            list($param_name, $param_value) = explode("=", $pair);
+
+            $this->add(new URLParameter($param_name, $param_value));
         }
+
+        //finally append the resource if any
+        if ($resource_param instanceof URLParameter) $this->add($resource_param);
 
     }
 
@@ -273,8 +265,7 @@ class URLBuilder implements IGETConsumer
     {
         //
         if ($this->is_script) {
-
-            $from = $this->build_string;
+            $from = $this->script_name;
             $names = array_keys($row);
             foreach ($names as $idx => $name) {
                 $replace = array("%" . $name . "%" => $row[$name]);
@@ -285,7 +276,7 @@ class URLBuilder implements IGETConsumer
         }
 
         $names = array_keys($this->parameters);
-        foreach ($names as $idx => $name) {
+        foreach ($names as $name) {
             $param = $this->get($name);
             $param->setData($row);
         }

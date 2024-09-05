@@ -276,7 +276,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
                 if ($have_data > 0) {
                     $url = new URLBuilder();
-                    $url->buildFrom($this->url->getBuildFrom());
+                    $url->copyParametersFrom($this->url);
                     $url->add(new URLParameter("year", $year));
                     $url->add(new URLParameter("month", $b+1));
                     $active = "";

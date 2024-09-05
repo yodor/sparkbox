@@ -3,18 +3,18 @@ include_once ("utils/IDataResultProcessor.php");
 
 class URLParameter implements IDataResultProcessor
 {
-    protected $name;
-    protected $value;
-    protected $field;
+    protected string $name = "";
+    protected string $value = "";
+    protected string $field = "";
 
-    protected $is_slug;
+    protected bool $is_slug = false;
 
-    public function __construct(string $name, string $value = "", $is_slug = false)
+    public function __construct(string $name, ?string $value = "", bool $is_slug = false)
     {
         $this->name = $name;
 
+        //data parameter - parse field name
         if (str_starts_with($value, "%") && str_ends_with($value, "%")) {
-            // It starts with 'http'
             $this->field = substr($value, 1, strlen($value)-1);
         }
 
@@ -30,7 +30,7 @@ class URLParameter implements IDataResultProcessor
         return $this->value;
     }
 
-    public function setValue(string $value)
+    public function setValue(string $value) : void
     {
         $this->value = $value;
     }
@@ -39,20 +39,23 @@ class URLParameter implements IDataResultProcessor
         return $this->name;
     }
 
-    public function field()
+    public function field() : string
     {
         return $this->field;
     }
 
-    public function isResource() {
-        if (str_starts_with($this->name, "#")) {
-            return true;
-        }
-        return false;
-    }
-    public function text(bool $quoteValue = FALSE)
+    public function isResource() : bool
     {
+        return str_starts_with($this->name, "#");
+    }
 
+    /**
+     * Return concatenation of name=value string
+     * @param bool $quoteValue quote result in single quotes if true
+     * @return string
+     */
+    public function text(bool $quoteValue = FALSE) : string
+    {
         $ret = $this->name;
         if ($this->value) {
             $ret .= "=";
@@ -71,6 +74,7 @@ class URLParameter implements IDataResultProcessor
             }
         }
 
+        //is resource ?
         if (str_starts_with($this->name, "#")) {
             $names = array_keys($data);
             foreach ($names as $idx=>$name) {
@@ -86,7 +90,7 @@ class URLParameter implements IDataResultProcessor
         return $this->is_slug;
     }
 
-    public function setSlugEnabled(bool $mode)
+    public function setSlugEnabled(bool $mode) : void
     {
         $this->is_slug = $mode;
     }
