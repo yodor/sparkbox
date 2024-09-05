@@ -12,12 +12,12 @@ class FBPixel implements IHeadScript
         $this->trackEvents = array();
     }
 
-    public function addTrackEvent(string $eventName, string $eventParam)
+    public function addTrackEvent(string $eventName, string $eventParam) : void
     {
         $this->trackEvents[$eventName] = $eventParam;
     }
 
-    public function addTrackObject(FBTrackObject $fbtrack)
+    public function addTrackObject(FBTrackObject $fbtrack) : void
     {
         $this->addTrackEvent($fbtrack->getEvent(), $fbtrack->getParameters());
     }
@@ -53,8 +53,7 @@ class FBPixel implements IHeadScript
             ?>
         </script>
         <noscript>
-            <img height="1" width="1" src="https://www.facebook.com/tr?id=<?php
-            echo $this->pixelID; ?>&ev=PageView&noscript=1"/>
+            <img height="1" width="1" src="https://www.facebook.com/tr?id=<?php echo $this->pixelID; ?>&ev=PageView&noscript=1"/>
         </noscript>
         <!-- End Facebook Pixel Code -->
         <?php
