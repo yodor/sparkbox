@@ -4,13 +4,18 @@ include_once("components/Action.php");
 
 class Navigation
 {
-    protected $urls;
-    protected $name;
+    protected array $urls = array();
+    protected string $name;
 
     public function __construct(string $name="Navigation")
     {
         $this->name = $name;
         $this->urls = Session::Get($name, array());
+    }
+
+    public function entries() : array
+    {
+        return $this->urls;
     }
 
     public function push(string $pageName)

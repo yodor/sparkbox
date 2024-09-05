@@ -302,7 +302,7 @@ BODY {
     min-width:50%;
 }
 .BeanFormEditor {
-    width:100%;
+    width:auto;
 }
 .BeanFormEditor .FormRenderer{
     width:100%;

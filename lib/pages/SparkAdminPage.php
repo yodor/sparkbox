@@ -23,7 +23,6 @@ include_once("auth/AuthContext.php");
 class SparkAdminPage extends SparkPage
 {
 
-
     /**
      *
      */
@@ -32,9 +31,9 @@ class SparkAdminPage extends SparkPage
     const ACTION_EDIT = "Edit";
     const ACTION_DELETE = "Delete";
 
-    protected $roles = array();
+    protected array $roles = array();
 
-    protected $menu_bar = NULL;
+    protected MenuBarComponent $menu_bar;
 
     protected Navigation $navigation;
 
@@ -170,11 +169,22 @@ class SparkAdminPage extends SparkPage
 
     protected function constructTitle(): void
     {
-        $dynmenu = $this->menu_bar->getMainMenu();
+        //previous entries
+        //$navItems = $this->navigation->entries();
+        //echo ("NavEntry count: ".count($navItems));
 
-        $dynmenu->update($this->page_menu);
+        //this page caption
+        if ($this->name) {
+            $this->preferred_title = $this->name;
+        }
+        else {
+            $dynmenu = $this->menu_bar->getMainMenu();
 
-        $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());
+            $dynmenu->update($this->page_menu);
+
+            $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());
+        }
+
     }
 
     public function startRender()
