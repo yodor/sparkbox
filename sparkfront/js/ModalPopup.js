@@ -98,23 +98,20 @@ class ModalPopup {
 
     centerContents() {
 
-        $(this.popup).css("width", "auto");
-        $(this.popup).css("height", "auto");
-        // this.popup.css({});
-
         if (!this.popup)return;
+
+        this.popup.css("width", "auto");
+        this.popup.css("height", "auto");
 
         let windowWidth = $(window).width(); //retrieve current window width
         let windowHeight = $(window).height(); //retrieve current window height
 
-        let width = $(this.popup).width();
-        let height = $(this.popup).height();
+        let width = this.popup.width();
+        let height = this.popup.height();
 
         if (width==0 || height==0) return;
 
-
-        //console.log("Width: "+width+ " Height: " + height);
-
+        //console.log(" Width: "+width+ " Height: " + height);
         let left = ((windowWidth - width) / 2.0);
         let top = ((windowHeight - height) / 2.0);
 
@@ -122,7 +119,15 @@ class ModalPopup {
         this.popup.css("top", top);
         this.popup.css("width", width);
         //?
-        this.popup.css("height", height);
+        let minHeight = this.popup.css("min-height");
+        if (minHeight == "0px") {
+            //use auto
+        }
+        else {
+            //set height to honor min height
+            this.popup.css("height", height);
+        }
+
     }
 
     makeMovable() {
