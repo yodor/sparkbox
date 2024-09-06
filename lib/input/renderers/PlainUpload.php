@@ -8,6 +8,7 @@ abstract class PlainUpload extends InputFieldTag
     {
         parent::__construct($input);
         $this->setInputAttribute("type", "file");
+        $this->addClassName("PlainUpload");
     }
 
     public function requiredStyle(): array
