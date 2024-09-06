@@ -246,17 +246,23 @@ function getArrayText(array $arr)
 
     $msg = array();
     foreach ($arr as $key => $val) {
+        $message = "";
         if ($val instanceof StorageObject) {
+            $message = get_class($val) . " UID:" . $val->UID() . " MIME: ".$val->buffer()->mime();
             if ($val instanceof ImageStorageObject) {
-                $val = get_class($val) . " UID: " . $val->UID() . " Dimension: (" . $val->getWidth() . "," . $val->getHeight() . ")";
-            }
-            else {
-                $val = get_class($val) . " UID:" . $val->UID();
+                $message.= " Dimension: (" . $val->getWidth() . "," . $val->getHeight() . ")";
             }
         }
-        if (is_array($val)) $val = print_r($val, true);//"Array(" . implode(",", $val) . ")";
-
-        $msg[] = "[$key] => $val";
+        else if (is_array($val)) {
+            $message = print_r($val, true);
+        }
+        else if (is_object($val)) {
+            $message = get_class($val);
+        }
+        else if (is_null($val)) {
+            $message = "NULL";
+        }
+        $msg[] = "[$key] => $message";
     }
     return implode("; ", $msg);
 
