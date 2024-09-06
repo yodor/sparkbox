@@ -64,7 +64,7 @@ class MCEImageBrowserDialog extends MessageDialog
     }
 
     //final method
-    public function renderImpl()
+    protected function renderImpl()
     {
 
         echo "<form method='post' enctype='multipart/form-data'>";
