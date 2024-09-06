@@ -190,15 +190,22 @@ class DataInput
         $this->value = $value;
     }
 
+
     /**
-     * @return string|array
+     * Get the error text for this inpu
+     * @return string
      */
-    public function getError()
+    public function getError() : string
     {
         return $this->error;
     }
 
-    public function setError(string $err)
+    /**
+     * Set the error text for this input
+     * @param string $err
+     * @return void
+     */
+    public function setError(string $err) : void
     {
         $this->error = $err;
     }
@@ -209,7 +216,11 @@ class DataInput
         return false;
     }
 
-    public function clear()
+    /**
+     * Clear the value and error of this input
+     * @return void
+     */
+    public function clear() : void
     {
         $this->value = "";
         $this->error = "";
