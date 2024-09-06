@@ -74,7 +74,7 @@ class SessionUpload extends Component {
         //copy the request url
         form.attr("action", this.req.getURL().href);
 
-        console.log("Submitting form clone to URL: " + form.attr("action"));
+        //console.log("Submitting form clone to URL: " + form.attr("action"));
 
         form.submit();
 
