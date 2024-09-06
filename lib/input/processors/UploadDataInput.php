@@ -20,14 +20,12 @@ class UploadDataInput extends InputProcessor
         debug("Setting default empty FileStorageObject ...");
 
         debug("_FILES array keys: " . implode("|", array_keys($_FILES)));
-
         if (!isset($_FILES[$name])) {
             debug("_FILES array does not have key '$name' - no file uploaded from this control...");
             return;
         }
 
         debug("Processing _FILES array data");
-
         if (!is_array($_FILES[$name]["name"])) {
             debug("Processing single uploaded file ...");
             $file_storage = new FileStorageObject();
@@ -37,12 +35,11 @@ class UploadDataInput extends InputProcessor
         }
 
         debug("Processing multiple uploaded files ...");
+        //reformat array keys
+        $uploaded_files = $this->diverse_array($_FILES[$name]);
 
         $files = array();
-
-        $upload = $this->diverse_array($_FILES[$name]);
-
-        foreach ($upload as $idx => $file) {
+        foreach ($uploaded_files as $idx => $file) {
             $storage = new FileStorageObject();
             $this->processImpl($file, $storage);
             $files[] = $storage;
