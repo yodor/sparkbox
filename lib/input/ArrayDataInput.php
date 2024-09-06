@@ -92,14 +92,19 @@ class ArrayDataInput extends DataInput
      */
     public function getErrorText() : string
     {
+        //default error for that label itself or when no element
         $error_text = tr(ArrayDataInput::ERROR_TEXT);
-        $values_count = count($this->value);
 
-        for ($idx=0; $idx<$values_count; $idx++) {
-            if ($this->haveErrorAt($idx)) {
-                $error_text.= "<BR>[$idx]: ".$this->getErrorAt($idx);
+        if (is_array($this->value)) {
+            $values_count = count($this->value);
+
+            for ($idx=0; $idx<$values_count; $idx++) {
+                if ($this->haveErrorAt($idx)) {
+                    $error_text.= "<BR>[$idx]: ".$this->getErrorAt($idx);
+                }
             }
         }
+
         return $error_text;
     }
 
