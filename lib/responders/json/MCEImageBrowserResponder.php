@@ -80,38 +80,33 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
     }
 
-    public function getHTML(StorageObject $object, $field_name) : string
+    public function getHTML(StorageObject $object, string $field_name) : string
     {
-        return "";
-    }
-
-    public function createUploadElement(array $imgrow)
-    {
-        $id = $imgrow["imageID"];
-
+        //use uid as id
+        $beanID = $object->UID();
         ob_start();
-        echo "<div class='Element' imageID=$id>";
+        echo "<div class='Element' imageID='$beanID'>";
         echo "<div class='remove_button'></div>";
-        $img_href = StorageItem::Image($id, "MCEImagesBean", $this->width, $this->height);
+        $img_href = StorageItem::Image(intval($beanID), "MCEImagesBean", $this->width, $this->height);
         echo "<img class='image_contents' src='$img_href'>";
         echo "</div>";
         $html = ob_get_contents();
         ob_end_clean();
-
-        return array("imageID" => $id, "html" => $html,);
+        return $html;
     }
 
+    //return all images for section
     protected function _find(JSONResponse $resp)
     {
         debug("Section: '$this->section_name' Section Key: '$this->section_key'");
 
         $bean = new MCEImagesBean();
         $qry = $bean->query();
-        $qry->select->where()->add("section", "'$this->section_name'")->add("section_key", "'$this->section_key'");
+        $qry->select->where()->add("section", "'$this->section_name'");
+        $qry->select->where()->add("section_key", "'$this->section_key'");
 
         if ($this->ownerID > 0) {
             $qry->select->where()->add("ownerID", $this->ownerID);
-
         }
 
         if (isset($_GET["imageID"])) {
@@ -119,24 +114,39 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $qry->select->where()->add("imageID", $imageID);
         }
 
-        $qry->select->fields()->set("section", "section_key", "imageID", "ownerID", "auth_context");
+        $qry->select->fields()->set("section", "section_key", "imageID", "ownerID", "auth_context", "photo");
 
         $num_images = $qry->exec();
 
         $resp->objects = array();
 
-        while ($imgrow = $qry->next()) {
-            $resp->objects[] = $this->createUploadElement($imgrow);
+        while ($result = $qry->nextResult()) {
+            $imageID = $result->get("imageID");
+            $object = @unserialize($result->get("photo"));
+            if (! ($object instanceof ImageStorageObject)) {
+                debug("Skipping non ImageStorageObject - ID: $imageID");
+                continue;
+            }
+            try {
+                debug("Creating response object for ID: $imageID");
+                //force ID as uid
+                $object->setUID($imageID);
+                //getHTML is used inside the viewport
+                $resp->objects[] = $this->createResponseObject($object, $this->getHTML($object, $this->field_name));
+            }
+            catch (Exception $e) {
+                debug("Error creating response object: ".$e->getMessage());
+            }
         }
 
-        $resp->result_count = $num_images;
+        $total = count($resp->objects);
+        debug("Response object_count: $total");
+        $resp->object_count = $total;
 
     }
 
-    protected function assignUploadObjects(JSONResponse $resp, FileStorageObject $upload_object)
+    protected function storeUploadObject(FileStorageObject $uploadObject) : void
     {
-        debug("assignUploadObjects");
-
         $bean = new MCEImagesBean();
         $bean_row = array();
         $bean_row["section"] = $this->section_name;
@@ -150,19 +160,24 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $bean_row["auth_context"] = get_class($this->auth_context);
         }
 
-        $bean_row["photo"] = $upload_object->serializeDB();
+        $bean_row["photo"] = $uploadObject->serializeDB();
 
         $imageID = $bean->insert($bean_row);
         if ($imageID < 1) throw new Exception("Unable to insert image object: " . $bean->getDB()->getError());
 
-        debug("assignUploadObjects::stored to mce_images with imageID: $imageID");
-        $bean_row["imageID"] = $imageID;
+        $uploadObject->setUID($imageID);
 
-        $resp->objects = array();
+        debug("Stored object to mce_images using ID: $imageID");
 
-        $resp->objects[] = $this->createUploadElement($bean_row);
+    }
 
-        $resp->result_count = 1;
+    protected function createResponseObject(FileStorageObject $uploadObject, string $html) : array
+    {
+        return array(
+            //lastinsertid
+            "imageID" => $uploadObject->uid(),
+            "html" => $html
+        );
     }
 
     protected function _remove(JSONResponse $resp)
