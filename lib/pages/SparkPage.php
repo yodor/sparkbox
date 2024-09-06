@@ -345,7 +345,7 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $this->prepareMetaTitle();
 
-        ob_start();
+        ob_start(null, 4096);
 
         //regular responders to commands
         //creates IPageComponents ; can generate redirec so call before startRender
