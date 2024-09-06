@@ -231,7 +231,7 @@ class JSONRequest extends SparkObject {
 
         if (this.post_data.toString().length > 0 || this.form_data != null) {
 
-            console.log("Using POST: " + responderURL.href);
+            //console.log("Using POST: " + responderURL.href);
             this.xmlRequest.open("POST", responderURL.href, this.async);
 
             if (this.form_data == null) {
@@ -244,7 +244,7 @@ class JSONRequest extends SparkObject {
             this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
 
         } else {
-            console.log("Using GET: " + responderURL.href);
+            //console.log("Using GET: " + responderURL.href);
             this.xmlRequest.open("GET", responderURL.href, this.async);
             this.xmlRequest.send(null);
             this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
@@ -312,8 +312,3 @@ class JSONRequest extends SparkObject {
         }
     }
 }
-
-
-
-
-
