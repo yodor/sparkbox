@@ -73,13 +73,17 @@ $defines->set("STORAGE_EXTERNAL", $protocol . $site_domain . $location . "/stora
 
 // error_reporting(E_ALL & ~E_WARNING);
 error_reporting(E_ALL);
-ini_set("display_errors", "1");
-ini_set("display_startup_errors", "0");
+ini_set("display_errors", 1);
+ini_set("display_startup_errors", 0);
 
-ini_set("session.cookie_lifetime", "0");
-ini_set("session.use_only_cookies", "0");
-
-ini_set("zlib.output_compression", "0");
+ini_set("session.cookie_lifetime", 0);
+ini_set("session.use_only_cookies", 1);
+ini_set("session.cache_limiter", "private");
+//minutes - cache of the response
+ini_set("session.cache_expire", 60); //1 hour
+//seconds
+ini_set("session.gc_maxlifetime", 1440);
+ini_set("zlib.output_compression", 1);
 
 //important for storage cache to work is the timezone matching across the lamp stack, apache uses the system timezone
 //mysql driver uses date.timezone to set the mysql timezone
@@ -139,6 +143,7 @@ $defines->set("DEFAULT_LOCALE", "en-us");
 $defines->set("DEFAULT_CURRENCY", "EUR");
 
 $defines->set("STORAGE_CACHE_ENABLED", TRUE);
+//time in seconds to expire the cached page components
 $defines->set("PAGE_CACHE_TTL", 3600);
 $defines->set("PAGE_CACHE_ENABLED", FALSE);
 
