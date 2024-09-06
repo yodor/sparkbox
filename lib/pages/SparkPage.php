@@ -345,16 +345,17 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $this->prepareMetaTitle();
 
+        ob_start();
+
+        //regular responders to commands
         //creates IPageComponents ; can generate redirec so call before startRender
         RequestController::processResponders();
-
-        //ob_start();
 
         //
         parent::startRender();
         //body started here
 
-        //regular responders to commands
+
 
     }
 
@@ -377,10 +378,7 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         parent::finishRender();
 
-       // $buffer = ob_get_contents();
-       // ob_end_clean();
-        //$this->obCallback($buffer);
-       // echo $buffer;
+        ob_end_flush();
     }
 
     /**
