@@ -129,7 +129,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor implements I
 
         if ($text_action instanceof Action) {
             foreach ($this->filter_value as $name => $value) {
-                $text_action->getURLBuilder()->add(new DataParameter($name, $value));
+                $text_action->getURL()->add(new DataParameter($name, $value));
 
             }
         }

@@ -8,7 +8,7 @@ include_once("components/renderers/items/DataIteratorItem.php");
 class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 {
 
-    protected URLBuilder $url;
+    protected URL $url;
 
     protected int $width = 64;
     protected int $height = 64;
@@ -23,18 +23,18 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
         $this->tagName = "A";
 
         $this->setClassName("item");
-        $this->url = new URLBuilder();
+        $this->url = new URL();
 
         if (empty($beanClass)) throw new Exception("Empty bean class");
         $this->beanClass = $beanClass;
     }
 
-    public function setURL(URLBuilder $url)
+    public function setURL(URL $url)
     {
         $this->url = $url;
     }
 
-    public function getURL(): URLBuilder
+    public function getURL(): URL
     {
         return $this->url;
     }
@@ -43,7 +43,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
     {
         parent::setData($data);
         $this->url->setData($data);
-        $this->setAttribute("href", $this->url->url());
+        $this->setAttribute("href", $this->url->toString());
         $this->setAttribute("itemID", $this->id);
 
     }
@@ -141,13 +141,13 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
         $this->bean = $bean;
 
-        $this->url = new URLBuilder();
+        $this->url = new URL();
 
         if ($link_page) {
-            $this->url->buildFrom($link_page);
+            $this->url->fromString($link_page);
         }
         else {
-            $this->url->buildFrom(currentURL());
+            $this->url->fromString(currentURL());
         }
 
         $this->selected_ID = array();
@@ -275,7 +275,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
                 $have_data = $this->bean->publicationsCount($year, $b+1);
 
                 if ($have_data > 0) {
-                    $url = new URLBuilder();
+                    $url = new URL();
                     $url->copyParametersFrom($this->url);
                     $url->add(new URLParameter("year", $year));
                     $url->add(new URLParameter("month", $b+1));
@@ -283,7 +283,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
                     if ( $b+1 == $this->selected_month) {
                         $active = "selected";
                     }
-                    echo "<a href='{$url->url()}' $active class='item'>";
+                    echo "<a href='{$url->toString()}' $active class='item'>";
                     echo tr($month);
                     echo "</a>";
                 }

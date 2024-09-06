@@ -1,6 +1,6 @@
 <?php
 include_once("objects/ComponentCollection.php");
-include_once("utils/URLBuilder.php");
+include_once("utils/URL.php");
 include_once("components/Action.php");
 
 class ActionCollection extends ComponentCollection
@@ -15,7 +15,7 @@ class ActionCollection extends ComponentCollection
 
         foreach ($this->elements as $action) {
             if ($action instanceof Action) {
-                $action->getURLBuilder()->add($param);
+                $action->getURL()->add($param);
             }
         }
     }

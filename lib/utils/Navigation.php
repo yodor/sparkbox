@@ -33,7 +33,7 @@ class Navigation
 
         $stored_urls = new ArrayIterator($this->urls, true);
 
-        $urlbuild = new URLBuilder();
+        $urlbuild = new URL();
 
         $urls = array();
 
@@ -45,7 +45,7 @@ class Navigation
                 $href = $stored_urls->current();
 
                 //same page ?
-                $urlbuild->buildFrom($href);
+                $urlbuild->fromString($href);
 
                 if ($urlbuild == $pageURL) {
                     debug("Current page url is already in the navigation: '$title' - Clearing remaining entries");
@@ -53,19 +53,19 @@ class Navigation
                 }
 
                 //add back
-                $urls[$title] = $urlbuild->url();
+                $urls[$title] = $urlbuild->toString();
 
                 $stored_urls->next();
             }
         }
 
         //navigation entries are constructed by using $pagename as unique key not the url
-        $urls[$pageName] = $pageURL->url();
+        $urls[$pageName] = $pageURL->toString();
 
         $this->urls = $urls;
 
         Session::Set($this->name, $this->urls);
-        debug("Adding page to navigation '$pageName' => {$pageURL->url()} - Naviagtion contents: ".print_r($this->urls,true));
+        debug("Adding page to navigation '$pageName' => {$pageURL->toString()} - Naviagtion contents: ".print_r($this->urls,true));
     }
 
     public function clear()
@@ -83,7 +83,7 @@ class Navigation
 
         $reverted = new ArrayIterator(array_reverse($this->urls, true));
 
-        $urlbuild = new URLBuilder();
+        $urlbuild = new URL();
 
         $action = NULL;
 
@@ -92,7 +92,7 @@ class Navigation
             $title = $reverted->key();
             $href = $reverted->current();
 
-            $urlbuild->buildFrom($href);
+            $urlbuild->fromString($href);
 
             if (strcmp($urlbuild->getScriptName(), SparkPage::Instance()->getURL()->getScriptName())==0) {
                 //skip the current entry added in push()
@@ -101,7 +101,6 @@ class Navigation
             else {
                 $action = new Action($title, $href);
                 debug("Using href: ".$href);
-                //$action->getURLBuilder()->setKeepRequestParams(FALSE);
                 break;
             }
 

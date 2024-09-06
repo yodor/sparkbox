@@ -196,7 +196,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
         if ($this->action) {
             $this->action->setData($data);
-            $this->image_popup->setAttribute("href", $this->action->getURLBuilder()->url());
+            $this->image_popup->setAttribute("href", $this->action->getURL()->toString());
         }
         else {
             $this->image_popup->removeAttribute("href");

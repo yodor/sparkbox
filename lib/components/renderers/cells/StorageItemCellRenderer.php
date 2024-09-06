@@ -69,7 +69,7 @@ class StorageItemCellRenderer extends TableCellRenderer
 
         $si = new StorageItem($id, $beanClass, $beanField);
 
-        $this->action->getURLBuilder()->buildFrom($si->hrefFile());
+        $this->action->getURL()->fromString($si->hrefFile());
         $this->action->setContents(tr("Download"));
         $this->action->render();
 

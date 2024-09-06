@@ -16,7 +16,7 @@ abstract class RequestResponder
 
     /**
      * Current URL
-     * @var URLBuilder
+     * @var URL
      */
     protected $url;
 
@@ -25,8 +25,7 @@ abstract class RequestResponder
         $this->cmd = $cmd;
 
         RequestController::Add($this);
-        $this->url = new URLBuilder();
-        $this->url->buildFrom(currentURL());
+        $this->url = URL::Current();
     }
 
     public function __destruct()
@@ -96,7 +95,7 @@ abstract class RequestResponder
             $redirectURL = $this->getCancelUrl();
             if (!$redirectURL) {
                 $this->buildRedirectURL();
-                $redirectURL = $this->url->url();
+                $redirectURL = $this->url->toString();
                 $this->cancel_url = $redirectURL;
             }
             debug("need_redirect: " . (int)$this->need_redirect);

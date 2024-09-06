@@ -62,9 +62,9 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     /**
      * Redirect to this URL on successful processing
-     * @var URLBuilder|null
+     * @var URL|null
      */
-    protected ?URLBuilder $redirect_url = null;
+    protected ?URL $redirect_url = null;
 
     /**
      * Enable/Disable redirect logic during processInput
@@ -138,12 +138,12 @@ class BeanFormEditor extends Container implements IBeanEditor
         return $this->redirect_enabled;
     }
 
-    public function setRedirectURL(URLBuilder $url)
+    public function setRedirectURL(URL $url)
     {
         $this->redirect_url = $url;
     }
 
-    public function getRedirectURL(): ?URLBuilder
+    public function getRedirectURL(): ?URL
     {
         return $this->redirect_url;
     }
@@ -264,8 +264,7 @@ class BeanFormEditor extends Container implements IBeanEditor
                     if (!$redirectURL) {
                         debug("RedirectURL is not set - Setting redirectURL to the edit location");
                         $lastID = $this->transactor->getLastID();
-                        $redirectURL = new URLBuilder();
-                        $redirectURL->buildFrom(SparkPage::Instance()->getPageURL());
+                        $redirectURL = new URL(SparkPage::Instance()->getPageURL());
                         $redirectURL->add(new URLParameter("editID", $lastID));
                     }
 
@@ -277,16 +276,15 @@ class BeanFormEditor extends Container implements IBeanEditor
 
                     if (!$redirectURL) {
                         debug("RedirectURL is not set - Setting redirectURL to the current location");
-                        $redirectURL = new URLBuilder();
-                        $redirectURL->buildFrom(SparkPage::Instance()->getPageURL());
+                        $redirectURL = new URL(SparkPage::Instance()->getPageURL());
                     }
                 }
 
                 if ($this->redirect_enabled) {
                     debug("Redirect logic enabled");
-                    if ($redirectURL instanceof URLBuilder) {
-                        debug("Using redirectURL: ".$redirectURL->url());
-                        header("Location: " . $redirectURL->url());
+                    if ($redirectURL instanceof URL) {
+                        debug("Using redirectURL: ".$redirectURL->toString());
+                        header("Location: " . $redirectURL->toString());
                         exit;
                     }
                 }

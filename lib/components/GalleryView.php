@@ -157,7 +157,7 @@ class GalleryView extends Container
 
         $collection = $this->actions;
 
-        $collection->append(new Action("Edit", $url->url(), $edit_params));
+        $collection->append(new Action("Edit", $url->toString(), $edit_params));
 
         $collection->append(Action::PipeSeparator());
 

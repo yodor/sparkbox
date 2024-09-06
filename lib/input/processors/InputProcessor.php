@@ -436,7 +436,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     }
 
-    public function clearURLParameters(URLBuilder $url)
+    public function clearURLParameters(URL $url)
     {
         $url->remove($this->input->getName());
     }

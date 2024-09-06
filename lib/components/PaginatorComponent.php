@@ -42,25 +42,23 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
     public function drawPrevButton() : void
     {
-        $link = new URLBuilder();
-        $link->buildFrom(SparkPage::Instance()->getPageURL());
+        $link = new URL(SparkPage::Instance()->getPageURL());
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if ($this->paginator->getCurrentPage() > 0) {
             $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() - 1));
-            echo "<a class='previous_page' href='{$link->url()}'> < " . tr("Prev") . " </a>";
+            echo "<a class='previous_page' href='{$link->toString()}'> < " . tr("Prev") . " </a>";
         }
     }
 
     public function drawNextButton() : void
     {
-        $link = new URLBuilder();
-        $link->buildFrom(SparkPage::Instance()->getPageURL());
+        $link = new URL(SparkPage::Instance()->getPageURL());
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
             $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() + 1));
-            echo "<a  class='next_page' href='{$link->url()}'>" . tr("Next") . " > </a>";
+            echo "<a  class='next_page' href='{$link->toString()}'>" . tr("Next") . " > </a>";
         }
     }
 
@@ -78,8 +76,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
             echo "<select name=orderby onChange='javascript:changeSort(this)'>";
 
-            $link = new URLBuilder();
-            $link->buildFrom(SparkPage::Instance()->getPageURL());
+            $link = new URL(SparkPage::Instance()->getPageURL());
             $link->setClearParams(Paginator::KEY_PAGE);
             $link->add(new URLParameter(Paginator::KEY_ORDER_BY, ""));
             $link->add(new URLParameter(Paginator::KEY_ORDER_DIR, ""));
@@ -95,7 +92,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
                 $link->get(Paginator::KEY_ORDER_BY)->setValue($sort_field->value);
                 $link->get(Paginator::KEY_ORDER_DIR)->setValue($sort_field->order_direction);
 
-                echo "<option $selected value='{$link->url()}' >" . tr($sort_field->label) . "</option>";
+                echo "<option $selected value='{$link->toString()}' >" . tr($sort_field->label) . "</option>";
 
             }
             echo "</select>";
@@ -111,7 +108,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
             }
             $link->get(Paginator::KEY_ORDER_DIR)->setValue($direction);
 
-            echo "<a class='direction' direction='$active_direction' href='{$link->url()}'></a>";
+            echo "<a class='direction' direction='$active_direction' href='{$link->toString()}'></a>";
 
         echo "</div>";
 
@@ -128,8 +125,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
     protected function renderPageSelector() : void
     {
 
-        $link = new URLBuilder();
-        $link->buildFrom(SparkPage::Instance()->getPageURL());
+        $link = new URL(SparkPage::Instance()->getPageURL());
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         echo "<div class='pager'>";
@@ -143,10 +139,10 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         if ($this->paginator->getCurrentPage() > 0) {
 
             $link->get(Paginator::KEY_PAGE)->setValue(0);
-            echo "<a  href='{$link->url()}' title='".tr("First")."'> <<  </a>";
+            echo "<a  href='{$link->toString()}' title='".tr("First")."'> <<  </a>";
 
             $link->get(Paginator::KEY_PAGE)->setValue($this->paginator->getCurrentPage() - 1);
-            echo "<a   href='{$link->url()}' title='".tr("Prev")."'> <  </a>";
+            echo "<a   href='{$link->toString()}' title='".tr("Prev")."'> <  </a>";
 
         }
 
@@ -159,17 +155,17 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
                 $link_class = "class=selected";
             }
 
-            echo "<a $link_class  href='{$link->url()}'>" . ($a + 1) . "</a>";
+            echo "<a $link_class  href='{$link->toString()}'>" . ($a + 1) . "</a>";
             $a++;
         }
 
         if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
 
             $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() + 1));
-            echo "<a  href='{$link->url()}' title='".tr("Next")."'> > </a>";
+            echo "<a  href='{$link->toString()}' title='".tr("Next")."'> > </a>";
 
             $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getPagesTotal() - 1));
-            echo "<a  href='{$link->url()}' title='".tr("Last")."'> >> </a>";
+            echo "<a  href='{$link->toString()}' title='".tr("Last")."'> >> </a>";
         }
 
         echo "</div>";

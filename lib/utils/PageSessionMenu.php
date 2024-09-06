@@ -46,12 +46,11 @@ class PageSessionMenu extends MainMenu
         $selectedItem = $this->getSelectedItem();
         if ($selectedItem instanceof MenuItem) {
 
-            $selectedURL = new URLBuilder();
-            $selectedURL->buildFrom($selectedItem->getHref());
+            $selectedURL = new URL($selectedItem->getHref());
 
             if (count($menuItems) > 0) {
 
-                $itemURL = new URLBuilder();
+                $itemURL = new URL();
                 $selectedItem->clearChildNodes();
 
                 foreach ($menuItems as $idx => $item) {

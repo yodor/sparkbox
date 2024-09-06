@@ -6,7 +6,7 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
 
 
     protected string $sortField = "";
-    protected ?URLBuilder $sortLink = NULL;
+    protected ?URL $sortLink = NULL;
 
     const KEY_ORDER_BY = "orderby";
     const KEY_ORDER_DIR = "orderdir";
@@ -17,14 +17,13 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
         $this->tagName = "TH";
 
         $this->translation_enabled = true;
-        $this->sortLink = new URLBuilder();
-        $this->sortLink->buildFrom(SparkPage::Instance()->getURL()->url());
+        $this->sortLink = new URL(SparkPage::Instance()->getPageURL());
         $this->sortLink->add(new URLParameter(HeaderCellRenderer::KEY_ORDER_BY));
         $this->sortLink->add(new URLParameter(HeaderCellRenderer::KEY_ORDER_DIR, "ASC"));
 
     }
 
-    public function getSortURL(): ?URLBuilder
+    public function getSortURL(): ?URL
     {
         return $this->sortLink;
     }
@@ -54,7 +53,7 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
         if ($this->column->isSortable()) {
 
             //default order by field name asc
-            echo "<a href='{$this->sortLink->url()}'>";
+            echo "<a href='{$this->sortLink->toString()}'>";
             parent::renderImpl();
             echo "</a>";
 
@@ -64,11 +63,11 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
                 if (strcmp_isset(self::KEY_ORDER_DIR, "ASC", $_GET)) {
                     //current list is ordered ASC show up arrow and href with opposite direction
                     $this->sortLink->get(self::KEY_ORDER_DIR)->setValue("DESC");
-                    echo "<a class='direction' direction='ASC' href='{$this->sortLink->url()}'></a>";
+                    echo "<a class='direction' direction='ASC' href='{$this->sortLink->toString()}'></a>";
                 }
                 else {
                     $this->sortLink->get(self::KEY_ORDER_DIR)->setValue("ASC");
-                    echo "<a class='direction' direction='DESC' href='{$this->sortLink->url()}'></a>";
+                    echo "<a class='direction' direction='DESC' href='{$this->sortLink->toString()}'></a>";
                 }
 
             }

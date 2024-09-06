@@ -77,7 +77,7 @@ class CompoundInput extends InputProcessor
 
     }
 
-    public function clearURLParameters(URLBuilder $url)
+    public function clearURLParameters(URL $url)
     {
         parent::clearURLParameters($url);
 

@@ -66,13 +66,11 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
         if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_CLEAR, $data)) {
 
-            $url = new URLBuilder();
-            $url->buildFrom(SparkPage::Instance()->getPageURL());
-
+            $url = new URL(SparkPage::Instance()->getPageURL());
             $url->remove(KeywordSearch::SUBMIT_KEY);
             $url->remove("keyword");
 
-            header("Location: " . $url->url());
+            header("Location: " . $url->toString());
             exit;
         }
         else if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $data)) {

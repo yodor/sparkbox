@@ -7,9 +7,16 @@ include_once("components/renderers/ICacheable.php");
 include_once("storage/CacheEntry.php");
 include_once("utils/OutputBuffer.php");
 
+/**
+ * Wrapper for HTML element
+ */
 class Component extends SparkObservable implements IRenderer, IHeadContents, ICacheable
 {
 
+    /**
+     * Buffer to hold the inner contents for this HTML tag
+     * @var OutputBuffer
+     */
     protected OutputBuffer $buffer;
 
     protected bool $cacheable = false;
@@ -27,13 +34,13 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
 
     /**
-     * Collection of HTML attribute name/values
+     * Collection of HTML tag attribute name/values
      * @var array
      */
     protected array $attributes = array();
 
     /**
-     * Collection oh CSS style name/values
+     * Collection of CSS style name/values
      * @var array
      */
     protected array $style = array();
@@ -74,8 +81,11 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
 
     /**
-     * Component constructor.
-     * Creates default component class by using the inheritance chain get_class
+     * Sets the component class to the value of get_class($this)
+     * If '$chained_component_class' is true calls get_class on all parents and construct the component class from
+     * their names including this component class
+     * Ex: $cmp = new Component(true) will have compnent class = SparkObject SparkObservable Component
+     * @param bool $chained_component_class enable inheritance component class
      */
     public function __construct(bool $chained_component_class = true)
     {
@@ -92,7 +102,6 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
             $class_chain[] = get_class($this);
             $this->setComponentClass(implode(" ", $class_chain));
         }
-
         else {
             $this->setComponentClass(get_class($this));
         }
@@ -181,6 +190,11 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->tagName;
     }
 
+    /**
+     * Set inner contents - between opening and closing tags
+     * @param string $contents
+     * @return void
+     */
     public function setContents(string $contents) : void
     {
         $this->buffer->set($contents);
@@ -344,6 +358,11 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->getAttribute("tooltip");
     }
 
+    /**
+     * Set 'tooltip' attribute value
+     * @param string $text
+     * @return void
+     */
     public function setTooltipText(string $text) : void
     {
         if (!empty($text)) {
@@ -355,7 +374,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     }
 
     /**
-     * Get title attrobite
+     * Get 'title' attribute value
      * @return string
      */
     public function getTitle(): string
@@ -364,7 +383,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     }
 
     /**
-     * Set title attribute
+     * Set 'title' attribute value
      * @param string $text
      * @return void
      */
@@ -373,7 +392,10 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         $this->setAttribute("title", $text);
     }
 
-
+    /**
+     * Return the all the attributes for this element
+     * @return array
+     */
     public function getAttributes(): array
     {
         return $this->attributes;
@@ -384,13 +406,17 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
         return $this->style;
     }
 
+    /**
+     * Get all CSS class names as string
+     * @return string
+     */
     public function getClassName() : string
     {
         return implode(" ", array_keys($this->classNames));
     }
 
     /**
-     * Set the CSS class of this component, clearing any previously set class names
+     * Set the CSS class name of this component, clearing any previously set class names
      * @param string $cssClass
      */
     public function setClassName(string $cssClass)
@@ -402,7 +428,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     }
 
     /**
-     * Add CSS class name to this components class names
+     * Add CSS class name
      * @param string $cssClass
      */
     public function addClassName(string $cssClass)
@@ -413,7 +439,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     }
 
     /**
-     * Remove CSS class specified in '$cssClass'
+     * Remove CSS class name
      * @param string $cssClass
      */
     public function removeClassName(string $cssClass)
@@ -467,7 +493,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
             if (!$this->render_tooltip && strcmp($name, "tooltip") == 0) continue;
 
-            //value can be "0"
+            //value can be "0" or ""
             if (is_null($value) || strlen($value) < 1) {
                 $attributes[] = $name;
                 continue;

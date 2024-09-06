@@ -3,7 +3,7 @@ include_once("utils/URLParameter.php");
 include_once("utils/Paginator.php");
 include_once("utils/IGETConsumer.php");
 
-class URLBuilder implements IGETConsumer
+class URL implements IGETConsumer
 {
 
     protected bool $is_script = FALSE;
@@ -17,9 +17,24 @@ class URLBuilder implements IGETConsumer
     protected bool $clear_page_param = FALSE;
     protected array $clear_params = array();
 
-    public function __construct()
+    /**
+     * Construct URL with value current request URL
+     * Uses currentURL() internally
+     * @return URL
+     */
+    public static function Current() : URL
     {
-        $this->reset();
+        return new URL(currentURL());
+    }
+
+    public function __construct(?string $url="")
+    {
+        if (strlen($url)>0) {
+            $this->fromString($url);
+        }
+        else {
+            $this->reset();
+        }
     }
 
     public function reset() : void
@@ -99,11 +114,12 @@ class URLBuilder implements IGETConsumer
         return array_keys($this->parameters);
     }
 
+
     /**
-     * Return string representation of this url builder
+     * Return string representation of this URL object
      * @return string
      */
-    public function url(): string
+    public function toString(): string
     {
         if ($this->is_script) {
             return $this->script_name;
@@ -168,6 +184,20 @@ class URLBuilder implements IGETConsumer
         return $result;
     }
 
+    public function __toString() : string
+    {
+        return $this->toString();
+    }
+    /**
+     * Full url including protocol and domain
+     * Uses fullURL() from functions
+     * @return URL
+     */
+    public function fullURL() : URL
+    {
+        return new URL(fullURL($this));
+    }
+
     public function getScriptName() : string
     {
         return $this->script_name;
@@ -184,19 +214,12 @@ class URLBuilder implements IGETConsumer
     }
 
 
-    public static function Create(string $build_string) : URLBuilder
-    {
-        $result = new URLBuilder();
-        $result->buildFrom($build_string);
-        return $result;
-    }
     /**
-     * Parse contents of $build_string and construct the URLBuilder
-     *
+     * Reset this url and build from build_string
      * @param string $build_string
      * @return void
      */
-    public function buildFrom(string $build_string) : void
+    public function fromString(string $build_string) : void
     {
 
         $this->reset();
@@ -210,7 +233,6 @@ class URLBuilder implements IGETConsumer
             $this->script_name = $build_string;
             return;
         }
-
 
         $resource_param = null;
         //have #resource
@@ -258,7 +280,7 @@ class URLBuilder implements IGETConsumer
     }
 
     /**
-     * @param array $row Parametrise this URLBuilder parameter values using $row associative array as source.
+     * @param array $row Parametrise this URL parameter values using $row associative array as source.
      * JavaScript code is replaced using %parameter_name% as a match.
      * $row[$parameter_name] value is used as a replacement.
      *
@@ -285,7 +307,7 @@ class URLBuilder implements IGETConsumer
 
     }
 
-    public function copyParametersTo(URLBuilder $url)
+    public function copyParametersTo(URL $url)
     {
         $parameters = $this->getParameterNames();
         foreach ($parameters as $idx=>$name) {
@@ -294,7 +316,7 @@ class URLBuilder implements IGETConsumer
 
     }
 
-    public function copyParametersFrom(URLBuilder $url)
+    public function copyParametersFrom(URL $url)
     {
         $parameters = $url->getParameterNames();
         foreach ($parameters as $idx=>$name) {

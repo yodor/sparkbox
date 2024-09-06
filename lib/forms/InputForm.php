@@ -475,7 +475,7 @@ class InputForm implements IBeanEditor
         return $item_row;
     }
 
-    public function clearURLParameters(URLBuilder $url)
+    public function clearURLParameters(URL $url)
     {
         $names = $this->getInputNames();
         foreach ($names as $idx=>$name) {

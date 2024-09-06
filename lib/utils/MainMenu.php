@@ -27,7 +27,7 @@ class MainMenu
 
     /**
      * During construct() is used to set the href of the MenuItem using DataParameter ($value_key)
-     * @var URLBuilder|null
+     * @var URL|null
      */
     protected $target_url;
 
@@ -167,8 +167,7 @@ class MainMenu
      */
     public function setTargetURL(string $build_href)
     {
-        $this->target_url = new URLBuilder();
-        $this->target_url->buildFrom($build_href);
+        $this->target_url = new URL($build_href);
 
         if ($this->bean) {
             $this->target_url->add(new DataParameter($this->bean->key()));
@@ -269,9 +268,9 @@ class MainMenu
                     $menu_link = LOCAL . $menu_link;
                 }
             }
-            else if ($this->target_url instanceof URLBuilder) {
+            else if ($this->target_url instanceof URL) {
                 $this->target_url->setData($data);
-                $menu_link = $this->target_url->url();
+                $menu_link = $this->target_url->toString();
             }
 
             //debug("MenuItem ID:$menuID using menu_link: " . $menu_link);
@@ -359,32 +358,31 @@ class MainMenu
 
         $this->unselectAll($items);
 
-        $pageURL = new URLBuilder();
-        $pageURL->buildFrom(currentURL());
+        $pageURL = URL::Current();
 
-        debug("Current URL: " . $pageURL->url());
+        debug("Current URL: " . $pageURL->toString());
 
         $match_code = array();
 
-        $match_full = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
-            $match = (strcmp(mb_strtolower($itemURL->url()), mb_strtolower($pageURL->url())) == 0);
+        $match_full = function (MenuItem $item, URL $itemURL) use ($pageURL) {
+            $match = (strcmp(mb_strtolower($itemURL->toString()), mb_strtolower($pageURL->toString())) == 0);
             if ($match) {
-                debug("Match full URL: " . $itemURL->url() . " - matches");
+                debug("Match full URL: " . $itemURL->toString() . " - matches");
             }
             return $match;
         };
         $match_code[MainMenu::MATCH_FULL] = $match_full;
 
-        $match_partial = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
-            $match = (str_starts_with(mb_strtolower($pageURL->url()), mb_strtolower($itemURL->url())));
+        $match_partial = function (MenuItem $item, URL $itemURL) use ($pageURL) {
+            $match = (str_starts_with(mb_strtolower($pageURL->toString()), mb_strtolower($itemURL->toString())));
             if ($match) {
-                debug("Match partial URL: " . $itemURL->url() . " - matches");
+                debug("Match partial URL: " . $itemURL->toString() . " - matches");
             }
             return $match;
         };
         $match_code[MainMenu::MATCH_PARTIAL] = $match_partial;
 
-        $match_script = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
+        $match_script = function (MenuItem $item, URL $itemURL) use ($pageURL) {
             $match = (strcmp(mb_strtolower($itemURL->getScriptName()), mb_strtolower($pageURL->getScriptName())) == 0);
             if ($match) {
                 debug("Match scriptName: " . $itemURL->getScriptName() . " - matches");
@@ -393,7 +391,7 @@ class MainMenu
         };
         $match_code[MainMenu::MATCH_SCRIPT] = $match_script;
 
-        $match_path = function (MenuItem $item, URLBuilder $itemURL) use ($pageURL) {
+        $match_path = function (MenuItem $item, URL $itemURL) use ($pageURL) {
             $match = (strcmp(mb_strtolower($itemURL->getScriptPath()), mb_strtolower($pageURL->getScriptPath())) == 0);
             if ($match) {
                 debug("Match scriptPath: " . $itemURL->getScriptPath() . " - matches");
@@ -435,7 +433,7 @@ class MainMenu
 
         $result = NULL;
 
-        $itemURL = new URLBuilder();
+        $itemURL = new URL();
 
         foreach ($items as $idx => $item) {
             if (!($item instanceof MenuItem)) throw new Exception("Element is not instance of MenuItem");
@@ -446,9 +444,9 @@ class MainMenu
                 $item_href .= "index.php";
             }
             if (isset($GLOBALS["DEBUG_MAINMENU_MATCHITEM"])) {
-                debug("URLBuilder from MenuItem href: " . $item_href);
+                debug("URL from MenuItem href: " . $item_href);
             }
-            $itemURL->buildFrom(urldecode($item_href));
+            $itemURL->fromString(urldecode($item_href));
 
             $is_match = $matcher($item, $itemURL);
 

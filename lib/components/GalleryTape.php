@@ -33,7 +33,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
         }
     }
 
-    public function setItemURL(URLBuilder $url)
+    public function setItemURL(URL $url)
     {
         $this->url = $url;
     }

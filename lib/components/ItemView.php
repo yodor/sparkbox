@@ -53,7 +53,7 @@ class ItemView extends AbstractResultView
 
         if (!$this->item_renderer) throw new Exception("ItemRenderer not set");
 
-        $url = fullURL(SparkPage::Instance()->getPageURL());
+        $url = SparkPage::Instance()->getURL()->fullURL()->toString();
 
         echo "<link itemprop='url' href='$url'>";
         echo "<meta itemprop='numberOfItems' content='$this->total_rows'>";

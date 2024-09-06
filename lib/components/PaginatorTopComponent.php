@@ -16,17 +16,16 @@ class PaginatorTopComponent extends PaginatorComponent
         if ($this->view_modes_enabled) {
             echo "<div class='cell view_mode'>";
 
-                $link = new URLBuilder();
-                $link->buildFrom(SparkPage::Instance()->getPageURL());
+                $link = new URL(SparkPage::Instance()->getPageURL());
                 $link->remove(Paginator::KEY_PAGE);
 
                 $link->add(new URLParameter(Paginator::KEY_VIEW, "list"));
 
-                $listURL = $link->url();
+                $listURL = $link->toString();
                 echo "<a class='icon list' href='$listURL'></a>";
 
                 $link->get(Paginator::KEY_VIEW)->setValue("grid");
-                $gridURL = $link->url();
+                $gridURL = $link->toString();
                 echo "<a class='icon grid' href='$gridURL'></a>";
 
             echo "</div>";

@@ -133,6 +133,10 @@ abstract class BeanDataResponse extends SparkHTTPResponse
             throw new Exception("Field name not found");
         }
 
+        if (strlen($result[$this->field])<1) {
+            throw new Exception("Empty data");
+        }
+
         $object = @unserialize($result[$this->field]);
 
         if ($object instanceof StorageObject) {

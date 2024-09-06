@@ -1,6 +1,6 @@
 <?php
 include_once("utils/DataObject.php");
-include_once("utils/URLBuilder.php");
+include_once("utils/URL.php");
 
 class StorageItem extends DataObject implements JsonSerializable
 {
@@ -8,11 +8,10 @@ class StorageItem extends DataObject implements JsonSerializable
     public $id = -1;
     public $className = "";
     public $field = "";
-    public $storageURL = "";
 
-    protected URLBuilder $urlbuilder;
+    protected bool $use_external = false;
 
-    protected string $serializedURL = "";
+    protected ?URL $url = null;
 
     const TYPE_IMAGE = 1;
     const TYPE_FILE = 2;
@@ -26,28 +25,20 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->id = $id;
         $this->className = $className;
         $this->field = $field;
-        $this->storageURL = STORAGE_LOCAL;
 
-        $this->urlbuilder = URLBuilder::Create($this->storageURL);
     }
 
-    public function setType(int $type)
+    public function setType(int $type) : void
     {
         $this->type = $type;
     }
 
-    public function enableExternalURL(bool $mode)
+    public function enableExternalURL(bool $mode) : void
     {
-        if ($mode) {
-            $this->storageURL = STORAGE_EXTERNAL;
-        }
-        else {
-            $this->storageURL = STORAGE_LOCAL;
-        }
-        $this->urlbuilder = URLBuilder::Create($this->storageURL);
+        $this->use_external = $mode;
     }
 
-    public function hrefImage(int $width = -1, int $height = -1)
+    public function hrefImage(int $width = -1, int $height = -1) : string
     {
         if ($width > 0 || $height > 0) {
 
@@ -59,24 +50,24 @@ class StorageItem extends DataObject implements JsonSerializable
         return $this->hrefFull();
     }
 
-    public function hrefFull()
+    public function hrefFull() : string
     {
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
-        $this->urlbuilder->remove("width");
-        $this->urlbuilder->remove("height");
-        $this->urlbuilder->remove("size");
-        return $this->urlbuilder->url();
+        $this->url->remove("width");
+        $this->url->remove("height");
+        $this->url->remove("size");
+        return $this->url->toString();
     }
 
     public function hrefCrop($width, $height) : string
     {
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
-        $this->urlbuilder->remove("size");
-        $this->urlbuilder->add(new URLParameter("width", $width));
-        $this->urlbuilder->add(new URLParameter("height", $height));
-        return $this->urlbuilder->url();
+        $this->url->remove("size");
+        $this->url->add(new URLParameter("width", $width));
+        $this->url->add(new URLParameter("height", $height));
+        return $this->url->toString();
 
     }
 
@@ -84,23 +75,23 @@ class StorageItem extends DataObject implements JsonSerializable
     {
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
-        $this->urlbuilder->remove("width");
-        $this->urlbuilder->remove("height");
-        $this->urlbuilder->add(new URLParameter("size", $width));
-        return $this->urlbuilder->url();
+        $this->url->remove("width");
+        $this->url->remove("height");
+        $this->url->add(new URLParameter("size", $width));
+        return $this->url->toString();
     }
 
     public function hrefFile() : string
     {
         $this->setType(StorageItem::TYPE_FILE);
         $this->buildURL();
-        return $this->urlbuilder->url();
+        return $this->url->toString();
     }
 
     public function href() : string
     {
         $this->buildURL();
-        return $this->urlbuilder->url();
+        return $this->url->toString();
     }
 
     protected function buildURL()
@@ -113,12 +104,19 @@ class StorageItem extends DataObject implements JsonSerializable
             $cmd = "data";
         }
 
-        $this->urlbuilder->add(new URLParameter("cmd", $cmd));
-        $this->urlbuilder->add(new URLParameter("class", $this->className));
-        $this->urlbuilder->add(new URLParameter("id", (string)$this->id));
+        if (is_null($this->url)) {
+            $storageURL = STORAGE_LOCAL;
+            if ($this->use_external) $storageURL = STORAGE_EXTERNAL;
+
+            $this->url = new URL($storageURL);
+        }
+
+        $this->url->add(new URLParameter("cmd", $cmd));
+        $this->url->add(new URLParameter("class", $this->className));
+        $this->url->add(new URLParameter("id", (string)$this->id));
 
         if ($this->field) {
-            $this->urlbuilder->add(new URLParameter("field", $this->field));
+            $this->url->add(new URLParameter("field", $this->field));
         }
     }
 
@@ -158,8 +156,9 @@ class StorageItem extends DataObject implements JsonSerializable
      */
     public function jsonSerialize() : mixed
     {
-        $this->serializedURL = $this->href();
-        return get_object_vars($this);
+        $result = get_object_vars($this);
+        $result["use_external"] = $this->use_external;
+        return $result;
     }
 }
 

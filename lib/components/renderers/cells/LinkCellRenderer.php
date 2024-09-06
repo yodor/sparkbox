@@ -18,7 +18,7 @@ class LinkCellRenderer extends TableCellRenderer
     protected function renderImpl()
     {
         if ($this->value) {
-            $this->action->getURLBuilder()->buildFrom($this->value);
+            $this->action->getURL()->fromString($this->value);
             $this->action->setContents($this->value);
             $this->action->render();
         }

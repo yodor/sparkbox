@@ -1,5 +1,5 @@
 <?php
-include_once("utils/URLBuilder.php");
+include_once("utils/URL.php");
 include_once("utils/URLParameter.php");
 include_once("utils/DataParameter.php");
 include_once("components/renderers/items/DataIteratorItem.php");
@@ -12,9 +12,9 @@ class Action extends DataIteratorItem
     protected ?Closure $check_code = NULL;
 
     /**
-     * @var URLBuilder
+     * @var URL
      */
-    protected URLBuilder $urlbuilder;
+    protected URL $url;
 
     /**
      * Render the action as contents of this Action if contents are not set
@@ -24,10 +24,11 @@ class Action extends DataIteratorItem
 
 
     /**
-     * @param string $action
-     * @param string $href
-     * @param array $parameters
-     * @param Closure|null $check_code
+     * Construct new A HTML component
+     * @param string $action Inner contents and 'action' attribute value if not empty
+     * @param string $href Set the URL and the 'href' attribute value
+     * @param array $parameters Array of URLParameters to append to the URL of this Action
+     * @param Closure|null $check_code If set controls rendering from its return value true/false. Used during setData
      */
     public function __construct(string $action = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
     {
@@ -36,8 +37,7 @@ class Action extends DataIteratorItem
 
         $this->tagName = "A";
 
-        $this->urlbuilder = new URLBuilder();
-        $this->urlbuilder->buildFrom($href);
+        $this->url = new URL($href);
 
         if ($action) {
             $this->setAttribute("action", $action);
@@ -46,7 +46,7 @@ class Action extends DataIteratorItem
 
         foreach ($parameters as $parameter) {
 
-            $this->urlbuilder->add($parameter);
+            $this->url->add($parameter);
 
         }
 
@@ -63,9 +63,9 @@ class Action extends DataIteratorItem
         return $arr;
     }
 
-    public function getURLBuilder(): URLBuilder
+    public function getURL(): URL
     {
-        return $this->urlbuilder;
+        return $this->url;
     }
 
     public function setData(array $data) : void
@@ -85,22 +85,13 @@ class Action extends DataIteratorItem
             }
         }
 
-        $this->urlbuilder->setData($data);
+        $this->url->setData($data);
 
         //set contents from DataIteratorItem
         if ($this->value_key) {
             $this->setContents($this->value);
         }
 
-//        //override only if not empty
-//        if ($this->action_as_contents) {
-//
-//            $action = $this->getAttribute("action");
-//
-//            if ($action) {
-//                $this->setContents($action);
-//            }
-//        }
 
     }
 
@@ -108,11 +99,7 @@ class Action extends DataIteratorItem
     {
         parent::processAttributes();
 
-        $url = $this->urlbuilder->url();
-
-        if ($url) {
-            $this->setAttribute("href", $url);
-        }
+        $this->setAttribute("href", $this->url);
 
     }
 
@@ -131,7 +118,7 @@ class Action extends DataIteratorItem
         foreach ($actions as $item) {
             if ($item instanceof MenuItem) {
                 $action = new Action();
-                $action->getURLBuilder()->buildFrom($item->getHref());
+                $action->getURL()->fromString($item->getHref());
                 $action->translation_enabled = $translate;
                 $action->setContents($item->getTitle());
                 $action->render();

@@ -6,7 +6,7 @@ include_once("beans/BeanTranslationsBean.php");
 include_once("beans/TranslationPhrasesBean.php");
 
 include_once("utils/IRequestProcessor.php");
-include_once("utils/URLBuilder.php");
+include_once("utils/URL.php");
 include_once("utils/Session.php");
 
 class Translator implements IRequestProcessor, IGETConsumer
@@ -133,14 +133,14 @@ class Translator implements IRequestProcessor, IGETConsumer
                 debug("Error: ".$e->getMessage());
             }
 
-            $url = new URLBuilder();
-            $url->buildFrom(currentURL());
+            $url = URL::Current();
+
             $url->remove(Translator::KEY_CHANGE_LANGUAGE);
             $url->remove(Translator::KEY_LANGUAGE_ID);
             $url->remove(Translator::KEY_LANGUAGE);
-            debug("Redirecting to: ".$url->url());
+            debug("Redirecting to: ".$url->toString());
 
-            header("Location: ".$url->url());
+            header("Location: ".$url->toString());
             exit;
         }
 

@@ -1,6 +1,6 @@
 <?php
 include_once("components/Component.php");
-include_once("utils/URLBuilder.php");
+include_once("utils/URL.php");
 include_once("pages/HTMLHead.php");
 include_once("pages/HTMLBody.php");
 
@@ -96,11 +96,9 @@ class HTMLPage extends Component
         return currentURL();
     }
 
-    public function getURL(): URLBuilder
+    public function getURL(): URL
     {
-        $url = new URLBuilder();
-        $url->buildFrom($this->getPageURL());
-        return $url;
+        return new URL($this->getPageURL());
     }
 
     public function setName(string $name) : void

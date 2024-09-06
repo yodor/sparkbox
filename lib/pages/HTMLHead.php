@@ -193,7 +193,7 @@ class HTMLHead extends Component
             echo $object->script();
         }
 
-        $url = fullURL(SparkPage::Instance()->getURL()->url());
+        $url = SparkPage::Instance()->getURL()->fullURL()->toString();
         //X-default tags are recommended, but not mandatory
         echo "<link rel='alternate' hreflang='x-default' href='$url'>";
 
@@ -207,7 +207,7 @@ class HTMLHead extends Component
                 if (array_key_exists($name, $this->canonical_params)) continue;
                 $builder->remove($name);
             }
-            $canonical_href = fullURL($builder->url());
+            $canonical_href = fullURL($builder->toString());
             echo "<link rel='canonical' href='$canonical_href'>";
         }
 
