@@ -9,12 +9,37 @@ class ArrayDataInput extends DataInput
 
     public bool $source_label_visible = false;
 
+    //exception on processing validation or processing
+    protected string $error_generic = "";
+
     public function __construct(string $name, string $label, bool $required)
     {
         parent::__construct($name, $label, $required);
 
         $this->value = array();
         $this->error = array();
+    }
+
+
+
+    /**
+     * Set generic error text for the whole array input
+     * @param string $err
+     * @return void
+     */
+    public function setError(string $err) : void
+    {
+        //validators or processors might set generic error for the whole array here
+        $this->error_generic = $err;
+    }
+
+    /**
+     * Get the generic error text
+     * @return string
+     */
+    public function getError() : string
+    {
+        return $this->error_generic;
     }
 
     public function setValidator(IInputValidator $validator)
@@ -42,13 +67,20 @@ class ArrayDataInput extends DataInput
         return count($this->value);
     }
 
-    public function getErrorAt($idx)
+    public function getErrorAt($idx) : string
     {
         if (isset($this->error[$idx])) return $this->error[$idx];
         return "";
     }
 
-    public function setErrorAt(int $idx, string $err)
+    /**
+     * Set or clear error for given index
+     * Clear if $err parameter is ""
+     * @param int $idx
+     * @param string $err
+     * @return void
+     */
+    public function setErrorAt(int $idx, string $err) : void
     {
 
         if (strlen($err) > 0) {
@@ -64,23 +96,16 @@ class ArrayDataInput extends DataInput
 
     public function haveError(): bool
     {
-
-        if (is_array($this->error)) {
-            if (count($this->error) > 0) return TRUE;
-        }
-        if ($this->error) {
-            return TRUE;
-        }
+        if (count($this->error) > 0 || $this->error_generic) return TRUE;
         return FALSE;
-
     }
 
-    public function haveErrorAt($idx)
+    public function haveErrorAt($idx) : bool
     {
         return isset($this->error[$idx]);
     }
 
-    public function clear()
+    public function clear() : void
     {
         $this->value = array();
         $this->error = array();
@@ -95,17 +120,17 @@ class ArrayDataInput extends DataInput
         //default error for that label itself or when no element
         $error_text = tr(ArrayDataInput::ERROR_TEXT);
 
-        if (is_array($this->value)) {
-            $values_count = count($this->value);
-
-            for ($idx=0; $idx<$values_count; $idx++) {
-                if ($this->haveErrorAt($idx)) {
-                    $error_text.= "<BR>[$idx]: ".$this->getErrorAt($idx);
-                }
+        if (is_array($this->error)) {
+            foreach ($this->error as $idx => $error) {
+                $error_text.= "<BR>[$idx]: ".$this->getErrorAt($idx);
             }
+            return $error_text;
+        }
+        else {
+            //can be string for empty array values return the default error set from validator
+            return $this->error_generic;
         }
 
-        return $error_text;
     }
 
 }
