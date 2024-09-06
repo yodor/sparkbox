@@ -53,6 +53,8 @@ abstract class SessionUpload extends ArrayField
         return $arr;
     }
 
+    //Force [] to the input name
+    //SessionSpload is ArrayDataInput
     protected function processInputAttributes()
     {
         parent::processInputAttributes();
@@ -65,6 +67,10 @@ abstract class SessionUpload extends ArrayField
         $this->setInputAttribute("max_slots", $max_slots);
 
         $this->setInputAttribute("type", "file");
+
+        //allow uploading multiple files
+        $this->setInputAttribute("name", $this->input->getName()."[]");
+        $this->setInputAttribute("multiple", "");
     }
 
     public function renderDetails()
