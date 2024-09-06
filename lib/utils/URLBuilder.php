@@ -135,7 +135,9 @@ class URLBuilder implements IGETConsumer
                 $param = $this->get($name);
                 if ($param->isSlugEnabled()) continue;
                 if ($param->isResource()) {
-                    $resource = $param->name();
+                    //handle paramterized resource named using #resource.%param%
+                    //parameter value is done in setData of URLParameter
+                    $resource = (strlen($param->value())<1) ? $param->name() : $param->value();
                 }
                 else {
                     $pairs[] = $param->text();

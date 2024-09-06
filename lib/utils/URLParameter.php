@@ -34,6 +34,7 @@ class URLParameter implements IDataResultProcessor
     {
         $this->value = $value;
     }
+
     public function name(): string
     {
         return $this->name;
@@ -74,13 +75,16 @@ class URLParameter implements IDataResultProcessor
             }
         }
 
-        //is resource ?
-        if (str_starts_with($this->name, "#")) {
+        if ($this->isResource()) {
+            //parameterized resource ie ?prodID=385#ProductPhotosBean.%ppID%
+            //make value equal to #ProductPhotosBean.34 if ppID is found as data key in $data
             $names = array_keys($data);
+            $parametrized = $this->name;
             foreach ($names as $idx=>$name) {
                 $replace = array("%$name%"=>$data[$name]);
-                $this->value = strtr($name, $replace);
+                $parametrized = strtr($parametrized, $replace);
             }
+            $this->value = $parametrized;
         }
 
     }
