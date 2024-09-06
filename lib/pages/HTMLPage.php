@@ -19,7 +19,6 @@ class HTMLPage extends Component
         $this->head = new HTMLHead();
         $this->body = new HTMLBody();
 
-        $this->setAttribute("dir", Session::Get("page_dir", "LTR"));
         $this->setAttribute("lang", substr(DEFAULT_LANGUAGE_ISO3, 0,2));
 
         //override automatic css class names
