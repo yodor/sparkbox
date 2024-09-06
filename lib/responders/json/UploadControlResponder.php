@@ -57,9 +57,12 @@ abstract class UploadControlResponder extends JSONResponder
         $validator = $this->validator();
 
         //virtual input field to process ajax posted data
-        $input = new DataInput($this->field_name, "Upload Control", 1);
+        $input = new ArrayDataInput($this->field_name, "Upload Control", 1);
 
+        //validator will be called for each element of the ArrayDataInput
         $input->setValidator($validator);
+
+        //set processor to the input
         new UploadDataInput($input);
 
         debug("Loading input processor with _POST data");
@@ -69,16 +72,28 @@ abstract class UploadControlResponder extends JSONResponder
         $input->validate();
 
         //FileStorageObject
-        $uploadObject = $input->getValue();
+        $value = $input->getValue();
 
-        //TODO:multiple uploaded files can be processed?
-        $num_files = 0;
-
-        if ($input->haveError()) {
-            throw new Exception(tr("Error").": ".$input->getError());
+        if (is_array($value)) {
+            debug("Processing multiple uploeded files: ".count($value));
+            foreach ($value as $idx=>$uploadObject) {
+                $error = $input->getErrorAt($idx);
+                if ($error) {
+                    debug("Element[$idx]: Validation error: $error");
+                }
+                else {
+                    $this->assignUploadObjects($resp, $uploadObject);
+                }
+            }
         }
+        else {
 
-        $this->assignUploadObjects($resp, $uploadObject);
+            if ($input->haveError()) {
+                throw new Exception(tr("Error").": ".$input->getError());
+            }
+
+            $this->assignUploadObjects($resp, $value);
+        }
 
         debug("Finished");
     }
@@ -90,7 +105,7 @@ abstract class UploadControlResponder extends JSONResponder
         $html = $this->getHTML($uploadObject, $this->field_name);
         //
         $jsonObject = array("name" => $uploadObject->getFilename(), "uid" => $uploadObject->UID(),
-                            "mime" => $uploadObject->buffer()->mime(), "html" => $html,);
+                            "mime" => $uploadObject->buffer()->mime(), "html" => $html);
 
         //JSONResponse returns all dynamically assigned properties in its result
         $resp->objects[] = $jsonObject;
@@ -100,7 +115,7 @@ abstract class UploadControlResponder extends JSONResponder
         debug("Stored FileStorageObject to session using UID: " . $uploadObject->UID() . " for field['" . $this->field_name . "']");
 
         //JSONResponse.response() returns dynamically assigned properties in its result
-        $resp->object_count = 1;
+        $resp->object_count = count($resp->objects);
     }
 
     protected function _remove(JSONResponse $resp)
