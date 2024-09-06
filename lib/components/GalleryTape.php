@@ -78,7 +78,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
         if (!$this->image_popup->getBeanClass()) throw new Exception("Bean class not set");
         if ($this->id < 1) throw new Exception("ID not set");
         if ($this->url) {
-            $this->image_popup->setAttribute("href", $this->url->url());
+            $this->image_popup->setAttribute("href", $this->url);
         }
         $this->image_popup->setID($this->id);
         $this->image_popup->render();
