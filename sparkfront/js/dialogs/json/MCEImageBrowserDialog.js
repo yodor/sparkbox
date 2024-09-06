@@ -158,7 +158,7 @@ class MCEImageBrowserDialog extends JSONDialog {
 
             const dialog = this;
 
-            for (var a = 0; a < jsonResult.result_count; a++) {
+            for (var a = 0; a < jsonResult.object_count; a++) {
                 var image = jsonResult.objects[a];
                 this.modal_pane.popup.find(".ImageStorage .Collection").first().append(image.html);
             }
@@ -212,11 +212,12 @@ class MCEImageBrowserDialog extends JSONDialog {
      * @param result
      */
     processUploadResult(result) {
-        for (var a = 0; a < result.result_count; a++) {
-            var image = result.objects[a];
-            var imageID = image.imageID;
-            //load the image into the view
-            this.loadImages(imageID);
+        for (var a = 0; a < result.object_count; a++) {
+            //meta_info (imageID=>beanID, html=>html)
+            var meta_info = result.objects[a];
+            var imageID = meta_info.imageID;
+
+            this.modal_pane.popup.find(".ImageStorage .Collection").first().append(meta_info.html);
         }
     }
 
