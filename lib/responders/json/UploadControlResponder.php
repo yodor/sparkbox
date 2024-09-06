@@ -82,7 +82,7 @@ abstract class UploadControlResponder extends JSONResponder
                     debug("Element[$idx]: Validation error: $error");
                 }
                 else {
-                    $this->assignUploadObjects($resp, $uploadObject);
+                    $this->assignUploadObject($resp, $uploadObject);
                 }
             }
         }
@@ -92,30 +92,70 @@ abstract class UploadControlResponder extends JSONResponder
                 throw new Exception(tr("Error").": ".$input->getError());
             }
 
-            $this->assignUploadObjects($resp, $value);
+            $this->assignUploadObject($resp, $value);
         }
 
         debug("Finished");
     }
 
-    protected function assignUploadObjects(JSONResponse $resp, FileStorageObject $uploadObject)
+    /**
+     * Assign result to JSONResponse
+     * 1. calls createResponseObject and assign to the object field of $resp
+     * 2. storeToSession the $uploadObject
+     * 3. increment object_count field of $resp
+     *
+     * @param JSONResponse $resp
+     * @param FileStorageObject $uploadObject
+     * @return void
+     */
+    private function assignUploadObject(JSONResponse $resp, FileStorageObject $uploadObject)
     {
         debug("...");
 
+        //!Do store first
+        //StorageObject can change UID depending on strage type used
+        $this->storeUploadObject($uploadObject);
+
+        //prepare representation for this storage object
         $html = $this->getHTML($uploadObject, $this->field_name);
-        //
-        $jsonObject = array("name" => $uploadObject->getFilename(), "uid" => $uploadObject->UID(),
-                            "mime" => $uploadObject->buffer()->mime(), "html" => $html);
 
         //JSONResponse returns all dynamically assigned properties in its result
-        $resp->objects[] = $jsonObject;
-
-        //store the original data in the session array by the field name and UID
-        $_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uploadObject->UID()] = serialize($uploadObject);
-        debug("Stored FileStorageObject to session using UID: " . $uploadObject->UID() . " for field['" . $this->field_name . "']");
+        //create response array with metadata and html
+        $resp->objects[] = $this->createResponseObject($uploadObject, $html);
 
         //JSONResponse.response() returns dynamically assigned properties in its result
         $resp->object_count = count($resp->objects);
+    }
+
+
+    /**
+     * Store upload object
+     * Default is to use the StorageObject into session using the StorageObject UID
+     * @param FileStorageObject $uploadObject
+     * @return void
+     */
+    protected function storeUploadObject(FileStorageObject $uploadObject) : void
+    {
+        //store the original data in the session array by the field name and UID
+        $_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uploadObject->UID()] = serialize($uploadObject);
+        debug("Stored FileStorageObject to session using UID: " . $uploadObject->UID() . " for field['" . $this->field_name . "']");
+    }
+
+    /**
+     *  Create array using FileStorageObject meta-data and html to use as representation in the upload control
+     *  Data user name, uid, mime
+     *  HTML is prepared from getHTML
+     * @param FileStorageObject $uploadObject
+     * @param string $html
+     * @return array
+     */
+    protected function createResponseObject(FileStorageObject $uploadObject, string $html) : array
+    {
+        return array(
+            "name" => $uploadObject->getFilename(),
+            "uid" => $uploadObject->UID(),
+            "mime" => $uploadObject->buffer()->mime(),
+            "html" => $html);
     }
 
     protected function _remove(JSONResponse $resp)
