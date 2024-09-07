@@ -4,9 +4,9 @@ include_once("components/Component.php");
 class ColorButton extends Component
 {
 
-    const TYPE_SUBMIT = "submit";
-    const TYPE_RESET = "reset";
-    const TYPE_BUTTON = "button";
+    const string TYPE_SUBMIT = "submit";
+    const string TYPE_RESET = "reset";
+    const string TYPE_BUTTON = "button";
 
     protected static string $default_class = "";
 
@@ -61,22 +61,40 @@ class ColorButton extends Component
         return $arr;
     }
 
+    /**
+     * Set value of HTML attribute 'type'
+     * @param string $type Value for attribute 'type'
+     * @return void
+     */
     public function setType(string $type)
     {
         $this->setAttribute("type", $type);
     }
 
+    /**
+     * Get value of HTML attribute 'type'
+     * @return string
+     */
     public function getType(): string
     {
         return $this->getAttribute("type");
     }
 
-    public function setValue(string $value)
+    /**
+     * Set value of HTML attribute 'value' and 'aria-label' to '$value'
+     * @param string $value Value for attribute 'value'
+     * @return void
+     */
+    public function setValue(string $value) : void
     {
         $this->setAttribute("value", $value);
         $this->setAttribute("aria-label", $value);
     }
 
+    /**
+     * Get value of HTML attribute 'value'
+     * @return string
+     */
     public function getValue(): string
     {
         return $this->getAttribute("value");
