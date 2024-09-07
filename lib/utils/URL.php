@@ -9,6 +9,9 @@ class URL implements IGETConsumer
     protected bool $is_script = FALSE;
     protected string $script_name = "";
 
+    protected string $domain = "";
+    protected string $protocol = "";
+
     /**
      * @var array  All url parameters name/value pairs
      */
@@ -50,6 +53,9 @@ class URL implements IGETConsumer
         $this->clear_params = array();
         $this->clear_page_param = false;
         $this->is_script = false;
+
+        $this->domain = "";
+        $this->protocol = "";
 
     }
 
@@ -215,7 +221,7 @@ class URL implements IGETConsumer
 
 
     /**
-     * Reset this url and build from build_string
+     * Reset this url removing any existing data and rebuild using build_string
      * @param string $build_string
      * @return void
      */
@@ -232,6 +238,20 @@ class URL implements IGETConsumer
             $this->is_script = TRUE;
             $this->script_name = $build_string;
             return;
+        }
+
+        //cut domain and protocol first
+        if (str_contains($build_string, "://")) {
+            list($this->protocol, $build_string) = explode("://", $build_string);
+        }
+
+        //first position of '/'
+        $pos = strpos($build_string, "/");
+        $this->domain = substr($build_string, 0,  $pos);
+
+        if ($pos>0) {
+            //from first position of '/' to the end
+            $build_string = substr($build_string, $pos);
         }
 
         $resource_param = null;
@@ -267,11 +287,14 @@ class URL implements IGETConsumer
         $static_pairs = explode("&", $script_query);
         foreach ($static_pairs as $idx => $pair) {
             if (strlen(trim($pair))<1) continue;
-            if (!str_contains($pair, "=")) continue;
-
-            list($param_name, $param_value) = explode("=", $pair);
-
-            $this->add(new URLParameter($param_name, $param_value));
+            $param_name = $pair;
+            $param_value = "";
+            if (str_contains($pair, "=")) {
+                list($param_name, $param_value) = explode("=", $pair);
+            }
+            if (strlen(trim($param_name))>0) {
+                $this->add(new URLParameter($param_name, $param_value));
+            }
         }
 
         //finally append the resource if any
