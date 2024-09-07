@@ -262,6 +262,9 @@ function getArrayText(array $arr)
         else if (is_null($val)) {
             $message = "NULL";
         }
+        else {
+            $message = $val;
+        }
         $msg[] = "[$key] => $message";
     }
     return implode("; ", $msg);
