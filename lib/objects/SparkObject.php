@@ -1,5 +1,5 @@
 <?php
-class SparkObject
+class SparkObject implements jsonSerializable
 {
     /**
      * @var SparkObject|null
@@ -41,12 +41,14 @@ class SparkObject
     }
 
     /**
-     * Return hash of the serialized value of this object
+     * Return hash of the object
+     * Hash value is constructed using json_encoded result of '$this'
+     * Uses the default sparkHash for actual hashing
      * @return string Currently uses the sparkHash function that use xxh3 algorithm
      */
     public function hash(): string
     {
-        return sparkHash(serialize($this));
+        return sparkHash(json_encode($this));
     }
 
     /**
@@ -59,5 +61,12 @@ class SparkObject
         return (strcmp($this->hash(), $other->hash())==0);
     }
 
+    /**
+     * @return mixed
+     */
+    public function jsonSerialize(): mixed
+    {
+        return get_object_vars($this);
+    }
 }
 ?>
