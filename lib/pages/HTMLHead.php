@@ -131,7 +131,8 @@ class HTMLHead extends Component
         //X-default tags are recommended, but not mandatory
         echo "<link rel='alternate' hreflang='x-default' href='$url'>\n";
 
-        echo "<link rel='alternate' hreflang='{DEFAULT_LOCALE}' href='$url'>\n";
+        $default_locale = "".DEFAULT_LOCALE;
+        echo "<link rel='alternate' hreflang='{$default_locale}' href='$url'>\n";
 
 
         if (count($this->canonical_params)>0) {
