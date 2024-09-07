@@ -9,7 +9,7 @@ class InputComponent extends Component
     /**
      * @var DataInput
      */
-    protected $input;
+    protected ?DataInput $input = null;
 
     /**
      * @var InputLabel
@@ -29,19 +29,19 @@ class InputComponent extends Component
     {
         $this->input = $input;
 
-        $this->attributes["field"] = $input->getName();
+        $this->setAttribute("field",$input->getName());
 
         if ($input->isRequired()) {
-            $this->attributes["required"] = 1;
+            $this->setAttribute("required", 1);
         }
         else {
-            $this->attributes["required"] = "";
+            $this->removeAttribute("required");
         }
 
         $this->label_renderer = new InputLabel($input);
     }
 
-    public function getDataInput(): DataInput
+    public function getDataInput(): ?DataInput
     {
         return $this->input;
     }

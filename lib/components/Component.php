@@ -1,5 +1,5 @@
 <?php
-include_once("objects/SparkObservable.php");
+include_once("objects/SparkObject.php");
 include_once("components/renderers/IRenderer.php");
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
@@ -10,11 +10,11 @@ include_once("utils/OutputBuffer.php");
 /**
  * Wrapper for HTML element
  */
-class Component extends SparkObservable implements IRenderer, IHeadContents, ICacheable
+class Component extends SparkObject implements IRenderer, IHeadContents, ICacheable
 {
 
     /**
-     * Buffer to hold the inner contents for this HTML tag
+     * Buffer to hold the inner contents of this HTML element
      * @var OutputBuffer
      */
     protected OutputBuffer $buffer;
@@ -22,7 +22,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     protected bool $cacheable = false;
 
     /**
-     * HTML tag of this component
+     * HTML tag of this element
      * @var string
      */
     protected string $tagName = "DIV";
@@ -34,7 +34,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
 
 
     /**
-     * Collection of HTML tag attribute name/values
+     * Collection of HTML element attribute name/values
      * @var array
      */
     protected array $attributes = array();
@@ -132,7 +132,7 @@ class Component extends SparkObservable implements IRenderer, IHeadContents, ICa
     }
 
     /**
-     * Set component css class name
+     * Set component CSS class name
      * @param string $name
      */
     public function setComponentClass(string $name) : void

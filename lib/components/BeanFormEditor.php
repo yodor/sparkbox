@@ -11,8 +11,6 @@ include_once("responders/json/UploadControlResponder.php");
 
 include_once("dialogs/BeanTranslationDialog.php");
 
-include_once("objects/SparkObserver.php");
-
 
 class BeanFormEditorEvent extends SparkEvent {
     const FORM_BEAN_LOADED = "FORM_BEAN_LOADED";
@@ -124,8 +122,6 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->items()->append($this->form_render);
 
-        $this->setObserver(new SparkObserver());
-
     }
 
     public function setRedirectEnabled(bool $mode)
@@ -233,10 +229,10 @@ class BeanFormEditor extends Container implements IBeanEditor
 
             debug("Loading bean data into form");
             $this->form->loadBeanData($this->getEditID(), $this->getBean());
-            $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_LOADED, $this));
+            SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_LOADED, $this));
             debug("Calling form processor");
             $this->processor->process($this->form);
-            $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_PROCESSED, $this));
+            SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_PROCESSED, $this));
 
             $process_status = $this->processor->getStatus();
             debug("FormProcessor status => " . $process_status);
@@ -246,12 +242,12 @@ class BeanFormEditor extends Container implements IBeanEditor
 
                 debug("Transacting form values");
                 $this->transactor->processForm($this->form);
-                $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_VALUES_TRANSACTED, $this));
+                SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_VALUES_TRANSACTED, $this));
 
                 debug("Processing bean");
                 $this->transactor->processBean();
                 debug("Process status is successful");
-                $this->notify(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_TRANSACED, $this));
+                SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_TRANSACED, $this));
 
                 $redirectURL = $this->redirect_url;
 

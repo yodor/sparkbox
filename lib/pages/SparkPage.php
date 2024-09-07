@@ -12,6 +12,7 @@ include_once("utils/ActionCollection.php");
 include_once("utils/FBPixel.php");
 include_once("utils/GTAG.php");
 include_once("utils/GTAGObject.php");
+include_once("objects/SparkEventManager.php");
 
 class SparkPage extends HTMLPage implements IActionCollection
 {

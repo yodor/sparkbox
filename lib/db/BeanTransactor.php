@@ -38,7 +38,7 @@ class BeanTransactorEvent extends SparkEvent
  * Handles add data to 'DBTableBean' and edit data from 'DBTableBean'
  * Class BeanTransactor
  */
-class BeanTransactor extends SparkObservable implements IBeanEditor
+class BeanTransactor extends SparkObject implements IBeanEditor
 {
 
     protected array $values = array();
@@ -77,7 +77,6 @@ class BeanTransactor extends SparkObservable implements IBeanEditor
         $this->form = null;
         $this->bean = $bean;
         $this->editID = $editID;
-        $this->setObserver(new SparkObserver());
     }
 
     public function getEditID(): int
@@ -240,7 +239,7 @@ class BeanTransactor extends SparkObservable implements IBeanEditor
 
             $this->beforeCommit($db);
 
-            $this->notify(new BeanTransactorEvent(BeanTransactorEvent::BEFORE_COMMIT, $this, $db));
+            SparkEventManager::emit(new BeanTransactorEvent(BeanTransactorEvent::BEFORE_COMMIT, $this, $db));
 
             $db->commit();
 
@@ -249,7 +248,7 @@ class BeanTransactor extends SparkObservable implements IBeanEditor
             try {
                 $this->afterCommit();
 
-                $this->notify(new BeanTransactorEvent(BeanTransactorEvent::AFTER_COMMIT, $this, $db));
+                SparkEventManager::emit(new BeanTransactorEvent(BeanTransactorEvent::AFTER_COMMIT, $this, $db));
             }
             catch (Exception $exx) {
                 debug("afterCommit() failed: " . $exx->getMessage());

@@ -1,40 +1,36 @@
 <?php
 include_once("objects/IObserver.php");
+include_once("objects/SparkEvent.php");
 
 /**
- * Default adapter class using Closure callback if set
+ * Default adapter class using Closure callback
  */
 class SparkObserver implements IObserver
 {
     /**
      * @var Closure
      */
-    protected $callback = NULL;
+    protected Closure $callback;
 
-    public function __construct()
-    {
-
-    }
-
-    public function setCallback(Closure $closure)
+    public function __construct(Closure $closure)
     {
         $this->callback = $closure;
     }
 
-    public function getCallback(): ?Closure
+    public function setCallback(Closure $closure) : void
+    {
+        $this->callback = $closure;
+    }
+
+    public function getCallback() : Closure
     {
         return $this->callback;
     }
 
-    public function onEvent(SparkEvent $event)
+    public function onEvent(SparkEvent $event) : void
     {
-        debug("SparkObserver onEvent: ".$event->getName()." | Source: ".get_class($event->getSource()));
-
-        if ($this->callback instanceof Closure) {
-            $observer = $this->callback;
-            $observer($event);
-        }
-
+        debug("onEvent: ".get_class($event)." - name: ".$event->getName());
+        ($this->callback)($event);
     }
 
 }
