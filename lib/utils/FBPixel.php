@@ -1,13 +1,14 @@
 <?php
-include_once ("utils/IHeadScript.php");
+include_once ("utils/OutputScript.php");
 
-class FBPixel implements IHeadScript
+class FBPixel extends OutputScript
 {
     protected string $pixelID;
     protected array $trackEvents;
 
     public function __construct(string $pixelID)
     {
+        parent::__construct();
         $this->pixelID = $pixelID;
         $this->trackEvents = array();
     }
@@ -24,7 +25,7 @@ class FBPixel implements IHeadScript
 
     public function script() : string
     {
-        ob_start();
+        $this->buffer->start();
         ?>
         <!-- Facebook Pixel Code Start -->
         <script>
@@ -57,9 +58,9 @@ class FBPixel implements IHeadScript
         </noscript>
         <!-- End Facebook Pixel Code -->
         <?php
-        $contents = ob_get_contents();
-        ob_end_clean();
-        return $contents;
+        $this->buffer->end();
+
+        return $this->buffer->get();
     }
 
 }

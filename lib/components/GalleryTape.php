@@ -6,7 +6,7 @@ include_once("components/renderers/IDataIteratorRenderer.php");
 
 class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 {
-    protected $url;
+    protected URL $url;
 
     /**
      * @var ImagePopup
@@ -19,7 +19,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
         $this->image_popup = new ImagePopup();
         $this->image_popup->setPhotoSize(-1, 128);
 
-        $this->url = NULL;
+        $this->url = URL::Current();
 
         $this->setComponentClass("slot");
     }
@@ -28,12 +28,11 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
     {
         parent::setData($data);
 
-        if ($this->url) {
-            $this->url->setData($data);
-        }
+        $this->url->setData($data);
+
     }
 
-    public function setItemURL(URL $url)
+    public function setItemURL(URL $url) : void
     {
         $this->url = $url;
     }
@@ -42,7 +41,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
      * Set the ImagePopup bean class
      * @param string $beanClass
      */
-    public function setBeanClass(string $beanClass)
+    public function setBeanClass(string $beanClass) : void
     {
         $this->image_popup->setBeanClass($beanClass);
     }
@@ -105,6 +104,7 @@ class GalleryTape extends Component implements IDataIteratorRenderer
 
     public function getCacheName() : string
     {
+
         if (!($this->iterator instanceof SQLQuery)) return "";
 
         return parent::getCacheName()."-".$this->iterator->select->getSQL();

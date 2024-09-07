@@ -49,16 +49,6 @@ class HTMLPage extends Component
         return $this->body;
     }
 
-    protected function headStart()
-    {
-        $this->head->startRender();
-    }
-
-    protected function headEnd()
-    {
-        $this->head->finishRender();
-    }
-
     protected function bodyStart()
     {
         $this->body->startRender();
@@ -75,8 +65,7 @@ class HTMLPage extends Component
 
         parent::startRender();
 
-        $this->headStart();
-        $this->headEnd();
+        $this->head->render();
 
         $this->bodyStart();
     }

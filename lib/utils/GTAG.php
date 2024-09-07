@@ -17,10 +17,10 @@ class GTAG implements IHeadScript
     public function script(): string
     {
         ob_start();
-        echo "<!-- Start GTAG script for ID: $this->id -->";
+        echo "\n<!-- Start GTAG script for ID: $this->id -->\n";
         ?>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php
-        echo $this->id; ?>"></script>
+        <script src="https://www.googletagmanager.com/gtag/js?id=<?php echo $this->id; ?>"></script>
+
         <script>
             window.dataLayer = window.dataLayer || [];
 
@@ -41,7 +41,7 @@ class GTAG implements IHeadScript
 
         </script>
         <?php
-        echo "\r\n<!-- End GTAG script for ID: $this->id  -->\r\n";
+        echo "\n<!-- End GTAG script for ID: $this->id  -->\n";
         $script = ob_get_contents();
         ob_end_clean();
         return $script;

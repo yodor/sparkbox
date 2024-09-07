@@ -35,13 +35,8 @@ class HTMLHead extends Component
      */
     protected array $canonical_params = array();
 
-    /**
-     * @var FBPixel|null
-     */
-    protected ?FBPixel $fbpixel = null;
 
-    protected array $gtag_objects = array();
-
+    protected array $head_scripts = array();
 
 
     public function __construct()
@@ -60,31 +55,6 @@ class HTMLHead extends Component
         //default favicon
         $this->favicon = "//" . SITE_DOMAIN . LOCAL."/favicon.ico";
 
-
-
-        if (DB_ENABLED) {
-            $config = ConfigBean::Factory();
-            $config->setSection("seo");
-
-            $facebookID_pixel = $config->get("facebookID_pixel");
-            if ($facebookID_pixel) {
-                $this->fbpixel = new FBPixel($facebookID_pixel);
-            }
-
-            $adsID = $config->get("googleID_ads", "");
-            $conversionID = $config->get("googleID_ads_conversion", "");
-            if ($adsID && $conversionID) {
-                $obj = new GTAGObject();
-                $obj->setCommand(GTAGObject::COMMAND_EVENT);
-                $obj->setType("conversion");
-                $obj->setParamTemplate("{'send_to': '%googleID_ads_conversion%'}");
-                $obj->setName("googleID_ads_conversion");
-                $data = array("googleID_ads_conversion"=>$conversionID);
-                $obj->setData($data);
-                $this->addGTAGObject($obj);
-            }
-
-        }
     }
 
     public function setTitle(string $text) : void
@@ -97,6 +67,10 @@ class HTMLHead extends Component
         return $this->title;
     }
 
+    public function addScript(IHeadScript $ihead_script) : void
+    {
+        $this->head_scripts[] = $ihead_script;
+    }
     /**
      *  Add meta tag to be rendered into this page.
      * @param $name string The name attribute to add to the Meta collection
@@ -128,26 +102,8 @@ class HTMLHead extends Component
         return $this->canonical_params;
     }
 
-    public function addGTAGObject(GTAGObject $obj)
-    {
-        $this->gtag_objects[] = $obj;
-    }
-
-    public function getFacebookPixel(): ?FBPixel
-    {
-        return $this->fbpixel;
-    }
-
     protected function renderImpl()
     {
-
-    }
-
-    public function startRender()
-    {
-
-        parent::startRender();
-
         echo "<TITLE>$this->title</TITLE>\n";
 
         $this->renderMeta();
@@ -165,39 +121,17 @@ class HTMLHead extends Component
         echo "<link rel='shortcut icon' href='$this->favicon'>";
         echo "\n";
 
-        if (DB_ENABLED) {
-            $config = ConfigBean::Factory();
-            $config->setSection("seo");
-
-            $gtag = new GTAG();
-
-            $googleID_analytics = $config->get("googleID_analytics");
-            if ($googleID_analytics) {
-                $gtag->setID($googleID_analytics);
-                echo $gtag->script();
+        foreach ($this->head_scripts as $object) {
+            if ($object instanceof IHeadScript) {
+                echo $object->script();
             }
-
-            $googleID_ads = $config->get("googleID_ads");
-            if ($googleID_ads) {
-                $gtag->setID($googleID_ads);
-                echo $gtag->script();
-            }
-        }
-
-        if ($this->fbpixel) {
-            echo $this->fbpixel->script();
-        }
-
-        foreach ($this->gtag_objects as $idx => $object) {
-            if (!($object instanceof GTAGObject)) continue;
-            echo $object->script();
         }
 
         $url = SparkPage::Instance()->getURL()->fullURL()->toString();
         //X-default tags are recommended, but not mandatory
-        echo "<link rel='alternate' hreflang='x-default' href='$url'>";
+        echo "<link rel='alternate' hreflang='x-default' href='$url'>\n";
 
-        echo "<link rel='alternate' hreflang='".DEFAULT_LOCALE."' href='$url'>";
+        echo "<link rel='alternate' hreflang='{DEFAULT_LOCALE}' href='$url'>\n";
 
 
         if (count($this->canonical_params)>0) {
@@ -208,7 +142,7 @@ class HTMLHead extends Component
                 $builder->remove($name);
             }
             $canonical_href = fullURL($builder->toString());
-            echo "<link rel='canonical' href='$canonical_href'>";
+            echo "<link rel='canonical' href='$canonical_href'>\n";
         }
 
 
