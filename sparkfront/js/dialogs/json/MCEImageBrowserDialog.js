@@ -147,41 +147,55 @@ class MCEImageBrowserDialog extends JSONDialog {
         let imageID = this.req.getParameter("imageID");
 
         if (funct == "renderDimensionDialog") {
+
             this.insert_image.setContents(jsonResult.contents);
             this.insert_image.setImageID(this.req.getParameter("imageID"));
             this.insert_image.show();
+
         } else if (funct == "remove") {
+
             let element = this.modal_pane.popup.find(".ImageStorage .Collection .Element[imageID='" + imageID + "']");
             element.remove();
             this.modal_pane.centerContents();
+
         } else if (funct == "find") {
 
-            const dialog = this;
-
             for (var a = 0; a < jsonResult.object_count; a++) {
-                var image = jsonResult.objects[a];
-                this.modal_pane.popup.find(".ImageStorage .Collection").first().append(image.html);
+                let object_result = jsonResult.objects[a];
+                this.appendResult(object_result);
             }
-
-            this.modal_pane.popup.find(".ImageStorage .Collection .Element").each(function (index) {
-
-                let imageID = $(this).attr("imageID");
-
-                $(this).on("click", function (event) {
-                    dialog.onClickImage(imageID, event);
-                    return false;
-                });
-
-                let remove_button = $(this).children(".remove_button").first();
-                remove_button.on("click", function (event) {
-                    dialog.removeImage(imageID, event);
-                    return false;
-                });
-
-            }); //each image
-
             this.modal_pane.centerContents();
         } //find
+    }
+
+    /**
+     * Process single elements from the objects returned
+     * Append html to the viewport and assign onclick/remove event handlers
+     * @param object_result
+     */
+    appendResult(object_result) {
+
+        const dialog = this;
+
+        const collection = this.modal_pane.popup.find(".ImageStorage .Collection").first();
+
+        const element = $(object_result.html);
+
+        const imageID = element.attr("imageID");
+
+        element.on("click", function (event) {
+            dialog.onClickImage(imageID, event);
+            return false;
+        });
+
+        let remove_button = element.children(".remove_button").first();
+        remove_button.on("click", function (event) {
+            dialog.removeImage(imageID, event);
+            return false;
+        });
+
+        collection.append(element);
+
     }
 
     show() {
@@ -208,17 +222,17 @@ class MCEImageBrowserDialog extends JSONDialog {
     }
 
     /**
-     * Handle new image upload to collection
+     * Handle new image upload to collection, can return multiple object results
      * @param result
      */
     processUploadResult(result) {
+        //json object result count
         for (var a = 0; a < result.object_count; a++) {
-            //meta_info (imageID=>beanID, html=>html)
-            var meta_info = result.objects[a];
-            var imageID = meta_info.imageID;
-
-            this.modal_pane.popup.find(".ImageStorage .Collection").first().append(meta_info.html);
+            //object_result (imageID=>beanID, html=>html)
+            let object_result = result.objects[a];
+            this.appendResult(object_result);
         }
+        this.modal_pane.centerContents();
     }
 
     loadImages(imageID) {

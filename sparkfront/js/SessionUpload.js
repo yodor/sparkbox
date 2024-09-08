@@ -119,7 +119,16 @@ class SessionUpload extends Component {
 
                     if (textStatus != "success") throw textStatus;
 
-                    var result = JSON && JSON.parse(contents) || $.parseJSON(contents);
+                    let isString = contents.constructor === String;
+                    let isObject = contents.constructor === Object;
+
+                    //expected json already from responder content-type
+                    let result = contents;
+
+                    if (isString) {
+                        result = JSON && JSON.parse(contents) || $.parseJSON(contents);
+                    }
+
                     if (result.status != "OK") throw result.message;
 
                     this.processResult(result);
