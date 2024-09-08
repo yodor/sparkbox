@@ -78,9 +78,10 @@ ini_set("display_startup_errors", 0);
 
 ini_set("session.cookie_lifetime", 0);
 ini_set("session.use_only_cookies", 1);
-ini_set("session.cache_limiter", "private");
+//overwrited from session_start do not set cache_limiter
+//ini_set("session.cache_limiter", "private");
 //minutes - cache of the response
-ini_set("session.cache_expire", 60); //1 hour
+//ini_set("session.cache_expire", 60); //1 hour
 //seconds
 ini_set("session.gc_maxlifetime", 1440);
 ini_set("zlib.output_compression", 1);
