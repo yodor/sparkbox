@@ -79,6 +79,7 @@ ini_set("display_startup_errors", 0);
 ini_set("session.cookie_lifetime", 0);
 ini_set("session.use_only_cookies", 1);
 //overwrited from session_start do not set cache_limiter
+//try to enable only on specific pages
 //ini_set("session.cache_limiter", "private");
 //minutes - cache of the response
 //ini_set("session.cache_expire", 60); //1 hour
