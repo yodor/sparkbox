@@ -64,18 +64,17 @@ class Translator implements IRequestProcessor, IGETConsumer
         //prefer cookie langID
         $langID = -1;
 
-        if (Session::Contains(Translator::KEY_LANGUAGE_ID)) {
-            $langID = (int)Session::Get(Translator::KEY_LANGUAGE_ID);
-            debug("Session ".Translator::KEY_LANGUAGE_ID.": ".$langID);
-        }
-        else if (Session::HaveCookie(Translator::KEY_LANGUAGE_ID)) {
+//        if (Session::Contains(Translator::KEY_LANGUAGE_ID)) {
+//            $langID = (int)Session::Get(Translator::KEY_LANGUAGE_ID);
+//            debug("Session ".Translator::KEY_LANGUAGE_ID.": ".$langID);
+//        }
+        if (Session::HaveCookie(Translator::KEY_LANGUAGE_ID)) {
             $langID = (int)Session::GetCookie(Translator::KEY_LANGUAGE_ID);
             debug("Cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
         }
 
         //no session or cookie set
         if ($langID > 0) {
-            debug("Using Session/Cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
             try {
                 $this->loadLanguageID($langID);
             }
@@ -92,6 +91,7 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     protected function loadLanguageID(int $langID) : void
     {
+        debug("Loading ".Translator::KEY_LANGUAGE_ID.": ".$langID);
         $this->language = $this->languages->getByID($langID);
         $this->langID = $langID;
         $this->storeLanguage();
@@ -106,9 +106,9 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     protected function storeLanguage() : void
     {
-        debug("Storing langID: ".$this->langID. " in session and cookies");
+        debug("Storing langID: ".$this->langID. " in cookies");
         Session::SetCookie("langID", $this->langID);
-        Session::Set("langID", $this->langID);
+        //Session::Set("langID", $this->langID);
     }
 
     public function processInput()
@@ -138,9 +138,9 @@ class Translator implements IRequestProcessor, IGETConsumer
             $url->remove(Translator::KEY_CHANGE_LANGUAGE);
             $url->remove(Translator::KEY_LANGUAGE_ID);
             $url->remove(Translator::KEY_LANGUAGE);
-            debug("Redirecting to: ".$url->toString());
+            debug("Redirecting to: ".$url);
 
-            header("Location: ".$url->toString());
+            header("Location: ".$url);
             exit;
         }
 

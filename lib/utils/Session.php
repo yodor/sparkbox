@@ -14,17 +14,22 @@ class Session
     {
         if (!Session::$is_started) {
             session_start();
+            Session::$is_started = TRUE;
+            debug("Starting session ID: " . session_id());
         }
-        Session::$is_started = TRUE;
-        //debug("Starting session with ID: " . session_id());
+
     }
 
     public static function Destroy()
     {
         if (Session::$is_started) {
+            foreach ($_SESSION as $key => $value) {
+                unset($_SESSION[$key]);
+            }
             session_destroy();
+            Session::$is_started = FALSE;
         }
-        Session::$is_started = FALSE;
+
     }
 
     public static function Close()
@@ -43,7 +48,6 @@ class Session
 
     public static function Get(string $key, $default = NULL)
     {
-        Session::Start();
         if (Session::Contains($key)) {
             return $_SESSION[$key];
         }
