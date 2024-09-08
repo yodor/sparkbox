@@ -12,6 +12,10 @@ class MCETextArea extends Component {
 
     }
 
+    /**
+     * Overriden in MCESetupObject.js
+     * @returns {{schema: string, strict_loading_mode: boolean, convert_newlines_to_brs: boolean, plugins: string, branding: boolean, verify_html: number, media_restrict: boolean, script_url: string, force_br_newlines: boolean, invalid_elements: string, forced_root_block: boolean, newline_behavior: string, menubar: boolean, toolbar2: string, content_style: string, toolbar1: string, force_p_newlines: boolean, remove_linebreaks: boolean, width: string, resize: string, theme: string, entity_encoding: string, extended_valid_elements: string, height: string}}
+     */
     defaultSetup() {
         let mce_setup_object = {
             schema: 'html5',
@@ -26,8 +30,13 @@ class MCETextArea extends Component {
 
             //
             entity_encoding: "raw",
-            force_p_newlines: true,
+
+            force_p_newlines: false,
             force_br_newlines: true,
+            convert_newlines_to_brs: true,
+            remove_linebreaks: true,
+            forced_root_block: false,
+            newline_behavior: 'linebreak',
 
             ///ver 4
             menubar: false,
@@ -49,6 +58,7 @@ class MCETextArea extends Component {
 
             //content_css: "/mycontent.css",
             content_style: "p { margin: 0; } body { line-height: 1; }",
+
         };
         return mce_setup_object;
     }
