@@ -26,6 +26,7 @@ class Session
             foreach ($_SESSION as $key => $value) {
                 unset($_SESSION[$key]);
             }
+            session_write_close();
             session_destroy();
             Session::$is_started = FALSE;
         }

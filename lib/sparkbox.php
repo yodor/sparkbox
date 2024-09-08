@@ -76,7 +76,9 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 0);
 
+ini_set("session.use_strict_mode", 1);
 ini_set("session.cookie_lifetime", 0);
+ini_set("session.use_cookies", 1);
 ini_set("session.use_only_cookies", 1);
 //overwrited from session_start do not set cache_limiter
 //try to enable only on specific pages
