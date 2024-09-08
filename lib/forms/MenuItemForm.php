@@ -57,7 +57,7 @@ class MenuItemForm extends InputForm
 
             $page_id = (int)$_GET["page_id"];
 
-            $link_url = "/pages.php?id=$page_id";
+            $link_url = "/pages/index.php?id=$page_id";
 
             $this->getInput("link")->setValue($link_url);
         }
