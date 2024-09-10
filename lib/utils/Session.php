@@ -8,7 +8,7 @@ class Session
 {
     protected static bool $is_started = false;
 
-    public const string ALERT = "alert";
+    public const ALERT = "alert";
 
     public static function Start() : void
     {
