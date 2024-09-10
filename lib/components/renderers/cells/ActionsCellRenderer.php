@@ -1,7 +1,7 @@
 <?php
 include_once("components/renderers/cells/TableCellRenderer.php");
 include_once("components/Action.php");
-include_once("utils/ActionCollection.php");
+include_once("objects/ActionCollection.php");
 
 class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
 {

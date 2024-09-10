@@ -1,5 +1,5 @@
 <?php
-include_once("utils/DataObject.php");
+include_once("objects/data/DataObject.php");
 include_once("utils/IHeadScript.php");
 
 class GTAGObject extends DataObject implements IHeadScript

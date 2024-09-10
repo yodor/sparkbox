@@ -1,5 +1,5 @@
 <?php
-include_once("utils/OutputScript.php");
+include_once("utils/output/OutputScript.php");
 
 class LDJsonScript extends OutputScript
 {

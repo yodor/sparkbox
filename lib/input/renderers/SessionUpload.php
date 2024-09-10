@@ -81,8 +81,7 @@ abstract class SessionUpload extends ArrayField
 
         echo "<div class='Limits'>";
 
-        echo "<div field='max_size'><label>UPLOAD_MAX_FILESIZE: </label><span>" . file_size(UPLOAD_MAX_FILESIZE) . "</span></div>";
-        echo "<div field='max_post_size'><label>POST_MAX_FILESIZE: </label><span>" . file_size(POST_MAX_FILESIZE) . "</span></div>";
+        echo "<div field='max_size'><label>UPLOAD_MAX_SIZE: </label><span>" . file_size(UPLOAD_MAX_SIZE) . "</span></div>";
         echo "<div field='memory_limit'><label>MEMORY_LIMIT: </label><span>" . file_size(MEMORY_LIMIT) . "</span></div>";
         $transact_max = $this->input->getProcessor()->getTransactBeanItemLimit();
         $max_slots = 1;

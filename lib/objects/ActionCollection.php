@@ -1,6 +1,6 @@
 <?php
 include_once("objects/ComponentCollection.php");
-include_once("utils/URL.php");
+include_once("utils/url/URL.php");
 include_once("components/Action.php");
 
 class ActionCollection extends ComponentCollection

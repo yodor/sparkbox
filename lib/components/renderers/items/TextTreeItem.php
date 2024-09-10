@@ -1,7 +1,7 @@
 <?php
 include_once("components/renderers/items/NestedSetItem.php");
 include_once("utils/IActionCollection.php");
-include_once("utils/ActionCollection.php");
+include_once("objects/ActionCollection.php");
 
 include_once("components/Action.php");
 

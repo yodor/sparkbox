@@ -1,7 +1,7 @@
 <?php
-include_once("utils/URL.php");
-include_once("utils/URLParameter.php");
-include_once("utils/DataParameter.php");
+include_once("utils/url/URL.php");
+include_once("utils/url/URLParameter.php");
+include_once("utils/url/DataParameter.php");
 include_once("components/renderers/items/DataIteratorItem.php");
 
 class Action extends DataIteratorItem
@@ -120,7 +120,7 @@ class Action extends DataIteratorItem
                 $action = new Action();
                 $action->getURL()->fromString($item->getHref());
                 $action->translation_enabled = $translate;
-                $action->setContents($item->getTitle());
+                $action->setContents($item->getName());
                 $action->render();
             }
             else if ($item instanceof Action) {

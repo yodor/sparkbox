@@ -5,7 +5,7 @@ include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
 include_once("components/renderers/ICacheable.php");
 include_once("storage/CacheEntry.php");
-include_once("utils/OutputBuffer.php");
+include_once("utils/output/OutputBuffer.php");
 
 /**
  * Wrapper for HTML element

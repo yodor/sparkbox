@@ -1,6 +1,6 @@
 <?php
 include_once("components/Component.php");
-include_once("utils/MainMenu.php");
+include_once("utils/menu/MainMenu.php");
 include_once("components/renderers/menus/MenuBarItemRenderer.php");
 
 class MenuBarComponent extends Container

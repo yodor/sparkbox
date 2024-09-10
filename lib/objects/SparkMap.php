@@ -43,7 +43,17 @@ class SparkMap implements ISparkCollection
 
     public function add(string $key, SparkObject $object) : void
     {
+        $this->set($key, $object);
+    }
+
+    public function set(string $key, SparkObject $object) : void
+    {
         $this->elements[$key] = $object;
+    }
+
+    public function isSet(string $key) : bool
+    {
+        return isset($this->elements[$key]);
     }
 
     public function remove(string $key) : void
@@ -65,6 +75,7 @@ class SparkMap implements ISparkCollection
     }
 
     /**
+     * Check if this map contains value '$object'
      * @param SparkObject $object
      * @param bool $strict
      * @return bool

@@ -1,6 +1,6 @@
 <?php
 include_once("components/renderers/IRenderer.php");
-include_once("utils/MenuItem.php");
+include_once("utils/menu/MenuItem.php");
 
 interface IMenuItemRenderer
 {

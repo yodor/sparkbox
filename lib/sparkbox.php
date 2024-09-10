@@ -107,8 +107,7 @@ KMG($pmf);
 $ml = ini_get("memory_limit");
 KMG($ml);
 
-$defines->set("UPLOAD_MAX_FILESIZE", $umf);
-$defines->set("POST_MAX_FILESIZE", $pmf);
+$defines->set("UPLOAD_MAX_SIZE", $pmf);
 $defines->set("MEMORY_LIMIT", $ml);
 
 //'base size' for all uploaded images

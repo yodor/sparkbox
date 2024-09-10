@@ -2,8 +2,8 @@
 include_once ("objects/SparkObject.php");
 include_once ("objects/SparkIterator.php");
 
-interface ISparkCollection {
-
+interface ISparkCollection
+{
     public function __clone() : void;
     public function count() : int;
     public function keys() : array;

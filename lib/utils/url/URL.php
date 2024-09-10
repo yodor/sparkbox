@@ -1,5 +1,5 @@
 <?php
-include_once("utils/URLParameter.php");
+include_once("utils/url/URLParameter.php");
 include_once("utils/Paginator.php");
 include_once("utils/IGETConsumer.php");
 

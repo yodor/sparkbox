@@ -4,7 +4,6 @@ include_once("input/DataInput.php");
 
 abstract class UploadDataValidator implements IInputValidator
 {
-    protected int $maxsize = -1;
 
     //fill with mime strings to accept only these mimes to be uploaded
     protected array $accept_mimes = array();
@@ -14,6 +13,7 @@ abstract class UploadDataValidator implements IInputValidator
     //in ArrayInputField case Processors get called only once, but validators are called for each array value
     public function __construct()
     {
+
 
     }
 
@@ -39,7 +39,7 @@ abstract class UploadDataValidator implements IInputValidator
                 $ret = "There is no error, the file uploaded with success.";
                 break;
             case UPLOAD_ERR_INI_SIZE:
-                $ret = "The uploaded file exceeds the init limit of " . UPLOAD_MAX_FILESIZE;
+                $ret = "The uploaded file exceeds the init limit of " . file_size(UPLOAD_MAX_SIZE);
                 break;
             case UPLOAD_ERR_FORM_SIZE:
                 $ret = "The uploaded file exceeds the form limit of ".file_size($maxsize);
@@ -70,26 +70,14 @@ abstract class UploadDataValidator implements IInputValidator
     {
         debug("Using input: '{$input->getName()}'");
 
-        if ($this->maxsize < 1) {
-            $this->maxsize = UPLOAD_MAX_FILESIZE;
-        }
-        if ($this->maxsize > UPLOAD_MAX_FILESIZE) {
-            $this->maxsize = UPLOAD_MAX_FILESIZE;
-        }
 
-        debug("Max data size: " . $this->maxsize);
 
         $content_length = 0;
         if (isset($_SERVER["CONTENT_LENGTH"])) {
             $content_length = $_SERVER['CONTENT_LENGTH'];
         }
 
-        debug("Upload max data size: " . $this->maxsize . " | Content length: " . $content_length);
-
-        //$_FILES array is always empty if post size > maxsize so check additionally here to be able to give correct error message
-        if ($content_length > $this->maxsize) {
-            throw new Exception(UploadDataValidator::errString(UPLOAD_ERR_FORM_SIZE, $this->maxsize));
-        }
+        debug("Content length: " . $content_length);
 
         //UploadDataInput processor always create default empty FileStorageObject
         $object = $input->getValue();
@@ -108,12 +96,6 @@ abstract class UploadDataValidator implements IInputValidator
                 }
             }
             return;
-        }
-
-        if ($object->buffer()->length() > $this->maxsize) {
-            // if the file is not less than the maximum allowed, print an error
-            debug("Upload data size exceeds the maximum allowed");
-            throw new Exception(tr("Uploaded file size exceeds the maximum allowed size") . "<BR>" . "Max data size: " . file_size($this->maxsize));
         }
 
         if (count($this->accept_mimes)>0) {

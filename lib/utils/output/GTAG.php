@@ -1,22 +1,23 @@
 <?php
-include_once ("utils/IHeadScript.php");
+include_once("utils/output/OutputScript.php");
 
-class GTAG implements IHeadScript
+class GTAG extends OutputScript
 {
     protected string $id = "";
 
     public function __construct()
     {
+        parent::__construct();
     }
 
-    public function setID(string $id)
+    public function setID(string $id) : void
     {
         $this->id = $id;
     }
 
     public function script(): string
     {
-        ob_start();
+        $this->buffer->start();
         echo "\n<!-- Start GTAG script for ID: $this->id -->\n";
         ?>
         <script src="https://www.googletagmanager.com/gtag/js?id=<?php echo $this->id; ?>"></script>
@@ -42,8 +43,7 @@ class GTAG implements IHeadScript
         </script>
         <?php
         echo "\n<!-- End GTAG script for ID: $this->id  -->\n";
-        $script = ob_get_contents();
-        ob_end_clean();
-        return $script;
+        $this->buffer->end();
+        return $this->buffer->get();
     }
 }

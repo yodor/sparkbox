@@ -165,14 +165,6 @@ class FormRenderer extends Container
         $this->setName($this->form->getName());
     }
 
-    public function startRender()
-    {
-        parent::startRender();
-        //if (strcmp($this->method, FormRenderer::METHOD_POST) == 0) {
-            //echo "<input type=hidden name='MAX_FILE_SIZE' value='" . UPLOAD_MAX_FILESIZE . "'>";
-        //}
-    }
-
     protected function renderImpl()
     {
         $this->renderInputs();

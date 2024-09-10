@@ -6,7 +6,7 @@ include_once("beans/BeanTranslationsBean.php");
 include_once("beans/TranslationPhrasesBean.php");
 
 include_once("utils/IRequestProcessor.php");
-include_once("utils/URL.php");
+include_once("utils/url/URL.php");
 include_once("utils/Session.php");
 
 class Translator implements IRequestProcessor, IGETConsumer

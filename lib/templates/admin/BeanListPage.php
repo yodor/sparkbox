@@ -1,6 +1,6 @@
 <?php
 include_once("templates/admin/AdminPageTemplate.php");
-include_once("utils/ActionCollection.php");
+include_once("objects/ActionCollection.php");
 include_once("components/KeywordSearch.php");
 include_once("responders/DeleteItemResponder.php");
 include_once("responders/ChangePositionResponder.php");

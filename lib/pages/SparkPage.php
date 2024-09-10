@@ -8,10 +8,10 @@ include_once("beans/ConfigBean.php");
 include_once("dialogs/MessageDialog.php");
 include_once("components/ImagePopup.php");
 include_once("utils/IActionCollection.php");
-include_once("utils/ActionCollection.php");
-include_once("utils/FBPixel.php");
-include_once("utils/GTAG.php");
-include_once("utils/GTAGObject.php");
+include_once("objects/ActionCollection.php");
+include_once("utils/output/FBPixel.php");
+include_once("utils/output/GTAG.php");
+include_once("objects/data/GTAGObject.php");
 include_once("objects/SparkEventManager.php");
 
 class SparkPage extends HTMLPage implements IActionCollection

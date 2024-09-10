@@ -190,7 +190,11 @@ function quoteArray(&$item, $key, $user_data = "")
 
 function KMG(&$umf)
 {
-    if (str_contains($umf, "M")) {
+    if (str_contains($umf, "G")) {
+        str_replace("G", "", $umf);
+        $umf = (int)$umf * 1024 * 1024 * 1024;
+    }
+    else if (str_contains($umf, "M")) {
         str_replace("M", "", $umf);
         $umf = (int)$umf * 1024 * 1024;
     }
@@ -225,7 +229,7 @@ function constructSiteTitleArray($path) : array
     $title = array();
     foreach ($path as $key => $item) {
         if ($item instanceof MenuItem) {
-            $title[] = mb_convert_case(strip_tags($item->getTitle()), MB_CASE_TITLE, "UTF-8");
+            $title[] = mb_convert_case(strip_tags($item->getName()), MB_CASE_TITLE, "UTF-8");
         }
         else {
             $title[] = mb_convert_case($item, MB_CASE_TITLE, "UTF-8");
@@ -254,7 +258,7 @@ function getArrayText(array $arr)
             }
         }
         else if ($val instanceof MenuItem) {
-            $message = get_class($val) . "[" . $val->getTitle()."] => ".$val->getHref();
+            $message = get_class($val) . "[" . $val->getName()."] => ".$val->getHref();
         }
         else if (is_array($val)) {
             //$message = print_r($val, true);

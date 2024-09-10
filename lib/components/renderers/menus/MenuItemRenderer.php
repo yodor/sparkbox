@@ -48,11 +48,11 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
             $this->linkTag->setAttribute("itemprop","url");
         }
 
-        $contents = "<meta itemprop='name' content='".$item->getTitle()."'>";
-        $contents.= $item->getTitle();
+        $contents = "<meta itemprop='name' content='".$item->getName()."'>";
+        $contents.= $item->getName();
 
         if ($item->needTranslate()) {
-            $contents = tr($item->getTitle());
+            $contents = tr($item->getName());
         }
 
         if ($item->getIcon()) {
@@ -65,7 +65,7 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
         }
         $this->linkTag->setContents($contents);
 
-        $this->setAttribute("title", $item->getTitle());
+        $this->setAttribute("title", $item->getName());
 
     }
 

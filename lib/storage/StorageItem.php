@@ -1,6 +1,6 @@
 <?php
-include_once("utils/DataObject.php");
-include_once("utils/URL.php");
+include_once("objects/data/DataObject.php");
+include_once("utils/url/URL.php");
 
 class StorageItem extends DataObject implements JsonSerializable
 {

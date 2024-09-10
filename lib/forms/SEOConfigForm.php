@@ -1,6 +1,6 @@
 <?php
 include_once("forms/InputForm.php");
-include_once("utils/GTAGObject.php");
+include_once("objects/data/GTAGObject.php");
 include_once("input/processors/DataObjectInput.php");
 
 class SEOConfigForm extends InputForm

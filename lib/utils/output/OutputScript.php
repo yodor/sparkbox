@@ -1,6 +1,6 @@
 <?php
 include_once("utils/IHeadScript.php");
-include_once("utils/OutputBuffer.php");
+include_once("utils/output/OutputBuffer.php");
 
 abstract class OutputScript implements IHeadScript
 {

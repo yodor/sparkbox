@@ -3,14 +3,17 @@ include_once("utils/IRequestProcessor.php");
 include_once("utils/ISQLSelectProcessor.php");
 include_once("utils/IGETConsumer.php");
 include_once("sql/SQLSelect.php");
+include_once("objects/SparkObject.php");
 
-class GETProcessor implements IRequestProcessor, ISQLSelectProcessor, IGETConsumer
+class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectProcessor, IGETConsumer
 {
 
     protected string $title = "";
-    protected string $name = "";
+
     protected string $value = "";
+
     protected bool $is_active = false;
+
     protected ?SQLSelect $select;
 
     protected ?Closure $closure;
@@ -19,6 +22,8 @@ class GETProcessor implements IRequestProcessor, ISQLSelectProcessor, IGETConsum
 
     public function __construct(string $title, string $name)
     {
+        parent::__construct();
+
         $this->title = $title;
         $this->name = $name;
 
@@ -39,15 +44,6 @@ class GETProcessor implements IRequestProcessor, ISQLSelectProcessor, IGETConsum
     public function getTitle(): string
     {
         return $this->title;
-    }
-
-    /**
-     * GET variable name
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     /**

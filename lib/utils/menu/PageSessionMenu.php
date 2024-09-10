@@ -1,5 +1,5 @@
 <?php
-include_once("utils/MainMenu.php");
+include_once("utils/menu/MainMenu.php");
 
 class PageSessionMenu extends MainMenu
 {
@@ -35,7 +35,7 @@ class PageSessionMenu extends MainMenu
         //find last active item
         $lastActive = $this->getBySelectedState();
         if ($lastActive instanceof MenuItem) {
-            debug("'lastActive' MenuItem: '" . $lastActive->getTitle() . "' - URL: " . $lastActive->getHref());
+            debug("'lastActive' MenuItem: '" . $lastActive->getName() . "' - URL: " . $lastActive->getHref());
         }
         else {
             debug("'lastActive' MenuItem is NULL");
@@ -51,7 +51,7 @@ class PageSessionMenu extends MainMenu
             if (count($menuItems) > 0) {
 
                 $itemURL = new URL();
-                $selectedItem->clearChildNodes();
+                $selectedItem->clearSubmenu();
 
                 foreach ($menuItems as $idx => $item) {
                     if ($item instanceof MenuItem) {

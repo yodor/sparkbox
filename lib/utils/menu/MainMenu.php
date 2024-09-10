@@ -1,5 +1,5 @@
 <?php
-include_once("utils/MenuItem.php");
+include_once("utils/menu/MenuItem.php");
 
 class MainMenu
 {
@@ -113,6 +113,7 @@ class MainMenu
         $this->constructSelectedPath();
     }
 
+    //TODO change to collection and use get by name
     /**
      * Return the first MenuItem after '$index' having getTitle()=$title
      * @param string $title
@@ -124,7 +125,7 @@ class MainMenu
         for ($a = $index; $a < count($items); $a++) {
             $item = $items[$a];
             if (!($item instanceof MenuItem)) throw new Exception("Element is not instance of MenuItem");
-            if (strcmp($title, $item->getTitle()) == 0) return $a;
+            if (strcmp($title, $item->getName()) == 0) return $a;
         }
         return -1;
     }

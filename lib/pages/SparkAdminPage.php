@@ -1,5 +1,5 @@
 <?php
-include_once("pages/BufferedPage.php");
+include_once("pages/SparkPage.php");
 
 include_once("auth/AdminAuthenticator.php");
 include_once("beans/AdminAccessBean.php");
@@ -15,7 +15,7 @@ include_once("components/BeanFormEditor.php");
 include_once("components/TableView.php");
 include_once("components/ClosureComponent.php");
 
-include_once("utils/PageSessionMenu.php");
+include_once("utils/menu/PageSessionMenu.php");
 include_once("utils/Navigation.php");
 
 include_once("auth/AuthContext.php");
@@ -159,9 +159,9 @@ class SparkAdminPage extends SparkPage
     }
 
     //local menu items created from the page
-    protected $page_menu = array();
+    protected array $page_menu = array();
 
-    public function setPageMenu(array $menu_items)
+    public function setPageMenu(array $menu_items) : void
     {
         $this->page_menu = $menu_items;
 
@@ -175,13 +175,20 @@ class SparkAdminPage extends SparkPage
         $dynmenu = $this->menu_bar->getMainMenu();
         $dynmenu->update($this->page_menu);
 
-        //this page caption
-        if ($this->name) {
-            $this->preferred_title = $this->name;
+        $selected_path = $dynmenu->getSelectedPath();
+
+        if (count($selected_path) == 0) {
+            //this page caption
+            if ($this->name) {
+                $selected_path[] = $this->name;
+            }
+            else {
+                $selected_path[] = tr("Administration");
+            }
         }
-        else {
-            $this->preferred_title = constructSiteTitle($dynmenu->getSelectedPath());
-        }
+
+
+        $this->preferred_title = constructSiteTitle($selected_path);
 
     }
 
@@ -231,7 +238,7 @@ class SparkAdminPage extends SparkPage
                 $arr = array_reverse($arr);
                 $item = $arr[0];
                 if ($item instanceof MenuItem) {
-                    $this->name = $item->getTitle();
+                    $this->name = $item->getName();
                 }
             }
         }
