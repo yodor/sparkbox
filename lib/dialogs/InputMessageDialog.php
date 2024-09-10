@@ -29,9 +29,11 @@ class InputMessageDialog extends ConfirmMessageDialog
         return $this->input;
     }
 
-    protected function renderImpl()
+    public function startRender() : void
     {
+        parent::startRender();
         $cmp = new InputComponent($this->input);
         $cmp->render();
     }
+
 }
