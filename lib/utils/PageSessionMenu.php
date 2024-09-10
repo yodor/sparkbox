@@ -4,9 +4,9 @@ include_once("utils/MainMenu.php");
 class PageSessionMenu extends MainMenu
 {
 
-    protected $context = NULL;
+    protected AuthContext $context;
 
-    protected $dataKey = "";
+    protected string $dataKey = "";
 
     public function __construct(AuthContext $context, array $main_menu)
     {
@@ -17,14 +17,14 @@ class PageSessionMenu extends MainMenu
         //assign initial menu
         $this->main_menu = $main_menu;
 
-        $this->dataKey = sparkHash(SessionData::MENU . "|" . get_class($this) . SITE_TITLE);
+        $this->dataKey = get_class($this);
 
         //check if there is already a menu in session and use it instead or put the inital menu to the session
         if ($context->getData()->contains($this->dataKey)) {
-            $this->main_menu = unserialize($context->getData()->get($this->dataKey));
+            $this->main_menu = $context->getData()->get($this->dataKey);
         }
         else {
-            $context->getData()->set($this->dataKey, serialize($this->main_menu));
+            $context->getData()->set($this->dataKey, $this->main_menu);
         }
     }
 
@@ -75,7 +75,7 @@ class PageSessionMenu extends MainMenu
 
         }
 
-        $this->context->getData()->set($this->dataKey, serialize($this->main_menu));
+        $this->context->getData()->set($this->dataKey, $this->main_menu);
 
     }
 

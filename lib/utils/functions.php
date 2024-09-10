@@ -253,8 +253,12 @@ function getArrayText(array $arr)
                 $message.= " Dimension: (" . $val->getWidth() . "," . $val->getHeight() . ")";
             }
         }
+        else if ($val instanceof MenuItem) {
+            $message = get_class($val) . "[" . $val->getTitle()."] => ".$val->getHref();
+        }
         else if (is_array($val)) {
-            $message = print_r($val, true);
+            //$message = print_r($val, true);
+            $message = getArrayText($val);
         }
         else if (is_object($val)) {
             $message = get_class($val);

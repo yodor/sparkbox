@@ -106,9 +106,7 @@ abstract class Authenticator
             return NULL;
         }
 
-        $auth = $this->session->get(SessionData::AUTH_TOKEN);
-
-        $token = unserialize($auth);
+        $token = $this->session->get(SessionData::AUTH_TOKEN);
 
         if (!($token instanceof AuthToken)) {
             debug($this, "AuthContext un-serialize failed");
@@ -223,7 +221,11 @@ abstract class Authenticator
         $token->storeCookies($this->session->name());
 
         debug($this, "Serializing auth_token in SessionData");
-        $this->session->set(SessionData::AUTH_TOKEN, serialize($token));
+        $this->session->set(SessionData::AUTH_TOKEN, $token);
+
+        //remove the current login token
+        $this->session->remove(SessionData::LOGIN_TOKEN);
+
     }
 
     protected function fillSessionData(array $row)

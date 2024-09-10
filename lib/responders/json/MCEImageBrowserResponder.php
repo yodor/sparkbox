@@ -42,12 +42,12 @@ class ImageDimensionForm extends InputForm
 class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageSection
 {
 
-    protected $field_name = NULL;
+    protected string $field_name = "";
 
-    protected $section_name = "global";
-    protected $section_key = "";
-    protected $ownerID = -1;
-    protected $auth_context = NULL;
+    protected string $section_name = "global";
+    protected string $section_key = "";
+    protected int $ownerID = -1;
+    protected ?Authenticator $auth_context = null;
 
     public function __construct()
     {
@@ -156,7 +156,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         if ($this->ownerID > 0) {
             $bean_row["ownerID"] = $this->ownerID;
         }
-        if ($this->auth_context) {
+        if ($this->auth_context instanceof Authenticator) {
             $bean_row["auth_context"] = get_class($this->auth_context);
         }
 

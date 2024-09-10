@@ -1,17 +1,23 @@
 <?php
 include_once("responders/json/JSONResponder.php");
 include_once("storage/FileStorageObject.php");
+include_once("utils/SessionData.php");
 
 abstract class UploadControlResponder extends JSONResponder
 {
 
+    //json request required parameter names
     public const PARAM_FIELD_NAME = "field_name";
     public const PARAM_UID = "uid";
 
+    //TODO: remove
+    //session access key name
     public const PARAM_CONTROL_NAME = "upload_control";
 
     //ajax handler is working with '$field_name' field
-    protected $field_name = NULL;
+    protected string $field_name = "";
+
+    protected SessionData $data;
 
     /**
      * UploadControlResponder constructor.
@@ -34,6 +40,7 @@ abstract class UploadControlResponder extends JSONResponder
         $field_name = $_GET[UploadControlResponder::PARAM_FIELD_NAME];
         $this->field_name = str_replace("[]", "", $field_name);
 
+        $this->data = new SessionData(SessionData::Prefix($this->field_name,SessionData::UPLOAD_CONTROL));
     }
 
     /**
@@ -137,8 +144,8 @@ abstract class UploadControlResponder extends JSONResponder
     protected function storeUploadObject(FileStorageObject $uploadObject) : void
     {
         //store the original data in the session array by the field name and UID
-        $_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uploadObject->UID()] = serialize($uploadObject);
-        debug("Stored FileStorageObject to session using UID: " . $uploadObject->UID() . " for field['" . $this->field_name . "']");
+        $this->data->set($uploadObject->UID(),$uploadObject);
+        debug("Stored FileStorageObject to session data using UID: " . $uploadObject->UID() . " for field['" . $this->field_name . "']");
     }
 
     /**
@@ -168,14 +175,9 @@ abstract class UploadControlResponder extends JSONResponder
 
         if (strlen($uid) > 50) throw new Exception("UID maximum size reached");
 
-        debug("Using UID: " . $uid);
+        debug("Removing UID[$uid] from session data");
 
-        if (isset($_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uid])) {
-
-            debug("Removing UID:'$uid' from session array");
-            unset($_SESSION[self::PARAM_CONTROL_NAME][$this->field_name][$uid]);
-
-        }
+        $this->data->remove($uid);
 
         debug("Finished");
     }

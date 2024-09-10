@@ -63,6 +63,11 @@ class AuthToken
         debug("Cookie values mismatch");
         return FALSE;
     }
+
+    public function __serialize() : array
+    {
+        return get_object_vars($this);
+    }
 }
 
 ?>

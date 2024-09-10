@@ -2,18 +2,17 @@
 include_once("input/processors/InputProcessor.php");
 include_once("storage/FileStorageObject.php");
 include_once("storage/ImageStorageObject.php");
+include_once("utils/SessionData.php");
 
 class SessionUploadInput extends InputProcessor
 {
 
-
-
     //uids as keys -
     //loaded objects from the main transaction row
-    protected $loaded_uids = array();
+    protected array $loaded_uids = array();
 
     //keeps map of storage_object UID to data_source primary key value
-    protected $source_loaded_uids = array();
+    protected array $source_loaded_uids = array();
 
     public function __construct(DataInput $input)
     {
@@ -29,9 +28,10 @@ class SessionUploadInput extends InputProcessor
     public function clear()
     {
         $name = $this->input->getName();
-        if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$name])) {
-            unset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$name]);
-        }
+
+        $session_data = new SessionData(SessionData::Prefix($name, SessionData::UPLOAD_CONTROL));
+        $session_data->clear();
+
     }
 
     //only one storage object can be loaded from the main transaction result row
@@ -67,7 +67,7 @@ class SessionUploadInput extends InputProcessor
                 $uid = $value->UID();
 
                 if ($this->transact_bean) {
-                    $this->source_loaded_uids[$uid] = $id;
+                    $this->source_loaded_uids[$uid] = $id; //id of
                 }
                 else {
                     $this->loaded_uids = array();
@@ -94,7 +94,7 @@ class SessionUploadInput extends InputProcessor
     public function loadPostData(array $data) : void
     {
         //
-        //arr holds the posted UIDs
+        //posted $data holds the UIDs that have been uploaded previously using ajax/json
         //
         $name = $this->input->getName();
 
@@ -102,16 +102,8 @@ class SessionUploadInput extends InputProcessor
 
         $values = $this->input->getValue();
 
-        $num_files = 0;
-
-        $session_files = array();
-        if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$name])) {
-            $session_files = $_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$name];
-        }
-
         $posted_uids = array();
         if (isset($data["uid_$name"])) {
-
             debug("Found posted UIDs for DataInput '$name'");
             if (is_array($data["uid_$name"])) {
                 $posted_uids = $data["uid_$name"];
@@ -121,13 +113,17 @@ class SessionUploadInput extends InputProcessor
             }
         }
 
-        debug("Final UIDs posted:", $posted_uids);
+        //[0] => 1725976901.6922.1567366113
+        debug("UIDs posted:", $posted_uids);
 
-        //remove from session files with non-posted uids
-        foreach ($session_files as $uid => $file) {
+        $session_data = new SessionData(SessionData::Prefix($name, SessionData::UPLOAD_CONTROL));
 
-            if (!in_array($uid, $posted_uids)) unset($session_files[$uid]);
+        $stored_keys = $session_data->keys();
+        debug("Session stored UIDs: ",$stored_keys);
 
+        //remove keys that are not inside posted_uids
+        foreach ($stored_keys as $uid) {
+            if (!in_array($uid, $posted_uids)) $session_data->remove($uid);
         }
 
         if (is_array($values)) {
@@ -142,17 +138,19 @@ class SessionUploadInput extends InputProcessor
             $values = array();
         }
 
+        $stored_keys = $session_data->keys();
         //merge remaining session files
-        foreach ($session_files as $uid => $file) {
+        foreach ($stored_keys as $uid) {
 
-            @$storage_object = unserialize($file);
+            $storage_object = $session_data->get($uid);
+
             if ($storage_object instanceof StorageObject) {
                 $values[] = $storage_object;
-                debug("De-serialized UID: " . $storage_object->UID() . " append to field values");
+                debug("Appending StorageObject UID: " . $storage_object->UID() . " to field values");
 
             } else {
-                debug("[$uid] could not be de-serialized as StorageObject - removing from session array");
-                unset($session_files[$uid]);
+                debug("[$uid] is not StorageObject - removing from session array");
+                $session_data->remove($uid);
             }
 
         }
@@ -172,13 +170,9 @@ class SessionUploadInput extends InputProcessor
 
         $field_name = $this->input->getName();
 
-        if (isset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name])) {
-
-            unset($_SESSION[UploadControlResponder::PARAM_CONTROL_NAME][$field_name]);
-            debug("Cleared Session field['$field_name']");
-        }
-
-
+        debug("Clearing session data for field['$field_name']");
+        $session_data = new SessionData(SessionData::Prefix($field_name, SessionData::UPLOAD_CONTROL));
+        $session_data->clear();
     }
 
     public function transactValue(BeanTransactor $transactor) : void

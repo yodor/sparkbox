@@ -6,11 +6,11 @@
  */
 class Session
 {
-    protected static $is_started = FALSE;
+    protected static bool $is_started = false;
 
-    public const ALERT = "alert";
+    public const string ALERT = "alert";
 
-    public static function Start()
+    public static function Start() : void
     {
         if (!Session::$is_started) {
             session_start();
@@ -20,20 +20,19 @@ class Session
 
     }
 
-    public static function Destroy()
+    public static function Destroy() : void
     {
         if (Session::$is_started) {
             foreach ($_SESSION as $key => $value) {
                 unset($_SESSION[$key]);
             }
             session_write_close();
-            session_destroy();
             Session::$is_started = FALSE;
         }
 
     }
 
-    public static function Close()
+    public static function Close() : void
     {
         if (Session::$is_started) {
             session_write_close();
@@ -41,13 +40,13 @@ class Session
     }
 
 
-    public static function Contains(string $key)
+    public static function Contains(string $key) : bool
     {
         Session::Start();
         return isset($_SESSION[$key]);
     }
 
-    public static function Get(string $key, $default = NULL)
+    public static function Get(string $key, mixed $default = NULL) : mixed
     {
         if (Session::Contains($key)) {
             return $_SESSION[$key];
@@ -55,20 +54,20 @@ class Session
         return $default;
     }
 
-    public static function Set(string $key, $val)
+    public static function Set(string $key, mixed $val) : void
     {
         Session::Start();
         $_SESSION[$key] = $val;
     }
 
-    public static function Clear(string $key)
+    public static function Clear(string $key) : void
     {
         if (Session::Contains($key)) {
             unset($_SESSION[$key]);
         }
     }
 
-    public static function SetCookie($key, $val, $expire = 0)
+    public static function SetCookie(string $key, $val, $expire = 0) : void
     {
         $cookie_path = LOCAL;
         if (!$cookie_path) $cookie_path = "/";
@@ -78,7 +77,7 @@ class Session
 
     }
 
-    public static function ClearCookie($key)
+    public static function ClearCookie(string $key) : void
     {
         $cookie_path = LOCAL;
         if (!$cookie_path) $cookie_path = "/";
@@ -89,7 +88,7 @@ class Session
         }
     }
 
-    public static function GetCookie($key, $default = FALSE)
+    public static function GetCookie(string $key, $default = FALSE)
     {
         if (isset($_COOKIE[$key])) {
             return $_COOKIE[$key];
@@ -99,7 +98,7 @@ class Session
         }
     }
 
-    public static function HaveCookie($key)
+    public static function HaveCookie(string $key)
     {
         return isset($_COOKIE[$key]);
     }
@@ -114,12 +113,12 @@ class Session
         }
     }
 
-    public static function GetAlert()
+    public static function GetAlert() : string
     {
         return Session::Get(Session::ALERT, "");
     }
 
-    public static function ClearAlert()
+    public static function ClearAlert() : void
     {
         Session::Clear(Session::ALERT);
     }
