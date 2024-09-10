@@ -240,19 +240,20 @@ class URL implements IGETConsumer
             return;
         }
 
+        //TODO: some urls are relateive
         //cut domain and protocol first
-        if (str_contains($build_string, "://")) {
-            list($this->protocol, $build_string) = explode("://", $build_string);
-        }
-
-        //first position of '/'
-        $pos = strpos($build_string, "/");
-        $this->domain = substr($build_string, 0,  $pos);
-
-        if ($pos>0) {
-            //from first position of '/' to the end
-            $build_string = substr($build_string, $pos);
-        }
+//        if (str_contains($build_string, "://")) {
+//            list($this->protocol, $build_string) = explode("://", $build_string);
+//        }
+//
+//        //first position of '/'
+//        $pos = strpos($build_string, "/");
+//        $this->domain = substr($build_string, 0,  $pos);
+//
+//        if ($pos>0) {
+//            //from first position of '/' to the end
+//            $build_string = substr($build_string, $pos);
+//        }
 
         $resource_param = null;
         //have #resource
