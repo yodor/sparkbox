@@ -29,11 +29,6 @@ class ChangePositionResponder extends RequestResponder
 
         $this->bean = $bean;
 
-        //define early so it can be catched in the page rendering
-        $dialog = new InputMessageDialog();
-        $dialog->getInput()->setName("position");
-        $dialog->getInput()->setLabel("Input new position");
-
     }
 
     protected function parseParams()
@@ -112,14 +107,19 @@ class ChangePositionResponder extends RequestResponder
                     $this->bean->reorderFixed($this->item_id, $this->position);
                 }
                 else {
+                    //dialog is added as page_component
+                    //append buffer with init code only
+                    $dialog = new InputMessageDialog();
+                    $dialog->getInput()->setName("position");
+                    $dialog->getInput()->setLabel("Input new position");
 
+                    $dialog->buffer()->start();
                     ?>
                     <script type="text/javascript">
 
                         onPageLoad(function () {
 
                             let input_position = new InputMessageDialog();
-
                             input_position.buttonAction = function (action) {
                                 if (action == "confirm") {
 
@@ -141,6 +141,7 @@ class ChangePositionResponder extends RequestResponder
 
                     </script>
                     <?php
+                    $dialog->buffer()->end();
 
                 }
             }
