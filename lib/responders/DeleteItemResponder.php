@@ -4,8 +4,8 @@ include_once("responders/RequestResponder.php");
 class DeleteItemResponder extends RequestResponder
 {
 
-    protected $item_id;
-    protected $bean;
+    protected int $item_id = -1;
+    protected DBTableBean $bean;
 
     public function __construct(DBTableBean $bean)
     {
