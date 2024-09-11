@@ -1,4 +1,5 @@
 <?php
+include_once("utils/url/URL.php");
 
 abstract class RequestResponder
 {
@@ -18,7 +19,7 @@ abstract class RequestResponder
      * Current URL
      * @var URL
      */
-    protected $url;
+    protected URL $url;
 
     public function __construct(string $cmd)
     {
@@ -50,7 +51,7 @@ abstract class RequestResponder
         return $this->cmd;
     }
 
-    public function setCancelUrl(string $url)
+    public function setCancelUrl(string $url) : void
     {
         $this->cancel_url = $url;
     }
@@ -60,7 +61,7 @@ abstract class RequestResponder
         return $this->cancel_url;
     }
 
-    public function setSuccessUrl(string $url)
+    public function setSuccessUrl(string $url) : void
     {
         $this->success_url = $url;
     }
@@ -70,12 +71,16 @@ abstract class RequestResponder
         return $this->success_url;
     }
 
-    public function needProcess(): bool
+    /**
+     * Return true if this responder want to process this request based on the command present inside the $_REQUEST
+     * @return bool
+     */
+    public function accept(): bool
     {
         return strcmp_isset(RequestResponder::KEY_COMMAND, $this->cmd, $_REQUEST);
     }
 
-    public function processInput()
+    public function process()
     {
 
         $process_error = FALSE;
@@ -149,12 +154,12 @@ abstract class RequestResponder
 
     abstract protected function parseParams();
 
-    protected function processConfirmation()
+    protected function processConfirmation() : void
     {
-        $this->drawConfirmDialog();
+        $this->setupConfirmDialog();
     }
 
-    public function drawConfirmDialog($title = "Confirm Action", $text = "Confirm action?")
+    protected function setupConfirmDialog(string $title = "Confirm Action", string $text = "Confirm action?") : void
     {
         //will be added as IPageComponent
         $md = new ConfirmMessageDialog($title, "msg_confirm");
@@ -164,34 +169,26 @@ abstract class RequestResponder
         echo "<form method=post>";
         echo "<input type=hidden name=confirm_handler value=1>";
         echo "</form>";
-
         ?>
         <script type='text/javascript'>
-
             onPageLoad(function () {
-
                 let confirm_delete = new MessageDialog();
                 confirm_delete.setID("msg_confirm");
                 confirm_delete.buttonAction = function (action) {
                     if (action == "confirm") {
-                        console.log("Confirm");
+                        //console.log("Confirm");
                         var frm = $(confirm_delete.visibleSelector()+" FORM");
                         frm.submit();
                     } else if (action == "cancel") {
-                        console.log("Cancel");
+                        //console.log("Cancel");
                         document.location.replace("<?php echo $this->cancel_url;?>");
                     }
                 };
-
                 confirm_delete.show();
             });
-
         </script>
-
         <?php
         $md->buffer()->end();
-
-
 
     }
 }

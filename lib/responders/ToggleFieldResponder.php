@@ -39,7 +39,7 @@ class ToggleFieldResponder extends RequestResponder
 
     }
 
-    protected function buildRedirectURL()
+    protected function buildRedirectURL() : void
     {
         parent::buildRedirectURL();
         $this->url->remove("item_id");

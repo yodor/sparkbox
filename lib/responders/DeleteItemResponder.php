@@ -24,7 +24,7 @@ class DeleteItemResponder extends RequestResponder
 
     }
 
-    protected function buildRedirectURL()
+    protected function buildRedirectURL() : void
     {
         parent::buildRedirectURL();
         $this->url->remove("item_id");
@@ -41,9 +41,9 @@ class DeleteItemResponder extends RequestResponder
         return new Action($title, "?cmd=delete_item$href_add", array_merge($parameters, $parameters_array), $check_code);
     }
 
-    protected function processConfirmation()
+    protected function processConfirmation() : void
     {
-        $this->drawConfirmDialog("Delete", "Confirm you want to delete this item?");
+        $this->setupConfirmDialog("Delete", "Confirm you want to delete this item?");
     }
 
     /**

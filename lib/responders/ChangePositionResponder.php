@@ -66,7 +66,7 @@ class ChangePositionResponder extends RequestResponder
         }
     }
 
-    protected function buildRedirectURL()
+    protected function buildRedirectURL() : void
     {
         parent::buildRedirectURL();
 

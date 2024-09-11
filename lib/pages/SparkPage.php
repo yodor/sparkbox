@@ -165,6 +165,7 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function __construct()
     {
+        debug("--- CTOR ---");
         parent::__construct();
 
         self::$instance = $this;
@@ -338,6 +339,7 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function startRender()
     {
+        debug("--- StartRender ---");
         ob_start(null, 4096);
 
         //JSONReponders exit execution

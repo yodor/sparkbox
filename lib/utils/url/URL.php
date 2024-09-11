@@ -241,6 +241,9 @@ class URL implements IGETConsumer
         }
 
         //TODO: some urls are relateive
+        //"?cmd=copy_product$href_add"
+        //"banners/list.php?itemID=123"
+
         //cut domain and protocol first
 //        if (str_contains($build_string, "://")) {
 //            list($this->protocol, $build_string) = explode("://", $build_string);
