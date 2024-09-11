@@ -4,6 +4,17 @@ include_once("utils/url/URL.php");
 include_once("pages/HTMLHead.php");
 include_once("pages/HTMLBody.php");
 
+class HTMLPageEvent extends SparkEvent
+{
+    const OUTPUT_STARTING = "output_starting";
+    const OUTPUT_FINISHING = "output_finishing";
+
+    public function __construct(string $name, SparkObject $source = null)
+    {
+        parent::__construct($name, $source);
+    }
+}
+
 class HTMLPage extends Component
 {
 
@@ -61,6 +72,7 @@ class HTMLPage extends Component
 
     public function startRender()
     {
+        SparkEventManager::emit(new HTMLPageEvent(HTMLPageEvent::OUTPUT_STARTING, $this));
         echo "<!DOCTYPE html>\n";
 
         parent::startRender();
@@ -73,7 +85,9 @@ class HTMLPage extends Component
     public function finishRender()
     {
         $this->bodyEnd();
+        SparkEventManager::emit(new HTMLPageEvent(HTMLPageEvent::OUTPUT_FINISHING, $this));
         parent::finishRender();
+
     }
 
     /**

@@ -46,7 +46,7 @@ class SparkPage extends HTMLPage implements IActionCollection
      * Authenticated context data array. is null if not authenticated yet
      * @var AuthContext
      */
-    protected $context = NULL;
+    protected ?AuthContext $context = NULL;
 
     /**
      * The Preferred title of this page for rendering into the <TITLE></TITLE> tag
@@ -323,6 +323,11 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->addOGTag("description", $meta_description);
 
     }
+
+    public function isJSONRequest() : bool
+    {
+        return ($this->getURL()->contains("JSONRequest"));
+    }
     /**
      * Start rendering of this page
      *
@@ -335,7 +340,7 @@ class SparkPage extends HTMLPage implements IActionCollection
     public function startRender()
     {
         //try JSONResponders first
-        if ($this->getURL()->contains("JSONRequest")) {
+        if ($this->isJSONRequest()) {
             //will 'exit' script always as JSONRequest is found as request URL parameter
             debug("Handling JSONRequest");
             RequestController::processJSONResponders();
@@ -346,17 +351,17 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $this->prepareMetaTitle();
 
-        ob_start(null, 4096);
-
         //regular responders to commands
         //creates IPageComponents ; can generate redirec so call before startRender
         RequestController::processResponders();
 
-        //
+
+        //starting output - push head until body tag - browser can fetch css and scripts while we render the body contents
+        //no session start further below
         parent::startRender();
         //body started here
 
-
+        ob_start(null, 4096);
 
     }
 

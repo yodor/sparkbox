@@ -70,9 +70,14 @@ class Navigation
 
     public function clear()
     {
-        debug("Before clear - Naviagtion contents: ".print_r($this->urls,true));
-        $this->urls = array();
-        Session::Set($this->name, $this->urls);
+        if (SparkPage::Instance()->isJSONRequest()) {
+            debug("Not clearing for JSONRequest");
+        }
+        else {
+            debug("Before clear - Naviagtion contents: " . print_r($this->urls, true));
+            $this->urls = array();
+            Session::Set($this->name, $this->urls);
+        }
     }
 
     public function back() : ?Action

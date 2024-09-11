@@ -57,7 +57,7 @@ class TextCaptchaField extends TextField
 
     public function resetResult()
     {
-        Session::Clear($this->input->getName().".captcha.result");
+        Session::Remove($this->input->getName().".captcha.result");
     }
     public function getResult() : int
     {

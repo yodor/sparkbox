@@ -54,13 +54,21 @@ class Session
         return $default;
     }
 
+    public static function &GetRef(string $key) : mixed
+    {
+        if (Session::Contains($key)) {
+            return $_SESSION[$key];
+        }
+        throw new Exception("Key not found in session");
+    }
+
     public static function Set(string $key, mixed $val) : void
     {
         Session::Start();
         $_SESSION[$key] = $val;
     }
 
-    public static function Clear(string $key) : void
+    public static function Remove(string $key) : void
     {
         if (Session::Contains($key)) {
             unset($_SESSION[$key]);
@@ -120,7 +128,7 @@ class Session
 
     public static function ClearAlert() : void
     {
-        Session::Clear(Session::ALERT);
+        Session::Remove(Session::ALERT);
     }
 }
 

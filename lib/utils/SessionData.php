@@ -6,14 +6,19 @@ include_once("utils/Session.php");
  */
 class SessionData
 {
+    //data key
     const string EMAIL = "email";
     const string FULLNAME = "fullname";
     const string MENU = "menu";
     const string AUTH_TOKEN = "auth_token";
     const string LOGIN_TOKEN = "login_token";
+
+    //session name
     const string UPLOAD_CONTROL = "upload_control";
 
-    protected array $data = array();
+    //reference to S_SESSION[$name] data
+    protected array $data;
+
     protected string $name = "";
 
     public static function Prefix(string $name, string $prefix) : string
@@ -25,28 +30,27 @@ class SessionData
     {
         $this->name = $name;
 
+        if (!Session::Contains($name)) {
+            debug("SessionData [$this->name] initializing empty data.");
+            Session::Set($name, array());
+        }
 
         if (Session::Contains($name)) {
-            $this->data = Session::Get($name);
-            debug("SessionData [$this->name] found in session. Data count: ".count($this->data));
+            if (!is_array(Session::GetRef($name))) throw new Exception("Incorrect SessionData");
+            $this->data = &Session::GetRef($name);
+            debug("SessionData [$this->name] loaded - data count: ".count($this->data));
         }
-        else {
-            debug("SessionData [$this->name] not found in session");
-        }
+
     }
 
-
-    protected function storeData() : void
-    {
-        debug("Storing SessionData [$this->name] to session. Data count: ".count($this->data));
-        Session::Set($this->name, $this->data);
-        //debug("Data: ",$this->data);
-    }
-
-    public function clear() : void
+    public function destroy() : void
     {
         debug("Removing SessionData [$this->name] from session");
-        Session::Clear($this->name);
+        $keys = array_keys($this->data);
+        foreach ($keys as $idx=>$key) {
+            unset($this->data[$key]);
+        }
+        Session::Remove($this->name);
     }
 
     public function name() : string
@@ -57,7 +61,6 @@ class SessionData
     public function set(string $key, mixed $val) : void
     {
         $this->data[$key] = $val;
-        $this->storeData();
     }
 
     public function get(string $key) : mixed
@@ -78,7 +81,6 @@ class SessionData
     {
         if ($this->contains($key)) {
             unset($this->data[$key]);
-            $this->storeData();
         }
     }
 

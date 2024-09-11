@@ -25,15 +25,6 @@ class SessionUploadInput extends InputProcessor
 
     }
 
-    public function clear()
-    {
-        $name = $this->input->getName();
-
-        $session_data = new SessionData(SessionData::Prefix($name, SessionData::UPLOAD_CONTROL));
-        $session_data->clear();
-
-    }
-
     //only one storage object can be loaded from the main transaction result row
     public function loadBeanData(int $editID, DBTableBean $bean, array $data) : void
     {
@@ -172,7 +163,7 @@ class SessionUploadInput extends InputProcessor
 
         debug("Clearing session data for field['$field_name']");
         $session_data = new SessionData(SessionData::Prefix($field_name, SessionData::UPLOAD_CONTROL));
-        $session_data->clear();
+        $session_data->destroy();
     }
 
     public function transactValue(BeanTransactor $transactor) : void
