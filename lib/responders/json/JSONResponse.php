@@ -7,7 +7,6 @@
 
     public string $status = "error";
     public string $message = "";
-    public string $name = "";
 
     public function __construct(string $name)
     {

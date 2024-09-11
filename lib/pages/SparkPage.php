@@ -1,8 +1,11 @@
 <?php
 include_once("pages/HTMLPage.php");
 include_once("responders/RequestController.php");
+include_once("objects/SparkEventManager.php");
+
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
+
 include_once("beans/ConfigBean.php");
 
 include_once("dialogs/MessageDialog.php");
@@ -12,7 +15,7 @@ include_once("objects/ActionCollection.php");
 include_once("utils/output/FBPixel.php");
 include_once("utils/output/GTAG.php");
 include_once("objects/data/GTAGObject.php");
-include_once("objects/SparkEventManager.php");
+
 
 class SparkPage extends HTMLPage implements IActionCollection
 {
@@ -324,10 +327,6 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     }
 
-    public function isJSONRequest() : bool
-    {
-        return ($this->getURL()->contains("JSONRequest"));
-    }
     /**
      * Start rendering of this page
      *
@@ -339,27 +338,24 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function startRender()
     {
-        //try JSONResponders first
-        if ($this->isJSONRequest()) {
-            //will 'exit' script always as JSONRequest is found as request URL parameter
-            debug("Handling JSONRequest");
-            RequestController::processJSONResponders();
-        }
+        ob_start(null, 4096);
+
+        //JSONReponders exit execution
+        //creates IPageComponents ;
+        //can generate redirect so call before startRender
+        RequestController::process();
 
         //prepare the title
         $this->constructTitle();
 
+        //prepare meta
         $this->prepareMetaTitle();
-
-        //regular responders to commands
-        //creates IPageComponents ; can generate redirec so call before startRender
-        RequestController::processResponders();
-
 
         //starting output - push head until body tag - browser can fetch css and scripts while we render the body contents
         //no session start further below
         parent::startRender();
         //body started here
+        ob_end_flush();
 
         ob_start(null, 4096);
 

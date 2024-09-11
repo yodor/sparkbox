@@ -8,17 +8,19 @@ class RequestController
 
     protected static $responders = array();
 
-    public static function Add(RequestResponder $responder)
+    public static function isJSONRequest() : bool
+    {
+        return URL::Current()->contains("JSONRequest");
+    }
+
+    public static function Add(RequestResponder $responder) : void
     {
         $command_name = $responder->getCommand();
         self::$responders[$command_name] = $responder;
-
         debug("Adding RequestResponder: '" . get_class($responder) . "' for command: '$command_name'");
-
-
     }
 
-    public static function Remove(RequestResponder $responder)
+    public static function Remove(RequestResponder $responder) : void
     {
         $command_name = $responder->getCommand();
         if (isset(self::$responders[$command_name])) {
@@ -32,69 +34,60 @@ class RequestController
         return self::$responders[$command];
     }
 
-    public static function processJSONResponders()
+    public static function Process()
     {
+        $isJson = RequestController::isJSONRequest();
 
         $commands = array_keys(self::$responders);
 
-        $ret = new JSONResponse("RequestController");
-        $ret->status = JSONResponse::STATUS_ERROR;
+        $request_responder = null;
 
         foreach ($commands as $idx => $command) {
+            $responder = RequestController::Get($command);
+            if ($isJson) {
+                if (! ($responder instanceof JSONResponder)) continue;
+            }
+            else {
+                if ($responder instanceof JSONResponder) continue;
+            }
+            if (!$responder->needProcess()) continue;
+            $request_responder = $responder;
+            break;
+        }
 
-            $request_responder = RequestController::Get($command);
-            if (!($request_responder instanceof JSONResponder)) continue;
-
-            if ($request_responder->needProcess()) {
-
-                try {
-                    debug("Responder '" . get_class($request_responder) . "' accepted processing");
-                    $request_responder->processInput();
-                }
-                catch (Exception $e) {
-                    $ret->message = $e->getMessage();
-                    $ret->send();
-                }
+        if (is_null($request_responder)) {
+            debug("No responder accepted this request");
+            if ($isJson) {
+                $ret = new JSONResponse("RequestController");
+                $ret->message = "No responder is registered to process this request";
+                $ret->send();
                 exit;
             }
-            else {
-                debug("Responder '" . get_class($request_responder) . "' refused processing");
-            }
-
+            return;
         }
 
-        //request contains JSONRequest but no handler accepted it - send error
-        $ret = new JSONResponse("RequestController");
-        $ret->message = "No responder is registered to process this request";
-        $ret->send();
-        exit;
-    }
-
-    public static function processResponders()
-    {
-
-        $commands = array_keys(self::$responders);
-        foreach ($commands as $idx => $command) {
-            $request_responder = RequestController::Get($command);
-            //skip JSONResponders
-            if ($request_responder instanceof JSONResponder) continue;
-
-            if ($request_responder->needProcess()) {
-                debug("RequestResponder '" . get_class($request_responder) . "' accepted input processing");
-                try {
-                    $request_responder->processInput();
-                }
-                catch (Exception $e) {
-                    debug("RequestResponder error: ".$e->getMessage());
-                    Session::SetAlert("Error processing this request: "."<BR>".$e->getMessage());
-                }
-                break;
+        //
+        try {
+            debug("Responder '" . get_class($request_responder) . "' accepted processing. Is JSON: $isJson");
+            $request_responder->processInput();
+        }
+        catch (Exception $e) {
+            if ($isJson) {
+                $ret = new JSONResponse("RequestController");
+                $ret->status = JSONResponse::STATUS_ERROR;
+                $ret->message = $e->getMessage();
+                $ret->send();
             }
             else {
-                debug("RequestResponder '" . get_class($request_responder) . "' denied input processing");
+                debug("RequestResponder error: ".$e->getMessage());
+                Session::SetAlert("Error processing this request: "."<BR>".$e->getMessage());
             }
-
         }
+
+        if ($isJson) {
+            exit;
+        }
+
 
     }
 

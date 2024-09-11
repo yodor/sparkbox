@@ -1,6 +1,7 @@
 <?php
 include_once("utils/Session.php");
 include_once("components/Action.php");
+include_once("responders/RequestController.php");
 
 class Navigation
 {
@@ -70,7 +71,7 @@ class Navigation
 
     public function clear()
     {
-        if (SparkPage::Instance()->isJSONRequest()) {
+        if (RequestController::isJSONRequest()) {
             debug("Not clearing for JSONRequest");
         }
         else {
