@@ -3,6 +3,7 @@ include_once("components/Component.php");
 include_once("utils/url/URL.php");
 include_once("pages/HTMLHead.php");
 include_once("pages/HTMLBody.php");
+include_once("objects/SparkEvent.php");
 
 class HTMLPageEvent extends SparkEvent
 {
