@@ -4,6 +4,10 @@ include_once("sql/ISQLGet.php");
 
 abstract class SQLStatement implements ISQLGet
 {
+    /**
+     * Set of column names and values to operate the statement with during insert or update
+     * @var array
+     */
     protected array $set = array();
     /**
      * SELECT, UPDATE, DELETE, INSERT
@@ -17,6 +21,8 @@ abstract class SQLStatement implements ISQLGet
     protected ClauseCollection $whereset;
 
     /**
+     * Table name for the statement
+     * Also for insert
      * @var string Table name
      */
     public string $from = "";
@@ -26,6 +32,11 @@ abstract class SQLStatement implements ISQLGet
     public string $limit = "";
     public string $having = "";
 
+    /**
+     * Returns SQL text for this statement
+     * @return string
+     * @throws Exception
+     */
     public abstract function getSQL() : string;
 
     public function __construct()
@@ -48,6 +59,13 @@ abstract class SQLStatement implements ISQLGet
         return $this->type;
     }
 
+    /**
+     * Set single value for column '$column'
+     * No quoting or escaping is done
+     * @param string $column
+     * @param string $value
+     * @return void
+     */
     public function set(string $column, string $value) : void
     {
         $this->set[$column] = $value;
