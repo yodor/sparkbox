@@ -3,18 +3,6 @@ include_once("components/Component.php");
 include_once("utils/url/URL.php");
 include_once("pages/HTMLHead.php");
 include_once("pages/HTMLBody.php");
-include_once("objects/SparkEvent.php");
-
-class HTMLPageEvent extends SparkEvent
-{
-    const OUTPUT_STARTING = "output_starting";
-    const OUTPUT_FINISHING = "output_finishing";
-
-    public function __construct(string $name, SparkObject $source = null)
-    {
-        parent::__construct($name, $source);
-    }
-}
 
 class HTMLPage extends Component
 {
@@ -56,59 +44,26 @@ class HTMLPage extends Component
     {
         return $this->head;
     }
+
     public function body() : HTMLBody
     {
         return $this->body;
     }
 
-    protected function bodyStart()
-    {
-        $this->body->startRender();
-    }
-
-    protected function bodyEnd()
-    {
-        $this->body->finishRender();
-    }
-
     public function startRender()
     {
-        SparkEventManager::emit(new HTMLPageEvent(HTMLPageEvent::OUTPUT_STARTING, $this));
         echo "<!DOCTYPE html>\n";
-
-        parent::startRender();
-
+        parent::startRender(); //<html>
         $this->head->render();
-
-        $this->bodyStart();
+        $this->body->startRender();
     }
 
     public function finishRender()
     {
-        $this->bodyEnd();
-        SparkEventManager::emit(new HTMLPageEvent(HTMLPageEvent::OUTPUT_FINISHING, $this));
-        parent::finishRender();
-
+        $this->body->finishRender();
+        parent::finishRender(); //</html>
     }
 
-    /**
-     * Return the full URL this page is running from
-     * @return string
-     */
-    public function getPageURL() : string
-    {
-        return currentURL();
-    }
-
-    public function getURL(): URL
-    {
-        return new URL($this->getPageURL());
-    }
-
-    public function setName(string $name) : void
-    {
-        $this->name = $name;
-    }
 }
 
 ?>

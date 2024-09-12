@@ -28,9 +28,9 @@ class Navigation
     {
 
         //current URL
-        $pageURL = SparkPage::instance()->getURL();
+        $pageURL = URL::Current();
 
-        debug("Navigated to: ".SparkPage::instance()->getPageURL()." - Navigation contents: ".print_r($this->urls,true));
+        debug("Navigated to: ".$pageURL." - Navigation contents: ".print_r($this->urls,true));
 
         $stored_urls = new ArrayIterator($this->urls, true);
 
@@ -66,7 +66,7 @@ class Navigation
         $this->urls = $urls;
 
         Session::Set($this->name, $this->urls);
-        debug("Adding page to navigation '$pageName' => {$pageURL->toString()} - Naviagtion contents: ".print_r($this->urls,true));
+        debug("Adding page to navigation '$pageName' => $pageURL - Naviagtion contents: ".print_r($this->urls,true));
     }
 
     public function clear()
@@ -93,6 +93,8 @@ class Navigation
 
         $action = NULL;
 
+        $current_script = URL::Current()->getScriptName();
+
         while ($reverted->valid()) {
 
             $title = $reverted->key();
@@ -100,7 +102,7 @@ class Navigation
 
             $urlbuild->fromString($href);
 
-            if (strcmp($urlbuild->getScriptName(), SparkPage::Instance()->getURL()->getScriptName())==0) {
+            if (strcmp($urlbuild->getScriptName(), $current_script)==0) {
                 //skip the current entry added in push()
                 $reverted->next();
             }

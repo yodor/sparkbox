@@ -16,7 +16,7 @@ class PaginatorTopComponent extends PaginatorComponent
         if ($this->view_modes_enabled) {
             echo "<div class='cell view_mode'>";
 
-                $link = new URL(SparkPage::Instance()->getPageURL());
+                $link = URL::Current();
                 $link->remove(Paginator::KEY_PAGE);
 
                 $link->add(new URLParameter(Paginator::KEY_VIEW, "list"));

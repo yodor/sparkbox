@@ -17,7 +17,7 @@ class HeaderCellRenderer extends TableCellRenderer implements IGETConsumer
         $this->tagName = "TH";
 
         $this->translation_enabled = true;
-        $this->sortLink = new URL(SparkPage::Instance()->getPageURL());
+        $this->sortLink = URL::Current();
         $this->sortLink->add(new URLParameter(HeaderCellRenderer::KEY_ORDER_BY));
         $this->sortLink->add(new URLParameter(HeaderCellRenderer::KEY_ORDER_DIR, "ASC"));
 

@@ -133,7 +133,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
                     $this->storeSessionData($form);
 
                     if ($this->redirectEnabled) {
-                        $url = new URL(SparkPage::Instance()->getPageURL());
+                        $url = URL::Current();
                         foreach ($form->getInputs() as $inputName=>$input){
                             $url->remove($inputName);
                         }

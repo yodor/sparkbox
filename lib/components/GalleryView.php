@@ -152,7 +152,7 @@ class GalleryView extends Container
 
         $edit_params = array(new DataParameter("editID", $bkey));
 
-        $url = SparkPage::Instance()->getURL();
+        $url = URL::Current();
         $url->setScriptName("add.php");
 
         $collection = $this->actions;

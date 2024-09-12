@@ -3,35 +3,8 @@ include_once("objects/SparkEvent.php");
 include_once("objects/SparkObserver.php");
 include_once("forms/InputForm.php");
 include_once("beans/IBeanEditor.php");
+include_once("objects/events/BeanTransactorEvent.php");
 
-class BeanTransactorEvent extends SparkEvent
-{
-
-    const BEFORE_COMMIT = "BEFORE_COMMIT";
-    const AFTER_COMMIT = "AFTER_COMMIT";
-
-    /**
-     * @var DBDriver
-     */
-    protected ?DBDriver $db;
-
-    public function __construct(string $name = "", SparkObject $source = NULL, DBDriver $db = NULL)
-    {
-        parent::__construct($name, $source);
-        $this->db = $db;
-    }
-
-    public function setDB(DBDriver $db)
-    {
-        $this->db = $db;
-    }
-
-    public function getDB(): ?DBDriver
-    {
-        return $this->db;
-    }
-
-}
 /**
  * Process all DataInput controls from an InputForm and prepare values to be stored in a DBTableBean
  * Allows data to be stored into other DBTableBeans as set from the form DataInput fields

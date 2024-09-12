@@ -42,7 +42,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
     public function drawPrevButton() : void
     {
-        $link = new URL(SparkPage::Instance()->getPageURL());
+        $link = URL::Current();
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if ($this->paginator->getCurrentPage() > 0) {
@@ -53,7 +53,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
     public function drawNextButton() : void
     {
-        $link = new URL(SparkPage::Instance()->getPageURL());
+        $link = URL::Current();
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
@@ -76,7 +76,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
             echo "<select name=orderby onChange='javascript:changeSort(this)'>";
 
-            $link = new URL(SparkPage::Instance()->getPageURL());
+            $link = URL::Current();
             $link->setClearParams(Paginator::KEY_PAGE);
             $link->add(new URLParameter(Paginator::KEY_ORDER_BY, ""));
             $link->add(new URLParameter(Paginator::KEY_ORDER_DIR, ""));
@@ -125,7 +125,7 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
     protected function renderPageSelector() : void
     {
 
-        $link = new URL(SparkPage::Instance()->getPageURL());
+        $link = URL::Current();
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         echo "<div class='pager'>";

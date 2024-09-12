@@ -10,7 +10,7 @@ class RequestController
 
     public static function isJSONRequest(): bool
     {
-        return URL::Current()->contains("JSONRequest");
+        return isset($_REQUEST["JSONRequest"]);
     }
 
     /**

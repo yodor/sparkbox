@@ -15,7 +15,7 @@ class SparkEventManager
     }
 
     /**
-     * Register observer for receving events of given class name
+     * Register observer for receiving events of given class name
      * @param string $event_class
      * @param IObserver $observer
      * @return void

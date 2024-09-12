@@ -241,8 +241,8 @@ class URL implements IGETConsumer
         }
 
         //TODO: some urls are relateive
-        //"?cmd=copy_product$href_add"
-        //"banners/list.php?itemID=123"
+        //"?cmd=copy_product$href_add" - should take only parameters from this string
+        //"banners/list.php?itemID=123" - should take only path of current URL without the script file
 
         //cut domain and protocol first
 //        if (str_contains($build_string, "://")) {

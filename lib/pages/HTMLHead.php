@@ -127,7 +127,7 @@ class HTMLHead extends Component
             }
         }
 
-        $url = SparkPage::Instance()->getURL()->fullURL()->toString();
+        $url = URL::Current()->fullURL()->toString();
         //X-default tags are recommended, but not mandatory
         echo "<link rel='alternate' hreflang='x-default' href='$url'>\n";
 
@@ -136,7 +136,7 @@ class HTMLHead extends Component
 
 
         if (count($this->canonical_params)>0) {
-            $builder = SparkPage::Instance()->getURL();
+            $builder = URL::Current();
             $parameters = $builder->getParameterNames();
             foreach ($parameters as $name) {
                 if (array_key_exists($name, $this->canonical_params)) continue;

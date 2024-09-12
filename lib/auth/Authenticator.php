@@ -78,7 +78,7 @@ abstract class Authenticator
      * @return AuthContext
      * @throws Exception
      */
-    public function register(array $urow)
+    public function register(array $urow) : AuthContext
     {
 
         $userID = $this->bean->insert($urow);
@@ -95,10 +95,11 @@ abstract class Authenticator
     }
 
     /**
-     * @param array|null $user_data
+     * @param array|NULL $user_data
      * @return AuthContext|null
+     * @throws Exception
      */
-    public function authorize(array $user_data = NULL)
+    public function authorize(array $user_data = NULL) : ?AuthContext
     {
 
         if (!$this->session->contains(SessionData::AUTH_TOKEN)) {
@@ -128,9 +129,10 @@ abstract class Authenticator
     /**
      * @param string $username
      * @param string $pass - HMAC of rand from client
-     * @param $rand
+     * @param string $rand
      * @param bool $remember_me
      * @param bool $check_password_only
+     * @return void
      * @throws Exception
      */
     public function login(string $username, string $pass, string $rand, bool $remember_me = FALSE, bool $check_password_only = FALSE)

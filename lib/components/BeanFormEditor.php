@@ -10,15 +10,7 @@ include_once("db/BeanTransactor.php");
 include_once("responders/json/UploadControlResponder.php");
 
 include_once("dialogs/BeanTranslationDialog.php");
-
-
-class BeanFormEditorEvent extends SparkEvent {
-    const FORM_BEAN_LOADED = "FORM_BEAN_LOADED";
-    const FORM_PROCESSED = "FORM_PROCESSED";
-    const FORM_VALUES_TRANSACTED = "FORM_VALUES_TRANSACTED";
-    const FORM_BEAN_TRANSACED = "FORM_BEAN_TRANSACED";
-};
-
+include_once("objects/events/BeanFormEditorEvent.php");
 
 class BeanFormEditor extends Container implements IBeanEditor
 {
@@ -199,7 +191,7 @@ class BeanFormEditor extends Container implements IBeanEditor
         return $this->processor;
     }
 
-    public function setProcessor(IFormProcessor $processor)
+    public function setProcessor(IFormProcessor $processor) : void
     {
         $this->processor = $processor;
     }
@@ -209,7 +201,7 @@ class BeanFormEditor extends Container implements IBeanEditor
         return $this->transactor;
     }
 
-    public function setTransactor(BeanTransactor $transactor)
+    public function setTransactor(BeanTransactor $transactor) : void
     {
         $this->transactor = $transactor;
     }
@@ -260,7 +252,7 @@ class BeanFormEditor extends Container implements IBeanEditor
                     if (!$redirectURL) {
                         debug("RedirectURL is not set - Setting redirectURL to the edit location");
                         $lastID = $this->transactor->getLastID();
-                        $redirectURL = new URL(SparkPage::Instance()->getPageURL());
+                        $redirectURL = URL::Current();
                         $redirectURL->add(new URLParameter("editID", $lastID));
                     }
 
@@ -272,7 +264,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
                     if (!$redirectURL) {
                         debug("RedirectURL is not set - Setting redirectURL to the current location");
-                        $redirectURL = new URL(SparkPage::Instance()->getPageURL());
+                        $redirectURL = URL::Current();
                     }
                 }
 

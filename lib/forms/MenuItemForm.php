@@ -16,7 +16,7 @@ class MenuItemForm extends InputForm
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "link", "Link", 1);
 
-        $link = SparkPage::Instance()->getURL();
+        $link = URL::Current();
         $action = new Action("Choose Dynamic Page", ADMIN_LOCAL . "/content/pages/list.php?chooser=".base64_encode($link->toString()));
         $field->getRenderer()->getAddonContainer()->items()->append($action);
         $this->addInput($field);

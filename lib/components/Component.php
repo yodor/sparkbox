@@ -6,6 +6,7 @@ include_once("components/renderers/IPageComponent.php");
 include_once("components/renderers/ICacheable.php");
 include_once("storage/CacheEntry.php");
 include_once("utils/output/OutputBuffer.php");
+include_once("objects/events/ComponentEvent.php");
 
 /**
  * Wrapper for HTML element
@@ -107,12 +108,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         }
 
 
-        include_once("pages/SparkPage.php");
-        $page = SparkPage::Instance();
-
-        if ($page instanceof SparkPage) {
-            $page->componentCreated($this);
-        }
+        SparkEventManager::emit(new ComponentEvent(ComponentEvent::COMPONENT_CREATED, $this));
 
     }
 

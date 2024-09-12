@@ -20,9 +20,9 @@ include_once("objects/data/GTAGObject.php");
 class SparkPage extends HTMLPage implements IActionCollection
 {
 
-    private static $instance = NULL;
+    private static ?SparkPage $instance = NULL;
 
-    public static function Instance()
+    public static function Instance() : ?SparkPage
     {
         return self::$instance;
     }
@@ -31,30 +31,31 @@ class SparkPage extends HTMLPage implements IActionCollection
      * Require auth success to access the page
      * @var bool
      */
-    protected $authorized_access = FALSE;
+    protected bool $authorized_access = FALSE;
 
     /**
      * Login page redirection on auth fail
      * @var string
      */
-    protected $loginURL = "";
+    protected string $loginURL = "";
+
 
     /**
-     * Authenticator to use
-     * @var Authenticator
+     * Authenticator to use during authorization
+     * @var Authenticator|null
      */
-    protected $auth = NULL;
+    protected ?Authenticator $auth = NULL;
 
     /**
      * Authenticated context data array. is null if not authenticated yet
-     * @var AuthContext
+     * @var AuthContext|null
      */
     protected ?AuthContext $context = NULL;
 
     /**
      * The Preferred title of this page for rendering into the <TITLE></TITLE> tag
      */
-    protected $preferred_title = "";
+    protected string $preferred_title = "";
 
 
     /**
@@ -81,7 +82,7 @@ class SparkPage extends HTMLPage implements IActionCollection
 
 
 
-    protected $canonical_enabled = false;
+    protected bool $canonical_enabled = false;
 
     /**
      * Array holding the url parameter names that will be present in the canonical url version of 'this' page
@@ -103,7 +104,7 @@ class SparkPage extends HTMLPage implements IActionCollection
     /**
      * @return int The numeric ID as from the Authenticator
      */
-    public function getUserID()
+    public function getUserID() : int
     {
         if ($this->context instanceof AuthContext) {
             return $this->context->getID();
@@ -121,27 +122,26 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->actions = $actions;
     }
 
-    public function addURLParameter(URLParameter $parameter)
-    {
-        //TODO:
-    }
-
     /**
-     * Component constructor calls this method
+     * Handle component event COMPONENT_CREATED
+     * Add required CSS and JS files to the head for components implementing IHeadContents
+     * Add component to page_components if implementing IPageComponent
      *
-     * Adds required CSS and JS files to the head for components implementing IHeadContents
-     * Adds component to page_components if implementing IPageComponent
-     *
-     * @param Component $cmp
+     * @param SparkEvent $event
      * @return void
      */
-    public function componentCreated(Component $cmp)
+    protected function componentEvent(SparkEvent $event) : void
     {
+        if (!($event instanceof ComponentEvent)) return;
+        if (!$event->isEvent(ComponentEvent::COMPONENT_CREATED)) return;
+
+        $cmp = $event->getSource();
+
         if ($cmp instanceof IPageComponent) {
             $this->page_components[] = $cmp;
         }
 
-        //page constructors add css files directly to the head section
+        //SparkPage constructors add css files directly to the head section
         //use prepend to allow overload of component defined styles
         if ($cmp instanceof IHeadContents) {
             $css_files = $cmp->requiredStyle();
@@ -166,6 +166,8 @@ class SparkPage extends HTMLPage implements IActionCollection
     public function __construct()
     {
         debug("--- CTOR ---");
+
+        SparkEventManager::register(ComponentEvent::class, new SparkObserver($this->componentEvent(...)));
         parent::__construct();
 
         self::$instance = $this;
@@ -243,7 +245,7 @@ class SparkPage extends HTMLPage implements IActionCollection
                     if (strlen($this->loginURL) > 0) {
 
                         debug("Redirecting to login page URL: " . $this->loginURL);
-                        Session::Set("login.redirect", $this->getPageURL());
+                        Session::Set("login.redirect", URL::Current()->toString());
 
                         header("Location: $this->loginURL");
                         exit;
@@ -290,97 +292,78 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     /**
      * Assign the title, keywords and description to the head section
-     * Read DB for default values of keywords and description if empty
      * Process the meta values to max 150 symbols
      * @return void
      */
     protected function prepareMetaTitle() : void
     {
+        $title = strip_tags($this->preferred_title);
+        $this->head()->setTitle($title);
+        $this->head()->addOGTag("title", $title);
 
-        $this->head()->setTitle($this->preferred_title);
-        $this->head()->addOGTag("title", $this->preferred_title);
-
-        $meta_keywords = "";
-        $meta_description = "";
-
-        if (DB_ENABLED) {
-            $config = ConfigBean::Factory();
-            $config->setSection("seo");
-
-            $meta_keywords = sanitizeKeywords($config->get("meta_keywords"));
-            $meta_description = $config->get("meta_description");
-        }
-
-        if ($this->keywords) {
-            $meta_keywords = $this->keywords;
-        }
-
-        if ($this->description) {
-            $meta_description = $this->description;
-        }
-
-        $meta_keywords = prepareMeta($meta_keywords, 150);
-        $meta_description = prepareMeta($meta_description, 150);
-
+        $meta_keywords = prepareMeta($this->keywords, 150);
+        $meta_description = prepareMeta($this->description, 150);
         $this->head()->addMeta("keywords", $meta_keywords);
         $this->head()->addMeta("description", $meta_description);
         $this->head()->addOGTag("description", $meta_description);
-
     }
 
     /**
      * Start rendering of this page
-     *
-     * 1. RequestController processes all Ajax responders attached to this page
-     * 2. Config section of DB is read to load meta_keywords/description
-     * 3. Output buffering is set up
-     * 4. All tags including the BODY tag are rendered to the output
-     * 5. RequestController processes all regular responders(non-ajax)
+     * Two buffers are sent to client
+     * 1. The head contents buffer - sent in startRender()
+     * 2. The body contents buffer - everything between startRender() and finishRender() calls
      */
     public function startRender()
     {
         debug("--- StartRender ---");
+
+        //head output buffer
         ob_start(null, 4096);
 
         //JSONReponders exit execution
-        //creates IPageComponents ;
-        //can generate redirect so call before startRender
+        //can create IPageComponents
+        //can set header to redirect
         RequestController::process();
 
-        //prepare the title
+        //prepare $this->preferred_title value
         $this->constructTitle();
 
-        //prepare meta
+        //apply title, meta keywords, meta description to the head
         $this->prepareMetaTitle();
 
-        //starting output - push head until body tag - browser can fetch css and scripts while we render the body contents
-        //no session start further below
         parent::startRender();
-        //body started here
+        //<body> is in output buffer now
+
+        //push head until including the body tag - browser can fetch css and scripts while we do the body contents
         ob_end_flush();
+        //first output to client - no session start further below - headers sent
 
+        //body output buffer
         ob_start(null, 4096);
-
     }
 
     /**
-     * Finalize rendering of this page
-     *
-     * 1. Process messages if any
-     * 2. Process final components rendering ie all before the closing BODY tag
+     * Finalize rendering of this page and send the body output buffer
+     * 1. Render final components rendering ie all before the closing BODY tag
      * 3. Render the closing BODY tag
      * 4. Render the closing HTML tag
      * 5. End output buffering and send to client
      */
     public function finishRender()
     {
+        //still inside the body section
+
+        debug("--- FinishRender ---");
         //append message dialog templates
         $this->renderPageComponents();
 
         //show session alerts
         $this->processMessages();
 
+
         parent::finishRender();
+        //</html> ended here
 
         ob_end_flush();
     }

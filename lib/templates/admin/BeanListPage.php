@@ -154,7 +154,7 @@ class BeanListPage extends AdminPageTemplate
      */
     protected function initPageActions()
     {
-        $url = SparkPage::Instance()->getURL();
+        $url = URL::Current();
         $url->setScriptName("add.php");
         $action_add = new Action(SparkAdminPage::ACTION_ADD, $url->toString());
         $action_add->setTooltipText("Add new element to this collection");
