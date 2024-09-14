@@ -9,41 +9,42 @@ abstract class RequestResponder
     protected string $success_url = "";
 
     protected bool $need_confirm = FALSE;
-
     protected bool $need_redirect = TRUE;
 
-    const KEY_COMMAND = "cmd";
-    const KEY_CONFIRM = "confirm_handler";
+    const string KEY_COMMAND = "cmd";
+    const string KEY_CONFIRM = "confirm_handler";
 
     /**
-     * Current URL
+     * Current request URL
+     *
      * @var URL
      */
     protected URL $url;
 
+    /**
+     * Cleaned up from commands used to redirect on success or failure/cancel if $success/$cancel urls are not set
+     * @var URL
+     */
+    protected URL $redirect;
+
     public function __construct(string $cmd)
     {
         $this->cmd = $cmd;
+        $this->url = URL::Current();
+
+        $this->redirect = URL::Current();
 
         RequestController::Add($this);
-        $this->url = URL::Current();
     }
 
-    public function __destruct()
-    {
-        RequestController::Remove($this);
-    }
+
     /**
      * Clear the request url from the parameters of this responder
+     * Default remove the cmd, subclasses remove their parameters
      */
-    protected function buildRedirectURL()
+    protected function buildRedirectURL() : void
     {
-        $this->url->remove("cmd");
-    }
-
-    public function setNeedConfirm(bool $mode)
-    {
-        $this->need_confirm = $mode;
+        $this->redirect->remove("cmd");
     }
 
     public function getCommand(): string
@@ -51,6 +52,12 @@ abstract class RequestResponder
         return $this->cmd;
     }
 
+    /**
+     * Set the url to be redirected on error or cancel processing of this responder
+     *
+     * @param string $url
+     * @return void
+     */
     public function setCancelUrl(string $url) : void
     {
         $this->cancel_url = $url;
@@ -61,6 +68,12 @@ abstract class RequestResponder
         return $this->cancel_url;
     }
 
+    /**
+     * Set the url to be redirected after successfully processing this responder
+     *
+     * @param string $url
+     * @return void
+     */
     public function setSuccessUrl(string $url) : void
     {
         $this->success_url = $url;
@@ -69,6 +82,11 @@ abstract class RequestResponder
     public function getSuccessUrl(): string
     {
         return $this->success_url;
+    }
+
+    public function needRedirect() : bool
+    {
+        return $this->need_redirect;
     }
 
     /**
@@ -80,68 +98,44 @@ abstract class RequestResponder
         return strcmp_isset(RequestResponder::KEY_COMMAND, $this->cmd, $_REQUEST);
     }
 
-    public function process()
+
+    public function process() : void
     {
 
-        $process_error = FALSE;
-        $redirectURL = "";
+        //setup redirect url
+        $this->buildRedirectURL();
+
+        if (!$this->cancel_url) {
+            $this->cancel_url = $this->redirect->toString();
+        }
+        if (!$this->success_url) {
+            $this->success_url = $this->redirect->toString();
+        }
 
         $this->parseParams();
 
         if ($this instanceof JSONResponder) {
-            //should always exit script or throw error
             $this->processImpl();
             return;
         }
 
-        try {
+        debug("Needs confirmation: ".(($this->need_confirm)?"YES":"NO"));
 
-            //redirect URL is already set?
-            $redirectURL = $this->getCancelUrl();
-            if (!$redirectURL) {
-                $this->buildRedirectURL();
-                $redirectURL = $this->url->toString();
-                $this->cancel_url = $redirectURL;
-            }
-            debug("need_redirect: " . (int)$this->need_redirect);
-
-            if ($this->need_confirm) {
-                if (!isset($_POST[RequestResponder::KEY_CONFIRM])) {
-                    debug("Responder needs additional confirmation");
-                    $this->processConfirmation();
-                    return;
-                }
-                else {
-                    debug("Responder is confirmed");
-                }
-            }
-
-            $this->processImpl();
-
-            //success URL is set - use it for redirection
-            if ($this->getSuccessUrl()) {
-                $redirectURL = $this->getSuccessUrl();
-            }
-
-        }
-        catch (Exception $ex) {
-
-            Session::SetAlert($ex->getMessage());
-            debug("processImpl error: " . $ex->getMessage());
-            $process_error = TRUE;
-
-        }
-
-        if ($this->need_redirect || $process_error) {
-            if ($redirectURL) {
-                debug("Redirecting to URL: $redirectURL");
-                header("Location: " . $redirectURL);
-                exit;
+        if ($this->need_confirm) {
+            if (!isset($_POST[RequestResponder::KEY_CONFIRM])) {
+                debug("Asking confirmation");
+                //disable redirection
+                $this->need_redirect = false;
+                //construct the dialog so it can be attached to the page_components
+                $this->processConfirmation();
+                return;
             }
             else {
-                debug("Redirect URL is empty");
+                debug("Confirmation received");
             }
         }
+
+        $this->processImpl();
 
     }
 
@@ -152,7 +146,11 @@ abstract class RequestResponder
 
     abstract protected function processImpl();
 
-    abstract protected function parseParams();
+    /**
+     * @return void
+     * @throws Exception
+     */
+    abstract protected function parseParams() : void;
 
     protected function processConfirmation() : void
     {

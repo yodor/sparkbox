@@ -43,13 +43,18 @@ class SessionData
 
     }
 
-    public function destroy() : void
+    public function removeAll() : void
     {
-        debug("Removing SessionData [$this->name] from session");
         $keys = array_keys($this->data);
         foreach ($keys as $idx=>$key) {
             unset($this->data[$key]);
         }
+    }
+
+    public function destroy() : void
+    {
+        debug("Removing SessionData [$this->name] from session");
+        $this->removeAll();
         Session::Remove($this->name);
     }
 

@@ -31,9 +31,10 @@ abstract class UploadControlResponder extends JSONResponder
     }
 
     /**
+     * @return void
      * @throws Exception
      */
-    protected function parseParams()
+    protected function parseParams() : void
     {
         parent::parseParams();
         if (!isset($_GET[UploadControlResponder::PARAM_FIELD_NAME])) throw new Exception("Field name not passed");

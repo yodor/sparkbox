@@ -14,7 +14,11 @@ class DeleteItemResponder extends RequestResponder
         $this->need_confirm = TRUE;
     }
 
-    protected function parseParams()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function parseParams() : void
     {
         if (!$this->url->contains("item_id")) {
             throw new Exception("Item ID not passed");
@@ -27,7 +31,7 @@ class DeleteItemResponder extends RequestResponder
     protected function buildRedirectURL() : void
     {
         parent::buildRedirectURL();
-        $this->url->remove("item_id");
+        $this->redirect->remove("item_id");
     }
 
     public function getItemID()

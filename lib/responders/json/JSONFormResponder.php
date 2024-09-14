@@ -12,12 +12,12 @@ abstract class JSONFormResponder extends JSONResponder
     /**
      * @var InputForm
      */
-    protected $form;
+    protected InputForm $form;
 
     /**
      * @var FormProcessor
      */
-    protected $proc;
+    protected FormProcessor $proc;
 
     public function __construct(string $cmd="")
     {

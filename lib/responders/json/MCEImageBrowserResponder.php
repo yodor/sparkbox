@@ -74,7 +74,11 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         $this->auth_context = $auth;
     }
 
-    protected function parseParams()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function parseParams() : void
     {
         parent::parseParams();
 

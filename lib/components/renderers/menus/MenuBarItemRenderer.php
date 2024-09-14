@@ -5,7 +5,7 @@ include_once("components/renderers/menus/SubmenuRenderer.php");
 class MenuBarItemRenderer extends MenuItemRenderer
 {
 
-    protected $ir_submenu = NULL;
+    protected ?IMenuItemRenderer $ir_submenu = NULL;
 
     public function __construct()
     {
@@ -20,12 +20,12 @@ class MenuBarItemRenderer extends MenuItemRenderer
         $this->ir_submenu = $ir_submenu;
     }
 
-    public function disableSubmenuRenderer()
+    public function disableSubmenuRenderer() : void
     {
         $this->ir_submenu = NULL;
     }
 
-    public function setMenuItem(MenuItem $item)
+    public function setMenuItem(MenuItem $item) : void
     {
 
         parent::setMenuItem($item);

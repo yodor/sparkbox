@@ -3,7 +3,7 @@ include_once("utils/url/URLParameter.php");
 include_once("utils/Paginator.php");
 include_once("utils/IGETConsumer.php");
 
-class URL implements IGETConsumer
+class URL implements IGETConsumer, IDataResultProcessor
 {
 
     protected bool $is_script = FALSE;
@@ -312,14 +312,14 @@ class URL implements IGETConsumer
      * $row[$parameter_name] value is used as a replacement.
      *
      */
-    public function setData(array $row)
+    public function setData(array $data) : void
     {
         //
         if ($this->is_script) {
             $from = $this->script_name;
-            $names = array_keys($row);
+            $names = array_keys($data);
             foreach ($names as $idx => $name) {
-                $replace = array("%" . $name . "%" => $row[$name]);
+                $replace = array("%" . $name . "%" => $data[$name]);
                 $from = strtr($from, $replace);
             }
             $this->script_name = $from;
@@ -329,12 +329,12 @@ class URL implements IGETConsumer
         $names = array_keys($this->parameters);
         foreach ($names as $name) {
             $param = $this->get($name);
-            $param->setData($row);
+            $param->setData($data);
         }
 
     }
 
-    public function copyParametersTo(URL $url)
+    public function copyParametersTo(URL $url) : void
     {
         $parameters = $this->getParameterNames();
         foreach ($parameters as $idx=>$name) {
@@ -343,7 +343,7 @@ class URL implements IGETConsumer
 
     }
 
-    public function copyParametersFrom(URL $url)
+    public function copyParametersFrom(URL $url) : void
     {
         $parameters = $url->getParameterNames();
         foreach ($parameters as $idx=>$name) {
@@ -351,8 +351,9 @@ class URL implements IGETConsumer
         }
 
     }
-    public function clearParameters()
+    public function clearParameters() : void
     {
         $this->parameters = array();
     }
+
 }

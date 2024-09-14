@@ -5,9 +5,9 @@ include_once("components/renderers/IMenuItemRenderer.php");
 abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
 {
 
-    protected $item = NULL;
+    protected ?MenuItem $item = null;
 
-    protected $linkTag = NULL;
+    protected ?Component $linkTag  = null;
 
     public function __construct()
     {
@@ -18,14 +18,14 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
         $this->linkTag->setAttribute("role", "menuitem");
     }
 
-    public function renderSeparator($idx_curr, $items_total)
+    public function renderSeparator(int $idx_curr, int $items_total) : void
     {
         if ($idx_curr < $items_total - 1) {
             echo "<div class='MenuSeparator' position='$idx_curr'><div></div></div>";
         }
     }
 
-    public function setMenuItem(MenuItem $item)
+    public function setMenuItem(MenuItem $item) : void
     {
 
         $this->item = $item;
@@ -69,7 +69,7 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
 
     }
 
-    public function getMenuItem()
+    public function getMenuItem() : ?MenuItem
     {
         return $this->item;
     }

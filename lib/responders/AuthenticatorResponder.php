@@ -29,10 +29,12 @@ class AuthenticatorResponder extends RequestResponder
         return $this->auth;
     }
 
+
     /**
+     * @return void
      * @throws Exception
      */
-    protected function parseParams()
+    protected function parseParams() : void
     {
         if (!isset($_REQUEST["email"])) throw new Exception("Username not passed");
         if (!isset($_REQUEST["pass"])) throw new Exception("Password not passed");

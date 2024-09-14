@@ -79,39 +79,55 @@ class RequestController
             break;
         }
 
-        if (is_null($request_responder)) {
-            debug("No responder accepted this request");
-            if ($isJson) {
-                $ret = new JSONResponse("RequestController");
-                $ret->message = "No responder is registered to process this request";
-                $ret->send();
-                exit;
-            }
-            return;
-        }
-
         //
+        $exception = null;
+
         try {
+
+            if (is_null($request_responder)) {
+                debug("No responder accepted this request");
+                if ($isJson) throw new Exception("No responder is registered to process this request");
+
+                return;
+            }
+
             debug("Responder " . get_class($request_responder) . " accepted processing. Is JSON: ". ($isJson?"YES":"NO"));
             $request_responder->process();
         }
         catch (Exception $e) {
             debug("Error processing this responder: ".$e->getMessage());
-            if ($isJson) {
-                $ret = new JSONResponse("RequestController");
-                $ret->status = JSONResponse::STATUS_ERROR;
-                $ret->message = $e->getMessage();
-                $ret->send();
-            }
-            else {
-                Session::SetAlert("Error processing this request: "."<BR>".$e->getMessage());
-            }
+            $exception = $e;
         }
 
         if ($isJson) {
+            if ($exception instanceof Exception) {
+                $ret = new JSONResponse("RequestController");
+                $ret->status = JSONResponse::STATUS_ERROR;
+                $ret->message = $exception->getMessage();
+                $ret->send();
+            }
             exit;
         }
 
+        $redirectURL = null;
+
+        if ($request_responder->needRedirect()) {
+            $redirectURL = new URL($request_responder->getSuccessUrl());
+        }
+
+        if ($exception instanceof Exception) {
+            Session::SetAlert($exception->getMessage());
+            $redirectURL = new URL($request_responder->getCancelUrl());
+        }
+
+        if ($redirectURL instanceof URL) {
+            debug("Redirecting to URL: ".$redirectURL);
+            header("Location: " . $redirectURL);
+            exit;
+        }
+        else {
+            debug("Redirect URL is not set");
+        }
 
     }
 

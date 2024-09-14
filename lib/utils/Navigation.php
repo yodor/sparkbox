@@ -5,24 +5,21 @@ include_once("responders/RequestController.php");
 
 class Navigation
 {
-    protected array $urls = array();
+
     protected string $name;
+    protected SessionData $urldata;
 
     public function __construct(string $name="Navigation")
     {
         $this->name = $name;
-        $this->urls = Session::Get($name, array());
-    }
-
-    public function entries() : array
-    {
-        return $this->urls;
+        $this->urldata = new SessionData($this->name);
     }
 
     /**
-     * Push current page URL to the stack using key $pageName
+     * Push current url to navigation using pageName as access key
      * @param string $pageName
      * @return void
+     * @throws Exception
      */
     public function push(string $pageName) : void
     {
@@ -30,89 +27,74 @@ class Navigation
         //current URL
         $pageURL = URL::Current();
 
-        debug("Navigated to: ".$pageURL." - Navigation contents: ".print_r($this->urls,true));
+        debug("Pushing $pageName - Current URL: ".$pageURL);
 
-        $stored_urls = new ArrayIterator($this->urls, true);
-
-        $urlbuild = new URL();
-
-        $urls = array();
-
-        if (count($this->urls)>0) {
+        if ($this->urldata->count()>0) {
+            //check if is already present and splice
             debug("Rebuilding navigation entries");
-            while ($stored_urls->valid()) {
 
-                $title = $stored_urls->key();
-                $href = $stored_urls->current();
+            $clearRemaining = false;
 
-                //same page ?
-                $urlbuild->fromString($href);
-
-                if ($urlbuild == $pageURL) {
-                    debug("Current page url is already in the navigation: '$title' - Clearing remaining entries");
-                    break;
+            $pages = $this->urldata->keys();
+            foreach ($pages as $page) {
+                if ($clearRemaining) {
+                    $this->urldata->remove($page);
                 }
+                else {
+                    //get the stored url
+                    $storedURL = $this->urldata->get($page);
 
-                //add back
-                $urls[$title] = $urlbuild->toString();
-
-                $stored_urls->next();
+                    if ($storedURL == $pageURL) {
+                        debug("Current page url is already in the navigation as '$page' - Clearing remaining entries");
+                        $clearRemaining = true;
+                    }
+                }
             }
+
         }
 
+        debug("Adding page to navigation '$pageName' => $pageURL");
         //navigation entries are constructed by using $pagename as unique key not the url
-        $urls[$pageName] = $pageURL->toString();
+        $this->urldata->set($pageName, $pageURL);
 
-        $this->urls = $urls;
-
-        Session::Set($this->name, $this->urls);
-        debug("Adding page to navigation '$pageName' => $pageURL - Naviagtion contents: ".print_r($this->urls,true));
     }
 
-    public function clear()
+    public function clear() : void
     {
         if (RequestController::isJSONRequest()) {
             debug("Not clearing for JSONRequest");
         }
         else {
-            debug("Before clear - Naviagtion contents: " . print_r($this->urls, true));
-            $this->urls = array();
-            Session::Set($this->name, $this->urls);
+            debug("Clearing all navigation entries");
+            $this->urldata->removeAll();
+
         }
     }
 
     public function back() : ?Action
     {
-        debug("Navigation entries: ".print_r($this->urls,true));
+        debug("Requested back action");
 
-        if (count($this->urls)<1)return NULL;
+        if ($this->urldata->count()<1)return NULL;
 
-        $reverted = new ArrayIterator(array_reverse($this->urls, true));
-
-        $urlbuild = new URL();
+        $pages = array_reverse($this->urldata->keys(), true);
 
         $action = NULL;
 
         $current_script = URL::Current()->getScriptName();
 
-        while ($reverted->valid()) {
-
-            $title = $reverted->key();
-            $href = $reverted->current();
-
-            $urlbuild->fromString($href);
-
-            if (strcmp($urlbuild->getScriptName(), $current_script)==0) {
-                //skip the current entry added in push()
-                $reverted->next();
+        foreach ($pages as $pageName) {
+            $storedURL = $this->urldata->get($pageName);
+            if (strcmp($storedURL->getScriptName(), $current_script)==0) {
+                continue;
             }
             else {
-                $action = new Action($title, $href);
-                debug("Using href: ".$href);
+                $action = new Action($pageName, $storedURL->toString());
+                debug("Using href: ".$action->getURL());
                 break;
             }
-
         }
+
         return $action;
 
     }

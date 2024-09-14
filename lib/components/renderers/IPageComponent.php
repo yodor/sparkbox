@@ -1,6 +1,8 @@
 <?php
 
-//All components implementing this interface would get the output of renderFinal() placed before the ending body tag
+/**
+ * All components implementing this interface will get rendered before the closing body during finishRender of SparkPage
+ */
 interface IPageComponent
 {
 

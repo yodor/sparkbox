@@ -2,10 +2,10 @@
 
 #[AllowDynamicProperties] class JSONResponse extends SparkObject
 {
-    const STATUS_ERROR = "error";
-    const STATUS_OK = "OK";
+    const string STATUS_ERROR = "error";
+    const string STATUS_OK = "OK";
 
-    public string $status = "error";
+    public string $status = JSONResponse::STATUS_ERROR;
     public string $message = "";
 
     public function __construct(string $name)

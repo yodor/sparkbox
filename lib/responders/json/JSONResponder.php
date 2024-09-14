@@ -7,7 +7,6 @@ abstract class JSONResponder extends RequestResponder
 
     protected array $supported_content = array();
     protected string $content_type = "";
-    protected bool $response_send = FALSE;
 
     public function __construct(string $cmd)
     {
@@ -17,22 +16,30 @@ abstract class JSONResponder extends RequestResponder
         $this->supported_content = array();
 
         $class_methods = get_class_methods($this);
-        foreach ($class_methods as $key => $fname) {
-            if (str_starts_with($fname, "_") && !str_contains($fname, "__")) {
-                $supported_content = str_replace("_", "", $fname);
-                $this->supported_content[] = $supported_content;
-            }
+        foreach ($class_methods as $method) {
+            if (str_starts_with($method, "__"))continue;
+            if (!str_starts_with($method, "_"))continue;
+            $supported_content = str_replace("_", "", $method);
+            $this->supported_content[] = $supported_content;
         }
 
-        debug("Accepting function calls: ", $this->supported_content);
+        debug(get_class($this)." accepting function calls: ", $this->supported_content);
 
     }
 
-    protected function parseParams()
+    protected function buildRedirectURL() : void
     {
 
-        if (!isset($_GET["type"])) throw new Exception("Parameter 'type' not specified");
-        $content_type = $_GET["type"];
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function parseParams() : void
+    {
+        if (!isset($_REQUEST["type"])) throw new Exception("Parameter 'type' not specified");
+        $content_type = $_REQUEST["type"];
 
         if (!in_array($content_type, $this->supported_content)) throw new Exception("Function call not supported");
 
@@ -43,17 +50,15 @@ abstract class JSONResponder extends RequestResponder
 
     /**
      * Call the _named function passing a JSONResponse object as parameter
-     * All properties set to the response are sent back to the JS as json_object
+     * All properties set to the response are sent back as json_object
+     * Capture output and set as property contents of the response
      */
     protected function processImpl()
     {
 
-        $response = new JSONResponse(get_class($this) . "Response");
+        $response = new JSONResponse(get_class($this));
 
         ob_start();
-
-        register_shutdown_function(array($this, "shutdown"));
-
         try {
 
             $function_name = "_" . $this->content_type;
@@ -85,35 +90,9 @@ abstract class JSONResponder extends RequestResponder
 
         ob_end_clean();
         $response->send();
-        $this->response_send = TRUE;
 
     }
 
-    public function shutdown()
-    {
-        $err = error_get_last();
-
-        //if response is sent last error is proably not fatal
-        debug($this, "response_send = " . (int)$this->response_send);
-
-        if (is_array($err)) {
-
-            debug($this, "error_get_last: ", $err);
-
-            if (!$this->response_send) {
-
-                @ob_end_clean();
-
-                $response = new JSONResponse(get_class($this) . "Response");
-                $response->status = JSONResponse::STATUS_ERROR;
-                $response->message = "Error: " . $err["type"] . " - " . $err["message"] . "<BR>File: " . $err["file"] . " Line: " . $err["line"];
-                $response->send();
-                $response->contents = "";
-            }
-
-        }
-        exit;
-    }
 }
 
 ?>

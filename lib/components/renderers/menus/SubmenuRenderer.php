@@ -6,9 +6,9 @@ include_once("components/renderers/IMenuItemRenderer.php");
 class SubmenuRenderer extends Component implements IMenuItemRenderer
 {
 
-    protected $menu_item = NULL; //menu_item - owner of this submenu
+    protected ?MenuItem $menu_item = NULL;
 
-    protected $ir_menuitem = NULL;
+    protected ?SubmenuItemRenderer $ir_menuitem = NULL;
 
 
     public function __construct()
@@ -18,19 +18,19 @@ class SubmenuRenderer extends Component implements IMenuItemRenderer
 
     }
 
-    public function getMenuItem()
+    public function getMenuItem() : ?MenuItem
     {
         return $this->menu_item;
     }
 
-    public function renderSeparator($idx_curr, $items_total)
+    public function renderSeparator($idx_curr, $items_total) : void
     {
         if ($idx_curr < $items_total - 1) {
             echo "\n<div class='SubmenuSeparator' position='$idx_curr'><div></div></div>";
         }
     }
 
-    public function setMenuItem(MenuItem $item)
+    public function setMenuItem(MenuItem $item) : void
     {
         $this->menu_item = $item;
 

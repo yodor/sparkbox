@@ -29,7 +29,7 @@ class PageSessionMenu extends MainMenu
     }
 
     //set selected menu items and add submenu 'arr_menu' to last selected node
-    public function update($menuItems = array())
+    public function update($menuItems = array()) : void
     {
 
         //find last active item

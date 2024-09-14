@@ -61,10 +61,9 @@ class SparkEventManager
             return;
         }
 
-        debug("Emiting $event_class to ".count($observers)." registered observers");
+        //debug("Emiting $event_class to ".count($observers)." registered observers");
 
         foreach ($observers as $observer) {
-            debug("Calling observer: ".get_class($observer));
             $observer->onEvent($event);
         }
     }

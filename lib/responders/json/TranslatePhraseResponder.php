@@ -21,7 +21,11 @@ class TranslatePhraseResponder extends JSONResponder
         $this->bean = new TranslationPhrasesBean();
     }
 
-    protected function parseParams()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function parseParams() : void
     {
         parent::parseParams();
 

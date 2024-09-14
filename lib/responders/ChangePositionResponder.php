@@ -31,7 +31,11 @@ class ChangePositionResponder extends RequestResponder
 
     }
 
-    protected function parseParams()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function parseParams() : void
     {
         if (!$this->url->contains("item_id")) {
             throw new Exception("Item ID not passed");
@@ -70,9 +74,9 @@ class ChangePositionResponder extends RequestResponder
     {
         parent::buildRedirectURL();
 
-        $this->url->remove("item_id");
-        $this->url->remove("type");
-        $this->url->remove("position");
+        $this->redirect->remove("item_id");
+        $this->redirect->remove("type");
+        $this->redirect->remove("position");
     }
 
     protected function processImpl()

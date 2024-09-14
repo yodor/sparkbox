@@ -20,7 +20,11 @@ class ToggleFieldResponder extends RequestResponder
         $this->need_confirm = TRUE;
     }
 
-    protected function parseParams()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function parseParams() : void
     {
         if (!$this->url->contains("item_id")) {
             throw new Exception("Item ID not passed");
@@ -42,9 +46,9 @@ class ToggleFieldResponder extends RequestResponder
     protected function buildRedirectURL() : void
     {
         parent::buildRedirectURL();
-        $this->url->remove("item_id");
-        $this->url->remove("status");
-        $this->url->remove("field");
+        $this->redirect->remove("item_id");
+        $this->redirect->remove("status");
+        $this->redirect->remove("field");
     }
 
     public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array()) : Action
