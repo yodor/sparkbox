@@ -256,11 +256,9 @@ class BeanTransactor extends SparkObject implements IBeanEditor
             $values = array_merge($this->values, $this->insert_values);
         }
 
-        if (is_callable("DBTransactor_onMergeBeanValues")) {
-            call_user_func_array("DBTransactor_onMergeBeanValues", array(&$values));
-        }
-
         $this->values = $values;
+
+        //debug("Working bean: ".get_class($this->bean)." values: ",$this->values);
 
         if ($this->editID > 0) {
             debug("doing update");

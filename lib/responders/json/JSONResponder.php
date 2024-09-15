@@ -53,7 +53,7 @@ abstract class JSONResponder extends RequestResponder
      * All properties set to the response are sent back as json_object
      * Capture output and set as property contents of the response
      */
-    protected function processImpl()
+    protected function processImpl() : void
     {
 
         $response = new JSONResponse(get_class($this));

@@ -70,16 +70,12 @@ class ChangePositionResponder extends RequestResponder
         }
     }
 
-    protected function buildRedirectURL() : void
+    public function getParameterNames() : array
     {
-        parent::buildRedirectURL();
-
-        $this->redirect->remove("item_id");
-        $this->redirect->remove("type");
-        $this->redirect->remove("position");
+        return parent::getParameterNames() + array("item_id", "type", "position");
     }
 
-    protected function processImpl()
+    protected function processImpl() : void
     {
 
         if ($this->bean instanceof NestedSetBean) {

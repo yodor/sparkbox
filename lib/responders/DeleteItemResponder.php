@@ -20,29 +20,24 @@ class DeleteItemResponder extends RequestResponder
      */
     protected function parseParams() : void
     {
-        if (!$this->url->contains("item_id")) {
-            throw new Exception("Item ID not passed");
-        }
-
+        if (!$this->url->contains("item_id")) throw new Exception("Item ID not passed");
         $this->item_id = (int)$this->url->get("item_id")->value();
-
     }
 
-    protected function buildRedirectURL() : void
+    public function getParameterNames() : array
     {
-        parent::buildRedirectURL();
-        $this->redirect->remove("item_id");
+        return parent::getParameterNames() + array("item_id");
     }
 
-    public function getItemID()
+    public function getItemID() : int
     {
         return $this->item_id;
     }
 
-    public function createAction($title = "Delete", $href_add = "", $check_code = NULL, $parameters_array = array())
+    public function createAction(string $title = "Delete", string $href = "", Closure $check_code = NULL, array $parameters = array()) : ?Action
     {
-        $parameters = array(new DataParameter("item_id", $this->bean->key()));
-        return new Action($title, "?cmd=delete_item$href_add", array_merge($parameters, $parameters_array), $check_code);
+        $parameters[] = new DataParameter("item_id", $this->bean->key());
+        return new Action($title, "?cmd={$this->cmd}&$href", $parameters, $check_code);
     }
 
     protected function processConfirmation() : void
@@ -53,7 +48,7 @@ class DeleteItemResponder extends RequestResponder
     /**
      * @throws Exception
      */
-    protected function processImpl()
+    protected function processImpl() : void
     {
 
         debug("Deleting ID: $this->item_id of DBTableBean: ".get_class($this->bean));

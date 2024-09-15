@@ -6,10 +6,10 @@ include_once("dialogs/ConfirmMessageDialog.php");
 class ToggleFieldResponder extends RequestResponder
 {
 
-    protected $item_id;
-    protected $bean;
-    protected $status;
-    protected $field_name;
+    protected int $item_id;
+    protected DBTableBean $bean;
+    protected int $status;
+    protected string $field_name;
 
     public function __construct(DBTableBean $bean, $cmd = "toggle_field")
     {
@@ -43,24 +43,20 @@ class ToggleFieldResponder extends RequestResponder
 
     }
 
-    protected function buildRedirectURL() : void
+    public function getParameterNames() : array
     {
-        parent::buildRedirectURL();
-        $this->redirect->remove("item_id");
-        $this->redirect->remove("status");
-        $this->redirect->remove("field");
+        return parent::getParameterNames() + array("item_id", "status", "field");
     }
 
-    public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array()) : Action
+    public function createAction(string $title = "Toggle", string $href = "", Closure $check_code = NULL, array $parameters = array()) : ?Action
     {
 
-        $parameters = array(new DataParameter("item_id", $this->bean->key()));
-
-        return new Action($title, "?cmd={$this->cmd}&$href_add", array_merge($parameters, $parameters_array), $check_code);
+        $parameters[] = new DataParameter("item_id", $this->bean->key());
+        return new Action($title, "?cmd={$this->cmd}&$href", $parameters, $check_code);
 
     }
 
-    protected function processImpl()
+    protected function processImpl() : void
     {
 
         $field_name = DBConnections::Get()->escape($this->field_name);

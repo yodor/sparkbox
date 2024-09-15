@@ -7,16 +7,16 @@ class InputGroup {
     /**
      * @var string The name of this input group
      */
-    protected $name;
+    protected string $name;
     /**
      * @var string Description of this input group
      */
-    protected $description;
+    protected string $description;
 
     /**
      * @var array Names of all inputs in this input group
      */
-    protected $contents;
+    protected array $contents;
 
     public function __construct(string $name, string $description="")
     {
@@ -25,7 +25,7 @@ class InputGroup {
         $this->contents = array();
     }
 
-    public function containsInput(DataInput $input)
+    public function containsInput(DataInput $input): bool
     {
         return array_key_exists($input->getName(), $this->contents);
     }
@@ -35,19 +35,19 @@ class InputGroup {
         return array_keys($this->contents);
     }
 
-    public function addInput(DataInput $input)
+    public function addInput(DataInput $input): void
     {
         $this->contents[$input->getName()] = 1;
     }
 
-    public function removeInput(DataInput $input)
+    public function removeInput(DataInput $input): void
     {
         if ($this->containsInput($input)) {
             unset($this->contents[$input->getName()]);
         }
     }
 
-    public function removeAll()
+    public function removeAll(): void
     {
         $this->contents = array();
     }
@@ -57,7 +57,7 @@ class InputGroup {
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -67,7 +67,7 @@ class InputGroup {
         return $this->description;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -98,16 +98,16 @@ class InputForm implements IBeanEditor
      * Associative array with key = DataInput name and value = DataInput object
      * @var array
      */
-    protected $inputs = array();
+    protected array $inputs = array();
 
     /**
      * @var DBTableBean
      */
-    protected $bean = NULL;
+    protected ?DBTableBean $bean = NULL;
     /**
      * @var int
      */
-    protected $beanID = -1;
+    protected int $beanID = -1;
 
     /**
      * @var IFormProcessor
@@ -119,13 +119,14 @@ class InputForm implements IBeanEditor
      */
     protected $renderer = NULL;
 
-    protected $name = "";
+    protected string $name = "";
 
     const DEFAULT_GROUP = "default";
 
-    protected $groups = NULL;
+    //group names
+    protected array $groups = array();
 
-    protected $default_group = NULL;
+    protected InputGroup $default_group;
     /**
      * InputForm constructor.
      * @throws Exception
@@ -141,7 +142,7 @@ class InputForm implements IBeanEditor
         $this->groups[$this->default_group->getName()] = $this->default_group;
     }
 
-    public function addGroup(InputGroup $group)
+    public function addGroup(InputGroup $group): void
     {
         if (strcmp($group->getName(), InputForm::DEFAULT_GROUP)==0) {
             throw new Exception("InputGroup name '".InputForm::DEFAULT_GROUP."' is reserved");
@@ -149,7 +150,7 @@ class InputForm implements IBeanEditor
         $this->groups[$group->getName()] = $group;
     }
 
-    public function insertGroupAfter(InputGroup $group, string $after_name)
+    public function insertGroupAfter(InputGroup $group, string $after_name): void
     {
 
         $index = array_search($after_name, array_keys($this->groups));
@@ -165,16 +166,17 @@ class InputForm implements IBeanEditor
 
     public function getGroup(string $name): InputGroup
     {
-        if (array_key_exists($name, $this->groups)) return $this->groups[$name];
-        throw new Exception("InputGroup name not found");
+        if (!array_key_exists($name, $this->groups)) throw new Exception("InputGroup name not found");
+
+        return $this->groups[$name];
     }
 
     /**
      * Return the InputGroup object of DataInput $input
      * @param DataInput $input
-     * @return InputGroup
+     * @return InputGroup|null
      */
-    public function getInputGroup(DataInput $input) : InputGroup
+    public function getInputGroup(DataInput $input) : ?InputGroup
     {
         $result = NULL;
 
@@ -193,9 +195,9 @@ class InputForm implements IBeanEditor
 
     /**
      * Return the name of the InputGroup object this DataInput $input is part of
+     * Non group objects are part of the 'Default group' specified with name InputForm::DEFAULT_GROUP
      * @param DataInput $input
      * @return string The group name this DataInput is part of
-     * Non group objects are part of the 'Default group' specified with name InputForm::DEFAULT_GROUP
      */
     public function groupName(DataInput $input) : string
     {
@@ -218,7 +220,7 @@ class InputForm implements IBeanEditor
     /**
      * @param string $name The name of this form
      */
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -234,12 +236,12 @@ class InputForm implements IBeanEditor
         return $this->renderer;
     }
 
-    public function setRenderer(FormRenderer $renderer)
+    public function setRenderer(FormRenderer $renderer): void
     {
         $this->renderer = $renderer;
     }
 
-    public function setProcessor(IFormProcessor $processor)
+    public function setProcessor(IFormProcessor $processor): void
     {
         $this->processor = $processor;
     }
@@ -249,7 +251,7 @@ class InputForm implements IBeanEditor
         return $this->processor;
     }
 
-    public function addInput(DataInput $input, InputGroup $group = NULL)
+    public function addInput(DataInput $input, InputGroup $group = NULL): void
     {
         if (is_null($group)) $group = $this->default_group;
 
@@ -260,7 +262,7 @@ class InputForm implements IBeanEditor
 
     }
 
-    public function setInputGroup(DataInput $input, InputGroup $group)
+    public function setInputGroup(DataInput $input, InputGroup $group): void
     {
         $groupName = $this->groupName($input);
         $inputGroup = $this->getGroup($groupName);
@@ -268,7 +270,7 @@ class InputForm implements IBeanEditor
         $group->addInput($input);
     }
 
-    public function insertFieldAfter(DataInput $input, string $after_name)
+    public function insertFieldAfter(DataInput $input, string $after_name): void
     {
         $index = array_search($after_name, array_keys($this->inputs));
 
@@ -282,7 +284,7 @@ class InputForm implements IBeanEditor
 
     }
 
-    public function removeInput(string $name)
+    public function removeInput(string $name): void
     {
         $input = $this->getInput($name);
         $groupName = $this->groupName($input);
@@ -313,7 +315,7 @@ class InputForm implements IBeanEditor
     }
 
     /**
-     * @param string $field_name
+     * @param string $name
      * @return bool
      */
     public function haveInput(string $name): bool
@@ -322,7 +324,7 @@ class InputForm implements IBeanEditor
     }
 
     /**
-     * @param string $field_name
+     * @param string $name
      * @return DataInput
      * @throws Exception
      */
@@ -376,14 +378,14 @@ class InputForm implements IBeanEditor
         return $found_error;
     }
 
-    public function clear()
+    public function clear(): void
     {
         foreach ($this->inputs as $name => $input) {
             $input->clear();
         }
     }
 
-    public function removeAll()
+    public function removeAll(): void
     {
         $this->inputs = array();
     }

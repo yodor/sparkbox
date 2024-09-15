@@ -19,7 +19,7 @@ abstract class OrderedDataBean extends DBTableBean
     {
 
         $code = function (DBDriver $db) use ($id) {
-            $pos = $this->getValue($id, "position");
+            $pos = (int)$this->getValue($id, "position");
 
             debug("Deleting item with position: $pos");
 
@@ -48,10 +48,10 @@ abstract class OrderedDataBean extends DBTableBean
         return parent::insert($row, $db);
     }
 
-    public function reorderFixed(int $id, int $new_pos, DBDriver $db = NULL)
+    public function reorderFixed(int $id, int $new_pos, DBDriver $db = NULL) : void
     {
 
-        $pos = $this->getValue($id, "position");
+        $pos = (int)$this->getValue($id, "position");
 
         $maxp = $this->getMaxPosition();
 
@@ -85,7 +85,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function reorderTop(int $id, DBDriver $db = NULL)
+    public function reorderTop(int $id, DBDriver $db = NULL) : void
     {
 
         $pos = (int)$this->getValue($id, "position");
@@ -114,7 +114,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function reorderBottom(int $id, DBDriver $db = NULL)
+    public function reorderBottom(int $id, DBDriver $db = NULL) : void
     {
 
         $pos = (int)$this->getValue($id, "position");
@@ -145,7 +145,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function reorderUp(int $id, DBDriver $db = NULL)
+    public function reorderUp(int $id, DBDriver $db = NULL) : void
     {
 
         $pos = (int)$this->getValue($id, "position");
@@ -181,7 +181,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function reorderDown(int $id, DBDriver $db = NULL)
+    public function reorderDown(int $id, DBDriver $db = NULL) : void
     {
         $pos = (int)$this->getValue($id, "position");
 
@@ -234,7 +234,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function rebuildReferentialOrdering(string $ref_key, string $ref_val)
+    public function rebuildReferentialOrdering(string $ref_key, string $ref_val) : void
     {
 
         $query = $this->query("position", "$ref_key", $this->prkey);

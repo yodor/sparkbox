@@ -47,14 +47,14 @@ class AuthenticatorResponder extends RequestResponder
         $this->remember = isset($_POST["remember"]);
     }
 
-    public function createAction($title = "Toggle", $href_add = "", $check_code = NULL, $parameters_array = array())
+    public function createAction(string $title = "", string $href = "", Closure $check_code = NULL, array $parameters = array()) : ?Action
     {
 
         return NULL;
 
     }
 
-    protected function processImpl()
+    protected function processImpl() : void
     {
 
         try {
@@ -70,6 +70,7 @@ class AuthenticatorResponder extends RequestResponder
         }
 
     }
+
 
 }
 

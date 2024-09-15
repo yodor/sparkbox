@@ -1,7 +1,7 @@
 <?php
 include_once("utils/url/URL.php");
 
-abstract class RequestResponder
+abstract class RequestResponder implements IGETConsumer
 {
     protected string $cmd = "";
 
@@ -37,14 +37,9 @@ abstract class RequestResponder
         RequestController::Add($this);
     }
 
-
-    /**
-     * Clear the request url from the parameters of this responder
-     * Default remove the cmd, subclasses remove their parameters
-     */
-    protected function buildRedirectURL() : void
+    public function getParameterNames(): array
     {
-        $this->redirect->remove("cmd");
+        return array("cmd");
     }
 
     public function getCommand(): string
@@ -54,7 +49,7 @@ abstract class RequestResponder
 
     /**
      * Set the url to be redirected on error or cancel processing of this responder
-     *
+     * Default is to use cleaned up version of the current url by removing all parameter names returned from getParameterNames
      * @param string $url
      * @return void
      */
@@ -70,7 +65,7 @@ abstract class RequestResponder
 
     /**
      * Set the url to be redirected after successfully processing this responder
-     *
+     * Default is to use cleaned up version of the current url by removing all parameter names returned from getParameterNames
      * @param string $url
      * @return void
      */
@@ -98,12 +93,33 @@ abstract class RequestResponder
         return strcmp_isset(RequestResponder::KEY_COMMAND, $this->cmd, $_REQUEST);
     }
 
+    /**
+     * @return void
+     * @throws Exception
+     */
+    abstract protected function parseParams() : void;
 
+    /**
+     * @return void
+     * @throws Exception
+     */
+    abstract protected function processImpl() : void;
+
+
+    /**
+     * Sets up the redirect url and checks for confirmation
+     * if success_url or cancel_url are unset use the redirect url as default values
+     * Calls parseParams and processImpl
+     * @return void
+     * @throws Exception
+     */
     public function process() : void
     {
 
         //setup redirect url
-        $this->buildRedirectURL();
+        foreach ($this->getParameterNames() as $parameterName) {
+            $this->redirect->remove($parameterName);
+        }
 
         if (!$this->cancel_url) {
             $this->cancel_url = $this->redirect->toString();
@@ -139,18 +155,10 @@ abstract class RequestResponder
 
     }
 
-    public function createAction($title = FALSE, $href = FALSE, $check_code = NULL, $data_parameters = array())
+    public function createAction(string $title = "", string $href = "", Closure $check_code = NULL, array $parameters = array()) : ?Action
     {
         return NULL;
     }
-
-    abstract protected function processImpl();
-
-    /**
-     * @return void
-     * @throws Exception
-     */
-    abstract protected function parseParams() : void;
 
     protected function processConfirmation() : void
     {
