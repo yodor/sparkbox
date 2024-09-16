@@ -59,7 +59,7 @@ class ToggleFieldResponder extends RequestResponder
     protected function processImpl() : void
     {
 
-        $field_name = DBConnections::Get()->escape($this->field_name);
+        $field_name = DBConnections::Open()->escape($this->field_name);
 
         $update_row = array();
         $update_row[$field_name] = $this->status;

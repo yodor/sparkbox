@@ -61,7 +61,7 @@ abstract class DBTableBean
             $this->db = $dbdriver;
         }
         else {
-            $this->db = DBConnections::Get();
+            $this->db = DBConnections::Open();
         }
 
         $this->initFields();

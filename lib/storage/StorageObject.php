@@ -51,7 +51,7 @@ class StorageObject
     public function serializeDB() : string
     {
 
-        return DBConnections::Get()->escape(serialize($this));
+        return DBConnections::Open()->escape(serialize($this));
 
     }
 
@@ -81,7 +81,7 @@ class StorageObject
 
         if ($doEscape) {
 
-            $row[$this->dataKey] = DBConnections::Get()->escape($this->buffer->data());
+            $row[$this->dataKey] = DBConnections::Open()->escape($this->buffer->data());
 
         }
         $row["mime"] = $this->buffer->mime();

@@ -101,7 +101,7 @@ class RelatedSourceFilterProcessor extends NestedSetFilterProcessor implements I
 
             if (!isset($_GET[$name])) continue;
 
-            $filter_value = DBConnections::Get()->escape($_GET[$name]);
+            $filter_value = DBConnections::Open()->escape($_GET[$name]);
             if (!$filter_value) continue;
 
             $sel = new SQLSelect();

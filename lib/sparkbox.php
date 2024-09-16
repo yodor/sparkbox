@@ -41,7 +41,7 @@ include_once("utils/functions.php");
 //$doc_root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', realpath($_SERVER['SCRIPT_FILENAME']));
 //$location = preg_replace("!^${doc_root}!", '', $install_path);
 $doc_full = realpath($_SERVER['DOCUMENT_ROOT']);
-$location = preg_replace("!^${doc_full}!", "", $install_path);
+$location = preg_replace("!^{$doc_full}!", "", $install_path);
 
 //app/site deployment (server path)
 $defines->set("INSTALL_PATH", $install_path);
@@ -80,7 +80,7 @@ ini_set("session.use_strict_mode", 1);
 ini_set("session.cookie_lifetime", 0);
 ini_set("session.use_cookies", 1);
 ini_set("session.use_only_cookies", 1);
-//overwrited from session_start do not set cache_limiter
+//overwritten from session_start do not set cache_limiter
 //try to enable only on specific pages
 //ini_set("session.cache_limiter", "private");
 //minutes - cache of the response
@@ -169,27 +169,18 @@ if (!file_exists(CACHE_PATH)) {
     if (!file_exists(CACHE_PATH)) throw new Exception("Unable to create cache folder: " . CACHE_PATH);
 }
 
-//define SKIP_SESSION to skip starting session
-if (!defined("SKIP_SESSION")) {
-    include_once("utils/Session.php");
-//    Session::Start();
-
-}
-
 //
 //define SKIP_DB to skip creating a default connection to DB
 if (DB_ENABLED && !defined("SKIP_DB")) {
 
-    include_once("dbdriver/DBConnections.php");
-    include_once("config/dbconfig.php");
     include_once("dbdriver/DBDriver.php");
+    include_once("dbdriver/DBConnections.php");
+    include_once("objects/SparkEventManager.php");
+    include_once("objects/SparkObserver.php");
 
-    $use_persistent = FALSE;
-    if (defined("PERSISTENT_DB")) $use_persistent = TRUE;
-
-    $driver = DBConnections::Factory(DBConnectionProperties::DEFAULT_NAME, $use_persistent);
-    //set default driver
-    DBConnections::Set($driver);
+    //fetch local config
+    include_once("config/dbconfig.php");
+    SparkEventManager::register(DBDriverEvent::class, new SparkObserver(DBConnections::connectionEvent(...)));
 }
 
 include_once("utils/language.php");

@@ -1,7 +1,5 @@
 <?php
-
 include_once("dbdriver/DBDriver.php");
-
 
 class MySQLiDriver extends DBDriver
 {
@@ -12,16 +10,15 @@ class MySQLiDriver extends DBDriver
 
 
     /**
-     * @param DBConnectionProperties $props
-     * @param bool $persistent
+     * @param DBConnection $props
      * @throws Exception
      */
-    public function __construct(DBConnectionProperties $props, bool $persistent = FALSE)
+    public function __construct(DBConnection $props)
     {
 
         $host = $props->host;
 
-        if ($persistent) {
+        if ($props->isPersistent()) {
             $host = "p:" . $host;
         }
 
@@ -41,26 +38,20 @@ class MySQLiDriver extends DBDriver
         $this->conn->query("SET character_set_connection = 'utf8'");
         $this->conn->query("SET character_set_client = 'utf8'");
 
-        DBConnections::$conn_count++;
+        SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::OPENED));
+    }
 
+    public function __destruct()
+    {
+        if ($this->conn instanceof mysqli) {
+            $this->conn->close();
+            SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED));
+        }
     }
 
     public function connection(): mysqli
     {
         return $this->conn;
-    }
-
-    public function __destruct()
-    {
-        $this->shutdown();
-    }
-
-    public function shutdown()
-    {
-        if ($this->conn) {
-            $this->conn->close();
-        }
-
     }
 
     public function getError(): string

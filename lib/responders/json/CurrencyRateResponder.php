@@ -41,7 +41,7 @@ class CurrencyRateResponder extends JSONResponder
     {
         $bean = new CurrencyRatesBean();
 
-        $db = DBConnections::Get();
+        $db = DBConnections::Open();
         try {
             $db->transaction();
             $sel = "DELETE FROM currency_rates WHERE (srcID='$this->srcID' AND dstID='$this->dstID') OR (dstID='$this->srcID' AND srcID='$this->dstID')";

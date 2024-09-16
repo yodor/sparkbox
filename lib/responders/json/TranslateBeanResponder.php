@@ -47,7 +47,7 @@ class TranslateBeanResponder extends JSONResponder
         $this->beanID = (int)$_GET["beanID"];
 
         if (!isset($_GET["field_name"])) throw new Exception("field_name not passed");
-        $this->field_name = DBConnections::Get()->escape($_GET["field_name"]);
+        $this->field_name = DBConnections::Open()->escape($_GET["field_name"]);
 
         if (!isset($_GET["bean_class"])) throw new Exception("bean_class not passed");
         $this->bean_class = $_GET["bean_class"];
@@ -74,7 +74,7 @@ class TranslateBeanResponder extends JSONResponder
     protected function _store(JSONResponse $ret)
     {
 
-        $translation = DBConnections::Get()->escape(trim($_REQUEST["translation"]));
+        $translation = DBConnections::Open()->escape(trim($_REQUEST["translation"]));
         if (strlen($translation) < 1) throw new Exception(tr("Input a text to be used as translation"));
 
         $btID = -1;
@@ -127,7 +127,7 @@ class TranslateBeanResponder extends JSONResponder
 
         $ret->translation = "";
 
-        $db = DBConnections::Get();
+        $db = DBConnections::Open();
 
         $res = $db->query($sql);
 

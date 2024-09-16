@@ -140,7 +140,7 @@ abstract class Authenticator
 
         debug($this, "Using loginToken: " . $rand);
 
-        $db = DBConnections::Get();
+        $db = DBConnections::Open();
 
         $username = $db->escape($username);
 
@@ -263,7 +263,7 @@ abstract class Authenticator
         $authstore["fbID"] = (int)$urow["fb_userID"];
 
         $s1 = "UPDATE users SET counter=counter+1 , last_active=CURRENT_TIMESTAMP, oauth_token='$oauth_token' WHERE " . $bean->key() . "='$userID'";
-        $db = DBConnections::Get();
+        $db = DBConnections::Open();
 
         $db->transaction();
         $ret = $db->query($s1);

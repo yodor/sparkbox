@@ -244,13 +244,13 @@ class Paginator implements IGETConsumer
         else {
 
             if (isset($_GET[Paginator::KEY_ORDER_BY])) {
-                $this->order_field = DBConnections::Get()->escape(sanitizeInput($_GET[Paginator::KEY_ORDER_BY]));
+                $this->order_field = DBConnections::Open()->escape(sanitizeInput($_GET[Paginator::KEY_ORDER_BY]));
             }
 
         }
 
         if (isset($_GET[Paginator::KEY_ORDER_DIR])) {
-            $this->order_direction = DBConnections::Get()->escape(sanitizeInput($_GET[Paginator::KEY_ORDER_DIR]));
+            $this->order_direction = DBConnections::Open()->escape(sanitizeInput($_GET[Paginator::KEY_ORDER_DIR]));
         }
 
         if (!self::$page_filter_only) {

@@ -1,114 +1,95 @@
 <?php
+include_once("objects/SparkObject.php");
+include_once("dbdriver/DBDriver.php");
+include_once("dbdriver/DBConnection.php");
 
-class DBConnectionProperties
-{
-    public const DEFAULT_NAME = "default";
-
-    public $driver = "MySQLi";
-    public $database = "";
-    public $user = "";
-    public $pass = "";
-    public $host = "";
-    public $port = "";
-
-    protected $variables = array();
-
-    protected $connectionName = DBConnectionProperties::DEFAULT_NAME;
-
-    public function setVariables(array $arr)
-    {
-        $this->variables = $arr;
-    }
-
-    public function getVariables(): array
-    {
-        return $this->variables;
-    }
-
-    public function setConnectionName(string $name)
-    {
-        $this->connectionName = $name;
-    }
-
-    public function getConnectionName(): string
-    {
-        return $this->connectionName;
-    }
-}
-
-class DBConnections
+class DBConnections extends SparkObject
 {
 
-    public static $conn_count = 0;
+    protected static array $available_connections = array();
 
-    protected static $available_connections = array();
-    protected static $active_connections = array();
+    protected static int $active_count = 0;
 
-    public static function addProperties(DBConnectionProperties $dbconn)
+    /**
+     * Add connection to this collection
+     * @param DBConnection $dbconn
+     * @return void
+     */
+    public static function Add(DBConnection $dbconn) : void
     {
-        self::$available_connections[$dbconn->getConnectionName()] = $dbconn;
+        self::$available_connections[$dbconn->getName()] = $dbconn;
     }
 
-    public static function haveConnection(string $connection_name): bool
+    public static function Get(string $connection_name): DBConnection
+    {
+        if (!self::Exists($connection_name)) throw new Exception("Undefined connection name '$connection_name'");
+        return self::$available_connections[$connection_name];
+    }
+
+    /**
+     * Return connection names
+     * @return array
+     */
+    public static function Names() : array
+    {
+        return array_keys(self::$available_connections);
+    }
+
+    /**
+     * Return true if named connection exists in this collection
+     * @param string $connection_name
+     * @return bool
+     */
+    public static function Exists(string $connection_name): bool
     {
         return array_key_exists($connection_name, self::$available_connections);
     }
 
-    public static function getProperties(string $connection_name): DBConnectionProperties
-    {
-        if (!self::haveConnection($connection_name)) throw new Exception("Undefined connection name '$connection_name'");
-        return self::$available_connections[$connection_name];
-    }
-
-    public static function count() : int
-    {
-        return count(DBConnections::$available_connections);
-    }
-
     /**
-     * Get the default global connection
-     * @var DBDriver
-     */
-    protected static $driver = NULL;
-
-    static public function Get(): DBDriver
-    {
-        return DBConnections::$driver;
-    }
-
-    /**
-     * Set the default global connection
-     * @param DBDriver $connection
-     */
-    static public function Set(DBDriver $connection)
-    {
-        DBConnections::$driver = $connection;
-    }
-
-    /**
-     * Open new connection to DB
+     * Return connection to db using connection name $conn_name if not specified the default connection name is used
+     * If connection is not open a call to open will be made as to ensure valid DBDriver connection is returned in connected state
      * @param string $conn_name
-     * @param bool $use_persistent
      * @return DBDriver
      * @throws Exception
      */
-    static public function Factory($conn_name = DBConnectionProperties::DEFAULT_NAME, bool $persistent = FALSE): DBDriver
+    public static function Open(string $conn_name = DBConnection::DEFAULT_NAME): DBDriver
     {
-        //DBConnectionProperties
-        $props = DBConnections::getProperties($conn_name);
-
-        $currDriver = FALSE;
-        switch ($props->driver) {
-            case "MySQLi":
-                include_once("dbdriver/MySQLiDriver.php");
-                $currDriver = new MySQLiDriver($props, $persistent);
-                break;
-
+        try {
+            $conn = self::Get($conn_name);
+            if (!$conn->isOpen()) {
+                $conn->open();
+            }
+            $driver = $conn->get();
+            if ($driver instanceof DBDriver) return $driver;
+            throw new Exception("Unable to get valid connection to database using connection name '$conn_name'");
         }
-        if ($currDriver instanceof DBDriver) return $currDriver;
-        throw new Exception("Unsupported DBDriver: " . $props->driver);
+        catch (Exception $e) {
+            debug("Unable to open connection with '$conn_name'");
+            throw $e;
+        }
+
     }
 
+    public static function Count() : int
+    {
+        return self::$active_count;
+    }
+
+    public static function connectionEvent(SparkEvent $event) : void
+    {
+        if ($event instanceof DBDriverEvent) {
+
+            if ($event->isEvent(DBDriverEvent::OPENED)) {
+                self::$active_count++;
+                debug("Opened - active count: ".self::$active_count);
+            }
+            else if ($event->isEvent(DBDriverEvent::CLOSED)) {
+                self::$active_count--;
+                debug("Closed - active count: ".self::$active_count);
+            }
+        }
+
+    }
 }
 
 ?>

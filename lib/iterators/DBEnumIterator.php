@@ -5,7 +5,7 @@ class DBEnumIterator extends ArrayDataIterator
 {
     public function __construct(string $table_name, string $table_field)
     {
-        $db = DBConnections::Get();
+        $db = DBConnections::Open();
 
         $ret = $db->fieldType($table_name, $table_field);
 

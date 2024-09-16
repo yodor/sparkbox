@@ -2,7 +2,7 @@
 
 class RawResult
 {
-    protected $result = array();
+    protected array $result = array();
 
     public function __construct(array $result)
     {

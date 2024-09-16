@@ -360,7 +360,7 @@ function debug($obj, $msg = NULL, $arr = NULL)
 
 function keywordFilterSQL($keywords_text, $search_fields, $inner_glue = " OR ", $outer_glue = " AND ", $split_string = "/[,;]/")
 {
-    $db = DBConnections::Get();
+    $db = DBConnections::Open();
 
     if (strlen($keywords_text) < 1) throw new Exception("keywords_text parameter empty");
     if (!is_array($search_fields) && strlen($search_fields) < 1) throw new Exception("search_fields parameter empty");
@@ -525,8 +525,8 @@ function safeVal($val, $accepted_tags = NULL)
 
     $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
-    if (DBConnections::count()>0) {
-        return DBConnections::Get()->escape($ret);
+    if (DBConnections::Count()>0) {
+        return DBConnections::Open()->escape($ret);
     }
     else {
         return escapeHelper($ret);

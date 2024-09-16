@@ -90,8 +90,8 @@ class UsersBean extends DBTableBean
         if ($is_confirmed>0) throw new Exception(tr("This profile is already activated."));
 
 
-        $email = "'".DBConnections::Get()->escape(strtolower(trim($email)))."'";
-        $confirm_code = "'".DBConnections::Get()->escape(strtolower(trim($confirm_code)))."'";
+        $email = "'".DBConnections::Open()->escape(strtolower(trim($email)))."'";
+        $confirm_code = "'".DBConnections::Open()->escape(strtolower(trim($confirm_code)))."'";
 
 
         $code = function (DBDriver $db) use ($email, $confirm_code) {

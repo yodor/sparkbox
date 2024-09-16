@@ -57,7 +57,7 @@ class KeywordSearchForm extends InputForm
     {
         $clause = new SQLClause();
 
-        $val = DBConnections::Get()->escape($val);
+        $val = DBConnections::Open()->escape($val);
         if (strcmp($key, "keyword") == 0) {
 
             $allwords = explode(" ", $val);

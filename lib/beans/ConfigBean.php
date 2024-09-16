@@ -44,7 +44,7 @@ class ConfigBean extends DBTableBean
     public function get(string $key, $default_value = "") : mixed
     {
 
-        $key = DBConnections::Get()->escape($key);
+        $key = DBConnections::Open()->escape($key);
 
         $qry = $this->queryField("config_key", $key, 1, "config_val");
         $qry->select->where()->add("section", "'" . $this->section . "'");
@@ -71,7 +71,7 @@ class ConfigBean extends DBTableBean
     public function set(string $key, $val) : void
     {
 
-        $key = DBConnections::Get()->escape($key);
+        $key = DBConnections::Open()->escape($key);
 
         $this->deleteRef("config_key", $key);
 
@@ -79,9 +79,9 @@ class ConfigBean extends DBTableBean
             $val = serialize($val);
         }
         if (!is_null($val)) {
-            $val = DBConnections::Get()->escape($val);
+            $val = DBConnections::Open()->escape($val);
         }
-        $section = DBConnections::Get()->escape($this->section);
+        $section = DBConnections::Open()->escape($this->section);
         $data = array("config_key" => $key, "config_val" => $val, "section" => $section);
         $this->insert($data);
 

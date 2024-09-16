@@ -214,7 +214,7 @@ class SessionUploadInput extends InputProcessor
         else {
             //serialize
             debug("Serializing object of type: '" . get_class($value) . "'");
-            $value = DBConnections::Get()->escape(serialize($value));
+            $value = DBConnections::Open()->escape(serialize($value));
             $transactor->appendValue($this->transact_column, $value);
         }
 

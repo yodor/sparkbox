@@ -27,7 +27,7 @@ class ForgotPasswordProcessor extends FormProcessor
 
         $random_pass = Authenticator::RandomToken(8);
         $fpm = new ForgotPasswordMailer($email, $random_pass, fullURL(ADMIN_LOCAL . "/login.php"));
-        $db = DBConnections::Factory();
+        $db = DBConnections::Open();
         try {
             $db->transaction();
 

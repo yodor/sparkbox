@@ -43,7 +43,7 @@ class DataObjectInput extends InputProcessor
 
         if ($this->object->getValue()) {
             debug("DataInput: '$name' - Transacting serialized version of DataObject: ".get_class($this->object));
-            $transactor->appendValue($this->input->getName(), DBConnections::Get()->escape(serialize($this->object)));
+            $transactor->appendValue($this->input->getName(), DBConnections::Open()->escape(serialize($this->object)));
         }
         else {
             debug("DataInput: '$name' - DataObject value is null");

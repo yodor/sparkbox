@@ -1,6 +1,8 @@
 <?php
 include_once("dbdriver/DBConnections.php");
 include_once("dbdriver/RawResult.php");
+include_once("objects/SparkEventManager.php");
+include_once("objects/events/DBDriverEvent.php");
 
 abstract class DBDriver
 {
@@ -14,12 +16,9 @@ abstract class DBDriver
         return explode(",", $enum_str);
     }
 
-    abstract function __construct(DBConnectionProperties $conn, bool $persistent = FALSE);
+    abstract function __construct(DBConnection $conn);
 
-    public function __destruct()
-    {
-        $this->shutdown();
-    }
+    abstract function __destruct();
 
     abstract public function affectedRows() : int;
 
@@ -52,8 +51,6 @@ abstract class DBDriver
     abstract public function fields($result) : array;
 
     abstract public function escape(string $data) : string;
-
-    abstract public function shutdown();
 
     abstract public function queryFields(string $table);
 

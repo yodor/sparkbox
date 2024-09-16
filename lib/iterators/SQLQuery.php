@@ -47,7 +47,7 @@ class SQLQuery implements IDataIterator
         $this->key = $primaryKey;
         $this->name = $tableName;
 
-        $this->db = DBConnections::Get();
+        $this->db = DBConnections::Open();
         $this->bean = NULL;
     }
 
