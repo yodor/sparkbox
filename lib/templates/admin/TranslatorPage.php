@@ -43,8 +43,14 @@ class TranslatorPage extends BeanListPage
 
     public function processInput()
     {
+
+
         $url = URL::Current();
-        if (!$url->contains("rehash")) return;
+        if (!$url->contains("rehash")) {
+            parent::processInput();
+            return;
+        }
+
         $query = $this->bean->queryFull();
         $num = $query->exec();
         $count = 0;
