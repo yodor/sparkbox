@@ -71,10 +71,4 @@ class PhraseTranslatorPage extends BeanListPage
 
     }
 
-    protected function renderImpl()
-    {
-        parent::renderImpl();
-
-
-    }
 }

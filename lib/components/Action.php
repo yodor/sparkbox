@@ -68,6 +68,11 @@ class Action extends DataIteratorItem
         return $this->url;
     }
 
+    public function setURL(URL $url) : void
+    {
+        $this->url = $url;
+    }
+
     public function setData(array $data) : void
     {
         parent::setData($data);

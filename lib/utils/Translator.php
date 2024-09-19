@@ -48,9 +48,9 @@ class Translator implements IRequestProcessor, IGETConsumer
      */
     protected array $language = array();
 
-    const KEY_LANGUAGE_ID = "langID";
-    const KEY_CHANGE_LANGUAGE = "change_language";
-    const KEY_LANGUAGE = "language";
+    const string KEY_LANGUAGE_ID = "langID";
+    const string KEY_CHANGE_LANGUAGE = "change_language";
+    const string KEY_LANGUAGE = "language";
 
     public function __construct()
     {
@@ -196,7 +196,7 @@ class Translator implements IRequestProcessor, IGETConsumer
     }
 
 
-    public function translateBean(int $id, string $field_name, array &$data, string $tableName)
+    public function translateBean(int $id, string $field_name, array &$data, string $tableName) : void
     {
         try {
             $qry = $this->translated_beans->query();

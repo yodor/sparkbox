@@ -45,15 +45,18 @@ class ToggleFieldResponder extends RequestResponder
 
     public function getParameterNames() : array
     {
-        return parent::getParameterNames() + array("item_id", "status", "field");
+        $result = parent::getParameterNames();
+        $result[] = "item_id";
+        $result[] = "status";
+        $result[] = "field";
+        return $result;
     }
 
-    public function createAction(string $title = "Toggle", string $href = "", Closure $check_code = NULL, array $parameters = array()) : ?Action
+    public function createAction(string $title = "Toggle") : ?Action
     {
-
-        $parameters[] = new DataParameter("item_id", $this->bean->key());
-        return new Action($title, "?cmd={$this->cmd}&$href", $parameters, $check_code);
-
+        $action = parent::createAction($title);
+        $action->getURL()->add(new DataParameter("item_id", $this->bean->key()));
+        return $action;
     }
 
     protected function processImpl() : void

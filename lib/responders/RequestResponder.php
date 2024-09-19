@@ -117,6 +117,7 @@ abstract class RequestResponder implements IGETConsumer
     {
 
         //setup redirect url
+        debug("Building redirect URL - removing parameter names: ", $this->getParameterNames());
         foreach ($this->getParameterNames() as $parameterName) {
             $this->redirect->remove($parameterName);
         }
@@ -155,9 +156,13 @@ abstract class RequestResponder implements IGETConsumer
 
     }
 
-    public function createAction(string $title = "", string $href = "", Closure $check_code = NULL, array $parameters = array()) : ?Action
+    public function createAction(string $title = "") : ?Action
     {
-        return NULL;
+        $url = URL::Current();
+        $url->add(new URLParameter("cmd", $this->cmd));
+        $action = new Action($title);
+        $action->setURL($url);
+        return $action;
     }
 
     protected function processConfirmation() : void

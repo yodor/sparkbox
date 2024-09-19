@@ -34,6 +34,16 @@ class TranslatorPage extends BeanListPage
     protected function initPageActions()
     {
         //disable add item
+        $url = URL::Current();
+        $url->add(new URLParameter("rehash", "1"));
+        $action_add = new Action(SparkAdminPage::ACTION_EDIT, $url->toString());
+        $action_add->setTooltipText("Rehash using xxH3");
+        $this->getPage()->getActions()->append($action_add);
+    }
+
+    public function processInput()
+    {
+
     }
 
     protected function initViewActions(ActionCollection $act)

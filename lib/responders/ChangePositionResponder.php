@@ -72,7 +72,11 @@ class ChangePositionResponder extends RequestResponder
 
     public function getParameterNames() : array
     {
-        return parent::getParameterNames() + array("item_id", "type", "position");
+        $result = parent::getParameterNames();
+        $result[] = "item_id";
+        $result[] = "type";
+        $result[] = "position";
+        return $result;
     }
 
     protected function processImpl() : void
