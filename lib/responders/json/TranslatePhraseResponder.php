@@ -11,9 +11,9 @@ class TranslatePhraseResponder extends JSONResponder
      */
     protected $bean;
 
-    private $trID = -1;
-    private $textID = -1;
-    private $langID = -1;
+    private int $trID = -1;
+    private int $textID = -1;
+    private int $langID = -1;
 
     public function __construct()
     {
@@ -29,13 +29,14 @@ class TranslatePhraseResponder extends JSONResponder
     {
         parent::parseParams();
 
-        if (!isset($_REQUEST["langID"])) throw new Exception("langID not passed");
-        $this->langID = (int)$_GET["langID"];
-        if (!isset($_REQUEST["textID"])) throw new Exception("textID not passed");
-        $this->textID = (int)$_GET["textID"];
-        if (!isset($_REQUEST["trID"])) throw new Exception("trID not passed");
-        $this->trID = (int)$_GET["trID"];
+        if (!$this->url->contains("langID")) throw new Exception("langID not passed");
+        $this->langID = (int)$this->url->get("langID")->value();
 
+        if (!$this->url->contains("textID")) throw new Exception("textID not passed");
+        $this->textID = (int)$this->url->get("textID")->value();
+
+        if (!$this->url->contains("trID")) throw new Exception("trID not passed");
+        $this->trID = (int)$this->url->get("trID")->value();
     }
 
     protected function _store(JSONResponse $ret)

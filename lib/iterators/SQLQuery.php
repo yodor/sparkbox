@@ -12,19 +12,19 @@ class SQLQuery implements IDataIterator
     /**
      * @var DBDriver
      */
-    protected $db;
+    protected DBDriver $db;
 
     /**
      * Primary key for this iterator
      * @var string
      */
-    protected $key;
+    protected string $key;
 
     /**
      * Main table
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * DBDriver resource
@@ -32,13 +32,13 @@ class SQLQuery implements IDataIterator
      */
     protected $res;
 
-    protected $numResults = -1;
+    protected int $numResults = -1;
 
     /**
      * Accessible bean
      * @var DBTableBean|null
      */
-    protected $bean;
+    protected ?DBTableBean $bean = null;
 
     public function __construct(SQLSelect $select, string $primaryKey = "id", string $tableName = "")
     {
@@ -127,7 +127,7 @@ class SQLQuery implements IDataIterator
         return $this->key;
     }
 
-    public function setKey(string $key)
+    public function setKey(string $key) : void
     {
         $this->key = $key;
     }
@@ -137,7 +137,7 @@ class SQLQuery implements IDataIterator
         return $this->db;
     }
 
-    public function setDB(DBDriver $db)
+    public function setDB(DBDriver $db) : void
     {
         $this->db = $db;
     }
@@ -152,7 +152,7 @@ class SQLQuery implements IDataIterator
         return $this->numResults;
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean) : void
     {
         $this->bean = $bean;
     }

@@ -56,10 +56,7 @@ class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
     {
         echo "<div class='actions_list'>";
 
-        $closure = function(Component $object, int|string|null $idx) {
-            $object->render();
-        };
-        $this->actions->each($closure);
+        Action::RenderActions($this->actions->toArray());
 
         echo "</div>";
     }

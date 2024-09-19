@@ -13,11 +13,17 @@ class SQLSelect extends SQLStatement
 
     protected array $modeMask = array();
 
-    public function __construct()
+    public function __construct(SQLStatement $other = NULL)
     {
         parent::__construct();
         $this->type = "SELECT";
         $this->fieldset = new SQLColumnSet();
+
+        //copy table and where
+        if ($other) {
+            $this->from = $other->from;
+            $other->where()->copyTo($this->whereset);
+        }
     }
 
     public function clearMode() : void

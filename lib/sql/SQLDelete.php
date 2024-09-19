@@ -8,7 +8,6 @@ class SQLDelete extends SQLStatement
     public function __construct(SQLSelect $other = NULL)
     {
         parent::__construct();
-
         $this->type = "DELETE";
 
         //copy table and where

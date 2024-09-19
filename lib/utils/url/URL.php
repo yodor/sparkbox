@@ -7,7 +7,11 @@ class URL implements IGETConsumer, IDataResultProcessor
 {
 
     protected bool $is_script = FALSE;
+
+    //keep the original script_name using placeholders intact ie value is javascript:item(%key1%)
     protected string $script_name = "";
+    //setData applied on script_name fills this variable ie value is javascript:item(123)
+    protected string $script_name_data = "";
 
     protected string $domain = "";
     protected string $protocol = "";
@@ -128,6 +132,9 @@ class URL implements IGETConsumer, IDataResultProcessor
     public function toString(): string
     {
         if ($this->is_script) {
+            //return the data applied to script name
+            if ($this->script_name_data) return $this->script_name_data;
+            //return original version
             return $this->script_name;
         }
 
@@ -316,13 +323,16 @@ class URL implements IGETConsumer, IDataResultProcessor
     {
         //
         if ($this->is_script) {
-            $from = $this->script_name;
-            $names = array_keys($data);
-            foreach ($names as $idx => $name) {
-                $replace = array("%" . $name . "%" => $data[$name]);
-                $from = strtr($from, $replace);
+            if (str_contains($this->script_name, "%")) {
+                $this->script_name_data = "";
+                $from = $this->script_name;
+                $names = array_keys($data);
+                foreach ($names as $idx => $name) {
+                    $replace = array("%" . $name . "%" => $data[$name]);
+                    $from = strtr($from, $replace);
+                }
+                $this->script_name_data = $from;
             }
-            $this->script_name = $from;
             return;
         }
 

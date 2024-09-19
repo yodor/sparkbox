@@ -479,17 +479,30 @@ abstract class DBTableBean
             }
 
             $sql = $delete->getSQL();
-
             if (isset($GLOBALS["DEBUG_DBTABLEBEAN_DELETE"])) {
                 debug(get_class($this) . " DELETE SQL: ". $sql);
             }
+
+            //fetch id of resulting rows first to properly manage the cache
+            $idlist = array();
+            $select = new SQLSelect($delete);
+            $select->fields()->reset();
+            $select->fields()->set($this->prkey);
+            $res = $db->query($select->getSQL());
+            while ($result = $db->fetchResult($res)) {
+                $idlist[] = (int)$result->get($this->prkey);
+            }
+            debug("Affected ID list: ", $idlist);
 
             if (!$db->query($sql)) {
                 debug("Unable to delete: " . $db->getError() . " SQL: " . $sql);
                 throw new Exception("Unable to delete: " . $db->getError());
             }
 
-            $this->manageCache($value);
+            foreach ($idlist as $id) {
+                $this->manageCache((int)$id);
+            }
+
         };
 
         return $this->handleTransaction($code, $db);
