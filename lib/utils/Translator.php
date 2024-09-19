@@ -239,13 +239,13 @@ class Translator implements IRequestProcessor, IGETConsumer
             }
             else {
                 //Capture new phrase. Insert into SiteTextsBean - disable temporary
-//                $phrase_data = array("value"=>DBConnections::Open()->escape($phrase), "hash_value"=>$phrase_hash);
-//                try {
-//                    $this->phrases->insert($phrase_data);
-//                }
-//                catch (Exception $ex) {
-//                    throw new Exception("Unable to capture new phrase: ". $ex->getMessage());
-//                }
+                $phrase_data = array("value"=>$qry->getDB()->escape($phrase), "hash_value"=>$phrase_hash);
+                try {
+                    $this->phrases->insert($phrase_data);
+                }
+                catch (Exception $ex) {
+                    throw new Exception("Unable to capture new phrase: ". $ex->getMessage());
+                }
             }
         }
         catch (Exception $e) {
