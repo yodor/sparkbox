@@ -43,7 +43,26 @@ class TranslatorPage extends BeanListPage
 
     public function processInput()
     {
-
+        $url = URL::Current();
+        if (!$url->contains("rehash")) return;
+        $query = $this->bean->queryFull();
+        $num = $query->exec();
+        $count = 0;
+        while ($result = $query->nextResult()) {
+            $textID = $result->get($this->bean->key());
+            $value = $result->get("value");
+            $hash_value = $result->get("hash_value");
+            if (strlen($hash_value)!=32) {
+                continue;
+            }
+            $update = array("value"=>$query->getDB()->escape($value), "hash_value"=>sparkHash($value));
+            if (!$this->bean->update($textID, $update)) throw new Exception("Unable to update hash_value");
+            $count++;
+        }
+        $url->remove("rehash");
+        Session::SetAlert("Rehash complete: ".$count);
+        header("Location:".$url);
+        exit;
     }
 
     protected function initViewActions(ActionCollection $act)

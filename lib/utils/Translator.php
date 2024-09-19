@@ -226,7 +226,7 @@ class Translator implements IRequestProcessor, IGETConsumer
         if (strlen(trim($phrase)) == 0) return $result;
 
         try {
-            $phrase_hash = md5($phrase);
+            $phrase_hash = sparkHash($phrase);
 
             $qry = $this->translated_phrases->queryLanguageID($this->langID);
             $qry->select->where()->add("hash_value", "'$phrase_hash'");
@@ -238,14 +238,14 @@ class Translator implements IRequestProcessor, IGETConsumer
                 }
             }
             else {
-                //Capture new phrase. Insert into SiteTextsBean
-                $phrase_data = array("value"=>DBConnections::Open()->escape($phrase), "hash_value"=>$phrase_hash);
-                try {
-                    $this->phrases->insert($phrase_data);
-                }
-                catch (Exception $ex) {
-                    throw new Exception("Unable to capture new phrase: ". $ex->getMessage());
-                }
+                //Capture new phrase. Insert into SiteTextsBean - disable temporary
+//                $phrase_data = array("value"=>DBConnections::Open()->escape($phrase), "hash_value"=>$phrase_hash);
+//                try {
+//                    $this->phrases->insert($phrase_data);
+//                }
+//                catch (Exception $ex) {
+//                    throw new Exception("Unable to capture new phrase: ". $ex->getMessage());
+//                }
             }
         }
         catch (Exception $e) {
