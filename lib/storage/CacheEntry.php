@@ -70,18 +70,6 @@ class CacheEntry
             if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
         }
 
-//        $timestamp = time();
-//        $check_ttl = function($item) use($timestamp) {
-//
-//            $filestamp = filemtime($item);
-//            $fileTTL = ($timestamp - $filestamp);
-//            if ( $fileTTL > PAGE_CACHE_TTL ) {
-//                debug("Removing stale cache entry: ".$item);
-//                unlink($item);
-//            }
-//        };
-//        array_map( $check_ttl, glob( "$cache_folder/*", GLOB_NOSORT | GLOB_NOESCAPE ) );
-
         return new CacheEntry(new SparkFile($cache_folder . DIRECTORY_SEPARATOR . $name));
     }
 
@@ -152,5 +140,22 @@ class CacheEntry
     public function lastModified() : int
     {
         return $this->file->lastModified();
+    }
+
+    public static function CleanupPageCache()
+    {
+        $cache_folder = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache";
+
+        $timestamp = time();
+        $check_ttl = function($item) use($timestamp) {
+
+            $filestamp = filemtime($item);
+            $fileTTL = ($timestamp - $filestamp);
+            if ( $fileTTL > PAGE_CACHE_TTL ) {
+                debug("Removing stale cache entry: ".$item);
+                unlink($item);
+            }
+        };
+        array_map( $check_ttl, glob( "$cache_folder/*", GLOB_NOSORT | GLOB_NOESCAPE ) );
     }
 }

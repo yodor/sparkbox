@@ -190,4 +190,9 @@ include_once("utils/language.php");
 //global site wide function
 @include_once("config/globals.php");
 
+if (PAGE_CACHE_ENABLED) {
+    register_shutdown_function(function(){
+        CacheEntry::CleanupPageCache();
+    });
+}
 ?>
