@@ -5,16 +5,10 @@ include_once("sql/SQLSelect.php");
 class SQLDelete extends SQLStatement
 {
 
-    public function __construct(SQLSelect $other = NULL)
+    public function __construct(SQLStatement $other = NULL)
     {
-        parent::__construct();
+        parent::__construct($other);
         $this->type = "DELETE";
-
-        //copy table and where
-        if ($other) {
-            $this->from = $other->from;
-            $other->where()->copyTo($this->whereset);
-        }
     }
 
     public function getSQL() : string

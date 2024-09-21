@@ -4,11 +4,14 @@ include_once("sql/ISQLGet.php");
 
 abstract class SQLStatement implements ISQLGet
 {
+    protected SQLColumnSet $fieldset;
+
     /**
      * Set of column names and values to operate the statement with during insert or update
      * @var array
      */
     protected array $set = array();
+
     /**
      * SELECT, UPDATE, DELETE, INSERT
      * @var string
@@ -39,14 +42,27 @@ abstract class SQLStatement implements ISQLGet
      */
     public abstract function getSQL() : string;
 
-    public function __construct()
+    public function __construct(SQLStatement $other = null)
     {
+        $this->fieldset = new SQLColumnSet();
         $this->whereset = new ClauseCollection();
+
+        //copy the where clause collection
+        if ($other) {
+            $this->from = $other->from;
+            $other->where()->copyTo($this->whereset);
+        }
     }
 
     public function __clone() : void
     {
         $this->whereset = clone $this->whereset;
+        $this->fieldset = clone $this->fieldset;
+    }
+
+    public function fields(): SQLColumnSet
+    {
+        return $this->fieldset;
     }
 
     public function where(): ClauseCollection

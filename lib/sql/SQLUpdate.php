@@ -5,17 +5,10 @@ include_once("sql/SQLSelect.php");
 class SQLUpdate extends SQLStatement
 {
 
-    public function __construct(SQLSelect $other = NULL)
+    public function __construct(SQLStatement $other = NULL)
     {
-        parent::__construct();
-
+        parent::__construct($other);
         $this->type = "UPDATE";
-
-        //copy the where clause collection
-        if ($other) {
-            $this->from = $other->from;
-            $other->where()->copyTo($this->whereset);
-        }
     }
 
     public function getSQL() : string

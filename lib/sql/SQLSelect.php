@@ -5,25 +5,16 @@ include_once("sql/SQLColumnSet.php");
 class SQLSelect extends SQLStatement
 {
 
-    protected SQLColumnSet $fieldset;
-
-    const SQL_CALC_FOUND_ROWS = 1;
-    const SQL_CACHE = 2;
-    const SQL_NO_CACHE = 3;
+    const int SQL_CALC_FOUND_ROWS = 1;
+    const int SQL_CACHE = 2;
+    const int SQL_NO_CACHE = 3;
 
     protected array $modeMask = array();
 
     public function __construct(SQLStatement $other = NULL)
     {
-        parent::__construct();
+        parent::__construct($other);
         $this->type = "SELECT";
-        $this->fieldset = new SQLColumnSet();
-
-        //copy table and where
-        if ($other) {
-            $this->from = $other->from;
-            $other->where()->copyTo($this->whereset);
-        }
     }
 
     public function clearMode() : void
@@ -48,16 +39,7 @@ class SQLSelect extends SQLStatement
         return isset($this->modeMask[$mode_clause]);
     }
 
-    public function fields(): SQLColumnSet
-    {
-        return $this->fieldset;
-    }
 
-    public function __clone() : void
-    {
-        parent::__clone();
-        $this->fieldset = clone $this->fieldset;
-    }
 
     public function getSQL() : string
     {
