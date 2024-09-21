@@ -142,7 +142,10 @@ class CacheEntry
         return $this->file->lastModified();
     }
 
-    public static function CleanupPageCache()
+    /**
+     * @return void
+     */
+    public static function CleanupPageCache() : void
     {
         $cleanup_file = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache.cleanup";
         if (!file_exists($cleanup_file)) touch($cleanup_file);

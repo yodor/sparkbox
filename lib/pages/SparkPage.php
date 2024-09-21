@@ -369,6 +369,13 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         ob_end_flush();
         debug("--- Page Buffer Sent ---");
+
+
+        if (PAGE_CACHE_ENABLED) {
+            register_shutdown_function(function(){
+                CacheEntry::CleanupPageCache();
+            });
+        }
     }
 
     /**
