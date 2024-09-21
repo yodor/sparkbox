@@ -6,23 +6,23 @@ include_once("responders/json/JSONResponder.php");
 class TranslateBeanResponder extends JSONResponder
 {
 
-    protected $langID = -1;
-    protected $beanID = -1;
+    protected int $langID = -1;
+    protected int $beanID = -1;
 
-    protected $field_name = "";
-    protected $bean_class = "";
+    protected string $field_name = "";
+    protected string $bean_class = "";
 
-    protected $table_name = "";
+    protected string $table_name = "";
 
     /**
      * @var BeanTranslationsBean
      */
-    protected $translations;
+    protected BeanTranslationsBean $translations;
 
     /**
      * @var SQLQuery
      */
-    protected $query;
+    protected SQLQuery $query;
 
     public function __construct()
     {
@@ -61,11 +61,10 @@ class TranslateBeanResponder extends JSONResponder
 
 
         $itr = $this->translations->queryFull();
-        $where = $itr->select->where();
-        $where->add("table_name", "'$this->table_name'");
-        $where->add("field_name", "'$this->field_name'");
-        $where->add("bean_id", $this->beanID);
-        $where->add("langID", $this->langID);
+        $itr->select->where()->add("table_name", "'$this->table_name'");
+        $itr->select->where()->add("field_name", "'$this->field_name'");
+        $itr->select->where()->add("bean_id", $this->beanID);
+        $itr->select->where()->add("langID", $this->langID);
         $itr->select->limit = " 1 ";
 
         $this->query = $itr;
@@ -83,19 +82,19 @@ class TranslateBeanResponder extends JSONResponder
             $btID = $trow[$this->query->key()];
         }
 
-        $trow["translated"] = $translation;
-
-        $trow["langID"] = $this->langID;
-        $trow["field_name"] = $this->field_name;
-        $trow["table_name"] = $this->table_name;
-        $trow["bean_id"] = $this->beanID;
+        $data = array();
+        $data["translated"] = $translation;
+        $data["langID"] = $this->langID;
+        $data["field_name"] = $this->field_name;
+        $data["table_name"] = $this->table_name;
+        $data["bean_id"] = $this->beanID;
 
         if ($btID > 0) {
-            $this->translations->update($btID, $trow);
+            $this->translations->update($btID, $data);
             $ret->message = tr("Translation Updated");
         }
         else {
-            $btID = $this->translations->insert($trow);
+            $btID = $this->translations->insert($data);
             $ret->message = tr("Translation Stored");
         }
 
@@ -106,7 +105,7 @@ class TranslateBeanResponder extends JSONResponder
     protected function _fetch(JSONResponse $response)
     {
 
-        $this->query->fields = " translated ";
+        $this->query->select->fields()->set("translated");
 
         $response->translation = "";
 
@@ -122,14 +121,13 @@ class TranslateBeanResponder extends JSONResponder
     protected function _clear(JSONResponse $ret)
     {
 
-        $sql = "DELETE FROM {$this->translations->getTableName()} WHERE ";
-        $sql.= $this->query->select->from;
+        $delete = new SQLDelete($this->query->select);
 
         $ret->translation = "";
 
         $db = DBConnections::Open();
 
-        $res = $db->query($sql);
+        $res = $db->query($delete->getSQL());
 
         if ($db->numRows($res)) {
             $ret->message = tr("Bean translation removed");

@@ -6,9 +6,9 @@ include_once("utils/IGETConsumer.php");
  */
 class RequestParameterCondition implements IGETConsumer
 {
-    protected $parameter;
-    protected $redirectURL;
-    protected $value;
+    protected string $parameter;
+    protected string $redirectURL;
+    protected string $value;
 
     public function __construct(string $name, string $redirectURL)
     {
@@ -37,15 +37,15 @@ class RequestParameterCondition implements IGETConsumer
         return array($this->parameter);
     }
 
-    public function getValue()
+    public function getValue() : string
     {
         return $this->value;
     }
 
-    protected function process()
+    protected function process() : void
     {
         if (!isset($_GET[$this->parameter])) throw new Exception("Key: $this->parameter not received in GET");
 
-        $this->value = $_GET[$this->parameter];
+        $this->value = (string)$_GET[$this->parameter];
     }
 }

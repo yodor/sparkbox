@@ -10,7 +10,7 @@ include_once("utils/RequestParameterCondition.php");
 class BeanKeyCondition extends RequestParameterCondition
 {
 
-    protected int $id;
+    protected int $id = -1;
     protected array $data = array();
 
     protected URLParameter $urlparam;
@@ -39,7 +39,7 @@ class BeanKeyCondition extends RequestParameterCondition
 
     }
 
-    protected function process()
+    protected function process() : void
     {
         parent::process();
 

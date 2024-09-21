@@ -7,7 +7,7 @@ class SQLQuery implements IDataIterator
     /**
      * @var SQLSelect
      */
-    public $select;
+    public SQLSelect $select;
 
     /**
      * @var DBDriver

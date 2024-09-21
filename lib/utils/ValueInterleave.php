@@ -4,8 +4,8 @@ class ValueInterleave
 {
 
 
-    protected $obj = NULL;
-    protected $iterator = NULL;
+    protected ?ArrayObject $obj = NULL;
+    protected ?ArrayIterator $iterator = NULL;
 
     public function __construct(array $items=array("even", "odd"))
     {
@@ -14,7 +14,7 @@ class ValueInterleave
     }
 
 
-    public function advance()
+    public function advance() : void
     {
         $this->iterator->next();
         if (!$this->iterator->valid()) {

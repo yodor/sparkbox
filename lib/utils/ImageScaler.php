@@ -5,16 +5,16 @@ include_once("storage/SparkWatermark.php");
 class ImageScaler
 {
 
-    const MODE_FULL = 0;
-    const MODE_CROP = 1;
-    const MODE_THUMB = 2;
+    const int MODE_FULL = 0;
+    const int MODE_CROP = 1;
+    const int MODE_THUMB = 2;
 
-    const TYPE_JPG = "image/jpg";
-    const TYPE_JPEG = "image/jpeg";
-    const TYPE_PNG = "image/png";
-    const TYPE_WEBP = "image/webp";
+    const string TYPE_JPG = "image/jpg";
+    const string TYPE_JPEG = "image/jpeg";
+    const string TYPE_PNG = "image/png";
+    const string TYPE_WEBP = "image/webp";
 
-    const SupportedMimes  = array(ImageScaler::TYPE_JPG, ImageScaler::TYPE_JPEG, ImageScaler::TYPE_PNG, ImageScaler::TYPE_WEBP);
+    const array SupportedMimes  = array(ImageScaler::TYPE_JPG, ImageScaler::TYPE_JPEG, ImageScaler::TYPE_PNG, ImageScaler::TYPE_WEBP);
 
 
     /**
@@ -91,7 +91,7 @@ class ImageScaler
      * @return void
      * @throws Exception
      */
-    public function setOutputFormat(string $mime)
+    public function setOutputFormat(string $mime) : void
     {
         if (!in_array($mime, ImageScaler::SupportedMimes)) throw new Exception("Unsupported output format type");
 
@@ -121,7 +121,7 @@ class ImageScaler
         return $this->height;
     }
 
-    public function process(DataBuffer $buffer)
+    public function process(DataBuffer $buffer) : void
     {
 
         if ($this->mode == ImageScaler::MODE_CROP) {
