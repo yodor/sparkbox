@@ -144,6 +144,18 @@ class CacheEntry
 
     public static function CleanupPageCache()
     {
+        $cleanup_file = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache.cleanup";
+        if (!file_exists($cleanup_file)) touch($cleanup_file);
+        $cleanup_time = filemtime($cleanup_file);
+        $delta = time() - $cleanup_time;
+        //default 24 hours - 86400 seconds
+        if ($delta < PAGE_CACHE_CLEANUP_DELTA) {
+            debug("Cleanup PageCache remaining time: ". PAGE_CACHE_CLEANUP_DELTA - $delta);
+            return;
+        }
+        //
+        debug("Doing PageCache cleanup ...");
+
         $cache_folder = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache";
 
         $timestamp = time();
@@ -157,5 +169,6 @@ class CacheEntry
             }
         };
         array_map( $check_ttl, glob( "$cache_folder/*", GLOB_NOSORT | GLOB_NOESCAPE ) );
+        touch($cleanup_file);
     }
 }
