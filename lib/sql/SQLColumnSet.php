@@ -5,7 +5,7 @@ class SQLColumnSet implements ISQLGet
 {
 
     /**
-     * @var array of SQLColumn
+     * @var array SQLColumn collection
      */
     protected array $fields = array();
 
@@ -23,7 +23,8 @@ class SQLColumnSet implements ISQLGet
     }
 
     /**
-     * Add prefix value to all columns in this collection
+     * Set prefix to all columns in this collection
+     * Effectively during getSQL of column it would return $prefix.col_name
      * @param string $prefix the prefix to add
      */
     public function setPrefix(string $prefix) : void
@@ -37,6 +38,7 @@ class SQLColumnSet implements ISQLGet
 
     /**
      * Clear prefix value from the columns in this collection
+     * @return void
      */
     public function clearPrefix() : void
     {
@@ -49,11 +51,12 @@ class SQLColumnSet implements ISQLGet
 
     /**
      * Add direct sql expression to the column collection using alias name as name
+     * Existing column named '$alias' would be replaced with the newly created column
      * @param string $expression SQL select expression string
      * @param string $alias Alias name
      * @throws Exception
      */
-    public function setExpression(string $expression, string $alias)
+    public function setExpression(string $expression, string $alias) : void
     {
         $column = new SQLColumn();
         $column->setExpression($expression, $alias);
@@ -62,16 +65,15 @@ class SQLColumnSet implements ISQLGet
 
     public function copyTo(SQLColumnSet $other) : void
     {
-        foreach ($this->fields as $key => $col) {
-            if ($col instanceof SQLColumn) {
-                $other->setColumn($col);
-            }
+        foreach ($this->fields as $name => $col) {
+            if (!($col instanceof SQLColumn)) continue;
+            $other->setColumn($col);
         }
     }
 
     /**
      * Set column names for this collection
-     * AS alias is parsed and assigned
+     * 'AS' alias is parsed and assigned ie 'column1 as column' will create aliased SQLColumn
      *
      * @param string ...$columns Array of column names to set to this collection
      * @throws Exception
@@ -99,6 +101,12 @@ class SQLColumnSet implements ISQLGet
         $this->fields[$column->getName()] = $column;
     }
 
+    public function getColumn(string $name) : SQLColumn
+    {
+        if (!isSet($this->fields[$name])) throw new Exception("Column name '$name' not found");
+        return $this->fields[$name];
+    }
+
     public function isSet(string $name): bool
     {
         return array_key_exists($name, $this->fields);
@@ -114,19 +122,45 @@ class SQLColumnSet implements ISQLGet
         $this->fields = array();
     }
 
+    /**
+     * Return the number of assigned columns in this collection
+     * @return int
+     */
     public function count(): int
     {
         return count(array_keys($this->fields));
     }
 
+    /**
+     * Return the column names in this collection
+     * @return array
+     */
+    public function names() : array
+    {
+        return array_keys($this->fields);
+    }
+
+    /**
+     * Return the values of the columns as column_name=>column_value
+     *
+     * @return array
+     */
+    public function values() : array
+    {
+        $result = array();
+        foreach ($this->fields as $name => $col) {
+            if (!($col instanceof SQLColumn)) continue;
+            $result[$name] = $col->getValue();
+        }
+        return $result;
+    }
+
     public function getSQL() : string
     {
         $result = array();
-
-        foreach ($this->fields as $key=>$col) {
-            if ($col instanceof SQLColumn) {
-                $result[] = $col->getSQL();
-            }
+        foreach ($this->fields as $name=>$col) {
+            if (!($col instanceof SQLColumn)) continue;
+            $result[] = $col->getSQL();
         }
         return implode(" , ", $result);
     }

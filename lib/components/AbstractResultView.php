@@ -89,7 +89,8 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     {
         return $this->list_empty;
     }
-    public function setListEmpty(Component $cmp)
+
+    public function setListEmpty(Component $cmp) : void
     {
         $this->list_empty = $cmp;
     }
@@ -98,11 +99,13 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      * set to -1 to disable paged results
      * @param int $item_count
      */
-    public function setItemsPerPage(int $item_count) {
+    public function setItemsPerPage(int $item_count) : void
+    {
         $this->items_per_page = $item_count;
     }
 
-    public function getItemsPerPage() : int {
+    public function getItemsPerPage() : int
+    {
         return $this->items_per_page;
     }
 
@@ -144,7 +147,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     }
 
-    public function enablePaginators(int $mode)
+    public function enablePaginators(int $mode) : void
     {
         $this->paginators_enabled = $mode;
     }
@@ -164,7 +167,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
         return $this->paginator_bottom;
     }
 
-    public function setDefaultOrder($default_order)
+    public function setDefaultOrder($default_order) : void
     {
         $this->default_order = $default_order;
     }
@@ -187,6 +190,7 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         return parent::getCacheName()."-".$select->getSQL();
     }
+
     /**
      * @throws Exception
      */

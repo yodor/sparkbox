@@ -87,7 +87,7 @@ class SQLQuery implements IDataIterator
      * @return array|null
      * @throws Exception
      */
-    public function next()
+    public function next() : ?array
     {
         if (!$this->res) throw new Exception("Not executed yet or no valid resource");
 
@@ -111,7 +111,7 @@ class SQLQuery implements IDataIterator
         return $ret;
     }
 
-    public function free()
+    public function free() : void
     {
         $this->db->free($this->res);
         $this->res = NULL;

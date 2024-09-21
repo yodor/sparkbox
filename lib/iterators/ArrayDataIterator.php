@@ -4,8 +4,8 @@ include_once("iterators/IDataIterator.php");
 class ArrayDataIterator implements IDataIterator
 {
 
-    const KEY_ID = "id";
-    const KEY_VALUE = "value";
+    const string KEY_ID = "id";
+    const string KEY_VALUE = "value";
 
     protected string $id_key = ArrayDataIterator::KEY_ID;
     protected string $value_key = ArrayDataIterator::KEY_VALUE;
@@ -57,7 +57,7 @@ class ArrayDataIterator implements IDataIterator
         return "";
     }
 
-    public function next()
+    public function next() : ?array
     {
         $this->pos++;
         if (isset($this->values[$this->pos])) {

@@ -17,8 +17,8 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     protected array $messages = array();
 
-    const MESSAGE_ADD = 1;
-    const MESSAGE_UPDATE = 2;
+    const int MESSAGE_ADD = 1;
+    const int MESSAGE_UPDATE = 2;
 
     /**
      * @var DBTableBean

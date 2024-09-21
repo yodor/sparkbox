@@ -16,8 +16,10 @@ class SQLUpdate extends SQLStatement
         $sql = $this->type . " " . $this->from;
         $sql .= " SET ";
         $set = array();
-        foreach ($this->set as $columnName => $columnValue) {
-            $set[] = $columnName . " = " . $columnValue;
+        $names = $this->fieldset->names();
+        foreach ($names as $columnName) {
+            $column = $this->fieldset->getColumn($columnName);
+            $set[] = $column->getSQL();
         }
         $sql .= implode(", ", $set);
 

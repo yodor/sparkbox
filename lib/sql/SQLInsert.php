@@ -14,26 +14,32 @@ class SQLInsert extends SQLStatement
     {
 
         $sql = $this->type . " " . $this->from;
-        $sql .= "(" . implode(",", array_keys($this->set)) . ")";
+        $sql .= "(" . implode(",", $this->fieldset->names()) . ")";
         $sql .= " VALUES ";
 
+        $values = $this->fieldset->values();
 
-        $keys = array_keys($this->set);
-        $values = array_values($this->set);
         //debug("Values contents: ".print_r($values, true));
 
-        if (is_array($values[0])) {
-            //if value is array count should be equal for each element in the set
-            $values_count = count($values[0]);
+        $multi_values = 0;
+        foreach ($values as $name=>$value) {
+            if (is_array($value)) {
+                $multi_values = count($value);
+                break;
+            }
+        }
 
-            foreach ($keys as $key) {
-                if (!is_array($this->set[$key]) || count($this->set[$key])!=$values_count) {
-                    throw new Exception("Values count should be equal for each column in the set");
+        if ($multi_values>0) {
+            debug("Multivalued insert - values count: $multi_values");
+
+            foreach ($values as $name => $value) {
+                if (!is_array($value) || (count($value)!=$multi_values)) {
+                    throw new Exception("Column '$name' values count mismatch. Should be equal for each column in the set");
                 }
             }
 
             $values_sql = array();
-            for ($idx = 0; $idx < $values_count; $idx++) {
+            for ($idx = 0; $idx < $multi_values; $idx++) {
                 $row = array();
                 //foreach column in the set
                 foreach ($values as $value) {
@@ -60,18 +66,6 @@ class SQLInsert extends SQLStatement
         return "(" . implode(",", $values) . ")";
     }
 
-    /**
-     * Append value for multi-value insert to column '$column'
-     * No quoting or escaping is done
-     * @param string $column
-     * @param string $value
-     * @return void
-     */
-    public function setAppend(string $column, string $value) : void
-    {
-        $this->set[$column][] = $value;
-
-    }
 
 }
 ?>

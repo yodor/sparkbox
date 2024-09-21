@@ -5,7 +5,7 @@ interface IDataIterator
 {
     public function exec(): int;
 
-    public function next();
+    public function next() : ?array;
 
     /**
      * @return string The primary key of this data iterator

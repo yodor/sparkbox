@@ -7,12 +7,6 @@ abstract class SQLStatement implements ISQLGet
     protected SQLColumnSet $fieldset;
 
     /**
-     * Set of column names and values to operate the statement with during insert or update
-     * @var array
-     */
-    protected array $set = array();
-
-    /**
      * SELECT, UPDATE, DELETE, INSERT
      * @var string
      */
@@ -76,15 +70,28 @@ abstract class SQLStatement implements ISQLGet
     }
 
     /**
-     * Set single value for column '$column'
+     * Create SQLColumn named $name and set its value to $value
      * No quoting or escaping is done
-     * @param string $column
+     * If $name already exists in the fieldset collection it will be replaced
+     * @param string $name
      * @param string $value
      * @return void
      */
-    public function set(string $column, string $value) : void
+    public function set(string $name, string $value) : void
     {
-        $this->set[$column] = $value;
+        $column = new SQLColumn($name, $value);
+        $this->fieldset->setColumn($column);
+    }
+
+    /**
+     * Return SQLColumn named '$name' from fieldset collection
+     * @param string $name
+     * @return SQLColumn
+     * @throws Exception
+     */
+    public function get(string $name): SQLColumn
+    {
+        return $this->fieldset->getColumn($name);
     }
 
 }
