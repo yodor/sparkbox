@@ -1,5 +1,6 @@
 <?php
 include_once("dbdriver/DBDriver.php");
+include_once("dbdriver/MySQLiResult.php");
 
 class MySQLiDriver extends DBDriver
 {
@@ -61,95 +62,48 @@ class MySQLiDriver extends DBDriver
 
     public function dateTime(int $add_days = 0, $interval_type = " DAY ") : string
     {
-        $res = $this->query("SELECT DATE_ADD(now(), INTERVAL $add_days $interval_type) as datetime");
-        $row = $this->fetch($res);
+        $result = $this->query("SELECT DATE_ADD(now(), INTERVAL $add_days $interval_type) as datetime");
+        if (!($result instanceof DBResult)) throw new Exception("Unable to query dateTime: ".$this->getError());
+        $row = $result->fetch();
         return $row["datetime"];
     }
 
     public function timestamp() : int
     {
-        $res = $this->query("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP) as datetime");
-        $row = $this->fetch($res);
+        $result = $this->query("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP) as datetime");
+        if (!($result instanceof DBResult)) throw new Exception("Unable to query timestamp: ".$this->getError());
+        $row = $result->fetch();
         return intval($row["datetime"]);
     }
 
-    public function query(string $str)
+    /**
+     * For successful queries which produce a result set, such as SELECT, SHOW, DESCRIBE or EXPLAIN,
+     * mysqli_query will return a mysqli_result object.
+     * For other successful queries mysqli_query will return true else throws exception
+     * @param string $str
+     * @return true|DBResult
+     * @throws Exception
+     */
+    public function query(string $str) : true|DBResult
     {
-        //debug("Excuting SQL: ".$str);
-        return $this->conn->query($str);
+        $res = false;
+        try {
+            $res = $this->conn->query($str);
+        }
+        catch (Exception $e) {
+            debug("DB Query Error: ".$this->conn->error." SQL: $str");
+            throw $e;
+        }
+
+        if ($res instanceof mysqli_result) return new MySQLiResult($res);
+        if ($res === false) throw new Exception("Query error: ".$this->conn->error);
+
+        return $res;
     }
 
     public function affectedRows(): int
     {
         return $this->conn->affected_rows;
-    }
-
-    public function numRows($result): int
-    {
-        $result = $this->assert_resource($result);
-        return $result->num_rows;
-    }
-
-    public function fields($result) : array
-    {
-        $result = $this->assert_resource($result);
-        return $result->fetch_fields();
-    }
-
-    protected function assert_resource($res): mysqli_result
-    {
-        if (!($res instanceof mysqli_result)) throw new Exception("No valid mysqli_resource passed");
-        return $res;
-    }
-
-    /**
-     * Fetch the next row of the result set $result as associative array
-     * @param $result mysqli_result
-     * @return array|null Associative array of the current result record or null if there are no more records
-     * @throws Exception
-     */
-    public function fetch($result): ?array
-    {
-        $result = $this->assert_resource($result);
-
-        //null indicates no more records from this resource
-        $record = $result->fetch_array(MYSQLI_ASSOC);
-
-        if ($record === false) throw new Exception("Error fetching the result: ".$this->getError());
-
-        return $record;
-    }
-
-    /**
-     * Fetch the next row of the result set $result as associative array
-     * @param $result
-     * @return array|null
-     * @throws Exception
-     */
-    public function fetchArray($result): ?array
-    {
-        $result = $this->assert_resource($result);
-
-        //null indicates no more records from this resource
-        $record = $result->fetch_array(MYSQLI_NUM);
-
-        if ($record === false) throw new Exception("Error fetching the result: ".$this->getError());
-
-        return $record;
-    }
-
-    public function fetchResult($result): ?RawResult
-    {
-        $record = $this->fetch($result);
-        if (is_array($record)) return new RawResult($record);
-        return null;
-    }
-
-    public function free($result) : void
-    {
-        if ($result instanceof mysqli_result) {
-            @$result->free();
-        }
     }
 
     public function lastID(): int
@@ -177,43 +131,33 @@ class MySQLiDriver extends DBDriver
         return $this->conn->real_escape_string($data);
     }
 
-    public function queryFields(string $table)
+    public function queryFields(string $table) : true|DBResult
     {
         return $this->query("show fields from $table");
     }
 
-    public function fieldType(string $table, string $field_name)
+    public function fieldType(string $table, string $field_name) : string
     {
+        $ret = "";
         $found = FALSE;
-        $ret = FALSE;
-        $res = $this->queryFields($table);
-        while ($row = $this->fetch($res)) {
-            if (strcmp($row["Field"], $field_name) == 0) {
-                $ret = $row["Type"];
-                $found = TRUE;
-                break;
-            }
+        $result = $this->queryFields($table);
+        while ($row = $result->fetch()) {
+            if (strcmp($row["Field"], $field_name) != 0) continue;
+            $ret = $row["Type"];
+            $found = TRUE;
+            break;
         }
-        $this->free($res);
         if (!$found) throw new Exception("Field [$field_name] does not exist in table: $table");
         return $ret;
     }
 
-    public function tableExists(string $table)
+    public function tableExists(string $table) : bool
     {
         $res = $this->query("show tables like '$table'");
-
-        if ($res->num_rows < 1) return FALSE;
+        if ($res->numRows() < 1) return FALSE;
         return TRUE;
     }
 
-    public function fetchTotalRows()
-    {
-        $ret = $this->query("SELECT FOUND_ROWS() as total");
-        if (!$ret) throw new Exception("Unable to fetch found_rows(): " . $this->getError());
-        $row = $this->fetch($ret);
-        return $row["total"];
-    }
 }
 
 ?>

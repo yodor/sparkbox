@@ -26,11 +26,11 @@ class SQLQuery implements IDataIterator
      */
     protected string $name;
 
+
     /**
-     * DBDriver resource
-     * @var null
+     * @var DBResult|null
      */
-    protected $res;
+    protected ?DBResult $res = null;
 
     protected int $numResults = -1;
 
@@ -49,11 +49,20 @@ class SQLQuery implements IDataIterator
 
         $this->db = DBConnections::Open();
         $this->bean = NULL;
+        $this->res = NULL;
     }
 
     public function __destruct()
     {
-        $this->db->free($this->res);
+        $this->free();
+    }
+
+    public function free() : void
+    {
+        if ($this->res instanceof DBResult) {
+            $this->res->free();
+        }
+        $this->res = NULL;
     }
 
     public function __clone()
@@ -68,16 +77,18 @@ class SQLQuery implements IDataIterator
      */
     public function exec(): int
     {
-        $this->db->free($this->res);
-
-        $this->res = $this->db->query($this->select->getSQL());
-
-        if (!$this->res) {
-            debug("Error: " . $this->db->getError() . " SQL: " . $this->select->getSQL());
-            throw new Exception($this->db->getError());
+        if ($this->res instanceof DBResult) {
+            $this->res->free();
         }
 
-        $this->numResults = $this->db->numRows($this->res);
+        //true or dbresult
+        $this->res = $this->db->query($this->select->getSQL());
+
+        $this->numResults = -1;
+
+        if ($this->res instanceof DBResult) {
+            $this->numResults = $this->res->numRows();
+        }
 
         return $this->numResults;
     }
@@ -89,32 +100,26 @@ class SQLQuery implements IDataIterator
      */
     public function next() : ?array
     {
-        if (!$this->res) throw new Exception("Not executed yet or no valid resource");
+        if (!($this->res instanceof DBResult)) throw new Exception("Not executed yet or no valid result");
 
-        $ret = $this->db->fetch($this->res);
-        if (!$ret) {
-            $this->db->free($this->res);
-            $this->res = NULL;
-        }
-        return $ret;
+        $data = $this->res->fetch();
+        if (is_array($data)) return $data;
+
+        $this->res->free();
+        $this->res = NULL;
+        return null;
+
     }
 
     public function nextResult() : ?RawResult
     {
-        if (!$this->res) throw new Exception("Not executed yet or no valid resource");
+        if (!($this->res instanceof DBResult)) throw new Exception("Not executed yet or no valid result");
 
-        $ret = $this->db->fetchResult($this->res);
-        if (!$ret) {
-            $this->db->free($this->res);
-            $this->res = NULL;
-        }
-        return $ret;
-    }
-
-    public function free() : void
-    {
-        $this->db->free($this->res);
+        $data = $this->res->fetchResult();
+        if ($data instanceof RawResult) return $data;
+        $this->res->free();
         $this->res = NULL;
+        return null;
     }
 
     public function isActive() : bool

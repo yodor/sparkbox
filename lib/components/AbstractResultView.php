@@ -8,9 +8,9 @@ include_once("components/PaginatorBottomComponent.php");
 
 abstract class AbstractResultView extends Component implements IDataIteratorRenderer
 {
-    const PAGINATOR_NONE = 0;
-    const PAGINATOR_TOP = 1;
-    const PAGINATOR_BOTTOM = 2;
+    const int PAGINATOR_NONE = 0;
+    const int PAGINATOR_TOP = 1;
+    const int PAGINATOR_BOTTOM = 2;
 
     protected int $items_per_page = 20;
 
@@ -247,23 +247,19 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
         //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
-        //$select->fields()->reset();
-        //$select->fields()->set("count(*) as total");
         $select->limit = "";
 
         //echo "Count SQL: ".$select->getSQL();
         $db = $this->iterator->getDB();
-        $res = $db->query($select->getSQL());
-        if (!$res) {
-            debug("Error fetching result count: " . $db->getError() . " SQL: " . $select->getSQL());
-            throw new Exception($db->getError());
+        $result = $db->query($select->getSQL());
+        if (! ($result instanceof DBResult) ) {
+            debug("Error fetching SQL_CALC_FOUND_ROWS: " . $select->getSQL());
+            throw new Exception("Unable to query SQL_CALC_FOUND_ROWS");
         }
-        $numRows = $db->numRows($res);
 
-        $this->total_rows = $numRows;
+        $this->total_rows = $result->numRows();
 
-        //echo $this->total_rows;
-        $db->free($res);
+        $result->free();
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 

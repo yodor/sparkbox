@@ -54,20 +54,14 @@ class AuthenticatorResponder extends RequestResponder
 
     }
 
+    /**
+     * @return void
+     * @throws Exception
+     */
     protected function processImpl() : void
     {
-
-        try {
-
-            //throws exception on login error
-            $this->auth->login($this->email, $this->pass, $this->randsalt, $this->remember);
-
-        }
-        catch (Exception $e) {
-            debug("Login failed");
-            sleep(1);
-            throw $e;
-        }
+        //throws exception on login error
+        $this->auth->login($this->email, $this->pass, $this->randsalt, $this->remember);
 
     }
 

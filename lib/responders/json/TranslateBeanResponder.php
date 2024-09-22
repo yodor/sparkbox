@@ -127,9 +127,9 @@ class TranslateBeanResponder extends JSONResponder
 
         $db = DBConnections::Open();
 
-        $res = $db->query($delete->getSQL());
+        $db->query($delete->getSQL());
 
-        if ($db->numRows($res)) {
+        if ($db->affectedRows()>0) {
             $ret->message = tr("Bean translation removed");
         }
         else {

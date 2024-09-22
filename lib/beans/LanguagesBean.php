@@ -20,28 +20,22 @@ CREATE TABLE `languages` (
         parent::__construct("languages");
     }
 
-//    public function id4language($lng_name)
-//    {
-//
-//        $db = $this->db;
-//
-//        $lng_name = $db->escape($lng_name);
-//
-//        $q = "SELECT langID from {$this->table} WHERE language='$lng_name'";
-//        $res = $db->query($q);
-//        $row = $db->fetch($res);
-//        if (!$row) {
-//            throw new Exception ("No such language: $lng_name");
-//        }
-//        return $row["langID"];
-//    }
-
-    protected function createTable()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function createTable() : void
     {
         parent::createTable();
-        $db = $this->db;
-        $db->transaction();
-        $db->query("INSERT INTO languages (language, lang_code) values ('" . DEFAULT_LANGUAGE . "','" . DEFAULT_LANGUAGE_ISO3 . "');");
-        $db->commit();
+
+        try {
+            $this->db->transaction();
+            $this->db->query("INSERT INTO languages (language, lang_code) values ('" . DEFAULT_LANGUAGE . "','" . DEFAULT_LANGUAGE_ISO3 . "');");
+            $this->db->commit();
+        }
+        catch (Exception $e) {
+            $this->db->rollback();
+            throw $e;
+        }
     }
 }

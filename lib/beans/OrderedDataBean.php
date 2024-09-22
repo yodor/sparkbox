@@ -224,11 +224,11 @@ abstract class OrderedDataBean extends DBTableBean
         $selectMax = clone $this->select;
         $selectMax->fields()->setExpression(" MAX(position) ", "max_position");
 
-        $res = $db->query($selectMax->getSQL());
+        $result = $db->query($selectMax->getSQL());
 
-        if (!$res) throw new Exception ("Error getting max position");
+        if (!($result instanceof DBResult)) throw new Exception ("Error getting max position");
 
-        $row = $db->fetch($res);
+        $row = $result->fetch();
 
         return (int)$row["max_position"];
 

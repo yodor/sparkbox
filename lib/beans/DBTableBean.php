@@ -77,7 +77,11 @@ abstract class DBTableBean
 
     }
 
-    protected function initFields()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function initFields() : void
     {
 
         $this->columns = array();
@@ -93,9 +97,10 @@ abstract class DBTableBean
             throw new Exception("Table '$this->table' is not available in the active DB connection");
         }
 
-        $res = $this->db->queryFields($this->table);
+        $result = $this->db->queryFields($this->table);
+        if (!($result instanceof DBResult)) throw new Exception("Unable to query table fields");
 
-        while ($row = $this->db->fetch($res)) {
+        while ($row = $result->fetch()) {
             if (strcmp($row["Key"], "PRI") == 0) {
                 $this->prkey = $row["Field"];
             }
@@ -104,21 +109,22 @@ abstract class DBTableBean
 
             $this->columns[$field_name] = $row["Type"];
         }
-        if ($res) $this->db->free($res);
-
+        $result->free();
         //debug("Storage Types for Bean: ".get_class($this), $this->storage_types);
 
     }
 
-    protected function createTable()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    protected function createTable() : void
     {
 
         try {
             $this->db->transaction();
-            $res = $this->db->query($this->createString);
-            if (!$res) throw new Exception("Unable to create the table structure: " . $this->db->getError());
+            $this->db->query($this->createString);
             $this->db->commit();
-            $this->db->free($res);
         }
         catch (Exception $e) {
             $this->db->rollback();
@@ -127,7 +133,7 @@ abstract class DBTableBean
 
     }
 
-    public function getTableName()
+    public function getTableName() : string
     {
         return $this->table;
     }
@@ -137,12 +143,12 @@ abstract class DBTableBean
         return $this->error;
     }
 
-    public function setDB(DBDriver $db)
+    public function setDB(DBDriver $db) : void
     {
         $this->db = $db;
     }
 
-    public function getDB()
+    public function getDB() : DBDriver
     {
         return $this->db;
     }
@@ -368,8 +374,6 @@ abstract class DBTableBean
     {
         $use_transaction = FALSE;
 
-        $affectedRows = 0;
-
         if (!$db) {
             $use_transaction = TRUE;
             $db = $this->db;
@@ -377,7 +381,7 @@ abstract class DBTableBean
             $db->transaction();
         }
         else {
-            debug("Not starting transaction - using DBDriver from function call paramater");
+            debug("Not starting transaction - using DBDriver from function call parameter");
         }
 
         try {
@@ -388,10 +392,8 @@ abstract class DBTableBean
             $code($db);
 
             $affectedRows = $db->affectedRows();
-            debug("Closure Affected Rows: " . $affectedRows);
-
-            debug("Closure function executed");
-
+            debug("Closure finished - affected rows: " . $affectedRows);
+            
             if ($use_transaction) {
                 debug("Committing DB transaction");
                 $db->commit();
@@ -434,15 +436,9 @@ abstract class DBTableBean
 
             $sql = $delete->getSQL();
 
-            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_DELETE"])) {
-                debug(get_class($this) . " DELETE SQL: ". $sql);
-            }
-
-            if (!$db->query($sql)) {
-                debug("Unable to delete: " . $db->getError() . " SQL: " . $sql);
-                throw new Exception("Unable to delete: " . $db->getError());
-            }
-
+            //true or exception is thrown in db->query
+            $db->query($sql);
+              
             $this->manageCache($id);
         };
 
@@ -478,26 +474,21 @@ abstract class DBTableBean
                 $delete->where()->add($this->prkey, "($keep_list_ids)", " NOT IN ", " AND ");
             }
 
-            $sql = $delete->getSQL();
-            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_DELETE"])) {
-                debug(get_class($this) . " DELETE SQL: ". $sql);
-            }
-
             //fetch id of resulting rows first to properly manage the cache
-            $idlist = array();
             $select = new SQLSelect($delete);
             $select->fields()->reset();
             $select->fields()->set($this->prkey);
-            $res = $db->query($select->getSQL());
-            while ($result = $db->fetchResult($res)) {
-                $idlist[] = (int)$result->get($this->prkey);
+
+            $result = $db->query($select->getSQL());
+            if (!($result instanceof DBResult)) throw new Exception("Unable to query affected ID list: ".$select->getSQL());
+
+            $idlist = array();
+            while ($data = $result->fetchResult()) {
+                $idlist[] = intval($data->get($this->prkey));
             }
             debug("Affected ID list: ", $idlist);
 
-            if (!$db->query($sql)) {
-                debug("Unable to delete: " . $db->getError() . " SQL: " . $sql);
-                throw new Exception("Unable to delete: " . $db->getError());
-            }
+            $db->query($delete->getSQL());
 
             foreach ($idlist as $id) {
                 $this->manageCache((int)$id);
@@ -567,15 +558,7 @@ abstract class DBTableBean
 
         $code = function (DBDriver $db) use (&$insertID , $insert) {
 
-            $sql = $insert->getSQL();
-            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_INSERT"])) {
-                debug(get_class($this) . " INSERT SQL: ". $sql);
-            }
-
-            if (!$db->query($sql)) {
-                debug("Unable to insert: " . $db->getError() . " SQL: " . $sql);
-                throw new Exception("Unable to insert: " . $db->getError());
-            }
+            $db->query($insert->getSQL());
 
             //NOTE!!! lastID return the first auto_increment of a multi insert transaction
             $insertID = $db->lastID();
@@ -604,15 +587,7 @@ abstract class DBTableBean
 
         $code = function (DBDriver $db) use ($id, $update) {
 
-            $sql = $update->getSQL();
-            if (isset($GLOBALS["DEBUG_DBTABLEBEAN_UPDATE"])) {
-                debug(get_class($this) . " UPDATE SQL: ".$sql);
-            }
-
-            if (!$db->query($sql)) {
-                debug("Unable to update: " . $db->getError() . " SQL: " . $sql);
-                throw new Exception("Unable to update: " . $db->getError());
-            }
+            $db->query($update->getSQL());
 
             $this->manageCache($id);
 

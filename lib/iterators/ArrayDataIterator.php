@@ -70,10 +70,10 @@ class ArrayDataIterator implements IDataIterator
     {
         $db = DBConnections::Open();
 
-        $res = $db->query($qry->getSQL());
-        if (!$res) throw new Exception ($db->getError());
+        $result = $db->query($qry->getSQL());
+
         $arr = array();
-        while ($row = $db->fetch($res)) {
+        while ($row = $result->fetch()) {
 
             $arr_key = $row[$prkey];
             $arr_val = $row[$label];
@@ -85,7 +85,7 @@ class ArrayDataIterator implements IDataIterator
 
             $arr[$arr_key] = $arr_val;
         }
-        $db->free($res);
+
 
         return new ArrayDataIterator($arr, $prkey, $label);
     }

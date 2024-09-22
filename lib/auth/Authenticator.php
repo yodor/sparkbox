@@ -201,9 +201,15 @@ abstract class Authenticator
         $update->set("last_active", "CURRENT_TIMESTAMP");
         $update->where()->add($this->bean->key(), $userID);
 
-        $db->transaction();
-        $db->query($update->getSQL());
-        $db->commit();
+        try {
+            $db->transaction();
+            $db->query($update->getSQL());
+            $db->commit();
+        }
+        catch (Exception $e) {
+            $db->rollback();
+            throw $e;
+        }
     }
 
     /**
@@ -240,41 +246,6 @@ abstract class Authenticator
         if (isset($row[SessionData::FULLNAME])) {
             $this->session->set(SessionData::FULLNAME, $row[SessionData::FULLNAME]);
         }
-
-    }
-
-    public function fbAuthenticate($oauth_token)
-    {
-
-        $graph_url = "https://graph.facebook.com/me?access_token=$oauth_token";
-        $user_fb = json_decode(file_get_contents($graph_url));
-
-        $bean = new UsersBean();
-        $email = $user_fb->email;
-
-        $qry = $bean->queryField("email", $email, 1);
-        $qry->exec();
-
-        if (!($urow = $qry->next())) throw new Exception("This email is not registered or not confirmed yet");
-
-        $userID = (int)$urow[$bean->key()];
-
-        $authstore["id"] = $userID;
-        $authstore["fbID"] = (int)$urow["fb_userID"];
-
-        $s1 = "UPDATE users SET counter=counter+1 , last_active=CURRENT_TIMESTAMP, oauth_token='$oauth_token' WHERE " . $bean->key() . "='$userID'";
-        $db = DBConnections::Open();
-
-        $db->transaction();
-        $ret = $db->query($s1);
-        if (!$ret) throw new Exception($db->getError());
-        $db->commit();
-
-        $this->createContext($userID, $authstore);
-
-        $this->updateLastSeen($userID);
-
-        return $urow;
 
     }
 

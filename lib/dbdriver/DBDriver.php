@@ -24,19 +24,11 @@ abstract class DBDriver
 
     abstract public function getError(): string;
 
-    abstract public function query(string $str);
-
-    abstract public function fetch($result) : ?array;
-
-    abstract public function fetchArray($result) : ?array;
-
-    abstract public function fetchResult($result) : ?RawResult;
+    abstract public function query(string $str) : true|DBResult;
 
     abstract public function dateTime(int $add_days = 0, string $interval_type = " DAY ") : string;
 
     abstract public function timestamp() : int;
-
-    abstract public function free($result) : void;
 
     abstract public function lastID(): int;
 
@@ -46,16 +38,13 @@ abstract class DBDriver
 
     abstract public function transaction(?string $name = null) : bool;
 
-    abstract public function numRows($result): int;
-
-    abstract public function fields($result) : array;
-
     abstract public function escape(string $data) : string;
 
-    abstract public function queryFields(string $table);
+    abstract public function queryFields(string $table) : true|DBResult;
 
-    abstract public function tableExists(string $table);
+    abstract public function tableExists(string $table) : bool;
 
+    abstract public function fieldType(string $table, string $field_name) : string;
 }
 
 ?>
