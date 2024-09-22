@@ -56,12 +56,12 @@ class NestedSetBean extends DBTableBean
                 $update = new SQLUpdate($this->select);
                 $update->set("rgt", "rgt+2");
                 $update->where()->add(" rgt >= $rgt ", "", "");
-                if (!$db->query($update->getSQL())) throw new Exception($db->getError());
+                $db->query($update->getSQL());
 
                 $update = new SQLUpdate($this->select);
                 $update->set("lft", "lft+2");
                 $update->where()->add(" lft > $rgt ", "", "");
-                if (!$db->query($update->getSQL())) throw new Exception($db->getError());
+                $db->query($update->getSQL());
 
                 $lastid = parent::insert($row, $db);
 
@@ -176,31 +176,30 @@ class NestedSetBean extends DBTableBean
                 $update = new SQLUpdate($this->select);
                 $update->set("lft", "lft + $extent");
                 $update->where()->addExpression("lft >= $new_lft ");
-                if (!$db->query($update->getSQL())) throw new Exception("Update Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
+                $db->query($update->getSQL());
 
                 $update = new SQLUpdate($this->select);
                 $update->set("rgt", "rgt + $extent");
                 $update->where()->addExpression("rgt >= $new_lft");
-                if (!$db->query($update->getSQL())) throw new Exception("Update Error(2): " . $db->getError() . "<HR>" . $update->getSQL());
+                $db->query($update->getSQL());
 
                 //move into new space
                 $update = new SQLUpdate($this->select);
                 $update->set("lft", "lft + $distance");
                 $update->set("rgt", "rgt + $distance");
                 $update->where()->addExpression(" (lft >= $tmppos AND rgt < $tmppos + $extent) ");
-
-                if (!$db->query($update->getSQL())) throw new Exception("Update Error(3): " . $db->getError() . "<HR>" . $update->getSQL());
+                $db->query($update->getSQL());
 
                 //remove old space
                 $update = new SQLUpdate($this->select);
                 $update->set("lft", "lft - $extent");
                 $update->where()->addExpression("lft > $rgt");
-                if (!$db->query($update->getSQL())) throw new Exception("Update Error(4): " . $db->getError() . "<HR>" . $update->getSQL());
+                $db->query($update->getSQL());
 
                 $update = new SQLUpdate($this->select);
                 $update->set("rgt", "rgt - $extent");
                 $update->where()->addExpression("rgt > $rgt");
-                if (!$db->query($update->getSQL())) throw new Exception("Update Error(5): " . $db->getError() . "<HR>" . $update->getSQL());
+                $db->query($update->getSQL());
 
                 $affectedRows = parent::update($id, $row, $db);
 
@@ -253,24 +252,22 @@ class NestedSetBean extends DBTableBean
             $update->set("lft", " lft - 1 ");
             $update->set("rgt", " rgt - 1 ");
             $update->where()->addExpression("(lft BETWEEN $lft AND $rgt)");
-
-            if (!$db->query($update->getSQL())) throw new Exception("Delete Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("rgt", " rgt - 2 ");
             $update->where()->add("rgt > $rgt", "", "");
-
-            if (!$db->query($update->getSQL())) throw new Exception("Delete Error(2): " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("lft", " lft - 2 ");
             $update->where()->add(" lft > $rgt ", "", "");
-            if (!$db->query($update->getSQL())) throw new Exception("Delete Error(3): " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("parentID", $parentID);
             $update->where()->add("parentID", $id);
-            if (!$db->query($update->getSQL())) throw new Exception("Delete Error(4): " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $db->commit();
         }
@@ -284,7 +281,14 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    public function reconstructNestedSet(&$lft = -1, &$cnt = 0, $parentID = 0)
+    /**
+     * @param $lft
+     * @param $cnt
+     * @param $parentID
+     * @return void
+     * @throws Exception
+     */
+    public function reconstructNestedSet(&$lft = -1, &$cnt = 0, $parentID = 0) : void
     {
 
         $qry = $this->query();
@@ -383,15 +387,14 @@ class NestedSetBean extends DBTableBean
             $update->set("lft", " lft - $brotherSize ");
             $update->set("rgt", " rgt - $brotherSize ");
             $update->where()->addExpression(" (lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . ") ");
-            if (!$db->query($update->getSQL())) throw new Exception("moveLeft($id) - Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("lft", " lft + $nodeSize ");
             $update->set("rgt", " rgt + $nodeSize ");
             $update->where()->addExpression(" (lft BETWEEN " . $brother["lft"] . " AND " . $brother["rgt"] . ") ");
             $update->where()->add($this->prkey, " ( $idlist ) ", "NOT IN");
-
-            if (!$db->query($update->getSQL())) throw new Exception("moveLeft($id) - Error(2): " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $db->commit();
 
@@ -437,15 +440,14 @@ class NestedSetBean extends DBTableBean
             $update->set("lft", " lft + $brotherSize ");
             $update->set("rgt", " rgt + $brotherSize ");
             $update->where()->addExpression("( lft BETWEEN " . $node["lft"] . " AND " . $node["rgt"] . ") ");
-
-            if (!$db->query($update->getSQL())) throw new Exception("moveRight($id) - Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("lft", " lft - $nodeSize ");
             $update->set("rgt", " rgt - $nodeSize ");
             $update->where()->addExpression("( lft BETWEEN " . $brother["lft"] . " AND " . $brother["rgt"] . ") ");
             $update->where()->add($this->prkey, "($idlist)", "NOT IN");
-            if (!$db->query($update->getSQL())) throw new Exception("moveRight($id) - Error(1): " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $db->commit();
         }

@@ -29,8 +29,7 @@ abstract class OrderedDataBean extends DBTableBean
             $update->set("position", "position-1");
             $update->where()->addExpression("position>$pos");
 
-            $res = $db->query($update->getSQL());
-            if (!$res) throw new Exception("Delete reposition DBError: " . $db->getError());
+            $db->query($update->getSQL());
 
         };
 
@@ -67,18 +66,17 @@ abstract class OrderedDataBean extends DBTableBean
             $update = new SQLUpdate($this->select);
             $update->set("position", "position - 1");
             $update->where()->addExpression("position>$pos");
-            if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", "position + 1");
             $update->where()->addExpression("position>=$new_pos");
-            if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", $new_pos);
             $update->where()->add($this->prkey, $id);
-
-            if (!$db->query($update->getSQL())) throw new Exception("Set position error: " . $db->getError());
+            $db->query($update->getSQL());
         };
 
         $this->handleTransaction($code, $db);
@@ -100,14 +98,12 @@ abstract class OrderedDataBean extends DBTableBean
             $update = new SQLUpdate($this->select);
             $update->set("position", "position + 1");
             $update->where()->addExpression("position<$pos");
-
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Top Error: " . $db->getError());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", " 1 ");
             $update->where()->add($this->prkey, $id);
-
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Top Error: " . $db->getError());
+            $db->query($update->getSQL());
         };
 
         $this->handleTransaction($code, $db);
@@ -131,14 +127,13 @@ abstract class OrderedDataBean extends DBTableBean
             $update = new SQLUpdate($this->select);
             $update->set("position", "position-1");
             $update->where()->addExpression("position>$pos");
-
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(1) Error: " . $db->getError() . "<HR>" . $update->getSQL());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", $max_pos);
             $update->where()->add($this->prkey , $id);
+            $db->query($update->getSQL());
 
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Bottom(2) Error: " . $db->getError() . "<HR>" . $update->getSQL());
         };
 
         $this->handleTransaction($code, $db);
@@ -161,20 +156,17 @@ abstract class OrderedDataBean extends DBTableBean
             $update = new SQLUpdate($this->select);
             $update->set("position", " -1 ");
             $update->where()->add($this->prkey, $id);
-
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Up Error: " . $db->getError());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", " position + 1 ");
             $update->where()->add("position", ($pos - 1));
-
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Up Error: " . $db->getError());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", $pos - 1);
             $update->where()->add($this->prkey, $id);
-
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Up Error: " . $db->getError());
+            $db->query($update->getSQL());
         };
 
         $this->handleTransaction($code, $db);
@@ -196,20 +188,18 @@ abstract class OrderedDataBean extends DBTableBean
             $update = new SQLUpdate($this->select);
             $update->set("position", " -1 ");
             $update->where()->add($this->prkey, $id);
-
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Down(1) Error: " . $db->getError());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", " position - 1 ");
             $update->where()->add("position", ($pos + 1));
-
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Down(2) Error: " . $db->getError());
+            $db->query($update->getSQL());
 
             $update = new SQLUpdate($this->select);
             $update->set("position", $pos + 1);
             $update->where()->add($this->prkey, $id);
+            $db->query($update->getSQL());
 
-            if (!$db->query($update->getSQL())) throw new Exception("Reorder Down(3) Error: " . $db->getError());
         };
 
         $this->handleTransaction($code, $db);
@@ -262,9 +252,7 @@ abstract class OrderedDataBean extends DBTableBean
                 $update->set("position", $pos);
                 $update->where()->add($this->prkey, $id);
 
-                if (!$this->db->query($update->getSQL())) {
-                    throw new Exception("Unable to rebuild referential ordering: " . $this->db->getError());
-                }
+                $this->db->query($update->getSQL());
 
             }
             $this->db->commit();

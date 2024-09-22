@@ -86,19 +86,19 @@ class MySQLiDriver extends DBDriver
      */
     public function query(string $str) : true|DBResult
     {
-        $res = false;
+
         try {
             $res = $this->conn->query($str);
+            if ($res === false) throw new Exception("Result is false");
         }
         catch (Exception $e) {
-            debug("DB Query Error: ".$this->conn->error." SQL: $str");
-            throw $e;
+            debug("Query exception: ".$e->getMessage()." | Connection Error: ".$this->conn->error." | SQL: $str");
+            throw new Exception("Query exception: ".$e->getMessage());
         }
 
         if ($res instanceof mysqli_result) return new MySQLiResult($res);
-        if ($res === false) throw new Exception("Query error: ".$this->conn->error);
 
-        return $res;
+        return true;
     }
 
     public function affectedRows(): int

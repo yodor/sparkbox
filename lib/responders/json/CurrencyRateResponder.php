@@ -45,7 +45,7 @@ class CurrencyRateResponder extends JSONResponder
         try {
             $db->transaction();
             $sel = "DELETE FROM currency_rates WHERE (srcID='$this->srcID' AND dstID='$this->dstID') OR (dstID='$this->srcID' AND srcID='$this->dstID')";
-            if (!$db->query($sel)) throw new Exception("Error deleting old quote"."<HR>".$db->getError());
+            $db->query($sel);
 
             //forward rate
             $data_forward = array("srcID"=>$this->srcID, "dstID"=>$this->dstID, "rate"=>$this->rate);

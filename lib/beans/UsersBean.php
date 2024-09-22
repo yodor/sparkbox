@@ -103,11 +103,7 @@ class UsersBean extends DBTableBean
             $update->where()->add("email", $email);
             $update->where()->add("confirm_code", $confirm_code);
 
-            debug("UPDATE executing sql: " . $update->getSQL());
-
-            if (!$db->query($update->getSQL())) {
-                throw new Exception("Unable to update: " . $db->getError());
-            }
+            $db->query($update->getSQL());
         };
 
         return $this->handleTransaction($code, $db);
