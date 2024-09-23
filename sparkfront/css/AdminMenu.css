@@ -77,7 +77,7 @@
 .admin_menu .SubmenuRenderer .SubmenuItemOuter {
     padding: 5px;
 
-    background-image: url("../images/admin/submenu_item_bullet.png");
+    /*background-image: url("../images/admin/submenu_item_bullet.png");*/
     background-repeat: no-repeat;
     background-position: left center;
 }

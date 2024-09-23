@@ -1,6 +1,3 @@
 @import url("AdminPage_base.css");
 @import url("AdminPage_mobile.css") (max-width: 1000px);
 @import url("mobile/MenuBarComponent.css") (max-width: 1000px);
-@import url("mobile/FormRenderer.css") (max-width: 1000px);
-@import url("mobile/TableView.css") (max-width: 1000px);
-@import url("mobile/InputRenderer.css") (max-width: 1000px);
