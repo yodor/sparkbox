@@ -31,18 +31,18 @@ class MCETextArea extends Component {
             //
             entity_encoding: "raw",
 
-            force_p_newlines: false,
+            // force_p_newlines: false,
             force_br_newlines: true,
             convert_newlines_to_brs: true,
             remove_linebreaks: true,
-            forced_root_block: false,
+            // forced_root_block: false,
             newline_behavior: 'linebreak',
 
             ///ver 4
             menubar: false,
-            toolbar1: 'code | undo redo | fontselect fontsizeselect | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
-            toolbar2: 'link unlink anchor | image media code | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser |',
-            plugins: 'code link image lists charmap anchor insertdatetime media paste code',
+            toolbar1: 'undo redo | fontfamily fontsize | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
+            toolbar2: 'code|link unlink anchor | image media  | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser',
+            plugins: 'link image lists charmap anchor insertdatetime media code',
 
             invalid_elements: 'iframe,object,embed',
 
@@ -50,7 +50,7 @@ class MCETextArea extends Component {
 
             branding: false,
 
-            verify_html: 1,
+            verify_html: true,
             media_restrict: false,
 
             width: '100%',
@@ -59,6 +59,8 @@ class MCETextArea extends Component {
             //content_css: "/mycontent.css",
             content_style: "p { margin: 0; } body { line-height: 1; }",
 
+            //ver 7
+            license_key: 'gpl',
         };
         return mce_setup_object;
     }
