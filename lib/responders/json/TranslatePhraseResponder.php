@@ -68,7 +68,7 @@ class TranslatePhraseResponder extends JSONResponder
             }
         }
         catch (Exception $ex) {
-            $ret->message = $ex->getMessage()."<HR>".$this->bean->getError();
+            $ret->message = $ex->getMessage();
         }
 
 

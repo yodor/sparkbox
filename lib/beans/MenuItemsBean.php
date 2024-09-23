@@ -3,7 +3,7 @@ include_once("beans/NestedSetBean.php");
 
 class MenuItemsBean extends NestedSetBean
 {
-    protected $createString = "CREATE TABLE `menu_items` (
+    protected string $createString = "CREATE TABLE `menu_items` (
  `menuID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `menu_title` varchar(50) NOT NULL,
  `link` varchar(255) NOT NULL,

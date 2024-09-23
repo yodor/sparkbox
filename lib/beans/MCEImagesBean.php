@@ -3,7 +3,7 @@ include_once("beans/DBTableBean.php");
 
 class MCEImagesBean extends DBTableBean
 {
-    protected $createString = "CREATE TABLE `mce_images` (
+    protected string $createString = "CREATE TABLE `mce_images` (
  `imageID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `section` varchar(255) NOT NULL,
  `section_key` varchar(255) NOT NULL,

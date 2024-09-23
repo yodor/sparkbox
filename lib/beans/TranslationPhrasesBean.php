@@ -5,7 +5,7 @@ include_once("beans/SiteTextsBean.php");
 class TranslationPhrasesBean extends DBTableBean
 {
 
-    protected $createString = "
+    protected string $createString = "
 CREATE TABLE `translation_phrases` (
  `trID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `langID` int(11) unsigned NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE `translation_phrases` (
         parent::__construct("translation_phrases");
     }
 
-    public function queryLanguageID(int $langID)
+    public function queryLanguageID(int $langID) : SQLQuery
     {
         $sel = new SQLSelect();
 

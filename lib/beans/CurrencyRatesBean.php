@@ -4,7 +4,7 @@ include_once("beans/DBTableBean.php");
 
 class CurrencyRatesBean extends DBTableBean
 {
-    protected $createString = "CREATE TABLE `currency_rates` (
+    protected string $createString = "CREATE TABLE `currency_rates` (
  `crID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `srcID` int(11) unsigned NOT NULL,
  `dstID` int(11) unsigned NOT NULL,

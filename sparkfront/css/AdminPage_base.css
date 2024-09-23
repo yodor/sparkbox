@@ -1,0 +1,331 @@
+HTML {
+    box-sizing: border-box;
+}
+
+BODY {
+
+    padding: 0;
+    margin: 0;
+
+    box-sizing: border-box;
+
+}
+
+.admin_layout {
+    border-collapse: collapse;
+
+
+    display: grid;
+
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 100vh;
+}
+
+.admin_layout .admin_header {
+    background-color: #464646;
+    color: white;
+    padding: 1em;
+    text-align: center;
+
+}
+
+
+.admin_layout .left_menu {
+
+    box-sizing: border-box;
+
+    white-space: nowrap;
+    vertical-align: top;
+    padding: 0;
+
+    background-image: url("../images/admin/admin_header.png");
+
+    /*position:sticky;*/
+    /*left:0;*/
+    /*top:0;*/
+
+    background-attachment: fixed;
+    z-index: 100;
+}
+
+.admin_layout .left_menu .menu_contents {
+    position: sticky;
+    left: 0;
+    top: 0;
+
+    /*-webkit-box-shadow: 8px 0 10px -6px #000000;*/
+    /*-moz-box-shadow: 8px 0 10px -6px #000000;*/
+    /*box-shadow: 8px 0 10px -6px #000000;*/
+
+}
+
+.admin_layout .left_menu .menu_contents .admin_menu {
+    border: 1px solid #464646;
+}
+
+
+.admin_layout .page_area {
+
+    vertical-align: top;
+
+    box-sizing: border-box;
+
+    padding: 1em;
+    margin: 0;
+    padding-right:0;
+
+    display: grid;
+    grid-template-rows: auto 1fr;
+
+    overflow: hidden;
+
+}
+
+
+.admin_layout .page_area .page_caption {
+
+    border-bottom: 1px solid #cccccc;
+    background-color: white;
+
+    /*position: sticky;*/
+    /*left: 0;*/
+    /*top: 0;*/
+
+    z-index: 10;
+    box-sizing: border-box;
+    display: block;
+}
+
+.admin_layout .page_area .page_caption .page_actions:empty {
+    display: none;
+}
+
+.admin_layout .page_area .page_caption .page_actions {
+    display: inline-block;
+    margin-right: 10px;
+    height: 30px;
+    vertical-align: top;
+}
+
+.admin_layout .page_area .page_caption .page_actions .Action {
+    display: inline-block;
+    width: 30px;
+    height: 100%;
+    background-size: cover;
+    margin-bottom: -7px;
+    margin-left: 2px;
+    margin-right: 3px;
+    vertical-align: top;
+}
+
+.admin_layout .page_area .page_caption .page_actions .Action[action]:not([action='']) {
+    background-repeat: no-repeat;
+    /*   content: attr(title) ": ";  */
+    color: transparent;
+}
+
+.admin_layout .page_area .page_caption .page_actions .Action[action='Add'] {
+    background-image: url("../images/page_actions/green_plus.png");
+}
+
+.admin_layout .page_area .page_caption .page_actions .Action[action='Multi-Add'] {
+    background-image: url("../images/page_actions/green_multi_plus.png");
+}
+
+.admin_layout .page_area .page_caption .page_actions .Action[action='Back'] {
+    background-image: url("../images/page_actions/green_left.png");
+}
+
+.admin_layout .page_area .page_caption .page_title {
+    color: #656565;
+    font-size: 1.3em;
+}
+
+.admin_layout .page_area .page_caption .page_filters {
+    margin-top: 0.5em;
+
+    display: block;
+}
+
+.admin_layout .page_area .page_contents {
+    display: block;
+    overflow: auto;
+    position: relative;
+}
+
+
+.admin_layout .page_area .page_contents .TableView TH {
+    position: sticky;
+    left: 0;
+    top: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    border-bottom:0 !important;
+}
+
+.admin_layout .page_area .page_contents .TableView .PaginatorBottomComponent {
+    position:sticky;
+    bottom:0;
+    left:0;
+    background-color:white;
+    z-index:10;
+    border-top:1px solid #cecece;
+}
+
+.admin_layout .page_area .page_area.products.list .TableView .viewport .ImageList {
+    /*   max-width:120px; */
+    display: inline-block;
+}
+
+.admin_layout .page_area .page_area.products.list .TableView .viewport .ImageList .Item {
+    display: inline-block;
+}
+
+
+.AdminLoginPage {
+
+}
+
+
+.BeanFormEditor[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
+    display: block;
+}
+
+.BeanFormEditor[bean='AdminUsersBean'] .InputComponent[field="password"] {
+    display: none;
+}
+
+.BeanFormEditor[bean='AdminUsersBean'] .InputComponent[field="password1"] {
+    display: none;
+}
+
+
+.TranslationPhrases .original_text {
+    font-weight: bold;
+}
+
+.BeanFormEditor[bean='MenuItemsBean'] .FormRenderer .InputField {
+    min-width: 400px;
+
+}
+
+.BeanFormEditor .FormRenderer .InputField.MCETextArea TEXTAREA {
+    height: 150px;
+    /*   max-height:150px; */
+}
+
+.TableView[name='SiteTexts'] TD[column='value'] {
+    text-align: left;
+}
+
+
+.BeanFormEditor > .Caption:first-child {
+    color: #656565;
+    font-size: 20px;
+    /* font-weight: bold; */
+    border-bottom: 1px solid #cccccc;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+
+}
+
+
+.orange {
+    color: #f9a541;
+}
+
+
+.AdminLoginPage.forgot_password .FormRenderer {
+    border: 1px solid #eaeaea;
+}
+
+.AdminLoginPage.forgot_password .FormRenderer .SubmitLine .TextSpace {
+    display: block;
+}
+
+.AdminLoginPage.forgot_password .FormRenderer .SubmitLine .Buttons {
+    display: block;
+}
+
+
+.admin_layout .KeywordSearch {
+    display: block;
+}
+
+.admin_layout .KeywordSearch .InputComponent[field='keyword'] .InputLabel {
+    display: none !important;
+}
+
+.admin_layout .KeywordSearch .SubmitLine .Buttons > * {
+    margin-left: 0.3em;
+}
+
+.CurrencyRateEditor {
+
+    border: 1px solid slategrey;
+    position: relative;
+    display: table;
+    border-collapse: collapse;
+
+}
+
+.CurrencyRateEditor .Line {
+    display: table-row;
+}
+
+.CurrencyRateEditor .Item {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0.5em;
+    border: 1px dotted slategrey;
+}
+
+.CurrencyRateEditor .Item.code {
+    font-weight: bold;
+    background-color: #506266;
+    color: antiquewhite;
+}
+
+.CurrencyRateEditor .Item.rate {
+    cursor: pointer;
+}
+
+.CurrencyRateEditor .Item.rate:hover {
+    text-decoration: underline;
+}
+
+.CurrencyRateEditor .Item.space {
+    background-color: papayawhip;
+}
+
+.BeanEditorPage {
+    min-width: 50%;
+}
+
+.BeanFormEditor {
+    width: auto;
+}
+
+.BeanFormEditor .FormRenderer {
+    width: 100%;
+}
+
+.BeanFormEditor .FormRenderer .TextArea TEXTAREA {
+    min-height: 200px;
+}
+
+.caption.empty_list {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+.admin_layout .page_area .PageTemplate {
+    vertical-align: top;
+}
+
+.admin_layout .page_area .PageTemplate .Container {
+    vertical-align: top;
+    display: block;
+}

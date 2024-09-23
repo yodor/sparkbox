@@ -36,7 +36,7 @@ class BeanEditorPage extends AdminPageTemplate
         }
     }
 
-    public function setForm(InputForm $form)
+    public function setForm(InputForm $form) : void
     {
         $this->form = $form;
     }

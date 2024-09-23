@@ -1,4 +1,71 @@
 
+.admin_layout {
+    grid-template-rows: auto;
+    grid-template-columns: auto;
+}
+
+
+.InputField.TextField input[type='text'] {
+    font-size: 1.1em;
+}
+
+.InputField.SelectField SELECT {
+    font-size: 1.1em;
+}
+
+
+
+.FormRenderer {
+    display: block;
+    border-spacing: inherit;
+}
+
+.FormRenderer[field_layout] .InputComponent {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+.FormRenderer[field_layout] .InputComponent .InputLabel {
+    display: block;
+    text-align: left;
+    padding: 0px;
+    margin-bottom: 2px;
+}
+
+.FormRenderer[field_layout] .InputComponent .InputField {
+    display: inline-block;
+    text-align: left;
+    padding: 0px;
+}
+
+.FormRenderer[field_layout] .InputComponent .InputField .addon_content {
+    display: block;
+    margin-left: 0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.FormRenderer .SubmitLine {
+    display: block;
+
+}
+
+.FormRenderer .SubmitLine .Buttons {
+    display: inherit;
+}
+
+
+.GalleryViewItemRenderer {
+    margin-right: 0px;
+    display: block;
+}
+
+.GalleryViewItemRenderer .image_slot .ImagePopup IMG {
+    width: 100%;
+}
+
+
 .TableView {
     display: block;
 }

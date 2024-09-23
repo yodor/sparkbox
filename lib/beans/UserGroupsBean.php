@@ -3,7 +3,7 @@ include_once("beans/DBTableBean.php");
 
 class UserGroupsBean extends DBTableBean
 {
-    protected $createString = "CREATE TABLE `user_groups` (
+    protected string $createString = "CREATE TABLE `user_groups` (
  `gmID` int(10) unsigned NOT NULL AUTO_INCREMENT,
  `groupID` int(10) unsigned NOT NULL,
  `userID` int(10) unsigned NOT NULL,

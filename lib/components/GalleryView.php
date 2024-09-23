@@ -14,40 +14,30 @@ class GalleryView extends Container
     /**
      * @var DBTableBean
      */
-    protected $bean;
+    protected DBTableBean $bean;
 
-    protected $refkey = "";
-    protected $refval = -1;
+    protected AbstractResultView $view;
 
-    protected $view;
+    protected IPhotoRenderer $photo_renderer;
 
-    protected $edit_script;
+    const int MODE_GRID = 1;
+    const int MODE_LIST = 2;
 
-    protected $photo_renderer;
+    protected int $view_mode = GalleryView::MODE_GRID;
 
-    const MODE_GRID = 1;
-    const MODE_LIST = 2;
+    protected ?ActionCollection $actions = null;
 
-    protected $view_mode = GalleryView::MODE_GRID;
-
-    protected $actions;
-
-    public function __construct(DBTableBean $bean, SQLQuery $query=NULL)
+    public function __construct(DBTableBean $bean, ?SQLQuery $query=NULL)
     {
         parent::__construct();
         $this->bean = $bean;
 
-        //default query for bean
-        $qry = $this->bean->query();
-        $qry->select->fields()->set($this->bean->key(), "position", "caption", "date_upload");
-
-        //use already prepared query
-        if ($query !== NULL) {
+        if (!is_null($query)) {
             $qry = $query;
         }
-
-
-
+        else {
+            $qry = $this->bean->query($this->bean->key(), "position", "caption", "date_upload");
+        }
 
         if (strcmp_isset("view", "list")) {
 
@@ -144,61 +134,75 @@ class GalleryView extends Container
         return $this->bean;
     }
 
-    protected function initActions()
+    protected function initActions() : void
     {
-        $bkey = $this->bean->key();
-
-        //default mode for action is to keep the request search parameters if script name is empty ie starts with ?
-
-        $edit_params = array(new DataParameter("editID", $bkey));
 
         $url = URL::Current();
         $url->setScriptName("add.php");
+        $url->add(new DataParameter("editID", $this->bean->key()));
+        $action_edit = new Action("Edit");
+        $action_edit->setURL($url);
+        $this->actions->append($action_edit);
 
-        $collection = $this->actions;
+        $this->actions->append(Action::PipeSeparator());
 
-        $collection->append(new Action("Edit", $url->toString(), $edit_params));
+        $url = URL::Current();
+        $url->add(new URLParameter("cmd", "delete_item"));
+        $url->add(new DataParameter("item_id", $this->bean->key()));
+        $delete_action = new Action("Delete");
+        $delete_action->setURL($url);
+        $this->actions->append($delete_action);
 
-        $collection->append(Action::PipeSeparator());
-
-        $delete_params = array(new DataParameter("item_id", $bkey));
-
-        $collection->append(new Action("Delete", "?cmd=delete_item", $delete_params));
 
         if ($this->bean instanceof OrderedDataBean) {
 
-            $collection->append(Action::RowSeparator());
-            $collection->append(Action::RowSeparator());
+            $this->actions->append(Action::RowSeparator());
 
-            $repos_param = array(new DataParameter("item_id", $bkey),
-                                 new DataParameter("#" . get_class($this->bean) . ".%$bkey%", $bkey));
+            $url = URL::Current();
+            $url->add(new URLParameter("cmd", "reposition"));
+            $url->add(new DataParameter("item_id", $this->bean->key()));
+            $url->add(new DataParameter("#" . get_class($this->bean) . ".%{$this->bean->key()}%", $this->bean->key()));
 
-            //if (strlen($this->refkey > 0)) $repos_param[] = $ref_param;
+            $action = new Action("First");
+            $action->setURL(clone $url);
+            $action->getURL()->add(new URLParameter("type", "first"));
+            $this->actions->append($action);
 
-            $collection->append(new Action("First", "?cmd=reposition&type=first", $repos_param));
+            $this->actions->append(Action::PipeSeparator());
 
-            $collection->append(Action::PipeSeparator());
+            $action = new Action("Last");
+            $action->setURL(clone $url);
+            $action->getURL()->add(new URLParameter("type", "last"));
+            $this->actions->append($action);
 
-            $collection->append(new Action("Last", "?cmd=reposition&type=last", $repos_param));
+            $this->actions->append(Action::RowSeparator());
 
-            $collection->append(Action::RowSeparator());
+            $action = new Action("Previous");
+            $action->setURL(clone $url);
+            $action->getURL()->add(new URLParameter("type", "previous"));
+            $this->actions->append($action);
 
-            $collection->append(new Action("Previous", "?cmd=reposition&type=previous", $repos_param));
+            $this->actions->append(Action::PipeSeparator());
 
-            $collection->append(Action::PipeSeparator());
+            $action = new Action("Next");
+            $action->setURL(clone $url);
+            $action->getURL()->add(new URLParameter("type", "next"));
+            $this->actions->append($action);
 
-            $collection->append(new Action("Next", "?cmd=reposition&type=next", $repos_param));
+            $this->actions->append(Action::RowSeparator());
 
-            $collection->append(Action::RowSeparator());
+            $action = new Action("Fixed");
+            $action->setURL(clone $url);
+            $action->getURL()->add(new URLParameter("type", "fixed"));
+            $this->actions->append($action);
 
-            $collection->append(new Action("Reposition", "?cmd=reposition&type=fixed", $repos_param));
         }
     }
 
     /**
-     * @return TableView|ItemView
+     * @return AbstractResultView
      */
-    public function getView()
+    public function getView() : AbstractResultView
     {
         return $this->view;
     }

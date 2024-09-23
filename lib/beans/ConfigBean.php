@@ -4,7 +4,7 @@ include_once("beans/DBTableBean.php");
 class ConfigBean extends DBTableBean
 {
 
-    protected $createString = "CREATE TABLE `config` (
+    protected string $createString = "CREATE TABLE `config` (
  `cfgID` int(10) unsigned NOT NULL AUTO_INCREMENT,
  `config_key` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
  `config_val` longblob,
@@ -26,8 +26,9 @@ class ConfigBean extends DBTableBean
 
     public static function Factory() : ConfigBean
     {
-        if (self::$instance instanceof ConfigBean) return self::$instance;
-        self::$instance = new ConfigBean();
+        if (!(self::$instance instanceof ConfigBean)) {
+            self::$instance = new ConfigBean();
+        }
         return self::$instance;
     }
 

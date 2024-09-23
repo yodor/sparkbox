@@ -3,7 +3,7 @@ include_once("beans/DBTableBean.php");
 
 class FAQSectionsBean extends DBTableBean
 {
-    protected $createString = "CREATE TABLE `faq_sections` (
+    protected string $createString = "CREATE TABLE `faq_sections` (
  `fqsID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `section_name` varchar(255) NOT NULL,
  PRIMARY KEY (`fqsID`),

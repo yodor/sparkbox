@@ -2,10 +2,10 @@
 
 class AuthToken
 {
-    const HASH = "hash";
-    const ID = "id";
+    const string HASH = "hash";
+    const string ID = "id";
 
-    const TOKEN_LENGTH = 32;
+    const int TOKEN_LENGTH = 32;
 
     /**
      * @var int
@@ -23,7 +23,7 @@ class AuthToken
         $this->hash = Authenticator::RandomToken(AuthToken::TOKEN_LENGTH);
     }
 
-    public function getID()
+    public function getID() : int
     {
         return $this->id;
     }
@@ -33,14 +33,14 @@ class AuthToken
         return $this->hash;
     }
 
-    public function storeCookies(string $contextName)
+    public function storeCookies(string $contextName) : void
     {
         //hash_hmac ( string $algo , string $data , string $key [, bool $raw_output = FALSE ] ) : string
         Session::SetCookie($contextName . "_" . AuthToken::HASH, $this->hash);
         Session::SetCookie($contextName . "_" . AuthToken::ID, $this->id);
     }
 
-    public function validateCookies(string $contextName)
+    public function validateCookies(string $contextName) : bool
     {
         if ($this->id < 1 || strlen($this->hash) != AuthToken::TOKEN_LENGTH) {
             debug("Token data invalid");

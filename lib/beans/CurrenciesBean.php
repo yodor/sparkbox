@@ -3,7 +3,7 @@ include_once("beans/DBTableBean.php");
 
 class CurrenciesBean extends DBTableBean
 {
-    protected $createString = "CREATE TABLE `currencies` (
+    protected string $createString = "CREATE TABLE `currencies` (
  `currencyID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `currency_code` varchar(3) COLLATE utf8_unicode_ci NOT NULL,
  `symbol` varchar(10) COLLATE utf8_unicode_ci NOT NULL,

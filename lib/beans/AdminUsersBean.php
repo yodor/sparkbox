@@ -4,7 +4,7 @@ include_once("beans/DBTableBean.php");
 class AdminUsersBean extends DBTableBean
 {
 
-    protected $createString = "CREATE TABLE `admin_users` (
+    protected string $createString = "CREATE TABLE `admin_users` (
  `userID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `email` varchar(255) CHARACTER SET ascii NOT NULL,
  `password` varchar(32) CHARACTER SET ascii NOT NULL,

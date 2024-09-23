@@ -4,7 +4,7 @@ include_once("beans/DBTableBean.php");
 class SiteTextsBean extends DBTableBean
 {
 
-    protected $createString = "
+    protected string $createString = "
 CREATE TABLE `site_texts` (
  `textID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `value` text COLLATE utf8_unicode_ci NOT NULL,

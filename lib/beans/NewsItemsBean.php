@@ -3,7 +3,7 @@ include_once("beans/DatedBean.php");
 
 class NewsItemsBean extends DatedBean
 {
-    protected $createString = "
+    protected string $createString = "
     CREATE TABLE `news_items` (
     `newsID` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `item_title` varchar(255) NOT NULL,

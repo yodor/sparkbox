@@ -4,7 +4,7 @@ include_once("beans/OrderedDataBean.php");
 class DynamicPagePhotosBean extends OrderedDataBean
 {
 
-    protected $createString = "CREATE TABLE `page_photos` (
+    protected string $createString = "CREATE TABLE `page_photos` (
  `ppID` int(10) unsigned NOT NULL AUTO_INCREMENT,
  `photo` longblob NOT NULL,
  `date_upload` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -353,7 +353,7 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    public function moveLeft(int $id, DBDriver $db = NULL)
+    public function moveLeft(int $id, DBDriver $db = NULL) : void
     {
         if (!$db) $db = $this->db;
 
@@ -404,10 +404,9 @@ class NestedSetBean extends DBTableBean
             throw $e;
         }
 
-        return TRUE;
     }
 
-    public function moveRight($id, $db = FALSE)
+    public function moveRight(int $id, DBDriver $db = NULL) : void
     {
         if (!$db) $db = $this->db;
 
@@ -456,7 +455,6 @@ class NestedSetBean extends DBTableBean
             throw $e;
         }
 
-        return TRUE;
     }
 
     /**

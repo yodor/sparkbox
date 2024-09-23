@@ -5,11 +5,9 @@ include_once("beans/AdminUsersBean.php");
 class AdminAuthenticator extends Authenticator
 {
 
-    public const CONTEXT_NAME = "context_admin";
-
     public function __construct()
     {
-        parent::__construct(AdminAuthenticator::CONTEXT_NAME, new AdminUsersBean());
+        parent::__construct(new AdminUsersBean());
     }
 
 }

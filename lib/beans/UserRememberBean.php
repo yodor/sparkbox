@@ -3,7 +3,7 @@ include_once("beans/DBTableBean.php");
 
 class UserRememberBean extends DBTableBean
 {
-    protected $createString = "
+    protected string $createString = "
 CREATE TABLE `user_remember` (
  `urID` int(10) unsigned NOT NULL auto_increment,
  `userID` int(10) unsigned NOT NULL,

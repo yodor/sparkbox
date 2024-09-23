@@ -19,7 +19,7 @@ class RawResult
         return isset($this->result[$key]);
     }
 
-    public function getAll() : array
+    public function toArray() : array
     {
         return $this->result;
     }

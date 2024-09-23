@@ -41,17 +41,14 @@
     /*   border-bottom:1px solid #cccccc; */
     border-top: 1px solid #cccccc;
 
-    padding-right: 15px;
+    /*padding-right: 15px;*/
 
 
 }
 
 .admin_menu .MenuBarItemRenderer[active="1"] .MenuItemLink {
     background-color: #b9b3a3;
-    -webkit-border-radius: 0 20px 20px 0;
-    -moz-border-radius: 0 20px 20px 0;
-    border-radius: 0 20px 20px 0;
-    margin-right: -15px;
+
     color: white;
     background-image: none;
     border-top: none;
@@ -114,32 +111,4 @@
     vertical-align: middle;
 }
 
-.icon_dashboard {
-    background-image: url("../images/admin/menu_icons/dashboard.png");
-    background-repeat: no-repeat;
-    background-position: center center;
-}
 
-.icon_content {
-    background-image: url("../images/admin/menu_icons/languages.png");
-    background-repeat: no-repeat;
-    background-position: center center;
-}
-
-.icon_registrations {
-    background-image: url("../images/admin/menu_icons/data_capture.png");
-    background-repeat: no-repeat;
-    background-position: center center;
-}
-
-.icon_settings {
-    background-image: url("../images/admin/menu_icons/page_navigation.png");
-    background-repeat: no-repeat;
-    background-position: center center;
-}
-
-.icon_seo {
-    background-image: url("../images/admin/menu_icons/seo.png");
-    background-repeat: no-repeat;
-    background-position: center center;
-}

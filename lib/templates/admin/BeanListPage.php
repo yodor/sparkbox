@@ -249,7 +249,7 @@ class BeanListPage extends AdminPageTemplate
         if (!$this->query) throw new Exception("Query not set yet");
 
         if (count($this->keyword_search->getForm()->getFields()) > 0) {
-            $this->items()->append($this->keyword_search);
+            $this->getPage()->getPageFilters()->items()->append($this->keyword_search);
         }
 
         $this->view = new TableView($this->query);

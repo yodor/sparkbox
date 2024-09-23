@@ -3,7 +3,7 @@ include_once("beans/DBTableBean.php");
 
 class SiteTextUsageBean extends DBTableBean
 {
-    protected $createString = "
+    protected string $createString = "
 CREATE TABLE `site_text_usage` (
  `stuID` int(10) unsigned NOT NULL auto_increment,
  `textID` int(10) unsigned NOT NULL,

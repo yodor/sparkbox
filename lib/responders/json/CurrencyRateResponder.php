@@ -50,11 +50,11 @@ class CurrencyRateResponder extends JSONResponder
             //forward rate
             $data_forward = array("srcID"=>$this->srcID, "dstID"=>$this->dstID, "rate"=>$this->rate);
 
-            if (!$bean->insert($data_forward, $db)) throw new Exception("Error updating forward quote:"."<HR>".$bean->getError());
+            if (!$bean->insert($data_forward, $db)) throw new Exception("Error updating forward quote:"."<HR>".$db->getError());
 
             $data_backward = array("dstID"=>$this->srcID, "srcID"=>$this->dstID, "rate"=>round(1.0/$this->rate,2));
 
-            if (!$bean->insert($data_backward, $db)) throw new Exception("Error updating backward quote:"."<HR>".$bean->getError());
+            if (!$bean->insert($data_backward, $db)) throw new Exception("Error updating backward quote:"."<HR>".$db->getError());
 
             $db->commit();
 

@@ -16,10 +16,10 @@ abstract class Authenticator
 
     protected SessionData $session;
 
-    public function __construct(string $contextName, DBTableBean $bean)
+    public function __construct(DBTableBean $bean)
     {
         $this->bean = $bean;
-        $this->session = new SessionData($contextName);
+        $this->session = new SessionData(get_class($this));
     }
 
     public static function HMAC(string $key, string $data, string $hash_algo = 'md5')

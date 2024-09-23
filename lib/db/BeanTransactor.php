@@ -271,9 +271,8 @@ class BeanTransactor extends SparkObject implements IBeanEditor
             debug("doing insert");
 
             $lastID = $this->bean->insert($this->values, $db);
-            if ($lastID < 1) {
-                throw new Exception("Unable to insert: " . $this->bean->getError());
-            }
+            if ($lastID < 1) throw new Exception("Unable to insert: " . $db->getError());
+
             $this->lastID = $lastID;
         }
 

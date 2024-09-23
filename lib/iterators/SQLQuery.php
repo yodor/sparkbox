@@ -5,9 +5,9 @@ class SQLQuery implements IDataIterator
 {
 
     /**
-     * @var SQLSelect
+     * @var SQLSelect|null
      */
-    public SQLSelect $select;
+    public ?SQLSelect $select;
 
     /**
      * @var DBDriver
@@ -40,7 +40,7 @@ class SQLQuery implements IDataIterator
      */
     protected ?DBTableBean $bean = null;
 
-    public function __construct(SQLSelect $select, string $primaryKey = "id", string $tableName = "")
+    public function __construct(?SQLSelect $select=null, string $primaryKey = "id", string $tableName = "")
     {
 
         $this->select = $select;
@@ -75,16 +75,26 @@ class SQLQuery implements IDataIterator
      * @return int Number of result rows
      * @throws Exception
      */
-    public function exec(): int
+    public function exec(?SQLStatement $statement = null): int
     {
         if ($this->res instanceof DBResult) {
             $this->res->free();
         }
 
-        //true or dbresult
-        $this->res = $this->db->query($this->select->getSQL());
+        $sql = "";
+        if ($statement instanceof SQLStatement) {
+            $sql = $statement->getSQL();
+        }
+        else if ($this->select instanceof SQLSelect) {
+            $sql = $this->select->getSQL();
+        }
+        else {
+            throw new Exception("No statement to execute");
+        }
+        //true or DBResult
+        $this->res = $this->db->query($sql);
 
-        $this->numResults = -1;
+        $this->numResults = 0;
 
         if ($this->res instanceof DBResult) {
             $this->numResults = $this->res->numRows();
@@ -94,7 +104,7 @@ class SQLQuery implements IDataIterator
     }
 
     /**
-     * TODO: Deprecated use nextResult
+     *
      * @return array|null
      * @throws Exception
      */
@@ -105,20 +115,25 @@ class SQLQuery implements IDataIterator
         $data = $this->res->fetch();
         if (is_array($data)) return $data;
 
-        $this->res->free();
-        $this->res = NULL;
+        $this->free();
+
         return null;
 
     }
 
+    /**
+     * @return RawResult|null
+     * @throws Exception
+     */
     public function nextResult() : ?RawResult
     {
         if (!($this->res instanceof DBResult)) throw new Exception("Not executed yet or no valid result");
 
         $data = $this->res->fetchResult();
         if ($data instanceof RawResult) return $data;
-        $this->res->free();
-        $this->res = NULL;
+
+        $this->free();
+
         return null;
     }
 

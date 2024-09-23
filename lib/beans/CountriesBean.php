@@ -3,7 +3,7 @@ include_once("beans/DBTableBean.php");
 
 class CountriesBean extends DBTableBean
 {
-    protected $createString = "
+    protected string $createString = "
 CREATE TABLE countries (
  countryID int(10) unsigned NOT NULL AUTO_INCREMENT,
  country_name varchar(250) NOT NULL,

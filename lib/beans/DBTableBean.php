@@ -25,7 +25,7 @@ abstract class DBTableBean
      * SQL to create this bean table into the DB
      * @var string
      */
-    protected $createString;
+    protected string $createString = "";
 
     /**
      * @var DBDriver
@@ -44,7 +44,6 @@ abstract class DBTableBean
      */
     protected SQLSelect $select;
 
-    protected string $error = "";
 
     /**
      * DBTableBean constructor. Specify the table name to work with in the '$table_name' parameter.
@@ -53,7 +52,7 @@ abstract class DBTableBean
      * @param DBDriver|null $dbdriver
      * @throws Exception
      */
-    public function __construct(string $table_name, DBDriver $dbdriver = NULL)
+    public function __construct(string $table_name, ?DBDriver $dbdriver = NULL)
     {
         $this->table = $table_name;
 
@@ -136,11 +135,6 @@ abstract class DBTableBean
     public function getTableName() : string
     {
         return $this->table;
-    }
-
-    public function getError(): string
-    {
-        return $this->error;
     }
 
     public function setDB(DBDriver $db) : void
@@ -226,15 +220,15 @@ abstract class DBTableBean
      */
     public function query(string ...$columns): SQLQuery
     {
-        $qry = new SQLQuery(clone $this->select, $this->prkey, $this->getTableName());
-        $qry->setDB($this->db);
-        $qry->setBean($this);
+        $select = clone $this->select;
         if (sizeof($columns)>0) {
-            $qry->select->fields()->reset();
-            $qry->select->fields()->set(...$columns);
+            $select->fields()->reset();
+            $select->fields()->set(...$columns);
         }
-        return $qry;
+
+        return $this->beanQuery($select);
     }
+
 
     /**
      * Create query that select all columns of this table
@@ -246,7 +240,7 @@ abstract class DBTableBean
     }
 
     /**
-     * Query the table where column '$field' = '$value'
+     * CQuery the table where column '$field' = '$value'
      * Result columns are the primary key, $field and all column names passed in $columns
      * @param string $field
      * @param string $value
@@ -259,20 +253,26 @@ abstract class DBTableBean
         $field = $this->db->escape($field);
         $value = $this->db->escape($value);
 
-        $qry = $this->query();
-        $qry->select->fields()->set($this->prkey);
-        $qry->select->fields()->set($field);
+        $select = clone $this->select;
+        $select->fields()->set($this->prkey);
+        $select->fields()->set($field);
+        $select->fields()->set(...$columns);
 
-        $qry->select->fields()->set(...$columns);
-
-        $qry->select->where()->add($field, "'$value'");
+        $select->where()->add($field, "'$value'");
         if ($limit > 0) {
-            $qry->select->limit = $limit;
+            $select->limit = $limit;
         }
 
-        return $qry;
+        return $this->beanQuery($select);
     }
 
+    protected function beanQuery(SQLSelect $select) : SQLQuery
+    {
+        $qry = new SQLQuery($select, $this->prkey, $this->getTableName());
+        $qry->setDB($this->db);
+        $qry->setBean($this);
+        return $qry;
+    }
     /**
      * Retrieve single result row where column '$column' has value '$value'
      * @param string $column
@@ -299,8 +299,8 @@ abstract class DBTableBean
     {
         $column = $this->db->escape($column);
 
-        $qry = $this->queryField($this->prkey, $id, 1);
-        $qry->select->fields()->set($this->prkey, "`$column`");
+        $qry = $this->queryField($this->prkey, $id, 1, $column);
+
         $qry->exec();
         if ($row = $qry->next()) {
             return $row[$column];
@@ -319,22 +319,12 @@ abstract class DBTableBean
      */
     public function getByID(int $id, string ...$columns)
     {
-        $qry = NULL;
-
         //use only columns passed in columns + the primary key
-        if (count($columns) > 0) {
-            $qry = $this->query();
-            $qry->select->fields()->set($this->prkey);
-            $qry->select->fields()->set(...$columns);
-        }
-        else {
-            //match all columns
-            $qry = $this->queryFull();
+        if (count($columns)<1) {
+            $columns = $this->columnNames();
         }
 
-        $qry->select->where()->add($this->prkey, $id);
-
-        $qry->select->limit = 1;
+        $qry = $this->queryField($this->prkey, $id, 1, ...$columns);
 
         $num = $qry->exec();
         if ($num < 1) throw new Exception("No such ID");
@@ -406,7 +396,6 @@ abstract class DBTableBean
 
             if ($use_transaction) {
                 debug("Rolling back DB transaction - Exception: " . $ex->getMessage() . " - DBError: " . $db->getError());
-                $this->error = $db->getError();
                 $db->rollback();
             }
 

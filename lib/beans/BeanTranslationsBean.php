@@ -4,7 +4,7 @@ include_once("beans/DBTableBean.php");
 class BeanTranslationsBean extends DBTableBean
 {
 
-    protected $createString = "
+    protected string $createString = "
 CREATE TABLE `translation_beans` (
  `btID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `table_name` varchar(50) CHARACTER SET utf8 NOT NULL,
