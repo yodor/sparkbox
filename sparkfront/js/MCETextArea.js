@@ -54,7 +54,6 @@ class MCETextArea extends Component {
             media_restrict: false,
 
             width: '100%',
-            height: '300px',
 
             //content_css: "/mycontent.css",
             content_style: "p { margin: 0; } body { line-height: 1; }",
