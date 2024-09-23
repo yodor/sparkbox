@@ -103,16 +103,16 @@ BODY {
 .admin_layout .page_area .page_caption .page_actions {
     display: inline-block;
     margin-right: 10px;
-    height: 30px;
+
     vertical-align: top;
 }
 
 .admin_layout .page_area .page_caption .page_actions .Action {
     display: inline-block;
     width: 30px;
-    height: 100%;
+    height: 30px;
     background-size: cover;
-    margin-bottom: -7px;
+
     margin-left: 2px;
     margin-right: 3px;
     vertical-align: top;
@@ -173,13 +173,17 @@ BODY {
     border-top:1px solid #cecece;
 }
 
-.admin_layout .page_area .page_area.products.list .TableView .viewport .ImageList {
+.admin_layout .page_area .TableView .viewport .ImageList {
     /*   max-width:120px; */
     display: inline-block;
 }
 
-.admin_layout .page_area .page_area.products.list .TableView .viewport .ImageList .Item {
+.admin_layout .page_area .TableView .viewport .ImageList .Item {
     display: inline-block;
+}
+
+.admin_layout .page_area .TableView .viewport .ImageList .Item IMG {
+    max-height:64px;
 }
 
 
@@ -329,3 +333,4 @@ BODY {
     vertical-align: top;
     display: block;
 }
+

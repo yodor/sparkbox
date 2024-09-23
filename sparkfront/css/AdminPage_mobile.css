@@ -3,8 +3,34 @@
     grid-template-rows: auto;
     grid-template-columns: auto;
 }
+.admin_layout .left_menu {
+    background:none;
+    border-bottom:1px solid black;
+    padding-top:0.5em;
+    padding-bottom:0.5em;
+    margin-bottom:0.5em;
+}
+.admin_layout .left_menu .admin_header {
+    float:right;
+    background:none;
+    color:black;
+    height:auto;
+    max-height:inherit;
+    padding:0;
+    margin-right:0.5em;
+}
+.admin_layout .left_menu .admin_header * {
+    display: inline-block;
+    margin-left:1em;
 
-
+}
+.admin_layout .page_area {
+    padding:0;
+}
+.admin_layout .page_area .page_filters {
+    padding-left:0.5em;
+    padding-right:0.5em;
+}
 .InputField.TextField input[type='text'] {
     font-size: 1.1em;
 }
@@ -55,16 +81,24 @@
     display: inherit;
 }
 
-
-.GalleryViewItemRenderer {
-    margin-right: 0px;
+.GalleryView {
     display: block;
 }
 
-.GalleryViewItemRenderer .image_slot .ImagePopup IMG {
-    width: 100%;
+.GalleryViewItem {
+    margin: 0;
+    display: block;
 }
+.GalleryViewItem .image_slot {
+    display:block;
+    width:auto;
+    height:auto;
 
+}
+.GalleryViewItem .image_slot IMG {
+    width:100%;
+    max-width:100%;
+}
 
 .TableView {
     display: block;
@@ -97,12 +131,12 @@
     font-size: 1.2em;
     padding-left: 0;
     padding-right: 0;
-
+    border:0;
 }
 
 .TableView .viewport .TableCellRenderer {
-    text-align: left;
-
+    text-align: left !important;
+    border:0 !important;
 
 }
 
@@ -122,6 +156,8 @@
 
 .TableView .viewport TD:not([title='']):before {
     content: attr(title) ": ";
+    color:#bbbbbb;
+
 }
 
 .TableView .viewport .ImageCellRenderer {
@@ -131,6 +167,19 @@
 .TableView .viewport .ImageCellRenderer:not([title='']):before {
     content: attr(title) ": ";
     display: block;
+}
+.TableView .viewport .ImageList {
+    display: block !important;
+}
+
+.TableView .viewport .ImageList .Item {
+    display: block !important;
+    padding: 3px;
+
+}
+.TableView .viewport .ImageList .Item IMG {
+    width:100%;
+    max-height:inherit !important;
 }
 
 .TableView .viewport .ActionsCellRenderer {
@@ -142,7 +191,7 @@
 }
 
 .TableView .viewport .ActionsCellRenderer .actions_list {
-    text-align: right;
+    text-align: center;
     white-space: normal;
 }
 
@@ -150,17 +199,14 @@
     display: inline-block;
 
 }
-
-.TableView .viewport .ActionsCellRenderer .actions_list .Action[action*='Separator'] {
+.TableView .viewport .ActionsCellRenderer .actions_list .Action[action='Row'] {
+   display: inline-block;
+}
+.TableView .viewport .ActionsCellRenderer .actions_list .Action[action='Row']:before {
+    content: "|";
     color: #cccccc;
-    font-weight: bold;
-    padding-left: 2px;
-    padding-right: 3px;
 }
 
-.TableView .viewport .ActionsCellRenderer .actions_list .Action[action='RowSeparator'] {
-    display: block;
-}
 
 .TableView .viewport .ActionsCellRenderer:not([title='']):before {
     content: attr(title) ": ";
@@ -175,12 +221,8 @@
     display: none;
 }
 
-.TableView .viewport .ImageList {
-    display: block;
-}
 
-.TableView .viewport .ImageList .Item {
-    display: inline-block;
-    padding: 3px;
-
+.mceEditor > table {
+    width:100% !important;
+    max-width:100% !important;
 }

@@ -15,7 +15,6 @@
     margin-right: 5px;
     margin-left: 5px;
 
-
 }
 
 .MenuBar .toggle {
@@ -67,6 +66,7 @@
 .MenuBar .MenuBarComponent .MenuBarItemRenderer {
     padding-left: 0px;
     padding-right: 0px;
+    background-color: #efefef;
 }
 
 .MenuBar .MenuBarComponent .MenuBarItemRenderer .MenuItemLink {

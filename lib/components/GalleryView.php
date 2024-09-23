@@ -30,6 +30,9 @@ class GalleryView extends Container
     public function __construct(DBTableBean $bean, ?SQLQuery $query=NULL)
     {
         parent::__construct();
+
+
+
         $this->bean = $bean;
 
         if (!is_null($query)) {
@@ -42,7 +45,8 @@ class GalleryView extends Container
         if (strcmp_isset("view", "list")) {
 
             $view = new TableView($qry);
-            $this->view = $view;
+            $view->addClassName("GalleryView");
+            $view->addClassName("ListMode");
 
             $view->addColumn(new TableColumn("position", "#"));
             $view->addColumn(new TableColumn("photo", "Photo"));
@@ -68,7 +72,9 @@ class GalleryView extends Container
         else {
 
             $view = new ItemView($qry);
-            $this->view = $view;
+
+            $view->addClassName("GalleryView");
+            $view->addClassName("GridMode");
 
             $renderer = new GalleryViewItem($this);
             $renderer->setPhotoSize(256, -1);
@@ -83,6 +89,8 @@ class GalleryView extends Container
 
         }
 
+        $this->view = $view;
+
         if ($this->bean instanceof OrderedDataBean) {
             $view->setDefaultOrder(" position ASC ");
         }
@@ -92,6 +100,7 @@ class GalleryView extends Container
         $this->initActions();
 
         $this->wrapper_enabled = false;
+
 
         $this->items()->append($this->view);
 
