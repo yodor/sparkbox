@@ -53,7 +53,11 @@ class BeanListPage extends AdminPageTemplate
         $this->keyword_search->processInput();
 
         if ($this->keyword_search->isProcessed()) {
-            $this->keyword_search->getForm()->prepareClauseCollection("OR")->copyTo($this->query->select->where());
+
+            $clauses = $this->keyword_search->getForm()->prepareClauseCollection("OR");
+            //$clauses->copyTo($this->query->select->where());
+            $this->query->select->having = $clauses->getSQL("");
+
         }
 
 

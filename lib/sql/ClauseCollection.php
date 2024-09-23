@@ -67,13 +67,11 @@ class ClauseCollection extends SparkList implements ISQLGet
 
     }
 
-    public function getSQL(): string
+    public function getSQL(string $prepend = "WHERE"): string
     {
-        $result = "";
+        if ($this->count() <1) return "";
 
-        if ($this->count() <1) return $result;
-
-        $result .= " WHERE ";
+        $result = " $prepend ";
 
         $last_clause = NULL;
         $iterator = $this->iterator();
