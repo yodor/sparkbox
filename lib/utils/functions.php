@@ -223,7 +223,7 @@ function renderExceptionDetails($error)
 
 }
 
-function constructSiteTitleArray($path) : array
+function constructSiteTitleArray(array $path) : array
 {
     $path = array_reverse($path);
     $title = array();
@@ -238,7 +238,7 @@ function constructSiteTitleArray($path) : array
     return $title;
 }
 
-function constructSiteTitle($path)
+function constructSiteTitle(array $path) : string
 {
     $title = constructSiteTitleArray($path);
 

@@ -240,13 +240,15 @@ abstract class DBTableBean
     }
 
     /**
-     * CQuery the table where column '$field' = '$value'
-     * Result columns are the primary key, $field and all column names passed in $columns
-     * @param string $field
-     * @param string $value
-     * @param int $limit
-     * @param string ...$columns
-     * @return SQLQuery
+     * Construct SQLSelect querying the table for column '$field' = '$value'
+     * Result columns names are the primary key, '$field' and all column names passed in $columns list
+     * SQLQuery is initialized using the resulting SQLSelect, '$this' bean and '$this->db' and returned from this method call
+     * @param string $field Column being matched
+     * @param string $value Value to match the column value with
+     * @param int $limit Limit results count in the limit clause
+     * @param string ...$columns Additional result columns for the query
+     * @return SQLQuery Initialized with resulting select and using beanQuery method
+     * @throws Exception
      */
     public function queryField(string $field, string $value, int $limit = 0, string ...$columns): SQLQuery
     {
@@ -273,8 +275,9 @@ abstract class DBTableBean
         $qry->setBean($this);
         return $qry;
     }
+
     /**
-     * Retrieve single result row where column '$column' has value '$value'
+     * Retrieve single result where column '$column' has value '$value'
      * @param string $column
      * @param string $value
      * @return array|null
@@ -291,7 +294,7 @@ abstract class DBTableBean
      * Retrieve the value of column '$column' where primary key value = '$id'
      * Return NULL if no matching result is found
      * @param int $id
-     * @param string $field
+     * @param string $column
      * @return string|null
      * @throws Exception
      */
@@ -317,7 +320,7 @@ abstract class DBTableBean
      * @return array|null
      * @throws Exception
      */
-    public function getByID(int $id, string ...$columns)
+    public function getByID(int $id, string ...$columns) : ?array
     {
         //use only columns passed in columns + the primary key
         if (count($columns)<1) {
@@ -340,7 +343,7 @@ abstract class DBTableBean
      * @return array|null
      * @throws Exception
      */
-    public function getByRef(string $column, int $value, string ...$columns)
+    public function getByRef(string $column, int $value, string ...$columns): ?array
     {
 
         $qry = $this->queryField($column, $value, 1, ...$columns);
@@ -489,7 +492,7 @@ abstract class DBTableBean
 
     }
 
-    public function needQuotes(string $key, &$value = "")
+    public function needQuotes(string $key, &$value = "") : bool
     {
         $storage_type = $this->columns[$key];
 

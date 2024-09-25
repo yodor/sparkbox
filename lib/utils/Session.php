@@ -1,14 +1,15 @@
 <?php
 
-/**
- * Class Session
- * Session/Cookie access
- */
 class Session
 {
     protected static bool $is_started = false;
 
     const string ALERT = "alert";
+
+    private function __construct()
+    {
+
+    }
 
     public static function Start() : void
     {
@@ -17,16 +18,28 @@ class Session
             Session::$is_started = TRUE;
             debug("Starting session ID: " . session_id());
         }
-
     }
 
     public static function Destroy() : void
     {
         if (Session::$is_started) {
+            //Unset individual session variables
             foreach ($_SESSION as $key => $value) {
                 unset($_SESSION[$key]);
             }
-            session_write_close();
+            //Reset the session array
+            $_SESSION = array();
+
+            //Destroy the session
+            session_destroy();
+
+            //Delete the session cookie
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+
+            //Verify session file deletion (if file-based storage)
+            unlink(session_save_path() . '/' . session_id());
+
             Session::$is_started = FALSE;
         }
 

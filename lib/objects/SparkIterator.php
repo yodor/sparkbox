@@ -40,5 +40,10 @@ class SparkIterator implements ISparkIterator
         }
         return null;
     }
+
+    public function pos() : int
+    {
+        return $this->pos;
+    }
 }
 ?>

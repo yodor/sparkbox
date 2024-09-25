@@ -5,9 +5,11 @@ include_once("beans/UsersBean.php");
 class UserAuthenticator extends Authenticator
 {
 
+    public const CONTEXT_NAME = "UserContext";
+
     public function __construct()
     {
-        parent::__construct(new UsersBean());
+        parent::__construct(UserAuthenticator::CONTEXT_NAME, new UsersBean());
     }
 
 }

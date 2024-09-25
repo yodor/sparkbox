@@ -1,24 +1,28 @@
 <?php
 include_once("components/Component.php");
-include_once("utils/menu/MainMenu.php");
+include_once("utils/menu/MenuItemList.php");
 include_once("components/renderers/menus/MenuBarItemRenderer.php");
 
 class MenuBarComponent extends Container
 {
+
     /**
-     * @var MainMenu
+     * @var MenuItemList
      */
-    protected MainMenu $main_menu;
+    protected MenuItemList $menu;
+
 
     /**
      * @var MenuBarItemRenderer
      */
     protected MenuBarItemRenderer $ir_baritem;
 
+
     /**
      * @var Component
      */
     protected Component $bar;
+
 
     /**
      * @var Component
@@ -29,18 +33,15 @@ class MenuBarComponent extends Container
 
     protected bool $separator_enabled = true;
 
-    public function __construct(MainMenu $menu)
+    public function __construct(MenuItemList $menu)
     {
         parent::__construct(false);
 
-        $this->main_menu = $menu;
+        $this->menu = $menu;
         $this->ir_baritem = new MenuBarItemRenderer();
 
-        $bean_name = $menu->getMenuBeanClass();
-
-        if ($bean_name) {
-
-            $this->setAttribute("source", $bean_name);
+        if ($this->menu->getName()) {
+            $this->setAttribute("menu", $this->menu->getName());
         }
 
         $this->bar = new Component(false);
@@ -54,7 +55,6 @@ class MenuBarComponent extends Container
         $this->toggle->setTagName("A");
         $this->toggle->setContents( "<div></div>");
         $this->toggle->setComponentClass("toggle");
-
 
     }
 
@@ -88,9 +88,9 @@ class MenuBarComponent extends Container
         $this->separator_enabled = $mode;
     }
 
-    public function getMainMenu(): MainMenu
+    public function getMenu(): MenuItemList
     {
-        return $this->main_menu;
+        return $this->menu;
 
     }
 
@@ -123,23 +123,21 @@ class MenuBarComponent extends Container
 
     protected function renderImpl()
     {
-        $menu_items = $this->main_menu->getMenuItems();
 
-        $total_items = count($menu_items);
+        $itemCount = $this->menu->count();
 
-        for ($a = 0; $a < $total_items; $a++) {
-            $item = $menu_items[$a];
-
+        $iterator = $this->menu->iterator();
+        while ($item = $iterator->next()) {
+            if (! ($item instanceof MenuItem)) continue;
             $this->ir_baritem->setMenuItem($item);
-            $this->ir_baritem->setAttribute("position",$a);
+            $this->ir_baritem->setAttribute("position", $iterator->pos());
             $this->ir_baritem->render();
             if ($this->separator_enabled) {
-                $this->ir_baritem->renderSeparator($a, $total_items);
+                $this->ir_baritem->renderSeparator($iterator->pos(), $itemCount);
             }
-
         }
-
     }
+
     public function render()
     {
         parent::render();
@@ -148,7 +146,7 @@ class MenuBarComponent extends Container
             onPageLoad(function () {
                 let menu_bar = new MenuBarComponent();
                 menu_bar.attachWith("<?php echo $this->getName();?>");
-
+                menu_bar.showSelected();
             });
         </script>
         <?php

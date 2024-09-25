@@ -33,7 +33,7 @@ class ForgotPasswordProcessor extends FormProcessor
 
             $userID = $users->email2id($email);
             $update_row["password"] = md5($random_pass);
-            if (!$users->update($userID, $update_row, $db)) throw new Exception("Unable to update records: " . $db->getError());
+            $users->update($userID, $update_row, $db);
 
             $fpm->send();
 

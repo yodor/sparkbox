@@ -1,7 +1,7 @@
 <?php
-include_once("utils/menu/MainMenu.php");
+include_once("utils/menu/MenuItemList.php");
 
-class PageSessionMenu extends MainMenu
+class PageSessionMenu extends MenuItemList
 {
 
     protected AuthContext $context;
@@ -10,30 +10,32 @@ class PageSessionMenu extends MainMenu
 
     public function __construct(AuthContext $context, array $main_menu)
     {
-        parent::__construct();
+        parent::__construct($main_menu);
 
         $this->context = $context;
-
-        //assign initial menu
-        $this->main_menu = $main_menu;
 
         $this->dataKey = get_class($this);
 
         //check if there is already a menu in session and use it instead or put the inital menu to the session
         if ($context->getData()->contains($this->dataKey)) {
-            $this->main_menu = $context->getData()->get($this->dataKey);
+            $this->elements = $context->getData()->get($this->dataKey);
         }
         else {
-            $context->getData()->set($this->dataKey, $this->main_menu);
+            $context->getData()->set($this->dataKey, $this->elements);
         }
     }
 
-    //set selected menu items and add submenu 'arr_menu' to last selected node
-    public function update($menuItems = array()) : void
+    /**
+     * Find active and clear append with $menuItems
+     * @param array $menuItems
+     * @return void
+     */
+    public function update(array $menuItems = array()) : void
     {
 
-        //find last active item
-        $lastActive = $this->getBySelectedState();
+        //find the MenuItem that was lastly selected
+        $lastActive = $this->getSelected();
+
         if ($lastActive instanceof MenuItem) {
             debug("'lastActive' MenuItem: '" . $lastActive->getName() . "' - URL: " . $lastActive->getHref());
         }
@@ -41,27 +43,26 @@ class PageSessionMenu extends MainMenu
             debug("'lastActive' MenuItem is NULL");
         }
 
-        $this->selectActive();
+        $selectedItem = $this->selectActive();
 
-        $selectedItem = $this->getSelectedItem();
         if ($selectedItem instanceof MenuItem) {
-
-            $selectedURL = new URL($selectedItem->getHref());
-
+            //clear and append selected with $menuItems
             if (count($menuItems) > 0) {
 
-                $itemURL = new URL();
-                $selectedItem->clearSubmenu();
+                $selectedURL = new URL($selectedItem->getHref());
+                $selectedItem->clear();
 
                 foreach ($menuItems as $idx => $item) {
-                    if ($item instanceof MenuItem) {
-                        $href = $item->getHref();
 
-                        if (!str_starts_with($href, "/")) {
-                            $item->setHref($selectedURL->getScriptPath() . "/" . $href);
-                        }
-                        $selectedItem->addMenuItem($item);
+                    if (! ($item instanceof MenuItem)) continue;
+
+                    $href = $item->getHref();
+                    //TODO: check usage
+                    if (!str_starts_with($href, "/")) {
+                        $item->setHref($selectedURL->getScriptPath() . "/" . $href);
                     }
+                    $selectedItem->append($item);
+
                 }
             }
         }
@@ -70,12 +71,13 @@ class PageSessionMenu extends MainMenu
 
             if ($lastActive instanceof MenuItem) {
                 debug("Selecting 'lastActive' MenuItem as the current active");
-                $this->setSelectedItem($lastActive);
+                $lastActive->setSelected(true);
             }
 
         }
 
-        $this->context->getData()->set($this->dataKey, $this->main_menu);
+        //store
+        $this->context->getData()->set($this->dataKey, $this->elements);
 
     }
 

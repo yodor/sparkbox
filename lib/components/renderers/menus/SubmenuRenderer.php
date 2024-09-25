@@ -41,12 +41,9 @@ class SubmenuRenderer extends Component implements IMenuItemRenderer
         //clone
         $menu_item = clone $this->menu_item;
 
-        $submenu = $menu_item->getSubmenu();
-
-        $items_count = count($submenu);
-
-        for ($a = 0; $a < $items_count; $a++) {
-            $curr = $submenu[$a];
+        $iterator = $menu_item->iterator();
+        while ($curr = $iterator->next()) {
+            if (! ($curr instanceof MenuItem)) continue;
 
             $this->ir_menuitem->setMenuItem($curr);
 
@@ -54,14 +51,14 @@ class SubmenuRenderer extends Component implements IMenuItemRenderer
 
             $this->ir_menuitem->renderImpl();
 
-            if (count($curr->getSubmenu()) > 0) {
+            if ($curr->count() > 0) {
                 $this->setMenuItem($curr);
                 $this->render();
             }
 
             $this->ir_menuitem->finishRender();
-
         }
+
     }
 
 }

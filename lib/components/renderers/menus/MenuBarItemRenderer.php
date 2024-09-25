@@ -30,9 +30,7 @@ class MenuBarItemRenderer extends MenuItemRenderer
 
         parent::setMenuItem($item);
 
-        $submenu = $item->getSubmenu();
-
-        if (count($submenu) > 0) {
+        if ($item->count() > 0) {
             $this->setAttribute("have_submenu", "1");
         }
         else {
@@ -57,7 +55,7 @@ class MenuBarItemRenderer extends MenuItemRenderer
 
         echo "</div>";
 
-        if (count($this->item->getSubmenu()) > 0) {
+        if ($this->item->count() > 0) {
             if ($this->ir_submenu) {
 
                 $this->ir_submenu->setMenuItem($this->item);

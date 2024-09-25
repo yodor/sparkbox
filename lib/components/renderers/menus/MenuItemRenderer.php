@@ -60,7 +60,7 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
             $contents = "<div class='MenuIcon $icon'></div>" . $contents;
         }
 
-        if (count($item->getSubmenu()) > 0) {
+        if ($item->count() > 0) {
             $contents .= "<div class='handle'></div>";
         }
         $this->linkTag->setContents($contents);

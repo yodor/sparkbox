@@ -21,10 +21,8 @@ class UserGroupsBean extends DBTableBean
         parent::__construct("user_groups");
     }
 
-    public function isMemberOf(int $userID, int $groupID)
+    public function isMemberOf(int $userID, int $groupID) : bool
     {
-        $userID = (int)$userID;
-        $groupID = (int)$groupID;
         $qry = $this->query();
         $qry->select->where()->add("userID", $userID)->add("groupID", $groupID);
         $qry->select->fields()->set("userID");

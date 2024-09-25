@@ -1,13 +1,14 @@
 <?php
 include_once("objects/ISparkCollection.php");
 
-class SparkList implements ISparkCollection
+class SparkList extends SparkObject implements ISparkCollection
 {
 
     protected array $elements = array();
 
     public function __construct()
     {
+        parent::__construct();
         $this->elements = array();
     }
 

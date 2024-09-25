@@ -9,6 +9,7 @@ include_once("utils/SessionData.php");
  */
 abstract class Authenticator
 {
+
     /**
      * @var DBTableBean
      */
@@ -16,10 +17,10 @@ abstract class Authenticator
 
     protected SessionData $session;
 
-    public function __construct(DBTableBean $bean)
+    public function __construct(string $context_name, DBTableBean $bean)
     {
         $this->bean = $bean;
-        $this->session = new SessionData(get_class($this));
+        $this->session = new SessionData($context_name);
     }
 
     public static function HMAC(string $key, string $data, string $hash_algo = 'md5')
@@ -217,7 +218,7 @@ abstract class Authenticator
      * Serialize the token to the SessionData of this Authenticator
      * @param int $id
      */
-    protected function createAuthToken(int $id)
+    protected function createAuthToken(int $id) : void
     {
         debug($this, "Regenerating session ID");
 
@@ -236,7 +237,7 @@ abstract class Authenticator
 
     }
 
-    protected function fillSessionData(array $row)
+    protected function fillSessionData(array $row) : void
     {
         debug($this, "fill common SessionData");
 

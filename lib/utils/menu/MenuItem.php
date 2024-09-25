@@ -1,8 +1,8 @@
 <?php
-include_once("utils/menu/MainMenu.php");
 include_once("objects/SparkObject.php");
+include_once("utils/menu/MenuItemList.php");
 
-class MenuItem extends SparkObject
+class MenuItem extends MenuItemList
 {
     protected string $href = "";
     protected string $title = "";
@@ -16,8 +16,6 @@ class MenuItem extends SparkObject
     protected bool $disabled = false;
 
     protected string $target = "";
-
-    protected array $childNodes = array();
 
     protected bool $need_translate = false;
 
@@ -36,11 +34,29 @@ class MenuItem extends SparkObject
         $this->icon = $icon;
         $this->target = "";
         $this->need_translate = TRUE;
-        $this->childNodes = array();
         $this->selected = false;
         $this->disabled = false;
         $this->tooltip = $tooltip;
         $this->id = -1;
+
+    }
+
+    public function append(SparkObject $object): void
+    {
+        parent::append($object);
+        $object->setParent($this);
+    }
+
+    public function prepend(SparkObject $object): void
+    {
+        parent::prepend($object);
+        $object->setParent($this);
+    }
+
+    public function insert(SparkObject $object, int $index): void
+    {
+        parent::insert($object, $index);
+        $object->setParent($this);
     }
 
     public function setID(int $id) : void
@@ -63,8 +79,6 @@ class MenuItem extends SparkObject
         $this->tooltip = $text;
     }
 
-    //flag for renderers to handle the title translation themselves - enableTranslation(true) - default - uses tr($title)
-    //enableTranslation(false) -  title is already translated translation in MainMenu::constructMenuItems 
     public function enableTranslation(bool $mode) : void
     {
         $this->need_translate = $mode;
@@ -90,9 +104,22 @@ class MenuItem extends SparkObject
         return $this->selected;
     }
 
+    /**
+     * Set the selection state of this item and all the direct parents to $mode
+     * @param bool $mode
+     * @return void
+     */
     public function setSelected(bool $mode) : void
     {
         $this->selected = $mode;
+
+        $current = $this;
+        while ($parent = $current->getParent()) {
+            if ($parent instanceof MenuItem) {
+                $parent->setSelected($mode);
+                $current = $parent;
+            }
+        }
     }
 
     public function setTarget(string $target) : void
@@ -103,23 +130,6 @@ class MenuItem extends SparkObject
     public function getTarget() : string
     {
         return $this->target;
-    }
-
-    public function clearSubmenu() : void
-    {
-        $this->childNodes = array();
-    }
-
-    public function addMenuItem(MenuItem $m) : void
-    {
-        $this->childNodes[] = $m;
-        $m->setParent($this);
-
-    }
-
-    public function getSubmenu() : array
-    {
-        return $this->childNodes;
     }
 
     public function getHref() : string
@@ -152,6 +162,24 @@ class MenuItem extends SparkObject
         $this->w = $width;
         $this->h = $height;
     }
+
+    protected function matchItems(Closure $matcher) : ?MenuItem
+    {
+        //exhaust the submenu items first
+        $result = parent::matchItems($matcher);
+
+        //none from submenu
+        if (is_null($result)) {
+            //try this item
+            if ($matcher($this, new URL(urldecode($this->getHref())))) {
+                $result = $this;
+            }
+        }
+
+        return $result;
+
+    }
+
 }
 
 ?>

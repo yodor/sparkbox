@@ -4,7 +4,7 @@ class SparkObject implements jsonSerializable
     /**
      * @var SparkObject|null
      */
-    protected ?SparkObject $parent;
+    protected ?SparkObject $parent = null;
 
     /**
      * @var string
@@ -65,6 +65,11 @@ class SparkObject implements jsonSerializable
      * @return mixed
      */
     public function jsonSerialize(): mixed
+    {
+        return get_object_vars($this);
+    }
+
+    public function __serialize(): array
     {
         return get_object_vars($this);
     }

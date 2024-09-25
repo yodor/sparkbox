@@ -46,9 +46,10 @@ class ConfigBean extends DBTableBean
     {
 
         $key = DBConnections::Open()->escape($key);
+        $section = DBConnections::Open()->escape($this->section);
 
         $qry = $this->queryField("config_key", $key, 1, "config_val");
-        $qry->select->where()->add("section", "'" . $this->section . "'");
+        $qry->select->where()->add("section", "'$section'");
         $result = $default_value;
 
         if ($qry->exec() && $data = $qry->next()) {

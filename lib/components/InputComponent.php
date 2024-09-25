@@ -6,15 +6,8 @@ include_once("input/ArrayDataInput.php");
 class InputComponent extends Component
 {
 
-    /**
-     * @var DataInput
-     */
     protected ?DataInput $input = null;
-
-    /**
-     * @var InputLabel
-     */
-    protected $label_renderer;
+    protected ?InputLabel $label_renderer = null;
 
     public function __construct(DataInput $input = NULL)
     {
@@ -25,7 +18,7 @@ class InputComponent extends Component
         }
     }
 
-    public function setDataInput(DataInput $input)
+    public function setDataInput(DataInput $input) : void
     {
         $this->input = $input;
 
@@ -53,17 +46,17 @@ class InputComponent extends Component
         return $arr;
     }
 
-    public function setLabelRenderer(InputLabel $label_renderer)
+    public function setLabelRenderer(InputLabel $label_renderer) : void
     {
         $this->label_renderer = $label_renderer;
     }
 
-    public function getLabelRenderer(): InputLabel
+    public function getLabelRenderer(): ?InputLabel
     {
         return $this->label_renderer;
     }
 
-    public function getInput(): DataInput
+    public function getInput(): ?DataInput
     {
         return $this->input;
     }

@@ -168,10 +168,8 @@ class SparkAdminPage extends SparkPage
 
     protected function constructTitle(): void
     {
-        //previous entries
-        //$navItems = $this->navigation->entries();
-        //echo ("NavEntry count: ".count($navItems));
-        $dynmenu = $this->menu_bar->getMainMenu();
+
+        $dynmenu = $this->menu_bar->getMenu();
         $dynmenu->update($this->page_menu);
 
         $selected_path = $dynmenu->getSelectedPath();
@@ -227,7 +225,7 @@ class SparkAdminPage extends SparkPage
 
             echo "<div class='page_area' >";
 
-            $dynmenu = $this->menu_bar->getMainMenu();
+            $dynmenu = $this->menu_bar->getMenu();
 
             if (!$this->name) {
                 $arr = $dynmenu->getSelectedPath();
