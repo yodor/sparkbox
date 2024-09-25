@@ -38,7 +38,7 @@ class Session
             setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 
             //Verify session file deletion (if file-based storage)
-            unlink(session_save_path() . '/' . session_id());
+            //unlink(session_save_path() . '/' . session_id());
 
             Session::$is_started = FALSE;
         }

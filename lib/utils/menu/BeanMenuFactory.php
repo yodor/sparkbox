@@ -5,7 +5,6 @@ include_once("utils/menu/MenuItemList.php");
 class BeanMenuFactory
 {
 
-
     /**
      * @var MenuItemList|null
      */
@@ -34,106 +33,114 @@ class BeanMenuFactory
      * During construct() is used to set the href of the MenuItem using DataParameter ($value_key)
      * @var URL|null
      */
-    protected ?URL $target_url;
+    protected ?URL $target_url = null;
 
+    protected ?SQLSelect $select = null;
 
     public function __construct(NestedSetBean $bean, string $label_key = "menu_title", string $value_key = "menuID")
     {
+
+        if (!$bean->haveColumn($value_key)) throw new Exception("Value key '$value_key' not found in bean columns");
+        if (!$bean->haveColumn($label_key)) throw new Exception("Label key '$label_key' not found in bean columns");
+
         $this->bean = $bean;
 
         $this->label_key = $label_key;
         $this->value_key = $value_key;
 
-        if (!$this->bean->haveColumn($this->value_key)) throw new Exception("Value key '$this->value_key' not found in bean columns");
-        if (!$this->bean->haveColumn($this->label_key)) throw new Exception("Label key '$this->label_key' not found in bean columns");
+        $this->select = clone $this->bean->select();
 
+        $this->select->fields()->set($this->value_key, $this->label_key);
+
+        if ($this->bean->haveColumn("link")) {
+            $this->select->fields()->set("link");
+        }
+
+        $this->select->order_by = " lft ASC ";
     }
 
     /**
      * Use this href to set the MenuItem $href during construct()
      * The url is parametrized with query parameter = $this->bean->key()
+     * Overrides link column from menu if present
      * @param string $build_href
      */
     public function setTargetURL(string $build_href) : void
     {
         $this->target_url = new URL($build_href);
         $this->target_url->add(new DataParameter($this->bean->key()));
+        $this->select->fields()->unset("link");
     }
 
     public function menu() : MenuItemList
     {
-        return new MenuItemList($this->construct());
+        $menu = new MenuItemList();
+        $this->fill($menu);
+        return $menu;
     }
 
     /**
-     * @param int $parentID
-     * @param MenuItem|NULL $parent
-     * @return array
+     * @param MenuItemList $parent
+     * @return void
      * @throws Exception
      */
-    public function construct(int $parentID = 0, MenuItem $parent = NULL) : ?array
+    protected function fill(MenuItemList $parent) : void
     {
 
-        $items_top = array();
-
-        $qry = $this->bean->queryField("parentID", $parentID);
-        $qry->select->fields()->set($this->value_key, $this->label_key);
-
-        if ($this->bean->haveColumn("link")) {
-            $qry->select->fields()->set("link");
+        $parentID = 0;
+        if ($parent instanceof MenuItem) {
+            $parentID = $parent->getID();
         }
 
-        $qry->select->order_by = " lft ASC ";
+        $this->select->where()->clear();
+        $this->select->where()->add("parentID", $parentID);
 
-        $total_items = $qry->exec();
+        $qry = new SQLQuery();
 
-        //debug("Total #$total_items MenuItems with parentID=$parentID");
+        if ($qry->exec($this->select) < 1) return;
 
-        if ($total_items < 1) return null;
-
-        while ($data = $qry->next()) {
-
-            $menuID = (int)$data[$this->value_key];
-
-            trbean($menuID, $this->label_key, $data, $this->bean->getTableName());
-
-            $menu_link = "";
-            if (isset($data["link"])) {
-                $menu_link = $data["link"];
-
-                if (str_starts_with($menu_link, "//")) {
-                    debug("Using external URL");
-                }
-                // - url is internal root
-                else if (str_starts_with($menu_link, "/")) {
-                    $menu_link = LOCAL . $menu_link;
-                }
-            }
-            else if ($this->target_url instanceof URL) {
-                $this->target_url->setData($data);
-                $menu_link = $this->target_url->toString();
-            }
-
-            //debug("MenuItem ID:$menuID using menu_link: " . $menu_link);
-
-            $item = new MenuItem($data[$this->label_key], $menu_link);
-            $item->setID($menuID);
-
-            $item->enableTranslation(FALSE);
-
-            if ($parentID == 0) {
-                $items_top[] = $item;
-            }
-            if ($parent) {
-                $parent->append($item);
-            }
-
-            $this->construct($menuID, $item);
+        while ($result = $qry->nextResult()) {
+            $parent->append($this->createItem($result));
         }
 
-        if ($parentID == 0) {
-            return $items_top;
+        $qry->free();
+
+        $iterator = $parent->iterator();
+        while ($item = $iterator->next()) {
+            if ($item instanceof MenuItem) {
+                $this->fill($item);
+            }
         }
-        return null;
+
+    }
+
+    protected function createItem(RawResult $result) : MenuItem
+    {
+        $menuID = (int)$result->get($this->value_key);
+        trbean($menuID, $this->label_key, $result->arrayRef(), $this->bean->getTableName());
+
+        $href = "";
+
+        if ($this->target_url instanceof URL) {
+            $this->target_url->setData($result->arrayRef());
+            $href = $this->target_url->toString();
+        }
+        else if ($result->isSet("link")) {
+            $href = $result->get("link");
+
+            if (str_starts_with($href, "//")) {
+                debug("Using external URL");
+            }
+            // - url is internal root
+            else if (str_starts_with($href, "/")) {
+                $href = LOCAL . $href;
+            }
+        }
+
+        $item = new MenuItem($result->get($this->label_key), $href);
+        $item->setID($menuID);
+        $item->enableTranslation(FALSE);
+
+        return $item;
     }
 }

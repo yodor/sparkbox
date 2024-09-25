@@ -24,6 +24,11 @@ class RawResult
         return $this->result;
     }
 
+    public function &arrayRef() : array
+    {
+        return $this->result;
+    }
+
     public function keys() : array
     {
         return array_keys($this->result);
