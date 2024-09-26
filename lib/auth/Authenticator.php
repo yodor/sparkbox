@@ -112,6 +112,7 @@ abstract class Authenticator
 
         if (!($token instanceof AuthToken)) {
             debug($this, "AuthContext un-serialize failed");
+            Session::Remove(SessionData::AUTH_TOKEN);
             return NULL;
         }
 
@@ -119,6 +120,7 @@ abstract class Authenticator
 
         if ($token->validateCookies($this->session->name()) !== TRUE) {
             debug($this, "AuthContext validation failed");
+            Session::Remove(SessionData::AUTH_TOKEN);
             return NULL;
         }
 

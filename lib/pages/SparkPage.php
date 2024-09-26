@@ -245,8 +245,6 @@ class SparkPage extends HTMLPage implements IActionCollection
                     if (strlen($this->loginURL) > 0) {
 
                         debug("Redirecting to login page URL: " . $this->loginURL);
-                        Session::Set("login.redirect", URL::Current()->toString());
-
                         header("Location: $this->loginURL");
                         exit;
                     }
