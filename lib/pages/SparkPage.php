@@ -314,8 +314,6 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function startRender()
     {
-        debug("--- Head Buffer Started ---");
-
         //head output buffer
         ob_start(null, 4096);
 
@@ -335,10 +333,7 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         //push head until including the body tag - browser can fetch css and scripts while we do the body contents
         ob_end_flush();
-        debug("--- Head Buffer Sent ---");
-        //first output to client - no session start further below - headers sent
 
-        debug("--- Page Buffer Start ---");
         //body output buffer
         ob_start(null, 4096);
     }
@@ -354,7 +349,6 @@ class SparkPage extends HTMLPage implements IActionCollection
     {
         //still inside the body section
 
-        debug("--- FinishRender ---");
         //append message dialog templates
         $this->renderPageComponents();
 
@@ -366,8 +360,6 @@ class SparkPage extends HTMLPage implements IActionCollection
         //</html> ended here
 
         ob_end_flush();
-        debug("--- Page Buffer Sent ---");
-
 
         if (PAGE_CACHE_ENABLED) {
             register_shutdown_function(function(){

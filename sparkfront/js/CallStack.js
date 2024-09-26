@@ -21,7 +21,7 @@ class CallStack {
                 }
             }
             catch (e) {
-                console.log("Error calling load function: " + e.stackTrace);
+                console.log("Error calling load function: " + e);
             }
         }
         this.functions = persistent;

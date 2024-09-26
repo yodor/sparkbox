@@ -146,7 +146,6 @@ class MenuBarComponent extends Container
             onPageLoad(function () {
                 let menu_bar = new MenuBarComponent();
                 menu_bar.attachWith("<?php echo $this->getName();?>");
-                menu_bar.showSelected();
             });
         </script>
         <?php

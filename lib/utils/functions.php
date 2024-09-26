@@ -281,7 +281,7 @@ function getArrayText(array $arr)
 
 function debug($obj, $msg = NULL, $arr = NULL)
 {
-    if (!(isset($GLOBALS["DEBUG_OUTPUT"]) && $GLOBALS["DEBUG_OUTPUT"])) return;
+    if (!isset($GLOBALS["DEBUG_OUTPUT"]) && !$GLOBALS["DEBUG_OUTPUT"]) return;
 
     $class = "";
     $message = "";
