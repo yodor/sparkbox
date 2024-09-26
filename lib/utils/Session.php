@@ -30,12 +30,12 @@ class Session
             //Reset the session array
             $_SESSION = array();
 
-            //Destroy the session
-            session_destroy();
-
             //Delete the session cookie
             $params = session_get_cookie_params();
             setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+
+            //Destroy the session
+            session_destroy();
 
             //Verify session file deletion (if file-based storage)
             //unlink(session_save_path() . '/' . session_id());
