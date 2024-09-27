@@ -71,6 +71,15 @@ class HTMLHead extends Component
     {
         $this->head_scripts[] = $ihead_script;
     }
+
+    public function findScript(string $class_name) : array
+    {
+        $result = array();
+        foreach ($this->head_scripts as $script) {
+            if ($script instanceof $class_name) $result[] = $script;
+        }
+        return $result;
+    }
     /**
      *  Add meta tag to be rendered into this page.
      * @param $name string The name attribute to add to the Meta collection

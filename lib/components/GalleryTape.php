@@ -11,13 +11,13 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
     /**
      * @var ImagePopup
      */
-    protected $image_popup;
+    protected ImagePopup $image_popup;
 
     public function __construct()
     {
         parent::__construct();
         $this->image_popup = new ImagePopup();
-        $this->image_popup->setPhotoSize(-1, 128);
+        $this->image_popup->getImage()->setPhotoSize(-1, 128);
 
         $this->url = URL::Current();
 
@@ -59,17 +59,17 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 
     public function setPhotoSize(int $width, int $height): void
     {
-        $this->image_popup->setPhotoSize($width, $height);
+        $this->image_popup->getImage()->setPhotoSize($width, $height);
     }
 
     public function getPhotoWidth(): int
     {
-        return $this->image_popup->getPhotoWidth();
+        return $this->image_popup->getImage()->getPhotoWidth();
     }
 
     public function getPhotoHeight(): int
     {
-        return $this->image_popup->getPhotoHeight();
+        return $this->image_popup->getImage()->getPhotoHeight();
     }
 
     protected function renderImpl()

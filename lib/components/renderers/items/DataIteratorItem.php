@@ -2,7 +2,7 @@
 include_once("components/Component.php");
 include_once("utils/IDataResultProcessor.php");
 
-abstract class DataIteratorItem extends Component implements IDataResultProcessor
+abstract class DataIteratorItem extends Container implements IDataResultProcessor
 {
     //use value of data array key '$value_key' to construct the value of this item
     protected string $value_key = "";

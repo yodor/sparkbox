@@ -1,74 +1,49 @@
 <?php
-include_once("components/Component.php");
+include_once("components/Action.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("storage/StorageItem.php");
+include_once("components/Image.php");
 
-class ImagePopup extends Component implements IPhotoRenderer
+class ImagePopup extends Action
 {
-
-    protected string $thumb_url = "";
-    protected string $popup_url = "";
-
-    protected int $width = -1;
-    protected int $height = 256;
-
-    protected StorageItem $storageItem;
-
-    protected bool $lazyLoad = true;
 
     protected Component $image;
 
     public function __construct()
     {
         parent::__construct();
-        $this->tagName = "A";
+        $this->setComponentClass("ImagePopup");
 
-        $this->storageItem = new StorageItem();
-        $this->image = new Component();
-        $this->image->setClosingTagRequired(false);
-        $this->image->setTagName("IMG");
-        $this->image->setAttribute("itemprop", "image");
+        $this->image = new Image();
+        $this->image->setStorageItem(new StorageItem());
+
+        $this->items()->append($this->image);
+
     }
 
-    public function getImage() : Component
+    public function getImage() : Image
     {
         return $this->image;
     }
 
-    public function setLazyLoadEnabled(bool $mode) : void
-    {
-        $this->lazyLoad = $mode;
-        if ($mode) {
-            $this->image->setAttribute("loading", "lazy");
-        }
-        else {
-            $this->image->removeAttribute("loading");
-        }
-    }
-
-    public function isLazyLoadEnabled() : bool
-    {
-        return $this->lazyLoad;
-    }
-
-    public function setRelation(string $relation)
+    public function setRelation(string $relation) : void
     {
         $this->setAttribute("relation", $relation);
     }
 
-    public function getRelation(): ?string
+    public function getRelation(): string
     {
         return $this->getAttribute("relation");
     }
 
-    public function setStorageItem(StorageItem $storageItem)
+    public function setStorageItem(StorageItem $storageItem) : void
     {
-        $this->storageItem = $storageItem;
+        $this->image->setStorageItem($storageItem);
     }
 
     public function getStorageItem() : StorageItem
     {
-        return $this->storageItem;
+        return $this->image->getStorageItem();
     }
 
     public function requiredStyle(): array
@@ -85,47 +60,37 @@ class ImagePopup extends Component implements IPhotoRenderer
         return $arr;
     }
 
-    public function setID(int $id)
+    public function setID(int $id) : void
     {
-        $this->storageItem->id = $id;
+        parent::setID($id);
+        $this->image->getStorageItem()->id = $id;
     }
 
-    public function getID(): int
+    public function setBeanClass(string $beanClass) : void
     {
-        return $this->storageItem->id;
+        $this->image->getStorageItem()->className = $beanClass;
     }
 
-    public function setBeanClass(string $beanClass)
+    public function setBean(DBTableBean $bean) : void
     {
-        $this->storageItem->className = $beanClass;
-    }
-
-    public function setBean(DBTableBean $bean)
-    {
-        $this->storageItem->className = get_class($bean);
+        $this->image->getStorageItem()->className = get_class($bean);
     }
 
     public function getBeanClass(): string
     {
-        return $this->storageItem->className;
+        return $this->image->getStorageItem()->className;
     }
 
     protected function processAttributes(): void
     {
         parent::processAttributes();
-        $this->thumb_url = $this->storageItem->hrefImage($this->width, $this->height);
-        $this->popup_url = $this->storageItem->hrefImage();
 
         //if ($this->mode == ImagePopup::MODE_BACKGROUND) {
         //    $this->setStyleAttribute("background-image", "url({$this->thumb_url})");
         //}
 
-        $this->setAttribute("itemID", $this->storageItem->id);
-        $this->setAttribute("itemClass", $this->storageItem->className);
-    }
-
-    protected function renderImpl()
-    {
+        $this->setAttribute("itemID", $this->image->getStorageItem()->id);
+        $this->setAttribute("itemClass", $this->image->getStorageItem()->className);
 
         $titleValue = $this->getAttribute("title");
         $alt = $this->image->getAttribute("alt");
@@ -135,27 +100,8 @@ class ImagePopup extends Component implements IPhotoRenderer
             }
         }
 
-        $this->image->setAttribute("src", $this->thumb_url);
-        $this->image->render();
-
     }
 
-    public function setPhotoSize(int $width, int $height): void
-    {
-        // TODO: Implement setPhotoSize() method.
-        $this->width = $width;
-        $this->height = $height;
-    }
-
-    public function getPhotoWidth(): int
-    {
-        return $this->width;
-    }
-
-    public function getPhotoHeight(): int
-    {
-        return $this->height;
-    }
 }
 
 ?>

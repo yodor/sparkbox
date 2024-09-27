@@ -104,7 +104,9 @@ class Action extends DataIteratorItem
     {
         parent::processAttributes();
 
-        $this->setAttribute("href", $this->url);
+        if ($this->url->toString()) {
+            $this->setAttribute("href", $this->url->toString());
+        }
 
     }
 

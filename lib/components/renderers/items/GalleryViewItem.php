@@ -100,17 +100,17 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
     public function setPhotoSize(int $width, int $height): void
     {
-        $this->image_popup->setPhotoSize($width, $height);
+        $this->image_popup->getImage()->setPhotoSize($width, $height);
     }
 
     public function getPhotoWidth(): int
     {
-        return $this->image_popup->getPhotoWidth();
+        return $this->image_popup->getImage()->getPhotoWidth();
     }
 
     public function getPhotoHeight(): int
     {
-        return $this->image_popup->getPhotoHeight();
+        return $this->image_popup->getImage()->getPhotoHeight();
     }
 
     public function setActions(ActionCollection $actions)
