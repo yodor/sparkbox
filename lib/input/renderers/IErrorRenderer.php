@@ -2,13 +2,13 @@
 
 interface IErrorRenderer
 {
-    const MODE_TOOLTIP = 1;
-    const MODE_SPAN = 2;
-    const MODE_NONE = 0;
+    const int MODE_TOOLTIP = 1;
+    const int MODE_SPAN = 2;
+    const int MODE_NONE = 0;
 
-    public function processErrorAttributes();
-    public function setErrorRenderMode(int $mode);
-    public function getErrorRenderMode():int;
+    public function setErrorRenderMode(int $mode) : void;
+
+    public function getErrorRenderMode() : int;
 }
 
 ?>

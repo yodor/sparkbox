@@ -1,0 +1,36 @@
+<?php
+include_once("components/renderers/items/DataIteratorItem.php");
+
+/**
+ * Rendered multiple times for each iterator step value
+ */
+class SelectItem extends DataIteratorItem
+{
+    public function __construct()
+    {
+        parent::__construct(false);
+        $this->setComponentClass("");
+
+        $this->tagName = "OPTION";
+    }
+
+    public function processAttributes(): void
+    {
+        parent::processAttributes();
+
+        if ($this->isSelected()) {
+            $this->setAttribute("SELECTED", "");
+        }
+        else {
+            $this->removeAttribute("SELECTED");
+        }
+
+        $this->setAttribute("value", attributeValue((string)$this->value));
+        //allow html tags here
+        $this->setContents($this->label);
+    }
+
+}
+
+?>
+

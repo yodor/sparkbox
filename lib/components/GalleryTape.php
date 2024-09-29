@@ -6,7 +6,6 @@ include_once("components/renderers/IDataIteratorRenderer.php");
 
 class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 {
-    protected URL $url;
 
     /**
      * @var ImagePopup
@@ -15,26 +14,31 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 
     public function __construct()
     {
-        parent::__construct();
-        $this->image_popup = new ImagePopup();
-        $this->image_popup->getImage()->setPhotoSize(-1, 128);
-
-        $this->url = URL::Current();
+        parent::__construct(false);
 
         $this->setComponentClass("slot");
+
+        $this->image_popup = new ImagePopup();
+        $this->image_popup->image()->setPhotoSize(-1, 128);
+
+        $this->items()->append($this->image_popup);
+    }
+
+    public function setID(int $id) : void
+    {
+        parent::setID($id);
+        $this->image_popup->setID($id);
     }
 
     public function setData(array $data) : void
     {
         parent::setData($data);
-
-        $this->url->setData($data);
-
+        $this->image_popup->setData($data);
     }
 
     public function setItemURL(URL $url) : void
     {
-        $this->url = $url;
+        $this->image_popup->setURL($url);
     }
 
     /**
@@ -43,7 +47,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
      */
     public function setBeanClass(string $beanClass) : void
     {
-        $this->image_popup->setBeanClass($beanClass);
+        $this->image_popup->image()->getStorageItem()->className = $beanClass;
     }
 
     /**
@@ -59,29 +63,19 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 
     public function setPhotoSize(int $width, int $height): void
     {
-        $this->image_popup->getImage()->setPhotoSize($width, $height);
+        $this->image_popup->image()->setPhotoSize($width, $height);
     }
 
     public function getPhotoWidth(): int
     {
-        return $this->image_popup->getImage()->getPhotoWidth();
+        return $this->image_popup->image()->getPhotoWidth();
     }
 
     public function getPhotoHeight(): int
     {
-        return $this->image_popup->getImage()->getPhotoHeight();
+        return $this->image_popup->image()->getPhotoHeight();
     }
 
-    protected function renderImpl()
-    {
-        if (!$this->image_popup->getBeanClass()) throw new Exception("Bean class not set");
-        if ($this->id < 1) throw new Exception("ID not set");
-        if ($this->url) {
-            $this->image_popup->setAttribute("href", $this->url);
-        }
-        $this->image_popup->setID($this->id);
-        $this->image_popup->render();
-    }
 }
 
 class GalleryTape extends Component implements IDataIteratorRenderer

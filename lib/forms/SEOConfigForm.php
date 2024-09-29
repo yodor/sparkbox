@@ -12,14 +12,14 @@ class SEOConfigForm extends InputForm
 
         $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "meta_description", "Meta Description", 0);
         $rend = $field->getRenderer();
-        $rend->setInputAttribute("rows", 10);
-        $rend->setInputAttribute("cols", 80);
+        $rend->input()?->setAttribute("rows", 10);
+        $rend->input()?->setAttribute("cols", 80);
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "meta_keywords", "Meta Keywords", 0);
         $rend = $field->getRenderer();
-        $rend->setInputAttribute("rows", 10);
-        $rend->setInputAttribute("cols", 80);
+        $rend->input()?->setAttribute("rows", 10);
+        $rend->input()?->setAttribute("cols", 80);
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "googleID_analytics", "Google Analytics ID (eg: UA-123456789-1)", 0);

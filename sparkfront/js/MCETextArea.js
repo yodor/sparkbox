@@ -3,7 +3,7 @@ class MCETextArea extends Component {
     constructor() {
         super();
         //all TEXTAREA elements having CSS class MCETextArea
-        this.setClass("TEXTAREA.MCETextArea");
+        this.setClass(".MCETextArea TEXTAREA");
 
         this.image_browser = new MCEImageBrowserDialog();
         this.image_browser.setMCETextArea(this);

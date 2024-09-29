@@ -13,6 +13,7 @@ class Container extends Component
     {
         parent::__construct($chained_component_class);
         $this->items = new ComponentCollection();
+        $this->items->setParent($this);
 
     }
 

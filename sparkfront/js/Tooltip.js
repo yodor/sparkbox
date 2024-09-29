@@ -30,34 +30,34 @@ function processTooltipContent(elm) {
     if (!elm) elm = "body";
 
     $(elm).find("[tooltip]").each(function (index) {
-        var is_tooltip = $(this).data("tooltip_attached");
+        let is_tooltip = $(this).data("tooltip_attached");
         if (is_tooltip) return;
 
         $(this).data("tooltip_attached", 1);
 
-        var str = $(this).attr("tooltip");
+        let str = $(this).attr("tooltip");
 
         if (!str) return;
 
-        var trig = $(this);
+        let trig = $(this);
 
         if (trig.attr("error")) {
             str = "Error: " + str;
         }
 
         if (trig.hasClass("MCETextArea")) {
-            var fields = trig.children().last();
+            let fields = trig.children().last();
             if (fields.get(0)) trig = $(fields);
         }
 
-        trig.hover(
-            function (event) {
-                showTooltip(str, event);
-            },
-            function (event) {
-                hideTooltip();
-            }
-        );
+        trig.on("mouseenter", function (event){
+            showTooltip(str, event);
+        });
+
+        trig.on("mouseleave", function (event){
+            hideTooltip();
+        });
+
 
     });
 }

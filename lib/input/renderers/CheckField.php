@@ -1,26 +1,6 @@
 <?php
 include_once("input/renderers/DataIteratorField.php");
-include_once("components/renderers/items/DataIteratorItem.php");
-
-class CheckItem extends DataIteratorItem
-{
-
-    public function renderImpl()
-    {
-        //TODO: find a way to set individual attributes
-        $attrs = $this->prepareAttributes();
-
-        //hackish! - force submit of unchecked checkbox
-        echo "<input type='hidden' name='$this->name' value=''>";
-
-        echo "<input type='checkbox' value='$this->value' name='$this->name' $attrs ";
-        if ($this->isSelected()) echo "CHECKED";
-
-        echo ">";
-        echo "<span>$this->label</span>";
-    }
-
-}
+include_once("input/renderers/CheckItem.php");
 
 class CheckField extends DataIteratorField
 {
@@ -28,30 +8,26 @@ class CheckField extends DataIteratorField
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-        $this->setItemRenderer(new CheckItem(false));
+        $this->setItemRenderer(new CheckItem());
     }
 
-    public function renderImpl()
+    protected function renderItems() : void
     {
-
         if (!$this->iterator) {
 
             $item = clone $this->item;
 
             $item->setValue(1);
-            $item->setName($this->input->getName());
-            $item->setSelected($this->input->getValue() ? TRUE : FALSE);
+            $item->setName($this->dataInput->getName());
+            $item->setSelected((bool)$this->dataInput->getValue());
 
-            echo "<div class='FieldElements'>";
             $item->render();
-            echo "</div>";
-
         }
         else {
-            parent::renderImpl();
+            parent::renderItems();
         }
-
     }
+
 
 }
 

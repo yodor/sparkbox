@@ -101,6 +101,23 @@ class ComponentCollection extends SparkList {
 
     }
 
+    public function getByContainerClass(string $name): ?Container
+    {
+        $comparator = function (Component $cmp, string $name)  {
+            if (strcmp($name, $cmp->getComponentClass()) == 0) {
+                return TRUE;
+            }
+            return FALSE;
+        };
+
+        $idx = $this->index($comparator, $name);
+        if (is_null($idx)) return null;
+        $object = $this->get($idx);
+        if ($object instanceof Container) return $object;
+        return null;
+
+    }
+
     public function removeByAction(string $action) : void
     {
         debug("removeByAction: $action");

@@ -68,7 +68,7 @@ $defines->set("SITE_DOMAIN", $site_domain);
 //URL of this site without path and ending slash '/'
 $defines->set("SITE_URL", $protocol . $site_domain . $location);
 $defines->set("TITLE_PATH_SEPARATOR", " :: ");
-$defines->set("COOKIE_DOMAIN", $site_domain); // or .domain.com
+$defines->set("COOKIE_DOMAIN", ".".$site_domain); // or .domain.com
 $defines->set("STORAGE_EXTERNAL", $protocol . $site_domain . $location . "/storage.php");
 
 // error_reporting(E_ALL & ~E_WARNING);
@@ -190,5 +190,11 @@ include_once("utils/language.php");
 // debug("Exported Globals: ",$constants["user"]);
 //global site wide function
 @include_once("config/globals.php");
+
+include_once("utils/ErrorHandler.php");
+function exception_error_handler(int $errNo, string $errStr, string $errFile, int $errLine) {
+    throw new ErrorHandler($errNo, $errStr, $errFile, $errLine);
+}
+//set_error_handler("exception_error_handler", E_ALL);
 
 ?>

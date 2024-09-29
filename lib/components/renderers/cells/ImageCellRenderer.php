@@ -47,7 +47,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         }
 
         $this->image_popup = new ImagePopup();
-        $this->image_popup->getImage()->setPhotoSize($width, $height);
+        $this->image_popup->image()->setPhotoSize($width, $height);
         $this->image_popup->setAttribute("relation", "ImageCellRenderer");
 
     }
@@ -79,17 +79,17 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     public function setPhotoSize(int $width, int $height): void
     {
-        $this->image_popup->getImage()->setPhotoSize($width, $height);
+        $this->image_popup->image()->setPhotoSize($width, $height);
     }
 
     public function getPhotoWidth(): int
     {
-        return $this->image_popup->getImage()->getPhotoWidth();
+        return $this->image_popup->image()->getPhotoWidth();
     }
 
     public function getPhotoHeight(): int
     {
-        return $this->image_popup->getImage()->getPhotoHeight();
+        return $this->image_popup->image()->getPhotoHeight();
     }
 
     public function setAction(Action $action)
@@ -156,7 +156,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
         foreach ($this->items as $idx => $item) {
 
-            $this->image_popup->setStorageItem($item);
+            $this->image_popup->image()->setStorageItem($item);
 
             $this->image_popup->setClassName("Item");
 

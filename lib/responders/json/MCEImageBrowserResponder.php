@@ -34,7 +34,7 @@ class ImageDimensionForm extends InputForm
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::CHECKBOX, "enable_popup", "Enable Popup", 0);
-        $field->getRenderer()->setInputAttribute("tooltip", "Enable fullscreen view");
+        $field->getRenderer()->input()?->setAttribute("tooltip", "Enable fullscreen view");
         $this->addInput($field);
     }
 }
@@ -52,7 +52,6 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
     public function __construct()
     {
         parent::__construct("mceImage");
-
 
         //do not require thumbnail. just create the imagestorage of the upload data
         $this->setPhotoSize(128, -1);

@@ -3,7 +3,7 @@ class JSONRequestResult  {
         this.time = new Date();
         this.json_result = null;
         this.status = null;
-        this.response = null;
+        //this.response = null;
     }
 }
 
@@ -22,6 +22,8 @@ class JSONRequest extends SparkObject {
     static EVENT_STARTED = "started";
     static EVENT_SUCCESS = "success";
     static EVENT_ERROR = "error";
+    static EVENT_PROGRESS = "progress";
+    static EVENT_FINISHED = "finished";
 
     constructor() {
         super();
@@ -37,6 +39,7 @@ class JSONRequest extends SparkObject {
 
         this.xmlRequest.onreadystatechange = this.onReadyStateChange.bind(this);
 
+        this.xmlRequest.upload.onprogress = this.onProgress.bind(this);
         /**
          * @type {URL}
          */
@@ -50,7 +53,6 @@ class JSONRequest extends SparkObject {
 
         this.async = true;
         this.request_time = null;
-        this.progress_display = null;
 
         this.parameters = new URLSearchParams();
 
@@ -241,13 +243,13 @@ class JSONRequest extends SparkObject {
                 this.form_data.append(key, value);
             }.bind(this));
             this.xmlRequest.send(this.form_data);
-            this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
+
 
         } else {
             //console.log("Using GET: " + responderURL.href);
             this.xmlRequest.open("GET", responderURL.href, this.async);
             this.xmlRequest.send(null);
-            this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
+
         }
 
     }
@@ -268,13 +270,40 @@ class JSONRequest extends SparkObject {
         showAlert(result.description);
     }
 
+    /**
+     *
+     * @param event ProgressEvent
+     */
+    onProgress(event) {
+        let progress_event = new SparkEvent(JSONRequest.EVENT_PROGRESS, this);
+        progress_event.computable = event.lengthComputable;
+        progress_event.loaded = event.loaded;
+        progress_event.total = event.total;
+        let percent = 0;
+        if (progress_event.computable && event.total>0) {
+            percent = (event.loaded / event.total) * 100;
+        }
+        progress_event.percent = percent;
+        this.notify(progress_event);
+    }
 
+    // 0	UNSENT	Client has been created. open() not called yet.
+    // 1	OPENED	open() has been called.
+    // 2	HEADERS_RECEIVED	send() has been called, and headers and status are available.
+    // 3	LOADING	Downloading; responseText holds partial data.
+    // 4	DONE	The operation is complete.
     onReadyStateChange() {
+
+        if (this.xmlRequest.readyState == 1) {
+            this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
+            return;
+        }
 
         if (this.xmlRequest.readyState != 4) return;
 
-        var status = this.xmlRequest.status;
-        var response = this.xmlRequest.responseText;
+
+        let status = this.xmlRequest.status;
+        let response = this.xmlRequest.responseText;
 
         try {
 
@@ -282,14 +311,20 @@ class JSONRequest extends SparkObject {
                 throw "HTTP Error: " + status;
             }
 
-            let json_result = JSON && JSON.parse(response) || $.parseJSON(response); //json_parse(ret);
+            //let isObject = response.constructor === Object;
 
-            if (json_result.status != "OK") {
-                throw json_result.message;
+            let json_response = response;
+
+            if (response.constructor === String) {
+                json_response = JSON && JSON.parse(response);
+            }
+
+            if (json_response.status != "OK") {
+                throw json_response.message;
             }
 
             let request_result = new JSONRequestResult();
-            request_result.json_result = json_result;
+            request_result.json_result = json_response;
             request_result.status = status;
             request_result.response = response;
             this.request_result = request_result;
@@ -310,5 +345,7 @@ class JSONRequest extends SparkObject {
             this.notify(new SparkEvent(JSONRequest.EVENT_ERROR, this));
             this.onError(request_error);
         }
+
+        this.notify(new SparkEvent(JSONRequest.EVENT_FINISHED, this));
     }
 }

@@ -17,7 +17,7 @@ class ClosureComponent extends Container
         return $this->closure;
     }
 
-    public function setClosure(Closure $callback)
+    public function setClosure(Closure $callback) : void
     {
         $this->closure = $callback;
     }

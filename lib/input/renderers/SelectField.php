@@ -1,45 +1,6 @@
 <?php
 include_once("input/renderers/DataIteratorField.php");
-include_once("components/renderers/items/DataIteratorItem.php");
-
-class SelectOption extends DataIteratorItem
-{
-    public function __construct()
-    {
-        parent::__construct(false);
-        $this->setComponentClass("");
-
-        $this->tagName = "OPTION";
-    }
-
-    public function setSelected(bool $mode) : void
-    {
-        parent::setSelected($mode);
-        if ($mode) {
-            $this->setAttribute("SELECTED", "");
-        }
-        else {
-            $this->removeAttribute("SELECTED");
-        }
-    }
-
-    public function processAttributes(): void
-    {
-        $this->setAttribute("value", (string)$this->value);
-        if ($this->isSelected()) {
-            $this->setAttribute("SELECTED", "");
-        }
-        else {
-            $this->removeAttribute("SELECTED");
-        }
-    }
-
-    public function renderImpl()
-    {
-        echo $this->label;
-    }
-
-}
+include_once("input/renderers/SelectItem.php");
 
 class SelectField extends DataIteratorField
 {
@@ -50,18 +11,24 @@ class SelectField extends DataIteratorField
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-        $this->setItemRenderer(new SelectOption());
+        $this->setItemRenderer(new SelectItem());
+
+        $this->items()->clear();
+
+        $this->input = new Input();
+        $this->input->setTagName("SELECT");
+        $this->input->setClosingTagRequired(TRUE);
+
+//        $this->elements->items()->clear();
+//        $this->elements->items()->append($this->input);
+
+        $this->input->items()->append(new ClosureComponent($this->renderItems(...), false));
+
+        $this->items()->append($this->input);
     }
 
-    protected function startRenderItems()
+    protected function renderItems() : void
     {
-
-        parent::startRenderItems();
-
-        $attrs = $this->prepareInputAttributes();
-
-        echo "<select $attrs>";
-
         //prepare the default select value
         if ($this->na_label) {
 
@@ -84,18 +51,12 @@ class SelectField extends DataIteratorField
             $item->render();
 
         }
-    }
-
-    protected function finishRenderItems()
-    {
-
-        echo "</select>";
-        parent::finishRenderItems();
+        parent::renderItems();
     }
 
     protected function isModelSelected(): bool
     {
-        $field_values = $this->input->getValue();
+        $field_values = $this->dataInput->getValue();
         $selected = FALSE;
         if (is_array($field_values)) {
             foreach ($field_values as $idx => $field_value) {
@@ -124,15 +85,15 @@ class SelectMultipleField extends SelectField
         //use SelectField css
         $this->setClassName("SelectField");
 
-        $this->setInputAttribute("multiple", "");
+        $this->input->setAttribute("multiple", "");
 
         $this->na_label = "";
     }
 
-    protected function startRenderItems()
+    protected function processAttributes(): void
     {
-        $this->setInputAttribute("name", $this->input->getName() . "[]");
-        parent::startRenderItems();
+        parent::processAttributes();
+        $this->input->setName($this->dataInput->getName()."[]");
     }
 
 }

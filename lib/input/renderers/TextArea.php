@@ -4,15 +4,27 @@ include_once("input/renderers/InputField.php");
 class TextArea extends InputField
 {
 
-    public function renderImpl()
+    public function __construct(DataInput $dataInput)
     {
-        $field_attrs = $this->prepareInputAttributes();
+        parent::__construct($dataInput);
+    }
 
-        echo "<textarea $field_attrs>";
+    protected function createInput() : Input
+    {
+        $input = new Input();
+        $input->setTagName("TEXTAREA");
+        $input->setClosingTagRequired(true);
 
-        echo htmlentities(mysql_real_unescape_string($this->input->getValue()), ENT_QUOTES, "UTF-8");
+        return $input;
+    }
 
-        echo "</textarea>";
+    protected function processAttributes(): void
+    {
+        parent::processAttributes();
+
+        $dataValue = attributeValue((string)$this->dataInput->getValue());
+
+        $this->input->setContents($dataValue);
     }
 
 }

@@ -64,11 +64,30 @@ class SparkList extends SparkObject implements ISparkCollection
         }
     }
 
+    /**
+     * Remove all occurrences of $object from this list
+     * @param SparkObject $object
+     * @return void
+     */
     public function removeAll(SparkObject $object) : void
     {
         $keys = array_keys($this->elements, $object);
         foreach ($keys as $key) {
             unset($this->elements[$key]);
+        }
+    }
+
+    /**
+     * Remove first occurrence of $object from this list
+     * @param SparkObject $object
+     * @return void
+     */
+    public function removeObject(SparkObject $object) : void
+    {
+        $keys = array_keys($this->elements, $object);
+        foreach ($keys as $key) {
+            unset($this->elements[$key]);
+            break;
         }
     }
 

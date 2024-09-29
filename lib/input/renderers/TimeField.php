@@ -13,8 +13,8 @@ class TimeField extends InputField
 
     protected function renderImpl()
     {
-        $field_value = $this->input->getValue();
-        $field_name = $this->input->getName();
+        $field_value = $this->dataInput->getValue();
+        $field_name = $this->dataInput->getName();
 
         $hour = -1;
         $minute = -1;

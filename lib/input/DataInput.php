@@ -192,7 +192,7 @@ class DataInput
 
 
     /**
-     * Get the error text for this inpu
+     * Get the error text for this input
      * @return string
      */
     public function getError() : string

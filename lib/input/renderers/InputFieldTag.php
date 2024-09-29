@@ -7,36 +7,32 @@ abstract class InputFieldTag extends InputField
 
     protected $skip_value_types = array("file");
 
-    protected function processInputAttributes()
+    public function __construct(DataInput $input)
     {
-        parent::processInputAttributes();
+        parent::__construct($input);
+    }
 
-        $process_value = true;
+    protected function createInput() : Input
+    {
+        return new Input();
+    }
 
-        if ($this->haveInputAttribute("type")) {
+    protected function processAttributes() : void
+    {
+        parent::processAttributes();
 
-            $type = $this->getInputAttribute("type");
+        $type = $this->input->getType();
 
-            if (in_array($type, $this->skip_value_types)) {
-                $process_value = false;
-                debug("Disable value setting for type: ".$type);
-            }
-
+        if (!$type || !in_array($type, $this->skip_value_types) ) {
+            $dataValue = attributeValue((string)$this->dataInput->getValue());
+            $this->input->setValue($dataValue);
         }
-
-        if ($process_value) {
-            $field_value = mysql_real_unescape_string($this->input->getValue());
-            $this->setInputAttribute("value", $field_value);
+        else {
+            debug("Non value attribute input type: " . $type);
         }
-
 
     }
 
-    protected function renderImpl()
-    {
-        $field_attr = $this->prepareInputAttributes();
-        echo "<input $field_attr>";
-    }
 
 }
 

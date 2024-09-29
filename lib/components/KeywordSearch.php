@@ -23,7 +23,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         $this->form = new KeywordSearchForm();
 
         $input = $this->form->getInput("keyword");
-        $input->getRenderer()->setInputAttribute("placeholder", $input->getLabel());
+        $input->getRenderer()->input()?->setAttribute("placeholder", $input->getLabel());
 
         parent::__construct($this->form);
 

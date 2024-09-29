@@ -107,6 +107,9 @@ class Action extends DataIteratorItem
         if ($this->url->toString()) {
             $this->setAttribute("href", $this->url->toString());
         }
+        else {
+            $this->removeAttribute("href");
+        }
 
     }
 

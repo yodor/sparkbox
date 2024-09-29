@@ -18,8 +18,19 @@ class MessageDialog extends Component {
         this.icon_enabled = true;
 
         this.index = -1;
+
+        //singleInstance
+        this.single = false;
+
+        this.singleInstance = null;
     }
 
+    initialize() {
+        super.initialize();
+        if (this.component().attr("single")) {
+            this.single = true;
+        }
+    }
     /**
      * Return the cloned jQuery object to show inside modal pane
      * @returns {jQuery}
@@ -27,6 +38,12 @@ class MessageDialog extends Component {
     createContent() {
 
         let cnt = this.component().clone(true, true);
+
+        if (this.single) {
+            //copy
+            this.singleInstance = this.component().clone(true, true);
+            this.component().remove();
+        }
 
         if (this.caption) {
             cnt.find(".Caption .Title").html(this.caption);
@@ -68,6 +85,7 @@ class MessageDialog extends Component {
         this.index = MessageDialog.indexCounter;
 
         let element = this.createContent();
+
         element.attr("index", this.index);
 
         this.modal_pane.showContent(element);
@@ -99,6 +117,10 @@ class MessageDialog extends Component {
             console.log(this.constructor.name + this.selector() + " not shown yet");
         }
 
+        if (this.singleInstance) {
+            $("body").append(this.singleInstance);
+            this.singleInstance = null;
+        }
     }
 
     /**

@@ -20,9 +20,8 @@ abstract class UploadDataValidator implements IInputValidator
     /**
      * @param array $accept_mimes
      */
-    public function setAcceptMimes(array $accept_mimes)
+    public function setAcceptMimes(array $accept_mimes) : void
     {
-
         $this->accept_mimes = $accept_mimes;
     }
 

@@ -12,12 +12,13 @@ class InputLabel extends Component implements IErrorRenderer
     public function __construct(DataInput $input)
     {
         parent::__construct(false);
+        $this->setComponentClass("InputLabel");
+        $this->setTagName("LABEL");
 
-        $this->tagName = "LABEL";
         $this->input = $input;
     }
 
-    public function processErrorAttributes()
+    protected function processErrorAttributes() : void
     {
 
         if (!$this->input->haveError()) return;
@@ -33,18 +34,16 @@ class InputLabel extends Component implements IErrorRenderer
             else {
                 $error = tr($this->input->getError());
             }
-            $this->setAttribute("tooltip", $error);
+            $this->setTooltipText($error);
 
         }
 
     }
 
-    public function startRender()
+    protected function processAttributes(): void
     {
+        parent::processAttributes();
         $this->processErrorAttributes();
-
-        parent::startRender();
-
     }
 
     public function renderImpl()
@@ -66,7 +65,7 @@ class InputLabel extends Component implements IErrorRenderer
     }
 
 
-    public function setErrorRenderMode(int $mode)
+    public function setErrorRenderMode(int $mode) : void
     {
         $this->error_render_mode = $mode;
     }

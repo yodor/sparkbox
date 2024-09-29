@@ -11,8 +11,10 @@ class NestedSelectField extends SelectField
         $this->setClassName("SelectField");
     }
 
-    protected function renderItems()
+    protected function renderItems() : void
     {
+
+        $num = $this->iterator->exec();
 
         $path = array();
 
@@ -33,19 +35,19 @@ class NestedSelectField extends SelectField
 
             $path[] = $rgt;
             $path_len = count($path);
-            $margin = 3 * ($path_len);
+            $margin = ($path_len) - 1;
 
-            $selected = ($nodeID == $this->input->getValue());
+            $selected = ($nodeID == $this->dataInput->getValue());
 
             $item = $this->item;
             $item->setID($nodeID);
 
-            $item->setName($this->input->getName() . "[]");
+            $item->setName($this->dataInput->getName() . "[]");
             $item->setData($row);
 
             $item->setSelected($selected);
 
-            $label = implode('', array_fill(0, $margin, '&nbsp;')) . $item->getLabel();
+            $label = implode('', array_fill(0, $margin, '&emsp;')) . $item->getLabel();
             $item->setLabel($label);
 
             $item->render();

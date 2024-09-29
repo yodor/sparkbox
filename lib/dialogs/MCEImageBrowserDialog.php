@@ -9,14 +9,14 @@ class MCEImageBrowserDialog extends MessageDialog
     /**
      * @var MCEImageBrowserResponder
      */
-    protected $handler;
+    protected UploadControlResponder $handler;
 
     /**
      * @var InputComponent
      */
-    protected $icmp;
+    protected InputComponent $icmp;
 
-    protected $image_input;
+    protected ArrayDataInput $image_input;
 
     public function __construct()
     {
@@ -27,13 +27,21 @@ class MCEImageBrowserDialog extends MessageDialog
         $this->setDialogType(MessageDialog::TYPE_PLAIN);
 
         $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
-        $this->image_input->getRenderer()->assignUploadHandler($this->handler);
+
+        $this->image_input->getProcessor()->setTransactBeanItemLimit(4);
+
+        $session_image = $this->image_input->getRenderer();
+
+        if ($session_image instanceof SessionImage) {
+            $session_image->setResponder($this->handler);
+        }
 
         $this->icmp = new InputComponent($this->image_input);
 
         //imagedimensiondialog from javascript
         new ConfirmMessageDialog();
 
+        $this->setAttribute('single',true);
     }
 
     public function requiredScript(): array
@@ -58,7 +66,7 @@ class MCEImageBrowserDialog extends MessageDialog
         return $this->handler;
     }
 
-    public function setHandler(UploadControlResponder $handler)
+    public function setHandler(UploadControlResponder $handler) : void
     {
         $this->handler = $handler;
     }

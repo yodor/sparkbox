@@ -27,13 +27,13 @@ class AdminUserForm extends InputForm
         //
         $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "pass", "Create Password", 0);
         $field->getProcessor()->skip_transaction = TRUE;
-        $field->getRenderer()->setInputAttribute("autocomplete", "off");
+        $field->getRenderer()->input()?->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
         //
         $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "pass1", "Repeat Password", 0);
         $field->getProcessor()->skip_transaction = TRUE;
-        $field->getRenderer()->setInputAttribute("autocomplete", "off");
+        $field->getRenderer()->input()?->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
         //

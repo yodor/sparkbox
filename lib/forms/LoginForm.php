@@ -10,11 +10,11 @@ class LoginForm extends InputForm
         parent::__construct();
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "email", "Email", 1);
-        $field->getRenderer()->setInputAttribute("autocomplete", "on");
+        $field->getRenderer()->input()?->setAttribute("autocomplete", "on");
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "password", "Password", 1);
-        $field->getRenderer()->setInputAttribute("autocomplete", "on");
+        $field->getRenderer()->input()?->setAttribute("autocomplete", "on");
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::HIDDEN, "rand", "rand", 1);

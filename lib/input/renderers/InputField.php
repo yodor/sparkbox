@@ -6,9 +6,9 @@ include_once("components/renderers/IDataIteratorRenderer.php");
 /**
  * Class InputField
  * Base class wrapping various input tags into a Component
- * Use to get visual representation of DataInput values
+ * Used to get visual representation of DataInput values
  */
-abstract class InputField extends Component implements IErrorRenderer, IDataIteratorRenderer
+abstract class InputField extends Container implements IErrorRenderer, IDataIteratorRenderer
 {
 
     /**
@@ -19,51 +19,55 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
     /**
      * @var int
      */
-    protected $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
+    protected int $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
 
     /**
      * @var DataInput
      */
-    protected DataInput $input;
+    protected DataInput $dataInput;
 
     /**
      * Render values iterator
      * Implementing classes use this iterator to render their values using data from the iterator
      * (DataIteratorItem)
-     * @var IDataIterator
+     * @var IDataIterator|null
      */
-    protected $iterator = NULL;
+    protected ?IDataIterator $iterator = NULL;
 
-    public const ADDON_MODE_INSIDE = 1;
-    public const ADDON_MODE_OUSIDE = 2;
+    protected Container $addon_contents;
 
-    protected $addon_render_mode = InputField::ADDON_MODE_INSIDE;
-    protected $addon_contents;
-
-    /**
-     * Attributes to be used for the actual input element.
-     * Separate collection from the Component attributes.
-     * @var array
-     */
-    protected $input_attributes = array();
 
     protected bool $is_compound = false;
 
-    public function __construct(DataInput $input)
+    protected ?Input $input = null;
+
+    public function __construct(DataInput $dataInput)
     {
         parent::__construct(false);
         $this->setComponentClass("InputField");
-
         $this->setClassName(get_class($this));
 
-        $this->input = $input;
-
-        $input->setRenderer($this);
-
-        $this->attributes["field"] = $this->input->getName();
-
-        $this->addon_contents = new Container();
+        $this->addon_contents = new Container(false);
         $this->addon_contents->setClassName("addon");
+
+        $this->dataInput = $dataInput;
+        $dataInput->setRenderer($this);
+
+        $this->input = $this->createInput();
+
+        if ($this->input instanceof Input) {
+            $this->items()->append($this->input);
+        }
+    }
+
+    protected function createInput() : ?Input
+    {
+        return null;
+    }
+
+    public function input() : ?Input
+    {
+        return $this->input;
     }
 
     public function requiredStyle() : array
@@ -86,8 +90,8 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
     public function setItemRenderer(DataIteratorItem $item)
     {
         $this->item = $item;
-        $this->item->setValueKey($this->input->getName());
-        $this->item->setLabelKey($this->input->getName());
+        $this->item->setValueKey($this->dataInput->getName());
+        $this->item->setLabelKey($this->dataInput->getName());
     }
 
     public function getItemRenderer(): ?DataIteratorItem
@@ -95,122 +99,70 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         return $this->item;
     }
 
-    public function setInputAttribute(string $name, string $value)
+
+    public function setDataInput(DataInput $input) : void
     {
-        $this->input_attributes[$name] = $value;
+        $this->dataInput = $input;
     }
 
-    public function haveInputAttribute(string $name) : bool
+    public function getDataInput() : DataInput
     {
-        return isset($this->input_attributes[$name]);
+        return $this->dataInput;
     }
 
-    public function getInputAttribute(string $name): string
-    {
-        return $this->input_attributes[$name];
-    }
 
-    public function getInputAttributes(): array
+    protected function processAttributes(): void
     {
-        return $this->input_attributes;
-    }
+        parent::processAttributes();
 
-    public function setInput(DataInput $input)
-    {
-        $this->input = $input;
-    }
+        $this->setAttribute("field", $this->dataInput->getName());
 
-    public function getInput()
-    {
-        return $this->input;
-    }
+        $this->input?->setName($this->dataInput->getName());
 
-    /**
-     * Set all input attributes before rendering is started.
-     * subclasses use this method to set all attributes to be used on
-     * the actual input element
-     *
-     */
-    protected function processInputAttributes()
-    {
-        $this->setInputAttribute("name", $this->input->getName());
-
-        if (!$this->input->isEditable()) {
-            $this->setInputAttribute("disabled", "true");
+        if (!$this->dataInput->isEditable()) {
+            $this->input?->setAttribute("disabled", "true");
         }
+
+        if ($this->addon_contents->items()->count()>0) {
+            $this->items()->append($this->addon_contents);
+        }
+
+        $this->processErrorAttributes();
+
+
     }
 
-    public function processErrorAttributes()
+    protected function processErrorAttributes() : void
     {
-        if (!$this->input->haveError()) return;
+        if (!$this->dataInput->haveError()) return;
+
+        $this->setAttribute("error", 1);
+
+        $error = "";
+        if ($this->dataInput instanceof ArrayDataInput) {
+            $error = $this->dataInput->getErrorText();
+        }
+        else {
+            $error = tr($this->dataInput->getError());
+        }
 
         if ($this->error_render_mode == IErrorRenderer::MODE_TOOLTIP) {
 
-            $error = "";
-            if ($this->input instanceof ArrayDataInput) {
-                $error = $this->input->getErrorText();
+            if ($this->input) {
+                $this->input->setTooltipText($error);
             }
             else {
-                $error = tr($this->input->getError());
+                $this->setTooltipText($error);
             }
-            $this->setAttribute("tooltip", $error);
 
         }
-        $this->setAttribute("error", 1);
-    }
-
-    /**
-     * Subclasses that use the input attributes call this method to
-     * get all the attributes to be used on the actual input field as text
-     * @return string
-     */
-    protected function prepareInputAttributes(): string
-    {
-
-        return $this->getAttributesText($this->input_attributes);
-
-    }
-
-    public function startRender()
-    {
-        $this->processInputAttributes();
-        $this->processErrorAttributes();
-
-        parent::startRender();
-
-    }
-
-    public function finishRender()
-    {
-        if ($this->addon_render_mode == InputField::ADDON_MODE_INSIDE) {
-            $this->renderAddonContents();
+        else if ($this->error_render_mode == IErrorRenderer::MODE_SPAN) {
+            $error = new TextComponent($error);
+            $error->setComponentClass("error_details");
+            $error->setTagName("small");
+            $this->items()->append($error);
         }
 
-        if ($this->input->haveError() && $this->error_render_mode == IErrorRenderer::MODE_SPAN) {
-            echo "<small class='error_details'>";
-            echo tr($this->input->getError());
-            echo "</small>";
-        }
-
-        parent::finishRender();
-
-        if ($this->addon_render_mode == InputField::ADDON_MODE_OUSIDE) {
-            $this->renderAddonContents();
-        }
-
-    }
-
-    protected function renderAddonContents()
-    {
-        if ($this->addon_contents->items()->count()>0) {
-            $this->addon_contents->render();
-        }
-
-    }
-
-    public function setAddonRenderMode(int $mode) {
-
-        $this->addon_render_mode = $mode;
 
     }
 
@@ -219,7 +171,7 @@ abstract class InputField extends Component implements IErrorRenderer, IDataIter
         return $this->addon_contents;
     }
 
-    public function setErrorRenderMode(int $mode)
+    public function setErrorRenderMode(int $mode) : void
     {
         $this->error_render_mode = $mode;
     }

@@ -13,7 +13,8 @@ class Image extends Component implements IPhotoRenderer
 
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct(false);
+        $this->setComponentClass("Image");
 
         $this->setClosingTagRequired(false);
         $this->setTagName("IMG");
@@ -21,6 +22,11 @@ class Image extends Component implements IPhotoRenderer
 
     }
 
+    /**
+     * Apply the width and height values as attributes width and height during rendering
+     * @param bool $mode
+     * @return void
+     */
     public function setUseSizeAttributes(bool $mode) : void
     {
         $this->use_size_attributes = $mode;

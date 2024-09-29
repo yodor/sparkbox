@@ -1,5 +1,5 @@
 <?php
-include_once("components/Component.php");
+include_once("components/Container.php");
 include_once("utils/IDataResultProcessor.php");
 
 abstract class DataIteratorItem extends Container implements IDataResultProcessor
@@ -51,9 +51,11 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
     }
 
     /**
-     * During setData set the attribute '$name' to the value of $row[$field]
-     * @param string $name
-     * @param string $field
+     * Create attributes from the iterator data passed
+     * Ex: $name = "title", $field = "product_name" => title = '$data["product_name"]' ;
+     * Ex: $name = "title", $field = "" => title = '$data["title"]'
+     * @param string $name Set html attribute '$name' using value from data result row key '$name'
+     * @param string $field Override data result row key to '$field'
      */
     public function addDataAttribute(string $name, string $field = "") : void
     {

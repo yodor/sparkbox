@@ -9,7 +9,6 @@ class SessionFile extends SessionUpload
     {
         parent::__construct($input, new FileUploadResponder());
 
-        //        $this->setInputAttribute("validator", "file");
     }
 
 }

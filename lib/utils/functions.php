@@ -552,7 +552,7 @@ function escapeHelper(string $unescaped_string): string
     return strtr($unescaped_string, $replacementMap);
 }
 
-function attributeValue(string $value)
+function attributeValue(string $value) : string
 {
     return htmlentities(mysql_real_unescape_string($value), ENT_QUOTES, "UTF-8");
 }

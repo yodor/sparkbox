@@ -1,23 +1,27 @@
 <?php
-include_once("input/renderers/InputField.php");
+include_once("input/renderers/InputFieldTag.php");
 
-class SliderField extends InputField
+class SliderField extends InputFieldTag
 {
 
-    public $accepted_values = NULL;
+    public array $accepted_values = array();
 
-    protected function processInputAttributes()
+    public function __construct(DataInput $input)
+    {
+        parent::__construct($input);
+        $this->input->setType("hidden");
+    }
+
+
+    protected function processAttributes() : void
     {
 
-        parent::processInputAttributes();
-        $field_value = htmlentities(mysql_real_unescape_string($this->input->getValue()), ENT_QUOTES, "UTF-8");
-        $this->setInputAttribute("type", "hidden");
-        $this->setInputAttribute("value", $field_value);
+        parent::processAttributes();
 
         if (is_array($this->accepted_values)) {
-            $this->setInputAttribute("increments", implode("|", $this->accepted_values));
-            $this->setInputAttribute("min", 0);
-            $this->setInputAttribute("max", count($this->accepted_values) - 1);
+            $this->input->setAttribute("increments", implode("|", $this->accepted_values));
+            $this->input->setAttribute("min", 0);
+            $this->input->setAttribute("max", count($this->accepted_values) - 1);
         }
 
     }
@@ -25,9 +29,7 @@ class SliderField extends InputField
     protected function renderImpl()
     {
 
-        $attrs = $this->prepareInputAttributes();
-
-        echo "<input $attrs>";
+        parent::renderImpl();
 
         echo "<div class='slider_input'></div>";
         if (is_array($this->accepted_values)) {
@@ -47,12 +49,12 @@ class SliderField extends InputField
             echo "</table>";
         }
 
-        $field_value = htmlentities(mysql_real_unescape_string($this->input->getValue()), ENT_QUOTES, "UTF-8");
+        $field_value = $this->dataInput->getValue();
 
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                var name = "<?php echo $this->input->getName();?>";
+                var name = "<?php echo $this->dataInput->getName();?>";
                 if ($("input[name='" + name + "'] + .slider_input").value) {
                     $("input[name='" + name + "'] + .slider_input").value("<?php echo $field_value;?>");
                 }

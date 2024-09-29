@@ -70,7 +70,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         }
 
         $this->image_popup->setID($photoID);
-        $this->image_popup->setBeanClass(get_class($this->view->getBean()));
+        $this->image_popup->image()->getStorageItem()->className = get_class($this->view->getBean());
 
         $tooltip = "";
 
@@ -100,17 +100,17 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
     public function setPhotoSize(int $width, int $height): void
     {
-        $this->image_popup->getImage()->setPhotoSize($width, $height);
+        $this->image_popup->image()->setPhotoSize($width, $height);
     }
 
     public function getPhotoWidth(): int
     {
-        return $this->image_popup->getImage()->getPhotoWidth();
+        return $this->image_popup->image()->getPhotoWidth();
     }
 
     public function getPhotoHeight(): int
     {
-        return $this->image_popup->getImage()->getPhotoHeight();
+        return $this->image_popup->image()->getPhotoHeight();
     }
 
     public function setActions(ActionCollection $actions)

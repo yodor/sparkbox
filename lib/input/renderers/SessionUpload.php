@@ -1,41 +1,55 @@
 <?php
+include_once("components/LabelSpan.php");
 include_once("input/renderers/ArrayField.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
-abstract class SessionUpload extends ArrayField
+abstract class SessionUpload extends InputField
 {
-    /**
-     * @var UploadControlResponder
-     */
-    protected $ajax_handler;
 
-    /**
-     * SessionUpload constructor.
-     * @param DataInput $input
-     * @param UploadControlResponder $ajax_handler
-     */
-    public function __construct(DataInput $input, UploadControlResponder $ajax_handler)
+    protected ?UploadControlResponder $responder;
+
+
+    public function __construct(DataInput $dataInput, UploadControlResponder $responder)
     {
 
-        $this->input = $input;
+        parent::__construct($dataInput);
 
-        $this->assignUploadHandler($ajax_handler);
-
-        parent::__construct($this);
-
+        $this->responder = $responder;
 
         $this->addClassName("SessionUpload");
+
+        $this->input = new Input();
+        $this->input->setType("file");
+        //allow uploading multiple files at once
+
+        $this->input->setAttribute("multiple", "");
+
+        $field_elements = new Container();
+        $field_elements->setComponentClass("FieldElements");
+
+        $details = $this->createDetails();
+        $field_elements->items()->append($details);
+
+        $controls = new ClosureComponent($this->createControls(...), false);
+        $controls->setComponentClass("");
+        $field_elements->items()->append($controls);
+
+        $arrayContents = new ClosureComponent($this->createArrayContents(...), false);
+        $arrayContents->setComponentClass("");
+        $field_elements->items()->append($arrayContents);
+
+        $this->items()->append($field_elements);
     }
 
-    public function assignUploadHandler(UploadControlResponder $handler)
+    public function setResponder(UploadControlResponder $responder) : void
     {
-        $this->ajax_handler = $handler;
-        $this->setAttribute("handler_command", $this->ajax_handler->getCommand());
+        $this->responder = $responder;
+
     }
 
-    public function getAjaxHandler() : UploadControlResponder
+    public function getResponder() : UploadControlResponder
     {
-        return $this->ajax_handler;
+        return $this->responder;
     }
 
     public function requiredStyle(): array
@@ -48,100 +62,113 @@ abstract class SessionUpload extends ArrayField
     public function requiredScript(): array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/jqplugins/jquery.form.js";
         $arr[] = SPARK_LOCAL . "/js/SessionUpload.js";
         return $arr;
     }
 
-    //Force [] to the input name
-    //SessionSpload is ArrayDataInput
-    protected function processInputAttributes()
-    {
-        parent::processInputAttributes();
-
-        $transact_max = $this->input->getProcessor()->getTransactBeanItemLimit();
-        $max_slots = 1;
-        if ($transact_max>0) {
-            $max_slots = $transact_max;
-        }
-        $this->setInputAttribute("max_slots", $max_slots);
-
-        $this->setInputAttribute("type", "file");
-
-        //allow uploading multiple files
-        $this->setInputAttribute("name", $this->input->getName()."[]");
-        $this->setInputAttribute("multiple", "");
-    }
-
-    public function renderDetails()
+    //SessionUpload is ArrayDataInput
+    protected function processAttributes() : void
     {
 
 
-        echo "<div class='Details'>";
+        parent::processAttributes();
 
-        echo "<div class='Limits'>";
+        $this->input->setName($this->dataInput->getName()."[]");
 
-        echo "<div field='max_size'><label>UPLOAD_MAX_SIZE: </label><span>" . file_size(UPLOAD_MAX_SIZE) . "</span></div>";
-        echo "<div field='memory_limit'><label>MEMORY_LIMIT: </label><span>" . file_size(MEMORY_LIMIT) . "</span></div>";
-        $transact_max = $this->input->getProcessor()->getTransactBeanItemLimit();
-        $max_slots = 1;
-        if ($transact_max>0) {
-                $max_slots = $transact_max;
+        $this->setAttribute("handler_command", $this->responder->getCommand());
+
+        $limit = $this->dataInput->getProcessor()->getTransactBeanItemLimit();
+        $uploadLimit = 1;
+        if ($limit>0) {
+            $uploadLimit = $limit;
         }
-        if ($this instanceof SessionFile) {
-            $validator = $this->input->getValidator()->getItemValidator();
-            if ($validator instanceof UploadDataValidator) {
+        $this->input->setAttribute("max_slots", $uploadLimit);
 
-                echo "<div field='accept_mimes'><label>Accept MIMEs: </label><span>" . implode(";",$validator->getAcceptMimes()) . "</span></div>";
+        $validator = $this->dataInput->getValidator();
+
+        if ($validator instanceof ArrayInputValidator) {
+            $itemValidator = $validator->getItemValidator();
+            if ($itemValidator instanceof UploadDataValidator) {
+                $this->input->setAttribute("accept", implode(",", $itemValidator->getAcceptMimes()));
             }
         }
-        echo "<div field='max_slots'><label>Available Slots: </label><span>" . $max_slots . "</span></div>";
 
-
-        echo "</div>";
-
-        echo "</div>";
+        $max_slots = $this->items()
+            ->getByContainerClass("FieldElements")?->items()
+            ->getByContainerClass("Details")?->items()
+            ->getByContainerClass("Limits")?->items()
+            ->getByAttribute("max_slots", "field");
+        if ($max_slots instanceof LabelSpan) {
+            $max_slots->span()->setContents($uploadLimit);
+        }
     }
 
-    public function renderControls()
+    public function createDetails() : Container
+    {
+        $details =  new Container(false);
+        $details->setComponentClass("Details");
+
+        $limits = new Container(false);
+        $limits->setComponentClass("Limits");
+        $details->items()->append($limits);
+
+        $max_size = new LabelSpan("UPLOAD_MAX_SIZE: ", file_size(UPLOAD_MAX_SIZE));
+        $max_size->setAttribute("field", "max_size");
+        $limits->items()->append($max_size);
+
+        $memory_limit = new LabelSpan("MEMORY_LIMIT: ", file_size(MEMORY_LIMIT));
+        $memory_limit->setAttribute("field", "memory_limit");
+        $limits->items()->append($memory_limit);
+
+        $accept_mimes = new LabelSpan("Accept MIMEs: ", $this->input->getAttribute("accept"));
+        $accept_mimes->setAttribute("field", "accept_mimes");
+        $limits->items()->append($accept_mimes);
+
+        $max_slots = new LabelSpan("Available Slots: ", -1);
+        $max_slots->setAttribute("field", "max_slots");
+        $limits->items()->append($max_slots);
+
+        return $details;
+    }
+
+    protected function createControls() : void
     {
         echo "<div class='Controls' >";
 
-        echo "<div class='Buttons'>";
+            echo "<div class='Buttons'>";
 
-        $attr = $this->prepareInputAttributes();
-        echo "<input $attr>";
+            $this->input->render();
 
-        ColorButton::RenderButton("Browse", "", "browse");
+            ColorButton::RenderButton("Browse", "", "browse");
 
-        echo "</div>"; //Buttons
+            echo "</div>"; //Buttons
 
-        echo "<div class='Progress'>";
-        echo "<div class='bar'></div>";
-        echo "<div class='percent'>0%</div>";
-        echo "</div>"; //Progress
+            echo "<div class='Progress'>";
+            echo "<div class='bar'></div>";
+            echo "<div class='percent'>0%</div>";
+            echo "</div>"; //Progress
 
         echo "</div>"; //Controls
 
     }
 
-    public function renderArrayContents()
+    protected function createArrayContents() : void
     {
-        $field_name = $this->input->getName();
+        $field_name = $this->dataInput->getName();
 
-        $images = $this->input->getValue();
+        $images = $this->dataInput->getValue();
 
-        if (!$this->ajax_handler) {
+        if (!$this->responder) {
             echo "<div class='ArrayContents'>";
             echo "<div class='error'>Upload Handler not registered</div>";
             echo "</div>";
             return;
         }
 
-        echo "<div class='ArrayContents' field='" . $this->input->getName() . "'>";
+        echo "<div class='ArrayContents' field='{$this->dataInput->getName()}'>";
 
         if (!is_array($images)) {
-            $images = array($this->input->getValue());
+            $images = array($this->dataInput->getValue());
         }
 
         foreach ($images as $idx => $storage_object) {
@@ -150,35 +177,25 @@ abstract class SessionUpload extends ArrayField
 
             if (!($storage_object instanceof StorageObject)) continue;
 
-            echo $this->ajax_handler->getHTML($storage_object, $field_name);
+            echo $this->responder->getHTML($storage_object, $field_name);
 
         }
         echo "</div>";
     }
 
-    public function renderImpl()
+    public function finishRender()
     {
-
-        echo "<div class='FieldElements'>";
-
-        $this->renderDetails();
-
-        $this->renderControls();
-
-        $this->renderArrayContents();
-
+        parent::finishRender(); // TODO: Change the autogenerated stub
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                var upload_control = new SessionUpload();
-                upload_control.setField("<?php echo $this->input->getName();?>");
+                let upload_control = new SessionUpload();
+                upload_control.setField("<?php echo $this->dataInput->getName();?>");
                 upload_control.initialize();
 
             });
         </script>
         <?php
-        echo "</div>";
-
     }
 
 }

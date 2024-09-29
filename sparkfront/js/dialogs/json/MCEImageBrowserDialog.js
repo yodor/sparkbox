@@ -166,6 +166,7 @@ class MCEImageBrowserDialog extends JSONDialog {
             }
             this.modal_pane.centerContents();
         } //find
+
     }
 
     /**
@@ -205,13 +206,13 @@ class MCEImageBrowserDialog extends JSONDialog {
         //subsequent shows need clear parameters
         this.req.clearParameters();
 
-        var field = this.modal_pane.popup.find(".SessionUpload").first();
+        let field = this.modal_pane.popup.find(".SessionUpload");
 
         this.field_name = field.attr("field");
 
         this.req.setParameter("field_name", this.field_name);
 
-        var upload_control = field.data("upload_control");
+        let upload_control = field.data("upload_control");
 
         upload_control.processResult = this.processUploadResult.bind(this);
 
@@ -222,12 +223,15 @@ class MCEImageBrowserDialog extends JSONDialog {
     }
 
     /**
-     * Handle new image upload to collection, can return multiple object results
-     * @param result
+     *
+     * @param request_result {JSONRequestResult}
      */
-    processUploadResult(result) {
-        //json object result count
-        for (var a = 0; a < result.object_count; a++) {
+    processUploadResult(request_result) {
+
+        let result = request_result.json_result;
+        //console.log("Result count: " + result.object_count);
+
+        for (let a = 0; a < result.object_count; a++) {
             //object_result (imageID=>beanID, html=>html)
             let object_result = result.objects[a];
             this.appendResult(object_result);

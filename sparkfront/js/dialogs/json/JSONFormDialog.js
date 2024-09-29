@@ -106,7 +106,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
         }
     }
 
-    //inital rendering during show()
+    //initial rendering during show()
     processRenderResult(request_result)
     {
         let result = request_result.json_result;

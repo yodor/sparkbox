@@ -13,7 +13,7 @@ class ImageUploadValidator extends UploadDataValidator
     {
         parent::__construct();
 
-        $this->setAcceptMimes(ImageScaler::SupportedMimes);
+        $this->accept_mimes = ImageScaler::SupportedMimes;
 
         if (IMAGE_UPLOAD_UPSCALE || IMAGE_UPLOAD_DOWNSCALE) {
             $this->setResizedSize(IMAGE_UPLOAD_DEFAULT_WIDTH, IMAGE_UPLOAD_DEFAULT_HEIGHT);
@@ -21,6 +21,15 @@ class ImageUploadValidator extends UploadDataValidator
         else {
             $this->setResizeEnabled(false);
         }
+    }
+
+    public function setAcceptMimes(array $accept_mimes) : void
+    {
+        $supported_mimes = ImageScaler::SupportedMimes;
+        foreach ($accept_mimes as $mime) {
+            if (!in_array($mime, $supported_mimes)) throw new Exception("Unsupported mime: " . $mime);
+        }
+        $this->accept_mimes = $accept_mimes;
     }
 
     public function setResizedSize(int $width, int $height) : void

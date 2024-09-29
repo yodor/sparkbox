@@ -6,16 +6,24 @@ class SessionUpload extends Component {
 
         this.req = new JSONRequest();
 
+        this.req.addObserver(this.onRequestEvent.bind(this));
+
+        this.req.onError = this.processError.bind(this);
     }
 
     input() {
         return $(this.selector() + " INPUT[type='file']");
     }
 
+    controls(element) {
+        if (!element)element = "";
+
+        return $(this.selector() + " .Controls " + element);
+    }
+
     initialize() {
 
         super.initialize();
-
 
         this.req.setResponder(this.component().attr("handler_command"));
         this.req.setParameter("field_name", this.field);
@@ -23,7 +31,7 @@ class SessionUpload extends Component {
         this.component().data("upload_control", this);
 
 
-        this.input().on("change", function(event){
+        this.input().on("change", function (event) {
             this.uploadFileChanged(event);
         }.bind(this));
 
@@ -38,9 +46,41 @@ class SessionUpload extends Component {
 
     }
 
+
+
+    onRequestEvent(event) {
+        if (event.isEvent(JSONRequest.EVENT_STARTED)) {
+            this.controls().attr("working", "1");
+            this.updateProgress(0);
+        } else if (event.isEvent(JSONRequest.EVENT_SUCCESS)) {
+            this.controls().removeAttr("working");
+        } else if (event.isEvent(JSONRequest.EVENT_ERROR)) {
+            this.controls().removeAttr("working");
+        } else if (event.isEvent(JSONRequest.EVENT_PROGRESS)) {
+            this.updateProgress(event.percent);
+        }
+
+    }
+
+    updateProgress(value)
+    {
+        let percentVal = parseInt(value)+"%";
+
+        this.controls(".bar").width(percentVal);
+        this.controls(".percent").html(percentVal);
+
+    }
     uploadFileChanged(event) {
 
         console.log("SessionUpload::uploadFileChanged()");
+
+        let fileInput = this.input().get(0);
+        let upload_count = fileInput.files.length;
+        if (upload_count<1) {
+            //console.log("No file selected for upload");
+            return;
+        }
+        //console.log("Upload count: " + upload_count);
 
         let max_slots = this.input().attr("max_slots");
         let slots = this.component().find(".ArrayContents");
@@ -55,108 +95,44 @@ class SessionUpload extends Component {
             return;
         }
 
-        if (this.input().get(0).files) {
-
-            let upload_count = this.input().get(0).files.length;
-            if (active_slots + upload_count > max_slots) {
-                showAlert("Select less files");
-                this.resetFileInput();
-                return;
-            }
+        if (active_slots + upload_count > max_slots) {
+            showAlert("Select less files");
+            this.resetFileInput();
+            return;
         }
-
-        let form = this.prepareUploadForm();
 
         this.req.setFunction("upload");
 
-        //let form = this.input().parents("FORM").first();
+        this.req.onSuccess = this.processResult.bind(this);
 
-        //copy the request url
-        form.attr("action", this.req.getURL().href);
+        let fileData = new FormData();
 
-        //console.log("Submitting form clone to URL: " + form.attr("action"));
+        for (let a=0;a<fileInput.files.length;a++) {
+            fileData.append(this.input().attr("name"), fileInput.files[a]);
+        }
 
-        form.submit();
+        this.req.setPostFormData(fileData);
 
+        this.req.start();
+    }
+
+
+    /**
+     *
+      * @param result {JSONRequestError}
+     */
+    processError(result) {
+        showAlert(result.description);
     }
 
     /**
      *
-     * @returns {jQuery}
+     * @param result {JSONRequestResult}
      */
-    prepareUploadForm() {
+    processResult(request_result) {
+        //        console.log(result);
+        let result = request_result.json_result;
 
-        let controls = $(this.selector()).find(".Controls");
-        let form = $(this.selector()).parents("FORM").first().clone();
-
-        let progress = controls.find(".Progress");
-
-        let bar = progress.find(".bar");
-        let percent = progress.find(".percent");
-
-        form.ajaxForm({
-            beforeSend: function () {
-                var percentVal = '0%';
-                bar.width(percentVal)
-                percent.html(percentVal);
-                controls.attr("working", "1");
-            },
-            uploadProgress: function (event, position, total, percentComplete) {
-                var percentVal = percentComplete + '%';
-                bar.width(percentVal)
-                percent.html(percentVal);
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                showAlert("Error processing upload: " + errorThrown);
-            },
-            success: function (contents, textStatus, xhr) {
-                let percentVal = '100%';
-                bar.width(percentVal)
-                percent.html(percentVal);
-                controls.removeAttr("working");
-
-                try {
-
-                    if (textStatus != "success") throw textStatus;
-
-                    let isString = contents.constructor === String;
-                    let isObject = contents.constructor === Object;
-
-                    //expected json already from responder content-type
-                    let result = contents;
-
-                    if (isString) {
-                        result = JSON && JSON.parse(contents) || $.parseJSON(contents);
-                    }
-
-                    if (result.status != "OK") throw result.message;
-
-                    this.processResult(result);
-
-                } catch (err) {
-                    var emsg = (err.message ? err.message : err);
-                    console.log("JSONRequest Processing Error:" + emsg);
-                    console.log(contents);
-                    showAlert(emsg);
-                }
-
-            }.bind(this),
-            complete: function (xhr, textStatus) {
-                //form.attr("action", form.data("action"));
-
-                this.resetFileInput();
-
-            }.bind(this)
-        });
-
-        return form;
-    }
-
-    /**
-     *
-     * @param result
-     */
-    processResult(result) {
         let slots = this.component().find(".ArrayContents");
 
         if (result.contents) showAlert(result.contents);
@@ -174,13 +150,8 @@ class SessionUpload extends Component {
             });
         });
 
-        $.event.trigger({
-            type: "SessionUpload",
-            message: "onProcessResult",
-            time: new Date(),
-            json_result: result
-        });
-
+        processTooltipContent();
+        this.resetFileInput();
     }
 
     resetFileInput() {
@@ -196,14 +167,15 @@ class SessionUpload extends Component {
      */
     removeSlot(elm) {
 
-        var uid = elm.parents(".Element").first().find("input[type='hidden']").first().attr("value");
+        let uid = elm.parents(".Element").find("input[type='hidden']").attr("value");
 
         this.req.setFunction("remove");
 
         this.req.setParameter("uid", uid);
 
         this.req.onSuccess=function(request_result) {
-            elm.parents(".Element").first().remove();
+            elm.parents(".Element").remove();
+            hideTooltip();
         };
 
         this.req.start();

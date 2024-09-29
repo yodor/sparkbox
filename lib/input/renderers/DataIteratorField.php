@@ -8,40 +8,27 @@ abstract class DataIteratorField extends InputField
     protected $array_key_field_name = "";
     protected $array_key_model_id = false;
 
+    protected Container $elements;
+
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
+
+        $this->elements = new Container(false);
+        $this->elements->setComponentClass("FieldElements");
+
+        $this->items->append($this->elements);
+
+        $this->elements->items()->append(new ClosureComponent($this->renderItems(...), false));
     }
 
-    protected function renderImpl()
+    protected function renderItems() : void
     {
 
-        if ($this->iterator instanceof IDataIterator) {
-            $num = $this->iterator->exec();
-        }
+        if (!$this->iterator instanceof IDataIterator) return;
 
-        $this->startRenderItems();
-        $this->renderItems();
-        $this->finishRenderItems();
-
-
-    }
-
-    protected function startRenderItems()
-    {
-        echo "<div class='FieldElements'>";
-    }
-
-    protected function finishRenderItems()
-    {
-        echo "</div>";
-    }
-
-    protected function renderItems()
-    {
-
-        $field_values = $this->input->getValue();
-        $field_name = $this->input->getName();
+        $field_values = $this->dataInput->getValue();
+        $field_name = $this->dataInput->getName();
 
         if (!is_array($field_values)) {
             $field_values = array($field_values);
@@ -49,47 +36,48 @@ abstract class DataIteratorField extends InputField
 
         $index = 0;
 
-        if ($this->iterator instanceof IDataIterator) {
-            while ($data_row = $this->iterator->next()) {
+        $num = $this->iterator->exec();
 
-                //TODO
-                $id = 0;
-                if (isset($data_row[$this->iterator->key()])) {
-                    $id = $data_row[$this->iterator->key()];
-                }
+        while ($data_row = $this->iterator->next()) {
 
-                $item = $this->item;
-                //$item = clone $this->item;
+            //TODO
+            $id = 0;
+            if (isset($data_row[$this->iterator->key()])) {
+                $id = $data_row[$this->iterator->key()];
+            }
 
-                $item->setID((int)$id);
-                $item->setIndex($index);
-                //sets the actual value of the item being rendered
-                $item->setData($data_row);
+            $item = $this->item;
+            //$item = clone $this->item;
 
-                $isSelected = $this->isModelSelected();
-                $item->setSelected($isSelected);
+            $item->setID((int)$id);
+            $item->setIndex($index);
+            //sets the actual value of the item being rendered
+            $item->setData($data_row);
 
-                $array_key_value = "";
-                if ($isSelected) {
-                    if ($this->array_key_model_id) {
-                        //the corresponding ID of the value from transact-bean of DataInput
-                        $modelID = $this->getModelValueID();
-                        if ($modelID > -1) {
-                            $array_key_value = "modelID:" . $modelID;
-                        }
+            $isSelected = $this->isModelSelected();
+            $item->setSelected($isSelected);
+
+            $array_key_value = "";
+            if ($isSelected) {
+                if ($this->array_key_model_id) {
+                    //the corresponding ID of the value from transact-bean of DataInput
+                    $modelID = $this->getModelValueID();
+                    if ($modelID > -1) {
+                        $array_key_value = "modelID:" . $modelID;
                     }
                 }
-                //override key
-                if ($this->array_key_field_name && isset($data_row[$this->array_key_field_name])) {
-                    $array_key_value = $data_row[$this->array_key_field_name];
-                }
-                $item->setName($field_name . "[".$array_key_value."]");
-
-                $item->render();
-
-                $index++;
             }
+            //override key
+            if ($this->array_key_field_name && isset($data_row[$this->array_key_field_name])) {
+                $array_key_value = $data_row[$this->array_key_field_name];
+            }
+            $item->setName($field_name . "[".$array_key_value."]");
+
+            $item->render();
+
+            $index++;
         }
+
     }
 
     /**
@@ -98,7 +86,7 @@ abstract class DataIteratorField extends InputField
      */
     protected function isModelSelected(): bool
     {
-        $field_values = $this->input->getValue();
+        $field_values = $this->dataInput->getValue();
         if (!is_array($field_values)) {
             $field_values = array($field_values);
         }
@@ -112,7 +100,7 @@ abstract class DataIteratorField extends InputField
      */
     protected function getModelValueID() : int
     {
-        $field_values = $this->input->getValue();
+        $field_values = $this->dataInput->getValue();
         if (!is_array($field_values)) return -1;
         $found = array_search($this->item->getValue(), $field_values);
         if ($found === FALSE) return -1;

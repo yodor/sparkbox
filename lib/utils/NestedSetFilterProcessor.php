@@ -48,13 +48,13 @@ class NestedSetFilterProcessor
 
     protected function processTextAction(NestedSetTreeView $view)
     {
-        $key = $view->getIterator()->key();
 
-        if (!$this->item_clicked_action) {
-            $this->item_clicked_action = $this->createDefaultAction($view->getIterator());
+        $action = $view->getItemRenderer()->getTextAction();
+        if ($action instanceof Action) {
+            $action->getURL()->add(new DataParameter($view->getIterator()->key()));
+            $action->getURL()->setClearPageParams(TRUE);
         }
 
-        $view->getItemRenderer()->setTextAction($this->item_clicked_action);
     }
 
 }

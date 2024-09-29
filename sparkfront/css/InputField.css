@@ -18,15 +18,7 @@
 .InputField {
     display: inline-block;
 
-    background-color: white;
 
-    border-top: 1px solid #b7b7b7;
-    border-left: 1px solid #b7b7b7;
-    border-right: 1px solid #dcdcdc;
-    border-bottom: 1px solid #dcdcdc;
-
-    margin: 0;
-    padding: 0.2em;
 }
 
 .InputLabel .required {
@@ -56,23 +48,32 @@
     margin-left: 1em;
 }
 
-.InputField INPUT, TEXTAREA, .MCETextArea {
+.InputField INPUT, TEXTAREA {
     font-size: 100%;
-    border: 0;
-    background-color: transparent;
+
     outline: 0;
-    padding: 0;
     margin: 0;
     display: block;
 
+    background-color: white;
+
+    border-top: 1px solid #b7b7b7;
+    border-left: 1px solid #b7b7b7;
+    border-right: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+
+    padding: 0.2em;
+
+    box-sizing: border-box;
 }
+
 .InputField .MCETextArea {
     min-height:450px;
 
 }
 
 .InputField INPUT, TEXTAREA, .MCETextArea .mce-container {
-    box-sizing: border-box;
+
 }
 
 .InputField.TextField INPUT {

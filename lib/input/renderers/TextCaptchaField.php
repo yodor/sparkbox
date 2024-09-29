@@ -14,11 +14,11 @@ class TextCaptchaField extends TextField
     {
         parent::__construct($input);
 
-        if (Session::Contains($this->input->getName().".captcha.result")) {
-            $this->var1 = Session::Get($this->input->getName().".captcha.var1");
-            $this->var2 = Session::Get($this->input->getName().".captcha.var2");
-            $this->oper = Session::Get($this->input->getName().".captcha.oper");
-            $this->label = Session::Get($this->input->getName().".captcha.label");
+        if (Session::Contains($this->dataInput->getName().".captcha.result")) {
+            $this->var1 = Session::Get($this->dataInput->getName().".captcha.var1");
+            $this->var2 = Session::Get($this->dataInput->getName().".captcha.var2");
+            $this->oper = Session::Get($this->dataInput->getName().".captcha.oper");
+            $this->label = Session::Get($this->dataInput->getName().".captcha.label");
         }
         else {
             $this->initResult();
@@ -48,20 +48,20 @@ class TextCaptchaField extends TextField
             $this->result = $this->var1 - $this->var2;
             $this->label = $this->var1." - ".$this->var2." = ? ";
         }
-        Session::Set($this->input->getName().".captcha.var1", $this->var1);
-        Session::Set($this->input->getName().".captcha.var2", $this->var2);
-        Session::Set($this->input->getName().".captcha.oper", $this->oper);
-        Session::Set($this->input->getName().".captcha.label", $this->label);
-        Session::Set($this->input->getName().".captcha.result", $this->result);
+        Session::Set($this->dataInput->getName().".captcha.var1", $this->var1);
+        Session::Set($this->dataInput->getName().".captcha.var2", $this->var2);
+        Session::Set($this->dataInput->getName().".captcha.oper", $this->oper);
+        Session::Set($this->dataInput->getName().".captcha.label", $this->label);
+        Session::Set($this->dataInput->getName().".captcha.result", $this->result);
     }
 
     public function resetResult()
     {
-        Session::Remove($this->input->getName().".captcha.result");
+        Session::Remove($this->dataInput->getName().".captcha.result");
     }
     public function getResult() : int
     {
-        return Session::Get($this->input->getName().".captcha.result");
+        return Session::Get($this->dataInput->getName().".captcha.result");
     }
     public function getLabel() : string
     {

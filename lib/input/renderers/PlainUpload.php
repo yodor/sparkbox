@@ -7,7 +7,7 @@ abstract class PlainUpload extends InputFieldTag
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-        $this->setInputAttribute("type", "file");
+        $this->input->setType("file");
         $this->addClassName("PlainUpload");
     }
 
@@ -29,8 +29,8 @@ abstract class PlainUpload extends InputFieldTag
 
     protected function renderImpl()
     {
-        $storage_object = $this->input->getValue();
-        $field_name = $this->input->getName();
+        $storage_object = $this->dataInput->getValue();
+        $field_name = $this->dataInput->getName();
 
         echo "<div class='FieldElements'>";
 
@@ -49,9 +49,7 @@ abstract class PlainUpload extends InputFieldTag
         echo "<div class='Controls' >";
         ColorButton::RenderButton("Browse", "", "browse");
 
-        $attr = $this->prepareInputAttributes();
-
-        echo "<input $attr>";
+        parent::renderImpl();
 
         echo "</div>";
 
@@ -69,7 +67,7 @@ abstract class PlainUpload extends InputFieldTag
         <script type='text/javascript'>
             onPageLoad(function () {
                 let upload_field = new PlainUpload();
-                upload_field.attachWith("<?php echo $this->input->getName();?>");
+                upload_field.attachWith("<?php echo $this->dataInput->getName();?>");
 
             });
         </script>

@@ -4,11 +4,10 @@ include_once("input/renderers/InputField.php");
 class PasswordField extends InputFieldTag
 {
 
-    protected function processInputAttributes()
+    public function __construct(DataInput $input)
     {
-        parent::processInputAttributes();
-        $this->setInputAttribute("type", "password");
-
+        parent::__construct($input);
+        $this->input->setType("password");
     }
 
 }

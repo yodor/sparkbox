@@ -14,8 +14,8 @@ class PhoneField extends InputField
     public function renderImpl()
     {
 
-        $field_name = $this->input->getName();
-        $field_value = $this->input->getValue();
+        $field_name = $this->dataInput->getName();
+        $field_value = $this->dataInput->getValue();
 
         $pieces = explode("|", (string)$field_value);
 

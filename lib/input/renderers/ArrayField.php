@@ -5,33 +5,32 @@ include_once("components/Action.php");
 class ArrayField extends InputField
 {
 
-    /**
-     * @var Container
-     */
     protected Container $controls;
 
+    protected Container $array_contents;
+
     /**
-     * Remove element action of the element source
+     * Element remove action
      * @var Action
      */
     protected Action $remove_action;
 
-    const DEFAULT_CONTROL_ACTION = "Add";
-    const DEFAULT_CONTROL_NAME = "Add";
-    const DEFAULT_CONTROL_TEXT = "Add";
+    const string DEFAULT_CONTROL_ACTION = "Add";
+    const string DEFAULT_CONTROL_NAME = "Add";
+    const string DEFAULT_CONTROL_TEXT = "Add";
 
     protected InputField $element_renderer;
 
-    protected bool $dynamic_addition = TRUE;
+    protected Container $element_controls;
 
     public function __construct(InputField $field)
     {
-        parent::__construct($field->getInput());
+        parent::__construct($field->getDataInput());
 
         $this->element_renderer = $field;
 
-        $this->controls = new Container();
-        $this->controls->setClassName("ArrayControls");
+        $this->controls = new Container(false);
+        $this->controls->setComponentClass("ArrayControls");
 
         $button_add = new ColorButton();
         $button_add->setType(ColorButton::TYPE_BUTTON);
@@ -39,24 +38,37 @@ class ArrayField extends InputField
         $button_add->setAttribute("action", ArrayField::DEFAULT_CONTROL_ACTION);
         $button_add->setContents(ArrayField::DEFAULT_CONTROL_TEXT);
 
-        $this->addControl($button_add);
+        $this->controls->items()->append($button_add);
 
         $this->remove_action = new Action("Remove");
 
+        $this->element_controls = new Container(false);
+        $this->element_controls->setComponentClass("Controls");
+        $this->element_controls->items()->append($this->remove_action);
 
+        $this->items()->append($this->controls);
+
+        $element_source = new ClosureComponent($this->renderElementSource(...));
+        $element_source->setComponentClass("ElementSource");
+        $this->items->append($element_source);
+
+        $this->array_contents = new ClosureComponent($this->renderArrayContents(...));
+        $this->array_contents->setComponentClass("ArrayContents");
+        $this->items->append($this->array_contents);
     }
 
-    public function enableDynamicAddition(bool $mode)
+    public function enableDynamicAddition(bool $mode) : void
     {
-        $this->dynamic_addition = $mode;
+        $this->controls->setRenderEnabled($mode);
+        $this->element_controls->setRenderEnabled($mode);
     }
 
     public function isDynamicAdditionEnabled(): bool
     {
-        return $this->dynamic_addition;
+        return $this->controls->isRenderEnabled();
     }
 
-    public function setElementRenderer(InputField $renderer)
+    public function setElementRenderer(InputField $renderer) : void
     {
         $this->element_renderer = $renderer;
     }
@@ -80,127 +92,88 @@ class ArrayField extends InputField
         return $arr;
     }
 
-    /**
-     * Add component to the controls container
-     * @param Component $cmp
-     */
-    public function addControl(Component $cmp)
-    {
-        $this->controls->items()->append($cmp);
-    }
-
-    /**'
-     * @param string $name
-     * @return Component
-     */
-    public function getControl(string $name)
-    {
-        return $this->controls->items()->getByName($name);
-    }
-
-    /**
-     * @return Container
-     */
-    public function getControls(): Container
+    public function controls() : Container
     {
         return $this->controls;
     }
 
-    public function getInput()
+    public function elementControls() : Container
     {
-        return $this->input;
+        return $this->element_controls;
     }
 
-    public function renderControls()
+    public function elementRemoveAction() : Action
     {
-        if (!$this->dynamic_addition) return;
-
-        $this->controls->setAttribute("field", $this->input->getName());
-
-        $this->controls->render();
-
+        return $this->remove_action;
     }
 
-    public function renderElementSource()
+    protected function processAttributes(): void
     {
-        if (!$this->dynamic_addition) return;
+        parent::processAttributes();
+        $this->controls->setAttribute("field", $this->dataInput->getName());
+        $this->array_contents->setAttribute("field", $this->dataInput->getName());
+    }
 
-        echo "<div class='ElementSource'>";
-
-        $fake_input = new DataInput("render_source", $this->input->getLabel(), $this->input->isRequired());
+    protected function renderElementSource() : void
+    {
+        $fake_input = new DataInput("render_source", $this->dataInput->getLabel(), $this->dataInput->isRequired());
 
         $renderer = clone $this->element_renderer;
-        $renderer->setInput($fake_input);
+        $renderer->setDataInput($fake_input);
 
         $renderer->render();
 
-        echo "<div class='Controls'>";
-        $this->remove_action->render();
-        echo "</div>";
-
-        echo "</div>";
-
+        $this->element_controls->render();
     }
 
-    public function renderArrayContents()
+    protected function renderArrayContents() : void
     {
-        echo "<div class='ArrayContents' field='" . $this->input->getName() . "'>";
 
-        $values = $this->input->getValue();
+        $values = $this->dataInput->getValue();
 
-        if (is_array($values)) {
+        if (!is_array($values)) return;
+        if (!($this->dataInput instanceof ArrayDataInput)) return;
 
-            $pos = -1;
-            foreach ($values as $idx => $value) {
+        $element_input = new DataInput($this->dataInput->getName() , $this->dataInput->getLabel(), $this->dataInput->isRequired());
 
-                //class ElementSource is renamed to class Element from ArrayControls.js
+        $renderer = clone $this->element_renderer;
 
-                $pos++;
+        $pos = -1;
+        foreach ($values as $idx => $value) {
 
-                $element_input = new DataInput($this->input->getName() . "[$idx]", $this->input->getLabel(), $this->input->isRequired());
+            $pos++;
 
-                $element_input->setError($this->input->getErrorAt($idx));
+            $element_input->setName($this->dataInput->getName()."[$idx]");
+            $element_input->setError($this->dataInput->getErrorAt($idx));
+            $element_input->setValue($value);
 
-                $element_input->setValue($value);
+            echo "<div class='Element' pos='$pos' key='$idx'>";
 
-                echo "<div class='Element' pos='$pos' key='$idx'>";
+            $renderer->setDataInput($element_input);
+            $renderer->render();
 
-                $renderer = clone $this->element_renderer;
-                $renderer->setInput($element_input);
+            $this->element_controls->render();
 
-                $renderer->render();
-
-                if ($this->dynamic_addition) {
-                    echo "<div class='Controls' >";
-                    $this->remove_action->render();
-                    echo "</div>";
-                }
-
-                echo "</div>";
-
-            }
+            echo "</div>";
 
         }
-        echo "</div>";
+
     }
 
-    public function renderImpl()
-    {
-        $this->renderControls();
-        $this->renderElementSource();
-        $this->renderArrayContents();
 
+    public function finishRender()
+    {
+        parent::finishRender();
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
                 let array_field = new ArrayField();
-                array_field.setField("<?php echo $this->input->getName();?>");
+                array_field.setField("<?php echo $this->dataInput->getName();?>");
                 array_field.initialize();
                 //array_field selector is now .ArrayField[field='$this->input->getName()']
             });
         </script>
         <?php
-
     }
 
 }

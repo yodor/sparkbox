@@ -75,7 +75,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
     public bool $translation_enabled = FALSE;
     public bool $render_tooltip = TRUE;
-    public bool $render_enabled = TRUE;
+
+    protected bool $render_enabled = TRUE;
 
     protected string $caption = "";
     protected ?Component $caption_component = null;
@@ -110,6 +111,16 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
         SparkEventManager::emit(new ComponentEvent(ComponentEvent::COMPONENT_CREATED, $this));
 
+    }
+
+    public function setRenderEnabled(bool $mode) : void
+    {
+        $this->render_enabled = $mode;
+    }
+
+    public function isRenderEnabled() : bool
+    {
+        return $this->render_enabled;
     }
 
     public function buffer() : OutputBuffer

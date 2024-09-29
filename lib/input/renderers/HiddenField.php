@@ -4,11 +4,10 @@ include_once("input/renderers/InputFieldTag.php");
 class HiddenField extends InputFieldTag
 {
 
-    protected function processInputAttributes()
+    public function __construct(DataInput $dataInput)
     {
-        parent::processInputAttributes();
-        $this->setInputAttribute("type", "hidden");
-
+        parent::__construct($dataInput);
+        $this->input->setType("hidden");
     }
 
 }

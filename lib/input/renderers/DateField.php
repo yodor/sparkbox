@@ -40,8 +40,8 @@ class DateField extends InputField
 
         echo "<div class='FieldElements'>";
 
-        $field_value = (string)$this->input->getValue();
-        $field_name = $this->input->getName();
+        $field_value = (string)$this->dataInput->getValue();
+        $field_name = $this->dataInput->getName();
 
         $pieces = explode("-", $field_value);
 
@@ -112,7 +112,7 @@ class DateField extends InputField
 
     public function renderValueImpl()
     {
-        $field_value = $this->input->getValue();
+        $field_value = $this->dataInput->getValue();
 
         if (DateValidator::isValidDate($field_value)) {
             $pieces = explode("-", $field_value);

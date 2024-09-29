@@ -1,22 +1,20 @@
 <?php
+//do not include circular references from MCEImageBrowserDialog
 
-class MCETextArea extends InputField
+class MCETextArea extends TextArea
 {
 
     protected static ?MCEImageBrowserDialog $image_browser = null;
 
     public function __construct(DataInput $input)
     {
-
-        parent::__construct($input);
-
-        $this->tagName = "TEXTAREA";
-
         //force single instance of the dialog to all MCETextAreas to prevent double session upload
         if (is_null(MCETextArea::$image_browser)) {
             include_once("dialogs/MCEImageBrowserDialog.php");
             MCETextArea::$image_browser = new MCEImageBrowserDialog();
         }
+
+        parent::__construct($input);
 
     }
 
@@ -35,43 +33,25 @@ class MCETextArea extends InputField
         return $arr;
     }
 
-    public function setAttribute($name, $value) : void
-    {
-        $this->setInputAttribute($name, $value);
-        self::$image_browser->setAttribute($name, $value);
-    }
-
     public function getImageBrowser(): MCEImageBrowserDialog
     {
         return self::$image_browser;
     }
 
-    public function startRender()
+    public function finishRender()
     {
-        $this->setContents((string)$this->input->getValue());
-        parent::startRender();
-    }
-
-    public function render()
-    {
-        parent::render();
+        parent::finishRender();
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                var mce = new MCETextArea();
-                mce.setName("<?php echo $this->input->getName();?>");
+                let mce = new MCETextArea();
+                mce.setName("<?php echo $this->dataInput->getName();?>");
                 mce.initialize();
             });
         </script>
         <?php
     }
 
-    protected function prepareAttributes() : string
-    {
-        $ret = parent::prepareAttributes();
-        $ret.= parent::prepareInputAttributes();
-        return $ret;
-    }
 }
 
 ?>

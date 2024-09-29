@@ -18,8 +18,6 @@ class GalleryView extends Container
 
     protected AbstractResultView $view;
 
-    protected IPhotoRenderer $photo_renderer;
-
     const int MODE_GRID = 1;
     const int MODE_LIST = 2;
 
@@ -30,8 +28,6 @@ class GalleryView extends Container
     public function __construct(DBTableBean $bean, ?SQLQuery $query=NULL)
     {
         parent::__construct();
-
-
 
         $this->bean = $bean;
 
@@ -55,8 +51,6 @@ class GalleryView extends Container
 
             $renderer = new ImageCellRenderer();
 
-            $this->photo_renderer = $renderer;
-
             $view->getColumn("photo")->setCellRenderer($renderer);
             $view->getColumn("date_upload")->setCellRenderer(new DateCellRenderer());
 
@@ -78,8 +72,6 @@ class GalleryView extends Container
 
             $renderer = new GalleryViewItem($this);
             $renderer->setPhotoSize(256, -1);
-
-            $this->photo_renderer = $renderer;
 
             $this->actions = $renderer->getActions();
 
@@ -118,11 +110,6 @@ class GalleryView extends Container
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/GalleryView.js";
         return $arr;
-    }
-
-    public function getPhotoRenderer(): IPhotoRenderer
-    {
-        return $this->photo_renderer;
     }
 
     public function getViewMode()

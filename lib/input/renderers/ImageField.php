@@ -13,8 +13,8 @@ class ImageField extends PlainUpload implements IPhotoRenderer
     {
         parent::__construct($input);
 
-        $this->setInputAttribute("validator", "image");
-        $this->setInputAttribute("accept", implode(",", ImageScaler::SupportedMimes));
+        $this->input->setAttribute("validator", "image");
+        $this->input->setAttribute("accept", implode(",", ImageScaler::SupportedMimes));
     }
 
     public function setPhotoSize(int $width, int $height): void
