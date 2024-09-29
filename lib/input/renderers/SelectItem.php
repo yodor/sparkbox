@@ -1,9 +1,6 @@
 <?php
 include_once("components/renderers/items/DataIteratorItem.php");
 
-/**
- * Rendered multiple times for each iterator step value
- */
 class SelectItem extends DataIteratorItem
 {
     public function __construct()
@@ -33,4 +30,3 @@ class SelectItem extends DataIteratorItem
 }
 
 ?>
-
