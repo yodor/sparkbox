@@ -23,13 +23,6 @@ class SubmenuRenderer extends Component implements IMenuItemRenderer
         return $this->menu_item;
     }
 
-    public function renderSeparator($idx_curr, $items_total) : void
-    {
-        if ($idx_curr < $items_total - 1) {
-            echo "\n<div class='SubmenuSeparator' position='$idx_curr'><div></div></div>";
-        }
-    }
-
     public function setMenuItem(MenuItem $item) : void
     {
         $this->menu_item = $item;

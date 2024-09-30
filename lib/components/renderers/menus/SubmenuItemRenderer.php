@@ -10,11 +10,6 @@ class SubmenuItemRenderer extends MenuItemRenderer
         $this->linkTag->setComponentClass("SubmenuItemLink");
     }
 
-    public function renderSeparator(int $idx_curr, int $items_total) : void
-    {
-
-    }
-
     public function setMenuItem(MenuItem $item) : void
     {
 

@@ -94,8 +94,6 @@ class ItemView extends AbstractResultView
             $this->item_renderer->setData($row);
             $this->item_renderer->render();
 
-            $this->item_renderer->renderSeparator($this->position_index, $this->total_rows);
-
             $this->position_index++;
             $group_listed++;
 

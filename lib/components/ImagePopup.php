@@ -1,24 +1,15 @@
 <?php
-include_once("components/Action.php");
-include_once("components/renderers/IPhotoRenderer.php");
-include_once("storage/StorageItem.php");
-include_once("components/Image.php");
+include_once("components/ImageStorage.php");
 
-class ImagePopup extends Action
+class ImagePopup extends ImageStorage
 {
 
-    protected Image $image;
-
-    public function __construct()
+    public function __construct(?StorageItem $storageItem = null)
     {
-        parent::__construct();
-        $this->setComponentClass("ImagePopup");
-
-        $this->image = new Image();
-        $this->image->setStorageItem(new StorageItem());
-
-        $this->items()->append($this->image);
-
+        parent::__construct($storageItem);
+        $this->addClassName("ImagePopup");
+        //force A
+        $this->setTagName("A");
     }
 
     public function requiredStyle(): array
@@ -35,57 +26,15 @@ class ImagePopup extends Action
         return $arr;
     }
 
-    /**
-     * Return Image component initialized with StorageItem
-     * @return Image
-     */
-    public function image() : Image
-    {
-        return $this->image;
-    }
-
-    public function setRelation(string $relation) : void
-    {
-        $this->setAttribute("relation", $relation);
-    }
-
-    public function getRelation(): string
-    {
-        return $this->getAttribute("relation");
-    }
-
-    /**
-     * Set also the storageItem of the image to $id
-     * @param int $id
-     * @return void
-     */
-    public function setID(int $id) : void
-    {
-        parent::setID($id);
-        $this->image->getStorageItem()->id = $id;
-    }
-
     protected function processAttributes(): void
     {
         parent::processAttributes();
-
-        //if ($this->mode == ImagePopup::MODE_BACKGROUND) {
-        //    $this->setStyleAttribute("background-image", "url({$this->thumb_url})");
-        //}
-
-        $this->setAttribute("itemID", $this->image->getStorageItem()->id);
-        $this->setAttribute("itemClass", $this->image->getStorageItem()->className);
-
         $titleValue = $this->getAttribute("title");
         $alt = $this->image->getAttribute("alt");
-        if (!$alt) {
-            if ($titleValue) {
-                $this->image->setAttribute("alt", $titleValue);
-            }
+        if (!$alt && $titleValue) {
+            $this->image->setAttribute("alt", $titleValue);
         }
-
     }
-
 }
 
 ?>

@@ -5,37 +5,36 @@ include_once("components/renderers/menus/MenuBarItemRenderer.php");
 
 class MenuBarComponent extends Container
 {
-
     /**
      * @var MenuItemList
      */
     protected MenuItemList $menu;
-
 
     /**
      * @var MenuBarItemRenderer
      */
     protected MenuBarItemRenderer $ir_baritem;
 
-
     /**
      * @var Component
      */
     protected Component $bar;
-
 
     /**
      * @var Component
      */
     protected Component $toggle;
 
-    public bool $toggle_first = FALSE;
-
-    protected bool $separator_enabled = true;
+    public bool $toggle_first = true;
 
     public function __construct(MenuItemList $menu)
     {
         parent::__construct(false);
+        $this->setComponentClass("MenuBar");
+
+        $this->setAttribute("itemscope", "");
+        $this->setAttribute("itemtype","https://schema.org/SiteNavigationElement");
+        $this->setAttribute("role", "menu");
 
         $this->menu = $menu;
         $this->ir_baritem = new MenuBarItemRenderer();
@@ -44,28 +43,16 @@ class MenuBarComponent extends Container
             $this->setAttribute("menu", $this->menu->getName());
         }
 
-        $this->bar = new Component(false);
-        $this->bar->setComponentClass("MenuBar");
-
-        $this->bar->setAttribute("itemscope", "");
-        $this->bar->setAttribute("itemtype","https://schema.org/SiteNavigationElement");
-        $this->bar->setAttribute("role", "menu");
-
         $this->toggle = new Component(false);
         $this->toggle->setTagName("A");
         $this->toggle->setContents( "<div></div>");
         $this->toggle->setComponentClass("toggle");
 
-    }
+        $this->bar = new ClosureComponent($this->renderItems(...), true);
+        $this->bar->setComponentClass("MenuBarComponent");
 
-    public function setToggleFirst() : void
-    {
-        $this->toggle_first = true;
-    }
-
-    public function setToggleLast() : void
-    {
-        $this->toggle_first = false;
+        $this->items->append($this->toggle);
+        $this->items->append($this->bar);
     }
 
     public function requiredStyle() : array
@@ -73,7 +60,6 @@ class MenuBarComponent extends Container
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/MenuBarComponent.css";
         return $arr;
-
     }
 
     public function requiredScript() : array
@@ -83,15 +69,9 @@ class MenuBarComponent extends Container
         return $arr;
     }
 
-    public function setSeparatorEnabled(bool $mode)
-    {
-        $this->separator_enabled = $mode;
-    }
-
     public function getMenu(): MenuItemList
     {
         return $this->menu;
-
     }
 
     public function setItemRenderer(MenuBarItemRenderer $ir_baritem)
@@ -111,19 +91,8 @@ class MenuBarComponent extends Container
         $this->toggle->setAttribute("title", $name);
     }
 
-    public function startRender()
+    protected function renderItems() : void
     {
-        $this->bar->startRender();
-        if ($this->toggle_first) {
-            $this->toggle->render();
-        }
-        parent::startRender();
-
-    }
-
-    protected function renderImpl()
-    {
-
         $itemCount = $this->menu->count();
 
         $iterator = $this->menu->iterator();
@@ -132,15 +101,12 @@ class MenuBarComponent extends Container
             $this->ir_baritem->setMenuItem($item);
             $this->ir_baritem->setAttribute("position", $iterator->pos());
             $this->ir_baritem->render();
-            if ($this->separator_enabled) {
-                $this->ir_baritem->renderSeparator($iterator->pos(), $itemCount);
-            }
         }
     }
 
-    public function render()
+    public function finishRender()
     {
-        parent::render();
+        parent::finishRender();
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
@@ -149,15 +115,6 @@ class MenuBarComponent extends Container
             });
         </script>
         <?php
-    }
-
-    public function finishRender()
-    {
-        parent::finishRender();
-        if (!$this->toggle_first) {
-            $this->toggle->render();
-        }
-        $this->bar->finishRender();
     }
 }
 

@@ -20,14 +20,23 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      */
     protected OutputBuffer $buffer;
 
+    /**
+     * Property controlling the reachability for this component using PageCache
+     * @var bool
+     */
     protected bool $cacheable = false;
 
     /**
-     * HTML tag of this element
+     * HTML tag name of this element ex DIV,SPAN,LABEL etc
      * @var string
      */
     protected string $tagName = "DIV";
 
+    /**
+     * Property controlling the closing tag for this component
+     * ex IMG does not need closing tag but SPAN does need
+     * @var bool
+     */
     protected bool $closingTagRequired = true;
 
     protected int $index = -1;
@@ -48,15 +57,16 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
 
     /**
-     * Collection of atrribue names that require json encoded value
+     * Collection of attribute names that require their value as json encoded
      * @var array
      */
     protected array $json_attributes = array();
 
 
     /**
-     * If true the component class is set to this object class name + all parent object class names
-     * If false only this object class name is set as $component_class
+     * Property controlling automatic php class name to CSS class name mapping during constructor calls
+     * If true the CSS class name is set using get_class of $this and its parents objects
+     * If false CSS class name is equal to get_class($this) ie setComponentClass(get_class($this))
      * @var bool
      */
     protected bool $chained_component_class = true;
@@ -76,7 +86,13 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     public bool $translation_enabled = FALSE;
     public bool $render_tooltip = TRUE;
 
+    /**
+     * Property controlling the enablement of the render method of this component
+     *
+     * @var bool
+     */
     protected bool $render_enabled = TRUE;
+
 
     protected string $caption = "";
     protected ?Component $caption_component = null;
@@ -86,7 +102,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * Sets the component class to the value of get_class($this)
      * If '$chained_component_class' is true calls get_class on all parents and construct the component class from
      * their names including this component class
-     * Ex: $cmp = new Component(true) will have compnent class = SparkObject SparkObservable Component
+     * Ex: $cmp = new Container(true) will have component class = SparkObject Component Container
+     * If '$chained_component_class' is false calls setComponentClass(get_class(this))
      * @param bool $chained_component_class enable inheritance component class
      */
     public function __construct(bool $chained_component_class = true)
@@ -113,6 +130,11 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
     }
 
+    /**
+     * Property controlling the rendering of this component
+     * @param bool $mode
+     * @return void
+     */
     public function setRenderEnabled(bool $mode) : void
     {
         $this->render_enabled = $mode;

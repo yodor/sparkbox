@@ -7,8 +7,6 @@ interface IMenuItemRenderer
 
     public function getMenuItem() : ?MenuItem;
 
-    public function renderSeparator(int $idx_curr, int $items_total) : void;
-
 }
 
 ?>

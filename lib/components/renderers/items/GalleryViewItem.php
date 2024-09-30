@@ -175,10 +175,6 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         }
     }
 
-    public function renderSeparator($idx_curr, $items_total)
-    {
-
-    }
 
 
 }

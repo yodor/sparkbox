@@ -18,13 +18,6 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
         $this->linkTag->setAttribute("role", "menuitem");
     }
 
-    public function renderSeparator(int $idx_curr, int $items_total) : void
-    {
-        if ($idx_curr < $items_total - 1) {
-            echo "<div class='MenuSeparator' position='$idx_curr'><div></div></div>";
-        }
-    }
-
     public function setMenuItem(MenuItem $item) : void
     {
 

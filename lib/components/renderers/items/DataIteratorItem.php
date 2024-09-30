@@ -170,11 +170,6 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
 
     }
 
-    public function renderSeparator(int $idx_curr, int $items_total)
-    {
-
-    }
-
 }
 
 ?>
