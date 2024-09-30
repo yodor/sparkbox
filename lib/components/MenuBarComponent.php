@@ -74,7 +74,12 @@ class MenuBarComponent extends Container
         return $this->menu;
     }
 
-    public function setItemRenderer(MenuBarItemRenderer $ir_baritem)
+    public function getBar() : ClosureComponent
+    {
+        return $this->bar;
+    }
+
+    public function setItemRenderer(MenuBarItemRenderer $ir_baritem) : void
     {
         $this->ir_baritem = $ir_baritem;
     }

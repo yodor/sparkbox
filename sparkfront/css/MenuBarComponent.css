@@ -82,11 +82,11 @@
     border: 1px solid black;
     text-align: left;
 
+    flex-direction: column;
 }
 
 .SubmenuRenderer.normal {
     display: flex;
-    flex-direction: column;
 }
 
 .SubmenuItemRenderer[selected="1"] {

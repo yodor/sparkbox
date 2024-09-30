@@ -1,114 +1,82 @@
-.admin_menu {
+.MenuBar {
 
-    min-width: 180px;
-
-    display: inline-block;
-    background-color: transparent;
 }
 
-.admin_menu .toggle {
-    display: none;
+.MenuBarComponent {
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    flex-grow:1;
 }
 
-.admin_menu .handle {
-    display: none !important;
-}
-
-.admin_menu .MenuItemOuter {
-    display: block !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-.admin_menu .MenuBarItemRenderer {
-    display: block;
-    height: auto;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.admin_menu .MenuSeparator {
-    display: none
-}
-
-.admin_menu .MenuBarItemRenderer .MenuItemLink {
-    padding: 5px;
-
-    color: #517688;
-    display: block;
-
-
-    /*   border-bottom:1px solid #cccccc; */
+.MenuBarComponent .MenuBarItemRenderer {
     border-top: 1px solid #cccccc;
+    color: #517688;
 
-    /*padding-right: 15px;*/
+    flex-flow: column wrap;
 
+    padding:0;
 
+    align-items:flex-start;
+
+    width:100%;
+    box-sizing:border-box;
 }
 
-.admin_menu .MenuBarItemRenderer[active="1"] .MenuItemLink {
+.MenuBarComponent .MenuBarItemRenderer .MenuItemLink {
+    padding:0.5em;
+}
+
+.MenuBarComponent .MenuBarItemRenderer[active="1"]  {
     background-color: #b9b3a3;
-
     color: white;
-    background-image: none;
-    border-top: none;
-    border-bottom: none;
 }
 
-.admin_menu .MenuBarItemRenderer[active="1"] .SubmenuRenderer {
+
+.MenuBarComponent .MenuBarItemRenderer[active="1"] .SubmenuRenderer {
+    display:flex;
+
     background: white;
     color: #b9b3a3;
 
-    display: block;
     position: relative;
-    border: 0;
-    padding-left: 10px;
+
+    padding:0;
+    padding-left:0.5em;
+
+    width:100%;
+    box-sizing: border-box;
+    border:0;
 }
 
-.admin_menu .SubmenuRenderer .SubmenuItemLink {
+.SubmenuRenderer .SubmenuItemRenderer {
     color: #666666;
     padding-left: 2px;
 }
 
-.admin_menu .SubmenuRenderer .SubmenuItemLink .MenuIcon {
-    display: none;
-}
-
-.admin_menu .SubmenuRenderer .SubmenuItemOuter {
+.SubmenuRenderer .SubmenuItemOuter {
     padding: 5px;
-
-    /*background-image: url("../images/admin/submenu_item_bullet.png");*/
-    background-repeat: no-repeat;
-    background-position: left center;
 }
 
-.admin_menu .SubmenuRenderer .SubmenuItemOuter .RightPart {
-    display: none;
-}
-
-.admin_menu .MenuBarItemRenderer[active="1"] .MenuItemLink + .SubmenuRenderer {
+.MenuBarItemRenderer[active="1"] .MenuItemLink + .SubmenuRenderer {
     margin-left: 0;
     padding-left: 0;
 }
 
-.admin_menu .SubmenuItemRenderer[selected="1"] > .SubmenuItemOuter .SubmenuItemLink {
+.SubmenuItemRenderer[selected="1"] > .SubmenuItemOuter .SubmenuItemLink {
     text-decoration: underline;
     font-weight: bold;
 }
 
-.admin_menu .MenuBarItemRenderer[active="1"] .SubmenuItemRenderer .SubmenuRenderer {
+.MenuBarItemRenderer[active="1"] .SubmenuItemRenderer .SubmenuRenderer {
     display: none;
 }
 
-.admin_menu .MenuBarItemRenderer[active="1"] .SubmenuItemRenderer[selected="1"] .SubmenuRenderer {
-    display: block;
-
-}
-
-.admin_menu .MenuIcon {
-
-    display: inline-block;
-    vertical-align: middle;
+.MenuBarItemRenderer[active="1"] .SubmenuItemRenderer[selected="1"] .SubmenuRenderer {
+    display: flex;
 }
 
 
