@@ -16,18 +16,23 @@
 /*hamburger menu is open - have class .normal */
 .MenuBar.normal .MenuBarComponent {
     display: flex;
+
     position: absolute;
-    left:0;
+
+    /*center on viewport*/
+    left: 50%;
+    transform: translateX(-50%);
 
     /*below hamburger menu*/
-    top:35px;
+    top: calc(100%);
 
-    flex-direction:column;
-    align-items:flex-start;
-    width:100%;
+    flex-direction: column;
+    align-items: flex-start;
 
     /*!*/
-    height:auto;
+    /*viewport width*/
+    width: calc(100vw);
+    height: auto;
 
     box-shadow: 0 8px 8px -8px rgba(0, 0, 0, 0.5);
 }
