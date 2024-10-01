@@ -111,7 +111,7 @@ abstract class DataIteratorField extends InputField
      * Set flag to enable using the modelID as array key. Actual value of the key will be prefixed with string - 'modelID:'
      * @param bool $mode
      */
-    public function useArrayKeyModelID(bool $mode)
+    public function useArrayKeyModelID(bool $mode) : void
     {
         $this->array_key_model_id = $mode;
     }
@@ -121,7 +121,7 @@ abstract class DataIteratorField extends InputField
      * Overrides any other key naming like modelID
      * @param string $field_name
      */
-    public function setArrayKeyFieldName(string $field_name)
+    public function setArrayKeyFieldName(string $field_name) : void
     {
         $this->array_key_field_name = $field_name;
     }

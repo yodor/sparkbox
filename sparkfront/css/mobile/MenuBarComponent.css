@@ -5,7 +5,7 @@
 
 .MenuBar .toggle {
     /*is inside flex container*/
-    display:inherit;
+    display:initial;
 }
 
 /*hide the menu component by default*/
