@@ -216,7 +216,6 @@ class DataInputFactory
             case DataInputFactory::CHECKBOX_TREEVIEW:
 
                 $input = new ArrayDataInput($name, $label, $required);
-                $input->getValidator()->require_array_value = TRUE;
                 new CheckboxTreeView($input);
                 break;
 

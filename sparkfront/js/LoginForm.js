@@ -29,7 +29,7 @@ class LoginForm extends Component {
             }.bind(this));
 
         } catch (exx) {
-            alert("Unable to attach with requested AuthForm: " + exx);
+            alert("Unable to attach with requested AuthForm: " + exx + " " + this.selector());
         }
 
     }

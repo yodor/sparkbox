@@ -115,8 +115,6 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
     {
         parent::processAttributes();
 
-        $this->setAttribute("field", $this->dataInput->getName());
-
         $this->input?->setName($this->dataInput->getName());
 
         if (!$this->dataInput->isEditable()) {
@@ -128,7 +126,6 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
         }
 
         $this->processErrorAttributes();
-
 
     }
 

@@ -3,73 +3,71 @@ include_once("components/Container.php");
 include_once("components/InputComponent.php");
 include_once("components/Container.php");
 
-class InputGroupRenderer extends Component
+class InputGroupRenderer extends Container
 {
 
     protected InputGroup $group;
 
     public function __construct(InputGroup $group)
     {
-        parent::__construct();
+        parent::__construct(false);
         $this->tagName = "fieldset";
         $this->group = $group;
         $this->setName($group->getName());
+
+        $legend = new Component(false);
+        $legend->setTagName("legend");
+        $legend->setContents($this->group->getDescription());
+        $this->items()->append($legend);
     }
 
-    public function startRender()
-    {
-        parent::startRender();
-        echo "<legend>";
-        echo $this->group->getDescription();
-        echo "</legend>";
-
-    }
 }
 
 class FormRenderer extends Container
 {
     protected InputForm $form;
-    protected ColorButton $submitButton;
 
-    //TODO
-    protected $render_field_callback = NULL;
-
-    const FIELD_HBOX = "HBox";
-    const FIELD_VBOX = "VBox";
-
-    const SUBMIT_NAME = "SubmitForm";
-
+    const string FIELD_HBOX = "HBox";
+    const string FIELD_VBOX = "VBox";
     protected string $layout = FormRenderer::FIELD_VBOX;
 
-    protected string $method;
+    const string METHOD_POST = "post";
+    const string METHOD_GET = "get";
+    protected string $method = FormRenderer::METHOD_POST;
 
-    protected $submitLine;
+    /**
+     * Submit element name attribute default value.
+     * FormProcessor look for array key with this name in the request data during processing matching its value to the form name
+     * By default form name is equal to the PHP class name
+     */
+    const string SUBMIT_NAME = "SubmitForm";
 
-    const METHOD_POST = "post";
-    const METHOD_GET = "get";
+
+    /**
+     * Default submit button
+     * @var ColorButton
+     */
+    protected ColorButton $submitButton;
+    protected Container $submitLine;
 
     public function __construct(InputForm $form)
     {
         parent::__construct(false);
 
+        $this->setTagName("FORM");
         $this->setComponentClass("FormRenderer");
+        $this->setLayout($this->layout);
 
-        $this->tagName = "FORM";
-
-        $this->form = $form;
-        $form->setRenderer($this);
+        $this->setForm($form);
 
         $this->setAttribute("enctype", "multipart/form-data");
-
         $this->setMethod(FormRenderer::METHOD_POST);
 
-        $button = new ColorButton();
+        $button = new ColorButton(ColorButton::TYPE_SUBMIT, FormRenderer::SUBMIT_NAME);
         $button->setAttribute("action", "submit");
         $button->setContents("Submit");
-        $button->setType(ColorButton::TYPE_SUBMIT);
-        $button->setName(FormRenderer::SUBMIT_NAME);
-
         $this->submitButton = $button;
+
 
         $this->submitLine = new Container(false);
         $this->submitLine->setClassName("SubmitLine");
@@ -84,14 +82,15 @@ class FormRenderer extends Container
         $buttons->items()->append($this->submitButton);
         $this->submitLine->items()->append($buttons);
 
-        $this->setLayout($this->layout);
+
+        $this->items()->append(new ClosureComponent($this->renderInputs(...), false));
+        $this->items()->append(new ClosureComponent($this->renderSubmitLine(...), false));
 
     }
 
-    public function setMethod(string $method)
+    public function setMethod(string $method) : void
     {
         $this->method = $method;
-        $this->setAttribute("method", $method);
     }
 
     public function getMethod(): string
@@ -133,22 +132,17 @@ class FormRenderer extends Container
         return $arr;
     }
 
-    public function setLayout(string $mode)
+    public function setLayout(string $mode) : void
     {
         $this->layout = $mode;
-        $this->setAttribute("layout", $this->layout);
     }
 
-    public function setRenderFieldCallback($fname)
-    {
-        $this->render_field_callback = $fname;
-    }
 
-    public function setForm(InputForm $form)
+    public function setForm(InputForm $form) : void
     {
         $this->form = $form;
         $this->form->setRenderer($this);
-
+        $this->setName($form->getName());
     }
 
     public function getForm() : InputForm
@@ -161,88 +155,75 @@ class FormRenderer extends Container
      */
     protected function processAttributes(): void
     {
+
         parent::processAttributes();
-        $this->setName($this->form->getName());
+
+        $this->setAttribute("method", $this->method);
+        $this->setAttribute("layout", $this->layout);
+
     }
 
-    protected function renderImpl()
-    {
-        $this->renderInputs();
-        if ($this->submitLine->isEnabled()) {
-            $this->renderSubmitLine();
-        }
-        else {
-            $this->renderSubmitValue();
-        }
-    }
-
-    public function renderInputs()
+    protected function renderInputs() : void
     {
         $group_names = $this->form->getGroupNames();
-        foreach ($group_names as $idx1=>$group_name) {
+
+        foreach ($group_names as $group_name) {
+
             $group = $this->form->getGroup($group_name);
 
-            $fieldSet = new InputGroupRenderer($group);
             $inputNames = $group->inputNames();
             if (count($inputNames)<1) continue;
 
-            if(count($group_names)>1) {
-                $fieldSet->startRender();
-            }
-            foreach ($inputNames as $idx2=>$inputName) {
-                $input = $this->form->getInput($inputName);
-                $this->renderInput($input);
-            }
-            if(count($group_names)>1) {
-                $fieldSet->finishRender();
-            }
-        }
-
-    }
-
-    public function renderInput(DataInput $input)
-    {
-
-        $callback_rendered = FALSE;
-        if ($this->render_field_callback) {
-            if (is_callable($this->render_field_callback)) {
-                $callback_rendered = call_user_func($this->render_field_callback, $input, $this);
+            $container = null;
+            if (count($group_names)==1 && strcmp($group_name, InputForm::DEFAULT_GROUP)==0) {
+                //single group - with name default no rendering using input group
+                $container = new Container(false);
+                $container->wrapper_enabled = false;
             }
             else {
-                //TODO: Check if exception throwing is more appropriate here
-                debug("callback set but callback render function not callable");
-
+                $container = new InputGroupRenderer($group);
             }
+
+            foreach ($inputNames as $idx2=>$inputName) {
+                $input = $this->form->getInput($inputName);
+                $container->items()->append($this->createInputComponent($input));
+            }
+
+            $container->render();
+
+
         }
-        if (!$callback_rendered) {
-            $component = new InputComponent($input);
-            $component->render();
+
+    }
+
+    protected function createInputComponent(DataInput $input) : Component
+    {
+        return new InputComponent($input);
+    }
+
+    protected function renderSubmitLine() : void
+    {
+        //default is to use the submit name of the form
+        $submit_value = $this->form->getName();
+
+        if ($this->submitLine->isRenderEnabled()) {
+
+            //rare but honor the button value if set
+            if (!$this->submitButton->getValue()) {
+                $this->submitButton->setValue($submit_value);
+            }
+            $this->submitLine->render();
+
         }
-
-    }
-
-    public function renderSubmitLine()
-    {
-        //prefer submit value of the submit button
-        $submit_value = $this->getSubmitValue();
-
-        $this->submitButton->setValue($submit_value);
-        $this->submitLine->render();
-    }
-
-    public function renderSubmitValue()
-    {
-        echo "<input type=hidden name='" . FormRenderer::SUBMIT_NAME . "' value='" . $this->getSubmitValue() . "'>";
-    }
-
-    public function getSubmitValue() : string
-    {
-        $submit_value = $this->submitButton->getValue();
-        if (!$submit_value) {
-            $submit_value = $this->getName();
+        else {
+            //submit line is hidden render hidden input to signal the processor
+            $submit = new Input("hidden");
+            $submit->setName(FormRenderer::SUBMIT_NAME);
+            $submit->setValue($submit_value);
+            $submit->render();
         }
-        return $submit_value;
     }
+
 }
 
 ?>

@@ -225,9 +225,8 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         echo "</div>";
 
         echo "<div class='dimension'>";
-        $frend->startRender();
-        $frend->renderInputs();
-        $frend->finishRender();
+        $frend->getSubmitLine()->setRenderEnabled(false);
+        $frend->render();
         echo "</div>";
 
         echo "</div>";

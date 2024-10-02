@@ -2,27 +2,28 @@
 include_once("input/DataInputFactory.php");
 include_once("beans/IBeanEditor.php");
 
-class InputGroup {
+class InputGroup extends SparkObject {
 
-    /**
-     * @var string The name of this input group
-     */
-    protected string $name;
+
     /**
      * @var string Description of this input group
      */
-    protected string $description;
+    protected string $description = "";
 
     /**
      * @var array Names of all inputs in this input group
      */
-    protected array $contents;
+    protected array $contents = array();
 
     public function __construct(string $name, string $description="")
     {
-        $this->name = $name;
-        $this->description = $description;
+        parent::__construct();
+
         $this->contents = array();
+
+        $this->setName($name);
+        $this->setDescription($description);
+
     }
 
     public function containsInput(DataInput $input): bool
@@ -52,16 +53,6 @@ class InputGroup {
         $this->contents = array();
     }
 
-    public function getName() : string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
     public function getDescription() : string
     {
         return $this->description;
@@ -81,13 +72,13 @@ class InputGroup {
  * - Can be assigned with "FormProcessor" to process the collection of InputFeilds
  * - Editor for DBTableBean class, and row ID can be set
  *
- * Sparkbox Form handling usage:
- * After constructing SitePage(or one of its subclasses) instance and before SitePage->begin() is exectued
- * IFromProcessors->processForm is called with instance of InputForm
+ * SparkBox Form handling usage:
+ * After constructing SparkPage(or one of its subclasses) instance and before SitePage->begin() is executed
+ * IFromProcessors->process is called with instance of InputForm
  * after SitePage->begin() is called which marks end of server side processing and start of rendering
- *form can be rendered using IFormRenderer->renderForm()
+ * form can be rendered using IFormRenderer->renderForm()
  */
-class InputForm implements IBeanEditor
+class InputForm extends SparkObject implements IBeanEditor
 {
     /**
      * @var bool
@@ -121,7 +112,7 @@ class InputForm implements IBeanEditor
 
     protected string $name = "";
 
-    const DEFAULT_GROUP = "default";
+    const string DEFAULT_GROUP = "default";
 
     //group names
     protected array $groups = array();
@@ -133,8 +124,11 @@ class InputForm implements IBeanEditor
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->bean = NULL;
         $this->beanID = -1;
+
         $this->name = get_class($this);
 
         //create default group
@@ -215,20 +209,6 @@ class InputForm implements IBeanEditor
         }
 
         return $result;
-    }
-
-    /**
-     * @param string $name The name of this form
-     */
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
-
-    public function getName(): string
-    {
-        if ($this->name) return $this->name;
-        return get_class($this);
     }
 
     public function getRenderer(): ?FormRenderer

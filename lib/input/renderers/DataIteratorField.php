@@ -28,7 +28,6 @@ abstract class DataIteratorField extends InputField
         if (!$this->iterator instanceof IDataIterator) return;
 
         $field_values = $this->dataInput->getValue();
-        $field_name = $this->dataInput->getName();
 
         if (!is_array($field_values)) {
             $field_values = array($field_values);
@@ -38,6 +37,7 @@ abstract class DataIteratorField extends InputField
 
         $num = $this->iterator->exec();
 
+
         while ($data_row = $this->iterator->next()) {
 
             //TODO
@@ -46,19 +46,15 @@ abstract class DataIteratorField extends InputField
                 $id = $data_row[$this->iterator->key()];
             }
 
-            $item = $this->item;
-            //$item = clone $this->item;
-
-            $item->setID((int)$id);
-            $item->setIndex($index);
+            $this->item->setID((int)$id);
+            $this->item->setIndex($index);
             //sets the actual value of the item being rendered
-            $item->setData($data_row);
+            $this->item->setData($data_row);
 
-            $isSelected = $this->isModelSelected();
-            $item->setSelected($isSelected);
+            $this->item->setSelected($this->isModelSelected((string)$this->item->getValue()));
 
-            $array_key_value = "";
-            if ($isSelected) {
+            $array_key_value = $index;
+            if ($this->item->isSelected()) {
                 if ($this->array_key_model_id) {
                     //the corresponding ID of the value from transact-bean of DataInput
                     $modelID = $this->getModelValueID();
@@ -67,13 +63,17 @@ abstract class DataIteratorField extends InputField
                     }
                 }
             }
+
             //override key
             if ($this->array_key_field_name && isset($data_row[$this->array_key_field_name])) {
                 $array_key_value = $data_row[$this->array_key_field_name];
             }
-            $item->setName($field_name . "[".$array_key_value."]");
 
-            $item->render();
+            //dataInput name might already be forced to array from ArrayField
+            //force array name for html input
+            $this->item->setName($this->dataInput->getName() . "[".$array_key_value."]");
+
+            $this->item->render();
 
             $index++;
         }
@@ -84,13 +84,15 @@ abstract class DataIteratorField extends InputField
      * Search 'this' item value inside DataInput values.
      * @return bool
      */
-    protected function isModelSelected(): bool
+    protected function isModelSelected(string $item_value): bool
     {
+
         $field_values = $this->dataInput->getValue();
+
         if (!is_array($field_values)) {
             $field_values = array($field_values);
         }
-        return (in_array($this->item->getValue(), $field_values));
+        return in_array($item_value, $field_values);
     }
 
     /**
@@ -98,7 +100,7 @@ abstract class DataIteratorField extends InputField
      * Return -1 if 'this' item value is not inside 'this' DataInput values.
      * @return int
      */
-    protected function getModelValueID() : int
+    protected function getModelValueID() : int|string
     {
         $field_values = $this->dataInput->getValue();
         if (!is_array($field_values)) return -1;

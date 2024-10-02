@@ -11,12 +11,9 @@ class ArrayInputValidator implements IInputValidator
 
     public function validate(DataInput $input) : void
     {
-        //input processor passes ordered values to the field
-        //from arrayinputprocessor
-        // 	      $values_ordered = reorderArray($values_array);
-        //
-        // 	      $field->setValue($values_ordered);
+
         if (!($input instanceof ArrayDataInput)) throw new Exception("Not an instance of ArrayDataInput");
+
 
         $values_array = $input->getValue();
 
@@ -31,11 +28,9 @@ class ArrayInputValidator implements IInputValidator
         debug("Input name: '{$input->getName()}' value type: " . getType($values_array) . " is_required: " . $input->isRequired());
 
         if (!is_array($values_array) || count($values_array) < 1) {
-
             if ($input->isRequired()) {
                 throw new Exception("Input value(s) for this collection");
             }
-
         }
 
         for ($idx = 0; $idx < count($values_array); $idx++) {
@@ -50,9 +45,6 @@ class ArrayInputValidator implements IInputValidator
                 $cfield = clone $input;
 
                 $cfield->setValue($value);
-
-                //array inputs required?
-                //$cfield->setRequired($this->validator_private->require_array_value);
 
                 $this->item_validator->validate($cfield);
 
@@ -71,7 +63,12 @@ class ArrayInputValidator implements IInputValidator
 
     }
 
-    public function getItemValidator()
+    public function setItemValidator(IInputValidator $item_validator) : void
+    {
+        $this->item_validator = $item_validator;
+    }
+
+    public function getItemValidator() : IInputValidator
     {
         return $this->item_validator;
     }

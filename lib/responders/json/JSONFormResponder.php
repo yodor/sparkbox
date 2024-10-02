@@ -41,7 +41,7 @@ abstract class JSONFormResponder extends JSONResponder
     protected function setupFormRenderer()
     {
         $fr = new FormRenderer($this->form);
-        $fr->getSubmitLine()->setEnabled(false);
+        $fr->getSubmitLine()->setRenderEnabled(false);
     }
 
     public function _render(JSONResponse $resp)

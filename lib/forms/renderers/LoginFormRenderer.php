@@ -56,16 +56,15 @@ class LoginFormRenderer extends FormRenderer
         return $arr;
     }
 
-    public function startRender()
+    protected function processAttributes(): void
     {
+        parent::processAttributes();
         $this->form->getInput("rand")->setValue($this->handler->getAuthenticator()->createLoginToken());
-
-        parent::startRender();
     }
 
-    public function render()
+    public function finishRender()
     {
-        parent::render();
+        parent::finishRender();
 
         ?>
         <script type='text/javascript'>
@@ -78,13 +77,6 @@ class LoginFormRenderer extends FormRenderer
         <?php
     }
 
-    public function renderSubmitLine()
-    {
-        $this->submitLine->render();
-
-        //echo "<div class='fb-login-button' onlogin='Facebook_login()' autologoutlink='false' scope='email,user_interests,user_about_me'>Login with Facebook</div>";
-
-    }
 
 }
 

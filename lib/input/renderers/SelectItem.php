@@ -15,6 +15,9 @@ class SelectItem extends DataIteratorItem
     {
         parent::processAttributes();
 
+        //no name for options
+        $this->removeAttribute("name");
+
         if ($this->isSelected()) {
             $this->setAttribute("SELECTED", "");
         }

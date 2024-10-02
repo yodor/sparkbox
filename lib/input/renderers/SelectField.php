@@ -32,47 +32,39 @@ class SelectField extends DataIteratorField
         //prepare the default select value
         if ($this->na_label) {
 
-            //            $data = array($this->getItemRenderer()->getValueKey()=>$this->na_value,
-            //                $this->getItemRenderer()->getLabelKey()=>$this->na_label);
+            $this->item->setID(-1);
+            $this->item->setIndex(-1);
 
-            $item = $this->item;
+            $this->item->setValue($this->na_value);
+            $this->item->setLabel($this->na_label);
 
-            $item->setID(-1);
+            $this->item->setSelected($this->isModelSelected((string)$this->item->getValue()));
 
-            $item->setIndex(-1);
-
-            //$item->setData($data);
-
-            $item->setValue($this->na_value);
-            $item->setLabel($this->na_label);
-
-            $item->setSelected($this->isModelSelected());
-
-            $item->render();
+            $this->item->render();
 
         }
         parent::renderItems();
     }
 
-    protected function isModelSelected(): bool
+    protected function isModelSelected(string $item_value) : bool
     {
         $field_values = $this->dataInput->getValue();
         $selected = FALSE;
         if (is_array($field_values)) {
             foreach ($field_values as $idx => $field_value) {
-                $selected = $this->compareValue((string)$field_value);
+                $selected = $this->compareValue($item_value, (string)$field_value);
                 if ($selected) break;
             }
         }
         else {
-            $selected = $this->compareValue((string)$field_values);
+            $selected = $this->compareValue($item_value, (string)$field_values);
         }
         return $selected;
     }
 
-    protected function compareValue(string $field_value) : bool
+    protected function compareValue(string $item_value, string $field_value) : bool
     {
-        return (strcmp((string)$this->item->getValue(), $field_value)==0);
+        return (strcmp($item_value, $field_value)==0);
     }
 
 }

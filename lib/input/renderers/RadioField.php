@@ -8,10 +8,15 @@ class RadioField extends DataIteratorField
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-
         $this->setItemRenderer(new RadioItem());
     }
 
+    protected function processAttributes(): void
+    {
+        parent::processAttributes();
+
+        $this->removeAttribute("name");
+    }
 }
 
 ?>

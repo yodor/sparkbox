@@ -84,8 +84,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->form_render = new FormRenderer($form);
 
-        $this->attributes["bean"] = get_class($this->bean);
-        $this->form_render->setName(get_class($this->bean));
+        $this->setAttribute("bean", get_class($this->bean));
 
         $this->processor = new FormProcessor();
 
@@ -142,7 +141,7 @@ class BeanFormEditor extends Container implements IBeanEditor
      * @param string $message
      * @param int $type MESSAGE_ADD or MESSAGE_UPDATE
      */
-    public function setMessage(string $message, int $type)
+    public function setMessage(string $message, int $type) : void
     {
         $this->messages[$type] = $message;
     }

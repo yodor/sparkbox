@@ -105,56 +105,56 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     {
         $submitKey = FormRenderer::SUBMIT_NAME;
         $submitValue = "";
+
         if (isset($_REQUEST[$submitKey])) {
             $submitValue = $_REQUEST[$submitKey];
         }
 
         $form_name = $form->getName();
 
+        if (strcmp($submitValue, $form_name) != 0) {
+            debug("STATUS_NOT_PROCESSED - _REQUEST[$submitKey] not equal to '$form_name' ");
+            $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
+            return;
+        }
 
         if ($this->sessionEnabled) {
             $this->restoreSessionData($form);
         }
 
-        if (strcmp($submitValue, $form_name) == 0) {
-            debug("Loading form with _REQUEST values - key '$submitKey' value = Form name: '$form_name' ");
+        debug("Loading _REQUEST data - _REQUEST[$submitKey] match form name '$form_name'");
 
-            try {
+        try {
 
-                //validate values coming from user input
-                $form->loadPostData($_REQUEST);
-                $form->validate();
+            //validate values coming from user input
+            $form->loadPostData($_REQUEST);
+            $form->validate();
 
-                $this->processImpl($form);
+            $this->processImpl($form);
 
-                $this->setStatus(IFormProcessor::STATUS_OK);
+            $this->setStatus(IFormProcessor::STATUS_OK);
 
-                if ($this->sessionEnabled) {
-                    $this->storeSessionData($form);
+            if ($this->sessionEnabled) {
+                $this->storeSessionData($form);
 
-                    if ($this->redirectEnabled) {
-                        $url = URL::Current();
-                        foreach ($form->getInputs() as $inputName=>$input){
-                            $url->remove($inputName);
-                        }
-                        $url->remove(FormRenderer::SUBMIT_NAME);
-                        header("Location: ".$url->toString());
-                        exit;
+                if ($this->redirectEnabled) {
+                    $url = URL::Current();
+                    foreach ($form->getInputs() as $inputName=>$input){
+                        $url->remove($inputName);
                     }
+                    $url->remove(FormRenderer::SUBMIT_NAME);
+                    header("Location: ".$url->toString());
+                    exit;
                 }
-
-            }
-            catch (Exception $e) {
-
-                $this->setMessage($e->getMessage());
-                $this->status = IFormProcessor::STATUS_ERROR;
             }
 
         }
-        else {
-            debug("Setting STATUS_NOT_PROCESSED - _REQUEST key '$submitKey' not found or not equal to '{$form->getName()}' ");
-            $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
+        catch (Exception $e) {
+
+            $this->setMessage($e->getMessage());
+            $this->status = IFormProcessor::STATUS_ERROR;
         }
+
 
     }
 

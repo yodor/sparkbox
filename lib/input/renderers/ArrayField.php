@@ -25,6 +25,7 @@ class ArrayField extends InputField
 
     public function __construct(InputField $field)
     {
+
         parent::__construct($field->getDataInput());
 
         $this->element_renderer = $field;
@@ -110,6 +111,8 @@ class ArrayField extends InputField
     protected function processAttributes(): void
     {
         parent::processAttributes();
+        //needs the field attribute
+        $this->setAttribute("field", $this->dataInput->getName());
         $this->controls->setAttribute("field", $this->dataInput->getName());
         $this->array_contents->setAttribute("field", $this->dataInput->getName());
     }
@@ -118,7 +121,8 @@ class ArrayField extends InputField
     {
         $fake_input = new DataInput("render_source", $this->dataInput->getLabel(), $this->dataInput->isRequired());
 
-        $renderer = clone $this->element_renderer;
+        $renderer = $this->element_renderer;
+
         $renderer->setDataInput($fake_input);
 
         $renderer->render();
@@ -136,13 +140,14 @@ class ArrayField extends InputField
 
         $element_input = new DataInput($this->dataInput->getName() , $this->dataInput->getLabel(), $this->dataInput->isRequired());
 
-        $renderer = clone $this->element_renderer;
+        $renderer = $this->element_renderer;
 
         $pos = -1;
         foreach ($values as $idx => $value) {
 
             $pos++;
 
+            //force array name for html input
             $element_input->setName($this->dataInput->getName()."[$idx]");
             $element_input->setError($this->dataInput->getErrorAt($idx));
             $element_input->setValue($value);

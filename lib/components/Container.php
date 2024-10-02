@@ -3,18 +3,32 @@ include_once("components/Component.php");
 
 class Container extends Component
 {
+    /**
+     * Collection of items to be rendered in addition to the contents buffer
+     * @var ComponentCollection
+     */
     protected ComponentCollection $items;
 
-    protected bool $enabled = TRUE;
-
+    /**
+     * Flag controlling opening/closing tag rendering.
+     * If set to false will prevent calling the start/finish render methods of the parent Component class.
+     * Only renderImpl will be executed rendering the content buffer and all the elements in the ComponentCollection.
+     * @var bool
+     */
     protected bool $wrapper_enabled = true;
+
+    /**
+     * Flag controlling component collection rendering position
+     * If set to true will render items from the component collection first, before the contents buffer
+     * @var bool
+     */
+    protected bool $items_first = false;
 
     public function __construct(bool $chained_component_class = true)
     {
         parent::__construct($chained_component_class);
         $this->items = new ComponentCollection();
         $this->items->setParent($this);
-
     }
 
     public function requiredStyle() : array
@@ -24,16 +38,6 @@ class Container extends Component
         return $arr;
     }
 
-    public function setEnabled(bool $mode) : void
-    {
-        $this->enabled = $mode;
-    }
-
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
-    }
-
     public function items() : ComponentCollection
     {
         return $this->items;
@@ -41,14 +45,24 @@ class Container extends Component
 
     public function startRender()
     {
-        if ($this->wrapper_enabled) {
-            parent::startRender();
-        }
+        if (!$this->wrapper_enabled) return;
+        parent::startRender();
     }
 
     protected function renderImpl()
     {
-        parent::renderImpl();
+        if ($this->items_first) {
+            $this->renderCollectionItems();
+            parent::renderImpl();
+        }
+        else {
+            parent::renderImpl();
+            $this->renderCollectionItems();
+        }
+    }
+
+    private function renderCollectionItems() : void
+    {
         $iterator = $this->items->iterator();
         while ($object = $iterator->next()) {
             if (!($object instanceof Component)) continue;
@@ -58,9 +72,8 @@ class Container extends Component
 
     public function finishRender()
     {
-        if ($this->wrapper_enabled) {
-            parent::finishRender();
-        }
+        if (!$this->wrapper_enabled) return;
+        parent::finishRender();
     }
 
 }

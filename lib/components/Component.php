@@ -83,11 +83,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      */
     protected array $classNames = array();
 
-    public bool $translation_enabled = FALSE;
-    public bool $render_tooltip = TRUE;
-
     /**
-     * Property controlling the enablement of the render method of this component
+     * Flag controlling the enablement of the render method of this component
      *
      * @var bool
      */
@@ -97,6 +94,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     protected string $caption = "";
     protected ?Component $caption_component = null;
 
+
+    public bool $translation_enabled = FALSE;
 
     /**
      * Sets the component class to the value of get_class($this)
@@ -240,7 +239,9 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      */
     protected function processAttributes(): void
     {
-
+        if ($this->name) {
+            $this->setAttribute("name", $this->name);
+        }
     }
 
     public function startRender()
@@ -351,12 +352,6 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     public function getCacheName() : string
     {
         return basename($_SERVER["SCRIPT_FILENAME"])."-".get_class($this)."-".$this->getName();
-    }
-
-    public function setName(string $name) : void
-    {
-        parent::setName($name);
-        $this->setAttribute("name", $name);
     }
 
     public function getCaption(): string
@@ -519,8 +514,6 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
         $attributes = array();
         foreach ($src_attributes as $name => $value) {
-
-            if (!$this->render_tooltip && strcmp($name, "tooltip") == 0) continue;
 
             //value can be "0" or ""
             if (is_null($value) || strlen($value) < 1) {

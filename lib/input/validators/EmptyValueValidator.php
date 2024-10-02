@@ -8,28 +8,20 @@ class EmptyValueValidator implements IInputValidator
 
     public function validate(DataInput $input) : void
     {
+        //not required = any value
+        if (!$input->isRequired()) return;
 
         $value = $input->getValue();
 
-        //checkbox and radios receive array of values here
+        //checkbox and radio have array as value
         if (is_array($value)) {
-
-            if ($input->isRequired()) {
-                if (count($value) < 1) throw new Exception("Input value");
-                $empty_count = 0;
-                foreach ($value as $val) {
-                    if (strlen(trim($val)) == 0 && $this->require_array_value) $empty_count++;
-                }
-                if ($empty_count == count($value)) throw new Exception("Input value");
-            }
+            if (count($value) < 1) throw new Exception("Value required");
 
         }
         else {
-
-            if (strlen(trim($value)) == 0 && $input->isRequired()) {
+            if (strlen(trim($value)) == 0) {
                 throw new Exception("Input value");
             }
-
         }
 
     }
