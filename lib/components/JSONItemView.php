@@ -31,7 +31,7 @@ class JSONItemView extends ItemView
      */
     protected ItemViewResponder $responder;
 
-    protected ColorButton $button;
+    protected Button $button;
 
     protected Container $container;
 
@@ -43,10 +43,10 @@ class JSONItemView extends ItemView
 
         $this->container = new Container();
         $this->container->setClassName("loader");
-        $this->button = new ColorButton();
+        $this->button = new Button();
         $this->button->setContents("<label>".tr("Show More")."</label>"."<div class='progress-bar'><div class='circle border'></div></div>");
 
-        $this->button->setAttribute("onClick", "loadMoreResults(this)");
+        $this->button->setAttribute("onClick", "javascript:loadMoreResults(this)");
         $this->button->setName("fetchResults");
 
         $this->container->items()->append($this->button);

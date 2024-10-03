@@ -1,42 +1,38 @@
 <?php
-include_once("components/Component.php");
+include_once("components/Container.php");
+include_once("components/ClosureComponent.php");
+include_once("components/LabelSpan.php");
+include_once("components/Action.php");
+
 include_once("input/DataInput.php");
 include_once("input/ArrayDataInput.php");
 
-class InputComponent extends Component
+class InputComponent extends Container
 {
 
-    protected ?DataInput $input = null;
+    protected ?DataInput $dataInput = null;
     protected ?InputLabel $label_renderer = null;
+    protected ?Action $translator = null;
+    protected ?ClosureComponent $closure = null;
 
-    public function __construct(DataInput $input = NULL)
+    public function __construct(?DataInput $input = NULL)
     {
         parent::__construct(false);
+
+        $this->label_renderer = new InputLabel();
+        $this->items()->append($this->label_renderer);
+
+        $this->closure = new ClosureComponent(null, false);
+        $this->items()->append($this->closure);
+
+        $this->translator = new Action("TranslateBeanField");
+        $this->translator->setContents("Translate");
+        $this->translator->setRenderEnabled(false);
+        $this->items()->append($this->translator);
 
         if ($input) {
             $this->setDataInput($input);
         }
-    }
-
-    public function setDataInput(DataInput $input) : void
-    {
-        $this->input = $input;
-
-        $this->setAttribute("field",$input->getName());
-
-        if ($input->isRequired()) {
-            $this->setAttribute("required", 1);
-        }
-        else {
-            $this->removeAttribute("required");
-        }
-
-        $this->label_renderer = new InputLabel($input);
-    }
-
-    public function getDataInput(): ?DataInput
-    {
-        return $this->input;
     }
 
     public function requiredStyle() : array
@@ -46,49 +42,41 @@ class InputComponent extends Component
         return $arr;
     }
 
-    public function setLabelRenderer(InputLabel $label_renderer) : void
+    public function setDataInput(DataInput $input) : void
     {
-        $this->label_renderer = $label_renderer;
+        $this->dataInput = $input;
+        $this->label_renderer->setDataInput($input);
+        $this->closure->setClosure($this->dataInput->getRenderer()->render(...));
     }
 
-    public function getLabelRenderer(): ?InputLabel
+    public function getDataInput(): ?DataInput
     {
-        return $this->label_renderer;
+        return $this->dataInput;
     }
 
-    public function getInput(): ?DataInput
+    protected function processAttributes(): void
     {
-        return $this->input;
-    }
+        parent::processAttributes();
 
-    public function renderImpl()
-    {
+        $this->setAttribute("field", $this->dataInput->getName());
 
-        if (!($this->input->getRenderer() instanceof HiddenField)) {
+        $this->translator->setAttribute("field", $this->dataInput->getName());
 
-            $this->label_renderer->render();
+        if ($this->dataInput->isRequired()) {
+            $this->setAttribute("required", 1);
+        }
+        else {
+            $this->removeAttribute("required");
         }
 
-        $this->input->getRenderer()->render();
-
-    }
-
-    public function finishRender()
-    {
-
-        $field = $this->input;
-        $field_name = $field->getName();
-
-        if (TRANSLATOR_ENABLED && $field->translatorEnabled()) {
-
-            echo "<a class='Action' action='TranslateBeanField' field='$field_name'>";
-            echo tr("Translate");
-            echo "</a>";
-
+        if ($this->dataInput->getRenderer() instanceof HiddenField) {
+            $this->addClassName("Hidden");
         }
 
-        parent::finishRender();
 
+        if (TRANSLATOR_ENABLED && $this->dataInput->translatorEnabled()) {
+            $this->translator->setRenderEnabled(true);
+        }
     }
 
 }

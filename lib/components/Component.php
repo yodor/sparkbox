@@ -234,8 +234,11 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Called in start render before prepareAttributes
-     * Can be used from sub classess to set all required attributes
+     * Process all attributes of this component.
+     * Called from startRender ie just before the tag is output.
+     * Marshal php object property name/value to attribute name/value.
+     * Ex property this->name is html attribute "name"
+     * Default is to set the name attribute if not empty
      */
     protected function processAttributes(): void
     {
@@ -354,7 +357,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         return basename($_SERVER["SCRIPT_FILENAME"])."-".get_class($this)."-".$this->getName();
     }
 
-    public function getCaption(): string
+    public function getCaption() : string
     {
         return $this->caption;
     }
@@ -377,19 +380,24 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         $this->caption_component = $component;
     }
 
-    public function getTooltipText(): string
+    /**
+     * Get 'tooltip' attribute value
+     * @return string
+     */
+    public function getTooltip(): string
     {
         return $this->getAttribute("tooltip");
     }
 
     /**
-     * Set 'tooltip' attribute value
+     * Set 'tooltip' attribute value.
+     * If empty $text remove the attribute if it was previously set
      * @param string $text
      * @return void
      */
-    public function setTooltipText(string $text) : void
+    public function setTooltip(string $text) : void
     {
-        if (!empty($text)) {
+        if ($text) {
             $this->setAttribute("tooltip", $text);
         }
         else {
@@ -408,16 +416,22 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
     /**
      * Set 'title' attribute value
+     * If empty $text remove the attribute if it was previously set
      * @param string $text
      * @return void
      */
     public function setTitle(string $text) : void
     {
-        $this->setAttribute("title", $text);
+        if ($text) {
+            $this->setAttribute("title", $text);
+        }
+        else {
+            $this->removeAttribute("title");
+        }
     }
 
     /**
-     * Return the all the attributes for this element
+     * Get the html attribute name/value array
      * @return array
      */
     public function getAttributes(): array
@@ -443,7 +457,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * Set the CSS class name of this component, clearing any previously set class names
      * @param string $cssClass
      */
-    public function setClassName(string $cssClass)
+    public function setClassName(string $cssClass) : void
     {
         $this->classNames = array();
         if (!empty($cssClass)) {
@@ -455,7 +469,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * Add CSS class name
      * @param string $cssClass
      */
-    public function addClassName(string $cssClass)
+    public function addClassName(string $cssClass) : void
     {
         if (!empty($cssClass)) {
             $this->classNames[$cssClass] = "";
@@ -466,18 +480,29 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * Remove CSS class name
      * @param string $cssClass
      */
-    public function removeClassName(string $cssClass)
+    public function removeClassName(string $cssClass) : void
     {
         if (array_key_exists($cssClass, $this->classNames)) {
             unset($this->classNames[$cssClass]);
         }
     }
 
+    /**
+     * Set html attribute '$name' to '$value'
+     * @param string $name
+     * @param string $value
+     * @return void
+     */
     public function setAttribute(string $name, string $value) : void
     {
         $this->attributes[$name] = trim($value);
     }
 
+    /**
+     * Remove html attribute '$name'
+     * @param string $name
+     * @return void
+     */
     public function removeAttribute(string $name) : void
     {
         if (isset($this->attributes[$name])) {
@@ -486,10 +511,10 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Get value of attribute '$name'
+     * Get the value of attribute '$name'
      * If attribute is not set return empty string
-     * @param string $name Name of attribte
-     * @return string Value of attribute
+     * @param string $name
+     * @return string
      */
     public function getAttribute(string $name): string
     {
@@ -497,12 +522,25 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         return "";
     }
 
-    public function setStyleAttribute(string $name, string $value) : void
+    /**
+     * Set inline style property '$name' to '$value'
+     * Ex: $name="color" $value="red" will set style='color:red;'
+     * @param string $name
+     * @param string $value
+     * @return void
+     */
+    public function setStyleProperty(string $name, string $value) : void
     {
         $this->style[$name] = $value;
     }
 
-    public function getStyleAttribute(string $name): string
+    /**
+     * Get value of inline style property '$name'
+     * If property is not set return empty string
+     * @param string $name
+     * @return string
+     */
+    public function getStyleProperty(string $name): string
     {
         if (isset($this->style[$name])) return $this->style[$name];
         return "";

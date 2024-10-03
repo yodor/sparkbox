@@ -23,7 +23,7 @@ abstract class InputFieldTag extends InputField
 
         $type = $this->input->getType();
 
-        if (!$type || !in_array($type, $this->skip_value_types) ) {
+        if (!in_array($type, $this->skip_value_types) ) {
             $dataValue = attributeValue((string)$this->dataInput->getValue());
             $this->input->setValue($dataValue);
         }

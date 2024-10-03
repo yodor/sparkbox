@@ -1,15 +1,10 @@
-
-
-
 .LoginFormRenderer {
-
     border: 1px solid #eaeaea;
-    padding: 1em;
+    flex-grow:0;
+    padding:1em;
+
 }
 
-.LoginFormRenderer .InputComponent {
-    margin: 0.3em;
-}
 
 .LoginFormRenderer .Caption {
     text-transform: uppercase;
@@ -24,31 +19,5 @@
     text-align: center;
 }
 
-.LoginFormRenderer .InputComponent[field='pass'] {
-    display: none !important;
-}
 
-.LoginFormRenderer .InputComponent[field='rand'] {
-    display: none !important;
-}
-
-
-.LoginFormRenderer .SubmitLine {
-    display:block !important;
-    width:100%;
-
-}
-
-.LoginFormRenderer .SubmitLine>.Container {
-    margin-bottom: 1em;
-}
-
-.LoginFormRenderer .SubmitLine .TextSpace {
-    width:100%;
-    column-span: all;
-}
-
-.LoginFormRenderer .SubmitLine .Buttons {
-    column-span: all;
-}
 

@@ -37,16 +37,16 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
         $this->getButtons()->items()->clear();
 
-        $submit_search = new ColorButton();
-        $submit_search->setType(ColorButton::TYPE_SUBMIT);
+        $submit_search = new Button();
+        $submit_search->setType(Button::TYPE_SUBMIT);
         $submit_search->setContents("Search");
         $submit_search->setName(KeywordSearch::SUBMIT_KEY);
         $submit_search->setValue(KeywordSearch::ACTION_SEARCH);
         $submit_search->setAttribute("action", KeywordSearch::ACTION_SEARCH);
         $this->getButtons()->items()->append($submit_search);
 
-        $submit_clear = new ColorButton();
-        $submit_clear->setType(ColorButton::TYPE_SUBMIT);
+        $submit_clear = new Button();
+        $submit_clear->setType(Button::TYPE_SUBMIT);
         $submit_clear->setContents("Clear");
         $submit_clear->setName(KeywordSearch::SUBMIT_KEY);
         $submit_clear->setValue(KeywordSearch::ACTION_CLEAR);
@@ -82,11 +82,11 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
     }
 
 
-    public function getButton(string $action): ?ColorButton
+    public function getButton(string $action): ?Button
     {
         $result = $this->getButtons()->items()->getByAction($action);
 
-        if ($result instanceof ColorButton) return $result;
+        if ($result instanceof Button) return $result;
 
         return null;
     }

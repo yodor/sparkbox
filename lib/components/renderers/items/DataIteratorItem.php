@@ -28,9 +28,10 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
     protected int $position = 0;
 
 
-    public function __construct(bool $chained_component_class = true)
+    public function __construct()
     {
-        parent::__construct($chained_component_class);
+        parent::__construct(false);
+        $this->setComponentClass("DataIteratorItem");
     }
 
     protected function resetData()

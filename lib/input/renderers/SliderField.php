@@ -1,66 +1,126 @@
 <?php
 include_once("input/renderers/InputFieldTag.php");
+include_once("components/DataList.php");
 
 class SliderField extends InputFieldTag
 {
 
-    public array $accepted_values = array();
+    protected DataList $dataList;
 
+    protected LabelSpan $label;
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
-        $this->input->setType("hidden");
+
+        $this->input->setType("range");
+
+        $this->dataList = new DataList();
+
+        $this->items()->append($this->dataList);
+
+        $this->label = new LabelSpan("Value: ");
+        $this->items->append($this->label);
+
     }
 
+    public function label() : LabelSpan
+    {
+        return $this->label;
+    }
+
+    public function list() : DataList
+    {
+        return $this->dataList;
+    }
 
     protected function processAttributes() : void
     {
 
         parent::processAttributes();
 
-        if (is_array($this->accepted_values)) {
-            $this->input->setAttribute("increments", implode("|", $this->accepted_values));
-            $this->input->setAttribute("min", 0);
-            $this->input->setAttribute("max", count($this->accepted_values) - 1);
+        $dataValue = $this->dataInput->getValue();
+        $value = (int)$dataValue;
+
+        $max = intval($this->getMaximum());
+        $min = intval($this->getMinimum());
+
+        if ($min>0) {
+            if ($value < $min) {
+                $dataValue = $min;
+            }
         }
+        if ($max>0) {
+            if ($value > $max) {
+                $dataValue = $max;
+            }
+        }
+
+        $this->input->setAttribute("value", $dataValue);
+
+        if ($this->dataList->items()->count()<1) {
+            $this->dataList->setRenderEnabled(false);
+        }
+        else {
+            $this->dataList->setID($this->dataInput->getName());
+            $this->setAttribute("list", $this->dataInput->getName());
+        }
+        $this->label->span()->setContents((string)$dataValue);
 
     }
 
-    protected function renderImpl()
+    public function setMinimum(string $minimum) : void
     {
+        $this->input->setAttribute("min", $minimum);
+    }
+    public function getMinimum() : string
+    {
+        return $this->input->getAttribute("min");
+    }
 
-        parent::renderImpl();
+    public function setMaximum(string $maximum) : void
+    {
+        $this->input->setAttribute("max", $maximum);
+    }
+    public function getMaximum() : string
+    {
+        return $this->input->getAttribute("max");
+    }
 
-        echo "<div class='slider_input'></div>";
-        if (is_array($this->accepted_values)) {
-            echo "<table width=100% cellpadding=0 cellspacing=0 style='border-collapse:collapse;'>";
-            echo "<tr>";
-            $pos = 1;
-            $mid = round((count($this->accepted_values)) / 2.0);
+    public function setStep(string $step) : void
+    {
+        $this->input->setAttribute("step", $step);
+    }
+    public function getStep() : string
+    {
+        return $this->input->getAttribute("step");
+    }
 
-            foreach ($this->accepted_values as $key => $val) {
-                $align = "center";
-                if ($pos < $mid) $align = "left";
-                if ($pos > $mid) $align = "right";
-                echo "<td align=$align style='width:" . (int)(100 / count($this->accepted_values)) . "%;'>$val</td>";
-                $pos++;
-            }
-            echo "</tr>";
-            echo "</table>";
-        }
+    public function addMarker(string $value, string $label) : void
+    {
+        $this->dataList->items()->append(new DataListItem($value,$label));
+    }
 
-        $field_value = $this->dataInput->getValue();
-
+    public function finishRender()
+    {
+        parent::finishRender();
         ?>
-        <script type='text/javascript'>
-            onPageLoad(function () {
-                var name = "<?php echo $this->dataInput->getName();?>";
-                if ($("input[name='" + name + "'] + .slider_input").value) {
-                    $("input[name='" + name + "'] + .slider_input").value("<?php echo $field_value;?>");
-                }
-            });
+        <script type="text/javascript">
+            onPageLoad(function(){
+                const name = "<?php echo $this->dataInput->getName();?>";
+
+                const input = document.querySelector("input[type='range'][name='"+name+"']");
+                const sliderField = input.closest(".SliderField");
+                const value = sliderField.querySelector("SPAN");
+
+                value.textContent = input.value;
+
+                input.addEventListener("input", (event) => {
+                    value.textContent = event.target.value;
+                });
+            })
         </script>
         <?php
+
     }
 
 }

@@ -9,6 +9,8 @@ class CallbackItemRenderer extends DataIteratorItem
     public function __construct($function_name)
     {
         parent::__construct();
+        $this->setClassName("CallbackItemRenderer");
+
         $this->attributes["align"] = "left";
         $this->attributes["valign"] = "middle";
 

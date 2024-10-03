@@ -12,20 +12,22 @@
 
 .MenuBarComponent {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    /*justify-content: center;*/
+    /*align-items: center;*/
 
     background-color: white;
     position: relative;
-    z-index:1;
+    /*above mce*/
+    z-index:10;
 }
 
 .MenuBarComponent .MenuBarItemRenderer {
     display: flex;
-    justify-content: center;
-    align-items:center;
+    /*justify-content: center;*/
+    /*align-items:center;*/
 
     padding:0.5em;
+
     cursor: pointer;
     position: relative;
     color:black;
@@ -40,6 +42,7 @@
 .MenuBarComponent .MenuBarItemRenderer .MenuItemLink {
     color: inherit;
     text-decoration: none;
+
 }
 
 .MenuBarComponent .MenuBarItemRenderer.Hover {
@@ -83,6 +86,7 @@
     text-align: left;
 
     flex-direction: column;
+
 }
 
 .SubmenuRenderer.normal {

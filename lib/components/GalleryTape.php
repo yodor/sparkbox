@@ -14,7 +14,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 
     public function __construct()
     {
-        parent::__construct(false);
+        parent::__construct();
 
         $this->setComponentClass("slot");
 

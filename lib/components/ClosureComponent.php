@@ -3,16 +3,16 @@
 class ClosureComponent extends Container
 {
 
-    protected Closure $closure;
+    protected ?Closure $closure = null;
 
-    public function __construct(Closure $callback, bool $wrapper_enabled = true)
+    public function __construct(?Closure $callback = null, bool $wrapper_enabled = true)
     {
         parent::__construct();
         $this->closure = $callback;
         $this->wrapper_enabled = $wrapper_enabled;
     }
 
-    public function getCloser() : Closure
+    public function getClosure() : ?Closure
     {
         return $this->closure;
     }
@@ -20,6 +20,14 @@ class ClosureComponent extends Container
     public function setClosure(Closure $callback) : void
     {
         $this->closure = $callback;
+    }
+
+    protected function processAttributes(): void
+    {
+        parent::processAttributes();
+        if (is_null($this->closure)) {
+            $this->setRenderEnabled(false);
+        }
     }
 
     protected function renderImpl()

@@ -140,7 +140,7 @@ abstract class SessionUpload extends InputField
 
             $this->input->render();
 
-            ColorButton::RenderButton("Browse", "", "browse");
+            Button::RenderButton("Browse", "", "browse");
 
             echo "</div>"; //Buttons
 

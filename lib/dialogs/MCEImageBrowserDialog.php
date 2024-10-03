@@ -54,7 +54,7 @@ class MCEImageBrowserDialog extends MessageDialog
 
     protected function initButtons()
     {
-        $btn_close = new ColorButton();
+        $btn_close = new Button();
         $btn_close->setContents("Close");
         $btn_close->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
         $btn_close->setAttribute("default_action", 1);

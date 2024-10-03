@@ -7,7 +7,7 @@ class ImagePopup extends ImageStorage
     public function __construct(?StorageItem $storageItem = null)
     {
         parent::__construct($storageItem);
-        $this->addClassName("ImagePopup");
+        $this->setComponentClass("ImagePopup");
         //force A
         $this->setTagName("A");
     }

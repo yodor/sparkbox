@@ -1,16 +1,16 @@
 <?php
 include_once("input/renderers/Input.php");
 
-class ColorButton extends Input
+class Button extends Input
 {
 
     const string TYPE_SUBMIT = "submit";
     const string TYPE_RESET = "reset";
     const string TYPE_BUTTON = "button";
 
-    public static function RenderButton($text = "Button", $href = "", $action = "")
+    public static function RenderButton($text = "Button", $href = "", $action = "") : void
     {
-        $btn = new ColorButton();
+        $btn = new Button();
 
         $btn->setContents($text);
 
@@ -24,10 +24,11 @@ class ColorButton extends Input
         $btn->render();
     }
 
-    public function __construct(string $type = ColorButton::TYPE_BUTTON, string $name="", string $value = "")
+    public function __construct(string $type = Button::TYPE_BUTTON, string $name="", string $value = "")
     {
 
         parent::__construct($type, $name, $value);
+        $this->setComponentClass("ColorButton");
 
         $this->setTagName("BUTTON");
         $this->setClosingTagRequired(true);

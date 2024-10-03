@@ -1,26 +1,12 @@
-.InputField.SessionUpload {
-
-    background-color: transparent;
-    border: 0;
-    padding: 0;
-}
-
 .InputField.SessionUpload .FieldElements {
-
-
+    display:flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .InputField.SessionUpload .Details {
-    display: block;
 
-}
-
-.InputField.SessionUpload .Details .Caption {
-
-}
-
-.InputField.SessionUpload .Details .Limits {
-    display: block;
+    white-space:nowrap;
 }
 
 .InputField.SessionUpload .Details .Limits SPAN {
@@ -41,15 +27,19 @@
     display: none;
 }
 
+.InputField.SessionUpload .Details .Limits [field='accept_mimes'] {
+    display: none;
+}
+
 
 .InputField.SessionUpload .Controls {
-    display: block;
+
     position: relative;
-    margin-top: 5px;
+    align-self: stretch;
 }
 
 .InputField.SessionUpload .Controls .Buttons {
-    display: inline-block;
+
     position: relative;
 }
 
@@ -57,16 +47,6 @@
     display: none;
 }
 
-.InputField.SessionUpload .Controls .Buttons BUTTON {
-
-    vertical-align: middle;
-
-    text-align: center;
-
-    left: 0;
-    top: 0;
-
-}
 
 .InputField.SessionUpload .Controls .Buttons INPUT[type="file"] {
 
@@ -76,6 +56,7 @@
     -moz-opacity: 0;
     filter: alpha(opacity:0);
     opacity: 0;
+
     z-index: 2;
     position: absolute;
     left: 0;
@@ -124,26 +105,24 @@
 
 
 .InputField.SessionUpload .ArrayContents {
-    display: block !important;
-    vertical-align: top;
-    margin-top: 15px;
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
 
-}
+ }
 
 .InputField.SessionUpload .ArrayContents .Element {
-    display: inline-block !important;
-    vertical-align: top;
+
     position: relative;
-    margin-left: 10px;
+
+    margin-left:1em;
+    margin-top:1em;
+
 }
 
 .InputField.SessionUpload .ArrayContents .Element .thumbnail {
 
-    display: inline-block;
-    vertical-align: top;
-
-    margin-right: 10px;
-    margin-bottom: 10px;
 
 }
 
@@ -184,7 +163,7 @@
 
 .InputField.SessionUpload.SessionFile .ArrayContents .Element .thumbnail {
     margin-right: 0;
-    display: inline-block;
+
 }
 
 .InputField.SessionUpload.SessionFile .ArrayContents .Element .details {

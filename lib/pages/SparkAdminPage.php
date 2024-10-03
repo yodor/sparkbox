@@ -112,7 +112,7 @@ class SparkAdminPage extends SparkPage
         if ($back_action instanceof Action) {
             $back_action->setContents("");
             $back_action->setAttribute("action", SparkAdminPage::ACTION_BACK);
-            $back_action->setTooltipText("Go back");
+            $back_action->setTooltip("Go back");
             $page_actions->items()->append($back_action);
         }
 
@@ -213,7 +213,7 @@ class SparkAdminPage extends SparkPage
                     }
                     echo "<div class='username'>".$fullname."</div>";
 
-                    ColorButton::RenderButton("Logout", ADMIN_LOCAL . "/logout.php");
+                    Button::RenderButton("Logout", ADMIN_LOCAL . "/logout.php");
 
                     echo "</div>";
 

@@ -1,6 +1,7 @@
 <?php
 include_once("forms/processors/IFormProcessor.php");
 include_once("beans/IBeanEditor.php");
+include_once("utils/SessionData.php");
 
 class FormProcessor implements IFormProcessor, IBeanEditor
 {
@@ -13,9 +14,6 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     protected ?DBTableBean $bean = NULL;
 
     protected bool $sessionEnabled = false;
-
-    //redirect to clean the url after storing session data. only works if session is enabled
-    protected bool $redirectEnabled = true;
 
     /**
      * Store/Restore the form input values to session during process call
@@ -30,20 +28,6 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     public function isSessionEnabled() : bool
     {
         return $this->sessionEnabled;
-    }
-
-    /**
-     * Enable redirection to the same url cleaned from GET variables after successful process
-     * @param bool $mode
-     */
-    public function setRedirectEnabled(bool $mode) : void
-    {
-        $this->redirectEnabled = $mode;
-    }
-
-    public function isRedirectEnabled() : bool
-    {
-        return $this->redirectEnabled;
     }
 
     /**
@@ -136,16 +120,6 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
             if ($this->sessionEnabled) {
                 $this->storeSessionData($form);
-
-                if ($this->redirectEnabled) {
-                    $url = URL::Current();
-                    foreach ($form->getInputs() as $inputName=>$input){
-                        $url->remove($inputName);
-                    }
-                    $url->remove(FormRenderer::SUBMIT_NAME);
-                    header("Location: ".$url->toString());
-                    exit;
-                }
             }
 
         }
@@ -158,50 +132,46 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
     }
 
-    protected function restoreSessionData(InputForm $form)
+    protected function restoreSessionData(InputForm $form) : void
     {
+
         $form_name = $form->getName();
         debug("Restoring values from session - InputForm['$form_name']");
 
-        if (Session::Contains($form_name)) {
-            $values = Session::Get($form_name);
-            $values = unserialize($values);
+        try {
 
-            try {
+            $sessionData = new SessionData($form_name);
 
-                //validate values coming from user input
-                foreach($values as $inputName=>$inputValue) {
-                    if ($form->haveInput($inputName)) {
-                        $form->getInput($inputName)->setValue($inputValue);
-                    }
+            foreach($sessionData->keys() as $inputName=>$inputValue) {
+                if ($form->haveInput($inputName)) {
+                    $form->getInput($inputName)->setValue($inputValue);
                 }
-                $form->validate();
-
             }
-            catch (Exception $e) {
-                $form->clear();
-                debug("Session data could not be restored for this form '$form_name'");
 
-            }
+            $form->validate();
+
         }
+        catch (Exception $e) {
+            $form->clear();
+
+            debug("Error restoring SessionData - Form:'$form_name' - ".$e->getMessage());
+        }
+
     }
 
-    protected function storeSessionData(InputForm $form)
+    protected function storeSessionData(InputForm $form) : void
     {
-
-        $values = array();
 
         $form_name = $form->getName();
         debug("Storing values to session - InputForm['$form_name']");
 
-        foreach ($form->getInputs() as $inputName=>$input){
-            if (!($input instanceof DataInput)) continue;
-            $inputValue = $input->getValue();
-            $values[$inputName] = $inputValue;
+        $sessionData = new SessionData($form_name);
+        $sessionData->removeAll();
 
+        foreach ($form->getInputNames() as $inputName) {
+            $input = $form->getInput($inputName);
+            $sessionData->set($inputName, $input->getValue());
         }
-
-        Session::Set($form_name, serialize($values));
 
     }
 

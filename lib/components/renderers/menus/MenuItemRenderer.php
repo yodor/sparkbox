@@ -29,7 +29,7 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
         $this->linkTag->setContents("");
 
         if ($item->getTooltip()) {
-            $this->linkTag->setTooltipText($item->getTooltip());
+            $this->linkTag->setTooltip($item->getTooltip());
         }
 
         if ($item->getTarget()) {

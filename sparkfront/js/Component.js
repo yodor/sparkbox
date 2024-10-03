@@ -79,7 +79,7 @@ class Component extends SparkObject
 
     initialize() {
 
-        if ($(this.selector()).get(0)) {
+        if (document.querySelector(this.selector())) {
             //console.log(this.constructor.name + "::initialize() " + this.selector());
         }
         else {

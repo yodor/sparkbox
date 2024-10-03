@@ -161,7 +161,7 @@ class BeanListPage extends AdminPageTemplate
         $url = URL::Current();
         $url->setScriptName("add.php");
         $action_add = new Action(SparkAdminPage::ACTION_ADD, $url->toString());
-        $action_add->setTooltipText("Add new element to this collection");
+        $action_add->setTooltip("Add new element to this collection");
         $this->getPage()->getActions()->append($action_add);
     }
 
@@ -193,32 +193,32 @@ class BeanListPage extends AdminPageTemplate
             $act->append(Action::RowSeparator());
 
             $action_prev = new Action("Previous", "?cmd=reposition&type=previous", $repos_param);
-            $action_prev->setTooltipText("Move element one position backward");
+            $action_prev->setTooltip("Move element one position backward");
             $act->append($action_prev);
 
             $act->append(Action::PipeSeparator());
 
             $action_next = new Action("Next", "?cmd=reposition&type=next", $repos_param);
-            $action_next->setTooltipText("Move element one position forward");
+            $action_next->setTooltip("Move element one position forward");
             $act->append($action_next);
             //
             $act->append(Action::RowSeparator());
             //
 
             $action_first = new Action("First", "?cmd=reposition&type=first", $repos_param);
-            $action_first->setTooltipText("Move element to first position");
+            $action_first->setTooltip("Move element to first position");
             $act->append($action_first);
 
             $act->append(Action::PipeSeparator());
 
             $action_last = new Action("Last", "?cmd=reposition&type=last", $repos_param);
-            $action_last->setTooltipText("Move element to last position");
+            $action_last->setTooltip("Move element to last position");
             $act->append($action_last);
 
             $act->append(Action::RowSeparator());
 
             $action_choose = new Action("Set position", "?cmd=reposition&type=fixed", $repos_param);
-            $action_choose->setTooltipText("Input element position");
+            $action_choose->setTooltip("Input element position");
             $act->append($action_choose);
 
             //

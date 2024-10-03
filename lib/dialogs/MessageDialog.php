@@ -1,7 +1,7 @@
 <?php
 include_once("components/Component.php");
 include_once("components/renderers/IPageComponent.php");
-include_once("components/ColorButton.php");
+include_once("components/Button.php");
 
 class MessageDialog extends Component implements IPageComponent
 {
@@ -70,7 +70,7 @@ class MessageDialog extends Component implements IPageComponent
 
     protected function initButtons()
     {
-        $btn_ok = new ColorButton();
+        $btn_ok = new Button();
         $btn_ok->setContents("OK");
         $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
         $btn_ok->setAttribute("default_action", 1);

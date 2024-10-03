@@ -64,17 +64,17 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $container = new Container();
         $container->addClassName("ButtonGroup");
 
-        $btn_translate = new ColorButton();
+        $btn_translate = new Button();
         $btn_translate->setContents("Translate");
         $btn_translate->setAttribute("action", "Translate");
         $container->items()->append($btn_translate);
 
-        $btn_clear = new ColorButton();
+        $btn_clear = new Button();
         $btn_clear->setContents("Clear");
         $btn_clear->setAttribute("action", "Clear");
         $container->items()->append($btn_clear);
 
-        $btn_close = new ColorButton();
+        $btn_close = new Button();
         $btn_close->setContents("Close");
         $btn_close->setAttribute("action", "Close");
         $container->items()->append($btn_close);

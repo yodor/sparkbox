@@ -6,6 +6,7 @@ class SelectItem extends DataIteratorItem
     public function __construct()
     {
         parent::__construct(false);
+        //options are not styled
         $this->setComponentClass("");
 
         $this->tagName = "OPTION";

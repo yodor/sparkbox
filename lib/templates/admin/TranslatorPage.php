@@ -37,7 +37,7 @@ class TranslatorPage extends BeanListPage
         $url = URL::Current();
         $url->add(new URLParameter("rehash", "1"));
         $action_add = new Action(SparkAdminPage::ACTION_EDIT, $url->toString());
-        $action_add->setTooltipText("Rehash using xxH3");
+        $action_add->setTooltip("Rehash using xxH3");
         $this->getPage()->getActions()->append($action_add);
     }
 

@@ -1,30 +1,13 @@
-.InputComponent {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
 
 .InputLabel {
     font-size: 100%;
-    display: inline-block;
-}
-
-.InputLabel+.ArrayField {
-    border-top: 1px solid gainsboro !important;
-    margin-top:0.5em;
-    padding-top:0.5em !important;
-}
-
-.InputField {
-    display: inline-block;
-
-
+    align-items:flex-start;
 }
 
 .InputLabel .required {
     color: rgba(255, 0, 170, 0.62);
     font-weight: bold;
-    font-family: "Consolas", monospace;
+    font-family: monospace;
 }
 
 .InputLabel[error="1"] {
@@ -32,28 +15,35 @@
 }
 
 
-.InputField .FieldElements {
-    display: block;
+.InputField {
+    margin: 0;
+    outline: 0;
+    padding: 0;
+    font-size: 100%;
+    box-sizing: border-box;
+
+    display:flex;
+
+    flex-direction:column;
+    align-items:flex-start;
 }
 
-.InputField[error="1"] .FieldElements {
-
+.InputField * {
+    font-size:100%;
 }
 
-/*.ArrayContents .InputField[error="1"] {
-  border:1px dotted red;
-}*/
-.InputField .addon_content {
-    display: inline-block;
-    margin-left: 1em;
+.InputField > .Caption:first-child {
+    background-color: #FFFFFF;
+    color: black;
+    font-weight: bold;
+    padding: 5px;
+    align-self:stretch;
 }
 
 .InputField INPUT, TEXTAREA {
-    font-size: 100%;
-
     outline: 0;
     margin: 0;
-    display: block;
+    padding: 0.2em;
 
     background-color: white;
 
@@ -61,279 +51,73 @@
     border-left: 1px solid #b7b7b7;
     border-right: 1px solid #dcdcdc;
     border-bottom: 1px solid #dcdcdc;
-
-    padding: 0.2em;
-
-    box-sizing: border-box;
-}
-
-.InputField .MCETextArea {
-    min-height:450px;
-
-}
-
-.InputField INPUT, TEXTAREA, .MCETextArea .mce-container {
-
-}
-
-.InputField.TextField INPUT {
-    width: 100%;
-    height: 100%;
-}
-
-.InputField.PasswordField INPUT {
-    width: 100%;
-    height: 100%;
 }
 
 .InputField.TextArea TEXTAREA {
-    width: 100%;
-    height: 100%;
     resize: vertical;
 }
 
-
-.InputField.SelectField {
-    padding: 0;
-    outline: 0;
-    margin: 0;
-    border: 0;
-    background-color: transparent;
-}
-
-.InputField.SelectField SELECT {
-
-    outline: 0;
-    font-size: 100%;
+.InputField SELECT {
     padding: 0.2em;
 }
 
-.InputField.SelectField OPTION {
-    padding: 0.2em;
-    outline: 0;
-    font-size: 100%;
+.InputField.TextField, .InputField.PasswordField, .InputField.TextArea  {
+    align-items:stretch;
 }
 
+.InputField .FieldElements {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 
-.InputField.NestedSelectField {
+    gap: 0.5em;
 
+    align-items:center;
 }
 
-.InputField.NestedSelectField SELECT {
+.InputField .DataIteratorItem {
+    display:flex;
+    flex-direction: row;
+    align-items: center;
 
-    outline: 0;
-    padding: 0.2em;
+    gap:0.1em;
+    font-size:95%;
 }
 
-.InputField.NestedSelectField OPTION {
-    padding: 0.3em;
-    outline: 0;
-}
-
-/*CheckBox*/
-
-.InputField.CheckField {
-    border: 0;
-    background-color: transparent;
-    display: inline-block;
-
-    margin: 0;
-    outline: 0;
-    padding: 0;
-}
-
-.InputField.CheckField[error="1"] .FieldElements {
-
-}
-
-.InputField.CheckField .CheckItem {
-    display: inline-block;
-    margin-right: 0.5em;
-}
-
-.InputField.CheckField .CheckItem INPUT[type='checkbox'] {
-    display: inline-block;
-    vertical-align: bottom;
-    margin-bottom: -0.03em;
-    margin-right: 0.1em;
+.InputField INPUT[type='checkbox'], INPUT[type='radio'] {
     width: 1.2em;
     height: 1.2em;
 }
 
-.InputField.CheckField .CheckItem SPAN {
-    display: inline-block;
-}
-
-
-/*RadioButton*/
-
-.InputField.RadioField {
-    border: 0;
-    background-color: transparent;
-    display: inline-block;
-
-    margin: 0;
-    outline: 0;
-    padding: 0;
-}
-
-
-.InputField.RadioField[error="1"] .FieldElements {
-
-}
-
-.InputField.RadioField .RadioItem {
-
-    display: inline-block;
-    margin-right: 0.5em;
-
-}
-
-.InputField.RadioField .RadioItem INPUT[type='radio'] {
-    display: inline-block;
-    vertical-align: bottom;
-    margin-bottom: -0.03em;
-    margin-right: 0.1em;
-    width: 1.2em;
-    height: 1.2em;
-}
-
-
-.InputField.RadioField .RadioItem SPAN {
-    display: inline-block;
-}
-
-/*DateField*/
-
-.InputField.DateField {
-    display: inline-block;
-    background-color: transparent;
-    border: 0;
-    margin: 0;
-    outline: 0;
-    padding: 0;
-}
-
-
-.InputField.DateField SELECT {
-    display: inline-block;
-
-    outline: 0;
-    font-size: 100%;
-    margin-right: 0.3em;
-
-    padding: 0.2em;
-
-}
 
 .InputField.DateField .CalendarControl {
-
     position: relative;
     cursor: pointer;
-    display: inline-block;
+
     padding: 0;
     margin: 0;
-    vertical-align: top;
 }
 
 .InputField.DateField .CalendarControl IMG {
-
     padding: 0;
     margin: 0;
-
     border: 0;
-    display: block;
-
 }
 
-/*TimeField*/
-.InputField.TimeField {
-    display: inline-block;
-    background-color: transparent;
-    border: 0;
-    margin: 0;
-    outline: 0;
-    padding: 0;
-
-}
-
-.InputField.TimeField SELECT {
-    display: inline-block;
-
-    outline: 0;
-    font-size: 100%;
-    margin-right: 0.3em;
-
-    padding: 0.2em;
-}
-
-
-/*PhoneField*/
-
-.InputField.PhoneField {
-    border: 0;
-    background-color: transparent;
-    display: inline-block;
-
-    margin: 0;
-    outline: 0;
-    padding: 0;
-
-}
-
-.InputField.PhoneField .PhonePart[type='text'] {
-    display: inline-block;
-
-    background-color: white;
-
-    border-top: 1px solid #b7b7b7;
-    border-left: 1px solid #b7b7b7;
-    border-right: 1px solid #dcdcdc;
-    border-bottom: 1px solid #dcdcdc;
-
-    margin: 0;
-    padding: 0.2em;
-
-}
 
 .InputField.PhoneField .PhonePart.CountryCode {
     width: 2.5em;
     min-width: 2.5em;
-    display: inline;
 }
 
 .InputField.PhoneField .PhonePart.CityCode {
     width: 2.5em;
     min-width: 2.5em;
-    display: inline;
 }
 
 .InputField.PhoneField .PhonePart.PhoneNumber {
     width: 5em;
     min-width: 5em;;
-    display: inline;
 }
 
-/*HiddenField*/
-.InputField.HiddenField {
-    background-color: transparent;
-    border: 0;
-}
 
-.InputField > .Caption:first-child {
-
-    background-color: #FFFFFF;
-    color: black;
-    font-weight: bold;
-    padding: 5px;
-
-}
-
-.InputField.ColorCodeField INPUT[type='color'] {
-    display:inline-block;
-    width:15%;
-}
-.InputField.ColorCodeField INPUT[type='text'] {
-    width:85%;
-    display:inline-block;
-}

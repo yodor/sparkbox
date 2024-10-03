@@ -9,6 +9,7 @@ class TextItemRenderer extends DataIteratorItem
     public function __construct(string $field_name)
     {
         parent::__construct();
+        $this->setClassName("TextItemRenderer");
 
         $this->field_name = $field_name;
     }

@@ -19,7 +19,9 @@ class RadioItem extends DataIteratorItem
 
     public function __construct()
     {
-        parent::__construct(false);
+        parent::__construct();
+
+        $this->setClassName("RadioItem");
 
         $this->input = new Input();
         $this->input->setType("radio");

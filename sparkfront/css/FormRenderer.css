@@ -1,6 +1,11 @@
 @import url("FormRendererHBox.css");
 @import url("FormRendererVBox.css");
 
+.FormRenderer {
+    display: inline-grid;
+    text-align: left;
+}
+
 .InputGroupRenderer {
     margin-bottom:30px;
     padding-top:20px;
@@ -10,4 +15,19 @@
 .InputGroupRenderer LEGEND {
 
 }
+
+.InputComponent {
+    box-sizing: border-box;
+}
+
+.InputComponent.Hidden {
+    display:none;
+}
+.InputComponent.Hidden * {
+    display: none;
+}
+.InputComponent.Hidden * {
+    display: none;
+}
+
 

@@ -45,9 +45,9 @@ class FormRenderer extends Container
 
     /**
      * Default submit button
-     * @var ColorButton
+     * @var Button
      */
-    protected ColorButton $submitButton;
+    protected Button $submitButton;
     protected Container $submitLine;
 
     public function __construct(InputForm $form)
@@ -63,21 +63,21 @@ class FormRenderer extends Container
         $this->setAttribute("enctype", "multipart/form-data");
         $this->setMethod(FormRenderer::METHOD_POST);
 
-        $button = new ColorButton(ColorButton::TYPE_SUBMIT, FormRenderer::SUBMIT_NAME);
+        $button = new Button(Button::TYPE_SUBMIT, FormRenderer::SUBMIT_NAME);
         $button->setAttribute("action", "submit");
         $button->setContents("Submit");
         $this->submitButton = $button;
 
 
         $this->submitLine = new Container(false);
-        $this->submitLine->setClassName("SubmitLine");
+        $this->submitLine->setComponentClass("SubmitLine");
 
         $textSpace = new Container(false);
-        $textSpace->setClassName("TextSpace");
+        $textSpace->setComponentClass("TextSpace");
         $this->submitLine->items()->append($textSpace);
 
         $buttons = new Container(false);
-        $buttons->setClassName("Buttons");
+        $buttons->setComponentClass("Buttons");
 
         $buttons->items()->append($this->submitButton);
         $this->submitLine->items()->append($buttons);
@@ -105,20 +105,20 @@ class FormRenderer extends Container
 
     public function getButtons(): Container
     {
-        $buttons = $this->submitLine->items()->getByClassName("Buttons");
+        $buttons = $this->submitLine->items()->getByComponentClass("Buttons");
         if ($buttons instanceof Container) return $buttons;
 
         throw new Exception("Buttons container not found");
     }
 
-    public function getSubmitButton(): ColorButton
+    public function getSubmitButton(): Button
     {
         return $this->submitButton;
     }
 
     public function getTextSpace(): Container
     {
-        $textSpace = $this->submitLine->items()->getByClassName("TextSpace");
+        $textSpace = $this->submitLine->items()->getByComponentClass("TextSpace");
         if ($textSpace instanceof Container) return $textSpace;
 
         throw new Exception("TextSpace container not found");
@@ -138,6 +138,11 @@ class FormRenderer extends Container
     }
 
 
+    /**
+     * Assign form and copying and copy the form name to $this->name
+     * @param InputForm $form
+     * @return void
+     */
     public function setForm(InputForm $form) : void
     {
         $this->form = $form;
@@ -151,7 +156,8 @@ class FormRenderer extends Container
     }
 
     /**
-     * Will set this component name as the form name
+     * Assign 'method' and 'layout' properties as attibutes
+     * @return void
      */
     protected function processAttributes(): void
     {

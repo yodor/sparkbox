@@ -1,62 +1,40 @@
 .FormRenderer[layout="VBox"] {
-    display: inline-block;
-    text-align: left;
-}
 
+    gap:0.5em;
+}
 
 .FormRenderer[layout="VBox"] .InputComponent {
-
-    display: block;
-    margin-bottom:1em;
-    clear:both;
-
-}
-
-.FormRenderer[layout="VBox"] .InputComponent .InputField {
-    display: block;
-
-}
-
-.FormRenderer[layout="VBox"] .InputComponent .InputLabel {
-    display: inline-block;
-    text-align: left;
-}
-
-.FormRenderer[layout="VBox"] .InputComponent .content_after {
-    display: inline-block;
-    text-align: left;
-}
-
-.FormRenderer[layout="VBox"] .InputComponent .content_before {
-    display: inline-block;
-    text-align: left;
-}
-
-.FormRenderer[layout="VBox"] .InputComponent .Action {
-    float:right;
-    clear:both;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1em;
 
 }
 
 .FormRenderer[layout="VBox"] .SubmitLine {
-    display:block;
-    width:100%;
+
+    display:flex;
+    flex-direction: row;
+
+    gap:1em;
 }
 
-.FormRenderer[layout="VBox"] .SubmitLine .TextSpace {
-    text-align: left;
-    vertical-align: middle;
-    display:inline-block;
-    width:100%;
+.FormRenderer[layout="VBox"]  .SubmitLine .TextSpace {
+    flex-grow:1;
+
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    align-items: flex-start;
 }
 
-.FormRenderer[layout="VBox"] .SubmitLine .Buttons {
+.FormRenderer[layout="VBox"]  .SubmitLine .Buttons {
 
-    text-align: right;
-    vertical-align: middle;
-    width:100%;
+    display:flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    align-items: flex-end;
+    gap:0.5em;
 }
 
-.FormRenderer[layout="VBox"] .SubmitLine .Buttons>* {
-
-}

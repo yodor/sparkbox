@@ -79,7 +79,7 @@ class TableCellRenderer extends Component implements IDataResultProcessor
     {
         //debug("setData: ", $data);
         $this->value = $data[$this->field] ?? "";
-        $this->setTooltipText($data[$this->tooltip_field] ?? "");
+        $this->setTooltip($data[$this->tooltip_field] ?? "");
 
         foreach ($this->value_attributes as $idx => $field) {
             if (isset($data[$field])) {

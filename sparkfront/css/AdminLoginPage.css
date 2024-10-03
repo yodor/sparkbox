@@ -1,0 +1,12 @@
+.AdminLoginPage {
+    display: grid;
+    height: calc(100%);
+    width: calc(100%);
+    align-items: center;
+    justify-content: center;
+}
+
+.AdminLoginPage .FormRenderer {
+    border: 1px solid #eaeaea;
+}
+

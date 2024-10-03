@@ -1,12 +1,12 @@
 <?php
-include_once("input/renderers/InputField.php");
+include_once("input/renderers/InputFieldTag.php");
 
 class PasswordField extends InputFieldTag
 {
 
-    public function __construct(DataInput $input)
+    public function __construct(DataInput $dataInput)
     {
-        parent::__construct($input);
+        parent::__construct($dataInput);
         $this->input->setType("password");
     }
 

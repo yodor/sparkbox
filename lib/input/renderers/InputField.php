@@ -146,10 +146,10 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
         if ($this->error_render_mode == IErrorRenderer::MODE_TOOLTIP) {
 
             if ($this->input) {
-                $this->input->setTooltipText($error);
+                $this->input->setTooltip($error);
             }
             else {
-                $this->setTooltipText($error);
+                $this->setTooltip($error);
             }
 
         }

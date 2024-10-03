@@ -187,9 +187,7 @@ BODY {
 }
 
 
-.AdminLoginPage {
 
-}
 
 
 .BeanFormEditor[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
@@ -240,30 +238,6 @@ BODY {
 }
 
 
-.AdminLoginPage.forgot_password .FormRenderer {
-    border: 1px solid #eaeaea;
-}
-
-.AdminLoginPage.forgot_password .FormRenderer .SubmitLine .TextSpace {
-    display: block;
-}
-
-.AdminLoginPage.forgot_password .FormRenderer .SubmitLine .Buttons {
-    display: block;
-}
-
-
-.admin_layout .KeywordSearch {
-    display: block;
-}
-
-.admin_layout .KeywordSearch .InputComponent[field='keyword'] .InputLabel {
-    display: none !important;
-}
-
-.admin_layout .KeywordSearch .SubmitLine .Buttons > * {
-    margin-left: 0.3em;
-}
 
 .CurrencyRateEditor {
 

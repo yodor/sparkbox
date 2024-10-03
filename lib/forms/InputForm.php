@@ -110,7 +110,6 @@ class InputForm extends SparkObject implements IBeanEditor
      */
     protected $renderer = NULL;
 
-    protected string $name = "";
 
     const string DEFAULT_GROUP = "default";
 
@@ -335,12 +334,6 @@ class InputForm extends SparkObject implements IBeanEditor
     public function getInputNames(): array
     {
         return array_keys($this->inputs);
-    }
-
-    public function valueUnescape(string $name)
-    {
-        $input = $this->getInput($name);
-        return mysql_real_unescape_string($input->getValue());
     }
 
     /**

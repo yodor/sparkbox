@@ -1,91 +1,49 @@
-
-
-
 .FormRenderer[layout="HBox"] {
-    display: table;
-    border-spacing: 0.5em;
-    border-collapse: separate;
-    text-align: left;
+    grid-template-columns: auto auto;
+    column-gap: 0.25em;
+    row-gap: 0.5em;
+    align-items: center;
+    justify-items: stretch;
 }
 
 .FormRenderer[layout="HBox"] .InputComponent {
-    display: table-row;
+    display: contents;
 }
 
-.FormRenderer[layout="HBox"] .InputComponent .InputLabel {
-    display: table-cell;
+.FormRenderer[layout="HBox"] .InputLabel {
+
     text-align: right;
-
-    vertical-align: middle;
-}
-
-.FormRenderer[layout="HBox"] .InputComponent .InputField {
-    display: table-cell;
-    text-align: left;
-
-    vertical-align: middle;
-}
-
-
-.FormRenderer[layout="HBox"] .InputComponent .content_after {
-    display: table-cell;
-    text-align: left;
-
-    vertical-align: middle;
-}
-
-.FormRenderer[layout="HBox"] .InputComponent .content_before {
-    display: table-cell;
-    text-align: left;
-
-    vertical-align: middle;
-}
-
-/*HBOX Array*/
-
-.FormRenderer[layout="HBox"] .ArrayContents:empty {
-    display: none;
-}
-
-.FormRenderer[layout="HBox"] .ArrayContents {
-    display: table;
-    border-spacing: 0.2em;
-    border-collapse: separate;
-}
-
-.FormRenderer[layout="HBox"] .ArrayContents .Element {
-    display: table-row;
-}
-
-.FormRenderer[layout="HBox"] .ArrayContents .Element > * {
-    display: table-cell;
-    vertical-align: middle;
 }
 
 .FormRenderer[layout="HBox"] .SubmitLine {
-    display: table-row;
+    grid-column: 1/-1;
 
+    display:flex;
+    justify-self: stretch;
 }
-
 .FormRenderer[layout="HBox"]  .SubmitLine .TextSpace {
 
-    text-align: left;
-    vertical-align: middle;
-    display:table-cell;
+    display:flex;
+    flex-direction: row;
+    flex-wrap:wrap;
+    flex-grow:1;
+
+    align-items:flex-start;
+
+    gap:0.5em;
+
 }
 
 .FormRenderer[layout="HBox"]  .SubmitLine .Buttons {
 
-    text-align: right;
-    vertical-align: middle;
-    display:table-cell;
-}
+    display:flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
 
-.FormRenderer[layout="HBox"]  .SubmitLine .Buttons>* {
-    margin-left:0.5em;
-    margin-left:0em;
-}
+    align-items:flex-end;
 
+    gap:0.5em;
+}
 
 
 

@@ -37,8 +37,11 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
     public function __construct(GalleryView $view)
     {
         parent::__construct();
+        $this->setComponentClass("GalleryViewItem");
+
         $this->view = $view;
         $this->action = new Action();
+
         $this->image_popup = new ImagePopup();
         $this->image_popup->setClassName("image_slot");
         $this->actions = new ActionCollection();
