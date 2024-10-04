@@ -328,6 +328,9 @@ class SparkPage extends HTMLPage implements IActionCollection
         //apply title, meta keywords, meta description to the head
         $this->prepareMetaTitle();
 
+        //show session alerts
+        $this->processMessages();
+
         parent::startRender();
         //<body> is in output buffer now
 
@@ -352,8 +355,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         //append message dialog templates
         $this->renderPageComponents();
 
-        //show session alerts
-        $this->processMessages();
+
 
 
         parent::finishRender();
