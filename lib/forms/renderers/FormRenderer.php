@@ -38,7 +38,7 @@ class FormRenderer extends Container
     /**
      * Submit element name attribute default value.
      * FormProcessor look for array key with this name in the request data during processing matching its value to the form name
-     * By default form name is equal to the PHP class name
+     * By default InputForm name is equal to the PHP class name unless overwritten using setName method
      */
     const string SUBMIT_NAME = "SubmitForm";
 
@@ -63,11 +63,7 @@ class FormRenderer extends Container
         $this->setAttribute("enctype", "multipart/form-data");
         $this->setMethod(FormRenderer::METHOD_POST);
 
-        $button = new Button(Button::TYPE_SUBMIT, FormRenderer::SUBMIT_NAME);
-        $button->setAttribute("action", "submit");
-        $button->setContents("Submit");
-        $this->submitButton = $button;
-
+        $this->submitButton = Button::SubmitButton(FormRenderer::SUBMIT_NAME);
 
         $this->submitLine = new Container(false);
         $this->submitLine->setComponentClass("SubmitLine");

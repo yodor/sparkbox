@@ -47,7 +47,7 @@ abstract class PlainUpload extends InputFieldTag
         echo "</div>";
 
         echo "<div class='Controls' >";
-        Button::RenderButton("Browse", "", "browse");
+        Button::TextButton("Browse", "browse")->render();
 
         parent::renderImpl();
 

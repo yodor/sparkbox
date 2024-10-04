@@ -4,6 +4,9 @@ include_once("components/renderers/IPhotoRenderer.php");
 include_once("storage/StorageItem.php");
 include_once("components/Image.php");
 
+/**
+ * Backend storage image reference
+ */
 class ImageStorage extends Action
 {
 

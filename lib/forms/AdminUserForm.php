@@ -47,8 +47,7 @@ class AdminUserForm extends InputForm
         $enum = new DBEnumIterator("admin_users", "access_level");
 
         $rend = new SelectField($field);
-        $rend->na_label = "";
-        $rend->na_value = FALSE;
+        $rend->setDefaultOption(null);
         $rend->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_VALUE);
         $rend->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
         $rend->setIterator($enum);

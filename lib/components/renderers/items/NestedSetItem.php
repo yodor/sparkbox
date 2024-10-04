@@ -4,9 +4,9 @@ include_once("components/renderers/items/DataIteratorItem.php");
 abstract class NestedSetItem extends DataIteratorItem
 {
 
-    public function __construct(bool $chained_component_class = true)
+    public function __construct()
     {
-        parent::__construct($chained_component_class);
+        parent::__construct();
         $this->setComponentClass("Node");
 
     }

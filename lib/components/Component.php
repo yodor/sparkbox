@@ -9,7 +9,7 @@ include_once("utils/output/OutputBuffer.php");
 include_once("objects/events/ComponentEvent.php");
 
 /**
- * Wrapper for HTML element
+ * HTML Element Component
  */
 class Component extends SparkObject implements IRenderer, IHeadContents, ICacheable
 {
@@ -38,9 +38,6 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * @var bool
      */
     protected bool $closingTagRequired = true;
-
-    protected int $index = -1;
-
 
 
     /**
@@ -188,15 +185,6 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         return array();
     }
 
-    public function setIndex(int $index) : void
-    {
-        $this->index = $index;
-    }
-
-    public function getIndex(): int
-    {
-        return $this->index;
-    }
 
     public function setTagName(string $tagName) : void
     {
@@ -493,7 +481,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * @param string $value
      * @return void
      */
-    public function setAttribute(string $name, string $value) : void
+    public function setAttribute(string $name, string $value="") : void
     {
         $this->attributes[$name] = trim($value);
     }
@@ -520,6 +508,11 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     {
         if (isset($this->attributes[$name])) return $this->attributes[$name];
         return "";
+    }
+
+    public function hasAttribute(string $name) : bool
+    {
+        return isset($this->attributes[$name]);
     }
 
     /**

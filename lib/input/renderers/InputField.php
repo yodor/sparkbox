@@ -14,17 +14,7 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
     /**
      * @var DataIteratorItem|null
      */
-    protected $item = NULL;
-
-    /**
-     * @var int
-     */
-    protected int $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
-
-    /**
-     * @var DataInput
-     */
-    protected DataInput $dataInput;
+    protected ?DataIteratorItem $item = NULL;
 
     /**
      * Render values iterator
@@ -34,11 +24,27 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
      */
     protected ?IDataIterator $iterator = NULL;
 
-    protected Container $addon_contents;
 
+    /**
+     * @var int
+     */
+    protected int $error_render_mode = IErrorRenderer::MODE_TOOLTIP;
+
+
+
+    protected Container $addon_contents;
 
     protected bool $is_compound = false;
 
+    /**
+     * @var DataInput
+     */
+    protected DataInput $dataInput;
+
+    /**
+     *
+     * @var Input|null
+     */
     protected ?Input $input = null;
 
     public function __construct(DataInput $dataInput)
@@ -92,6 +98,7 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
         $this->item = $item;
         $this->item->setValueKey($this->dataInput->getName());
         $this->item->setLabelKey($this->dataInput->getName());
+        $this->item->setParent($this);
     }
 
     public function getItemRenderer(): ?DataIteratorItem
@@ -110,23 +117,27 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
         return $this->dataInput;
     }
 
+    /**
+     * Default implementation for standard input html elements.
+     * Set input name equal to dataInput name
+     * @return void
+     */
+    protected function processInput() : void
+    {
+        $this->input?->setName($this->dataInput->getName());
+    }
 
     protected function processAttributes(): void
     {
         parent::processAttributes();
 
-        $this->input?->setName($this->dataInput->getName());
-
-        if (!$this->dataInput->isEditable()) {
-            $this->input?->setAttribute("disabled", "true");
-        }
+        $this->processInput();
 
         if ($this->addon_contents->items()->count()>0) {
             $this->items()->append($this->addon_contents);
         }
 
         $this->processErrorAttributes();
-
     }
 
     protected function processErrorAttributes() : void

@@ -41,13 +41,10 @@ class ImagePopup extends SparkObject {
         let sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_CHANGED,this);
         this.notify(sparkEvent);
 
-        $.event.trigger({
-            type: "ImagePopup",
-            message: "onNextImage",
-            time: new Date(),
-            relation: this.relation,
-            source: this
-        });
+        let ev = new SparkEvent("ImagePopup", this);
+        ev.message = "onNextImage";
+        ev.relation = this.relation;
+        document.dispatchEvent(ev);
 
         return false;
     }
@@ -64,13 +61,10 @@ class ImagePopup extends SparkObject {
         let sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_CHANGED,this);
         this.notify(sparkEvent);
 
-        $.event.trigger({
-            type: "ImagePopup",
-            message: "onPrevImage",
-            time: new Date(),
-            relation: this.relation,
-            source: this
-        });
+        let ev = new SparkEvent("ImagePopup", this);
+        ev.message = "onPrevImage";
+        ev.relation = this.relation;
+        document.dispatchEvent(ev);
 
         return false;
     }
@@ -201,13 +195,10 @@ class ImagePopup extends SparkObject {
         let sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
         this.notify(sparkEvent);
 
-        $.event.trigger({
-            type: "ImagePopup",
-            message: "close",
-            time: new Date(),
-            relation: this.relation,
-            source: this
-        });
+        let ev = new SparkEvent("ImagePopup", this);
+        ev.message = "close";
+        ev.relation = this.relation;
+        document.dispatchEvent(ev);
 
     }
 
@@ -250,13 +241,10 @@ class ImagePopup extends SparkObject {
 
         this.notify(new SparkEvent(ImagePopup.EVENT_FETCH_COMPLETE,this));
 
-        $.event.trigger({
-            type: "ImagePopup",
-            message: "popupImage",
-            time: new Date(),
-            relation: this.relation,
-            source: this
-        });
+        let ev = new SparkEvent("ImagePopup", this);
+        ev.message = "popupImage";
+        ev.relation = this.relation;
+        document.dispatchEvent(ev);
 
     }
 

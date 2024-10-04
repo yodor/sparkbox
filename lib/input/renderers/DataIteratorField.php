@@ -22,10 +22,16 @@ abstract class DataIteratorField extends InputField
         $this->elements->items()->append(new ClosureComponent($this->renderItems(...), false));
     }
 
+
     protected function renderItems() : void
     {
 
-        if (!$this->iterator instanceof IDataIterator) return;
+        if (!$this->iterator instanceof IDataIterator) {
+            throw new Exception("IDataIterator not set");
+        }
+        if (!$this->item instanceof DataIteratorItem) {
+            throw new Exception("DataIteratorItem not set");
+        }
 
         $field_values = $this->dataInput->getValue();
 
@@ -33,27 +39,30 @@ abstract class DataIteratorField extends InputField
             $field_values = array($field_values);
         }
 
-        $index = 0;
+        $position = 0;
 
         $num = $this->iterator->exec();
 
+        //ArrayField appends [] to the dataInput
+        $this->item->setName($this->dataInput->getName());
 
-        while ($data_row = $this->iterator->next()) {
+        while ($data = $this->iterator->next()) {
 
-            //TODO
             $id = 0;
-            if (isset($data_row[$this->iterator->key()])) {
-                $id = $data_row[$this->iterator->key()];
+            if (isset($data[$this->iterator->key()])) {
+                $id = $data[$this->iterator->key()];
             }
 
             $this->item->setID((int)$id);
-            $this->item->setIndex($index);
-            //sets the actual value of the item being rendered
-            $this->item->setData($data_row);
+
+            $this->item->setPosition($position);
+
+            //sets value and label
+            $this->item->setData($data);
 
             $this->item->setSelected($this->isModelSelected((string)$this->item->getValue()));
 
-            $array_key_value = $index;
+            $array_key_value = $position;
             if ($this->item->isSelected()) {
                 if ($this->array_key_model_id) {
                     //the corresponding ID of the value from transact-bean of DataInput
@@ -65,17 +74,16 @@ abstract class DataIteratorField extends InputField
             }
 
             //override key
-            if ($this->array_key_field_name && isset($data_row[$this->array_key_field_name])) {
-                $array_key_value = $data_row[$this->array_key_field_name];
+            if ($this->array_key_field_name && isset($data[$this->array_key_field_name])) {
+                $array_key_value = $data[$this->array_key_field_name];
             }
 
-            //dataInput name might already be forced to array from ArrayField
-            //force array name for html input
-            $this->item->setName($this->dataInput->getName() . "[".$array_key_value."]");
+
+            $this->item->setKey($array_key_value);
 
             $this->item->render();
 
-            $index++;
+            $position++;
         }
 
     }

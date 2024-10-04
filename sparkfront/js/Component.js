@@ -11,6 +11,7 @@ class Component extends SparkObject
         this.field = "";
         this.class = ".Component"
         this.id = "";
+        this.element = null;
     }
 
     setName(name) {
@@ -47,7 +48,6 @@ class Component extends SparkObject
         return this.class;
     }
 
-
     setID(id) {
         this.id = id;
     }
@@ -55,8 +55,10 @@ class Component extends SparkObject
     getID() {
         return this.id;
     }
+
     /**
-     *
+     * Build and return selector string using the component 'class' property
+     * Appends name, field and ID attributes if set
      * @returns {string}
      */
     selector() {
@@ -73,18 +75,40 @@ class Component extends SparkObject
         return result;
     }
 
+    /**
+     * Return jquery selector for this component
+     * @returns {JQuery<HTMLElement>}
+     */
     component() {
         return $(this.selector());
     }
 
+    /**
+     * Query the document and return the dom Element of this component -
+     * Using this.selector()
+     * @returns {Element}
+     */
+    getElement() {
+        return this.element;
+    }
+
     initialize() {
 
-        if (document.querySelector(this.selector())) {
-            //console.log(this.constructor.name + "::initialize() " + this.selector());
-        }
-        else {
-            throw "DOM element not found: " + this.selector();
+        this.element = document.querySelector(this.selector());
+        if (! (this.element instanceof Element)) {
+            console.log("DOM query failed: " + this.selector());
         }
 
+    }
+
+    cloneWithListeners(element) {
+        let clonedNode = element.cloneNode(true);
+
+        Array.prototype.forEach.call(element.querySelectorAll('*'), (element) => {
+            const events = getEventListeners(element);
+            events.forEach((event) => {
+                clonedNode.addEventListener(event.type, event.handler);
+            });
+        });
     }
 }

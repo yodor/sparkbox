@@ -213,8 +213,7 @@ BODY {
 }
 
 .BeanFormEditor .FormRenderer .InputField.MCETextArea TEXTAREA {
-    height: 150px;
-    /*   max-height:150px; */
+
 }
 
 .TableView[name='SiteTexts'] TD[column='value'] {
@@ -287,7 +286,7 @@ BODY {
 }
 
 .BeanFormEditor .FormRenderer {
-    width: 100%;
+    /*width: 100%;*/
 }
 
 .BeanFormEditor .FormRenderer .TextArea TEXTAREA {

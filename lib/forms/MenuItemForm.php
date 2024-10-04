@@ -25,9 +25,7 @@ class MenuItemForm extends InputForm
 
         $rend = new NestedSelectField($field);
 
-        // $source = new MenuItemsBean();
-        $rend->na_label = "--- TOP ---";
-        $rend->na_value = "0";
+        $rend->setDefaultOption("--- TOP ---", "0");
 
         $rend->setIterator(new SQLQuery($source->selectTree(array("menu_title")), "menuID", $source->getTableName()));
         $rend->getItemRenderer()->setValueKey("menuID");

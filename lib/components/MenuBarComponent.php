@@ -115,8 +115,9 @@ class MenuBarComponent extends Container
         ?>
         <script type='text/javascript'>
             onPageLoad(function () {
-                let menu_bar = new MenuBarComponent();
-                menu_bar.attachWith("<?php echo $this->getName();?>");
+                const menu_bar = new MenuBarComponent();
+                menu_bar.setName("<?php echo $this->getName();?>")
+                menu_bar.initialize();
             });
         </script>
         <?php

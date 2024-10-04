@@ -11,12 +11,6 @@ class RadioField extends DataIteratorField
         $this->setItemRenderer(new RadioItem());
     }
 
-    protected function processAttributes(): void
-    {
-        parent::processAttributes();
-
-        $this->removeAttribute("name");
-    }
 }
 
 ?>

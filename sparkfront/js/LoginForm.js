@@ -2,84 +2,70 @@ class LoginForm extends Component {
     constructor() {
         super();
         this.setClass("FORM");
+        this.form = null;
     }
 
     initialize() {
 
+        super.initialize();
+
         try {
-            this.form = $(this.selector());
-            if (!this.form.get(0)) throw "Required form component class not found";
+            this.form = this.getElement();
 
-            this.email = this.form.find("INPUT[name='email']").first();
-            if (!this.email.get(0)) throw "Required field not found";
+            if (!(typeof hex_hmac_md5 === 'function')) throw "Required hashing function not defined";
 
-            this.password = this.form.find("INPUT[name='password']").first();
-            if (!this.password.get(0)) throw "Required field not found";
+            if (!(this.form instanceof HTMLFormElement)) {
+                throw "Component element is not a HTMLFormElement";
+            }
 
-            this.rand = this.form.find("INPUT[type='hidden'][name='rand']").first();
-            if (!this.rand.get(0)) throw "Required field not found";
+            if (!this.form.querySelector("INPUT[name='email']")) throw "Required field 'email' not found";
+            if (!this.form.querySelector("INPUT[name='password']")) throw "Required field 'password' not found";
+            if (!this.form.querySelector("INPUT[type='hidden'][name='rand']")) throw "Required field 'rand' not found";
+            if (!this.form.querySelector("INPUT[type='hidden'][name='pass']")) throw "Required field 'pass' not found";
 
-            this.pass = this.form.find("INPUT[type='hidden'][name='pass']").first();
-            if (!this.pass.get(0)) throw "Required field not found";
+            const instance = this;
+            this.form.addEventListener("submit", (event) => {
+                instance.onSubmit(event);
+            });
 
-            this.form.on("submit", function (event) {
 
-                return this.onSubmit(event);
-
-            }.bind(this));
 
         } catch (exx) {
-            alert("Unable to attach with requested AuthForm: " + exx + " " + this.selector());
+            alert("Unable to attach with requested Form: " + exx + " " + this.selector());
         }
 
     }
 
-    onSubmit(event) {
+    async onSubmit(event) {
 
-        this.email.val(trim(this.email.val()));
-        this.password.val(trim(this.password.val()));
-
-        let u = this.email.val();
-        let p = this.password.val();
-        let r = this.rand.val();
+        this.form.email.value = trim(this.form.email.value);
+        this.form.password.value = trim(this.form.password.value);
 
         try {
-            if (u.length < 1) {
-                throw "Input your email";
-            }
-            this.processEmail();
 
-            if (!(typeof hex_hmac_md5 === 'function')) throw "Required hashing function not defined";
-
-            this.processPassword();
+            await this.processEmail();
+            await this.processPassword();
+            return;
 
         } catch (exx) {
-
             showAlert(exx);
-            return false;
-
         }
 
-
-        return true;
-
+        event.preventDefault(); // prevent the default form submission behavior
     }
 
     async processPassword() {
 
-        let p = this.password.val();
-        let r = this.rand.val();
+        let p = this.form.password.value;
+        let r = this.form.rand.value;
 
         if (p.length < 1) throw "Input your password to continue.";
         if (p.length < 6) throw "Minimum password of 6 symbols required.";
 
-        this.password.val("");
+        this.form.pass.value = hex_hmac_md5(hex_md5(p), r);
 
-        let result = hex_hmac_md5(hex_md5(p), r);
-        //const result = await this.hmac(hmac_key, hmac_message);
-
-        this.pass.val(result);
-        this.rand.val("");
+        this.form.rand.value = "";
+        this.form.password.value = "";
 
     }
 
@@ -109,10 +95,12 @@ class LoginForm extends Component {
 
     }
 
-    processEmail() {
-        let u = this.email.val();
-
-        let emailFilter = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    async processEmail() {
+        const u = this.form.email.value;
+        if (u.length < 1) {
+            throw "Input your email";
+        }
+        const emailFilter = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
         if (!emailFilter.test(u)) {              //test email for illegal
             throw "Please enter a valid email address.";

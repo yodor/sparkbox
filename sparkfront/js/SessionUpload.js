@@ -145,7 +145,7 @@ class SessionUpload extends Component {
         let instance = this;
 
         slots.find("[action='Remove']").each(function (index) {
-            $(this).click(function (event) {
+            $(this).on("click",function (event) {
                 instance.removeSlot($(this));
             });
         });

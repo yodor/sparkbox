@@ -2,6 +2,10 @@
 include_once("components/Container.php");
 include_once("utils/IDataResultProcessor.php");
 
+/**
+ * Item renderers are reused for each iterator step
+ *
+ */
 abstract class DataIteratorItem extends Container implements IDataResultProcessor
 {
     //use value of data array key '$value_key' to construct the value of this item
@@ -25,8 +29,13 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
 
     protected bool $checked = false;
 
-    protected int $position = 0;
+    protected int $position = -1;
 
+    /**
+     * Model index key value
+     * @var string
+     */
+    protected ?string $key = null;
 
     public function __construct()
     {
@@ -38,9 +47,13 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
     {
         $this->value = "";
         $this->label = "";
-
     }
 
+    /**
+     * Sequential position during iteration
+     * @param int $position
+     * @return void
+     */
     public function setPosition(int $position) : void
     {
         $this->position = $position;
@@ -49,6 +62,26 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
     public function getPosition() : int
     {
         return $this->position;
+    }
+
+
+    /**
+     * Set the array key value ie name[$key] will be output as html attribute name
+     * @param string|null $key
+     * @return void
+     */
+    public function setKey(?string $key) : void
+    {
+        $this->key = $key;
+    }
+
+    /**
+     * Get the array key value
+     * @return string|null
+     */
+    public function getKey(): ?string
+    {
+        return $this->key;
     }
 
     /**
@@ -79,6 +112,11 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
         return $this->label;
     }
 
+    /**
+     * ID key value from the result row
+     * @param int $id
+     * @return void
+     */
     public function setID(int $id) : void
     {
         $this->id = $id;
@@ -89,21 +127,39 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
         return $this->id;
     }
 
+    /**
+     * Data key value to use as value of this item during setData
+     * @param string $field
+     * @return void
+     */
     public function setValueKey(string $field) : void
     {
         $this->value_key = $field;
     }
 
+    /**
+     * Get data key in use for value
+     * @return string
+     */
     public function getValueKey(): string
     {
         return $this->value_key;
     }
 
+    /**
+     * Data key value to use as label of this item during setData
+     * @param string $field
+     * @return void
+     */
     public function setLabelKey(string $field) : void
     {
         $this->label_key = $field;
     }
 
+    /**
+     * Get data key in use for label
+     * @return string
+     */
     public function getLabelKey(): string
     {
         return $this->label_key;
@@ -119,13 +175,72 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
         return $this->value;
     }
 
+    /**
+     * Return string to be used as name attribute of this item
+     * Default is to use "$this->name"."[$this->key]"
+     * Ex name='input1' key='1' => "input1[1]"
+     * If key is null just $this->getName() is returned
+     * @return string
+     */
+    protected function createInputName() : string
+    {
+        $name = $this->getName();
+        if (!is_null($this->key)) {
+            $name = $name."[".$this->key."]";
+        }
+        return $name;
+    }
+
+    /**
+     * Assign attributes pos. key, name to the Component passed in $input
+     * Uses createInputName to set the actual name attribute
+     * Called from processAttributes
+     * Fields with complex elements ie CheckItem, RadioItem override getInput() and return the actual input item
+     * @param Component $input
+     * @return void
+     */
+    protected function assignInputAttributes(Component $input) : void
+    {
+        $input->setAttribute("pos", $this->position);
+
+        if (!is_null($this->key)) {
+            $input->setAttribute("key", $this->key);
+        }
+        else {
+            $input->removeAttribute("key");
+        }
+
+        $name = $this->createInputName();
+
+        //overwrite the name attribute
+        if ($name) {
+            $input->setAttribute("name", $name);
+        }
+        else {
+            $input->removeAttribute("name");
+        }
+
+    }
+
+    /**
+     * Return '$this' for passing to assignInputAttributes
+     * Fields with complex elements ie CheckItem, RadioItem override this method and return the actual input component here
+     * @return Component
+     */
+    protected function getInput() : Component
+    {
+        return $this;
+    }
+
+    /**
+     * Item renderers are reused for each iterator step so clear values
+     * Uses assignInputAttributes(getInput())
+     * @return void
+     */
     protected function processAttributes(): void
     {
         parent::processAttributes();
-
-        if ($this->index > -1) {
-            $this->setAttribute("index", $this->index);
-        }
+        $this->assignInputAttributes($this->getInput());
     }
 
     public function setSelected(bool $mode) : void
@@ -148,9 +263,9 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
         return $this->checked;
     }
 
-    public function getDataValue(string $key) : string
+    public function getData() : array
     {
-        return $this->data[$key];
+        return $this->data;
     }
 
     public function setData(array $data) : void
@@ -168,7 +283,6 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
                 $this->removeAttribute($attributeName);
             }
         }
-
     }
 
 }

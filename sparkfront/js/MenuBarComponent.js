@@ -13,56 +13,48 @@ function isMob() {
     }
 }
 
-class MenuBarComponent {
+class MenuBarComponent extends Component {
 
     constructor() {
-        this.component_class = ".MenuBarComponent";
-        this.cls = this.component_class + "[submenu_popup!='0']";
-
+        super();
+        this.class = ".MenuBarComponent:not([noattach])";
+        this.menuBar = null;
+        this.toggle = null;
     }
 
-    toggleMenu(event, toggle) {
+    toggleMenu(event) {
 
-
-        var bar = toggle.parents(".MenuBar").first();
-
-
-        if (bar) {
-            console.log("Menu toggle clicked: " + bar.attr("name"));
-            if (bar.hasClass("normal")) {
-                bar.removeClass("normal");
-                this.leaveAll();
-            } else {
-                bar.addClass("normal");
-            }
+        const classNames = this.menuBar.classList;
+        if (classNames.contains("normal")) {
+            classNames.remove("normal");
+            this.leaveAll();
+        } else {
+            classNames.add("normal");
         }
+
     }
 
-    attachWith(name) {
+    initialize() {
 
-        this.name = name;
+        super.initialize();
 
 
-        var name_attribute = "[name='" + name + "']";
-        this.cls += name_attribute;
+        if (!this.element) {
+            //console.log("Not initializing for having noattach attribute");
+            return;
+        }
 
-        //find parent MenuBar find child toggle
-        //attach onClick with instnce toggleMenu attach even with submenu_popup=0
-        var toggle = $(this.component_class + name_attribute).parents(".MenuBar").first().children(".toggle").first();
-        toggle.on("click", function (event) {
-            //show/hide the MenuBarComponent
-            instance.toggleMenu(event, toggle);
+        const instance = this;
+
+        this.menuBar = this.element.closest(".MenuBar");
+        this.toggle = this.menuBar.querySelector(".toggle");
+
+        this.toggle.addEventListener("click", (event)=>{
+            instance.toggleMenu(event);
         });
 
-
-        var instance = this;
-
-        //link instance with dom
-        $(this.cls).data("menu_instance", instance);
-
-
         //assign each menubar item with events
-        $(this.cls).first().children(".MenuBarItemRenderer").each(function (index) {
+        $(this.selector()).first().children(".MenuBarItemRenderer").each(function (index) {
 
             var barItem = $(this);
             var handle = barItem.find(".handle").first();
@@ -109,7 +101,7 @@ class MenuBarComponent {
         });
 
 
-        $(this.cls).first().find(".SubmenuItemRenderer").each(function (index) {
+        $(this.selector()).first().find(".SubmenuItemRenderer").each(function (index) {
 
             var subItem = $(this);
             //only submenuitems containing submenus have data-line attribute defined
@@ -155,9 +147,9 @@ class MenuBarComponent {
     }
 
     leaveAll() {
-        var instance = this;
+        let instance = this;
 
-        $(this.cls).find(".MenuBarItemRenderer").each(function (index) {
+        $(this.selector()).find(".MenuBarItemRenderer").each(function (index) {
             var mitem = $(this);
             instance.menuLeave(mitem);
         });

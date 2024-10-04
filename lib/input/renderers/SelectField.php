@@ -5,8 +5,8 @@ include_once("input/renderers/SelectItem.php");
 class SelectField extends DataIteratorField
 {
 
-    public $na_label = "--- SELECT ---";
-    public $na_value = NULL;
+    protected ?string $default_label = null;
+    protected string $default_value = "";
 
     public function __construct(DataInput $input)
     {
@@ -19,30 +19,38 @@ class SelectField extends DataIteratorField
         $this->input->setTagName("SELECT");
         $this->input->setClosingTagRequired(TRUE);
 
-//        $this->elements->items()->clear();
-//        $this->elements->items()->append($this->input);
-
         $this->input->items()->append(new ClosureComponent($this->renderItems(...), false));
 
         $this->items()->append($this->input);
+
+        $this->setDefaultOption("--- SELECT ---");
     }
 
-    protected function renderItems() : void
+    public function setDefaultOption(string|null $label, string $value="") : void
+    {
+        $this->default_label = $label;
+        $this->default_value = $value;
+    }
+
+    protected function renderDefaultItem() : void
     {
         //prepare the default select value
-        if ($this->na_label) {
-
+        if (!is_null($this->default_label)) {
             $this->item->setID(-1);
-            $this->item->setIndex(-1);
+            $this->item->setKey(-1);
 
-            $this->item->setValue($this->na_value);
-            $this->item->setLabel($this->na_label);
+            $this->item->setValue($this->default_value);
+            $this->item->setLabel($this->default_label);
 
             $this->item->setSelected($this->isModelSelected((string)$this->item->getValue()));
 
             $this->item->render();
-
         }
+    }
+
+    protected function renderItems() : void
+    {
+        $this->renderDefaultItem();
         parent::renderItems();
     }
 
@@ -75,18 +83,24 @@ class SelectMultipleField extends SelectField
     {
         parent::__construct($input);
         //use SelectField css
-        $this->setClassName("SelectField");
+        $this->addClassName("SelectField");
 
         $this->input->setAttribute("multiple", "");
 
-        $this->na_label = "";
+        //do not render default inital option
+        $this->setDefaultOption(null);
     }
 
-    protected function processAttributes(): void
+    protected function processInput(): void
     {
-        parent::processAttributes();
+        parent::processInput();
+
+        //dataInput name might already be appended with []
+        //make the name an array as this is multi-select
         $this->input->setName($this->dataInput->getName()."[]");
     }
+
+
 
 }
 

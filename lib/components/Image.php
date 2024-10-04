@@ -57,6 +57,11 @@ class Image extends Component implements IPhotoRenderer
         }
     }
 
+    /**
+     * Point this image to the storage using the StorageItem data
+     * @param StorageItem $item
+     * @return void
+     */
     public function setStorageItem(StorageItem $item) : void
     {
         $this->storageItem = $item;

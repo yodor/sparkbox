@@ -5,6 +5,10 @@
     top: 0;
     width: 100%;
     height: 100%;
-    display: table;
+    display: grid;
     z-Index: 100;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+    align-items: center;
+    justify-items: center;
 }

@@ -39,7 +39,9 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
 
     public function __construct()
     {
-        parent::__construct(false);
+        parent::__construct();
+
+        $this->addClassName("TextTreeItem");
 
         $handle = new Container(false);
         $handle->setComponentClass("Handle");

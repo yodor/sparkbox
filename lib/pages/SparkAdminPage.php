@@ -69,7 +69,7 @@ class SparkAdminPage extends SparkPage
         $this->menu_bar->setName("admin_menu");
         $this->menu_bar->setClassName("admin_menu");
 
-        $this->menu_bar->getBar()->setAttribute("submenu_popup", "0");
+        $this->menu_bar->getBar()->setAttribute("noattach");
 
         $this->head()->addCSS(SPARK_LOCAL . "/css/AdminPage.css");
         $this->head()->addCSS(SPARK_LOCAL . "/css/AdminButtons.css");
@@ -213,7 +213,7 @@ class SparkAdminPage extends SparkPage
                     }
                     echo "<div class='username'>".$fullname."</div>";
 
-                    Button::RenderButton("Logout", ADMIN_LOCAL . "/logout.php");
+                    Button::LocationButton("Logout", new URL(ADMIN_LOCAL . "/logout.php"))->render();
 
                     echo "</div>";
 

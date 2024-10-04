@@ -17,11 +17,14 @@ class ImageDimensionForm extends InputForm
         $render_modes = new ArrayDataIterator($modes);
 
         $field = DataInputFactory::Create(DataInputFactory::SELECT, "render_mode", "Render Mode", 0);
-        $field->getRenderer()->setIterator($render_modes);
-        $field->getRenderer()->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_ID);
-        $field->getRenderer()->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
-        $field->getRenderer()->na_label = "";
 
+        $renderer = $field->getRenderer();
+        if ($renderer instanceof SelectField) {
+            $renderer->setIterator($render_modes);
+            $renderer->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_ID);
+            $renderer->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
+            $renderer->setDefaultOption(null);
+        }
         $this->addInput($field);
 
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "caption", "Caption", 0);

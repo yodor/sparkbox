@@ -10,6 +10,12 @@ class CheckItem extends RadioItem
 
         $this->input->setType("checkbox");
     }
+
+    protected function createInputName() : string
+    {
+        //prefer the array name with key name as set in DataIteratorItem
+        return DataIteratorItem::createInputName();
+    }
 }
 
 ?>

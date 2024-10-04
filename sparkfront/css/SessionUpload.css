@@ -1,12 +1,16 @@
 .InputField.SessionUpload .FieldElements {
-    display:flex;
+
     flex-direction: column;
     align-items: flex-start;
 }
 
 .InputField.SessionUpload .Details {
 
-    white-space:nowrap;
+
+}
+
+.InputField.SessionUpload .Details .Limits {
+    white-space: nowrap;
 }
 
 .InputField.SessionUpload .Details .Limits SPAN {
@@ -35,44 +39,52 @@
 .InputField.SessionUpload .Controls {
 
     position: relative;
-    align-self: stretch;
+
 }
 
-.InputField.SessionUpload .Controls .Buttons {
-
-    position: relative;
+.InputField.SessionUpload .Controls [type='button'] {
+    cursor:pointer;
 }
 
-.InputField.SessionUpload .Controls[working] .Buttons {
-    display: none;
+.InputField.SessionUpload .Controls [action='browse'] {
+    position:relative;
+    box-sizing:border-box;
+    overflow:clip;
 }
 
 
-.InputField.SessionUpload .Controls .Buttons INPUT[type="file"] {
-
-    width: 100%;
-    height: 100%;
-
-    -moz-opacity: 0;
-    filter: alpha(opacity:0);
-    opacity: 0;
-
-    z-index: 2;
-    position: absolute;
-    left: 0;
-    top: 0;
-    cursor: pointer;
+.InputField.SessionUpload .Controls INPUT[type="file"] {
+    display:none;
 }
 
 .InputField.SessionUpload .Controls .Progress {
     display: none;
-    position: relative;
-    border: 1px solid #555;
-    border-radius: 0.2em;
+
+    box-sizing: border-box;
+    align-items:center;
+    justify-content: center;
+
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+}
+
+.InputField.SessionUpload .Controls[working] [action='browse'] {
+    background-color: transparent;
+    color:transparent;
+    box-shadow: none;
+
+    pointer-events:none;
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
 }
 
 .InputField.SessionUpload .Controls[working] .Progress {
-    display: block;
+    display: inline-flex;
+
 }
 
 .InputField.SessionUpload .Controls .Progress .bar {
@@ -80,36 +92,26 @@
     width: 0;
     height: 100%;
 
-    border-radius: 0.2em;
-    display: block;
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 0;
 }
 
 .InputField.SessionUpload .Controls .Progress .percent {
 
-    display: block;
-
-    font-size: 0.5em;
-    text-align: center;
-
-    position: relative;
+    font-size: 70%;
     z-index: 1;
+    color:black;
 
-    vertical-align: middle;
-
-    padding: 0.3em;
 }
 
 
 .InputField.SessionUpload .ArrayContents {
-    display:flex;
+    display:inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-
+    justify-items: flex-start;
  }
 
 .InputField.SessionUpload .ArrayContents .Element {

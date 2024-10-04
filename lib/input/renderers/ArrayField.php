@@ -119,7 +119,7 @@ class ArrayField extends InputField
 
     protected function renderElementSource() : void
     {
-        $fake_input = new DataInput("render_source", $this->dataInput->getLabel(), $this->dataInput->isRequired());
+        $fake_input = new DataInput("render_source", $this->dataInput->getLabel(), 0);
 
         $renderer = $this->element_renderer;
 

@@ -1,67 +1,66 @@
-function showTooltip(str, event) {
-
-    var existing_tooltip = $(".TooltipPanel").first();
-
-    if (existing_tooltip.get(0)) {
-        str = str + "<BR>" + existing_tooltip.html();
-        existing_tooltip.html(str);
-    } else {
-        var tooltip_content = "<div class='TooltipPanel'>" + str + "</div>";
-        $("body").append(tooltip_content);
+class ToolTip {
+    constructor() {
+        const template = document.createElement('template');
+        template.innerHTML = "<div class='TooltipPanel'></div>";
+        this.tipElement = template.content.firstChild;
     }
 
-    var tooltip = $("body").children(".TooltipPanel").first();
+    /**
+     *
+     * @param element {HTMLElement}
+     * @param event
+     */
+    show(element, event) {
 
-    var left = event.pageX + 20;
-    var top = event.pageY + 20;
+        this.hide(element,event);
 
-    tooltip.css("left", left);
-    tooltip.css("top", top);
-    tooltip.css("display", "block");
+        this.tipElement.textContent = element.getAttribute("tooltip");
 
-}
+        let left = event.pageX + 25;
+        let top = event.pageY + 25;
 
-function hideTooltip() {
-    $(".TooltipPanel").remove();
+        this.tipElement.style.left = left + "px"
+        this.tipElement.style.top = top + "px"
+        this.tipElement.style.display = "block";
 
-}
+        document.body.append(this.tipElement);
+        // setTimeout(function(event){
+        //         hideTooltip(element, event);
+        // }, 3000);
+    }
 
-function processTooltipContent(elm) {
-    if (!elm) elm = "body";
+    /**
+     *
+     * @param element {HTMLElement}
+     * @param event
+     */
+    hide(element, event) {
+        document.querySelector(".TooltipPanel")?.remove();
+    }
 
-    $(elm).find("[tooltip]").each(function (index) {
-        let is_tooltip = $(this).data("tooltip_attached");
-        if (is_tooltip) return;
+    /**
+     *
+     * @param element {HTMLElement}
+     */
+    assignListeners(element) {
+        if (!element) element = "body";
 
-        $(this).data("tooltip_attached", 1);
+        const toolTip = this;
 
-        let str = $(this).attr("tooltip");
-
-        if (!str) return;
-
-        let trig = $(this);
-
-        if (trig.attr("error")) {
-            str = "Error: " + str;
-        }
-
-        if (trig.hasClass("MCETextArea")) {
-            let fields = trig.children().last();
-            if (fields.get(0)) trig = $(fields);
-        }
-
-        trig.on("mouseenter", function (event){
-            showTooltip(str, event);
+        document.querySelectorAll(element+" [tooltip]").forEach((element) => {
+            element.addEventListener("mouseenter", function(event){
+                toolTip.show(this,event);
+            });
+            element.addEventListener("mouseleave", function(event){
+                toolTip.hide(this,event);
+            });
         });
+    }
 
-        trig.on("mouseleave", function (event){
-            hideTooltip();
-        });
-
-
-    });
 }
+
+const toolTip = new ToolTip();
 
 onPageLoad(function () {
-    processTooltipContent();
+    toolTip.assignListeners();
 }, true);

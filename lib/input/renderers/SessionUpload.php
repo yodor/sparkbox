@@ -8,6 +8,7 @@ abstract class SessionUpload extends InputField
 
     protected ?UploadControlResponder $responder;
 
+    protected Button $browse_button;
 
     public function __construct(DataInput $dataInput, UploadControlResponder $responder)
     {
@@ -21,7 +22,6 @@ abstract class SessionUpload extends InputField
         $this->input = new Input();
         $this->input->setType("file");
         //allow uploading multiple files at once
-
         $this->input->setAttribute("multiple", "");
 
         $field_elements = new Container();
@@ -30,21 +30,37 @@ abstract class SessionUpload extends InputField
         $details = $this->createDetails();
         $field_elements->items()->append($details);
 
-        $controls = new ClosureComponent($this->createControls(...), false);
-        $controls->setComponentClass("");
+        $button = Button::TextButton("Browse","browse");
+        $button->setTagName("LABEL");
+        $button->setTooltip("Select file(s) for upload");
+        $button->setAttribute("for", $this->input->getName());
+        $button->items()->append($this->input);
+        $progress = new TextComponent();
+        $progress->setComponentClass("Progress");
+        $progress->setContents("<div class='bar'></div><div class='percent'>0%</div>");
+        $button->items()->append($progress);
+
+        $this->browse_button = $button;
+
+        $controls = new Container(false);
+        $controls->setComponentClass("Controls");
+//        $controls->setAttribute("working", "");
+        $controls->items()->append($button);
         $field_elements->items()->append($controls);
 
-        $arrayContents = new ClosureComponent($this->createArrayContents(...), false);
-        $arrayContents->setComponentClass("");
+
+        $arrayContents = new ClosureComponent($this->renderItems(...));
+        $arrayContents->setComponentClass("ArrayContents");
+        $arrayContents->setAttribute("field", $this->dataInput->getName());
         $field_elements->items()->append($arrayContents);
 
         $this->items()->append($field_elements);
+
     }
 
     public function setResponder(UploadControlResponder $responder) : void
     {
         $this->responder = $responder;
-
     }
 
     public function getResponder() : UploadControlResponder
@@ -70,10 +86,11 @@ abstract class SessionUpload extends InputField
     protected function processAttributes() : void
     {
 
-
         parent::processAttributes();
 
         $this->input->setName($this->dataInput->getName()."[]");
+        $this->input->setAttribute("id", $this->input->getName());
+        $this->browse_button->setAttribute("for", $this->input->getName());
 
         $this->setAttribute("handler_command", $this->responder->getCommand());
         $this->setAttribute("field", $this->dataInput->getName());
@@ -132,56 +149,27 @@ abstract class SessionUpload extends InputField
         return $details;
     }
 
-    protected function createControls() : void
-    {
-        echo "<div class='Controls' >";
-
-            echo "<div class='Buttons'>";
-
-            $this->input->render();
-
-            Button::RenderButton("Browse", "", "browse");
-
-            echo "</div>"; //Buttons
-
-            echo "<div class='Progress'>";
-            echo "<div class='bar'></div>";
-            echo "<div class='percent'>0%</div>";
-            echo "</div>"; //Progress
-
-        echo "</div>"; //Controls
-
-    }
-
-    protected function createArrayContents() : void
+    protected function renderItems() : void
     {
         $field_name = $this->dataInput->getName();
 
         $images = $this->dataInput->getValue();
 
         if (!$this->responder) {
-            echo "<div class='ArrayContents'>";
             echo "<div class='error'>Upload Handler not registered</div>";
-            echo "</div>";
             return;
         }
-
-        echo "<div class='ArrayContents' field='{$this->dataInput->getName()}'>";
 
         if (!is_array($images)) {
             $images = array($this->dataInput->getValue());
         }
 
         foreach ($images as $idx => $storage_object) {
-
             if (is_null($storage_object)) continue;
-
             if (!($storage_object instanceof StorageObject)) continue;
-
             echo $this->responder->getHTML($storage_object, $field_name);
-
         }
-        echo "</div>";
+
     }
 
     public function finishRender()

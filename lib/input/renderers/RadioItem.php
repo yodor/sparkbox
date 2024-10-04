@@ -33,15 +33,31 @@ class RadioItem extends DataIteratorItem
         $this->items()->append($this->span);
     }
 
+    protected function getInput() : Component
+    {
+        return $this->input;
+    }
+
+
+    /**
+     * Override DataIteratorItem naming and return just the dataInput name as
+     * set from the DataIteratorField during renderItems()
+     *
+     * DataIteratorItem default implementation sets named keys as name ie name[1],name[2]
+     * but radio buttons are single selection model and are grouped using the same name
+     * @return string
+     */
+    protected function createInputName() : string
+    {
+        return $this->getName();
+    }
+
     protected function processAttributes(): void
     {
         parent::processAttributes();
 
-        /**
-         * this->name is assigned from DataIteratorField during renderItems
-         * copy from this name and remove the attribute
-         */
-        $this->input->setName($this->name);
+        //DataIteratorField assigns name = dataInput name during renderItems
+        //passthrough the name to the actual inputs
         $this->removeAttribute("name");
 
         $this->input->setValue(attributeValue($this->value));
