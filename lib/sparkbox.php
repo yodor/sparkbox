@@ -89,6 +89,10 @@ ini_set("session.use_only_cookies", 1);
 ini_set("session.gc_maxlifetime", 1440);
 ini_set("zlib.output_compression", 1);
 
+//disable automatic output buffering this is handled manually in SparkPage
+//in php.ini
+//ini_get("output_buffering", 0);
+
 //important for storage cache to work is the timezone matching across the lamp stack, apache uses the system timezone
 //mysql driver uses date.timezone to set the mysql timezone
 $timezone = "Europe/Sofia";
@@ -195,6 +199,7 @@ include_once("utils/ErrorHandler.php");
 function exception_error_handler(int $errNo, string $errStr, string $errFile, int $errLine) {
     throw new ErrorHandler($errNo, $errStr, $errFile, $errLine);
 }
+//make all errors an exception even the warnings
 //set_error_handler("exception_error_handler", E_ALL);
 
 ?>

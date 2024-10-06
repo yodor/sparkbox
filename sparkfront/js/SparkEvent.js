@@ -1,20 +1,19 @@
 class SparkEvent extends Event {
     /**
      *
-     * @param name {string}
+     * @param message {string}
      * @param source {object}
      */
-    constructor(name, source) {
-        super(name);
-        this.name = name;
+    constructor(message, source) {
+        super(source.constructor.name);
         this.source = source;
+        this.message = message;
         this.time = new Date();
-        this.message = "";
 
     }
 
-    isEvent(name) {
-        return (this.name == name);
+    isEvent(message) {
+        return (this.message == message);
     }
 
 }

@@ -1,6 +1,7 @@
 class ImagePopup extends SparkObject {
 
-    static EVENT_POSITION_CHANGED = "position_changed";
+    static EVENT_POSITION_NEXT = "position_next";
+    static EVENT_POSITION_PREV = "position_prev";
     static EVENT_FETCH_COMPLETE = "fetch_complete";
     static EVENT_CLOSED = "closed";
 
@@ -38,13 +39,9 @@ class ImagePopup extends SparkObject {
         if (this.pos >= this.collection.length) this.pos = 0;
         this.showImage();
 
-        let sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_CHANGED,this);
+        const sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_NEXT, this);
         this.notify(sparkEvent);
-
-        let ev = new SparkEvent("ImagePopup", this);
-        ev.message = "onNextImage";
-        ev.relation = this.relation;
-        document.dispatchEvent(ev);
+        document.dispatchEvent(sparkEvent);
 
         return false;
     }
@@ -58,13 +55,9 @@ class ImagePopup extends SparkObject {
 
         this.showImage();
 
-        let sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_CHANGED,this);
+        const sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_PREV,this);
         this.notify(sparkEvent);
-
-        let ev = new SparkEvent("ImagePopup", this);
-        ev.message = "onPrevImage";
-        ev.relation = this.relation;
-        document.dispatchEvent(ev);
+        document.dispatchEvent(sparkEvent);
 
         return false;
     }
@@ -192,13 +185,11 @@ class ImagePopup extends SparkObject {
         this.disableZoom();
         this.modal_pane.close();
 
-        let sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
+        const sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
+        sparkEvent.relation = this.relation;
         this.notify(sparkEvent);
 
-        let ev = new SparkEvent("ImagePopup", this);
-        ev.message = "close";
-        ev.relation = this.relation;
-        document.dispatchEvent(ev);
+        document.dispatchEvent(sparkEvent);
 
     }
 
@@ -239,12 +230,10 @@ class ImagePopup extends SparkObject {
 
         $(loader).removeClass("cover-spin");
 
-        this.notify(new SparkEvent(ImagePopup.EVENT_FETCH_COMPLETE,this));
+        const sparkEvent = new SparkEvent(ImagePopup.EVENT_FETCH_COMPLETE, this)
+        this.notify(sparkEvent);
 
-        let ev = new SparkEvent("ImagePopup", this);
-        ev.message = "popupImage";
-        ev.relation = this.relation;
-        document.dispatchEvent(ev);
+        document.dispatchEvent(sparkEvent);
 
     }
 
@@ -384,7 +373,7 @@ class ImagePopup extends SparkObject {
 
 onPageLoad(function () {
 
-    let image_popup = new ImagePopup();
+    const image_popup = new ImagePopup();
 
     $("A.ImagePopup:not([href])").on("click", function () {
         image_popup.popupImage($(this));

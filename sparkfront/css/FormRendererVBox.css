@@ -1,5 +1,5 @@
 .FormRenderer[layout="VBox"] {
-
+    grid-template-columns: auto;
     gap:0.5em;
 }
 

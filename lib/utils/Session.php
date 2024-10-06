@@ -14,6 +14,11 @@ class Session
     public static function Start() : void
     {
         if (!Session::$is_started) {
+            $filename = "";
+            $line = "";
+            if (headers_sent($filename, $line)) {
+                throw new Exception("Headers already sent in $filename line $line");
+            }
             session_start();
             Session::$is_started = TRUE;
             debug("Starting session ID: " . session_id());

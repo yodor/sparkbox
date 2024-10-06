@@ -4,7 +4,6 @@ include_once("utils/output/OutputBuffer.php");
 
 abstract class OutputScript implements IHeadScript
 {
-    protected string $type = "text/javascript";
 
     protected OutputBuffer $buffer;
 
@@ -13,16 +12,23 @@ abstract class OutputScript implements IHeadScript
         $this->buffer = new OutputBuffer();
     }
 
-    public function setType(string $type) : void
-    {
-        $this->type = $type;
-    }
+    /**
+     * OutputBuffer is already started - Output the script contents directly
+     * @return void
+     */
+    abstract protected function fillBuffer() : void;
 
     /**
      * Render the script to buffer and return contents
      * @return string
      */
-    abstract public function script(): string;
+    public function script(): string
+    {
+        $this->buffer->start();
+        $this->fillBuffer();
+        $this->buffer->end();
+        return $this->buffer->get();
+    }
 
 }
 ?>

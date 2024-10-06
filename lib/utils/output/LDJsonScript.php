@@ -16,20 +16,14 @@ class LDJsonScript extends OutputScript
         $this->data = $data;
     }
 
-    /**
-     * @return string
-     */
-    public function script(): string
+    protected function fillBuffer(): void
     {
-        if (count($this->data)<1) return "";
+        if (count($this->data)<1) return;
 
-        $this->buffer->start();
         echo "\n<script type='application/ld+json'>\n";
         echo json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         echo "\n</script>\n";
-        $this->buffer->end();
 
-        return $this->buffer->get();
     }
 }
 ?>

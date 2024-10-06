@@ -1,8 +1,6 @@
 class ToolTip {
     constructor() {
-        const template = document.createElement('template');
-        template.innerHTML = "<div class='TooltipPanel'></div>";
-        this.tipElement = template.content.firstChild;
+        this.tipElement = document.templateFactory.createElement("<div class='TooltipPanel'></div>");
     }
 
     /**
@@ -38,29 +36,28 @@ class ToolTip {
         document.querySelector(".TooltipPanel")?.remove();
     }
 
-    /**
-     *
-     * @param element {HTMLElement}
-     */
-    assignListeners(element) {
-        if (!element) element = "body";
 
-        const toolTip = this;
+    assignListeners(parentNode) {
 
-        document.querySelectorAll(element+" [tooltip]").forEach((element) => {
+        parentNode.querySelectorAll("[tooltip]").forEach((element) => {
+            if (element.tooltip instanceof ToolTip) return;
+
+            element.tooltip = document.tooltip;
+
             element.addEventListener("mouseenter", function(event){
-                toolTip.show(this,event);
+
+                element.tooltip.show(this,event);
             });
             element.addEventListener("mouseleave", function(event){
-                toolTip.hide(this,event);
+                element.tooltip.hide(this,event);
             });
         });
     }
 
 }
 
-const toolTip = new ToolTip();
+document.tooltip = new ToolTip();
 
 onPageLoad(function () {
-    toolTip.assignListeners();
-}, true);
+    document.tooltip.assignListeners(document);
+});

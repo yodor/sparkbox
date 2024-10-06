@@ -190,12 +190,14 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->addJS(SPARK_LOCAL . "/js/js.cookie.min.js");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/CallStack.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/TemplateFactory.js");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/SparkObject.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/SparkEvent.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/Component.js");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/JSONComponent.js");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/ModalPopup.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/Tooltip.js");
@@ -328,7 +330,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         //apply title, meta keywords, meta description to the head
         $this->prepareMetaTitle();
 
-        //show session alerts
+        //show session alerts - !will start session
         $this->processMessages();
 
         parent::startRender();
@@ -336,6 +338,8 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         //push head until including the body tag - browser can fetch css and scripts while we do the body contents
         ob_end_flush();
+
+        //disable session work from here on
 
         //body output buffer
         ob_start(null, 4096);
@@ -354,9 +358,6 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         //append message dialog templates
         $this->renderPageComponents();
-
-
-
 
         parent::finishRender();
         //</html> ended here

@@ -1,4 +1,7 @@
 class ModalPopup {
+
+    static EVENT_CONTENT_SHOWN = "contentShown";
+
     static indexCounter = -1;
 
     constructor() {
@@ -82,12 +85,8 @@ class ModalPopup {
 
         this.popup.css("visibility", "visible");
 
-        $.event.trigger({
-            type: "ModalPane",
-            message: "contentShown",
-            time: new Date(),
-            pane: this,
-        });
+        const sparkEvent = new SparkEvent(ModalPopup.EVENT_CONTENT_SHOWN, this);
+        dispatchEvent(sparkEvent);
 
     }
 

@@ -24,10 +24,6 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
      */
     protected $image_popup;
 
-    /**
-     * @var int
-     */
-    protected int $position = -1;
 
     /**
      * @var URLParameter
@@ -59,9 +55,6 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
     {
         parent::setData($data);
 
-        if (isset($data["position"])) {
-            $this->setAttribute("position", $data["position"]);
-        }
 
         $photoID = (int)$data[$this->view->getBean()->key()];
 
@@ -90,8 +83,6 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         }
 
         $this->image_popup->setAttribute("tooltip", $tooltip);
-
-
 
         if (isset($data["position"])) {
             $this->position = $data["position"];

@@ -66,16 +66,6 @@ class ImageStorage extends Action
         return $this->getAttribute("list-relation");
     }
 
-    public function setPosition(int $position) : void
-    {
-        $this->setAttribute("pos", $position);
-    }
-
-    public function getPosition() : int
-    {
-        return $this->getAttribute("pos");
-    }
-
     /**
      * Set also the storageItem of the image to $id
      * @param int $id

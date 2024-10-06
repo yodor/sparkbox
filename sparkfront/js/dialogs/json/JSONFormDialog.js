@@ -15,7 +15,8 @@ class JSONFormDialog extends ConfirmMessageDialog {
         //Which selector holds the loaded content ie the view space
         this.contentSelector = " .Text";
 
-        this.req.addObserver(this.onRequestEvent.bind(this));
+        const observer = this.onRequestEvent.bind(this);
+        this.req.addObserver(observer);
 
     }
 
@@ -117,10 +118,8 @@ class JSONFormDialog extends ConfirmMessageDialog {
     {
         $(this.visibleSelector() + " " + this.contentSelector).html(contents);
 
-        //trigger ModalPopup centerContents()
-        $(window).resize();
-
         //trigger onPageLoad() handlers
+        document.tooltip.assignListeners(document.querySelector(this.visibleSelector() + " " + this.contentSelector));
         dispatchEvent(new Event('load'));
     }
 

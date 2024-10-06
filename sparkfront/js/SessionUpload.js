@@ -6,7 +6,8 @@ class SessionUpload extends Component {
 
         this.req = new JSONRequest();
 
-        this.req.addObserver(this.onRequestEvent.bind(this));
+        const observer = this.onRequestEvent.bind(this);
+        this.req.addObserver(observer);
 
         this.req.onError = this.processError.bind(this);
     }
@@ -150,7 +151,8 @@ class SessionUpload extends Component {
             });
         });
 
-        processTooltipContent();
+
+        document.tooltip.assignListeners(this.element.querySelector(".ArrayContents"));
         this.resetFileInput();
     }
 
@@ -175,7 +177,7 @@ class SessionUpload extends Component {
 
         this.req.onSuccess=function(request_result) {
             elm.parents(".Element").remove();
-            hideTooltip();
+            document.tooltip.hide();
         };
 
         this.req.start();

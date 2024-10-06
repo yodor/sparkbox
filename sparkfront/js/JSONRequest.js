@@ -294,12 +294,12 @@ class JSONRequest extends SparkObject {
     // 4	DONE	The operation is complete.
     onReadyStateChange() {
 
-        if (this.xmlRequest.readyState == 1) {
+        if (this.xmlRequest.readyState === 1) {
             this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
             return;
         }
 
-        if (this.xmlRequest.readyState != 4) return;
+        if (this.xmlRequest.readyState !== 4) return;
 
 
         let status = this.xmlRequest.status;
@@ -307,7 +307,7 @@ class JSONRequest extends SparkObject {
 
         try {
 
-            if (status != 200) {
+            if (status !== 200) {
                 throw "HTTP Error: " + status;
             }
 
@@ -319,7 +319,7 @@ class JSONRequest extends SparkObject {
                 json_response = JSON && JSON.parse(response);
             }
 
-            if (json_response.status != "OK") {
+            if (json_response.status !== "OK") {
                 throw json_response.message;
             }
 

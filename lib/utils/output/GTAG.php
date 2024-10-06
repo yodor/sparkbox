@@ -15,9 +15,8 @@ class GTAG extends OutputScript
         $this->id = $id;
     }
 
-    public function script(): string
+    protected function fillBuffer() : void
     {
-        $this->buffer->start();
         echo "\n<!-- Start GTAG script for ID: $this->id -->\n";
         ?>
         <script src="https://www.googletagmanager.com/gtag/js?id=<?php echo $this->id; ?>"></script>
@@ -43,7 +42,6 @@ class GTAG extends OutputScript
         </script>
         <?php
         echo "\n<!-- End GTAG script for ID: $this->id  -->\n";
-        $this->buffer->end();
-        return $this->buffer->get();
+
     }
 }

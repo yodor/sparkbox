@@ -23,9 +23,8 @@ class FBPixel extends OutputScript
         $this->addTrackEvent($fbtrack->getEvent(), $fbtrack->getParameters());
     }
 
-    public function script() : string
+    protected function fillBuffer() : void
     {
-        $this->buffer->start();
         ?>
         <!-- Facebook Pixel Code Start -->
         <script>
@@ -58,9 +57,6 @@ class FBPixel extends OutputScript
         </noscript>
         <!-- End Facebook Pixel Code -->
         <?php
-        $this->buffer->end();
-
-        return $this->buffer->get();
     }
 
 }

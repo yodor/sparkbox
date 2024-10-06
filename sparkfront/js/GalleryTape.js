@@ -24,13 +24,13 @@ class GalleryTape extends Component {
 
         document.addEventListener("ImagePopup", (event)=>{
 
-            if (event.relation != this.name) return;
+            if (event.source.relation != this.name) return;
 
             switch (event.message) {
-                case "onPrevImage":
+                case ImagePopup.EVENT_POSITION_PREV:
                     instance.prevImage();
                     break;
-                case "onNextImage":
+                case ImagePopup.EVENT_POSITION_NEXT:
                     instance.nextImage();
                     break;
 
