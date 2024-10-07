@@ -5,6 +5,7 @@ include_once("objects/SparkEventManager.php");
 
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
+include_once("components/Template.php");
 
 include_once("beans/ConfigBean.php");
 
@@ -12,8 +13,8 @@ include_once("dialogs/MessageDialog.php");
 include_once("components/ImagePopup.php");
 include_once("utils/IActionCollection.php");
 include_once("objects/ActionCollection.php");
-include_once("utils/output/FBPixel.php");
-include_once("utils/output/GTAG.php");
+include_once("utils/script/FBPixel.php");
+include_once("utils/script/GTAG.php");
 include_once("objects/data/GTAGObject.php");
 
 
@@ -137,22 +138,42 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $cmp = $event->getSource();
 
+        if ($cmp instanceof HTMLHead) return;
+        if ($cmp instanceof HTMLPage) return;
+        if ($cmp instanceof HTMLBody) return;
+
         if ($cmp instanceof IPageComponent) {
-            $this->page_components[] = $cmp;
+            if ($cmp instanceof IPageScript) {
+                $this->page_components[get_class($cmp)] = $cmp;
+            }
+            else {
+                //TODO: Refactoring to templates
+                if ($cmp instanceof ITemplate) {
+                    $template = new Template();
+                    $template->setID($cmp->getID());
+                    $template->items()->append($cmp);
+                    $this->page_components["Template#".$cmp->getID()] = $template;
+                }
+                else {
+                    $this->page_components[get_class($cmp)] = $cmp;
+                }
+            }
         }
 
         //SparkPage constructors add css files directly to the head section
-        //use prepend to allow overload of component defined styles
-        if ($cmp instanceof IHeadContents) {
-            $css_files = $cmp->requiredStyle();
-            foreach ($css_files as $key => $url) {
-                $this->head()->addCSS($url, "", true);
-            }
+        //use prepend to allow override of component defined styles
+        if ($this->head()) {
+            if ($cmp instanceof IHeadContents) {
+                $css_files = $cmp->requiredStyle();
+                foreach ($css_files as $key => $url) {
+                    $this->head()->addCSS($url, true);
+                }
 
-            $js_files = $cmp->requiredScript();
-            foreach ($js_files as $key => $url) {
-                //no prepend here
-                $this->head()->addJS($url, "", FALSE);
+                $js_files = $cmp->requiredScript();
+                foreach ($js_files as $key => $url) {
+                    //no prepend here
+                    $this->head()->addJS($url);
+                }
             }
         }
     }
@@ -195,6 +216,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->addJS(SPARK_LOCAL . "/js/SparkObject.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/SparkEvent.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/Component.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/TemplateComponent.js");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/JSONComponent.js");

@@ -1,18 +1,17 @@
 <?php
 include_once("objects/data/DataObject.php");
-include_once("utils/IHeadScript.php");
+include_once("utils/IScript.php");
 
-class GTAGObject extends DataObject implements IHeadScript
+class GTAGObject extends DataObject implements IScript
 {
-    const COMMAND_CONFIG = "config";
-    const COMMAND_SET = "set";
-    const COMMAND_EVENT = "event";
+    const string COMMAND_CONFIG = "config";
+    const string COMMAND_SET = "set";
+    const string COMMAND_EVENT = "event";
 
-    protected $command;
-    protected $type;
-    protected $param_template;
-
-    protected $parameters;
+    protected string $command = "";
+    protected string $type = "";
+    protected string $param_template = "";
+    protected string $parameters = "";
 
     public function __construct(string $command = GTAGObject::COMMAND_EVENT)
     {
@@ -20,7 +19,7 @@ class GTAGObject extends DataObject implements IHeadScript
         $this->command = $command;
     }
 
-    public function setCommand(string $command)
+    public function setCommand(string $command) : void
     {
         $this->command = $command;
     }
@@ -30,7 +29,7 @@ class GTAGObject extends DataObject implements IHeadScript
         return $this->command;
     }
 
-    public function setType(string $type)
+    public function setType(string $type) : void
     {
         $this->type = $type;
     }
@@ -49,7 +48,7 @@ class GTAGObject extends DataObject implements IHeadScript
         return $this->parameters;
     }
 
-    public function setParamTemplate(string $template)
+    public function setParamTemplate(string $template) : void
     {
         $this->param_template = $template;
     }
@@ -59,17 +58,16 @@ class GTAGObject extends DataObject implements IHeadScript
         return $this->param_template;
     }
 
-    public function script() : string
+    public function script() : Script
     {
-        ob_start();
-        ?>
-        <script>
-            gtag('<?php echo $this->command;?>', '<?php echo $this->type;?>', <?php echo $this->parameters;?>);
-        </script>
-        <?php
-        $contents = ob_get_contents();
-        ob_end_clean();
-        return $contents;
+        $script = new Script();
+        $contents = <<<JS
+
+        gtag( '{$this->command}', '{$this->type}', {$this->parameters} );
+JS;
+
+        $script->setContents($contents);
+        return $script;
     }
 
     public function setData(array $data) : void

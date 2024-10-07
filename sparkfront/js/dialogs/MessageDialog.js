@@ -39,6 +39,7 @@ class MessageDialog extends Component {
 
         let cnt = this.component().clone(true, true);
 
+
         if (this.single) {
             //copy
             this.singleInstance = this.component().clone(true, true);

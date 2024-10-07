@@ -1,7 +1,7 @@
 <?php
-include_once("components/Script.php");
+include_once("components/Component.php");
 
-class Script extends Component
+class Script extends Container
 {
     public function __construct()
     {
@@ -19,6 +19,15 @@ class Script extends Component
     public function getType() : string
     {
         return $this->getAttribute("type");
+    }
+
+    public function setSrc(string $src) : void
+    {
+        $this->setAttribute("src", $src);
+    }
+    public function getSrc() : string
+    {
+        return $this->getAttribute("src");
     }
 
 }

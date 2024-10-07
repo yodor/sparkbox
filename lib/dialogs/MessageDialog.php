@@ -2,35 +2,37 @@
 include_once("components/Component.php");
 include_once("components/renderers/IPageComponent.php");
 include_once("components/Button.php");
+include_once("components/renderers/ITemplate.php");
 
-class MessageDialog extends Component implements IPageComponent
+class MessageDialog extends Container implements IPageComponent
 {
-    const TYPE_PLAIN = "";
-    const TYPE_ERROR = "Error";
-    const TYPE_INFO = "Info";
-    const TYPE_QUESTION = "Question";
+    const string TYPE_PLAIN = "";
+    const string TYPE_ERROR = "Error";
+    const string TYPE_INFO = "Info";
+    const string TYPE_QUESTION = "Question";
 
-    const BUTTON_ACTION_CONFIRM = "confirm";
-    const BUTTON_ACTION_CANCEL = "cancel";
-    const BUTTON_ACTION_CLOSE = "close";
+    const string BUTTON_ACTION_CONFIRM = "confirm";
+    const string BUTTON_ACTION_CANCEL = "cancel";
+    const string BUTTON_ACTION_CLOSE = "close";
 
-    protected $type = MessageDialog::TYPE_INFO;
+    protected string $type = MessageDialog::TYPE_INFO;
 
-    protected $title = "";
-    protected $id = "";
-    protected $icon_class = "";
+    protected string $title = "";
+    protected string $id = "";
+    protected string $icon_class = "";
 
-    protected $buttonsBar;
+    protected Container $buttonsBar;
 
     public $show_close_button = FALSE;
 
-    public function __construct($title = "Message", $id = "message_dialog")
+    public function __construct(string $title = "Message", string $id = "message_dialog")
     {
-        parent::__construct(true);
-        //$this->setComponentClass("MessageDialog");
-
+        //make component created event happy
         $this->title = $title;
         $this->id = $id;
+
+        parent::__construct(false);
+        $this->addClassName("MessageDialog");
 
         $this->setAttribute("id", $id);
 
@@ -48,7 +50,7 @@ class MessageDialog extends Component implements IPageComponent
 
     }
 
-    public function getID()
+    public function getID() : string
     {
         return $this->id;
     }
@@ -82,7 +84,7 @@ class MessageDialog extends Component implements IPageComponent
         return $this->buttonsBar;
     }
 
-    public function setDialogType(string $type)
+    public function setDialogType(string $type) : void
     {
         $this->type = $type;
         $this->setAttribute("type", $type);

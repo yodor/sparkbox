@@ -7,14 +7,16 @@ include_once("pages/HTMLBody.php");
 class HTMLPage extends Component
 {
 
-    protected HTMLHead $head;
-    protected HTMLBody $body;
+    protected ?HTMLHead $head = null;
+    protected ?HTMLBody $body = null;
 
     public function __construct()
     {
         parent::__construct(false);
-
-        $this->tagName = "html";
+        $this->setTagName("HTML");
+        //no css class
+        $this->setComponentClass("");
+        $this->setClassName("");
 
         $this->head = new HTMLHead();
         $this->body = new HTMLBody();
@@ -23,10 +25,6 @@ class HTMLPage extends Component
 
         //override automatic css class names
         $this->body->setComponentClass($this->getPageClass());
-
-        //no css class
-        $this->setClassName("");
-        $this->setComponentClass("");
 
     }
 
@@ -40,12 +38,12 @@ class HTMLPage extends Component
         return get_class($this) . " " . $pname . " " . $sname;
     }
 
-    public function head() : HTMLHead
+    public function head() : ?HTMLHead
     {
         return $this->head;
     }
 
-    public function body() : HTMLBody
+    public function body() : ?HTMLBody
     {
         return $this->body;
     }

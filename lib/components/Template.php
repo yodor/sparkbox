@@ -1,4 +1,5 @@
 <?php
+include_once("components/Container.php");
 
 class Template extends Container
 {

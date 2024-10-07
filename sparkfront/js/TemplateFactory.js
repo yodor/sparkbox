@@ -2,31 +2,23 @@ class TemplateFactory {
 
     constructor() {
         this.factory = document.createElement('template');
-        this.templateList = null;
-    }
-
-    initialize() {
-
-        this.templateList = document.querySelectorAll("TEMPLATE");
-        this.templateList?.forEach((element) => {
-            //const id = element.getAttribute("id");
-        })
-
     }
 
     /**
      * Get ChildNode of template #id
      * @param id
-     * @returns {*}
+     * @returns {Node}
      */
     getElement(id) {
-        const template = this.templateList.querySelector("#"+id);
+        const template = document.querySelector( "template#" + id);
+        if (!template) throw "template#"+id+ " not found";
         return template.content.firstChild;
     }
+
     /**
      * Create node to insert in the document from html_text
      * @param html_text
-     * @returns {ChildNode}
+     * @returns {Node}
      */
     createElement(html_text) {
         this.factory.innerHTML = html_text;
@@ -36,6 +28,3 @@ class TemplateFactory {
 }
 
 document.templateFactory = new TemplateFactory();
-onPageLoad(()=>{
-    document.templateFactory.initialize();
-});

@@ -117,7 +117,7 @@ class ModalPopup {
 }
 
 
-$(document).on("keyup", function (event) {
+document.addEventListener("keyup", (event) => {
 
     let pane = $(".ModalPane[index]").last();
     if (!pane.get(0)) return true;
@@ -126,28 +126,34 @@ $(document).on("keyup", function (event) {
     let confirm_button = pane.find("[action='confirm']").first();
     let default_button = pane.find("[action][default_action]").first();
 
-    if (event.which == 27) {
+    switch (event.key) {
+        case "Escape":
+            // Do something for "esc" key press.
+            if (cancel_button.get(0)) {
+                cancel_button.click();
+            } else if (confirm_button.get(0)) {
+                confirm_button.click();
+            } else {
+                pane.click();
+            }
 
-        if (cancel_button.get(0)) {
-            cancel_button.click();
-        } else if (confirm_button.get(0)) {
-            confirm_button.click();
-        } else {
-            pane.click();
-        }
-        return false;
-    } else if (event.which == 13) {
+            break;
+        case "Enter":
+            // Do something for "enter" or "return" key press.
+            if (confirm_button.get(0)) {
+                confirm_button.click();
+            } else if (default_button.get(0)) {
+                default_button.click();
+            } else {
+                return true;
+            }
 
-        if (confirm_button.get(0)) {
-            confirm_button.click();
-        } else if (default_button.get(0)) {
-            default_button.click();
-        } else {
-            return true;
-        }
+            break;
 
-        return false;
+        default:
+            break;
     }
+
 
     return false;
 });
