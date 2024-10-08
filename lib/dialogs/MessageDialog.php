@@ -44,6 +44,7 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
         $title->setComponentClass("Title");
         $title->setContents("Message");
         $header->items()->append($title);
+        $this->title = $title;
 
         $content = new Container(false);
         $content->setComponentClass("Content");
@@ -70,6 +71,15 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
 
         $this->initButtons();
 
+    }
+
+    public function setTitle(string $title) : void
+    {
+        $this->title->setContents($title);
+    }
+    public function getTitle() : string
+    {
+        return $this->title->getContents();
     }
 
     public function setSingleInstance(bool $mode) : void

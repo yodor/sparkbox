@@ -1,19 +1,21 @@
 
-.JSONFormDialog .Center .Contents .Text {
-    margin-left:0;
+.Dialog.JSONFormDialog .Inner .Content {
+    flex-direction:column;
+    align-items:flex-start;
 }
-.JSONFormDialog FORM {
+
+.Dialog.JSONFormDialog .Inner .Content FORM {
 
 }
-.JSONFormDialog FORM .Caption {
+.Dialog.JSONFormDialog .Inner .Content FORM .Caption {
     color:black;
     display:inline-block;
 
     white-space:break-spaces;
     text-transform: none;
     font-size:100%;
-    /*width:500px;*/
 }
+
 /*loader animation*/
 .lds-facebook {
     display: inline-block;

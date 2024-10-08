@@ -12,7 +12,7 @@ class GalleryTape extends Component {
 
         this.element.querySelector(".button.left")?.addEventListener("click", (event)=> this.prevImage(event));
 
-        this.element.querySelector(".button.right")?.addEventListener("click", (event)=> this.nextImage(evemt));
+        this.element.querySelector(".button.right")?.addEventListener("click", (event)=> this.nextImage(event));
 
         this.slots = this.element.querySelector(".slots");
 

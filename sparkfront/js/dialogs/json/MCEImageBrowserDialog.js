@@ -156,7 +156,7 @@ class MCEImageBrowserDialog extends JSONDialog {
      */
     appendResult(object_result) {
 
-        const resultElement = document.templateFactory.createElement(object_result.html);
+        const resultElement = document.templateFactory.nodeList(object_result.html)[0];
 
         const imageID = resultElement.getAttribute("imageID");
 

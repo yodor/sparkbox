@@ -1,6 +1,6 @@
 class ToolTip {
     constructor() {
-        this.tipElement = document.templateFactory.createElement("<div class='TooltipPanel'></div>");
+        this.tipElement = document.templateFactory.nodeList("<div class='TooltipPanel'></div>")[0];
 
         window.addEventListener("load", (event) => this.assignListeners(document));
         document.addEventListener(SparkEvent.DOM_UPDATED, (event) => this.assignListeners(event.source));
@@ -42,18 +42,11 @@ class ToolTip {
 
     assignListeners(parentNode) {
 
-        parentNode.querySelectorAll("[tooltip]").forEach((element) => {
-            if (element.tooltip instanceof ToolTip) return;
+        parentNode.querySelectorAll("[tooltip]").forEach( (element) => {
 
-            element.tooltip = document.tooltip;
+            element.addEventListener("mouseenter", (event)=>document.tooltip.show(element,event));
+            element.addEventListener("mouseleave", (event)=>document.tooltip.hide(element,event));
 
-            element.addEventListener("mouseenter", function(event){
-
-                element.tooltip.show(this,event);
-            });
-            element.addEventListener("mouseleave", function(event){
-                element.tooltip.hide(this,event);
-            });
         });
     }
 

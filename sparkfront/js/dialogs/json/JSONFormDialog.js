@@ -22,7 +22,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
         if (event.isEvent(JSONRequest.EVENT_STARTING)) {
             this.element.setAttribute("loading", "");
-            this.setContent(this.loader);
+            this.content.innerHTML = this.loader;
         }
         else if (event.isEvent(JSONRequest.EVENT_FINISHED)) {
             this.element.removeAttribute("loading");
@@ -46,9 +46,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
         this.req.setFunction("render");
 
-        this.req.onSuccess = function(request_result) {
-            this.processRenderResult(request_result);
-        }.bind(this);
+        this.req.onSuccess = this.processRenderResult.bind(this);
 
         this.req.start();
     }
@@ -92,6 +90,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
     //subsequent rendering after form submit
     processSubmitResult(request_result, form_name) {
+
         const result = request_result.json_result;
         if (result.contents) {
             this.loadContent(result.contents)
@@ -101,27 +100,22 @@ class JSONFormDialog extends ConfirmMessageDialog {
             this.remove();
             showAlert(result.message);
         }
+
     }
 
     //initial rendering during show()
-    processRenderResult(request_result)
-    {
+    processRenderResult(request_result) {
+
         let result = request_result.json_result;
         this.loadContent(result.contents);
+
     }
 
     loadContent(contents) {
 
-        const loadedContent = document.templateFactory.createElement(contents);
-        const dialogContent = this.contentElement();
+        this.content.innerHTML = "";
+        document.templateFactory.appendContent(this.content, contents);
 
-        dialogContent.innerHTML = "";
-        dialogContent.append(loadedContent);
-
-        const event = new SparkEvent(SparkEvent.DOM_UPDATED);
-        event.source = dialogContent;
-
-        document.dispatchEvent(event);
     }
 
 }

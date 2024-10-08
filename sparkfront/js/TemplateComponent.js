@@ -26,6 +26,6 @@ class TemplateComponent extends Component
     }
 
     remove() {
-        document.body.removeChild(this.element);
+        this.element.remove();
     }
 }

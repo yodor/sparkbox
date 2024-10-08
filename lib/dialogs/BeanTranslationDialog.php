@@ -1,7 +1,34 @@
 <?php
 include_once("dialogs/MessageDialog.php");
 include_once("responders/json/TranslateBeanResponder.php");
+include_once("components/PageScript.php");
 
+class BeanTranslationDialogInit extends PageScript
+{
+    function code() : string
+    {
+        $alertText = tr("Please submit the form to enable translation");
+
+        return <<<JS
+        let bean_translator = new BeanTranslationDialog();
+        bean_translator.initialize();
+
+        document.querySelectorAll("[action='TranslateBeanField']").forEach((element) => {
+            
+            element.addEventListener("click", (event)=>{
+                let editID = document.querySelector(".BeanFormEditor").getAttribute("editID");
+                if (editID<1) {
+                    showAlert("{$alertText}");
+                    return;
+                }
+                bean_translator.show(element.getAttribute("field"), false);
+            });
+            
+        });
+JS;
+
+    }
+}
 //IFinalRenderer delegate rendering to page control does not need to call render
 class BeanTranslationDialog extends MessageDialog implements IPageComponent
 {
@@ -14,6 +41,19 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $this->setTitle("Translate");
         $this->setType(MessageDialog::TYPE_PLAIN);
+
+
+        $this->content->items()->clear();
+
+        $phraseInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "original_text", "Original Text", 0);
+        $phraseInput->getRenderer()->input()->setAttribute("rows", 5);
+        $phrase = new InputComponent($phraseInput);
+        $this->content->items()->append($phrase);
+
+        $translationInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "translation", "Translation", 0);
+        $translationInput->getRenderer()->input()->setAttribute("rows", 5);
+        $translation = new InputComponent($translationInput);
+        $this->content->items()->append($translation);
 
         include_once("input/DataInputFactory.php");
         $ls = new DataInput("langID", "Language", 1);
@@ -32,12 +72,13 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $this->input = $ls;
 
-
         include_once("components/InputComponent.php");
         $cmp = new InputComponent($this->input);
         $this->buttonsBar->items()->prepend($cmp);
 
         $responder = new TranslateBeanResponder();
+
+        $script = new BeanTranslationDialogInit();
     }
 
     public function requiredStyle() : array
@@ -81,58 +122,6 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $this->buttonsBar->items()->append($container);
     }
 
-    protected function renderImpl()
-    {
-
-        echo "<table class='Items'>";
-
-        echo "<tr><td>";
-        echo "<label>" . tr("Original Text") . ": </label>";
-        echo "</td></tr>";
-
-        echo "<tr><td class='cell original_text InputField'>";
-        echo "<textarea READONLY name='original_text' rows='5' ></textarea>";
-        echo "</td></tr>";
-
-        echo "<tr><td>";
-        echo "<label>" . tr("Translation") . ": </label>";
-        echo "</td></tr>";
-
-        echo "<tr><td class='cell translation InputField'>";
-        echo "<textarea name='translation' rows='5' >";
-        echo "</textarea>";
-        echo "</td></tr>"; //item
-
-        echo "</table>";
-
-
-        ?>
-        <script type='text/javascript'>
-            onPageLoad(function () {
-                let bean_translator = new BeanTranslationDialog();
-                bean_translator.initialize();
-
-                $("BODY").find("[action='TranslateBeanField']").each(function (index) {
-
-                    var is_mce = $(this).parent().children(".MCETextArea").length > 0;
-                    console.log("is_mce=" + is_mce);
-
-                    $(this).click(function (event) {
-                        let editID = $(".BeanFormEditor").first().attr("editID");
-                        if (editID<1) {
-                            showAlert("<?php echo tr("Please submit the form to enable translation");?>");
-                            return;
-                        }
-                        bean_translator.show($(this).attr("field"), is_mce);
-
-                    });
-                });
-
-            });
-        </script>
-        <?php
-
-    }
 
 }
 

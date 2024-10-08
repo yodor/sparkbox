@@ -63,6 +63,7 @@
 
 .InputField.TextField, .InputField.PasswordField, .InputField.TextArea  {
     align-items:stretch;
+    align-self:stretch;
 }
 
 .InputField .FieldElements {

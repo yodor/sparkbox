@@ -8,10 +8,23 @@ include_once("components/KeywordSearch.php");
 include_once("dialogs/PhraseTranslationDialog.php");
 
 include_once("iterators/SQLQuery.php");
+include_once("components/PageScript.php");
 
+class PhraseTranslatorInit extends PageScript
+{
+    public function code() : string
+    {
+        return <<<JS
+
+            const phrase_translator = new PhraseTranslationDialog();
+            phrase_translator.initialize();
+JS;
+    }
+
+}
 class PhraseTranslatorPage extends BeanListPage
 {
-    protected $langID = -1;
+    protected int $langID = -1;
 
     public function __construct()
     {
@@ -20,14 +33,12 @@ class PhraseTranslatorPage extends BeanListPage
         $rc = new BeanKeyCondition(new LanguagesBean(), "../list.php", array("language"));
         $this->setRequestCondition($rc);
 
-        $langID = $rc->getID();
+        $this->langID = $rc->getID();
 
         $this->page->setName(tr("Translations For") . ": " . $rc->getData("language"));
 
         $dialog = new PhraseTranslationDialog();
-        $dialog->setAttribute("langID", $langID);
-
-        $this->langID = $langID;
+        $dialog->setAttribute("langID", $this->langID);
 
         $bean = new TranslationPhrasesBean();
 
@@ -37,6 +48,9 @@ class PhraseTranslatorPage extends BeanListPage
         $this->getSearch()->getForm()->setFields($search_fields);
 
         $this->setListFields(array("phrase" => "Phrase", "translation" => "Translation"));
+
+        //init the dialog - ready for edit call
+        new PhraseTranslatorInit();
     }
 
     protected function initPageActions()

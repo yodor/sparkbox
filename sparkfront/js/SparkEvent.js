@@ -12,7 +12,7 @@ class SparkEvent extends Event {
         }
         else {
             super(message);
-            console.log("Creating Event: "+message);
+            //console.log("Creating Event: "+message);
         }
 
         this.source = source;

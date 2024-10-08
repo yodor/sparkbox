@@ -131,7 +131,7 @@ class SessionUpload extends Component {
 
         for (let a = 0; a < result.object_count; a++) {
             let current_object = result.objects[a];
-            const elementLoaded = document.templateFactory.createElement(current_object.html);
+            const elementLoaded = document.templateFactory.nodeList(current_object.html)[0];
             this.slots.appendChild(elementLoaded);
 
             elementLoaded.querySelector("[action='Remove']").addEventListener("click", (event)=>this.removeSlot(elementLoaded));

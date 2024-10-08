@@ -99,7 +99,7 @@ class Component extends SparkObject
             console.log("DOM query failed: " + this.selector());
         }
         else {
-            console.log("Element created for: " + this.selector());
+           // console.log("Element created for: " + this.selector());
         }
 
     }

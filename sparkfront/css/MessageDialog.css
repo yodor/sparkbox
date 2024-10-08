@@ -75,6 +75,19 @@
     padding: 0.5em;
 }
 
+.Dialog[type="Plain"] .Inner .Content {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.Dialog[type="Plain"] .Inner .Content .InputComponent {
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    align-self:stretch;
+}
+
+
 .Dialog .Inner .Content .Icon {
     width: 64px;
     height: 64px;
@@ -174,3 +187,4 @@
 .Dialog[loading] .Inner .Footer {
     display:none;
 }
+

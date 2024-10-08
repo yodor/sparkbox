@@ -22,17 +22,19 @@ class JSONComponent extends Component {
 
         if (event.isEvent(JSONRequest.EVENT_SUCCESS)) {
 
-            this.element = document.templateFactory.createElement(this.request.request_result.json_result.contents);
+            const nodeList = document.templateFactory.appendContent(this.parentElement, this.request.request_result.json_result.contents);
 
-            this.parentElement.appendChild(this.element);
+            //ensure json_result.contents root is single
+            if (nodeList.length>1) {
+                showAlert("NodeList count > 1");
+                throw "NodeList count > 1";
+            }
+
+            this.element = nodeList[0];
 
             const event_created = new SparkEvent(JSONComponent.EVENT_ELEMENT_CREATED, this);
             this.notify(event_created);
             document.dispatchEvent(event_created);
-
-            const event_updated = new SparkEvent(SparkEvent.DOM_UPDATED);
-            event_updated.source = this.parentElement;
-            document.dispatchEvent(event_updated);
 
         }
 

@@ -3,12 +3,12 @@ class PhraseTranslationDialog extends JSONDialog {
     constructor() {
         super();
 
-        this.setID("phrase_translator");
-
         this.req.setResponder("translator");
 
         this.textID = -1;
 
+        this.phraseInput = this.element.querySelector("[name='phrase']");
+        this.translationInput = this.element.querySelector("[name='translation']");
     }
 
     buttonAction(action) {
@@ -19,10 +19,18 @@ class PhraseTranslationDialog extends JSONDialog {
 
         } else if (action == "Close") {
 
-            this.modal_pane.close();
+            this.remove();
         }
     }
 
+    getTableCell(textID, trID=null)
+    {
+        let cellSelector = `[relation='translation'][textID='${textID}']`;
+        if (trID) {
+            cellSelector+= `[trID='${trID}']`;
+        }
+        return document.querySelector(cellSelector);
+    }
     /**
      * Process the result of the backend responder
      */
@@ -34,63 +42,60 @@ class PhraseTranslationDialog extends JSONDialog {
 
         if (funct == "fetch") {
 
-            this.modal_pane.popup.find("[name='phrase']").val(jsonResult.phrase);
-            this.modal_pane.popup.find("[name='translation']").val(jsonResult.translation);
+            this.phraseInput.value = jsonResult.phrase;
+            this.translationInput.value = jsonResult.translation;
+
         }
         else if (funct == "store") {
 
-            let translation = this.modal_pane.popup.find("[name=translation]");
+            const html = "<span>" + this.translationInput.value + "</span>";
 
-            var html = "<span>" + translation.val() + "</span>";
+            const textID = this.req.getParameter("textID");
+            const trID = this.req.getParameter("trID");
+            const cell = this.getTableCell(textID, trID);
 
-            let textID = this.req.getParameter("textID");
-            let trID = this.req.getParameter("trID");
-
-            let cell = $("[relation='translation'][trID='" + trID + "'][textID='" + textID + "']");
-
-            cell.html(html);
-            cell.attr("trID", jsonResult.trID);
+            cell.setAttribute("trID", jsonResult.trID);
+            cell.innerHTML = html;
 
             showAlert(message);
 
-            this.modal_pane.close();
+            this.remove();
+
         }
         else if (funct == "clear") {
 
-            let textID = this.req.getParameter("textID");
-            let trID = this.req.getParameter("trID");
+            const textID = this.req.getParameter("textID");
+            const trID = this.req.getParameter("trID");
+            const cell = this.getTableCell(textID, trID);
 
-            let cell = $("[relation='translation'][trID='" + trID + "'][textID='" + textID + "']");
-
-            cell.attr("trID", -1);
-            cell.html("");
+            cell.setAttribute("trID", -1);
+            cell.innerHTML = "";
 
             showAlert(message);
 
-            this.modal_pane.close();
         }
     }
 
     edit(textID) {
 
         this.textID = textID;
-        this.req.setParameter("textID", textID);
 
-        this.show();
+        const cell = this.getTableCell(textID);
+        const trID = cell.getAttribute("trID");
 
-        let cell = $("[column='translation'][textID='" + textID + "']");
-        let trID = cell.attr("trID");
-
-        this.langID = this.modal_pane.popup.attr("langID");
-        this.req.setParameter("langID", this.langID);
-
-        this.req.setParameter("trID", trID);
+        this.langID = this.element.getAttribute("langID");
 
         this.req.setFunction("fetch");
+
+        this.req.setParameter("textID", textID);
+        this.req.setParameter("langID", this.langID);
+        this.req.setParameter("trID", trID);
 
         this.req.clearPostParameters();
 
         this.req.start();
+
+        this.show();
     }
 
     store() {
@@ -99,9 +104,7 @@ class PhraseTranslationDialog extends JSONDialog {
 
         this.req.setFunction("store");
 
-        let translation = this.modal_pane.popup.find("[name=translation]");
-
-        this.req.setPostParameter("translation", translation.val());
+        this.req.setPostParameter("translation", this.translationInput.value);
 
         this.req.start();
 
@@ -109,8 +112,8 @@ class PhraseTranslationDialog extends JSONDialog {
 
     clear(textID) {
 
-        var cell = $("[relation='translation'][textID='" + textID + "']");
-        var trID = cell.attr("trID");
+        const cell = this.getTableCell(textID);
+        const trID = cell.getAttribute("trID");
 
         this.req.setFunction("clear");
 

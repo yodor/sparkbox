@@ -21,6 +21,12 @@ class MessageDialog extends TemplateComponent {
         this.modal = this.element.hasAttribute("modal");
         this.single = this.element.hasAttribute("single");
 
+        this.header = this.element.querySelector(".Inner .Header");
+        this.content = this.element.querySelector(".Inner .Content");
+        this.footer = this.element.querySelector(".Inner .Footer");
+
+        this.buttons = this.element.querySelector(".Inner .Footer .Buttons");
+
         this.shown = false;
     }
 
@@ -34,28 +40,16 @@ class MessageDialog extends TemplateComponent {
         return result;
     }
 
-    headerElement() {
-        return this.element.querySelector(".Inner .Header");
-    }
-
-    contentElement() {
-        return this.element.querySelector(".Inner .Content");
-    }
-
-    footerElement() {
-        return this.element.querySelector(".Inner .Footer");
-    }
-
     setTitle(html) {
-        this.headerElement().querySelector(".Title").innerHTML = html;
+        this.header.querySelector(".Title").innerHTML = html;
     }
 
     setText(html) {
-        this.contentElement().querySelector(".Text").innerHTML = html;
+        this.content.querySelector(".Text").innerHTML = html;
     }
 
     setContent(html) {
-        this.contentElement().innerHTML = html;
+        this.content.innerHTML = html;
     }
 
     setType(type) {
@@ -102,7 +96,6 @@ class MessageDialog extends TemplateComponent {
 
     remove() {
         super.remove();
-
         this.shown = false;
     }
 
