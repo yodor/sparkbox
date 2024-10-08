@@ -3,7 +3,7 @@
 interface ITemplate
 {
 
-    public function getID() : string;
+    public function templateID() : string;
 
 }
 

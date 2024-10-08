@@ -24,10 +24,7 @@ class LoginForm extends Component {
             if (!this.form.querySelector("INPUT[type='hidden'][name='pass']")) throw "Required field 'pass' not found";
 
             const instance = this;
-            this.form.addEventListener("submit", (event) => {
-                instance.onSubmit(event);
-            });
-
+            this.form.addEventListener("submit", (event) => this.onSubmit(event));
 
 
         } catch (exx) {

@@ -98,17 +98,10 @@ class Component extends SparkObject
         if (! (this.element instanceof Element)) {
             console.log("DOM query failed: " + this.selector());
         }
+        else {
+            console.log("Element created for: " + this.selector());
+        }
 
     }
 
-    cloneWithListeners(element) {
-        let clonedNode = element.cloneNode(true);
-
-        Array.prototype.forEach.call(element.querySelectorAll('*'), (element) => {
-            const events = getEventListeners(element);
-            events.forEach((event) => {
-                clonedNode.addEventListener(event.type, event.handler);
-            });
-        });
-    }
 }

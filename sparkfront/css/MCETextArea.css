@@ -1,50 +1,10 @@
-.MCEImageBrowserDialog {
-    min-width:80%;
-    min-height:80%;
-    width:80%;
-    height:80%;
 
-}
-.MCEImageBrowserDialog .Contents .Text {
-
-    border: 1px dotted green;
-    display: table !important;
-    width:100%;
-    height:100%;
-}
-
-.MCEImageBrowserDialog .Contents .Text FORM {
-    display: table-row;
-}
-
-.MCEImageBrowserDialog .Contents .Text FORM .InputComponent {
-    display: table-cell;
-    vertical-align: top;
-    margin-right: 10px;
-}
-.MCEImageBrowserDialog .Contents .Text FORM .InputComponent .InputLabel {
-    display:none;
-}
-
-.MCEImageBrowserDialog .Contents .Text .ImageStorage {
-    display: table-row;
+.Dialog.MCEImageBrowserDialog .Inner .Content {
+    flex-direction:column;
 }
 
 
-
-.MCEImageBrowserDialog .ImageStorage .Viewport {
-    display: table-cell;
-    height:100%;
-
-}
-
-.MCEImageBrowserDialog .ImageStorage .Collection  {
-    overflow-y:scroll;
-    width:100%;
-    height:100%;
-}
-
-.MCEImageBrowserDialog .ImageStorage .Collection .Element {
+.MCEImageBrowserDialog .ImageStorage .Element {
     display: inline-block;
     margin-top: 0.5em;
     margin-left:0.5em;
@@ -57,18 +17,17 @@
     vertical-align: top;
 }
 
-.MCEImageBrowserDialog .ImageStorage .Collection .Element IMG {
+.MCEImageBrowserDialog .ImageStorage .Element IMG {
     display: block;
     cursor:pointer;
 }
 
-.MCEImageBrowserDialog .ImageStorage .Collection .Element[selected] {
+.MCEImageBrowserDialog .ImageStorage .Element[selected] {
     border: 1px solid black;
-
 }
 
 
-.MCEImageBrowserDialog .ImageStorage .Collection .Element .remove_button {
+.MCEImageBrowserDialog .ImageStorage .Element .remove_button {
     display: block;
     width: 25px;
     height: 25px;

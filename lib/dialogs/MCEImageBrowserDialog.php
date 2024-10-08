@@ -20,14 +20,16 @@ class MCEImageBrowserDialog extends MessageDialog
 
     public function __construct()
     {
-        parent::__construct("MCE Image Browser", "mceImage_browser");
+        parent::__construct();
+
+        $this->setTitle("MCE Image Browser");
+        $this->setType(MessageDialog::TYPE_PLAIN);
+
+        $this->setSingleInstance(true);
 
         $this->handler = new MCEImageBrowserResponder();
 
-        $this->setDialogType(MessageDialog::TYPE_PLAIN);
-
         $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
-
         $this->image_input->getProcessor()->setTransactBeanItemLimit(4);
 
         $session_image = $this->image_input->getRenderer();
@@ -41,7 +43,20 @@ class MCEImageBrowserDialog extends MessageDialog
         //imagedimensiondialog from javascript
         new ConfirmMessageDialog();
 
-        $this->setAttribute('single',true);
+        $this->content->items()->append($this->icmp);
+
+        $image_storage = new Container(false);
+        $image_storage->setComponentClass("ImageStorage");
+        $this->content->items()->append($image_storage);
+
+//        $viewport = new Container(false);
+//        $viewport->setComponentClass("Viewport");
+//        $image_storage->items()->append($viewport);
+//
+//        $collection = new Container(false);
+//        $collection->setComponentClass("Collection");
+//        $viewport->items()->append($collection);
+
     }
 
     public function requiredScript(): array
@@ -52,7 +67,7 @@ class MCEImageBrowserDialog extends MessageDialog
         return $arr;
     }
 
-    protected function initButtons()
+    protected function initButtons() : void
     {
         $btn_close = new Button();
         $btn_close->setContents("Close");
@@ -69,26 +84,6 @@ class MCEImageBrowserDialog extends MessageDialog
     public function setHandler(UploadControlResponder $handler) : void
     {
         $this->handler = $handler;
-    }
-
-    //final method
-    protected function renderImpl()
-    {
-
-        echo "<form method='post' enctype='multipart/form-data'>";
-        $this->icmp->render();
-        echo "</form>";
-
-        echo "<div class='ImageStorage'>";
-
-        echo "<div class='Viewport'>";
-
-        echo "<div class='Collection'></div>";
-
-        echo "</div>";
-
-        echo "</div>";
-
     }
 
 }

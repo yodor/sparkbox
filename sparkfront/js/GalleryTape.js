@@ -10,18 +10,13 @@ class GalleryTape extends Component {
 
         super.initialize();
 
-        const instance = this;
+        this.element.querySelector(".button.left")?.addEventListener("click", (event)=> this.prevImage(event));
 
-        this.element.querySelector(".button.left")?.addEventListener("click", (event)=>{
-            instance.prevImage(event);
-        });
-
-        this.element.querySelector(".button.right")?.addEventListener("click", (event)=>{
-            instance.nextImage(event);
-        });
+        this.element.querySelector(".button.right")?.addEventListener("click", (event)=> this.nextImage(evemt));
 
         this.slots = this.element.querySelector(".slots");
 
+        const instance = this;
         document.addEventListener("ImagePopup", (event)=>{
 
             if (event.source.relation != this.name) return;

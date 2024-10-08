@@ -1,136 +1,133 @@
-class MessageDialog extends Component {
+class MessageDialog extends TemplateComponent {
+
+    static TYPE_PLAIN = "Plain";
+    static TYPE_ERROR = "Error";
+    static TYPE_INFO = "Info";
+    static TYPE_QUESTION = "Question";
+
 
     static indexCounter = -1;
 
     /**
      * Create a DOM element selector for MessageDialog popups
      */
-    constructor() {
-        super();
-        this.setClass(".MessageDialog");
-        this.setID("message_dialog");
-
-        this.text = "";
-        this.caption = "";
-
-        this.modal_pane = new ModalPopup();
-
-        this.icon_enabled = true;
+    constructor(templateID=null) {
+        super(templateID);
 
         this.index = -1;
 
-        //singleInstance
-        this.single = false;
+        this.type = ""+this.element.getAttribute("type");
 
-        this.singleInstance = null;
+        this.modal = this.element.hasAttribute("modal");
+        this.single = this.element.hasAttribute("single");
+
+        this.shown = false;
     }
 
     initialize() {
         super.initialize();
-        if (this.component().attr("single")) {
-            this.single = true;
-        }
-    }
-    /**
-     * Return the cloned jQuery object to show inside modal pane
-     * @returns {jQuery}
-     */
-    createContent() {
-
-        let cnt = this.component().clone(true, true);
-
-
-        if (this.single) {
-            //copy
-            this.singleInstance = this.component().clone(true, true);
-            this.component().remove();
-        }
-
-        if (this.caption) {
-            cnt.find(".Caption .Title").html(this.caption);
-        }
-
-        if (this.text) {
-            cnt.find(".Inner .Contents .Text").html(this.text);
-        }
-
-        if (!this.icon_enabled) {
-            cnt.find(".Contents .Icon").remove();
-
-        }
-
-        return cnt;
     }
 
-    setCaption(caption) {
-        this.caption = caption;
-        $(this.visibleSelector()).find(".Caption .Title").html(this.caption);
-    }
-
-    setText(text) {
-        this.text = text;
-        $(this.visibleSelector()).find(".Inner .Contents .Text").html(this.text);
-    }
-
-    visibleSelector() {
-        let result = this.selector();
+    selector() {
+        let result = super.selector();
         result += "[index='" + this.index + "']";
         return result;
     }
 
+    headerElement() {
+        return this.element.querySelector(".Inner .Header");
+    }
+
+    contentElement() {
+        return this.element.querySelector(".Inner .Content");
+    }
+
+    footerElement() {
+        return this.element.querySelector(".Inner .Footer");
+    }
+
+    setTitle(html) {
+        this.headerElement().querySelector(".Title").innerHTML = html;
+    }
+
+    setText(html) {
+        this.contentElement().querySelector(".Text").innerHTML = html;
+    }
+
+    setContent(html) {
+        this.contentElement().innerHTML = html;
+    }
+
+    setType(type) {
+        this.element.setAttribute("type", type);
+    }
+
+    setModal(mode) {
+        if (mode) {
+            this.element.setAttribute("modal","");
+        }
+        else {
+            this.element.removeAttribute("modal");
+        }
+    }
+
+
     show() {
+        if (this.shown) return;
+
+        this.shown = true;
 
         //increment the global index counter
         MessageDialog.indexCounter++;
         //set this selector index
         this.index = MessageDialog.indexCounter;
 
-        let element = this.createContent();
+        this.element.setAttribute("index", this.index);
 
-        element.attr("index", this.index);
+        const buttons = this.element.querySelector(".Footer .Buttons");
 
-        this.modal_pane.showContent(element);
-
-        let buttonsBar = $(this.visibleSelector()).find(".Buttons");
-
-        let instance = this;
-
-        //setup button actions
-        buttonsBar.find("[action]").each(function(index) {
-           $(this).on("click", function (event) {
-               let action = $(this).attr("action");
-               instance.buttonAction(action);
-           });
+        buttons.querySelectorAll("[action]").forEach((element)=>{
+            element.addEventListener("click", (event) => {
+                const action = element.getAttribute("action");
+                if (action) {
+                    this.buttonAction(action);
+                }
+            });
         });
 
-        buttonsBar.find("[default_action]").first().focus();
+        buttons.querySelector("[default_action]")?.focus();
 
-        $(window).resize();
+        this.render();
     }
 
     remove() {
+        super.remove();
 
-        let pane = $(this.modal_pane.visualSelector());
-
-        if (pane) {
-            pane.remove();
-        } else {
-            console.log(this.constructor.name + this.selector() + " not shown yet");
-        }
-
-        if (this.singleInstance) {
-            $("body").append(this.singleInstance);
-            this.singleInstance = null;
-        }
+        this.shown = false;
     }
 
     /**
-     *
+     * Default handler remove the dialog
      * @param action {string} Button action attribute value
      */
     buttonAction(action) {
-        console.log(this.visibleSelector() + "::buttonAction() - Default handler: " + action);
+        //console.log("buttonAction() : " + action);
+        this.remove();
     }
 
+    static ShowAlert(text)
+    {
+        let dialog = new MessageDialog();
+        dialog.setText(text);
+        dialog.setTitle("Alert!");
+
+        dialog.buttonAction = function(action) {
+            dialog.remove();
+        };
+
+        dialog.show();
+
+        return dialog;
+    }
 
 }

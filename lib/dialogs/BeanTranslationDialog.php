@@ -10,13 +10,12 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
     public function __construct()
     {
-        parent::__construct("Translate", "bean_translator");
-        //$this->show_close_button = TRUE;
+        parent::__construct();
 
-        $this->setDialogType(MessageDialog::TYPE_PLAIN);
+        $this->setTitle("Translate");
+        $this->setType(MessageDialog::TYPE_PLAIN);
 
         include_once("input/DataInputFactory.php");
-
         $ls = new DataInput("langID", "Language", 1);
 
         $renderer = new SelectField($ls);
@@ -58,7 +57,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         return $arr;
     }
 
-    protected function initButtons()
+    protected function initButtons() : void
     {
 
         $container = new Container();

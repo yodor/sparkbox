@@ -3,9 +3,16 @@ include_once("dialogs/ConfirmMessageDialog.php");
 
 class JSONFormDialog extends ConfirmMessageDialog {
 
-    public function __construct($title = "Question", $id = "json_dialog")
+    protected string $templateID = "json_dialog";
+
+    public function __construct()
     {
-        parent::__construct($title, $id);
+        parent::__construct();
+
+        $button_confirm = $this->buttonsBar->items()->getByAction(MessageDialog::BUTTON_ACTION_CONFIRM);
+        if ($button_confirm instanceof Button) {
+            $button_confirm->setContents("Submit");
+        }
     }
 
     public function requiredScript(): array
@@ -20,20 +27,6 @@ class JSONFormDialog extends ConfirmMessageDialog {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/JSONFormDialog.css";
         return $arr;
-    }
-
-    protected function initButtons()
-    {
-        $btn_ok = new Button();
-        $btn_ok->setContents("Submit");
-        $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
-        $btn_ok->setAttribute("default_action", 1);
-        $this->buttonsBar->items()->append($btn_ok);
-
-        $btn_cancel = new Button();
-        $btn_cancel->setContents("Cancel");
-        $btn_cancel->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
-        $this->buttonsBar->items()->append($btn_cancel);
     }
 
 }

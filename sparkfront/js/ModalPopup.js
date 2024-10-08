@@ -86,7 +86,7 @@ class ModalPopup {
         this.popup.css("visibility", "visible");
 
         const sparkEvent = new SparkEvent(ModalPopup.EVENT_CONTENT_SHOWN, this);
-        dispatchEvent(sparkEvent);
+        document.dispatchEvent(sparkEvent);
 
     }
 

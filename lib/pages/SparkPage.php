@@ -150,9 +150,9 @@ class SparkPage extends HTMLPage implements IActionCollection
                 //TODO: Refactoring to templates
                 if ($cmp instanceof ITemplate) {
                     $template = new Template();
-                    $template->setID($cmp->getID());
+                    $template->setID($cmp->templateID());
                     $template->items()->append($cmp);
-                    $this->page_components["Template#".$cmp->getID()] = $template;
+                    $this->page_components[$template->getID()] = $template;
                 }
                 else {
                     $this->page_components[get_class($cmp)] = $cmp;
@@ -210,11 +210,12 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $this->head()->addJS(SPARK_LOCAL . "/js/js.cookie.min.js");
 
+        $this->head()->addJS(SPARK_LOCAL . "/js/SparkObject.js");
+        $this->head()->addJS(SPARK_LOCAL . "/js/SparkEvent.js");
+
         $this->head()->addJS(SPARK_LOCAL . "/js/CallStack.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/TemplateFactory.js");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/SparkObject.js");
-        $this->head()->addJS(SPARK_LOCAL . "/js/SparkEvent.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/Component.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/TemplateComponent.js");
 
@@ -339,7 +340,7 @@ class SparkPage extends HTMLPage implements IActionCollection
     public function startRender()
     {
         //head output buffer
-        ob_start(null, 4096);
+        ob_start();
 
         //JSONReponders exit execution
         //can create IPageComponents
@@ -378,7 +379,7 @@ class SparkPage extends HTMLPage implements IActionCollection
     {
         //still inside the body section
 
-        //append message dialog templates
+        //append dialog templates and pagescripts
         $this->renderPageComponents();
 
         parent::finishRender();
@@ -396,7 +397,7 @@ class SparkPage extends HTMLPage implements IActionCollection
     /**
      * Render all component implementing the IFinalRenderer before closing the BODY
      */
-    protected function renderPageComponents()
+    protected function renderPageComponents() : void
     {
         foreach ($this->page_components as $idx => $cmp) {
             $cmp->render();

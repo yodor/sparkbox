@@ -4,9 +4,9 @@ include_once("components/renderers/IPageComponent.php");
 include_once("components/Button.php");
 include_once("components/renderers/ITemplate.php");
 
-class MessageDialog extends Container implements IPageComponent
+class MessageDialog extends Container implements IPageComponent, ITemplate
 {
-    const string TYPE_PLAIN = "";
+    const string TYPE_PLAIN = "Plain";
     const string TYPE_ERROR = "Error";
     const string TYPE_INFO = "Info";
     const string TYPE_QUESTION = "Question";
@@ -17,42 +17,82 @@ class MessageDialog extends Container implements IPageComponent
 
     protected string $type = MessageDialog::TYPE_INFO;
 
-    protected string $title = "";
-    protected string $id = "";
-    protected string $icon_class = "";
+    protected Component $title;
 
     protected Container $buttonsBar;
 
-    public $show_close_button = FALSE;
+    protected Container $content;
 
-    public function __construct(string $title = "Message", string $id = "message_dialog")
+    protected bool $singleInstance = false;
+    protected bool $modal = true;
+
+    public function __construct()
     {
-        //make component created event happy
-        $this->title = $title;
-        $this->id = $id;
 
         parent::__construct(false);
-        $this->addClassName("MessageDialog");
+        $this->addClassName("Dialog");
 
-        $this->setAttribute("id", $id);
+        $inner = new Container("false");
+        $inner->setComponentClass("Inner");
+        $this->items()->append($inner);
 
-        $this->setAttribute("name", $id);
+        $header = new Container(false);
+        $header->setComponentClass("Header");
+        $inner->items()->append($header);
+
+        $title = new Component(false);
+        $title->setComponentClass("Title");
+        $title->setContents("Message");
+        $header->items()->append($title);
+
+        $content = new Container(false);
+        $content->setComponentClass("Content");
+        $inner->items()->append($content);
+        $this->content = $content;
+
+        $icon = new Container(false);
+        $icon->setComponentClass("Icon");
+        $content->items()->append($icon);
+
+        $text = new Container(false);
+        $text->setComponentClass("Text");
+        $content->items()->append($text);
+
+        $footer = new Container(false);
+        $footer->setComponentClass("Footer");
 
         $this->buttonsBar = new Container(false);
-        $this->buttonsBar->setClassName("Buttons");
+        $this->buttonsBar->setComponentClass("Buttons");
 
-        $this->addClassName("PopupPanel");
-        $this->addClassName("resizable");
+        $footer->items()->append($this->buttonsBar);
 
-        $this->setDialogType($this->type);
+        $inner->items()->append($footer);
 
         $this->initButtons();
 
     }
 
-    public function getID() : string
+    public function setSingleInstance(bool $mode) : void
     {
-        return $this->id;
+        $this->singleInstance = $mode;
+    }
+    public function isSingleInstance() : bool
+    {
+        return $this->singleInstance;
+    }
+
+    public function setModal(bool $mode) : void
+    {
+        $this->modal = $mode;
+    }
+    public function isModal() : bool
+    {
+        return $this->modal;
+    }
+
+    public function templateID() : string
+    {
+        return get_class($this);
     }
 
     public function requiredStyle() : array
@@ -70,7 +110,7 @@ class MessageDialog extends Container implements IPageComponent
         return $arr;
     }
 
-    protected function initButtons()
+    protected function initButtons() : void
     {
         $btn_ok = new Button();
         $btn_ok->setContents("OK");
@@ -84,64 +124,32 @@ class MessageDialog extends Container implements IPageComponent
         return $this->buttonsBar;
     }
 
-    public function setDialogType(string $type) : void
+    public function setType(string $type) : void
     {
         $this->type = $type;
-        $this->setAttribute("type", $type);
     }
 
-    public function startRender()
+    protected function processAttributes(): void
     {
+        parent::processAttributes();
+        $this->setAttribute("type", $this->type);
 
-        parent::startRender();
-
-        echo "<div class='Inner'>";
-
-        echo "<div class='Header'>";
-
-        if (strlen($this->title) > 0) {
-            echo "<div class='Caption'>";
-
-            echo "<span class='Title'>" . tr($this->title) . "</span>";
-
-            echo "</div>";
+        if ($this->singleInstance) {
+            $this->setAttribute("single");
+        }
+        else {
+            $this->removeAttribute("single");
         }
 
-        echo "</div>";
-
-        echo "<div class='Center'>";
-
-        echo "<div class='Contents'>";
-
-        echo "<div class='Icon'></div>";
-
-        echo "<div class='Text'>";
-    }
-
-    public function finishRender()
-    {
-        echo "</div>";
-
-        echo "</div>";//Contents
-
-        echo "</div>"; //center
-
-        echo "<div class='Footer'>";
-        $this->buttonsBar->render();
-        echo "</div>";
-
-        echo "</div>"; //Inner
-
-        ?>
-        <div class='resizer top-left'></div>
-        <div class='resizer top-right'></div>
-        <div class='resizer bottom-left'></div>
-        <div class='resizer bottom-right'></div>
-        <?php
-
-        parent::finishRender();
+        if ($this->modal) {
+            $this->setAttribute("modal");
+        }
+        else {
+            $this->removeAttribute("modal");
+        }
 
     }
+
 
 }
 

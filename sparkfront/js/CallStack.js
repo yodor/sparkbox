@@ -2,15 +2,20 @@ class CallStack {
 
     constructor() {
         this.functions = Array();
-        window.addEventListener("load", this.execute.bind(this));
+        //const onLoad = this.execute.bind(this);
+        window.addEventListener("load", (event)=>this.execute());
+        document.addEventListener(SparkEvent.DOM_UPDATED, (event)=>this.execute());
     }
 
     execute() {
+
+        // console.log("CallStack execute: " + this.functions.length);
+
         let persistent = Array();
 
         while (this.functions.length>0) {
             let callback = this.functions.shift();
-            //console.log("Stay mode: " + callback.stay);
+
             if (callback.stay) {
                 persistent.push(callback);
             }
@@ -45,7 +50,7 @@ class OnLoadFunction {
     }
 }
 
-let sparkCallStack = new CallStack();
+document.sparkCallStack = new CallStack();
 
 /**
  * Append function to the window 'onLoad' event call stack.
@@ -57,7 +62,7 @@ let sparkCallStack = new CallStack();
 function onPageLoad(func, persistent=false)
 {
     if (typeof func == 'function') {
-        sparkCallStack.append(new OnLoadFunction(func,persistent));
+        document.sparkCallStack.append(new OnLoadFunction(func,persistent));
     }
     else {
         console.log("onPageLoad: 'func' parameter is not a function");

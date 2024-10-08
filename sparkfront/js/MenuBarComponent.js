@@ -49,9 +49,7 @@ class MenuBarComponent extends Component {
         this.menuBar = this.element.closest(".MenuBar");
         this.toggle = this.menuBar.querySelector(".toggle");
 
-        this.toggle.addEventListener("click", (event)=>{
-            instance.toggleMenu(event);
-        });
+        this.toggle.addEventListener("click", (event)=>this.toggleMenu(event));
 
         //assign each menubar item with events
         $(this.selector()).first().children(".MenuBarItemRenderer").each(function (index) {

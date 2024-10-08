@@ -5,11 +5,12 @@ include_once("responders/json/TranslatePhraseResponder.php");
 class PhraseTranslationDialog extends MessageDialog
 {
 
-    protected $type = MessageDialog::TYPE_PLAIN;
-
     public function __construct()
     {
-        parent::__construct("Phrase Translator", "phrase_translator");
+        parent::__construct();
+
+        $this->setTitle("Phrase Translator");
+        $this->setType(MessageDialog::TYPE_PLAIN);
 
         $h_translate = new TranslatePhraseResponder();
 
@@ -29,7 +30,7 @@ class PhraseTranslationDialog extends MessageDialog
         return $arr;
     }
 
-    protected function initButtons()
+    protected function initButtons() : void
     {
         $btn = new Button();
         $btn->setContents("Cancel");

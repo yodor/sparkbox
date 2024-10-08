@@ -8,12 +8,15 @@ class InputMessageDialog extends ConfirmMessageDialog
      */
     protected $input;
 
-    public function __construct($title = "Message", $id = "input_dialog")
+    public function __construct()
     {
-        parent::__construct($title, $id);
-        $this->setDialogType(MessageDialog::TYPE_PLAIN);
+        parent::__construct();
+        $this->setType(MessageDialog::TYPE_PLAIN);
 
         $this->input = DataInputFactory::Create(DataInputFactory::TEXT, "user_input", "Input Data", 0);
+
+        $cmp = new InputComponent($this->input);
+        $this->content->items()->append($cmp);
     }
 
     public function requiredScript(): array
@@ -29,11 +32,5 @@ class InputMessageDialog extends ConfirmMessageDialog
         return $this->input;
     }
 
-    public function startRender() : void
-    {
-        parent::startRender();
-        $cmp = new InputComponent($this->input);
-        $cmp->render();
-    }
 
 }

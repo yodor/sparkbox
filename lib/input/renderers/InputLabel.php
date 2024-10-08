@@ -15,7 +15,7 @@ class InputLabel extends LabelSpan implements IErrorRenderer
     {
         parent::__construct();
         $this->setComponentClass("InputLabel");
-        $this->setTagName("LABEL");
+        //$this->setTagName("LABEL");
 
         if ($input instanceof DataInput) {
             $this->setDataInput($input);

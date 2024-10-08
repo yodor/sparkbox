@@ -3,17 +3,10 @@ class JSONFormDialog extends ConfirmMessageDialog {
     constructor() {
         super();
         this.loader = "<div class='lds-facebook'><div></div><div></div><div></div></div>";
-        this.icon_enabled = false;
-        this.text = this.loader;
-
-        this.setID("json_dialog");
-
-        this.responderName = "";
 
         this.req = new JSONRequest();
 
-        //Which selector holds the loaded content ie the view space
-        this.contentSelector = " .Text";
+        this.req.setResponder(this.element.getAttribute("handler"));
 
         const observer = this.onRequestEvent.bind(this);
         this.req.addObserver(observer);
@@ -26,9 +19,13 @@ class JSONFormDialog extends ConfirmMessageDialog {
      */
     onRequestEvent(event)
     {
+
         if (event.isEvent(JSONRequest.EVENT_STARTING)) {
-            this.setText(this.loader);
-            $(window).resize();
+            this.element.setAttribute("loading", "");
+            this.setContent(this.loader);
+        }
+        else if (event.isEvent(JSONRequest.EVENT_FINISHED)) {
+            this.element.removeAttribute("loading");
         }
     }
 
@@ -37,7 +34,6 @@ class JSONFormDialog extends ConfirmMessageDialog {
      * @param responder_name string
      */
     setResponder(responder_name) {
-        this.responderName = responder_name;
         this.req.setResponder(responder_name);
     }
 
@@ -47,8 +43,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
     show() {
         super.show();
-        $(this.visibleSelector()).attr("handler", this.responderName);
-        this.req.setResponder(this.responderName);
+
         this.req.setFunction("render");
 
         this.req.onSuccess = function(request_result) {
@@ -78,8 +73,9 @@ class JSONFormDialog extends ConfirmMessageDialog {
         //console.log("Submitting form");
         this.req.setFunction("submit");
 
-        let form = $(this.visibleSelector()+" FORM").get(0);
-        let name = form.getAttribute("name");
+        const form = this.element.querySelector("FORM");
+        const name = form.getAttribute("name");
+
         this.req.setPostParameter("SubmitForm", name);
         this.req.setPostFormData(new FormData(form));
 
@@ -96,7 +92,7 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
     //subsequent rendering after form submit
     processSubmitResult(request_result, form_name) {
-        let result = request_result.json_result;
+        const result = request_result.json_result;
         if (result.contents) {
             this.loadContent(result.contents)
             showAlert(result.message);
@@ -114,14 +110,18 @@ class JSONFormDialog extends ConfirmMessageDialog {
         this.loadContent(result.contents);
     }
 
-    loadContent(contents)
-    {
-        $(this.visibleSelector() + " " + this.contentSelector).html(contents);
+    loadContent(contents) {
 
-        //trigger onPageLoad() handlers
-        document.tooltip.assignListeners(document.querySelector(this.visibleSelector() + " " + this.contentSelector));
-        dispatchEvent(new Event('load'));
+        const loadedContent = document.templateFactory.createElement(contents);
+        const dialogContent = this.contentElement();
+
+        dialogContent.innerHTML = "";
+        dialogContent.append(loadedContent);
+
+        const event = new SparkEvent(SparkEvent.DOM_UPDATED);
+        event.source = dialogContent;
+
+        document.dispatchEvent(event);
     }
-
 
 }

@@ -1,19 +1,134 @@
 :root {
     --spark-dialog-background: #ffffff;
-    --spark-dialog-title-background: #000000;
-    --spark-dialog-title-fontsize: 1em;
-    --spark-dialog-title-color: #ffffff;
+    --spark-dialog-header-background: #000000;
+    --spark-dialog-header-fontsize: 1em;
+    --spark-dialog-header-color: #ffffff;
+
+    --spark-dialog-text-color: #000000;
+    --spark-dialog-text-fontsize: 1em;
 }
-.PopupPanel.MessageDialog {
+
+.Dialog {
     box-sizing: border-box;
+    display:grid;
+    width:100%;
+    height:100%;
+    position:fixed;
+    left:0;
+    top:0;
+
+    z-index:100;
+
+}
+.Dialog[modal] {
+    background-color: rgba(0,0,0,0.8);
+
+}
+.Dialog[modal] .Inner {
+    box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.8);
+    border:1px solid #909090;
 }
 
-.MessageDialog.resizable {
+.Dialog .Inner {
+    background-color: var(--spark-dialog-background);
+    display:inline-grid;
+    box-sizing: border-box;
+    align-self: center;
+    justify-self: center;
+
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+
+    padding:2px;
+
+    box-shadow: 0 0 15px 2px rgba(0,0,0,0.75);
+}
+
+.Dialog .Inner .Header {
+
+    display: flex;
+    flex-direction:row;
+    user-select: none;
+
+    font-weight: bold;
+
+    font-size: var(--spark-dialog-header-fontsize);
+    color: var(--spark-dialog-header-color);
+    background-color: var(--spark-dialog-header-background);
+
+    box-sizing: border-box;
+
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+
+    padding: 0.3em;
+}
+
+.Dialog .Inner .Header .Title {
+
+}
+
+
+.Dialog .Inner .Content {
+    display: inline-flex;
+    flex-direction:row;
+    padding: 0.5em;
+}
+
+.Dialog .Inner .Content .Icon {
+    width: 64px;
+    height: 64px;
+    background-repeat:no-repeat;
+    background-size:contain;
+    background-position: center center;
+}
+
+.Dialog[type="Plain"] .Inner .Content .Icon {
+    display: none;
+}
+
+.Dialog[type="Info"] .Inner .Content .Icon {
+    background-image: url("../images/msgpopup/exclamation.png");
+}
+
+.Dialog[type="Question"] .Inner .Content .Icon {
+    background-image: url("../images/msgpopup/exclamation.png");
+}
+
+.Dialog[type="Error"] .Inner .Content .Icon {
+    background-image: url("../images/msgpopup/exclamation.png");
+}
+
+.Dialog .Inner .Content .Text {
+    font-size:var(--spark-dialog-text-fontsize);
+    color:var(--spark-dialog-text-color);
+}
+
+.Dialog .Inner .Footer {
+    display: flex;
+    flex-direction:row;
+    justify-self: flex-end;
+    padding:0.5em;
+}
+
+.Dialog .Inner .Footer .Buttons {
+    display: inline-flex;
+    align-items: flex-end;
+
+    align-self:flex-end;
+
+    gap:0.5em;
+
+}
+
+
+
+.Dialog.resizable {
 
 
 }
 
-.MessageDialog.resizable .resizer {
+.Dialog.resizable .resizer {
     width: 20px;
     height: 20px;
     border-radius: 50%; /*magic to turn square into circle*/
@@ -23,25 +138,25 @@
 
 }
 
-.MessageDialog.resizable .resizer.top-left {
+.Dialog.resizable .resizer.top-left {
     left: -5px;
     top: -5px;
     cursor: nwse-resize; /*resizer cursor*/
 }
 
-.MessageDialog.resizable .resizer.top-right {
+.Dialog.resizable .resizer.top-right {
     right: -5px;
     top: -5px;
     cursor: nesw-resize;
 }
 
-.MessageDialog.resizable .resizer.bottom-left {
+.Dialog.resizable .resizer.bottom-left {
     left: -5px;
     bottom: -5px;
     cursor: nesw-resize;
 }
 
-.MessageDialog.resizable .resizer.bottom-right {
+.Dialog.resizable .resizer.bottom-right {
     right: -5px;
     bottom: -5px;
     cursor: nwse-resize;
@@ -56,140 +171,6 @@
     /*border-left-width:0;*/
 }
 
-.MessageDialog .Inner {
-
-    background-color: var(--spark-dialog-background);
-
-    height: 100%;
-    width: 100%;
-
-    display: table;
-
-    box-sizing: border-box;
-
-    border-spacing: 0.15em;
-
-}
-
-.MessageDialog .Inner .Header {
-    display: table-row;
-}
-
-.MessageDialog .Inner .Center {
-    display: table-row;
-    height: 100%;
-
-}
-
-.MessageDialog .Inner .Footer {
-    display: table-row;
-
-}
-.MessageDialog .Header {
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-}
-.MessageDialog .Header .Caption {
-
-    font-weight: bold;
-    font-size: var(--spark-dialog-title-fontsize);
-
-    color: var(--spark-dialog-title-color);
-
-    background-color: var(--spark-dialog-title-background);
-
-    cursor: move;
-
-    display: table-cell;
-
-    box-sizing: border-box;
-
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-
-    padding: 0.3em;
-}
-
-.MessageDialog .Header .Caption .Title {
-    display: block;
-
-}
-
-
-.MessageDialog .Center .Contents {
-
-    padding: 0.5em;
-
-    display: table-cell;
-
-    vertical-align: top;
-
-    /*text-align:center;*/
-}
-
-.MessageDialog .Center .Contents .Icon {
-    width: 64px;
-    height: 64px;
-
-    vertical-align: top;
-    background-size: contain;
-    background-position: center center;
-    background-repeat: no-repeat;
-
-    /*margin-right: 0.5em;*/
-}
-
-.MessageDialog[type=""] .Icon {
-    display: none !important;
-}
-
-.MessageDialog[type="Info"] .Icon {
-    background-image: url("../images/msgpopup/exclamation.png");
-    display: inline-block;
-}
-
-.MessageDialog[type="Question"] .Icon {
-    background-image: url("../images/msgpopup/exclamation.png");
-    display: inline-block;
-}
-
-.MessageDialog[type="Error"] .Icon {
-    background-image: url("../images/msgpopup/exclamation.png");
-    display: inline-block;
-}
-
-.MessageDialog .Center .Contents .Text {
-    display: inline-block;
-    /*margin-left:15px;*/
-    text-align:left;
-}
-
-.MessageDialog .Center .Contents .Text .exception_link {
-    display: block;
-    color: red;
-    font-weight: bold;
-}
-
-.PopupPanel .Center .Contents .Text .exception_details {
-    display: none;
-    visibility: hidden;
-}
-
-
-.MessageDialog .Footer .Container.Buttons {
-    display: table;
-    text-align: right;
-    border-spacing: 0.5em;
-    border-collapse: separate;
-    width: 100%;
-}
-
-.MessageDialog .Inner .Container.Buttons > * {
-    display: table-cell;
-    margin-left: 0.3em;
-    margin-top:0.3em;
+.Dialog[loading] .Inner .Footer {
+    display:none;
 }

@@ -1,18 +1,11 @@
 class InsertImageDialog extends ConfirmMessageDialog {
 
     constructor() {
-        super();
-        this.contents = "";
+        super("ConfirmMessageDialog");
+        this.setType(MessageDialog.TYPE_PLAIN);
 
-        /**
-         *
-         * @type {MessageDialog}
-         */
         this.parent = null;
-        this.icon_enabled = false;
-
         this.itemClass = "MCEImagesBean";
-
     }
 
     setImageID(imageID) {
@@ -24,8 +17,7 @@ class InsertImageDialog extends ConfirmMessageDialog {
     }
 
     setContents(contents) {
-        this.contents = contents;
-        this.setText(this.contents);
+        this.setText(contents);
     }
 
     buttonAction(action) {
@@ -40,23 +32,15 @@ class InsertImageDialog extends ConfirmMessageDialog {
 
     confirm() {
 
-        let image_url = new URL(STORAGE_LOCAL, location.href);
-        image_url.searchParams.set("cmd", "image");
-        image_url.searchParams.set("class", this.itemClass);
-        image_url.searchParams.set("id", this.imageID);
+        let form = this.element.querySelector("FORM");
 
-        let form = this.modal_pane.popup.find("FORM");
-
-        let render_mode = form.find("[name='render_mode']").val();
-        let caption = form.find("[name='caption']").val();
-        let enable_popup = form.find("[name='enable_popup']");
-
-        let width = parseInt(form.find("[name='width']").val());
-        let height = parseInt(form.find("[name='height']").val());
+        let width = parseInt(form.width.value);
+        let height = parseInt(form.height.value);
 
         if (isNaN(width) || width < 1) {
             width = -1;
         }
+
         if (isNaN(height) || height < 1) {
             height = -1;
         }
@@ -66,69 +50,67 @@ class InsertImageDialog extends ConfirmMessageDialog {
             return;
         }
 
-        let image_tag = $("<img>");
+        let image_url = new URL(STORAGE_LOCAL, location.href);
+        image_url.searchParams.set("cmd", "image");
+        image_url.searchParams.set("class", this.itemClass);
+        image_url.searchParams.set("id", this.imageID);
 
-        if (render_mode == "fit_prc") {
+        const image_tag = document.createElement("IMG");
+
+        if (form.render_mode.value == "fit_prc") {
             if (width>0) {
-                image_tag.attr("width", "" + width + "%");
+                image_tag.setAttribute("width", "" + width + "%");
             }
             if (height>0) {
-                image_tag.attr("height", "" + height + "%");
+                image_tag.setAttribute("height", "" + height + "%");
             }
         }
-        else if (render_mode == "fit_px") {
-            image_url.searchParams.set("width", width);
-            image_url.searchParams.set("height", height);
+        else if (form.render_mode.value == "fit_px") {
+            image_url.searchParams.set("width", ""+width);
+            image_url.searchParams.set("height", ""+height);
         }
 
+        image_tag.setAttribute("src", image_url.href);
+        image_tag.setAttribute("alt", form.caption.value);
 
-        image_tag.attr("src", image_url.href);
-        image_tag.attr("alt", caption);
+        let html = image_tag.outerHTML;
 
-        let final_tag = image_tag;
-
-        if (enable_popup.is(":checked")) {
-            console.log("Enabling popup");
-            final_tag = $("<a href='#'></a>");
-            final_tag.attr("class", "ImagePopup");
-            final_tag.attr("itemID", this.imageID);
-            final_tag.attr("itemClass", this.itemClass);
-            final_tag.attr("title", caption);
-            final_tag.html(image_tag);
+        if (form.enable_popup.checked) {
+            const popup = document.createElement("A");
+            popup.setAttribute("class", "ImagePopup");
+            popup.setAttribute("itemID", this.imageID);
+            popup.setAttribute("itemClass", this.itemClass);
+            popup.setAttribute("title", form.caption.value);
+            popup.appendChild(image_tag);
+            html = popup.outerHTML;
         }
 
-        console.log("Inserting into MCE: " + final_tag.get(0).outerHTML);
-        this.parent.mce_textarea.editor.execCommand("mceInsertContent", false, final_tag.get(0).outerHTML);
+        this.parent.mce_textarea.editor.execCommand("mceInsertContent", false, html);
 
         this.remove();
-
         this.parent.remove();
     }
 
-    show() {
-
-        super.show();
-        this.modal_pane.popup.find(".preview IMG").on("load", function (event) {
-            this.modal_pane.centerContents();
-        }.bind(this));
-
-    }
 }
 
 class MCEImageBrowserDialog extends JSONDialog {
 
     constructor() {
         super();
-        this.setID("mceImage_browser");
+
         this.mce_textarea = null;
 
-        this.field_name = null;
+        this.insert_image = new InsertImageDialog();
+        this.insert_image.setTitle("Insert Image");
+        this.insert_image.setParent(this);
+
+        //SessionUpload control object is not assigned yet
+        this.uploadInput = this.element.querySelector(".SessionUpload");
 
         this.req.setResponder("mceImage");
+        this.req.setParameter("field_name", this.uploadInput.getAttribute("field"));
 
-        this.insert_image = new InsertImageDialog();
-        this.insert_image.setCaption("Insert Image");
-        this.insert_image.setParent(this);
+        this.collection = this.element.querySelector(".ImageStorage");
     }
 
     setMCETextArea(textarea) {
@@ -136,9 +118,7 @@ class MCEImageBrowserDialog extends JSONDialog {
     }
 
     buttonAction(action, dialog) {
-
         this.remove();
-
     }
 
     processResult(responder, funct, result) {
@@ -154,18 +134,18 @@ class MCEImageBrowserDialog extends JSONDialog {
 
         } else if (funct == "remove") {
 
-            let element = this.modal_pane.popup.find(".ImageStorage .Collection .Element[imageID='" + imageID + "']");
+            let element = this.element.querySelector("[imageID='" + imageID + "']");
             element.remove();
-            this.modal_pane.centerContents();
+
 
         } else if (funct == "find") {
 
-            for (var a = 0; a < jsonResult.object_count; a++) {
+            for (let a = 0; a < jsonResult.object_count; a++) {
                 let object_result = jsonResult.objects[a];
                 this.appendResult(object_result);
             }
-            this.modal_pane.centerContents();
-        } //find
+
+        }
 
     }
 
@@ -176,26 +156,19 @@ class MCEImageBrowserDialog extends JSONDialog {
      */
     appendResult(object_result) {
 
+        const resultElement = document.templateFactory.createElement(object_result.html);
+
+        const imageID = resultElement.getAttribute("imageID");
+
         const dialog = this;
 
-        const collection = this.modal_pane.popup.find(".ImageStorage .Collection").first();
+        let image_contents = resultElement.querySelector(".image_contents");
+        image_contents.addEventListener("click", (event)=>this.onClickImage(imageID));
 
-        const element = $(object_result.html);
+        let remove_button = resultElement.querySelector(".remove_button");
+        remove_button.addEventListener("click", (event)=>this.removeImage(imageID));
 
-        const imageID = element.attr("imageID");
-
-        element.on("click", function (event) {
-            dialog.onClickImage(imageID, event);
-            return false;
-        });
-
-        let remove_button = element.children(".remove_button").first();
-        remove_button.on("click", function (event) {
-            dialog.removeImage(imageID, event);
-            return false;
-        });
-
-        collection.append(element);
+        this.collection.append(resultElement);
 
     }
 
@@ -203,22 +176,11 @@ class MCEImageBrowserDialog extends JSONDialog {
 
         super.show();
 
-        //subsequent shows need clear parameters
-        this.req.clearParameters();
+        const sessionUpload = this.uploadInput.upload_control;
+        sessionUpload.processResult = this.processUploadResult.bind(this);
 
-        let field = this.modal_pane.popup.find(".SessionUpload");
-
-        this.field_name = field.attr("field");
-
-        this.req.setParameter("field_name", this.field_name);
-
-        let upload_control = field.data("upload_control");
-
-        upload_control.processResult = this.processUploadResult.bind(this);
-
-        this.loadImages();
-
-        //setTimeout(this.loadImages.bind(this), 100);
+        this.req.setFunction("find");
+        this.req.start();
 
     }
 
@@ -229,39 +191,25 @@ class MCEImageBrowserDialog extends JSONDialog {
     processUploadResult(request_result) {
 
         let result = request_result.json_result;
-        //console.log("Result count: " + result.object_count);
+        console.log("Result count: " + result.object_count);
 
         for (let a = 0; a < result.object_count; a++) {
             //object_result (imageID=>beanID, html=>html)
             let object_result = result.objects[a];
             this.appendResult(object_result);
         }
-        this.modal_pane.centerContents();
-    }
-
-    loadImages(imageID) {
-
-        this.req.setFunction("find");
-        this.req.removeParameter("imageID");
-
-        if (imageID > 0) {
-            this.req.setParameter("imageID", imageID);
-        } else {
-            this.modal_pane.popup.find(".ImageStorage .Collection").first().empty();
-        }
-
-        this.req.start();
 
     }
 
-    onClickImage(imageID, event) {
+
+    onClickImage(imageID) {
 
         this.req.setFunction("renderDimensionDialog");
         this.req.setParameter("imageID", imageID);
         this.req.start();
     }
 
-    removeImage(imageID, event) {
+    removeImage(imageID) {
 
         this.req.setFunction("remove");
         this.req.setParameter("imageID", imageID);

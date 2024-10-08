@@ -26,9 +26,14 @@ class JSONComponent extends Component {
 
             this.parentElement.appendChild(this.element);
 
-            const sparkEvent = new SparkEvent(JSONComponent.EVENT_ELEMENT_CREATED, this);
-            this.notify(sparkEvent);
-            dispatchEvent(sparkEvent);
+            const event_created = new SparkEvent(JSONComponent.EVENT_ELEMENT_CREATED, this);
+            this.notify(event_created);
+            document.dispatchEvent(event_created);
+
+            const event_updated = new SparkEvent(SparkEvent.DOM_UPDATED);
+            event_updated.source = this.parentElement;
+            document.dispatchEvent(event_updated);
+
         }
 
     }

@@ -10,6 +10,7 @@ class SessionUpload extends Component {
         this.req.addObserver(observer);
 
         this.req.onError = this.processError.bind(this);
+
     }
 
     input() {
@@ -31,6 +32,7 @@ class SessionUpload extends Component {
 
         this.component().data("upload_control", this);
 
+        this.element.upload_control = this;
 
         this.input().on("change", function (event) {
             this.uploadFileChanged(event);

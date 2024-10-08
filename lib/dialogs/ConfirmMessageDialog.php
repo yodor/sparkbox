@@ -4,9 +4,10 @@ include_once("dialogs/MessageDialog.php");
 class ConfirmMessageDialog extends MessageDialog
 {
 
-    public function __construct($title = "Question", $id = "confirm_dialog")
+    public function __construct()
     {
-        parent::__construct($title, $id);
+        parent::__construct();
+        $this->setType(MessageDialog::TYPE_QUESTION);
     }
 
     public function requiredScript(): array
@@ -16,7 +17,7 @@ class ConfirmMessageDialog extends MessageDialog
         return $arr;
     }
 
-    protected function initButtons()
+    protected function initButtons() : void
     {
         $btn_ok = new Button();
         $btn_ok->setContents("OK");

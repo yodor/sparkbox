@@ -1,23 +1,14 @@
 class InputMessageDialog extends MessageDialog {
 
     constructor() {
-
         super();
-        this.setID("input_dialog");
-
+        this.input = this.element.querySelector(" INPUT");
     }
 
     show() {
         super.show();
-        this.input().focus();
+        this.input.focus();
     }
 
-    /**
-     * The input field of this dialog
-     * @returns {jQuery}
-     */
-    input() {
-        return $(this.visibleSelector() + " INPUT").first();
-    }
 
 }

@@ -16,17 +16,7 @@
  */
 function showAlert(text) {
 
-    let dialog = new MessageDialog();
-    dialog.setText(text);
-    dialog.setCaption("Alert!");
-    dialog.initialize();
-
-    dialog.show();
-
-    dialog.buttonAction = function(action) {
-        dialog.remove();
-    };
-    return dialog;
+    return MessageDialog.ShowAlert(text);
 
 }
 
