@@ -2,7 +2,7 @@ class InputMessageDialog extends MessageDialog {
 
     constructor() {
         super();
-        this.input = this.element.querySelector(" INPUT");
+        this.input = this.element.querySelector("INPUT");
     }
 
     show() {

@@ -1,13 +1,9 @@
 class ToolTip {
     constructor() {
         this.tipElement = document.templateFactory.createElement("<div class='TooltipPanel'></div>");
-        const instance = this;
-        document.addEventListener("load", (event)=>{
-            instance.assignListeners(document);
-        });
-        document.addEventListener(SparkEvent.DOM_UPDATED, (event)=>{
-            instance.assignListeners(event.source);
-        });
+
+        window.addEventListener("load", (event) => this.assignListeners(document));
+        document.addEventListener(SparkEvent.DOM_UPDATED, (event) => this.assignListeners(event.source));
     }
 
     /**

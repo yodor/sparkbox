@@ -11,54 +11,48 @@ class SessionUpload extends Component {
 
         this.req.onError = this.processError.bind(this);
 
+        this.controls = null;
+        this.slots = null;
+        this.fileInput = null;
+        this.max_slots = 0;
     }
 
-    input() {
-        return $(this.selector() + " INPUT[type='file']");
-    }
-
-    controls(element) {
-        if (!element)element = "";
-
-        return $(this.selector() + " .Controls " + element);
+    setField(field) {
+        super.setField(field);
+        this.req.setParameter("field_name", field);
     }
 
     initialize() {
 
         super.initialize();
 
-        this.req.setResponder(this.component().attr("handler_command"));
-        this.req.setParameter("field_name", this.field);
-
-        this.component().data("upload_control", this);
-
         this.element.upload_control = this;
+        this.req.setResponder(this.element.getAttribute("handler_command"));
 
-        this.input().on("change", function (event) {
-            this.uploadFileChanged(event);
-        }.bind(this));
+        this.controls = this.element.querySelector(".Controls");
 
-        let instance = this;
-        let slots = this.component().find(".ArrayContents");
-        slots.find("[action='Remove']").each(function (index) {
-            $(this).on("click", function (event) {
-                instance.removeSlot($(this));
-            });
-        })
+        this.slots = this.element.querySelector(".ArrayContents");
 
+        this.fileInput = this.element.querySelector("INPUT[type='file']");
+        this.fileInput.addEventListener("change", (event)=>this.uploadFileChanged(event));
+
+        this.max_slots = this.fileInput.getAttribute("max_slots");
+
+        this.slots.querySelectorAll("[action='Remove']").forEach((element)=>{
+            element.addEventListener("click", (event)=>this.removeSlot(element));
+        });
 
     }
 
 
-
     onRequestEvent(event) {
         if (event.isEvent(JSONRequest.EVENT_STARTED)) {
-            this.controls().attr("working", "1");
+            this.controls.setAttribute("working", "");
             this.updateProgress(0);
         } else if (event.isEvent(JSONRequest.EVENT_SUCCESS)) {
-            this.controls().removeAttr("working");
+            this.controls.removeAttribute("working");
         } else if (event.isEvent(JSONRequest.EVENT_ERROR)) {
-            this.controls().removeAttr("working");
+            this.controls.removeAttribute("working");
         } else if (event.isEvent(JSONRequest.EVENT_PROGRESS)) {
             this.updateProgress(event.percent);
         }
@@ -69,38 +63,35 @@ class SessionUpload extends Component {
     {
         let percentVal = parseInt(value)+"%";
 
-        this.controls(".bar").width(percentVal);
-        this.controls(".percent").html(percentVal);
+        this.controls.querySelector(".bar").style.width = percentVal;
+        this.controls.querySelector(".percent").innerText = percentVal;
 
     }
+
     uploadFileChanged(event) {
 
         console.log("SessionUpload::uploadFileChanged()");
 
-        let fileInput = this.input().get(0);
-        let upload_count = fileInput.files.length;
+        let upload_count = this.fileInput.files.length;
         if (upload_count<1) {
             //console.log("No file selected for upload");
             return;
         }
         //console.log("Upload count: " + upload_count);
 
-        let max_slots = this.input().attr("max_slots");
-        let slots = this.component().find(".ArrayContents");
-        let controls = this.component().find(".Controls");
-
         //process current number of slots
-        let active_slots = slots.children().length;
-        if (active_slots >= max_slots) {
+        let active_slots = this.slots.children.length;
+
+        if (active_slots >= this.max_slots) {
 
             showAlert("Maximum number of upload slots reached");
-            this.resetFileInput();
+            this.fileInput.value="";
             return;
         }
 
-        if (active_slots + upload_count > max_slots) {
+        if (active_slots + upload_count > this.max_slots) {
             showAlert("Select less files");
-            this.resetFileInput();
+            this.fileInput.value="";
             return;
         }
 
@@ -110,8 +101,8 @@ class SessionUpload extends Component {
 
         let fileData = new FormData();
 
-        for (let a=0;a<fileInput.files.length;a++) {
-            fileData.append(this.input().attr("name"), fileInput.files[a]);
+        for (let a=0;a<this.fileInput.files.length;a++) {
+            fileData.append(this.fileInput.getAttribute("name"), this.fileInput.files[a]);
         }
 
         this.req.setPostFormData(fileData);
@@ -136,49 +127,41 @@ class SessionUpload extends Component {
         //        console.log(result);
         let result = request_result.json_result;
 
-        let slots = this.component().find(".ArrayContents");
-
         if (result.contents) showAlert(result.contents);
 
         for (let a = 0; a < result.object_count; a++) {
             let current_object = result.objects[a];
-            slots.append(current_object.html);
+            const elementLoaded = document.templateFactory.createElement(current_object.html);
+            this.slots.appendChild(elementLoaded);
+
+            elementLoaded.querySelector("[action='Remove']").addEventListener("click", (event)=>this.removeSlot(elementLoaded));
         }
 
-        let instance = this;
+        const updateEvent = new SparkEvent(SparkEvent.DOM_UPDATED);
+        updateEvent.source = this.slots;
+        document.dispatchEvent(updateEvent);
 
-        slots.find("[action='Remove']").each(function (index) {
-            $(this).on("click",function (event) {
-                instance.removeSlot($(this));
-            });
-        });
-
-
-        document.tooltip.assignListeners(this.element.querySelector(".ArrayContents"));
-        this.resetFileInput();
+        this.fileInput.value = "";
     }
 
-    resetFileInput() {
-
-        this.input().wrap("<form>").closest("form").get(0).reset();
-        this.input().unwrap();
-
-    }
 
     /**
-     * jquery element
-     * @param elm
+     *
+     * @param remove_button {Element}
      */
-    removeSlot(elm) {
+    removeSlot(remove_button) {
 
-        let uid = elm.parents(".Element").find("input[type='hidden']").attr("value");
+        //console.log(remove_button);
+
+        const item = remove_button.parentElement;
+        let uid = item.querySelector("input[type='hidden']").value;
 
         this.req.setFunction("remove");
 
         this.req.setParameter("uid", uid);
 
         this.req.onSuccess=function(request_result) {
-            elm.parents(".Element").remove();
+            item.remove();
             document.tooltip.hide();
         };
 
