@@ -2,6 +2,19 @@
 include_once("dialogs/MessageDialog.php");
 include_once("responders/json/TranslatePhraseResponder.php");
 
+class PhraseTranslatorInit extends PageScript
+{
+    public function code() : string
+    {
+        return <<<JS
+
+            const phrase_translator = new PhraseTranslationDialog();
+            phrase_translator.initialize();
+JS;
+    }
+
+}
+
 class PhraseTranslationDialog extends MessageDialog
 {
 
@@ -12,17 +25,22 @@ class PhraseTranslationDialog extends MessageDialog
         $this->setTitle("Phrase Translator");
         $this->setType(MessageDialog::TYPE_PLAIN);
 
-        $h_translate = new TranslatePhraseResponder();
-
         $this->content->items()->clear();
 
         $phraseInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "phrase", "Original Text", 0);
+        $phraseInput->getRenderer()->input()->setAttribute("rows", 5);
         $phrase = new InputComponent($phraseInput);
         $this->content->items()->append($phrase);
 
         $translationInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "translation", "Translation", 0);
+        $translationInput->getRenderer()->input()->setAttribute("rows", 5);
         $translation = new InputComponent($translationInput);
         $this->content->items()->append($translation);
+
+        new TranslatePhraseResponder();
+
+        //init the dialog - ready for edit call
+        new PhraseTranslatorInit();
 
     }
 

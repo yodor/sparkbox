@@ -10,18 +10,7 @@ include_once("dialogs/PhraseTranslationDialog.php");
 include_once("iterators/SQLQuery.php");
 include_once("components/PageScript.php");
 
-class PhraseTranslatorInit extends PageScript
-{
-    public function code() : string
-    {
-        return <<<JS
 
-            const phrase_translator = new PhraseTranslationDialog();
-            phrase_translator.initialize();
-JS;
-    }
-
-}
 class PhraseTranslatorPage extends BeanListPage
 {
     protected int $langID = -1;
@@ -49,8 +38,7 @@ class PhraseTranslatorPage extends BeanListPage
 
         $this->setListFields(array("phrase" => "Phrase", "translation" => "Translation"));
 
-        //init the dialog - ready for edit call
-        new PhraseTranslatorInit();
+
     }
 
     protected function initPageActions()

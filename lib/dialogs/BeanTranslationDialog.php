@@ -3,7 +3,7 @@ include_once("dialogs/MessageDialog.php");
 include_once("responders/json/TranslateBeanResponder.php");
 include_once("components/PageScript.php");
 
-class BeanTranslationDialogInit extends PageScript
+class BeanTranslatorInit extends PageScript
 {
     function code() : string
     {
@@ -47,6 +47,8 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $phraseInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "original_text", "Original Text", 0);
         $phraseInput->getRenderer()->input()->setAttribute("rows", 5);
+        $phraseInput->getRenderer()->input()->setAttribute("readonly");
+
         $phrase = new InputComponent($phraseInput);
         $this->content->items()->append($phrase);
 
@@ -76,16 +78,15 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $cmp = new InputComponent($this->input);
         $this->buttonsBar->items()->prepend($cmp);
 
-        $responder = new TranslateBeanResponder();
+        new TranslateBeanResponder();
 
-        $script = new BeanTranslationDialogInit();
+        new BeanTranslatorInit();
     }
 
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
         $arr[] = SPARK_LOCAL . "/css/BeanTranslationDialog.css";
-        $arr[] = SPARK_LOCAL . "/css/MCETextArea.css";
         return $arr;
     }
 
@@ -93,33 +94,27 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/dialogs/json/BeanTranslationDialog.js";
-        $arr[] = SPARK_LOCAL . "/js/MCETextArea.js";
-        $arr[] = SPARK_LOCAL . "/js/tiny_mce/jquery.tinymce.min.js";
         return $arr;
     }
 
     protected function initButtons() : void
     {
 
-        $container = new Container();
-        $container->addClassName("ButtonGroup");
-
         $btn_translate = new Button();
         $btn_translate->setContents("Translate");
         $btn_translate->setAttribute("action", "Translate");
-        $container->items()->append($btn_translate);
+        $this->buttonsBar->items()->append($btn_translate);
 
         $btn_clear = new Button();
         $btn_clear->setContents("Clear");
         $btn_clear->setAttribute("action", "Clear");
-        $container->items()->append($btn_clear);
+        $this->buttonsBar->items()->append($btn_clear);
 
         $btn_close = new Button();
         $btn_close->setContents("Close");
         $btn_close->setAttribute("action", "Close");
-        $container->items()->append($btn_close);
+        $this->buttonsBar->items()->append($btn_close);
 
-        $this->buttonsBar->items()->append($container);
     }
 
 
