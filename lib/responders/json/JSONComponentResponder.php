@@ -1,6 +1,5 @@
 <?php
 include_once("responders/json/JSONResponder.php");
-include_once("dialogs/JSONFormDialog.php");
 
 class JSONComponentResponder extends JSONResponder
 {
@@ -8,15 +7,15 @@ class JSONComponentResponder extends JSONResponder
     /**
      * @var Component
      */
-    protected $component;
+    protected Component $component;
 
     public function __construct(string $cmd)
     {
         parent::__construct($cmd);
-        $dialog = new JSONFormDialog();
+
     }
 
-    public function setComponent(Component $component)
+    public function setComponent(Component $component) : void
     {
         $this->component = $component;
     }
