@@ -202,7 +202,6 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $this->head()->addCSS(SPARK_LOCAL . "/css/ModalPane.css");
         $this->head()->addCSS(SPARK_LOCAL . "/css/ImagePopup.css");
-        $this->head()->addCSS(SPARK_LOCAL . "/css/MessageDialog.css");
         $this->head()->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/utils.js");
@@ -225,7 +224,6 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->addJS(SPARK_LOCAL . "/js/ModalPopup.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/Tooltip.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/ImagePopup.js");
-        $this->head()->addJS(SPARK_LOCAL . "/js/dialogs/MessageDialog.js");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/SparkPage.js");
 
@@ -353,11 +351,11 @@ class SparkPage extends HTMLPage implements IActionCollection
         //apply title, meta keywords, meta description to the head
         $this->prepareMetaTitle();
 
-        //show session alerts - !will start session
-        $this->processMessages();
-
         parent::startRender();
         //<body> is in output buffer now
+
+        //show session alerts - !will start session
+        $this->processMessages();
 
         //push head until including the body tag - browser can fetch css and scripts while we do the body contents
         ob_end_flush();

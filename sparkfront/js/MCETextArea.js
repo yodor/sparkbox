@@ -17,7 +17,7 @@ class MCETextArea extends Component {
      * @returns {{schema: string, strict_loading_mode: boolean, convert_newlines_to_brs: boolean, plugins: string, branding: boolean, verify_html: number, media_restrict: boolean, script_url: string, force_br_newlines: boolean, invalid_elements: string, forced_root_block: boolean, newline_behavior: string, menubar: boolean, toolbar2: string, content_style: string, toolbar1: string, force_p_newlines: boolean, remove_linebreaks: boolean, width: string, resize: string, theme: string, entity_encoding: string, extended_valid_elements: string, height: string}}
      */
     defaultSetup() {
-        let mce_setup_object = {
+        return {
             schema: 'html5',
 
             extended_valid_elements: 'img[*],a[*]',
@@ -61,7 +61,7 @@ class MCETextArea extends Component {
             //ver 7
             license_key: 'gpl',
         };
-        return mce_setup_object;
+
     }
 
     onEditorInit(editor) {
@@ -69,8 +69,8 @@ class MCETextArea extends Component {
         console.log("MCETextArea::onEditorInit() - Using editor ID: " + editor.id);
     }
 
-    onInsertImage(ed) {
-        this.editor = ed;
+    onInsertImage(editor) {
+        this.editor = editor;
         this.image_browser.show();
     }
 
@@ -81,9 +81,6 @@ class MCETextArea extends Component {
         this.image_browser.initialize();
 
         console.log("MCETextArea::initialize() - Using selector: " + this.selector());
-        let mce_area = $(this.selector());
-
-        let instance = this;
 
         let mce_setup_object = null;
 
@@ -93,6 +90,8 @@ class MCETextArea extends Component {
         else {
             mce_setup_object = this.defaultSetup();
         }
+
+        let instance = this;
 
         mce_setup_object.setup = function (editor) {
 
@@ -109,14 +108,15 @@ class MCETextArea extends Component {
             //     editor.save(); // updates this instance's textarea
             // });
 
-
             editor.on('init', function (event) {
-                instance.editor = editor;
                 instance.onEditorInit(editor);
-
             });
         };
-        mce_area.tinymce(mce_setup_object);
+
+        mce_setup_object.selector = this.selector();
+
+        //mce_area.tinymce(mce_setup_object);
+        tinymce.init(mce_setup_object);
 
 
     }

@@ -26,6 +26,7 @@
 
     flex-direction:column;
     align-items:flex-start;
+    min-width:0;
 }
 
 .InputField * {
@@ -51,6 +52,8 @@
     border-left: 1px solid #b7b7b7;
     border-right: 1px solid #dcdcdc;
     border-bottom: 1px solid #dcdcdc;
+
+    min-width:0;
 }
 
 .InputField.TextArea TEXTAREA {
@@ -64,6 +67,7 @@
 .InputField.TextField, .InputField.PasswordField, .InputField.TextArea  {
     align-items:stretch;
     align-self:stretch;
+    justify-content:center;
 }
 
 .InputField .FieldElements {
