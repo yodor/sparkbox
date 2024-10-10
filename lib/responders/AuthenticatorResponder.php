@@ -17,9 +17,9 @@ class AuthenticatorResponder extends RequestResponder
     protected string $pass = "";
     protected bool $remember = FALSE;
 
-    public function __construct(Authenticator $auth, $cmd = "doLogin")
+    public function __construct(Authenticator $auth)
     {
-        parent::__construct($cmd);
+        parent::__construct();
         $this->auth = $auth;
         //success and cancel urls set outside
     }

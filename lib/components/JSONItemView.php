@@ -9,9 +9,9 @@ class ItemViewResponder extends JSONResponder
      */
     protected JSONItemView $view;
 
-    public function __construct(string $cmd, JSONItemView $view)
+    public function __construct(JSONItemView $view)
     {
-        parent::__construct($cmd);
+        parent::__construct();
         $this->view = $view;
     }
 

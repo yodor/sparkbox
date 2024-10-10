@@ -92,7 +92,7 @@ abstract class SessionUpload extends InputField
         $this->input->setAttribute("id", $this->input->getName());
         $this->browse_button->setAttribute("for", $this->input->getName());
 
-        $this->setAttribute("handler_command", $this->responder->getCommand());
+        $this->setAttribute(RequestResponder::KEY_COMMAND, $this->responder->getName());
         $this->setAttribute("field", $this->dataInput->getName());
 
         $limit = $this->dataInput->getProcessor()->getTransactBeanItemLimit();

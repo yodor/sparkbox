@@ -1,5 +1,5 @@
 <?php
-include_once("components/Component.php");
+include_once("components/Container.php");
 
 class Script extends Container
 {

@@ -3,10 +3,8 @@ include_once ("dialogs/ConfirmMessageDialog.php");
 
 class InputMessageDialog extends ConfirmMessageDialog
 {
-    /**
-     * @var ArrayDataInput|DataInput
-     */
-    protected $input;
+
+    protected DataInput $input;
 
     public function __construct()
     {
@@ -34,3 +32,5 @@ class InputMessageDialog extends ConfirmMessageDialog
 
 
 }
+
+?>

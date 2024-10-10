@@ -70,15 +70,15 @@ class MCETextArea extends Component {
     }
 
     onInsertImage(editor) {
-        this.editor = editor;
+
+        //create new instance - clone fresh template
+
         this.image_browser.show();
     }
 
     initialize() {
 
         super.initialize();
-
-        this.image_browser.initialize();
 
         console.log("MCETextArea::initialize() - Using selector: " + this.selector());
 

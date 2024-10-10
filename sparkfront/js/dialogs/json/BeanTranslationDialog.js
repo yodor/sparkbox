@@ -6,8 +6,6 @@ class BeanTranslationDialog extends JSONDialog {
 
         this.language_alert = "Please select translation language";
 
-        this.req.setResponder("bean_translator");
-
         this.languageInput = this.element.querySelector("[name='langID']")
         this.languageInput.value = "";
 
@@ -34,7 +32,7 @@ class BeanTranslationDialog extends JSONDialog {
 
         this.translationInput.value = "";
 
-        this.req.setParameter("langID", ""+this.langID);
+        this.request.setParameter("langID", ""+this.langID);
 
         this.fetch();
     }
@@ -53,19 +51,20 @@ class BeanTranslationDialog extends JSONDialog {
 
         console.log("beanID: " + bean_id + " bean_class: " + bean_class + " DataInput: " + field_name);
 
-        this.req.setParameter("field_name", field_name);
-        this.req.setParameter("beanID", bean_id);
-        this.req.setParameter("bean_class", bean_class);
+        this.request.setParameter("field_name", field_name);
+        this.request.setParameter("beanID", bean_id);
+        this.request.setParameter("bean_class", bean_class);
 
-        this.req.setParameter("langID", this.languageInput.value);
+        this.request.setParameter("langID", this.languageInput.value);
 
-        this.originalInput.value = editor.querySelector(`INPUT[name='${field_name}']`).value;
+        this.originalInput.value = "";
+        this.originalInput.value = editor.querySelector("[name='"+field_name+"']").value;
         this.fetch();
     }
 
     processResult(responder, funct, result) {
-        let jsonResult = result.json_result;
-        let message = jsonResult.message;
+        let response = result.response;
+        let message = response.message;
 
         if (funct == "store") {
 
@@ -73,8 +72,8 @@ class BeanTranslationDialog extends JSONDialog {
 
         } else if (funct == "fetch") {
 
-            if (!jsonResult.translation) showAlert(message);
-            this.translationInput.value = jsonResult.translation;
+            if (!response.translation) showAlert(message);
+            this.translationInput.value = response.translation;
 
         } else if (funct == "clear") {
 
@@ -92,9 +91,9 @@ class BeanTranslationDialog extends JSONDialog {
 
         this.ensureLangID();
 
-        this.req.setFunction("store");
-        this.req.setPostParameter("translation", this.translationInput.value);
-        this.req.start();
+        this.request.setFunction("store");
+        this.request.setPostParameter("translation", this.translationInput.value);
+        this.request.start();
     }
 
 
@@ -102,9 +101,9 @@ class BeanTranslationDialog extends JSONDialog {
 
         this.ensureLangID();
 
-        this.req.setFunction("fetch");
-        this.req.clearPostParameters();
-        this.req.start();
+        this.request.setFunction("fetch");
+        this.request.clearPostParameters();
+        this.request.start();
 
     }
 
@@ -112,9 +111,9 @@ class BeanTranslationDialog extends JSONDialog {
 
         this.ensureLangID();
 
-        this.req.setFunction("clear");
-        this.req.clearPostParameters();
-        this.req.start();
+        this.request.setFunction("clear");
+        this.request.clearPostParameters();
+        this.request.start();
     }
 
 

@@ -73,6 +73,8 @@
     display: inline-flex;
     flex-direction:row;
     padding: 0.5em;
+    gap:0.5em;
+    align-items:center;
 }
 
 .Dialog[type="Plain"] .Inner .Content {
@@ -101,15 +103,15 @@
 }
 
 .Dialog[type="Info"] .Inner .Content .Icon {
-    background-image: url("../images/msgpopup/exclamation.png");
+    background-image: url("../images/dialog/info.svg");
 }
 
 .Dialog[type="Question"] .Inner .Content .Icon {
-    background-image: url("../images/msgpopup/exclamation.png");
+    background-image: url("../images/dialog/question.svg");
 }
 
 .Dialog[type="Error"] .Inner .Content .Icon {
-    background-image: url("../images/msgpopup/exclamation.png");
+    background-image: url("../images/dialog/nosign.svg");
 }
 
 .Dialog .Inner .Content .Text {

@@ -1,18 +1,12 @@
 <?php
-include_once("dialogs/ConfirmMessageDialog.php");
+include_once("dialogs/json/JSONDialog.php");
 
-class JSONFormDialog extends ConfirmMessageDialog {
+class JSONFormDialog extends JSONDialog {
 
-    protected string $templateID = "json_dialog";
 
     public function __construct()
     {
         parent::__construct();
-
-        $button_confirm = $this->buttonsBar->items()->getByAction(MessageDialog::BUTTON_ACTION_CONFIRM);
-        if ($button_confirm instanceof Button) {
-            $button_confirm->setContents("Submit");
-        }
     }
 
     public function requiredScript(): array
@@ -29,6 +23,15 @@ class JSONFormDialog extends ConfirmMessageDialog {
         return $arr;
     }
 
+    protected function initButtons(): void
+    {
+        parent::initButtons();
+
+        $button_confirm = $this->buttonsBar->items()->getByAction(MessageDialog::BUTTON_ACTION_CONFIRM);
+        if ($button_confirm instanceof Button) {
+            $button_confirm->setContents(tr("Submit"));
+        }
+    }
 }
 
 ?>

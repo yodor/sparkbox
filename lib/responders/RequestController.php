@@ -6,11 +6,13 @@ include_once("responders/json/JSONResponse.php");
 class RequestController
 {
 
+
+
     protected static $responders = array();
 
     public static function isJSONRequest(): bool
     {
-        return isset($_REQUEST["JSONRequest"]);
+        return isset($_REQUEST[JSONResponder::KEY_JSONREQUEST]);
     }
 
     /**
@@ -21,9 +23,9 @@ class RequestController
      */
     public static function Add(RequestResponder $responder): void
     {
-        $command_name = $responder->getCommand();
-        self::$responders[$command_name] = $responder;
-        debug("Command: [$command_name] => ".get_class($responder));
+        $name = $responder->getName();
+        self::$responders[$name] = $responder;
+        debug("Adding: '$name'");
     }
 
     /**
@@ -33,9 +35,9 @@ class RequestController
      */
     public static function Remove(RequestResponder $responder): void
     {
-        $command_name = $responder->getCommand();
-        if (isset(self::$responders[$command_name])) {
-            debug("Command: [$command_name] => ".get_class($responder));
+        $name = $responder->getName();
+        if (isset(self::$responders[$name])) {
+            debug("Removing: '$name'");
         }
     }
 
@@ -45,10 +47,10 @@ class RequestController
      * @return RequestResponder
      * @throws Exception
      */
-    public static function Get(string $command): RequestResponder
+    public static function Get(string $name): RequestResponder
     {
-        if (!isset(self::$responders[$command])) throw new Exception("RequestResponder for command: '$command' not found");
-        return self::$responders[$command];
+        if (!isset(self::$responders[$name])) throw new Exception("RequestResponder '$name' not found");
+        return self::$responders[$name];
     }
 
     /**
@@ -56,23 +58,23 @@ class RequestController
      * @param string $command
      * @return bool
      */
-    public static function Have(string $command): bool
+    public static function Have(string $name): bool
     {
-        return isset(self::$responders[$command]);
+        return isset(self::$responders[$name]);
     }
 
     public static function Process()
     {
         $isJson = RequestController::isJSONRequest();
 
-        $commands = array_keys(self::$responders);
+        $names = array_keys(self::$responders);
 
-        debug("Registered commands: ", $commands);
+        debug("Registered responders: ", $names);
 
         $request_responder = null;
 
-        foreach ($commands as $idx => $command) {
-            $responder = RequestController::Get($command);
+        foreach ($names as $name) {
+            $responder = RequestController::Get($name);
             if ($isJson xor ($responder instanceof JSONResponder)) continue;
             if (!$responder->accept()) continue;
             $request_responder = $responder;
@@ -85,7 +87,7 @@ class RequestController
         try {
 
             if (is_null($request_responder)) {
-                debug("No responder accepted this request");
+                debug("No responder accepted this request: ".URL::Current());
                 if ($isJson) throw new Exception("No responder is registered to process this request");
 
                 return;

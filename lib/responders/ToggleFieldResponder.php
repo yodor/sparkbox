@@ -11,9 +11,9 @@ class ToggleFieldResponder extends RequestResponder
     protected int $status;
     protected string $field_name;
 
-    public function __construct(DBTableBean $bean, $cmd = "toggle_field")
+    public function __construct(DBTableBean $bean)
     {
-        parent::__construct($cmd);
+        parent::__construct();
 
         $this->bean = $bean;
 

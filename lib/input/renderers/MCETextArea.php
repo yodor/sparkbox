@@ -10,7 +10,7 @@ class MCETextArea extends TextArea
     {
         //force single instance of the dialog to all MCETextAreas to prevent double session upload
         if (is_null(MCETextArea::$image_browser)) {
-            include_once("dialogs/MCEImageBrowserDialog.php");
+            include_once("dialogs/json/MCEImageBrowserDialog.php");
             MCETextArea::$image_browser = new MCEImageBrowserDialog();
         }
 

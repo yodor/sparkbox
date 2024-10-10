@@ -100,7 +100,7 @@ class MessageDialog extends TemplateComponent {
     }
 
     /**
-     * Default handler remove the dialog
+     * Default - remove the dialog
      * @param action {string} Button action attribute value
      */
     buttonAction(action) {

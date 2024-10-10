@@ -9,7 +9,7 @@ class DeleteItemResponder extends RequestResponder
 
     public function __construct(DBTableBean $bean)
     {
-        parent::__construct("delete_item");
+        parent::__construct();
         $this->bean = $bean;
         $this->need_confirm = TRUE;
     }

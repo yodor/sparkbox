@@ -1,3 +1,7 @@
+/**
+ * Load template contents to DOM
+ * if templateID is null uses the JavaScript object class name as templateID
+ */
 class TemplateComponent extends Component
 {
     constructor(templateID=null) {
@@ -5,6 +9,7 @@ class TemplateComponent extends Component
         if (!templateID) {
             templateID = this.constructor.name;
         }
+
         this.element = document.templateFactory.getElement(templateID).cloneNode(true);
         this.class = ""+this.element.className;
         this.name = ""+this.element.getAttribute("name");
@@ -13,13 +18,12 @@ class TemplateComponent extends Component
     }
 
     initialize() {
-        //no initialize here
-        //check single attribute and create single instance
-        //console.log(this);
+        //initialization is already done in the constructor
     }
 
     render() {
         document.body.appendChild(this.element);
+
         const event_update = new SparkEvent(SparkEvent.DOM_UPDATED);
         event_update.source = this.element;
         document.dispatchEvent(event_update);

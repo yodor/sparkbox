@@ -481,9 +481,9 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * @param string $value
      * @return void
      */
-    public function setAttribute(string $name, string $value="") : void
+    public function setAttribute(string $name, ?string $value="") : void
     {
-        $this->attributes[$name] = trim($value);
+        $this->attributes[$name] = trim((string)$value);
     }
 
     /**

@@ -6,6 +6,7 @@ include_once("components/renderers/ITemplate.php");
 
 class MessageDialog extends Container implements IPageComponent, ITemplate
 {
+    //https://www.svgrepo.com/collection/wolf-kit-rounded-line-icons/
     const string TYPE_PLAIN = "Plain";
     const string TYPE_ERROR = "Error";
     const string TYPE_INFO = "Info";
@@ -22,6 +23,8 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
     protected Container $buttonsBar;
 
     protected Container $content;
+
+    protected Container $text;
 
     protected bool $singleInstance = false;
     protected bool $modal = true;
@@ -58,6 +61,7 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
         $text = new Container(false);
         $text->setComponentClass("Text");
         $content->items()->append($text);
+        $this->text = $text;
 
         $footer = new Container(false);
         $footer->setComponentClass("Footer");
@@ -73,9 +77,18 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
 
     }
 
-    public function setTitle(string $title) : void
+    public function setText(string $text) : void
     {
-        $this->title->setContents($title);
+        $this->text->setContents($text);
+    }
+    public function getText() : string
+    {
+        return $this->text->getContents();
+    }
+
+    public function setTitle(string $text) : void
+    {
+        $this->title->setContents($text);
     }
     public function getTitle() : string
     {
@@ -116,7 +129,6 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
     {
         $arr = parent::requiredScript();
         $arr[] = SPARK_LOCAL . "/js/dialogs/MessageDialog.js";
-        $arr[] = SPARK_LOCAL . "/js/dialogs/json/JSONDialog.js";
         return $arr;
     }
 

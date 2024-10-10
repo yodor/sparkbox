@@ -27,7 +27,7 @@ class SessionUpload extends Component {
         super.initialize();
 
         this.element.upload_control = this;
-        this.req.setResponder(this.element.getAttribute("handler_command"));
+        this.req.setResponder(this.element.getAttribute(JSONRequest.KEY_RESPONDER));
 
         this.controls = this.element.querySelector(".Controls");
 
@@ -123,14 +123,14 @@ class SessionUpload extends Component {
      *
      * @param result {JSONRequestResult}
      */
-    processResult(request_result) {
+    processResult(result) {
         //        console.log(result);
-        let result = request_result.json_result;
+        const response = result.response;
 
-        if (result.contents) showAlert(result.contents);
+        if (response.contents) showAlert(response.contents);
 
-        for (let a = 0; a < result.object_count; a++) {
-            let current_object = result.objects[a];
+        for (let a = 0; a < response.object_count; a++) {
+            let current_object = response.objects[a];
             const elementLoaded = document.templateFactory.nodeList(current_object.html)[0];
             this.slots.appendChild(elementLoaded);
 
@@ -160,7 +160,7 @@ class SessionUpload extends Component {
 
         this.req.setParameter("uid", uid);
 
-        this.req.onSuccess=function(request_result) {
+        this.req.onSuccess=function(result) {
             item.remove();
             document.tooltip.hide();
         };

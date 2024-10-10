@@ -15,7 +15,7 @@ class ChangePositionResponder extends RequestResponder
 
     public function __construct(DBTableBean $bean)
     {
-        parent::__construct("reposition");
+        parent::__construct();
 
         if ($bean instanceof OrderedDataBean) {
             $this->supported_content = array("first", "last", "previous", "next", "fixed");

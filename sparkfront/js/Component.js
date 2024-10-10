@@ -7,10 +7,13 @@ class Component extends SparkObject
      */
     constructor() {
         super();
+
+        //selector items
+        this.class = ".Component"
         this.name = "";
         this.field = "";
-        this.class = ".Component"
         this.id = "";
+
         this.element = null;
     }
 

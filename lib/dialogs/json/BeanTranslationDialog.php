@@ -1,5 +1,5 @@
 <?php
-include_once("dialogs/MessageDialog.php");
+include_once("dialogs/json/JSONDialog.php");
 include_once("responders/json/TranslateBeanResponder.php");
 include_once("components/PageScript.php");
 
@@ -10,8 +10,8 @@ class BeanTranslatorInit extends PageScript
         $alertText = tr("Please submit the form to enable translation");
 
         return <<<JS
-        let bean_translator = new BeanTranslationDialog();
-        bean_translator.initialize();
+        const beanDialog = new BeanTranslationDialog();
+        beanDialog.initialize();
 
         document.querySelectorAll("[action='TranslateBeanField']").forEach((element) => {
             
@@ -21,7 +21,7 @@ class BeanTranslatorInit extends PageScript
                     showAlert("{$alertText}");
                     return;
                 }
-                bean_translator.show(element.getAttribute("field"), false);
+                beanDialog.show(element.getAttribute("field"), false);
             });
             
         });
@@ -30,7 +30,7 @@ JS;
     }
 }
 //IFinalRenderer delegate rendering to page control does not need to call render
-class BeanTranslationDialog extends MessageDialog implements IPageComponent
+class BeanTranslationDialog extends JSONDialog implements IPageComponent
 {
 
     protected DataInput $input;
@@ -41,7 +41,6 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
 
         $this->setTitle("Translate");
         $this->setType(MessageDialog::TYPE_PLAIN);
-
 
         $this->content->items()->clear();
 
@@ -56,6 +55,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $translationInput->getRenderer()->input()->setAttribute("rows", 5);
         $translation = new InputComponent($translationInput);
         $this->content->items()->append($translation);
+
 
         include_once("input/DataInputFactory.php");
         $ls = new DataInput("langID", "Language", 1);
@@ -78,7 +78,7 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
         $cmp = new InputComponent($this->input);
         $this->buttonsBar->items()->prepend($cmp);
 
-        new TranslateBeanResponder();
+        $this->setResponder(new TranslateBeanResponder());
 
         new BeanTranslatorInit();
     }
@@ -101,17 +101,17 @@ class BeanTranslationDialog extends MessageDialog implements IPageComponent
     {
 
         $btn_translate = new Button();
-        $btn_translate->setContents("Translate");
+        $btn_translate->setContents(tr("Translate"));
         $btn_translate->setAttribute("action", "Translate");
         $this->buttonsBar->items()->append($btn_translate);
 
         $btn_clear = new Button();
-        $btn_clear->setContents("Clear");
+        $btn_clear->setContents(tr("Clear"));
         $btn_clear->setAttribute("action", "Clear");
         $this->buttonsBar->items()->append($btn_clear);
 
         $btn_close = new Button();
-        $btn_close->setContents("Close");
+        $btn_close->setContents(tr("Close"));
         $btn_close->setAttribute("action", "Close");
         $this->buttonsBar->items()->append($btn_close);
 

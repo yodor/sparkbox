@@ -7,6 +7,11 @@
 .Dialog.JSONFormDialog .Inner .Content FORM {
 
 }
+
+.Dialog.JSONFormDialog[loading] .Inner .Content {
+    align-items:center;
+}
+
 .Dialog.JSONFormDialog .Inner .Content FORM .Caption {
     color:black;
     display:inline-block;

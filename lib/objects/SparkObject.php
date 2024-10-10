@@ -13,8 +13,7 @@ class SparkObject implements jsonSerializable
 
     public function __construct()
     {
-        $this->name = "";
-        $this->parent = null;
+
     }
 
     public function getName(): string

@@ -9,10 +9,10 @@ class JSONComponentResponder extends JSONResponder
      */
     protected Component $component;
 
-    public function __construct(string $cmd)
+    public function __construct(string $name)
     {
-        parent::__construct($cmd);
-
+        SparkObject::setName($name);
+        parent::__construct();
     }
 
     public function setComponent(Component $component) : void

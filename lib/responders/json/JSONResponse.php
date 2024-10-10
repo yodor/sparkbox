@@ -7,6 +7,7 @@
 
     public string $status = JSONResponse::STATUS_ERROR;
     public string $message = "";
+    public string $name = "";
 
     public function __construct(string $name)
     {

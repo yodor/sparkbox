@@ -1,9 +1,62 @@
 <?php
 include_once("utils/url/URL.php");
+include_once("components/PageScript.php");
+include_once("dialogs/ConfirmMessageDialog.php");
 
-abstract class RequestResponder implements IGETConsumer
+class ConfirmResponderScript extends PageScript
 {
-    protected string $cmd = "";
+    protected string $cancelURL;
+
+    public function setCancelURL(string $cancelURL) : void
+    {
+        $this->cancelURL = $cancelURL;
+    }
+
+    public function code() : string
+    {
+        return <<<JS
+        onPageLoad(function () {
+            let confirm_dialog = new MessageDialog("ConfirmResponderDialog");
+            
+            confirm_dialog.buttonAction = function (action) {
+                if (action == "confirm") {
+                    //console.log("Confirm");
+                    const form = confirm_dialog.element.querySelector("FORM");
+                    form.submit();
+                    
+                } else if (action == "cancel") {
+                    //console.log("Cancel");
+                    document.location.replace("{$this->cancelURL}");
+                }
+            };
+            confirm_dialog.show();
+        });
+JS;
+
+    }
+}
+class ConfirmResponderDialog extends ConfirmMessageDialog
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        $form = new TextComponent();
+
+        $html = <<<HTML
+        <form method=post>
+        <input type=hidden name='{RequestResponder::KEY_CONFIRM}' value=1>
+        </form>
+HTML;
+
+        $form->setContents($html);
+
+        $this->text->items()->append($form);
+
+    }
+}
+abstract class RequestResponder extends SparkObject implements IGETConsumer
+{
 
     protected string $cancel_url = "";
     protected string $success_url = "";
@@ -11,8 +64,11 @@ abstract class RequestResponder implements IGETConsumer
     protected bool $need_confirm = FALSE;
     protected bool $need_redirect = TRUE;
 
-    const string KEY_COMMAND = "cmd";
-    const string KEY_CONFIRM = "confirm_handler";
+    //match JSONRequest.js KEY_COMMAND
+    const string KEY_COMMAND = "responder";
+
+    //
+    const string KEY_CONFIRM = "confirm_request";
 
     /**
      * Current request URL
@@ -27,9 +83,15 @@ abstract class RequestResponder implements IGETConsumer
      */
     protected URL $redirect;
 
-    public function __construct(string $cmd)
+    public function __construct()
     {
-        $this->cmd = $cmd;
+        parent::__construct();
+
+        //allow name override ex JSONComponentResponder
+        if (!$this->getName()) {
+            $this->setName(get_class($this));
+        }
+
         $this->url = URL::Current();
 
         $this->redirect = URL::Current();
@@ -39,12 +101,7 @@ abstract class RequestResponder implements IGETConsumer
 
     public function getParameterNames(): array
     {
-        return array("cmd");
-    }
-
-    public function getCommand(): string
-    {
-        return $this->cmd;
+        return array(RequestResponder::KEY_COMMAND);
     }
 
     /**
@@ -90,7 +147,7 @@ abstract class RequestResponder implements IGETConsumer
      */
     public function accept(): bool
     {
-        return strcmp_isset(RequestResponder::KEY_COMMAND, $this->cmd, $_REQUEST);
+        return strcmp_isset(RequestResponder::KEY_COMMAND, $this->getName(), $_REQUEST);
     }
 
     /**
@@ -159,7 +216,7 @@ abstract class RequestResponder implements IGETConsumer
     public function createAction(string $title = "") : ?Action
     {
         $url = URL::Current();
-        $url->add(new URLParameter("cmd", $this->cmd));
+        $url->add(new URLParameter(RequestResponder::KEY_COMMAND, $this->getName()));
         $action = new Action($title);
         $action->setURL($url);
         return $action;
@@ -173,33 +230,13 @@ abstract class RequestResponder implements IGETConsumer
     protected function setupConfirmDialog(string $title = "Confirm Action", string $text = "Confirm action?") : void
     {
         //will be added as IPageComponent
-        $md = new ConfirmMessageDialog($title, "msg_confirm");
+        $md = new ConfirmResponderDialog();
+        $md->setText($text);
+        $md->setTitle($title);
 
-        $md->buffer()->start();
-        echo $text;
-        echo "<form method=post>";
-        echo "<input type=hidden name=confirm_handler value=1>";
-        echo "</form>";
-        ?>
-        <script type='text/javascript'>
-            onPageLoad(function () {
-                let confirm_delete = new MessageDialog();
-                confirm_delete.setID("msg_confirm");
-                confirm_delete.buttonAction = function (action) {
-                    if (action == "confirm") {
-                        //console.log("Confirm");
-                        var frm = $(confirm_delete.visibleSelector()+" FORM");
-                        frm.submit();
-                    } else if (action == "cancel") {
-                        //console.log("Cancel");
-                        document.location.replace("<?php echo $this->cancel_url;?>");
-                    }
-                };
-                confirm_delete.show();
-            });
-        </script>
-        <?php
-        $md->buffer()->end();
+        $script = new ConfirmResponderScript();
+        $script->setCancelURL($this->cancel_url);
+
 
     }
 }

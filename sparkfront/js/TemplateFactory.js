@@ -5,8 +5,8 @@ class TemplateFactory {
     }
 
     /**
-     * Get ChildNode of template #id
-     * @param id
+     * Get firstChild of template #id
+     * @param id {string}
      * @returns {Node}
      */
     getElement(id) {
@@ -18,9 +18,10 @@ class TemplateFactory {
     }
 
     /**
-     * Create node to insert in the document from html_text
-     * @param html_text
-     * @returns {Node[]}
+     * Create Node[] array from string containing HTML
+     * Look for scripts in the string and create nodes for them in the nodeList
+     * @param html_text HTML string to create nodes from
+     * @returns {Node[]} Resulting Node[] array
      */
     nodeList(html_text) {
 
@@ -45,6 +46,11 @@ class TemplateFactory {
         return nodeList;
     }
 
+    /**
+     * Append each node from the 'nodeList' array to 'element' Node and dispatch SparkEvent.DOM_UPDATED
+     * @param element {Node}
+     * @param nodeList {Node[]}
+     */
     appendNodes(element, nodeList)
     {
         nodeList.forEach((node) => {
@@ -56,6 +62,12 @@ class TemplateFactory {
         document.dispatchEvent(event);
     }
 
+    /**
+     * nodeList + appendNodes combined method
+     * @param element {Node} DOM node to append the resulting nodes to
+     * @param html_text {string} HTML string
+     * @returns {Node[]} Resulting nodeList that was created from html_text
+     */
     appendContent(element, html_text)
     {
         const nodeList = this.nodeList(html_text);

@@ -26,7 +26,7 @@ class TranslateBeanResponder extends JSONResponder
 
     public function __construct()
     {
-        parent::__construct("bean_translator");
+        parent::__construct();
         $this->translations = new BeanTranslationsBean();
 
     }
@@ -127,14 +127,23 @@ class TranslateBeanResponder extends JSONResponder
 
         $db = DBConnections::Open();
 
-        $db->query($delete->getSQL());
+        try {
+            $db->transaction();
+            $db->query($delete->getSQL());
 
-        if ($db->affectedRows()>0) {
-            $ret->message = tr("Bean translation removed");
+            if ($db->affectedRows()>0) {
+                $ret->message = tr("Bean translation removed");
+            }
+            else {
+                $ret->message = tr("No bean translation found for clearing");
+            }
+            $db->commit();
         }
-        else {
-            $ret->message = tr("No bean translation found for clearing");
+        catch (Exception $e) {
+            $db->rollback();
+            $ret->message = $e->getMessage();
         }
+
 
     }
 

@@ -20,7 +20,7 @@ function loadMoreResults(button_source)
 
         request.onSuccess = function (result) {
 
-            viewPort.append(result.json_result.html);
+            viewPort.append(result.response.html);
             itemView.attr("page", currentPage);
             $(button_source).removeAttr("working", "");
 

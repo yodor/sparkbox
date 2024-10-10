@@ -4,7 +4,6 @@ include_once("responders/json/JSONResponder.php");
 include_once("forms/InputForm.php");
 include_once("forms/processors/FormProcessor.php");
 include_once("forms/renderers/FormRenderer.php");
-include_once("dialogs/JSONFormDialog.php");
 
 abstract class JSONFormResponder extends JSONResponder
 {
@@ -19,10 +18,10 @@ abstract class JSONFormResponder extends JSONResponder
      */
     protected FormProcessor $proc;
 
-    public function __construct(string $cmd="")
+    public function __construct()
     {
-        if (!$cmd) $cmd = get_class($this);
-        parent::__construct($cmd);
+
+        parent::__construct();
 
         $this->form = $this->createForm();
 
@@ -30,7 +29,6 @@ abstract class JSONFormResponder extends JSONResponder
 
         $this->proc = new FormProcessor();
 
-        $dialog = new JSONFormDialog();
     }
 
     abstract protected function createForm() : InputForm;

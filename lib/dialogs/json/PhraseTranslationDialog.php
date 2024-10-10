@@ -1,21 +1,10 @@
 <?php
-include_once("dialogs/MessageDialog.php");
+include_once("dialogs/json/JSONDialog.php");
 include_once("responders/json/TranslatePhraseResponder.php");
 
-class PhraseTranslatorInit extends PageScript
-{
-    public function code() : string
-    {
-        return <<<JS
 
-            const phrase_translator = new PhraseTranslationDialog();
-            phrase_translator.initialize();
-JS;
-    }
 
-}
-
-class PhraseTranslationDialog extends MessageDialog
+class PhraseTranslationDialog extends JSONDialog
 {
 
     public function __construct()
@@ -37,10 +26,10 @@ class PhraseTranslationDialog extends MessageDialog
         $translation = new InputComponent($translationInput);
         $this->content->items()->append($translation);
 
-        new TranslatePhraseResponder();
+        $this->setResponder(new TranslatePhraseResponder());
 
         //init the dialog - ready for edit call
-        new PhraseTranslatorInit();
+
 
     }
 
@@ -61,12 +50,12 @@ class PhraseTranslationDialog extends MessageDialog
     protected function initButtons() : void
     {
         $btn = new Button();
-        $btn->setContents("Cancel");
+        $btn->setContents(tr("Cancel"));
         $btn->setAttribute("action", "Close");
         $this->buttonsBar->items()->append($btn);
 
         $btn = new Button();
-        $btn->setContents("Translate");
+        $btn->setContents(tr("Translate"));
         $btn->setAttribute("action", "Translate");
         $btn->setAttribute("default_action", 1);
         $this->buttonsBar->items()->append($btn);

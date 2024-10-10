@@ -5,25 +5,39 @@ include_once("responders/json/JSONResponse.php");
 abstract class JSONResponder extends RequestResponder
 {
 
-    protected array $supported_content = array();
-    protected string $content_type = "";
+    //!should match JSONRequest KEY_FUNCTION
+    const string KEY_FUNCTION = "function";
+    const string KEY_JSONREQUEST = "JSONRequest";
 
-    public function __construct(string $cmd)
+    /**
+     * Contains all remote callable method names.
+     * Object methods names starting with '_' are allowed
+     * @var array
+     */
+    protected array $functions = array();
+
+    /**
+     * Current request function call name - should be in $function for successful call
+     * @var string
+     */
+    protected string $requestFunction = "";
+
+    public function __construct()
     {
-        parent::__construct($cmd);
+        parent::__construct();
 
         $this->need_redirect = false;
-        $this->supported_content = array();
+        $this->functions = array();
 
-        $class_methods = get_class_methods($this);
-        foreach ($class_methods as $method) {
+        $classMethods = get_class_methods($this);
+        foreach ($classMethods as $method) {
             if (str_starts_with($method, "__"))continue;
             if (!str_starts_with($method, "_"))continue;
-            $supported_content = str_replace("_", "", $method);
-            $this->supported_content[] = $supported_content;
+            $method = str_replace("_", "", $method);
+            $this->functions[] = $method;
         }
 
-        debug(get_class($this)." accepting function calls: ", $this->supported_content);
+        debug($this->getName()." enabled functions: ", $this->functions);
 
     }
 
@@ -38,14 +52,14 @@ abstract class JSONResponder extends RequestResponder
      */
     protected function parseParams() : void
     {
-        if (!isset($_REQUEST["type"])) throw new Exception("Parameter 'type' not specified");
-        $content_type = $_REQUEST["type"];
+        if (!isset($_REQUEST[JSONResponder::KEY_FUNCTION])) throw new Exception("Request parameter '".JSONResponder::KEY_FUNCTION."' not found");
+        $requestFunction = $_REQUEST[JSONResponder::KEY_FUNCTION];
 
-        if (!in_array($content_type, $this->supported_content)) throw new Exception("Function call not supported");
+        if (!in_array($requestFunction, $this->functions)) throw new Exception("Function not supported");
 
-        $this->content_type = $content_type;
+        $this->requestFunction = "_".$requestFunction;
 
-        debug("Using function call: '$this->content_type'");
+        debug("Request function is: '$this->requestFunction'");
     }
 
     /**
@@ -56,18 +70,16 @@ abstract class JSONResponder extends RequestResponder
     protected function processImpl() : void
     {
 
-        $response = new JSONResponse(get_class($this));
+        $response = new JSONResponse($this->getName());
 
         ob_start();
         try {
 
-            $function_name = "_" . $this->content_type;
-
-            if (is_callable(array($this, $function_name))) {
-                $this->$function_name($response);
+            if (is_callable(array($this, $this->requestFunction))) {
+                $this->{$this->requestFunction}($response);
             }
             else {
-                throw new Exception("Function: '$function_name' not callable");
+                throw new Exception("Function: '{$this->requestFunction}' not callable");
             }
 
             $response->contents = ob_get_contents();
@@ -83,12 +95,8 @@ abstract class JSONResponder extends RequestResponder
             $response->message = $e->getMessage();
 
         }
-
-        if (isset($GLOBALS["DEBUG_JSONRESPONDER_OUTPUT"])) {
-            debug("Response buffer: ".ob_get_contents());
-        }
-
         ob_end_clean();
+
         $response->send();
 
     }

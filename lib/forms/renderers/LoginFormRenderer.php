@@ -1,6 +1,27 @@
 <?php
 include_once("forms/renderers/FormRenderer.php");
+include_once("components/PageScript.php");
 
+class LoginFormScript extends PageScript
+{
+    protected LoginForm $form;
+
+    public function __construct(LoginForm $form)
+    {
+        parent::__construct();
+        $this->form = $form;
+    }
+
+    public function code() : string {
+        return <<<JS
+        onPageLoad(function () {
+                let auth_form = new LoginForm();
+                auth_form.setName("{$this->form->getName()}");
+                auth_form.initialize();
+        });
+JS;
+    }
+}
 class LoginFormRenderer extends FormRenderer
 {
 
@@ -9,21 +30,21 @@ class LoginFormRenderer extends FormRenderer
     /**
      * @var AuthenticatorResponder
      */
-    protected $handler;
-    protected $action;
+    protected AuthenticatorResponder $responder;
+    protected Action $action;
 
-    public function __construct(LoginForm $form, AuthenticatorResponder $handler)
+    public function __construct(LoginForm $form, AuthenticatorResponder $responder)
     {
         parent::__construct($form);
 
         $this->setClassName("LoginFormRenderer");
 
-        $this->handler = $handler;
+        $this->responder = $responder;
 
         $this->setLayout(FormRenderer::FIELD_VBOX);
 
-        $this->submitButton->setName($handler::KEY_COMMAND);
-        $this->submitButton->setValue($handler->getCommand());
+        $this->submitButton->setName(RequestResponder::KEY_COMMAND);
+        $this->submitButton->setValue($this->responder->getName());
 
         $this->submitButton->setAttribute("action", "login");
         $this->submitButton->setContents("Login");
@@ -34,6 +55,7 @@ class LoginFormRenderer extends FormRenderer
 
         $this->getTextSpace()->items()->append($this->action);
 
+        new LoginFormScript($form);
     }
 
     public function forgotPasswordAction() : Action
@@ -59,24 +81,8 @@ class LoginFormRenderer extends FormRenderer
     protected function processAttributes(): void
     {
         parent::processAttributes();
-        $this->form->getInput("rand")->setValue($this->handler->getAuthenticator()->createLoginToken());
+        $this->form->getInput("rand")->setValue($this->responder->getAuthenticator()->createLoginToken());
     }
-
-    public function finishRender()
-    {
-        parent::finishRender();
-
-        ?>
-        <script type='text/javascript'>
-            onPageLoad(function () {
-                var auth_form = new LoginForm();
-                auth_form.setName("<?php echo $this->form->getName();?>");
-                auth_form.initialize();
-            });
-        </script>
-        <?php
-    }
-
 
 }
 

@@ -5,11 +5,23 @@ include_once("beans/LanguagesBean.php");
 include_once("beans/TranslationPhrasesBean.php");
 
 include_once("components/KeywordSearch.php");
-include_once("dialogs/PhraseTranslationDialog.php");
+include_once("dialogs/json/PhraseTranslationDialog.php");
 
 include_once("iterators/SQLQuery.php");
 include_once("components/PageScript.php");
 
+class PhraseTranslatorInit extends PageScript
+{
+    public function code() : string
+    {
+        return <<<JS
+
+            document.phraseTranslator = new PhraseTranslationDialog();
+            document.phraseTranslator.initialize();
+JS;
+    }
+
+}
 
 class PhraseTranslatorPage extends BeanListPage
 {
@@ -38,6 +50,7 @@ class PhraseTranslatorPage extends BeanListPage
 
         $this->setListFields(array("phrase" => "Phrase", "translation" => "Translation"));
 
+        new PhraseTranslatorInit();
 
     }
 
@@ -48,11 +61,11 @@ class PhraseTranslatorPage extends BeanListPage
 
     protected function initViewActions(ActionCollection $act)
     {
-        $action_translate = new Action("Translate", "javascript:phrase_translator.edit(%textID%)");
+        $action_translate = new Action("Translate", "javascript:document.phraseTranslator.edit(%textID%)");
         $act->append($action_translate);
         $act->append(Action::PipeSeparator());
 
-        $action_clear = new Action("Clear", "javascript:phrase_translator.clear(%textID%)");
+        $action_clear = new Action("Clear", "javascript:document.phraseTranslator.clear(%textID%)");
         $act->append($action_clear);
     }
 

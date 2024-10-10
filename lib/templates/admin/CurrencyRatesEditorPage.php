@@ -149,18 +149,18 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
 
                             //console.log(url.href);
-                            req.start(
-                                function (request_result) {
-                                    var result = request_result.json_result;
+                            req.start();
+                            req.onSuccess = function (result) {
+                                    var response = result.response;
 
-                                    let forward_item = document.querySelector(".rate[srcID='" + result.srcID + "'][dstID='" + result.dstID + "']");
-                                    forward_item.innerHTML = parseFloat(result.forward_rate).toFixed(2);
-                                    let backward_item = document.querySelector(".rate[srcID='" + result.dstID + "'][dstID='" + result.srcID + "']");
-                                    backward_item.innerHTML = parseFloat(result.backward_rate).toFixed(2);
+                                    let forward_item = document.querySelector(".rate[srcID='" + response.srcID + "'][dstID='" + response.dstID + "']");
+                                    forward_item.innerHTML = parseFloat(response.forward_rate).toFixed(2);
+                                    let backward_item = document.querySelector(".rate[srcID='" + response.dstID + "'][dstID='" + response.srcID + "']");
+                                    backward_item.innerHTML = parseFloat(response.backward_rate).toFixed(2);
 
                                     input_dialog.remove();
-                                }
-                            );
+                            };
+
                         }
                     }
                 };

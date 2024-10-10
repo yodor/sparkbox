@@ -1,9 +1,18 @@
 class JSONRequestResult  {
     constructor() {
         this.time = new Date();
-        this.json_result = null;
-        this.status = null;
-        //this.response = null;
+
+        /**
+         * JSONResponse status or protocol error number
+         * @type {string}
+         */
+        this.status = "";
+
+        /**
+         * JSONResponse object returned from backend responder
+         * @type {object}
+         */
+        this.response = {};
     }
 }
 
@@ -11,7 +20,12 @@ class JSONRequestError extends JSONRequestResult {
 
     constructor() {
         super();
-        this.description = null;
+
+        /**
+         * Error description
+         * @type {string}
+         */
+        this.description = "";
     }
 
 }
@@ -25,11 +39,15 @@ class JSONRequest extends SparkObject {
     static EVENT_PROGRESS = "progress";
     static EVENT_FINISHED = "finished";
 
+    //match const in RequestResponder.php
+    static KEY_RESPONDER = "responder";
+
+    //match const in JSONResponder.php
+    static KEY_FUNCTION = "function";
+    static KEY_JSONREQUEST = "JSONRequest";
+
     constructor() {
         super();
-
-        this.request_result = null;
-        this.request_error = null;
 
         /**
          * @type {XMLHttpRequest}
@@ -44,7 +62,7 @@ class JSONRequest extends SparkObject {
          * @type {URL}
          */
         this.url = new URL(window.location.href);
-        this.url.searchParams.set("JSONRequest", "1");
+        this.url.searchParams.set(JSONRequest.KEY_JSONREQUEST, "1");
 
         this.interval = -1;
         this.status = 0;
@@ -52,23 +70,22 @@ class JSONRequest extends SparkObject {
         this.post_data = new URLSearchParams();
 
         this.async = true;
-        this.request_time = null;
 
         this.parameters = new URLSearchParams();
 
-        this.command = "";
+        this.responder = "";
         this.function = "";
 
         this.form_data = null;
     }
 
     /**
-     * Set the backend responder command name
-     * @param cmd {string}
+     * Set the backend responder class name
+     * @param responder {string}
      */
-    setResponder(cmd) {
+    setResponder(responder) {
 
-        this.command = cmd;
+        this.responder = responder;
     }
 
     /**
@@ -76,7 +93,7 @@ class JSONRequest extends SparkObject {
      * @returns {string}
      */
     getResponder() {
-        return this.command;
+        return this.responder;
     }
 
     /**
@@ -192,8 +209,8 @@ class JSONRequest extends SparkObject {
     getURL() {
 
         let url = new URL(this.url.href);
-        url.searchParams.set("cmd", this.command);
-        url.searchParams.set("type", this.function);
+        url.searchParams.set(JSONRequest.KEY_RESPONDER, this.responder);
+        url.searchParams.set(JSONRequest.KEY_FUNCTION, this.function);
 
         this.parameters.forEach(function (value, key, parent) {
             url.searchParams.set(key, value);
@@ -214,20 +231,14 @@ class JSONRequest extends SparkObject {
 
     /**
      * Start the HTTP request
-     * @param on_success {function(JSONRequestResult)}
-     * @param on_error {function(JSONRequestError)}
      */
     start() {
 
-        this.request_result = null;
-        this.request_error = null;
-
         this.notify(new SparkEvent(JSONRequest.EVENT_STARTING, this));
 
-        let responderURL = this.getURL();
+        const responderURL = this.getURL();
 
-        let logstr = "JSONRequest::start() - Responder: " + this.command + " Function: " + this.function + "\r\n";
-        console.log(logstr);
+        //console.log(`JSONRequest::start() - ${this.responder}::${this.function}`);
 
         this.request_time = new Date();
 
@@ -255,7 +266,8 @@ class JSONRequest extends SparkObject {
     }
 
     /**
-     * Executed after start and there is no error during the request
+     * Default delegate handler for successful response
+     * Does nothing by default
      * @param result {JSONRequestResult}
      */
     onSuccess(result) {
@@ -263,16 +275,17 @@ class JSONRequest extends SparkObject {
     }
 
     /**
-     * Executed after start and there is error
-     * @param result {JSONRequestError}
+     * Default delegate handler for error response
+     * Shows alert with error.description
+     * @param error {JSONRequestError}
      */
-    onError(result) {
-        showAlert(result.description);
+    onError(error) {
+        showAlert(error.description);
     }
 
     /**
-     *
-     * @param event ProgressEvent
+     * Notify observers for progress
+     * @param event {ProgressEvent}
      */
     onProgress(event) {
         let progress_event = new SparkEvent(JSONRequest.EVENT_PROGRESS, this);
@@ -307,43 +320,55 @@ class JSONRequest extends SparkObject {
 
         try {
 
+            //protocol error
             if (status !== 200) {
                 throw "HTTP Error: " + status;
             }
 
             //let isObject = response.constructor === Object;
-
-            let json_response = response;
-
             if (response.constructor === String) {
-                json_response = JSON && JSON.parse(response);
+                response = JSON && JSON.parse(response);
             }
 
-            if (json_response.status !== "OK") {
-                throw json_response.message;
+            //JSONResponse default properties are
+            // name = responder name,
+            // status should be OK for success and Error for error,
+            // message generic message text,
+            // generic contents payload result
+
+            //Responder error
+            if (response.status !== "OK") {
+                throw response.message;
             }
 
-            let request_result = new JSONRequestResult();
-            request_result.json_result = json_response;
-            request_result.status = status;
-            request_result.response = response;
-            this.request_result = request_result;
+            //Accept ok only from same name
+            if (response.name !== this.getResponder()) {
+                throw `Responder result name mismatch: response.name=${response.name} | request.responder=${this.getResponder()}`;
+            }
 
-            this.notify(new SparkEvent(JSONRequest.EVENT_SUCCESS, this));
-            this.onSuccess(request_result);
+            const result = new JSONRequestResult();
+            //assign the response object
+            result.response = response;
+
+            const event = new SparkEvent(JSONRequest.EVENT_SUCCESS, this);
+            event.result = result;
+            this.notify(event);
+
+            this.onSuccess(result);
 
         } catch (err) {
 
-            let description = (err.message ? err.message : err);
+            const description = (err.message ? err.message : err);
 
-            let request_error = new JSONRequestError();
-            request_error.response = response;
-            request_error.status = status;
-            request_error.description = description; //
-            this.request_error = request_error;
+            const requestError = new JSONRequestError();
+            requestError.status = status;
+            requestError.description = description;
 
-            this.notify(new SparkEvent(JSONRequest.EVENT_ERROR, this));
-            this.onError(request_error);
+            const event = new SparkEvent(JSONRequest.EVENT_ERROR, this);
+            event.error = requestError;
+            this.notify(event);
+
+            this.onError(requestError);
         }
 
         this.notify(new SparkEvent(JSONRequest.EVENT_FINISHED, this));

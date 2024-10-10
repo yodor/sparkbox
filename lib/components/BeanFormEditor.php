@@ -9,7 +9,7 @@ include_once("db/BeanTransactor.php");
 
 include_once("responders/json/UploadControlResponder.php");
 
-include_once("dialogs/BeanTranslationDialog.php");
+include_once("dialogs/json/BeanTranslationDialog.php");
 include_once("objects/events/BeanFormEditorEvent.php");
 
 class BeanFormEditor extends Container implements IBeanEditor
@@ -98,7 +98,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
             if ($renderer instanceof MCETextArea) {
 
-                $handler = $renderer->getImageBrowser()->getHandler();
+                $handler = $renderer->getImageBrowser()->getResponder();
 
                 $handler->setSection(get_class($this->form), $fieldName);
                 $handler->setOwnerID(SparkAdminPage::Instance()->getUserID());

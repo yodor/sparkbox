@@ -25,6 +25,7 @@ class GalleryView extends Container
 
     protected ?ActionCollection $actions = null;
 
+
     public function __construct(DBTableBean $bean, ?SQLQuery $query=NULL)
     {
         parent::__construct();
@@ -96,6 +97,8 @@ class GalleryView extends Container
 
         $this->items()->append($this->view);
 
+
+
     }
 
     public function requiredStyle() : array
@@ -143,7 +146,7 @@ class GalleryView extends Container
         $this->actions->append(Action::PipeSeparator());
 
         $url = URL::Current();
-        $url->add(new URLParameter("cmd", "delete_item"));
+        $url->add(new URLParameter(RequestResponder::KEY_COMMAND, DeleteItemResponder::class));
         $url->add(new DataParameter("item_id", $this->bean->key()));
         $delete_action = new Action("Delete");
         $delete_action->setURL($url);

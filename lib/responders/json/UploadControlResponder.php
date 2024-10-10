@@ -24,9 +24,9 @@ abstract class UploadControlResponder extends JSONResponder
      *
      * @param string $cmd Having cmd=$cmd in the request makes this handler process the request
      */
-    public function __construct(string $cmd)
+    public function __construct()
     {
-        parent::__construct($cmd);
+        parent::__construct();
 
     }
 

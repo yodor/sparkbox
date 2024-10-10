@@ -10,7 +10,7 @@ class CurrencyRateResponder extends JSONResponder
 
     public function __construct()
     {
-        parent::__construct("currency_rates");
+        parent::__construct();
         $this->srcID = -1;
         $this->dstID = -1;
         $this->crID = -1;

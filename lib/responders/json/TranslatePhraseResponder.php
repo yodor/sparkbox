@@ -17,7 +17,7 @@ class TranslatePhraseResponder extends JSONResponder
 
     public function __construct()
     {
-        parent::__construct("translator");
+        parent::__construct();
         $this->bean = new TranslationPhrasesBean();
     }
 

@@ -8,7 +8,7 @@ class FileUploadResponder extends UploadControlResponder
 
     public function __construct()
     {
-        parent::__construct("file_upload");
+        parent::__construct();
     }
 
     public function getHTML(StorageObject $object, string $field_name) : string

@@ -106,11 +106,9 @@ class MCEImageBrowserDialog extends JSONDialog {
 
         //SessionUpload control object is not assigned yet
         this.uploadInput = this.element.querySelector(".SessionUpload");
-
-        this.req.setResponder("mceImage");
-        this.req.setParameter("field_name", this.uploadInput.getAttribute("field"));
-
         this.collection = this.element.querySelector(".ImageStorage");
+
+        this.request.setParameter("field_name", this.uploadInput.getAttribute("field"));
     }
 
     setMCETextArea(textarea) {
@@ -122,53 +120,71 @@ class MCEImageBrowserDialog extends JSONDialog {
     }
 
     processResult(responder, funct, result) {
-        let jsonResult = result.json_result;
-        let message = jsonResult.message;
-        let imageID = this.req.getParameter("imageID");
+
+        let response = result.response;
+        let imageID = this.request.getParameter("imageID");
 
         if (funct == "renderDimensionDialog") {
 
-            this.insert_image.setContents(jsonResult.contents);
-            this.insert_image.setImageID(this.req.getParameter("imageID"));
+            this.insert_image.setContents(response.contents);
+            this.insert_image.setImageID(this.request.getParameter("imageID"));
             this.insert_image.show();
 
         } else if (funct == "remove") {
 
-            let element = this.element.querySelector("[imageID='" + imageID + "']");
+            let element = this.collection.querySelector("[imageID='" + imageID + "']");
             element.remove();
-
 
         } else if (funct == "find") {
 
-            for (let a = 0; a < jsonResult.object_count; a++) {
-                let object_result = jsonResult.objects[a];
-                this.appendResult(object_result);
-            }
+            this.collection.innerHTML = "";
+            this.appendResponseItems(response);
 
         }
 
     }
 
     /**
-     * Process single elements from the objects returned
-     * Append html to the viewport and assign onclick/remove event handlers
-     * @param object_result
+     *
+     * @param result {JSONRequestResult}
      */
-    appendResult(object_result) {
+    processUploadResult(result) {
+        this.appendResponseItems(result.response);
+    }
 
-        const resultElement = document.templateFactory.nodeList(object_result.html)[0];
+    appendResponseItems(response) {
+        for (let a = 0; a < response.object_count; a++) {
+            const object_result = response.objects[a];
+            const resultElement = document.templateFactory.nodeList(object_result.html)[0];
+            this.appendElement(resultElement);
+        }
+    }
+    /**
+     * Append the collection with 'element' and assign onclick handlers - removeImage and onClickImage
+     * Append html to the viewport and assign onclick/remove event handlers
+     * @param element {HTMLElement}
+     */
+    appendElement(element) {
 
-        const imageID = resultElement.getAttribute("imageID");
+        const imageID = element.getAttribute("imageID");
 
-        const dialog = this;
+        let image_element = element.querySelector(".image_contents");
+        image_element.addEventListener("click", (event)=>{
+            this.request.setFunction("renderDimensionDialog");
+            this.request.setParameter("imageID", imageID);
+            this.request.start();
+        });
 
-        let image_contents = resultElement.querySelector(".image_contents");
-        image_contents.addEventListener("click", (event)=>this.onClickImage(imageID));
+        let remove_button = element.querySelector(".remove_button");
+        remove_button.addEventListener("click", (event)=> {
 
-        let remove_button = resultElement.querySelector(".remove_button");
-        remove_button.addEventListener("click", (event)=>this.removeImage(imageID));
+            this.request.setFunction("remove");
+            this.request.setParameter("imageID", imageID);
+            this.request.start();
 
-        this.collection.append(resultElement);
+        });
+
+        this.collection.append(element);
 
     }
 
@@ -177,44 +193,16 @@ class MCEImageBrowserDialog extends JSONDialog {
         super.show();
 
         const sessionUpload = this.uploadInput.upload_control;
+        //redirect SessionUpload
         sessionUpload.processResult = this.processUploadResult.bind(this);
 
-        this.req.setFunction("find");
-        this.req.start();
-
-    }
-
-    /**
-     *
-     * @param request_result {JSONRequestResult}
-     */
-    processUploadResult(request_result) {
-
-        let result = request_result.json_result;
-        console.log("Result count: " + result.object_count);
-
-        for (let a = 0; a < result.object_count; a++) {
-            //object_result (imageID=>beanID, html=>html)
-            let object_result = result.objects[a];
-            this.appendResult(object_result);
-        }
+        this.request.setFunction("find");
+        //cleanup
+        this.request.removeParameter("imageID");
+        this.request.start();
 
     }
 
 
-    onClickImage(imageID) {
-
-        this.req.setFunction("renderDimensionDialog");
-        this.req.setParameter("imageID", imageID);
-        this.req.start();
-    }
-
-    removeImage(imageID) {
-
-        this.req.setFunction("remove");
-        this.req.setParameter("imageID", imageID);
-        this.req.start();
-
-    }
 
 }

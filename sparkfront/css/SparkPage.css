@@ -1,5 +1,6 @@
 :root {
-    --spark-tooltip-background: rgba(5, 32, 55, 0.9);
+    /*--spark-tooltip-background: rgba(5, 32, 55, 0.9);*/
+    --spark-tooltip-background: rgba(0,0,0, 0.85);
     --spark-tooltip-color: white;
 }
 
@@ -28,35 +29,10 @@ H1 {
     clear: both;
 }
 
-.AjaxLoader {
-    display: block;
-    width: 100%;
-    height: 100%;
-    background-image: url("../images/ajax-loader.gif");
-    background-repeat: no-repeat;
-    background-position: center center;
-}
-
-.PopupPanel {
-
-    color: black;
-    position: absolute;
-    z-index: 100;
-    display: none;
-
-    text-align: left;
-
-    border-radius: 5px;
-
-    /*box-shadow: #333 0 1em 1em;*/
-
-    overflow: hidden;
-
-}
 
 .TooltipPanel {
     /*background-color: black;*/
-    padding: 0.5em;
+    padding: 0.7em;
 
     position: absolute;
     left: 0;

@@ -1,54 +1,40 @@
-class JSONFormDialog extends ConfirmMessageDialog {
+class JSONFormDialog extends JSONDialog {
 
-    constructor() {
-        super();
+
+    constructor(templateID=null) {
+        //use confirm message dialog template
+        super(templateID);
+
         this.loader = "<div class='lds-facebook'><div></div><div></div><div></div></div>";
-
-        this.req = new JSONRequest();
-
-        this.req.setResponder(this.element.getAttribute("handler"));
-
-        const observer = this.onRequestEvent.bind(this);
-        this.req.addObserver(observer);
-
     }
 
     /**
-     *
-     * @param sparkEvent {SparkEvent}
+     * EVENT_STARTING replace this.content innerHTML with this.loader
+     * @param event {SparkEvent}
      */
     onRequestEvent(event)
     {
+        super.onRequestEvent(event);
 
         if (event.isEvent(JSONRequest.EVENT_STARTING)) {
-            this.element.setAttribute("loading", "");
             this.content.innerHTML = this.loader;
         }
-        else if (event.isEvent(JSONRequest.EVENT_FINISHED)) {
-            this.element.removeAttribute("loading");
-        }
+
     }
+
 
     /**
-     * The backend responder cmd name
-     * @param responder_name string
+     * Show the dialog and call responder method 'render'
+     * JSONRequest onSuccess points to processRenderResult
      */
-    setResponder(responder_name) {
-        this.req.setResponder(responder_name);
-    }
-
-    getJSONRequest() {
-        return this.req;
-    }
-
     show() {
         super.show();
 
-        this.req.setFunction("render");
+        this.request.setFunction("render");
 
-        this.req.onSuccess = this.processRenderResult.bind(this);
+        this.request.onSuccess = this.processRenderResult.bind(this);
 
-        this.req.start();
+        this.request.start();
     }
 
 
@@ -66,51 +52,73 @@ class JSONFormDialog extends ConfirmMessageDialog {
 
     }
 
+    /**
+     * Call responder method 'submit' posint the formdata created from the FORM inside this.element
+     * JSONRequest onSuccess points to processSubmitResult
+     */
     submitForm()  {
 
         //console.log("Submitting form");
-        this.req.setFunction("submit");
+        this.request.setFunction("submit");
 
         const form = this.element.querySelector("FORM");
         const name = form.getAttribute("name");
 
-        this.req.setPostParameter("SubmitForm", name);
-        this.req.setPostFormData(new FormData(form));
+        this.request.setPostParameter("SubmitForm", name);
+        this.request.setPostFormData(new FormData(form));
 
-        this.req.onSuccess = function(request_result) {
-            this.processSubmitResult(request_result, name);
+        this.request.onSuccess = function(result) {
+            this.processSubmitResult(result, name);
         }.bind(this);
 
-        this.req.start();
+        this.request.start();
     }
 
     cancelForm() {
         this.remove();
     }
 
-    //subsequent rendering after form submit
-    processSubmitResult(request_result, form_name) {
+    /**
+     * Process result of 'submit' responder method
+     * If 'response.contents' is empty the dialog is closed if not loadContent is called using 'response.contents'
+     * Alert message is shown using 'response.message'
+     *
+     * @param result {JSONRequestResult}
+     * @param form_name {string} the name of the form
+     */
+    processSubmitResult(result, form_name) {
 
-        const result = request_result.json_result;
-        if (result.contents) {
-            this.loadContent(result.contents)
-            showAlert(result.message);
+        const response = result.response;
+
+        if (response.contents) {
+            this.loadContent(response.contents)
+            showAlert(response.message);
         }
         else {
             this.remove();
-            showAlert(result.message);
+            showAlert(response.message);
         }
 
     }
 
-    //initial rendering during show()
-    processRenderResult(request_result) {
 
-        let result = request_result.json_result;
-        this.loadContent(result.contents);
+    /**
+     * Process result of 'render' responder method
+     * 'response.contents' are loaded into 'this.content'
+     *
+     * @param result {JSONRequestResult}
+     */
+    processRenderResult(result) {
+
+        this.loadContent(result.response.contents);
 
     }
 
+    /**
+     * Replace 'this.content' inner nodes with nodeList created from 'contents' html string
+     *
+     * @param contents {string} The html string received from the backend responder
+     */
     loadContent(contents) {
 
         this.content.innerHTML = "";

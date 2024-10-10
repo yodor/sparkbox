@@ -54,7 +54,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
     public function __construct()
     {
-        parent::__construct("mceImage");
+        parent::__construct();
 
         //do not require thumbnail. just create the imagestorage of the upload data
         $this->setPhotoSize(128, -1);
