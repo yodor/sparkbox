@@ -19,14 +19,14 @@ class JSONDialog extends MessageDialog {
     }
 
     /**
-     * Observe JSONRequest events.
-     * EVENT_STARTING set the 'loading' attribute
+     * Observe JSONRequest events
+     * EVENT_STARTED set the 'loading' attribute
      * EVENT_FINISHED remove the 'loading' attribute
      * @param event {SparkEvent}
      */
     onRequestEvent(event)
     {
-        if (event.isEvent(JSONRequest.EVENT_STARTING)) {
+        if (event.isEvent(JSONRequest.EVENT_STARTED)) {
             this.element.setAttribute("loading", "");
         }
         else if (event.isEvent(JSONRequest.EVENT_FINISHED)) {
@@ -35,12 +35,12 @@ class JSONDialog extends MessageDialog {
     }
 
     /**
-     * The backend responder cmd name
-     * @param cmd {string}
+     * Set the backend responder class name
+     * @param responder {string}
      */
-    setResponder(cmd) {
-        this.request.setResponder(cmd);
-        this.element.setAttribute("responder", cmd);
+    setResponder(responder) {
+        this.request.setResponder(responder);
+        this.element.setAttribute("responder", responder);
     }
 
     getJSONRequest() {

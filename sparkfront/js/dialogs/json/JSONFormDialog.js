@@ -9,14 +9,14 @@ class JSONFormDialog extends JSONDialog {
     }
 
     /**
-     * EVENT_STARTING replace this.content innerHTML with this.loader
+     * EVENT_STARTED replace this.content innerHTML with this.loader
      * @param event {SparkEvent}
      */
     onRequestEvent(event)
     {
         super.onRequestEvent(event);
 
-        if (event.isEvent(JSONRequest.EVENT_STARTING)) {
+        if (event.isEvent(JSONRequest.EVENT_STARTED)) {
             this.content.innerHTML = this.loader;
         }
 

@@ -32,7 +32,6 @@ class JSONRequestError extends JSONRequestResult {
 
 class JSONRequest extends SparkObject {
 
-    static EVENT_STARTING = "starting";
     static EVENT_STARTED = "started";
     static EVENT_SUCCESS = "success";
     static EVENT_ERROR = "error";
@@ -55,29 +54,210 @@ class JSONRequest extends SparkObject {
         this.xmlRequest = new XMLHttpRequest();
         if (!this.xmlRequest) throw "XMLHttpRequest is not available";
 
-        this.xmlRequest.onreadystatechange = this.onReadyStateChange.bind(this);
+        this.xmlRequest.addEventListener("loadstart", (event)=>
+            this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this))
+        );
 
-        this.xmlRequest.upload.onprogress = this.onProgress.bind(this);
+        this.xmlRequest.addEventListener("load", (event)=>
+            this.onLoad(event)
+        );
+
+        this.xmlRequest.addEventListener("error", (event)=>
+            this.emitError(this.xmlRequest.statusText, this.xmlRequest.status)
+        );
+
+        this.xmlRequest.addEventListener("abort", (event)=>
+            this.emitError("Aborted", 0)
+        );
+
+        this.xmlRequest.addEventListener("loadend", (event)=>
+            this.notify(new SparkEvent(JSONRequest.EVENT_FINISHED, this))
+        );
+
+        this.xmlRequest.upload.addEventListener("progress", (event)=> {
+            let progress_event = new SparkEvent(JSONRequest.EVENT_PROGRESS, this);
+            progress_event.computable = event.lengthComputable;
+            progress_event.loaded = event.loaded;
+            progress_event.total = event.total;
+            let percent = 0;
+            if (progress_event.computable && event.total>0) {
+                percent = (event.loaded / event.total) * 100;
+            }
+            progress_event.percent = percent;
+            this.notify(progress_event);
+        });
+
+
         /**
-         * @type {URL}
+         * Request POST parameters
+         * @type {URLSearchParams}
          */
-        this.url = new URL(window.location.href);
-        this.url.searchParams.set(JSONRequest.KEY_JSONREQUEST, "1");
-
-        this.interval = -1;
-        this.status = 0;
-
         this.post_data = new URLSearchParams();
 
-        this.async = true;
-
+        /**
+         * Request URL parameters
+         * @type {URLSearchParams}
+         */
         this.parameters = new URLSearchParams();
 
+        /**
+         *
+         * @type {string}
+         */
         this.responder = "";
+        /**
+         *
+         * @type {string}
+         */
         this.function = "";
 
+        /**
+         *
+         * @type {FormData}
+         */
         this.form_data = null;
     }
+
+    emitError(description, status)
+    {
+        const requestError = new JSONRequestError();
+        requestError.status = status;
+        requestError.description = description;
+
+        const sparkEvent = new SparkEvent(JSONRequest.EVENT_ERROR, this);
+        sparkEvent.error = requestError;
+        this.notify(sparkEvent);
+
+        this.onError(requestError);
+    }
+    /**
+     * Returns the complete URL including the responder, function, and function parameters
+     * @returns {URL}
+     */
+    getURL() {
+
+        const url = new URL(window.location.href);
+        url.searchParams.set(JSONRequest.KEY_JSONREQUEST, "1");
+        url.searchParams.set(JSONRequest.KEY_RESPONDER, this.responder);
+        url.searchParams.set(JSONRequest.KEY_FUNCTION, this.function);
+
+        this.parameters.forEach(function (value, key, parent) {
+            url.searchParams.set(key, value);
+        });
+
+        return url;
+    }
+
+    /**
+     * Start the HTTP request
+     */
+    start() {
+
+        const responderURL = this.getURL();
+
+        //console.log(`JSONRequest::start() - ${this.responder}::${this.function}`);
+
+        if (this.post_data.toString().length > 0 || this.form_data != null) {
+
+            //console.log("Using POST: " + responderURL.href);
+            let form_data = this.form_data;
+
+            if (form_data == null) {
+                form_data = new FormData();
+            }
+
+            this.post_data.forEach((value, key, urlSearchParams) => {
+                form_data.append(key, value);
+            });
+
+            this.xmlRequest.open("POST", responderURL, true);
+            this.xmlRequest.send(form_data);
+
+
+        } else {
+            //console.log("Using GET: " + responderURL.href);
+            this.xmlRequest.open("GET", responderURL, true);
+            this.xmlRequest.send(null);
+
+        }
+
+    }
+
+    /**
+     * Default delegate handler for successful response
+     * Does nothing by default
+     * @param result {JSONRequestResult}
+     */
+    onSuccess(result) {
+
+    }
+
+    /**
+     * Default delegate handler for error response
+     * Shows alert with error.description
+     * @param error {JSONRequestError}
+     */
+    onError(error) {
+        showAlert(`Error: ${error.description} - Status: ${error.status}`);
+    }
+
+    onLoad() {
+
+        //HTTP protocol status code
+        let status = this.xmlRequest.status;
+        let response = this.xmlRequest.responseText;
+
+        try {
+
+            //protocol error
+            if (status !== 200) {
+                throw new Error(this.xmlRequest.responseText);
+            }
+
+            //let isObject = response.constructor === Object;
+            try {
+                if (response.constructor === String) {
+                    response = JSON && JSON.parse(response);
+                }
+            }
+            catch (e) {
+                throw new Error("Incorrect JSON response: " + e.message);
+            }
+
+            //JSONResponse default properties are
+            // name = responder name,
+            // status should be OK for success and Error for error,
+            // message generic message text,
+            // generic contents payload result
+
+            //Responder error
+            if (response.status !== "OK") {
+                throw new Error(response.message);
+            }
+
+            //Accept ok only from same name
+            if (response.name !== this.getResponder()) {
+                throw new Error(`Responder result name mismatch: response.name=${response.name} | request.responder=${this.getResponder()}`);
+            }
+
+            const result = new JSONRequestResult();
+            //assign the response object
+            result.response = response;
+
+            const event = new SparkEvent(JSONRequest.EVENT_SUCCESS, this);
+            event.result = result;
+            this.notify(event);
+
+            this.onSuccess(result);
+
+        } catch (err) {
+            this.emitError((err.message ? err.message : err), status);
+        }
+
+
+    }
+
+
 
     /**
      * Set the backend responder class name
@@ -126,7 +306,7 @@ class JSONRequest extends SparkObject {
 
     /**
      * Get the value of the function call parameter named 'name'
-     * @param name
+     * @param name {string}
      * @returns {string}
      */
     getParameter(name) {
@@ -134,7 +314,7 @@ class JSONRequest extends SparkObject {
     }
 
     /**
-     * Remove all function call parameters
+     * Remove all function call query parameters
      */
     clearParameters() {
         this.parameters = new URLSearchParams();
@@ -142,7 +322,7 @@ class JSONRequest extends SparkObject {
 
     /**
      * Remove function call parameter named 'name'
-     * @param name
+     * @param name {string}
      */
     removeParameter(name) {
         this.parameters.delete(name);
@@ -168,7 +348,7 @@ class JSONRequest extends SparkObject {
 
     /**
      * Get the POST parameter named 'name' value
-     * @param name
+     * @param name {string}
      * @returns {string}
      */
     getPostParameter(name) {
@@ -177,7 +357,7 @@ class JSONRequest extends SparkObject {
 
     /**
      *
-     * @param form_data FormData
+     * @param form_data {FormData}
      */
     setPostFormData(form_data) {
         this.form_data = form_data;
@@ -203,174 +383,11 @@ class JSONRequest extends SparkObject {
     }
 
     /**
-     * Returns the complete URL including the responder, function, and function parameters
-     * @returns {URL}
+     * Clear post_data and set from_data to null
      */
-    getURL() {
-
-        let url = new URL(this.url.href);
-        url.searchParams.set(JSONRequest.KEY_RESPONDER, this.responder);
-        url.searchParams.set(JSONRequest.KEY_FUNCTION, this.function);
-
-        this.parameters.forEach(function (value, key, parent) {
-            url.searchParams.set(key, value);
-        });
-
-        return url;
+    clearPost() {
+        this.clearPostFormData();
+        this.clearPostParameters();
     }
 
-    setInterval(msec) {
-        this.interval = msec;
-    }
-
-    stop() {
-        if (this.xmlRequest) {
-            this.xmlRequest.abort();
-        }
-    }
-
-    /**
-     * Start the HTTP request
-     */
-    start() {
-
-        this.notify(new SparkEvent(JSONRequest.EVENT_STARTING, this));
-
-        const responderURL = this.getURL();
-
-        //console.log(`JSONRequest::start() - ${this.responder}::${this.function}`);
-
-        this.request_time = new Date();
-
-        if (this.post_data.toString().length > 0 || this.form_data != null) {
-
-            //console.log("Using POST: " + responderURL.href);
-            this.xmlRequest.open("POST", responderURL.href, this.async);
-
-            if (this.form_data == null) {
-                this.form_data = new FormData();
-            }
-            this.post_data.forEach(function (value, key, parent) {
-                this.form_data.append(key, value);
-            }.bind(this));
-            this.xmlRequest.send(this.form_data);
-
-
-        } else {
-            //console.log("Using GET: " + responderURL.href);
-            this.xmlRequest.open("GET", responderURL.href, this.async);
-            this.xmlRequest.send(null);
-
-        }
-
-    }
-
-    /**
-     * Default delegate handler for successful response
-     * Does nothing by default
-     * @param result {JSONRequestResult}
-     */
-    onSuccess(result) {
-
-    }
-
-    /**
-     * Default delegate handler for error response
-     * Shows alert with error.description
-     * @param error {JSONRequestError}
-     */
-    onError(error) {
-        showAlert(error.description);
-    }
-
-    /**
-     * Notify observers for progress
-     * @param event {ProgressEvent}
-     */
-    onProgress(event) {
-        let progress_event = new SparkEvent(JSONRequest.EVENT_PROGRESS, this);
-        progress_event.computable = event.lengthComputable;
-        progress_event.loaded = event.loaded;
-        progress_event.total = event.total;
-        let percent = 0;
-        if (progress_event.computable && event.total>0) {
-            percent = (event.loaded / event.total) * 100;
-        }
-        progress_event.percent = percent;
-        this.notify(progress_event);
-    }
-
-    // 0	UNSENT	Client has been created. open() not called yet.
-    // 1	OPENED	open() has been called.
-    // 2	HEADERS_RECEIVED	send() has been called, and headers and status are available.
-    // 3	LOADING	Downloading; responseText holds partial data.
-    // 4	DONE	The operation is complete.
-    onReadyStateChange() {
-
-        if (this.xmlRequest.readyState === 1) {
-            this.notify(new SparkEvent(JSONRequest.EVENT_STARTED, this));
-            return;
-        }
-
-        if (this.xmlRequest.readyState !== 4) return;
-
-
-        let status = this.xmlRequest.status;
-        let response = this.xmlRequest.responseText;
-
-        try {
-
-            //protocol error
-            if (status !== 200) {
-                throw "HTTP Error: " + status;
-            }
-
-            //let isObject = response.constructor === Object;
-            if (response.constructor === String) {
-                response = JSON && JSON.parse(response);
-            }
-
-            //JSONResponse default properties are
-            // name = responder name,
-            // status should be OK for success and Error for error,
-            // message generic message text,
-            // generic contents payload result
-
-            //Responder error
-            if (response.status !== "OK") {
-                throw response.message;
-            }
-
-            //Accept ok only from same name
-            if (response.name !== this.getResponder()) {
-                throw `Responder result name mismatch: response.name=${response.name} | request.responder=${this.getResponder()}`;
-            }
-
-            const result = new JSONRequestResult();
-            //assign the response object
-            result.response = response;
-
-            const event = new SparkEvent(JSONRequest.EVENT_SUCCESS, this);
-            event.result = result;
-            this.notify(event);
-
-            this.onSuccess(result);
-
-        } catch (err) {
-
-            const description = (err.message ? err.message : err);
-
-            const requestError = new JSONRequestError();
-            requestError.status = status;
-            requestError.description = description;
-
-            const event = new SparkEvent(JSONRequest.EVENT_ERROR, this);
-            event.error = requestError;
-            this.notify(event);
-
-            this.onError(requestError);
-        }
-
-        this.notify(new SparkEvent(JSONRequest.EVENT_FINISHED, this));
-    }
 }

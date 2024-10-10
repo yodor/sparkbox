@@ -158,6 +158,10 @@ class MCEImageBrowserDialog extends JSONDialog {
             const resultElement = document.templateFactory.nodeList(object_result.html)[0];
             this.appendElement(resultElement);
         }
+
+        const event = new SparkEvent(SparkEvent.DOM_UPDATED);
+        event.source = this.collection;
+        document.dispatchEvent(event);
     }
     /**
      * Append the collection with 'element' and assign onclick handlers - removeImage and onClickImage
@@ -194,7 +198,7 @@ class MCEImageBrowserDialog extends JSONDialog {
 
         const sessionUpload = this.uploadInput.upload_control;
         //redirect SessionUpload
-        sessionUpload.processResult = this.processUploadResult.bind(this);
+        sessionUpload.uploadSuccess = this.processUploadResult.bind(this);
 
         this.request.setFunction("find");
         //cleanup

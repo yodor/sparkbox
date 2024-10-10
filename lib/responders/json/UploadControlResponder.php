@@ -10,10 +10,6 @@ abstract class UploadControlResponder extends JSONResponder
     public const PARAM_FIELD_NAME = "field_name";
     public const PARAM_UID = "uid";
 
-    //TODO: remove
-    //session access key name
-    public const PARAM_CONTROL_NAME = "upload_control";
-
     //ajax handler is working with '$field_name' field
     protected string $field_name = "";
 
