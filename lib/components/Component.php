@@ -241,7 +241,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         $attrs = $this->prepareAttributes();
         echo "<";
         echo $this->tagName;
-        if (!empty($attrs)) echo " ".$attrs;
+        if ($attrs) echo " ".$attrs;
         echo ">";
 
         $this->renderCaption();
