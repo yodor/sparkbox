@@ -4,6 +4,7 @@ class ToolTip {
 
         window.addEventListener("load", (event) => this.assignListeners(document));
         document.addEventListener(SparkEvent.DOM_UPDATED, (event) => this.assignListeners(event.source));
+        this.timerID = null;
     }
 
     /**
@@ -13,7 +14,7 @@ class ToolTip {
      */
     show(element, event) {
 
-        this.hide(element,event);
+        this.hide(element, event);
 
         this.tipElement.textContent = element.getAttribute("tooltip");
 
@@ -25,9 +26,9 @@ class ToolTip {
         this.tipElement.style.display = "block";
 
         document.body.append(this.tipElement);
-        // setTimeout(function(event){
-        //         hideTooltip(element, event);
-        // }, 3000);
+        this.timerID = setTimeout((event) => {
+             this.hide(element, event);
+        }, 3000);
     }
 
     /**
@@ -36,6 +37,8 @@ class ToolTip {
      * @param event
      */
     hide(element, event) {
+        clearTimeout(this.timerID);
+
         document.querySelector(".TooltipPanel")?.remove();
     }
 

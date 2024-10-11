@@ -35,13 +35,13 @@ JS;
         $this->setContents($contents);
 
     }
-    protected function processAttributes(): void
-    {
-        parent::processAttributes();
-        //append the no noscript code
-        $noscript = "<noscript><img height=1 width=1 src='https://www.facebook.com/tr?id={$this->pixelID}&ev=PageView&noscript=1'></noscript>";
-        $this->buffer()->append($noscript);
-    }
+//    protected function processAttributes(): void
+//    {
+//        parent::processAttributes();
+//        //append the no noscript code
+//        $noscript = "<noscript><img height=1 width=1 src='https://www.facebook.com/tr?id={$this->pixelID}&ev=PageView&noscript=1'></noscript>";
+//        $this->buffer()->append($noscript);
+//    }
 
     public function addTrackEvent(string $eventName, string $eventParam) : void
     {
