@@ -151,6 +151,8 @@ class ImagePopup extends SparkObject {
             return;
         }
 
+        document.body.style.overflow = "hidden";
+
         this.popup.setAttribute("loading","");
 
         const relation = element.getAttribute("relation");
@@ -240,6 +242,8 @@ class ImagePopup extends SparkObject {
         this.popup.removeAttribute("zoom");
         this.popup.remove();
 
+        document.body.style.overflow = "initial";
+
         const sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
         this.notify(sparkEvent);
         document.dispatchEvent(sparkEvent);
@@ -297,13 +301,18 @@ class ImagePopup extends SparkObject {
     }
     zoomImage() {
 
+
+
         if (this.popup.hasAttribute("zoom")) {
             this.popup.removeAttribute("zoom");
 
             this.popup.style.backgroundPosition = "center center";
 
+
+
             return;
         }
+
 
         this.popup.setAttribute("zoom", "");
         this.setupZoom();
