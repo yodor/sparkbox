@@ -108,19 +108,26 @@ class MessageDialog extends TemplateComponent {
         this.remove();
     }
 
-    static ShowAlert(text)
-    {
-        let dialog = new MessageDialog();
-        dialog.setText(text);
-        dialog.setTitle("Alert!");
+}
 
-        dialog.buttonAction = function(action) {
-            dialog.remove();
-        };
+/**
+ * Show the default message dialog with text 'text' and return instance to the dialog
+ *
+ * @param text {string}
+ * @return {MessageDialog}
+ */
+function showAlert(text) {
 
-        dialog.show();
+    const dialog = new MessageDialog();
+    dialog.setText(text);
+    dialog.setTitle("Alert!");
 
-        return dialog;
-    }
+    dialog.buttonAction = function(action) {
+        dialog.remove();
+    };
+
+    dialog.show();
+
+    return dialog;
 
 }

@@ -1,132 +1,122 @@
 class TreeView extends Component {
+
+    static BRANCH_OPENED = "opened";
+    static BRANCH_CLOSED = "closed";
+    static BRANCH_LEAF = "leaf";
+
+
     constructor() {
         super();
         this.setClass(".TreeView");
     }
 
-    setSelectedID(selectedID) {
 
-        var tree_instance = this;
-
-        //deselect any selected (from cache)
-        $(this.selector() + " .Node").each(function () {
-            $(this).attr("active", "0");
-        });
-
-        //open the active branch to top
-        $(this.selector() + " .Node[nodeID='"+selectedID+"']").each(function () {
-
-            $(this).parents(".NodeOuter").each(function () {
-
-                $(this).children(".Node").each(function () {
-                    var nodeID = $(this).attr("nodeID");
-                    var branch_type = $(this).attr("branch_type");
-
-                    if (nodeID > 0 && branch_type == "closed") {
-
-                        tree_instance.handleClicked(nodeID);
-
-                    }
-
-                });
-
-
-            });
-
-        });
-
-        $(this.selector() + " .Node[nodeID='"+selectedID+"']").each(function () {
-            //var nodeID = $(this).attr("nodeID");
-            $(this).attr("active", "1");
-        });
-    }
 
     initialize() {
 
         super.initialize();
 
-        var tree_instance = this;
+        this.element.querySelectorAll(".Node").forEach((node)=>{
 
-        $(this.selector() + " .Node").each(function (index) {
+            const nodeID = node.getAttribute("nodeID");
+            const branchType = node.getAttribute("branch_type");
 
-            var nodeID = $(this).attr("nodeID");
+            node.addEventListener("click", (event) => this.nodeClicked(nodeID));
 
-            $(this).click(function (event) {
+            const handle = node.querySelector(".Handle");
+            handle.addEventListener("click", (event) => this.handleClicked(nodeID));
 
-                tree_instance.nodeClicked(nodeID, event);
-
-            });
-
-            var handle = $(this).find(".Handle").first();
-            handle.click(function (event) {
-
-                tree_instance.handleClicked(nodeID, event);
-
-            });
-
-            //update leaf nodes for aggregate function
-            var child_count = $(this).parent().children(".NodeChilds").first().children().length;
-
-            if (child_count < 1) {
-                $(this).attr("branch_type", "leaf");
+            if (branchType === "opened") {
+                node.setAttribute("branch_type", "closed");
             }
 
         });
 
+        //reset leaf branches because of aggregate select and/or cached treeview
+        this.element.querySelectorAll(".NodeChilds:empty").forEach((node) =>{
+            node.closest(".NodeOuter")?.querySelector(".Node")?.setAttribute("branch_type", "leaf");
+        });
 
     }
 
-    handleClicked(id, event) {
+    /**
+     * Set node active and open all branches towards the root of the tree
+     * @param nodeID {string}
+     */
+    setSelectedID(nodeID) {
+        //console.log("selecting ID: " + selectedID);
 
-        var node = $(this.selector() + " .Node[nodeID='" + id + "']");
-        var branch_type = node.attr("branch_type");
-        //console.log("Node Branch Type: " + branch_type);
+        //close all open branches
+        this.element.querySelectorAll(".Node[branch_type='opened']").forEach((node_element)=>{
+            node_element.setAttribute("branch_type", "closed");
+        });
 
-        var current_branch_type = branch_type;
+        //set the active node to not active
+        this.element.querySelectorAll(".Node[active='1']").forEach((node_element)=>{
+            node_element.setAttribute("active", "0");
+        })
 
-        var handle = node.find(".Handle").first();
+        const selectedNode = this.element.querySelector(".Node[nodeID='"+nodeID+"']");
+        if (selectedNode == null) return;
 
-        var childs = node.parent().find(".NodeChilds").first();
+        selectedNode.setAttribute("active", "1");
 
-        if (branch_type == "opened") {
-            //close the branch
-            node.attr("branch_type", "closed");
-
-            childs.find(".Node[branch_type='opened']").each(function (index) {
-                $(this).attr("branch_type", "closed");
-            });
-            current_branch_type = "closed";
-
-        } else if (branch_type == "closed") {
-            //open the branch
-            node.attr("branch_type", "opened");
-            current_branch_type = "opened";
-
-        } else {
-            //
+        if (selectedNode.getAttribute("branch_type") !== "leaf") {
+            selectedNode.setAttribute("branch_type", "opened");
         }
 
-        $.event.trigger({
-            type: "TreeView",
-            message: "onHandleClicked",
-            time: new Date(),
-            nodeID: id,
-            source: this.source,
-            old_branch_type: branch_type,
-            current_branch_type: current_branch_type,
-        });
+        let currentNode = selectedNode;
+
+        //walk up until tree root
+        while (currentNode) {
+            //console.log("Current nodeID: " + currentNode.getAttribute("nodeID"));
+            let parent = currentNode?.closest(".NodeChilds")?.closest(".NodeOuter")?.querySelector(".Node");
+            if (parent) {
+                //console.log("Parent nodeID: " + parent.getAttribute("nodeID"));
+                parent.setAttribute("branch_type", "opened");
+            }
+            currentNode = parent;
+        }
 
     }
 
-    //reimplement nodeClicked to get notified when node is clicked
-    nodeClicked(id, event) {
-        $.event.trigger({
-            type: "TreeView",
-            message: "onNodeClicked",
-            time: new Date(),
-            nodeID: id,
-            source: this.source
-        });
+    /**
+     * node handle button click handler
+     * @param nodeID {string}
+     */
+    handleClicked(nodeID) {
+
+        const node = this.element.querySelector(".Node[nodeID='"+nodeID+"']");
+
+        const branchType = node.getAttribute("branch_type");
+
+        if (branchType === "opened") {
+            //close the branch
+            node.setAttribute("branch_type", "closed");
+
+            //close all child branches
+            const parent = node.closest(".NodeOuter");
+            parent.querySelectorAll(".Node[branch_type='opened']").forEach((node_element)=>{
+                node_element.setAttribute("branch_type", "closed");
+            });
+
+        } else if (branchType === "closed") {
+            //open the current branch
+            node.setAttribute("branch_type", "opened");
+
+        } else {
+            //lead node do nothing
+        }
+
+    }
+
+
+    /**
+     * Default delegate handler for click on .Node
+     * @param nodeID {string}
+     */
+    nodeClicked(nodeID) {
+
     }
 
 }

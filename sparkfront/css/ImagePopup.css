@@ -1,155 +1,115 @@
-A.ImagePopup {
+.ImagePopup {
     cursor:pointer;
 }
 
-.ModalPane .ImagePopup {
-    /*   border:1px dotted red; */
-    display:table;
+.ImagePopupPane {
+
+    display:flex;
+
+    flex-direction:column;
+
+    position:absolute;
+    left:0;
+    top:0;
+
     width:100%;
     height:100%;
-    vertical-align:middle;
+
+    max-height:100%;
+    max-width:100%;
+
+    overflow: hidden;
 
     background-repeat: no-repeat;
     background-position: center center;
 
-}
+    background-size: contain;
 
-.ModalPane .ImagePopup>* {
-    display:table-row;
-}
-.ModalPane .ImagePopup>*>* {
-    display:table-cell;
-}
+    background-color: rgba(0,0,0,0.9);
 
-.ModalPane .ImagePopup .Header>* {
-    vertical-align:top;
+    z-index:101;
 
 }
 
-.ModalPane .ImagePopup .Footer>* {
-    vertical-align:bottom;
+.ImagePopupPane .Header {
+    height:50px;
+    display:flex;
+    flex-direction:row;
+    justify-content: space-between;
 
+    padding:1em;
 }
 
-.ModalPane .ImagePopup .Base>* {
-    vertical-align:middle;
+.ImagePopupPane .Header .Button {
 
-}
-.ModalPane .ImagePopup .Header .Contents {
-    height:80px;
-}
-.ModalPane .ImagePopup .Footer .Contents {
-    height:80px;
-    text-align:right;
-}
+    width:50px;
+    height:50px;
 
-.ModalPane .ImagePopup .Footer .Contents .Caption {
-    display:inline-block;
-    vertical-align: middle;
-    background-color:rgba(1,1,1,0.75);
-    color:white;
-    padding: 1em;
-    border-top-left-radius: 1em;
-}
-
-.ModalPane .ImagePopup .Header .Contents .Button {
-    display: inline-block;
-
-    width:100%;
-    height:100%;
-
-    z-index: 1;
-
-    background-color: transparent;
+    /*max-width:50px;*/
+    /*max-height:50px;*/
 
     text-decoration: none;
 
     background-repeat: no-repeat;
+    background-color: transparent;
+    background-size: contain;
 
     cursor: pointer;
 
-    background-size: 50px 50px;
+}
+.ImagePopupPane .Header .Button[action="CloseImage"] {
+    background-image: url("../images/close.png");
 
-    background-position: right 20px center;
 }
 
-.ModalPane .ImagePopup .Base .Contents {
-    text-align:center;
-    position:relative;
-    vertical-align:middle;
-
-    background-repeat: no-repeat;
-    background-position: center center;
-    height:100%;
+.ImagePopupPane .Header .Button[action="ZoomImage"] {
+    background-image: url("../images/zoom.png");
 
 }
-.ModalPane.ImagePopup .Base .Contents .ImagePart {
-    display: inline-block;
-    vertical-align:middle;
+
+.ImagePopupPane .Contents {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    flex-grow:1;
 }
 
-.ModalPane .ImagePopup .Base .Contents .Button {
-    display: inline-block;
-
-    width:50%;
-    max-width:50%;
-    height:100%;
-
-    z-index: 1;
+.ImagePopupPane .Contents .Button {
 
     background-color: transparent;
+    background-size: 50px 50px;
+
+    background-repeat: no-repeat;
 
     text-decoration: none;
 
-    background-repeat: no-repeat;
     color: gray;
 
     cursor: pointer;
 
-    background-size:50px 50px;
+    width:50px;
 }
 
-.ModalPane .ImagePopup .Button[action="PrevImage"] {
+.ImagePopupPane .Contents .Button[action="PrevImage"] {
 
     background-image: url("../images/gallery_left.png");
-
-
-    left:0;
     background-position:left center;
+
 }
 
-.ModalPane .ImagePopup .Button[action="NextImage"] {
+.ImagePopupPane .Contents .Button[action="NextImage"] {
 
     background-image: url("../images/gallery_right.png");
-
-    left:50%;
     background-position:right center;
+
 }
 
-.ModalPane .ImagePopup .Button[action="CloseImage"] {
-
-    background-image: url("../images/close.png");
-
-    background-position:right 20px center !important;
-    width:50% !important;
+.ImagePopupPane .Footer  {
+    height:50px;
 }
 
-.ModalPane .ImagePopup .Button[action="ZoomImage"] {
 
-    background-image: url("../images/zoom.png");
-
-    background-position:left 20px center !important;
-    width:50% !important;
-}
-
-.ModalPane .cover-spin {
-    /*position:fixed;*/
-    /*width:100%;*/
-    /*left:0;right:0;top:0;bottom:0;*/
-    /*background-color: rgba(255,255,255,0.7);*/
-    /*z-index:9999;*/
-    /*display:block;*/
-}
 
 @-webkit-keyframes spin {
     from {-webkit-transform:rotate(0deg);}
@@ -161,17 +121,42 @@ A.ImagePopup {
     to {transform:rotate(360deg);}
 }
 
-.ModalPane .cover-spin::after {
+
+.ImagePopupPane[loading] .Button {
+    display:none;
+
+}
+.ImagePopupPane[loading] .Contents:after {
+
     content:'';
-    display:block;
+
+    /*display:block;*/
     position:absolute;
-    /*left:50%;top:50%;*/
-    width:2em;height:2em;
-    border-style:solid;
-    border-color:gray;
+
+    /*bottom: 1em;*/
+    /*left: 1em;*/
+
+    top: calc(50% - (2em / 2));
+    /*bottom: calc(50% - (2em / 2));*/
+
+    left: calc(50% - (2em / 2));
+
+    width:2em;
+    height:2em;
+
+    border-style: solid;
+    border-color: gray;
     border-top-color:transparent;
     border-width: 1em;
     border-radius: 50%;
     -webkit-animation: spin .8s linear infinite;
     animation: spin .8s linear infinite;
+}
+
+.ImagePopupPane[zoom] {
+    background-size:cover;
+}
+
+.ImagePopupPane[zoom] .Contents .Button {
+    display:none;
 }

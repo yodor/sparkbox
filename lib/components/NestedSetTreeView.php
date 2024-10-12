@@ -10,14 +10,16 @@ include_once("iterators/SQLQuery.php");
 class NestedSetTreeView extends Component implements IDataIteratorRenderer
 {
 
-    const BRANCH_OPENED = "opened";
-    const BRANCH_CLOSED = "closed";
-    const BRANCH_LEAF = "leaf";
+    const string ATTRIBUTE_BRANCH_TYPE = "branch_type";
 
-    const MODE_BRANCHES_FOLDED = 1;
-    const MODE_BRANCHES_UNFOLDED = 2;
+    const string BRANCH_OPENED = "opened";
+    const string BRANCH_CLOSED = "closed";
+    const string BRANCH_LEAF = "leaf";
 
-    protected $branch_render_mode = NestedSetTreeView::MODE_BRANCHES_FOLDED;
+    const int MODE_BRANCHES_FOLDED = 1;
+    const int MODE_BRANCHES_UNFOLDED = 2;
+
+    protected int $branch_render_mode = NestedSetTreeView::MODE_BRANCHES_FOLDED;
 
     /**
      * @var IDataIterator
@@ -207,7 +209,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             $item = $this->item;
             $item->setID($nodeID);
             $item->setData($row);
-            $item->setAttribute("branch_type", $branch_type);
+            $item->setAttribute(NestedSetTreeView::ATTRIBUTE_BRANCH_TYPE, $branch_type);
             //move selection to javascript
             //$item->setSelected($selected);
             $item->setChecked(false);

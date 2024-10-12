@@ -12,18 +12,19 @@ class LoginForm extends Component {
         try {
             this.form = this.getElement();
 
-            if (!(typeof hex_hmac_md5 === 'function')) throw "Required hashing function not defined";
-
             if (!(this.form instanceof HTMLFormElement)) {
                 throw "Component element is not a HTMLFormElement";
             }
 
+            if (!(typeof hex_hmac_md5 === 'function')) throw "Required hashing function not defined";
             if (!this.form.querySelector("INPUT[name='email']")) throw "Required field 'email' not found";
             if (!this.form.querySelector("INPUT[name='password']")) throw "Required field 'password' not found";
-            if (!this.form.querySelector("INPUT[type='hidden'][name='rand']")) throw "Required field 'rand' not found";
+
+            //do not check the rand as this class is reused from the registerform
+            // if (!this.form.querySelector("INPUT[type='hidden'][name='rand']")) throw "Required field 'rand' not found";
+
             if (!this.form.querySelector("INPUT[type='hidden'][name='pass']")) throw "Required field 'pass' not found";
 
-            const instance = this;
             this.form.addEventListener("submit", (event) => this.onSubmit(event));
 
 
@@ -34,9 +35,6 @@ class LoginForm extends Component {
     }
 
     async onSubmit(event) {
-
-        this.form.email.value = trim(this.form.email.value);
-        this.form.password.value = trim(this.form.password.value);
 
         try {
 
@@ -53,15 +51,20 @@ class LoginForm extends Component {
 
     async processPassword() {
 
-        let p = this.form.password.value;
-        let r = this.form.rand.value;
+        this.form.password.value = this.form.password.value.trim();
 
-        if (p.length < 1) throw "Input your password to continue.";
-        if (p.length < 6) throw "Minimum password of 6 symbols required.";
+        if (this.form.password.value.length < 1) throw "Input your password to continue.";
+        if (this.form.password.value.length < 6) throw "Minimum password of 6 symbols required.";
 
-        this.form.pass.value = hex_hmac_md5(hex_md5(p), r);
+        this.form.pass.value = hex_md5(this.form.password.value);
 
-        this.form.rand.value = "";
+        //login forms have rand
+        if (this.form.rand) {
+            let rand = this.form.rand.value;
+            this.form.pass.value = hex_hmac_md5(this.form.pass.value, rand);
+            this.form.rand.value = "";
+        }
+
         this.form.password.value = "";
 
     }
@@ -93,13 +96,14 @@ class LoginForm extends Component {
     }
 
     async processEmail() {
-        const u = this.form.email.value;
-        if (u.length < 1) {
+        this.form.email.value = this.form.email.value.trim();
+
+        if (this.form.email.value.length < 1) {
             throw "Input your email";
         }
         const emailFilter = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-        if (!emailFilter.test(u)) {              //test email for illegal
+        if (!emailFilter.test(this.form.email.value)) {              //test email for illegal
             throw "Please enter a valid email address.";
         }
 

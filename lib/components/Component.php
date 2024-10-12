@@ -242,6 +242,9 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         echo "<";
         echo $this->tagName;
         if ($attrs) echo " ".$attrs;
+        if (!$this->closingTagRequired) {
+            echo "/";
+        }
         echo ">";
 
         $this->renderCaption();

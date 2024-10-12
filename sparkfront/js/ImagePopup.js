@@ -1,3 +1,24 @@
+class ZoomData {
+    constructor() {
+        /**
+         * MouseDown/TouchStart - MouseUp/TouchEnd
+         */
+        this.down = false;
+        /**
+         * Current background position
+         */
+        this.position = {x:0, y:0};
+        /**
+         * Current scaled image dimensions
+         */
+        this.scaled = {width: 0, height:0};
+        /**
+         * Original image dimensions
+         */
+        this.original = {width: 0, height:0};
+    }
+
+}
 class ImagePopup extends SparkObject {
 
     static EVENT_POSITION_NEXT = "position_next";
@@ -8,77 +29,133 @@ class ImagePopup extends SparkObject {
     constructor() {
         super();
 
-        this.old_pos = -1;
         this.pos = -1;
-        this.collection = [];
+        /**
+         *
+         * @type {NodeList}
+         */
+        this.collection = null;
+
         this.relation = "";
 
-        this.modal_pane = new ModalPopup();
-        this.modal_pane.fullscreen = true;
-        this.modal_pane.paneClicked = this.onClickPane.bind(this);
+        /**
+         *
+         * @type {HTMLElement}
+         */
+        this.popup = document.templateFactory.nodeList(this.createPopupContents())[0];
+        //assign listeners to buttons of popup contents
+        if (!(this.popup instanceof HTMLElement))  {
+            showAlert("Incorrect popup contents");
+            throw new Error("Incorrect popup contents");
+        }
+
+        this.contents = this.popup.querySelector(".Contents");
+
+        this.buttonNext = this.popup.querySelector("[action='NextImage']");
+        this.buttonPrev = this.popup.querySelector("[action='PrevImage']");
+        this.buttonZoom = this.popup.querySelector("[action='ZoomImage']");
+        this.buttonClose = this.popup.querySelector("[action='CloseImage']");
+
+        this.buttonNext.addEventListener("click", (event)=>this.nextImage());
+        this.buttonPrev.addEventListener("click", (event)=>this.prevImage());
+        this.buttonZoom.addEventListener("click", (event)=>this.zoomImage());
+        this.buttonClose.addEventListener("click", (event)=>this.closeImage());
+
+        /**
+         * Zoom data
+         * @type {ZoomData}
+         */
+        this.zoom = new ZoomData();
+
+        /**
+         * Working image object
+         * @type {HTMLImageElement}
+         */
+        this.image = new Image();
+        this.image.addEventListener("load", (event)=>{
+            this.popup.style.backgroundImage = "url("+this.image.src+")";
+            this.popup.removeAttribute("loading");
+
+        });
+
+        this.popup.addEventListener("mousedown", (event)=> this.mouseDownHandler(event));
+        this.popup.addEventListener("touchstart", (event)=> this.mouseDownHandler(event));
+
+        this.popup.addEventListener("mouseup", (event) => this.mouseUpHandler(event));
+        this.popup.addEventListener("touchend", (event) => this.mouseUpHandler(event));
+
+        this.popup.addEventListener("mousemove", (event) => this.mouseMoveHandler(event));
+        this.popup.addEventListener("touchmove", (event) => this.mouseMoveHandler(event));
+
+        window.addEventListener("load", (event) => this.assignListeners(document));
+        window.addEventListener("resize", (event)=> this.setupZoom());
+
+        document.addEventListener(SparkEvent.DOM_UPDATED, (event) => this.assignListeners(event.source));
+
     }
 
-    zoomEnabled() {
-        let viewport = this.modal_pane.popup;
-        let zoom_enabled = parseInt($(viewport).attr("zoom-enabled"));
-        if (zoom_enabled==1) return true;
-        return false;
-    }
-    onClickImage(event) {
-        if (!this.zoomEnabled()) this.remove();
-    }
+    nextImage() {
 
-    onClickPane(event) {
-        if (!this.zoomEnabled()) this.remove();
-    }
-
-    nextImage(event) {
-
-        this.old_pos = this.pos;
         this.pos++;
         if (this.pos >= this.collection.length) this.pos = 0;
-        this.showImage();
+
+        this.fetchImage();
 
         const sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_NEXT, this);
         this.notify(sparkEvent);
         document.dispatchEvent(sparkEvent);
 
-        return false;
     }
 
-    prevImage(event) {
-
-        let old_position = this.pos;
+    prevImage() {
 
         this.pos--;
         if (this.pos < 0) this.pos = this.collection.length - 1;
 
-        this.showImage();
+        this.fetchImage();
 
         const sparkEvent = new SparkEvent(ImagePopup.EVENT_POSITION_PREV,this);
         this.notify(sparkEvent);
         document.dispatchEvent(sparkEvent);
 
-        return false;
+    }
+
+    /**
+     *  Return the html to be shown inside a ModalPane
+     * @returns {string}
+     */
+    createPopupContents() {
+        let html = "";
+        html += "<div class='ImagePopupPane'>";
+        html += "<div class='Header'><a class='Button' action='ZoomImage'></a><a class='Button' action='CloseImage' default_action></a></div>";
+        html += "<div class='Contents'>";
+        html += "<a class='Button' action='PrevImage'></a><a class='Button' action='NextImage'></a>";
+        html += "</div>";
+        html += "<div class='Footer'></div>";
+        html += "</div>";
+        return html;
     }
 
     /**
      * Show the ImageStorage object as popup. itemID and itemClass attributes are parsed to show the actual image
-     * @param aelm {jQuery}
+     * related images are loaded into collection
+     * @param element {HTMLElement}
      */
-    popupImage(aelm) {
+    show(element) {
 
-
-        let itemClass = aelm.attr("itemClass");
-        let itemID = aelm.attr("itemID");
+        const itemClass = element.getAttribute("itemClass");
+        const itemID = element.getAttribute("itemID");
 
         if (!itemClass || !itemID) {
-            showAlert("itemClass or itemID attribute not found");
+            showAlert("itemClass and itemID attributes required");
             return;
         }
 
-        let relation = aelm.attr("relation");
-        let list = aelm.attr("list-relation");
+        this.popup.setAttribute("loading","");
+
+        const relation = element.getAttribute("relation");
+        const list = element.getAttribute("list-relation");
+
         let collection_selector = "";
 
         if (list) {
@@ -95,291 +172,176 @@ class ImagePopup extends SparkObject {
             collection_selector  = "itemClass='" + itemClass + "'";
         }
 
-        this.collection = $("[" + collection_selector + "]").toArray();
-
-        // //remove duplicates
-        // let reduced = this.collection.reduce(function (item, e1) {
-        //     var matches = item.filter(function (e2)
-        //     { return $(e1).attr("itemid") == $(e2).attr("itemid")});
-        //     if (matches.length == 0) {
-        //         item.push(e1);
-        //     }
-        //     return item;
-        // }, []);
-
-        // this.collection = reduced;
+        this.collection = document.querySelectorAll("[" + collection_selector + "]");
 
         this.pos = 0;
 
-        for (var a=0;a<this.collection.length;a++) {
-            let item = this.collection[a];
-            if ($(item).attr("itemid") == aelm.attr("itemid")) {
+        for (let a= 0; a < this.collection.length; a++) {
+            const item = this.collection.item(a);
+
+            if (item.getAttribute("itemID") === itemID) {
                 this.pos = a;
                 break;
             }
         }
 
-        this.modal_pane.showContent($(this.createPopupContents()));
-
-        let buttonNext = this.modal_pane.popup.find("[action='NextImage']");
-        buttonNext.on("click", this.nextImage.bind(this));
-
-        let buttonPrev = this.modal_pane.popup.find("[action='PrevImage']");
-        buttonPrev.on("click", this.prevImage.bind(this));
-
-        let buttonZoom = this.modal_pane.popup.find("[action='ZoomImage']");
-        buttonZoom.on("click", this.zoomImage.bind(this));
-
-        let buttonClose = this.modal_pane.popup.find("[action='CloseImage']");
-        buttonClose.on("click", this.remove.bind(this));
-
-        $("html").css("overflow", "hidden");
-        $("body").css("overflow", "hidden");
-
-
-        this.showImage();
-
-    }
-
-    /**
-     *  Return the html to be shown inside a ModalPane
-     * @returns {string}
-     */
-    createPopupContents() {
-        let html = "";
-        html += "<div class='ImagePopup'>";
-
-        html += "<div class='Header'><div class='Contents'><a class='Button' action='ZoomImage'></a><a class='Button' action='CloseImage' default_action></a></div></div>";
-
-        html += "<div class='Base'>";
-
-        html += "<div class='Contents'>";
-
-        html += "<a class='Button' action='PrevImage'></a><a class='Button' action='NextImage'></a>";
-
-        html += "</div>";//contents
-
-        html += "</div>";//base
-
-        html += "<div class='Footer'><div class='Contents'></div></div>";
-
-        html += "</div>";//ImagePopupPanel
-
-        return this.processPopupContents(html);
-    }
-
-    /**
-     * Called after createPopupContents() to allow parsing or changing the default content
-     * @param html {string}
-     * @returns {string}
-     */
-    processPopupContents(html) {
-        return html;
-    }
-
-    remove() {
-
-        $("html").css("overflow", "");
-        $("body").css("overflow", "");
-
-        this.disableZoom();
-        this.modal_pane.close();
-
-        const sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
-        sparkEvent.relation = this.relation;
-        this.notify(sparkEvent);
-
-        document.dispatchEvent(sparkEvent);
+        document.body.appendChild(this.popup);
+        this.fetchImage();
 
     }
 
     fetchImage() {
 
+        this.popup.setAttribute("loading","");
 
-        let aelm = $(this.collection.slice(this.pos, this.pos + 1));
+        let current = this.collection[this.pos];
 
-        if (!aelm) {
-            console.log("Requested position: " + this.pos + " out of bounds for this image collection.");
+        if (!current) {
+            showAlert("Requested position: " + this.pos + " out of bounds for this image collection.");
+            this.closeImage();
             return;
         }
 
-        let itemClass = aelm.attr("itemClass");
-        let itemID = aelm.attr("itemID");
+        const itemClass = current.getAttribute("itemClass");
+        const itemID = current.getAttribute("itemID");
 
         let url = new URL(STORAGE_LOCAL, location.href);
         url.searchParams.set("cmd", "image");
         url.searchParams.set("class", itemClass);
         url.searchParams.set("id", itemID);
 
-        let caption = aelm.attr("caption");
 
-        let contents = this.modal_pane.popup.find(".Footer .Contents");
+        let caption = current.getAttribute("title");
+
+        let footer = this.popup.querySelector(".Footer");
         if (caption) {
-            contents.html("<h1 class='Caption'>" + caption + "</h1>");
-        } else {
-            contents.html("");
+            footer.innerHTML = "<h1 class='Caption'>" + caption + "</h1>";
+        }
+        else {
+            footer.innerHTML = "";
         }
 
-        let viewport = this.modal_pane.popup;
-        let loader = this.modal_pane.popup.find(".Base .Contents");
-
-        $(viewport).data("imageURL", url.href);
-
-        $(viewport).css("background-image", "url(" + url.href + ")");
-        $(viewport).css("background-size", "contain");
-
-        $(loader).removeClass("cover-spin");
+        //trigger on load
+        this.image.src = url.href;
 
         const sparkEvent = new SparkEvent(ImagePopup.EVENT_FETCH_COMPLETE, this)
         this.notify(sparkEvent);
-
         document.dispatchEvent(sparkEvent);
 
     }
 
-    disableZoom() {
-        console.log("Disable zoom");
-        let viewport = this.modal_pane.popup;
+    closeImage() {
 
-        $(viewport).css("background-position", "");
-        $(viewport).css("background-size", "contain");
-        $(viewport).attr("zoom-enabled", 0);
+        this.image.src="";
+        this.popup.style.backgroundImage = "";
+        this.popup.style.backgroundPosition = "";
 
-        this.modal_pane.popup.find(".Button[action='PrevImage']").css("display","");
-        this.modal_pane.popup.find(".Button[action='NextImage']").css("display","");
+        this.popup.removeAttribute("loading");
+        this.popup.removeAttribute("zoom");
+        this.popup.remove();
 
-        $(viewport).off("touchstart mousedown");
-        $(viewport).off("touchend mouseup");
-        $(viewport).off("touchmove mousemove");
+        const sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
+        this.notify(sparkEvent);
+        document.dispatchEvent(sparkEvent);
+
     }
 
-    zoomImage(event) {
+    mouseDownHandler(event)
+    {
+        if (!this.popup.hasAttribute("zoom")) return;
+        this.zoom.down = true;
+    }
+    mouseUpHandler(event)
+    {
+        if (!this.popup.hasAttribute("zoom")) return;
+        this.zoom.down = false;
+    }
+    mouseMoveHandler(event)
+    {
+        if (!this.popup.hasAttribute("zoom")) return;
+        if (!this.zoom.down) return false;
 
-        event.stopPropagation();
-        event.preventDefault();
-
-        let viewport = this.modal_pane.popup;
-
-        let zoom_enabled = $(viewport).attr("zoom-enabled");
-
-        if (zoom_enabled==1) {
-
-            this.disableZoom();
-
+        let mX = event.clientX;
+        if (event.clientX == null) {
+            mX = event.touches[0].clientX;
         }
-        else {
-            console.log("Enabling zoom");
-            $(viewport).css("background-size", "");
-            $(viewport).attr("zoom-enabled", 1);
+        if (mX<0)mX=0;
 
-            this.modal_pane.popup.find(".Button[action='PrevImage']").css("display","none");
-            this.modal_pane.popup.find(".Button[action='NextImage']").css("display","none");
+        if (mX>this.popup.clientWidth) {
+            mX = this.popup.clientWidth;
+        }
 
-            //center image inside the background area
-            let image = new Image();
-            image.src = $(viewport).data("imageURL");
-            //console.log("Image size ["+image.width + "," + image.height+"]");
-            //console.log("Viewport size ["+$(viewport).width() + "," + $(viewport).height()+"]");
-
-            $(viewport).data("imageWidth", image.width);
-            $(viewport).data("imageHeight", image.height);
-
-
-            let bX = ($(viewport).width() / 2.0) - (image.width / 2.0);
-            let bY = ($(viewport).height() / 2.0) - (image.height / 2.0);
-            $(viewport).data("bX", bX);
-            $(viewport).data("bY", bY);
-
-            $(viewport).css("background-position", bX+"px "+ bY + "px");
-
-            $(viewport).on("touchstart mousedown", function(event){
-                //event.stopPropagation();
-                //event.preventDefault();
-
-                $(viewport).data("down", 1);
-                //console.log("Touch start");
-            }.bind(viewport));
-
-            $(viewport).on("touchend mouseup", function(event){
-                //event.stopPropagation();
-                //event.preventDefault();
-
-                $(viewport).data("down", 0);
-                //console.log("Touch end");
-            }.bind(viewport));
-
-            $(viewport).on("touchmove mousemove", function(event){
-
-                event.stopPropagation();
-                event.preventDefault();
-
-                if ($(viewport).data("down") != 1) return false;
-
-                var mX = event.clientX;
-                if (event.clientX == null) {
-                    mX = event.touches[0].clientX;
-                }
-                if (mX<0)mX=0;
-
-                if (mX>$(viewport).width()) {
-                    mX = $(viewport).width();
-                }
-
-                var mY = event.clientY;
-                if (event.clientY == null) {
-                    mY = event.touches[0].clientY;
-                }
-                if (mY<0)mY=0;
-                if (mY>$(viewport).height()) {
-                    mY = $(viewport).height();
-                }
-
-                //console.log("mX="+mX+" mY="+mY);
-
-                let bX = $(viewport).data("bX");
-                let bY = $(viewport).data("bY");
-
-                if ($(viewport).data("imageWidth")> $(viewport).width()) {
-                    let dX = ($(viewport).data("imageWidth") - $(viewport).width()) / $(viewport).width();
-                    bX = dX * mX * -1;
-                }
-
-                if ($(viewport).data("imageHeight")> $(viewport).height()) {
-                    let dY = ($(viewport).data("imageHeight") - $(viewport).height()) / $(viewport).height();
-                    bY = dY * mY * -1;
-                }
-
-                $(viewport).css("background-position", bX+"px "+ bY + "px");
-                return true;
-
-            }.bind(viewport));
-
-
+        let mY = event.clientY;
+        if (event.clientY == null) {
+            mY = event.touches[0].clientY;
+        }
+        if (mY<0)mY=0;
+        if (mY>this.popup.clientHeight) {
+            mY = this.popup.clientHeight;
         }
 
 
+        if (this.zoom.scaled.width > this.popup.clientWidth) {
+            let dX = (this.zoom.scaled.width - this.popup.clientWidth) / this.popup.clientWidth;
+            this.zoom.position.x = (dX * mX * -1);
+        }
+
+        if (this.zoom.scaled.height > this.popup.clientHeight) {
+            let dY = (this.zoom.scaled.height - this.popup.clientHeight) / this.popup.clientHeight;
+            this.zoom.position.y = (dY * mY * -1);
+        }
+
+        this.popup.style.backgroundPositionX = this.zoom.position.x + "px";
+        this.popup.style.backgroundPositionY = this.zoom.position.y + "px";
+
     }
-    showImage() {
+    zoomImage() {
 
-        let loader = this.modal_pane.popup.find(".Base .Contents");
-        $(loader).addClass("cover-spin");
+        if (this.popup.hasAttribute("zoom")) {
+            this.popup.removeAttribute("zoom");
 
-        setTimeout(function (event) {
-            this.fetchImage();
-        }.bind(this), 100);
+            this.popup.style.backgroundPosition = "center center";
 
+            return;
+        }
+
+        this.popup.setAttribute("zoom", "");
+        this.setupZoom();
+
+    }
+
+    setupZoom()
+    {
+        if (!this.popup.hasAttribute("zoom"))return;
+
+        //console.log(`Viewport [${this.popup.clientWidth}x${this.popup.clientHeight}]`);
+        //console.log(`Image [${this.image.width}x${this.image.height}]`);
+
+        const ratio = Math.max(this.popup.clientWidth / this.image.width, this.popup.clientHeight / this.image.height);
+        const scaledWidth = Math.round(this.image.width * ratio);
+        const scaledHeight = Math.round(this.image.height * ratio);
+
+        //console.log(`Scaled [${scaledWidth}x${scaledHeight}]`);
+
+        this.zoom.position.x = -(scaledWidth - this.popup.clientWidth)/2;
+        this.zoom.position.y = -(scaledHeight - this.popup.clientHeight)/2;
+
+        this.zoom.scaled.width = scaledWidth;
+        this.zoom.scaled.height = scaledHeight;
+        this.zoom.scaled.ratio = ratio;
+
+        this.popup.style.backgroundPositionX = this.zoom.position.x + "px";
+        this.popup.style.backgroundPositionY = this.zoom.position.y + "px";
+    }
+
+    assignListeners(parentNode) {
+
+        parentNode.querySelectorAll(".ImagePopup:not([href])").forEach( (element) => {
+
+            element.addEventListener("click", (event)=>document.imagePopup.show(element,event));
+
+        });
     }
 }
 
-onPageLoad(function () {
-
-    const image_popup = new ImagePopup();
-
-    $("A.ImagePopup:not([href])").on("click", function () {
-        image_popup.popupImage($(this));
-        return false;
-    });
-
-    $("A.ImagePopup:not([href])").data("ImagePopup", image_popup);
-
-});
+document.imagePopup = new ImagePopup();

@@ -4,8 +4,20 @@ class ArrayField extends Component {
     constructor() {
         super();
         this.setClass(".ArrayField");
+        /**
+         *
+         * @type {Element}
+         */
         this.array_controls = null;
+        /**
+         *
+         * @type {Element}
+         */
         this.array_contents = null;
+        /**
+         *
+         * @type {Element}
+         */
         this.element_source = null;
 
     }
@@ -17,87 +29,54 @@ class ArrayField extends Component {
 
         let instance = this;
 
-        this.array_controls = $(this.selector() + " .ArrayControls");
-        this.array_controls.find("[action='Add']").first().on("click", this.insertItem.bind(this));
+        this.array_controls = this.element.querySelector(".ArrayControls");
+        this.array_controls.querySelector("[action='Add']").addEventListener("click", (event)=>this.insertItem(event));
 
-        this.array_contents = $(this.selector() + " .ArrayContents");
-        this.array_contents.find("[action='Remove']").each(function (index) {
 
-            $(this).removeAttr("href");
-            $(this).on("click", function(event){
-                instance.removeItem(this);
-            });
-
+        this.array_contents = this.element.querySelector(".ArrayContents");
+        this.array_contents.querySelectorAll("[action='Remove']").forEach((element)=>{
+            element.addEventListener("click", (event)=>this.removeItem(element));
         });
 
-        this.element_source = $(this.selector() + " .ElementSource");
+        this.element_source = this.element.querySelector(".ElementSource");
     }
 
-    insertItem() {
+    insertItem(event) {
 
-        let element_count = this.array_contents.children().length;
+        const element_count = this.array_contents.children.length;
 
-        let element = this.element_source.clone(true,true);
+        let element_source = this.element_source.cloneNode(true);
+        element_source.className = "Element";
+        element_source.setAttribute("field", this.field);
+        element_source.setAttribute("pos", element_count);
 
-        element.find("[field='render_source']").attr("field", this.field);
-
-        let field_name = this.field;
-
-        element.find("[name]").each(function (col) {
-
-            let name = $(this).attr("name");
-            name = name.replace("render_source", field_name + "[" + element_count + "]");
-            $(this).attr("name", name);
-
+        element_source.querySelectorAll("[name]").forEach((element)=>{
+            const element_name = this.field + "[" + element_count + "]";
+            element.setAttribute("name", element_name);
         });
 
-        element.attr("class", "Element");
+        const remove_button = element_source.querySelector("[action='Remove']");
+        remove_button.addEventListener("click", (event)=>this.removeItem(remove_button));
 
-        element.attr("pos", element_count);
+        this.array_contents.append(element_source);
 
-        this.array_contents.append(element);
-
-        let instance = this;
-
-        this.array_contents.find("[action='Remove']").each(function (index) {
-            $(this).removeAttr("href");
-            $(this).on("click", function(event){
-                instance.removeItem(this);
-            });
-        });
-
+        const ev = new SparkEvent(SparkEvent.DOM_UPDATED);
+        ev.source = this.array_contents;
+        document.dispatchEvent(ev);
     }
 
     /**
      *
-     * @param btn Corresponding element 'Remove' button
+     * @param element {HTMLElement} Remove button of the element being removed from ArrayContents
      */
-    removeItem(btn) {
+    removeItem(remove_button) {
 
+        const element = remove_button.closest(".Element");
 
-
-        let position = $(btn).parents(".Element").first().attr("pos");
-
+        let position = element.getAttribute("pos");
         console.log("Removing element at position: " + position);
 
-        this.array_contents.find(".Element[pos='" + position + "']").remove();
-
-        let field_name = this.field;
-
-        //reposition elements
-        this.array_contents.children(".Element").each(function (pos) {
-
-            $(this).attr("pos", pos);
-
-            $(this).find("[name]").each(function (index) {
-
-                let append_name = ($(this).attr("name").endsWith("[]")) ? "[]" : "";
-
-                $(this).attr("name", field_name + "[" + pos + "]" + append_name);
-
-            });
-        });
-
+        element.remove();
 
     }
 

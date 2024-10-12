@@ -204,9 +204,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->addCSS(SPARK_LOCAL . "/css/ImagePopup.css");
         $this->head()->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/utils.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/jquery-3.7.1.min.js");
-
         $this->head()->addJS(SPARK_LOCAL . "/js/js.cookie.min.js");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/SparkObject.js");
@@ -225,10 +223,9 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->addJS(SPARK_LOCAL . "/js/Tooltip.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/ImagePopup.js");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/SparkPage.js");
-
         $this->actions = new ActionCollection();
 
+        //default template for showAlert
         $dialog = new MessageDialog();
 
     }
