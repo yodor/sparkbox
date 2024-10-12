@@ -232,23 +232,6 @@ class ImagePopup extends SparkObject {
 
     }
 
-    closeImage() {
-
-        this.image.src="";
-        this.popup.style.backgroundImage = "";
-        this.popup.style.backgroundPosition = "";
-
-        this.popup.removeAttribute("loading");
-        this.popup.removeAttribute("zoom");
-        this.popup.remove();
-
-        document.body.style.overflow = "initial";
-
-        const sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
-        this.notify(sparkEvent);
-        document.dispatchEvent(sparkEvent);
-
-    }
 
     mouseDownHandler(event)
     {
@@ -299,6 +282,26 @@ class ImagePopup extends SparkObject {
         this.popup.style.backgroundPositionY = this.zoom.position.y + "px";
 
     }
+
+
+    closeImage() {
+
+        this.image.src="";
+        this.popup.style.backgroundImage = "";
+        this.popup.style.backgroundPosition = "";
+
+        this.popup.removeAttribute("loading");
+        this.popup.removeAttribute("zoom");
+        this.popup.remove();
+
+        document.body.style.overflow = "auto";
+
+        const sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
+        this.notify(sparkEvent);
+        document.dispatchEvent(sparkEvent);
+
+    }
+
     zoomImage() {
 
 
@@ -307,8 +310,6 @@ class ImagePopup extends SparkObject {
             this.popup.removeAttribute("zoom");
 
             this.popup.style.backgroundPosition = "center center";
-
-
 
             return;
         }
