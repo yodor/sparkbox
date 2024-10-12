@@ -30,6 +30,9 @@
     z-index:101;
 
 }
+.ImagePopupPane .Button {
+    filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.95));
+}
 
 .ImagePopupPane .Header {
     height:50px;
@@ -55,6 +58,9 @@
     background-size: contain;
 
     cursor: pointer;
+
+    /*box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.8);*/
+
 
 }
 .ImagePopupPane .Header .Button[action="CloseImage"] {

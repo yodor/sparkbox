@@ -117,11 +117,8 @@
 .InputField.SessionUpload .ArrayContents .Element {
 
     position: relative;
-    margin-left:1em;
-    margin-top:1em;
-}
-.InputField.SessionUpload .ArrayContents .Element:first-of-type {
-    margin-left:auto;
+    margin-left: 1em;
+    margin-top: 1em;
 }
 
 .InputField.SessionUpload .ArrayContents .Element .thumbnail {
