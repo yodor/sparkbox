@@ -1,13 +1,4 @@
-class SwipeEvent extends SparkEvent {
-    constructor(message, source) {
-        super();
-        this.type = "SwipeAction";
-        this.message = message;
-        this.time = new Date();
-        this.source = source;
-    }
 
-}
 class SwipeListener extends SparkObject {
     /**
      *
@@ -25,7 +16,8 @@ class SwipeListener extends SparkObject {
     }
 
     emitEvent(action, evt) {
-        this.elm.dispatchEvent(new SwipeEvent(action, evt));
+        //emit "SwipeListener" message=>action
+        this.elm.dispatchEvent(new SparkEvent(action, this));
         this.onAction(action, evt);
     }
 
@@ -71,15 +63,15 @@ class SwipeListener extends SparkObject {
 
         if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
             if ( xDiff > 0 ) {
-                this.emitEvent("right",evt);
+                this.emitEvent("right", evt);
             } else {
-                this.emitEvent("left",evt);
+                this.emitEvent("left", evt);
             }
         } else {
             if ( yDiff > 0 ) {
-                this.emitEvent("down",evt);
+                this.emitEvent("down", evt);
             } else {
-                this.emitEvent("up",evt);
+                this.emitEvent("up", evt);
             }
         }
 

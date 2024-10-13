@@ -37,18 +37,20 @@ class GalleryTape extends Component {
         try {
 
             const listener = new SwipeListener(this.element);
-            this.element.addEventListener("SwipeAction", (event)=> {
+            this.element.addEventListener("SwipeListener", (event)=> {
+
                 if (event.message == "right") {
                     this.nextImage();
                 }
                 else if (event.message == "left") {
                     this.prevImage();
                 }
+
             });
 
         }
         catch(e) {
-            console.log("Class SwipeListener is not defined: " + e);
+            console.log(e);
         }
 
 

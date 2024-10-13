@@ -6,7 +6,7 @@ class SparkEvent extends Event {
      * @param message {string}
      * @param source {object}
      */
-    constructor(message, source= null) {
+    constructor(message, source = null) {
         if (source) {
             super(source.constructor.name);
         }
