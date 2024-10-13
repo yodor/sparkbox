@@ -200,11 +200,9 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         $this->head()->addMeta("viewport", "width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes");
 
-        $this->head()->addCSS(SPARK_LOCAL . "/css/ModalPane.css");
-        $this->head()->addCSS(SPARK_LOCAL . "/css/ImagePopup.css");
         $this->head()->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/jquery-3.7.1.min.js");
+//        $this->head()->addJS(SPARK_LOCAL . "/js/jquery-3.7.1.min.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/js.cookie.min.js");
 
         $this->head()->addJS(SPARK_LOCAL . "/js/SparkObject.js");
@@ -219,9 +217,9 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
         $this->head()->addJS(SPARK_LOCAL . "/js/JSONComponent.js");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/ModalPopup.js");
+
         $this->head()->addJS(SPARK_LOCAL . "/js/Tooltip.js");
-        $this->head()->addJS(SPARK_LOCAL . "/js/ImagePopup.js");
+;
 
         $this->actions = new ActionCollection();
 

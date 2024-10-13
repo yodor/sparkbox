@@ -16,39 +16,39 @@ class GalleryTape extends Component {
 
         this.slots = this.element.querySelector(".slots");
 
-        const instance = this;
+
         document.addEventListener("ImagePopup", (event)=>{
 
             if (event.source.relation != this.name) return;
 
             switch (event.message) {
                 case ImagePopup.EVENT_POSITION_PREV:
-                    instance.prevImage();
+                    this.prevImage();
                     break;
                 case ImagePopup.EVENT_POSITION_NEXT:
-                    instance.nextImage();
+                    this.nextImage();
                     break;
 
             }
         });
 
-        let elm = $(this.selector());
 
-        const className = 'SwipeListener';
-        if (Reflect.has(window, className)) {
-            const listener = new SwipeListener(elm);
-            elm.on("SwipeAction", function(e) {
 
-                if (e.message == "right") {
+        try {
+
+            const listener = new SwipeListener(this.element);
+            this.element.addEventListener("SwipeAction", (event)=> {
+                if (event.message == "right") {
                     this.nextImage();
                 }
-                else if (e.message == "left") {
+                else if (event.message == "left") {
                     this.prevImage();
                 }
+            });
 
-            }.bind(this));
-        } else {
-            //console.log(`Class ${className} is not defined`);
+        }
+        catch(e) {
+            console.log("Class SwipeListener is not defined: " + e);
         }
 
 

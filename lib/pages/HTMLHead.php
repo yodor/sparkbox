@@ -258,7 +258,7 @@ JS;
     public function addScript(Script $object) : void
     {
 
-        $src = $object->getAttribute("src");
+        $src = $object->getSrc();
         if ($src) {
             $this->scripts[$src] = $object;
         }

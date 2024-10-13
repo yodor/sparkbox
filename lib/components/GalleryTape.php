@@ -115,8 +115,8 @@ class GalleryTape extends Component implements IDataIteratorRenderer
     public function requiredScript(): array
     {
         $ret = parent::requiredScript();
-        $ret[] = SPARK_LOCAL . "/js/GalleryTape.js";
         $ret[] = SPARK_LOCAL . "/js/SwipeListener.js";
+        $ret[] = SPARK_LOCAL . "/js/GalleryTape.js";
         return $ret;
     }
 

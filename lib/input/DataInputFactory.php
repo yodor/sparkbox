@@ -14,8 +14,6 @@ include_once("input/renderers/TimeField.php");
 include_once("input/renderers/PhoneField.php");
 include_once("input/renderers/MCETextArea.php");
 include_once("input/renderers/NestedSelectField.php");
-include_once("input/renderers/ImageField.php");
-include_once("input/renderers/FileField.php");
 include_once("input/renderers/SliderField.php");
 include_once("input/renderers/SessionImage.php");
 include_once("input/renderers/SessionFile.php");
@@ -56,8 +54,6 @@ class DataInputFactory
     const DATE = 10;
     const TIME = 11;
     const HIDDEN = 12;
-    const FILE = 13;
-    const IMAGE = 14;
 
     const EMAIL = 15;
     const NESTED_SELECT = 16;
@@ -159,19 +155,6 @@ class DataInputFactory
                 $input->setValidator(new PhoneValidator());
                 break;
 
-            case DataInputFactory::FILE:
-                new FileField($input);
-                new UploadDataInput($input);
-                $input->setValidator(new FileUploadValidator());
-
-                break;
-
-            case DataInputFactory::IMAGE:
-                new ImageField($input);
-                new UploadDataInput($input);
-                $input->setValidator(new ImageUploadValidator());
-
-                break;
 
             case DataInputFactory::NESTED_SELECT:
                 new NestedSelectField($input);

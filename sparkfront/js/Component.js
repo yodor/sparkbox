@@ -14,9 +14,17 @@ class Component extends SparkObject
         this.field = "";
         this.id = "";
 
+        /**
+         *
+         * @type {HTMLElement}
+         */
         this.element = null;
     }
 
+    /**
+     *
+     * @param name {string}
+     */
     setName(name) {
         this.name = name;
 
@@ -26,6 +34,10 @@ class Component extends SparkObject
         return this.name;
     }
 
+    /**
+     *
+     * @param field {string}
+     */
     setField(field) {
         this.field = field;
 
@@ -79,17 +91,9 @@ class Component extends SparkObject
     }
 
     /**
-     * Return jquery selector for this component
-     * @returns {JQuery<HTMLElement>}
-     */
-    component() {
-        return $(this.selector());
-    }
-
-    /**
      * Query the document and return the dom Element of this component -
      * Using this.selector()
-     * @returns {Element}
+     * @returns {HTMLElement}
      */
     getElement() {
         return this.element;

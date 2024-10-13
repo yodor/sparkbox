@@ -1,7 +1,7 @@
 class SwipeListener extends SparkObject {
     /**
      *
-     * @param elm JQuery selector
+     * @param elm {HTMLElement}
      */
     constructor(elm) {
         super();
@@ -14,8 +14,9 @@ class SwipeListener extends SparkObject {
             source: undefined,
         }
         this.elm = elm;
-        elm.on('touchstart', this.handleTouchStart.bind(this));
-        elm.on('touchmove', this.handleTouchMove.bind(this));
+        elm.addEventListener("touchstart", (event)=>this.handleTouchStart(event));
+        elm.addEventListener("touchmove", (event)=>this.handleTouchMove(event));
+
     }
 
     emitEvent(action,evt) {
@@ -24,7 +25,7 @@ class SwipeListener extends SparkObject {
         this.SwipeEvent.time = new Date();
         this.SwipeEvent.source = evt;
 
-        this.elm.trigger(this.SwipeEvent);
+        this.elm.dispatchEvent(this.SwipeEvent);
         this.onAction(action, evt);
     }
 
@@ -32,11 +33,20 @@ class SwipeListener extends SparkObject {
 
     }
 
+    /**
+     *
+     * @param evt {TouchEvent}
+     * @returns {TouchList|Touch[]|TouchList}
+     */
     getTouches(evt) {
         // browser API || jQuery API
         return evt.touches || evt.originalEvent.touches;
     }
 
+    /**
+     *
+     * @param evt {TouchEvent}
+     */
     handleTouchStart(evt) {
 
         let firstTouch = this.getTouches(evt)[0];
@@ -44,6 +54,10 @@ class SwipeListener extends SparkObject {
         this.yDown = firstTouch.clientY;
     }
 
+    /**
+     *
+     * @param evt {TouchEvent}
+     */
     handleTouchMove(evt) {
         if ( ! this.xDown || ! this.yDown ) {
             return;

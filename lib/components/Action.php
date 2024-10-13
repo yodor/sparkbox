@@ -32,10 +32,10 @@ class Action extends DataIteratorItem
      */
     public function __construct(string $action = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
     {
-        parent::__construct(false);
+        parent::__construct();
         $this->setComponentClass("Action");
 
-        $this->tagName = "A";
+        $this->setTagName("A");
 
         $this->url = new URL($href);
 

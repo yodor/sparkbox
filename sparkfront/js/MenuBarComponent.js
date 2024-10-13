@@ -22,7 +22,7 @@ class MenuBarComponent extends Component {
         this.toggle = null;
     }
 
-    toggleMenu(event) {
+    toggleMenu() {
 
         const classNames = this.menuBar.classList;
         if (classNames.contains("normal")) {
@@ -32,6 +32,23 @@ class MenuBarComponent extends Component {
             classNames.add("normal");
         }
 
+    }
+
+    /**
+     *
+     * @param item {HTMLElement}
+     * @param event {Event}
+     */
+    menuAction(item, event)
+    {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const href = item.querySelector("[href]")?.getAttribute("href");
+        //console.log(link);
+        if (href) {
+            window.location.href = href;
+        }
     }
 
     initialize() {
@@ -44,275 +61,142 @@ class MenuBarComponent extends Component {
             return;
         }
 
-        const instance = this;
-
         this.menuBar = this.element.closest(".MenuBar");
         this.toggle = this.menuBar.querySelector(".toggle");
 
-        this.toggle.addEventListener("click", (event)=>this.toggleMenu(event));
+        this.toggle.addEventListener("click", ()=>this.toggleMenu());
 
-        //assign each menubar item with events
-        $(this.selector()).first().children(".MenuBarItemRenderer").each(function (index) {
+        this.element.querySelectorAll(".MenuBarItemRenderer").forEach((barItem)=>{
+            barItem.addEventListener("mouseenter", ()=>this.menuEnter(barItem));
 
-            var barItem = $(this);
-            var handle = barItem.find(".handle").first();
+            barItem.addEventListener("mouseleave", ()=>this.menuLeave(barItem));
 
-
-            if (isMob()) {
-                if (barItem.attr("have_submenu")) {
-
-                    handle.attr("data-line", "▼");
-
-                    handle.on("click touch", function (event) {
-
-                        if (barItem.hasClass("Hover")) {
-                            instance.menuLeave(barItem);
-                        } else {
-                            instance.menuEnter(barItem);
-                        }
-
-                    });//handle on click
-                }
-            } else {
-
-                if (barItem.attr("have_submenu")) {
-
-                    handle.attr("data-line", "▼");
-
-                }
-
-                barItem.on("mouseenter", function (event) {
-                    instance.menuEnter(this);
-                });
-
-                barItem.on("mouseleave", function (event) {
-                    instance.menuLeave(this);
-                });
-
-                barItem.on("click", function (event) {
-                    var link_addr = barItem.children(".MenuItemOuter").first().children(".MenuItemLink").first();
-                    window.location.href = link_addr.attr("href");
-                });
-
-            }
-
+            barItem.addEventListener("click", (event)=>this.menuAction(barItem, event));
         });
 
-
-        $(this.selector()).first().find(".SubmenuItemRenderer").each(function (index) {
-
-            var subItem = $(this);
-            //only submenuitems containing submenus have data-line attribute defined
-            var handle = subItem.find(".SubmenuItemOuter .handle[data-line]").first();
-
-            handle.attr("data-line", "▼");
-
-            //mouseenter is fired on click and touch too
-
-            if (isMob()) {
-                handle.on("click touch", function (event) {
-
-                    console.log($(subItem).hasClass("Hover"));
-
-                    if (subItem.hasClass("Hover")) {
-
-                        console.log("Handle Clicked of Opened Submenu");
-                        //this would hide all other submenus and this
-                        instance.submenuLeave(subItem, event);
-
-                    } else {
-
-                        console.log("Handle Clicked of Closed Submenu");
-                        //this would hide all other menus but this
-                        instance.submenuEnter(subItem, event);
-
-                    }
-
-                });
-
-            } else {
-                subItem.on("mouseenter", function (event) {
-
-                    instance.submenuEnter(this, event);
-                    return false;
-                });
-            }
-
-
+        this.element.querySelectorAll(".SubmenuItemRenderer").forEach((subItem)=>{
+            subItem.addEventListener("mouseenter", ()=>this.submenuEnter(subItem));
+            subItem.addEventListener("click", (event)=>this.menuAction(subItem, event));
         });
 
 
     }
 
     leaveAll() {
-        let instance = this;
 
-        $(this.selector()).find(".MenuBarItemRenderer").each(function (index) {
-            var mitem = $(this);
-            instance.menuLeave(mitem);
+        this.element.querySelectorAll(".MenuBarItemRenderer").forEach((barItem)=>{
+            barItem.menuLeave(barItem);
         });
 
-
     }
 
-    setItemSelected(elm, mode) {
+    /**
+     * Add/Remove css class Hover to elm
+     * @param elm {HTMLElement}
+     * @param mode {boolean}
+     */
+    setItemSelected(item, mode) {
 
-        if (!elm) return;
-
-        var instance = this;
-
-        $(elm).removeClass("Hover");
-        var opened = "▲";
-        var closed = "▼";
-        var data_line = closed;
+        if (!item) return;
 
         if (mode) {
-
-            $(elm).addClass("Hover");
-            data_line = opened;
+            item.classList.add("Hover");
         }
-
-
-        if ($(elm).hasClass("MenuBarItemRenderer")) {
-            //search children only (first level)
-            var handle = $(elm).find(".handle").first();
-            handle.attr("data-line", data_line);
-
-
-        } else if ($(elm).hasClass("SubmenuItemRenderer")) {
-
-            var handle = $(elm).children(".SubmenuItemOuter").first().children(".handle").first();
-            handle.attr("data-line", data_line);
-            //close all submenu items contained in this submenuitem
-            if (!mode) {
-                $(elm).find(".SubmenuItemRenderer.Hover").each(function (index) {
-                    instance.setItemSelected(this, false);
-                });
-            }
-
-
+        else {
+            item.classList.remove("Hover");
         }
-
     }
 
-    menuEnter(mitem) {
-//     var source = $(mitem).parents("[source]").last().attr("source");
-//
-        this.setItemSelected(mitem, true);
+    /**
+     * Set selected and open submenu if any
+     * @param barItem {HTMLElement} MenuBarItemRenderer
+     */
+    menuEnter(barItem) {
 
-        var have_submenu = $(mitem).attr("have_submenu");
+        this.setItemSelected(barItem, true);
 
-        if (have_submenu) {
+        if (barItem.getAttribute("have_submenu")) {
 
-            var pos = $(mitem).offset();
-            var y = pos.top + $(mitem).outerHeight(true);
-
-            this.submenuShow(mitem, pos.left, y);
+            const rect = barItem.getBoundingClientRect()
+            this.submenuShow(barItem, 0, rect.height);
 
         }
 
 
     }
 
+    /**
+     *
+     * @param mitem {HTMLElement}
+     */
     menuLeave(mitem) {
 
         this.setItemSelected(mitem, false);
 
-        var instance = this;
-
-        $(mitem).find(".SubmenuRenderer").each(
-            function (index) {
-                $(this).removeClass("normal");
-                $(this).find(".SubmenuItemRenderer.Hover").each(
-                    function (index1) {
-
-                        instance.submenuLeave(this, event);
-
-
-                    }
-                );
-            }//index
-        );//each
-
-        $(mitem).find(".handle").first().data("opened", false);
-    }
-
-
-    submenuEnter(smitem, event) {
-
-        var pos = $(smitem).offset();
-        var h = $(smitem).outerHeight(true);
-        var v = $(smitem).outerWidth(true);
-
-        var instance = this;
-
-        instance.submenuLeave(smitem, event);
-
-        instance.submenuShow(smitem, (pos.left + v), pos.top);
-
-        instance.setItemSelected(smitem, true);
-
-
-    }
-
-    submenuLeave(smitem, event) {
-
-        var instance = this;
-
-        //leaveAll including current
-        $(smitem).parent(".SubmenuRenderer").find(".SubmenuItemRenderer").each(
-            function (index) {
-
-                instance.setItemSelected(this, false);
-
-                $(this).find(".SubmenuRenderer").each(
-                    function (index1) {
-                        $(this).removeClass("normal");
-                    }
-                );
-            }
-        );
-
-        instance.setItemSelected(smitem, false);
-
+        mitem.querySelectorAll(".SubmenuRenderer").forEach((item)=> {
+            item.classList.remove("normal");
+            item.querySelectorAll(".SubmenuItemRenderer.Hover").forEach((item1)=>{
+                this.submenuLeave(item1);
+            });
+        });
 
     }
 
 
+    submenuEnter(smitem) {
+
+        const pos = smitem.getBoundingClientRect()
+        const parentPos = smitem.offsetParent.getBoundingClientRect();
+
+        this.submenuLeave(smitem);
+        this.submenuShow(smitem, pos.width, pos.bottom - parentPos.y - pos.height);
+        this.setItemSelected(smitem, true);
+
+    }
+
+    /**
+     * Set submenu visible(add class normal) and position at specified position [left, top]
+     * @param mitem {HTMLElement} SubmenuItemRenderer | MenuBarItemRenderer
+     * @param left
+     * @param top
+     */
     submenuShow(mitem, left, top) {
 
+        //console.log(`Position: Left: ${left} Top: ${top}`);
 
-//     console.log("Parent: " + mitem + " | left: " + left + " | top: " + top);
+        const subMenu = mitem.querySelector(".SubmenuRenderer");
 
-        var layout_direction = $(mitem).attr("submenu_direction");
-
-        var submenu = $(mitem).children(".SubmenuRenderer").first();
-
-//     submenu.css("min-width", menu_item.outerWidth(true));
-
-        var margin_top = parseInt(submenu.css("margin-top"));
-        if (!isNaN(margin_top) && margin_top > 0) {
-            top += margin_top;
+        if (subMenu) {
+            //make it visible
+            subMenu.classList.add("normal");
+            subMenu.style.left = left + "px";
+            subMenu.style.top = top + "px";
         }
 
-        //make it visible
-        submenu.addClass("normal");
+    }
+
+    /**
+     *
+     * @param smitem {HTMLElement} .SubmenuItemRenderer
+     */
+    submenuLeave(smitem) {
 
 
-        if (layout_direction == "right") {
+        //leaveAll including current
+        smitem.closest(".SubmenuRenderer").querySelectorAll(".SubmenuItemRenderer").forEach((item)=>{
+                this.setItemSelected(item, false);
 
-// 	  left+=menu_item.outerWidth();
-            left -= submenu.outerWidth();
-            left += parseInt($(mitem).css("padding-left"));
-            left += parseInt($(mitem).css("width"));
-        } else {
-//         console.log("To bottom. Left: " + left + " | Top: " + top);
+                item.querySelectorAll(".SubmenuRenderer").forEach((item1)=>{
+                    item1.classList.remove("normal");
+                })
+        });
 
-        }
-
-        submenu.offset({top: top, left: left});
+        this.setItemSelected(smitem, false);
 
 
     }
+
+
+
 
 }

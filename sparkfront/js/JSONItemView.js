@@ -1,12 +1,12 @@
 function loadMoreResults(button_source)
 {
-    let itemView = $(button_source).parents(".JSONItemView").first();
-    let viewPort = itemView.children(".viewport").first();
+    let itemView = button_source.closest(".JSONItemView");
+    let viewPort = itemView.querySelector(".viewport");
 
     //currentPage = index
     //pagesTotal = count
-    let currentPage = parseInt(itemView.attr("page")) ;
-    let pagesTotal = parseInt(itemView.attr("pagesTotal"));
+    let currentPage = parseInt(itemView.getAttribute("page")) ;
+    let pagesTotal = parseInt(itemView.getAttribute("pagesTotal"));
 
     if (isNaN(currentPage)) currentPage = 0;
 
@@ -16,25 +16,27 @@ function loadMoreResults(button_source)
         let request = new JSONRequest();
         request.setResponder("ItemViewResponder");
         request.setFunction("renderItems");
-        request.setParameter("page", currentPage);
+        request.setParameter("page", "" + currentPage);
 
         request.onSuccess = function (result) {
 
-            viewPort.append(result.response.html);
-            itemView.attr("page", currentPage);
-            $(button_source).removeAttr("working", "");
+            document.templateFactory.appendContent(viewPort, result.response.html);
+
+            itemView.setAttribute("page", currentPage);
+
+            button_source.removeAttribute("working");
 
             let url = new URL(document.location.href);
             url.searchParams.set("page", currentPage);
             window.history.pushState({}, "", url.href);
 
         };
-        $(button_source).attr("working", "");
+        button_source.setAttribute("working", "");
 
         request.start();
     }
-    if (currentPage == pagesTotal-1) {
-        $(button_source).remove();
+    if (currentPage === (pagesTotal-1)) {
+        button_source.remove();
     }
 
 
