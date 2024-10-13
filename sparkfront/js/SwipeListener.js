@@ -1,3 +1,13 @@
+class SwipeEvent extends SparkEvent {
+    constructor(message, source) {
+        super();
+        this.type = "SwipeAction";
+        this.message = message;
+        this.time = new Date();
+        this.source = source;
+    }
+
+}
 class SwipeListener extends SparkObject {
     /**
      *
@@ -7,25 +17,15 @@ class SwipeListener extends SparkObject {
         super();
         this.xDown = null;
         this.yDown = null;
-        this.SwipeEvent = {
-            type: "SwipeAction",
-            message: undefined,
-            time: undefined,
-            source: undefined,
-        }
+
         this.elm = elm;
         elm.addEventListener("touchstart", (event)=>this.handleTouchStart(event));
         elm.addEventListener("touchmove", (event)=>this.handleTouchMove(event));
 
     }
 
-    emitEvent(action,evt) {
-
-        this.SwipeEvent.message = action;
-        this.SwipeEvent.time = new Date();
-        this.SwipeEvent.source = evt;
-
-        this.elm.dispatchEvent(this.SwipeEvent);
+    emitEvent(action, evt) {
+        this.elm.dispatchEvent(new SwipeEvent(action, evt));
         this.onAction(action, evt);
     }
 
