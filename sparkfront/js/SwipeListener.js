@@ -1,5 +1,9 @@
 
 class SwipeListener extends SparkObject {
+    static LEFT = "left";
+    static RIGHT = "right";
+    static UP = "up";
+    static DOWN = "down";
     /**
      *
      * @param elm {HTMLElement}
@@ -15,13 +19,11 @@ class SwipeListener extends SparkObject {
 
     }
 
-    emitEvent(action, evt) {
-        //emit "SwipeListener" message=>action
-        this.elm.dispatchEvent(new SparkEvent(action, this));
-        this.onAction(action, evt);
-    }
-
-    onAction(action, evt) {
+    /**
+     * Default delegate event handler
+     * @param event {SparkEvent}
+     */
+    onAction(event) {
 
     }
 
@@ -63,15 +65,15 @@ class SwipeListener extends SparkObject {
 
         if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
             if ( xDiff > 0 ) {
-                this.emitEvent("right", evt);
+                this.onAction(new SparkEvent(SwipeListener.RIGHT, this));
             } else {
-                this.emitEvent("left", evt);
+                this.onAction(new SparkEvent(SwipeListener.LEFT, this));
             }
         } else {
             if ( yDiff > 0 ) {
-                this.emitEvent("down", evt);
+                this.onAction(new SparkEvent(SwipeListener.DOWN, this));
             } else {
-                this.emitEvent("up", evt);
+                this.onAction(new SparkEvent(SwipeListener.UP, this));
             }
         }
 

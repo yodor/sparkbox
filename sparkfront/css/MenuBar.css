@@ -1,0 +1,109 @@
+.MenuBar {
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-flow: row nowrap;
+
+}
+
+.MenuBar .ItemList {
+    display: flex;
+    /*justify-content: center;*/
+    /*align-items: center;*/
+
+    background-color: white;
+    position: relative;
+    /*above mce*/
+    z-index:10;
+}
+
+.MenuBar .ItemList .Item {
+    display: flex;
+    /*justify-content: center;*/
+    /*align-items:center;*/
+
+    padding:0.5em;
+
+    cursor: pointer;
+    position: relative;
+    color:black;
+}
+
+.MenuBar .ItemList .Item .Link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.MenuBar .ItemList .Item.Hover {
+    background-color: black;
+    color: white;
+}
+
+.MenuBar .ItemList .Item.Hover .Link {
+    color: inherit;
+}
+
+/*only main menu bar active item*/
+.MenuBar > .ItemList > .Item[active="1"] > .Link {
+    font-weight:bold;
+}
+
+.MenuBar > .ItemList > .Item[active="1"].Hover > .Link {
+
+}
+
+
+
+.MenuBar .ItemList.Submenu {
+
+    display: none;
+
+    position: absolute;
+    white-space: nowrap;
+
+    background-color: white;
+
+    border: 1px solid black;
+    text-align: left;
+
+    flex-direction: column;
+
+}
+
+.MenuBar .ItemList.Submenu[open] {
+    display: flex;
+}
+
+.MenuBar .ItemList.Submenu .Item[active="1"] {
+    text-decoration:underline;
+}
+
+
+
+.MenuBar .toggle {
+
+    display:none;
+
+    cursor:pointer;
+
+    background-image:url(../images/menu.svg);
+    background-size:cover;
+
+    margin:5px;
+
+    max-height:24px;
+    max-width:24px;
+
+    min-height:24px;
+    min-width:24px;
+
+    height:24px;
+    width:24px;
+
+    box-sizing: border-box;
+
+}

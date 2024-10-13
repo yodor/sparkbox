@@ -1,27 +1,44 @@
 <?php
 include_once("components/Component.php");
-include_once("components/renderers/IMenuItemRenderer.php");
 
-abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
+class MenuItemRenderer extends Container
 {
 
-    protected ?MenuItem $item = null;
-
     protected ?Component $linkTag  = null;
+    protected ?MenuListRenderer $submenu = null;
 
     public function __construct()
     {
         parent::__construct(false);
+        $this->setComponentClass("Item");
+
+//        $container = new Container(false);
+//        $container->setComponentClass("Outer");
+//
+//        $this->items()->append($container);
+
         $this->linkTag = new Component(false);
         $this->linkTag->setTagName("A");
-        $this->linkTag->setComponentClass("MenuItemLink");
+        $this->linkTag->setComponentClass("Link");
         $this->linkTag->setAttribute("role", "menuitem");
+
+        $this->items()->append($this->linkTag);
+
+        $this->submenu = new MenuListRenderer();
+        $this->submenu->setComponentClass("ItemList Submenu");
+        $this->items()->append($this->submenu);
+
     }
 
     public function setMenuItem(MenuItem $item) : void
     {
 
-        $this->item = $item;
+        if ($item->count()<1) {
+            $this->submenu->setRenderEnabled(false);
+        }
+        else {
+            $this->submenu->setItemList($item);
+        }
 
         $this->linkTag->removeAttribute("target");
         $this->linkTag->removeAttribute("tooltip");
@@ -48,23 +65,24 @@ abstract class MenuItemRenderer extends Component implements IMenuItemRenderer
             $contents = tr($item->getName());
         }
 
-        if ($item->getIcon()) {
-            $icon = $item->getIcon();
-            $contents = "<div class='MenuIcon $icon'></div>" . $contents;
-        }
-
-        if ($item->count() > 0) {
-            $contents .= "<div class='handle'></div>";
-        }
         $this->linkTag->setContents($contents);
 
         $this->setAttribute("title", $item->getName());
 
-    }
+        if ($item->count() > 0) {
+            $this->setAttribute("have_submenu", "1");
+        }
+        else {
+            $this->removeAttribute("have_submenu");
+        }
 
-    public function getMenuItem() : ?MenuItem
-    {
-        return $this->item;
+        if ($item->isSelected()) {
+            $this->setAttribute("active", "1");
+        }
+        else {
+            $this->removeAttribute("active");
+        }
+
     }
 
 }

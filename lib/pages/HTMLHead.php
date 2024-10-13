@@ -257,10 +257,15 @@ JS;
      */
     public function addScript(Script $object) : void
     {
-
-        $src = $object->getSrc();
-        if ($src) {
-            $this->scripts[$src] = $object;
+        $key = "";
+        if ($object->getName()) {
+            $key = $object->getName();
+        }
+        else if ($object->getSrc()) {
+            $key = $object->getSrc();
+        }
+        if ($key) {
+            $this->scripts[$key] = $object;
         }
         else {
             $this->scripts[] = $object;

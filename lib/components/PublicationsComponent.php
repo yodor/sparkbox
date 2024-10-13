@@ -312,7 +312,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
             function toggleArchiveYear(year) {
                 document.querySelector(".months").style.display = "none";
-                document.querySelector(".months[year=''" + year + "']").style.display = "block";
+                document.querySelector(".months[year='" + year + "']").style.display = "block";
             }
 
             onPageLoad(function () {

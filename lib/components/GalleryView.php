@@ -108,13 +108,6 @@ class GalleryView extends Container
         return $arr;
     }
 
-    public function requiredScript() : array
-    {
-        $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/GalleryView.js";
-        return $arr;
-    }
-
     public function getViewMode()
     {
         return $this->view_mode;

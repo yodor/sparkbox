@@ -2,7 +2,7 @@
 
 }
 
-.MenuBarComponent {
+.ItemList {
     flex-direction: column;
     flex-wrap: wrap;
 
@@ -12,7 +12,7 @@
     flex-grow:1;
 }
 
-.MenuBarComponent .MenuBarItemRenderer {
+.ItemList .Item {
     border-top: 1px solid #cccccc;
     color: #517688;
 
@@ -26,17 +26,17 @@
     box-sizing:border-box;
 }
 
-.MenuBarComponent .MenuBarItemRenderer .MenuItemLink {
+.ItemList .Item .Link {
     padding:0.5em;
 }
 
-.MenuBarComponent .MenuBarItemRenderer[active="1"]  {
+.ItemList .Item[active="1"]  {
     background-color: #b9b3a3;
     color: white;
 }
 
 
-.MenuBarComponent .MenuBarItemRenderer[active="1"] .SubmenuRenderer {
+.ItemList .Item[active="1"] .ItemList.Submenu {
     display:flex;
 
     background: white;
@@ -52,30 +52,30 @@
     border:0;
 }
 
-.SubmenuRenderer .SubmenuItemRenderer {
+.ItemList.Submenu .Item {
     color: #666666;
     padding-left: 2px;
 }
 
-.SubmenuRenderer .SubmenuItemOuter {
+.ItemList.Submenu .Outer {
     padding: 5px;
 }
 
-.MenuBarItemRenderer[active="1"] .MenuItemLink + .SubmenuRenderer {
+.Item[active="1"] .Link + .ItemList.Submenu {
     margin-left: 0;
     padding-left: 0;
 }
 
-.SubmenuItemRenderer[selected="1"] > .SubmenuItemOuter .SubmenuItemLink {
+.Item[selected="1"] > .Outer .Link {
     text-decoration: underline;
     font-weight: bold;
 }
 
-.MenuBarItemRenderer[active="1"] .SubmenuItemRenderer .SubmenuRenderer {
+.Item[active="1"] .Item .ItemList.Submenu {
     display: none;
 }
 
-.MenuBarItemRenderer[active="1"] .SubmenuItemRenderer[selected="1"] .SubmenuRenderer {
+.Item[active="1"] .Item[selected="1"] .ItemList.Submenu {
     display: flex;
 }
 

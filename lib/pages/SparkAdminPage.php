@@ -34,7 +34,7 @@ class SparkAdminPage extends SparkPage
 
     protected array $roles = array();
 
-    protected MenuBarComponent $menu_bar;
+    protected MenuBar $menu_bar;
 
     protected Navigation $navigation;
 
@@ -64,7 +64,7 @@ class SparkAdminPage extends SparkPage
 
         $dynmenu = new PageSessionMenu($this->context, $this->initMainMenu());
 
-        $this->menu_bar = new MenuBarComponent($dynmenu);
+        $this->menu_bar = new MenuBar($dynmenu);
         $this->menu_bar->toggle_first = FALSE;
         $this->menu_bar->setName("admin_menu");
         $this->menu_bar->setClassName("admin_menu");

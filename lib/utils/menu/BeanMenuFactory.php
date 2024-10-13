@@ -76,6 +76,7 @@ class BeanMenuFactory
     {
         $menu = new MenuItemList();
         $this->fill($menu);
+        $menu->setName(get_class($this->bean));
         return $menu;
     }
 

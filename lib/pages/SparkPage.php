@@ -144,10 +144,9 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         if ($cmp instanceof IPageComponent) {
             if ($cmp instanceof IPageScript) {
-                $this->page_components[get_class($cmp)] = $cmp;
+                $this->page_components[] = $cmp;
             }
             else {
-                //TODO: Refactoring to templates
                 if ($cmp instanceof ITemplate) {
                     $template = new Template();
                     $template->setID($cmp->templateID());

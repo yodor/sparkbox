@@ -9,12 +9,12 @@
 }
 
 /*hide the menu component by default*/
-.MenuBarComponent {
+.MenuBar > .ItemList {
     display: none;
 }
 
-/*hamburger menu is open - have class .normal */
-.MenuBar.normal .MenuBarComponent {
+/*hamburger menu is open - have class .normal have attribute open */
+.MenuBar[open] > .ItemList {
     display: flex;
 
     position: absolute;
@@ -37,7 +37,7 @@
     box-shadow: 0 8px 8px -8px rgba(0, 0, 0, 0.5);
 }
 
-.MenuBar.normal .MenuBarComponent .MenuBarItemRenderer {
+.MenuBar[open] .ItemList .Item {
 
     align-items:flex-start;
     align-self: stretch;
@@ -47,13 +47,13 @@
     flex-wrap:wrap;
 }
 
-.MenuBar.normal .MenuBarComponent .MenuBarItemRenderer[have_submenu="1"] {
+.MenuBar[open] .ItemList .Item[have_submenu="1"] {
     padding-bottom:0;
     padding-right:0;
 
 }
 
-.MenuBar.normal .SubmenuRenderer {
+.MenuBar[open] .ItemList.Submenu {
 
     position: relative;
     background-color: white;
@@ -70,11 +70,11 @@
     margin-top:0.5em;
 }
 
-.MenuBar.normal .SubmenuItemRenderer {
+.MenuBar[open] .Item {
     color: black;
     /*border-top: 1px dotted gray;*/
 }
-.MenuBar.normal .SubmenuItemRenderer:first-of-type {
+.MenuBar[open] .Item:first-of-type {
     border-top: none;
 }
 
