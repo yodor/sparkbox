@@ -10,8 +10,8 @@ class SwipeListener extends SparkObject {
         this.yDown = null;
 
         this.elm = elm;
-        elm.addEventListener("touchstart", (event)=>this.handleTouchStart(event));
-        elm.addEventListener("touchmove", (event)=>this.handleTouchMove(event));
+        elm.addEventListener("touchstart", (event)=>this.handleTouchStart(event), {passive: true});
+        elm.addEventListener("touchmove", (event)=>this.handleTouchMove(event), {passive: true});
 
     }
 

@@ -79,13 +79,13 @@ class ImagePopup extends SparkObject {
         });
 
         this.popup.addEventListener("mousedown", (event)=> this.mouseDownHandler(event));
-        this.popup.addEventListener("touchstart", (event)=> this.mouseDownHandler(event));
+        this.popup.addEventListener("touchstart", (event)=> this.mouseDownHandler(event), {passive: true});
 
         this.popup.addEventListener("mouseup", (event) => this.mouseUpHandler(event));
         this.popup.addEventListener("touchend", (event) => this.mouseUpHandler(event));
 
         this.popup.addEventListener("mousemove", (event) => this.mouseMoveHandler(event));
-        this.popup.addEventListener("touchmove", (event) => this.mouseMoveHandler(event));
+        this.popup.addEventListener("touchmove", (event) => this.mouseMoveHandler(event), {passive: true});
 
         window.addEventListener("load", (event) => this.assignListeners(document));
         window.addEventListener("resize", (event)=> this.setupZoom());
