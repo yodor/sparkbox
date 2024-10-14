@@ -1,4 +1,54 @@
+@media screen and (max-width: 768px) {
+    .admin_layout {
+        display:flex;
+        flex-direction: column;
+    }
+    .admin_layout .admin_header {
+        display:flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding:0.5em;
+    }
+    .admin_layout .page_area {
+        padding: 0.5em 0;
+    }
+    .admin_layout .page_area .page_caption {
 
+    }
+    .admin_layout .page_area .page_caption .page_actions {
+        margin-left:0.5em;
+    }
+    .admin_layout .page_area .page_contents {
+        display:flex;
+        flex-direction: column;
+        align-items:flex-start;
+        flex-wrap:wrap;
+    }
+    .admin_layout .page_area .page_contents * {
+        min-width:0;
+    }
+    .admin_layout .page_area .page_contents .PageTemplate {
+        display:flex;
+        flex-direction: column;
+
+        align-items:stretch;
+
+        max-width:100%;
+        width:100%;
+
+    }
+    .admin_layout .page_area .page_contents .BeanFormEditor {
+        display:flex;
+        flex-direction: column;
+
+        max-width:100%;
+        width:100%;
+
+        align-items:stretch;
+    }
+
+}
 /*.admin_layout {*/
 /*    grid-template-rows: auto;*/
 /*    grid-template-columns: auto;*/

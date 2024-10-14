@@ -52,8 +52,8 @@
     padding-right:0;
 
 }
-
-.MenuBar[open] .ItemList.Submenu {
+/*only active items' submenu is visible*/
+.MenuBar[open] .Item[active="1"] > .Submenu {
 
     position: relative;
     background-color: white;
@@ -67,7 +67,7 @@
     padding:0;
     padding-left:0.5em;
 
-    margin-top:0.5em;
+    /*margin-top:0.5em;*/
 }
 
 .MenuBar[open] .Item {

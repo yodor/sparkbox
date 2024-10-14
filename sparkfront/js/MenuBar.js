@@ -24,7 +24,7 @@ class MenuBar extends Component {
 
     constructor() {
         super();
-        this.class = ".MenuBar:not([noattach])";
+        this.class = ".MenuBar";
 
         this.menu = "";
         /**
@@ -42,17 +42,6 @@ class MenuBar extends Component {
     isTouchEnabled() {
         return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
     }
-    // selector() {
-    //     let result = super.selector();
-    //     if (this.menu) {
-    //         result+="[menu='" + this.menu + "']";
-    //     }
-    //     return result;
-    // }
-    //
-    // setMenu(menu) {
-    //     this.menu = menu;
-    // }
 
     initialize() {
 
@@ -70,7 +59,7 @@ class MenuBar extends Component {
         this.itemList = this.element.querySelector(".ItemList");
         this.itemList.querySelectorAll(".Item").forEach((barItem)=>{
 
-            if (!this.isTouchEnabled()) {
+            if (!this.isTouchEnabled() && !this.element.hasAttribute("noattach")) {
                 barItem.addEventListener("mouseenter", () => this.menuEnter(barItem));
                 barItem.addEventListener("mouseleave", () => this.menuLeave(barItem));
             }

@@ -2,7 +2,9 @@
     flex-flow: column wrap;
     align-items: normal;
 }
-
+.MenuBar .toggle {
+    filter: invert(1);
+}
 .MenuBar .ItemList {
 
     flex-direction: column;

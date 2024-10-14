@@ -12,13 +12,12 @@ BODY {
 }
 
 .admin_layout {
-    border-collapse: collapse;
-
 
     display: grid;
 
     grid-template-columns: auto 1fr;
     grid-template-rows: 100vh;
+
 }
 
 .admin_layout .admin_header {
@@ -26,7 +25,9 @@ BODY {
     color: white;
     padding: 1em;
     text-align: center;
-
+    display: flex;
+    flex-direction: column;
+    align-items:flex-start;
 }
 
 
@@ -84,38 +85,37 @@ BODY {
 
 .admin_layout .page_area .page_caption {
 
-    border-bottom: 1px solid #cccccc;
-    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 
-    /*position: sticky;*/
-    /*left: 0;*/
-    /*top: 0;*/
-
-    z-index: 10;
     box-sizing: border-box;
-    display: block;
+
+    border-bottom: 1px solid #cccccc;
+    z-index: 10;
+
+    gap:0.5em;
+
+}
+
+.admin_layout .page_area .page_caption .page_actions {
+    display: flex;
+    flex-direction: row;
+
+    align-items:center;
+    gap:0.5em;
 }
 
 .admin_layout .page_area .page_caption .page_actions:empty {
     display: none;
 }
-
-.admin_layout .page_area .page_caption .page_actions {
-    display: inline-block;
-    margin-right: 10px;
-
-    vertical-align: top;
-}
-
 .admin_layout .page_area .page_caption .page_actions .Action {
-    display: inline-block;
+
     width: 30px;
     height: 30px;
-    background-size: cover;
 
-    margin-left: 2px;
-    margin-right: 3px;
-    vertical-align: top;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .admin_layout .page_area .page_caption .page_actions .Action[action]:not([action='']) {
@@ -142,9 +142,13 @@ BODY {
 }
 
 .admin_layout .page_area .page_caption .page_filters {
-    margin-top: 0.5em;
 
-    display: block;
+    display:flex;
+    flex-direction:row;
+
+}
+.admin_layout .page_area .page_caption .page_filters:has(*) {
+    padding-bottom:0.5em;
 }
 
 .admin_layout .page_area .page_contents {
