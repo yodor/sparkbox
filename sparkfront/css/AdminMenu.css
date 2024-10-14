@@ -1,82 +1,72 @@
 .MenuBar {
-
+    flex-flow: column wrap;
+    align-items: normal;
 }
 
-.ItemList {
+.MenuBar .ItemList {
+
     flex-direction: column;
     flex-wrap: wrap;
-
-    align-items: flex-start;
-    justify-content: flex-start;
-
-    flex-grow:1;
 }
 
-.ItemList .Item {
-    border-top: 1px solid #cccccc;
-    color: #517688;
-
-    flex-flow: column wrap;
-
+/*all items*/
+.MenuBar .ItemList .Item {
+    border-top: 1px solid  #b9b3a3;
+    flex-direction: column;
     padding:0;
-
-    align-items:flex-start;
-
-    width:100%;
-    box-sizing:border-box;
 }
-
-.ItemList .Item .Link {
+.MenuBar .ItemList .Item .Link {
     padding:0.5em;
 }
 
-.ItemList .Item[active="1"]  {
+/*top level items only*/
+.MenuBar > .ItemList > .Item {
+    color:#517688;
+}
+
+/*top level selected item only*/
+.MenuBar > .ItemList > .Item[active="1"] {
     background-color: #b9b3a3;
     color: white;
 }
 
-
-.ItemList .Item[active="1"] .ItemList.Submenu {
+/*only active items' submenu is visible*/
+.MenuBar .Item[active="1"] > .Submenu {
     display:flex;
+    position:relative;
+    border:none;
 
-    background: white;
-    color: #b9b3a3;
+}
 
-    position: relative;
+/*visible submenu items padded */
+.MenuBar .Item[active="1"] > .Submenu > .Item {
 
-    padding:0;
     padding-left:0.5em;
+    padding-right:0.5em;
 
-    width:100%;
-    box-sizing: border-box;
+    font-weight:normal;
+    text-decoration:none;
+
+
+}
+
+.MenuBar .Item[active="1"] > .Submenu > .Item[active="1"] {
+    font-weight:bold;
+
     border:0;
+    border-top:1px solid #b9b3a3;
+
 }
 
-.ItemList.Submenu .Item {
-    color: #666666;
-    padding-left: 2px;
+/*sub items of the active item*/
+.MenuBar .Item[active="1"] > .Submenu > .Item[active="1"] .Item {
+    border:0;
+    /*color:red;*/
 }
 
-.ItemList.Submenu .Outer {
-    padding: 5px;
-}
 
-.Item[active="1"] .Link + .ItemList.Submenu {
-    margin-left: 0;
-    padding-left: 0;
-}
 
-.Item[selected="1"] > .Outer .Link {
-    text-decoration: underline;
-    font-weight: bold;
-}
 
-.Item[active="1"] .Item .ItemList.Submenu {
-    display: none;
-}
 
-.Item[active="1"] .Item[selected="1"] .ItemList.Submenu {
-    display: flex;
-}
 
 
