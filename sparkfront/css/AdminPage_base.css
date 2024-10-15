@@ -15,7 +15,7 @@ BODY {
 
     display: grid;
     /*flex-direction:row;*/
-    grid-template-columns: minmax(min-content, 13em) auto;
+    grid-template-columns: 13em auto;
     grid-template-rows: 100vh;
 
 }
