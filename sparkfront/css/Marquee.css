@@ -7,7 +7,7 @@
 
 }
 .Marquee * {
-    animation-duration: 10s ;
+    animation-duration: 20s ;
     animation-iteration-count: infinite ;
     animation-name: marquee-content ;
     animation-timing-function: linear ;
