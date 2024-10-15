@@ -186,8 +186,6 @@ BODY {
 
 
 
-
-
 .BeanFormEditor[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
     display: block;
 }
@@ -304,4 +302,13 @@ BODY {
     vertical-align: top;
     display: block;
 }
+.ConfigEditorPage {
+    width:50%;
+}
+.ConfigEditorPage .FormRenderer {
+    display:grid;
+}
+.ConfigEditorPage .TextArea TEXTAREA {
+    min-height:150px;
 
+}
