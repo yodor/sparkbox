@@ -22,7 +22,11 @@ class Marquee extends Component
     protected function processAttributes(): void
     {
         parent::processAttributes();
-        $this->viewport->setContents($this->translation_enabled ? tr($this->buffer->get()) : $this->buffer->get());
+
+        $value = $this->buffer()->get();
+        $value = strip_tags(stripslashes($value));
+        $value = str_replace("\r\n", " ", $value);
+        $this->viewport->setContents($value);
     }
 
     protected function renderImpl()
