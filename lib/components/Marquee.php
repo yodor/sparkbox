@@ -24,8 +24,10 @@ class Marquee extends Component
         parent::processAttributes();
 
         $value = $this->buffer()->get();
+
+        $value = str_replace(array("\\r\\n", "\\r", "\\n"), ' ', $value);
         $value = strip_tags(stripslashes($value));
-        $value = str_replace("\r\n", " ", $value);
+
         $this->viewport->setContents($value);
     }
 

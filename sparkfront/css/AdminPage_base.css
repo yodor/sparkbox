@@ -15,7 +15,7 @@ BODY {
 
     display: grid;
     /*flex-direction:row;*/
-    grid-template-columns: 150px auto;
+    grid-template-columns: 13em auto;
     grid-template-rows: 100vh;
 
 }
