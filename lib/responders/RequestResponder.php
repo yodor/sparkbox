@@ -41,15 +41,12 @@ class ConfirmResponderDialog extends ConfirmMessageDialog
     {
         parent::__construct();
 
-        $form = new TextComponent();
+        $form = new Form();
 
-        $html = <<<HTML
-        <form method=post>
-        <input type=hidden name='{RequestResponder::KEY_CONFIRM}' value=1>
-        </form>
-HTML;
+        $form->setMethod(Form::METHOD_POST);
 
-        $form->setContents($html);
+        $input = new Input("hidden", RequestResponder::KEY_CONFIRM, 1);
+        $form->items()->append($input);
 
         $this->text->items()->append($form);
 

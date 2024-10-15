@@ -125,6 +125,16 @@ abstract class Authenticator
         }
 
         debug($this, "Cookie validation success");
+
+        //check if account is enabled
+        if ($this->bean->haveColumn("suspended")) {
+            $suspend_status = (int)$this->bean->getValue($token->getID(), "suspended");
+            if ($suspend_status > 0) {
+                debug($this, "Account is suspended");
+                return NULL;
+            }
+        }
+
         return new AuthContext($token->getID(), $this->session);
 
     }

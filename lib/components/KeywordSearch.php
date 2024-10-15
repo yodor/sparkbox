@@ -30,7 +30,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         $this->setClassName("KeywordSearch");
 
 
-        $this->setLayout(FormRenderer::FIELD_HBOX);
+        $this->setLayout(FormRenderer::LAYOUT_HBOX);
 
         //in admin pages is preferred POST as there are already some request conditions to be matched
         $this->setMethod(FormRenderer::METHOD_POST);

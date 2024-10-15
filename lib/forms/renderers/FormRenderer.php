@@ -1,7 +1,7 @@
 <?php
-include_once("components/Container.php");
+include_once("components/Form.php");
 include_once("components/InputComponent.php");
-include_once("components/Container.php");
+
 
 class InputGroupRenderer extends Container
 {
@@ -23,17 +23,14 @@ class InputGroupRenderer extends Container
 
 }
 
-class FormRenderer extends Container
+class FormRenderer extends Form
 {
     protected InputForm $form;
 
-    const string FIELD_HBOX = "HBox";
-    const string FIELD_VBOX = "VBox";
-    protected string $layout = FormRenderer::FIELD_VBOX;
+    const string LAYOUT_HBOX = "HBox";
+    const string LAYOUT_VBOX = "VBox";
+    protected string $layout = FormRenderer::LAYOUT_VBOX;
 
-    const string METHOD_POST = "post";
-    const string METHOD_GET = "get";
-    protected string $method = FormRenderer::METHOD_POST;
 
     /**
      * Submit element name attribute default value.
@@ -53,15 +50,14 @@ class FormRenderer extends Container
     public function __construct(InputForm $form)
     {
         parent::__construct(false);
-
-        $this->setTagName("FORM");
         $this->setComponentClass("FormRenderer");
         $this->setLayout($this->layout);
 
         $this->setForm($form);
 
-        $this->setAttribute("enctype", "multipart/form-data");
-        $this->setMethod(FormRenderer::METHOD_POST);
+        $this->setEnctype(Form::ENCTYPE_MULTIPART);
+        $this->setMethod(Form::METHOD_POST);
+        $this->setLayout(FormRenderer::LAYOUT_VBOX);
 
         $this->submitButton = Button::SubmitButton(FormRenderer::SUBMIT_NAME);
 
@@ -82,16 +78,6 @@ class FormRenderer extends Container
         $this->items()->append(new ClosureComponent($this->renderInputs(...), false));
         $this->items()->append(new ClosureComponent($this->renderSubmitLine(...), false));
 
-    }
-
-    public function setMethod(string $method) : void
-    {
-        $this->method = $method;
-    }
-
-    public function getMethod(): string
-    {
-        return $this->method;
     }
 
     public function getSubmitLine(): Container
@@ -159,8 +145,6 @@ class FormRenderer extends Container
     {
 
         parent::processAttributes();
-
-        $this->setAttribute("method", $this->method);
         $this->setAttribute("layout", $this->layout);
 
     }
