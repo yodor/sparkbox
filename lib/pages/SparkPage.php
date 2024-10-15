@@ -17,6 +17,23 @@ include_once("utils/script/FBPixel.php");
 include_once("utils/script/GTAG.php");
 include_once("objects/data/GTAGObject.php");
 
+class SparkLocationScript extends PageScript
+{
+    public function code() : string
+    {
+        $page_local = new Script();
+        $local = LOCAL;
+        $spark_local = SPARK_LOCAL;
+        $storage_local = STORAGE_LOCAL;
+        return <<<JS
+        const LOCAL = "{$local}";
+        const SPARK_LOCAL = "{$spark_local}";
+        const STORAGE_LOCAL = "{$storage_local}";
+JS;
+
+    }
+
+}
 
 class SparkPage extends HTMLPage implements IActionCollection
 {
@@ -192,10 +209,7 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         self::$instance = $this;
 
-        $this->head()->addMeta("revisit-after", "1 days");
-        $this->head()->addMeta("robots", "index, follow");
-        $this->head()->addMeta("keywords", "%meta_keywords%");
-        $this->head()->addMeta("description", "%meta_description%");
+
 
         $this->head()->addMeta("viewport", "width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes");
 
@@ -220,6 +234,8 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->addJS(SPARK_LOCAL . "/js/Tooltip.js");
 ;
 
+        $location = new SparkLocationScript();
+
         $this->actions = new ActionCollection();
 
         //default template for showAlert
@@ -227,54 +243,59 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     }
 
-    public function authorize()
+    /**
+     * Authorize this page usage if this->auth assigned with Authenticator prior to this method call
+     *
+     * Assign AuthContext to $this->context on successful authorization
+     * If $this->authorized_access is true but authorization failed
+     *  send JSONResponse with message if this is JSONRequest request and exits script execution
+     *  redirects to the loginURL if it is set and exits script execution
+     *  else  throws Exception
+     * @return void
+     * @throws Exception
+     */
+    public function authorize(): void
     {
-        if ($this->auth) {
+        if (!($this->auth instanceof Authenticator)) return;
 
-            debug("Using Authenticator: " . get_class($this->auth));
+        debug("Using Authenticator: " . get_class($this->auth));
 
-            $this->context = $this->auth->authorize();
+        $this->context = $this->auth->authorize();
 
-            if ($this->context) {
+        if ($this->context instanceof AuthContext) {
 
-                debug("Authorization success");
-
-            }
-            else {
-
-                debug("Authorization failed");
-
-                if ($this->authorized_access) {
-
-                    debug("'authorized_access' is set for this page");
-
-                    if (isset($_GET["ajax"]) || isset($_GET["JSONRequest"])) {
-                        $response = new JSONResponse("RequestController");
-                        $message = tr("Your session has expired");
-                        $message.= "<BR>";
-                        $message.= tr("Please log into your profile again");
-                        $message.= "<BR>";
-                        $response->message = $message;
-                        $response->send();
-                        exit;
-                    }
-
-                    if (strlen($this->loginURL) > 0) {
-
-                        debug("Redirecting to login page URL: " . $this->loginURL);
-                        header("Location: $this->loginURL");
-                        exit;
-                    }
-
-                    throw new Exception("Authorization failed");
-                }
-                else {
-                    debug("'authorized_access' is NOT set");
-                }
-
-            }
-
+            debug("Authorization success");
+            return;
         }
+
+        debug("Authorization failed");
+
+        if (!$this->authorized_access) {
+            debug("Authorization is not required");
+            return;
+        }
+
+        debug("Authorization is required for this page");
+
+        if (isset($_GET[JSONResponder::KEY_JSONREQUEST])) {
+            $response = new JSONResponse("RequestController");
+            $message = tr("Your session has expired.");
+            $message.= "<BR>";
+            $message.= tr("Please log into your profile again.");
+            $message.= "<BR>";
+            $response->message = $message;
+            $response->send();
+            exit;
+        }
+
+        if (strlen($this->loginURL) > 0) {
+
+            debug("Redirecting to login page URL: " . $this->loginURL);
+            header("Location: $this->loginURL");
+            exit;
+        }
+
+        throw new Exception("Authorization failed");
     }
 
     /**

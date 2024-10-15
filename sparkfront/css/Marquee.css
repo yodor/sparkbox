@@ -1,0 +1,37 @@
+.Marquee {
+
+    display: flex ;
+    overflow: hidden ;
+    white-space: nowrap ;
+    width: calc(100%) ;
+
+}
+.Marquee * {
+    animation-duration: 10s ;
+    animation-iteration-count: infinite ;
+    animation-name: marquee-content ;
+    animation-timing-function: linear ;
+
+    padding-left:0.5em;
+    padding-right:0.5em;
+
+    animation-delay: 1s; /* delay for 2 seconds */
+}
+
+.Marquee:hover * {
+    animation-play-state: paused;
+}
+
+/**
+* BOTH of the marquee items are going to be translating left at the same time.
+* And, once each of them has translated to -100%, they will both snap back into
+* place, making it seem as if they are continuously scrolling.
+*/
+@keyframes marquee-content {
+    from {
+        transform: translateX( 0% );
+    }
+    to {
+        transform: translateX( -100% );
+    }
+}

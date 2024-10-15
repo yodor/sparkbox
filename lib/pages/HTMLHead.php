@@ -107,21 +107,6 @@ class HTMLHead extends Container
         $locale_default->setAttribute("hreflang", "".DEFAULT_LOCALE);
         $this->items()->append($locale_default);
 
-        $page_local = new Script();
-        $local = LOCAL;
-        $spark_local = SPARK_LOCAL;
-        $storage_local = STORAGE_LOCAL;
-        $contents = <<<JS
-        //SparkPage local script start
-        const LOCAL = "{$local}";
-        const SPARK_LOCAL = "{$spark_local}";
-        const STORAGE_LOCAL = "{$storage_local}";
-        //SparkPage local script end
-        
-JS;
-        $page_local->setContents($contents);
-        $this->items()->append($page_local);
-
     }
 
     public function setTitle(string $text) : void

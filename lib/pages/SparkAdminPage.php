@@ -38,13 +38,25 @@ class SparkAdminPage extends SparkPage
 
     protected Navigation $navigation;
 
+    protected Container $sidePane;
+
+    protected Container $pageCaption;
+
+    protected Container $page_actions;
     protected Container $page_filters;
-    protected Container $page_caption;
+
+
+    //local menu items created from the page
+    protected array $page_menu = array();
+
+    public function setPageMenu(array $menu_items) : void
+    {
+        $this->page_menu = $menu_items;
+
+    }
 
     public function __construct()
     {
-
-        $this->navigation = new Navigation("AdminPageLib");
 
         $this->auth = new AdminAuthenticator();
         $this->loginURL = ADMIN_LOCAL . "/login.php";
@@ -55,6 +67,8 @@ class SparkAdminPage extends SparkPage
         $this->authorize();
 
         //control gets here only if authorized
+        $this->navigation = new Navigation("AdminPageLib");
+
         $admin_access = new AdminAccessBean();
         $qry = $admin_access->queryField("userID", $this->getUserID());
         $qry->exec();
@@ -63,10 +77,9 @@ class SparkAdminPage extends SparkPage
         }
 
         $dynmenu = new PageSessionMenu($this->context, $this->initMainMenu());
+        $dynmenu->setName("admin_menu");
 
         $this->menu_bar = new MenuBar($dynmenu);
-        $this->menu_bar->toggle_first = FALSE;
-        $this->menu_bar->setName("admin_menu");
         $this->menu_bar->setClassName("admin_menu");
 
         $this->menu_bar->setAttribute("noattach");
@@ -75,15 +88,47 @@ class SparkAdminPage extends SparkPage
         $this->head()->addCSS(SPARK_LOCAL . "/css/AdminButtons.css");
         $this->head()->addCSS(SPARK_LOCAL . "/css/AdminMenu.css");
 
+        $this->body()->addClassName("admin_layout");
 
-        $this->page_caption = new Container(false);
-        $this->page_caption->setClassName("page_caption");
+        $this->sidePane = $this->createSidePane();
+
+
+        $this->pageCaption = new Container(false);
+        $this->pageCaption->setComponentClass("page_caption");
+
+        $this->page_actions = new Container(false);
+        $this->page_actions->setComponentClass("page_actions");
+        $this->pageCaption->items()->append($this->page_actions);
 
         $this->page_filters = new Container(false);
-        $this->page_filters->setClassName("page_filters");
+        $this->page_filters->setComponentClass("page_filters");
+        $this->pageCaption->items()->append($this->page_filters);
 
+        $this->setTitle(tr("Administration"));
+    }
 
+    protected function createSidePane() : Container
+    {
+        $container = new Container(false);
+        $container->setComponentClass("sidePane");
 
+        $adminHeader = new Container(false);
+        $adminHeader->setComponentClass("admin_header");
+        $container->items()->append($adminHeader);
+
+        $username = $this->context->getData()->get(SessionData::FULLNAME);
+        if ($username) {
+            $adminName = new TextComponent($username);
+            $adminName->setComponentClass("username");
+            $adminHeader->items()->append($adminName);
+        }
+
+        $buttonLogout = Button::LocationButton("Logout", new URL(ADMIN_LOCAL . "/logout.php"));
+        $adminHeader->items()->append($buttonLogout);
+
+        $container->items()->append($this->menu_bar);
+
+        return $container;
     }
 
     public function navigation() : Navigation
@@ -95,45 +140,20 @@ class SparkAdminPage extends SparkPage
     {
 
         $admin_menu = array();
-        $admin_menu[] = new MenuItem("Content", ADMIN_LOCAL . "/content/index.php", "content");
-        $admin_menu[] = new MenuItem("Settings", ADMIN_LOCAL . "/settings/index.php", "settings");
+        $admin_menu[] = new MenuItem("Content", ADMIN_LOCAL . "/content/index.php");
+        $admin_menu[] = new MenuItem("Settings", ADMIN_LOCAL . "/settings/index.php");
 
         return $admin_menu;
     }
 
-    public function renderNavigationBar()
-    {
-
-        $page_actions = new Container(false);
-        $page_actions->setClassName("page_actions");
-
-        $back_action = $this->navigation->back();
-
-        if ($back_action instanceof Action) {
-            $back_action->setContents("");
-            $back_action->setAttribute("action", SparkAdminPage::ACTION_BACK);
-            $back_action->setTooltip("Go back");
-            $page_actions->items()->append($back_action);
-        }
-
-        foreach($this->actions->toArray() as $action) {
-            $page_actions->items()->append($action);
-        }
-
-        $title = new TextComponent($this->name);
-        $title->setClassName("page_title");
-        $page_actions->items()->append($title);
-
-        $this->page_caption->items()->append($page_actions);
-
-        $this->page_caption->items()->append($this->page_filters);
-
-        $this->page_caption->render();
-    }
-
     public function getPageCaption() : Container
     {
-        return $this->page_caption;
+        return $this->pageCaption;
+    }
+
+    public function getPageActions() : Container
+    {
+        return $this->page_actions;
     }
 
     public function getPageFilters() : Container
@@ -157,103 +177,102 @@ class SparkAdminPage extends SparkPage
     }
 
 
-    //local menu items created from the page
-    protected array $page_menu = array();
-
-    public function setPageMenu(array $menu_items) : void
-    {
-        $this->page_menu = $menu_items;
-
-    }
-
+    /**
+     * After request controllers before start render
+     * @return void
+     * @throws Exception
+     */
     protected function constructTitle(): void
     {
 
         $dynmenu = $this->menu_bar->getMenu();
-        $dynmenu->update($this->page_menu);
 
         $selected_path = $dynmenu->getSelectedPath();
 
         if (count($selected_path) == 0) {
-            //this page caption
-            if ($this->name) {
-                $selected_path[] = $this->name;
-            }
-            else {
-                $selected_path[] = tr("Administration");
+            $selected_path[] = tr("Administration");
+        }
+
+        $this->preferred_title = constructSiteTitle($selected_path);
+    }
+
+    protected function updateNavigation()
+    {
+        $dynmenu = $this->menu_bar->getMenu();
+
+        //update here
+        $dynmenu->update($this->page_menu);
+
+        //page does not set a name, try and get the selected menu item and use for page name/caption
+        if (!$this->name) {
+            $selected = $dynmenu->getSelectedPath();
+            //default name of page from MenuItem
+            $itemsTotal = count($selected);
+            if ($itemsTotal > 0) {
+                $item = $selected[$itemsTotal-1];
+                if ($item instanceof MenuItem) {
+                    $this->name = $item->getName();
+
+                }
             }
         }
 
+        //push even if unnamed page
+        $this->navigation->push($this->name);
+    }
 
-        $this->preferred_title = constructSiteTitle($selected_path);
+    /**
+     * Update page actions and page caption title
+     * @return void
+     */
+    protected function updatePageActions()
+    {
+        $back_action = $this->navigation->back();
 
+        //prepend the back action
+        if ($back_action instanceof Action) {
+            $back_action->setContents("");
+            $back_action->setAttribute("action", SparkAdminPage::ACTION_BACK);
+            $back_action->setTooltip("Go back");
+            $this->page_actions->items()->append($back_action);
+        }
+
+        //fill all actions into the page actions container
+        foreach ($this->actions->toArray() as $action) {
+            $this->page_actions->items()->append($action);
+        }
+
+        //set the page title
+        $title = new TextComponent($this->name);
+        $title->setClassName("page_title");
+        $this->page_actions->items()->append($title);
     }
 
     public function startRender()
     {
 
-        //allow processing of ajax responders first
+        $this->updateNavigation();
+        $this->updatePageActions();
+
+        //allow processing of responders, constructTitle and prepareMetaTitle
         parent::startRender();
 
         echo "\n<!-- startRender SparkAdminPage -->\n";
 
-        echo "<div class='admin_layout'>";
+        $this->sidePane->render();
 
-//        echo "<tr>";
+        echo "<div class='page_area' >";
 
-            echo "<div class='left_menu'>";
+        $this->pageCaption->render();
 
-                echo "<div class='menu_contents'>";
-
-                    echo "<div class='admin_header'>";
-
-                    $fullname = "";
-                    if ($this->context->getData()->contains(SessionData::FULLNAME)) {
-                        $fullname = $this->context->getData()->get(SessionData::FULLNAME);
-                    }
-                    echo "<div class='username'>".$fullname."</div>";
-
-                    Button::LocationButton("Logout", new URL(ADMIN_LOCAL . "/logout.php"))->render();
-
-                    echo "</div>";
-
-                    $this->menu_bar->render();
-
-                echo "</div>";
-
-            echo "</div>";
-
-            echo "<div class='page_area' >";
-
-            $dynmenu = $this->menu_bar->getMenu();
-
-            if (!$this->name) {
-                $arr = $dynmenu->getSelectedPath();
-                //default name of page from MenuItem
-                if (count($arr) > 0) {
-                    $arr = array_reverse($arr);
-                    $item = $arr[0];
-                    if ($item instanceof MenuItem) {
-                        $this->name = $item->getName();
-                    }
-                }
-            }
-
-            $this->navigation->push($this->name);
-
-            $this->renderNavigationBar();
-
-            echo "<div class='page_contents'>";
+        echo "<div class='page_contents'>";
     }
 
     public function finishRender()
     {
-            echo "</div>"; //page_contents
+        echo "</div>"; //page_contents
 
-            echo "</div>";//page_area
-
-
-        echo "</div>";//admin_layout
+        echo "</div>";//page_area
 
         echo "\n<!-- finishRender SparkAdminPage -->\n";
 

@@ -10,7 +10,8 @@ class BufferedPage extends SparkPage
     }
     protected function prepareMetaTitle() : void
     {
-
+        $this->head()->addMeta("keywords", "%meta_keywords%");
+        $this->head()->addMeta("description", "%meta_description%");
     }
 
     public function obCallback(string &$buffer)

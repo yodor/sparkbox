@@ -8,6 +8,17 @@ class Button extends Input
     const string TYPE_RESET = "reset";
     const string TYPE_BUTTON = "button";
 
+    public static function Action(string $text, string $href = "") : Button
+    {
+        $action = new Button();
+        $action->setTagName("A");
+        $action->setComponentClass("");
+
+        $action->setContents($text);
+        $action->setAttribute("href", $href);
+        return $action;
+    }
+
     public static function SubmitButton(string $submit_name) : Button
     {
         $button = Button::TextButton("Submit", "submit");

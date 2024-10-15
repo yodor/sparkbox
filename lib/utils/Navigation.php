@@ -75,7 +75,7 @@ class Navigation
     {
         debug("Requested back action");
 
-        if ($this->urldata->count()<1)return NULL;
+        if ($this->urldata->count()==0)return NULL;
 
         $pages = array_reverse($this->urldata->keys(), true);
 

@@ -1,6 +1,7 @@
 .MenuBar {
     flex-flow: column wrap;
     align-items: normal;
+
 }
 .MenuBar .toggle {
     filter: invert(1);
@@ -16,6 +17,9 @@
     border-top: 1px solid  #b9b3a3;
     flex-direction: column;
     padding:0;
+
+    white-space: break-spaces;
+    word-break: break-all;
 }
 .MenuBar .ItemList .Item .Link {
     padding:0.5em;

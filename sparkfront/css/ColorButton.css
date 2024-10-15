@@ -1,103 +1,86 @@
 :root {
     --spark-button-background-color: #506266;
-    --spark-submit-button-background-color: #f1af5b;
-    --spark-submit-button-border-color: #ac5c05;
-    --spark-submit-button-background-from: #f9a541;
-    --spark-submit-button-background-to: #f78f14;
-}
-INPUT[type="submit"]::-moz-focus-inner, INPUT[type="button"]::-moz-focus-inner, A {
-    border: 0;
-}
+    --spark-button-border-color: var(--spark-button-background-color);
 
-/*for IE8 */
-INPUT[type="submit"]:focus, INPUT[type="button"]:focus, A {
-    outline: none;
+    --spark-button-border-radius: 0.2em;
+
+    --spark-button-text-color: #ffffff;
+
+    --spark-button-text-transfrom: none;
+    --spark-button-text-decoration: none;
+    --spark-button-font-weight: normal;
+    --spark-button-font-size: 100%;
+
+    /*submit*/
+    --spark-submit-button-background-color: #f1af5b;
+    --spark-submit-button-border-color: var(--spark-submit-button-background-color);
+
+    --spark-submit-button-text-color: var(--spark-button-text-color);
+
+    --spark-submit-button-text-transfrom: var(--spark-button-text-transfrom);
+    --spark-submit-button-text-decoration: var(--spark-button-text-decoration);
+    --spark-submit-button-font-weight: var(--spark-button-font-weight);
+    --spark-submit-button-font-size: var(--spark-button-font-weight);
 }
 
 
 .ColorButton {
-    display: inline-block;
+    display: inline-flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+
     position: relative;
 
-    text-align: center;
-    vertical-align: text-bottom;
 
-    padding-top: 0.2em;
-    padding-bottom: 0.2em;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+    margin:0;
+    padding-inline:0;
+    padding-block:0;
 
-    border: 1px solid #0c2226;
+    padding: 0.2em 0.5em;
 
-    -moz-border-radius: 0.2em;
-    -webkit-border-radius: 0.2em;
-    border-radius: 0.2em;
+    min-width:5em;
 
-    outline: none;
+    border-radius: var(--spark-button-border-radius);
 
-    font-size: 100%;
-    font-weight: normal;
-    text-transform: none;
-    text-decoration: none;
+    font-size: var(--spark-button-font-size);
+    font-weight: var(--spark-button-font-weight);
 
-    color: #fff;
+    text-decoration: var(--spark-button-text-decoration);
+    text-transform: var(--spark-button-text-transfrom);
+
+    color: var(--spark-button-text-color);
+    border: 1px solid var(--spark-button-border-color);
     background-color: var(--spark-button-background-color);
 
     cursor: pointer;
-
-    min-width:5em;
-}
-A.ColorButton {
-    padding-top: 0.2em;
-    text-decoration:none !important;
-}
-A.ColorButton:link {
-
-}
-
-A.ColorButton:visited {
-    color: #fff;
+    outline: none;
 }
 
 .ColorButton:hover {
-    color: #fff;
 
+    box-shadow: 0 0 0.1em 0.1em var(--spark-button-background-color);
 
-    -moz-box-shadow: 0 0 0.1em 0.1em #667d85;
-    -webkit-box-shadow: 0 0 0.1em 0.1em #667d85;
-    box-shadow: 0 0 0.1em 0.1em #667d85;
-
-    outline: none;
 }
 
-.ColorButton:active {
-    color: #fff;
+.ColorButton[action="submit"] , .ColorButton[type="submit"]  {
+    color: var(--spark-submit-button-text-color);
+    border: 1px solid var(--spark-submit-button-border-color);
+    background-color: var(--spark-submit-button-background-color);
+    /*linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));*/
 
-    -webkit-box-shadow: inset 0 0 0.1em 0.1em #0c2226;
-    -moz-box-shadow: inset 0 0 0.1em 0.1em #0c2226;
-    box-shadow: inset 0 0 0.1em 0.1em #0c2226;
-    outline: none;
+
+    font-size: var(--spark-submit-button-font-size);
+    font-weight: var(--spark-submit-button-font-weight);
+
+    text-decoration: var(--spark-submit-button-text-decoration);
+    text-transform: var(--spark-submit-button-text-transfrom);
 }
-
-
-
-
-TD.input_field {
-    vertical-align: middle;
-}
-
-.button_remove_array_field {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.ColorButton[action="submit"]  {
-    border-color: var(--spark-submit-button-border-color);
-    background-color: var(--spark-button-background-color);
-    background: -webkit-gradient(linear, 0 0, 0 bottom, from(var(--spark-submit-button-background-from)), to(var(--spark-submit-button-background-to)));
-    background: -webkit-linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
-    background: -moz-linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
-    background: -ms-linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
-    background: -o-linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
-    background: linear-gradient(var(--spark-submit-button-background-from), var(--spark-submit-button-background-to));
+.ColorButton[action="submit"]:hover , .ColorButton[type="submit"]:hover  {
+    box-shadow: 0 0 0.1em 0.1em var(--spark-submit-button-background-color);
 }

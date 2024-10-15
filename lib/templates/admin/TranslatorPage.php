@@ -21,7 +21,7 @@ class TranslatorPage extends BeanListPage
         $qry->exec();
 
         while ($row = $qry->next()) {
-            $item = new MenuItem(tr("Translations for").": " . $row["lang_code"], "phrases.php?langID=" . $row["langID"]);
+            $item = new MenuItem( mb_strtoupper($row["lang_code"]), "phrases.php?langID=" . $row["langID"]);
             $item->enableTranslation(false);
             $menu[] = $item;
         }

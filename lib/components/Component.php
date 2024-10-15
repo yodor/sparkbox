@@ -246,7 +246,6 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
             echo "/";
         }
         echo ">";
-
         $this->renderCaption();
     }
 
@@ -278,7 +277,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     public function finishRender()
     {
         if ($this->closingTagRequired) {
-            echo "</$this->tagName>\n";
+            echo "</$this->tagName>";
         }
     }
 
@@ -564,7 +563,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
         }
 
-        return implode(" ", $attributes);
+        return trim(implode(" ", $attributes));
 
     }
 
@@ -608,8 +607,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         }
         $attrs[] = $this->getAttributesText();
         $attrs[] = $this->getStyleText();
+        return trim(implode(" ", $attrs));
 
-        return implode(" ", $attrs);
     }
 
     public function appendAttributes(array $attributes) : void

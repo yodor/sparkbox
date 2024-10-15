@@ -14,8 +14,8 @@ class SparkList extends SparkObject implements ISparkCollection
 
     public function __clone() : void
     {
-        foreach ($this->elements as $idx => $clause) {
-            $this->elements[$idx] = clone $clause;
+        foreach ($this->elements as $idx => $object) {
+            $this->elements[$idx] = clone $object;
         }
     }
 
@@ -46,6 +46,7 @@ class SparkList extends SparkObject implements ISparkCollection
     {
         $this->elements[] = $object;
     }
+
 
     public function insert(SparkObject $object, int $index) : void
     {
@@ -120,6 +121,27 @@ class SparkList extends SparkObject implements ISparkCollection
         return new SparkIterator($this);
     }
 
+
+    /**
+     * Append all items from '$source' to this list elements
+     * @param SparkList $source
+     * @param bool $clone Clone each item before appending to this list
+     * @return void
+     */
+    public function appendAll(SparkList $source, bool $clone = false) : void
+    {
+        $iterator = $source->iterator();
+        while ($object = $iterator->next()) {
+            if (!($object instanceof SparkObject)) continue;
+            if ($clone) {
+                $this->append(clone $object);
+            }
+            else {
+                $this->append($object);
+            }
+
+        }
+    }
 
 }
 ?>

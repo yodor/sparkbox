@@ -21,7 +21,7 @@ class Link extends Component
         return $this->getAttribute("href");
     }
 
-    public function setRelation($relation) : void
+    public function setRelation(string $relation) : void
     {
         $this->setAttribute("rel", $relation);
     }

@@ -38,8 +38,6 @@ class MenuBar extends Container
 
     protected MenuBarInitScript $initScript;
 
-    public bool $toggle_first = true;
-
     public function __construct(MenuItemList $menu)
     {
         parent::__construct(false);

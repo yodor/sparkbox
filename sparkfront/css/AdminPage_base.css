@@ -14,53 +14,45 @@ BODY {
 .admin_layout {
 
     display: grid;
-
-    grid-template-columns: auto 1fr;
+    /*flex-direction:row;*/
+    grid-template-columns: 150px auto;
     grid-template-rows: 100vh;
 
 }
 
-.admin_layout .admin_header {
+.admin_layout .sidePane {
+
+    box-sizing: border-box;
+
+    background-attachment: fixed;
+
+    background-image: url("../images/admin/admin_header.png");
+
+    position:sticky;
+    left:0;
+    top:0;
+
+    display:inline-flex;
+    flex-direction:column;
+
+}
+
+.admin_layout .sidePane .admin_header {
+
     background-color: #464646;
     color: white;
     padding: 1em;
     text-align: center;
+
     display: flex;
     flex-direction: column;
-    align-items:flex-start;
-}
-
-
-.admin_layout .left_menu {
-
-    box-sizing: border-box;
-
-    white-space: nowrap;
-    vertical-align: top;
-    padding: 0;
-
-    background-image: url("../images/admin/admin_header.png");
-
-    /*position:sticky;*/
-    /*left:0;*/
-    /*top:0;*/
-
-    background-attachment: fixed;
-    z-index: 100;
-}
-
-.admin_layout .left_menu .menu_contents {
-    position: sticky;
-    left: 0;
-    top: 0;
-
-    /*-webkit-box-shadow: 8px 0 10px -6px #000000;*/
-    /*-moz-box-shadow: 8px 0 10px -6px #000000;*/
-    /*box-shadow: 8px 0 10px -6px #000000;*/
+    align-items: center;
 
 }
 
-.admin_layout .left_menu .menu_contents .admin_menu {
+
+
+.admin_layout .sidePane .admin_menu {
     border: 1px solid #464646;
 }
 
@@ -81,7 +73,9 @@ BODY {
     overflow: hidden;
 
 }
-
+.admin_layout .page_area > * {
+    min-width:0;
+}
 
 .admin_layout .page_area .page_caption {
 
@@ -282,9 +276,7 @@ BODY {
 }
 
 .BeanEditorPage {
-    min-width: 50%;
-    width:50%;
-    max-width: 100%;
+
 }
 
 .BeanFormEditor {
@@ -292,7 +284,7 @@ BODY {
 }
 
 .BeanFormEditor .FormRenderer {
-    /*width: 100%;*/
+
 }
 
 .BeanFormEditor .FormRenderer .TextArea TEXTAREA {
