@@ -2,22 +2,14 @@
 @import url("FormRendererVBox.css");
 
 .FormRenderer {
-    display: inline-grid;
-    text-align: left;
+    min-width:0;
+    white-space: wrap;
+}
+.FormRenderer * {
+    min-width:0;
+    white-space: wrap;
 }
 
-.InputGroupRenderer {
-    margin-bottom:30px;
-    padding-top:20px;
-    border:1px solid #bababa;
-
-    display:flex;
-    flex-direction: column;
-}
-
-.InputGroupRenderer LEGEND {
-
-}
 
 .InputComponent {
     box-sizing: border-box;
@@ -33,4 +25,17 @@
     display: none;
 }
 
+.InputGroupRenderer {
+    margin-bottom:30px;
+    padding-top:20px;
+    border:1px solid #bababa;
+
+    display:inline-flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.InputGroupRenderer LEGEND {
+
+}
 

@@ -69,7 +69,7 @@ class AdminUserForm extends InputForm
     }
 
     //post_data already assigned
-    public function validate()
+    public function validate(): void
     {
         if (strcmp($this->getInput("access_level")->getValue(), "Limited Access") == 0) {
             $this->getInput("role")->setRequired(TRUE);

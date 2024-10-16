@@ -16,7 +16,7 @@ class ConfigFormProcessor extends FormProcessor
 
         if (!($this->bean instanceof ConfigBean)) throw new Exception("ConfigBean not set yet");
 
-        $input_names = $form->getInputNames();
+        $input_names = $form->inputNames();
         foreach ($input_names as $name) {
 
             $input = $form->getInput($name);

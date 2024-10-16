@@ -42,9 +42,12 @@
     padding-inline:0;
     padding-block:0;
 
-    padding: 0.2em 0.5em;
+    padding-top:0.2em;
+    padding-bottom:0.2em;
+    padding-left:0.5em;
+    padding-right:0.5em;
 
-    min-width:5em;
+    min-width: 5em !important;
 
     border-radius: var(--spark-button-border-radius);
 

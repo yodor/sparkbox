@@ -81,6 +81,8 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->bean = $bean;
         $this->form = $form;
+        $this->form->setBean($bean);
+
 
         $this->form_render = new FormRenderer($form);
 
@@ -90,7 +92,7 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         $this->transactor = new BeanTransactor($this->bean, $this->editID);
 
-        $fieldNames = $this->form->getInputNames();
+        $fieldNames = $this->form->inputNames();
         foreach ($fieldNames as $fieldName) {
 
             $field = $this->form->getInput($fieldName);
@@ -161,11 +163,12 @@ class BeanFormEditor extends Container implements IBeanEditor
         return $this->editID;
     }
 
-    public function setEditID(int $editID)
+    public function setEditID(int $editID): void
     {
         $this->editID = $editID;
         $this->attributes["editID"] = $this->editID;
         $this->transactor->setEditID($editID);
+        $this->form->setEditID($editID);
 
     }
 
@@ -174,10 +177,11 @@ class BeanFormEditor extends Container implements IBeanEditor
         return $this->bean;
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean): void
     {
         $this->bean = $bean;
         $this->transactor->setBean($bean);
+        $this->form->setBean($bean);
     }
 
     public function getForm(): InputForm
@@ -218,9 +222,16 @@ class BeanFormEditor extends Container implements IBeanEditor
 
         try {
 
-            debug("Loading bean data into form");
-            $this->form->loadBeanData($this->getEditID(), $this->getBean());
-            SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_LOADED, $this));
+
+            if ($this->editID>0) {
+                debug("Loading bean data into form");
+                $this->form->loadBeanData($this->getEditID(), $this->getBean());
+                SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_LOADED, $this));
+            }
+            else {
+                debug("Add mode not loading bean data");
+            }
+
             debug("Calling form processor");
             $this->processor->process($this->form);
             SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_PROCESSED, $this));

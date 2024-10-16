@@ -2,7 +2,7 @@
 
 class DataObjectInput extends InputProcessor
 {
-    protected $object;
+    protected DataObject $object;
 
     public function __construct(DataInput $input, DataObject $object)
     {

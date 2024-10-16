@@ -40,6 +40,20 @@ class InputGroup extends SparkObject {
     {
         $this->contents[$input->getName()] = 1;
     }
+    public function insertInputAfter(DataInput $input, string $after_name): void
+    {
+
+        $names = array_keys($this->contents);
+        $index = (int)array_search($after_name, $names);
+        $index++;
+
+
+        // Create a new array with the new element at the desired position
+        $this->contents = array_merge(
+            array_slice($this->contents, 0, $index),
+            array($input->getName() => 1),
+            array_slice($this->contents, $index));
+    }
 
     public function removeInput(DataInput $input): void
     {
@@ -249,17 +263,26 @@ class InputForm extends SparkObject implements IBeanEditor
         $group->addInput($input);
     }
 
-    public function insertFieldAfter(DataInput $input, string $after_name): void
+    public function insertInputAfter(DataInput $input, string $after_name): void
     {
-        $index = array_search($after_name, array_keys($this->inputs));
-
-        $this->inputs = array_slice($this->inputs, 0, $index + 1, TRUE) + array($input->getName() => $input) + array_slice($this->inputs, $index + 1, count($this->inputs) - 1, TRUE);
 
         $afterInput = $this->getInput($after_name);
+
+        $input->setForm($this);
+
+        $index = (int)array_search($after_name, array_keys($this->inputs));
+        $index++;
+
+        // Create a new array with the new element at the desired position
+        $this->inputs = array_merge(
+            array_slice($this->inputs, 0, $index),
+            array($input->getName() => $input),
+            array_slice($this->inputs, $index));
+
         $groupName = $this->groupName($afterInput);
 
         $inputGroup = $this->getGroup($groupName);
-        $inputGroup->addInput($input);
+        $inputGroup->insertInputAfter($input, $after_name);
 
     }
 
@@ -273,7 +296,7 @@ class InputForm extends SparkObject implements IBeanEditor
         unset($this->inputs[$name]);
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean): void
     {
         $this->bean = $bean;
     }
@@ -283,9 +306,9 @@ class InputForm extends SparkObject implements IBeanEditor
         return $this->bean;
     }
 
-    public function setEditID(int $editid)
+    public function setEditID(int $editID): void
     {
-        $this->beanID = $editid;
+        $this->beanID = $editID;
     }
 
     public function getEditID(): int
@@ -313,7 +336,7 @@ class InputForm extends SparkObject implements IBeanEditor
     }
 
     // 	public function getValuesArray()
-    public function getInputValues()
+    public function inputValues() : array
     {
         $ret = array();
 
@@ -322,19 +345,20 @@ class InputForm extends SparkObject implements IBeanEditor
         }
         return $ret;
     }
+    public function inputNames(): array
+    {
+        return array_keys($this->inputs);
+    }
 
     /**
      * @return array
      */
-    public function getInputs(): array
+    public function inputs(): array
     {
         return $this->inputs;
     }
 
-    public function getInputNames(): array
-    {
-        return array_keys($this->inputs);
-    }
+
 
     /**
      * @return bool
@@ -364,8 +388,25 @@ class InputForm extends SparkObject implements IBeanEditor
     }
 
     /**
-     * Load values with data from _POST or DBTableBean
-     * @param array $arr
+     * Validate all DataInputs in this collection
+     * @throws Exception
+     */
+    public function validate(): void
+    {
+        $names = array_keys($this->inputs);
+
+        foreach ($names as $pos => $name) {
+            $input = $this->getInput($name);
+
+            if ($input->isEditable()) {
+                $input->validate();
+            }
+        }
+    }
+
+    /**
+     * Load and populate values into all inputs using their processor method loadPostData
+     * @param array $data
      * @throws Exception
      */
     public function loadPostData(array $data) : void
@@ -389,43 +430,27 @@ class InputForm extends SparkObject implements IBeanEditor
     }
 
     /**
-     * Validate data values for all fields in this form
-     * @throws Exception
-     */
-    public function validate()
-    {
-        $names = array_keys($this->inputs);
-
-        foreach ($names as $pos => $name) {
-            $input = $this->getInput($name);
-
-            if ($input->isEditable()) {
-                $input->validate();
-            }
-        }
-    }
-
-    /**
      * Select bean data row by ID specified in $editID
      * Pass result to each of the inputs processors
      * @param int $editID
      * @param DBTableBean $bean
-     * @return array|mixed
+     * @return array
      * @throws Exception
      */
-    public function loadBeanData(int $editID, DBTableBean $bean)
+    public function loadBeanData(int $editID, DBTableBean $bean): array
     {
+
         debug("Loading data from '" . get_class($bean) . "' ID='$editID' ");
 
-        //TODO: check if setEditBean and editID is used anymore
+        //used
         $this->setBean($bean);
         $this->setEditID($editID);
 
-        $item_row = array();
+        $result = array();
 
         if ($editID > 0) {
             debug("Edit/Update mode ");
-            $item_row = $bean->getByID($editID);
+            $result = $bean->getByID($editID);
             $item_key = $bean->key();
 
             //do not validate values coming from db
@@ -433,26 +458,26 @@ class InputForm extends SparkObject implements IBeanEditor
             debug("Loading form using bean '" . get_class($bean) . "' where " . $bean->key()." = ".$editID);
 
             //initial loading of bean data
-            $names = $this->getInputNames();
+            $names = $this->inputNames();
             foreach ($names as $pos => $name) {
 
                 $input = $this->getInput($name);
                 debug("Processing DataInput '$name'");
 
                 //processor need value set. processor might need other values from the item_row or to parse differently the value
-                $input->getProcessor()->loadBeanData($editID, $bean, $item_row);
+                $input->getProcessor()->loadBeanData($editID, $bean, $result);
             }
 
         }
         else {
             debug("Add/Insert mode");
         }
-        return $item_row;
+        return $result;
     }
 
-    public function clearURLParameters(URL $url)
+    public function clearURLParameters(URL $url): void
     {
-        $names = $this->getInputNames();
+        $names = $this->inputNames();
         foreach ($names as $idx=>$name) {
             $input = $this->getInput($name);
             $input->getProcessor()->clearURLParameters($url);
@@ -463,7 +488,7 @@ class InputForm extends SparkObject implements IBeanEditor
     {
         $where = new ClauseCollection();
 
-        $names = $this->getInputNames();
+        $names = $this->inputNames();
         foreach ($names as $pos => $name) {
 
             $input = $this->getInput($name);
@@ -503,7 +528,7 @@ class InputForm extends SparkObject implements IBeanEditor
         echo "<?xml version='1.0' encoding='utf-8'?>";
         echo "<inputform class='" . get_class($this) . "'>";
         echo "<fields>";
-        $names = $this->getInputNames();
+        $names = $this->inputNames();
 
         foreach ($names as $idx => $name) {
             $input = $this->getInput($name);
@@ -547,7 +572,7 @@ class InputForm extends SparkObject implements IBeanEditor
     {
         echo "<div class='FormValueList' name='".$this->getName()."'>";
 
-        foreach ($this->getInputs() as $index => $field) {
+        foreach ($this->inputs() as $index => $field) {
             if (!($field instanceof DataInput))continue;
 
             echo "<div class='item'>";

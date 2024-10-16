@@ -16,12 +16,17 @@
         $this->name = $name;
     }
 
-    public function send()
+    public function sendHeaders() : void
     {
         header("Cache-Control: no-cache");
         //header("Pragma: no-cache");
         header("Expires: 0");
         header("Content-Type: application/json");
+    }
+
+    public function send()
+    {
+        $this->sendHeaders();
         echo json_encode($this);
     }
 

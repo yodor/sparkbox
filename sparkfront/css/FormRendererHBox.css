@@ -1,9 +1,11 @@
 .FormRenderer[layout="HBox"] {
+    display:inline-grid;
     grid-template-columns: auto auto;
     column-gap: 0.25em;
     row-gap: 0.5em;
+
     align-items: center;
-    justify-items: stretch;
+
 }
 
 .FormRenderer[layout="HBox"] .InputComponent {
@@ -20,10 +22,13 @@
 
     display:flex;
     justify-self: stretch;
+
+    gap:0.5em;
 }
+
 .FormRenderer[layout="HBox"]  .SubmitLine .TextSpace {
 
-    display:flex;
+    display:inline-flex;
     flex-direction: row;
     flex-wrap:wrap;
     flex-grow:1;
@@ -36,7 +41,7 @@
 
 .FormRenderer[layout="HBox"]  .SubmitLine .Buttons {
 
-    display:flex;
+    display:inline-flex;
     flex-direction: row;
     flex-wrap: nowrap;
 

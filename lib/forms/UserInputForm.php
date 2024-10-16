@@ -36,7 +36,7 @@ class UserInputForm extends InputForm
      * post_data already assigned
      * @throws Exception
      */
-    public function validate()
+    public function validate(): void
     {
 
         parent::validate();

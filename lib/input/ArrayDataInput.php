@@ -42,7 +42,7 @@ class ArrayDataInput extends DataInput
         return $this->error_generic;
     }
 
-    public function setValidator(IInputValidator $validator)
+    public function setValidator(IInputValidator $validator) : void
     {
         parent::setValidator(new ArrayInputValidator($validator));
     }
@@ -52,7 +52,7 @@ class ArrayDataInput extends DataInput
         return $this->value[$idx];
     }
 
-    public function setValueAt($idx, $value)
+    public function setValueAt($idx, $value) : void
     {
         $this->value[$idx] = $value;
     }

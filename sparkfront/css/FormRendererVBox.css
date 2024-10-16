@@ -1,13 +1,17 @@
 .FormRenderer[layout="VBox"] {
-    grid-template-columns: auto;
+    display: inline-flex;
+    flex-direction: column;
+    flex-wrap: wrap;
     gap:0.5em;
+    align-items:flex-start;
+
 }
 
 .FormRenderer[layout="VBox"] .InputComponent {
     display: inline-flex;
     flex-direction: column;
+    flex-wrap: wrap;
     gap: 0.1em;
-
 }
 
 .FormRenderer[layout="VBox"] .SubmitLine {
@@ -16,12 +20,14 @@
     flex-direction: row;
 
     gap:1em;
+
+    align-self: stretch;
 }
 
 .FormRenderer[layout="VBox"]  .SubmitLine .TextSpace {
     flex-grow:1;
 
-    display:flex;
+    display:inline-flex;
     flex-direction: row;
     flex-wrap: wrap;
 
@@ -30,7 +36,7 @@
 
 .FormRenderer[layout="VBox"]  .SubmitLine .Buttons {
 
-    display:flex;
+    display:inline-flex;
     flex-direction: row;
     flex-wrap: nowrap;
 

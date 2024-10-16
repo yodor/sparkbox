@@ -7,7 +7,10 @@
 .Dialog.JSONFormDialog .Inner .Content FORM {
 
 }
-
+.Dialog.JSONFormDialog .Inner .Content FORM .InputComponent {
+    align-self:stretch;
+    align-items:stretch;
+}
 .Dialog.JSONFormDialog[loading] .Inner .Content {
     align-items:center;
 }

@@ -53,7 +53,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         return $this->status;
     }
 
-    public function setEditID(int $editID)
+    public function setEditID(int $editID): void
     {
         $this->editID = $editID;
     }
@@ -168,7 +168,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         $sessionData = new SessionData($form_name);
         $sessionData->removeAll();
 
-        foreach ($form->getInputNames() as $inputName) {
+        foreach ($form->inputNames() as $inputName) {
             $input = $form->getInput($inputName);
             $sessionData->set($inputName, $input->getValue());
         }
@@ -183,7 +183,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
             $this->status = IFormProcessor::STATUS_ERROR;
 
             $error_inputs = array();
-            foreach ($form->getInputs() as $field_name => $field) {
+            foreach ($form->inputs() as $field_name => $field) {
                 if ($field->haveError()) {
                     $error_inputs[] = $field->getName();
                 }

@@ -19,10 +19,14 @@ class DataObject extends SparkObject implements IDataResultProcessor
         return $this->value;
     }
 
+    public function setValue($value) : void
+    {
+        $this->value = $value;
+    }
+
     public function setData(array $data) : void
     {
         $this->value = $data[$this->name] ?? "";
-
     }
 }
 ?>

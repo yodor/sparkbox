@@ -113,7 +113,7 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
     }
 
     /**
-     * ID key value from the result row
+     * Primary Key value from the result row
      * @param int $id
      * @return void
      */
@@ -196,6 +196,7 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
      * Uses createInputName to set the actual name attribute
      * Called from processAttributes
      * Fields with complex elements ie CheckItem, RadioItem override getInput() and return the actual input item
+     * Component $input might be 'this' if getInput() is not reimplemented
      * @param Component $input
      * @return void
      */
@@ -212,13 +213,15 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
 
         $name = $this->createInputName();
 
-        //overwrite the name attribute
-        if ($name) {
-            $input->setAttribute("name", $name);
-        }
-        else {
-            $input->removeAttribute("name");
-        }
+        //overwrite the name - actual attribute will be set during processAttributes of $input
+        $input->setName($name);
+//        if ($name) {
+//
+//            $input->setAttribute("name", $name);
+//        }
+//        else {
+//            $input->removeAttribute("name");
+//        }
 
     }
 
@@ -239,8 +242,16 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
      */
     protected function processAttributes(): void
     {
-        parent::processAttributes();
         $this->assignInputAttributes($this->getInput());
+
+        //set actual name attribute using $this->name
+        //parent::processAttributes();
+        if ($this->name) {
+            $this->setAttribute("name", $this->name);
+        }
+        else {
+            $this->removeAttribute("name");
+        }
     }
 
     public function setSelected(bool $mode) : void
@@ -276,8 +287,8 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
         $this->label = $data[$this->label_key] ?? "";
 
         foreach ($this->data_attributes as $attributeName => $fieldName) {
-            if (isset($this->data[$fieldName])) {
-                $this->setAttribute($attributeName, $this->data[$fieldName]);
+            if (isset($data[$fieldName])) {
+                $this->setAttribute($attributeName, $data[$fieldName]);
             }
             else {
                 $this->removeAttribute($attributeName);

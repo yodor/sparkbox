@@ -49,7 +49,7 @@ class FormRenderer extends Form
 
     public function __construct(InputForm $form)
     {
-        parent::__construct(false);
+        parent::__construct();
         $this->setComponentClass("FormRenderer");
         $this->setLayout($this->layout);
 

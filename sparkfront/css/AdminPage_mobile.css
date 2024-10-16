@@ -5,7 +5,10 @@
         display:flex;
         flex-direction: column;
     }
-    .admin_layout .admin_header {
+    .admin_layout .sidePane {
+
+    }
+    .admin_layout .sidePane .admin_header {
         display:flex;
         flex-direction: row;
         align-items: center;
@@ -21,6 +24,20 @@
     .admin_layout .page_area .page_caption .page_actions {
         margin-left:0.5em;
     }
+    .admin_layout .page_area .page_caption .page_filters {
+        flex-direction: column;
+
+    }
+
+    .admin_layout .page_area .page_contents TH[column='actions'] {
+        position:sticky;
+        right:0;
+    }
+    .admin_layout .page_area .page_contents TD[column='actions'] {
+        position:sticky;
+        right:0;
+    }
+
     .admin_layout .page_area .page_contents {
         display:flex;
         flex-direction: column;

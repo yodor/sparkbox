@@ -62,13 +62,13 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      * Override transact column name - default is = DataInput.getName() set in the CTOR
      * @var string
      */
-    protected $transact_column;
+    protected string $transact_column;
 
     /**
      *
      * @var DataInput
      */
-    protected $input;
+    protected DataInput $input;
 
     /**
      * Transact the DataInput values to this bean instead of the main transaction row
@@ -88,6 +88,17 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         $this->accepted_tags = DefaultAcceptedTags();
 
         $this->transact_column = $input->getName();
+    }
+
+    public function setDataInput(DataInput $input) : void
+    {
+        $this->input = $input;
+        $this->transact_column = $input->getName();
+    }
+
+    public function getDataInput() : DataInput
+    {
+        return $this->input;
     }
 
     public function getTransactBean(): ?DBTableBean
@@ -436,7 +447,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     }
 
-    public function clearURLParameters(URL $url)
+    public function clearURLParameters(URL $url): void
     {
         $url->remove($this->input->getName());
     }

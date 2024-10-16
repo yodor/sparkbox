@@ -460,7 +460,7 @@ function isEmptyPassword($password)
 //TODO: move field2columns to parsing class
 function fields2columns(InputForm $form, TableView $view, IDataBean $bean = NULL)
 {
-    foreach ($form->getInputs() as $field_name => $field) {
+    foreach ($form->inputs() as $field_name => $field) {
         if ($bean) {
             if (!$bean->haveField($field_name)) continue;
         }

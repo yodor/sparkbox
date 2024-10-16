@@ -524,7 +524,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * @param string $value
      * @return void
      */
-    public function setStyleProperty(string $name, string $value) : void
+    public function setStyle(string $name, string $value) : void
     {
         $this->style[$name] = $value;
     }
@@ -535,7 +535,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * @param string $name
      * @return string
      */
-    public function getStyleProperty(string $name): string
+    public function getStyle(string $name): string
     {
         if (isset($this->style[$name])) return $this->style[$name];
         return "";

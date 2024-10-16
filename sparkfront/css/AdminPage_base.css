@@ -16,6 +16,7 @@ BODY {
     display: grid;
     /*flex-direction:row;*/
     grid-template-columns: 13em auto;
+
     grid-template-rows: 100vh;
 
 }
@@ -35,6 +36,7 @@ BODY {
     display:inline-flex;
     flex-direction:column;
 
+    z-index:100;
 }
 
 .admin_layout .sidePane .admin_header {
@@ -139,6 +141,7 @@ BODY {
 
     display:flex;
     flex-direction:row;
+    gap:0.5em;
 
 }
 .admin_layout .page_area .page_caption .page_filters:has(*) {
@@ -184,131 +187,10 @@ BODY {
     max-height:64px;
 }
 
-
-
-.BeanFormEditor[bean='AdminUsersBean'] .CheckField[field="role"] .CheckItem {
-    display: block;
-}
-
-.BeanFormEditor[bean='AdminUsersBean'] .InputComponent[field="password"] {
-    display: none;
-}
-
-.BeanFormEditor[bean='AdminUsersBean'] .InputComponent[field="password1"] {
-    display: none;
-}
-
-
-.TranslationPhrases .original_text {
-    font-weight: bold;
-}
-
-.BeanFormEditor[bean='MenuItemsBean'] .FormRenderer .InputField {
-    min-width: 400px;
-
-}
-
-.BeanFormEditor .FormRenderer .InputField.MCETextArea TEXTAREA {
-
-}
-
-.TableView[name='SiteTexts'] TD[column='value'] {
-    text-align: left;
-}
-
-
-.BeanFormEditor > .Caption:first-child {
-    color: #656565;
-    font-size: 20px;
-    /* font-weight: bold; */
-    border-bottom: 1px solid #cccccc;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-
-}
-
-
-.orange {
-    color: #f9a541;
-}
-
-
-
-.CurrencyRateEditor {
-
-    border: 1px solid slategrey;
-    position: relative;
-    display: table;
-    border-collapse: collapse;
-
-}
-
-.CurrencyRateEditor .Line {
-    display: table-row;
-}
-
-.CurrencyRateEditor .Item {
-    display: table-cell;
-    vertical-align: middle;
-    text-align: center;
-    padding: 0.5em;
-    border: 1px dotted slategrey;
-}
-
-.CurrencyRateEditor .Item.code {
-    font-weight: bold;
-    background-color: #506266;
-    color: antiquewhite;
-}
-
-.CurrencyRateEditor .Item.rate {
-    cursor: pointer;
-}
-
-.CurrencyRateEditor .Item.rate:hover {
-    text-decoration: underline;
-}
-
-.CurrencyRateEditor .Item.space {
-    background-color: papayawhip;
-}
-
 .BeanEditorPage {
-
+    display:flex;
+    flex-direction:column;
 }
-
 .BeanFormEditor {
-    width: auto;
-}
-
-.BeanFormEditor .FormRenderer {
-
-}
-
-.BeanFormEditor .FormRenderer .TextArea TEXTAREA {
-    min-height: 200px;
-}
-
-.caption.empty_list {
-    padding-top: 1em;
-    padding-bottom: 1em;
-}
-
-.admin_layout .page_area .PageTemplate {
-    vertical-align: top;
-}
-
-.admin_layout .page_area .PageTemplate .Container {
-    vertical-align: top;
-    display: block;
-}
-.ConfigEditorPage {
-    width:50%;
-}
-.ConfigEditorPage .FormRenderer {
-    display:grid;
-}
-.ConfigEditorPage .TextArea TEXTAREA {
-    min-height:150px;
-
+    /*width:200px;*/
 }

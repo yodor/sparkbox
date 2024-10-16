@@ -125,6 +125,8 @@ class SessionUpload extends Component {
 
         if (response.contents) showAlert(response.contents);
 
+        console.log(result);
+
         for (let a = 0; a < response.object_count; a++) {
             let current_object = response.objects[a];
 

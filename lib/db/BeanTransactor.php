@@ -62,12 +62,12 @@ class BeanTransactor extends SparkObject implements IBeanEditor
         return $this->bean;
     }
 
-    public function setEditID(int $editID)
+    public function setEditID(int $editID): void
     {
         $this->editID = $editID;
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean): void
     {
         $this->bean = $bean;
     }
@@ -131,7 +131,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
 
         debug("Using InputForm: " . get_class($form));
 
-        $fieldNames = $form->getInputNames();
+        $fieldNames = $form->inputNames();
 
         foreach ($fieldNames as $fieldName) {
             $field = $form->getInput($fieldName);
@@ -162,7 +162,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
         if (!$this->form) throw new Exception("Expected InputForm is null");
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
-        $names = $this->form->getInputNames();
+        $names = $this->form->inputNames();
         foreach ($names as $name) {
 
             $input = $this->form->getInput($name);
@@ -187,7 +187,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
         if (!$this->form) throw new Exception("Expected InputForm is null");
 
         //cycle all fields - do not skip fields with skip_transaction flag set. needed for cleanup
-        $names = $this->form->getInputNames();
+        $names = $this->form->inputNames();
         foreach ($names as $name) {
 
             $input = $this->form->getInput($name);

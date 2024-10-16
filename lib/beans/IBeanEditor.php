@@ -11,7 +11,7 @@ interface IBeanEditor
     /**
      * @param int $editID
      */
-    public function setEditID(int $editID);
+    public function setEditID(int $editID): void;
 
     /**
      * @return DBTableBean
@@ -21,6 +21,6 @@ interface IBeanEditor
     /**
      * @param DBTableBean $bean
      */
-    public function setBean(DBTableBean $bean);
+    public function setBean(DBTableBean $bean): void;
 
 }

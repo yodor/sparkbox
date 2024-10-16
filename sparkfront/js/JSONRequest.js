@@ -221,6 +221,7 @@ class JSONRequest extends SparkObject {
                 }
             }
             catch (e) {
+                console.error(response);
                 throw new Error("Incorrect JSON response: " + e.message);
             }
 

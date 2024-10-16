@@ -35,10 +35,11 @@ class MenuItemForm extends InputForm
 
     }
 
-    public function loadBeanData($editID, DBTableBean $bean)
+    public function loadBeanData($editID, DBTableBean $bean): array
     {
-        parent::loadBeanData($editID, $bean);
+        $result = parent::loadBeanData($editID, $bean);
         $this->load();
+        return $result;
     }
 
     public function loadPostData(array $data) : void
@@ -62,7 +63,7 @@ class MenuItemForm extends InputForm
 
     }
 
-    public function validate()
+    public function validate(): void
     {
         parent::validate();
         $editID = $this->getEditID();

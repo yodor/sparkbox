@@ -32,9 +32,6 @@ include_once("input/validators/FileUploadValidator.php");
 include_once("input/validators/EmptyValueValidator.php");
 include_once("input/validators/TextCaptchaValidator.php");
 
-include_once("input/processors/DateInput.php");
-include_once("input/processors/TimeInput.php");
-include_once("input/processors/PhoneInput.php");
 include_once("input/processors/UploadDataInput.php");
 
 include_once("input/processors/SessionUploadInput.php");
