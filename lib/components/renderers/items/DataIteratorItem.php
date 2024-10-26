@@ -202,7 +202,9 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
      */
     protected function assignInputAttributes(Component $input) : void
     {
-        $input->setAttribute("pos", $this->position);
+        if ($this->position>-1) {
+            $input->setAttribute("pos", $this->position);
+        }
 
         if (!is_null($this->key)) {
             $input->setAttribute("key", $this->key);

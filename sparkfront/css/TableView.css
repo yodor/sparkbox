@@ -1,145 +1,90 @@
 .TableView {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
-
-
 .TableView .viewport {
-    border-collapse: collapse;
-    width: 100%;
+    display: inline-grid;
+    /*grid-template-columns: auto;*/
 }
-
-
-.TableView .viewport .HeaderCellRenderer {
-
+.TableView .viewport .Cell {
+    border: 0.1em solid #aeaeae;
+    align-items: center;
+    align-content: center;
     text-align: center;
 
-    border: 1px solid #aeaeae;
+    padding:0.3em;
+}
+/*alternating columns*/
+.TableView .viewport > .Cell:nth-child(odd) {
+    /*background-color: #f3f6fb; !* light gray *!*/
+}
+
+.TableView .viewport > .Cell:nth-child(even) {
+    /*background-color: red; !* gray *!*/
+}
+
+.TableView .viewport .Cell[parity='even'] {
+
+}
+.TableView .viewport .Cell[parity='odd'] {
+    background-color: #f3f6fb;
+}
+
+.TableView .viewport .Header {
     background-color: #e7e7e7;
-
-    white-space: normal;
-    color: #537689;
-
-    padding: 0.3em !important;
-
-    vertical-align:middle;
-
-}
-
-.TableView .viewport .HeaderCellRenderer A {
+    align-content: center;
+    text-align: center;
 
     color: #537689;
+    font-weight:bold;
 }
-
-.TableView .viewport .TableCellRenderer {
-
-
-    text-align: left;
-    vertical-align: middle;
-
-    padding-left: 0.3em;
-    padding-right: 0.3em;
-
-    padding-top:0;
-    padding-bottom:0;
+.TableView .viewport .Header A {
+    color: inherit;
 }
-
-.TableView .viewport .TableCellRenderer.center {
+.TableView .viewport .Cell.center {
     text-align:center;
 }
-
-.TableView .viewport .TableCellRenderer.left {
+.TableView .viewport .Cell.left {
     text-align:left;
 }
-
-.TableView .viewport .TableCellRenderer.right {
+.TableView .viewport .Cell.right {
     text-align:right;
 }
 
-.TableView .viewport TR.odd .TableCellRenderer {
-    background-color: #f3f6fb;
-    border: 1px solid #aeaeae;
-
-}
-
-.TableView .viewport TR.even .TableCellRenderer {
-    border: 1px solid #aeaeae;
-    background-color: white;
-
-}
-
-.TableView .viewport .ImageCellRenderer {
-
-    vertical-align: middle;
-    text-align: center;
-}
-
-.TableView .viewport .BooleanCellRenderer {
-
-    vertical-align: middle;
-    text-align: center;
-
-}
-
-.TableView .viewport .ActionsCellRenderer {
-
-    line-height: 180%;
-    text-align: center;
-    color: #50a9f9;
-    white-space: nowrap;
-
-}
-
-.TableView .viewport .ActionsCellRenderer .pipe_separator {
-    color: #cccccc;
-}
-
-
-.TableView .viewport .ActionsCellRenderer .actions_list {
-    display: inline-block;
-    text-align: left;
-}
-
-.TableView .viewport .ActionsCellRenderer .actions_list>* {
-
-}
-
-.TableView .viewport .ColorCodeCellRenderer {
-    text-align: center;
-}
-
-.TableView .viewport .ColorCodeCellRenderer .color_value {
-    display: inline-block;
-
-    min-width: 48px;
-    min-height: 48px;
-
-}
-
-.TableView .HeaderCellRenderer .direction {
+.TableView .viewport .Header .direction {
 
     display:inline-block;
     box-sizing:border-box;
 
-    min-width:15px;
-    min-height:15px;
+    min-width: 1em;
+    min-height: 1em;
 
-    width:15px;
-    height:20px;
+    width: 1em;
+    height: 1em;
 
-    margin-left:5px;
+    margin-left: 0.2em;
 
     background-repeat:no-repeat;
 
-    background-position: 50% 50%;
+    background-position: center center;
     background-size:contain;
     filter: invert(.5);
 
     vertical-align: bottom;
 }
 
-.TableView .HeaderCellRenderer .direction[direction="ASC"] {
+.TableView .viewport .Header .direction[direction="ASC"] {
     background-image:url(../images/icon_sort_asc.svg)
 }
-.TableView .HeaderCellRenderer .direction[direction="DESC"] {
+.TableView .viewport .Header .direction[direction="DESC"] {
     background-image:url(../images/icon_sort_desc.svg)
+}
+
+.TableView .viewport .Cell .actions_list {
+    white-space: nowrap;
+}
+
+.TableView .viewport .ActionsCellRenderer .actions_list>* {
+
 }

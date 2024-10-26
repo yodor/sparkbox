@@ -16,7 +16,7 @@ class ToolTip {
 
         this.hide(element, event);
 
-        this.tipElement.textContent = element.getAttribute("tooltip");
+        this.tipElement.innerHTML = element.getAttribute("tooltip");
 
         let left = event.pageX + 25;
         let top = event.pageY + 25;

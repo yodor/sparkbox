@@ -30,7 +30,7 @@ class GalleryViewPage extends BeanListPage
 
         $this->view = $gv;
 
-        if (count($this->keyword_search->getForm()->getFields()) > 0) {
+        if (count($this->keyword_search->getForm()->getColumns()) > 0) {
             $this->items()->append($this->keyword_search);
         }
 

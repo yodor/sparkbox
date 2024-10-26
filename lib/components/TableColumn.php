@@ -1,58 +1,54 @@
 <?php
-include_once("components/Component.php");
-include_once("components/renderers/cells/TableCellRenderer.php");
-include_once("components/renderers/cells/HeaderCellRenderer.php");
+include_once("objects/SparkObject.php");
+include_once("components/renderers/cells/TableCell.php");
+include_once("components/renderers/cells/HeaderCell.php");
 
-class TableColumn
+class TableColumn extends SparkObject
 {
 
     /**
-     * @var HeaderCellRenderer
+     * @var HeaderCell
      */
-    protected $header;
+    protected HeaderCell $header;
 
     /**
-     * @var TableCellRenderer
+     * @var TableCell
      */
-    protected $cell;
+    protected TableCell $cell;
 
     /**
      * @var TableView
      */
-    protected $view;
+    protected TableView $view;
 
     /**
      * @var string
      */
-    protected $field_name;
-
-    /**
-     * @var string
-     */
-    protected $label;
+    protected string $label;
 
     /**
      * @var bool
      */
-    protected $sortable = TRUE;
+    protected bool $sortable = TRUE;
 
-    const ALIGN_LEFT = "left";
-    const ALIGN_RIGHT = "right";
-    const ALIGN_CENTER = "center";
+    const string ALIGN_LEFT = "left";
+    const string ALIGN_RIGHT = "right";
+    const string ALIGN_CENTER = "center";
 
-    protected $alignClass = "";
+    protected string $alignClass = "";
 
-    public function __construct(string $field_name, string $label, string $alignClass = "")
+    public function __construct(string $column, string $label, string $alignClass = "")
     {
+        parent::__construct();
 
-        $this->field_name = $field_name;
+        $this->name = $column;
         $this->label = $label;
 
-        $this->setCellRenderer(new TableCellRenderer());
-        $this->setHeaderCellRenderer(new HeaderCellRenderer());
+        $this->setCellRenderer(new TableCell());
+        $this->setHeaderCellRenderer(new HeaderCell());
 
-        if (strcasecmp($field_name, "actions") == 0) {
-            $this->getHeaderCellRenderer()->setSortable(FALSE);
+        if (strcasecmp($column, "actions") == 0) {
+            $this->sortable = false;
         }
 
         if ($alignClass) {
@@ -60,7 +56,7 @@ class TableColumn
         }
     }
 
-    public function setAlignClass(string $alignClass)
+    public function setAlignClass(string $alignClass): void
     {
         $this->alignClass = $alignClass;
     }
@@ -70,28 +66,27 @@ class TableColumn
         return $this->alignClass;
     }
 
-    public function setHeaderCellRenderer(HeaderCellRenderer $renderer)
+    public function setHeaderCellRenderer(HeaderCell $renderer): void
     {
         $this->header = $renderer;
         $this->header->setColumn($this);
     }
 
-    public function getHeaderCellRenderer(): HeaderCellRenderer
+    public function getHeaderCellRenderer(): HeaderCell
     {
         return $this->header;
     }
 
-    public function getCellRenderer(): TableCellRenderer
-    {
-        return $this->cell;
-
-    }
-
-    public function setCellRenderer(TableCellRenderer $renderer)
+    public function setCellRenderer(TableCell $renderer): void
     {
         $this->cell = $renderer;
         $this->cell->setColumn($this);
-        $this->setSortable($renderer->isSortable());
+
+    }
+    public function getCellRenderer(): TableCell
+    {
+        return $this->cell;
+
     }
 
     public function getView(): TableView
@@ -99,14 +94,9 @@ class TableColumn
         return $this->view;
     }
 
-    public function setView(TableView $view)
+    public function setView(TableView $view): void
     {
         $this->view = $view;
-    }
-
-    public function getFieldName(): string
-    {
-        return $this->field_name;
     }
 
     public function getLabel(): string
@@ -119,24 +109,9 @@ class TableColumn
         return $this->sortable;
     }
 
-    public function setSortable(bool $mode)
+    public function setSortable(bool $mode): void
     {
         $this->sortable = $mode;
-    }
-
-    public function startRender()
-    {
-
-    }
-
-    public function renderImpl()
-    {
-
-    }
-
-    public function finishRender()
-    {
-
     }
 
 }

@@ -4,8 +4,8 @@ include_once("components/TableView.php");
 include_once("components/ItemView.php");
 
 include_once("components/renderers/items/GalleryViewItem.php");
-include_once("components/renderers/cells/ImageCellRenderer.php");
-include_once("components/renderers/cells/DateCellRenderer.php");
+include_once("components/renderers/cells/ImageCell.php");
+include_once("components/renderers/cells/DateCell.php");
 
 include_once("components/renderers/IPhotoRenderer.php");
 
@@ -50,14 +50,14 @@ class GalleryView extends Container
             $view->addColumn(new TableColumn("caption", "Caption"));
             $view->addColumn(new TableColumn("date_upload", "Date Upload"));
 
-            $renderer = new ImageCellRenderer();
+            $renderer = new ImageCell();
 
             $view->getColumn("photo")->setCellRenderer($renderer);
-            $view->getColumn("date_upload")->setCellRenderer(new DateCellRenderer());
+            $view->getColumn("date_upload")->setCellRenderer(new DateCell());
 
             $view->addColumn(new TableColumn("actions", "Actions"));
 
-            $act = new ActionsCellRenderer();
+            $act = new ActionsCell();
             $this->actions = $act->getActions();
 
             $view->getColumn("actions")->setCellRenderer($act);

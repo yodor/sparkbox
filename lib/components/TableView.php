@@ -4,10 +4,9 @@ include_once("components/renderers/IHeadContents.php");
 
 include_once("utils/ValueInterleave.php");
 include_once("components/TableColumn.php");
-include_once("components/renderers/cells/ImageCellRenderer.php");
-include_once("components/renderers/cells/CallbackCellRenderer.php");
-include_once("components/renderers/cells/ActionsCellRenderer.php");
-include_once("components/renderers/cells/BooleanCellRenderer.php");
+include_once("components/renderers/cells/ImageCell.php");
+include_once("components/renderers/cells/ActionsCell.php");
+include_once("components/renderers/cells/BooleanCell.php");
 
 include_once("components/Action.php");
 
@@ -17,58 +16,16 @@ class TableView extends AbstractResultView implements IHeadContents
     /**
      * @var array TableColumn
      */
-    protected $columns = array();
+    protected array $columns = array();
 
-    protected $header_cells_enabled = TRUE;
-
-    /**
-     * @var Component
-     */
-    protected $row;
-
-    /**
-     * @var Component
-     */
-    protected $header_row;
-
-    /**
-     * @var Component
-     */
-    protected $table;
-
-    /**
-     * @var string Message shown if the table source list is empty
-     */
-    protected $list_empty_message;
 
     public function __construct(IDataIterator $itr)
     {
         parent::__construct($itr);
         $this->enablePaginators(AbstractResultView::PAGINATOR_BOTTOM);
 
-        $this->row = new Component(false);
-        $this->row->setTagName("TR");
-        $this->row->setComponentClass("");
+        $this->list_empty->setContents("No elements in this collection yet");
 
-        $this->header_row = new Component(false);
-        $this->header_row->setTagName("TR");
-        $this->header_row->setComponentClass("sort");
-
-        $this->table = new Component(false);
-        $this->table->setTagName("TABLE");
-        $this->table->setComponentClass("viewport");
-
-        $this->list_empty_message = "No elements in this collection yet";
-    }
-
-    public function setListEmptyMessage(string $message)
-    {
-        $this->list_empty_message = $message;
-    }
-
-    public function getListEmptyMessage(): string
-    {
-        return $this->list_empty_message;
     }
 
     public function requiredStyle() : array
@@ -78,26 +35,26 @@ class TableView extends AbstractResultView implements IHeadContents
         return $arr;
     }
 
-    public function addColumn(TableColumn $column)
+    public function addColumn(TableColumn $column): void
     {
-        $column_name = $column->getFieldName();
+        $column_name = $column->getName();
         $column->setView($this);
         $this->columns[$column_name] = $column;
     }
 
-    public function insertColumn(TableColumn $column, string $after_column_name)
+    public function insertColumn(TableColumn $column, string $after_column_name): void
     {
 
         $keys = array_keys($this->columns);
         $index = array_search($after_column_name, $keys);
 
-        $column_name = $column->getFieldName();
+        $column_name = $column->getName();
         $column->setView($this);
 
         $this->columns = array_slice($this->columns, 0, $index + 1, TRUE) + array("$column_name" => $column) + array_slice($this->columns, $index + 1, count($this->columns) - 1, TRUE);
     }
 
-    public function resetActionsColumn()
+    public function resetActionsColumn(): void
     {
         if (!isset($this->columns["actions"])) return;
         $tc = $this->columns["actions"];
@@ -106,7 +63,7 @@ class TableView extends AbstractResultView implements IHeadContents
         $this->addColumn($tc);
     }
 
-    public function removeColumn(string $name)
+    public function removeColumn(string $name): void
     {
         if (isset($this->columns[$name])) unset($this->columns[$name]);
     }
@@ -125,101 +82,60 @@ class TableView extends AbstractResultView implements IHeadContents
         return array_key_exists($name, $this->columns);
     }
 
-    /**
-     * Enable/Disable rendering of the Table Header Cells row
-     * @param bool $mode
-     */
-    public function setHeaderCellsEnabled(bool $mode)
+
+    protected function processAttributes(): void
     {
-        $this->header_cells_enabled = $mode;
+        $columnCount = count(array_keys($this->columns));
+
+        $this->viewport->setStyle("grid-template-columns", "repeat($columnCount, auto)");
+
+        parent::processAttributes();
     }
 
-    public function startRender()
+    protected function renderItems() : void
     {
 
-        //will render top paginator if enabled
-        parent::startRender();
+        $names = array_keys($this->columns);
+        foreach ($names as $pos => $name) {
 
-        if ($this->total_rows<1 && strlen($this->list_empty_message)>0) {
-            echo "<div class='caption empty_list'>";
-            echo tr($this->list_empty_message);
-            echo "</div>";
+            $column = $this->getColumn($name);
+//
+//            $emptyRow = array();
+//
+            $header = $column->getHeaderCellRenderer();
+//            if ($column->getAlignClass()) {
+//                $header->addClassName($column->getAlignClass());
+//            }
+//            $header->setData($emptyRow);
+            $header->render();
         }
 
-        $this->table->startRender();
+        parent::renderItems();
+    }
+    protected function renderItem(RawResult $result) : void
+    {
+        static $v = new ValueInterleave();
 
-        if ($this->header_cells_enabled) {
+        $names = array_keys($this->columns);
 
-            $this->header_row->startRender();
+        foreach ($names as $pos => $name) {
 
-            $names = array_keys($this->columns);
-            foreach ($names as $pos => $name) {
+            $column = $this->getColumn($name);
 
-                $column = $this->getColumn($name);
+            $cell = $column->getCellRenderer();
 
-                $emptyRow = array();
-
-                $header = $column->getHeaderCellRenderer();
-                if ($column->getAlignClass()) {
-                    $header->setClassName($column->getAlignClass());
-                }
-                $header->setData($emptyRow);
-                $header->render();
+            if ($column->getAlignClass()) {
+                $cell->addClassName($column->getAlignClass());
             }
 
-            $this->header_row->finishRender();
-
+            $cell->setData($result->toArray());
+            $cell->setAttribute("title", $column->getName());
+            $cell->setAttribute("parity", $v->value());
+            $cell->render();
         }
 
-
+        $v->advance();
     }
-
-    protected function renderImpl()
-    {
-
-        $v = new ValueInterleave();
-        $this->position_index = 0;
-
-        while ($data = $this->iterator->next()) {
-
-            $this->row->setClassName($v->value());
-
-            $this->row->startRender();
-
-            $names = array_keys($this->columns);
-
-            foreach ($names as $pos => $name) {
-
-                $column = $this->getColumn($name);
-
-                $cell = $column->getCellRenderer();
-                $header = $column->getHeaderCellRenderer();
-                $label = $header->getValue();
-                if ($column->getAlignClass()) {
-                    $cell->setClassName($column->getAlignClass());
-                }
-
-                $cell->setData($data);
-                $cell->setAttribute("title", $label);
-                $cell->render();
-            }
-
-            $this->row->finishRender();
-
-            $this->position_index++;
-
-            $v->advance();
-        }
-
-    }
-
-    public function finishRender()
-    {
-        $this->table->finishRender();
-
-        parent::finishRender();
-    }
-
 }
 
 ?>

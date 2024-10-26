@@ -83,7 +83,7 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
         return $arr;
     }
 
-    public function setIterator(IDataIterator $query)
+    public function setIterator(IDataIterator $query): void
     {
         $this->iterator = $query;
     }
@@ -93,7 +93,7 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
         return $this->iterator;
     }
 
-    public function setItemRenderer(DataIteratorItem $item)
+    public function setItemRenderer(DataIteratorItem $item): void
     {
         $this->item = $item;
         $this->item->setValueKey($this->dataInput->getName());

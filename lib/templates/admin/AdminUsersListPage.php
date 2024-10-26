@@ -5,8 +5,8 @@ include_once("beans/AdminUsersBean.php");
 
 include_once("responders/DeleteItemResponder.php");
 include_once("responders/ToggleFieldResponder.php");
-include_once("components/renderers/cells/DateCellRenderer.php");
-include_once("components/renderers/cells/NumericCellRenderer.php");
+include_once("components/renderers/cells/DateCell.php");
+include_once("components/renderers/cells/NumericCell.php");
 
 class AdminUsersListPage extends BeanListPage
 {
@@ -41,29 +41,29 @@ class AdminUsersListPage extends BeanListPage
         $view->addColumn(new TableColumn("fullname", "Full Name"));
 
         $view->addColumn(new TableColumn("date_created", "Date Created", TableColumn::ALIGN_CENTER));
-        $view->getColumn("date_created")->setCellRenderer(new DateCellRenderer());
+        $view->getColumn("date_created")->setCellRenderer(new DateCell());
 
         $view->addColumn(new TableColumn("last_active", "Last Active", TableColumn::ALIGN_CENTER));
-        $view->getColumn("last_active")->setCellRenderer(new DateCellRenderer());
+        $view->getColumn("last_active")->setCellRenderer(new DateCell());
 
         $view->addColumn(new TableColumn("access_level", "Access"));
 
         $view->addColumn(new TableColumn("counter", "Login Count"));
-        $view->getColumn("counter")->setCellRenderer(new NumericCellRenderer("%0.0f"));
+        $view->getColumn("counter")->setCellRenderer(new NumericCell("%0.0f"));
 
         $view->addColumn(new TableColumn("status", "Availability"));
         $view->addColumn(new TableColumn("actions", "Actions"));
 
-        //$view->getColumn("access_level")->setCellRenderer(new CallbackTableCellRenderer("draw_access_level"));
+        //$view->getColumn("access_level")->setCellRenderer(new ClosureCell("draw_access_level"));
 
-        $act = new ActionsCellRenderer();
+        $act = new ActionsCell();
         $act->getActions()->append(new Action("Edit", "add.php", array(new DataParameter("editID", $bean->key()))));
         $act->getActions()->append(Action::PipeSeparator());
         $act->getActions()->append($h_delete->createAction());
 
         $view->getColumn("actions")->setCellRenderer($act);
 
-        $vis_act = new ActionsCellRenderer();
+        $vis_act = new ActionsCell();
 
         $check_is_suspend = function (Action $act, array $data) {
             return ($data['suspend'] < 1);

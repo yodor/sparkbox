@@ -46,7 +46,7 @@ class PhraseTranslatorPage extends BeanListPage
         $this->setIterator($bean->queryLanguageID($this->langID));
 
         $search_fields = array("st.value");
-        $this->getSearch()->getForm()->setFields($search_fields);
+        $this->getSearch()->getForm()->setColumns($search_fields);
 
         $this->setListFields(array("phrase" => "Phrase", "translation" => "Translation"));
 
@@ -76,13 +76,13 @@ class PhraseTranslatorPage extends BeanListPage
 
         $phrase = $this->view->getColumn("phrase")->getCellRenderer();
         $phrase->setAttribute("relation", "phrase");
-        $phrase->addValueAttribute("textID");
-        $phrase->addValueAttribute("trID");
+        $phrase->addDataAttribute("textID");
+        $phrase->addDataAttribute("trID");
 
         $translation = $this->view->getColumn("translation")->getCellRenderer();
         $translation->setAttribute("relation", "translation");
-        $translation->addValueAttribute("textID");
-        $translation->addValueAttribute("trID");
+        $translation->addDataAttribute("textID");
+        $translation->addDataAttribute("trID");
 
     }
 

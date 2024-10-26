@@ -7,13 +7,16 @@ include_once("beans/AdminAccessBean.php");
 include_once("responders/ChangePositionResponder.php");
 include_once("responders/DeleteItemResponder.php");
 include_once("responders/ToggleFieldResponder.php");
+include_once("dialogs/json/JSONFormDialog.php");
 
 include_once("utils/BeanKeyCondition.php");
 include_once("sql/SQLSelect.php");
 
+include_once("components/MenuBar.php");
 include_once("components/BeanFormEditor.php");
 include_once("components/TableView.php");
 include_once("components/ClosureComponent.php");
+
 
 include_once("utils/menu/PageSessionMenu.php");
 include_once("utils/Navigation.php");
@@ -85,7 +88,6 @@ class SparkAdminPage extends SparkPage
         $this->menu_bar->setAttribute("noattach");
 
         $this->head()->addCSS(SPARK_LOCAL . "/css/AdminPage.css");
-        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminButtons.css");
         $this->head()->addCSS(SPARK_LOCAL . "/css/AdminMenu.css");
 
         $this->body()->addClassName("admin_layout");
@@ -105,6 +107,8 @@ class SparkAdminPage extends SparkPage
         $this->pageCaption->items()->append($this->page_filters);
 
         $this->setTitle(tr("Administration"));
+
+        $dialog = new JSONFormDialog();
     }
 
     protected function createSidePane() : Container

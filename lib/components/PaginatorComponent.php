@@ -1,8 +1,8 @@
 <?php
-include_once("components/Component.php");
+include_once("components/Container.php");
 include_once("utils/IGETConsumer.php");
 
-abstract class PaginatorComponent extends Component implements IGETConsumer
+abstract class PaginatorComponent extends Container implements IGETConsumer
 {
     protected Paginator $paginator;
 
@@ -45,8 +45,8 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         $link = URL::Current();
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
-        if ($this->paginator->getCurrentPage() > 0) {
-            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() - 1));
+        if ($this->paginator->currentPage() > 0) {
+            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->currentPage() - 1));
             echo "<a class='previous_page' href='{$link->toString()}'> < " . tr("Prev") . " </a>";
         }
     }
@@ -56,17 +56,17 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
         $link = URL::Current();
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
-        if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
-            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() + 1));
+        if (($this->paginator->currentPage() + 1) < $this->paginator->totalPages()) {
+            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->currentPage() + 1));
             echo "<a  class='next_page' href='{$link->toString()}'>" . tr("Next") . " > </a>";
         }
     }
 
     protected function renderSortFields() : void
     {
-        $sort_fields = $this->paginator->getSortFields();
+        $items = $this->paginator->getOrderColumns();
 
-        if (count($sort_fields) < 1) return;
+        if (count($items) < 1) return;
 
         echo "<div class='cell sort_fields' nowrap>";
 
@@ -74,49 +74,50 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
             echo tr("Sort By");
             echo "</label>";
 
-            echo "<select name=orderby onChange='javascript:changeSort(this)'>";
+            echo "<select name='".Paginator::KEY_ORDER_BY."' onChange='javascript:changeSort(this)'>";
 
             $link = URL::Current();
             $link->setClearParams(Paginator::KEY_PAGE);
             $link->add(new URLParameter(Paginator::KEY_ORDER_BY, ""));
             $link->add(new URLParameter(Paginator::KEY_ORDER_DIR, ""));
 
-            foreach ($sort_fields as $field_name => $sort_field) {
+            $selectedField = $this->paginator->getSelectedOrderColumn();
 
+            foreach ($items as $column => $sortField) {
+                if (!($sortField instanceof OrderColumn)) continue;
                 $selected = "";
 
-                if (strcmp($sort_field->value, $this->paginator->getOrderField()) == 0) {
+                if ($selectedField && strcmp($sortField->getName(), $selectedField->getName()) == 0) {
                     $selected = " SELECTED ";
                 }
 
-                $link->get(Paginator::KEY_ORDER_BY)->setValue($sort_field->value);
-                $link->get(Paginator::KEY_ORDER_DIR)->setValue($sort_field->order_direction);
+                $link->get(Paginator::KEY_ORDER_BY)->setValue($sortField->getName());
+                $link->get(Paginator::KEY_ORDER_DIR)->setValue($sortField->getDirection());
 
-                echo "<option $selected value='{$link->toString()}' >" . tr($sort_field->label) . "</option>";
+                echo "<option $selected value='{$link->toString()}' >" . tr($sortField->getLabel()) . "</option>";
 
             }
             echo "</select>";
 
-            $active_field = $this->paginator->getOrderField();
-            $active_direction = $this->paginator->getOrderDirection();
+            $activeOrdering = $this->paginator->getActiveOrdering();
 
-            $link->get(Paginator::KEY_ORDER_BY)->setValue($this->paginator->getOrderField());
+           // $active_direction = $this->paginator->getOrderDirection();
 
-            $direction = "ASC";
-            if (strcmp($active_direction, "ASC") == 0) {
-                $direction = "DESC";
+            //next click toggle direction
+            $direction = OrderColumn::ASC;
+            if (strcmp($activeOrdering->getDirection(), OrderColumn::ASC) == 0) {
+                $direction = OrderColumn::DESC;
             }
             $link->get(Paginator::KEY_ORDER_DIR)->setValue($direction);
 
-            echo "<a class='direction' direction='$active_direction' href='{$link->toString()}'></a>";
+            echo "<a class='direction' direction='$direction' href='{$link->toString()}'></a>";
 
         echo "</div>";
 
         ?>
         <script type='text/javascript'>
             function changeSort(sel) {
-                var href = sel.options[sel.options.selectedIndex].value;
-                window.location.href = href;
+                window.location.href = sel.options[sel.options.selectedIndex].value;
             }
         </script>
         <?php
@@ -130,28 +131,28 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
 
         echo "<div class='pager'>";
 
-        $a = $this->paginator->getPageListStart();
+        $a = $this->paginator->pageListStart();
 
 //        if ($this->paginator->havePreviousPage() || $this->paginator->haveNextPage()) {
 //            echo "<label>" . tr("Page") . "</label>";
 //        }
 
-        if ($this->paginator->getCurrentPage() > 0) {
+        if ($this->paginator->currentPage() > 0) {
 
             $link->get(Paginator::KEY_PAGE)->setValue(0);
             echo "<a  href='{$link->toString()}' title='".tr("First")."'> <<  </a>";
 
-            $link->get(Paginator::KEY_PAGE)->setValue($this->paginator->getCurrentPage() - 1);
+            $link->get(Paginator::KEY_PAGE)->setValue($this->paginator->currentPage() - 1);
             echo "<a   href='{$link->toString()}' title='".tr("Prev")."'> <  </a>";
 
         }
 
-        while ($a < $this->paginator->getPageListEnd()) {
+        while ($a < $this->paginator->pageListEnd()) {
 
             $link->get(Paginator::KEY_PAGE)->setValue($a);
 
             $link_class = "";
-            if ($this->paginator->getCurrentPage() == $a) {
+            if ($this->paginator->currentPage() == $a) {
                 $link_class = "class=selected";
             }
 
@@ -159,12 +160,12 @@ abstract class PaginatorComponent extends Component implements IGETConsumer
             $a++;
         }
 
-        if (($this->paginator->getCurrentPage() + 1) < $this->paginator->getPagesTotal()) {
+        if (($this->paginator->currentPage() + 1) < $this->paginator->totalPages()) {
 
-            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getCurrentPage() + 1));
+            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->currentPage() + 1));
             echo "<a  href='{$link->toString()}' title='".tr("Next")."'> > </a>";
 
-            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->getPagesTotal() - 1));
+            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->totalPages() - 1));
             echo "<a  href='{$link->toString()}' title='".tr("Last")."'> >> </a>";
         }
 

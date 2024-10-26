@@ -65,7 +65,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         return $arr;
     }
 
-    public function setIterator(IDataIterator $query)
+    public function setIterator(IDataIterator $query): void
     {
         if (!$query instanceof SQLQuery) throw new Exception("Incorrect iterator");
         $this->iterator = $query;
@@ -117,7 +117,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         return $this->selected_nodeID;
     }
 
-    public function setItemRenderer(DataIteratorItem $item)
+    public function setItemRenderer(DataIteratorItem $item): void
     {
         $this->item = $item;
     }

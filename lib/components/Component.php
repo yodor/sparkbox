@@ -461,7 +461,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      */
     public function addClassName(string $cssClass) : void
     {
-        if (!empty($cssClass)) {
+        if ($cssClass) {
             $this->classNames[$cssClass] = "";
         }
     }

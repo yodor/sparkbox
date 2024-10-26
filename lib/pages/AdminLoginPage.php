@@ -8,8 +8,6 @@ class AdminLoginPage extends SparkPage
     {
         parent::__construct();
 
-        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminPage.css");
-        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminButtons.css");
         $this->head()->addCSS(SPARK_LOCAL . "/css/AdminLoginPage.css");
 
         $this->setTitle(tr("Login"));

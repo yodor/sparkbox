@@ -17,26 +17,26 @@ class PaginatorBottomComponent extends PaginatorComponent
         echo "<label>" . tr("Page") . "</label>";
 
         $page = 0;
-        if ($this->paginator->getPagesTotal() > 0) {
-            $page = $this->paginator->getCurrentPage() + 1;
+        if ($this->paginator->totalPages() > 0) {
+            $page = $this->paginator->currentPage() + 1;
         }
         echo $page;
         echo "&nbsp;";
         echo " / ";
         echo "&nbsp;";
-        echo $this->paginator->getPagesTotal();
+        echo $this->paginator->totalPages();
 
         echo "</div>";
 
         echo "<div class='cell page_navigation long'>";
-        if ($this->paginator->getPagesTotal() > 1) {
+        if ($this->paginator->totalPages() > 1) {
             $this->renderPageSelector();
         }
         echo "</div>";
 
         echo "<div class='cell results_info'>";
         echo "<label>" . tr("Results") . "</label>";
-        echo "<span>" . $this->paginator->getResultsTotal() . "</span>";
+        echo "<span>" . $this->paginator->resultsTotal() . "</span>";
         echo "</div>";
 
     }

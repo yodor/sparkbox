@@ -135,7 +135,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         return $this->actions;
     }
 
-    public function setActions(ActionCollection $actions)
+    public function setActions(ActionCollection $actions): void
     {
         $this->actions = $actions;
     }

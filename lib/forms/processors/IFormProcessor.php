@@ -4,9 +4,9 @@ include_once("forms/InputForm.php");
 interface IFormProcessor
 {
 
-    const STATUS_ERROR = -1;
-    const STATUS_NOT_PROCESSED = 0;
-    const STATUS_OK = 1;
+    const int STATUS_ERROR = -1;
+    const int STATUS_NOT_PROCESSED = 0;
+    const int STATUS_OK = 1;
 
     public function process(InputForm $form) : void;
 

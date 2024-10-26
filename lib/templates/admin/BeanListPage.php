@@ -48,7 +48,7 @@ class BeanListPage extends AdminPageTemplate
         parent::processInput();
 
         //keyword is not enabled?
-        if (count($this->keyword_search->getForm()->getFields()) < 1) return;
+        if (count($this->keyword_search->getForm()->getColumns()) < 1) return;
 
         $this->keyword_search->processInput();
 
@@ -241,7 +241,7 @@ class BeanListPage extends AdminPageTemplate
     /**
      * Initialize the contents of the container
      * Set the $this->view instance to TableView
-     * Set the $this->view_item_actions instance as ActionsTableCellRenderer
+     * Set the $this->view_item_actions instance as ActionsCell
      * Calls initViewActions
      * Return the initialized TableView (Used when initView is called externaly) before startRender()
      * This method is automatically called from startRender() of PageTemplate , before processInput
@@ -252,7 +252,7 @@ class BeanListPage extends AdminPageTemplate
     {
         if (!$this->query) throw new Exception("Query not set yet");
 
-        if (count($this->keyword_search->getForm()->getFields()) > 0) {
+        if (count($this->keyword_search->getForm()->getColumns()) > 0) {
             $this->getPage()->getPageFilters()->items()->append($this->keyword_search);
         }
 
@@ -267,7 +267,7 @@ class BeanListPage extends AdminPageTemplate
 
         $this->view->addColumn(new TableColumn("actions", "Actions"));
 
-        $act = new ActionsCellRenderer();
+        $act = new ActionsCell();
         $this->view_item_actions = $act->getActions();
 
         $this->initViewActions($this->view_item_actions);

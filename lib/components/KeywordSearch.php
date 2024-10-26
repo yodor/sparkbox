@@ -60,7 +60,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
     public function processInput()
     {
 
-        if (count($this->form->getFields()) < 1) return;
+        if (count($this->form->getColumns()) < 1) return;
 
         $data = $_REQUEST;
 

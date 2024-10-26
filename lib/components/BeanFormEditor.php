@@ -1,18 +1,15 @@
 <?php
-include_once("components/Component.php");
+include_once("db/BeanTransactor.php");
 include_once("beans/DBTableBean.php");
 include_once("forms/InputForm.php");
-
-include_once("forms/processors/FormProcessor.php");
 include_once("forms/renderers/FormRenderer.php");
-include_once("db/BeanTransactor.php");
+include_once("forms/processors/FormProcessor.php");
 
-include_once("responders/json/UploadControlResponder.php");
 
 include_once("dialogs/json/BeanTranslationDialog.php");
 include_once("objects/events/BeanFormEditorEvent.php");
 
-class BeanFormEditor extends Container implements IBeanEditor
+class BeanFormEditor extends FormRenderer implements IBeanEditor
 {
 
     protected array $messages = array();
@@ -27,15 +24,6 @@ class BeanFormEditor extends Container implements IBeanEditor
 
     protected int $editID = -1;
 
-    /**
-     * @var InputForm
-     */
-    protected InputForm $form;
-
-    /**
-     * @var FormRenderer
-     */
-    protected FormRenderer $form_render;
 
     /**
      * @var FormProcessor
@@ -51,16 +39,10 @@ class BeanFormEditor extends Container implements IBeanEditor
 
 
     /**
-     * Redirect to this URL on successful processing
+     * Allow external callers to set redirect url
      * @var URL|null
      */
     protected ?URL $redirect_url = null;
-
-    /**
-     * Enable/Disable redirect logic during processInput
-     * @var bool
-     */
-    protected bool $redirect_enabled = false;
 
     /**
      * @var BeanTranslationDialog
@@ -70,27 +52,18 @@ class BeanFormEditor extends Container implements IBeanEditor
     public function __construct(DBTableBean $bean, InputForm $form)
     {
 
-        parent::__construct();
+        parent::__construct($form);
+        $this->setClassName("BeanFormEditor");
 
+        $this->setMessage(tr("Information was updated"), BeanFormEditor::MESSAGE_UPDATE);
+        $this->setMessage(tr("Information was added"), BeanFormEditor::MESSAGE_ADD);
 
-
-        $this->redirect_enabled = true;
-
-        $this->setMessage("Information was updated", BeanFormEditor::MESSAGE_UPDATE);
-        $this->setMessage("Information was added", BeanFormEditor::MESSAGE_ADD);
-
-        $this->bean = $bean;
-        $this->form = $form;
-        $this->form->setBean($bean);
-
-
-        $this->form_render = new FormRenderer($form);
-
-        $this->setAttribute("bean", get_class($this->bean));
+        $this->bean_translator = new BeanTranslationDialog();
 
         $this->processor = new FormProcessor();
 
-        $this->transactor = new BeanTransactor($this->bean, $this->editID);
+        $this->bean = $bean;
+        $this->transactor = new BeanTransactor($this->bean);
 
         $fieldNames = $this->form->inputNames();
         foreach ($fieldNames as $fieldName) {
@@ -100,34 +73,27 @@ class BeanFormEditor extends Container implements IBeanEditor
 
             if ($renderer instanceof MCETextArea) {
 
-                $handler = $renderer->getImageBrowser()->getResponder();
-
-                $handler->setSection(get_class($this->form), $fieldName);
-                $handler->setOwnerID(SparkAdminPage::Instance()->getUserID());
+                $responder = $renderer->getImageBrowser()->getResponder();
+                if ($responder instanceof MCEImageBrowserResponder) {
+                    $responder->setSection(get_class($this->form), $fieldName);
+                    $responder->setOwnerID(SparkAdminPage::Instance()->getUserID());
+                }
 
             }
 
         }
 
-        $this->bean_translator = new BeanTranslationDialog();
-
-        $this->setEditID(-1);
-
-        $this->items()->append($this->form_render);
-
     }
 
-    public function setRedirectEnabled(bool $mode)
+    public function processAttributes(): void
     {
-        $this->redirect_enabled = $mode;
+        parent::processAttributes();
+        $this->setAttribute("editID", $this->editID);
+        $this->setAttribute("bean", get_class($this->bean));
+        $this->setAttribute("form", get_class($this->form));
     }
 
-    public function isRedirectEnabled() : bool
-    {
-        return $this->redirect_enabled;
-    }
-
-    public function setRedirectURL(URL $url)
+    public function setRedirectURL(URL $url) : void
     {
         $this->redirect_url = $url;
     }
@@ -138,8 +104,7 @@ class BeanFormEditor extends Container implements IBeanEditor
     }
 
     /**
-     * Set the message to show after successful add or update
-     * '$message' will be tr()'ed before setting it to Session::SetAlert
+     * Set the message text to show after successful add or update
      * @param string $message
      * @param int $type MESSAGE_ADD or MESSAGE_UPDATE
      */
@@ -149,7 +114,7 @@ class BeanFormEditor extends Container implements IBeanEditor
     }
 
     /**
-     * Use BeanFormEditor::MESSAGE_ADD or MESSAGE_UPDATE for type
+     * Get message text that is shown after processInput
      * @param int $type
      * @return string
      */
@@ -166,10 +131,7 @@ class BeanFormEditor extends Container implements IBeanEditor
     public function setEditID(int $editID): void
     {
         $this->editID = $editID;
-        $this->attributes["editID"] = $this->editID;
         $this->transactor->setEditID($editID);
-        $this->form->setEditID($editID);
-
     }
 
     public function getBean(): DBTableBean
@@ -209,27 +171,34 @@ class BeanFormEditor extends Container implements IBeanEditor
         $this->transactor = $transactor;
     }
 
-    public function processInput()
+    public function processInput() : void
     {
-
-        //will process external editID only if editID is not set
-        if ($this->editID < 1 && isset($_GET["editID"])) {
-
-            $this->setEditID((int)$_GET["editID"]);
-            debug("Using editID='$this->editID' from _GET ");
-
-        }
 
         try {
 
+            $message = $this->getMessage(BeanFormEditor::MESSAGE_ADD);
+
+            //will process external editID only if editID is not set already set
+            $editID = $this->editID;
+            if ($editID < 1 && isset($_GET["editID"])) {
+                $editID = (int)$_GET["editID"];
+                debug("Using editID from _GET");
+            }
+
+            //update form and transactor editIDs
+            $this->setEditID($editID);
 
             if ($this->editID>0) {
-                debug("Loading bean data into form");
+                $message = $this->getMessage(BeanFormEditor::MESSAGE_UPDATE);
+
+                debug("Loading bean data ".get_class($this->bean)." ID: ".$this->editID);
+                //sets bean and editID to form
                 $this->form->loadBeanData($this->getEditID(), $this->getBean());
                 SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_LOADED, $this));
+
             }
             else {
-                debug("Add mode not loading bean data");
+                debug("Add mode - not loading bean data");
             }
 
             debug("Calling form processor");
@@ -237,64 +206,43 @@ class BeanFormEditor extends Container implements IBeanEditor
             SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_PROCESSED, $this));
 
             $process_status = $this->processor->getStatus();
-            debug("FormProcessor status => " . $process_status);
+
+            if ($process_status === IFormProcessor::STATUS_NOT_PROCESSED) {
+                debug("FormProcessor - NOT_PROCESSED");
+                return;
+            }
+            if ($process_status === IFormProcessor::STATUS_ERROR) {
+                debug("FormProcessor - ERROR");
+                throw new Exception($this->processor->getMessage());
+            }
 
             //form is ok transact to db using the bean
-            if ($process_status === IFormProcessor::STATUS_OK) {
+            debug("Transactor ProcessForm");
+            $this->transactor->processForm($this->form);
+            SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_VALUES_TRANSACTED, $this));
 
-                debug("Transacting form values");
-                $this->transactor->processForm($this->form);
-                SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_VALUES_TRANSACTED, $this));
+            debug("Transactor ProcessBean");
+            $this->transactor->processBean();
+            SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_TRANSACED, $this));
 
-                debug("Processing bean");
-                $this->transactor->processBean();
-                debug("Process status is successful");
-                SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_TRANSACED, $this));
-
-                $redirectURL = $this->redirect_url;
-
-                //reload after adding item?
-                if ($this->editID < 1) {
-
-                    $msg = $this->getMessage(BeanFormEditor::MESSAGE_ADD);
-                    if ($msg) Session::SetAlert(tr($msg));
-
-                    if (!$redirectURL) {
-                        debug("RedirectURL is not set - Setting redirectURL to the edit location");
-                        $lastID = $this->transactor->getLastID();
-                        $redirectURL = URL::Current();
-                        $redirectURL->add(new URLParameter("editID", $lastID));
-                    }
-
-                }
-                else {
-
-                    $msg = $this->getMessage(BeanFormEditor::MESSAGE_UPDATE);
-                    if ($msg) Session::SetAlert(tr($msg));
-
-                    if (!$redirectURL) {
-                        debug("RedirectURL is not set - Setting redirectURL to the current location");
-                        $redirectURL = URL::Current();
-                    }
-                }
-
-                if ($this->redirect_enabled) {
-                    debug("Redirect logic enabled");
-                    if ($redirectURL instanceof URL) {
-                        debug("Using redirectURL: ".$redirectURL->toString());
-                        header("Location: " . $redirectURL->toString());
-                        exit;
-                    }
-                }
-                else {
-                    debug("Redirect logic disabled");
-                }
-
+            $url = $this->redirect_url;
+            //externally set URL for redirection
+            if ($url instanceof URL) {
 
             }
-            else if ($process_status === IFormProcessor::STATUS_ERROR) {
-                debug("Process status is error");
-                throw new Exception($this->processor->getMessage());
+            else {
+                //add function - redirect to edit function
+                if ($this->editID<1) {
+                    $url = URL::Current();
+                    $url->add(new URLParameter("editID", $this->editID));
+                }
+            }
+
+            Session::SetAlert($message);
+            if ($url instanceof URL) {
+                debug("Redirecting to: " . $url);
+                header("Location: " . $url);
+                exit;
             }
 
         }

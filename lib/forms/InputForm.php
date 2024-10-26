@@ -106,7 +106,7 @@ class InputForm extends SparkObject implements IBeanEditor
     protected array $inputs = array();
 
     /**
-     * @var DBTableBean
+     * @var DBTableBean|null
      */
     protected ?DBTableBean $bean = NULL;
     /**

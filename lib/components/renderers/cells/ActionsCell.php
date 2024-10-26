@@ -1,32 +1,27 @@
 <?php
-include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/renderers/cells/TableCell.php");
 include_once("components/Action.php");
 include_once("objects/ActionCollection.php");
 
-class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
+class ActionsCell extends TableCell implements IActionCollection
 {
 
     /**
      * @var ActionCollection
      */
     protected ActionCollection $actions;
-
-    /**
-     * @var bool
-     */
-    protected $sortable = FALSE;
+    protected ClosureComponent $itemList;
 
     public function __construct()
     {
         parent::__construct();
         $this->actions = new ActionCollection();
+        $this->itemList = new ClosureComponent(function(){
+            Action::RenderActions($this->actions->toArray());
+        });
+        $this->itemList->setComponentClass("actions_list");
+        $this->items()->append($this->itemList);
 
-    }
-
-    public function setColumn(TableColumn $tc)
-    {
-        parent::setColumn($tc);
-        $tc->setAlignClass(TableColumn::ALIGN_CENTER);
     }
 
     public function requiredStyle() : array
@@ -36,7 +31,7 @@ class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
         return $arr;
     }
 
-    public function setActions(ActionCollection $actions)
+    public function setActions(ActionCollection $actions): void
     {
         $this->actions = $actions;
     }
@@ -50,15 +45,7 @@ class ActionsCellRenderer extends TableCellRenderer implements IActionCollection
     {
         parent::setData($data);
         $this->actions->setData($data);
-    }
-
-    protected function renderImpl()
-    {
-        echo "<div class='actions_list'>";
-
-        Action::RenderActions($this->actions->toArray());
-
-        echo "</div>";
+        $this->setContents("");
     }
 
 }

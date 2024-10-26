@@ -26,6 +26,10 @@ class Navigation
 
         //current URL
         $pageURL = URL::Current();
+        if ($pageURL->contains(JSONResponder::KEY_JSONREQUEST)) {
+            debug("Not pushing JSONRequest ...");
+            return;
+        }
 
         debug("Pushing $pageName - Current URL: ".$pageURL);
 

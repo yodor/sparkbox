@@ -33,7 +33,7 @@ class CheckboxTreeView extends DataIteratorField
         $this->treeView->setCheckedNodes(...$this->dataInput->getValue());
     }
 
-    public function setIterator(IDataIterator $query)
+    public function setIterator(IDataIterator $query): void
     {
         parent::setIterator($query);
         $this->treeView->setIterator($query);

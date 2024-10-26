@@ -132,9 +132,9 @@ class GalleryTape extends Component implements IDataIteratorRenderer
         $this->item_renderer->setName($name);
     }
 
-    public function setIterator(IDataIterator $iterator)
+    public function setIterator(IDataIterator $query): void
     {
-        $this->iterator = $iterator;
+        $this->iterator = $query;
     }
 
     public function getIterator(): IDataIterator
@@ -142,7 +142,7 @@ class GalleryTape extends Component implements IDataIteratorRenderer
         return $this->iterator;
     }
 
-    public function setItemRenderer(DataIteratorItem $item)
+    public function setItemRenderer(DataIteratorItem $item): void
     {
         $this->item_renderer = $item;
     }

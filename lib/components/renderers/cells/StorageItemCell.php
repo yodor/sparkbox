@@ -1,15 +1,14 @@
 <?php
-include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/renderers/cells/TableCell.php");
 include_once("components/Action.php");
 
-class StorageItemCellRenderer extends TableCellRenderer
+class StorageItemCell extends TableCell
 {
 
-    protected $action;
-    protected $beanField = "";
-    protected $beanClass = "";
-    protected $idField = "";
-    protected $id = -1;
+    protected string $beanField = "";
+    protected string $beanClass = "";
+    protected string $idField = "";
+    protected int $id = -1;
 
     public function __construct()
     {
@@ -17,19 +16,23 @@ class StorageItemCellRenderer extends TableCellRenderer
 
         $this->action = new Action();
 
+        $this->addClassName("StorageItem");
+
+        $this->items()->append($this->action);
+
     }
 
-    public function setBeanField(string $field)
+    public function setBeanField(string $field): void
     {
         $this->beanField = $field;
     }
 
-    public function setBeanClass(string $beanClass)
+    public function setBeanClass(string $beanClass): void
     {
         $this->beanClass = $beanClass;
     }
 
-    public function setIdField(string $idField)
+    public function setIdField(string $idField): void
     {
         $this->idField = $idField;
     }
@@ -41,38 +44,24 @@ class StorageItemCellRenderer extends TableCellRenderer
         if (isset($data[$this->idField])) {
             $this->id = (int)$data[$this->idField];
         }
-    }
 
-    protected function renderImpl()
-    {
-
-        $id = $this->id;
-
-        $beanClass = $this->beanClass;
-        $beanField = $this->beanField;
-
-        if (!$beanClass) {
-
+        if (!$this->beanClass) {
             throw new Exception("Bean class not set");
-
         }
 
-        if (!$beanField) {
-
+        if (!$this->beanField) {
             throw new Exception("Bean field not set");
-
         }
 
-        if ($id < 0) {
+        if ($this->id < 0) {
             throw new Exception("Invalid bean ID");
         }
 
-        $si = new StorageItem($id, $beanClass, $beanField);
+        $si = new StorageItem($this->id, $this->beanClass, $this->beanField);
 
         $this->action->getURL()->fromString($si->hrefFile());
         $this->action->setContents(tr("Download"));
-        $this->action->render();
-
+        $this->setContents("");
     }
 
 }

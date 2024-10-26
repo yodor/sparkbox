@@ -107,7 +107,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         return $this->image_popup->image()->getPhotoHeight();
     }
 
-    public function setActions(ActionCollection $actions)
+    public function setActions(ActionCollection $actions): void
     {
         $this->actions = $actions;
     }

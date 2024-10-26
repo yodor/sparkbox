@@ -1,7 +1,7 @@
 <?php
 include_once("templates/admin/BeanListPage.php");
-include_once("components/renderers/cells/ImageCellRenderer.php");
-include_once("components/renderers/cells/DateCellRenderer.php");
+include_once("components/renderers/cells/ImageCell.php");
+include_once("components/renderers/cells/DateCell.php");
 
 class NewsItemsListPage extends BeanListPage
 {
@@ -23,11 +23,11 @@ class NewsItemsListPage extends BeanListPage
     public function initView()
     {
         parent::initView();
-        $ticr = new ImageCellRenderer();
+        $ticr = new ImageCell();
         $ticr->setBean($this->bean);
 
         $this->view->getColumn("item_photo")->setCellRenderer($ticr);
-        $this->view->getColumn("item_date")->setCellRenderer(new DateCellRenderer());
+        $this->view->getColumn("item_date")->setCellRenderer(new DateCell());
         return $this->view;
     }
 }

@@ -136,19 +136,16 @@ class DataInputFactory
 
             case DataInputFactory::DATE:
                 new DateField($input);
-                new DateInput($input);
                 $input->setValidator(new DateValidator());
                 break;
 
             case DataInputFactory::TIME:
                 new TimeField($input);
-                new TimeInput($input);
                 $input->setValidator(new TimeValidator());
                 break;
 
             case DataInputFactory::PHONE:
                 new PhoneField($input);
-                new PhoneInput($input);
                 $input->setValidator(new PhoneValidator());
                 break;
 

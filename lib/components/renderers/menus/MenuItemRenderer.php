@@ -48,6 +48,9 @@ class MenuItemRenderer extends Container
         if ($item->getTooltip()) {
             $this->linkTag->setTooltip($item->getTooltip());
         }
+        else {
+            $this->linkTag->setAttribute("title", $item->getName());
+        }
 
         if ($item->getTarget()) {
             $this->linkTag->setAttribute("target", $item->getTarget());
@@ -67,7 +70,7 @@ class MenuItemRenderer extends Container
 
         $this->linkTag->setContents($contents);
 
-        $this->setAttribute("title", $item->getName());
+
 
         if ($item->count() > 0) {
             $this->setAttribute("have_submenu", "1");

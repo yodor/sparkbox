@@ -28,7 +28,7 @@ class TranslatorPage extends BeanListPage
 
         $this->page->setPageMenu($menu);
 
-        $this->getSearch()->getForm()->setFields(array("value"));
+        $this->getSearch()->getForm()->setColumns(array("value"));
     }
 
     protected function initPageActions()

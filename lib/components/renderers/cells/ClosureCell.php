@@ -1,7 +1,7 @@
 <?php
-include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/renderers/cells/TableCell.php");
 
-class ClosureCellRenderer extends TableCellRenderer
+class ClosureCell extends TableCell
 {
     /**
      * @var Closure
@@ -17,18 +17,20 @@ class ClosureCellRenderer extends TableCellRenderer
     {
         parent::__construct();
         $this->closure = $closure;
-    }
+        $component = new ClosureComponent(function(){
+            ($this->closure)($this->data, $this->column);
+        }, false);
 
-    protected function renderImpl()
-    {
-        ($this->closure)($this->data, $this->column);
+        $this->items()->append($component);
     }
 
     public function setData(array $data) : void
     {
         parent::setData($data);
         $this->data = $data;
+        $this->setContents("");
     }
 
 }
+
 ?>

@@ -1,16 +1,16 @@
 <?php
-include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/renderers/cells/TableCell.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/TableColumn.php");
 include_once("storage/StorageItem.php");
 
-class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
+class ImageCell extends TableCell implements IPhotoRenderer
 {
 
     /**
-     * @var DBTableBean
+     * @var DBTableBean|null
      */
-    protected $bean = NULL;
+    protected ?DBTableBean $bean = null;
 
     protected int $list_limit = 0;
 
@@ -18,21 +18,23 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     protected string $relateField = "";
 
-    protected array $items = array();
+    protected array $elements = array();
 
     protected ImagePopup $image_popup;
 
     protected static $DefaultWidth = 128;
     protected static $DefaultHeight = -1;
 
-    protected $sortable = FALSE;
+    protected bool $sortable = FALSE;
 
-    protected $error = "";
+    protected string $error = "";
 
-    public static function SetDefaultPhotoSize(int $width, int $height)
+    protected ClosureComponent $imageList;
+
+    public static function SetDefaultPhotoSize(int $width, int $height): void
     {
-        ImageCellRenderer::$DefaultWidth = $width;
-        ImageCellRenderer::$DefaultHeight = $height;
+        ImageCell::$DefaultWidth = $width;
+        ImageCell::$DefaultHeight = $height;
     }
 
     public function __construct(int $width = -1, int $height = -1)
@@ -42,23 +44,22 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         $this->list_limit = 1;
 
         if ($width < 1 && $height < 1) {
-            $width = ImageCellRenderer::$DefaultWidth;
-            $height = ImageCellRenderer::$DefaultHeight;
+            $width = ImageCell::$DefaultWidth;
+            $height = ImageCell::$DefaultHeight;
         }
 
         $this->image_popup = new ImagePopup();
         $this->image_popup->image()->setPhotoSize($width, $height);
-        $this->image_popup->setAttribute("relation", "ImageCellRenderer");
+        $this->image_popup->setAttribute("relation", "ImageCell");
 
+        $this->imageList = new ClosureComponent($this->renderImageItems(...));
+        $this->imageList->setComponentClass("ImageList");
+
+        $this->items()->append($this->imageList);
     }
 
-    public function setColumn(TableColumn $tc)
-    {
-        parent::setColumn($tc);
-        $tc->setAlignClass(TableColumn::ALIGN_CENTER);
-    }
 
-    public function setBean(DBTableBean $bean, string $relateField = "")
+    public function setBean(DBTableBean $bean, string $relateField = ""): void
     {
         $this->bean = $bean;
         if ($relateField) {
@@ -67,12 +68,12 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     }
 
-    public function setLimit(int $num)
+    public function setLimit(int $num): void
     {
         $this->list_limit = $num;
     }
 
-    public function setBlobField(string $blob_field)
+    public function setBlobField(string $blob_field): void
     {
         $this->blob_field = $blob_field;
     }
@@ -92,9 +93,9 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         return $this->image_popup->image()->getPhotoHeight();
     }
 
-    public function setAction(Action $action)
+    public function setAction(Action $a): void
     {
-        $this->action = $action;
+        $this->action = $a;
     }
 
     protected function getDataValues(?string $values): array
@@ -107,10 +108,10 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
         return $values;
     }
 
-    protected function constructItems(array $data)
+    protected function constructItems(array $data) : void
     {
 
-        $this->items = array();
+        $this->elements = array();
 
         if (!$this->bean) return;
 
@@ -125,11 +126,11 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
             $item->field = $this->blob_field;
 
-            $this->items[] = $item;
+            $this->elements[] = $item;
         }
         else {
 
-            $fieldName = $this->column->getFieldName();
+            $fieldName = $this->column->getName();
             //debug("Column '$fieldName' Related bean: '" . get_class($this->bean) . "' Related field: '$this->relateField'", $data);
 
             if (array_key_exists($fieldName, $data)) {
@@ -139,7 +140,7 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
                     $item = new StorageItem();
                     $item->className = get_class($this->bean);
                     $item->id = $value;
-                    $this->items[] = $item;
+                    $this->elements[] = $item;
                 }
 
             }
@@ -150,11 +151,9 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
     protected function renderImageItems()
     {
-        $num = count($this->items);
+        $num = count($this->elements);
 
-        echo "<div class='ImageList'  count='$num'>";
-
-        foreach ($this->items as $idx => $item) {
+        foreach ($this->elements as $idx => $item) {
 
             $this->image_popup->image()->setStorageItem($item);
 
@@ -162,20 +161,6 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
 
             $this->image_popup->render();
         }
-
-        echo "</div>"; //ImageList
-
-    }
-
-    protected function renderImpl()
-    {
-        if ($this->error) {
-            echo $this->error;
-        }
-        else {
-            $this->renderImageItems();
-        }
-
     }
 
     //default rendering fetch from source bean linking with current 'view' iterator prkey
@@ -191,8 +176,12 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             $this->constructItems($data);
         }
         catch (Exception $e) {
-            $this->error = $e->getMessage();
+            $this->setContents($e->getMessage());
+            $this->imageList->setRenderEnabled(false);
+            return;
         }
+
+        $this->imageList->setRenderEnabled(true);
 
         if ($this->action) {
             $this->action->setData($data);
@@ -202,13 +191,14 @@ class ImageCellRenderer extends TableCellRenderer implements IPhotoRenderer
             $this->image_popup->removeAttribute("href");
         }
 
-        if (isset($row["caption"])) {
-            $this->image_popup->setAttribute("caption", $row["caption"]);
+        if (isset($data["caption"])) {
+            $this->image_popup->setTooltip($data["caption"]);
         }
         else {
             $this->image_popup->removeAttribute("caption");
         }
 
+        $this->setContents("");
     }
 
 }

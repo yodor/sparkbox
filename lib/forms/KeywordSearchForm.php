@@ -7,96 +7,92 @@ class KeywordSearchForm extends InputForm
     /**
      * @var array
      */
-    protected $table_fields;
+    protected array $queryColumns = array();
 
-    protected $search_expressions = NULL;
-    protected $compare_operators = NULL;
+    protected array $searchExpressions = array();
+    protected array $compareOperators = array();
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->table_fields = array();
-
-        $this->search_expressions = array();
-
-        $this->compare_operators = array();
-
-        $field = new DataInput("keyword", "Keyword", 0);
-        new TextField($field);
-        $this->addInput($field);
-
+        $keyword = new DataInput("keyword", "Keyword", 0);
+        new TextField($keyword);
+        $this->addInput($keyword);
     }
 
-    public function setCompareExpression(string $field_name, array $expressions, string $compare_operator = "LIKE")
+    public function setCompareExpression(string $column, array $expressions, string $compare_operator = "LIKE"): void
     {
-        $this->search_expressions[$field_name] = $expressions;
-        $this->compare_operators[$field_name] = $compare_operator;
+        $this->searchExpressions[$column] = $expressions;
+        $this->compareOperators[$column] = $compare_operator;
     }
 
-    public function setFields(array $table_fields)
+    public function setColumns(array $queryColumns): void
     {
-        $this->table_fields = $table_fields;
+        $this->queryColumns = $queryColumns;
     }
 
-    public function removeField(string ...$names)
+    public function removeColumns(string ...$names): void
     {
-        foreach ($this->table_fields as $idx=>$name)
+        foreach ($this->queryColumns as $idx => $name)
         {
-            if (in_array($name, $names)) unset($this->table_fields[$idx]);
+            if (in_array($name, $names)) unset($this->queryColumns[$idx]);
         }
-
     }
 
-    public function getFields(): array
+    public function getColumns(): array
     {
-        return $this->table_fields;
+        return $this->queryColumns;
     }
 
     protected function clauseValue(string $key, string $val): SQLClause
     {
+        if (strcmp($key, "keyword")!=0) {
+            return parent::clauseValue($key, $val);
+        }
+
         $clause = new SQLClause();
 
-        $val = DBConnections::Open()->escape($val);
-        if (strcmp($key, "keyword") == 0) {
+        $db = DBConnections::Open();
 
-            $allwords = explode(" ", $val);
+        $allWords = explode(" ", $db->escape($val));
 
-            $qry = array();
+        $resultAll = array();
 
-            foreach ($allwords as $pos => $keyword) {
+        foreach ($allWords as $idx => $keyword) {
 
-                $ret = array();
+            $result = array();
 
-                foreach ($this->table_fields as $pos1 => $field_name) {
+            foreach ($this->queryColumns as $idx1 => $column) {
 
-                    if (isset($this->search_expressions[$field_name])) {
-                        foreach ($this->search_expressions[$field_name] as $idx => $expression) {
-                            $expression = str_replace("{keyword}", $keyword, $expression);
-                            $operator = $this->compare_operators[$field_name];
-                            $ret[] = " $field_name $operator '$expression' ";
-                        }
-                    }
-                    else {
+                if (isset($this->searchExpressions[$column])) {
 
-                        $ret[] = " $field_name LIKE '%$keyword%' ";
+                    foreach ($this->searchExpressions[$column] as $idx2 => $expression) {
+
+                        $expression = str_replace("{keyword}", $keyword, $expression);
+                        $operator = $this->compareOperators[$column];
+                        $result[] = " $column $operator '$expression' ";
 
                     }
 
                 }
+                else {
 
-                $qry[] = "( " . implode(" OR ", $ret) . " )";
+                    $result[] = " $column LIKE '%$keyword%' ";
+
+                }
 
             }
-            $expr = "( " . implode(" AND ", $qry) . " )";
 
-            //set expression directly
-            $clause->setExpression($expr, "", "");
-            return $clause;
+            $resultAll[] = "( " . implode(" OR ", $result) . " )";
+
         }
-        else {
-            return parent::clauseValue($key, $val);
-        }
+        $expr = "( " . implode(" AND ", $resultAll) . " )";
+
+        //set expression directly
+        $clause->setExpression($expr, "", "");
+        return $clause;
+
     }
 
 }

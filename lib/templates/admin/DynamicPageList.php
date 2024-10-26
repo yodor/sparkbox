@@ -1,8 +1,8 @@
 <?php
 include_once("templates/admin/BeanListPage.php");
-include_once("components/renderers/cells/BooleanCellRenderer.php");
-include_once("components/renderers/cells/ImageCellRenderer.php");
-include_once("components/renderers/cells/DateCellRenderer.php");
+include_once("components/renderers/cells/BooleanCell.php");
+include_once("components/renderers/cells/ImageCell.php");
+include_once("components/renderers/cells/DateCell.php");
 include_once("beans/DynamicPagesBean.php");
 
 class DynamicPageList extends BeanListPage
@@ -58,14 +58,14 @@ class DynamicPageList extends BeanListPage
     public function initView()
     {
         parent::initView();
-        $ticr = new ImageCellRenderer();
+        $ticr = new ImageCell();
         $ticr->setBean($this->bean);
 
         $this->view->getColumn("item_photo")->setCellRenderer($ticr);
 
-        $this->view->getColumn("visible")->setCellRenderer(new BooleanCellRenderer("Yes", "No"));
+        $this->view->getColumn("visible")->setCellRenderer(new BooleanCell("Yes", "No"));
 
-        $this->view->getColumn( "item_date")->setCellRenderer(new DateCellRenderer());
+        $this->view->getColumn( "item_date")->setCellRenderer(new DateCell());
     }
 
     protected function renderImpl()

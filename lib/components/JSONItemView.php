@@ -76,7 +76,7 @@ class JSONItemView extends ItemView
     {
         $this->viewport->finishRender();
 
-        if ($this->paginator->getCurrentPage() < $this->paginator->getPagesTotal()-1) {
+        if ($this->paginator->currentPage() < $this->paginator->totalPages()-1) {
             $this->container->render();
         }
 

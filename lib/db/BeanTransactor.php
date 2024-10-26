@@ -39,7 +39,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
      */
     protected ?InputForm $form;
 
-    public function __construct(DBTableBean $bean, int $editID)
+    public function __construct(DBTableBean $bean, int $editID=-1)
     {
         parent::__construct();
 

@@ -14,16 +14,23 @@ BODY {
 .admin_layout {
 
     display: grid;
+    /*display: flex;*/
     /*flex-direction:row;*/
+
     grid-template-columns: 13em auto;
 
     grid-template-rows: 100vh;
 
+    position: relative;
+    box-sizing: border-box;
+
+}
+.admin_layout .page_area * {
+    position: relative;
+    box-sizing: border-box;
 }
 
 .admin_layout .sidePane {
-
-    box-sizing: border-box;
 
     background-attachment: fixed;
 
@@ -33,10 +40,12 @@ BODY {
     left:0;
     top:0;
 
-    display:inline-flex;
+    display:flex;
     flex-direction:column;
 
     z-index:100;
+    height:100vh;
+    flex-basis: 13em;
 }
 
 .admin_layout .sidePane .admin_header {
@@ -61,44 +70,54 @@ BODY {
 
 .admin_layout .page_area {
 
-    vertical-align: top;
+    display: flex;
+    flex-direction: column;
 
-    box-sizing: border-box;
+    /*full-width*/
+    align-items: stretch;
 
-    padding: 1em;
-    margin: 0;
-    padding-right:0;
+    /*top*/
+    justify-items: flex-start;
 
-    display: grid;
-    grid-template-rows: auto 1fr;
+    /*sticky page_caption*/
+    overflow: auto;
 
-    overflow: hidden;
-
+    background-color:white;
+    background-origin: border-box;
+    /*border:1px solid red;*/
 }
+
 .admin_layout .page_area > * {
     min-width:0;
+
 }
 
+
 .admin_layout .page_area .page_caption {
+
+    padding:1em;
 
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 
-    box-sizing: border-box;
-
     border-bottom: 1px solid #cccccc;
-    z-index: 10;
 
-    gap:0.5em;
+    z-index: 10;
+    position:sticky;
+    top:0;
+
+    background-color:white;
+
+    /*box-shadow: 0px 11px 20px -12px rgba(0,0,0,0.75);*/
 
 }
 
 .admin_layout .page_area .page_caption .page_actions {
     display: flex;
     flex-direction: row;
-
     align-items:center;
+
     gap:0.5em;
 }
 
@@ -143,26 +162,47 @@ BODY {
     flex-direction:row;
     gap:0.5em;
 
+
+
 }
 .admin_layout .page_area .page_caption .page_filters:has(*) {
-    padding-bottom:0.5em;
+    margin-top:0.5em;
 }
 
 .admin_layout .page_area .page_contents {
-    display: block;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    /*border:1px solid green;*/
+
+    padding-left:1em;
+
+    position:sticky;
+    top:0;
+
+    /*sticky table headers*/
     overflow: auto;
-    position: relative;
 }
 
+.admin_layout .page_area .page_contents .FormRenderer[layout="VBox"] .InputComponent {
+    align-self:stretch;
+}
 
-.admin_layout .page_area .page_contents .TableView TH {
+.admin_layout .page_area .page_contents .TableView .Cell.Header A:not([href]) {
+    cursor: default;
+}
+.admin_layout .page_area .page_contents .TableView .Cell.Header {
     position: sticky;
-    left: 0;
+    /*left: 0;*/
     top: 0;
     border-collapse: separate;
     border-spacing: 0;
 
     border-bottom:0 !important;
+    z-index:100;
 }
 
 .admin_layout .page_area .page_contents .TableView .PaginatorBottomComponent {
@@ -175,22 +215,24 @@ BODY {
 }
 
 .admin_layout .page_area .TableView .viewport .ImageList {
-    /*   max-width:120px; */
-    display: inline-block;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
 
-.admin_layout .page_area .TableView .viewport .ImageList .Item {
-    display: inline-block;
-}
-
-.admin_layout .page_area .TableView .viewport .ImageList .Item IMG {
+.admin_layout .page_area .TableView .viewport .ImageList IMG {
     max-height:64px;
 }
 
-.BeanEditorPage {
+.AdminPageTemplate {
     display:flex;
     flex-direction:column;
 }
-.BeanFormEditor {
-    /*width:200px;*/
+
+.InputGroupRenderer {
+    align-self:stretch;
+}
+
+.admin_layout .ConfigEditorPage {
+    min-width:50%;
 }

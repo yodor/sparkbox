@@ -1,8 +1,8 @@
 <?php
-include_once("components/renderers/cells/TableCellRenderer.php");
+include_once("components/renderers/cells/TableCell.php");
 include_once("components/TableColumn.php");
 
-class BooleanCellRenderer extends TableCellRenderer
+class BooleanCell extends TableCell
 {
 
     protected string $true_value = "Enabled";
@@ -14,19 +14,16 @@ class BooleanCellRenderer extends TableCellRenderer
 
         $this->true_value = $true_value;
         $this->false_value = $false_value;
-    }
 
-    public function setColumn(TableColumn $tc)
-    {
-        parent::setColumn($tc);
-        $tc->setAlignClass(TableColumn::ALIGN_CENTER);
+        $this->addClassName("Boolean");
+
     }
 
     public function setData(array $data) : void
     {
         parent::setData($data);
 
-        $this->value = ($data[$this->column->getFieldName()]) ? tr($this->true_value) : tr($this->false_value);
+        $this->setContents( ($data[$this->column->getName()]) ? tr($this->true_value) : tr($this->false_value));
 
     }
 }

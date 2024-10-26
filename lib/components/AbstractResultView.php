@@ -6,7 +6,7 @@ include_once("utils/Paginator.php");
 include_once("components/PaginatorTopComponent.php");
 include_once("components/PaginatorBottomComponent.php");
 
-abstract class AbstractResultView extends Component implements IDataIteratorRenderer
+abstract class AbstractResultView extends Container implements IDataIteratorRenderer
 {
     const int PAGINATOR_NONE = 0;
     const int PAGINATOR_TOP = 1;
@@ -21,11 +21,14 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     protected string $default_order = "";
 
     /**
-     * Total results row after executing the query
-     * @var int
+     *
+     * @var int Total result rows for this data iterator
      */
     protected int $total_rows = 0;
 
+    /**
+     * @var int total number of results for the current iteration
+     */
     protected int $paged_rows = 0;
 
     /**
@@ -48,8 +51,9 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     protected int $paginators_enabled = AbstractResultView::PAGINATOR_NONE;
 
+
     /**
-     *  @var DataIteratorItem
+     * @var DataIteratorItem|null
      */
     protected ?DataIteratorItem $item_renderer = null;
 
@@ -64,21 +68,37 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
      */
     protected ?SQLQuery $iterator;
 
-
+    protected Container $viewport;
 
     public function __construct(?IDataIterator $itr=null)
     {
         parent::__construct(false);
 
+
         $this->iterator = $itr;
 
         $this->paginator = new Paginator();
+
         $this->paginator_top = new PaginatorTopComponent($this->paginator);
+        $this->paginator_top->setRenderEnabled(false);
+
         $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
+        $this->paginator_bottom->setRenderEnabled(false);
+
         $this->paginators_enabled = (AbstractResultView::PAGINATOR_TOP | AbstractResultView::PAGINATOR_BOTTOM);
 
         $this->list_empty = new Component(false);
         $this->list_empty->addClassName("ListEmpty");
+
+        $this->viewport = new ClosureComponent($this->renderItems(...));
+        $this->viewport->setComponentClass("viewport");
+
+
+        $this->items()->append($this->paginator_top);
+        $this->items()->append($this->list_empty);
+        $this->items()->append($this->viewport);
+        $this->items()->append($this->paginator_bottom);
+
     }
 
     /**
@@ -93,6 +113,16 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     public function setListEmpty(Component $cmp) : void
     {
         $this->list_empty = $cmp;
+    }
+
+    public function setListEmptyMessage(string $message): void
+    {
+        $this->list_empty->setContents($message);
+    }
+
+    public function getListEmptyMessage(): string
+    {
+        return $this->list_empty->getContents();
     }
     /**
      * Max number of results per page
@@ -117,13 +147,13 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     /**
      * @throws Exception
      */
-    public function setIterator(IDataIterator $itr)
+    public function setIterator(IDataIterator $itr): void
     {
         if (!($itr instanceof SQLQuery)) throw new Exception("Unsuitable iterator. Expecting SQLQuery");
         $this->iterator = $itr;
     }
 
-    public function setItemRenderer(DataIteratorItem $renderer)
+    public function setItemRenderer(DataIteratorItem $renderer): void
     {
         $this->item_renderer = $renderer;
         $this->item_renderer->setParent($this);
@@ -141,9 +171,8 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
     public function getPositionIndex(): int
     {
-        $paginator = $this->paginator;
 
-        return ($paginator->getCurrentPage() * $paginator->getItemsPerPage()) + $this->position_index;
+        return ($this->paginator->currentPage() * $this->paginator->itemsPerPage()) + $this->position_index;
 
     }
 
@@ -182,13 +211,29 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         $select = clone $this->iterator->select;
 
-        $orderFilter = $this->paginator->prepareOrderFilter($this->default_order);
-        $pageFilter = $this->paginator->preparePageFilter();
+        $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
+        $pageFilter = $this->paginator->getLimitingSelect();
 
         $select->combine($pageFilter);
         $select->combine($orderFilter);
 
         return parent::getCacheName()."-".$select->getSQL();
+    }
+
+    protected function processAttributes(): void
+    {
+        parent::processAttributes();
+        $this->setAttribute("pagesTotal", $this->paginator->totalPages());
+        $this->setAttribute("page", $this->paginator->currentPage());
+
+        if ($this->total_rows>0) {
+            if ($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
+                $this->paginator_top->setRenderEnabled(true);
+            }
+            if($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) {
+                $this->paginator_bottom->setRenderEnabled(true);
+            }
+        }
     }
 
     /**
@@ -197,44 +242,31 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
     public function startRender()
     {
         if (is_null($this->iterator)) {
-            echo "No iterator set";
-            return;
+            $this->list_empty->setRenderEnabled(true);
+            $this->list_empty->setContents("No iterator set");
+            $this->viewport->setRenderEnabled(false);
+
         }
-
-        $this->processIterator();
-
-        $this->setAttribute("pagesTotal", $this->paginator->getPagesTotal());
-        $this->setAttribute("page", $this->paginator->getCurrentPage());
+        else {
+            $this->processIterator();
+            if ($this->total_rows > 0) {
+                $this->list_empty->setRenderEnabled(false);
+            }
+            else {
+                $this->viewport->setRenderEnabled(false);
+            }
+        }
 
         parent::startRender();
 
-        if(($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) && $this->total_rows>0) {
-            $this->paginator_top->render();
-        }
-
-        if ($this->total_rows<1) {
-            $this->list_empty->render();
-        }
     }
 
-    /**
-     * @throws Exception
-     */
-    public function finishRender()
-    {
-        if(($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) && $this->total_rows>0) {
-            $this->paginator_bottom->render();
-        }
-
-        parent::finishRender();
-
-    }
 
     /**
      * @return void
      * @throws Exception
      */
-    public function processIterator() : void
+    protected function processIterator() : void
     {
         if ($this->iterator->isActive()) {
             debug("Already active");
@@ -263,18 +295,31 @@ abstract class AbstractResultView extends Component implements IDataIteratorRend
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
-        $orderFilter = $this->paginator->prepareOrderFilter($this->default_order);
-        $pageFilter = $this->paginator->preparePageFilter();
+        $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
+        $pageFilter = $this->paginator->getLimitingSelect();
 
         $this->iterator->select->combine($pageFilter);
         $this->iterator->select->combine($orderFilter);
 
         $this->iterator->select->setMode(SQLSelect::SQL_NO_CACHE);
 
-        //echo "Final SQL: ".$this->iterator->select->getSQL();
+       //echo "Final SQL: ".$this->iterator->select->getSQL();
 
         $this->paged_rows = $this->iterator->exec();
     }
+
+    protected function renderItems() : void
+    {
+        $this->position_index = 0;
+        while ($result = $this->iterator->nextResult())
+        {
+            $this->renderItem($result);
+            $this->position_index++;
+        }
+    }
+
+    abstract protected function renderItem(RawResult $result) : void;
+
 }
 
 ?>
