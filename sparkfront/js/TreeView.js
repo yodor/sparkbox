@@ -26,9 +26,7 @@ class TreeView extends Component {
             const handle = node.querySelector(".Handle");
             handle.addEventListener("click", (event) => this.handleClicked(nodeID));
 
-            if (branchType === "opened") {
-                node.setAttribute("branch_type", "closed");
-            }
+
 
         });
 
@@ -44,7 +42,12 @@ class TreeView extends Component {
      * @param nodeID {string}
      */
     setSelectedID(nodeID) {
-        //console.log("selecting ID: " + selectedID);
+
+        //console.log("selecting ID: " + nodeID);
+        if (parseInt(nodeID)<1) {
+            //console.log("Nothing to select");
+            return;
+        }
 
         //close all open branches
         this.element.querySelectorAll(".Node[branch_type='opened']").forEach((node_element)=>{

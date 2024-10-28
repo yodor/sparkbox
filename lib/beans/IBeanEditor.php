@@ -14,7 +14,7 @@ interface IBeanEditor
     public function setEditID(int $editID): void;
 
     /**
-     * @return DBTableBean
+     * @return DBTableBean|null
      */
     public function getBean(): ?DBTableBean;
 

@@ -28,14 +28,24 @@ class NestedSetViewPage extends BeanListPage
         $h_delete = new DeleteItemResponder($this->bean);
 
         $ir = new TextTreeItem();
-        $ir->getActions()->append(new Action("Up", "?cmd=reposition&type=left", array(new DataParameter("item_id", $this->bean->key()))));
-        $ir->getActions()->append(new Action("Down", "?cmd=reposition&type=right", array(new DataParameter("item_id", $this->bean->key()))));
+
+        $actionUp = $h_repos->createAction("Up");
+        $actionUp->getURL()->add(new URLParameter("type", "left"));
+        $actionUp->getURL()->add(new DataParameter("item_id",  $this->bean->key()));
+
+        $actionDown = $h_repos->createAction("Down");
+        $actionDown->getURL()->add(new URLParameter("type", "right"));
+        $actionDown->getURL()->add(new DataParameter("item_id",  $this->bean->key()));
+
+        $ir->getActions()->append($actionUp);
+        $ir->getActions()->append($actionDown);
 
         $ir->getActions()->append(new Action("Edit", "add.php", array(new DataParameter("editID", $this->bean->key()))));
         $ir->getActions()->append($h_delete->createAction());
 
         $tv = new NestedSetTreeView();
         $tv->setItemRenderer($ir);
+        $tv->setBranchRenderMode(NestedSetTreeView::MODE_BRANCHES_UNFOLDED);
 
         $tv->setName(get_class($this->bean));
 
