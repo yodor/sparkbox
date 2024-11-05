@@ -4,7 +4,7 @@ include_once("templates/PageTemplate.php");
 abstract class AdminPageTemplate extends PageTemplate
 {
     /**
-     * @var DBTableBean
+     * @var DBTableBean|null
      */
     protected ?DBTableBean $bean = null;
 

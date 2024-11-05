@@ -200,7 +200,7 @@ class SparkAdminPage extends SparkPage
         $this->preferred_title = constructSiteTitle($selected_path);
     }
 
-    protected function updateNavigation()
+    protected function updateNavigation(): void
     {
         $dynmenu = $this->menu_bar->getMenu();
 
@@ -229,7 +229,7 @@ class SparkAdminPage extends SparkPage
      * Update page actions and page caption title
      * @return void
      */
-    protected function updatePageActions()
+    protected function updatePageActions(): void
     {
         $back_action = $this->navigation->back();
 
