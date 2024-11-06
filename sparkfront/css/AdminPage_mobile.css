@@ -6,7 +6,8 @@
         flex-direction: column;
     }
     .admin_layout .sidePane {
-
+        height:auto;
+        flex-basis: auto;
     }
     .admin_layout .sidePane .admin_header {
         display:flex;
@@ -45,7 +46,7 @@
         flex-wrap:wrap;
     }
     .admin_layout .page_area .page_contents * {
-        min-width:0;
+        min-width:auto;
     }
     .admin_layout .page_area .page_contents .PageTemplate {
         display:flex;
