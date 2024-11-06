@@ -8,8 +8,10 @@
 .ItemView .viewport {
 
     display: inline-flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: flex-start;
+
 }
 
 .ItemView .PaginatorTopComponent {

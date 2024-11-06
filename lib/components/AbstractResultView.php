@@ -226,14 +226,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $this->setAttribute("pagesTotal", $this->paginator->totalPages());
         $this->setAttribute("page", $this->paginator->currentPage());
 
-        if ($this->total_rows>0) {
-            if ($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
-                $this->paginator_top->setRenderEnabled(true);
-            }
-            if($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) {
-                $this->paginator_bottom->setRenderEnabled(true);
-            }
-        }
+
     }
 
     /**
@@ -251,10 +244,18 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             $this->processIterator();
             if ($this->total_rows > 0) {
                 $this->list_empty->setRenderEnabled(false);
+
+                if ($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
+                    $this->paginator_top->setRenderEnabled(true);
+                }
+                if($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) {
+                    $this->paginator_bottom->setRenderEnabled(true);
+                }
             }
             else {
                 $this->viewport->setRenderEnabled(false);
             }
+
         }
 
         parent::startRender();
