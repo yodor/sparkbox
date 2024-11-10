@@ -14,7 +14,7 @@ class ArrayDataIterator implements IDataIterator
 
     protected array $values = array();
 
-    public function __construct(array $result, string $id_key = ArrayDataIterator::KEY_ID, string $value_key = ArrayDataIterator::KEY_VALUE)
+    public function __construct(array $items = array(), string $id_key = ArrayDataIterator::KEY_ID, string $value_key = ArrayDataIterator::KEY_VALUE)
     {
 
         $this->id_key = $id_key;
@@ -22,11 +22,19 @@ class ArrayDataIterator implements IDataIterator
 
         $this->values = array();
 
-        foreach ($result as $idx => $value) {
+        foreach ($items as $idx => $value) {
             $this->values[] = array($this->id_key => $idx, $this->value_key => $value);
         }
     }
 
+    public function clearValues() : void
+    {
+        $this->values = array();
+    }
+    public function appendValue(string $id, string $value) : void
+    {
+        $this->values[] = array($this->id_key => $id, $this->value_key => $value);
+    }
     /**
      * Start data iterator and return number of items in this collection
      * @return int

@@ -205,7 +205,7 @@ BODY {
     z-index:100;
 }
 
-.admin_layout .page_area .page_contents .TableView .PaginatorBottomComponent {
+.admin_layout .page_area .page_contents .TableView .ResultViewFooter {
     position:sticky;
     bottom:0;
     left:0;

@@ -39,7 +39,7 @@ class JSONItemView extends ItemView
     {
         parent::__construct($itr);
         $this->responder = new ItemViewResponder("ItemViewResponder", $this);
-        $this->enablePaginators(AbstractResultView::PAGINATOR_TOP);
+        $this->getFooter()->setRenderEnabled(false);
 
         $this->container = new Container();
         $this->container->setClassName("loader");

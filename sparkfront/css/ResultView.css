@@ -1,0 +1,137 @@
+
+
+.ResultViewHeader {
+    color: black;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding:1em;
+    box-sizing: border-box;
+    align-items: center;
+    gap:0.5em;
+
+}
+.ResultViewHeader .view_mode {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.ResultViewHeader .view_mode .icon {
+    background-repeat: no-repeat;
+    width: 1.7em;
+    height: 1.7em;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 0.3em;
+    background-size:contain;
+}
+
+.ResultViewHeader .view_mode .icon.list {
+    background-image: url("../images/list_actions/icon_list.png");
+}
+
+.ResultViewHeader .view_mode .icon.grid {
+    background-image: url("../images/list_actions/icon_grid.png");
+}
+
+.ResultViewHeader .sort_fields {
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap:0.5em;
+    flex-grow:1;
+    justify-content: flex-end;
+}
+.ResultViewHeader .sort_fields .InputLabel {
+    align-self:center;
+}
+
+.ResultViewHeader .sort_fields .direction {
+
+    display:inline-block;
+    box-sizing:border-box;
+
+    min-width:1.7em;
+    min-height:1.7em;
+
+    width:1.7em;
+    height:1.7em;
+
+
+    background-repeat:no-repeat;
+
+    background-position: 50% 50%;
+    background-size:contain;
+    filter: invert(.5);
+
+    vertical-align: bottom;
+}
+
+.ResultViewHeader .sort_fields .direction[direction="ASC"] {
+    background-image:url(../images/icon_sort_asc.svg)
+}
+.ResultViewHeader .sort_fields .direction[direction="DESC"] {
+    background-image:url(../images/icon_sort_desc.svg)
+}
+
+.ResultViewFooter {
+    color: black;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding:1em;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.ResultViewFooter .page_info {
+
+}
+
+.ResultViewFooter .page_info LABEL:after {
+    content: ":";
+    margin-right:0.5em;
+}
+
+.ResultViewFooter .pager {
+    flex-grow:1;
+    text-align: center;
+}
+
+.ResultViewFooter .pager A {
+    color: #537689;
+    padding: 0.7em;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.ResultViewFooter .pager A.selected {
+    color: black;
+    border: 1px solid #537689;
+    font-weight: bold;
+}
+
+.ResultViewFooter .results_info {
+
+}
+
+.ResultViewFooter .results_info LABEL:after {
+    content: ":";
+    margin-right: 0.5em;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

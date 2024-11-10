@@ -3,8 +3,8 @@ include_once("components/Component.php");
 include_once("components/renderers/IDataIteratorRenderer.php");
 
 include_once("utils/Paginator.php");
-include_once("components/PaginatorTopComponent.php");
-include_once("components/PaginatorBottomComponent.php");
+include_once("components/ResultViewHeader.php");
+include_once("components/ResultViewFooter.php");
 
 abstract class AbstractResultView extends Container implements IDataIteratorRenderer
 {
@@ -37,20 +37,17 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     protected ?Paginator $paginator = NULL;
 
     /**
-     * @var PaginatorTopComponent|null
+     * @var ResultViewHeader|null
      */
-    protected ?PaginatorTopComponent $paginator_top = NULL;
+    protected ?ResultViewHeader $header = NULL;
 
     /**
-     * @var PaginatorBottomComponent|null
+     * @var ResultViewFooter|null
      */
-    protected ?PaginatorBottomComponent $paginator_bottom = NULL;
+    protected ?ResultViewFooter $footer = NULL;
 
 
     protected int $position_index = -1;
-
-    protected int $paginators_enabled = AbstractResultView::PAGINATOR_NONE;
-
 
     /**
      * @var DataIteratorItem|null
@@ -74,18 +71,13 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     {
         parent::__construct(false);
 
-
         $this->iterator = $itr;
 
         $this->paginator = new Paginator();
 
-        $this->paginator_top = new PaginatorTopComponent($this->paginator);
-        $this->paginator_top->setRenderEnabled(false);
+        $this->header = new ResultViewHeader($this->paginator);
 
-        $this->paginator_bottom = new PaginatorBottomComponent($this->paginator);
-        $this->paginator_bottom->setRenderEnabled(false);
-
-        $this->paginators_enabled = (AbstractResultView::PAGINATOR_TOP | AbstractResultView::PAGINATOR_BOTTOM);
+        $this->footer = new ResultViewFooter($this->paginator);
 
         $this->list_empty = new Component(false);
         $this->list_empty->addClassName("ListEmpty");
@@ -94,11 +86,18 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $this->viewport->setComponentClass("viewport");
 
 
-        $this->items()->append($this->paginator_top);
+        $this->items()->append($this->header);
         $this->items()->append($this->list_empty);
         $this->items()->append($this->viewport);
-        $this->items()->append($this->paginator_bottom);
+        $this->items()->append($this->footer);
 
+    }
+
+    public function requiredStyle() : array
+    {
+        $arr = parent::requiredStyle();
+        $arr[] = SPARK_LOCAL . "/css/ResultView.css";
+        return $arr;
     }
 
     /**
@@ -171,14 +170,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
 
     public function getPositionIndex(): int
     {
-
         return ($this->paginator->currentPage() * $this->paginator->itemsPerPage()) + $this->position_index;
-
-    }
-
-    public function enablePaginators(int $mode) : void
-    {
-        $this->paginators_enabled = $mode;
     }
 
     public function getPaginator(): Paginator
@@ -186,14 +178,14 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         return $this->paginator;
     }
 
-    public function getTopPaginator(): PaginatorTopComponent
+    public function getHeader(): ResultViewHeader
     {
-        return $this->paginator_top;
+        return $this->header;
     }
 
-    public function getBottomPaginator(): PaginatorBottomComponent
+    public function getFooter(): ResultViewFooter
     {
-        return $this->paginator_bottom;
+        return $this->footer;
     }
 
     public function setDefaultOrder($default_order) : void
@@ -225,8 +217,6 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         parent::processAttributes();
         $this->setAttribute("pagesTotal", $this->paginator->totalPages());
         $this->setAttribute("page", $this->paginator->currentPage());
-
-
     }
 
     /**
@@ -244,24 +234,17 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             $this->processIterator();
             if ($this->total_rows > 0) {
                 $this->list_empty->setRenderEnabled(false);
-
-                if ($this->paginators_enabled & AbstractResultView::PAGINATOR_TOP) {
-                    $this->paginator_top->setRenderEnabled(true);
-                }
-                if($this->paginators_enabled & AbstractResultView::PAGINATOR_BOTTOM) {
-                    $this->paginator_bottom->setRenderEnabled(true);
-                }
             }
             else {
+                $this->list_empty->setRenderEnabled(true);
                 $this->viewport->setRenderEnabled(false);
+                $this->header->setRenderEnabled(false);
+                $this->footer->setRenderEnabled(false);
             }
-
         }
 
         parent::startRender();
-
     }
-
 
     /**
      * @return void

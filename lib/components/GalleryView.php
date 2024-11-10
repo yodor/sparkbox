@@ -88,16 +88,13 @@ class GalleryView extends Container
             $view->setDefaultOrder(" position ASC ");
         }
 
-        $view->getTopPaginator()->view_modes_enabled = TRUE;
+        $view->getHeader()->getViewMode()->setRenderEnabled(true);
 
         $this->initActions();
 
         $this->wrapper_enabled = false;
 
-
         $this->items()->append($this->view);
-
-
 
     }
 

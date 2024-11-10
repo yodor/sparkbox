@@ -158,7 +158,8 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
         $this->itemView = new ItemView($qry);
 
-        $this->itemView->enablePaginators(0);
+        $this->itemView->getHeader()->setRenderEnabled(false);
+        $this->itemView->getFooter()->setRenderEnabled(false);
         $this->itemView->setItemsPerPage(0);
 
         $this->itemRenderer = new PublicationItem(get_class($this->bean));

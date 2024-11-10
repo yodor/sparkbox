@@ -22,8 +22,8 @@ class TableView extends AbstractResultView implements IHeadContents
     public function __construct(IDataIterator $itr)
     {
         parent::__construct($itr);
-        $this->enablePaginators(AbstractResultView::PAGINATOR_BOTTOM);
 
+        $this->header->setRenderEnabled(false);
         $this->list_empty->setContents("No elements in this collection yet");
 
     }
