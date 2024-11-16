@@ -209,7 +209,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $select->combine($pageFilter);
         $select->combine($orderFilter);
 
-        return parent::getCacheName()."-".$select->getSQL();
+        return parent::getCacheName()."-".$select->getSQL()."-".URL::Current()->toString();
     }
 
     protected function processAttributes(): void
