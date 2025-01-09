@@ -148,7 +148,7 @@ class GalleryView extends Container
             $this->actions->append(Action::RowSeparator());
 
             $url = URL::Current();
-            $url->add(new URLParameter("cmd", "reposition"));
+            $url->add(new URLParameter(RequestResponder::KEY_COMMAND, ChangePositionResponder::class));
             $url->add(new DataParameter("item_id", $this->bean->key()));
             $url->add(new DataParameter("#" . get_class($this->bean) . ".%{$this->bean->key()}%", $this->bean->key()));
 
