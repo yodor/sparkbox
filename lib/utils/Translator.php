@@ -43,14 +43,41 @@ class Translator implements IRequestProcessor, IGETConsumer
     protected int $langID = 1;
 
     /**
-     * The currently active language - 'language' column value from LanguagesBean
-     * @var string
+     * The currently active language result row from LanguagesBean
+     * @var array
      */
     protected array $language = array();
 
     const string KEY_LANGUAGE_ID = "langID";
     const string KEY_CHANGE_LANGUAGE = "change_language";
     const string KEY_LANGUAGE = "language";
+
+    /**
+     * Language ID primary key from LanguagesBean
+     * @return int
+     */
+    public function activeID() : int
+    {
+        return $this->langID;
+    }
+
+    /**
+     * Active language code according to ISO2
+     * @return string
+     */
+    public function activeCode() : string
+    {
+        return $this->language["lang_code"];
+    }
+
+    /**
+     * Active language full name
+     * @return string
+     */
+    public function activeName() : string
+    {
+        return $this->language["language"];
+    }
 
     public function __construct()
     {
@@ -92,7 +119,7 @@ class Translator implements IRequestProcessor, IGETConsumer
     protected function loadLanguageID(int $langID) : void
     {
         debug("Loading ".Translator::KEY_LANGUAGE_ID.": ".$langID);
-        $this->language = $this->languages->getByID($langID);
+        $this->language = $this->languages->getByID($langID, "lang_code", "language");
         $this->langID = $langID;
         $this->storeLanguage();
     }
@@ -167,7 +194,7 @@ class Translator implements IRequestProcessor, IGETConsumer
         debug("Loading default language");
         if (defined("DEFAULT_LANGUAGE")) {
             //query default language from define
-            $qry = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1);
+            $qry = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1, "lang_code");
             if ($qry->exec() && $data = $qry->next()) {
                 $this->language = $data;
                 $this->langID = $data[$this->languages->key()];
