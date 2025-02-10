@@ -25,9 +25,8 @@ class HTMLPage extends Component
 
         global $translator;
         if ($translator instanceof Translator) {
-            $this->setAttribute("lang", $translator->activeCode());
+            $this->setAttribute("lang", $translator->activeCodeISO2());
         }
-
 
         //override automatic css class names
         $this->body->setComponentClass($this->getPageClass());

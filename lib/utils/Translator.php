@@ -62,12 +62,21 @@ class Translator implements IRequestProcessor, IGETConsumer
     }
 
     /**
-     * Active language code according to ISO2
+     * Active language code according to ISO3
      * @return string
      */
     public function activeCode() : string
     {
         return $this->language["lang_code"];
+    }
+
+    /**
+     * Active language code according to ISO2
+     * @return string
+     */
+    public function activeCodeISO2() : string
+    {
+        return substr($this->language["lang_code"], 0,2);
     }
 
     /**
