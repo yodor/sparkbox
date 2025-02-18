@@ -40,9 +40,18 @@ class MCETextArea extends Component {
 
             ///ver 4
             menubar: false,
-            toolbar1: 'undo redo | fontfamily fontsize | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
+            toolbar1: 'undo redo | styles | fontfamily fontsize | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
             toolbar2: 'code|link unlink anchor | image media  | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser',
-            plugins: 'link image lists charmap anchor insertdatetime media code',
+            plugins: 'link image lists charmap anchor insertdatetime media code header',
+
+            style_formats: [
+                { title: 'Heading 1', block: 'h1' },
+                { title: 'Heading 2', block: 'h2' },
+                { title: 'Heading 3', block: 'h3' },
+                { title: 'Heading 4', block: 'h4' },
+                { title: 'Heading 5', block: 'h5' },
+                { title: 'Heading 6', block: 'h6' }
+            ],
 
             invalid_elements: 'iframe,object,embed',
 
