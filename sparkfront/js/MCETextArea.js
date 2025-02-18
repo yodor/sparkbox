@@ -42,7 +42,7 @@ class MCETextArea extends Component {
             menubar: false,
             toolbar1: 'undo redo | styles | fontfamily fontsize | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
             toolbar2: 'code|link unlink anchor | image media  | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser',
-            plugins: 'link image lists charmap anchor insertdatetime media code header',
+            plugins: 'link image lists charmap anchor insertdatetime media code',
 
             style_formats: [
                 { title: 'Heading 1', block: 'h1' },
