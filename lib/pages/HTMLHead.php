@@ -102,20 +102,23 @@ class HTMLHead extends Container
         $this->items()->append($x_default);
 
         if (TRANSLATOR_ENABLED) {
+
             $lb = new LanguagesBean();
             $qry = $lb->queryFull();
             $num = $qry->exec();
-            while ($result = $qry->nextResult()) {
-                if (!$result->isSet("lang_code")) continue;
-                $lang_code = $result->get("lang_code");
-                if (strlen($lang_code) < 2) continue;
-                $locale_default = new Link();
-                $locale_default->setRelation("alternate");
-                $url->add(new URLParameter("change_language", "1"));
-                $url->add(new URLParameter("langID", $result->get($lb->key())));
-                $locale_default->setHref($url->toString());
-                $locale_default->setAttribute("hreflang", substr($lang_code,0,2));
-                $this->items()->append($locale_default);
+            if ($num>1) {
+                while ($result = $qry->nextResult()) {
+                    if (!$result->isSet("lang_code")) continue;
+                    $lang_code = $result->get("lang_code");
+                    if (strlen($lang_code) < 2) continue;
+                    $locale_default = new Link();
+                    $locale_default->setRelation("alternate");
+                    $url->add(new URLParameter("change_language", "1"));
+                    $url->add(new URLParameter("langID", $result->get($lb->key())));
+                    $locale_default->setHref($url->toString());
+                    $locale_default->setAttribute("hreflang", substr($lang_code, 0, 2));
+                    $this->items()->append($locale_default);
+                }
             }
         }
 
