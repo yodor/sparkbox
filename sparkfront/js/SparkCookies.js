@@ -7,16 +7,23 @@ class SparkCookies extends SparkObject
     accept() {
         Cookies.set('accept_cookies', 1, { expires: 3650 });
         this.checkAccepted();
+        this.updateCookiesPanel();
     }
 
     isAccepted() {
-        return Cookies.get('accept_cookies');
+        if (Cookies.get('accept_cookies')>0) return true;
+        return false;
     }
 
     checkAccepted() {
 
     }
 
+    updateCookiesPanel()
+    {
+        let isAccepted = this.isAccepted();
+        document.querySelector(".section.cookies").setAttribute("accepted", isAccepted);
+    }
 }
 
 
