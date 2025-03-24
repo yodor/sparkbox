@@ -303,7 +303,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         if (is_array($value)) throw new Exception("Unable to transact array as value");
         if (is_object($value)) throw new Exception("Unable to transact object as value");
 
-        if (strlen($value) == 0 && $this->transact_empty_string_as_null) {
+        if ((is_null($value) || strlen($value) == 0) && $this->transact_empty_string_as_null) {
             $value = NULL;
         }
 
