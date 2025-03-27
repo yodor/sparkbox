@@ -458,7 +458,7 @@ function isEmptyPassword($password)
 }
 
 //TODO: move field2columns to parsing class
-function fields2columns(InputForm $form, TableView $view, IDataBean $bean = NULL)
+function fields2columns(InputForm $form, TableView $view, ?IDataBean $bean = NULL)
 {
     foreach ($form->inputs() as $field_name => $field) {
         if ($bean) {
@@ -680,7 +680,7 @@ function text4div(&$text)
  * @param array|null $arr
  * @return bool
  */
-function strcmp_isset(string $key, string $val, array $arr = NULL): bool
+function strcmp_isset(string $key, string $val, ?array $arr = NULL): bool
 {
     if (!$arr) $arr = $_GET;
     return (isset($arr[$key]) && (strcmp($arr[$key], $val) == 0));

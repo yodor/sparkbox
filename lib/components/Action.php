@@ -30,7 +30,7 @@ class Action extends DataIteratorItem
      * @param array $parameters Array of URLParameters to append to the URL of this Action
      * @param Closure|null $check_code If set controls rendering from its return value true/false. Used during setData
      */
-    public function __construct(string $action = "", string $href = "", array $parameters = array(), Closure $check_code = NULL)
+    public function __construct(string $action = "", string $href = "", array $parameters = array(), ?Closure $check_code = NULL)
     {
         parent::__construct();
         $this->setComponentClass("Action");

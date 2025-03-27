@@ -4,7 +4,7 @@ include_once("sql/SQLStatement.php");
 class SQLInsert extends SQLStatement
 {
 
-    public function __construct(SQLStatement $other=null)
+    public function __construct(?SQLStatement $other=null)
     {
         parent::__construct($other);
         $this->type = "INSERT INTO";

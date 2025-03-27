@@ -284,7 +284,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     /**
      * @param BeanTransactor $transactor
-     * @return mixed|null
+     * @return void
      * @throws Exception
      */
     public function transactValue(BeanTransactor $transactor) : void

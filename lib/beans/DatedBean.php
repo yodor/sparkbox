@@ -8,7 +8,7 @@ class DatedBean extends DBTableBean
 
     /**
      * DatedPublicationBean constructor.
-     * @param $table_name
+     * @param string $table_name
      * @param string $datefield
      * @throws Exception
      */

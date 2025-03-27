@@ -5,7 +5,7 @@ include_once("sql/SQLSelect.php");
 class SQLDelete extends SQLStatement
 {
 
-    public function __construct(SQLStatement $other = NULL)
+    public function __construct(?SQLStatement $other = NULL)
     {
         parent::__construct($other);
         $this->type = "DELETE";

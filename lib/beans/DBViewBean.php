@@ -9,25 +9,25 @@ class DBViewBean extends DBTableBean
         parent::__construct($table_name);
     }
 
-    public function delete(int $id, DBDriver $db = NULL) : int
+    public function delete(int $id, ?DBDriver $db = NULL) : int
     {
         throw new Exception("View not writable");
     }
 
-    public function deleteRef(string $column, string $value, DBDriver $db = NULL, array $keep_ids = array()) : int
+    public function deleteRef(string $column, string $value, ?DBDriver $db = NULL, array $keep_ids = array()) : int
     {
         throw new Exception("View not writable");
     }
 
 
-    public function update($id, array $row, DBDriver $db = NULL) : int
+    public function update($id, array $row, ?DBDriver $db = NULL) : int
     {
         throw new Exception("View not writable");
     }
 
     //
 
-    public function insert(array $row, DBDriver $db = NULL): int
+    public function insert(array $row, ?DBDriver $db = NULL): int
     {
         throw new Exception("View not writable");
     }

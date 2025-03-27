@@ -72,7 +72,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     }
 
     /**
-     * @return DBTableBean
+     * @return DBTableBean|null
      */
     public function getBean(): ?DBTableBean
     {

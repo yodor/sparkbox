@@ -16,7 +16,7 @@ class NestedSetBean extends DBTableBean
     //  PRIMARY KEY (`menuID`)
     // ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
-    public function __construct(string $table_name, DBDriver $dbdriver = NULL)
+    public function __construct(string $table_name, ?DBDriver $dbdriver = NULL)
     {
         parent::__construct($table_name, $dbdriver);
         if (!$this->haveColumn("lft") || !$this->haveColumn("rgt") || !$this->haveColumn("parentID")) {
@@ -24,7 +24,7 @@ class NestedSetBean extends DBTableBean
         }
     }
 
-    public function insert(array $row, DBDriver $db = NULL): int
+    public function insert(array $row, ?DBDriver $db = NULL): int
     {
         $lastid = -1;
 
@@ -97,7 +97,7 @@ class NestedSetBean extends DBTableBean
         return (int)$rr["max_rgt"];
     }
 
-    public function insertRecord2(array &$row, DBDriver $db = NULL): int
+    public function insertRecord2(array &$row, ?DBDriver $db = NULL): int
     {
         $lastid = parent::insert($row, $db);
 
@@ -106,7 +106,7 @@ class NestedSetBean extends DBTableBean
         return $lastid;
     }
 
-    public function update(int $id, array $row, DBDriver $db = NULL) : int
+    public function update(int $id, array $row, ?DBDriver $db = NULL) : int
     {
 
         if (!$db) {
@@ -216,7 +216,7 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    public function delete(int $id, DBDriver $db = NULL): int
+    public function delete(int $id, ?DBDriver $db = NULL): int
     {
 
         debug("Deleting ID: $id");
@@ -353,7 +353,7 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    public function moveLeft(int $id, DBDriver $db = NULL) : void
+    public function moveLeft(int $id, ?DBDriver $db = NULL) : void
     {
         if (!$db) $db = $this->db;
 
@@ -406,7 +406,7 @@ class NestedSetBean extends DBTableBean
 
     }
 
-    public function moveRight(int $id, DBDriver $db = NULL) : void
+    public function moveRight(int $id, ?DBDriver $db = NULL) : void
     {
         if (!$db) $db = $this->db;
 
@@ -640,7 +640,7 @@ class NestedSetBean extends DBTableBean
      * @return array
      * @throws Exception
      */
-    public function getChildNodes(int $nodeID, array $fieldNames = null) : array
+    public function getChildNodes(int $nodeID, ?array $fieldNames = null) : array
     {
         if (is_null($fieldNames)) {
             $fieldNames = array($this->prkey);

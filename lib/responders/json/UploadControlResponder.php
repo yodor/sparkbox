@@ -18,7 +18,6 @@ abstract class UploadControlResponder extends JSONResponder
     /**
      * UploadControlResponder constructor.
      *
-     * @param string $cmd Having cmd=$cmd in the request makes this handler process the request
      */
     public function __construct()
     {
@@ -42,7 +41,7 @@ abstract class UploadControlResponder extends JSONResponder
 
     /**
      * Prepare html contents for the object that was posted via ajax
-     * @param FileStorageObject $storageObject
+     * @param StorageObject $object
      * @param string $field_name
      * @return string the html contents
      */

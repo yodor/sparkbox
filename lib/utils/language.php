@@ -26,7 +26,7 @@ function trbean(int $id, string $field_name, array &$row, string $tableName)
 }
 
 /**
- * @param string $str_original
+ * @param string $phrase
  * @return string translated version of $str_original
  */
 function tr(string $phrase): string

@@ -154,7 +154,7 @@ class CurrencyConverter
 
     /**
      * Already converted value
-     * @param float $price
+     * @param float $converted_price
      * @return string
      */
     public function getLabel(float $converted_price) : string

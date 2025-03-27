@@ -36,7 +36,7 @@ abstract class SQLStatement implements ISQLGet
      */
     public abstract function getSQL() : string;
 
-    public function __construct(SQLStatement $other = null)
+    public function __construct(?SQLStatement $other = null)
     {
         $this->fieldset = new SQLColumnSet();
         $this->whereset = new ClauseCollection();

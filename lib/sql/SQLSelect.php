@@ -11,7 +11,7 @@ class SQLSelect extends SQLStatement
 
     protected array $modeMask = array();
 
-    public function __construct(SQLStatement $other = NULL)
+    public function __construct(?SQLStatement $other = NULL)
     {
         parent::__construct($other);
         $this->type = "SELECT";

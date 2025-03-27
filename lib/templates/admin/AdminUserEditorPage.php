@@ -2,6 +2,7 @@
 include_once("templates/admin/BeanEditorPage.php");
 include_once("forms/AdminUserForm.php");
 include_once("beans/AdminUsersBean.php");
+include_once("auth/AdminAuthenticator.php");
 
 class AdminUserScript extends PageScript
 {
@@ -64,6 +65,8 @@ class AdminUserEditorPage extends BeanEditorPage
         $this->setForm(new AdminUserForm());
         $this->page->head()->addJS(SPARK_LOCAL."/js/md5.js");
 
+        new AdminUserScript();
+
 
     }
 
@@ -72,6 +75,7 @@ class AdminUserEditorPage extends BeanEditorPage
         parent::initView();
 
         $this->view->getForm()->getRenderer()->setAttribute("onSubmit", "return checkForm(this)");
+        $this->getEditor()->getTransactor()->assignInsertValue("context", AdminAuthenticator::CONTEXT_NAME);
     }
 
 }

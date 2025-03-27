@@ -314,9 +314,9 @@ class URL implements IGETConsumer, IDataResultProcessor
     }
 
     /**
-     * @param array $row Parametrise this URL parameter values using $row associative array as source.
+     * @param array $data Parametrise this URL parameter values using $data associative array as source.
      * JavaScript code is replaced using %parameter_name% as a match.
-     * $row[$parameter_name] value is used as a replacement.
+     * $data[$parameter_name] value is used as a replacement.
      *
      */
     public function setData(array $data) : void

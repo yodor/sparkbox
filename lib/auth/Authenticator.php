@@ -100,7 +100,7 @@ abstract class Authenticator
      * @return AuthContext|null
      * @throws Exception
      */
-    public function authorize(array $user_data = NULL) : ?AuthContext
+    public function authorize(?array $user_data = NULL) : ?AuthContext
     {
 
         if (!$this->session->contains(SessionData::AUTH_TOKEN)) {

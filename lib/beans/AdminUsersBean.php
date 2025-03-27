@@ -28,13 +28,13 @@ class AdminUsersBean extends DBTableBean
         parent::__construct("admin_users");
     }
 
-    public function delete(int $id, DBDriver $db = NULL) : int
+    public function delete(int $id, ?DBDriver $db = NULL) : int
     {
         if ($id == 1) throw new Exception("Root admin user is protected");
         return parent::delete($id, $db);
     }
 
-    public function update(int $id, array $row, DBDriver $db = NULL) : int
+    public function update(int $id, array $row, ?DBDriver $db = NULL) : int
     {
         if ($id == 1 && (isset($row["suspend"]) && $row["suspend"] > 0)) throw new Exception("Root admin user is protected");
         return parent::update($id, $row, $db);

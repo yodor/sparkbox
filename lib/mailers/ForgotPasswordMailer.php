@@ -8,7 +8,7 @@ class ForgotPasswordMailer extends Mailer
      * ForgotPasswordMailer constructor.
      * @param string $email Recipient email
      * @param string $random_pass the password
-     * @param string|null $login_url url of the login page
+     * @param string $login_url url of the login page
      */
     public function __construct(string $email, string $random_pass, string $login_url="")
     {

@@ -43,7 +43,7 @@ class RequestController
 
     /**
      * Get the responder registered with command '$command'
-     * @param string $command
+     * @param string $name
      * @return RequestResponder
      * @throws Exception
      */
@@ -55,7 +55,7 @@ class RequestController
 
     /**
      * Return true if command '$command' have registered responder
-     * @param string $command
+     * @param string $name
      * @return bool
      */
     public static function Have(string $name): bool

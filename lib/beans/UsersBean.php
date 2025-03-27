@@ -74,7 +74,7 @@ class UsersBean extends DBTableBean
      * @return int The number of rows affected
      * @throws Exception
      */
-    public function activate(string $email, string $confirm_code, DBDriver $db = NULL) : int
+    public function activate(string $email, string $confirm_code, ?DBDriver $db = NULL) : int
     {
         if (!$email || !$confirm_code) throw new Exception("Unable to activate with empty 'email' or 'confirm code'");
 

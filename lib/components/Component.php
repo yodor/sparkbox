@@ -480,7 +480,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     /**
      * Set html attribute '$name' to '$value'
      * @param string $name
-     * @param string $value
+     * @param string|null $value
      * @return void
      */
     public function setAttribute(string $name, ?string $value="") : void
@@ -541,7 +541,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         return "";
     }
 
-    protected function getAttributesText(array $src_attributes = NULL): string
+    protected function getAttributesText(?array $src_attributes = NULL): string
     {
         if (!$src_attributes) $src_attributes = $this->attributes;
 

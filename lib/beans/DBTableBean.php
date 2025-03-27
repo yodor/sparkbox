@@ -363,7 +363,7 @@ abstract class DBTableBean
      * @return int The number of affected rows after closure execution
      * @throws Exception
      */
-    protected function handleTransaction(Closure $code, DBDriver $db = NULL) : int
+    protected function handleTransaction(Closure $code, ?DBDriver $db = NULL) : int
     {
         $use_transaction = FALSE;
 
@@ -415,7 +415,7 @@ abstract class DBTableBean
      * @return int
      * @throws Exception
      */
-    public function delete(int $id, DBDriver $db = NULL) : int
+    public function delete(int $id, ?DBDriver $db = NULL) : int
     {
 
         $code = function (DBDriver $db) use ($id) {
@@ -446,7 +446,7 @@ abstract class DBTableBean
      * @param array $keep_ids if not empty would not delete rows with primary keys specified in keep_ids
      * @throws Exception
      */
-    public function deleteRef(string $column, string $value, DBDriver $db = NULL, array $keep_ids = array()) : int
+    public function deleteRef(string $column, string $value, ?DBDriver $db = NULL, array $keep_ids = array()) : int
     {
         if (!in_array($column, $this->columnNames())) throw new Exception("Column '$column' not found in this bean table");
 
@@ -539,7 +539,7 @@ abstract class DBTableBean
      * @return int last insert ID
      * @throws Exception
      */
-    public function insert(array $row, DBDriver $db = NULL): int
+    public function insert(array $row, ?DBDriver $db = NULL): int
     {
 
         $insertID = -1;
@@ -571,7 +571,7 @@ abstract class DBTableBean
      * @return int the number of affected rows from this update
      * @throws Exception
      */
-    public function update(int $id, array $row, DBDriver $db = NULL) : int
+    public function update(int $id, array $row, ?DBDriver $db = NULL) : int
     {
         $update = new SQLUpdate($this->select);
         $update->where()->add($this->prkey, $id);

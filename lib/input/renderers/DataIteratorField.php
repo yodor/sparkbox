@@ -106,7 +106,7 @@ abstract class DataIteratorField extends InputField
     /**
      * Return the key of the DataInput value.
      * Return -1 if 'this' item value is not inside 'this' DataInput values.
-     * @return int
+     * @return int|string
      */
     protected function getModelValueID() : int|string
     {

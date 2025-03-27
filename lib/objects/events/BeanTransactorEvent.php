@@ -14,7 +14,7 @@ class BeanTransactorEvent extends SparkEvent
      */
     protected ?DBDriver $db = null;
 
-    public function __construct(string $name = "", SparkObject $source = NULL, DBDriver $db = NULL)
+    public function __construct(string $name = "", ?SparkObject $source = NULL, ?DBDriver $db = NULL)
     {
         parent::__construct($name, $source);
         $this->db = $db;

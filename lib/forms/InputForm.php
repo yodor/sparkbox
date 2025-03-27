@@ -244,7 +244,7 @@ class InputForm extends SparkObject implements IBeanEditor
         return $this->processor;
     }
 
-    public function addInput(DataInput $input, InputGroup $group = NULL): void
+    public function addInput(DataInput $input, ?InputGroup $group = NULL): void
     {
         if (is_null($group)) $group = $this->default_group;
 

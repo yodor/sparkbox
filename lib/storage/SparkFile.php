@@ -183,7 +183,7 @@ class SparkFile {
      * @return bool
      * @throws Exception
      */
-    public function lock(int $operation, int &$would_block = null) : bool
+    public function lock(int $operation, ?int &$would_block = null) : bool
     {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         return flock($this->handle, $operation, $would_block);

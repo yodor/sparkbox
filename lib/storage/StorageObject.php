@@ -93,8 +93,8 @@ class StorageObject
     /**
      * Create storage object form DB result row
      *
-     * @param array $row
-     * @param string $field_name
+     * @param array $result
+     * @param string $blob_field
      * @return StorageObject
      * @throws Exception
      */

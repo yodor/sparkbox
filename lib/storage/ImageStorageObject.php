@@ -7,7 +7,7 @@ class ImageStorageObject extends FileStorageObject
     protected int $width = -1;
     protected int $height = -1;
 
-    public function __construct(FileStorageObject $file_storage = NULL)
+    public function __construct(?FileStorageObject $file_storage = NULL)
     {
         parent::__construct();
         $this->dataKey = "photo";

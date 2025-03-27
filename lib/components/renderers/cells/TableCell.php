@@ -49,7 +49,7 @@ class TableCell extends Container implements IDataResultProcessor
 
     /**
      * Set attribute from datarow key_name
-     * @param $key_name
+     * @param string $name
      */
     public function addDataAttribute(string $name) : void
     {

@@ -252,7 +252,7 @@ class HTMLHead extends Container
 
     /**
      * Add a JavaScript Script to this head JavaScript scripts collection
-     * @param Script|IScript $object
+     * @param Script $object
      * @return void
      */
     public function addScript(Script $object) : void

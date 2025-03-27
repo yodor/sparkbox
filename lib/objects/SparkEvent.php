@@ -13,7 +13,7 @@ class SparkEvent extends SparkObject
      */
     protected ?SparkObject $source = null;
 
-    public function __construct(string $name="", SparkObject $source=null)
+    public function __construct(string $name="", ?SparkObject $source=null)
     {
         parent::__construct();
 

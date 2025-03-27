@@ -5,7 +5,7 @@ include_once("sql/SQLUpdate.php");
 abstract class OrderedDataBean extends DBTableBean
 {
 
-    public function __construct(string $table_name, DBDriver $dbdriver = NULL)
+    public function __construct(string $table_name, ?DBDriver $dbdriver = NULL)
     {
         parent::__construct($table_name, $dbdriver);
 
@@ -15,7 +15,7 @@ abstract class OrderedDataBean extends DBTableBean
         $this->select->order_by = " position ASC ";
     }
 
-    public function delete(int $id, DBDriver $db = NULL) : int
+    public function delete(int $id, ?DBDriver $db = NULL) : int
     {
 
         $code = function (DBDriver $db) use ($id) {
@@ -37,7 +37,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function insert(array $row, DBDriver $db = NULL): int
+    public function insert(array $row, ?DBDriver $db = NULL): int
     {
         if (!isset($row["position"])) {
             debug("Position field is missing - using max(position) + 1");
@@ -47,7 +47,7 @@ abstract class OrderedDataBean extends DBTableBean
         return parent::insert($row, $db);
     }
 
-    public function reorderFixed(int $id, int $new_pos, DBDriver $db = NULL) : void
+    public function reorderFixed(int $id, int $new_pos, ?DBDriver $db = NULL) : void
     {
 
         $pos = (int)$this->getValue($id, "position");
@@ -83,7 +83,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function reorderTop(int $id, DBDriver $db = NULL) : void
+    public function reorderTop(int $id, ?DBDriver $db = NULL) : void
     {
 
         $pos = (int)$this->getValue($id, "position");
@@ -110,7 +110,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function reorderBottom(int $id, DBDriver $db = NULL) : void
+    public function reorderBottom(int $id, ?DBDriver $db = NULL) : void
     {
 
         $pos = (int)$this->getValue($id, "position");
@@ -140,7 +140,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function reorderUp(int $id, DBDriver $db = NULL) : void
+    public function reorderUp(int $id, ?DBDriver $db = NULL) : void
     {
 
         $pos = (int)$this->getValue($id, "position");
@@ -173,7 +173,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function reorderDown(int $id, DBDriver $db = NULL) : void
+    public function reorderDown(int $id, ?DBDriver $db = NULL) : void
     {
         $pos = (int)$this->getValue($id, "position");
 

@@ -5,7 +5,7 @@ include_once("sql/SQLSelect.php");
 class SQLUpdate extends SQLStatement
 {
 
-    public function __construct(SQLStatement $other = NULL)
+    public function __construct(?SQLStatement $other = NULL)
     {
         parent::__construct($other);
         $this->type = "UPDATE";
