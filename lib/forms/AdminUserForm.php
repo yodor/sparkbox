@@ -66,6 +66,9 @@ class AdminUserForm extends InputForm
 
         $this->addInput($field);
 
+
+        $this->setBean(new AdminUsersBean());
+
     }
 
     //post_data already assigned
