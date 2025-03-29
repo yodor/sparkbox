@@ -35,8 +35,6 @@ class SparkAdminPage extends SparkPage
     const string ACTION_EDIT = "Edit";
     const string ACTION_DELETE = "Delete";
 
-    protected array $roles = array();
-
     protected MenuBar $menu_bar;
 
     protected Navigation $navigation;
@@ -72,14 +70,53 @@ class SparkAdminPage extends SparkPage
         //control gets here only if authorized
         $this->navigation = new Navigation("AdminPageLib");
 
-        $admin_access = new AdminAccessBean();
-        $qry = $admin_access->queryField("userID", $this->getUserID());
-        $qry->exec();
-        while ($row = $qry->next()) {
-            $this->roles[$row["role"]]=1;
+        $menuItems = $this->initMainMenu();
+
+        $access_level = $this->context->getData()->get(AdminAuthenticator::SESSION_DATA_ACCESS_LEVEL);
+        if (strcmp($access_level, AdminAuthenticator::ACCESS_LIMITED) == 0) {
+            $roles = $this->context->getData()->get(AdminAuthenticator::SESSION_DATA_ENABLED_ROLES);
+
+            $enabledMenu = array();
+
+            for ($i=0; $i<count($menuItems); $i++) {
+                $item = $menuItems[$i];
+                if ($item instanceof MenuItem) {
+                    if (in_array($item->getName(), $roles)) {
+                        $enabledMenu[] = $item;
+                    }
+                }
+            }
+
+            $menuItems = $enabledMenu;
+
+
+            $current = URL::Current();
+            $currentBasePath = pathInfo($current->toString(), PATHINFO_DIRNAME);
+            if (!str_contains($currentBasePath, pathInfo(ADMIN_LOCAL, PATHINFO_DIRNAME)) === 0) {
+
+                $found = false;
+                foreach ($enabledMenu as $menuItem) {
+                    if ($menuItem instanceof MenuItem) {
+                        $menuBasePath = pathinfo($menuItem->getHref(), PATHINFO_DIRNAME);
+
+
+                        if (str_contains($currentBasePath, $menuBasePath)) {
+                            $found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!$found) {
+                    throw new Exception("Access denied");
+                }
+            }
+
         }
 
-        $dynmenu = new PageSessionMenu($this->context, $this->initMainMenu());
+
+
+
+        $dynmenu = new PageSessionMenu($this->context, $menuItems);
         $dynmenu->setName("admin_menu");
 
         $this->menu_bar = new MenuBar($dynmenu);
@@ -142,12 +179,7 @@ class SparkAdminPage extends SparkPage
 
     protected function initMainMenu() : array
     {
-
-        $admin_menu = array();
-        $admin_menu[] = new MenuItem("Content", ADMIN_LOCAL . "/content/index.php");
-        $admin_menu[] = new MenuItem("Settings", ADMIN_LOCAL . "/settings/index.php");
-
-        return $admin_menu;
+        return array();
     }
 
     public function getPageCaption() : Container
@@ -164,22 +196,6 @@ class SparkAdminPage extends SparkPage
     {
         return $this->page_filters;
     }
-
-    public function haveRole($role) : bool
-    {
-        return in_array($role, $this->roles) || (count($this->roles) == 0);
-    }
-
-    public function checkAccess($role, $do_redirect = TRUE) : bool
-    {
-        $ret = $this->haveRole($role);
-        if (!$ret && $do_redirect) {
-            header("Location: " . ADMIN_LOCAL . "/access.php");
-            exit;
-        }
-        return $ret;
-    }
-
 
     /**
      * After request controllers before start render
@@ -283,7 +299,10 @@ class SparkAdminPage extends SparkPage
         parent::finishRender();
     }
 
-
+    public function getMenuBar() : MenuBar
+    {
+        return $this->menu_bar;
+    }
 
 }
 

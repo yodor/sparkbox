@@ -5,11 +5,12 @@ include_once("input/DataInputFactory.php");
 include_once("beans/AdminUsersBean.php");
 include_once("beans/AdminAccessBean.php");
 
-include_once("iterators/AdminRolesIterator.php");
 include_once("iterators/DBEnumIterator.php");
 
 class AdminUserForm extends InputForm
 {
+
+    protected array $roles = array();
 
     public function __construct()
     {
@@ -56,13 +57,12 @@ class AdminUserForm extends InputForm
         $this->addInput($field);
 
         //
-        $field = new DataInput("role", "Admin Roles", 0);
+        $field = new DataInput("role", "Menu Access Level", 0);
         $field->getProcessor()->setTransactBean(new AdminAccessBean());
-
         $rend = new CheckField($field);
-        $rend->setIterator(new AdminRolesIterator());
-        $rend->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_ID);
+        $rend->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_VALUE);
         $rend->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
+        $rend->setIterator(new ArrayDataIterator($this->roles));
 
         $this->addInput($field);
 
@@ -117,6 +117,16 @@ class AdminUserForm extends InputForm
             if ($this->getEditID() != $existID) {
                 $this->getInput("email")->setError("This email is already registered with other account");
             }
+        }
+
+    }
+
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+        $rend = $this->getInput("role")->getRenderer();
+        if ($rend instanceof CheckField) {
+            $rend->setIterator(new ArrayDataIterator($roles));
         }
 
     }

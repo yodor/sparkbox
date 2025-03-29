@@ -13,10 +13,9 @@ class PageSessionMenu extends MenuItemList
         parent::__construct($main_menu);
 
         $this->context = $context;
-
         $this->dataKey = get_class($this);
 
-        //check if there is already a menu in session and use it instead or put the inital menu to the session
+        //check if there is already a menu in session and use it instead or put the initial menu to the session
         if ($context->getData()->contains($this->dataKey)) {
             $this->elements = $context->getData()->get($this->dataKey);
         }
@@ -75,6 +74,7 @@ class PageSessionMenu extends MenuItemList
             }
 
         }
+
 
         //store
         $this->context->getData()->set($this->dataKey, $this->elements);

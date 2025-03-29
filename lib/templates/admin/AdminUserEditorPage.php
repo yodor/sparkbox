@@ -62,7 +62,21 @@ class AdminUserEditorPage extends BeanEditorPage
         //$this->page->checkAccess(ROLE_ADMIN_USERS_MENU);
 
         $this->setBean(new AdminUsersBean());
-        $this->setForm(new AdminUserForm());
+
+        $roles = array();
+        $menu = $this->getPage()->getMenuBar()->getMenu();
+        if ($menu instanceof MenuItemList) {
+            $itr = $menu->iterator();
+            while ($item = $itr->next()) {
+                if ($item instanceof MenuItem) {
+                    $roles[] = $item->getName();
+                }
+            }
+        }
+
+        $form = new AdminUserForm();
+        $form->setRoles($roles);
+        $this->setForm($form);
         $this->page->head()->addJS(SPARK_LOCAL."/js/md5.js");
 
         new AdminUserScript();

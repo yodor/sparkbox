@@ -88,7 +88,7 @@ abstract class Authenticator
             throw new Exception(tr("Error during registering. Please try again later."));
         }
 
-        $this->fillSessionData($urow);
+        $this->fillSessionData($urow, $userID);
 
         $this->createAuthToken($userID);
 
@@ -193,7 +193,7 @@ abstract class Authenticator
                 if ($is_suspended) throw new Exception(tr("Your account is temporary suspended."));
             }
 
-            $this->fillSessionData($row);
+            $this->fillSessionData($row, $userID);
 
             $this->createAuthToken($userID);
 
@@ -249,7 +249,7 @@ abstract class Authenticator
 
     }
 
-    protected function fillSessionData(array $row) : void
+    protected function fillSessionData(array $row, int $userID) : void
     {
         debug($this, "fill common SessionData");
 
