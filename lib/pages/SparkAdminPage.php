@@ -89,16 +89,13 @@ class SparkAdminPage extends SparkPage
 
             $menuItems = $enabledMenu;
 
-
-            $current = URL::Current();
-            $currentBasePath = pathInfo($current->toString(), PATHINFO_DIRNAME);
-            if (!str_contains($currentBasePath, pathInfo(ADMIN_LOCAL, PATHINFO_DIRNAME)) === 0) {
+            $currentBasePath = pathInfo(URL::Current()->toString(), PATHINFO_DIRNAME);
+            if (strcmp($currentBasePath, ADMIN_LOCAL ) != 0) {
 
                 $found = false;
                 foreach ($enabledMenu as $menuItem) {
                     if ($menuItem instanceof MenuItem) {
                         $menuBasePath = pathinfo($menuItem->getHref(), PATHINFO_DIRNAME);
-
 
                         if (str_contains($currentBasePath, $menuBasePath)) {
                             $found = true;
@@ -107,7 +104,9 @@ class SparkAdminPage extends SparkPage
                     }
                 }
                 if (!$found) {
-                    throw new Exception("Access denied");
+//                    throw new Exception("Access denied");
+                    header("Location: ".ADMIN_LOCAL."/access.php");
+                    exit;
                 }
             }
 
