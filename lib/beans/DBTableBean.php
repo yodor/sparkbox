@@ -277,15 +277,17 @@ abstract class DBTableBean
     }
 
     /**
-     * Retrieve single result where column '$column' has value '$value'
+     * Retrieve single result (limit = 1) where column '$column' has value '$value'
+     * primary key and $column columns are selected, select additional columns using $columns variadic array
      * @param string $column
      * @param string $value
+     * @param string ...$columns
      * @return array|null
      * @throws Exception
      */
-    public function getResult(string $column, string $value) : ?array
+    public function getResult(string $column, string $value, string ...$columns) : ?array
     {
-        $qry = $this->queryField($column, $value, 1);
+        $qry = $this->queryField($column, $value, 1, ...$columns);
         $qry->exec();
         return $qry->next();
     }
