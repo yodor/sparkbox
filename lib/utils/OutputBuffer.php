@@ -12,7 +12,7 @@ class OutputBuffer {
      * Clear the output buffer doing ob_end_clean if it is started
      * @return void
      */
-    public function clear()
+    public function clear() : void
     {
         $this->data = "";
         if ($this->started) {
