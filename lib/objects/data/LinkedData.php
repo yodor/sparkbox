@@ -4,19 +4,19 @@ class LinkedData
 {
     protected array $data = array();
 
-    protected string $type = "";
+    protected array $type = array();
 
-    public function __construct(string $type)
+    public function __construct(string ...$type)
+    {
+        $this->setType(...$type);
+    }
+
+    public function setType(string ...$type) : void
     {
         $this->type = $type;
     }
 
-    public function setType(string $type) : void
-    {
-        $this->type = $type;
-    }
-
-    public function getType() : string
+    public function getType() : array
     {
         return $this->type;
     }
