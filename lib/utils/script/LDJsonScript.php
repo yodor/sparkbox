@@ -4,11 +4,28 @@ include_once("components/Script.php");
 class LDJsonScript extends Script
 {
     protected array $data = array();
+    protected string $context = "https://schema.org";
 
-    public function __construct(array $data)
+    public function __construct()
     {
         parent::__construct();
         $this->setType("application/ld+json");
+
+    }
+
+    public function setContext(string $context) : void
+    {
+        $this->context = $context;
+    }
+
+    public function getContext() : string
+    {
+        return $this->context;
+    }
+
+    public function setLinkedData(LinkedData $linkedData) : void
+    {
+        $data = array("@context"=>$this->context) + $linkedData->toArray();
         $this->setData($data);
     }
 
