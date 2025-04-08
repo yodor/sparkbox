@@ -5,9 +5,9 @@ class ClosureComponent extends Container
 
     protected ?Closure $closure = null;
 
-    public function __construct(?Closure $callback = null, bool $wrapper_enabled = true)
+    public function __construct(?Closure $callback = null, bool $wrapper_enabled = true, bool $chained_component_class = true)
     {
-        parent::__construct();
+        parent::__construct($chained_component_class);
         $this->closure = $callback;
         $this->wrapper_enabled = $wrapper_enabled;
     }
