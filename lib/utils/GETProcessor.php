@@ -84,6 +84,11 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
         $this->closure = $closure;
     }
 
+    public function getClosure() : ?Closure
+    {
+        return $this->closure;
+    }
+
     protected function processClauseCollection()
     {
         if ($this->select instanceof SQLSelect) {
