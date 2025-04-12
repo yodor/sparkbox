@@ -80,13 +80,13 @@ class DBCacheEntry extends CacheEntry
     public function store(string $data, int $lastModified = 0): void
     {
         if ($this->haveData()) {
-            $data = array("data" => $data, "lastModified" => $lastModified);
+            $data = array("data" => $this->bean->getDB()->escape($data), "lastModified" => $lastModified);
             $this->bean->update($this->entryID, $data);
         }
         else {
             $data = array(
-                "cacheName" => $this->cacheName,
-                "className" => $this->className,
+                "cacheName" => $this->bean->getDB()->escape($this->cacheName),
+                "className" => $this->bean->getDB()->escape($this->className),
                 "beanID" => $this->beanID,
                 "data" => $this->bean->getDB()->escape($data),
                 "lastModified" => $lastModified

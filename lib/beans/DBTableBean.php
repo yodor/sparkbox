@@ -594,7 +594,8 @@ abstract class DBTableBean
 
     protected function manageCache(int $id) : void
     {
-        //TODO: check path
+        if ($this instanceof SparkCacheBean) return;
+
         $cache_file = CACHE_PATH . "/" . get_class($this) . "/" . $id;
         debug("Checking cache folder: '$cache_file'");
         if (!is_dir($cache_file)) {
@@ -610,6 +611,22 @@ abstract class DBTableBean
             //
             debug("Unable to delete cache folder: $cache_file");
         }
+
+        $delete = new SQLDelete();
+        $delete->from = "sparkcache";
+        $delete->where()->add("className", get_class($this));
+        $delete->where()->add("beanID", $id);
+
+        try {
+            $this->db->transaction();
+            $this->db->query($delete->getSQL());
+            $this->db->commit();
+        }
+        catch (Exception $e) {
+            $this->db->rollBack();
+            debug("Unable to delete from sparkcache table: ".$e->getMessage());
+        }
+
     }
 
     protected function prepareValues(array $row, SQLStatement $statement)
