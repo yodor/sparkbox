@@ -1,4 +1,5 @@
 <?php
+include_once("storage/CacheFactory.php");
 include_once("pages/HTMLPage.php");
 include_once("responders/RequestController.php");
 include_once("objects/SparkEventManager.php");
@@ -402,7 +403,7 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         if (PAGE_CACHE_ENABLED) {
             register_shutdown_function(function(){
-                CacheEntry::CleanupPageCache();
+                CacheFactory::CleanupPageCache();
             });
         }
     }

@@ -1,6 +1,6 @@
 <?php
 include_once("storage/SparkHTTPResponse.php");
-include_once("storage/CacheEntry.php");
+include_once("storage/CacheFactory.php");
 include_once("storage/FileStorageObject.php");
 include_once("auth/Authenticator.php");
 include_once("storage/DataBuffer.php");
@@ -72,7 +72,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->cacheEntry = NULL;
 
         if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
-            $this->cacheEntry = CacheEntry::BeanCacheEntry($this->cacheName(), $this->className, $this->id);
+            $this->cacheEntry = CacheFactory::BeanCacheEntry($this->cacheName(), $this->className, $this->id);
         }
 
 
@@ -199,7 +199,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     {
         if ($this->last_modified!=-1) return $this->last_modified;
 
-        if ($this->cacheEntry && $this->cacheEntry->getFile()->exists()) {
+        if ($this->cacheEntry && $this->cacheEntry->haveData()) {
             debug("Reading last-modified from filesystem");
             $last_modified = $this->cacheEntry->lastModified();
         }
@@ -302,10 +302,10 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         debug("Cache name is: ".$cacheName);
 
         //check if we have the data in cache (skip fetching blob data from DB and image processing if found)
-        if ($this->cacheEntry && $this->cacheEntry->getFile()->exists()) {
-            debug("Bean data found in cache - sending cache file as a response");
+        if ($this->cacheEntry && $this->cacheEntry->haveData()) {
+            debug("Bean data found in cache - sending cache data as a response");
             $this->setHeader("X-Tag", "SparkCache");
-            $this->sendFile($this->cacheEntry->getFile());
+            $this->sendCacheEntry($this->cacheEntry);
             exit;
         }
 
@@ -320,7 +320,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
             debug("Storing cache file for this bean request");
             $this->cacheEntry->storeBuffer($this->object->buffer(), $lastModified);
             debug("Sending cache file as a response");
-            $this->sendFile($this->cacheEntry->getFile());
+            $this->sendCacheEntry($this->cacheEntry);
         }
         else {
             //debug case only when cache is disabled

@@ -149,11 +149,15 @@ $defines->set("DEFAULT_LOCALE", "en-us");
 
 $defines->set("DEFAULT_CURRENCY", "EUR");
 
+
 $defines->set("STORAGE_CACHE_ENABLED", TRUE);
 //time in seconds to expire the cached page components
 $defines->set("PAGE_CACHE_TTL", 3600);
 $defines->set("PAGE_CACHE_ENABLED", FALSE);
 $defines->set("PAGE_CACHE_CLEANUP_DELTA", 86400);
+//filesystem or database
+$defines->set("BEAN_CACHE_BACKEND", "filesystem");
+$defines->set("PAGE_CACHE_BACKEND", "filesystem");
 
 //fetch local deployment configuration
 //can override stuff in defines

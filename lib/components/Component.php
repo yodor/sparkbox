@@ -298,8 +298,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
             if (!empty($cacheName)) {
                 debug("Cacheable component: ".get_class($this)." | Cache name: ".$cacheName);
 
-                $cacheEntry = CacheEntry::PageCacheEntry(get_class($this) . "-" . sparkHash($cacheName));
-                if ($cacheEntry->getFile()->exists()) {
+                $cacheEntry = CacheFactory::PageCacheEntry(get_class($this) . "-" . sparkHash($cacheName));
+                if ($cacheEntry->haveData()) {
 
                     $entryStamp = $cacheEntry->lastModified();
                     $timeStamp = time();

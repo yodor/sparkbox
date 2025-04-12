@@ -182,6 +182,18 @@ class SparkHTTPResponse
         debug("Response headers set");
     }
 
+    public function sendCacheEntry(CacheEntry $cacheEntry) : void
+    {
+        if ($cacheEntry instanceof FileCacheEntry) {
+            $this->sendFile($cacheEntry->getFile());
+        }
+        else if ($cacheEntry instanceof DBCacheEntry) {
+            $this->sendData($cacheEntry->getBuffer());
+        }
+        else {
+            throw new Exception("Unsupported CacheEntry type");
+        }
+    }
     /**
      * Output contents of file
      * @param SparkFile $file Contents of file to output
