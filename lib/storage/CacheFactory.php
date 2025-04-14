@@ -85,6 +85,8 @@ class CacheFactory
         $cleanup_time = filemtime($cleanup_file);
         $delta = time() - $cleanup_time;
         //default 24 hours - 86400 seconds
+        //debug("Cleanup PageCache delta: $delta");
+
         if ($delta < PAGE_CACHE_CLEANUP_DELTA) {
             debug("Cleanup PageCache remaining time: ". PAGE_CACHE_CLEANUP_DELTA - $delta);
             return;
@@ -98,7 +100,7 @@ class CacheFactory
 
             $bean = new SparkCacheBean();
             $delete = new SQLDelete($bean->select());
-            $delete->where()->add("className", "PageCache");
+            $delete->where()->add("className", "'PageCache'");
             $delete->where()->addExpression("(($timestamp - lastModified) > ".PAGE_CACHE_TTL.")", " AND ");
             $db = $bean->getDB();
             try {
@@ -106,6 +108,7 @@ class CacheFactory
                 $db->query($delete->getSQL());
                 $numEntries = $db->affectedRows();
                 $db->commit();
+                touch($cleanup_file);
                 debug("DB PageCache cleanup complete. Affected rows: " . $numEntries);
             }
             catch (Exception $e) {
