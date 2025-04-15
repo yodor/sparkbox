@@ -15,9 +15,9 @@ class SparkCacheBean extends DBTableBean
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 ";
 
-    public function __construct()
+    public function __construct(?DBDriver $dbdriver = NULL)
     {
-        parent::__construct("sparkcache");
+        parent::__construct("sparkcache", $dbdriver);
     }
 }
 ?>
