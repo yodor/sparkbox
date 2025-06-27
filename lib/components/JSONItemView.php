@@ -38,7 +38,7 @@ class JSONItemView extends ItemView
     public function __construct(?IDataIterator $itr = NULL)
     {
         parent::__construct($itr);
-        $this->responder = new ItemViewResponder("ItemViewResponder", $this);
+        $this->responder = new ItemViewResponder($this);
         $this->getFooter()->setRenderEnabled(false);
 
         $this->container = new Container();
@@ -85,9 +85,9 @@ class JSONItemView extends ItemView
 
     public function processResponse(JSONResponse $resp)
     {
-        $this->processIterator();
+        //$this->processIterator();
         ob_start();
-        $this->renderResults();
+        $this->renderItems();
         $resp->html = ob_get_contents();
         ob_end_clean();
     }
