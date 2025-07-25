@@ -33,7 +33,8 @@
 
 .Dialog .Inner {
     background-color: var(--spark-dialog-background);
-    display:inline-grid;
+    display:inline-flex;
+    flex-direction:column;
     box-sizing: border-box;
     align-self: center;
     justify-self: center;
@@ -131,6 +132,7 @@
     display: inline-flex;
     flex-direction:row;
     justify-self: flex-end;
+    justify-content: flex-end;
     padding:0.5em;
     flex-wrap:wrap;
 
