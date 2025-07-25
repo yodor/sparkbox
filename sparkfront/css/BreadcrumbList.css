@@ -1,31 +1,36 @@
 .BreadcrumbList {
-    display:inline-block;
+    display:inline-flex;
+    flex-direction:row;
     padding:0;
     margin:0;
+    list-style-type: none;
+    font-size:80%;
 }
 
 .BreadcrumbList .BreadcrumbListItem {
-    display:inline-block;
+
     vertical-align:top;
+    text-transform: capitalize ;
+
 }
 
 
 .BreadcrumbList .BreadcrumbListItem .Action {
     font-weight: normal;
     text-decoration: none;
-    vertical-align:top;
-    display:inline-block;
+    text-transform: inherit;
 }
 
 .BreadcrumbList .BreadcrumbListItem .Action SPAN {
-    display:inline-block;
-    vertical-align:top;
+    text-transform: inherit;
+
 }
 
 .BreadcrumbList .BreadcrumbListItem:after {
-    content: "//";
-    /*padding-left: 5px;*/
-    /*font-size:120%;*/
+    content: "/";
+    margin-left:0.5em;
+    margin-right:0.5em;
+
 }
 
 .BreadcrumbList .BreadcrumbListItem:last-child:after {

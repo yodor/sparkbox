@@ -55,7 +55,7 @@ class BreadcrumbList extends Container implements IHeadContents
             $this->renderer->startRender();
 
             $act->setAttribute("itemprop", "item");
-            $act->setContents("<span itemprop='name'>".$act->getAttribute("action")."</span>");
+            $act->setContents("<span itemprop='name'>".mb_strtolower($act->getAttribute("action"))."</span>");
             $act->render();
 
             echo "<meta itemprop='position' content='".($pos++)."' />";
