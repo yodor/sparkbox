@@ -169,7 +169,12 @@ function currentURL(): string
 
 function fullURL(string $url) : string
 {
-    return SITE_PROTOCOL.SITE_DOMAIN.$url;
+    $domain =  SITE_PROTOCOL.SITE_DOMAIN;
+    $url = str_replace($domain, "", $url);
+    if (str_starts_with($url, "http://") || str_starts_with($url, "https://")) {
+        return $url;
+    }
+    return $domain.$url;
 }
 
 function normalize($str)
