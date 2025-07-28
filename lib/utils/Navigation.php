@@ -26,8 +26,13 @@ class Navigation
 
         //current URL
         $pageURL = URL::Current();
-        if ($pageURL->contains(JSONResponder::KEY_JSONREQUEST)) {
+
+        if (RequestController::isJSONRequest()) {
             debug("Not pushing JSONRequest ...");
+            return;
+        }
+        if (RequestController::isResponderRequest()) {
+            debug("Not pushing RequestResponder ...");
             return;
         }
 
@@ -68,6 +73,9 @@ class Navigation
         if (RequestController::isJSONRequest()) {
             debug("Not clearing for JSONRequest");
         }
+        else if (RequestController::isResponderRequest()) {
+            debug("Not clearing for RequestResponder");
+        }
         else {
             debug("Clearing all navigation entries");
             $this->urldata->removeAll();
@@ -79,7 +87,10 @@ class Navigation
     {
         debug("Requested back action");
 
-        if ($this->urldata->count()==0)return NULL;
+        if ($this->urldata->count()==0){
+            debug("URL backward history is empty");
+            return NULL;
+        }
 
         $pages = array_reverse($this->urldata->keys(), true);
 
