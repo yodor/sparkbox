@@ -492,7 +492,7 @@ function reorderArray(array $values_array)
 function DefaultAcceptedTags()
 {
 
-    return "<br><p><a><ul><ol><li><b><u><i><h1><h2><h3><h4><center><sub><sup><hr><img><object><video><embed><iframe><strong><em><span>";
+    return "<br><p><a><ul><ol><li><b><u><i><h1><h2><h3><h4><h5><h6><center><sub><sup><hr><img><object><video><embed><iframe><strong><em><span>";
 
 }
 
