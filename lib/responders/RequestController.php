@@ -15,6 +15,11 @@ class RequestController
         return isset($_REQUEST[JSONResponder::KEY_JSONREQUEST]);
     }
 
+    public static function isResponderRequest(): bool
+    {
+        return isset($_REQUEST[RequestResponder::KEY_COMMAND]);
+    }
+
     /**
      * Register responder with controller using its command
      * Existing command registration will be replaced
