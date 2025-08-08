@@ -53,7 +53,7 @@ class HTMLPage extends Component
         return $this->body;
     }
 
-    public function startRender()
+    public function startRender(): void
     {
         echo "<!DOCTYPE html>\n";
         parent::startRender(); //<html>
@@ -61,7 +61,7 @@ class HTMLPage extends Component
         $this->body->startRender();
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         $this->body->finishRender();
         parent::finishRender(); //</html>

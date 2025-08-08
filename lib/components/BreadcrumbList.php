@@ -41,7 +41,7 @@ class BreadcrumbList extends Container implements IHeadContents
         return $arr;
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         $iterator = $this->items->iterator();
         $pos = 1;

@@ -145,7 +145,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
 
         $path = array();
@@ -231,7 +231,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     }
 
     //do not cache script code
-    public function render()
+    public function render(): void
     {
         parent::render();
         ?>

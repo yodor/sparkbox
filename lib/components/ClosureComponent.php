@@ -30,7 +30,7 @@ class ClosureComponent extends Container
         }
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         parent::renderImpl();
         ($this->closure)($this);

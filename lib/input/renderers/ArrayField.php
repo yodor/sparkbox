@@ -166,7 +166,7 @@ class ArrayField extends InputField
     }
 
 
-    public function finishRender()
+    public function finishRender(): void
     {
         parent::finishRender();
         ?>

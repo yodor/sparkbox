@@ -64,12 +64,12 @@ class PageResultsPanel extends Component
         $this->total_pages = $total_pages;
     }
 
-    public function startRender()
+    public function startRender(): void
     {
         echo "<span>";
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         echo "</span>";
     }
@@ -96,7 +96,7 @@ class PageResultsPanel extends Component
         }
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         $qry = $_GET;
 

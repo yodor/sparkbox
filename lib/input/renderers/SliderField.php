@@ -100,7 +100,7 @@ class SliderField extends InputFieldTag
         $this->dataList->items()->append(new DataListItem($value,$label));
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         parent::finishRender();
         ?>

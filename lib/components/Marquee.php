@@ -31,7 +31,7 @@ class Marquee extends Component
         $this->viewport->setContents($value);
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         $this->viewport->render();
         $this->viewport->render();

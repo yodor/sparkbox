@@ -49,7 +49,7 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
     }
 
-    public function renderImpl()
+    public function renderImpl(): void
     {
         echo "<div class='CurrencyRateEditor'>";
 

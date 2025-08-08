@@ -66,13 +66,13 @@ class JSONItemView extends ItemView
         return $arr;
     }
 
-    public function startRender()
+    public function startRender(): void
     {
         AbstractResultView::startRender();
         $this->viewport->startRender();
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         $this->viewport->finishRender();
 

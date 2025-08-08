@@ -67,7 +67,7 @@ class TextCaptchaField extends TextField
     {
         return $this->label;
     }
-    public function renderImpl()
+    public function renderImpl(): void
     {
         echo "<label>".$this->label."</label>";
         parent::renderImpl();

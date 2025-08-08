@@ -152,14 +152,14 @@ class GalleryTape extends Component implements IDataIteratorRenderer
         return $this->item_renderer;
     }
 
-    public function startRender()
+    public function startRender(): void
     {
         parent::startRender();
 
         $this->iterator->exec();
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
 
         echo "<div class='contents'>";
@@ -193,7 +193,7 @@ class GalleryTape extends Component implements IDataIteratorRenderer
         echo "</div>";
     }
 
-    public function render()
+    public function render(): void
     {
         parent::render();
         ?>

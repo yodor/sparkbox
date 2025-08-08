@@ -79,7 +79,7 @@ class AdminLoginForgotPassword extends AdminLogin
         $this->items()->append($this->view);
     }
 
-    public function startRender()
+    public function startRender(): void
     {
         $proc = new ForgotPasswordProcessor();
 

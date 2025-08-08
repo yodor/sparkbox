@@ -222,7 +222,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     /**
      * @throws Exception
      */
-    public function startRender()
+    public function startRender(): void
     {
         if (is_null($this->iterator)) {
             $this->list_empty->setRenderEnabled(true);

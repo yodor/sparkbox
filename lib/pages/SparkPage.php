@@ -351,7 +351,7 @@ class SparkPage extends HTMLPage implements IActionCollection
      * 1. The head contents buffer - sent in startRender()
      * 2. The body contents buffer - everything between startRender() and finishRender() calls
      */
-    public function startRender()
+    public function startRender(): void
     {
         //head output buffer
         ob_start();
@@ -389,7 +389,7 @@ class SparkPage extends HTMLPage implements IActionCollection
      * 4. Render the closing HTML tag
      * 5. End output buffering and send to client
      */
-    public function finishRender()
+    public function finishRender(): void
     {
         //still inside the body section
 

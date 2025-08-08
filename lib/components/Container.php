@@ -43,13 +43,13 @@ class Container extends Component
         return $this->items;
     }
 
-    public function startRender()
+    public function startRender(): void
     {
         if (!$this->wrapper_enabled) return;
         parent::startRender();
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         if ($this->items_first) {
             $this->renderCollectionItems();
@@ -70,7 +70,7 @@ class Container extends Component
         }
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         if (!$this->wrapper_enabled) return;
         parent::finishRender();

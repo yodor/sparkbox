@@ -117,7 +117,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         return $this->actions;
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
 
         echo "<div class='header'>";

@@ -21,7 +21,7 @@ class MenuListRenderer extends Component {
         }
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         static $renderer = new MenuItemRenderer();
 

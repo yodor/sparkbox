@@ -48,7 +48,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         echo "<div class='cell image'>";
         $img_href = StorageItem::Image($this->id, $this->beanClass, $this->width, $this->height);
@@ -325,7 +325,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         echo "<div class='Caption'>".tr("Latest News")."</div>";
         parent::renderImpl();

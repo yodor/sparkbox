@@ -267,7 +267,7 @@ class SparkAdminPage extends SparkPage
         $this->page_actions->items()->append($title);
     }
 
-    public function startRender()
+    public function startRender(): void
     {
 
         $this->updateNavigation();
@@ -287,7 +287,7 @@ class SparkAdminPage extends SparkPage
         echo "<div class='page_contents'>";
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         echo "</div>"; //page_contents
 

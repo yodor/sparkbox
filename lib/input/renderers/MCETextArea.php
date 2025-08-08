@@ -38,7 +38,7 @@ class MCETextArea extends TextArea
         return self::$image_browser;
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         parent::finishRender();
         ?>

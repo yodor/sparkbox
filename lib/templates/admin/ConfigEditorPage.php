@@ -85,7 +85,7 @@ class ConfigEditorPage extends AdminPageTemplate
         // TODO: Implement initView() method.
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         $this->form->getRenderer()->render();
     }

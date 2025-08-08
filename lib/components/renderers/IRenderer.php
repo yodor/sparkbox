@@ -12,9 +12,9 @@
 interface IRenderer
 {
 
-    public function startRender();
-    public function render();
-    public function finishRender();
+    public function startRender(): void;
+    public function render(): void;
+    public function finishRender(): void;
 
 }
 

@@ -172,7 +172,7 @@ abstract class SessionUpload extends InputField
 
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         parent::finishRender();
         ?>

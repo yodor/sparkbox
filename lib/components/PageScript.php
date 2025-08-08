@@ -18,7 +18,7 @@ abstract class PageScript extends Script implements IPageComponent, IPageScript
      */
     abstract function code() : string;
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         $this->buffer()->set($this->code());
         parent::renderImpl();

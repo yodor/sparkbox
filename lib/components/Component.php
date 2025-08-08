@@ -235,7 +235,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         }
     }
 
-    public function startRender()
+    public function startRender(): void
     {
         $this->processAttributes();
         $attrs = $this->prepareAttributes();
@@ -264,7 +264,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         }
     }
 
-    protected function renderImpl()
+    protected function renderImpl(): void
     {
         if ($this->translation_enabled) {
             echo tr($this->buffer->get());
@@ -274,7 +274,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         }
     }
 
-    public function finishRender()
+    public function finishRender(): void
     {
         if ($this->closingTagRequired) {
             echo "</$this->tagName>";
@@ -286,7 +286,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * @return void
      * @throws Exception
      */
-    public function render()
+    public function render(): void
     {
         if (!$this->render_enabled) return;
 

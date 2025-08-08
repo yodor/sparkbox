@@ -102,7 +102,7 @@ class ResultViewHeader extends Container
         return $this->viewMode;
     }
 
-    public function startRender()
+    public function startRender(): void
     {
         if ($this->caption) {
             $this->viewCaption->setContents($this->caption);

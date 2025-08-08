@@ -38,7 +38,7 @@ class ColorCodeField extends InputFieldTag
 
     }
 
-    public function renderImpl()
+    public function renderImpl(): void
     {
         parent::renderImpl();
 ?>
