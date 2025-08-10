@@ -158,6 +158,9 @@ $defines->set("PAGE_CACHE_CLEANUP_DELTA", 86400);
 //filesystem or database
 $defines->set("BEAN_CACHE_BACKEND", "filesystem");
 $defines->set("PAGE_CACHE_BACKEND", "filesystem");
+//slugify StorageItem returned urls
+$defines->set("STORAGE_ITEM_SLUGIFY_URLS", FALSE);
+
 
 //fetch local deployment configuration
 //can override stuff in defines

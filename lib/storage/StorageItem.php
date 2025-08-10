@@ -5,9 +5,9 @@ include_once("utils/url/URL.php");
 class StorageItem extends DataObject implements JsonSerializable
 {
 
-    public $id = -1;
-    public $className = "";
-    public $field = "";
+    public int $id = -1;
+    public string $className = "";
+    public string $field = "";
 
     protected bool $use_external = false;
 
@@ -38,7 +38,7 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->use_external = $mode;
     }
 
-    public function hrefImage(int $width = -1, int $height = -1) : string
+    public function hrefImage(int $width = -1, int $height = -1) : URL
     {
         if ($width > 0 || $height > 0) {
 
@@ -47,54 +47,52 @@ class StorageItem extends DataObject implements JsonSerializable
             }
             return $this->hrefCrop($width, $height);
         }
-        return $this->hrefFull();
+        //full version
+        return $this->hrefCrop(0, 0);
     }
 
-    public function hrefFull() : string
+    public function hrefFull() : URL
+    {
+          return $this->hrefCrop(0, 0);
+    }
+    public function hrefThumb($width) : URL
+    {
+        return $this->hrefCrop($width, $width);
+    }
+
+    public function hrefCrop($width, $height) : URL
     {
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
-        $this->url->remove("width");
-        $this->url->remove("height");
-        $this->url->remove("size");
-        return $this->url->toString();
-    }
 
-    public function hrefCrop($width, $height) : string
-    {
-        $this->setType(StorageItem::TYPE_IMAGE);
-        $this->buildURL();
-        $this->url->remove("size");
-        $this->url->add(new URLParameter("width", $width));
-        $this->url->add(new URLParameter("height", $height));
-        return $this->url->toString();
+        if (STORAGE_ITEM_SLUGIFY_URLS) {
+            $script_name = $this->url->getScriptName();
+            $script_name.=$width."/";
+            $script_name.=$height."/";
+            $this->url->setScriptName($script_name);
+        }
+        else {
+            $this->url->add(new URLParameter("width", $width));
+            $this->url->add(new URLParameter("height", $height));
+        }
+        return $this->url;
 
     }
 
-    public function hrefThumb($width) : string
-    {
-        $this->setType(StorageItem::TYPE_IMAGE);
-        $this->buildURL();
-        $this->url->remove("width");
-        $this->url->remove("height");
-        $this->url->add(new URLParameter("size", $width));
-        return $this->url->toString();
-    }
-
-    public function hrefFile() : string
+    public function hrefFile() : URL
     {
         $this->setType(StorageItem::TYPE_FILE);
         $this->buildURL();
-        return $this->url->toString();
+        return $this->url;
     }
 
-    public function href() : string
+    public function href() : URL
     {
         $this->buildURL();
-        return $this->url->toString();
+        return $this->url;
     }
 
-    protected function buildURL()
+    protected function buildURL() : void
     {
         $cmd = "image";
         if ($this->type == StorageItem::TYPE_IMAGE) {
@@ -104,16 +102,24 @@ class StorageItem extends DataObject implements JsonSerializable
             $cmd = "data";
         }
 
-        if (is_null($this->url)) {
-            $storageURL = STORAGE_LOCAL;
-            if ($this->use_external) $storageURL = STORAGE_EXTERNAL;
 
-            $this->url = new URL($storageURL);
+        $storageURL = STORAGE_LOCAL;
+        if ($this->use_external) $storageURL = STORAGE_EXTERNAL;
+
+        $this->url = new URL($storageURL);
+
+        if (STORAGE_ITEM_SLUGIFY_URLS) {
+            $slug = str_replace(".php", "/", $this->url->getScriptName());
+            $slug.=$cmd."/";
+            $slug.=$this->className."/";
+            $slug.=$this->id."/";
+            $this->url->setScriptName($slug);
         }
-
-        $this->url->add(new URLParameter("cmd", $cmd));
-        $this->url->add(new URLParameter("class", $this->className));
-        $this->url->add(new URLParameter("id", (string)$this->id));
+        else {
+            $this->url->add(new URLParameter("cmd", $cmd));
+            $this->url->add(new URLParameter("class", $this->className));
+            $this->url->add(new URLParameter("id", (string)$this->id));
+        }
 
         if ($this->field) {
             $this->url->add(new URLParameter("field", $this->field));
