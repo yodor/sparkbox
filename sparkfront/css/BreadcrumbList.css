@@ -1,5 +1,6 @@
 .BreadcrumbList {
     display:inline-flex;
+    flex-wrap: wrap;
     flex-direction:row;
     padding:0;
     margin:0;
