@@ -58,13 +58,16 @@ class StorageItem extends DataObject implements JsonSerializable
     {
           return $this->hrefCrop(0, 0);
     }
-    public function hrefThumb($width) : URL
+    public function hrefThumb(int $width) : URL
     {
         return $this->hrefCrop($width, $width);
     }
 
-    public function hrefCrop($width, $height) : URL
+    public function hrefCrop(int $width, int $height) : URL
     {
+        if ($width < 0) $width = 0;
+        if ($height < 0) $height = 0;
+
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
 

@@ -183,7 +183,9 @@ class ResultViewHeader extends Container
         ?>
         <script type='text/javascript'>
             function changeSort(sel) {
-                window.location.href = sel.options[sel.options.selectedIndex].value;
+                let value = sel.options[sel.options.selectedIndex].value;
+                console.log(value);
+                window.location.href = value;
             }
         </script>
         <?php
