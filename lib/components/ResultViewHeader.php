@@ -182,10 +182,26 @@ class ResultViewHeader extends Container
 
         ?>
         <script type='text/javascript'>
+            function decodeHtmlEntities(text) {
+                const entities = {
+                    '&amp;': '&',
+                    '&lt;': '<',
+                    '&gt;': '>',
+                    '&quot;': '"',
+                    '&#39;': "'",
+                    // Add more entities as needed
+                };
+
+                // Replace named entities
+                let decodedText = text.replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, (match) => entities[match]);
+
+                // Replace numeric entities (e.g., &#123;)
+                decodedText = decodedText.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec));
+
+                return decodedText;
+            }
             function changeSort(sel) {
-                let value = new URL(sel.options[sel.options.selectedIndex].value, window.location);
-                console.log(value);
-                window.location.href = value;
+                window.location.href = decodeHtmlEntities(sel.options[sel.options.selectedIndex].value);
             }
         </script>
         <?php
