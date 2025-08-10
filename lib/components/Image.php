@@ -55,8 +55,8 @@ class Image extends Component implements IPhotoRenderer
         if ($this->storageItem instanceof StorageItem) {
             $src = $this->storageItem->hrefImage($this->width, $this->height);
             if (STORAGE_ITEM_SLUGIFY_URLS) {
-                if (strlen($this->getAttribute("title"))>0) {
-                    $src->setScriptName($src->getScriptName().slugify($this->getAttribute("title")).".webp");
+                if (strlen($this->getAttribute("alt"))>0) {
+                    $src->setScriptName($src->getScriptName().slugify($this->getAttribute("alt")).".webp");
                 }
             }
             $this->setAttribute("src", $src);
