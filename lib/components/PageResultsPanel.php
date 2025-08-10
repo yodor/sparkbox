@@ -28,7 +28,7 @@ class PageResultsPanel extends Component
 
         $page = 0;
         if (isset($_GET["page"])) {
-            $page = $_GET["page"];
+            $page = (int)$_GET["page"];
         }
 
         if ($page > $total_pages) $page = $total_pages - 1;

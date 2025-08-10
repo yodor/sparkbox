@@ -43,7 +43,7 @@ class ResultViewFooter extends Container
     protected function renderPageSelector() : void
     {
 
-        $link = URL::Current();
+        $link = new URL();
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
 
