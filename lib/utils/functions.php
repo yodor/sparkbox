@@ -53,6 +53,7 @@ function slugify(string $text) : false|string
     [-[:Separator:]]+ > '-';
 RULES;
 
+    $text = Transliterator::create(TRANSLITERATOR_DEFAULT)->transliterate($text);
     return Transliterator::createFromRules($rules)->transliterate($text);
 }
 
