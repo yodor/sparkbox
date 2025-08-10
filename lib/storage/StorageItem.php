@@ -38,8 +38,11 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->use_external = $mode;
     }
 
-    public function hrefImage(int $width = -1, int $height = -1) : URL
+    public function hrefImage(int $width = 0, int $height = 0) : URL
     {
+        if ($width < 0) $width = 0;
+        if ($height < 0) $height = 0;
+
         if ($width > 0 || $height > 0) {
 
             if ($width == $height) {
