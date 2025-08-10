@@ -183,7 +183,7 @@ class ResultViewHeader extends Container
         ?>
         <script type='text/javascript'>
             function changeSort(sel) {
-                let value = decodeURI(sel.options[sel.options.selectedIndex].value);
+                let value = new URL(sel.options[sel.options.selectedIndex].value, window.location);
                 console.log(value);
                 window.location.href = value;
             }
