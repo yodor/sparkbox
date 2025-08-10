@@ -43,16 +43,16 @@ class ResultViewFooter extends Container
     protected function renderPageSelector() : void
     {
 
-        $link = URL::Current();
+        $link = new URL();
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
-//        $urlCurrent = URL::Current();
-//        if ($urlCurrent->contains(Paginator::KEY_ORDER_BY)) {
-//            $link->add($urlCurrent->get(Paginator::KEY_ORDER_BY));
-//        }
-//        if ($urlCurrent->contains(Paginator::KEY_ORDER_DIR)) {
-//            $link->add($urlCurrent->get(Paginator::KEY_ORDER_DIR));
-//        }
+        $urlCurrent = URL::Current();
+        if ($urlCurrent->contains(Paginator::KEY_ORDER_BY)) {
+            $link->add($urlCurrent->get(Paginator::KEY_ORDER_BY));
+        }
+        if ($urlCurrent->contains(Paginator::KEY_ORDER_DIR)) {
+            $link->add($urlCurrent->get(Paginator::KEY_ORDER_DIR));
+        }
 
         $a = $this->paginator->pageListStart();
 

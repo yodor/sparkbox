@@ -136,7 +136,7 @@ class ResultViewHeader extends Container
 
 
 
-        $link = URL::Current();
+        $link = new URL();
         $link->remove(Paginator::KEY_PAGE);
         $link->add(new URLParameter(Paginator::KEY_ORDER_BY, ""));
         $link->add(new URLParameter(Paginator::KEY_ORDER_DIR, ""));
