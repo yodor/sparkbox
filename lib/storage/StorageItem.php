@@ -68,7 +68,7 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
 
-        if (STORAGE_ITEM_SLUGIFY_URLS) {
+        if (STORAGE_ITEM_SLUG) {
             $script_name = $this->url->getScriptName();
             $script_name.=$width."/";
             $script_name.=$height."/";
@@ -111,7 +111,7 @@ class StorageItem extends DataObject implements JsonSerializable
 
         $this->url = new URL($storageURL);
 
-        if (STORAGE_ITEM_SLUGIFY_URLS) {
+        if (STORAGE_ITEM_SLUG) {
             $slug = str_replace(".php", "/", $this->url->getScriptName());
             $slug.=$cmd."/";
             $slug.=$this->className."/";
