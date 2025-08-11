@@ -9,8 +9,6 @@ class StorageItem extends DataObject implements JsonSerializable
     public string $className = "";
     public string $field = "";
 
-    protected bool $use_external = false;
-
     protected ?URL $url = null;
 
     const int TYPE_IMAGE = 1;
@@ -35,7 +33,7 @@ class StorageItem extends DataObject implements JsonSerializable
 
     public function enableExternalURL(bool $mode) : void
     {
-        $this->use_external = $mode;
+        //$this->use_external = $mode;
     }
 
     public function hrefImage(int $width = 0, int $height = 0) : URL
@@ -71,25 +69,43 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
 
+        $this->url->add(new URLParameter("width", $width));
+        $this->url->add(new URLParameter("height", $height));
+
         if (STORAGE_ITEM_SLUG) {
-            $script_name = $this->url->getScriptName();
-            $script_name.=$width."/";
-            $script_name.=$height."/";
-            $this->url->setScriptName($script_name);
+            return $this->SlugURL();
         }
         else {
-            $this->url->add(new URLParameter("width", $width));
-            $this->url->add(new URLParameter("height", $height));
+            return $this->url;
         }
-        return $this->url;
 
     }
 
+    private function SlugURL() : URL
+    {
+        $url = new URL(LOCAL . "/assets/");
+
+        $data = array("cmd"=>"", "class"=>"", "id"=>"", "width"=>"", "height"=>"");
+        foreach ($data as $key=>$value) {
+            if ($this->url->contains($key)) {
+                $data[$key] = $this->url->get($key)->value();
+                $url->add(new PathParameter($key, $key, false));
+            }
+        }
+        $url->setData($data);
+
+        return $url;
+    }
     public function hrefFile() : URL
     {
         $this->setType(StorageItem::TYPE_FILE);
         $this->buildURL();
-        return $this->url;
+        if (STORAGE_ITEM_SLUG) {
+            return $this->SlugURL();
+        }
+        else {
+            return $this->url;
+        }
     }
 
     public function href() : URL
@@ -108,24 +124,11 @@ class StorageItem extends DataObject implements JsonSerializable
             $cmd = "data";
         }
 
+        $this->url = new URL(STORAGE_LOCAL);
 
-        $storageURL = STORAGE_LOCAL;
-        if ($this->use_external) $storageURL = STORAGE_EXTERNAL;
-
-        $this->url = new URL($storageURL);
-
-        if (STORAGE_ITEM_SLUG) {
-            $slug = str_replace(".php", "/", $this->url->getScriptName());
-            $slug.=$cmd."/";
-            $slug.=$this->className."/";
-            $slug.=$this->id."/";
-            $this->url->setScriptName($slug);
-        }
-        else {
-            $this->url->add(new URLParameter("cmd", $cmd));
-            $this->url->add(new URLParameter("class", $this->className));
-            $this->url->add(new URLParameter("id", (string)$this->id));
-        }
+        $this->url->add(new URLParameter("cmd", $cmd));
+        $this->url->add(new URLParameter("class", $this->className));
+        $this->url->add(new URLParameter("id", (string)$this->id));
 
         if ($this->field) {
             $this->url->add(new URLParameter("field", $this->field));

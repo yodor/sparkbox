@@ -1,7 +1,11 @@
 <?php
 include_once("utils/url/URLParameter.php");
+include_once("utils/url/DataParameter.php");
+include_once("utils/url/PathParameter.php");
+
 include_once("utils/Paginator.php");
 include_once("utils/IGETConsumer.php");
+
 
 class URL implements IGETConsumer, IDataResultProcessor
 {
@@ -162,7 +166,7 @@ class URL implements IGETConsumer, IDataResultProcessor
             $pairs = array();
             foreach ($names as $idx => $name) {
                 $param = $this->get($name);
-                if ($param->isSlugEnabled()) continue;
+                if ($param instanceof PathParameter) continue;
                 if ($param->isResource()) {
                     //handle paramterized resource named using #resource.%param%
                     //parameter value is done in setData of URLParameter
@@ -179,9 +183,8 @@ class URL implements IGETConsumer, IDataResultProcessor
         $result = $this->script_name;
         //sluged parameters
         foreach ($parameters as $idx => $parameter) {
-            if ($parameter instanceof DataParameter) {
-                if (!$parameter->isSlugEnabled()) continue;
-                $result.=transliterate($parameter->value())."/";
+            if ($parameter instanceof PathParameter) {
+                $result.= $parameter->value()."/";
             }
         }
 
@@ -226,24 +229,24 @@ class URL implements IGETConsumer, IDataResultProcessor
         return dirname($this->script_name);
     }
 
-    public static function Slugify(URL $url) : URL
-    {
-        if ($url->is_script) {
-            return $url;
-        }
-
-        $slug = $url->script_name;
-
-        $slug = str_replace(".php", "/", $slug);
-
-        foreach ($url->parameters as $name => $param) {
-            if ($param instanceof URLParameter) {
-                $slug.= $param->value()."/";
-            }
-        }
-
-        return new URL($slug);
-    }
+//    public static function Slugify(URL $url) : URL
+//    {
+//        if ($url->is_script) {
+//            return $url;
+//        }
+//
+//        $slug = $url->script_name;
+//
+//        $slug = str_replace(".php", "/", $slug);
+//
+//        foreach ($url->parameters as $name => $param) {
+//            if ($param instanceof URLParameter) {
+//                $slug.= $param->value()."/";
+//            }
+//        }
+//
+//        return new URL($slug);
+//    }
     /**
      * Reset this url removing any existing data and rebuild using build_string
      * @param string $build_string
@@ -361,19 +364,21 @@ class URL implements IGETConsumer, IDataResultProcessor
 
     }
 
-    public function copyParametersTo(URL $url) : void
+    public function copyParametersTo(URL $url, bool $overwrite = true) : void
     {
         $parameters = $this->getParameterNames();
         foreach ($parameters as $idx=>$name) {
+            if ($url->contains($name) && !$overwrite) continue;
             $url->add($this->get($name));
         }
 
     }
 
-    public function copyParametersFrom(URL $url) : void
+    public function copyParametersFrom(URL $url, bool $overwrite = true) : void
     {
         $parameters = $url->getParameterNames();
         foreach ($parameters as $idx=>$name) {
+            if ($this->contains($name) && !$overwrite) continue;
             $this->add($url->get($name));
         }
 

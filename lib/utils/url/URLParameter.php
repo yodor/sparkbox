@@ -7,8 +7,6 @@ class URLParameter implements IDataResultProcessor
     protected string $value = "";
     protected string $field = "";
 
-    protected bool $is_slug = false;
-
     public function __construct(string $name, ?string $value = "", bool $is_slug = false)
     {
         $this->name = $name;
@@ -19,7 +17,6 @@ class URLParameter implements IDataResultProcessor
         }
 
         $this->value = $value;
-        $this->is_slug = $is_slug;
     }
 
     public function value(bool $quoted=false): string
@@ -89,13 +86,4 @@ class URLParameter implements IDataResultProcessor
 
     }
 
-    public function isSlugEnabled() : bool
-    {
-        return $this->is_slug;
-    }
-
-    public function setSlugEnabled(bool $mode) : void
-    {
-        $this->is_slug = $mode;
-    }
 }

@@ -69,7 +69,6 @@ $defines->set("SITE_DOMAIN", $site_domain);
 $defines->set("SITE_URL", $protocol . $site_domain . $location);
 $defines->set("TITLE_PATH_SEPARATOR", " :: ");
 $defines->set("COOKIE_DOMAIN", ".".$site_domain); // or .domain.com
-$defines->set("STORAGE_EXTERNAL", $protocol . $site_domain . $location . "/storage.php");
 
 // error_reporting(E_ALL & ~E_WARNING);
 error_reporting(E_ALL);
