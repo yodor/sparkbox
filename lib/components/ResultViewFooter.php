@@ -43,7 +43,9 @@ class ResultViewFooter extends Container
     protected function renderPageSelector() : void
     {
 
-        $link = URL::Current();
+        //allow slugified urls
+        $link = SparkPage::Instance()->currentURL();
+
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         $a = $this->paginator->pageListStart();

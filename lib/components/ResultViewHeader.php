@@ -119,7 +119,9 @@ class ResultViewHeader extends Container
 
         $this->pageInfo->span()->setContents("$page / " . $this->paginator->totalPages());
 
-        $link = URL::Current();
+        //allow slugified urls
+        $link = SparkPage::Instance()->currentURL();
+
         $link->add(new URLParameter(Paginator::KEY_PAGE));
 
         if ($this->paginator->currentPage() > 0) {
@@ -136,7 +138,7 @@ class ResultViewHeader extends Container
 
 
 
-        $link = URL::Current();
+        $link = SparkPage::Instance()->currentURL();
         $link->remove(Paginator::KEY_PAGE);
         $link->add(new URLParameter(Paginator::KEY_ORDER_BY, ""));
         $link->add(new URLParameter(Paginator::KEY_ORDER_DIR, ""));
