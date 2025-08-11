@@ -437,6 +437,11 @@ class SparkPage extends HTMLPage implements IActionCollection
         Session::ClearAlert();
     }
 
+    /**
+     * Return current working URL for building page parameters.
+     * Default implementation return URL::Current.
+     * @return URL
+     */
     public function currentURL() : URL
     {
         return URL::Current();
