@@ -180,7 +180,7 @@ class HTMLHead extends Container
     protected function renderCanonical() : void
     {
         if (count($this->canonical_params)>0) {
-            $builder = URL::Current();
+            $builder = SparkPage::Instance()->currentURL();
             $parameters = $builder->getParameterNames();
             foreach ($parameters as $name) {
                 if (array_key_exists($name, $this->canonical_params)) continue;
