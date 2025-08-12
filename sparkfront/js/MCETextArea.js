@@ -69,6 +69,8 @@ class MCETextArea extends Component {
 
             //ver 7
             license_key: 'gpl',
+
+            relative_urls : false,
         };
 
     }
