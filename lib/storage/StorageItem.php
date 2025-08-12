@@ -23,7 +23,6 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->id = $id;
         $this->className = $className;
         $this->field = $field;
-
     }
 
     public function setType(int $type) : void
@@ -91,6 +90,10 @@ class StorageItem extends DataObject implements JsonSerializable
                 $data[$key] = $this->url->get($key)->value();
                 $url->add(new PathParameter($key, $key, false));
             }
+        }
+        if ($this->getName()) {
+            $data["name"] = slugify($this->getName()).".webp";
+            $url->add(new PathParameter("name", "name",false, false));
         }
         $url->setData($data);
 

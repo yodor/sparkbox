@@ -53,10 +53,8 @@ class Image extends Component implements IPhotoRenderer
             }
         }
         if ($this->storageItem instanceof StorageItem) {
+            $this->storageItem->setName($this->getAttribute("alt"));
             $src = $this->storageItem->hrefImage($this->width, $this->height);
-            if (STORAGE_ITEM_SLUG) {
-                $src = $src->toString().slugify($this->getAttribute("alt")) . ".webp";
-            }
             $this->setAttribute("src", $src);
         }
     }

@@ -184,7 +184,8 @@ class URL implements IGETConsumer, IDataResultProcessor
         //sluged parameters
         foreach ($parameters as $idx => $parameter) {
             if ($parameter instanceof PathParameter) {
-                $result.= $parameter->value()."/";
+                $result.= $parameter->value();
+                if ($parameter->isAppendPathSeparator()) $result.="/";
             }
         }
 
