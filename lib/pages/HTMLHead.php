@@ -63,7 +63,7 @@ class HTMLHead extends Container
 
         $this->setTagName("HEAD");
 
-        $this->addMeta("charset","UTF-8");
+        $this->addMeta("charset", "UTF-8");
         $this->addMeta("Content-Type", "text/html;charset=utf-8");
         $this->addMeta("Content-Style-Type", "text/css");
 
@@ -78,7 +78,7 @@ class HTMLHead extends Container
         //default favicon
         $this->favicon = new Link();
         $this->favicon->setRelation("shortcut icon");
-        $this->favicon->setHref("//" . SITE_DOMAIN . LOCAL."/favicon.ico");
+        $this->favicon->setHref("//" . SITE_DOMAIN . LOCAL . "/favicon.ico");
         $this->items()->append($this->favicon);
 
         $meta = new ClosureComponent($this->renderMeta(...), false);
@@ -93,13 +93,86 @@ class HTMLHead extends Container
         $canonical = new ClosureComponent($this->renderCanonical(...), false);
         $this->items()->append($canonical);
 
+        $language = new ClosureComponent($this->renderLanguage(...), false);
+        $this->items()->append($language);
+
+    }
+
+    public function setTitle(string $text): void
+    {
+        $this->title->setContents($text);
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title->getContents();
+    }
+
+    public function favicon(): Link
+    {
+        return $this->favicon;
+    }
+
+    protected function renderMeta(): void
+    {
+        foreach ($this->meta as $name => $meta) {
+            if (!($meta instanceof Meta)) continue;
+            $meta->render();
+        }
+
+        foreach ($this->opengraph as $property => $meta) {
+            if (!($meta instanceof Meta)) continue;
+            $meta->render();
+        }
+    }
+
+    protected function renderCSS(): void
+    {
+        echo "<!-- CSS Files Start -->\n";
+
+        foreach ($this->cssLinks as $href => $cssLink) {
+            if (!($cssLink instanceof Link)) continue;
+            $cssLink->render();
+        }
+
+        echo "<!-- CSS Files End -->\n";
+
+    }
+
+    protected function renderScripts(): void
+    {
+        foreach ($this->scripts as $object) {
+            if ($object instanceof Script) {
+                $object->render();
+            } else if ($object instanceof IScript) {
+                $object->script()->render();
+            }
+        }
+    }
+
+    protected function renderCanonical(): void
+    {
+        if (count($this->canonical_params) > 0) {
+            $builder = SparkPage::Instance()->currentURL();
+            $parameters = $builder->getParameterNames();
+            foreach ($parameters as $name) {
+                if (array_key_exists($name, $this->canonical_params)) continue;
+                $builder->remove($name);
+            }
+            $canonical_href = fullURL($builder->toString());
+            echo "<link rel='canonical' href='$canonical_href'>\n";
+        }
+    }
+
+    protected function renderLanguage(): void
+    {
         $url = SparkPage::Instance()->currentURL()->fullURL();
         $x_default = new Link();
         $x_default->setRelation("alternate");
         $x_default->setHref($url->toString());
         //X-default tags are recommended, but not mandatory
         $x_default->setAttribute("hreflang", "x-default");
-        $this->items()->append($x_default);
+        $x_default->render();
 
         if (TRANSLATOR_ENABLED) {
 
@@ -117,80 +190,11 @@ class HTMLHead extends Container
                     $url->add(new URLParameter("langID", $result->get($lb->key())));
                     $locale_default->setHref($url->toString());
                     $locale_default->setAttribute("hreflang", substr($lang_code, 0, 2));
-                    $this->items()->append($locale_default);
+                    $locale_default->render();
                 }
             }
         }
-
     }
-
-    public function setTitle(string $text) : void
-    {
-        $this->title->setContents($text);
-    }
-
-    public function getTitle() : string
-    {
-        return $this->title->getContents();
-    }
-
-    public function favicon() : Link
-    {
-        return $this->favicon;
-    }
-
-    protected function renderMeta() : void
-    {
-        foreach ($this->meta as $name => $meta) {
-            if (!($meta instanceof Meta)) continue;
-            $meta->render();
-        }
-
-        foreach ($this->opengraph as $property => $meta) {
-            if (!($meta instanceof Meta)) continue;
-            $meta->render();
-        }
-    }
-
-    protected function renderCSS() : void
-    {
-        echo "<!-- CSS Files Start -->\n";
-
-        foreach ($this->cssLinks as $href => $cssLink) {
-            if (!($cssLink instanceof Link)) continue;
-            $cssLink->render();
-        }
-
-        echo "<!-- CSS Files End -->\n";
-
-    }
-
-    protected function renderScripts() : void
-    {
-        foreach ($this->scripts as $object) {
-            if ($object instanceof Script) {
-                $object->render();
-            }
-            else if ($object instanceof IScript) {
-                $object->script()->render();
-            }
-        }
-    }
-
-    protected function renderCanonical() : void
-    {
-        if (count($this->canonical_params)>0) {
-            $builder = SparkPage::Instance()->currentURL();
-            $parameters = $builder->getParameterNames();
-            foreach ($parameters as $name) {
-                if (array_key_exists($name, $this->canonical_params)) continue;
-                $builder->remove($name);
-            }
-            $canonical_href = fullURL($builder->toString());
-            echo "<link rel='canonical' href='$canonical_href'>\n";
-        }
-    }
-
     /**
      *  Add meta tag to be rendered into this page.
      * @param $name string The name attribute to add to the Meta collection
