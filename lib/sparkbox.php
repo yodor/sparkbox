@@ -159,7 +159,9 @@ $defines->set("BEAN_CACHE_BACKEND", "filesystem");
 $defines->set("PAGE_CACHE_BACKEND", "filesystem");
 //slugify StorageItem returned urls
 $defines->set("STORAGE_ITEM_SLUG", FALSE);
-$defines->set("TRANSLITERATOR_DEFAULT", "Bulgarian-Latin/BGN");
+
+$defines->set("SLUG_TRANSLITERATE", true);
+$defines->set("TRANSLITERATOR_ID", "Bulgarian-Latin/BGN");
 
 //fetch local deployment configuration
 //can override stuff in defines

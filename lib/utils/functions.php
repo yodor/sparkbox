@@ -38,34 +38,29 @@ function sanitizeKeywords(string $text) : string
     return $keywords;
 }
 
-function slugify(string $text) : false|string
+function slugify(string $text) : string
 {
 
-    $rules = <<<'RULES'
-    :: Any-Latin;
-    :: NFD;
-    :: [:Nonspacing Mark:] Remove;
-    :: NFC;
-    :: [^-[:^Punctuation:]] Remove;
-    :: Lower();
-    [:^L:] { [-] > ;
-    [-] } [:^L:] > ;
-    [-[:Separator:]]+ > '-';
-RULES;
-
-    $text = Transliterator::create(TRANSLITERATOR_DEFAULT)->transliterate($text);
-    return Transliterator::createFromRules($rules)->transliterate($text);
-}
-
-function transliterate(string $text) : false|string
-{
-    $id = "Bulgarian-Latin/BGN";
-    if (defined("TRANSLITERATOR_ID")) {
-        $id = TRANSLITERATOR_ID;
+    if (SLUG_TRANSLITERATE) {
+        $text = Transliterator::create(TRANSLITERATOR_ID)->transliterate($text);
     }
-    $result = Transliterator::create($id)->transliterate($text);
-    $result = slugify($result);
-    return $result;
+
+    $text = mb_strtolower($text, 'UTF-8');
+
+    //Remove non-letter or non-digit
+    $text = preg_replace('/[^\p{L}\p{N}\s-]/u', '', $text);
+
+    //Replace space and underscore with dash
+    $text = preg_replace('/[\s_]+/', '-', $text);
+
+    //Remove repeating dashes
+    $text = preg_replace('/-+/', '-', $text);
+
+    //Remove start/end dashes
+    $text = trim($text, '-');
+
+    return $text;
+
 }
 
 function enclose(string $value, string $char = "'") : string

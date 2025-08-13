@@ -3,21 +3,21 @@ include_once("utils/url/DataParameter.php");
 
 class PathParameter extends DataParameter
 {
-    protected bool $transliterate = true;
+    protected bool $doSlug = true;
     protected bool $appendPathSeparator = true;
 
-    public function __construct(string $name, string $field = "", bool $transliterate=true, bool $appendPathSeparator=true)
+    public function __construct(string $name, string $field = "", bool $doSlug=true, bool $appendPathSeparator=true)
     {
         parent::__construct($name, $field);
-        $this->transliterate=$transliterate;
+        $this->doSlug=$doSlug;
         $this->appendPathSeparator=$appendPathSeparator;
     }
 
     public function value(bool $quoted=false): string
     {
         $value = parent::value($quoted);
-        if ($this->transliterate) {
-            $value = transliterate($value);
+        if ($this->doSlug) {
+            $value = slugify($value);
         }
         return $value;
     }
@@ -25,9 +25,9 @@ class PathParameter extends DataParameter
     {
         return $this->appendPathSeparator;
     }
-    public function isTransliterate(): bool
+    public function isSlug(): bool
     {
-        return $this->transliterate;
+        return $this->doSlug;
     }
 }
 ?>
