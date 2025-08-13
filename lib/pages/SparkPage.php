@@ -338,8 +338,8 @@ class SparkPage extends HTMLPage implements IActionCollection
         $this->head()->setTitle($title);
         $this->head()->addOGTag("title", $title);
 
-        $meta_keywords = prepareMeta($this->keywords, 150);
-        $meta_description = prepareMeta($this->description, 150);
+        $meta_keywords = prepareMeta($this->keywords);
+        $meta_description = prepareMeta($this->description);
         $this->head()->addMeta("keywords", $meta_keywords);
         $this->head()->addMeta("description", $meta_description);
         $this->head()->addOGTag("description", $meta_description);
