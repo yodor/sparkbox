@@ -93,7 +93,7 @@ class HTMLHead extends Container
         $canonical = new ClosureComponent($this->renderCanonical(...), false);
         $this->items()->append($canonical);
 
-        $url = URL::Current()->fullURL();
+        $url = SparkPage::Instance()->currentURL()->fullURL();
         $x_default = new Link();
         $x_default->setRelation("alternate");
         $x_default->setHref($url->toString());
