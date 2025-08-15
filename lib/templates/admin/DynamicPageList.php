@@ -12,13 +12,24 @@ class DynamicPageList extends BeanListPage
         parent::__construct();
 
         $this->setBean(new DynamicPagesBean());
-        $this->setListFields(array("position"  => "#", "item_photo" => "Photo", "item_title" => "Title",
+        $this->setListFields(array($this->getBean()->key()=>"ID", "position" => "#", "item_photo" => "Photo", "item_title" => "Title",
                                    "item_date" => "Date", "visible" => "Visible", "keywords" => "Keywords"));
 
     }
 
-    protected $is_chooser = FALSE;
-    protected $chooser_return_url = "";
+    protected bool $is_chooser = FALSE;
+    protected string $chooser_return_url = "";
+
+    public function isChooser() : bool
+    {
+
+        return $this->is_chooser;
+    }
+
+    public function getChooserReturnUrl() : string
+    {
+        return $this->chooser_return_url;
+    }
 
     protected function initPageActions()
     {
