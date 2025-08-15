@@ -284,8 +284,11 @@ class BeanListPage extends AdminPageTemplate
         if ($this->bean instanceof OrderedDataBean) {
             $this->view->setDefaultOrder(" position ASC ");
 
+            $idColumn = $this->view->getColumn($this->query->key());
             if ($this->view->haveColumn("position")) {
-                $this->view->removeColumn($this->query->key());
+                if (strcmp($idColumn->getLabel(), "ID")==0) {
+                    $this->view->removeColumn($this->query->key());
+                }
                 $this->view->getColumn("position")->setAlignClass("center");
             }
 

@@ -12,7 +12,7 @@ class DynamicPageList extends BeanListPage
         parent::__construct();
 
         $this->setBean(new DynamicPagesBean());
-        $this->setListFields(array($this->getBean()->key()=>"ID", "position" => "#", "item_photo" => "Photo", "item_title" => "Title",
+        $this->setListFields(array($this->getBean()->key()=>"PageID", "position" => "#", "item_photo" => "Photo", "item_title" => "Title",
                                    "item_date" => "Date", "visible" => "Visible", "keywords" => "Keywords"));
 
     }
