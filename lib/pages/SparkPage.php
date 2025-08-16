@@ -327,9 +327,13 @@ class SparkPage extends HTMLPage implements IActionCollection
 
     }
 
+    protected function constructMetaDescription() : void
+    {
+
+    }
     /**
      * Assign the title, keywords and description to the head section
-     * Process the meta values to max 150 symbols
+     *
      * @return void
      */
     protected function prepareMetaTitle() : void
@@ -337,12 +341,15 @@ class SparkPage extends HTMLPage implements IActionCollection
         $title = strip_tags($this->preferred_title);
         $this->head()->setTitle($title);
         $this->head()->addOGTag("title", $title);
+        $this->head()->addMeta("twitter:title", $title);
 
         $meta_keywords = prepareMeta($this->keywords);
         $meta_description = prepareMeta($this->description);
         $this->head()->addMeta("keywords", $meta_keywords);
         $this->head()->addMeta("description", $meta_description);
         $this->head()->addOGTag("description", $meta_description);
+        $this->head()->addMeta("twitter:description", $meta_description);
+
     }
 
     /**
@@ -363,6 +370,7 @@ class SparkPage extends HTMLPage implements IActionCollection
 
         //prepare $this->preferred_title value
         $this->constructTitle();
+        $this->constructMetaDescription();
 
         //apply title, meta keywords, meta description to the head
         $this->prepareMetaTitle();
