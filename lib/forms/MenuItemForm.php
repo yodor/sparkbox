@@ -33,6 +33,19 @@ class MenuItemForm extends InputForm
 
         $this->addInput($field);
 
+        $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "seo_title", "SEO Title (max 60 characters)", 0);
+        $field->enableTranslator(true);
+        $field->getRenderer()->input()->setAttribute("maxLength","60");
+        $field->getRenderer()->input()->setAttribute("rows","3");
+        $field->getRenderer()->input()->setAttribute("cols","60");
+        $this->addInput($field);
+
+        $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "seo_description", "SEO Description (max 150 characters)", 0);
+        $field->enableTranslator(true);
+        $field->getRenderer()->input()->setAttribute("maxLength","150");
+        $field->getRenderer()->input()->setAttribute("rows","3");
+        $field->getRenderer()->input()->setAttribute("cols","60");
+        $this->addInput($field);
     }
 
     public function loadBeanData($editID, DBTableBean $bean): array

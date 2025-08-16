@@ -25,6 +25,9 @@ class MenuItem extends MenuItemList
 
     protected int $id = -1;
 
+    protected string $seoTitle = "";
+    protected string $seoDescription = "";
+
     public function __construct(string $name, string $href = "", string $icon = "", string $tooltip="")
     {
         parent::__construct();
@@ -38,7 +41,26 @@ class MenuItem extends MenuItemList
         $this->disabled = false;
         $this->tooltip = $tooltip;
         $this->id = -1;
+        $this->seoTitle = "";
+        $this->seoDescription = "";
+    }
 
+    public function setSeoTitle(string $seoTitle) : void
+    {
+        $this->seoTitle = $seoTitle;
+    }
+    public function getSeoTitle() : string
+    {
+        return $this->seoTitle;
+    }
+
+    public function setSeoDescription(string $seoDescription): void
+    {
+        $this->seoDescription = $seoDescription;
+    }
+    public function getSeoDescription() : string
+    {
+        return $this->seoDescription;
     }
 
     public function append(SparkObject $object): void

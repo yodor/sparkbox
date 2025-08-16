@@ -52,8 +52,11 @@ class BeanMenuFactory
 
         $this->select->fields()->set($this->value_key, $this->label_key);
 
-        if ($this->bean->haveColumn("link")) {
-            $this->select->fields()->set("link");
+        $fieldsAddition = array("link", "seo_title", "seo_description");
+        foreach($fieldsAddition as $key=>$value) {
+            if ($this->bean->haveColumn($value)) {
+                $this->select->fields()->set($value);
+            }
         }
 
         $this->select->order_by = " lft ASC ";
@@ -129,12 +132,13 @@ class BeanMenuFactory
         else if ($result->isSet("link")) {
             $href = $result->get("link");
 
-            if (str_starts_with($href, "//")) {
-                debug("Using external URL");
-            }
+
             // - url is internal root
-            else if (str_starts_with($href, "/")) {
+            if (str_starts_with($href, "/")) {
                 $href = LOCAL . $href;
+            }
+            else {
+                debug("Using external URL");
             }
         }
 
@@ -142,6 +146,12 @@ class BeanMenuFactory
         $item->setID($menuID);
         $item->enableTranslation(FALSE);
 
+        if ($result->isSet("seo_title")) {
+            $item->setSeoTitle($result->get("seo_title"));
+        }
+        if ($result->isSet("seo_description")) {
+            $item->setSeoDescription($result->get("seo_description"));
+        }
         return $item;
     }
 }
