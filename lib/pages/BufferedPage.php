@@ -4,11 +4,6 @@ include_once("pages/SparkPage.php");
 class BufferedPage extends SparkPage
 {
 
-    protected function constructTitle() : void
-    {
-
-    }
-
     /**
      * @return void
      */
