@@ -16,12 +16,6 @@ class SEOConfigForm extends InputForm
         $rend->input()?->setAttribute("cols", 80);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "meta_keywords", "Meta Keywords", 0);
-        $rend = $field->getRenderer();
-        $rend->input()?->setAttribute("rows", 10);
-        $rend->input()?->setAttribute("cols", 80);
-        $this->addInput($field);
-
         $field = DataInputFactory::Create(DataInputFactory::TEXT, "googleID_analytics", "Google Analytics ID (eg: UA-123456789-1)", 0);
         $this->addInput($field);
 

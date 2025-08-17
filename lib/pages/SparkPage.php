@@ -86,13 +86,6 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     protected array $page_components = array();
 
-
-    /**
-     * Meta tag 'Keywords' overload. If not empty is used instead of ConfigBean 'seo' section value
-     */
-    protected string $keywords = "";
-
-
     /**
      * @var ActionCollection
      */
@@ -363,7 +356,7 @@ class SparkPage extends HTMLPage implements IActionCollection
         //do any final changes to the head contents
         $this->headFinalize();
 
-        //apply title, meta keywords, meta description to the head
+        //apply title, meta description to the head
         $this->applyTitleDescription();
 
         parent::startRender();
