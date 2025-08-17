@@ -14,7 +14,6 @@ class BufferedPage extends SparkPage
      */
     protected function headFinalize() : void
     {
-        $this->head()->addMeta("keywords", "%meta_keywords%");
         $this->head()->addMeta("description", "%meta_description%");
     }
 
