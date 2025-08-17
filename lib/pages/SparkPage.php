@@ -76,17 +76,16 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     protected string $preferred_title = "";
 
+    /**
+     * Meta tag 'Description' overload. If not empty is used instead of ConfigBean 'seo' section value
+     */
+    protected string $description = "";
 
     /**
      * @var array IPageComponent
      */
     protected array $page_components = array();
 
-
-    /**
-     * Meta tag 'Description' overload. If not empty is used instead of ConfigBean 'seo' section value
-     */
-    protected string $description = "";
 
     /**
      * Meta tag 'Keywords' overload. If not empty is used instead of ConfigBean 'seo' section value
@@ -108,12 +107,6 @@ class SparkPage extends HTMLPage implements IActionCollection
      * @var array
      */
     protected array $canonical_params = array();
-
-
-    public function setMetaKeywords(string $keywords) : void
-    {
-        $this->keywords = $keywords;
-    }
 
     public function setMetaDescription(string $description) : void
     {
@@ -195,23 +188,8 @@ class SparkPage extends HTMLPage implements IActionCollection
         }
     }
 
-
-    /**
-     * Set the default static instance
-     * Sets default css / js
-     * @throws Exception
-     */
-    public function __construct()
+    protected function headInitialize() : void
     {
-        debug("--- CTOR ---");
-
-        SparkEventManager::register(ComponentEvent::class, new SparkObserver($this->componentEvent(...)));
-        parent::__construct();
-
-        self::$instance = $this;
-
-
-
         $this->head()->addMeta("viewport", "width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes");
 
         $this->head()->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
@@ -233,7 +211,25 @@ class SparkPage extends HTMLPage implements IActionCollection
 
 
         $this->head()->addJS(SPARK_LOCAL . "/js/Tooltip.js");
-;
+
+    }
+    /**
+     * Set the default static instance
+     * Sets default css / js
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        debug("--- CTOR ---");
+
+        SparkEventManager::register(ComponentEvent::class, new SparkObserver($this->componentEvent(...)));
+        parent::__construct();
+
+        self::$instance = $this;
+
+        $this->authorize();
+
+        $this->headInitialize();
 
         $location = new SparkLocationScript();
 
@@ -257,9 +253,17 @@ class SparkPage extends HTMLPage implements IActionCollection
      */
     public function authorize(): void
     {
-        if (!($this->auth instanceof Authenticator)) return;
+        if (!($this->auth instanceof Authenticator)) {
+            debug("Authenticator is not set");
+            return;
+        }
 
-        debug("Using Authenticator: " . get_class($this->auth));
+        if (!$this->authorized_access) {
+            debug("Authorization is not required");
+            return;
+        }
+
+        debug("Authorization required - using Authenticator: " . get_class($this->auth));
 
         $this->context = $this->auth->authorize();
 
@@ -270,13 +274,6 @@ class SparkPage extends HTMLPage implements IActionCollection
         }
 
         debug("Authorization failed");
-
-        if (!$this->authorized_access) {
-            debug("Authorization is not required");
-            return;
-        }
-
-        debug("Authorization is required for this page");
 
         if (isset($_GET[JSONResponder::KEY_JSONREQUEST])) {
             $response = new JSONResponse("RequestController");
@@ -317,38 +314,33 @@ class SparkPage extends HTMLPage implements IActionCollection
         return $this->preferred_title;
     }
 
-    /**
-     * Override to set the page title
-     * Final place to set the contents of $this->preferred_title before head output is started
-     * @return void
-     */
-    protected function constructTitle() : void
+    protected function headFinalize() : void
     {
-
+        if (!$this->description) {
+            $config = ConfigBean::Factory();
+            $config->setSection("seo");
+            $this->description = $config->get("meta_description");
+        }
     }
 
-    protected function constructMetaDescription() : void
-    {
-
-    }
     /**
-     * Assign the title, keywords and description to the head section
-     *
+     * Apply title, keywords, description that is assigned after page constructor.
+     * Called after headFinalize and before component startRender()
      * @return void
      */
-    protected function prepareMetaTitle() : void
+    protected function applyTitleDescription() : void
     {
         $title = strip_tags($this->preferred_title);
         $this->head()->setTitle($title);
         $this->head()->addOGTag("title", $title);
         $this->head()->addMeta("twitter:title", $title);
 
-        $meta_keywords = prepareMeta($this->keywords);
         $meta_description = prepareMeta($this->description);
-        $this->head()->addMeta("keywords", $meta_keywords);
         $this->head()->addMeta("description", $meta_description);
         $this->head()->addOGTag("description", $meta_description);
         $this->head()->addMeta("twitter:description", $meta_description);
+
+        $this->head()->addOGTag("url", $this->currentURL()->fullURL()->toString());
 
     }
 
@@ -368,12 +360,11 @@ class SparkPage extends HTMLPage implements IActionCollection
         //can set header to redirect
         RequestController::process();
 
-        //prepare $this->preferred_title value
-        $this->constructTitle();
-        $this->constructMetaDescription();
+        //do any final changes to the head contents
+        $this->headFinalize();
 
         //apply title, meta keywords, meta description to the head
-        $this->prepareMetaTitle();
+        $this->applyTitleDescription();
 
         parent::startRender();
         //<body> is in output buffer now

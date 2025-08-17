@@ -8,7 +8,11 @@ class BufferedPage extends SparkPage
     {
 
     }
-    protected function prepareMetaTitle() : void
+
+    /**
+     * @return void
+     */
+    protected function headFinalize() : void
     {
         $this->head()->addMeta("keywords", "%meta_keywords%");
         $this->head()->addMeta("description", "%meta_description%");
@@ -18,19 +22,12 @@ class BufferedPage extends SparkPage
     {
         $title = $this->preferred_title;
 
-        $meta_keywords = "";
         $meta_description = "";
 
         if (DB_ENABLED) {
             $config = ConfigBean::Factory();
             $config->setSection("seo");
-
-            $meta_keywords = sanitizeKeywords($config->get("meta_keywords"));
             $meta_description = $config->get("meta_description");
-        }
-
-        if ($this->keywords) {
-            $meta_keywords = $this->keywords;
         }
 
         if ($this->description) {
@@ -39,8 +36,7 @@ class BufferedPage extends SparkPage
 
         $replace = array(
             "%title%"=> strip_tags($title),
-            "%meta_keywords%" => prepareMeta($meta_keywords, 150),
-            "%meta_description%" => prepareMeta($meta_description, 150)
+            "%meta_description%" => prepareMeta($meta_description)
         );
 
         $buffer = strtr($buffer, $replace);
