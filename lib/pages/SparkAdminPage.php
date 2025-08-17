@@ -201,7 +201,7 @@ class SparkAdminPage extends SparkPage
      * @return void
      * @throws Exception
      */
-    protected function constructTitle(): void
+    protected function headFinalize(): void
     {
 
         $dynmenu = $this->menu_bar->getMenu();
