@@ -17,6 +17,11 @@ class BufferedPage extends SparkPage
         $this->head()->addMeta("description", "%meta_description%");
     }
 
+    protected function applyTitleDescription() : void
+    {
+        //do in obCallback
+    }
+
     public function obCallback(string &$buffer)
     {
         $title = $this->preferred_title;
