@@ -209,6 +209,23 @@ class HTMLHead extends Container
         $this->meta[$name] = $meta;
     }
 
+    public function getMeta(string $name) : string
+    {
+        $result = "";
+        if (isset($this->meta[$name])) {
+            $meta = $this->meta[$name];
+            if ($meta instanceof Meta) {
+                $result = $meta->getContent();
+            }
+        }
+        return $result;
+    }
+
+    public function haveMeta(string $name) : bool
+    {
+        return isset($this->meta[$name]);
+    }
+
     /**
      * Well known tag names
      * og:title	The title of the web page.
