@@ -140,9 +140,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     public function getCacheName() : string
     {
         if (!($this->iterator instanceof SQLQuery)) return "";
-
         return parent::getCacheName()."-".$this->iterator->select->getSQL();
-
     }
 
     protected function renderImpl(): void
