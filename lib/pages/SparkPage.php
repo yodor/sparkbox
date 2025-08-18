@@ -317,7 +317,7 @@ class SparkPage extends HTMLPage implements IActionCollection
     }
 
     /**
-     * Apply title, keywords, description that is assigned after page constructor.
+     * Apply title, description that is assigned after page constructor.
      * Called after headFinalize and before component startRender()
      * @return void
      */
@@ -325,16 +325,9 @@ class SparkPage extends HTMLPage implements IActionCollection
     {
         $title = strip_tags($this->preferred_title);
         $this->head()->setTitle($title);
-        $this->head()->addOGTag("title", $title);
-        $this->head()->addMeta("twitter:title", $title);
 
         $meta_description = prepareMeta($this->description);
         $this->head()->addMeta("description", $meta_description);
-        $this->head()->addOGTag("description", $meta_description);
-        $this->head()->addMeta("twitter:description", $meta_description);
-
-        $this->head()->addOGTag("url", $this->currentURL()->fullURL()->toString());
-
     }
 
     /**
