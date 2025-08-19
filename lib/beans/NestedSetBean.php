@@ -528,7 +528,7 @@ class NestedSetBean extends DBTableBean
      * @param array $columns Columns to be selected from this bean
      * @return SQLSelect
      */
-    public function selectTreeRelation(SQLSelect $relation, string $relation_table, string $relation_prkey, array $columns = array()) : SQLSelect
+    public function selectTreeRelation(SQLSelect $relation, string $relation_table, string $relation_prkey, array $columns = array(), bool $with_count = true) : SQLSelect
     {
         //relation SQLSelect might have WHERE clauses filled when search is applied to products first we then count the
         //results after the $relation is filtered
@@ -541,8 +541,9 @@ class NestedSetBean extends DBTableBean
 
         $sel = $this->selectAggregated("$relation_table.$prkey", $columns);
 
-        $sel->fields()->setExpression("COUNT($relation_table.$relation_prkey)", "related_count");
-
+        if ($with_count) {
+            $sel->fields()->setExpression("COUNT($relation_table.$relation_prkey)", "related_count");
+        }
         //$sel->group_by = " parent.$prkey ";
 
         return $sel->combineWith($result);
