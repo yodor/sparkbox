@@ -99,7 +99,7 @@ class URL implements IGETConsumer, IDataResultProcessor
 
 
     /**
-     * Get URLParamter with name $name
+     * Get URLParameter with name $name
      * @param string $name
      * @return URLParameter|null
      */
@@ -110,7 +110,7 @@ class URL implements IGETConsumer, IDataResultProcessor
     }
 
     /**
-     * Check if this url contains query paramter named $name
+     * Check if this url contains query parameter named $name
      * @param string $name The query parameter to check for
      * @return bool True if this url string have parameter with name $name
      */
