@@ -49,6 +49,10 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     {
         parent::__construct(false);
         $this->setComponentClass("TreeView");
+        $this->setTagName("nav");
+        $this->setAttribute("itemscope");
+        $this->setAttribute("itemtype", "https://schema.org/SiteNavigationElement");
+
     }
 
     public function requiredStyle() : array
