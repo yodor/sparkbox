@@ -67,7 +67,11 @@ class URL implements IGETConsumer, IDataResultProcessor
 
     }
 
-    //remove paginator page=? parameter from this href
+    /**
+     * Remove Paginator defined parameters during toString() conversion
+     * @param bool $mode
+     * @return void
+     */
     public function setClearPageParams(bool $mode) : void
     {
         $this->clear_page_param = $mode;
@@ -230,24 +234,6 @@ class URL implements IGETConsumer, IDataResultProcessor
         return dirname($this->script_name);
     }
 
-//    public static function Slugify(URL $url) : URL
-//    {
-//        if ($url->is_script) {
-//            return $url;
-//        }
-//
-//        $slug = $url->script_name;
-//
-//        $slug = str_replace(".php", "/", $slug);
-//
-//        foreach ($url->parameters as $name => $param) {
-//            if ($param instanceof URLParameter) {
-//                $slug.= $param->value()."/";
-//            }
-//        }
-//
-//        return new URL($slug);
-//    }
     /**
      * Reset this url removing any existing data and rebuild using build_string
      * @param string $build_string
