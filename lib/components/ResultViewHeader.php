@@ -104,8 +104,8 @@ class ResultViewHeader extends Container
 
     public function startRender(): void
     {
-        if ($this->caption) {
-            $this->viewCaption->setContents($this->caption);
+        if ($this->getCaption()) {
+            $this->viewCaption->setContents($this->getCaption());
             $this->viewCaption->setRenderEnabled(true);
         }
 

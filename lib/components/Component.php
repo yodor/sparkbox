@@ -87,10 +87,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      */
     protected bool $render_enabled = TRUE;
 
-
-    protected string $caption = "";
-    protected ?Component $caption_component = null;
-
+    private ?Container $caption_component = null;
 
     public bool $translation_enabled = FALSE;
 
@@ -121,9 +118,15 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
             $this->setComponentClass(get_class($this));
         }
 
-
         SparkEventManager::emit(new ComponentEvent(ComponentEvent::COMPONENT_CREATED, $this));
 
+    }
+
+    protected function CreateCaption() : Container
+    {
+        $component = new Container(false);
+        $component->setComponentClass("Caption");
+        return $component;
     }
 
     /**
@@ -259,9 +262,6 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         if ($this->caption_component instanceof Component) {
             $this->caption_component->render();
         }
-        else if ($this->caption) {
-            echo "<div class='Caption'>$this->caption</div>";
-        }
     }
 
     protected function renderImpl(): void
@@ -349,23 +349,23 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
     public function getCaption() : string
     {
-        return $this->caption;
+        return $this->getCaptionComponent()->getContents();
     }
 
     public function setCaption(string $caption) : void
     {
-        $this->caption = $caption;
-        if ($this->caption_component instanceof Component) {
-            $this->caption_component->setContents($caption);
-        }
+        $this->getCaptionComponent()->setContents($caption);
     }
 
-    public function getCaptionComponent() : ?Component
+    public function getCaptionComponent() : Container
     {
+        if (is_null($this->caption_component)) {
+            $this->caption_component = $this->CreateCaption();
+        }
         return $this->caption_component;
     }
 
-    public function setCaptionComponent(Component $component) : void
+    public function setCaptionComponent(Container $component) : void
     {
         $this->caption_component = $component;
     }
