@@ -41,26 +41,23 @@ function sanitizeKeywords(string $text) : string
 function slugify(string $text) : string
 {
 
-    if (SLUG_TRANSLITERATE) {
-        $text = Transliterator::create(TRANSLITERATOR_ID)->transliterate($text);
-    }
-
+    // Convert to lowercase and normalize special characters
     $text = mb_strtolower($text, 'UTF-8');
 
-    //Remove non-letter or non-digit
-    $text = preg_replace('/[^\p{L}\p{N}\s-]/u', '', $text);
+    //if (SLUG_TRANSLITERATE){}
+    // Transliterate non-ASCII characters to their ASCII equivalents
+    $text = transliterator_transliterate('Any-Latin; Latin-ASCII; Lower();', $text);
 
-    //Replace space and underscore with dash
-    $text = preg_replace('/[\s_]+/', '-', $text);
+    // Remove any remaining special characters
+    $text = preg_replace('/[^a-z0-9\s-]/', '', $text);
 
-    //Remove repeating dashes
-    $text = preg_replace('/-+/', '-', $text);
+    // Replace spaces and multiple hyphens with single hyphen
+    $text = preg_replace('/[\s-]+/', '-', trim($text));
 
-    //Remove start/end dashes
+    // Remove hyphens from start and end
     $text = trim($text, '-');
 
     return $text;
-
 }
 
 function enclose(string $value, string $char = "'") : string
