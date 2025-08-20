@@ -357,6 +357,13 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         $this->getCaptionComponent()->setContents($caption);
     }
 
+    /**
+     * Return Container used to render the caption space.
+     * Lazy ctor for $this->caption_component
+     * First call creates the caption component using CreateCaption() call
+     *
+     * @return Container
+     */
     public function getCaptionComponent() : Container
     {
         if (is_null($this->caption_component)) {
