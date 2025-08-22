@@ -69,7 +69,7 @@ class ResultViewFooter extends Container
             $link_class = "";
             $rel = "";
             if ($this->paginator->currentPage() == $a) {
-                $link_class = "class=selected";
+                $link_class = "class='selected' aria-current='page'";
             }
             if ($this->paginator->currentPage()+1 == $a) {
                 $rel = "rel='next'";

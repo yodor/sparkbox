@@ -156,7 +156,10 @@ class HTMLHead extends Container
             $builder = SparkPage::Instance()->currentURL();
             $parameters = $builder->getParameterNames();
             foreach ($parameters as $name) {
-                if (array_key_exists($name, $this->canonical_params)) continue;
+                if (array_key_exists($name, $this->canonical_params)) {
+                    if ($builder->get($name)->value()) continue;
+                    //remove also empty valued parameters present in the canonical_params
+                }
                 $builder->remove($name);
             }
             $canonical_href = fullURL($builder->toString());
