@@ -20,6 +20,8 @@ class ResultViewFooter extends Container
 
         $pager = new ClosureComponent($this->renderPageSelector(...));
         $pager->setComponentClass("pager");
+        $pager->setTagName("nav");
+        $pager->setAttribute("aria-label", "Product listing pagination");
         $this->items()->append($pager);
 
         $this->resultsInfo = new LabelSpan(tr("Results"), "0");
@@ -53,10 +55,10 @@ class ResultViewFooter extends Container
         if ($this->paginator->currentPage() > 0) {
 
             $link->get(Paginator::KEY_PAGE)->setValue(0);
-            echo "<a  href='{$link->toString()}' title='".tr("First")."'> <<  </a>";
+            echo "<a href='{$link->toString()}' title='".tr("First")."'> <<  </a>";
 
             $link->get(Paginator::KEY_PAGE)->setValue($this->paginator->currentPage() - 1);
-            echo "<a   href='{$link->toString()}' title='".tr("Prev")."'> <  </a>";
+            echo "<a rel='prev' href='{$link->toString()}' title='".tr("Prev")."'> <  </a>";
 
         }
 
@@ -65,18 +67,25 @@ class ResultViewFooter extends Container
             $link->get(Paginator::KEY_PAGE)->setValue($a);
 
             $link_class = "";
+            $rel = "";
             if ($this->paginator->currentPage() == $a) {
                 $link_class = "class=selected";
             }
+            if ($this->paginator->currentPage()+1 == $a) {
+                $rel = "rel='next'";
+            }
+            if ($this->paginator->currentPage()-1 == $a) {
+                $rel = "rel='prev'";
+            }
 
-            echo "<a $link_class  href='{$link->toString()}'>" . ($a + 1) . "</a>";
+            echo "<a $rel $link_class  href='{$link->toString()}'>" . ($a + 1) . "</a>";
             $a++;
         }
 
         if (($this->paginator->currentPage() + 1) < $this->paginator->totalPages()) {
 
             $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->currentPage() + 1));
-            echo "<a  href='{$link->toString()}' title='".tr("Next")."'> > </a>";
+            echo "<a rel='next' href='{$link->toString()}' title='".tr("Next")."'> > </a>";
 
             $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->totalPages() - 1));
             echo "<a  href='{$link->toString()}' title='".tr("Last")."'> >> </a>";

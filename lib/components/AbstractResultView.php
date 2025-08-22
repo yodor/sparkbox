@@ -247,11 +247,17 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     }
 
     /**
+     * Execute the assigned sqlquery and prepare the paginator values.
+     * Need to call this once
      * @return void
      * @throws Exception
      */
-    protected function processIterator() : void
+    public function processIterator() : void
     {
+        if (!($this->iterator instanceof SQLQuery)) {
+            debug("No iterator set");
+            return;
+        }
         if ($this->iterator->isActive()) {
             debug("Already active");
             return;
