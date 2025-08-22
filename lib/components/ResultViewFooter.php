@@ -94,7 +94,7 @@ class ResultViewFooter extends Container
                 $action->setAttribute("rel", "prev");
             }
 
-            $action->setTitle(tr("Page").": ".($a+1));
+            $action->setTitle(($a+1));
             $action->setContents(($a+1));
             $action->render();
 

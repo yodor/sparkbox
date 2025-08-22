@@ -267,7 +267,7 @@ class Paginator implements IGETConsumer
         }
 
         $this->show_prev = FALSE;
-        if ($this->page_list_start > 0) {
+        if ($this->page > 0) {
             $this->show_prev = TRUE;
 
         }
