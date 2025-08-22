@@ -96,6 +96,12 @@ class Paginator implements IGETConsumer
 
     static protected ?Paginator $instance = NULL;
 
+    /**
+     * Return last instance of Paginator class if no instance
+     * has been created return new empty/non-calculated
+     * instance of Paginator class
+     * @return Paginator
+     */
     static public function Instance() : Paginator
     {
         if (is_null(self::$instance)) {
@@ -130,6 +136,8 @@ class Paginator implements IGETConsumer
         if (isset($_GET[Paginator::KEY_PAGE])) {
             $this->page = (int)$_GET[Paginator::KEY_PAGE];
         }
+
+        self::$instance = $this;
     }
 
     public function getActiveOrdering(): ?OrderColumn
