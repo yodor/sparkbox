@@ -48,47 +48,76 @@ class ResultViewFooter extends Container
         //allow slugified urls
         $link = SparkPage::Instance()->currentURL();
 
-        $link->add(new URLParameter(Paginator::KEY_PAGE));
+        $action = new Action();
+        $action->setComponentClass("");
+        $action->setClassName("");
+        $action->setURL($link);
 
         $a = $this->paginator->pageListStart();
 
         if ($this->paginator->currentPage() > 0) {
 
-            $link->get(Paginator::KEY_PAGE)->setValue(0);
-            echo "<a href='{$link->toString()}' title='".tr("First")."'> <<  </a>";
+            $link->remove(Paginator::KEY_PAGE);
+            $action->setTitle(tr("First"));
+            $action->setContents(" <<  ");
+            $action->render();
 
-            $link->get(Paginator::KEY_PAGE)->setValue($this->paginator->currentPage() - 1);
-            echo "<a rel='prev' href='{$link->toString()}' title='".tr("Prev")."'> <  </a>";
+            if ($this->paginator->currentPage() - 1 > 0) {
+                $link->add(new URLParameter(Paginator::KEY_PAGE, $this->paginator->currentPage() - 1));
+            }
+            $action->setTitle(tr("Prev"));
+            $action->setContents(" <  ");
+            $action->setAttribute("rel", "prev");
+            $action->render();
 
         }
 
         while ($a < $this->paginator->pageListEnd()) {
 
-            $link->get(Paginator::KEY_PAGE)->setValue($a);
+            $link->add(new URLParameter(Paginator::KEY_PAGE, $a));
+            if ($a<1) {
+                $link->remove(Paginator::KEY_PAGE);
+            }
 
-            $link_class = "";
-            $rel = "";
+            $action->setClassName("");
+            $action->removeAttribute("rel");
+            $action->removeAttribute("aria-current");
+
             if ($this->paginator->currentPage() == $a) {
-                $link_class = "class='selected' aria-current='page'";
+                $action->setClassName("selected");
+                $action->setAttribute("aria-current","page");
             }
-            if ($this->paginator->currentPage()+1 == $a) {
-                $rel = "rel='next'";
+            else if ($this->paginator->currentPage()+1 == $a) {
+                $action->setAttribute("rel", "next");
             }
-            if ($this->paginator->currentPage()-1 == $a) {
-                $rel = "rel='prev'";
+            else if ($this->paginator->currentPage()-1 == $a) {
+                $action->setAttribute("rel", "prev");
             }
 
-            echo "<a $rel $link_class  href='{$link->toString()}'>" . ($a + 1) . "</a>";
+            $action->setTitle(tr("Page").": ".($a+1));
+            $action->setContents(($a+1));
+            $action->render();
+
             $a++;
         }
 
+        $action->setClassName("");
+        $action->removeAttribute("rel");
+        $action->removeAttribute("aria-current");
+
         if (($this->paginator->currentPage() + 1) < $this->paginator->totalPages()) {
 
-            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->currentPage() + 1));
-            echo "<a rel='next' href='{$link->toString()}' title='".tr("Next")."'> > </a>";
+            $link->add(new URLParameter(Paginator::KEY_PAGE, ($this->paginator->currentPage() + 1)));
+            $action->setAttribute("rel","next");
+            $action->setTitle(tr("Next"));
+            $action->setContents(" > ");
+            $action->render();
 
-            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->totalPages() - 1));
-            echo "<a  href='{$link->toString()}' title='".tr("Last")."'> >> </a>";
+            $link->add(new URLParameter(Paginator::KEY_PAGE, ($this->paginator->totalPages() - 1)));
+            $action->removeAttribute("rel");
+            $action->setTitle(tr("Last"));
+            $action->setContents(" >> ");
+            $action->render();
         }
 
     }
