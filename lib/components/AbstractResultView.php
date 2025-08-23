@@ -199,17 +199,20 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
      */
     public function getCacheName() : string
     {
-        if (!($this->iterator instanceof SQLQuery)) return "";
+        $result = parent::getCacheName();
+        if ($this->iterator instanceof SQLQuery) {
 
-        $select = clone $this->iterator->select;
+            $select = clone $this->iterator->select;
 
-        $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
-        $pageFilter = $this->paginator->getLimitingSelect();
+            $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
+            $pageFilter = $this->paginator->getLimitingSelect();
 
-        $select->combine($pageFilter);
-        $select->combine($orderFilter);
+            $select->combine($pageFilter);
+            $select->combine($orderFilter);
 
-        return parent::getCacheName()."-".$select->getSQL()."-".URL::Current()->toString();
+            $result.= "-".$select->getSQL();//."-".URL::Current()->toString();
+        }
+        return $result;
     }
 
     protected function processAttributes(): void

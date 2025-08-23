@@ -344,7 +344,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
     public function getCacheName() : string
     {
-        return basename(currentURL())."-".get_class($this)."-".$this->getName();
+        return basename($_SERVER["SCRIPT_FILENAME"])."-".get_class($this)."-".$this->getName();
+        //return basename(currentURL())."-".get_class($this)."-".$this->getName();
     }
 
     public function getCaption() : string
