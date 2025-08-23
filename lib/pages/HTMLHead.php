@@ -71,7 +71,7 @@ class HTMLHead extends Container
         $title = new Component();
         $title->setComponentClass("");
         $title->setTagName("TITLE");
-        $title->setContents("%title%");
+
         $this->title = $title;
         $this->items()->append($this->title);
 

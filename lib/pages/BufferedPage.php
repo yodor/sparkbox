@@ -9,37 +9,19 @@ class BufferedPage extends SparkPage
      */
     protected function headFinalize() : void
     {
-        $this->head()->addMeta("description", "%meta_description%");
-    }
-
-    protected function applyTitleDescription() : void
-    {
-        //do in obCallback
+        $this->head()->setTitle("%title%");
+        $this->head()->addMeta("description", "%meta_description%");//do in obCallback
+        //no parent call
     }
 
     public function obCallback(string &$buffer)
     {
-        $title = $this->preferred_title;
-
-        $meta_description = "";
-
-        if (DB_ENABLED) {
-            $config = ConfigBean::Factory();
-            $config->setSection("seo");
-            $meta_description = $config->get("meta_description");
-        }
-
-        if ($this->description) {
-            $meta_description = $this->description;
-        }
-
         $replace = array(
-            "%title%"=> strip_tags($title),
-            "%meta_description%" => prepareMeta($meta_description)
+            "%title%"=> strip_tags($this->preferred_title),
+            "%meta_description%" => prepareMeta($this->description)
         );
 
         $buffer = strtr($buffer, $replace);
-
     }
 
     public function startRender(): void

@@ -357,10 +357,11 @@ class SparkPage extends HTMLPage implements IActionCollection
         //can set header to redirect
         RequestController::process();
 
-        //apply title, meta description to the head
+        //assign values to preferred_title and description properties
         $this->applyTitleDescription();
 
         //do any final changes to the head contents
+        //transfer preferred_title and description to the head section
         $this->headFinalize();
 
         parent::startRender();

@@ -65,8 +65,6 @@ class SparkAdminPage extends SparkPage
 
         parent::__construct();
 
-        $this->authorize();
-
         //control gets here only if authorized
         $this->navigation = new Navigation("AdminPageLib");
 
@@ -201,7 +199,7 @@ class SparkAdminPage extends SparkPage
      * @return void
      * @throws Exception
      */
-    protected function headFinalize(): void
+    protected function applyTitleDescription(): void
     {
 
         $dynmenu = $this->menu_bar->getMenu();
