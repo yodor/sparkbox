@@ -307,7 +307,14 @@ class SparkPage extends HTMLPage implements IActionCollection
         return $this->preferred_title;
     }
 
-    protected function headFinalize() : void
+    /**
+     * Assign values to preferred_title and description.
+     * Default implementation assign value of meta_description from config seo
+     * section to the description property if it is not already assigned value
+     *
+     * @return void
+     */
+    protected function applyTitleDescription() : void
     {
         if (!$this->description) {
             $config = ConfigBean::Factory();
@@ -317,11 +324,15 @@ class SparkPage extends HTMLPage implements IActionCollection
     }
 
     /**
-     * Apply title, description that is assigned after page constructor.
-     * Called after headFinalize and before component startRender()
+     * Finalize head contents. Called before startRender() and after
+     * applyTitleDescription()
+     *
+     * Defaul implementation transfer $preferred_title and $description
+     * properties to the head() component
+     *
      * @return void
      */
-    protected function applyTitleDescription() : void
+    protected function headFinalize() : void
     {
         $title = strip_tags($this->preferred_title);
         $this->head()->setTitle($title);
@@ -346,11 +357,11 @@ class SparkPage extends HTMLPage implements IActionCollection
         //can set header to redirect
         RequestController::process();
 
-        //do any final changes to the head contents
-        $this->headFinalize();
-
         //apply title, meta description to the head
         $this->applyTitleDescription();
+
+        //do any final changes to the head contents
+        $this->headFinalize();
 
         parent::startRender();
         //<body> is in output buffer now
