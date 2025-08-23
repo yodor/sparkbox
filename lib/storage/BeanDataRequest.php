@@ -6,12 +6,12 @@ include_once("storage/FileDataResponse.php");
 
 class BeanDataRequest
 {
-    const KEY_CMD = "cmd";
-    const KEY_ID = "id";
-    const KEY_CLASS = "class";
+    const string KEY_CMD = "cmd";
+    const string KEY_ID = "id";
+    const string KEY_CLASS = "class";
 
-    const CMD_DATA = "data";
-    const CMD_PHOTO = "image";
+    const string CMD_DATA = "data";
+    const string CMD_PHOTO = "image";
 
     protected string $cmd = "";
     protected array $supported_commands = array(BeanDataRequest::CMD_DATA, BeanDataRequest::CMD_PHOTO);

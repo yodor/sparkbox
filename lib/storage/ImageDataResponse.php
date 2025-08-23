@@ -6,13 +6,13 @@ include_once("utils/ImageScaler.php");
 class ImageDataResponse extends BeanDataResponse
 {
 
-    const KEY_WIDTH = "width";
-    const KEY_HEIGHT = "height";
-    const KEY_SIZE = "size";
+    const string KEY_WIDTH = "width";
+    const string KEY_HEIGHT = "height";
+    const string KEY_SIZE = "size";
 
-    const KEY_FILTER = "filter";
+    const string KEY_FILTER = "filter";
 
-    const FILTER_GRAY = "gray";
+    const string FILTER_GRAY = "gray";
 
     protected string $field = BeanDataResponse::FIELD_PHOTO;
 
