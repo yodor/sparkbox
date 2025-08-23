@@ -73,8 +73,8 @@ class Paginator implements IGETConsumer
     /**
      * @var bool Show prev/next arrow buttons for page selection
      */
-    protected bool $show_next = true;
-    protected bool $show_prev = true;
+    protected bool $show_next = false;
+    protected bool $show_prev = false;
 
     /**
      * Defined sort fields
@@ -104,11 +104,11 @@ class Paginator implements IGETConsumer
      */
     static public function Instance() : Paginator
     {
-        if (is_null(self::$instance)) {
-            self::$instance = new Paginator();
+        if (is_null(Paginator::$instance)) {
+            Paginator::$instance = new Paginator();
         }
 
-        return self::$instance;
+        return Paginator::$instance;
     }
 
     public function getParameterNames(): array
@@ -137,7 +137,7 @@ class Paginator implements IGETConsumer
             $this->page = (int)$_GET[Paginator::KEY_PAGE];
         }
 
-        self::$instance = $this;
+        Paginator::$instance = $this;
     }
 
     public function getActiveOrdering(): ?OrderColumn
@@ -262,7 +262,7 @@ class Paginator implements IGETConsumer
         }
 
         $this->show_next = FALSE;
-        if ($this->page_list_end < $this->total_pages) {
+        if ($this->page < $this->total_pages-1) {
             $this->show_next = TRUE;
         }
 
