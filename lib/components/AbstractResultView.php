@@ -216,7 +216,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     {
         parent::processAttributes();
         $this->setAttribute("pagesTotal", $this->paginator->totalPages());
-        $this->setAttribute("page", $this->paginator->currentPage());
+        $this->setAttribute("page", ($this->paginator->currentPage()+1));
     }
 
     /**
