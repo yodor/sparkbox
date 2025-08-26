@@ -17,26 +17,35 @@ class ItemView extends AbstractResultView
     public function __construct(?IDataIterator $itr=null)
     {
         parent::__construct($itr);
+
         $this->setAttribute("itemscope", "");
         $this->setAttribute("itemtype", "https://schema.org/ItemList");
+        $this->setTagName("section");
+
         $this->group_container = new Container(false);
         $this->group_container->setClassName("group");
 
-        $url = URL::Current()->fullURL()->toString();
-        $this->schemaURL = new Link();
-        $this->schemaURL->setHref($url);
-        $this->schemaURL->setAttribute("itemprop", "url");
-        $this->viewport->items()->append($this->schemaURL);
-
         $this->schemaItems = new Meta();
         $this->schemaItems->setAttribute("itemprop", "numberOfItems");
-        $this->viewport->items()->append($this->schemaItems);
+        $this->items()->append($this->schemaItems);
 
         $this->schemaName = new Meta();
         $this->schemaName->setAttribute("itemprop", "name");
-        $this->viewport->items()->append($this->schemaName);
+        $this->items()->append($this->schemaName);
 
+        $this->viewport->setTagName("UL");
+    }
 
+    public function setName(string $name) : void
+    {
+        parent::setName($name);
+        $this->schemaName->setContent($name);
+    }
+
+    public function processIterator() : void
+    {
+        parent::processIterator();
+        $this->schemaItems->setContent($this->paginator->resultsTotal());
     }
 
     public function requiredStyle() : array
@@ -45,18 +54,6 @@ class ItemView extends AbstractResultView
         $arr[] = SPARK_LOCAL . "/css/ItemView.css";
         return $arr;
     }
-
-//    public function startRender()
-//    {
-//        parent::startRender();
-//        $this->viewport->startRender();
-//    }
-//
-//    public function finishRender()
-//    {
-//        $this->viewport->finishRender();
-//        parent::finishRender();
-//    }
 
     public function setItemsPerGroup(int $number): void
     {

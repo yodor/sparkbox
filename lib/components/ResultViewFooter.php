@@ -11,6 +11,7 @@ class ResultViewFooter extends Container
     {
         parent::__construct(false);
         $this->setComponentClass("ResultViewFooter");
+        $this->setTagName("footer");
 
         $this->paginator = $paginator;
 

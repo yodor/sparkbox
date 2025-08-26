@@ -28,6 +28,8 @@ class ResultViewHeader extends Container
     {
         parent::__construct(false);
         $this->setComponentClass("ResultViewHeader");
+        $this->setTagName("header");
+
         $this->paginator = $paginator;
 
         $this->viewMode = new Container(false);
