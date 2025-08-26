@@ -5,6 +5,7 @@ class DataObject extends SparkObject implements IDataResultProcessor
 {
 
     protected $value = "";
+    protected string $valueKey = "";
 
     /**
      * DataObject constructor.
@@ -24,9 +25,23 @@ class DataObject extends SparkObject implements IDataResultProcessor
         $this->value = $value;
     }
 
+    public function setValueKey(string $valueKey) : void
+    {
+        $this->valueKey = $valueKey;
+    }
+
+    public function getValueKey() : string
+    {
+        return $this->valueKey;
+    }
+
     public function setData(array $data) : void
     {
-        $this->value = $data[$this->name] ?? "";
+        $key = $this->name;
+        if ($this->valueKey) {
+            $key = $this->valueKey;
+        }
+        $this->value = $data[$key] ?? "";
     }
 }
 ?>
