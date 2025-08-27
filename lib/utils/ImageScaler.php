@@ -25,8 +25,8 @@ class ImageScaler
 
     protected int $mode = ImageScaler::MODE_FULL;
 
-    protected int $width = -1;
-    protected int $height = -1;
+    protected int $width = 0;
+    protected int $height = 0;
 
     protected bool $grayFilterEnabled = false;
 

@@ -20,8 +20,8 @@ class ImageDataResponse extends BeanDataResponse
 
     public function __construct(int $id, string $className)
     {
-        $width = -1;
-        $height = -1;
+        $width = 0;
+        $height = 0;
 
         if (isset($_GET[ImageDataResponse::KEY_WIDTH])) {
             $width = (int)$_GET[ImageDataResponse::KEY_WIDTH];
