@@ -8,3 +8,10 @@
 .KeywordSearch .Container.TextSpace {
     display: none;
 }
+.KeywordSearch button {
+    cursor: pointer;
+}
+.KeywordSearch input:focus, .KeywordSearch button:focus {
+    outline: 2px solid var(--theme-accent);
+    outline-offset: 2px;
+}
