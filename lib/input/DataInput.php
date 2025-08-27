@@ -15,6 +15,7 @@ class DataInput extends DataObject
 
     public bool $skip_search_filter_processing = false;
 
+    protected string $id = "";
 
     /**
      * @var string
@@ -68,6 +69,20 @@ class DataInput extends DataObject
         $this->editable = TRUE;
         $this->user_data = NULL;
         $this->translator_enabled = FALSE;
+    }
+
+    /**
+     * Set the ID attribute of this form input
+     * @param string $id
+     * @return void
+     */
+    public function setID(string $id): void
+    {
+        $this->id = $id;
+    }
+    public function getID(): string
+    {
+        return $this->id;
     }
 
     /**

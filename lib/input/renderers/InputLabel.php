@@ -83,6 +83,11 @@ class InputLabel extends LabelSpan implements IErrorRenderer
                 $this->span->setRenderEnabled(true);
             }
         }
+
+        $id = $this->dataInput->getID();
+        if ($id) {
+            $this->label->setAttribute("for", $id);
+        }
     }
 
     public function setErrorRenderMode(int $mode) : void

@@ -125,6 +125,9 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
     protected function processInput() : void
     {
         $this->input?->setName($this->dataInput->getName());
+        if ($this->dataInput->getID()) {
+            $this->input?->setAttribute("id", $this->dataInput->getID());
+        }
     }
 
     protected function processAttributes(): void
