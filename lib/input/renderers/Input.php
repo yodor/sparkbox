@@ -40,5 +40,15 @@ class Input extends Container
     {
         return $this->getAttribute("value");
     }
+    protected function processAttributes(): void
+    {
+        parent::processAttributes();
+        $value = $this->getValue();
+        if ($value) {}
+        else {
+            $this->removeAttribute("value");
+        }
+
+    }
 
 }
