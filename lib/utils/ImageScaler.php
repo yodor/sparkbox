@@ -35,6 +35,9 @@ class ImageScaler
     //resulting image width and height
     public function __construct(int $width, int $height)
     {
+        if ($width<1)$width = 0;
+        if ($height<1)$height = 0;
+
         $this->width = $width;
         $this->height = $height;
 
