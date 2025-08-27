@@ -64,9 +64,6 @@ class HTMLHead extends Container
         $this->setTagName("HEAD");
 
         $this->addMeta("charset", "UTF-8");
-        $this->addMeta("Content-Type", "text/html;charset=utf-8");
-        $this->addMeta("Content-Style-Type", "text/css");
-
 
         $title = new Component();
         $title->setComponentClass("");
