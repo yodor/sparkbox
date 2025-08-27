@@ -63,14 +63,16 @@ class HTMLHead extends Container
 
         $this->setTagName("HEAD");
 
-        $this->addMeta("charset", "UTF-8");
-
         $title = new Component();
         $title->setComponentClass("");
         $title->setTagName("TITLE");
 
         $this->title = $title;
         $this->items()->append($this->title);
+
+        $charset = new Meta();
+        $charset->setAttribute("charset", "utf-8");
+        $this->items()->append($charset);
 
         //default favicon
         $this->favicon = new Link();
