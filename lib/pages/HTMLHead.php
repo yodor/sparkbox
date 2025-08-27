@@ -176,6 +176,15 @@ class HTMLHead extends Container
         $x_default->setAttribute("hreflang", "x-default");
         $x_default->render();
 
+        $translator = Translator::Instance();
+        $currentLanguageISO2 = $translator->activeCodeISO2();
+        $x_current = new Link();
+        $x_current->setRelation("alternate");
+        $x_current->setHref($url->toString());
+        //X-default tags are recommended, but not mandatory
+        $x_current->setAttribute("hreflang", $currentLanguageISO2);
+        $x_current->render();
+
         if (TRANSLATOR_ENABLED) {
 
             $lb = new LanguagesBean();
@@ -186,6 +195,7 @@ class HTMLHead extends Container
                     if (!$result->isSet("lang_code")) continue;
                     $lang_code = $result->get("lang_code");
                     if (strlen($lang_code) < 2) continue;
+                    if (str_starts_with($lang_code, $currentLanguageISO2)) continue;
                     $locale_default = new Link();
                     $locale_default->setRelation("alternate");
                     $url->add(new URLParameter("change_language", "1"));

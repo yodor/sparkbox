@@ -12,6 +12,14 @@ include_once("utils/Session.php");
 class Translator implements IRequestProcessor, IGETConsumer
 {
 
+    protected static Translator $instance;
+    public static function Instance() : Translator
+    {
+        if (self::$instance == null) {
+            self::$instance = new Translator();
+        }
+        return self::$instance;
+    }
     /**
      * All captured texts for translation during translatePhrase()
      * @var SiteTextsBean
@@ -90,6 +98,8 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     public function __construct()
     {
+
+        self::$instance = $this;
 
         $this->phrases = new SiteTextsBean();
         $this->languages = new LanguagesBean();
