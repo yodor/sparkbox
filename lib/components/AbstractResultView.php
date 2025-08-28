@@ -20,6 +20,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
      */
     protected string $default_order = "";
 
+    protected bool $results_paginated = false;
     /**
      *
      * @var int Total result rows for this data iterator
@@ -249,6 +250,44 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         parent::startRender();
     }
 
+    public function paginate() : void
+    {
+        if ($this->results_paginated) return;
+
+        $select = clone $this->iterator->select;
+        $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
+
+        //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
+        //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
+        $select->limit = "0";
+
+        $db = $this->iterator->getDB();
+        $result = $db->query($select->getSQL());
+        if (! ($result instanceof DBResult) ) {
+            debug("Error executing SQL_CALC_FOUND_ROWS: " . $select->getSQL());
+            throw new Exception("Unable to query SQL_CALC_FOUND_ROWS");
+        }
+        $result->free();
+
+        $result = $db->query("SELECT FOUND_ROWS() as total_results");
+        if (! ($result instanceof DBResult) ) {
+            debug("Error fetching FOUND_ROWS: " . $select->getSQL());
+            throw new Exception("Unable to fetch FOUND_ROWS");
+        }
+
+        $this->total_rows = $result->fetchResult()->get("total_results");
+        $result->free();
+
+        $this->paginator->calculate($this->total_rows, $this->items_per_page);
+
+        $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
+        $pageFilter = $this->paginator->getLimitingSelect();
+
+        $this->iterator->select->combine($pageFilter);
+        $this->iterator->select->combine($orderFilter);
+
+        $this->results_paginated = true;
+    }
     /**
      * Execute the assigned sqlquery and prepare the paginator values.
      * Need to call this once
@@ -266,37 +305,9 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             return;
         }
 
-        $select = clone $this->iterator->select;
-        $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
-        $select->setMode(SQLSelect::SQL_CACHE);
+        $this->paginate();
 
-        //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
-        //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
-        $select->limit = "";
-
-        //echo "Count SQL: ".$select->getSQL();
-        $db = $this->iterator->getDB();
-        $result = $db->query($select->getSQL());
-        if (! ($result instanceof DBResult) ) {
-            debug("Error fetching SQL_CALC_FOUND_ROWS: " . $select->getSQL());
-            throw new Exception("Unable to query SQL_CALC_FOUND_ROWS");
-        }
-
-        $this->total_rows = $result->numRows();
-
-        $result->free();
-
-        $this->paginator->calculate($this->total_rows, $this->items_per_page);
-
-        $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
-        $pageFilter = $this->paginator->getLimitingSelect();
-
-        $this->iterator->select->combine($pageFilter);
-        $this->iterator->select->combine($orderFilter);
-
-        $this->iterator->select->setMode(SQLSelect::SQL_NO_CACHE);
-
-       //echo "Final SQL: ".$this->iterator->select->getSQL();
+        //echo "Final SQL: ".$this->iterator->select->getSQL();
 
         $this->paged_rows = $this->iterator->exec();
     }
