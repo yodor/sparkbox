@@ -84,11 +84,11 @@ class CacheFactory
         if (!file_exists($cleanup_file)) touch($cleanup_file);
         $cleanup_time = filemtime($cleanup_file);
         $delta = time() - $cleanup_time;
-        //default 24 hours - 86400 seconds
+        //default 1 hour - 3600 seconds
         //debug("Cleanup PageCache delta: $delta");
 
         if ($delta < PAGE_CACHE_CLEANUP_DELTA) {
-            debug("Cleanup PageCache remaining time: ". PAGE_CACHE_CLEANUP_DELTA - $delta);
+            debug("Remaining seconds until PageCache cleanup: ". PAGE_CACHE_CLEANUP_DELTA - $delta);
             return;
         }
         //
@@ -121,19 +121,29 @@ class CacheFactory
 
             $cache_folder = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache";
 
-            $check_ttl = function ($item) use ($timestamp) {
-
-                $filestamp = filemtime($item);
-                $fileTTL = ($timestamp - $filestamp);
-                if ($fileTTL > PAGE_CACHE_TTL) {
-                    debug("Removing stale cache entry: " . $item);
-                    unlink($item);
-                }
-            };
-            array_map($check_ttl, glob("$cache_folder/*", GLOB_NOSORT | GLOB_NOESCAPE));
-            touch($cleanup_file);
-
-        }
+            $handle = fopen($cleanup_file, 'a');
+            if (!$handle) {
+                debug("Unable to open cleanup file: " . $cleanup_file);
+                return;
+            }
+            if (flock($handle, LOCK_EX | LOCK_NB)) {
+                // Perform task
+                $check_ttl = function ($item) use ($timestamp) {
+                    $filestamp = filemtime($item);
+                    $fileTTL = ($timestamp - $filestamp);
+                    if ($fileTTL >= PAGE_CACHE_TTL) {
+                        debug("Removing stale cache entry: " . $item);
+                        unlink($item);
+                    }
+                };
+                array_map($check_ttl, glob("$cache_folder/*", GLOB_NOSORT | GLOB_NOESCAPE));
+                touch($cleanup_file);
+                flock($handle, LOCK_UN);
+            } else {
+                //echo "File is locked. Skipping.\n";
+            }
+            fclose($handle);
+        } //CacheFactory::BACKEND_FILESYSTEM
     }
 }
 
