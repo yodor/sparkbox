@@ -16,6 +16,13 @@ class StorageItem extends DataObject implements JsonSerializable
 
     protected $type = StorageItem::TYPE_IMAGE;
 
+    public function __clone()
+    {
+        if ($this->url instanceof URL) {
+            $this->url = clone $this->url;
+        }
+    }
+
     public function __construct(int $id = -1, string $className = "", string $field = "")
     {
         parent::__construct();

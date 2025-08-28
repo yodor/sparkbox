@@ -11,6 +11,13 @@ class Image extends Component implements IPhotoRenderer
 
     protected ?StorageItem $storageItem = null;
 
+    function __clone()
+    {
+        if ($this->storageItem instanceof StorageItem) {
+            $this->storageItem = clone $this->storageItem;
+        }
+    }
+
     public function __construct()
     {
         parent::__construct(false);
