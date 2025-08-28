@@ -296,9 +296,10 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
             $cacheName = $this->getCacheName();
             if (!empty($cacheName)) {
-                debug("Cacheable component: ".get_class($this)." | Cache name: ".$cacheName);
+                $entryName = get_class($this) . "-" . sparkHash($cacheName);
+                //debug("Cacheable component: ".get_class($this)." | Cache name: ".$cacheName);
 
-                $cacheEntry = CacheFactory::PageCacheEntry(get_class($this) . "-" . sparkHash($cacheName));
+                $cacheEntry = CacheFactory::PageCacheEntry($entryName);
                 if ($cacheEntry->haveData()) {
 
                     $entryStamp = $cacheEntry->lastModified();
@@ -310,6 +311,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
                     if ($remainingTTL > 0) {
                         //output cached data
+                        echo "<!-- PageCache: $entryName -->";
                         $cacheEntry->output();
                         return;
                     }
