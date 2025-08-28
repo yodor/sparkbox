@@ -76,7 +76,10 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         else if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $data)) {
             $this->form->loadPostData($data);
             $this->form->validate();
-            $this->have_filter = TRUE;
+            if ($this->form->getInput("keyword")->getValue()) {
+                $this->have_filter = TRUE;
+            }
+
         }
 
     }
