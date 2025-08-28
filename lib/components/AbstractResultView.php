@@ -324,6 +324,38 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
 
     abstract protected function renderItem(RawResult $result) : void;
 
+    public static function AppendHeadLinks(AbstractResultView $view, SparkPage $sparkPage) : void
+    {
+        $paginator = $view->getPaginator();
+        $currentPage = $paginator->currentPage();
+        if ($paginator->hasPrevPage()) {
+            $page = $currentPage - 1;
+            $url = $sparkPage->currentURL();
+            $link = new Link();
+            $link->setRelation("prev");
+            $url->add(new URLParameter("page", $page));
+            if ($page < 1) {
+                $url->remove("page");
+            }
+            $link->setHref($url);
+            $sparkPage->head()->items()->append($link);
+        }
+        if ($paginator->hasNextPage()) {
+            $page = $currentPage + 1;
+            $url = $sparkPage->currentURL();
+            $link = new Link();
+            $link->setRelation("next");
+            $url->add(new URLParameter("page", $page));
+            $link->setHref($url);
+            $sparkPage->head()->items()->append($link);
+        }
+
+        if ($paginator->totalPages() > 1) {
+            //apply page number to the title
+            $headTitle = $sparkPage->head()->getTitle();
+            $sparkPage->head()->setTitle($headTitle . " | " . tr("Page") . " " . ($currentPage + 1));
+        }
+    }
 }
 
 ?>
