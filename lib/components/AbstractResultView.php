@@ -326,6 +326,9 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
 
     public static function AppendHeadLinks(AbstractResultView $view, SparkPage $sparkPage) : void
     {
+        //execute pagination query
+        $view->paginate();
+
         $paginator = $view->getPaginator();
         $currentPage = $paginator->currentPage();
         if ($paginator->hasPrevPage()) {
