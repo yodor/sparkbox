@@ -15,18 +15,18 @@ class FileCacheEntry extends CacheEntry
 
         $this->file = $file;
 
-        debug("Using Cache Folder: ".basename($this->file->getPath()));
-        debug("Using Filename: ".$this->file->getFilename());
-        debug("Using Path: ".$this->file->getPath());
+        debug("Using Cache Folder: " . basename($this->file->getPath()));
+        debug("Using Filename: " . $this->file->getFilename());
+        debug("Using Path: " . $this->file->getPath());
     }
 
     //replaced getFile()->exists();
-    public function haveData() : bool
+    public function haveData(): bool
     {
         return $this->file->exists();
     }
 
-    public function getFile() : SparkFile
+    public function getFile(): SparkFile
     {
         return $this->file;
     }
@@ -36,7 +36,7 @@ class FileCacheEntry extends CacheEntry
      * @return void
      * @throws Exception
      */
-    public function output() : void
+    public function output(): void
     {
         $this->file->open('r');
         $this->file->lock(LOCK_SH);
@@ -52,7 +52,7 @@ class FileCacheEntry extends CacheEntry
      * @return void
      * @throws Exception
      */
-    public function store(string $data, int $lastModified=0) : void
+    public function store(string $data, int $lastModified = 0): void
     {
         $this->file->open('w');
         $this->file->lock(LOCK_EX);
@@ -60,7 +60,7 @@ class FileCacheEntry extends CacheEntry
         $this->file->lock(LOCK_UN);
         $this->file->close();
         debug("Stored " . $this->file->length() . " bytes");
-        if ($lastModified>0) {
+        if ($lastModified > 0) {
             $this->file->setLastModified($lastModified);
             debug("File last-modified set to: " . $lastModified);
         }
@@ -73,7 +73,7 @@ class FileCacheEntry extends CacheEntry
      * @return void
      * @throws Exception
      */
-    public function storeBuffer(DataBuffer $data, int $lastModified=0) : void
+    public function storeBuffer(DataBuffer $data, int $lastModified = 0): void
     {
         $this->file->open('w');
         $this->file->lock(LOCK_EX);
@@ -81,17 +81,25 @@ class FileCacheEntry extends CacheEntry
         $this->file->lock(LOCK_UN);
         $this->file->close();
         debug("Stored " . $this->file->length() . " bytes");
-        if ($lastModified>0) {
+        if ($lastModified > 0) {
             $this->file->setLastModified($lastModified);
             debug("File last-modified set to: " . $lastModified);
         }
     }
+
     /**
      * @return int Unix timestamp of this cache entry file
      * @throws Exception
      */
-    public function lastModified() : int
+    public function lastModified(): int
     {
         return $this->file->lastModified();
+    }
+
+    public function remove(): void
+    {
+        if ($this->file->exists()) {
+            $this->file->remove();
+        }
     }
 }

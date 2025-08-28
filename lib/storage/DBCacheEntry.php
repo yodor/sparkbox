@@ -112,6 +112,11 @@ class DBCacheEntry extends CacheEntry
         $buffer->setData($this->result->get("data"));
         return $buffer;
     }
+
+    public function remove() : void
+    {
+        $this->bean->delete($this->entryID);
+    }
 }
 
 ?>

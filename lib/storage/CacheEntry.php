@@ -42,6 +42,8 @@ abstract class CacheEntry
      * @throws Exception
      */
     public abstract function lastModified() : int;
+
+    public abstract function remove() : void;
 }
 
 ?>
