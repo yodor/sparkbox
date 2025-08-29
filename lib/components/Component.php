@@ -290,34 +290,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     {
         if (!$this->render_enabled) return;
 
-        $cacheEntry = null;
-
-        if ($this->cacheable && PAGE_CACHE_ENABLED) {
-
-            $cacheName = $this->getCacheName();
-            if (!empty($cacheName)) {
-                $entryName = get_class($this) . "-" . sparkHash($cacheName);
-                //debug("Cacheable component: ".get_class($this)." | Cache name: ".$cacheName);
-
-                $cacheEntry = CacheFactory::PageCacheEntry($entryName);
-                if ($cacheEntry->haveData()) {
-
-                    $entryStamp = $cacheEntry->lastModified();
-                    $timeStamp = time();
-                    $entryAge = ($timeStamp - $entryStamp);
-                    $remainingTTL = PAGE_CACHE_TTL - $entryAge;
-
-                    debug("CacheEntry exists - lastModified: " . $entryStamp . " | Remaining TTL: " . $remainingTTL);
-
-                    if ($remainingTTL > 0) {
-                        //output cached data
-                        echo "<!-- PageCache: $entryName -->";
-                        $cacheEntry->output();
-                        return;
-                    }
-                }
-            }
-        }
+        $cacheEntry = CacheFactory::CacheEntryOutput($this);
+        if ($cacheEntry === true) return;
 
         ob_start();
         $haveError = false;

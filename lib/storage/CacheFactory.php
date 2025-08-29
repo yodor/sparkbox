@@ -145,6 +145,50 @@ class CacheFactory
             fclose($handle);
         } //CacheFactory::BACKEND_FILESYSTEM
     }
+
+    /**
+     * Render component from cache
+     * Return true if component contents are found and output
+     * Return false if PAGE_CACHE_ENABLED is false, component isCacheable() is false
+     * or component getCacheName() is empty string
+     * Return new instance of CacheEntry if the entry is empty or the entry is expired
+     * @param Component $cmp
+     * @return CacheEntry|bool
+     * @throws Exception
+     */
+    public static function CacheEntryOutput(Component $cmp) : CacheEntry | bool
+    {
+
+        if (!PAGE_CACHE_ENABLED) return false;
+        if (!$cmp->isCacheable()) return false;
+
+        $cacheName = $cmp->getCacheName();
+        if (!$cacheName) return false;
+
+        $entryName = get_class($cmp) . "-" . sparkHash($cacheName);
+        //debug("Cacheable component: ".get_class($cmp)." | Cache name: ".$cacheName);
+
+        $cacheEntry = CacheFactory::PageCacheEntry($entryName);
+
+        if ($cacheEntry->haveData()) {
+
+            $entryStamp = $cacheEntry->lastModified();
+            $timeStamp = time();
+            $entryAge = ($timeStamp - $entryStamp);
+            $remainingTTL = PAGE_CACHE_TTL - $entryAge;
+
+            debug("CacheEntry exists - lastModified: " . $entryStamp . " | Remaining TTL: " . $remainingTTL);
+
+            if ($remainingTTL > 0) {
+                //output cached data
+                echo "<!-- PageCache: $entryName -->";
+                $cacheEntry->output();
+                return true;
+            }
+        }
+
+        return $cacheEntry;
+    }
 }
 
 ?>
