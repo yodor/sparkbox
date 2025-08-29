@@ -501,6 +501,14 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         return isset($this->attributes[$name]);
     }
 
+    public function setRole(string $role) : void
+    {
+        $this->setAttribute("role", $role);
+    }
+    public function getRole() : string
+    {
+        return $this->getAttribute("role");
+    }
     /**
      * Set inline style property '$name' to '$value'
      * Ex: $name="color" $value="red" will set style='color:red;'
