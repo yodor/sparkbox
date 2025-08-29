@@ -575,12 +575,12 @@ class NestedSetBean extends DBTableBean
 
         //prepend prefix to column names
         foreach ($columns as $idx => $field) {
-            if (strcmp($field, $prkey)==0) {
-                $fields[] = "DISTINCT $prefix.$field";
-            }
-            else {
+            //if (strcmp($field, $prkey)==0) {
+            //    $fields[] = "DISTINCT $prefix.$field";
+            //}
+            //else {
                 $fields[] = "$prefix.$field";
-            }
+            //}
         }
 
         $sel = new SQLSelect();
@@ -592,10 +592,13 @@ class NestedSetBean extends DBTableBean
 
         $sel->where()->addExpression("(child.lft BETWEEN node.lft AND node.rgt)");
 
-        $sel->where()->add("$relation_table.$prkey", "child.$prkey");
 
         if ($nodeID > 0) {
+            $sel->where()->add("$relation_table.$prkey", "child.$prkey");
             $sel->where()->add("node.$prkey", $nodeID, " = ");
+        }
+        else {
+            $sel->where()->add("$relation_table.$prkey", "node.$prkey");
         }
 
         $this->select->where()->copyTo($sel->where());
