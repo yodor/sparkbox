@@ -36,7 +36,7 @@ JS;
 
 }
 
-class SparkPage extends HTMLPage implements IActionCollection
+class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 {
 
     private static ?SparkPage $instance = NULL;
@@ -444,6 +444,10 @@ class SparkPage extends HTMLPage implements IActionCollection
         return URL::Current();
     }
 
+    public function getParameterNames(): array
+    {
+        return array();
+    }
 }
 
 ?>

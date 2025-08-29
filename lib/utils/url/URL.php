@@ -374,5 +374,17 @@ class URL implements IGETConsumer, IDataResultProcessor
     {
         $this->parameters = array();
     }
+    public static function Clean(URL $pageURL, array $supported_params) : void
+    {
+        //static url parameter names from the current page
+        $page_params = $pageURL->getParameterNames();
+        //cleanup non supported names
+        foreach ($page_params as $idx=>$name) {
+            $param = $pageURL->get($name);
+            if (!in_array($name, $supported_params) || !$param->value()) {
+                $pageURL->remove($name);
+            }
+        }
+    }
 
 }

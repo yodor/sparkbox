@@ -48,6 +48,9 @@ class ResultViewFooter extends Container
 
         //allow slugified urls
         $link = SparkPage::Instance()->currentURL();
+        $supported_params = SparkPage::Instance()->getParameterNames();
+
+        URL::Clean($link, $supported_params);
 
         $action = new Action();
         $action->setComponentClass("");
