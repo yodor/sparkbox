@@ -28,7 +28,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         parent::__construct($this->form);
 
         $this->setClassName("KeywordSearch");
-
+        $this->setAttribute("role", "search");
 
         $this->setLayout(FormRenderer::LAYOUT_HBOX);
 
