@@ -575,12 +575,12 @@ class NestedSetBean extends DBTableBean
 
         //prepend prefix to column names
         foreach ($columns as $idx => $field) {
-//            if (strcmp($field, $prkey)==0) {
-//                $fields[] = "DISTINCT $prefix.$field";
-//            }
-//            else {
+            if (strcmp($field, $prkey)==0) {
+                $fields[] = "DISTINCT $prefix.$field";
+            }
+            else {
                 $fields[] = "$prefix.$field";
-//            }
+            }
         }
 
         $sel = new SQLSelect();
