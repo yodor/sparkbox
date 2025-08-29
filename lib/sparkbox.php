@@ -9,6 +9,15 @@
 // $domain    = $_SERVER['SERVER_NAME'];
 // $full_url  = "${protocol}://${domain}${disp_port}${base_url}"; # Ex: 'http://example.com', 'https://example.com/mywebsite', etc.
 
+//define these to any value
+
+//no forced redirect to https if it is in http
+//$GLOBALS["FORCE_HTTPS"] = "";
+//no subdomain redirect
+//$GLOBALS["NO_SUBDOMAIN_REDIRECT"] = "";
+//default redirect subdomains or set to the desired subdomains
+//$GLOBALS["REDIRECT_SUBDOMAINS"] = "www;mail";
+
 if (!$install_path) throw new Exception("Install path is not defined");
 
 if (defined("REQUEST_THROTTLE_USERAGENT")) {
