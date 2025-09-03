@@ -11,7 +11,7 @@ class Button extends Input
     public static function Action(string $text, string $href = "") : Button
     {
         $action = new Button();
-        $action->setTagName("A");
+        $action->setTagName("a");
         $action->setComponentClass("");
 
         $action->setContents($text);
@@ -57,7 +57,7 @@ class Button extends Input
         parent::__construct($type, $name, $value);
         $this->setComponentClass("ColorButton");
 
-        $this->setTagName("BUTTON");
+        $this->setTagName("button");
         $this->setClosingTagRequired(true);
 
         $this->translation_enabled = TRUE;

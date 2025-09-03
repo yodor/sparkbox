@@ -16,7 +16,7 @@ class SelectField extends DataIteratorField
         $this->items()->clear();
 
         $this->input = new Input();
-        $this->input->setTagName("SELECT");
+        $this->input->setTagName("select");
         $this->input->setClosingTagRequired(TRUE);
 
         $this->input->items()->append(new ClosureComponent($this->renderItems(...), false));

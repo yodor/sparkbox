@@ -12,14 +12,14 @@ class LabelSpan extends Container
         $this->setComponentClass("");
 
         $label = new Component(false);
-        $label->setTagName("LABEL");
+        $label->setTagName("label");
         $label->setComponentClass("");
         $label->setContents($label_contents);
         $this->items()->append($label);
         $this->label = $label;
 
         $span = new Component(false);
-        $span->setTagName("SPAN");
+        $span->setTagName("span");
         $span->setComponentClass("");
         $span->setContents($span_contents);
         $this->items()->append($span);

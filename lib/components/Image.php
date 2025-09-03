@@ -24,7 +24,7 @@ class Image extends Component implements IPhotoRenderer
         $this->setComponentClass("Image");
 
         $this->setClosingTagRequired(false);
-        $this->setTagName("IMG");
+        $this->setTagName("img");
         $this->setAttribute("itemprop", "image");
 
     }

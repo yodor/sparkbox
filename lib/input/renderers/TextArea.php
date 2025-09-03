@@ -12,7 +12,7 @@ class TextArea extends InputField
     protected function createInput() : Input
     {
         $input = new Input();
-        $input->setTagName("TEXTAREA");
+        $input->setTagName("textarea");
         $input->setClosingTagRequired(true);
 
         return $input;

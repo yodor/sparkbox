@@ -18,7 +18,7 @@ class MenuItemRenderer extends Container
 //        $this->items()->append($container);
 
         $this->linkTag = new Component(false);
-        $this->linkTag->setTagName("A");
+        $this->linkTag->setTagName("a");
         $this->linkTag->setComponentClass("Link");
         $this->linkTag->setAttribute("role", "menuitem");
 

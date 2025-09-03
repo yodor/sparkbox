@@ -33,7 +33,7 @@ class ItemView extends AbstractResultView
         $this->schemaName->setAttribute("itemprop", "name");
         $this->items()->append($this->schemaName);
 
-        $this->viewport->setTagName("UL");
+        $this->viewport->setTagName("ul");
     }
 
     public function setName(string $name) : void

@@ -7,7 +7,7 @@ class BreadcrumbListItem extends Component {
     public function __construct()
     {
         parent::__construct(false);
-        $this->setTagName("LI");
+        $this->setTagName("li");
 
         $this->setAttribute("itemscope", "");
         $this->setAttribute("itemprop", "itemListElement");
@@ -26,7 +26,7 @@ class BreadcrumbList extends Container implements IHeadContents
 
 
         parent::__construct(false);
-        $this->setTagName("UL");
+        $this->setTagName("ul");
 
         $this->setAttribute("aria-label", "Breadcrumb");
 

@@ -20,7 +20,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
     public function __construct(string $beanClass)
     {
         parent::__construct();
-        $this->tagName = "A";
+        $this->tagName = "a";
 
         $this->setClassName("item");
         $this->url = new URL();

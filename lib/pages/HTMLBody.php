@@ -6,7 +6,7 @@ class HTMLBody extends Container
     public function __construct()
     {
         parent::__construct();
-        $this->setTagName("BODY");
+        $this->setTagName("body");
     }
 }
 ?>

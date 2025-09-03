@@ -7,7 +7,7 @@ class TextComponent extends Component
     public function __construct(string $contents="")
     {
         parent::__construct();
-        $this->tagName = "SPAN";
+        $this->tagName = "span";
 
         $this->buffer->set($contents);
 

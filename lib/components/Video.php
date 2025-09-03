@@ -6,7 +6,7 @@ class Source extends Component
     public function __construct(string $src = "", string $type = "")
     {
         parent::__construct(false);
-        $this->setTagName("SOURCE");
+        $this->setTagName("source");
         if ($src) {
             $this->setSrc($src);
         }
@@ -30,7 +30,7 @@ class Video extends Container
     public function __construct()
     {
         parent::__construct(false);
-        $this->setTagName("VIDEO");
+        $this->setTagName("video");
     }
 }
 

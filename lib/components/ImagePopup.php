@@ -9,7 +9,7 @@ class ImagePopup extends ImageStorage
         parent::__construct($storageItem);
         $this->setComponentClass("ImagePopup");
         //force A
-        $this->setTagName("A");
+        $this->setTagName("a");
     }
 
     public function requiredStyle(): array

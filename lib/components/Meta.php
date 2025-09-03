@@ -5,7 +5,7 @@ class Meta extends Component
 {
     public function __construct() {
         parent::__construct();
-        $this->setTagName("META");
+        $this->setTagName("meta");
         $this->setClosingTagRequired(false);
         $this->setComponentClass("");
     }

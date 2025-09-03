@@ -19,7 +19,7 @@ class Form extends Container
     public function __construct()
     {
         parent::__construct(false);
-        $this->setTagName("FORM");
+        $this->setTagName("form");
     }
 
     public function setMethod(string $method) : void

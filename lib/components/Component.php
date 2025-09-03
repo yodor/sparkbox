@@ -30,7 +30,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      * HTML tag name of this element ex DIV,SPAN,LABEL etc
      * @var string
      */
-    protected string $tagName = "DIV";
+    protected string $tagName = "div";
 
     /**
      * Property controlling the closing tag for this component

@@ -6,7 +6,7 @@ class Link extends Component
     public function __construct(string $href="")
     {
         parent::__construct(false);
-        $this->setTagName("LINK");
+        $this->setTagName("link");
         $this->setClosingTagRequired(false);
         $this->setComponentClass("");
         $this->setRelation("stylesheet");

@@ -13,7 +13,7 @@ class HTMLPage extends Component
     public function __construct()
     {
         parent::__construct(false);
-        $this->setTagName("HTML");
+        $this->setTagName("html");
         //no css class
         $this->setComponentClass("");
         $this->setClassName("");

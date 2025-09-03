@@ -9,7 +9,7 @@ class SelectItem extends DataIteratorItem
         //options are not styled
         $this->setComponentClass("");
 
-        $this->tagName = "OPTION";
+        $this->tagName = "option";
     }
 
     public function processAttributes(): void

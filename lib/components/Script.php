@@ -7,7 +7,7 @@ class Script extends Container
     {
         parent::__construct(false);
         $this->setComponentClass("");
-        $this->setTagName("SCRIPT");
+        $this->setTagName("script");
         $this->setType("text/javascript");
     }
 

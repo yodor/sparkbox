@@ -17,7 +17,7 @@ class ImageStorage extends Action
         parent::__construct();
         $this->setComponentClass("ImageStorage");
         //force DIV
-        $this->setTagName("DIV");
+        $this->setTagName("div");
 
         $this->image = new Image();
 

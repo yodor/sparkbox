@@ -61,11 +61,11 @@ class HTMLHead extends Container
         $this->setClassName("");
         $this->setComponentClass("");
 
-        $this->setTagName("HEAD");
+        $this->setTagName("head");
 
         $title = new Component();
         $title->setComponentClass("");
-        $title->setTagName("TITLE");
+        $title->setTagName("title");
 
         $this->title = $title;
         $this->items()->append($this->title);

@@ -35,7 +35,7 @@ class Action extends DataIteratorItem
         parent::__construct();
         $this->setComponentClass("Action");
 
-        $this->setTagName("A");
+        $this->setTagName("a");
 
         $this->url = new URL($href);
 
@@ -158,7 +158,7 @@ class Action extends DataIteratorItem
         $action = new Action();
         $action->translation_enabled = FALSE;
         $action->action_as_contents = false;
-        $action->setTagName("SPAN");
+        $action->setTagName("span");
         $action->setContents(" | ");
         $action->setAction("Pipe");
         return $action;
@@ -169,7 +169,7 @@ class Action extends DataIteratorItem
         $action = new Action();
         $action->action_as_contents = false;
         $action->translation_enabled = FALSE;
-        $action->setTagName("SPAN");
+        $action->setTagName("span");
         $action->setAction("Row");
         return $action;
     }
