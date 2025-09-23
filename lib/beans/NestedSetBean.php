@@ -592,13 +592,13 @@ class NestedSetBean extends DBTableBean
 
         $sel->where()->addExpression("(child.lft BETWEEN node.lft AND node.rgt)");
 
+        $sel->where()->add("$relation_table.$prkey", "child.$prkey");
 
         if ($nodeID > 0) {
-            $sel->where()->add("$relation_table.$prkey", "child.$prkey");
             $sel->where()->add("node.$prkey", $nodeID, " = ");
         }
         else {
-            $sel->where()->add("$relation_table.$prkey", "node.$prkey");
+            $sel->where()->add("node.parentID", 0, " = ");
         }
 
         $this->select->where()->copyTo($sel->where());
