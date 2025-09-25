@@ -83,6 +83,8 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor
 
         }
 
+        SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::EDITOR_CREATED, $this));
+
     }
 
     public function processAttributes(): void
