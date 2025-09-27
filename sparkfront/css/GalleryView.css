@@ -55,6 +55,8 @@
 .GalleryViewItem .footer {
     padding-top:0.5em;
     padding-bottom:0.5em;
+    display:flex;
+    justify-content: space-evenly;
 }
 .GalleryViewItem .footer .reposition_action {
     /*display: none;*/
