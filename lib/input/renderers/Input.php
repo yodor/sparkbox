@@ -44,7 +44,12 @@ class Input extends Container
     {
         parent::processAttributes();
         $value = $this->getValue();
-        if ($value) {}
+        if (is_numeric($value)) {
+
+        }
+        else if ($value) {
+
+        }
         else {
             $this->removeAttribute("value");
         }
