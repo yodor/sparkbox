@@ -5,7 +5,7 @@ include_once("input/renderers/InputField.php");
 abstract class InputFieldTag extends InputField
 {
 
-    protected $skip_value_types = array("file");
+    protected array $skip_value_types = array("file");
 
     public function __construct(DataInput $input)
     {
