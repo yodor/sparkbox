@@ -251,18 +251,18 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
             return;
         }
 
-        if (!$this->authorized_access) {
-            debug("Authorization is not required");
-            return;
-        }
-
-        debug("Authorization required - using Authenticator: " . get_class($this->auth));
+        debug("Using Authenticator: " . get_class($this->auth));
 
         $this->context = $this->auth->authorize();
 
         if ($this->context instanceof AuthContext) {
 
             debug("Authorization success");
+            return;
+        }
+
+        if (!$this->authorized_access) {
+            debug("Authorization is not required");
             return;
         }
 
