@@ -83,8 +83,23 @@ class ImageUploadValidator extends UploadDataValidator
             return;
         }
 
+        $width = $object->getWidth();
+        $height = $object->getHeight();
+
+        if (IMAGE_UPLOAD_UPSCALE) {
+            if ($object->getWidth() < $this->resize_width || $object->getHeight() < $this->resize_height) {
+                $width = $this->resize_width;
+                $height = $this->resize_height;
+            }
+        }
+        if (IMAGE_UPLOAD_DOWNSCALE) {
+            if ($object->getWidth() > $this->resize_width || $object->getHeight() > $this->resize_height) {
+                $width = $this->resize_width;
+                $height = $this->resize_height;
+            }
+        }
         //final image that goes to DB
-        $scaler = new ImageScaler($this->resize_width, $this->resize_height);
+        $scaler = new ImageScaler($width, $height);
         $scaler->setOutputQuality(IMAGE_UPLOAD_STORE_QUALITY);
         $scaler->process($object->buffer());
 
