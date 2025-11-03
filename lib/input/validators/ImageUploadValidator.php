@@ -99,9 +99,11 @@ class ImageUploadValidator extends UploadDataValidator
             }
         }
         //final image that goes to DB
-        $scaler = new ImageScaler($width, $height);
-        $scaler->setOutputQuality(IMAGE_UPLOAD_STORE_QUALITY);
-        $scaler->process($object->buffer());
+        if ($width != $object->getWidth() || $height != $object->getHeight()) {
+            $scaler = new ImageScaler($width, $height);
+            $scaler->setOutputQuality(IMAGE_UPLOAD_STORE_QUALITY);
+            $scaler->process($object->buffer());
+        }
 
     }
 
