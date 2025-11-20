@@ -50,6 +50,9 @@ class SparkAdminPage extends SparkPage
     //local menu items created from the page
     protected array $page_menu = array();
 
+    //get consumer parameter names
+    protected array $parameter_names = array();
+
     public function setPageMenu(array $menu_items) : void
     {
         $this->page_menu = $menu_items;
@@ -299,6 +302,18 @@ class SparkAdminPage extends SparkPage
     public function getMenuBar() : MenuBar
     {
         return $this->menu_bar;
+    }
+
+    public function addParameterName(string $name) : void
+    {
+        if (!in_array($name, $this->parameter_names)) {
+            $this->parameter_names[] = $name;
+        }
+    }
+
+    public function getParameterNames() : array
+    {
+        return $this->parameter_names;
     }
 
 }
