@@ -44,7 +44,8 @@ class ImageStorageObject extends FileStorageObject
         $this->width = imagesx($source);
         $this->height = imagesy($source);
 
-        @imagedestroy($source);
+        //force garbage collection
+        $source=null;
 
         debug("Image dimension [$this->width x $this->height]");
 

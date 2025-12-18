@@ -161,7 +161,7 @@ class ImageScaler
         if ($this->watermark->isEnabled()) {
             $h_source = $this->imageFromBuffer($buffer);
             $this->setImageData($buffer, $h_source);
-            imagedestroy($h_source);
+            $h_source=null;
         }
 
     }
@@ -203,11 +203,11 @@ class ImageScaler
 
         // Resize
         imagecopyresampled($h_crop, $h_source, 0, 0, 0, 0, $this->width, $this->height, $image_width, $image_height);
-        imagedestroy($h_source);
+        $h_source = null;
 
         $this->setImageData($buffer, $h_crop);
 
-        imagedestroy($h_crop);
+        $h_crop = null;
 
     }
 
@@ -230,16 +230,16 @@ class ImageScaler
         $h_crop = imagecrop($h_source, ['x' => ($image_width - $image_size) / 2,
             'y' => ($image_height - $image_size) / 2, 'width' => $image_size,
             'height' => $image_size]);
-        imagedestroy($h_source);
+        $h_source = null;
 
         $h_thumbnail = $this->createImage($this->width, $this->width);
 
         imagecopyresampled($h_thumbnail, $h_crop, 0, 0, 0, 0, $this->width, $this->width, $image_size, $image_size);
-        imagedestroy($h_crop);
+        $h_crop = null;
 
         $this->setImageData($buffer, $h_thumbnail);
 
-        imagedestroy($h_thumbnail);
+        $h_thumbnail = null;
     }
 
 

@@ -303,7 +303,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                     $this->notices[$this->currentRow] .= "!Image file '$imgname' not recognized or can not be loaded.";
                     continue;
                 }
-                @imagedestroy($source);
+                @$source = null;
 
                 $fstorage = new FileStorageObject();
                 $fstorage->setFilename($imgname);
