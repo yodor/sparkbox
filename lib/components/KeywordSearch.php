@@ -9,10 +9,10 @@ include_once("components/TextComponent.php");
 class KeywordSearch extends FormRenderer implements IRequestProcessor
 {
 
-    const ACTION_SEARCH = "search";
-    const ACTION_CLEAR = "clear";
+    const string ACTION_SEARCH = "search";
+    const string ACTION_CLEAR = "clear";
 
-    const SUBMIT_KEY = "filter";
+    const string SUBMIT_KEY = "filter";
 
     protected bool $have_filter = FALSE;
 
@@ -32,8 +32,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
         $this->setLayout(FormRenderer::LAYOUT_HBOX);
 
-        //in admin pages is preferred POST as there are already some request conditions to be matched
-        $this->setMethod(FormRenderer::METHOD_POST);
+        $this->setMethod(FormRenderer::METHOD_GET);
 
         $this->getButtons()->items()->clear();
 
@@ -68,7 +67,9 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
             $url = URL::Current();
             $url->remove(KeywordSearch::SUBMIT_KEY);
-            $url->remove("keyword");
+            foreach ($this->form->inputNames() as $idx=>$name) {
+                $url->remove($name);
+            }
 
             header("Location: " . $url->toString());
             exit;
@@ -76,9 +77,11 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         else if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $data)) {
             $this->form->loadPostData($data);
             $this->form->validate();
-            if ($this->form->getInput("keyword")->getValue()) {
-                $this->have_filter = TRUE;
-            }
+            $this->have_filter = TRUE;
+
+//            if ($this->form->getInput("keyword")->getValue()) {
+//
+//            }
 
         }
 
