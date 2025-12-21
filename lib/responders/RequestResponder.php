@@ -55,6 +55,9 @@ class ConfirmResponderDialog extends ConfirmMessageDialog
 abstract class RequestResponder extends SparkObject implements IGETConsumer
 {
 
+    protected string $confirm_dialog_title = "Confirm Action";
+    protected string $confirm_dialog_text = "Confirm action?";
+
     protected string $cancel_url = "";
     protected string $success_url = "";
 
@@ -221,21 +224,33 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
 
     protected function processConfirmation() : void
     {
-        $this->setupConfirmDialog();
-    }
-
-    protected function setupConfirmDialog(string $title = "Confirm Action", string $text = "Confirm action?") : void
-    {
         //will be added as IPageComponent
         $md = new ConfirmResponderDialog();
-        $md->setText($text);
-        $md->setTitle($title);
+        $md->setText($this->confirm_dialog_text);
+        $md->setTitle($this->confirm_dialog_title);
 
         $script = new ConfirmResponderScript();
         $script->setCancelURL($this->cancel_url);
-
-
     }
+
+    public function setConfirmDialogTitle(string $title) : void
+    {
+        $this->confirm_dialog_title = $title;
+    }
+    public function getConfirmDialogTitle() : string
+    {
+        return $this->confirm_dialog_title;
+    }
+
+    public function setConfirmDialogText(string $text) : void
+    {
+        $this->confirm_dialog_text = $text;
+    }
+    public function getConfirmDialogText() : string
+    {
+        return $this->confirm_dialog_text;
+    }
+
 }
 
 ?>

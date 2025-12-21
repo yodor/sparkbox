@@ -12,6 +12,8 @@ class DeleteItemResponder extends RequestResponder
         parent::__construct();
         $this->bean = $bean;
         $this->need_confirm = TRUE;
+        $this->confirm_dialog_title = "Delete";
+        $this->confirm_dialog_text = "Confirm you want to delete this item?";
     }
 
     /**
@@ -41,11 +43,6 @@ class DeleteItemResponder extends RequestResponder
         $action = parent::createAction($title);
         $action->getURL()->add(new DataParameter("item_id", $this->bean->key()));
         return $action;
-    }
-
-    protected function processConfirmation() : void
-    {
-        $this->setupConfirmDialog("Delete", "Confirm you want to delete this item?");
     }
 
     /**
