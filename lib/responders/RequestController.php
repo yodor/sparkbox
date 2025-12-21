@@ -2,6 +2,7 @@
 include_once("responders/RequestResponder.php");
 include_once("responders/json/JSONResponder.php");
 include_once("responders/json/JSONResponse.php");
+include_once("objects/events/RequestControllerEvent.php");
 
 class RequestController
 {
@@ -31,6 +32,8 @@ class RequestController
         $name = $responder->getName();
         self::$responders[$name] = $responder;
         debug("Adding: '$name'");
+
+        SparkEventManager::emit(new RequestControllerEvent(RequestControllerEvent::RESPONDER_ADDED, $responder));
     }
 
     /**
@@ -43,6 +46,7 @@ class RequestController
         $name = $responder->getName();
         if (isset(self::$responders[$name])) {
             debug("Removing: '$name'");
+            SparkEventManager::emit(new RequestControllerEvent(RequestControllerEvent::RESPONDER_REMOVED, $responder));
         }
     }
 
