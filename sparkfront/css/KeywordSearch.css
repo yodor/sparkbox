@@ -2,7 +2,10 @@
 .KeywordSearch {
     display:inline-flex !important;
 }
-.KeywordSearch .InputLabel {
+.KeywordSearch .InputComponent {
+    align-self: flex-end;
+}
+.KeywordSearch .InputComponent[field='keyword'] .InputLabel {
     display: none;
 }
 .KeywordSearch .Container.TextSpace {
