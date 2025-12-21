@@ -40,6 +40,29 @@ class InputGroup extends SparkObject {
     {
         $this->contents[$input->getName()] = 1;
     }
+    public function insertInputBefore(DataInput $input, string $before_name): void
+    {
+
+        $names = array_keys($this->contents);
+        $index = (int)array_search($before_name, $names);
+        $index--;
+
+        if ($index<0) {
+            $this->contents = array_merge(
+                array($input->getName() => 1),
+                array_slice($this->contents, 0)
+            );
+        }
+        else {
+            // Create a new array with the new element at the desired position
+            $this->contents = array_merge(
+                array_slice($this->contents, 0, $index),
+                array($input->getName() => 1),
+                array_slice($this->contents, $index)
+            );
+        }
+    }
+
     public function insertInputAfter(DataInput $input, string $after_name): void
     {
 
@@ -261,6 +284,37 @@ class InputForm extends SparkObject implements IBeanEditor
         $inputGroup = $this->getGroup($groupName);
         $inputGroup->removeInput($input);
         $group->addInput($input);
+    }
+
+    public function insertInputBefore(DataInput $input, string $before_name): void
+    {
+
+        $beforeInput = $this->getInput($before_name);
+
+        $input->setForm($this);
+
+        $index = (int)array_search($before_name, array_keys($this->inputs));
+        $index--;
+
+        if ($index<0) {
+            $this->inputs = array_merge(
+                array($input->getName() => $input),
+                array_slice($this->inputs, 0)
+            );
+        }
+        else {
+            // Create a new array with the new element at the desired position
+            $this->inputs = array_merge(
+                array_slice($this->inputs, 0, $index),
+                array($input->getName() => $input),
+                array_slice($this->inputs, $index));
+        }
+
+        $groupName = $this->groupName($beforeInput);
+
+        $inputGroup = $this->getGroup($groupName);
+        $inputGroup->insertInputBefore($input, $before_name);
+
     }
 
     public function insertInputAfter(DataInput $input, string $after_name): void
