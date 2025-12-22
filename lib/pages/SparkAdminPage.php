@@ -313,6 +313,11 @@ class SparkAdminPage extends SparkPage
 
     public function getParameterNames() : array
     {
+        $view_params = Paginator::Instance()->getParameterNames();
+        foreach ($view_params as $idx=>$name) {
+            if (str_contains($name, Paginator::KEY_PAGE))continue;
+            $this->parameter_names[] = $name;
+        }
         return $this->parameter_names;
     }
 
