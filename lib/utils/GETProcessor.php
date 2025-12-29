@@ -41,6 +41,11 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
         $this->select = $select;
     }
 
+    public function setTitle(string $title) : void
+    {
+        $this->title = $title;
+    }
+
     public function getTitle(): string
     {
         return $this->title;
@@ -53,6 +58,10 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
     public function getValue(): string
     {
         return $this->value;
+    }
+    public function setActive(bool $is_active) : void
+    {
+        $this->is_active = $is_active;
     }
 
     public function processInput()
