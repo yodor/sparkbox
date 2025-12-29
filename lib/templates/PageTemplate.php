@@ -7,7 +7,7 @@ include_once("class/pages/AdminPage.php");
 
 abstract class PageTemplate extends Container
 {
-    protected $page;
+    protected SparkAdminPage $page;
     protected $view;
 
     protected $request_condition;
@@ -53,6 +53,9 @@ abstract class PageTemplate extends Container
     public function setRequestCondition(RequestParameterCondition $request_condition)
     {
         $this->request_condition = $request_condition;
+        foreach ($this->request_condition->getParameterNames() as $idx=>$name) {
+            $this->page->addParameterName($name);
+        }
     }
 
     public function getRequestCondition() : RequestParameterCondition

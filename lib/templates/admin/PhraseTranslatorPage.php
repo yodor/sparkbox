@@ -38,6 +38,10 @@ class PhraseTranslatorPage extends BeanListPage
 
         $this->page->setName(tr("Translations For") . ": " . $rc->getData("language"));
 
+        $this->keyword_search->getForm()->addInput(DataInputFactory::Create(DataInputFactory::HIDDEN, "langID", "langID", false));
+        $this->keyword_search->getForm()->getInput("langID")->setValue($this->langID);
+        $this->keyword_search->getForm()->getInput("langID")->skip_search_filter_processing = true;
+
         $dialog = new PhraseTranslationDialog();
         $dialog->setAttribute("langID", $this->langID);
 
