@@ -2,12 +2,11 @@
 include_once("components/Container.php");
 include_once("components/BeanFormEditor.php");
 
-//TODO:
 include_once("class/pages/AdminPage.php");
 
 abstract class PageTemplate extends Container
 {
-    protected SparkAdminPage $page;
+    protected SparkPage $page;
     protected $view;
 
     protected $request_condition;
@@ -61,6 +60,11 @@ abstract class PageTemplate extends Container
     public function getRequestCondition() : RequestParameterCondition
     {
         return $this->request_condition;
+    }
+
+    public function getPage() : SparkPage
+    {
+        return $this->page;
     }
 
 }

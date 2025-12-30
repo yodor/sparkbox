@@ -19,11 +19,6 @@ abstract class AdminPageTemplate extends PageTemplate
         $this->page = new AdminPage();
     }
 
-    public function getPage() : SparkAdminPage
-    {
-        return $this->page;
-    }
-
     public function setBean(DBTableBean $bean)
     {
         $this->bean = $bean;
