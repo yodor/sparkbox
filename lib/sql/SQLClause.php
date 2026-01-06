@@ -65,5 +65,9 @@ class SQLClause extends SparkObject implements ISQLGet
     {
         return $this->operator;
     }
+    public function setOperator(string $operator) : void
+    {
+        $this->operator = $operator;
+    }
 }
 ?>
