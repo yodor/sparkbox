@@ -24,6 +24,13 @@ class Container extends Component
      */
     protected bool $items_first = false;
 
+    function __clone()
+    {
+        if ($this->items instanceof ComponentCollection) {
+            $this->items = clone $this->items;
+        }
+    }
+
     public function __construct(bool $chained_component_class = true)
     {
         parent::__construct($chained_component_class);
