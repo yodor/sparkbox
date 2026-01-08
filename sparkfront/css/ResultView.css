@@ -79,12 +79,18 @@
     color: black;
     display: flex;
     flex-direction: row;
-    width: 100%;
+    /*width: 100%;*/
     padding:1em;
     box-sizing: border-box;
     align-items: center;
+    flex-wrap:wrap;
+    gap:0.5em;
 }
-
+@media screen and (max-width: 640px) {
+    .ResultViewFooter {
+        justify-content: center;
+    }
+}
 .ResultViewFooter .page_info {
 
 }
