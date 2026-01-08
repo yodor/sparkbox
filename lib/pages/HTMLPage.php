@@ -4,7 +4,7 @@ include_once("utils/url/URL.php");
 include_once("pages/HTMLHead.php");
 include_once("pages/HTMLBody.php");
 
-class HTMLPage extends Component
+class HTMLPage extends Container
 {
 
     protected ?HTMLHead $head = null;
