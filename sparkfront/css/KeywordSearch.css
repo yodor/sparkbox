@@ -15,6 +15,6 @@
     cursor: pointer;
 }
 .KeywordSearch input:focus, .KeywordSearch button:focus {
-    outline: 2px solid var(--theme-accent);
-    outline-offset: 2px;
+    outline: 1px solid var(--theme-accent);
+    /*outline-offset: 1px;*/
 }
