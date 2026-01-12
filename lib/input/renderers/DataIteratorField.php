@@ -4,6 +4,8 @@ include_once("components/renderers/items/DataIteratorItem.php");
 
 abstract class DataIteratorField extends InputField
 {
+    protected ?string $default_label = null;
+    protected string $default_value = "";
 
     protected $array_key_field_name = "";
     protected $array_key_model_id = false;
@@ -22,6 +24,40 @@ abstract class DataIteratorField extends InputField
         $this->elements->items()->append(new ClosureComponent($this->renderItems(...), false));
     }
 
+    /**
+     * Prepend the items with this label and value
+     * @param string|null $label
+     * @param string $value
+     * @return void
+     */
+    public function setDefaultOption(string|null $label, string $value="") : void
+    {
+        $this->default_label = $label;
+        $this->default_value = $value;
+    }
+
+    protected function renderDefaultItem() : void
+    {
+        //prepare the default select value
+        if (!is_null($this->default_label)) {
+            $this->item->setName($this->dataInput->getName());
+            $this->item->setID(-1);
+            $this->item->setKey(-1);
+
+            $this->item->setValue($this->default_value);
+            $this->item->setLabel($this->default_label);
+
+            //'null' default value
+            if (strcmp($this->default_value, "null")===0 && !$this->dataInput->getValue()) {
+                $this->item->setSelected(true);
+            }
+            else {
+                $this->item->setSelected($this->isModelSelected((string)$this->item->getValue()));
+            }
+
+            $this->item->render();
+        }
+    }
 
     protected function renderItems() : void
     {
@@ -32,6 +68,8 @@ abstract class DataIteratorField extends InputField
         if (!$this->item instanceof DataIteratorItem) {
             throw new Exception("DataIteratorItem not set");
         }
+
+        $this->renderDefaultItem();
 
         $field_values = $this->dataInput->getValue();
 
@@ -94,7 +132,6 @@ abstract class DataIteratorField extends InputField
      */
     protected function isModelSelected(string $item_value): bool
     {
-
         $field_values = $this->dataInput->getValue();
 
         if (!is_array($field_values)) {

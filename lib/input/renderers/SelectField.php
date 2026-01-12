@@ -5,9 +5,6 @@ include_once("input/renderers/SelectItem.php");
 class SelectField extends DataIteratorField
 {
 
-    protected ?string $default_label = null;
-    protected string $default_value = "";
-
     public function __construct(DataInput $input)
     {
         parent::__construct($input);
@@ -26,33 +23,6 @@ class SelectField extends DataIteratorField
         $this->setDefaultOption("--- SELECT ---");
     }
 
-    public function setDefaultOption(string|null $label, string $value="") : void
-    {
-        $this->default_label = $label;
-        $this->default_value = $value;
-    }
-
-    protected function renderDefaultItem() : void
-    {
-        //prepare the default select value
-        if (!is_null($this->default_label)) {
-            $this->item->setID(-1);
-            $this->item->setKey(-1);
-
-            $this->item->setValue($this->default_value);
-            $this->item->setLabel($this->default_label);
-
-            $this->item->setSelected($this->isModelSelected((string)$this->item->getValue()));
-
-            $this->item->render();
-        }
-    }
-
-    protected function renderItems() : void
-    {
-        $this->renderDefaultItem();
-        parent::renderItems();
-    }
 
     protected function isModelSelected(string $item_value) : bool
     {
