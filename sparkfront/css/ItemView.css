@@ -11,5 +11,8 @@
     flex-wrap: wrap;
     align-items: flex-start;
 
+    list-style-type: none;
+    margin:0;
+    padding:0;
     /*justify-content: space-around;*/
 }
