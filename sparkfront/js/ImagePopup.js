@@ -92,6 +92,7 @@ class ImagePopup extends SparkObject {
 
         document.addEventListener(SparkEvent.DOM_UPDATED, (event) => this.assignListeners(event.source));
 
+        this.enabled = true;
     }
 
     nextImage() {
@@ -142,6 +143,8 @@ class ImagePopup extends SparkObject {
      * @param element {HTMLElement}
      */
     show(element) {
+
+        if (!this.enabled)return;
 
         const itemClass = element.getAttribute("itemClass");
         const itemID = element.getAttribute("itemID");
