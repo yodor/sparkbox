@@ -22,6 +22,7 @@ class SwipeListener extends SparkObject
 
         this.viewport.addEventListener('pointerdown', (event)=>this.touchStartHandler(event), { passive: true });
         this.viewport.addEventListener('pointermove', (event)=>this.touchMoveHandler(event), { passive: false });
+        this.viewport.addEventListener('touchmove', (event)=>this.touchMoveHandler(event), { passive: false });
         this.viewport.addEventListener('pointerup', (event)=>this.touchEndHandler(event), { passive: false });
 
     }
