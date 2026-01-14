@@ -20,13 +20,9 @@ class SwipeListener extends SparkObject
         this.viewport = viewport;
         this.threshold = this.viewport.clientWidth * 0.2;
 
-        this.viewport.addEventListener('touchstart', (event)=>this.touchStartHandler(event), { passive: true });
-        this.viewport.addEventListener('touchmove', (event)=>this.touchMoveHandler(event), { passive: false });
-        this.viewport.addEventListener('touchend', (event)=>this.touchEndHandler(event));
-
-        this.viewport.addEventListener('mousedown', (event)=>this.touchStartHandler(event), { passive: true });
-        this.viewport.addEventListener('mousemove', (event)=>this.touchMoveHandler(event), { passive: false });
-        this.viewport.addEventListener('mouseup', (event)=>this.touchEndHandler(event));
+        this.viewport.addEventListener('pointerdown', (event)=>this.touchStartHandler(event), { passive: true });
+        this.viewport.addEventListener('pointermove', (event)=>this.touchMoveHandler(event), { passive: false });
+        this.viewport.addEventListener('pointerup', (event)=>this.touchEndHandler(event), { passive: false });
 
     }
 
@@ -41,15 +37,19 @@ class SwipeListener extends SparkObject
     touchMoveHandler(e)
     {
         if (!this.isDragging) return;
+        e.preventDefault();
+
         const currentX = e.touches ? e.touches[0].clientX : e.x;
         this.diff = currentX - this.startX;
-        e.preventDefault();
+
         this.notify(new SparkEvent(SwipeListener.SWIPE_MOVE, this));
     }
 
     touchEndHandler(e)
     {
         if (!this.isDragging) return;
+        e.preventDefault();
+
         this.isDragging = false;
 
         const endX = e.changedTouches ? e.changedTouches[0].clientX : e.x;
