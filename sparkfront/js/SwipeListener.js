@@ -1,83 +1,70 @@
+class SwipeListener extends SparkObject
+{
+    static SWIPE_LEFT = "left";
+    static SWIPE_RIGHT = "right";
 
-class SwipeListener extends SparkObject {
-    static LEFT = "left";
-    static RIGHT = "right";
-    static UP = "up";
-    static DOWN = "down";
+    static SWIPE_START = "start";
+    static SWIPE_MOVE = "move";
+    static SWIPE_END = "end";
+
     /**
      *
-     * @param elm {HTMLElement}
+     * @param viewport {HTMLElement}
      */
-    constructor(elm) {
+    constructor(viewport) {
         super();
-        this.xDown = null;
-        this.yDown = null;
+        // Touch support for mobile swipe gestures
+        this.isDragging = false;
+        this.startX = 0;
+        this.diff = 0;
+        this.viewport = viewport;
+        this.threshold = this.viewport.clientWidth * 0.2;
 
-        this.elm = elm;
-        elm.addEventListener("touchstart", (event)=>this.handleTouchStart(event), {passive: true});
-        elm.addEventListener("touchmove", (event)=>this.handleTouchMove(event), {passive: true});
+        this.viewport.addEventListener('touchstart', (event)=>this.touchStartHandler(event), { passive: true });
+        this.viewport.addEventListener('touchmove', (event)=>this.touchMoveHandler(event), { passive: false });
+        this.viewport.addEventListener('touchend', (event)=>this.touchEndHandler(event));
+
+        this.viewport.addEventListener('mousedown', (event)=>this.touchStartHandler(event), { passive: true });
+        this.viewport.addEventListener('mousemove', (event)=>this.touchMoveHandler(event), { passive: false });
+        this.viewport.addEventListener('mouseup', (event)=>this.touchEndHandler(event));
 
     }
 
-    /**
-     * Default delegate event handler
-     * @param event {SparkEvent}
-     */
-    onAction(event) {
-
+    touchStartHandler(e)
+    {
+        this.diff = 0;
+        this.startX = e.touches ? e.touches[0].clientX : e.x;
+        this.isDragging = true;
+        this.notify(new SparkEvent(SwipeListener.SWIPE_START, this));
     }
 
-    /**
-     *
-     * @param evt {TouchEvent}
-     * @returns {TouchList|Touch[]|TouchList}
-     */
-    getTouches(evt) {
-        // browser API || jQuery API
-        return evt.touches || evt.originalEvent.touches;
+    touchMoveHandler(e)
+    {
+        if (!this.isDragging) return;
+        const currentX = e.touches ? e.touches[0].clientX : e.x;
+        this.diff = currentX - this.startX;
+        e.preventDefault();
+        this.notify(new SparkEvent(SwipeListener.SWIPE_MOVE, this));
     }
 
-    /**
-     *
-     * @param evt {TouchEvent}
-     */
-    handleTouchStart(evt) {
+    touchEndHandler(e)
+    {
+        if (!this.isDragging) return;
+        this.isDragging = false;
 
-        let firstTouch = this.getTouches(evt)[0];
-        this.xDown = firstTouch.clientX;
-        this.yDown = firstTouch.clientY;
-    }
+        const endX = e.changedTouches ? e.changedTouches[0].clientX : e.x;
+        this.diff = endX - this.startX;
 
-    /**
-     *
-     * @param evt {TouchEvent}
-     */
-    handleTouchMove(evt) {
-        if ( ! this.xDown || ! this.yDown ) {
-            return;
-        }
-
-        let xUp = evt.touches[0].clientX;
-        let yUp = evt.touches[0].clientY;
-
-        let xDiff = this.xDown - xUp;
-        let yDiff = this.yDown - yUp;
-
-        if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
-            if ( xDiff > 0 ) {
-                this.onAction(new SparkEvent(SwipeListener.RIGHT, this));
+        if (Math.abs(this.diff) > this.threshold) {
+            if (this.diff < 0) {
+                this.notify(new SparkEvent(SwipeListener.SWIPE_LEFT, this));
             } else {
-                this.onAction(new SparkEvent(SwipeListener.LEFT, this));
-            }
-        } else {
-            if ( yDiff > 0 ) {
-                this.onAction(new SparkEvent(SwipeListener.DOWN, this));
-            } else {
-                this.onAction(new SparkEvent(SwipeListener.UP, this));
+                this.notify(new SparkEvent(SwipeListener.SWIPE_RIGHT, this));
             }
         }
 
-        this.xDown = null;
-        this.yDown = null;
+        this.notify(new SparkEvent(SwipeListener.SWIPE_END, this));
     }
+
+
 }
