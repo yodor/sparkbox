@@ -25,6 +25,7 @@ class ImagePopup extends SparkObject {
     static EVENT_POSITION_PREV = "position_prev";
     static EVENT_FETCH_COMPLETE = "fetch_complete";
     static EVENT_CLOSED = "closed";
+    static EVENT_OPENED = "opened";
 
     constructor() {
         super();
@@ -191,6 +192,11 @@ class ImagePopup extends SparkObject {
         }
 
         document.body.appendChild(this.popup);
+
+        const sparkEvent = new SparkEvent(ImagePopup.OPENED, this)
+        this.notify(sparkEvent);
+        document.dispatchEvent(sparkEvent);
+
         this.fetchImage();
 
     }
