@@ -19,6 +19,7 @@
     position: relative;
     /*above mce*/
     z-index:10;
+    flex-grow:1;
 }
 
 .MenuBar .ItemList .Item {
@@ -31,6 +32,7 @@
     cursor: pointer;
     position: relative;
     color:black;
+    white-space: nowrap;
 }
 
 .MenuBar .ItemList .Item .Link {
