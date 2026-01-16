@@ -26,16 +26,21 @@
 }
 
 .InputGroupRenderer {
-    margin-bottom:30px;
-    padding-top:20px;
+
     border:1px solid #bababa;
 
     display:inline-flex;
     flex-direction: column;
     flex-wrap: wrap;
+
+    align-self:stretch;
+
+    gap:1em;
+
 }
 
 .InputGroupRenderer LEGEND {
-
+    text-align:right;
+    font-weight:bold;
 }
 
