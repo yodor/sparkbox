@@ -52,8 +52,6 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         $submit_clear->setAttribute("action", KeywordSearch::ACTION_CLEAR);
         $this->getButtons()->items()->append($submit_clear);
 
-
-
     }
 
     public function processInput()
@@ -74,6 +72,11 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
             header("Location: " . $url->toString());
             exit;
         }
+//        else if (isset($data["keyword"])) {
+//            $this->form->loadPostData($data);
+//            $this->form->validate();
+//            $this->have_filter = TRUE;
+//        }
         else if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $data)) {
             $this->form->loadPostData($data);
             $this->form->validate();
@@ -112,6 +115,40 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
     public function getForm(): KeywordSearchForm
     {
         return $this->form;
+    }
+    public function finishRender(): void
+    {
+        parent::finishRender();
+?>
+        <script>
+
+                // const form = document.forms["KeywordSearchForm"];
+                //
+                // form.addEventListener('submit', function (event) {
+                //     event.preventDefault(); // Prevent normal submission
+                //
+                //     const currentParams = new URLSearchParams(window.location.search);
+                //     const formData = new FormData(form);
+                //
+                //     for (const [key, value] of formData.entries()) {
+                //         const trimmedValue = value.trim();
+                //         if (trimmedValue === '') {
+                //             currentParams.delete(key); // Remove parameter if field is empty (common for clearing filters)
+                //         } else {
+                //             currentParams.set(key, trimmedValue); // Override or add the parameter
+                //         }
+                //     }
+                //
+                //     // Update the current URL with the merged parameters
+                //     const newUrl = new URL(window.location);
+                //     newUrl.search = currentParams.toString();
+                //
+                //     window.location.href = newUrl.toString();
+                // });
+
+
+        </script>
+<?php
     }
 
 }
