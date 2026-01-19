@@ -376,7 +376,7 @@ class URL implements IGETConsumer, IDataResultProcessor
     }
 
     /**
-     * Remove all parameters from $pageURL that not present in the $supported_params array
+     * Remove all parameters from '$pageURL' not present in '$supported_params' array
      * @param URL $pageURL The URL object to clean parameters
      * @param array $supported_params array containing the names of the parameters that should be kept
      * @return void
