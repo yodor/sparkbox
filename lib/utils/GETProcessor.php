@@ -20,6 +20,11 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
 
     protected ClauseCollection $collection;
 
+    /**
+     * Construct SQL GETProcessor with default clause matching column by processor name and value
+     * @param string $title
+     * @param string $name
+     */
     public function __construct(string $title, string $name)
     {
         parent::__construct();
@@ -40,6 +45,10 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
     {
         $this->select = $select;
     }
+    public function getSQLSelect(): ?SQLSelect
+    {
+        return $this->select;
+    }
 
     public function setTitle(string $title) : void
     {
@@ -52,6 +61,21 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
     }
 
     /**
+     * Setting closure to null would make only processing the clause collection
+     * @param Closure|null $closure
+     * @return void
+     */
+    public function setClosure(?Closure $closure) : void
+    {
+        $this->closure = $closure;
+    }
+
+    public function getClosure() : ?Closure
+    {
+        return $this->closure;
+    }
+
+    /**
      * The value of this query variable - already escaped
      * @return string
      */
@@ -59,6 +83,7 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
     {
         return $this->value;
     }
+
     public function setActive(bool $is_active) : void
     {
         $this->is_active = $is_active;
@@ -78,27 +103,18 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
         }
     }
 
+    /**
+     * SQL Where clause collection
+     * @return ClauseCollection
+     */
     public function getClauseCollection() : ClauseCollection
     {
         return $this->collection;
     }
 
-    /**
-     * Setting closure to null would make only processing the clause collection
-     * @param Closure|null $closure
-     * @return void
-     */
-    public function setClosure(?Closure $closure) : void
-    {
-        $this->closure = $closure;
-    }
 
-    public function getClosure() : ?Closure
-    {
-        return $this->closure;
-    }
 
-    protected function processClauseCollection()
+    protected function processClauseCollection() : void
     {
         if ($this->select instanceof SQLSelect) {
             $iterator = $this->collection->iterator();
@@ -110,7 +126,7 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
     }
 
     /**
-     * Return true if request data has loaded into this processor
+     * Return true if request data has been consumed by this processor
      * @return bool
      */
     public function isProcessed(): bool
@@ -123,10 +139,7 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
         return array($this->name);
     }
 
-    public function getSQLSelect(): ?SQLSelect
-    {
-        return $this->select;
-    }
+
 }
 
 ?>
