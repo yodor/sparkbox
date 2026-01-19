@@ -12,6 +12,8 @@ class GTAG extends Script
     {
         parent::__construct();
         $this->gtag = new Script();
+        $this->gtag->setAttribute("async");
+        $this->gtag->setAttribute("fetchpriority","low");
         $this->script = new Script();
         $this->items()->append($this->gtag);
         $this->items()->append($this->script);
