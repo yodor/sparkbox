@@ -54,7 +54,12 @@ class LinkedData
     {
         $result = $this->data;
 
-        if (count($this->type) > 0) {
+        $count = count($this->type);
+
+        if ($count == 1) {
+            $result = array("@type"=>$this->type[0]) + $result;
+        }
+        else if ($count > 1) {
             $result = array("@type"=>$this->type) + $result;
         }
 
