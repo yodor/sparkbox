@@ -340,7 +340,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             if ($page < 1) {
                 $url->remove("page");
             }
-            $link->setHref($url);
+            $link->setHref($url->fullURL());
             $sparkPage->head()->items()->append($link);
         }
         if ($paginator->hasNextPage()) {
@@ -349,7 +349,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             $link = new Link();
             $link->setRelation("next");
             $url->add(new URLParameter("page", $page));
-            $link->setHref($url);
+            $link->setHref($url->fullURL());
             $sparkPage->head()->items()->append($link);
         }
 

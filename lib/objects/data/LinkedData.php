@@ -11,6 +11,15 @@ class LinkedData
         $this->setType(...$type);
     }
 
+    public function setID(string $id) : void
+    {
+        $this->set("@id",$id);
+    }
+    public function getID() : string
+    {
+        return $this->get("@id");
+    }
+
     public function setType(string ...$type) : void
     {
         $this->type = $type;
@@ -43,7 +52,13 @@ class LinkedData
 
     public function toArray() : array
     {
-        return array("@type"=>$this->type) + $this->data;
+        $result = $this->data;
+
+        if (count($this->type) > 0) {
+            $result = array("@type"=>$this->type) + $result;
+        }
+
+        return $result;
     }
 }
 ?>

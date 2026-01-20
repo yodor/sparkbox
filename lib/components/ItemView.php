@@ -9,9 +9,11 @@ class ItemView extends AbstractResultView
     protected int $items_per_group = 0;
     protected ?Container $group_container = NULL;
 
-    protected Link $schemaURL;
+
     protected Meta $schemaItems;
     protected Meta $schemaName;
+    protected Meta $schemaDescription;
+    protected Meta $schemaURL;
 
 
     public function __construct(?IDataIterator $itr=null)
@@ -20,6 +22,8 @@ class ItemView extends AbstractResultView
 
         $this->setAttribute("itemscope", "");
         $this->setAttribute("itemtype", "https://schema.org/ItemList");
+        $this->setAttribute("itemid");
+
         $this->setTagName("section");
 
         $this->group_container = new Container(false);
@@ -33,13 +37,42 @@ class ItemView extends AbstractResultView
         $this->schemaName->setAttribute("itemprop", "name");
         $this->items()->append($this->schemaName);
 
+        $this->schemaDescription = new Meta();
+        $this->schemaDescription->setAttribute("itemprop", "description");
+        $this->items()->append($this->schemaDescription);
+
+        $this->schemaURL = new Meta();
+        $this->schemaURL->setAttribute("itemprop", "url");
+        $this->items()->append($this->schemaURL);
+
         $this->viewport->setTagName("ul");
+
+
     }
 
     public function setName(string $name) : void
     {
         parent::setName($name);
         $this->schemaName->setContent($name);
+    }
+
+    public function setSchemaDescription(string $description) : void
+    {
+        $this->schemaDescription->setContent($description);
+    }
+
+    public function getSchemaDescription() : string
+    {
+        return $this->schemaDescription->getContent();
+    }
+
+    public function setSchemaURL(string $schemaURL) : void
+    {
+        $this->schemaURL->setContent($schemaURL);
+    }
+    public function getSchemaURL() : string
+    {
+        return $this->schemaURL->getContent();
     }
 
     public function processIterator() : void
