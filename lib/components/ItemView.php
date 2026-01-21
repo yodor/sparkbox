@@ -50,6 +50,15 @@ class ItemView extends AbstractResultView
 
     }
 
+    public function setSchemaType(string $schemaType) : void
+    {
+        $this->setAttribute("itemtype", $schemaType);
+    }
+    public function getSchemaType() : string
+    {
+        return $this->getAttribute("itemtype");
+    }
+
     public function setName(string $name) : void
     {
         parent::setName($name);

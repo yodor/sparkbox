@@ -21,7 +21,8 @@ class ListItem extends DataIteratorItem
     public function setData(array $data) : void
     {
         parent::setData($data);
-        $this->positionMeta->setContent($this->position);
+        //start positioning from 1 as per recommendation
+        $this->positionMeta->setContent(($this->position+1));
     }
 }
 
