@@ -55,8 +55,6 @@ class BreadcrumbList extends Container implements IHeadContents
                 continue;
             }
 
-            $act->translation_enabled = false;
-
             $this->renderer->startRender();
 
             $act->setAttribute("itemprop", "item");

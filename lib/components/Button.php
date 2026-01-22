@@ -60,7 +60,6 @@ class Button extends Input
         $this->setTagName("button");
         $this->setClosingTagRequired(true);
 
-        $this->translation_enabled = TRUE;
     }
 
     public function requiredStyle() : array

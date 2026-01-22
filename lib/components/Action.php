@@ -51,9 +51,6 @@ class Action extends DataIteratorItem
         }
 
         $this->check_code = $check_code;
-
-        $this->translation_enabled = TRUE;
-
     }
 
     public function requiredStyle() : array
@@ -129,7 +126,6 @@ class Action extends DataIteratorItem
             if ($item instanceof MenuItem) {
                 $action = new Action();
                 $action->getURL()->fromString($item->getHref());
-                $action->translation_enabled = $translate;
                 $action->setContents($item->getName());
                 $action->render();
             }
@@ -156,7 +152,6 @@ class Action extends DataIteratorItem
     public static function PipeSeparator() : Action
     {
         $action = new Action();
-        $action->translation_enabled = FALSE;
         $action->action_as_contents = false;
         $action->setTagName("span");
         $action->setContents(" | ");
@@ -168,7 +163,6 @@ class Action extends DataIteratorItem
     {
         $action = new Action();
         $action->action_as_contents = false;
-        $action->translation_enabled = FALSE;
         $action->setTagName("span");
         $action->setAction("Row");
         return $action;

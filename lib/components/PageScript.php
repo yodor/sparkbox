@@ -9,7 +9,6 @@ abstract class PageScript extends Script implements IPageComponent, IPageScript
     public function __construct()
     {
         parent::__construct();
-        $this->translation_enabled = false;
     }
 
     /**

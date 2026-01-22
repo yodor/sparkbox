@@ -62,7 +62,6 @@ class ResultViewFooter extends Container
         $action->setComponentClass("");
         $action->setClassName("");
         $action->setURL($link);
-        $action->translation_enabled = false;
 
         $a = $this->paginator->pageListStart();
 

@@ -9,11 +9,11 @@ class LoginForm extends InputForm
     {
         parent::__construct();
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "email", "Email", 1);
+        $field = DataInputFactory::Create(DataInputFactory::TEXT, "email", tr("Email"), 1);
         $field->getRenderer()->input()?->setAttribute("autocomplete", "on");
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "password", "Password", 1);
+        $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "password", tr("Password"), 1);
         $field->getRenderer()->input()?->setAttribute("autocomplete", "on");
         $this->addInput($field);
 

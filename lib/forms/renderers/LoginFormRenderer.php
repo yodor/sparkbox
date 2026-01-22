@@ -47,11 +47,11 @@ class LoginFormRenderer extends FormRenderer
         $this->submitButton->setValue($this->responder->getName());
 
         $this->submitButton->setAttribute("action", "login");
-        $this->submitButton->setContents("Login");
+        $this->submitButton->setContents(tr("Login"));
 
         $this->setAttribute("autocomplete", "on");
 
-        $this->action = new Action("Forgot Password?", "forgot_password.php");
+        $this->action = new Action(tr("Forgot Password?"), "forgot_password.php");
 
         $this->getTextSpace()->items()->append($this->action);
 
