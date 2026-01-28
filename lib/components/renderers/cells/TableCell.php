@@ -1,6 +1,5 @@
 <?php
-include_once("components/Component.php");
-include_once("components/TableColumn.php");
+include_once("components/Container.php");
 
 class TableCell extends Container implements IDataResultProcessor
 {
@@ -17,10 +16,11 @@ class TableCell extends Container implements IDataResultProcessor
 
     protected array $dataAttributes = array();
 
-    public function __construct()
+    public function __construct(string $tagName = "div")
     {
         parent::__construct(false);
         $this->setComponentClass("Cell");
+        $this->setTagName($tagName);
     }
 
     public function setAction(Action $a): void
