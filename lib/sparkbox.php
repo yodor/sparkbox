@@ -144,9 +144,6 @@ $defines->set("DEFAULT_LANGUAGE", "english");
 $defines->set("DEFAULT_LANGUAGE_ISO3", "eng");
 $defines->set("DEFAULT_LOCALE", "en-us");
 
-$defines->set("DEFAULT_CURRENCY", "EUR");
-
-
 $defines->set("STORAGE_CACHE_ENABLED", TRUE);
 //time in seconds to expire the cached page components (default 24 hours)
 $defines->set("PAGE_CACHE_TTL", 86400);

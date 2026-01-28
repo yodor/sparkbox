@@ -8,6 +8,8 @@
     padding: 0px;
     margin: 0px;
 
+    display: flex;
+    flex-direction: column;
 }
 
 .TreeView .NodeChilds .NodeOuter {
@@ -20,10 +22,16 @@
 }
 
 .TreeView .Node {
-    display: table;
-    width: 100%;
-    border-spacing: 3px;
-    border-collapse: separate;
+    /*display: table;*/
+    /*width: 100%;*/
+    /*border-spacing: 3px;*/
+    /*border-collapse: separate;*/
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    padding: 3px;
+    gap:0.3em;
 }
 
 .TreeView .Node:hover {
@@ -31,28 +39,23 @@
 }
 
 .TreeView .Node .Handle {
-    display: table-cell;
 
     cursor: pointer;
-
-    vertical-align: middle;
-    text-align: left;
-
-    width: 16px;
-
+    width: 32px;
+    height: 32px;
 }
 .TreeView .Node .Icon {
-    display:table-cell;
 
     box-sizing: border-box;
-    width:32px;
+    min-width:32px;
     height:32px;
-    vertical-align:middle;
+    max-height:32px;
 }
 .TreeView .Node .Icon IMG {
-    display:block;
-    max-width:32px;
-    max-height:32px;
+
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
 .TreeView .Node .Handle .Button {
@@ -60,8 +63,6 @@
 
     width: 32px;
     height: 32px;
-
-    display: block;
 
     background-repeat: no-repeat;
     background-position: 50% 50%;
@@ -94,17 +95,14 @@
 }
 
 .TreeView .Node .Action {
-    display: table-cell;
-    vertical-align: middle;
+
 
     text-decoration: none;
     color: black;
 
     text-align: left;
 
-    /*   margin-left:25px; */
-    /*   margin-top:1px; */
-
+    flex-grow: 1;
 }
 
 .TreeView .Node[active="1"] .Action {
@@ -114,17 +112,15 @@
 }
 
 .TreeView .Node .node_actions {
-    display: table-cell;
-
-    vertical-align: middle;
-    text-align: right;
-
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:0.3em;
+    flex-wrap: nowrap;
 }
 
 .TreeView .Node .node_actions .Action {
 
-    display: inline-block;
-    margin-left: 5px;
     color: #50a9f9;
     text-decoration: none;
 

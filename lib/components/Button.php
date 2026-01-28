@@ -8,11 +8,11 @@ class Button extends Input
     const string TYPE_RESET = "reset";
     const string TYPE_BUTTON = "button";
 
-    public static function Action(string $text, string $href = "") : Button
+    public static function Action(string $text, string $href = "", string $componentClass="") : Button
     {
         $action = new Button();
         $action->setTagName("a");
-        $action->setComponentClass("");
+        $action->setComponentClass($componentClass);
 
         $action->setContents($text);
         $action->setAttribute("href", $href);

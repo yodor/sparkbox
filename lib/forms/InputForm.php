@@ -622,6 +622,7 @@ class InputForm extends SparkObject implements IBeanEditor
 
     }
 
+    //TODO deprecated move to CreatePlainRenderer
     public function renderPlain()
     {
         echo "<div class='FormValueList' name='".$this->getName()."'>";
@@ -637,6 +638,27 @@ class InputForm extends SparkObject implements IBeanEditor
         }
 
         echo "</div>";
+    }
+    public function CreatePlainRenderer() : Container
+    {
+        $cnt = new Container(false);
+        $cnt->setComponentClass("FormValueList");
+        $cnt->setName($this->getName());
+
+        foreach ($this->inputs() as $index => $field) {
+            if (!($field instanceof DataInput))continue;
+
+            $item = new LabelSpan();
+            $item->setComponentClass("item");
+            $item->label()->setTagName("span");
+            $item->label()->setComponentClass("label");
+            $item->label()->setContents($field->getLabel());
+            $value = strip_tags(stripslashes((string)$field->getValue()));
+            $item->span()->setContents($value);
+
+            $cnt->items()->append($item);
+        }
+        return $cnt;
     }
 }
 

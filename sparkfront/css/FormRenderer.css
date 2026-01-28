@@ -44,3 +44,13 @@
     font-weight:bold;
 }
 
+.FormValueList {
+
+}
+.FormValueList .item .label {
+
+}
+.FormValueList .item .label:after {
+    content: ": ";
+}
+

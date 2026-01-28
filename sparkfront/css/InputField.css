@@ -80,7 +80,7 @@
     gap:0.2em;
 }
 .InputField .DataIteratorItem.CheckItem, .DataIteratorItem.RadioItem {
-    align-items: self-end;
+    align-items: center;
 }
 
 .InputField INPUT[type='checkbox'], INPUT[type='radio'] {
