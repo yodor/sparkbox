@@ -12,8 +12,8 @@ class LabelSpan extends Container
         $this->setComponentClass("");
 
         $label = new Component(false);
-        $label->setTagName("label");
-        $label->setComponentClass("");
+        $label->setTagName("span");
+        $label->setComponentClass("label");
         $label->setContents($label_contents);
         $this->items()->append($label);
         $this->label = $label;
