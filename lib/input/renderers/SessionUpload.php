@@ -130,19 +130,19 @@ abstract class SessionUpload extends InputField
         $limits->setComponentClass("Limits");
         $details->items()->append($limits);
 
-        $max_size = new LabelSpan("UPLOAD_MAX_SIZE: ", file_size(UPLOAD_MAX_SIZE));
+        $max_size = new LabelSpan("UPLOAD_MAX_SIZE", file_size(UPLOAD_MAX_SIZE));
         $max_size->setAttribute("field", "max_size");
         $limits->items()->append($max_size);
 
-        $memory_limit = new LabelSpan("MEMORY_LIMIT: ", file_size(MEMORY_LIMIT));
+        $memory_limit = new LabelSpan("MEMORY_LIMIT", file_size(MEMORY_LIMIT));
         $memory_limit->setAttribute("field", "memory_limit");
         $limits->items()->append($memory_limit);
 
-        $accept_mimes = new LabelSpan("Accept MIMEs: ", $this->input->getAttribute("accept"));
+        $accept_mimes = new LabelSpan("Accept MIMEs", $this->input->getAttribute("accept"));
         $accept_mimes->setAttribute("field", "accept_mimes");
         $limits->items()->append($accept_mimes);
 
-        $max_slots = new LabelSpan("Available Slots: ", -1);
+        $max_slots = new LabelSpan("Available Slots", -1);
         $max_slots->setAttribute("field", "max_slots");
         $limits->items()->append($max_slots);
 

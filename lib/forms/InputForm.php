@@ -650,8 +650,6 @@ class InputForm extends SparkObject implements IBeanEditor
 
             $item = new LabelSpan();
             $item->setComponentClass("item");
-            $item->label()->setTagName("span");
-            $item->label()->setComponentClass("label");
             $item->label()->setContents($field->getLabel());
             $value = strip_tags(stripslashes((string)$field->getValue()));
             $item->span()->setContents($value);

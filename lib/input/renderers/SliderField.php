@@ -18,7 +18,7 @@ class SliderField extends InputFieldTag
 
         $this->items()->append($this->dataList);
 
-        $this->label = new LabelSpan("Value: ");
+        $this->label = new LabelSpan("Value");
         $this->items->append($this->label);
 
     }

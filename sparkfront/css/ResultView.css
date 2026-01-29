@@ -95,7 +95,7 @@
 
 }
 
-.ResultViewFooter .page_info LABEL:after {
+.ResultViewFooter .page_info .label:after {
     content: ":";
     margin-right:0.5em;
 }
@@ -122,7 +122,7 @@
 
 }
 
-.ResultViewFooter .results_info LABEL:after {
+.ResultViewFooter .results_info .label:after {
     content: ":";
     margin-right: 0.5em;
 }
