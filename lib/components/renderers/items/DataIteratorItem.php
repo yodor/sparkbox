@@ -3,8 +3,8 @@ include_once("components/Container.php");
 include_once("utils/IDataResultProcessor.php");
 
 /**
- * Item renderers are reused for each iterator step
- *
+ * Used to render sequential data values.
+ * Created once used many times with different data.
  */
 abstract class DataIteratorItem extends Container implements IDataResultProcessor
 {
@@ -41,12 +41,6 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
     {
         parent::__construct(false);
         $this->setComponentClass("DataIteratorItem");
-    }
-
-    protected function resetData()
-    {
-        $this->value = "";
-        $this->label = "";
     }
 
     /**
@@ -217,13 +211,6 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
 
         //overwrite the name - actual attribute will be set during processAttributes of $input
         $input->setName($name);
-//        if ($name) {
-//
-//            $input->setAttribute("name", $name);
-//        }
-//        else {
-//            $input->removeAttribute("name");
-//        }
 
     }
 
@@ -232,7 +219,7 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
      * Fields with complex elements ie CheckItem, RadioItem override this method and return the actual input component here
      * @return Component
      */
-    protected function getInput() : Component
+    public function getInput() : Component
     {
         return $this;
     }

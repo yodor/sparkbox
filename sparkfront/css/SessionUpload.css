@@ -13,14 +13,13 @@
     white-space: nowrap;
 }
 
-.InputField.SessionUpload .Details .Limits SPAN {
+.InputField.SessionUpload .Details .Limits  {
     display: inline-block;
     font-size: 80%;
 }
 
-.InputField.SessionUpload .Details .Limits .label {
-    display: inline-block;
-    font-size: 80%;
+.InputField.SessionUpload .Details .Limits .label:after {
+    content: ": ";
 }
 
 .InputField.SessionUpload .Details .Limits [field='max_post_size'] {

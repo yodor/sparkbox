@@ -33,7 +33,7 @@ class RadioItem extends DataIteratorItem
         $this->items()->append($this->span);
     }
 
-    protected function getInput() : Component
+    public function getInput() : Component
     {
         return $this->input;
     }
