@@ -3,18 +3,17 @@
 class SparkGlobals
 {
 
-    private $defines = array();
+    private array $defines = array();
 
-    protected $beanLocations = array();
+    protected array $beanLocations = array();
 
-    protected static $instance = null;
+    protected static ?SparkGlobals $instance = null;
 
     static public function Instance() : SparkGlobals
     {
-        if (self::$instance instanceof SparkGlobals) {
-            return self::$instance;
+        if (self::$instance == null) {
+            self::$instance = new SparkGlobals();
         }
-        self::$instance = new SparkGlobals();
         return self::$instance;
     }
 
@@ -23,12 +22,12 @@ class SparkGlobals
 
     }
 
-    public function addIncludeLocation(string $class_location)
+    public function addIncludeLocation(string $class_location) : void
     {
         $this->beanLocations[] = $class_location;
     }
 
-    public function includeBeanClass(string $class_name)
+    public function includeBeanClass(string $class_name) : void
     {
         debug("Including bean class: $class_name");
         foreach ($this->beanLocations as $pos => $location) {
@@ -47,7 +46,7 @@ class SparkGlobals
         }
     }
 
-    public function set(string $name, string $value)
+    public function set(string $name, string $value) : void
     {
         $this->defines[$name] = $value;
     }
@@ -62,7 +61,7 @@ class SparkGlobals
     }
 
 
-    public function export()
+    public function export() : void
     {
         foreach ($this->defines as $key => $val) {
             if (defined($key)) {
@@ -72,7 +71,7 @@ class SparkGlobals
         }
     }
 
-    public function dump()
+    public function dump() : void
     {
         foreach ($this->defines as $key => $val) {
             echo $key . "=>" . $val;
