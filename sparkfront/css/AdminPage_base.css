@@ -187,9 +187,6 @@ BODY {
     overflow: auto;
 }
 
-.admin_layout .page_area .page_contents .FormRenderer[layout="VBox"] .InputComponent {
-    align-self:stretch;
-}
 
 .admin_layout .page_area .page_contents .TableView .Cell.Header A:not([href]) {
     cursor: default;

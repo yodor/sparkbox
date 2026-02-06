@@ -129,7 +129,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
     {
         $this->form = $form;
 
-        debug("Using InputForm: " . get_class($form));
+        Debug::ErrorLog("Using InputForm: " . get_class($form));
 
         $fieldNames = $form->inputNames();
 
@@ -138,10 +138,10 @@ class BeanTransactor extends SparkObject implements IBeanEditor
 
             $proc = $field->getProcessor();
 
-            debug("DataInput '$fieldName' using processor: " . get_class($proc));
+            Debug::ErrorLog("DataInput '$fieldName' using processor: " . get_class($proc));
 
             if ($proc->skip_transaction) {
-                debug("InputProcessor 'skip_transaction' flag is set. Not calling transactValue()");
+                Debug::ErrorLog("InputProcessor 'skip_transaction' flag is set. Not calling transactValue()");
                 continue;
             }
 
@@ -175,7 +175,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
 
             }
             else {
-                debug("DataInput '$name' does not use transact_bean");
+                Debug::ErrorLog("DataInput '$name' does not use transact_bean");
             }
         }
 
@@ -206,7 +206,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
         try {
             $db->transaction();
 
-            debug("DB Transaction started for bean: ".get_class($this->bean));
+            Debug::ErrorLog("DB Transaction started for bean: ".get_class($this->bean));
 
             $this->processBeanTransaction($db);
 
@@ -216,7 +216,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
 
             $db->commit();
 
-            debug("DB Transaction committed for bean: ".get_class($this->bean));
+            Debug::ErrorLog("DB Transaction committed for bean: ".get_class($this->bean));
 
             try {
                 $this->afterCommit();
@@ -224,14 +224,14 @@ class BeanTransactor extends SparkObject implements IBeanEditor
                 SparkEventManager::emit(new BeanTransactorEvent(BeanTransactorEvent::AFTER_COMMIT, $this, $db));
             }
             catch (Exception $exx) {
-                debug("afterCommit() failed: " . $exx->getMessage());
+                Debug::ErrorLog("afterCommit() failed: " . $exx->getMessage());
             }
 
         }
         catch (Exception $e) {
 
             $db->rollback();
-            debug("DB Transaction rollback for error: " . $e->getMessage());
+            Debug::ErrorLog("DB Transaction rollback for error: " . $e->getMessage());
 
             $this->lastID = -1;
             throw $e;
@@ -247,7 +247,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
     protected function processBeanTransaction(DBDriver $db)
     {
 
-        debug("EditID: $this->editID");
+        Debug::ErrorLog("EditID: $this->editID");
         $values = array();
         if ($this->editID > 0) {
             $values = array_merge($this->values, $this->update_values);
@@ -258,17 +258,17 @@ class BeanTransactor extends SparkObject implements IBeanEditor
 
         $this->values = $values;
 
-        //debug("Working bean: ".get_class($this->bean)." values: ",$this->values);
+        //Debug::ErrorLog("Working bean: ".get_class($this->bean)." values: ",$this->values);
 
         if ($this->editID > 0) {
-            debug("doing update");
+            Debug::ErrorLog("doing update");
 
             $this->bean->update($this->editID, $this->values, $db);
             $this->lastID = $this->editID;
 
         }
         else {
-            debug("doing insert");
+            Debug::ErrorLog("doing insert");
 
             $lastID = $this->bean->insert($this->values, $db);
             if ($lastID < 1) throw new Exception("Unable to insert: " . $db->getError());

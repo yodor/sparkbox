@@ -35,7 +35,11 @@ class URL implements IGETConsumer, IDataResultProcessor
      */
     public static function Current() : URL
     {
-        return new URL(currentURL());
+        $ret = $_SERVER["SCRIPT_NAME"];
+        if ($_SERVER["QUERY_STRING"]) {
+            $ret .= "?" . rawurldecode($_SERVER["QUERY_STRING"]);
+        }
+        return new URL($ret);
     }
 
     public function __construct(?string $url="")
@@ -216,7 +220,14 @@ class URL implements IGETConsumer, IDataResultProcessor
      */
     public function fullURL() : URL
     {
-        return new URL(fullURL($this));
+        $domain =  Spark::Get(Config::SITE_PROTOCOL).Spark::Get(Config::SITE_DOMAIN);
+        $url = str_replace($domain, "", $this->toString());
+        if (str_starts_with($url, "http://") || str_starts_with($url, "https://")) {
+        }
+        else {
+            $url = $domain.$url;
+        }
+        return new URL($url);
     }
 
     public function getScriptName() : string

@@ -14,7 +14,7 @@ class SimpleTextValidator implements IInputValidator
     {
         $value = (string)$input->getValue();
 
-        if (strcmp($value, attributeValue($value)) != 0) {
+        if (strcmp($value, Spark::AttributeValue($value)) != 0) {
             throw new Exception("Only letters and space accepted here");
         }
 

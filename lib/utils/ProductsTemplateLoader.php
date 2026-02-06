@@ -14,35 +14,35 @@ include_once("class/beans/GendersBean.php");
 
 class ProductsTemplateLoader extends CSVTemplateLoader
 {
-    public $testMode = 1;
+    public int $testMode = 1;
     protected $db = NULL;
 
-    protected $catID = -1;
-    protected $brandID = -1;
+    protected int $catID = -1;
+    protected int $brandID = -1;
 
-    protected $fields = array();
+    protected array $fields = array();
 
-    protected $description = "";
-    protected $import_name = "";
+    protected string $description = "";
+    protected string $import_name = "";
 
-    protected $importID = -1;
+    protected int $importID = -1;
 
-    public function setImportName($name)
+    public function setImportName(string $name) : void
     {
         $this->import_name = $name;
     }
 
-    public function setDescription($descr)
+    public function setDescription(string $descr) : void
     {
         $this->description = $descr;
     }
 
-    public function getFields()
+    public function getFields() : array
     {
         return $this->fields;
     }
 
-    public function __construct($zipfile, DBDriver $db)
+    public function __construct(string $zipfile, DBDriver $db)
     {
         parent::__construct($zipfile);
         $this->db = $db;
@@ -76,7 +76,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
     }
 
-    public function startLoad()
+    public function startLoad() : void
     {
         $imp_row = array();
         $imp_row["import_name"] = $this->import_name;
@@ -87,12 +87,12 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
     }
 
-    public function finishLoad()
+    public function finishLoad() : void
     {
 
     }
 
-    public function processKeysRow($data)
+    public function processKeysRow(array $data) : void
     {
 
         $num = count($data);
@@ -148,7 +148,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
     }
 
-    public function processDataRow($data)
+    public function processDataRow(array $data) : void
     {
         unset($data[0]);
 
@@ -187,9 +187,9 @@ class ProductsTemplateLoader extends CSVTemplateLoader
             }
         }
 
-        $prod_row["brandID"] = (int)$this->brandID;
-        $prod_row["catID"] = (int)$this->catID;
-        $prod_row["importID"] = (int)$this->importID;
+        $prod_row["brandID"] = $this->brandID;
+        $prod_row["catID"] = $this->catID;
+        $prod_row["importID"] = $this->importID;
         $prod_row["visible"] = 0;
 
         //insert product
@@ -222,7 +222,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
     }
 
-    protected function processOptionalAttributes($prodID, $optional_attr)
+    protected function processOptionalAttributes(int $prodID, $optional_attr) : void
     {
         foreach ($optional_attr as $opt_name => $value) {
 
@@ -264,7 +264,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
         }
     }
 
-    protected function processProductFeatures($prodID, $features)
+    protected function processProductFeatures($prodID, $features) : void
     {
 
         foreach ($features as $pos => $value) {
@@ -279,7 +279,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
         }
     }
 
-    protected function processProductImages($prodID, $images)
+    protected function processProductImages($prodID, $images) : void
     {
         foreach ($images as $pos => $imgname) {
 
@@ -287,7 +287,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
 
             try {
 
-                $ret_img = $this->zip->statName(SPARK_LOCAL . "/images/$imgname");
+                $ret_img = $this->zip->statName(Spark::Get(Config::SPARK_LOCAL) . "/images/$imgname");
 
                 if ($ret_img === FALSE) {
                     //image not found but continue
@@ -295,7 +295,7 @@ class ProductsTemplateLoader extends CSVTemplateLoader
                     continue;
                 }
 
-                $filedata = $this->zip->getFromName(SPARK_LOCAL . "/images/$imgname");
+                $filedata = $this->zip->getFromName(Spark::Get(Config::SPARK_LOCAL) . "/images/$imgname");
 
                 $source = imagecreatefromstring($filedata);
                 if ($source === FALSE) {

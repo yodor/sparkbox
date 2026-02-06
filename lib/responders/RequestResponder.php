@@ -147,7 +147,7 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
      */
     public function accept(): bool
     {
-        return strcmp_isset(RequestResponder::KEY_COMMAND, $this->getName(), $_REQUEST);
+        return Spark::strcmp_isset(RequestResponder::KEY_COMMAND, $this->getName(), $_REQUEST);
     }
 
     /**
@@ -174,7 +174,7 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
     {
 
         //setup redirect url
-        debug("Building redirect URL - removing parameter names: ", $this->getParameterNames());
+        Debug::ErrorLog("Building redirect URL - removing parameter names: ", $this->getParameterNames());
         foreach ($this->getParameterNames() as $parameterName) {
             $this->redirect->remove($parameterName);
         }
@@ -193,11 +193,11 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
             return;
         }
 
-        debug("Needs confirmation: ".(($this->need_confirm)?"YES":"NO"));
+        Debug::ErrorLog("Needs confirmation: ".(($this->need_confirm)?"YES":"NO"));
 
         if ($this->need_confirm) {
             if (!isset($_POST[RequestResponder::KEY_CONFIRM])) {
-                debug("Asking confirmation");
+                Debug::ErrorLog("Asking confirmation");
                 //disable redirection
                 $this->need_redirect = false;
                 //construct the dialog so it can be attached to the page_components
@@ -205,7 +205,7 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
                 return;
             }
             else {
-                debug("Confirmation received");
+                Debug::ErrorLog("Confirmation received");
             }
         }
 

@@ -44,14 +44,14 @@ class BeanTranslationDialog extends JSONDialog implements IPageComponent
 
         $this->content->items()->clear();
 
-        $phraseInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "original_text", "Original Text", 0);
+        $phraseInput = DataInputFactory::Create(InputType::TEXTAREA, "original_text", "Original Text", 0);
         $phraseInput->getRenderer()->input()->setAttribute("rows", 5);
         $phraseInput->getRenderer()->input()->setAttribute("readonly");
 
         $phrase = new InputComponent($phraseInput);
         $this->content->items()->append($phrase);
 
-        $translationInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "translation", "Translation", 0);
+        $translationInput = DataInputFactory::Create(InputType::TEXTAREA, "translation", "Translation", 0);
         $translationInput->getRenderer()->input()->setAttribute("rows", 5);
         $translation = new InputComponent($translationInput);
         $this->content->items()->append($translation);
@@ -86,14 +86,14 @@ class BeanTranslationDialog extends JSONDialog implements IPageComponent
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/BeanTranslationDialog.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/BeanTranslationDialog.css";
         return $arr;
     }
 
     public function requiredScript() : array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/dialogs/json/BeanTranslationDialog.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/dialogs/json/BeanTranslationDialog.js";
         return $arr;
     }
 

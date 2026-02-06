@@ -20,15 +20,15 @@ class FileUploadResponder extends UploadControlResponder
         $mime = $object->buffer()->mime();
         $uid = $object->UID();
 
-        debug("UID:$uid filename:$filename mime:$mime");
+        Debug::ErrorLog("UID:$uid filename:$filename mime:$mime");
 
         ob_start();
 
         echo "<div class='Element' tooltip='$filename'>";
-        echo "<span class='thumbnail'><img src='" . SPARK_LOCAL . "/images/mimetypes/generic.png'></span>";
+        echo "<span class='thumbnail'><img src='" . Spark::Get(Config::SPARK_LOCAL) . "/images/mimetypes/generic.png'></span>";
         echo "<div class='details'>";
         echo "<span class='filename'><label>$filename</label></span>";
-        echo "<span class='filesize'><label>" . file_size($object->buffer()->length()) . "</label></span>";
+        echo "<span class='filesize'><label>" . Spark::ByteLabel($object->buffer()->length()) . "</label></span>";
         echo "</div>";
         echo "<span class='remove_button' action='Remove'></span>";
         echo "<input type=hidden name='uid_{$field_name}[]' value='$uid' >";

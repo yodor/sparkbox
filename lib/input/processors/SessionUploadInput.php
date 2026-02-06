@@ -73,7 +73,7 @@ class SessionUploadInput extends InputProcessor
                 //De-serialized object is not instance of StorageObject");
                 //do not throw here just unset
                 unset($values[$id]);
-                debug("Cleaning up non StorageObject: #$position - ID($id) - Value($value)");
+                Debug::ErrorLog("Cleaning up non StorageObject: #$position - ID($id) - Value($value)");
 
             }
         }
@@ -89,13 +89,13 @@ class SessionUploadInput extends InputProcessor
         //
         $name = $this->input->getName();
 
-        debug("DataInput '$name' Type: " . get_class($this->input));
+        Debug::ErrorLog("DataInput '$name' Type: " . get_class($this->input));
 
         $values = $this->input->getValue();
 
         $posted_uids = array();
         if (isset($data["uid_$name"])) {
-            debug("Found posted UIDs for DataInput '$name'");
+            Debug::ErrorLog("Found posted UIDs for DataInput '$name'");
             if (is_array($data["uid_$name"])) {
                 $posted_uids = $data["uid_$name"];
             }
@@ -105,12 +105,12 @@ class SessionUploadInput extends InputProcessor
         }
 
         //[0] => 1725976901.6922.1567366113
-        debug("UIDs posted:", $posted_uids);
+        Debug::ErrorLog("UIDs posted:", $posted_uids);
 
         $session_data = new SessionData(SessionData::Prefix($name, SessionData::UPLOAD_CONTROL));
 
         $stored_keys = $session_data->keys();
-        debug("Session stored UIDs: ",$stored_keys);
+        Debug::ErrorLog("Session stored UIDs: ",$stored_keys);
 
         //remove keys that are not inside posted_uids
         foreach ($stored_keys as $uid) {
@@ -137,10 +137,10 @@ class SessionUploadInput extends InputProcessor
 
             if ($storage_object instanceof StorageObject) {
                 $values[] = $storage_object;
-                debug("Appending StorageObject UID: " . $storage_object->UID() . " to field values");
+                Debug::ErrorLog("Appending StorageObject UID: " . $storage_object->UID() . " to field values");
 
             } else {
-                debug("[$uid] is not StorageObject - removing from session array");
+                Debug::ErrorLog("[$uid] is not StorageObject - removing from session array");
                 $session_data->remove($uid);
             }
 
@@ -151,7 +151,7 @@ class SessionUploadInput extends InputProcessor
 
         $this->input->setValue($values);
 
-        debug("Final values including session files: ", $values);
+        Debug::ErrorLog("Final values including session files: ", $values);
 
     }
 
@@ -161,7 +161,7 @@ class SessionUploadInput extends InputProcessor
 
         $field_name = $this->input->getName();
 
-        debug("Clearing session data for field['$field_name']");
+        Debug::ErrorLog("Clearing session data for field['$field_name']");
         $session_data = new SessionData(SessionData::Prefix($field_name, SessionData::UPLOAD_CONTROL));
         $session_data->destroy();
     }
@@ -170,10 +170,10 @@ class SessionUploadInput extends InputProcessor
     {
 
         $name = $this->input->getName();
-        debug("DataInput: '$name'");
+        Debug::ErrorLog("DataInput: '$name'");
 
         if ($this->transact_bean) {
-            debug("DataInput: '$name' uses transact bean - values will be transacted in beforeCommit() ...");
+            Debug::ErrorLog("DataInput: '$name' uses transact bean - values will be transacted in beforeCommit() ...");
             return;
         }
 
@@ -185,7 +185,7 @@ class SessionUploadInput extends InputProcessor
                 throw new Exception("Not possible to transact array of objects during to the main transaction row");
             }
             if (count($value) < 1) {
-                debug("Array count is 0. Transacting NULL value to the main transaction row");
+                Debug::ErrorLog("Array count is 0. Transacting NULL value to the main transaction row");
                 $value = NULL;
 
                 $transactor->appendValue($this->transact_column, $value);
@@ -208,12 +208,12 @@ class SessionUploadInput extends InputProcessor
 
         if (array_key_exists($uid, $this->loaded_uids)) {
             //Skip the value as this is edit and the object is not changed
-            debug("StorageObject UID: $uid is the same UID as the bean loaded one.");
+            Debug::ErrorLog("StorageObject UID: $uid is the same UID as the bean loaded one.");
             //$transactor->removeValue($column);
         }
         else {
             //serialize
-            debug("Serializing object of type: '" . get_class($value) . "'");
+            Debug::ErrorLog("Serializing object of type: '" . get_class($value) . "'");
             $value = DBConnections::Open()->escape(serialize($value));
             $transactor->appendValue($this->transact_column, $value);
         }
@@ -224,13 +224,13 @@ class SessionUploadInput extends InputProcessor
     {
 
         if (!$this->transact_bean) {
-            debug("transact_bean is null - nothing to do in beforeCommit");
+            Debug::ErrorLog("transact_bean is null - nothing to do in beforeCommit");
             return;
         }
 
         $name = $this->input->getName();
 
-        debug("UIDs loaded from bean '" . get_class($this->transact_bean) . "': ", $this->source_loaded_uids);
+        Debug::ErrorLog("UIDs loaded from bean '" . get_class($this->transact_bean) . "': ", $this->source_loaded_uids);
 
         $processed_ids = array();
 
@@ -238,7 +238,7 @@ class SessionUploadInput extends InputProcessor
 
         $values = $this->input->getValue();
 
-        debug("Values count: " . count($values));
+        Debug::ErrorLog("Values count: " . count($values));
 
         //order position for OrderedDataBean
         $position = 0;
@@ -251,10 +251,10 @@ class SessionUploadInput extends InputProcessor
 
             $uid = $value->UID();
 
-            debug("Processing UID: $uid");
+            Debug::ErrorLog("Processing UID: $uid");
 
             if (!array_key_exists($uid, $this->source_loaded_uids)) {
-                debug("Found new UID: $uid for insert");
+                Debug::ErrorLog("Found new UID: $uid for insert");
 
                 $data = array();
                 $data[$item_key] = $transactor->getLastID();
@@ -268,7 +268,7 @@ class SessionUploadInput extends InputProcessor
 
                 $processed_ids[] = $refID;
 
-                debug("StorageObject UID: $uid transacted to transact_bean. ID: " . $refID);
+                Debug::ErrorLog("StorageObject UID: $uid transacted to transact_bean. ID: " . $refID);
             }
             else {
                 //skip transaction. same uid
@@ -280,7 +280,7 @@ class SessionUploadInput extends InputProcessor
         //delete remaining values - transact_bean primary key values not found in processed_ids
         $this->transact_bean->deleteRef($item_key, $transactor->getLastID(), $db, $processed_ids);
 
-        debug("Remaining transact_bean values removed");
+        Debug::ErrorLog("Remaining transact_bean values removed");
 
     }
 }

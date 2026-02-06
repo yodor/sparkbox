@@ -93,7 +93,7 @@ class ItemView extends AbstractResultView
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/ItemView.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/ItemView.css";
         return $arr;
     }
 

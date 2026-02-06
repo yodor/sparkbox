@@ -15,8 +15,8 @@ class ImageUploadValidator extends UploadDataValidator
 
         $this->accept_mimes = ImageScaler::SupportedMimes;
 
-        if (IMAGE_UPLOAD_UPSCALE || IMAGE_UPLOAD_DOWNSCALE) {
-            $this->setResizedSize(IMAGE_UPLOAD_DEFAULT_WIDTH, IMAGE_UPLOAD_DEFAULT_HEIGHT);
+        if (Spark::GetBoolean(Config::IMAGE_UPLOAD_UPSCALE) || Spark::GetBoolean(Config::IMAGE_UPLOAD_DOWNSCALE)) {
+            $this->setResizedSize(Spark::GetInteger(Config::IMAGE_UPLOAD_DEFAULT_WIDTH), Spark::GetInteger(Config::IMAGE_UPLOAD_DEFAULT_HEIGHT));
         }
         else {
             $this->setResizeEnabled(false);
@@ -25,9 +25,9 @@ class ImageUploadValidator extends UploadDataValidator
 
     public function setAcceptMimes(array $accept_mimes) : void
     {
-        $supported_mimes = ImageScaler::SupportedMimes;
         foreach ($accept_mimes as $mime) {
-            if (!in_array($mime, $supported_mimes)) throw new Exception("Unsupported mime: " . $mime);
+            $validMime = ImageType::tryFrom($mime);
+            if ($validMime === null) throw new Exception("Unsupported mime: " . $mime);
         }
         $this->accept_mimes = $accept_mimes;
     }
@@ -51,7 +51,7 @@ class ImageUploadValidator extends UploadDataValidator
     {
         parent::validate($input);
 
-        debug("Input: " . $input->getName());
+        Debug::ErrorLog("Input: " . $input->getName());
 
         //field->getValue() contains FileStorageObject as uploaded from user
         $image_storage = new ImageStorageObject($input->getValue());
@@ -72,27 +72,27 @@ class ImageUploadValidator extends UploadDataValidator
 
         if (!($object instanceof ImageStorageObject)) throw new Exception("Invalid argument (Not an ImageStorageObject)");
 
-        debug("UID: " . $object->UID());
-        debug("Image dimension: [" . $object->getWidth() . " x " . $object->getHeight() . "]");
-        debug("MIME: " . $object->buffer()->mime());
-        debug("Length: " . $object->buffer()->length());
+        Debug::ErrorLog("UID: " . $object->UID());
+        Debug::ErrorLog("Image dimension: [" . $object->getWidth() . " x " . $object->getHeight() . "]");
+        Debug::ErrorLog("MIME: " . $object->buffer()->mime());
+        Debug::ErrorLog("Length: " . $object->buffer()->length());
 
         //do not resize during ajax calls. original uploaded file is stored in session
         if (!$this->resize_enabled) {
-            debug("Resizing is not enabled for this validator");
+            Debug::ErrorLog("Resizing is not enabled for this validator");
             return;
         }
 
         $width = $object->getWidth();
         $height = $object->getHeight();
 
-        if (IMAGE_UPLOAD_UPSCALE) {
+        if (Spark::GetBoolean(Config::IMAGE_UPLOAD_UPSCALE)) {
             if ($object->getWidth() < $this->resize_width || $object->getHeight() < $this->resize_height) {
                 $width = $this->resize_width;
                 $height = $this->resize_height;
             }
         }
-        if (IMAGE_UPLOAD_DOWNSCALE) {
+        if (Spark::GetBoolean(Config::IMAGE_UPLOAD_DOWNSCALE)) {
             if ($object->getWidth() > $this->resize_width || $object->getHeight() > $this->resize_height) {
                 $width = $this->resize_width;
                 $height = $this->resize_height;
@@ -101,7 +101,7 @@ class ImageUploadValidator extends UploadDataValidator
         //final image that goes to DB
         if ($width != $object->getWidth() || $height != $object->getHeight()) {
             $scaler = new ImageScaler($width, $height);
-            $scaler->setOutputQuality(IMAGE_UPLOAD_STORE_QUALITY);
+            $scaler->setOutputQuality(Spark::GetInteger(Config::IMAGE_UPLOAD_STORE_QUALITY));
             $scaler->process($object->buffer());
         }
 

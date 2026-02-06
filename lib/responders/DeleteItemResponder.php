@@ -51,7 +51,7 @@ class DeleteItemResponder extends RequestResponder
     protected function processImpl() : void
     {
 
-        debug("Deleting ID: $this->item_id of DBTableBean: ".get_class($this->bean));
+        Debug::ErrorLog("Deleting ID: $this->item_id of DBTableBean: ".get_class($this->bean));
 
         $this->bean->delete($this->item_id);
 

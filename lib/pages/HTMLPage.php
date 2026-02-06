@@ -21,7 +21,7 @@ class HTMLPage extends Container
         $this->head = new HTMLHead();
         $this->body = new HTMLBody();
 
-        $this->setAttribute("lang", substr(DEFAULT_LANGUAGE_ISO3, 0,2));
+        $this->setAttribute("lang", substr(Spark::Get(Config::DEFAULT_LANGUAGE_ISO3), 0,2));
 
         global $translator;
         if ($translator instanceof Translator) {

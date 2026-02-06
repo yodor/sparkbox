@@ -27,7 +27,7 @@ class ActionsCell extends TableCell implements IActionCollection
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/Action.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/Action.css";
         return $arr;
     }
 

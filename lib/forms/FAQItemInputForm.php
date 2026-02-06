@@ -11,7 +11,7 @@ class FAQItemInputForm extends InputForm
 
         parent::__construct();
 
-        $field = DataInputFactory::Create(DataInputFactory::SELECT, "fqsID", "Section", 1);
+        $field = DataInputFactory::Create(InputType::SELECT, "fqsID", "Section", 1);
 
         $bean = new FAQSectionsBean();
 
@@ -26,11 +26,11 @@ class FAQItemInputForm extends InputForm
 
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "question", "Question", 1);
+        $field = DataInputFactory::Create(InputType::TEXT, "question", "Question", 1);
         $field->enableTranslator(true);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "answer", "Answer", 1);
+        $field = DataInputFactory::Create(InputType::TEXTAREA, "answer", "Answer", 1);
         $field->enableTranslator(true);
         $this->addInput($field);
 

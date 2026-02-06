@@ -12,14 +12,14 @@ class JSONFormDialog extends JSONDialog {
     public function requiredScript(): array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/dialogs/json/JSONFormDialog.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/dialogs/json/JSONFormDialog.js";
         return $arr;
     }
 
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/JSONFormDialog.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/JSONFormDialog.css";
         return $arr;
     }
 

@@ -97,7 +97,7 @@ class NestedSetBean extends DBTableBean
         return (int)$rr["max_rgt"];
     }
 
-    public function insertRecord2(array &$row, ?DBDriver $db = NULL): int
+    public function insertRecord2(array $row, ?DBDriver $db = NULL): int
     {
         $lastid = parent::insert($row, $db);
 
@@ -219,16 +219,16 @@ class NestedSetBean extends DBTableBean
     public function delete(int $id, ?DBDriver $db = NULL): int
     {
 
-        debug("Deleting ID: $id");
+        Debug::ErrorLog("Deleting ID: $id");
 
         $affectedRows = 0;
 
         if (!$db) {
             $db = $this->db;
-            debug("Using local DBDriver instance");
+            Debug::ErrorLog("Using local DBDriver instance");
         }
         else {
-            debug("Using DBDriver passed as function parameter");
+            Debug::ErrorLog("Using DBDriver passed as function parameter");
         }
 
         $prow = $this->getByID($id, "lft", "rgt", "parentID");
@@ -239,14 +239,14 @@ class NestedSetBean extends DBTableBean
         $rgt = $prow["rgt"];
 
         try {
-            debug("Starting transaction");
+            Debug::ErrorLog("Starting transaction");
             $db->transaction();
 
             $affectedRows = parent::delete($id, $db);
 
-            debug("deleted node ID: $id");
+            Debug::ErrorLog("deleted node ID: $id");
 
-            debug("Re-parenting child nodes ...");
+            Debug::ErrorLog("Re-parenting child nodes ...");
 
             $update = new SQLUpdate($this->select);
             $update->set("lft", " lft - 1 ");
@@ -272,7 +272,7 @@ class NestedSetBean extends DBTableBean
             $db->commit();
         }
         catch (Exception $ex) {
-            debug("Rolling back for error: " . $ex->getMessage());
+            Debug::ErrorLog("Rolling back for error: " . $ex->getMessage());
             $db->rollback();
             throw $ex;
         }
@@ -288,7 +288,7 @@ class NestedSetBean extends DBTableBean
      * @return void
      * @throws Exception
      */
-    public function reconstructNestedSet(&$lft = -1, &$cnt = 0, $parentID = 0) : void
+    public function reconstructNestedSet(int &$lft = -1, int &$cnt = 0, int $parentID = 0) : void
     {
 
         $qry = $this->query();

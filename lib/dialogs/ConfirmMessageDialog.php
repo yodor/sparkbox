@@ -13,7 +13,7 @@ class ConfirmMessageDialog extends MessageDialog
     public function requiredScript(): array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/dialogs/ConfirmMessageDialog.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/dialogs/ConfirmMessageDialog.js";
         return $arr;
     }
 

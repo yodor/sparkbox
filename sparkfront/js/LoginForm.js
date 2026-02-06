@@ -71,7 +71,7 @@ class LoginForm extends Component {
 
     async hmac(hmac_key, hmac_message) {
         // encoder to convert string to Uint8Array
-        var enc = new TextEncoder("utf-8");
+        let enc = new TextEncoder("utf-8");
 
         const key = await window.crypto.subtle.importKey(
             "raw", // raw format of the key - should be Uint8Array

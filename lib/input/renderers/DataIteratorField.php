@@ -7,8 +7,8 @@ abstract class DataIteratorField extends InputField
     protected ?string $default_label = null;
     protected string $default_value = "";
 
-    protected $array_key_field_name = "";
-    protected $array_key_model_id = false;
+    protected string $array_key_field_name = "";
+    protected bool $array_key_model_id = false;
 
     protected Container $elements;
 

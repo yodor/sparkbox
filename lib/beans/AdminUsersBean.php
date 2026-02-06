@@ -42,24 +42,22 @@ class AdminUsersBean extends DBTableBean
     }
 
     //email
-    public function emailExists(string $email)
+    public function emailExists(string $email) : ?array
     {
         return $this->getResult("email", $email);
 
     }
 
-    public function email(int $userID)
+    public function email(int $userID) : ?string
     {
         return $this->getValue($userID, "email");
     }
 
-    public function email2id(string $email)
+    public function email2id(string $email) : int
     {
-
         $row = $this->getResult("email", $email);
         if (!$row) return -1;
-        return $row[$this->key()];
-
+        return (int)$row[$this->key()];
     }
 
 }

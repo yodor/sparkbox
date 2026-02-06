@@ -25,7 +25,7 @@ JS;
 class LoginFormRenderer extends FormRenderer
 {
 
-    public $fbLoginEnabled = FALSE;
+    public bool $fbLoginEnabled = FALSE;
 
     /**
      * @var AuthenticatorResponder
@@ -66,15 +66,15 @@ class LoginFormRenderer extends FormRenderer
     public function requiredScript() : array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/md5.js";
-        $arr[] = SPARK_LOCAL . "/js/LoginForm.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/md5.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/LoginForm.js";
         return $arr;
     }
 
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/LoginForm.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/LoginForm.css";
         return $arr;
     }
 

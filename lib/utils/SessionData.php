@@ -31,14 +31,14 @@ class SessionData
         $this->name = $name;
 
         if (!Session::Contains($name)) {
-            debug("SessionData [$this->name] initializing empty data.");
+            Debug::ErrorLog("SessionData [$this->name] initializing empty data.");
             Session::Set($name, array());
         }
 
         if (Session::Contains($name)) {
             if (!is_array(Session::GetRef($name))) throw new Exception("Incorrect SessionData");
             $this->data = &Session::GetRef($name);
-            debug("SessionData [$this->name] loaded - data count: ".count($this->data));
+            Debug::ErrorLog("SessionData [$this->name] loaded - data count: ".count($this->data));
         }
 
     }
@@ -53,7 +53,7 @@ class SessionData
 
     public function destroy() : void
     {
-        debug("Removing SessionData [$this->name] from session");
+        Debug::ErrorLog("Removing SessionData [$this->name] from session");
         $this->removeAll();
         Session::Remove($this->name);
     }

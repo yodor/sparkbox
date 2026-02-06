@@ -10,14 +10,14 @@ class MenuItemForm extends InputForm
 
         parent::__construct();
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "menu_title", "Menu Title", 1);
+        $field = DataInputFactory::Create(InputType::TEXT, "menu_title", "Menu Title", 1);
         $field->enableTranslator(true);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "link", "Link", 1);
+        $field = DataInputFactory::Create(InputType::TEXT, "link", "Link", 1);
 
         $link = URL::Current();
-        $action = new Action("Choose Dynamic Page", ADMIN_LOCAL . "/content/pages/list.php?chooser=".base64_encode($link->toString()));
+        $action = new Action("Choose Dynamic Page", Spark::Get(Config::ADMIN_LOCAL) . "/content/pages/list.php?chooser=".base64_encode($link->toString()));
         $field->getRenderer()->getAddonContainer()->items()->append($action);
         $this->addInput($field);
 
@@ -33,14 +33,14 @@ class MenuItemForm extends InputForm
 
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "seo_title", "SEO Title (max 60 characters)", 0);
+        $field = DataInputFactory::Create(InputType::TEXTAREA, "seo_title", "SEO Title (max 60 characters)", 0);
         $field->enableTranslator(true);
         $field->getRenderer()->input()->setAttribute("maxLength","60");
         $field->getRenderer()->input()->setAttribute("rows","3");
         $field->getRenderer()->input()->setAttribute("cols","60");
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "seo_description", "SEO Description (max 150 characters)", 0);
+        $field = DataInputFactory::Create(InputType::TEXTAREA, "seo_description", "SEO Description (max 150 characters)", 0);
         $field->enableTranslator(true);
         $field->getRenderer()->input()->setAttribute("maxLength","150");
         $field->getRenderer()->input()->setAttribute("rows","3");

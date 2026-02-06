@@ -20,7 +20,7 @@ class NewsItemsListPage extends BeanListPage
 
     }
 
-    public function initView()
+    public function initView(): ?Component
     {
         parent::initView();
         $ticr = new ImageCell();

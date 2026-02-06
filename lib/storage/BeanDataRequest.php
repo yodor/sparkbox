@@ -56,7 +56,7 @@ class BeanDataRequest
 
         }
         catch (Exception $e) {
-            debug("Exception processing this request: ".$e->getTraceAsString());
+            Debug::ErrorLog("Exception processing this request: ".$e->getTraceAsString());
             $resp = new ErrorResponse();
             $resp->sendException($e);
         }

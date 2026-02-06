@@ -11,7 +11,7 @@ class NestedSetViewPage extends BeanListPage
         parent::__construct();
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean): void
     {
         if (!($bean instanceof NestedSetBean)) throw new Exception("Incorrect DBTableBean - Expecting NestedSetBean");
         parent::setBean($bean);
@@ -21,7 +21,7 @@ class NestedSetViewPage extends BeanListPage
      * Will use the first element from the $this->fields as a list label for the tree
      * @throws Exception
      */
-    public function initView()
+    public function initView(): ?Component
     {
         $h_repos = new ChangePositionResponder($this->bean);
 

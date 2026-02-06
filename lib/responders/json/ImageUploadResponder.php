@@ -45,7 +45,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
         $mime = $object->buffer()->mime();
         $uid = $object->UID();
 
-        debug("UID:$uid filename:$filename mime:$mime");
+        Debug::ErrorLog("UID:$uid filename:$filename mime:$mime");
 
         //create a temporary thumbnail of the uploaded image
         $scaler = new ImageScaler($this->width, $this->height);

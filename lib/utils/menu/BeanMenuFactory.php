@@ -135,10 +135,10 @@ class BeanMenuFactory
 
             // - url is internal root
             if (str_starts_with($href, "/")) {
-                $href = LOCAL . $href;
+                $href = Spark::Get(Config::LOCAL) . $href;
             }
             else {
-                debug("Using external URL");
+                Debug::ErrorLog("Using external URL");
             }
         }
 

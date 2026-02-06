@@ -4,7 +4,7 @@ include_once ("utils/IDataResultProcessor.php");
 class DataObject extends SparkObject implements IDataResultProcessor
 {
 
-    protected $value = "";
+    protected mixed $value = "";
     protected string $valueKey = "";
 
     /**
@@ -15,7 +15,7 @@ class DataObject extends SparkObject implements IDataResultProcessor
         parent::__construct();
     }
 
-    public function getValue()
+    public function getValue() : mixed
     {
         return $this->value;
     }

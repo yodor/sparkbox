@@ -77,19 +77,21 @@ class AdminUserEditorPage extends BeanEditorPage
         $form = new AdminUserForm();
         $form->setRoles($roles);
         $this->setForm($form);
-        $this->page->head()->addJS(SPARK_LOCAL."/js/md5.js");
+        $this->page->head()->addJS(Spark::Get(Config::SPARK_LOCAL)."/js/md5.js");
 
         new AdminUserScript();
 
 
     }
 
-    public function initView()
+    public function initView(): ?Component
     {
         parent::initView();
 
         $this->view->getForm()->getRenderer()->setAttribute("onSubmit", "return checkForm(this)");
         $this->getEditor()->getTransactor()->assignInsertValue("context", AdminAuthenticator::CONTEXT_NAME);
+
+        return $this->view;
     }
 
 }

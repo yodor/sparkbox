@@ -38,7 +38,7 @@ class InputComponent extends Container
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/Action.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/Action.css";
         return $arr;
     }
 
@@ -74,7 +74,7 @@ class InputComponent extends Container
         }
 
 
-        if (TRANSLATOR_ENABLED && $this->dataInput->translatorEnabled()) {
+        if (Spark::GetBoolean(Config::TRANSLATOR_ENABLED) && $this->dataInput->translatorEnabled()) {
             $this->translator->setRenderEnabled(true);
         }
     }

@@ -7,28 +7,28 @@ include_once("components/Action.php");
 class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPhotoRenderer
 {
 
-    protected $actions;
+    protected ActionCollection $actions;
 
     /**
      * @var GalleryView
      */
-    protected $view;
+    protected GalleryView $view;
 
     /**
      * @var Action
      */
-    protected $action;
+    protected Action $action;
 
     /**
      * @var ImagePopup
      */
-    protected $image_popup;
+    protected ImagePopup $image_popup;
 
 
     /**
      * @var URLParameter
      */
-    protected $urlparam;
+    protected ?URLParameter $urlparam = null;
 
     public function __construct(GalleryView $view)
     {
@@ -47,7 +47,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/Action.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/Action.css";
         return $arr;
     }
 
@@ -79,7 +79,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         }
 
         if (isset($data["date_upload"])) {
-            $tooltip .= tr("Upload Date") . ": " . dateFormat($data["date_upload"], TRUE);
+            $tooltip .= tr("Upload Date") . ": " . Spark::DateFormat($data["date_upload"], TRUE);
         }
 
         $this->image_popup->setAttribute("tooltip", $tooltip);
@@ -160,7 +160,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
     }
 
-    public function renderFooterAction(string $action)
+    public function renderFooterAction(string $action) : void
     {
         $item = $this->actions->getByAction($action);
         if ($item instanceof Action) {

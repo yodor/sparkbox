@@ -14,12 +14,12 @@ abstract class AdminPageTemplate extends PageTemplate
 
     }
 
-    protected function initPage()
+    protected function initPage(): void
     {
         $this->page = new AdminPage();
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean): void
     {
         $this->bean = $bean;
 

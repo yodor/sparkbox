@@ -29,19 +29,19 @@ class SparkGlobals
 
     public function includeBeanClass(string $class_name) : void
     {
-        debug("Including bean class: $class_name");
+        Debug::ErrorLog("Including bean class: $class_name");
         foreach ($this->beanLocations as $pos => $location) {
             $class_file = $location . $class_name . ".php";
-            debug("Trying file: ".$class_file);
+            Debug::ErrorLog("Trying file: ".$class_file);
             @include_once($class_file);
             if (class_exists($class_name, FALSE)) {
-                debug("Class load success");
+                Debug::ErrorLog("Class load success");
                 break;
             }
         }
 
         if (!class_exists($class_name, FALSE)) {
-            debug("Class load failed");
+            Debug::ErrorLog("Class load failed");
             throw new Exception("Bean class not found: " . $class_name);
         }
     }

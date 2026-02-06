@@ -30,16 +30,16 @@ class CacheFactory
             throw new Exception("Incorrect ID");
         }
 
-        if (strcasecmp(BEAN_CACHE_BACKEND, CacheFactory::BACKEND_DATABASE)==0) {
+        if (strcasecmp(Spark::Get(Config::BEAN_CACHE_BACKEND), CacheFactory::BACKEND_DATABASE)===0) {
 
             return new DBCacheEntry($cacheName,  $className,  $id);
 
         }
-        else if (strcasecmp(BEAN_CACHE_BACKEND, CacheFactory::BACKEND_FILESYSTEM)==0) {
+        else if (strcasecmp(Spark::Get(Config::BEAN_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)===0) {
 
-            $cache_folder = CACHE_PATH . DIRECTORY_SEPARATOR . $className . DIRECTORY_SEPARATOR . $id;
+            $cache_folder = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . $className . DIRECTORY_SEPARATOR . $id;
             if (!file_exists($cache_folder)) {
-                debug("Creating cache folder: $cache_folder");
+                Debug::ErrorLog("Creating cache folder: $cache_folder");
                 @mkdir($cache_folder, 0777, TRUE);
                 if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
             }
@@ -59,14 +59,14 @@ class CacheFactory
             throw new Exception("Empty cache name identifier");
         }
 
-        if (strcasecmp(PAGE_CACHE_BACKEND, CacheFactory::BACKEND_DATABASE)==0) {
+        if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_DATABASE)===0) {
             return new DBCacheEntry($cacheName,  "PageCache",  0);
         }
-        else if (strcasecmp(PAGE_CACHE_BACKEND, CacheFactory::BACKEND_FILESYSTEM)==0) {
+        else if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)===0) {
 
-            $cache_folder = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache";
+            $cache_folder = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . "PageCache";
             if (!file_exists($cache_folder)) {
-                debug("Creating cache folder: $cache_folder");
+                Debug::ErrorLog("Creating cache folder: $cache_folder");
                 @mkdir($cache_folder, 0777, TRUE);
                 if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
             }
@@ -80,28 +80,28 @@ class CacheFactory
 
     public static function CleanupPageCache() : void
     {
-        $cleanup_file = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache.cleanup";
+        $cleanup_file = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . "PageCache.cleanup";
         if (!file_exists($cleanup_file)) touch($cleanup_file);
         $cleanup_time = filemtime($cleanup_file);
         $delta = time() - $cleanup_time;
         //default 1 hour - 3600 seconds
-        //debug("Cleanup PageCache delta: $delta");
+        //Debug::ErrorLog("Cleanup PageCache delta: $delta");
 
-        if ($delta < PAGE_CACHE_CLEANUP_DELTA) {
-            debug("Remaining seconds until PageCache cleanup: ". PAGE_CACHE_CLEANUP_DELTA - $delta);
+        if ($delta < Spark::GetInteger(Config::PAGE_CACHE_CLEANUP_DELTA)) {
+            Debug::ErrorLog("Remaining seconds until PageCache cleanup: ". Spark::GetInteger(Config::PAGE_CACHE_CLEANUP_DELTA) - $delta);
             return;
         }
         //
         $timestamp = time();
 
-        debug("Doing PageCache cleanup - now: $timestamp - TTL: ".PAGE_CACHE_TTL);
+        Debug::ErrorLog("Doing PageCache cleanup - now: $timestamp - TTL: ".Spark::GetInteger(Config::PAGE_CACHE_TTL));
 
-        if (strcasecmp(PAGE_CACHE_BACKEND, CacheFactory::BACKEND_DATABASE)==0) {
+        if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_DATABASE)==0) {
 
             $bean = new SparkCacheBean();
             $delete = new SQLDelete($bean->select());
             $delete->where()->add("className", "'PageCache'");
-            $delete->where()->addExpression("(($timestamp - lastModified) > ".PAGE_CACHE_TTL.")", " AND ");
+            $delete->where()->addExpression("(($timestamp - lastModified) > ".Spark::GetInteger(Config::PAGE_CACHE_TTL).")", " AND ");
             $db = $bean->getDB();
             try {
                 $db->transaction();
@@ -109,21 +109,21 @@ class CacheFactory
                 $numEntries = $db->affectedRows();
                 $db->commit();
                 touch($cleanup_file);
-                debug("DB PageCache cleanup complete. Affected rows: " . $numEntries);
+                Debug::ErrorLog("DB PageCache cleanup complete. Affected rows: " . $numEntries);
             }
             catch (Exception $e) {
                 $db->rollback();
-                debug("Unable to cleanup PageCache: " . $e->getMessage());
+                Debug::ErrorLog("Unable to cleanup PageCache: " . $e->getMessage());
             }
 
         }
-        else if (strcasecmp(PAGE_CACHE_BACKEND, CacheFactory::BACKEND_FILESYSTEM)==0) {
+        else if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)==0) {
 
-            $cache_folder = CACHE_PATH . DIRECTORY_SEPARATOR . "PageCache";
+            $cache_folder = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . "PageCache";
 
             $handle = fopen($cleanup_file, 'a');
             if (!$handle) {
-                debug("Unable to open cleanup file: " . $cleanup_file);
+                Debug::ErrorLog("Unable to open cleanup file: " . $cleanup_file);
                 return;
             }
             if (flock($handle, LOCK_EX | LOCK_NB)) {
@@ -131,8 +131,8 @@ class CacheFactory
                 $check_ttl = function ($item) use ($timestamp) {
                     $filestamp = filemtime($item);
                     $fileTTL = ($timestamp - $filestamp);
-                    if ($fileTTL >= PAGE_CACHE_TTL) {
-                        debug("Removing stale cache entry: " . $item);
+                    if ($fileTTL >= Spark::GetInteger(Config::PAGE_CACHE_TTL)) {
+                        Debug::ErrorLog("Removing stale cache entry: " . $item);
                         unlink($item);
                     }
                 };
@@ -159,14 +159,13 @@ class CacheFactory
     public static function CacheEntryOutput(Component $cmp) : CacheEntry | bool
     {
 
-        if (!PAGE_CACHE_ENABLED) return false;
+        if (!Spark::GetBoolean(Config::PAGE_CACHE_ENABLED)) return false;
         if (!$cmp->isCacheable()) return false;
 
         $cacheName = $cmp->getCacheName();
         if (!$cacheName) return false;
 
-        $entryName = get_class($cmp) . "-" . sparkHash($cacheName);
-        //debug("Cacheable component: ".get_class($cmp)." | Cache name: ".$cacheName);
+        $entryName = get_class($cmp) . "-" . Spark::Hash($cacheName);
 
         $cacheEntry = CacheFactory::PageCacheEntry($entryName);
 
@@ -175,9 +174,9 @@ class CacheFactory
             $entryStamp = $cacheEntry->lastModified();
             $timeStamp = time();
             $entryAge = ($timeStamp - $entryStamp);
-            $remainingTTL = PAGE_CACHE_TTL - $entryAge;
+            $remainingTTL = Spark::GetInteger(Config::PAGE_CACHE_TTL) - $entryAge;
 
-            debug("CacheEntry exists - lastModified: " . $entryStamp . " | Remaining TTL: " . $remainingTTL);
+            Debug::ErrorLog("CacheEntry exists - lastModified: " . $entryStamp . " | Remaining TTL: " . $remainingTTL);
 
             if ($remainingTTL > 0) {
                 //output cached data

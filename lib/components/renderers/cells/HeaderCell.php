@@ -41,12 +41,12 @@ class HeaderCell extends TableCell implements IGETConsumer
         $url->add(new URLParameter(Paginator::KEY_ORDER_BY, $this->column->getName()));
         $url->add(new URLParameter(Paginator::KEY_ORDER_DIR, "ASC"));
 
-        if (strcmp_isset(Paginator::KEY_ORDER_BY, $this->column->getName(), $_GET)) {
+        if (Spark::strcmp_isset(Paginator::KEY_ORDER_BY, $this->column->getName())) {
 
             $this->orderDirection->setRenderEnabled(true);
 
             //show the arrow link to change order direction
-            if (strcmp_isset(Paginator::KEY_ORDER_DIR, "ASC", $_GET)) {
+            if (Spark::strcmp_isset(Paginator::KEY_ORDER_DIR, "ASC")) {
 
                 //current list is ordered ASC show up arrow and href with opposite direction
                 $url->get(Paginator::KEY_ORDER_DIR)->setValue("DESC");

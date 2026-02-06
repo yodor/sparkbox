@@ -25,7 +25,7 @@ class ArrayInputValidator implements IInputValidator
 
         $values_array = $input->getValue();
 
-        debug("Input name: '{$input->getName()}' value type: " . getType($values_array) . " is_required: " . $input->isRequired());
+        Debug::ErrorLog("Input name: '{$input->getName()}' value type: " . getType($values_array) . " is_required: " . $input->isRequired());
 
         if (!is_array($values_array) || count($values_array) < 1) {
             if ($input->isRequired()) {
@@ -39,7 +39,7 @@ class ArrayInputValidator implements IInputValidator
 
             $value = $values_array[$idx];
 
-            debug("Value[$idx] - Type: " . getType($value));
+            Debug::ErrorLog("Value[$idx] - Type: " . getType($value));
 
             try {
                 $cfield = clone $input;
@@ -54,7 +54,7 @@ class ArrayInputValidator implements IInputValidator
             }
             catch (Exception $e) {
 
-                debug("Validate result: " . $e->getMessage());
+                Debug::ErrorLog("Validate result: " . $e->getMessage());
                 $input->setErrorAt($idx, $e->getMessage());
 
             }

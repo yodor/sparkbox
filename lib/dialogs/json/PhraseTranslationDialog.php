@@ -16,12 +16,12 @@ class PhraseTranslationDialog extends JSONDialog
 
         $this->content->items()->clear();
 
-        $phraseInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "phrase", "Original Text", 0);
+        $phraseInput = DataInputFactory::Create(InputType::TEXTAREA, "phrase", "Original Text", 0);
         $phraseInput->getRenderer()->input()->setAttribute("rows", 5);
         $phrase = new InputComponent($phraseInput);
         $this->content->items()->append($phrase);
 
-        $translationInput = DataInputFactory::Create(DataInputFactory::TEXTAREA, "translation", "Translation", 0);
+        $translationInput = DataInputFactory::Create(InputType::TEXTAREA, "translation", "Translation", 0);
         $translationInput->getRenderer()->input()->setAttribute("rows", 5);
         $translation = new InputComponent($translationInput);
         $this->content->items()->append($translation);
@@ -36,14 +36,14 @@ class PhraseTranslationDialog extends JSONDialog
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/PhraseTranslationDialog.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/PhraseTranslationDialog.css";
         return $arr;
     }
 
     public function requiredScript() : array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/dialogs/json/PhraseTranslationDialog.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/dialogs/json/PhraseTranslationDialog.js";
         return $arr;
     }
 

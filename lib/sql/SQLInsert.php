@@ -19,7 +19,7 @@ class SQLInsert extends SQLStatement
 
         $values = $this->fieldset->values();
 
-        //debug("Values contents: ".print_r($values, true));
+        //Debug::ErrorLog("Values contents: ".print_r($values, true));
 
         $multi_values = 0;
         foreach ($values as $name=>$value) {
@@ -30,7 +30,7 @@ class SQLInsert extends SQLStatement
         }
 
         if ($multi_values>0) {
-            debug("Multivalued insert - values count: $multi_values");
+            Debug::ErrorLog("Multivalued insert - values count: $multi_values");
 
             foreach ($values as $name => $value) {
                 if (!is_array($value) || (count($value)!=$multi_values)) {

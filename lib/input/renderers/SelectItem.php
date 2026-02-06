@@ -26,7 +26,7 @@ class SelectItem extends DataIteratorItem
             $this->removeAttribute("SELECTED");
         }
 
-        $this->setAttribute("value", attributeValue((string)$this->value));
+        $this->setAttribute("value", Spark::AttributeValue((string)$this->value));
         //allow html tags here
         $this->setContents($this->label);
     }

@@ -39,7 +39,7 @@ class GalleryView extends Container
             $qry = $this->bean->query($this->bean->key(), "position", "caption", "date_upload");
         }
 
-        if (strcmp_isset("view", "list")) {
+        if (Spark::strcmp_isset("view", "list")) {
 
             $view = new TableView($qry);
             $view->addClassName("GalleryView");
@@ -101,7 +101,7 @@ class GalleryView extends Container
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/GalleryView.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/GalleryView.css";
         return $arr;
     }
 

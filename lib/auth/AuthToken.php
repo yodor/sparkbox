@@ -43,12 +43,12 @@ class AuthToken
     public function validateCookies(string $contextName) : bool
     {
         if ($this->id < 1 || strlen($this->hash) != AuthToken::TOKEN_LENGTH) {
-            debug("Token data invalid");
+            Debug::ErrorLog("Token data invalid");
             return FALSE;
         }
 
         if (!Session::HaveCookie($contextName . "_" . AuthToken::HASH) || !Session::HaveCookie($contextName . "_" . AuthToken::ID)) {
-            debug("Required cookies were not found");
+            Debug::ErrorLog("Required cookies were not found");
             return FALSE;
         }
 
@@ -56,11 +56,11 @@ class AuthToken
         $cookie_id = (int)Session::GetCookie($contextName . "_" . AuthToken::ID);
 
         if (strcmp($cookie_hash, $this->hash) == 0 && $cookie_id == $this->id) {
-            debug("Cookie values matched successfully");
+            Debug::ErrorLog("Cookie values matched successfully");
             return TRUE;
         }
 
-        debug("Cookie values mismatch");
+        Debug::ErrorLog("Cookie values mismatch");
         return FALSE;
     }
 

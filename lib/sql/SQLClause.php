@@ -9,12 +9,12 @@ class SQLClause extends SparkObject implements ISQLGet
     /**
      * Connect the value to the expression using this operator by default
      */
-    const DEFAULT_OPERATOR = "=";
+    const string DEFAULT_OPERATOR = "=";
 
     /**
      * Connect this clause to the rest of the clauses using this operator by default
      */
-    const DEFAULT_GLUE = "AND";
+    const string DEFAULT_GLUE = "AND";
 
     protected string $expr = "";
     protected string $value = "";

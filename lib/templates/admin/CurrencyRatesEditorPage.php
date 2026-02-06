@@ -18,7 +18,7 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
         $dialog = new InputMessageDialog();
 
-        $this->getPage()->head()->addCSS(SPARK_LOCAL . "/css/InputField.css");
+        $this->getPage()->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/InputField.css");
 
         $responder = new CurrencyRateResponder();
 
@@ -39,14 +39,14 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
         }
     }
 
-    protected function initPageActions()
+    protected function initPageActions(): void
     {
 
     }
 
-    public function initView()
+    public function initView(): ?Component
     {
-
+        return null;
     }
 
     public function renderImpl(): void
@@ -151,7 +151,7 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
                             //console.log(url.href);
                             req.start();
                             req.onSuccess = function (result) {
-                                    var response = result.response;
+                                    const response = result.response;
 
                                     let forward_item = document.querySelector(".rate[srcID='" + response.srcID + "'][dstID='" + response.dstID + "']");
                                     forward_item.innerHTML = parseFloat(response.forward_rate).toFixed(2);

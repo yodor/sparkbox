@@ -30,7 +30,7 @@ CREATE TABLE `languages` (
 
         try {
             $this->db->transaction();
-            $this->db->query("INSERT INTO languages (language, lang_code) values ('" . DEFAULT_LANGUAGE . "','" . DEFAULT_LANGUAGE_ISO3 . "');");
+            $this->db->query("INSERT INTO languages (language, lang_code) values ('" . Spark::Get(Config::DEFAULT_LANGUAGE) . "','" . Spark::Get(Config::DEFAULT_LANGUAGE_ISO3) . "');");
             $this->db->commit();
         }
         catch (Exception $e) {

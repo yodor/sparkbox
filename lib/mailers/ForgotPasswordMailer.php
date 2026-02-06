@@ -14,13 +14,13 @@ class ForgotPasswordMailer extends Mailer
     {
         parent::__construct();
 
-        $this->subject = tr("Forgot Password Request at: ") . SITE_TITLE;
+        $this->subject = tr("Forgot Password Request at: ") . Spark::Get(Config::SITE_TITLE);
 
         $this->to = $email;
 
         $message = tr("Hello") . ",\r\n";
         $message .= "\r\n";
-        $message .= tr("This email is sent in relation to your forgot password request at") . " - ".SITE_TITLE . "\r\n";
+        $message .= tr("This email is sent in relation to your forgot password request at") . " - ".Spark::Get(Config::SITE_TITLE) . "\r\n";
         $message .= "\r\n";
         $message .= tr("Your new password is").": ".$random_pass."\r\n";
         $message .= "\r\n";
@@ -30,9 +30,9 @@ class ForgotPasswordMailer extends Mailer
             $message .= "\r\n";
         }
         $message .= tr("Sincerely").",\r\n";
-        $message .= SITE_TITLE."\r\n";
+        $message .= Spark::Get(Config::SITE_TITLE)."\r\n";
         $message .= "\r\n";
-        $message .= "<a href='".SITE_URL."'>".SITE_URL."</a>";
+        $message .= "<a href='".Spark::Get(Config::SITE_URL)."'>".Spark::Get(Config::SITE_URL)."</a>";
 
         $this->body = $this->templateMessage($message);
 

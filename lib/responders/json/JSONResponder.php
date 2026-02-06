@@ -37,7 +37,7 @@ abstract class JSONResponder extends RequestResponder
             $this->functions[] = $method;
         }
 
-        debug($this->getName()." enabled functions: ", $this->functions);
+        Debug::ErrorLog($this->getName()." enabled functions: ", $this->functions);
 
     }
 
@@ -59,7 +59,7 @@ abstract class JSONResponder extends RequestResponder
 
         $this->requestFunction = "_".$requestFunction;
 
-        debug("Request function is: '$this->requestFunction'");
+        Debug::ErrorLog("Request function is: '$this->requestFunction'");
     }
 
     /**
@@ -116,7 +116,7 @@ abstract class JSONResponder extends RequestResponder
         }
         catch (Exception $e) {
 
-            debug("Exception during process: " . $e->getMessage());
+            Debug::ErrorLog("Exception during process: " . $e->getMessage());
 
             $response->contents = "";
             $response->status = JSONResponse::STATUS_ERROR;

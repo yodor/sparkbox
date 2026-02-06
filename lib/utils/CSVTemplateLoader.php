@@ -2,38 +2,38 @@
 
 class CSVTemplateLoader
 {
-    protected $zipfile = "";
-    protected $zip = NULL;
-    protected $temp_filename = "";
-    protected $currentRow = -1;
+    protected string $zipfile = "";
+    protected ZipArchive $zip;
+    protected string $temp_filename = "";
+    protected int $currentRow = -1;
 
-    protected $errors = array();
-    protected $notices = array();
+    protected array $errors = array();
+    protected array $notices = array();
 
-    protected $success_rows = 0;
-    protected $error_rows = 0;
+    protected int $success_rows = 0;
+    protected int $error_rows = 0;
 
-    public function getSuccessRowCount()
+    public function getSuccessRowCount() : int
     {
         return $this->success_rows;
     }
 
-    public function getErrorRowCount()
+    public function getErrorRowCount() : int
     {
         return $this->error_rows;
     }
 
-    public function getErrors()
+    public function getErrors() : array
     {
         return $this->errors;
     }
 
-    public function getNotices()
+    public function getNotices() : array
     {
         return $this->notices;
     }
 
-    public function __construct($zipfile)
+    public function __construct(string $zipfile)
     {
         if (strlen($zipfile) < 1) throw new Exception("No file to import specified");
 
@@ -55,7 +55,7 @@ class CSVTemplateLoader
     }
 
     // 	'template.csv'
-    public function processFile($csvfile)
+    public function processFile(string $csvfile) : void
     {
         $ret_tmp = $this->zip->statName($csvfile);
         if ($ret_tmp === FALSE) {
@@ -103,19 +103,19 @@ class CSVTemplateLoader
     }
 
     //dummy output only function. actual functionality reimplemented in a subclass
-    public function startLoad()
+    public function startLoad() : void
     {
         echo "<table class='csv_template_loader'>";
     }
 
     //dummy output only function. actual functionality reimplemented in a subclass
-    public function finishLoad()
+    public function finishLoad() : void
     {
         echo "</table>";
     }
 
     //dummy output only function. actual functionality reimplemented in a subclass
-    public function processKeysRow($row)
+    public function processKeysRow(array $row) : void
     {
         echo "<tr>";
         foreach ($row as $key => $val) {
@@ -125,7 +125,7 @@ class CSVTemplateLoader
     }
 
     //dummy output only function. actual functionality reimplemented in a subclass
-    public function processDataRow($row)
+    public function processDataRow(array $row) : void
     {
 
         echo "<tr>";

@@ -6,11 +6,11 @@ include_once("objects/data/DataObject.php");
 class FBTrackObject extends DataObject
 {
 
-    protected $event;
-    protected $param_template;
-    protected $dataKey;
+    protected string $event;
+    protected string $param_template;
+    protected string $dataKey;
 
-    protected $parameters;
+    protected string $parameters;
 
     public function __construct()
     {
@@ -18,7 +18,7 @@ class FBTrackObject extends DataObject
     }
 
     //ViewContent
-    public function setEvent(string $event)
+    public function setEvent(string $event) : void
     {
         $this->event = $event;
     }
@@ -32,7 +32,7 @@ class FBTrackObject extends DataObject
      * Set template for parameters. %$this->dataKey% would be replaced with value of $data[$this->dataKey] during setData
      * @param string $value
      */
-    public function setParamTemplate(string $value)
+    public function setParamTemplate(string $value) : void
     {
         $this->param_template = $value;
     }
@@ -47,7 +47,7 @@ class FBTrackObject extends DataObject
         return $this->parameters;
     }
 
-    public function useDataKey(string $dataKey)
+    public function useDataKey(string $dataKey) : void
     {
         $this->dataKey = $dataKey;
     }
@@ -63,7 +63,7 @@ class FBTrackObject extends DataObject
 
         if (!isset($data[$this->dataKey])) throw new Exception("Data key '$this->dataKey' not found");
 
-        $replace = array("%" . $this->dataKey . "%" => attributeValue($data[$this->dataKey]));
+        $replace = array("%" . $this->dataKey . "%" => Spark::AttributeValue($data[$this->dataKey]));
         $this->parameters = strtr($this->param_template, $replace);
 
     }

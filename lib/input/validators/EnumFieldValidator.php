@@ -4,10 +4,10 @@ include_once("input/DataInput.php");
 
 class EnumFieldValidator implements IInputValidator
 {
-    protected $table_name;
-    protected $field_name;
+    protected string $table_name;
+    protected string $field_name;
 
-    public function __construct($table_name, $field_name = NULL)
+    public function __construct(string $table_name, string $field_name = "")
     {
         $this->table_name = $table_name;
         $this->field_name = $field_name;

@@ -36,39 +36,42 @@ include_once("input/processors/UploadDataInput.php");
 
 include_once("input/processors/SessionUploadInput.php");
 
+enum InputType : int {
+    case TEXT = 1;
+    case PASSWORD = 2;
+    case TEXTAREA = 3;
+    case SELECT = 4;
+    case SELECT_MULTI = 5;
+    case RADIO = 6;
+    case CHECKBOX = 7;
+    case CHECKBOX_ARRAY = 8;
+    case PHONE = 9;
+    case DATE = 10;
+    case TIME = 11;
+    case HIDDEN = 12;
+
+    case EMAIL = 15;
+    case NESTED_SELECT = 16;
+    case MCE_TEXTAREA = 17;
+    case DYNAMIC_PAGE = 18;
+    case SESSION_IMAGE = 19;
+    case SESSION_FILE = 20;
+    case COLOR_CODE = 21;
+
+    case CAPTCHA_TEXT = 23;
+
+    case HIDDEN_ARRAY = 100;
+    case TEXT_ARRAY = 101;
+    case SELECT_ARRAY = 102;
+
+    case SLIDER = 200;
+
+    case CHECKBOX_TREEVIEW = 201;
+}
 class DataInputFactory
 {
 
-    const TEXT = 1;
-    const PASSWORD = 2;
-    const TEXTAREA = 3;
-    const SELECT = 4;
-    const SELECT_MULTI = 5;
-    const RADIO = 6;
-    const CHECKBOX = 7;
-    const CHECKBOX_ARRAY = 8;
-    const PHONE = 9;
-    const DATE = 10;
-    const TIME = 11;
-    const HIDDEN = 12;
 
-    const EMAIL = 15;
-    const NESTED_SELECT = 16;
-    const MCE_TEXTAREA = 17;
-    const DYNAMIC_PAGE = 18;
-    const SESSION_IMAGE = 19;
-    const SESSION_FILE = 20;
-    const COLOR_CODE = 21;
-
-    const CAPTCHA_TEXT = 23;
-
-    const HIDDEN_ARRAY = 100;
-    const TEXT_ARRAY = 101;
-    const SELECT_ARRAY = 102;
-
-    const SLIDER = 200;
-
-    const CHECKBOX_TREEVIEW = 201;
 
     /**
      * @param int $type
@@ -78,7 +81,7 @@ class DataInputFactory
      * @return ArrayDataInput|DataInput
      * @throws Exception
      */
-    public static function Create(int $type, string $name, string $label, bool $required)
+    public static function Create(InputType $type, string $name, string $label, bool $required)
     {
         $input = new DataInput($name, $label, $required);
 
@@ -87,78 +90,78 @@ class DataInputFactory
 
         switch ($type) {
 
-            case DataInputFactory::TEXT:
+            case InputType::TEXT:
                 new TextField($input);
                 break;
 
-            case DataInputFactory::COLOR_CODE:
+            case InputType::COLOR_CODE:
                 new ColorCodeField($input);
                 break;
 
-            case DataInputFactory::EMAIL:
+            case InputType::EMAIL:
                 new TextField($input);
                 $input->setValidator(new EmailValidator());
                 break;
 
-            case DataInputFactory::TEXTAREA:
+            case InputType::TEXTAREA:
                 new TextArea($input);
                 break;
 
-            case DataInputFactory::SELECT:
+            case InputType::SELECT:
                 new SelectField($input);
                 $input->getProcessor()->transact_empty_string_as_null = TRUE;
                 break;
 
-            case DataInputFactory::SELECT_MULTI:
+            case InputType::SELECT_MULTI:
                 new SelectMultipleField($input);
                 break;
 
-            case DataInputFactory::PASSWORD:
+            case InputType::PASSWORD:
                 new PasswordField($input);
                 $input->setValidator(new PasswordValidator());
                 break;
 
-            case DataInputFactory::HIDDEN:
+            case InputType::HIDDEN:
                 new HiddenField($input);
                 break;
 
-            case DataInputFactory::CHECKBOX:
+            case InputType::CHECKBOX:
                 new CheckField($input);
                 break;
 
-            case DataInputFactory::RADIO:
+            case InputType::RADIO:
                 new RadioField($input);
                 break;
 
-            case DataInputFactory::MCE_TEXTAREA:
+            case InputType::MCE_TEXTAREA:
                 new MCETextArea($input);
                 break;
 
-            case DataInputFactory::DATE:
+            case InputType::DATE:
                 new DateField($input);
                 $input->setValidator(new DateValidator());
                 break;
 
-            case DataInputFactory::TIME:
+            case InputType::TIME:
                 new TimeField($input);
                 $input->setValidator(new TimeValidator());
                 break;
 
-            case DataInputFactory::PHONE:
+            case InputType::PHONE:
                 new PhoneField($input);
                 $input->setValidator(new PhoneValidator());
                 break;
 
 
-            case DataInputFactory::NESTED_SELECT:
+            case InputType::NESTED_SELECT:
                 new NestedSelectField($input);
                 break;
 
-            case DataInputFactory::SLIDER:
+            case InputType::SLIDER:
                 new SliderField($input);
                 break;
 
-            case DataInputFactory::SESSION_IMAGE:
+            case InputType::SESSION_IMAGE:
 
                 $input = new ArrayDataInput($name, $label, $required);
 
@@ -170,7 +173,7 @@ class DataInputFactory
                 $input->setValidator($validator);
 
                 break;
-            case DataInputFactory::SESSION_FILE:
+            case InputType::SESSION_FILE:
 
                 $input = new ArrayDataInput($name, $label, $required);
 
@@ -183,14 +186,14 @@ class DataInputFactory
 
                 break;
 
-            case DataInputFactory::CAPTCHA_TEXT:
+            case InputType::CAPTCHA_TEXT:
 
                 $input = new DataInput($name, $label, $required);
                 new TextCaptchaField($input);
                 $input->setValidator(new TextCaptchaValidator());
                 break;
 
-            case DataInputFactory::CHECKBOX_TREEVIEW:
+            case InputType::CHECKBOX_TREEVIEW:
 
                 $input = new ArrayDataInput($name, $label, $required);
                 new CheckboxTreeView($input);

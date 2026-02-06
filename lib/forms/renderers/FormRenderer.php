@@ -109,7 +109,7 @@ class FormRenderer extends Form
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/FormRenderer.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/FormRenderer.css";
 
         return $arr;
     }

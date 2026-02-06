@@ -547,11 +547,11 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
             }
 
             if (is_array($value) || in_array($name, $this->json_attributes)) {
-                //debug("component attribute value is array: " . get_class($this) . ": $name");
+                //Debug::ErrorLog("component attribute value is array: " . get_class($this) . ": $name");
                 $value = json_encode($value);
             }
 
-            $attributes[] = $name . "='" . attributeValue($value) . "'";
+            $attributes[] = $name . "='" . Spark::AttributeValue($value) . "'";
 
         }
 
@@ -571,7 +571,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         }
 
         if (count($styles) > 0) {
-            $result = "style='".attributeValue(implode("; ", $styles))."'";
+            $result = "style='".Spark::AttributeValue(implode("; ", $styles))."'";
         }
         return $result;
 
@@ -595,7 +595,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
         $attrs = array();
         if (count($css)>0) {
-            $attrs[] = "class='" . attributeValue(implode(" ", $css)) . "'";
+            $attrs[] = "class='" . Spark::AttributeValue(implode(" ", $css)) . "'";
         }
         $attrs[] = $this->getAttributesText();
         $attrs[] = $this->getStyleText();

@@ -184,7 +184,7 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor
             $editID = $this->editID;
             if ($editID < 1 && isset($_GET["editID"])) {
                 $editID = (int)$_GET["editID"];
-                debug("Using editID from _GET");
+                Debug::ErrorLog("Using editID from _GET");
             }
 
             //update form and transactor editIDs
@@ -193,37 +193,37 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor
             if ($this->editID>0) {
                 $message = $this->getMessage(BeanFormEditor::MESSAGE_UPDATE);
 
-                debug("Loading bean data ".get_class($this->bean)." ID: ".$this->editID);
+                Debug::ErrorLog("Loading bean data ".get_class($this->bean)." ID: ".$this->editID);
                 //sets bean and editID to form
                 $this->form->loadBeanData($this->getEditID(), $this->getBean());
                 SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_LOADED, $this));
 
             }
             else {
-                debug("Add mode - not loading bean data");
+                Debug::ErrorLog("Add mode - not loading bean data");
             }
 
-            debug("Calling form processor");
+            Debug::ErrorLog("Calling form processor");
             $this->processor->process($this->form);
             SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_PROCESSED, $this));
 
             $process_status = $this->processor->getStatus();
 
             if ($process_status === IFormProcessor::STATUS_NOT_PROCESSED) {
-                debug("FormProcessor - NOT_PROCESSED");
+                Debug::ErrorLog("FormProcessor - NOT_PROCESSED");
                 return;
             }
             if ($process_status === IFormProcessor::STATUS_ERROR) {
-                debug("FormProcessor - ERROR");
+                Debug::ErrorLog("FormProcessor - ERROR");
                 throw new Exception($this->processor->getMessage());
             }
 
             //form is ok transact to db using the bean
-            debug("Transactor ProcessForm");
+            Debug::ErrorLog("Transactor ProcessForm");
             $this->transactor->processForm($this->form);
             SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_VALUES_TRANSACTED, $this));
 
-            debug("Transactor ProcessBean");
+            Debug::ErrorLog("Transactor ProcessBean");
             $this->transactor->processBean();
             SparkEventManager::emit(new BeanFormEditorEvent(BeanFormEditorEvent::FORM_BEAN_TRANSACED, $this));
 
@@ -242,14 +242,14 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor
 
             Session::SetAlert($message);
             if ($url instanceof URL) {
-                debug("Redirecting to: " . $url);
+                Debug::ErrorLog("Redirecting to: " . $url);
                 header("Location: " . $url);
                 exit;
             }
 
         }
         catch (Exception $e) {
-            debug("Exception received: " . $e->getMessage());
+            Debug::ErrorLog("Exception received: " . $e->getMessage());
             Session::SetAlert($e->getMessage());
             $this->error = $e->getMessage();
         }

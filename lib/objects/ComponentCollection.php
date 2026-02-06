@@ -29,7 +29,7 @@ class ComponentCollection extends SparkList {
 
         $object = $this->get($idx);
         if ($object instanceof Component) return $object;
-        //debug("getByAction: $action - idx: $idx");
+        //Debug::ErrorLog("getByAction: $action - idx: $idx");
         return null;
     }
 
@@ -44,7 +44,7 @@ class ComponentCollection extends SparkList {
 
         $idx = $this->index($comparator, $parameter);
         if (is_null($idx))return null;
-        //debug("getByContent: $content - idx: $idx");
+        //Debug::ErrorLog("getByContent: $content - idx: $idx");
         $object = $this->get($idx);
         if ($object instanceof Component) return $object;
         return null;
@@ -61,7 +61,7 @@ class ComponentCollection extends SparkList {
 
         $idx = $this->index($comparator, $name);
         if (is_null($idx))return null;
-        //debug("getByName: $name - idx: $idx");
+        //Debug::ErrorLog("getByName: $name - idx: $idx");
         $object = $this->get($idx);
         if ($object instanceof Component) return $object;
         return null;
@@ -120,7 +120,7 @@ class ComponentCollection extends SparkList {
 
     public function removeByAction(string $action) : void
     {
-        debug("removeByAction: $action");
+        Debug::ErrorLog("removeByAction: $action");
 
         $action = $this->getByAction($action);
         if ($action) {

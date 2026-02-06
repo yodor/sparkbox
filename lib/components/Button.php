@@ -65,7 +65,7 @@ class Button extends Input
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/ColorButton.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/ColorButton.css";
         return $arr;
     }
 

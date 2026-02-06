@@ -84,9 +84,9 @@ class GalleryTape extends Component implements IDataIteratorRenderer
     /**
      * @var IDataIterator
      */
-    protected $iterator;
+    protected IDataIterator $iterator;
 
-    protected $item_renderer;
+    protected DataIteratorItem $item_renderer;
 
     protected $default_renderer;
 
@@ -108,15 +108,15 @@ class GalleryTape extends Component implements IDataIteratorRenderer
     public function requiredStyle(): array
     {
         $ret = parent::requiredStyle();
-        $ret[] = SPARK_LOCAL . "/css/GalleryTape.css";
+        $ret[] = Spark::Get(Config::SPARK_LOCAL) . "/css/GalleryTape.css";
         return $ret;
     }
 
     public function requiredScript(): array
     {
         $ret = parent::requiredScript();
-        $ret[] = SPARK_LOCAL . "/js/SwipeListener.js";
-        $ret[] = SPARK_LOCAL . "/js/GalleryTape.js";
+        $ret[] = Spark::Get(Config::SPARK_LOCAL) . "/js/SwipeListener.js";
+        $ret[] = Spark::Get(Config::SPARK_LOCAL) . "/js/GalleryTape.js";
         return $ret;
     }
 

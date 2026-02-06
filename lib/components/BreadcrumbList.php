@@ -9,7 +9,7 @@ class BreadcrumbListItem extends Component {
         parent::__construct(false);
         $this->setTagName("li");
 
-        $this->setAttribute("itemscope", "");
+        $this->setAttribute("itemscope");
         $this->setAttribute("itemprop", "itemListElement");
         $this->setAttribute("itemtype", "https://schema.org/ListItem");
     }
@@ -30,7 +30,7 @@ class BreadcrumbList extends Container implements IHeadContents
 
         $this->setAttribute("aria-label", "Breadcrumb");
 
-        $this->setAttribute("itemscope", "");
+        $this->setAttribute("itemscope");
         $this->setAttribute("itemtype", "https://schema.org/BreadcrumbList");
 
         $this->renderer = new BreadcrumbListItem();
@@ -40,7 +40,7 @@ class BreadcrumbList extends Container implements IHeadContents
     public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/BreadcrumbList.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/BreadcrumbList.css";
         return $arr;
     }
 

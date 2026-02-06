@@ -18,7 +18,7 @@ class AdminUsersListPage extends BeanListPage
 
     }
 
-    public function initView()
+    public function initView(): ?Component
     {
         $bean = new AdminUsersBean();
 

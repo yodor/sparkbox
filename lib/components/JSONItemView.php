@@ -17,9 +17,9 @@ class ItemViewResponder extends JSONResponder
 
     public function _renderItems(JSONResponse $resp)
     {
-        debug("... start");
+        Debug::ErrorLog("... start");
         $this->view->processResponse($resp);
-        debug("... finish");
+        Debug::ErrorLog("... finish");
     }
 
 }
@@ -55,14 +55,14 @@ class JSONItemView extends ItemView
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/JSONItemView.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/JSONItemView.css";
         return $arr;
     }
 
     public function requiredScript() : array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/JSONItemView.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/JSONItemView.js";
         return $arr;
     }
 

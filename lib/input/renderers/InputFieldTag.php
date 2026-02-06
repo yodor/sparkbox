@@ -24,11 +24,10 @@ abstract class InputFieldTag extends InputField
         $type = $this->input->getType();
 
         if (!in_array($type, $this->skip_value_types) ) {
-//            $dataValue = attributeValue();
             $this->input->setValue((string)$this->dataInput->getValue());
         }
         else {
-            debug("Non value attribute input type: " . $type);
+            Debug::ErrorLog("Non value attribute input type: " . $type);
         }
 
     }

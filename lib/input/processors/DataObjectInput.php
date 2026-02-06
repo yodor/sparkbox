@@ -42,11 +42,11 @@ class DataObjectInput extends InputProcessor
         $name = $this->input->getName();
 
         if ($this->object->getValue()) {
-            debug("DataInput: '$name' - Transacting serialized version of DataObject: ".get_class($this->object));
+            Debug::ErrorLog("DataInput: '$name' - Transacting serialized version of DataObject: ".get_class($this->object));
             $transactor->appendValue($this->input->getName(), DBConnections::Open()->escape(serialize($this->object)));
         }
         else {
-            debug("DataInput: '$name' - DataObject value is null");
+            Debug::ErrorLog("DataInput: '$name' - DataObject value is null");
         }
 
     }
@@ -65,13 +65,13 @@ class DataObjectInput extends InputProcessor
 
         $object = @unserialize($object);
         if (!($object instanceof DataObject)) {
-            debug("Un-serialized object is not DataObject");
+            Debug::ErrorLog("Un-serialized object is not DataObject");
             return;
         }
 
         $this->object = $object;
 
-        debug("Setting value of DataInput from DataObject value");
+        Debug::ErrorLog("Setting value of DataInput from DataObject value");
         $this->input->setValue($this->object->getValue());
     }
 

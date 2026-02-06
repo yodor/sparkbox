@@ -7,7 +7,7 @@ include_once("iterators/ArrayDataIterator.php");
 
 class ResultViewHeader extends Container
 {
-    public $view_modes_enabled = FALSE;
+    public bool $view_modes_enabled = FALSE;
 
     protected Paginator $paginator;
 
@@ -58,7 +58,7 @@ class ResultViewHeader extends Container
         $this->items()->append($this->viewCaption);
 
 
-        $dataInput = DataInputFactory::Create(DataInputFactory::SELECT, Paginator::KEY_ORDER_BY, tr("Sort By"), 0);
+        $dataInput = DataInputFactory::Create(InputType::SELECT, Paginator::KEY_ORDER_BY, tr("Sort By"), 0);
         $dataInput->getRenderer()->setIterator(new ArrayDataIterator());
         $dataInput->getRenderer()->input()->setAttribute("onChange", "changeSort(this);");
         $this->sort = new InputComponent($dataInput);

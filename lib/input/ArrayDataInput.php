@@ -5,7 +5,7 @@ include_once("input/renderers/ArrayField.php");
 class ArrayDataInput extends DataInput
 {
 
-    public const ERROR_TEXT = "This input collection have errors";
+    public const string ERROR_TEXT = "This input collection have errors";
 
     public bool $source_label_visible = false;
 

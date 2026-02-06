@@ -64,7 +64,7 @@ class DBConnections extends SparkObject
             throw new Exception("Unable to get valid connection to database using connection name '$conn_name'");
         }
         catch (Exception $e) {
-            debug("Unable to open connection with '$conn_name'");
+            Debug::ErrorLog("Unable to open connection with '$conn_name'");
             throw $e;
         }
 
@@ -81,11 +81,11 @@ class DBConnections extends SparkObject
 
             if ($event->isEvent(DBDriverEvent::OPENED)) {
                 self::$active_count++;
-                debug("Opened - active count: ".self::$active_count);
+                Debug::ErrorLog("Opened - active count: ".self::$active_count);
             }
             else if ($event->isEvent(DBDriverEvent::CLOSED)) {
                 self::$active_count--;
-                debug("Closed - active count: ".self::$active_count);
+                Debug::ErrorLog("Closed - active count: ".self::$active_count);
             }
         }
 

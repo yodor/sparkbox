@@ -79,7 +79,7 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/InputField.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/InputField.css";
         return $arr;
     }
 

@@ -35,7 +35,7 @@ class DynamicPageView extends Container implements IRequestProcessor
 
     }
 
-    public function processInput()
+    public function processInput(): void
     {
 
         try {

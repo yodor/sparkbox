@@ -89,12 +89,12 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
         $this->is_active = $is_active;
     }
 
-    public function processInput()
+    public function processInput(): void
     {
         if (isset($_GET[$this->name])) {
             $value = $_GET[$this->name];
             if ($value) {
-                $this->value = sanitizeInput($value);
+                $this->value = Spark::SanitizeInput($value);
                 $this->is_active = true;
                 //call closure to work with the clause collection
                 if ($this->closure instanceof Closure)($this->closure)($this);

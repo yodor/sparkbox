@@ -121,14 +121,14 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/MessageDialog.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/MessageDialog.css";
         return $arr;
     }
 
     public function requiredScript() : array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/dialogs/MessageDialog.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/dialogs/MessageDialog.js";
         return $arr;
     }
 

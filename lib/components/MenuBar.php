@@ -74,14 +74,14 @@ class MenuBar extends Container
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/MenuBar.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/MenuBar.css";
         return $arr;
     }
 
     public function requiredScript() : array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/MenuBar.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/MenuBar.js";
         return $arr;
     }
 

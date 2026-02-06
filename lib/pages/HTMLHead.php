@@ -77,7 +77,7 @@ class HTMLHead extends Container
         //default favicon
         $this->favicon = new Link();
         $this->favicon->setRelation("shortcut icon");
-        $this->favicon->setHref("//" . SITE_DOMAIN . LOCAL . "/favicon.ico");
+        $this->favicon->setHref("//" . Spark::Get(Config::SITE_DOMAIN) . Spark::Get(Config::LOCAL) . "/favicon.ico");
         $this->items()->append($this->favicon);
 
         $meta = new ClosureComponent($this->renderMeta(...), false);
@@ -161,7 +161,7 @@ class HTMLHead extends Container
                 }
                 $builder->remove($name);
             }
-            $canonical_href = fullURL($builder->toString());
+            $canonical_href = new URL($builder->toString())->fullURL();
             echo "<link rel='canonical' href='$canonical_href'>\n";
         }
     }
@@ -185,7 +185,7 @@ class HTMLHead extends Container
         $x_current->setAttribute("hreflang", $currentLanguageISO2);
         $x_current->render();
 
-        if (TRANSLATOR_ENABLED) {
+        if (Spark::GetBoolean(Config::TRANSLATOR_ENABLED)) {
 
             $lb = new LanguagesBean();
             $qry = $lb->queryFull();

@@ -19,7 +19,7 @@ class MenuItem extends MenuItemList
 
     protected bool $need_translate = false;
 
-    public static string $icon_path = SPARK_LOCAL . "/images/admin/spark_icons/";
+    public static string $icon_path = "";
 
     protected string $tooltip = "";
 
@@ -31,6 +31,13 @@ class MenuItem extends MenuItemList
     public function __construct(string $name, string $href = "", string $icon = "", string $tooltip="")
     {
         parent::__construct();
+
+        if (MenuItem::$icon_path) {
+
+        }
+        else {
+            MenuItem::$icon_path = Spark::Get(Config::SPARK_LOCAL) . "/images/admin/spark_icons/";
+        }
 
         $this->name = $name;
         $this->href = $href;

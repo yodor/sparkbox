@@ -18,35 +18,37 @@ class AdminLogin extends PageTemplate
 
     }
 
-    protected function initPage()
+    protected function initPage(): void
     {
         $this->page = new AdminLoginPage();
         //$this->page->head()->addCSS(SPARK_LOCAL . "/css/LoginForm.css");
 
     }
 
-    protected function initPageActions()
+    protected function initPageActions(): void
     {
 
     }
 
-    public function initView()
+    public function initView(): ?Component
     {
 
         $auth = new AdminAuthenticator();
 
         $req = new AuthenticatorResponder($auth);
-        $req->setCancelUrl(LOCAL . "/admin/login.php");
-        $req->setSuccessUrl(LOCAL . "/admin/index.php");
+        $req->setCancelUrl(Spark::Get(Config::ADMIN_LOCAL) . "/login.php");
+        $req->setSuccessUrl(Spark::Get(Config::ADMIN_LOCAL) . "/index.php");
 
         $af = new LoginForm();
 
         $afr = new LoginFormRenderer($af, $req);
 
-        $afr->setCaption(SITE_TITLE . "<BR><small>" . tr("Administration") . "</small>");
+        $afr->setCaption(Spark::Get(Config::SITE_TITLE) . "<BR><small>" . tr("Administration") . "</small>");
 
         $this->view = $afr;
         $this->items()->append($afr);
+
+        return $afr;
     }
 
     public function startRender(): void

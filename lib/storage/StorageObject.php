@@ -4,7 +4,7 @@ include_once("storage/DataBuffer.php");
 class StorageObject
 {
 
-    final public const Serial = 1.0;
+    final public const float Serial = 1.0;
 
     protected string $dataKey = "";
 
@@ -107,7 +107,7 @@ class StorageObject
             throw new Exception("Unable to reconstruct from this row. Required fields not found");
         }
 
-        debug("Found needed array keys to create StorageObject");
+        Debug::ErrorLog("Found needed array keys to create StorageObject");
 
         if (isset($result["width"]) && isset($result["height"])) {
             $object = new ImageStorageObject();
@@ -127,9 +127,9 @@ class StorageObject
             $object->setTimestamp(strtotime($result["date_upload"]));
         }
 
-        $object->setUID(sparkHash($object->getFilename()."|".$object->timestamp()));
+        $object->setUID(Spark::Hash($object->getFilename()."|".$object->timestamp()));
 
-        debug("Reconstructed: ". get_class($object).
+        Debug::ErrorLog("Reconstructed: ". get_class($object).
             " UID: " . $object->UID() .
             " MIME: " . $object->buffer()->mime() .
             " Length: " . $object->buffer->length()) .
@@ -157,7 +157,7 @@ class StorageObject
     {
         if (!array_key_exists("Serial", $data)) {
             $this->compatUnserialize = true;
-            debug("Using compatibility key names");
+            Debug::ErrorLog("Using compatibility key names");
         }
 
         $this->buffer = new DataBuffer();

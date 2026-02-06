@@ -18,7 +18,7 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
 
     protected string $label = "";
 
-    protected $value = null;
+    protected mixed $value = null;
 
     protected int $id = -1;
 
@@ -159,12 +159,12 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
         return $this->label_key;
     }
 
-    public function setValue($value) : void
+    public function setValue(mixed $value) : void
     {
         $this->value = $value;
     }
 
-    public function getValue()
+    public function getValue() : mixed
     {
         return $this->value;
     }

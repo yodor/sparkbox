@@ -37,7 +37,7 @@ class DBCacheEntry extends CacheEntry
     public function __construct(string $cacheName, string $className, int $beanID)
     {
         parent::__construct();
-        debug("CacheName: $cacheName | ClassName: $className | BeanID: $beanID");
+        Debug::ErrorLog("CacheName: $cacheName | ClassName: $className | BeanID: $beanID");
 
         $this->cacheName = $cacheName;
         $this->className = $className;
@@ -49,7 +49,7 @@ class DBCacheEntry extends CacheEntry
 
     protected function queryCache() : void
     {
-        debug("Doing cache query ...");
+        Debug::ErrorLog("Doing cache query ...");
         $query = $this->bean->queryFull();
         $query->select->where()->add("cacheName", "'{$this->cacheName}'");
         $query->select->where()->add("className", "'{$this->className}'");
@@ -58,12 +58,12 @@ class DBCacheEntry extends CacheEntry
         //should be only one match
 
         $this->resultCount = $query->exec();
-        debug("Result count: ".$this->resultCount);
+        Debug::ErrorLog("Result count: ".$this->resultCount);
 
         if ($this->resultCount > 0) {
             $this->result = $query->nextResult();
             $this->entryID = (int)$this->result->get($this->bean->key());
-            debug("EntryID: ".$this->entryID);
+            Debug::ErrorLog("EntryID: ".$this->entryID);
         }
     }
 

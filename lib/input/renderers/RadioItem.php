@@ -60,7 +60,7 @@ class RadioItem extends DataIteratorItem
         //passthrough the name to the actual inputs
         $this->removeAttribute("name");
 
-        $this->input->setValue(attributeValue($this->value));
+        $this->input->setValue(Spark::AttributeValue($this->value));
 
         if ($this->isSelected()) {
             $this->input->setAttribute("checked", "");
@@ -69,7 +69,7 @@ class RadioItem extends DataIteratorItem
             $this->input->removeAttribute("checked");
         }
 
-        $this->span->setContents(attributeValue($this->label));
+        $this->span->setContents(Spark::AttributeValue($this->label));
     }
 }
 

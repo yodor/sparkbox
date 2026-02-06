@@ -5,7 +5,7 @@ class SparkHTTPResponse
 
     protected array $headers = array();
 
-    public const DATE_FORMAT = "D, d M Y H:i:s T";
+    public const string DATE_FORMAT = "D, d M Y H:i:s T";
 
     protected string $disposition = "inline";
     protected string $disposition_filename = "";
@@ -79,11 +79,11 @@ class SparkHTTPResponse
     {
         $modifiedSince = strtotime($this->requestModifiedSince());
 
-        debug("Request IF_MODIFIED_SINCE: ".$modifiedSince);
-        debug("Response last_modified: ".$lastModified);
+        Debug::ErrorLog("Request IF_MODIFIED_SINCE: ".$modifiedSince);
+        Debug::ErrorLog("Response last_modified: ".$lastModified);
         if ($modifiedSince !== FALSE) {
             if ($lastModified<=$modifiedSince) {
-                debug("Request IF_MODIFIED_SINCE matching - responding with HTTP/304");
+                Debug::ErrorLog("Request IF_MODIFIED_SINCE matching - responding with HTTP/304");
                 $this->sendNotModified();
                 exit;
             }
@@ -101,10 +101,10 @@ class SparkHTTPResponse
     {
         //browser is sending ETag
         $requestETag = $this->requestETag();
-        debug("Request ETag is: ".$requestETag);
-        debug("Response ETag is: ".$ETag);
+        Debug::ErrorLog("Request ETag is: ".$requestETag);
+        Debug::ErrorLog("Response ETag is: ".$ETag);
         if (strcasecmp($requestETag, $ETag)==0) {
-            debug("Request ETag match response ETag - responding with HTTP/304");
+            Debug::ErrorLog("Request ETag match response ETag - responding with HTTP/304");
             $this->sendNotModified();
             exit;
         }
@@ -171,15 +171,15 @@ class SparkHTTPResponse
             if (strlen($key) < 1) continue;
             if (strlen($val) < 1) {
                 header($key);
-                //debug("Header: $key");
+                //Debug::ErrorLog("Header: $key");
             }
             else {
                 header("$key: $val");
-                //debug("Header: $key: $val");
+                //Debug::ErrorLog("Header: $key: $val");
             }
         }
 
-        debug("Response headers set");
+        Debug::ErrorLog("Response headers set");
     }
 
     public function sendCacheEntry(CacheEntry $cacheEntry) : void
@@ -203,7 +203,7 @@ class SparkHTTPResponse
     public function sendFile(SparkFile $file) : void
     {
 
-        debug("Sending file: ".$file->getAbsoluteFilename());
+        Debug::ErrorLog("Sending file: ".$file->getAbsoluteFilename());
 
         $this->setHeader("Content-Type", $file->getMIME());
         $this->setHeader("Content-Length", $file->length());
@@ -213,7 +213,7 @@ class SparkHTTPResponse
             $filename = $file->getFilename();
         }
 
-        debug("Using disposition filename: ".$filename);
+        Debug::ErrorLog("Using disposition filename: ".$filename);
 
         $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
 
@@ -232,7 +232,7 @@ class SparkHTTPResponse
         $file->passthru();
         $file->lock(LOCK_UN);
         $file->close();
-        debug("Sending complete ...");
+        Debug::ErrorLog("Sending complete ...");
     }
 
     /**
@@ -243,15 +243,15 @@ class SparkHTTPResponse
     {
         if ($buffer->length()<1) return;
 
-        debug("Sending DataBuffer ...");
+        Debug::ErrorLog("Sending DataBuffer ...");
 
         $filename = $this->disposition_filename;
         if(!empty($filename)) {
-            debug("Using disposition filename: ".$filename);
+            Debug::ErrorLog("Using disposition filename: ".$filename);
             $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
         }
         else {
-            debug("Disposition filename not set - not using disposition header");
+            Debug::ErrorLog("Disposition filename not set - not using disposition header");
         }
 
         $this->setHeader("Content-Type", $buffer->mime());
@@ -261,7 +261,7 @@ class SparkHTTPResponse
 
         echo $buffer->data();
 
-        debug("Data sending completed: ".$buffer->length()." bytes sent");
+        Debug::ErrorLog("Data sending completed: ".$buffer->length()." bytes sent");
 
     }
 }

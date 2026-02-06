@@ -10,7 +10,7 @@ class ActionCollection extends ComponentCollection
      * Add URLParameter $param to all actions in this collection
      * @param URLParameter $param
      */
-    public function addURLParameter(URLParameter $param)
+    public function addURLParameter(URLParameter $param) : void
     {
 
         foreach ($this->elements as $action) {

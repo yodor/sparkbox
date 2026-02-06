@@ -15,7 +15,7 @@ class Marquee extends Component
     public function requiredStyle() : array
     {
         $result = parent::requiredStyle();
-        $result[] = SPARK_LOCAL."/css/Marquee.css";
+        $result[] = Spark::Get(Config::SPARK_LOCAL)."/css/Marquee.css";
         return $result;
     }
 

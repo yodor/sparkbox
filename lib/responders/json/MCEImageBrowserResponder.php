@@ -16,7 +16,7 @@ class ImageDimensionForm extends InputForm
 
         $render_modes = new ArrayDataIterator($modes);
 
-        $field = DataInputFactory::Create(DataInputFactory::SELECT, "render_mode", "Render Mode", 0);
+        $field = DataInputFactory::Create(InputType::SELECT, "render_mode", "Render Mode", 0);
 
         $renderer = $field->getRenderer();
         if ($renderer instanceof SelectField) {
@@ -27,16 +27,16 @@ class ImageDimensionForm extends InputForm
         }
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "caption", "Caption", 0);
+        $field = DataInputFactory::Create(InputType::TEXT, "caption", "Caption", 0);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "width", "Width", 0);
+        $field = DataInputFactory::Create(InputType::TEXT, "width", "Width", 0);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "height", "Height", 0);
+        $field = DataInputFactory::Create(InputType::TEXT, "height", "Height", 0);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::CHECKBOX, "enable_popup", "Enable Popup", 0);
+        $field = DataInputFactory::Create(InputType::CHECKBOX, "enable_popup", "Enable Popup", 0);
         $field->getRenderer()->input()?->setAttribute("tooltip", "Enable fullscreen view");
         $this->addInput($field);
     }
@@ -104,7 +104,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
     //return all images for section
     protected function _find(JSONResponse $resp)
     {
-        debug("Section: '$this->section_name' Section Key: '$this->section_key'");
+        Debug::ErrorLog("Section: '$this->section_name' Section Key: '$this->section_key'");
 
         $bean = new MCEImagesBean();
         $qry = $bean->query();
@@ -130,23 +130,23 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $imageID = $result->get("imageID");
             $object = @unserialize($result->get("photo"));
             if (! ($object instanceof ImageStorageObject)) {
-                debug("Skipping non ImageStorageObject - ID: $imageID");
+                Debug::ErrorLog("Skipping non ImageStorageObject - ID: $imageID");
                 continue;
             }
             try {
-                debug("Creating response object for ID: $imageID");
+                Debug::ErrorLog("Creating response object for ID: $imageID");
                 //force ID as uid
                 $object->setUID($imageID);
                 //getHTML is used inside the viewport
                 $resp->objects[] = $this->createResponseObject($object, $this->getHTML($object, $this->field_name));
             }
             catch (Exception $e) {
-                debug("Error creating response object: ".$e->getMessage());
+                Debug::ErrorLog("Error creating response object: ".$e->getMessage());
             }
         }
 
         $total = count($resp->objects);
-        debug("Response object_count: $total");
+        Debug::ErrorLog("Response object_count: $total");
         $resp->object_count = $total;
 
     }
@@ -173,7 +173,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
         $uploadObject->setUID($imageID);
 
-        debug("Stored object to mce_images using ID: $imageID");
+        Debug::ErrorLog("Stored object to mce_images using ID: $imageID");
 
     }
 

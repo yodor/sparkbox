@@ -26,9 +26,7 @@ class Container extends Component
 
     function __clone()
     {
-        if ($this->items instanceof ComponentCollection) {
-            $this->items = clone $this->items;
-        }
+        $this->items = clone $this->items;
     }
 
     public function __construct(bool $chained_component_class = true)
@@ -41,7 +39,7 @@ class Container extends Component
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/Container.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/Container.css";
         return $arr;
     }
 

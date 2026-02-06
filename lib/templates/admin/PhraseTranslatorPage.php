@@ -38,7 +38,7 @@ class PhraseTranslatorPage extends BeanListPage
 
         $this->page->setName(tr("Translations For") . ": " . $rc->getData("language"));
 
-        $this->keyword_search->getForm()->addInput(DataInputFactory::Create(DataInputFactory::HIDDEN, "langID", "langID", false));
+        $this->keyword_search->getForm()->addInput(DataInputFactory::Create(InputType::HIDDEN, "langID", "langID", false));
         $this->keyword_search->getForm()->getInput("langID")->setValue($this->langID);
         $this->keyword_search->getForm()->getInput("langID")->skip_search_filter_processing = true;
 
@@ -58,12 +58,12 @@ class PhraseTranslatorPage extends BeanListPage
 
     }
 
-    protected function initPageActions()
+    protected function initPageActions(): void
     {
         //
     }
 
-    protected function initViewActions(ActionCollection $act)
+    protected function initViewActions(ActionCollection $act) : void
     {
         $action_translate = new Action("Translate", "javascript:document.phraseTranslator.edit(%textID%)");
         $act->append($action_translate);
@@ -73,7 +73,7 @@ class PhraseTranslatorPage extends BeanListPage
         $act->append($action_clear);
     }
 
-    public function initView()
+    public function initView(): ?Component
     {
 
         parent::initView();
@@ -88,6 +88,7 @@ class PhraseTranslatorPage extends BeanListPage
         $translation->addDataAttribute("textID");
         $translation->addDataAttribute("trID");
 
+        return $this->view;
     }
 
 }

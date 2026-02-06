@@ -1,20 +1,20 @@
 
-.KeywordSearch {
+.FormRenderer.KeywordSearch {
     display:inline-flex !important;
 }
-.KeywordSearch .InputComponent {
+.FormRenderer.KeywordSearch .InputComponent {
     align-self: flex-end;
 }
-.KeywordSearch .InputComponent[field='keyword'] .InputLabel {
+.FormRenderer.KeywordSearch .InputComponent[field='keyword'] .InputLabel {
     display: none;
 }
-.KeywordSearch .Container.TextSpace {
+.FormRenderer.KeywordSearch .Container.TextSpace {
     display: none;
 }
-.KeywordSearch button {
+.FormRenderer.KeywordSearch button {
     cursor: pointer;
 }
-.KeywordSearch input:focus, .KeywordSearch button:focus {
+.FormRenderer.KeywordSearch input:focus, .KeywordSearch button:focus {
     outline: 1px solid var(--theme-accent);
     /*outline-offset: 1px;*/
 }

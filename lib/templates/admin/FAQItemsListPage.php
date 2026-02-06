@@ -21,7 +21,7 @@ class FAQItemsListPage extends BeanListPage
         $this->setBean($bean);
 
     }
-    protected function initPage()
+    protected function initPage(): void
     {
         parent::initPage();
 

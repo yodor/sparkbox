@@ -92,7 +92,7 @@ class MySQLiDriver extends DBDriver
             if ($res === false) throw new Exception("Result is false");
         }
         catch (Exception $e) {
-            debug("Query exception: ".$e->getMessage()." | Connection Error: ".$this->conn->error." | SQL: $str");
+            Debug::ErrorLog("Query exception: ".$e->getMessage()." | Connection Error: ".$this->conn->error." | SQL: $str");
             throw new Exception("Query exception: ".$e->getMessage());
         }
 

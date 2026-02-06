@@ -9,7 +9,7 @@ class RequestController
 
 
 
-    protected static $responders = array();
+    protected static array $responders = array();
 
     public static function isJSONRequest(): bool
     {
@@ -31,7 +31,7 @@ class RequestController
     {
         $name = $responder->getName();
         self::$responders[$name] = $responder;
-        debug("Adding: '$name'");
+        Debug::ErrorLog("Adding: '$name'");
 
         SparkEventManager::emit(new RequestControllerEvent(RequestControllerEvent::RESPONDER_ADDED, $responder));
     }
@@ -45,7 +45,7 @@ class RequestController
     {
         $name = $responder->getName();
         if (isset(self::$responders[$name])) {
-            debug("Removing: '$name'");
+            Debug::ErrorLog("Removing: '$name'");
             SparkEventManager::emit(new RequestControllerEvent(RequestControllerEvent::RESPONDER_REMOVED, $responder));
         }
     }
@@ -78,7 +78,7 @@ class RequestController
 
         $names = array_keys(self::$responders);
 
-        debug("Registered responders: ", $names);
+        Debug::ErrorLog("Registered responders: ", $names);
 
         $request_responder = null;
 
@@ -96,17 +96,17 @@ class RequestController
         try {
 
             if (is_null($request_responder)) {
-                debug("No responder accepted this request: ".URL::Current());
+                Debug::ErrorLog("No responder accepted this request: ".URL::Current());
                 if ($isJson) throw new Exception("No responder is registered to process this request");
 
                 return;
             }
 
-            debug("Responder " . get_class($request_responder) . " accepted processing. Is JSON: ". ($isJson?"YES":"NO"));
+            Debug::ErrorLog("Responder " . get_class($request_responder) . " accepted processing. Is JSON: ". ($isJson?"YES":"NO"));
             $request_responder->process();
         }
         catch (Exception $e) {
-            debug("Error processing this responder: ".$e->getMessage());
+            Debug::ErrorLog("Error processing this responder: ".$e->getMessage());
             $exception = $e;
         }
 
@@ -132,12 +132,12 @@ class RequestController
         }
 
         if ($redirectURL instanceof URL) {
-            debug("Redirecting to URL: ".$redirectURL);
+            Debug::ErrorLog("Redirecting to URL: ".$redirectURL);
             header("Location: " . $redirectURL);
             exit;
         }
         else {
-            debug("Redirect URL is not set");
+            Debug::ErrorLog("Redirect URL is not set");
         }
 
     }

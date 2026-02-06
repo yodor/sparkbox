@@ -8,7 +8,7 @@ class AdminLoginPage extends SparkPage
     {
         parent::__construct();
 
-        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminLoginPage.css");
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminLoginPage.css");
 
         $this->setTitle(tr("Login"));
     }

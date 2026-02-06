@@ -19,9 +19,19 @@ class Session
             if (headers_sent($filename, $line)) {
                 throw new Exception("Headers already sent in $filename line $line");
             }
+
+            session_set_cookie_params([
+                "lifetime"   => 0,                     // session cookie (browser close)
+                "path"       => Spark::Get(Config::LOCAL),
+                "domain"     => Spark::Get(Config::COOKIE_DOMAIN),                    // current host; use '.example.com' for subdomains
+                "secure"     => true,                  // very strongly recommended
+                "httponly"   => true,
+                "samesite"   => "Strict",                 // or 'Strict' for maximum CSRF protection
+            ]);
+
             session_start();
             Session::$is_started = TRUE;
-            debug("Starting session ID: " . session_id());
+            Debug::ErrorLog("Starting session ID: " . session_id());
         }
     }
 
@@ -37,6 +47,7 @@ class Session
 
             //Delete the session cookie
             $params = session_get_cookie_params();
+
             setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 
             //Destroy the session
@@ -93,28 +104,28 @@ class Session
         }
     }
 
-    public static function SetCookie(string $key, $val, $expire = 0) : void
+    public static function SetCookie(string $key, string $val, $expire = 0) : void
     {
-        $cookie_path = LOCAL;
+        $cookie_path = Spark::Get(Config::LOCAL);
         if (!$cookie_path) $cookie_path = "/";
 
         $_COOKIE[$key] = $val;
-        setcookie($key, $val, $expire, $cookie_path, COOKIE_DOMAIN);
 
+        setcookie($key, $val, $expire, $cookie_path, Spark::Get(Config::COOKIE_DOMAIN), true, true);
     }
 
     public static function ClearCookie(string $key) : void
     {
-        $cookie_path = LOCAL;
+        $cookie_path = Spark::Get(Config::LOCAL);
         if (!$cookie_path) $cookie_path = "/";
 
-        setcookie($key, "", 1, $cookie_path, COOKIE_DOMAIN);
+        setcookie($key, "", 1, $cookie_path, Spark::Get(Config::COOKIE_DOMAIN), true, true);
         if (isset($_COOKIE[$key])) {
             unset($_COOKIE[$key]);
         }
     }
 
-    public static function GetCookie(string $key, $default = FALSE)
+    public static function GetCookie(string $key, string $default = "") : string
     {
         if (isset($_COOKIE[$key])) {
             return $_COOKIE[$key];
@@ -124,12 +135,12 @@ class Session
         }
     }
 
-    public static function HaveCookie(string $key)
+    public static function HaveCookie(string $key) : bool
     {
         return isset($_COOKIE[$key]);
     }
 
-    public static function SetAlert(string $msg)
+    public static function SetAlert(string $msg) : void
     {
         if (strlen($msg) > 0) {
             Session::Set(Session::ALERT, $msg);

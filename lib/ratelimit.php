@@ -90,7 +90,7 @@ function rateCheck(string $install_path)
 
 
 }
-
+if (!isset($install_path))throw new Exception("INSTALL_PATH not set");
 rateCheck($install_path);
 
 ?>

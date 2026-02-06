@@ -22,7 +22,7 @@ class TextArea extends InputField
     {
         parent::processAttributes();
 
-        $dataValue = attributeValue((string)$this->dataInput->getValue());
+        $dataValue = Spark::AttributeValue((string)$this->dataInput->getValue());
 
         $this->input->setContents($dataValue);
     }

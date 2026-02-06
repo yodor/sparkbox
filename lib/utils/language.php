@@ -13,7 +13,7 @@ if (defined("TRANSLATOR_ENABLED") &&
     }
     catch (Exception $e) {
         $translator = null;
-        debug("Translator can not be enabled: ".$e->getMessage());
+        Debug::ErrorLog("Translator can not be enabled: ".$e->getMessage());
     }
 }
 

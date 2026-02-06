@@ -5,10 +5,10 @@ include_once("input/DataInput.php");
 class NumericValidator implements IInputValidator
 {
 
-    public $allow_zero = FALSE;
-    public $allow_negative = FALSE;
+    protected bool $allow_zero = FALSE;
+    protected bool $allow_negative = FALSE;
 
-    public function __construct($allow_zero = FALSE, $allow_negative = FALSE)
+    public function __construct(bool $allow_zero = FALSE, bool $allow_negative = FALSE)
     {
         $this->allow_zero = $allow_zero;
         $this->allow_negative = $allow_negative;

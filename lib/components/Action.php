@@ -56,7 +56,7 @@ class Action extends DataIteratorItem
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/Action.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/Action.css";
         return $arr;
     }
 
@@ -75,10 +75,10 @@ class Action extends DataIteratorItem
         parent::setData($data);
 
         if ($this->check_code) {
-            debug("Action has check_code anonymous function set: " . $this->getContents());
+            Debug::ErrorLog("Action has check_code anonymous function set: " . $this->getContents());
             $check_code = $this->check_code;
             if (!$check_code($this, $data)) {
-                debug("check_code disabled rendering of this action");
+                Debug::ErrorLog("check_code disabled rendering of this action");
                 $this->render_enabled = FALSE;
                 return;
             }
@@ -115,12 +115,12 @@ class Action extends DataIteratorItem
         return $this->check_code;
     }
 
-    public function setCheckCode(?Closure $check_code)
+    public function setCheckCode(?Closure $check_code) : void
     {
         $this->check_code = $check_code;
     }
 
-    public static function RenderActions(array $actions, bool $separator = FALSE, bool $translate = FALSE)
+    public static function RenderActions(array $actions, bool $separator = FALSE, bool $translate = FALSE) : void
     {
         foreach ($actions as $item) {
             if ($item instanceof MenuItem) {

@@ -10,8 +10,11 @@
     border: 1px solid #eaeaea;
 }
 
-.AdminLoginPage .FormRenderer .InputComponent {
-    align-self:stretch;
-}
+/*.AdminLoginPage .FormRenderer .InputComponent {*/
+/*    align-self:stretch;*/
+/*}*/
 
+.AdminLoginPage .FormRenderer .InputComponent input {
+    flex-basis:100%;
+}
 

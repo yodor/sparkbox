@@ -20,7 +20,7 @@ class ImageStorageObject extends FileStorageObject
             $this->setUID($file_storage->UID());
             $this->setData($file_storage->data());
 
-            debug("Copied data from FileStorageObject UID: " . $file_storage->UID());
+            Debug::ErrorLog("Copied data from FileStorageObject UID: " . $file_storage->UID());
         }
     }
 
@@ -36,7 +36,7 @@ class ImageStorageObject extends FileStorageObject
 
     protected function processData(string $data) : void
     {
-        debug("Querying image dimensions. Data Length: " . strlen($data));
+        Debug::ErrorLog("Querying image dimensions. Data Length: " . strlen($data));
 
         $source = @imagecreatefromstring($data);
         if (!$source) throw new Exception("Unable to create image object using the input data");
@@ -47,7 +47,7 @@ class ImageStorageObject extends FileStorageObject
         //force garbage collection
         $source=null;
 
-        debug("Image dimension [$this->width x $this->height]");
+        Debug::ErrorLog("Image dimension [$this->width x $this->height]");
 
         if ($this->width < 1 || $this->height < 1) {
             throw new Exception("Invalid image dimensions from input data");

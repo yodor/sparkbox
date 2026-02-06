@@ -72,7 +72,7 @@ class ImageDataResponse extends BeanDataResponse
         $parts[] = $this->field;
         $parts[] = $this->scaler->getWidth();
         $parts[] = $this->scaler->getHeight();
-        $parts[] = $this->scaler->getMode();
+        $parts[] = $this->scaler->getMode()->value;
         if ($this->scaler->isGrayFilterEnabled()) {
             $parts[] = ImageDataResponse::FILTER_GRAY;
         }
@@ -88,7 +88,7 @@ class ImageDataResponse extends BeanDataResponse
             $watermark = $this->scaler->getWatermark();
             $parts[] = $watermark->getMarginX();
             $parts[] = $watermark->getMarginY();
-            $parts[] = $watermark->getPosition();
+            $parts[] = $watermark->getPosition()->value;
 
             $file = $watermark->getFile();
             $parts[] = $file->getAbsoluteFilename();
@@ -101,7 +101,7 @@ class ImageDataResponse extends BeanDataResponse
         $parts[] = $this->cacheName();
         $parts[] = $this->getLastModified();
 
-        return sparkHash(implode("-", $parts));
+        return Spark::Hash(implode("-", $parts));
     }
 
 }

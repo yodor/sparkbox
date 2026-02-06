@@ -26,7 +26,7 @@ class ForgotPasswordProcessor extends FormProcessor
         $users = new AdminUsersBean();
 
         $random_pass = Authenticator::RandomToken(8);
-        $fpm = new ForgotPasswordMailer($email, $random_pass, fullURL(ADMIN_LOCAL . "/login.php"));
+        $fpm = new ForgotPasswordMailer($email, $random_pass, new URL(Spark::Get(Config::ADMIN_LOCAL) . "/login.php")->fullURL());
         $db = DBConnections::Open();
         try {
             $db->transaction();
@@ -57,26 +57,28 @@ class AdminLoginForgotPassword extends AdminLogin
         parent::__construct();
 
         $this->page->setTitle(tr("Forgot Password"));
-        $this->page->head()->addCSS(SPARK_LOCAL . "/css/LoginForm.css");
+        $this->page->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/LoginForm.css");
 
         $this->form = new InputForm();
-        $this->form->addInput(DataInputFactory::Create(DataInputFactory::EMAIL, "email", "Input your registered email", 1));
+        $this->form->addInput(DataInputFactory::Create(InputType::EMAIL, "email", "Input your registered email", 1));
 
 
     }
 
 
-    public function initView()
+    public function initView(): ?Component
     {
 
         $frend = new FormRenderer($this->form);
         $frend->getSubmitButton()->setContents("Send");
         $frend->setClassName("LoginFormRenderer");
-        $frend->setCaption(SITE_TITLE . "<BR><small>" . tr("Administration") . "</small>");
+        $frend->setCaption(Spark::Get(Config::SITE_TITLE) . "<BR><small>" . tr("Administration") . "</small>");
 
         $this->view = $frend;
 
         $this->items()->append($this->view);
+
+        return $frend;
     }
 
     public function startRender(): void

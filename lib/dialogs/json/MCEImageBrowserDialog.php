@@ -25,7 +25,7 @@ class MCEImageBrowserDialog extends JSONDialog
         $this->setResponder(new MCEImageBrowserResponder());
 
 
-        $this->image_input = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "mceImage", "Upload Image", 1);
+        $this->image_input = DataInputFactory::Create(InputType::SESSION_IMAGE, "mceImage", "Upload Image", 1);
         $this->image_input->getProcessor()->setTransactBeanItemLimit(4);
 
         $session_image = $this->image_input->getRenderer();
@@ -51,8 +51,8 @@ class MCEImageBrowserDialog extends JSONDialog
     public function requiredScript(): array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/dialogs/ConfirmMessageDialog.js";
-        $arr[] = SPARK_LOCAL . "/js/dialogs/json/MCEImageBrowserDialog.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/dialogs/ConfirmMessageDialog.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/dialogs/json/MCEImageBrowserDialog.js";
         return $arr;
     }
 

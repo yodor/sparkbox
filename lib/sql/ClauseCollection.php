@@ -19,7 +19,7 @@ class ClauseCollection extends SparkList implements ISQLGet
         //if ($clause->equals($clause_existing)) {
 
         if ($this->contains($object)) {
-            debug("Clause already exists: ".$object->getSQL());
+            Debug::ErrorLog("Clause already exists: ".$object->getSQL());
             return;
         }
         parent::append($object);

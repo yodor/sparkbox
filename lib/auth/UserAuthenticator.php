@@ -5,7 +5,7 @@ include_once("beans/UsersBean.php");
 class UserAuthenticator extends Authenticator
 {
 
-    public const CONTEXT_NAME = "UserContext";
+    public const string CONTEXT_NAME = "UserContext";
 
     public function __construct()
     {

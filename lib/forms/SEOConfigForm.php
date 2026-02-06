@@ -10,16 +10,16 @@ class SEOConfigForm extends InputForm
     {
         parent::__construct();
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXTAREA, "meta_description", "Meta Description", 0);
+        $field = DataInputFactory::Create(InputType::TEXTAREA, "meta_description", "Meta Description", 0);
         $rend = $field->getRenderer();
         $rend->input()?->setAttribute("rows", 10);
         $rend->input()?->setAttribute("cols", 80);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "googleID_analytics", "Google Analytics ID (eg: UA-123456789-1)", 0);
+        $field = DataInputFactory::Create(InputType::TEXT, "googleID_analytics", "Google Analytics ID (eg: UA-123456789-1)", 0);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "googleID_ads", "Google Ads ID (eg: AW-123456789)", 0);
+        $field = DataInputFactory::Create(InputType::TEXT, "googleID_ads", "Google Ads ID (eg: AW-123456789)", 0);
         $this->addInput($field);
 
         $field = new DataInput("googleID_ads_conversion", "Google Ads Any Page Conversion ID", 0);
@@ -32,7 +32,7 @@ class SEOConfigForm extends InputForm
         $this->addInput($field);
 
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "facebookID_pixel", "Facebook Pixel ID", 0);
+        $field = DataInputFactory::Create(InputType::TEXT, "facebookID_pixel", "Facebook Pixel ID", 0);
         $this->addInput($field);
     }
 

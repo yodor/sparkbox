@@ -1,29 +1,23 @@
 <?php
 include_once("storage/DataBuffer.php");
 include_once("storage/SparkWatermark.php");
+include_once("utils/ImageType.php");
 
 class ImageScaler
 {
 
-    const int MODE_FULL = 0;
-    const int MODE_CROP = 1;
-    const int MODE_THUMB = 2;
-
-    const string TYPE_JPG = "image/jpg";
-    const string TYPE_JPEG = "image/jpeg";
-    const string TYPE_PNG = "image/png";
-    const string TYPE_WEBP = "image/webp";
-
-    const array SupportedMimes  = array(ImageScaler::TYPE_JPG, ImageScaler::TYPE_JPEG, ImageScaler::TYPE_PNG, ImageScaler::TYPE_WEBP);
+    const array SupportedMimes  = array(ImageType::TYPE_JPG->value, ImageType::TYPE_JPEG->value, ImageType::TYPE_PNG->value, ImageType::TYPE_WEBP->value);
 
 
     /**
-     * @var string
+     * Default Output Format
+     * @var ImageType
      */
-    protected string $output_format = ImageScaler::TYPE_WEBP;
+    protected ImageType $output_format = ImageType::TYPE_WEBP;
+
     protected int $output_quality = 60;
 
-    protected int $mode = ImageScaler::MODE_FULL;
+    protected ScaleMode $mode = ScaleMode::MODE_FULL;
 
     protected int $width = 0;
     protected int $height = 0;
@@ -42,14 +36,14 @@ class ImageScaler
         $this->height = $height;
 
         if ($this->width > 0 || $this->height > 0) {
-            $this->mode = ImageScaler::MODE_CROP;
+            $this->mode = ScaleMode::MODE_CROP;
 
             if ($this->width == $this->height) {
-                $this->mode = ImageScaler::MODE_THUMB;
+                $this->mode = ScaleMode::MODE_THUMB;
             }
         }
-        $this->output_format = IMAGE_SCALER_OUTPUT_FORMAT;
-        $this->output_quality = IMAGE_SCALER_OUTPUT_QUALITY;
+        $this->setOutputQuality(Spark::Get(Config::IMAGE_SCALER_OUTPUT_QUALITY));
+        $this->setOutputFormat(Spark::Get(Config::IMAGE_SCALER_OUTPUT_FORMAT));
 
         $this->watermark = new SparkWatermark();
 
@@ -96,20 +90,22 @@ class ImageScaler
      */
     public function setOutputFormat(string $mime) : void
     {
-        if (!in_array($mime, ImageScaler::SupportedMimes)) throw new Exception("Unsupported output format type");
+        $format = ImageType::tryFrom($mime);
 
-        $this->output_format = $mime;
+        if ($format === null) throw new Exception("Unsupported output format type");
+
+        $this->output_format = $format;
     }
 
     /**
-     * @return string Return the output format mime type string
+     * @return ImageType Return the output format
      */
-    public function getOutputFormat(): string
+    public function getOutputFormat(): ImageType
     {
         return $this->output_format;
     }
 
-    public function getMode(): int
+    public function getMode(): ScaleMode
     {
         return $this->mode;
     }
@@ -127,15 +123,15 @@ class ImageScaler
     public function process(DataBuffer $buffer) : void
     {
 
-        if ($this->mode == ImageScaler::MODE_CROP) {
-            debug("Using CROP mode");
+        if ($this->mode === ScaleMode::MODE_CROP) {
+            Debug::ErrorLog("Using CROP mode");
             $this->processCrop($buffer);
-        } else if ($this->mode == ImageScaler::MODE_THUMB) {
-            debug("Using THUMB mode");
+        } else if ($this->mode === ScaleMode::MODE_THUMB) {
+            Debug::ErrorLog("Using THUMB mode");
             $this->processThumb($buffer);
         } else {
             //as is
-            debug("Using as-is mode");
+            Debug::ErrorLog("Using as-is mode");
             $this->processFull($buffer);
         }
     }
@@ -189,16 +185,16 @@ class ImageScaler
             $ratio = $image_height / $this->height;
             $this->width = (int)($image_width / $ratio);
 
-            debug("Using fit to height");
+            Debug::ErrorLog("Using fit to height");
         } else if ($this->width > 0) {
             $ratio = $image_width / $this->width;
             $this->height = (int)($image_height / $ratio);
 
-            debug("Using fit to width");
+            Debug::ErrorLog("Using fit to width");
         }
 
 
-        debug("Output size: [$this->width, $this->height]");
+        Debug::ErrorLog("Output size: [$this->width, $this->height]");
         $h_crop = $this->createImage($this->width, $this->height);
 
         // Resize
@@ -253,7 +249,7 @@ class ImageScaler
      */
     protected function setImageData(DataBuffer $buffer, GdImage $h_source) : void
     {
-        debug("Set image data ...");
+        Debug::ErrorLog("Set image data ...");
 
         if ($this->grayFilterEnabled) {
             imagefilter($h_source, IMG_FILTER_GRAYSCALE);
@@ -264,10 +260,10 @@ class ImageScaler
         }
 
         ob_start();
-        if (strcmp($this->output_format, ImageScaler::TYPE_PNG) == 0) {
+        if ($this->output_format === ImageType::TYPE_PNG) {
             imagesavealpha($h_source, TRUE);
             imagepng($h_source);
-        } else if (strcmp($this->output_format, ImageScaler::TYPE_JPEG) == 0) {
+        } else if ($this->output_format === ImageType::TYPE_JPEG) {
             imagejpeg($h_source, NULL, $this->output_quality);
         } else {
             imagewebp($h_source, NULL, $this->output_quality);

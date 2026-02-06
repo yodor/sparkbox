@@ -28,19 +28,19 @@ class Navigation
         $pageURL = URL::Current();
 
         if (RequestController::isJSONRequest()) {
-            debug("Not pushing JSONRequest ...");
+            Debug::ErrorLog("Not pushing JSONRequest ...");
             return;
         }
         if (RequestController::isResponderRequest()) {
-            debug("Not pushing RequestResponder ...");
+            Debug::ErrorLog("Not pushing RequestResponder ...");
             return;
         }
 
-        debug("Pushing $pageName - Current URL: ".$pageURL);
+        Debug::ErrorLog("Pushing $pageName - Current URL: ".$pageURL);
 
         if ($this->urldata->count()>0) {
             //check if is already present and splice
-            debug("Rebuilding navigation entries");
+            Debug::ErrorLog("Rebuilding navigation entries");
 
             $clearRemaining = false;
 
@@ -54,7 +54,7 @@ class Navigation
                     $storedURL = $this->urldata->get($page);
 
                     if ($storedURL == $pageURL) {
-                        debug("Current page url is already in the navigation as '$page' - Clearing remaining entries");
+                        Debug::ErrorLog("Current page url is already in the navigation as '$page' - Clearing remaining entries");
                         $clearRemaining = true;
                     }
                 }
@@ -62,7 +62,7 @@ class Navigation
 
         }
 
-        debug("Adding page to navigation '$pageName' => $pageURL");
+        Debug::ErrorLog("Adding page to navigation '$pageName' => $pageURL");
         //navigation entries are constructed by using $pagename as unique key not the url
         $this->urldata->set($pageName, $pageURL);
 
@@ -71,13 +71,13 @@ class Navigation
     public function clear() : void
     {
         if (RequestController::isJSONRequest()) {
-            debug("Not clearing for JSONRequest");
+            Debug::ErrorLog("Not clearing for JSONRequest");
         }
         else if (RequestController::isResponderRequest()) {
-            debug("Not clearing for RequestResponder");
+            Debug::ErrorLog("Not clearing for RequestResponder");
         }
         else {
-            debug("Clearing all navigation entries");
+            Debug::ErrorLog("Clearing all navigation entries");
             $this->urldata->removeAll();
 
         }
@@ -85,10 +85,10 @@ class Navigation
 
     public function back() : ?Action
     {
-        debug("Requested back action");
+        Debug::ErrorLog("Requested back action");
 
         if ($this->urldata->count()==0){
-            debug("URL backward history is empty");
+            Debug::ErrorLog("URL backward history is empty");
             return NULL;
         }
 
@@ -105,7 +105,7 @@ class Navigation
             }
             else {
                 $action = new Action($pageName, $storedURL->toString());
-                debug("Using href: ".$action->getURL());
+                Debug::ErrorLog("Using href: ".$action->getURL());
                 break;
             }
         }

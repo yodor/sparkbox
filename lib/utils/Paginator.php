@@ -122,14 +122,14 @@ class Paginator implements IGETConsumer
         $this->activeOrder = OrderColumn::Empty();
 
         if (isset($_GET[Paginator::KEY_ORDER_DIR])) {
-            $this->activeOrder->setDirection(DBConnections::Open()->escape(sanitizeInput($_GET[Paginator::KEY_ORDER_DIR])));
+            $this->activeOrder->setDirection(Spark::SanitizeInput($_GET[Paginator::KEY_ORDER_DIR]));
         }
 
         if (isset($_GET[Paginator::KEY_ORDER_BY])) {
             if (!$this->activeOrder->getDirection()) {
                 $this->activeOrder->setDirection(OrderColumn::DESC);
             }
-            $this->activeOrder->setName(DBConnections::Open()->escape(sanitizeInput($_GET[Paginator::KEY_ORDER_BY])));
+            $this->activeOrder->setName(Spark::SanitizeInput($_GET[Paginator::KEY_ORDER_BY]));
         }
 
 
@@ -168,7 +168,7 @@ class Paginator implements IGETConsumer
 
         //check if the query parameter matches order column name
         foreach ($this->order_columns as $column => $sort_field) {
-            if (strcmp_isset(Paginator::KEY_ORDER_BY, $column, $_GET)) {
+            if (Spark::strcmp_isset(Paginator::KEY_ORDER_BY, $column)) {
                 $result = $sort_field;
                 break;
             }

@@ -97,7 +97,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         $form_name = $form->getName();
 
         if (strcmp($submitValue, $form_name) != 0) {
-            debug("STATUS_NOT_PROCESSED - _REQUEST[$submitKey] not equal to '$form_name' ");
+            Debug::ErrorLog("STATUS_NOT_PROCESSED - _REQUEST[$submitKey] not equal to '$form_name' ");
             $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
             return;
         }
@@ -106,7 +106,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
             $this->restoreSessionData($form);
         }
 
-        debug("Loading _REQUEST data - _REQUEST[$submitKey] match form name '$form_name'");
+        Debug::ErrorLog("Loading _REQUEST data - _REQUEST[$submitKey] match form name '$form_name'");
 
         try {
 
@@ -136,7 +136,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     {
 
         $form_name = $form->getName();
-        debug("Restoring values from session - InputForm['$form_name']");
+        Debug::ErrorLog("Restoring values from session - InputForm['$form_name']");
 
         try {
 
@@ -154,7 +154,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
         catch (Exception $e) {
             $form->clear();
 
-            debug("Error restoring SessionData - Form:'$form_name' - ".$e->getMessage());
+            Debug::ErrorLog("Error restoring SessionData - Form:'$form_name' - ".$e->getMessage());
         }
 
     }
@@ -163,7 +163,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     {
 
         $form_name = $form->getName();
-        debug("Storing values to session - InputForm['$form_name']");
+        Debug::ErrorLog("Storing values to session - InputForm['$form_name']");
 
         $sessionData = new SessionData($form_name);
         $sessionData->removeAll();
@@ -188,7 +188,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
                     $error_inputs[] = $field->getName();
                 }
             }
-            debug("STATUS_ERROR - Form '{$form->getName()}' - error found in DataInput(s): ", $error_inputs);
+            Debug::ErrorLog("STATUS_ERROR - Form '{$form->getName()}' - error found in DataInput(s): ", $error_inputs);
 
             throw new Exception("Please make input in all required fields");
 
@@ -197,7 +197,7 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
             $this->status = IFormProcessor::STATUS_OK;
 
-            debug("STATUS_OK - Form '{$form->getName()}' ");
+            Debug::ErrorLog("STATUS_OK - Form '{$form->getName()}' ");
 
         }
     }

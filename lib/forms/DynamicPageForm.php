@@ -50,7 +50,7 @@ class DynamicPageForm extends InputForm
 
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(DataInputFactory::SESSION_IMAGE, "photo", "Photo", 0);
+        $field = DataInputFactory::Create(InputType::SESSION_IMAGE, "photo", "Photo", 0);
         $this->addInput($field);
 
 

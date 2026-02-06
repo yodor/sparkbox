@@ -33,10 +33,10 @@ abstract class Authenticator
      * @param int $length Default 8 symbols
      * @return string
      */
-    public static function RandomToken(int $length = 8) : string
+    public static function RandomToken(int $length) : string
     {
         // Generate string with random data
-        $hash_result = hash('sha256', microtime_float() . "|" . rand());
+        $hash_result = hash('sha256', Spark::MicroTime() . "|" . rand());
 
         $hash_len = strlen($hash_result);
 
@@ -84,7 +84,7 @@ abstract class Authenticator
 
         $userID = $this->bean->insert($urow);
         if ($userID < 1) {
-            debug("Error: " . $this->bean->getDB()->getError());
+            Debug::ErrorLog("Error: " . $this->bean->getDB()->getError());
             throw new Exception(tr("Error during registering. Please try again later."));
         }
 
@@ -104,33 +104,33 @@ abstract class Authenticator
     {
 
         if (!$this->session->contains(SessionData::AUTH_TOKEN)) {
-            debug($this, "SessionData does not have auth_token set");
+            Debug::ErrorLog($this, "SessionData does not have auth_token set");
             return NULL;
         }
 
         $token = $this->session->get(SessionData::AUTH_TOKEN);
 
         if (!($token instanceof AuthToken)) {
-            debug($this, "AuthContext un-serialize failed");
+            Debug::ErrorLog($this, "AuthContext un-serialize failed");
             Session::Remove(SessionData::AUTH_TOKEN);
             return NULL;
         }
 
-        debug($this, "AuthToken un-serialized from session");
+        Debug::ErrorLog($this, "AuthToken un-serialized from session");
 
         if ($token->validateCookies($this->session->name()) !== TRUE) {
-            debug($this, "AuthContext validation failed");
+            Debug::ErrorLog($this, "AuthContext validation failed");
             Session::Remove(SessionData::AUTH_TOKEN);
             return NULL;
         }
 
-        debug($this, "Cookie validation success");
+        Debug::ErrorLog($this, "Cookie validation success");
 
         //check if account is enabled
         if ($this->bean->haveColumn("suspended")) {
             $suspend_status = (int)$this->bean->getValue($token->getID(), "suspended");
             if ($suspend_status > 0) {
-                debug($this, "Account is suspended");
+                Debug::ErrorLog($this, "Account is suspended");
                 return NULL;
             }
         }
@@ -151,7 +151,7 @@ abstract class Authenticator
     public function login(string $username, string $pass, string $rand, bool $remember_me = FALSE, bool $check_password_only = FALSE)
     {
 
-        debug($this, "Using loginToken: " . $rand);
+        Debug::ErrorLog($this, "Using loginToken: " . $rand);
 
         $db = DBConnections::Open();
 
@@ -232,16 +232,16 @@ abstract class Authenticator
      */
     protected function createAuthToken(int $id) : void
     {
-        debug($this, "Regenerating session ID");
+        Debug::ErrorLog($this, "Regenerating session ID");
 
         session_regenerate_id(TRUE);
 
         $token = new AuthToken($id);
 
-        debug($this, "Creating cookies for SessionData name: " . $this->session->name());
+        Debug::ErrorLog($this, "Creating cookies for SessionData name: " . $this->session->name());
         $token->storeCookies($this->session->name());
 
-        debug($this, "Serializing auth_token in SessionData");
+        Debug::ErrorLog($this, "Serializing auth_token in SessionData");
         $this->session->set(SessionData::AUTH_TOKEN, $token);
 
         //remove the current login token
@@ -251,7 +251,7 @@ abstract class Authenticator
 
     protected function fillSessionData(array $row, int $userID) : void
     {
-        debug($this, "fill common SessionData");
+        Debug::ErrorLog($this, "fill common SessionData");
 
         if (isset($row[SessionData::EMAIL])) {
             $this->session->set(SessionData::EMAIL, $row[SessionData::EMAIL]);
@@ -284,32 +284,31 @@ abstract class Authenticator
         return $this->session->get(SessionData::LOGIN_TOKEN);
     }
 
-    public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK = TRUE) : ?AuthContext
+    public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK) : ?AuthContext
     {
-        debug("AuthorizeContext using contextName: $contextName");
+        Debug::ErrorLog("AuthorizeContext using contextName: $contextName");
 
         //administrator access
         if ($adminOK) {
-            debug("Trying AdminAuthenticator first");
+            Debug::ErrorLog("Trying AdminAuthenticator first");
 
             include_once("auth/AdminAuthenticator.php");
             $auth_admin = new AdminAuthenticator();
             $context = $auth_admin->authorize();
             if ($auth_admin->authorize()) {
-                debug("AdminAuthenticator authorization success");
+                Debug::ErrorLog("AdminAuthenticator authorization success");
                 return $context;
             }
             else {
-                debug("AdminAuthenticator authorization failed");
+                Debug::ErrorLog("AdminAuthenticator authorization failed");
             }
         }
 
         try {
-            $globals = SparkGlobals::Instance();
-            $globals->includeBeanClass($contextName);
+            Spark::LoadBeanClass($contextName);
         }
         catch (Exception $e) {
-            debug("Authenticator class can not be loaded");
+            Debug::ErrorLog("Authenticator class can not be loaded");
             throw new Exception("Unable to locate the authorization class");
         }
 
@@ -319,10 +318,10 @@ abstract class Authenticator
 
             $context = $auth->authorize($user_data);
             if (!$context) {
-                debug("Authorization failed");
+                Debug::ErrorLog("Authorization failed");
                 throw new Exception("This resource is protected. Please login first.");
             }
-            debug("Authorization success");
+            Debug::ErrorLog("Authorization success");
             return $context;
 
         }

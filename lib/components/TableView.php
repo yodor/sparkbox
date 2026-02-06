@@ -31,7 +31,7 @@ class TableView extends AbstractResultView implements IHeadContents
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/TableView.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/TableView.css";
         return $arr;
     }
 

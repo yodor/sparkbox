@@ -5,7 +5,7 @@ include_once("input/validators/IInputValidator.php");
 class SimplePhoneValidator implements IInputValidator
 {
 
-    protected $allow_plus;
+    protected bool $allow_plus = TRUE;
 
     public function __construct(bool $allow_plus = TRUE)
     {

@@ -15,9 +15,9 @@ class FileCacheEntry extends CacheEntry
 
         $this->file = $file;
 
-        debug("Using Cache Folder: " . basename($this->file->getPath()));
-        debug("Using Filename: " . $this->file->getFilename());
-        debug("Using Path: " . $this->file->getPath());
+        Debug::ErrorLog("Using Cache Folder: " . basename($this->file->getPath()));
+        Debug::ErrorLog("Using Filename: " . $this->file->getFilename());
+        Debug::ErrorLog("Using Path: " . $this->file->getPath());
     }
 
     //replaced getFile()->exists();
@@ -59,10 +59,10 @@ class FileCacheEntry extends CacheEntry
         $this->file->write($data);
         $this->file->lock(LOCK_UN);
         $this->file->close();
-        debug("Stored " . $this->file->length() . " bytes");
+        Debug::ErrorLog("Stored " . $this->file->length() . " bytes");
         if ($lastModified > 0) {
             $this->file->setLastModified($lastModified);
-            debug("File last-modified set to: " . $lastModified);
+            Debug::ErrorLog("File last-modified set to: " . $lastModified);
         }
     }
 
@@ -80,10 +80,10 @@ class FileCacheEntry extends CacheEntry
         $this->file->write($data->data());
         $this->file->lock(LOCK_UN);
         $this->file->close();
-        debug("Stored " . $this->file->length() . " bytes");
+        Debug::ErrorLog("Stored " . $this->file->length() . " bytes");
         if ($lastModified > 0) {
             $this->file->setLastModified($lastModified);
-            debug("File last-modified set to: " . $lastModified);
+            Debug::ErrorLog("File last-modified set to: " . $lastModified);
         }
     }
 

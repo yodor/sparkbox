@@ -18,27 +18,27 @@ class AdminUserForm extends InputForm
         parent::__construct();
 
         //
-        $field = DataInputFactory::Create(DataInputFactory::EMAIL, "email", "Email", 1);
+        $field = DataInputFactory::Create(InputType::EMAIL, "email", "Email", 1);
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "fullname", "Full Name", 0);
+        $field = DataInputFactory::Create(InputType::TEXT, "fullname", "Full Name", 0);
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "pass", "Create Password", 0);
+        $field = DataInputFactory::Create(InputType::PASSWORD, "pass", "Create Password", 0);
         $field->getProcessor()->skip_transaction = TRUE;
         $field->getRenderer()->input()?->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(DataInputFactory::PASSWORD, "pass1", "Repeat Password", 0);
+        $field = DataInputFactory::Create(InputType::PASSWORD, "pass1", "Repeat Password", 0);
         $field->getProcessor()->skip_transaction = TRUE;
         $field->getRenderer()->input()?->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(DataInputFactory::HIDDEN, "password_hash", "Password Hash", 1);
+        $field = DataInputFactory::Create(InputType::HIDDEN, "password_hash", "Password Hash", 1);
         $field->getProcessor()->setTargetColumn("password");
         $this->addInput($field);
 
@@ -89,7 +89,7 @@ class AdminUserForm extends InputForm
         $f_pass = $this->getInput("pass"); //hold the input that is rendered
         $f_pass1 = $this->getInput("pass1"); //hold the input that is rendered
 
-        if (isEmptyPassword($password_hash->getValue()) === TRUE) {
+        if (Spark::IsEmptyPassword($password_hash->getValue())) {
             if ($this->getEditID() > 0) {
                 $password_hash->getProcessor()->skip_transaction = TRUE;
 

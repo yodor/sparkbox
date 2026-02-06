@@ -23,9 +23,9 @@ class SparkLocationScript extends PageScript
     public function code() : string
     {
         $page_local = new Script();
-        $local = LOCAL;
-        $spark_local = SPARK_LOCAL;
-        $storage_local = STORAGE_LOCAL;
+        $local = Spark::Get(Config::LOCAL);
+        $spark_local = Spark::Get(Config::SPARK_LOCAL);
+        $storage_local = Spark::Get(Config::STORAGE_LOCAL);
         return <<<JS
         const LOCAL = "{$local}";
         const SPARK_LOCAL = "{$spark_local}";
@@ -39,12 +39,18 @@ JS;
 class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 {
 
+
     private static ?SparkPage $instance = NULL;
 
     public static function Instance() : ?SparkPage
     {
         return self::$instance;
     }
+
+    /**
+     * @var array
+     */
+    protected array $parameter_names = array();
 
     /**
      * Require auth success to access the page
@@ -185,25 +191,25 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
     {
         $this->head()->addMeta("viewport", "width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes");
 
-        $this->head()->addCSS(SPARK_LOCAL . "/css/SparkPage.css");
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/SparkPage.css");
 
 //        $this->head()->addJS(SPARK_LOCAL . "/js/jquery-3.7.1.min.js");
-        $this->head()->addJS(SPARK_LOCAL . "/js/js.cookie.min.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/js.cookie.min.js");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/SparkObject.js");
-        $this->head()->addJS(SPARK_LOCAL . "/js/SparkEvent.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkObject.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkEvent.js");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/CallStack.js");
-        $this->head()->addJS(SPARK_LOCAL . "/js/TemplateFactory.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/CallStack.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/TemplateFactory.js");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/Component.js");
-        $this->head()->addJS(SPARK_LOCAL . "/js/TemplateComponent.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/Component.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/TemplateComponent.js");
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/JSONRequest.js");
-        $this->head()->addJS(SPARK_LOCAL . "/js/JSONComponent.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/JSONRequest.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/JSONComponent.js");
 
 
-        $this->head()->addJS(SPARK_LOCAL . "/js/Tooltip.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/Tooltip.js");
 
     }
     /**
@@ -213,7 +219,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
      */
     public function __construct()
     {
-        debug("--- CTOR ---");
+        Debug::ErrorLog("--- CTOR ---");
 
         SparkEventManager::register(ComponentEvent::class, new SparkObserver($this->componentEvent(...)));
         parent::__construct();
@@ -247,26 +253,26 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
     public function authorize(): void
     {
         if (!($this->auth instanceof Authenticator)) {
-            debug("Authenticator is not set");
+            Debug::ErrorLog("Authenticator is not set");
             return;
         }
 
-        debug("Using Authenticator: " . get_class($this->auth));
+        Debug::ErrorLog("Using Authenticator: " . get_class($this->auth));
 
         $this->context = $this->auth->authorize();
 
         if ($this->context instanceof AuthContext) {
 
-            debug("Authorization success");
+            Debug::ErrorLog("Authorization success");
             return;
         }
 
         if (!$this->authorized_access) {
-            debug("Authorization is not required");
+            Debug::ErrorLog("Authorization is not required");
             return;
         }
 
-        debug("Authorization failed");
+        Debug::ErrorLog("Authorization failed");
 
         if (isset($_GET[JSONResponder::KEY_JSONREQUEST])) {
             $response = new JSONResponse("RequestController");
@@ -281,7 +287,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 
         if (strlen($this->loginURL) > 0) {
 
-            debug("Redirecting to login page URL: " . $this->loginURL);
+            Debug::ErrorLog("Redirecting to login page URL: " . $this->loginURL);
             header("Location: $this->loginURL");
             exit;
         }
@@ -337,7 +343,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
         $title = strip_tags($this->preferred_title);
         $this->head()->setTitle($title);
 
-        $meta_description = prepareMeta($this->description);
+        $meta_description = Spark::MetaDescription($this->description);
         $this->head()->addMeta("description", $meta_description);
     }
 
@@ -398,7 +404,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 
         ob_end_flush();
 
-        if (PAGE_CACHE_ENABLED) {
+        if (Spark::GetBoolean(Config::PAGE_CACHE_ENABLED)) {
             register_shutdown_function(function(){
                 CacheFactory::CleanupPageCache();
             });
@@ -444,9 +450,16 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
         return URL::Current();
     }
 
-    public function getParameterNames(): array
+    public function addParameterName(string $name) : void
     {
-        return array();
+        if (!in_array($name, $this->parameter_names)) {
+            $this->parameter_names[] = $name;
+        }
+    }
+
+    public function getParameterNames() : array
+    {
+        return $this->parameter_names;
     }
 }
 

@@ -4,7 +4,7 @@ include_once("beans/DBTableBean.php");
 class DatedBean extends DBTableBean
 {
 
-    protected $date_column;
+    protected string $date_column;
 
     /**
      * DatedPublicationBean constructor.

@@ -13,28 +13,28 @@ class UploadDataInput extends InputProcessor
     {
 
         $name = $this->input->getName();
-        debug("DataInput name: " . $name);
+        Debug::ErrorLog("DataInput name: " . $name);
 
         //set default empty file storage
         $this->input->setValue(new FileStorageObject());
-        debug("Setting default empty FileStorageObject ...");
+        Debug::ErrorLog("Setting default empty FileStorageObject ...");
 
-        debug("_FILES array keys: " . implode("|", array_keys($_FILES)));
+        Debug::ErrorLog("_FILES array keys: " . implode("|", array_keys($_FILES)));
         if (!isset($_FILES[$name])) {
-            debug("_FILES array does not have key '$name' - no file uploaded from this control...");
+            Debug::ErrorLog("_FILES array does not have key '$name' - no file uploaded from this control...");
             return;
         }
 
-        debug("Processing _FILES array data");
+        Debug::ErrorLog("Processing _FILES array data");
         if (!is_array($_FILES[$name]["name"])) {
-            debug("Processing single uploaded file ...");
+            Debug::ErrorLog("Processing single uploaded file ...");
             $file_storage = new FileStorageObject();
             $this->processImpl($_FILES[$name], $file_storage);
             $this->input->setValue($file_storage);
             return;
         }
 
-        debug("Processing multiple uploaded files ...");
+        Debug::ErrorLog("Processing multiple uploaded files ...");
         //reformat array keys
         $uploaded_files = $this->diverse_array($_FILES[$name]);
 
@@ -52,14 +52,14 @@ class UploadDataInput extends InputProcessor
     protected function processImpl($file, FileStorageObject $object) : void
     {
 
-        debug("Populating FileStorageObject with data from _FILES");
+        Debug::ErrorLog("Populating FileStorageObject with data from _FILES");
 
         $upload_status = $file["error"];
 
-        debug("upload_status: " . $upload_status);
+        Debug::ErrorLog("upload_status: " . $upload_status);
 
         if ($upload_status == UPLOAD_ERR_NO_FILE) {
-            debug("No file selected for upload");
+            Debug::ErrorLog("No file selected for upload");
             return;
         }
 
@@ -72,7 +72,7 @@ class UploadDataInput extends InputProcessor
         $object->setFilename($file['name']);
         $object->setTimestamp(time());
 
-        debug("FileStorageObject populated. Length: ". $object->buffer()->length() . " | Name: ".$file['name']);
+        Debug::ErrorLog("FileStorageObject populated. Length: ". $object->buffer()->length() . " | Name: ".$file['name']);
 
     }
 

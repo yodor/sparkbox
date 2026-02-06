@@ -12,6 +12,7 @@
     flex-direction: column;
     flex-wrap: wrap;
     gap: 0.1em;
+    align-self:stretch;
 }
 
 .FormRenderer[layout="VBox"] .SubmitLine {

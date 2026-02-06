@@ -38,10 +38,10 @@ abstract class UploadDataValidator implements IInputValidator
                 $ret = "There is no error, the file uploaded with success.";
                 break;
             case UPLOAD_ERR_INI_SIZE:
-                $ret = "The uploaded file exceeds the init limit of " . file_size(UPLOAD_MAX_SIZE);
+                $ret = "The uploaded file exceeds the init limit of " . Spark::ByteLabel(Spark::Get(Config::UPLOAD_MAX_SIZE));
                 break;
             case UPLOAD_ERR_FORM_SIZE:
-                $ret = "The uploaded file exceeds the form limit of ".file_size($maxsize);
+                $ret = "The uploaded file exceeds the form limit of ".Spark::ByteLabel($maxsize);
                 break;
             case UPLOAD_ERR_PARTIAL:
                 $ret = "The uploaded file was only partially uploaded";
@@ -67,7 +67,7 @@ abstract class UploadDataValidator implements IInputValidator
      */
     public function validate(DataInput $input) : void
     {
-        debug("Using input: '{$input->getName()}'");
+        Debug::ErrorLog("Using input: '{$input->getName()}'");
 
 
 
@@ -76,7 +76,7 @@ abstract class UploadDataValidator implements IInputValidator
             $content_length = $_SERVER['CONTENT_LENGTH'];
         }
 
-        debug("Content length: " . $content_length);
+        Debug::ErrorLog("Content length: " . $content_length);
 
         //UploadDataInput processor always create default empty FileStorageObject
         $object = $input->getValue();
@@ -85,10 +85,10 @@ abstract class UploadDataValidator implements IInputValidator
             throw new Exception("Value not instance of StorageObject");
         }
 
-        debug("StorageObject class: " . get_class($object));
+        Debug::ErrorLog("StorageObject class: " . get_class($object));
 
         if ($object->buffer()->length()<1 || empty($object->UID())) {
-            debug("FileStorageObject is empty ...");
+            Debug::ErrorLog("FileStorageObject is empty ...");
             if ($input->isRequired()) {
                 if (!$input->getForm() || $input->getForm()->getEditID() < 1) {
                     throw new Exception("No file uploaded");
@@ -98,15 +98,15 @@ abstract class UploadDataValidator implements IInputValidator
         }
 
         if (count($this->accept_mimes)>0) {
-            debug("Accepting mime types: ", $this->accept_mimes);
-            debug("Uploaded mime type: ".$object->buffer()->mime());
+            Debug::ErrorLog("Accepting mime types: ", $this->accept_mimes);
+            Debug::ErrorLog("Uploaded mime type: ".$object->buffer()->mime());
             if (!in_array($object->buffer()->mime(), $this->accept_mimes)) {
-                debug("Wrong mime type ...");
+                Debug::ErrorLog("Wrong mime type ...");
                 throw new Exception(tr("Wrong mime type: ") . $object->buffer()->mime() . "<Br>".tr("Accepted mime types: ") . implode(';', $this->accept_mimes));
             }
         }
         else {
-            debug("Accepting all mime types");
+            Debug::ErrorLog("Accepting all mime types");
         }
 
     }

@@ -31,7 +31,7 @@ class TranslatorPage extends BeanListPage
         $this->getSearch()->getForm()->setColumns(array("value"));
     }
 
-    protected function initPageActions()
+    protected function initPageActions(): void
     {
         //disable add item
         $url = URL::Current();
@@ -41,7 +41,7 @@ class TranslatorPage extends BeanListPage
         $this->getPage()->getActions()->append($action_add);
     }
 
-    public function processInput()
+    public function processInput() : void
     {
 
 
@@ -61,7 +61,7 @@ class TranslatorPage extends BeanListPage
             if (strlen($hash_value)!=32) {
                 continue;
             }
-            $update = array("value"=>$query->getDB()->escape($value), "hash_value"=>sparkHash($value));
+            $update = array("value"=>$query->getDB()->escape($value), "hash_value"=>Spark::Hash($value));
             if (!$this->bean->update($textID, $update)) throw new Exception("Unable to update hash_value");
             $count++;
         }
@@ -71,7 +71,7 @@ class TranslatorPage extends BeanListPage
         exit;
     }
 
-    protected function initViewActions(ActionCollection $act)
+    protected function initViewActions(ActionCollection $act) : void
     {
         parent::initViewActions($act);
 

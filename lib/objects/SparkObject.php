@@ -47,7 +47,7 @@ class SparkObject implements jsonSerializable
      */
     public function hash(): string
     {
-        return sparkHash(json_encode($this));
+        return Spark::Hash(json_encode($this));
     }
 
     /**

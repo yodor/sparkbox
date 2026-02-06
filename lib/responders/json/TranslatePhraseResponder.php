@@ -9,7 +9,7 @@ class TranslatePhraseResponder extends JSONResponder
     /**
      * @var TranslationPhrasesBean
      */
-    protected $bean;
+    protected TranslationPhrasesBean $bean;
 
     private int $trID = -1;
     private int $textID = -1;
@@ -81,7 +81,7 @@ class TranslatePhraseResponder extends JSONResponder
 
         $qry->select->where()->add("st.textID", $this->textID);
 
-        //debug($qry->select->getSQL());
+        //Debug::ErrorLog($qry->select->getSQL());
 
         $response->phrase = "";
         $response->translation = "";

@@ -1,6 +1,6 @@
 <?php
 include_once("templates/admin/AdminPageTemplate.php");
-
+include_once("components/BeanFormEditor.php");
 /**
  * If request condition is BeanKeyCondition will use it to set where filter on the view bean and add field to the transactor
  * Class BeanEditorPage
@@ -19,12 +19,12 @@ class BeanEditorPage extends AdminPageTemplate
         parent::__construct();
     }
 
-    protected function initPageActions()
+    protected function initPageActions(): void
     {
 
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean): void
     {
         parent::setBean($bean);
         if ($this->page->getName()) {
@@ -46,14 +46,14 @@ class BeanEditorPage extends AdminPageTemplate
         return $this->form;
     }
 
-    public function processInput()
+    public function processInput() : void
     {
         $this->view->processInput();
     }
 
-    public function initView()
+    public function initView(): ?Component
     {
-        if ($this->view) return;
+        if ($this->view) return null;
 
         $view = new BeanFormEditor($this->bean, $this->form);
 
@@ -65,10 +65,13 @@ class BeanEditorPage extends AdminPageTemplate
         $this->view = $view;
 
         $this->items()->append($this->view);
+
+        return $this->view;
     }
 
     public function getEditor(): BeanFormEditor
     {
-        return $this->view;
+        if ($this->view instanceof BeanFromEditor) return $this->view;
+        throw new Exception("Incorrect view class");
     }
 }

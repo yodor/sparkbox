@@ -30,9 +30,9 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         $this->setClassName("KeywordSearch");
         $this->setAttribute("role", "search");
 
-        $this->setLayout(FormRenderer::LAYOUT_HBOX);
+        $this->setLayout(self::LAYOUT_HBOX);
 
-        $this->setMethod(FormRenderer::METHOD_GET);
+        $this->setMethod(self::METHOD_GET);
 
         $this->getButtons()->items()->clear();
 
@@ -54,14 +54,14 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
     }
 
-    public function processInput()
+    public function processInput(): void
     {
 
         if (count($this->form->getColumns()) < 1) return;
 
         $data = $_REQUEST;
 
-        if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_CLEAR, $data)) {
+        if (Spark::strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_CLEAR, $data)) {
 
             $url = URL::Current();
             $url->remove(KeywordSearch::SUBMIT_KEY);
@@ -77,18 +77,18 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 //            $this->form->validate();
 //            $this->have_filter = TRUE;
 //        }
-        else if (strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $data)) {
+        else if (Spark::strcmp_isset(KeywordSearch::SUBMIT_KEY, KeywordSearch::ACTION_SEARCH, $data)) {
             $this->form->loadPostData($data);
             $this->form->validate();
             if (!$this->form->haveErrors()) {
                 foreach ($this->form->inputNames() as $idx=>$name) {
                     $input = $this->form->getInput($name);
-                    if ($input instanceof DataInput) {
-                        if ($input->getValue()) {
-                            $this->have_filter = TRUE;
-                            break;
-                        }
+
+                    if ($input->getValue()) {
+                        $this->have_filter = TRUE;
+                        break;
                     }
+
                 }
             }
         }
@@ -108,7 +108,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/KeywordSearch.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/KeywordSearch.css";
         return $arr;
     }
 
@@ -120,40 +120,6 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
     public function getForm(): KeywordSearchForm
     {
         return $this->form;
-    }
-    public function finishRender(): void
-    {
-        parent::finishRender();
-?>
-        <script>
-
-                // const form = document.forms["KeywordSearchForm"];
-                //
-                // form.addEventListener('submit', function (event) {
-                //     event.preventDefault(); // Prevent normal submission
-                //
-                //     const currentParams = new URLSearchParams(window.location.search);
-                //     const formData = new FormData(form);
-                //
-                //     for (const [key, value] of formData.entries()) {
-                //         const trimmedValue = value.trim();
-                //         if (trimmedValue === '') {
-                //             currentParams.delete(key); // Remove parameter if field is empty (common for clearing filters)
-                //         } else {
-                //             currentParams.set(key, trimmedValue); // Override or add the parameter
-                //         }
-                //     }
-                //
-                //     // Update the current URL with the merged parameters
-                //     const newUrl = new URL(window.location);
-                //     newUrl.search = currentParams.toString();
-                //
-                //     window.location.href = newUrl.toString();
-                // });
-
-
-        </script>
-<?php
     }
 
 }

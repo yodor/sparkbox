@@ -112,11 +112,11 @@ class Translator implements IRequestProcessor, IGETConsumer
 
 //        if (Session::Contains(Translator::KEY_LANGUAGE_ID)) {
 //            $langID = (int)Session::Get(Translator::KEY_LANGUAGE_ID);
-//            debug("Session ".Translator::KEY_LANGUAGE_ID.": ".$langID);
+//            Debug::ErrorLog("Session ".Translator::KEY_LANGUAGE_ID.": ".$langID);
 //        }
         if (Session::HaveCookie(Translator::KEY_LANGUAGE_ID)) {
             $langID = (int)Session::GetCookie(Translator::KEY_LANGUAGE_ID);
-            debug("Cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
+            Debug::ErrorLog("Cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
         }
 
         //no session or cookie set
@@ -125,7 +125,7 @@ class Translator implements IRequestProcessor, IGETConsumer
                 $this->loadLanguageID($langID);
             }
             catch (Exception $e) {
-                debug("Session/Cookies contain unavailable language ID - Setting DEFAULT_LANGUAGE language");
+                Debug::ErrorLog("Session/Cookies contain unavailable language ID - Setting DEFAULT_LANGUAGE language");
                 $this->loadDefaultLanguage();
             }
         }
@@ -137,7 +137,7 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     protected function loadLanguageID(int $langID) : void
     {
-        debug("Loading ".Translator::KEY_LANGUAGE_ID.": ".$langID);
+        Debug::ErrorLog("Loading ".Translator::KEY_LANGUAGE_ID.": ".$langID);
         $this->language = $this->languages->getByID($langID, "lang_code", "language");
         $this->langID = $langID;
         $this->storeLanguage();
@@ -152,21 +152,21 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     protected function storeLanguage() : void
     {
-        debug("Storing langID: ".$this->langID. " in cookies");
+        Debug::ErrorLog("Storing langID: ".$this->langID. " in cookies");
         Session::SetCookie("langID", $this->langID);
         //Session::Set("langID", $this->langID);
     }
 
-    public function processInput()
+    public function processInput(): void
     {
         if (isset($_GET[Translator::KEY_CHANGE_LANGUAGE])) {
-            debug("Processing change_language request");
+            Debug::ErrorLog("Processing change_language request");
 
             $language = "";
             $langID = -1;
 
             if (isset($_GET[Translator::KEY_LANGUAGE])) {
-                $language = sanitizeInput($_GET[Translator::KEY_LANGUAGE]);
+                $language = Spark::SanitizeInput($_GET[Translator::KEY_LANGUAGE]);
             }
             if (isset($_GET[Translator::KEY_LANGUAGE_ID])) {
                 $langID = (int)$_GET[Translator::KEY_LANGUAGE_ID];
@@ -176,7 +176,7 @@ class Translator implements IRequestProcessor, IGETConsumer
                 $this->changeLanguage($language, $langID);
             }
             catch (Exception $e) {
-                debug("Error: ".$e->getMessage());
+                Debug::ErrorLog("Error: ".$e->getMessage());
             }
 
             $url = URL::Current();
@@ -184,7 +184,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             $url->remove(Translator::KEY_CHANGE_LANGUAGE);
             $url->remove(Translator::KEY_LANGUAGE_ID);
             $url->remove(Translator::KEY_LANGUAGE);
-            debug("Redirecting to: ".$url);
+            Debug::ErrorLog("Redirecting to: ".$url);
 
             header("Location: ".$url);
             exit;
@@ -210,7 +210,7 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     protected function loadDefaultLanguage() : void
     {
-        debug("Loading default language");
+        Debug::ErrorLog("Loading default language");
         if (defined("DEFAULT_LANGUAGE")) {
             //query default language from define
             $qry = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1, "lang_code");
@@ -260,7 +260,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             }
         }
         catch (Exception $e) {
-            debug("Unable to translate: ".$e->getMessage());
+            Debug::ErrorLog("Unable to translate: ".$e->getMessage());
         }
 
     }
@@ -272,7 +272,7 @@ class Translator implements IRequestProcessor, IGETConsumer
         if (strlen(trim($phrase)) == 0) return $result;
 
         try {
-            $phrase_hash = sparkHash($phrase);
+            $phrase_hash = Spark::Hash($phrase);
 
             $qry = $this->translated_phrases->queryLanguageID($this->langID);
             $qry->select->where()->add("hash_value", "'$phrase_hash'");
@@ -295,7 +295,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             }
         }
         catch (Exception $e) {
-            debug("Error: ".$e->getMessage());
+            Debug::ErrorLog("Error: ".$e->getMessage());
         }
 
         return $result;

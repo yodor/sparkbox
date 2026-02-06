@@ -15,7 +15,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
     protected string $beanClass = "";
 
-    protected $dateFormat = "j M Y";
+    protected string $dateFormat = "j M Y";
 
     public function __construct(string $beanClass)
     {
@@ -29,7 +29,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
         $this->beanClass = $beanClass;
     }
 
-    public function setURL(URL $url)
+    public function setURL(URL $url) : void
     {
         $this->url = $url;
     }
@@ -64,7 +64,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
     }
 
-    public function setDateFormat(string $dateFormat)
+    public function setDateFormat(string $dateFormat) : void
     {
         $this->dateFormat = $dateFormat;
     }
@@ -95,18 +95,18 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 class PublicationsComponent extends Container implements IRequestProcessor
 {
 
-    protected $bean;
+    protected DBTableBean $bean;
 
-    protected $selected_year = -1;
-    protected $selected_month = -1;
+    protected int $selected_year = -1;
+    protected int $selected_month = -1;
 
     protected $columns;
 
     protected $url;
 
-    protected $have_selection = FALSE;
+    protected bool $have_selection = FALSE;
 
-    protected $selected_ID = array();
+    protected array $selected_ID = array();
 
     protected $itemView;
     protected $itemRenderer;
@@ -141,14 +141,12 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
         $this->bean = $bean;
 
-        $this->url = new URL();
+        $this->url = URL::Current();
 
         if ($link_page) {
             $this->url->fromString($link_page);
         }
-        else {
-            $this->url->fromString(currentURL());
-        }
+
 
         $this->selected_ID = array();
 
@@ -191,11 +189,11 @@ class PublicationsComponent extends Container implements IRequestProcessor
     public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/Publications.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/Publications.css";
         return $arr;
     }
 
-    public function processInput()
+    public function processInput(): void
     {
 
         $qry = $this->bean->query($this->bean->key(), $this->bean->getDateColumn());

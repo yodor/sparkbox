@@ -3,15 +3,17 @@
 abstract class Mailer
 {
 
-    protected $to = "";
-    protected $from_name = DEFAULT_SERVICE_NAME; //senders name
-    protected $from_email = DEFAULT_SERVICE_EMAIL; //senders e-mail address
-    protected $subject = "";
+    protected string $to = "";
+    protected string $from_name = ""; //senders name
+    protected string $from_email = ""; //senders e-mail address
+    protected string $subject = "";
 
-    protected $body = "";
+    protected string $body = "";
 
     public function __construct()
     {
+        $this->from_name = Spark::Get(Config::DEFAULT_SERVICE_NAME); //senders name
+        $this->from_email = Spark::Get(Config::DEFAULT_SERVICE_EMAIL); //senders e-mail address
     }
 
     public function send()

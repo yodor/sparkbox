@@ -36,10 +36,10 @@ class PageSessionMenu extends MenuItemList
         $lastActive = $this->getSelected();
 
         if ($lastActive instanceof MenuItem) {
-            debug("'lastActive' MenuItem: '" . $lastActive->getName() . "' - URL: " . $lastActive->getHref());
+            Debug::ErrorLog("'lastActive' MenuItem: '" . $lastActive->getName() . "' - URL: " . $lastActive->getHref());
         }
         else {
-            debug("'lastActive' MenuItem is NULL");
+            Debug::ErrorLog("'lastActive' MenuItem is NULL");
         }
 
         $selectedItem = $this->selectActive();
@@ -66,10 +66,10 @@ class PageSessionMenu extends MenuItemList
             }
         }
         else {
-            debug("No MenuItem selected as active");
+            Debug::ErrorLog("No MenuItem selected as active");
 
             if ($lastActive instanceof MenuItem) {
-                debug("Selecting 'lastActive' MenuItem as the current active");
+                Debug::ErrorLog("Selecting 'lastActive' MenuItem as the current active");
                 $lastActive->setSelected(true);
             }
 

@@ -14,7 +14,7 @@ class StorageItem extends DataObject implements JsonSerializable
     const int TYPE_IMAGE = 1;
     const int TYPE_FILE = 2;
 
-    protected $type = StorageItem::TYPE_IMAGE;
+    protected int $type = StorageItem::TYPE_IMAGE;
 
     public function __clone()
     {
@@ -78,18 +78,17 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->url->add(new URLParameter("width", $width));
         $this->url->add(new URLParameter("height", $height));
 
-        if (STORAGE_ITEM_SLUG) {
+        if (Spark::Get(Config::STORAGE_ITEM_SLUG)) {
             return $this->SlugURL();
         }
         else {
             return $this->url;
         }
-
     }
 
     private function SlugURL() : URL
     {
-        $url = new URL(LOCAL . "/assets/");
+        $url = new URL(Spark::Get(Config::LOCAL) . "/assets/");
 
         $data = array("cmd"=>"", "class"=>"", "id"=>"", "width"=>"", "height"=>"");
         foreach ($data as $key=>$value) {
@@ -99,7 +98,7 @@ class StorageItem extends DataObject implements JsonSerializable
             }
         }
         if ($this->getName()) {
-            $data["name"] = slugify($this->getName()).".webp";
+            $data["name"] = Spark::Slugify($this->getName()).".webp";
             $url->add(new PathParameter("name", "name",false, false));
         }
         $url->setData($data);
@@ -110,7 +109,7 @@ class StorageItem extends DataObject implements JsonSerializable
     {
         $this->setType(StorageItem::TYPE_FILE);
         $this->buildURL();
-        if (STORAGE_ITEM_SLUG) {
+        if (Spark::GetBoolean(Config::STORAGE_ITEM_SLUG)) {
             return $this->SlugURL();
         }
         else {
@@ -134,7 +133,7 @@ class StorageItem extends DataObject implements JsonSerializable
             $cmd = "data";
         }
 
-        $this->url = new URL(STORAGE_LOCAL);
+        $this->url = new URL(Spark::Get(Config::STORAGE_LOCAL));
 
         $this->url->add(new URLParameter("cmd", $cmd));
         $this->url->add(new URLParameter("class", $this->className));

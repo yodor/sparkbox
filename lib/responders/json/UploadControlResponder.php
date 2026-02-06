@@ -7,8 +7,8 @@ abstract class UploadControlResponder extends JSONResponder
 {
 
     //json request required parameter names
-    public const PARAM_FIELD_NAME = "field_name";
-    public const PARAM_UID = "uid";
+    public const string PARAM_FIELD_NAME = "field_name";
+    public const string PARAM_UID = "uid";
 
     //ajax handler is working with '$field_name' field
     protected string $field_name = "";
@@ -56,7 +56,7 @@ abstract class UploadControlResponder extends JSONResponder
     protected function _upload(JSONResponse $resp)
     {
 
-        debug("Creating temporary DataInput object ... ");
+        Debug::ErrorLog("Creating temporary DataInput object ... ");
         $validator = $this->validator();
 
         //virtual input field to process ajax posted data
@@ -68,21 +68,21 @@ abstract class UploadControlResponder extends JSONResponder
         //set processor to the input
         new UploadDataInput($input);
 
-        debug("Loading input processor with _POST data");
+        Debug::ErrorLog("Loading input processor with _POST data");
         $input->getProcessor()->loadPostData($_POST);
 
-        debug("Validating ...");
+        Debug::ErrorLog("Validating ...");
         $input->validate();
 
         //FileStorageObject
         $value = $input->getValue();
 
         if (is_array($value)) {
-            debug("Processing multiple uploeded files: ".count($value));
+            Debug::ErrorLog("Processing multiple uploeded files: ".count($value));
             foreach ($value as $idx=>$uploadObject) {
                 $error = $input->getErrorAt($idx);
                 if ($error) {
-                    debug("Element[$idx]: Validation error: $error");
+                    Debug::ErrorLog("Element[$idx]: Validation error: $error");
                 }
                 else {
                     $this->assignUploadObject($resp, $uploadObject);
@@ -98,7 +98,7 @@ abstract class UploadControlResponder extends JSONResponder
             $this->assignUploadObject($resp, $value);
         }
 
-        debug("Finished");
+        Debug::ErrorLog("Finished");
     }
 
     /**
@@ -113,7 +113,7 @@ abstract class UploadControlResponder extends JSONResponder
      */
     private function assignUploadObject(JSONResponse $resp, FileStorageObject $uploadObject)
     {
-        debug("...");
+        Debug::ErrorLog("...");
 
         //!Do store first
         //StorageObject can change UID depending on strage type used
@@ -141,7 +141,7 @@ abstract class UploadControlResponder extends JSONResponder
     {
         //store the original data in the session array by the field name and UID
         $this->data->set($uploadObject->UID(),$uploadObject);
-        debug("Stored FileStorageObject to session data using UID: " . $uploadObject->UID() . " for field['" . $this->field_name . "']");
+        Debug::ErrorLog("Stored FileStorageObject to session data using UID: " . $uploadObject->UID() . " for field['" . $this->field_name . "']");
     }
 
     /**
@@ -163,7 +163,7 @@ abstract class UploadControlResponder extends JSONResponder
 
     protected function _remove(JSONResponse $resp)
     {
-        debug("...");
+        Debug::ErrorLog("...");
 
         if (!isset($_GET[UploadControlResponder::PARAM_UID])) throw new Exception("UID not passed");
 
@@ -171,11 +171,11 @@ abstract class UploadControlResponder extends JSONResponder
 
         if (strlen($uid) > 50) throw new Exception("UID maximum size reached");
 
-        debug("Removing UID[$uid] from session data");
+        Debug::ErrorLog("Removing UID[$uid] from session data");
 
         $this->data->remove($uid);
 
-        debug("Finished");
+        Debug::ErrorLog("Finished");
     }
 
 }

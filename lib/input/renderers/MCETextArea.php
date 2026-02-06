@@ -21,15 +21,15 @@ class MCETextArea extends TextArea
     public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/MCETextArea.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/MCETextArea.css";
         return $arr;
     }
 
     public function requiredScript(): array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/tiny_mce/tinymce.min.js";
-        $arr[] = SPARK_LOCAL . "/js/MCETextArea.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/tiny_mce/tinymce.min.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/MCETextArea.js";
         return $arr;
     }
 

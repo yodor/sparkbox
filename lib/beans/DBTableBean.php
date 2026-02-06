@@ -109,7 +109,7 @@ abstract class DBTableBean
             $this->columns[$field_name] = $row["Type"];
         }
         $result->free();
-        //debug("Storage Types for Bean: ".get_class($this), $this->storage_types);
+        //Debug::ErrorLog("Storage Types for Bean: ".get_class($this), $this->storage_types);
 
     }
 
@@ -372,25 +372,25 @@ abstract class DBTableBean
         if (!$db) {
             $use_transaction = TRUE;
             $db = $this->db;
-            debug("Starting DB transaction with local DBDriver instance");
+            Debug::ErrorLog("Starting DB transaction with local DBDriver instance");
             $db->transaction();
         }
         else {
-            debug("Not starting transaction - using DBDriver from function call parameter");
+            Debug::ErrorLog("Not starting transaction - using DBDriver from function call parameter");
         }
 
         try {
 
-            debug("Executing closure function");
+            Debug::ErrorLog("Executing closure function");
 
             //either throw or succeed
             $code($db);
 
             $affectedRows = $db->affectedRows();
-            debug("Closure finished - affected rows: " . $affectedRows);
+            Debug::ErrorLog("Closure finished - affected rows: " . $affectedRows);
             
             if ($use_transaction) {
-                debug("Committing DB transaction");
+                Debug::ErrorLog("Committing DB transaction");
                 $db->commit();
             }
 
@@ -400,7 +400,7 @@ abstract class DBTableBean
         catch (Exception $ex) {
 
             if ($use_transaction) {
-                debug("Rolling back DB transaction - Exception: " . $ex->getMessage() . " - DBError: " . $db->getError());
+                Debug::ErrorLog("Rolling back DB transaction - Exception: " . $ex->getMessage() . " - DBError: " . $db->getError());
                 $db->rollback();
             }
 
@@ -422,7 +422,7 @@ abstract class DBTableBean
 
         $code = function (DBDriver $db) use ($id) {
 
-            debug("Going to delete ID: $id");
+            Debug::ErrorLog("Going to delete ID: $id");
             //TODO: select with joins clause needs table specification before the FROM statement in the DELETE statement
             $delete = new SQLDelete();
             $delete->from = $this->table;
@@ -480,7 +480,7 @@ abstract class DBTableBean
             while ($data = $result->fetchResult()) {
                 $idlist[] = intval($data->get($this->prkey));
             }
-            debug("Affected ID list: ", $idlist);
+            Debug::ErrorLog("Affected ID list: ", $idlist);
 
             $db->query($delete->getSQL());
 
@@ -596,20 +596,20 @@ abstract class DBTableBean
     {
         if ($this instanceof SparkCacheBean) return;
 
-        $cache_file = CACHE_PATH . "/" . get_class($this) . "/" . $id;
-        debug("Checking cache folder: '$cache_file'");
+        $cache_file = Spark::Get(Config::CACHE_PATH) . "/" . get_class($this) . "/" . $id;
+        Debug::ErrorLog("Checking cache folder: '$cache_file'");
         if (!is_dir($cache_file)) {
-            debug("'$cache_file' not a folder");
+            Debug::ErrorLog("'$cache_file' not a folder");
             return;
         }
         try {
-            debug("Removing folder '$cache_file'");
-            deleteDir($cache_file);
-            debug("Removing folder '$cache_file' complete");
+            Debug::ErrorLog("Removing folder '$cache_file'");
+            Spark::DeleteFolder($cache_file);
+            Debug::ErrorLog("Removing folder '$cache_file' complete");
         }
         catch (Exception $e) {
             //
-            debug("Unable to delete cache folder: $cache_file");
+            Debug::ErrorLog("Unable to delete cache folder: $cache_file");
         }
 
         $delete = new SQLDelete();
@@ -624,7 +624,7 @@ abstract class DBTableBean
         }
         catch (Exception $e) {
             $this->db->rollBack();
-            debug("Unable to delete from sparkcache table: ".$e->getMessage());
+            Debug::ErrorLog("Unable to delete from sparkcache table: ".$e->getMessage());
         }
 
     }
@@ -642,7 +642,7 @@ abstract class DBTableBean
 
         foreach ($keys as $key) {
             $value = $row[$key];
-            //debug("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value)." is_null: ".is_null($value));
+            //Debug::ErrorLog("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value)." is_null: ".is_null($value));
 
             //TODO check usage
             if (is_array($value)) {

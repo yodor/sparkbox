@@ -120,7 +120,7 @@ class InputForm extends SparkObject implements IBeanEditor
     /**
      * @var bool
      */
-    public $star_required = TRUE;
+    public bool $star_required = TRUE;
 
     /**
      * Associative array with key = DataInput name and value = DataInput object
@@ -140,12 +140,12 @@ class InputForm extends SparkObject implements IBeanEditor
     /**
      * @var IFormProcessor
      */
-    protected $processor = NULL;
+    protected ?IFormProcessor $processor = NULL;
 
     /**
      * @var FormRenderer
      */
-    protected $renderer = NULL;
+    protected ?FormRenderer $renderer = NULL;
 
 
     const string DEFAULT_GROUP = "default";
@@ -494,7 +494,7 @@ class InputForm extends SparkObject implements IBeanEditor
     public function loadBeanData(int $editID, DBTableBean $bean): array
     {
 
-        debug("Loading data from '" . get_class($bean) . "' ID='$editID' ");
+        Debug::ErrorLog("Loading data from '" . get_class($bean) . "' ID='$editID' ");
 
         //used
         $this->setBean($bean);
@@ -503,20 +503,20 @@ class InputForm extends SparkObject implements IBeanEditor
         $result = array();
 
         if ($editID > 0) {
-            debug("Edit/Update mode ");
+            Debug::ErrorLog("Edit/Update mode ");
             $result = $bean->getByID($editID);
             $item_key = $bean->key();
 
             //do not validate values coming from db
 
-            debug("Loading form using bean '" . get_class($bean) . "' where " . $bean->key()." = ".$editID);
+            Debug::ErrorLog("Loading form using bean '" . get_class($bean) . "' where " . $bean->key()." = ".$editID);
 
             //initial loading of bean data
             $names = $this->inputNames();
             foreach ($names as $pos => $name) {
 
                 $input = $this->getInput($name);
-                debug("Processing DataInput '$name'");
+                Debug::ErrorLog("Processing DataInput '$name'");
 
                 //processor need value set. processor might need other values from the item_row or to parse differently the value
                 $input->getProcessor()->loadBeanData($editID, $bean, $result);
@@ -524,7 +524,7 @@ class InputForm extends SparkObject implements IBeanEditor
 
         }
         else {
-            debug("Add/Insert mode");
+            Debug::ErrorLog("Add/Insert mode");
         }
         return $result;
     }

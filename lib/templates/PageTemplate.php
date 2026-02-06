@@ -4,12 +4,13 @@ include_once("components/BeanFormEditor.php");
 
 include_once("class/pages/AdminPage.php");
 
-abstract class PageTemplate extends Container
+abstract class PageTemplate extends Container implements IRequestProcessor
 {
-    protected SparkPage $page;
-    protected $view;
+    protected SparkAdminPage $page;
 
-    protected $request_condition;
+    protected ?Component $view = null;
+
+    protected ?RequestParameterCondition $request_condition = null;
 
     public function __construct()
     {
@@ -20,15 +21,20 @@ abstract class PageTemplate extends Container
         $this->initPageActions();
     }
 
-    abstract protected function initPage();
+    abstract protected function initPage(): void;
 
-    abstract protected function initPageActions();
+    abstract protected function initPageActions(): void;
 
-    abstract public function initView();
+    abstract public function initView(): ?Component;
 
-    public function processInput()
+    public function processInput() : void
     {
 
+    }
+
+    public function isProcessed() : bool
+    {
+        return false;
     }
 
     public function startRender(): void
@@ -49,7 +55,7 @@ abstract class PageTemplate extends Container
         $this->page->finishRender();
     }
 
-    public function setRequestCondition(RequestParameterCondition $request_condition)
+    public function setRequestCondition(RequestParameterCondition $request_condition) : void
     {
         $this->request_condition = $request_condition;
         foreach ($this->request_condition->getParameterNames() as $idx=>$name) {
@@ -62,7 +68,7 @@ abstract class PageTemplate extends Container
         return $this->request_condition;
     }
 
-    public function getPage() : SparkPage
+    public function getPage() : SparkAdminPage
     {
         return $this->page;
     }

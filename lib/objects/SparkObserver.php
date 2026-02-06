@@ -29,7 +29,7 @@ class SparkObserver implements IObserver
 
     public function onEvent(SparkEvent $event) : void
     {
-        //debug("onEvent: ".get_class($event)." - name: ".$event->getName());
+        //Debug::ErrorLog("onEvent: ".get_class($event)." - name: ".$event->getName());
         ($this->callback)($event);
     }
 

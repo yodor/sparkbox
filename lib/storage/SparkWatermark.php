@@ -1,12 +1,9 @@
 <?php
 include_once("storage/SparkFile.php");
+include_once("storage/WatermarkPosition.php");
 
 class SparkWatermark
 {
-    const WATERMARK_POSITION_TOP_LEFT = 1;
-    const WATERMARK_POSITION_TOP_RIGHT = 2;
-    const WATERMARK_POSITION_BOTTOM_LEFT = 3;
-    const WATERMARK_POSITION_BOTTOM_RIGHT = 4;
 
     protected ?SparkFile $file = null;
 
@@ -17,7 +14,7 @@ class SparkWatermark
     protected int $margin_x = 10;
     protected int $margin_y = 10;
 
-    protected int $position = SparkWatermark::WATERMARK_POSITION_BOTTOM_RIGHT;
+    protected WatermarkPosition $position = WatermarkPosition::BOTTOM_RIGHT;
     //watermark square size percent over height of image default 1/5 of height
     protected int $size = 5;
 
@@ -25,40 +22,46 @@ class SparkWatermark
     {
 
         //disabled in config
-        if (defined("IMAGE_SCALER_WATERMARK_ENABLED") && IMAGE_SCALER_WATERMARK_ENABLED) {
+        if (Spark::GetBoolean(Config::IMAGE_SCALER_WATERMARK_ENABLED)) {
 
+            $watermarkFilename = Spark::Get(Config::IMAGE_SCALER_WATERMARK_FILENAME);
             //no watermark filename in config
-            if (defined("IMAGE_SCALER_WATERMARK_FILENAME") && IMAGE_SCALER_WATERMARK_FILENAME) {
+            if ($watermarkFilename) {
 
-                $filename = INSTALL_PATH.DIRECTORY_SEPARATOR.IMAGE_SCALER_WATERMARK_FILENAME;
+                $filename = Spark::Get(Config::INSTALL_PATH).DIRECTORY_SEPARATOR.$watermarkFilename;
 
                 $this->file = new SparkFile(realpath($filename));
-                debug("Watermark using file: ". $this->file->getAbsoluteFilename());
+                Debug::ErrorLog("Watermark using file: ". $this->file->getAbsoluteFilename());
                 if ($this->file->exists()) {
                     $this->image = @imagecreatefromstring($this->file->getContents());
                     if ($this->image !== FALSE) {
                         $this->enabled = true;
-                        debug("Watermark image loaded");
+                        Debug::ErrorLog("Watermark image loaded");
                     }
                     else {
-                        debug("Unable to read image from this file");
+                        Debug::ErrorLog("Unable to read image from this file");
                     }
                 }
                 else {
-                    debug("Watermark filename not found");
+                    Debug::ErrorLog("Watermark filename not found");
                 }
             }
             else {
-                debug("Watermark file not set in config");
+                Debug::ErrorLog("Watermark file not set in config");
             }
         }
         else {
-            debug("Watermark not enabled in config");
+            Debug::ErrorLog("Watermark not enabled in config");
         }
 
-        if (defined("IMAGE_SCALER_WATERMARK_POSITION")) {
-            $this->position = (int)IMAGE_SCALER_WATERMARK_POSITION;
+        $configPosition = WatermarkPosition::tryFrom(Spark::GetInteger(Config::IMAGE_SCALER_WATERMARK_POSITION));
+        if ($configPosition === null) {
+            $this->position = WatermarkPosition::BOTTOM_RIGHT;
         }
+        else {
+            $this->position = $configPosition;
+        }
+
     }
 
     public function getFile() : ?SparkFile
@@ -84,7 +87,7 @@ class SparkWatermark
         return $this->size;
     }
 
-    public function getPosition() : int
+    public function getPosition() : WatermarkPosition
     {
         return $this->position;
     }
@@ -113,13 +116,13 @@ class SparkWatermark
         $margin_x = (int)($wtsize / $this->margin_x);
         $margin_y = (int)($wtsize / $this->margin_y);
 
-        if ($this->position == self::WATERMARK_POSITION_TOP_LEFT) {
+        if ($this->position === WatermarkPosition::TOP_LEFT) {
             $dst_x = $margin_x;
             $dst_y = $margin_y;
-        } else if ($this->position == self::WATERMARK_POSITION_TOP_RIGHT) {
+        } else if ($this->position === WatermarkPosition::TOP_RIGHT) {
             $dst_x = $width - $margin_x - $wtsize;
             $dst_y = $margin_y;
-        } else if ($this->position == self::WATERMARK_POSITION_BOTTOM_LEFT) {
+        } else if ($this->position === WatermarkPosition::BOTTOM_LEFT) {
             $dst_x = $margin_x;
             $dst_y = $height - $margin_y - $wtsize;
         } else {
@@ -130,7 +133,7 @@ class SparkWatermark
             //}
         }
 
-        debug("Processing watermark on source");
+        Debug::ErrorLog("Processing watermark on source");
         //imagecopy($h_source, $stamp, imagesx($h_source) - $sx - $marge_right, imagesy($h_source) - $sy - $marge_bottom, 0, 0, imagesx($stamp), imagesy($stamp));
         //imagecopyresized($h_source, $stamp, $this->width - $marge_right - $wtsize, $this->height - $marge_bottom - $wtsize, 0, 0, imagesx($stamp), imagesy($stamp));
         imagecopyresampled($h_source, $this->image, $dst_x, $dst_y,

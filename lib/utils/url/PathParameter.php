@@ -17,7 +17,7 @@ class PathParameter extends DataParameter
     {
         $value = parent::value($quoted);
         if ($this->doSlug) {
-            $value = slugify($value);
+            $value = Spark::Slugify($value);
         }
         return $value;
     }

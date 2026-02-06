@@ -18,7 +18,7 @@ class BufferedPage extends SparkPage
     {
         $replace = array(
             "%title%"=> strip_tags($this->preferred_title),
-            "%meta_description%" => prepareMeta($this->description)
+            "%meta_description%" => Spark::MetaDescription($this->description)
         );
 
         $buffer = strtr($buffer, $replace);

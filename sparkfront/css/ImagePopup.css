@@ -115,13 +115,6 @@
     height:50px;
 }
 
-
-
-@-webkit-keyframes spin {
-    from {-webkit-transform:rotate(0deg);}
-    to {-webkit-transform:rotate(360deg);}
-}
-
 @keyframes spin {
     from {transform:rotate(0deg);}
     to {transform:rotate(360deg);}
@@ -155,7 +148,7 @@
     border-top-color:transparent;
     border-width: 1em;
     border-radius: 50%;
-    -webkit-animation: spin .8s linear infinite;
+
     animation: spin .8s linear infinite;
 }
 

@@ -24,7 +24,7 @@ class SparkEventManager
     public static function register(string $event_class, IObserver $observer) : void
     {
         if (!is_subclass_of($event_class, 'SparkEvent')) throw new Exception("Incorrect event_class - expecting SparkEvent subclass");
-        debug("Registering observer ".get_class($observer)." with event class: $event_class");
+        Debug::ErrorLog("Registering observer ".get_class($observer)." with event class: $event_class");
         self::$subscribers[$event_class][] = $observer;
     }
 
@@ -57,11 +57,11 @@ class SparkEventManager
         $observers = self::observersForEvent($event);
 
         if (is_null($observers)) {
-            debug("Event $event_class does not have registered observers");
+            Debug::ErrorLog("Event $event_class does not have registered observers");
             return;
         }
 
-        //debug("Emiting $event_class to ".count($observers)." registered observers");
+        //Debug::ErrorLog("Emiting $event_class to ".count($observers)." registered observers");
 
         foreach ($observers as $observer) {
             $observer->onEvent($event);

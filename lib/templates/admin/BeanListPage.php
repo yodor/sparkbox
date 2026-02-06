@@ -43,7 +43,7 @@ class BeanListPage extends AdminPageTemplate
     /**
      * Called just before rendering is about to start to process the user input
      */
-    public function processInput()
+    public function processInput() : void
     {
         parent::processInput();
 
@@ -72,7 +72,7 @@ class BeanListPage extends AdminPageTemplate
         return $this->keyword_search;
     }
 
-    public function removeListFields(string ...$names)
+    public function removeListFields(string ...$names) : void
     {
         foreach ($names as $name) {
             if (isset($this->fields[$name])) {
@@ -81,9 +81,9 @@ class BeanListPage extends AdminPageTemplate
         }
     }
     /**
-     * Set the list view column names and labels using the list_fields array
-     * Array keys are used as column names and values as column labels
-     * Try to set bean query fields using the names
+     * Set the list view column names and labels using the list_fields array.
+     * Array keys are used as column names and values as column labels.
+     * Try to set bean query fields using the names.
      * @param array $list_fields
      */
     public function setListFields(array $list_fields): void
@@ -100,7 +100,7 @@ class BeanListPage extends AdminPageTemplate
         $this->setBeanQuery();
     }
 
-    protected function setBeanQuery()
+    protected function setBeanQuery() : void
     {
 
         $qry = $this->bean->query();
@@ -122,7 +122,7 @@ class BeanListPage extends AdminPageTemplate
      *
      * @param DBTableBean $bean
      */
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean): void
     {
         parent::setBean($bean);
 
@@ -134,7 +134,7 @@ class BeanListPage extends AdminPageTemplate
         if ($this->query instanceof SQLQuery) return;
 
         //no list fields set yet. query fields will be set when setListFields is called
-        if (!is_array($this->fields) || count($this->fields)<1) return;
+        if (count($this->fields)<1) return;
 
         $this->setBeanQuery();
     }
@@ -143,12 +143,12 @@ class BeanListPage extends AdminPageTemplate
      * Set the iterator that will be used
      * @param SQLQuery $qry
      */
-    public function setIterator(SQLQuery $qry)
+    public function setIterator(SQLQuery $qry) : void
     {
         $this->query = $qry;
     }
 
-    public function getView()
+    public function getView() : Component
     {
         return $this->view;
     }
@@ -156,7 +156,7 @@ class BeanListPage extends AdminPageTemplate
     /**
      * Fill the required actions to the local page instance
      */
-    protected function initPageActions()
+    protected function initPageActions(): void
     {
         $url = URL::Current();
         $url->setScriptName("add.php");
@@ -172,7 +172,7 @@ class BeanListPage extends AdminPageTemplate
      *
      * @param ActionCollection $act
      */
-    protected function initViewActions(ActionCollection $act)
+    protected function initViewActions(ActionCollection $act) : void
     {
 
         $act->append(new Action(SparkAdminPage::ACTION_EDIT, "add.php", array(new DataParameter("editID", $this->view->getIterator()->key()))));
@@ -245,10 +245,10 @@ class BeanListPage extends AdminPageTemplate
      * Calls initViewActions
      * Return the initialized TableView (Used when initView is called externaly) before startRender()
      * This method is automatically called from startRender() of PageTemplate , before processInput
-     * @return TableView
+     * @return ?Component
      * @throws Exception
      */
-    public function initView()
+    public function initView(): ?Component
     {
         if (!$this->query) throw new Exception("Query not set yet");
 

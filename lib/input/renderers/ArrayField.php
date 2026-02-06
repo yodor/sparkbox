@@ -82,14 +82,14 @@ class ArrayField extends InputField
     public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/ArrayField.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/ArrayField.css";
         return $arr;
     }
 
     public function requiredScript(): array
     {
         $arr = parent::requiredScript();
-        $arr[] = SPARK_LOCAL . "/js/ArrayField.js";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/ArrayField.js";
         return $arr;
     }
 

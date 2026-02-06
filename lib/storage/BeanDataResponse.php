@@ -8,8 +8,8 @@ include_once("storage/DataBuffer.php");
 abstract class BeanDataResponse extends SparkHTTPResponse
 {
 
-    const FIELD_PHOTO = "photo";
-    const FIELD_DATA = "data";
+    const string FIELD_PHOTO = "photo";
+    const string FIELD_DATA = "data";
 
     protected string $className = "";
     protected int $id = -1;
@@ -57,8 +57,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->id = $id;
         $this->className = $className;
 
-        $globals = SparkGlobals::Instance();
-        $globals->includeBeanClass($className);
+        Spark::LoadBeanClass($className);
 
         $this->bean = new $this->className();
 
@@ -66,12 +65,12 @@ abstract class BeanDataResponse extends SparkHTTPResponse
             $this->field = $_GET["field"];
             $this->field_requested = TRUE;
 
-            debug("Requested bean field: $this->field");
+            Debug::ErrorLog("Requested bean field: $this->field");
         }
 
         $this->cacheEntry = NULL;
 
-        if (STORAGE_CACHE_ENABLED && !$this->skip_cache) {
+        if (Spark::Get(Config::STORAGE_CACHE_ENABLED) && !$this->skip_cache) {
             $this->cacheEntry = CacheFactory::BeanCacheEntry($this->cacheName(), $this->className, $this->id);
         }
 
@@ -83,10 +82,10 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      */
     protected function authorizeAccess(): void
     {
-        debug("authorizeAccess ...");
+        Debug::ErrorLog("authorizeAccess ...");
 
         if (!$this->bean->haveColumn("auth_context")) {
-            debug("No auth_context column defined");
+            Debug::ErrorLog("No auth_context column defined");
             return;
         }
 
@@ -104,11 +103,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $auth_context = (string)$data["auth_context"];
 
         if (strlen($auth_context) < 1) {
-            debug("auth_context not set for this id");
+            Debug::ErrorLog("auth_context not set for this id");
             return;
         }
 
-        debug("Protected resource requested. Using auth_context: $auth_context");
+        Debug::ErrorLog("Protected resource requested. Using auth_context: $auth_context");
 
         Session::Start();
         Authenticator::AuthorizeResource($auth_context, $data, TRUE);
@@ -123,13 +122,13 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     protected function loadBean() : void
     {
 
-        debug("Loading ID: " . $this->id . " from " . $this->className);
+        Debug::ErrorLog("Loading ID: " . $this->id . " from " . $this->className);
 
         $result = $this->bean->getByID($this->id);
-        debug("Data keys loaded: ", array_keys($result));
+        Debug::ErrorLog("Data keys loaded: ", array_keys($result));
 
         if (!isset($result[$this->field])) {
-            debug("Required field name not found");
+            Debug::ErrorLog("Required field name not found");
             throw new Exception("Field name not found");
         }
 
@@ -140,13 +139,13 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $object = @unserialize($result[$this->field]);
 
         if ($object instanceof StorageObject) {
-            debug("Unpacked: " . get_class($object));
+            Debug::ErrorLog("Unpacked: " . get_class($object));
             $object->setDataKey($this->field);
             $this->object = $object;
         }
         else {
 
-            debug("Field[$this->field] does not contain StorageObject");
+            Debug::ErrorLog("Field[$this->field] does not contain StorageObject");
 
             //Limit arbitrary data access from the result row
             if ($this->field_requested) {
@@ -176,11 +175,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         //set last modified from bean
         $modified = gmdate(SparkHTTPResponse::DATE_FORMAT, $last_modified);
-        debug("Last-Modified: $modified");
+        Debug::ErrorLog("Last-Modified: $modified");
 
         //keep one year ahead from request time
         $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
-        debug("Expires: $expires");
+        Debug::ErrorLog("Expires: $expires");
 
         $this->setHeader("ETag", $this->ETag());
 
@@ -200,11 +199,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         if ($this->last_modified!=-1) return $this->last_modified;
 
         if ($this->cacheEntry && $this->cacheEntry->haveData()) {
-            debug("Reading last-modified from filesystem");
+            Debug::ErrorLog("Reading last-modified from filesystem");
             $last_modified = $this->cacheEntry->lastModified();
         }
         else {
-            debug("Reading last-modified from bean");
+            Debug::ErrorLog("Reading last-modified from bean");
             $last_modified = $this->getBeanLastModified();
         }
 
@@ -227,7 +226,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         //default value
         if ($this->id==-1) {
-            debug("'Default value'");
+            Debug::ErrorLog("'Default value'");
             return $last_modified;
         }
 
@@ -239,7 +238,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         }
 
         if (count($columns)<1) {
-            debug("No suitable column found");
+            Debug::ErrorLog("No suitable column found");
             return $last_modified;
         }
 
@@ -255,14 +254,14 @@ abstract class BeanDataResponse extends SparkHTTPResponse
                 }
 
                 $last_modified = $value;
-                debug("Using value from column [$name]");
+                Debug::ErrorLog("Using value from column [$name]");
                 $found = true;
                 break;
             }
         }
 
         if (!$found) {
-            debug("No suitable column value found");
+            Debug::ErrorLog("No suitable column value found");
         }
 
         return $last_modified;
@@ -277,7 +276,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      */
     public function send() : void
     {
-        debug("Class: " . $this->className . " ID: " . $this->id . " Field: " . $this->field);
+        Debug::ErrorLog("Class: " . $this->className . " ID: " . $this->id . " Field: " . $this->field);
 
         if (!$this->bean->haveColumn($this->field)) {
             throw new Exception("Bean does not support this field");
@@ -299,11 +298,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->setDispositionFilename($beanETag);
 
         $cacheName = $this->cacheName();
-        debug("Cache name is: ".$cacheName);
+        Debug::ErrorLog("Cache name is: ".$cacheName);
 
         //check if we have the data in cache (skip fetching blob data from DB and image processing if found)
         if ($this->cacheEntry && $this->cacheEntry->haveData()) {
-            debug("Bean data found in cache - sending cache data as a response");
+            Debug::ErrorLog("Bean data found in cache - sending cache data as a response");
             $this->setHeader("X-Tag", "SparkCache");
             $this->sendCacheEntry($this->cacheEntry);
             exit;
@@ -317,14 +316,14 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         //store to cache
         if ($this->cacheEntry) {
-            debug("Storing cache file for this bean request");
+            Debug::ErrorLog("Storing cache file for this bean request");
             $this->cacheEntry->storeBuffer($this->object->buffer(), $lastModified);
-            debug("Sending cache file as a response");
+            Debug::ErrorLog("Sending cache file as a response");
             $this->sendCacheEntry($this->cacheEntry);
         }
         else {
-            //debug case only when cache is disabled
-            debug("Using sendData as a response");
+            //Debug::ErrorLog case only when cache is disabled
+            Debug::ErrorLog("Using sendData as a response");
             //cache headers
             $this->fillCacheHeaders();
             $this->sendData($this->object->buffer());
@@ -342,7 +341,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      */
     protected function ETag() : string
     {
-        return sparkHash($this->cacheName()."-".$this->getLastModified());
+        return Spark::Hash($this->cacheName()."-".$this->getLastModified());
     }
 
     abstract protected function process();

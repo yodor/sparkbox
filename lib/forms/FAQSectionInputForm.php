@@ -12,7 +12,7 @@ class FAQSectionInputForm extends InputForm
         parent::__construct();
 
 
-        $field = DataInputFactory::Create(DataInputFactory::TEXT, "section_name", "Section", 1);
+        $field = DataInputFactory::Create(InputType::TEXT, "section_name", "Section", 1);
         $this->addInput($field);
 
 

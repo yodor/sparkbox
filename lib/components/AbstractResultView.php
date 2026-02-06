@@ -97,7 +97,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     public function requiredStyle() : array
     {
         $arr = parent::requiredStyle();
-        $arr[] = SPARK_LOCAL . "/css/ResultView.css";
+        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/ResultView.css";
         return $arr;
     }
 
@@ -264,14 +264,14 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $db = $this->iterator->getDB();
         $result = $db->query($select->getSQL());
         if (! ($result instanceof DBResult) ) {
-            debug("Error executing SQL_CALC_FOUND_ROWS: " . $select->getSQL());
+            Debug::ErrorLog("Error executing SQL_CALC_FOUND_ROWS: " . $select->getSQL());
             throw new Exception("Unable to query SQL_CALC_FOUND_ROWS");
         }
         $result->free();
 
         $result = $db->query("SELECT FOUND_ROWS() as total_results");
         if (! ($result instanceof DBResult) ) {
-            debug("Error fetching FOUND_ROWS: " . $select->getSQL());
+            Debug::ErrorLog("Error fetching FOUND_ROWS: " . $select->getSQL());
             throw new Exception("Unable to fetch FOUND_ROWS");
         }
 
@@ -297,11 +297,11 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     public function processIterator() : void
     {
         if (!($this->iterator instanceof SQLQuery)) {
-            debug("No iterator set");
+            Debug::ErrorLog("No iterator set");
             return;
         }
         if ($this->iterator->isActive()) {
-            debug("Already active");
+            Debug::ErrorLog("Already active");
             return;
         }
 

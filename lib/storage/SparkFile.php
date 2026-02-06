@@ -4,7 +4,7 @@ class SparkFile {
     protected string $filename = "";
     protected string $path = "";
     protected finfo $finfo;
-    protected $handle = NULL;
+    protected mixed $handle = NULL;
 
     /**
      * @param string $absolute_filename If not empty calls setAbsoluteFilename
@@ -20,7 +20,7 @@ class SparkFile {
 
     public function getETag() : string
     {
-        return sparkHash($this->getFilename()."-".$this->lastModified());
+        return Spark::Hash($this->getFilename()."-".$this->lastModified());
     }
 
     /**

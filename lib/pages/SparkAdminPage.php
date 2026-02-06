@@ -50,9 +50,6 @@ class SparkAdminPage extends SparkPage
     //local menu items created from the page
     protected array $page_menu = array();
 
-    //get consumer parameter names
-    protected array $parameter_names = array();
-
     public function setPageMenu(array $menu_items) : void
     {
         $this->page_menu = $menu_items;
@@ -63,7 +60,7 @@ class SparkAdminPage extends SparkPage
     {
 
         $this->auth = new AdminAuthenticator();
-        $this->loginURL = ADMIN_LOCAL . "/login.php";
+        $this->loginURL = Spark::Get(Config::ADMIN_LOCAL) . "/login.php";
         $this->authorized_access = TRUE;
 
         parent::__construct();
@@ -91,7 +88,7 @@ class SparkAdminPage extends SparkPage
             $menuItems = $enabledMenu;
 
             $currentBasePath = pathInfo(URL::Current()->toString(), PATHINFO_DIRNAME);
-            if (strcmp($currentBasePath, ADMIN_LOCAL ) != 0) {
+            if (strcmp($currentBasePath, Spark::Get(Config::ADMIN_LOCAL) ) != 0) {
 
                 $found = false;
                 foreach ($enabledMenu as $menuItem) {
@@ -106,7 +103,7 @@ class SparkAdminPage extends SparkPage
                 }
                 if (!$found) {
 //                    throw new Exception("Access denied");
-                    header("Location: ".ADMIN_LOCAL."/access.php");
+                    header("Location: ".Spark::Get(Config::ADMIN_LOCAL)."/access.php");
                     exit;
                 }
             }
@@ -124,8 +121,8 @@ class SparkAdminPage extends SparkPage
 
         $this->menu_bar->setAttribute("noattach");
 
-        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminPage.css");
-        $this->head()->addCSS(SPARK_LOCAL . "/css/AdminMenu.css");
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminPage.css");
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminMenu.css");
 
         $this->body()->addClassName("admin_layout");
 
@@ -164,7 +161,7 @@ class SparkAdminPage extends SparkPage
             $adminHeader->items()->append($adminName);
         }
 
-        $buttonLogout = Button::LocationButton("Logout", new URL(ADMIN_LOCAL . "/logout.php"));
+        $buttonLogout = Button::LocationButton("Logout", new URL(Spark::Get(Config::ADMIN_LOCAL) . "/logout.php"));
         $adminHeader->items()->append($buttonLogout);
 
         $container->items()->append($this->menu_bar);
@@ -213,7 +210,7 @@ class SparkAdminPage extends SparkPage
             $selected_path[] = tr("Administration");
         }
 
-        $this->preferred_title = constructSiteTitle($selected_path);
+        $this->preferred_title = Spark::SiteTitle($selected_path);
     }
 
     protected function updateNavigation(): void
@@ -304,22 +301,7 @@ class SparkAdminPage extends SparkPage
         return $this->menu_bar;
     }
 
-    public function addParameterName(string $name) : void
-    {
-        if (!in_array($name, $this->parameter_names)) {
-            $this->parameter_names[] = $name;
-        }
-    }
 
-    public function getParameterNames() : array
-    {
-//        $view_params = Paginator::Instance()->getParameterNames();
-//        foreach ($view_params as $idx=>$name) {
-//            if (str_contains($name, Paginator::KEY_PAGE))continue;
-//            $this->parameter_names[] = $name;
-//        }
-        return $this->parameter_names;
-    }
 
 }
 

@@ -31,18 +31,18 @@ class MenuItemList extends SparkList
     public function selectActive(array $matchers = MenuItemList::DEFAULT_SELECT_MATCHERS, bool $match_first=true) : ?MenuItem
     {
 
-        debug("Select matchers: ", $matchers);
+        Debug::ErrorLog("Select matchers: ", $matchers);
 
         $pageURL = URL::Current();
 
-        debug("Current URL: " . $pageURL->toString());
+        Debug::ErrorLog("Current URL: " . $pageURL->toString());
 
         $match_code = array();
 
         $match_full = function (MenuItem $item, URL $itemURL) use ($pageURL) {
             $match = (strcmp(mb_strtolower($itemURL->toString()), mb_strtolower($pageURL->toString())) == 0);
             if ($match) {
-                debug("Match full URL: " . $itemURL->toString() . " - matches");
+                Debug::ErrorLog("Match full URL: " . $itemURL->toString() . " - matches");
             }
             return $match;
         };
@@ -51,7 +51,7 @@ class MenuItemList extends SparkList
         $match_partial = function (MenuItem $item, URL $itemURL) use ($pageURL) {
             $match = (str_starts_with(mb_strtolower($pageURL->toString()), mb_strtolower($itemURL->toString())));
             if ($match) {
-                debug("Match partial URL: " . $itemURL->toString() . " - matches");
+                Debug::ErrorLog("Match partial URL: " . $itemURL->toString() . " - matches");
             }
             return $match;
         };
@@ -60,7 +60,7 @@ class MenuItemList extends SparkList
         $match_script = function (MenuItem $item, URL $itemURL) use ($pageURL) {
             $match = (strcmp(mb_strtolower($itemURL->getScriptName()), mb_strtolower($pageURL->getScriptName())) == 0);
             if ($match) {
-                debug("Match scriptName: " . $itemURL->getScriptName() . " - matches");
+                Debug::ErrorLog("Match scriptName: " . $itemURL->getScriptName() . " - matches");
             }
             return $match;
         };
@@ -69,7 +69,7 @@ class MenuItemList extends SparkList
         $match_path = function (MenuItem $item, URL $itemURL) use ($pageURL) {
             $match = (strcmp(mb_strtolower($itemURL->getScriptPath()), mb_strtolower($pageURL->getScriptPath())) == 0);
             if ($match) {
-                debug("Match scriptPath: " . $itemURL->getScriptPath() . " - matches");
+                Debug::ErrorLog("Match scriptPath: " . $itemURL->getScriptPath() . " - matches");
             }
             return $match;
         };
@@ -82,7 +82,7 @@ class MenuItemList extends SparkList
         foreach ($matchers as $idx=>$mode) {
             $code = $match_code[$mode];
 
-            debug("Using: ".$mode);
+            Debug::ErrorLog("Using: ".$mode);
 
             $match_item = $this->matchItems($code);
 

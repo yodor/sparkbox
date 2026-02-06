@@ -33,7 +33,7 @@ class ConfigEditorPage extends AdminPageTemplate
         $this->processor->setBean($this->config);
     }
 
-    public function setForm(InputForm $form)
+    public function setForm(InputForm $form) : void
     {
         $this->form = $form;
 
@@ -53,7 +53,7 @@ class ConfigEditorPage extends AdminPageTemplate
         return $this->processor;
     }
 
-    public function setConfigSection(string $section)
+    public function setConfigSection(string $section) : void
     {
 
         $this->config->setSection($section);
@@ -64,7 +64,7 @@ class ConfigEditorPage extends AdminPageTemplate
 
     }
 
-    public function processInput()
+    public function processInput() : void
     {
         $this->processor->process($this->form);
 
@@ -75,14 +75,14 @@ class ConfigEditorPage extends AdminPageTemplate
         }
     }
 
-    protected function initPageActions()
+    protected function initPageActions(): void
     {
         // TODO: Implement initPageActions() method.
     }
 
-    public function initView()
+    public function initView(): ?Component
     {
-        // TODO: Implement initView() method.
+        return $this->form->getRenderer();
     }
 
     protected function renderImpl(): void

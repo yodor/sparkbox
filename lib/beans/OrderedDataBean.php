@@ -21,7 +21,7 @@ abstract class OrderedDataBean extends DBTableBean
         $code = function (DBDriver $db) use ($id) {
             $pos = (int)$this->getValue($id, "position");
 
-            debug("Deleting item with position: $pos");
+            Debug::ErrorLog("Deleting item with position: $pos");
 
             parent::delete($id, $db);
 
@@ -40,7 +40,7 @@ abstract class OrderedDataBean extends DBTableBean
     public function insert(array $row, ?DBDriver $db = NULL): int
     {
         if (!isset($row["position"])) {
-            debug("Position field is missing - using max(position) + 1");
+            Debug::ErrorLog("Position field is missing - using max(position) + 1");
             $pos = $this->getMaxPosition();
             $row["position"] = ($pos + 1);
         }
@@ -54,12 +54,12 @@ abstract class OrderedDataBean extends DBTableBean
 
         $maxp = $this->getMaxPosition();
 
-        debug("ID: $id position - current: $pos max: $maxp new: $new_pos");
+        Debug::ErrorLog("ID: $id position - current: $pos max: $maxp new: $new_pos");
 
         //if ($new_pos > $maxp) $new_pos = $maxp;
         if ($new_pos < 1) $new_pos = 1;
 
-        debug("Using pos: $new_pos");
+        Debug::ErrorLog("Using pos: $new_pos");
 
         $code = function (DBDriver $db) use ($id, $pos, $new_pos) {
 
@@ -92,7 +92,7 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at top position");
         }
 
-        debug("ID: $id position - current: $pos new: 1");
+        Debug::ErrorLog("ID: $id position - current: $pos new: 1");
 
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
@@ -121,7 +121,7 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at bottom position");
         }
 
-        debug("ID: $id position - current: $pos new: $max_pos");
+        Debug::ErrorLog("ID: $id position - current: $pos new: $max_pos");
 
         $code = function (DBDriver $db) use ($id, $pos, $max_pos) {
             $update = new SQLUpdate($this->select);
@@ -150,7 +150,7 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at top position");
         }
 
-        debug("ID: $id position - current: $pos new: " . ($pos - 1));
+        Debug::ErrorLog("ID: $id position - current: $pos new: " . ($pos - 1));
 
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
@@ -182,7 +182,7 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at bottom position");
         }
 
-        debug("ID: $id position - current: $pos new: " . ($pos + 1));
+        Debug::ErrorLog("ID: $id position - current: $pos new: " . ($pos + 1));
 
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
@@ -240,7 +240,7 @@ abstract class OrderedDataBean extends DBTableBean
             $positions[$id] = $position;
         }
 
-        debug("Using positions: ", $positions);
+        Debug::ErrorLog("Using positions: ", $positions);
 
         try {
             $this->db->transaction();
