@@ -81,9 +81,9 @@ final class Marshall {
 
 final class Spark {
 
-    static final array $defines = array();
-    static final array $constDefines = array();
-    static final array $beanLocations = array();
+    static array $defines = array();
+    static array $constDefines = array();
+    static array $beanLocations = array();
 
     private function __construct()
     {}
