@@ -12,7 +12,11 @@ include_once("utils/Session.php");
 class Translator implements IRequestProcessor, IGETConsumer
 {
 
-    protected static Translator $instance;
+    protected bool $enabled = false;
+
+    protected static ?Translator $instance = null;
+
+
     public static function Instance() : Translator
     {
         if (self::$instance == null) {
@@ -96,11 +100,32 @@ class Translator implements IRequestProcessor, IGETConsumer
         return $this->language["language"];
     }
 
-    public function __construct()
+    private function __construct()
     {
+        try {
+            $this->initialize();
+            $this->processInput();
+            $this->setEnabled(true);
+        }
+        catch (Exception $e) {
+            $this->setEnabled(false);
+            Debug::ErrorLog("Translator can not be enabled: ".$e->getMessage());
+        }
+    }
 
-        self::$instance = $this;
+    public function setEnabled(bool $enabled) : void
+    {
+        $this->enabled = $enabled;
+    }
 
+    public function isEnabled() : bool
+    {
+        return $this->enabled;
+    }
+
+    public function initialize() : void
+    {
+        Debug::ErrorLog("Initializing translator...");
         $this->phrases = new SiteTextsBean();
         $this->languages = new LanguagesBean();
 
@@ -110,17 +135,15 @@ class Translator implements IRequestProcessor, IGETConsumer
         //prefer cookie langID
         $langID = -1;
 
-//        if (Session::Contains(Translator::KEY_LANGUAGE_ID)) {
-//            $langID = (int)Session::Get(Translator::KEY_LANGUAGE_ID);
-//            Debug::ErrorLog("Session ".Translator::KEY_LANGUAGE_ID.": ".$langID);
-//        }
         if (Session::HaveCookie(Translator::KEY_LANGUAGE_ID)) {
             $langID = (int)Session::GetCookie(Translator::KEY_LANGUAGE_ID);
-            Debug::ErrorLog("Cookies ".Translator::KEY_LANGUAGE_ID.": ".$langID);
+            Debug::ErrorLog(Translator::KEY_LANGUAGE_ID.": ".$langID);
         }
+
 
         //no session or cookie set
         if ($langID > 0) {
+
             try {
                 $this->loadLanguageID($langID);
             }
@@ -300,29 +323,6 @@ class Translator implements IRequestProcessor, IGETConsumer
 
         return $result;
     }
-
-    public function translateNumber($val)
-    {
-        $language = Session::Get("language");
-        if (strcmp($language, "arabic") == 0) {
-            $arnum = array("0" => "٠", "1" => "١", "2" => "٢", "3" => "٣", "4" => "٤", "5" => "٥", "6" => "٦",
-                "7" => "٧", "8" => "٨", "9" => "٩", "." => ".", "," => ",");
-            $ret = "";
-
-            for ($a = 0; $a < strlen($val); $a++) {
-                $c = substr($val, $a, 1);
-                if (isset($arnum[$c])) {
-                    $ret .= $arnum[$c];
-                }
-                else {
-                    $ret .= $c;
-                }
-            }
-            return $ret;
-        }
-        return $val;
-    }
-
 
     /**
      * Return true if request data has loaded into this processor
