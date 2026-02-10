@@ -60,7 +60,6 @@ class Image extends Component implements IPhotoRenderer
             }
         }
         if ($this->storageItem instanceof StorageItem) {
-            $this->storageItem->setName($this->getAttribute("alt"));
             $src = $this->storageItem->hrefImage($this->width, $this->height);
             $this->setAttribute("src", $src);
         }
