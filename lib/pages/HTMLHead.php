@@ -161,7 +161,7 @@ class HTMLHead extends Container
                 }
                 $builder->remove($name);
             }
-            $canonical_href = new URL($builder->toString())->fullURL();
+            $canonical_href = $builder->fullURL();
             echo "<link rel='canonical' href='$canonical_href'>\n";
         }
     }
