@@ -19,7 +19,7 @@ class Config {
     /**
      * SparkBox frontend classes location (js/css/images) - HTTP accessible - without ending slash
      * Default to LOCAL/sparkfront
-     * Static
+     * Static(string)
      */
     const string SPARK_LOCAL = "SPARK_LOCAL";
     /**
