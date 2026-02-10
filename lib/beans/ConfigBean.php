@@ -26,7 +26,7 @@ class ConfigBean extends DBTableBean
 
     public static function Factory() : ConfigBean
     {
-        if (!(self::$instance instanceof ConfigBean)) {
+        if (is_null(self::$instance)) {
             self::$instance = new ConfigBean();
         }
         return self::$instance;
@@ -89,7 +89,7 @@ class ConfigBean extends DBTableBean
 
     }
 
-    public function loadForm(InputForm $form)
+    public function loadForm(InputForm $form) : void
     {
         foreach ($form->inputs() as $field_name => $field) {
             $stored_value = $this->get($field_name);
