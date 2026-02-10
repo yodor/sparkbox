@@ -110,13 +110,10 @@ class SparkHTTPResponse
         }
     }
 
-
     /**
-     * Send 304 response
-     * Set headers Last-Modified and ETag using parameters $lastModifiedDate and $ETag
+     * Send HTTP 304 response
+     * Set headers Last-Modified and ETag using $this->requestModifiedSince() and $this->requestETag();
      * Send all headers set by calling sendHeaders()
-     * @param string $lastModifiedDate Value to use for Last-Modified header field. If empty try Last-Modified from request if set
-     * @param string $ETag Value to use for ETag header field. If empty try ETag from request if set
      * @return void
      */
     public function sendNotModified() : void
@@ -237,6 +234,7 @@ class SparkHTTPResponse
 
     /**
      * Output contents of $this->data
+     * @param DataBuffer $buffer
      * @return void
      */
     public function sendData(DataBuffer $buffer) : void

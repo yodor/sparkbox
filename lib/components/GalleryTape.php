@@ -123,6 +123,8 @@ class GalleryTape extends Component implements IDataIteratorRenderer
     /**
      * Sets the component name and set the ImagePopup relation attribute
      * @param string $name
+     * @return void
+     * @throws Exception
      */
     public function setName(string $name) : void
     {

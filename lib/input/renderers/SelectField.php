@@ -55,7 +55,7 @@ class SelectMultipleField extends SelectField
         //use SelectField css
         $this->addClassName("SelectField");
 
-        $this->input->setAttribute("multiple", "");
+        $this->input->setAttribute("multiple");
 
         //do not render default inital option
         $this->setDefaultOption(null);

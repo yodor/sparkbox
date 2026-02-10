@@ -65,14 +65,14 @@ class AdminUserEditorPage extends BeanEditorPage
 
         $roles = array();
         $menu = $this->getPage()->getMenuBar()->getMenu();
-        if ($menu instanceof MenuItemList) {
-            $itr = $menu->iterator();
-            while ($item = $itr->next()) {
-                if ($item instanceof MenuItem) {
-                    $roles[] = $item->getName();
-                }
+
+        $itr = $menu->iterator();
+        while ($item = $itr->next()) {
+            if ($item instanceof MenuItem) {
+                $roles[] = $item->getName();
             }
         }
+
 
         $form = new AdminUserForm();
         $form->setRoles($roles);

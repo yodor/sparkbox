@@ -17,7 +17,7 @@ class DataObjectInput extends InputProcessor
         return $this->object;
     }
 
-    public function setTransactBean(DBTableBean $bean, int $max_items=-1)
+    public function setTransactBean(DBTableBean $bean, int $max_items=-1): void
     {
         throw new Exception("Setting transaction bean is not supported");
     }

@@ -70,7 +70,7 @@ class SessionUploadInput extends InputProcessor
             }
             else {
 
-                //De-serialized object is not instance of StorageObject");
+                //De-serialized object is not instance of StorageObject
                 //do not throw here just unset
                 unset($values[$id]);
                 Debug::ErrorLog("Cleaning up non StorageObject: #$position - ID($id) - Value($value)");

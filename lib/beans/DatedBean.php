@@ -53,7 +53,7 @@ class DatedBean extends DBTableBean
      * @return array
      * @throws Exception
      */
-    public function filterMonthList(string $d_year, string $d_month)
+    public function filterMonthList(string $d_year, string $d_month) : array
     {
 
         $qry = $this->query($this->key());
@@ -77,7 +77,7 @@ class DatedBean extends DBTableBean
      * @return array
      * @throws Exception
      */
-    public function filterDayList(string $d_year, string $d_month)
+    public function filterDayList(string $d_year, string $d_month) : array
     {
 
         $qry = $this->query($this->key());

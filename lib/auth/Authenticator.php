@@ -23,7 +23,7 @@ abstract class Authenticator
         $this->session = new SessionData($context_name);
     }
 
-    public static function HMAC(string $key, string $data, string $hash_algo = 'md5')
+    public static function HMAC(string $key, string $data, string $hash_algo = 'md5') : string
     {
         return hash_hmac($hash_algo, $data, $key);
     }
@@ -56,7 +56,7 @@ abstract class Authenticator
      * Return the context name this class is handling
      * @return string
      */
-    public function name()
+    public function name() : string
     {
         return $this->session->name();
     }
@@ -64,7 +64,7 @@ abstract class Authenticator
     /**
      * Logout. Clears any stored authentication data for a named context - '$name'
      */
-    public function logout()
+    public function logout() : void
     {
         $this->session->destroy();
         foreach ($_COOKIE as $key => $val) {
@@ -148,7 +148,7 @@ abstract class Authenticator
      * @return void
      * @throws Exception
      */
-    public function login(string $username, string $pass, string $rand, bool $remember_me = FALSE, bool $check_password_only = FALSE)
+    public function login(string $username, string $pass, string $rand, bool $remember_me = FALSE, bool $check_password_only = FALSE) : void
     {
 
         Debug::ErrorLog($this, "Using loginToken: " . $rand);
@@ -206,7 +206,7 @@ abstract class Authenticator
         }
     }
 
-    protected function updateLastSeen(int $userID, DBDriver $db)
+    protected function updateLastSeen(int $userID, DBDriver $db) : void
     {
 
         $update = new SQLUpdate($this->bean->select());
@@ -279,7 +279,7 @@ abstract class Authenticator
      * @return mixed
      * @throws Exception
      */
-    public function loginToken()
+    public function loginToken() : mixed
     {
         return $this->session->get(SessionData::LOGIN_TOKEN);
     }

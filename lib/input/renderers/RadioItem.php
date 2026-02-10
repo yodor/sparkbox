@@ -63,7 +63,7 @@ class RadioItem extends DataIteratorItem
         $this->input->setValue(Spark::AttributeValue($this->value));
 
         if ($this->isSelected()) {
-            $this->input->setAttribute("checked", "");
+            $this->input->setAttribute("checked");
         }
         else {
             $this->input->removeAttribute("checked");

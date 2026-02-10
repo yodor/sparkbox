@@ -14,7 +14,7 @@ class BufferedPage extends SparkPage
         //no parent call
     }
 
-    public function obCallback(string &$buffer)
+    public function obCallback(string &$buffer) : void
     {
         $replace = array(
             "%title%"=> strip_tags($this->preferred_title),

@@ -146,11 +146,10 @@ abstract class UploadControlResponder extends JSONResponder
 
     /**
      *  Create array using FileStorageObject meta-data and html to use as representation in the upload control
-     *  Data user name, uid, mime
      *  HTML is prepared from getHTML
      * @param FileStorageObject $uploadObject
      * @param string $html
-     * @return array
+     * @return array name=>getFilename(), uid=>UID(), mime=>buffer()->mime(), html=>$html
      */
     protected function createResponseObject(FileStorageObject $uploadObject, string $html) : array
     {

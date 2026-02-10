@@ -72,16 +72,17 @@ class DataInputFactory
 {
 
 
-
     /**
-     * @param int $type
-     * @param string $name
-     * @param string $label
-     * @param bool $required
-     * @return ArrayDataInput|DataInput
+     * Create new DataInput of the given '$type'
+     *
+     * @param InputType $type DataInput type to create
+     * @param string $name Name to use for this InputField
+     * @param string $label Label to use for this InputField
+     * @param bool $required Flag to set if this field requires value
+     * @return DataInput
      * @throws Exception
      */
-    public static function Create(InputType $type, string $name, string $label, bool $required)
+    public static function Create(InputType $type, string $name, string $label, bool $required) : DataInput
     {
         $input = new DataInput($name, $label, $required);
 
@@ -200,7 +201,7 @@ class DataInputFactory
                 break;
 
             default:
-                throw new Exception("Unknown input type: " . $type);
+                throw new Exception("Unknown input type: " . $type->name);
 
         }
         return $input;

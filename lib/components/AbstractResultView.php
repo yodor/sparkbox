@@ -60,11 +60,10 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
      */
     protected ?Component $list_empty = null;
 
-
     /**
      * @var SQLQuery|IDataIterator|null
      */
-    protected ?SQLQuery $iterator;
+    protected ?SQLQuery $iterator = null;
 
     protected Container $viewport;
 
@@ -289,7 +288,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $this->results_paginated = true;
     }
     /**
-     * Execute the assigned sqlquery and prepare the paginator values.
+     * Execute the assigned SQLQuery and prepare the paginator values.
      * Need to call this once
      * @return void
      * @throws Exception

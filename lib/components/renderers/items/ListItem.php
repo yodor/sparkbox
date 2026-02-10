@@ -9,9 +9,9 @@ class ListItem extends DataIteratorItem
     {
         parent::__construct();
 
-        $this->setAttribute("itemprop","itemListElement");
-        $this->setAttribute("itemscope", "");
+        $this->setAttribute("itemscope");
         $this->setAttribute("itemtype", "https://schema.org/ListItem");
+        $this->setAttribute("itemprop","itemListElement");
 
         $this->positionMeta = new Meta();
         $this->positionMeta->setAttribute("itemprop","position");

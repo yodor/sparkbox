@@ -137,16 +137,16 @@ class InputForm extends SparkObject implements IBeanEditor
      */
     protected int $beanID = -1;
 
+
     /**
-     * @var IFormProcessor
+     * @var IFormProcessor|null
      */
     protected ?IFormProcessor $processor = NULL;
 
     /**
-     * @var FormRenderer
+     * @var FormRenderer|null
      */
     protected ?FormRenderer $renderer = NULL;
-
 
     const string DEFAULT_GROUP = "default";
 

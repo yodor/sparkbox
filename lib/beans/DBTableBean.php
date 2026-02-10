@@ -109,8 +109,7 @@ abstract class DBTableBean
             $this->columns[$field_name] = $row["Type"];
         }
         $result->free();
-        //Debug::ErrorLog("Storage Types for Bean: ".get_class($this), $this->storage_types);
-
+       
     }
 
     /**
@@ -217,6 +216,7 @@ abstract class DBTableBean
      * Current SQLSelect is cloned and passed to the SQLQuery constructor
      * @param string ...$columns
      * @return SQLQuery
+     * @throws Exception
      */
     public function query(string ...$columns): SQLQuery
     {
@@ -445,7 +445,8 @@ abstract class DBTableBean
      * @param string $column
      * @param string $value
      * @param DBDriver|null $db
-     * @param array $keep_ids if not empty would not delete rows with primary keys specified in keep_ids
+     * @param array $keep_ids
+     * @return int
      * @throws Exception
      */
     public function deleteRef(string $column, string $value, ?DBDriver $db = NULL, array $keep_ids = array()) : int

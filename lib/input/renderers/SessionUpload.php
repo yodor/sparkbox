@@ -22,7 +22,7 @@ abstract class SessionUpload extends InputField
         $this->input = new Input();
         $this->input->setType("file");
         //allow uploading multiple files at once
-        $this->input->setAttribute("multiple", "");
+        $this->input->setAttribute("multiple");
 
         $field_elements = new Container();
         $field_elements->setComponentClass("FieldElements");

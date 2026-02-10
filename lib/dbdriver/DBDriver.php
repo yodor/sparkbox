@@ -7,7 +7,7 @@ include_once("objects/events/DBDriverEvent.php");
 abstract class DBDriver
 {
 
-    public static function Enum2Array($enum_str)
+    public static function Enum2Array(string $enum_str) : array
     {
         $enum_str = str_replace("enum(", "", $enum_str);
         $enum_str = str_replace(")", "", $enum_str);

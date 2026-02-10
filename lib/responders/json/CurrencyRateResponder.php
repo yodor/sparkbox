@@ -37,7 +37,7 @@ class CurrencyRateResponder extends JSONResponder
 
     }
 
-    protected function _setrate(JSONResponse $response)
+    protected function _setrate(JSONResponse $response) : void
     {
         $bean = new CurrencyRatesBean();
 

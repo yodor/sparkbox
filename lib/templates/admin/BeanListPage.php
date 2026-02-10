@@ -8,8 +8,9 @@ include_once("responders/ChangePositionResponder.php");
 class BeanListPage extends AdminPageTemplate
 {
 
+
     /**
-     * @var DBTableBean
+     * @var DBTableBean|null
      */
     protected ?DBTableBean $bean = null;
 
@@ -23,8 +24,9 @@ class BeanListPage extends AdminPageTemplate
      */
     protected ?SQLQuery $query = null;
 
+
     /**
-     * @var ActionCollection
+     * @var ActionCollection|null
      */
     protected ?ActionCollection $view_item_actions = null;
 
@@ -169,8 +171,9 @@ class BeanListPage extends AdminPageTemplate
      * Initialize the item actions collection
      * Append the default "Edit" and "Delete" actions
      * If the bean instance is null the delete action is not added
-     *
      * @param ActionCollection $act
+     * @return void
+     * @throws Exception
      */
     protected function initViewActions(ActionCollection $act) : void
     {

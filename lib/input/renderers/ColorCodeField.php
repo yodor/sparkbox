@@ -31,10 +31,10 @@ class ColorCodeField extends InputFieldTag
         $this->chooser->processAttributes();
 
         $chooser_name = $this->chooser->getName();
-        $this->input->setAttribute("onChange", "this.form.{$chooser_name}.value=this.value;");
+        $this->input->setAttribute("onChange", "this.form.$chooser_name.value=this.value;");
 
         $data_name = $this->dataInput->getName();
-        $this->chooser->setAttribute("onChange","this.form.{$data_name}.value=this.value;");
+        $this->chooser->setAttribute("onChange","this.form.$data_name.value=this.value;");
 
     }
 

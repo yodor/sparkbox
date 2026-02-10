@@ -74,7 +74,7 @@ class ArrayDataIterator implements IDataIterator
         return NULL;
     }
 
-    public static function FromSelect(SQLSelect $qry, $prkey, $label)
+    public static function FromSelect(SQLSelect $qry, $prkey, $label) : ArrayDataIterator
     {
         $db = DBConnections::Open();
 

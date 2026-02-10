@@ -36,18 +36,18 @@ abstract class JSONFormResponder extends JSONResponder
     /**
      * Setup form renderer
      */
-    protected function setupFormRenderer()
+    protected function setupFormRenderer(): void
     {
         $fr = new FormRenderer($this->form);
         $fr->getSubmitLine()->setRenderEnabled(false);
     }
 
-    public function _render(JSONResponse $resp)
+    public function _render(JSONResponse $resp): void
     {
         $this->form->getRenderer()->render();
     }
 
-    public function _submit(JSONResponse $resp)
+    public function _submit(JSONResponse $resp): void
     {
 
         $this->proc->process($this->form);
@@ -59,13 +59,13 @@ abstract class JSONFormResponder extends JSONResponder
         }
     }
 
-    protected function onProcessSuccess(JSONResponse $resp)
+    protected function onProcessSuccess(JSONResponse $resp): void
     {
         //do stuff with form data in subclass
         $resp->message = "success";
     }
 
-    protected function onProcessError(JSONResponse $resp)
+    protected function onProcessError(JSONResponse $resp): void
     {
         $resp->message = $this->proc->getMessage();
         $this->form->getRenderer()->render();

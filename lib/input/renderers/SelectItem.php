@@ -20,7 +20,7 @@ class SelectItem extends DataIteratorItem
         $this->removeAttribute("name");
 
         if ($this->isSelected()) {
-            $this->setAttribute("SELECTED", "");
+            $this->setAttribute("SELECTED");
         }
         else {
             $this->removeAttribute("SELECTED");

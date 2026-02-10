@@ -5,7 +5,7 @@ include_once("input/DataInput.php");
 class DateValidator implements IInputValidator
 {
 
-    public static function isValidDate($value)
+    public static function isValidDate($value) : bool
     {
         $pieces = explode("-", $value);
 
@@ -28,7 +28,7 @@ class DateValidator implements IInputValidator
         return $ret;
     }
 
-    public static function getTimestamp($field_value)
+    public static function getTimestamp($field_value) : false|int
     {
         $ret = 0;
         if (DateValidator::isValidDate($field_value)) {

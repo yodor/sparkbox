@@ -27,9 +27,9 @@ class SparkLocationScript extends PageScript
         $spark_local = Spark::Get(Config::SPARK_LOCAL);
         $storage_local = Spark::Get(Config::STORAGE_LOCAL);
         return <<<JS
-        const LOCAL = "{$local}";
-        const SPARK_LOCAL = "{$spark_local}";
-        const STORAGE_LOCAL = "{$storage_local}";
+        const LOCAL = "$local";
+        const SPARK_LOCAL = "$spark_local";
+        const STORAGE_LOCAL = "$storage_local";
 JS;
 
     }

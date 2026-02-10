@@ -17,7 +17,7 @@ CREATE TABLE countries (
         parent::__construct("countries");
     }
 
-    public static function code2id($code)
+    public static function code2id($code) : int
     {
         $c = new CountriesBean();
         $qry = $c->queryField("country_code", $code, 1);

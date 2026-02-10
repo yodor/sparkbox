@@ -26,7 +26,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
 
     /**
-     * @var URLParameter
+     * @var URLParameter|null
      */
     protected ?URLParameter $urlparam = null;
 

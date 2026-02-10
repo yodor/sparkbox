@@ -33,7 +33,7 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
 
     /**
      * Model index key value
-     * @var string
+     * @var string|null
      */
     protected ?string $key = null;
 

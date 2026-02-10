@@ -7,7 +7,7 @@ class MySQLiDriver extends DBDriver
     /**
      * @var mysqli
      */
-    private mysqli $conn;
+    private ?mysqli $conn = null;
 
 
     /**

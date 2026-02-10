@@ -81,7 +81,7 @@ class ClosureFilter extends SparkObject
     {
         $value = $input->getValue();
         if ($this->matchMode==ClosureFilter::MATCH_LIKE) {
-            $value = "%{$value}%";
+            $value = "%$value%";
         }
         return $value;
     }

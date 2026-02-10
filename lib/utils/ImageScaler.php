@@ -238,14 +238,14 @@ class ImageScaler
         $h_thumbnail = null;
     }
 
-
     /**
      * Put the image into the databuffer using the configured output format
      * Default output format is image/webp but is overriden from config define IMAGE_SCALER_OUTPUT_FORMAT
      * If watermark is enabled it is applied here
-     * @param DataBuffer $buffer Destination
-     * @param GdImage $h_source Source image to be put into the buffer
+     * @param DataBuffer $buffer
+     * @param GdImage $h_source
      * @return void
+     * @throws Exception
      */
     protected function setImageData(DataBuffer $buffer, GdImage $h_source) : void
     {

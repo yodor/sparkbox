@@ -67,7 +67,7 @@ class FileCacheEntry extends CacheEntry
     }
 
     /**
-     * Store data from this buffer and set last modified time (if non-sero))
+     * Store data from this buffer and set last modified time (if non-sero)
      * @param DataBuffer $data
      * @param int $lastModified
      * @return void

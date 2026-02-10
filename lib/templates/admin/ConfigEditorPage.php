@@ -13,8 +13,9 @@ class ConfigEditorPage extends AdminPageTemplate
      */
     protected ConfigFormProcessor $processor;
 
+
     /**
-     * @var InputForm
+     * @var InputForm|null
      */
     protected ?InputForm $form = null;
 

@@ -82,12 +82,12 @@ class BeanTransactor extends SparkObject implements IBeanEditor
      * @param string $key
      * @param $val
      */
-    public function appendValue(string $key, $val)
+    public function appendValue(string $key, $val) : void
     {
         $this->values[$key] = $val;
     }
 
-    public function appendURLParameter(URLParameter $param)
+    public function appendURLParameter(URLParameter $param) : void
     {
         $this->values[$param->name()] = $param->value();
     }
@@ -97,17 +97,17 @@ class BeanTransactor extends SparkObject implements IBeanEditor
      * @param string $key
      * @param $val
      */
-    public function assignInsertValue(string $key, $val)
+    public function assignInsertValue(string $key, $val) : void
     {
         $this->insert_values[$key] = $val;
     }
 
-    public function assignUpdateValue(string $key, $val)
+    public function assignUpdateValue(string $key, $val) : void
     {
         $this->update_values[$key] = $val;
     }
 
-    public function removeValue(string $key)
+    public function removeValue(string $key) : void
     {
         if (isset($this->values[$key])) {
 
@@ -125,7 +125,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
         return $this->values;
     }
 
-    public function processForm(InputForm $form)
+    public function processForm(InputForm $form) : void
     {
         $this->form = $form;
 
@@ -156,7 +156,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
      * @param DBDriver $db
      * @throws Exception
      */
-    public function beforeCommit(DBDriver $db)
+    public function beforeCommit(DBDriver $db) : void
     {
 
         if (!$this->form) throw new Exception("Expected InputForm is null");
@@ -181,7 +181,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
 
     }
 
-    public function afterCommit()
+    public function afterCommit() : void
     {
 
         if (!$this->form) throw new Exception("Expected InputForm is null");
@@ -198,7 +198,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
 
     }
 
-    public function processBean()
+    public function processBean() : void
     {
 
         $db = DBConnections::Open();
@@ -244,7 +244,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor
      * @param DBDriver $db
      * @throws Exception
      */
-    protected function processBeanTransaction(DBDriver $db)
+    protected function processBeanTransaction(DBDriver $db) : void
     {
 
         Debug::ErrorLog("EditID: $this->editID");

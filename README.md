@@ -1,7 +1,7 @@
 SparkBox
 ========
 
-PHP Object Oriented Library/Kit for developing CMS, web-portals and web-apps.
+PHP Object-Oriented Library/Kit for developing CMS, web-portals and web-apps.
 
 Developed using
 

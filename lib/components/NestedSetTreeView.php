@@ -22,12 +22,12 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     protected int $branch_render_mode = NestedSetTreeView::MODE_BRANCHES_FOLDED;
 
     /**
-     * @var IDataIterator
+     * @var SQLQuery|null
      */
     protected ?SQLQuery $iterator = NULL;
 
     /**
-     * @var DataIteratorItem
+     * @var DataIteratorItem|null
      */
     protected ?DataIteratorItem $item = NULL;
 

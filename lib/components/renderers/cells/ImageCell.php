@@ -22,8 +22,8 @@ class ImageCell extends TableCell implements IPhotoRenderer
 
     protected ImagePopup $image_popup;
 
-    protected static $DefaultWidth = 128;
-    protected static $DefaultHeight = -1;
+    protected static int $DefaultWidth = 128;
+    protected static int $DefaultHeight = -1;
 
     protected bool $sortable = FALSE;
 
@@ -131,7 +131,6 @@ class ImageCell extends TableCell implements IPhotoRenderer
         else {
 
             $fieldName = $this->column->getName();
-            //Debug::ErrorLog("Column '$fieldName' Related bean: '" . get_class($this->bean) . "' Related field: '$this->relateField'", $data);
 
             if (array_key_exists($fieldName, $data)) {
 

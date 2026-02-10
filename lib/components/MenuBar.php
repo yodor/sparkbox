@@ -44,7 +44,7 @@ class MenuBar extends Container
         $this->setComponentClass("MenuBar");
         $this->setTagName("nav");
 
-        $this->setAttribute("itemscope", "");
+        $this->setAttribute("itemscope");
         $this->setAttribute("itemtype","https://schema.org/SiteNavigationElement");
         $this->setAttribute("role", "menu");
 

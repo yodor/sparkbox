@@ -282,9 +282,10 @@ class NestedSetBean extends DBTableBean
     }
 
     /**
-     * @param $lft
-     * @param $cnt
-     * @param $parentID
+     * Reconstruct the nested-set tree using parentID relation
+     * @param int $lft
+     * @param int $cnt
+     * @param int $parentID
      * @return void
      * @throws Exception
      */
@@ -522,11 +523,13 @@ class NestedSetBean extends DBTableBean
      * '$relation_table' should have column name equal to this bean prkey
      * The count is returned in column named 'related_count'
      * '$relation' is cloned first
-     * @param SQLSelect $relation The complete select for the other table that will be combined with the tree select
-     * @param string $relation_table DB table name used in '$relation'
-     * @param string $relation_prkey DB table primary key used in '$relation'
-     * @param array $columns Columns to be selected from this bean
+     * @param SQLSelect $relation
+     * @param string $relation_table
+     * @param string $relation_prkey
+     * @param array $columns
+     * @param bool $with_count
      * @return SQLSelect
+     * @throws Exception
      */
     public function selectTreeRelation(SQLSelect $relation, string $relation_table, string $relation_prkey, array $columns = array(), bool $with_count = true) : SQLSelect
     {
@@ -558,6 +561,7 @@ class NestedSetBean extends DBTableBean
      * @param int $nodeID
      * @param array $columns
      * @return SQLSelect
+     * @throws Exception
      */
     public function selectChildNodesWith(SQLSelect $other, string $relation_table, int $nodeID = -1, array $columns = array()): SQLSelect
     {

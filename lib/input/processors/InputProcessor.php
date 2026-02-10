@@ -72,7 +72,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     /**
      * Transact the DataInput values to this bean instead of the main transaction row
-     * @var DBTableBean
+     * @var DBTableBean|null
      */
     protected ?DBTableBean $transact_bean = null;
 
@@ -112,12 +112,12 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      * Data from this field will be stored into '$bean' DBTableBean instead of the main
      * transaction bean.
      * Multiple values are loaded using the default SQLSelect returned from by the select() method of '$bean'
-     * Ordering might be adjusted by modifying the select of '$bean' before passing it here
+     * Ordering might be adjusted by modifying the 'select' of '$bean' before passing it here
      * ie. $bean->select()->order_by = " position ASC "
      * @param DBTableBean $bean
      * @param int $max_items
      */
-    public function setTransactBean(DBTableBean $bean, int $max_items=-1)
+    public function setTransactBean(DBTableBean $bean, int $max_items=-1): void
     {
         $this->transact_bean = $bean;
         $this->max_transact_bean_items = $max_items;
@@ -128,7 +128,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         return $this->max_transact_bean_items;
     }
 
-    public function setTransactBeanItemLimit(int $max_items)
+    public function setTransactBeanItemLimit(int $max_items): void
     {
         $this->max_transact_bean_items = $max_items;
     }
@@ -233,7 +233,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             }
 
             //copy values from the main transaction to the transact_bean
-            if (is_array($this->bean_copy_fields) && count($this->bean_copy_fields) > 0) {
+            if (count($this->bean_copy_fields) > 0) {
                 $bean_fields = $transactor->getValues();
                 foreach ($bean_fields as $key => $val) {
                     if (in_array($key, $this->bean_copy_fields)) {
@@ -311,7 +311,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
         //transacts additional values from renderer data source
         //matching by 'this' field name and its value posted. do not copy on empty 'value'
-        if (is_array($this->renderer_source_copy_fields) && count($this->renderer_source_copy_fields) > 0 && $value) {
+        if (count($this->renderer_source_copy_fields) > 0 && $value) {
             Debug::ErrorLog("renderer_source_copy_fields ... using renderer iterator to query additional values");
             $iterator = $this->input->getRenderer()->getIterator();
             if (!($iterator instanceof SQLQuery)) throw new Exception("Unsupported iterator");

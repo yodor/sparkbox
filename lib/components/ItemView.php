@@ -20,7 +20,7 @@ class ItemView extends AbstractResultView
     {
         parent::__construct($itr);
 
-        $this->setAttribute("itemscope", "");
+        $this->setAttribute("itemscope");
         $this->setAttribute("itemtype", "https://schema.org/ItemList");
         $this->setAttribute("itemid");
 

@@ -4,7 +4,7 @@ class SparkEventManager
 {
     /**
      * Reference to all subscribed observers by class_name and list of observers
-     * array("SomeEvent" => array("0"=>IObservable1, "1"=>IObservable2), "BeanEvent" => ...etc)
+     * array("SomeEvent" => array("0"=>IObservable1, "1"=>IObservable2), "BeanEvent" => ...etc.)
      * @var array
      */
     protected static array $subscribers = array();

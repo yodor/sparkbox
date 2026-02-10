@@ -18,7 +18,7 @@ class BeanTranslatorInit extends PageScript
             element.addEventListener("click", (event)=>{
                 let editID = document.querySelector(".BeanFormEditor").getAttribute("editID");
                 if (editID<1) {
-                    showAlert("{$alertText}");
+                    showAlert("$alertText");
                     return;
                 }
                 beanDialog.show(element.getAttribute("field"), false);
