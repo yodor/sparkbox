@@ -26,6 +26,7 @@ class NestedSetViewPage extends BeanListPage
         $h_repos = new ChangePositionResponder($this->bean);
 
         $h_delete = new DeleteItemResponder($this->bean);
+        $h_delete->setConfirmDialogText("<div class='alert'>".tr("All products from this category will be deleted.")."</div>");
 
         $ir = new TextTreeItem();
 

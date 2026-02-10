@@ -6,6 +6,8 @@
 
     --spark-dialog-text-color: #000000;
     --spark-dialog-text-fontsize: 1em;
+    --spark-dialog-alert-color: #ff0000;
+    --spark-dialog-alert-fontsize: 1.2em;
 }
 
 .Dialog {
@@ -126,6 +128,10 @@
 .Dialog .Inner .Content .Text {
     font-size:var(--spark-dialog-text-fontsize);
     color:var(--spark-dialog-text-color);
+}
+.Dialog .Inner .Content .Text .alert {
+    color: var(--spark-dialog-alert-color);
+    font-size: var(--spark-dialog-alert-fontsize);
 }
 
 .Dialog .Inner .Footer {
