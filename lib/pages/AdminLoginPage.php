@@ -16,7 +16,7 @@ class AdminLoginPage extends SparkPage
         parent::__construct();
 
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminLoginPage.css");
-
+        $this->setComponentClass("AdminLoginPage");
     }
 
     public function initialize() : void

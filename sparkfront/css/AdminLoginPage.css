@@ -6,15 +6,28 @@
     justify-content: center;
 }
 
-.AdminLoginPage .FormRenderer {
+
+.FormRenderer {
     border: 1px solid #eaeaea;
+    flex-grow:0;
+    padding:1em;
+
 }
 
-/*.AdminLoginPage .FormRenderer .InputComponent {*/
-/*    align-self:stretch;*/
-/*}*/
 
-.AdminLoginPage .FormRenderer .InputComponent input {
+.FormRenderer .Caption {
+    text-transform: uppercase;
+    color: #517789;
+    font-weight: bold;
+    font-size: 1.5em;
+    letter-spacing: 0.2em;
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 1em;
+    padding-bottom: 1em;
+    display: block;
+    text-align: center;
+}
+
+.FormRenderer .InputComponent input {
     flex-basis:100%;
 }
-

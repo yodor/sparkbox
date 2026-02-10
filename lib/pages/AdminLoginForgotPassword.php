@@ -1,16 +1,18 @@
 <?php
-include_once("pages/AdminLoginPage.php");
 include_once("input/DataInputFactory.php");
-include_once("forms/processors/FormProcessor.php");
+include_once("pages/AdminLoginPage.php");
+
+include_once("input/validators/EmailValidator.php");
+include_once("beans/AdminUsersBean.php");
+
 include_once("mailers/ForgotPasswordMailer.php");
+
+include_once("forms/processors/FormProcessor.php");
+include_once("forms/renderers/FormRenderer.php");
+include_once("components/TextComponent.php");
 
 class ForgotPasswordProcessor extends FormProcessor
 {
-    /**
-     * @param InputForm $form
-     * @return void
-     * @throws Exception
-     */
     protected function processImpl(InputForm $form) : void
     {
         parent::processImpl($form);
@@ -26,14 +28,15 @@ class ForgotPasswordProcessor extends FormProcessor
         $users = new AdminUsersBean();
 
         $random_pass = Authenticator::RandomToken(8);
-        $fpm = new ForgotPasswordMailer($email, $random_pass, new URL(Spark::Get(Config::ADMIN_LOCAL) . "/login.php")->fullURL());
+        $loginURL = new URL(Spark::Get(Config::ADMIN_LOCAL)."/login.php");
+        $fpm = new ForgotPasswordMailer($email, $random_pass, $loginURL->fullURL());
         $db = DBConnections::Open();
         try {
             $db->transaction();
 
             $userID = $users->email2id($email);
             $update_row["password"] = md5($random_pass);
-            $users->update($userID, $update_row, $db);
+            if (!$users->update($userID, $update_row, $db)) throw new Exception("Unable to update records: " . $db->getError());
 
             $fpm->send();
 
@@ -55,20 +58,22 @@ class AdminLoginForgotPassword extends AdminLoginPage
     public function __construct()
     {
         parent::__construct();
+
     }
 
     public function initialize() : void
     {
 
         $this->setTitle(tr("Forgot Password"));
-        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/LoginForm.css");
+
 
         $this->form = new InputForm();
         $this->form->addInput(DataInputFactory::Create(InputType::EMAIL, "email", "Input your registered email", 1));
 
         $frend = new FormRenderer($this->form);
         $frend->getSubmitButton()->setContents("Send");
-        $frend->setClassName("LoginFormRenderer");
+        $frend->addClassName("LoginFormRenderer");
+
         $frend->setCaption(Spark::Get(Config::SITE_TITLE) . "<BR><small>" . tr("Administration") . "</small>");
 
 
@@ -83,7 +88,7 @@ class AdminLoginForgotPassword extends AdminLoginPage
 
         $proc->process($this->form);
 
-        if ($proc->getStatus() == IFormProcessor::STATUS_OK) {
+        if ($proc->getStatus() === IFormProcessor::STATUS_OK) {
             Session::SetAlert(tr("Your new password was sent to your email") . ": " . $this->form->getInput("email")->getValue());
             header("Location: login.php");
             exit;
