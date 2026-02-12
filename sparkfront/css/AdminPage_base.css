@@ -222,15 +222,46 @@ BODY {
     max-height:64px;
 }
 
+.InputField.MCETextArea {
+
+}
+
 .AdminPageTemplate {
     display:flex;
     flex-direction:column;
+    margin-bottom:1em;
+    margin-top:1em;
+}
+.AdminPageTemplate.BeanListPage {
+    margin:0;
+}
+.AdminPageTemplate.ConfigEditorPage {
+    display:grid;
+    grid-template-columns: 600px;
+    grid-template-rows: auto;
 }
 
-.InputGroupRenderer {
-    align-self:stretch;
+.FormRenderer[name="SparkStoreConfigForm"] .InputField.TextArea TEXTAREA {
+    width:100%;
+    min-height:6em;
+}
+.FormRenderer[name="SparkStoreConfigForm"] .InputGroupRenderer  .InputField.TextField INPUT {
+    width:100%;
 }
 
-.admin_layout .ConfigEditorPage {
-    min-width:50%;
+
+.FormRenderer[name='ProductCategoryInputForm'] .InputField.TextField INPUT {
+    width:50em;
+}
+.FormRenderer[name='ProductCategoryInputForm'] .InputField.TextArea TEXTAREA {
+    width:50em;
+    height:6em;
+}
+
+.FormRenderer[name='ProductInputFormBase'] .InputField.TextField INPUT[name='product_name'] {
+    width:50em;
+}
+.FormRenderer[name='ProductInputFormBase'] .InputField.TextArea TEXTAREA {
+    width:50em;
+    height:6em;
 }

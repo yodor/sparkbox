@@ -79,6 +79,7 @@
 
     gap:0.2em;
 }
+
 .InputField .DataIteratorItem.CheckItem, .DataIteratorItem.RadioItem {
     align-items: center;
 }
@@ -87,6 +88,3 @@
     width: 1.2em;
     height: 1.2em;
 }
-
-
-
