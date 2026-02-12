@@ -213,5 +213,3 @@ class ResultViewHeader extends Container
     }
 
 }
-
-?>

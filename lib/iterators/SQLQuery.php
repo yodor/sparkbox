@@ -182,5 +182,3 @@ class SQLQuery implements IDataIterator
         return $this->bean;
     }
 }
-
-?>

@@ -17,7 +17,7 @@ class SparkHTTPResponse
         $this->setHeader("Cache-Control", "public, must-revalidate, must-understand, max-age=$max_age, stale-while-revalidate=$stale_while_revalidate");
     }
 
-    public function setDispositionFilename(string $disposition_filename)
+    public function setDispositionFilename(string $disposition_filename) : void
     {
         $this->disposition_filename = $disposition_filename;
     }
@@ -25,7 +25,7 @@ class SparkHTTPResponse
     {
         return $this->disposition_filename;
     }
-    public function setDisposition(string $disposition)
+    public function setDisposition(string $disposition) : void
     {
         $this->disposition = $disposition;
     }
@@ -37,7 +37,7 @@ class SparkHTTPResponse
      * Clear all assigned headers
      * @return void
      */
-    public function clearHeaders()
+    public function clearHeaders() : void
     {
         $this->headers = array();
     }
@@ -48,7 +48,7 @@ class SparkHTTPResponse
      * @param string $value Response header value
      * @return void
      */
-    public function setHeader(string $field, string $value = "")
+    public function setHeader(string $field, string $value = "") : void
     {
         $this->headers[$field] = $value;
     }
@@ -97,7 +97,7 @@ class SparkHTTPResponse
      * @param string $ETag Compare with this ETag
      * @return void
      */
-    public function checkCacheETag(string $ETag)
+    public function checkCacheETag(string $ETag) : void
     {
         //browser is sending ETag
         $requestETag = $this->requestETag();
@@ -162,7 +162,7 @@ class SparkHTTPResponse
      * Set all the headers to this response using $this->headers as source data
      * @return void
      */
-    protected function sendHeaders()
+    protected function sendHeaders() : void
     {
         foreach ($this->headers as $key => $val) {
             if (strlen($key) < 1) continue;

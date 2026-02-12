@@ -32,5 +32,3 @@ class ConfirmMessageDialog extends MessageDialog
     }
 
 }
-
-?>

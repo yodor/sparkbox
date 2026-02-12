@@ -1,6 +1,6 @@
 <?php
 
-function storePacket($fh, array $data)
+function storePacket($fh, array $data) : void
 {
     flock($fh, LOCK_EX);
     rewind($fh);
@@ -21,7 +21,7 @@ function readPacket($fh) : array
     flock($fh, LOCK_UN);
     return $data;
 }
-function rateCheck(string $install_path)
+function rateCheck(string $install_path) : void
 {
     $names = explode("|", REQUEST_THROTTLE_USERAGENT);
 
@@ -92,5 +92,3 @@ function rateCheck(string $install_path)
 }
 if (!isset($install_path))throw new Exception("INSTALL_PATH not set");
 rateCheck($install_path);
-
-?>

@@ -66,4 +66,3 @@ class LinkedData
         return $result;
     }
 }
-?>

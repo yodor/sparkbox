@@ -83,5 +83,3 @@ class ImageStorageObject extends FileStorageObject
         $this->height = (int)$data[$this->keyName("height")];
     }
 }
-
-?>

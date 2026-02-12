@@ -29,5 +29,3 @@ interface IDataIterator
     public function isActive() : bool;
 
 }
-
-?>

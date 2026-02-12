@@ -13,5 +13,3 @@ interface IInputValidator
     public function validate(DataInput $input) : void;
 
 }
-
-?>

@@ -28,5 +28,3 @@ class TextArea extends InputField
     }
 
 }
-
-?>

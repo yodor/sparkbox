@@ -17,5 +17,3 @@ class TextItem extends DataIteratorItem
     }
 
 }
-
-?>

@@ -1,5 +1,5 @@
 <?php
-include_once("templates/PageTemplate.php");
+include_once("components/templates/admin/PageTemplate.php");
 
 abstract class AdminPageTemplate extends PageTemplate
 {

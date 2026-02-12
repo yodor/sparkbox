@@ -46,5 +46,3 @@ abstract class DBDriver
 
     abstract public function fieldType(string $table, string $field_name) : string;
 }
-
-?>

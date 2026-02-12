@@ -213,5 +213,3 @@ class GalleryTape extends Component implements IDataIteratorRenderer
     }
 
 }
-
-?>

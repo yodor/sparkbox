@@ -20,5 +20,3 @@ class MCEImagesBean extends DBTableBean
     }
 
 }
-
-?>

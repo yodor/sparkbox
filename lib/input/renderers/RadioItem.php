@@ -72,5 +72,3 @@ class RadioItem extends DataIteratorItem
         $this->span->setContents(Spark::AttributeValue($this->label));
     }
 }
-
-?>

@@ -344,7 +344,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         return Spark::Hash($this->cacheName()."-".$this->getLastModified());
     }
 
-    abstract protected function process();
+    abstract protected function process(): void;
     abstract protected function cacheName() : string;
 
 

@@ -67,5 +67,3 @@ class MCEImageBrowserDialog extends JSONDialog
 
 
 }
-
-?>

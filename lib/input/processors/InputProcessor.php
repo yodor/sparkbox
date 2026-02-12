@@ -457,5 +457,3 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
     }
 }
-
-?>

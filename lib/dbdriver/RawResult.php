@@ -39,4 +39,3 @@ class RawResult
         return new ArrayIterator($this->result);
     }
 }
-?>

@@ -236,4 +236,3 @@ class SparkFile {
         touch($this->getAbsoluteFilename(), $lastModified);
     }
 }
-?>

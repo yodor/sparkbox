@@ -31,4 +31,3 @@ class BeanTransactorEvent extends SparkEvent
     }
 
 }
-?>

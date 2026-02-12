@@ -73,5 +73,3 @@ class SelectMultipleField extends SelectField
 
 
 }
-
-?>

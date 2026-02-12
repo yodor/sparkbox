@@ -76,5 +76,3 @@ class BeanKeyCondition extends RequestParameterCondition
         return $this->urlparam;
     }
 }
-
-?>

@@ -1,5 +1,5 @@
 <?php
-include_once("templates/admin/AdminPageTemplate.php");
+include_once("components/templates/admin/AdminPageTemplate.php");
 include_once("forms/processors/ConfigFormProcessor.php");
 include_once("forms/renderers/FormRenderer.php");
 

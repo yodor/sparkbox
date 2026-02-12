@@ -132,5 +132,3 @@ class AdminUserForm extends InputForm
     }
 
 }
-
-?>

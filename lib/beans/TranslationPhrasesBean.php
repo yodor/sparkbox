@@ -40,5 +40,3 @@ CREATE TABLE `translation_phrases` (
 
 
 }
-
-?>

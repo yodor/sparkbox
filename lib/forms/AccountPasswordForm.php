@@ -39,5 +39,3 @@ class AccountPasswordForm extends InputForm
     }
 
 }
-
-?>

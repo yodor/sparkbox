@@ -233,5 +233,3 @@ class Config {
     const string SITE_TITLE = "SITE_TITLE";
 
 }
-
-?>

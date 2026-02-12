@@ -41,5 +41,3 @@ class FileStorageObject extends StorageObject
         $this->filename = (string)$data[$this->keyName("filename")];
     }
 }
-
-?>

@@ -85,4 +85,3 @@ class SparkMap implements ISparkCollection
         return in_array($object, $this->elements, $strict);
     }
 }
-?>

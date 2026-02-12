@@ -48,7 +48,7 @@ class ImageDataResponse extends BeanDataResponse
         parent::__construct($id, $className);
     }
 
-    protected function process()
+    protected function process(): void
     {
 
         $buffer = $this->object->buffer();

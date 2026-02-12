@@ -65,4 +65,3 @@ class OutputBuffer {
         $this->started = false;
     }
 }
-?>

@@ -22,5 +22,3 @@ class MenuItemsBean extends NestedSetBean
     }
 
 }
-
-?>

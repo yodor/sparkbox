@@ -192,5 +192,3 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
         return $this->error_render_mode;
     }
 }
-
-?>

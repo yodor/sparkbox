@@ -23,5 +23,3 @@ class DynamicPagesBean extends OrderedDataBean
     }
 
 }
-
-?>

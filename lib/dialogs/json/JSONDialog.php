@@ -36,5 +36,3 @@ class JSONDialog extends ConfirmMessageDialog
         $this->responder = $responder;
     }
 }
-
-?>

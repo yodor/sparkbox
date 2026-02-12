@@ -124,5 +124,3 @@ class ItemView extends AbstractResultView
         $v->advance();
     }
 }
-
-?>

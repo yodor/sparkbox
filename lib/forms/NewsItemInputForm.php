@@ -26,5 +26,3 @@ class NewsItemInputForm extends InputForm
     }
 
 }
-
-?>

@@ -86,4 +86,3 @@ class ClosureFilter extends SparkObject
         return $value;
     }
 }
-?>

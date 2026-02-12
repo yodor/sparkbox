@@ -8,4 +8,3 @@ class BeanFormEditorEvent extends SparkEvent {
     const string FORM_BEAN_TRANSACED = "FORM_BEAN_TRANSACED";
     const string EDITOR_CREATED = "EDITOR_CREATED";
 }
-?>

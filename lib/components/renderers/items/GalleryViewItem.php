@@ -44,14 +44,14 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         $this->image_popup->setAttribute("relation", "GalleryViewItem");
     }
 
-    public function requiredStyle() : array
+    public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();
         $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/Action.css";
         return $arr;
     }
 
-    public function setData(array $data) : void
+    public function setData(array $data): void
     {
         parent::setData($data);
 
@@ -73,8 +73,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         if (isset($data["caption"]) && strlen($data["caption"]) > 0) {
             $this->image_popup->setAttribute("caption", $data["caption"]);
             $tooltip .= tr("Caption") . ": " . $data["caption"] . "<BR>";
-        }
-        else {
+        } else {
             $this->image_popup->removeAttribute("caption");
         }
 
@@ -160,7 +159,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
     }
 
-    public function renderFooterAction(string $action) : void
+    public function renderFooterAction(string $action): void
     {
         $item = $this->actions->getByAction($action);
         if ($item instanceof Action) {
@@ -168,7 +167,4 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
             $item->render();
         }
     }
-
-
-
 }

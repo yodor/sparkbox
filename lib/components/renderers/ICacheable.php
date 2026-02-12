@@ -7,5 +7,3 @@ interface ICacheable
 
     public function getCacheName() : string;
 }
-
-?>

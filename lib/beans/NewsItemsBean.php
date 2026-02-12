@@ -21,5 +21,3 @@ class NewsItemsBean extends DatedBean
     }
 
 }
-
-?>

@@ -109,4 +109,3 @@ class Image extends Component implements IPhotoRenderer
 
 
 }
-?>

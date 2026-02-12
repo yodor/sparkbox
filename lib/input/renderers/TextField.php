@@ -11,5 +11,3 @@ class TextField extends InputFieldTag
     }
 
 }
-
-?>

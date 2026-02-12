@@ -28,5 +28,3 @@ interface IFormProcessor
     public function setStatus(int $status) : void;
 
 }
-
-?>

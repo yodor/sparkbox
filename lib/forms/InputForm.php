@@ -603,7 +603,7 @@ class InputForm extends SparkObject implements IBeanEditor
      * @param $xml_string string
      * @throws Exception
      */
-    public function unserializeXML(string $xml_string)
+    public function unserializeXML(string $xml_string) : void
     {
         ob_start();
         $inputform = simplexml_load_string($xml_string);
@@ -623,7 +623,7 @@ class InputForm extends SparkObject implements IBeanEditor
     }
 
     //TODO deprecated move to CreatePlainRenderer
-    public function renderPlain()
+    public function renderPlain(): void
     {
         echo "<div class='FormValueList' name='".$this->getName()."'>";
 
@@ -659,5 +659,3 @@ class InputForm extends SparkObject implements IBeanEditor
         return $cnt;
     }
 }
-
-?>

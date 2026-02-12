@@ -60,18 +60,18 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         $this->setPhotoSize(128, -1);
     }
 
-    public function setSection(string $section_name, string $section_key)
+    public function setSection(string $section_name, string $section_key): void
     {
         $this->section_name = $section_name;
         $this->section_key = $section_key;
     }
 
-    public function setOwnerID(int $ownerID)
+    public function setOwnerID(int $ownerID): void
     {
         $this->ownerID = $ownerID;
     }
 
-    public function setAuthenticator(Authenticator $auth)
+    public function setAuthenticator(Authenticator $auth): void
     {
         $this->auth_context = $auth;
     }
@@ -102,7 +102,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
     }
 
     //return all images for section
-    protected function _find(JSONResponse $resp)
+    protected function _find(JSONResponse $resp) : void
     {
         Debug::ErrorLog("Section: '$this->section_name' Section Key: '$this->section_key'");
 
@@ -186,7 +186,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         );
     }
 
-    protected function _remove(JSONResponse $resp)
+    protected function _remove(JSONResponse $resp): void
     {
 
         if (!isset($_GET["imageID"])) throw new Exception("imageID not passed");
@@ -211,7 +211,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
     }
 
-    protected function _renderDimensionDialog(JSONResponse $resp)
+    protected function _renderDimensionDialog(JSONResponse $resp) : void
     {
         if (!isset($_GET["imageID"])) throw new Exception("imageID not passed");
 
@@ -236,5 +236,3 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
     }
 
 }
-
-?>

@@ -168,5 +168,3 @@ class Action extends DataIteratorItem
         return $action;
     }
 }
-
-?>

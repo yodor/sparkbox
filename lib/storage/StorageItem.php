@@ -144,7 +144,7 @@ class StorageItem extends DataObject implements JsonSerializable
         }
     }
 
-    public static function Create(int $id, $className)
+    public static function Create(int $id, $className) : StorageItem
     {
         $item = new StorageItem();
         $item->id = $id;
@@ -159,7 +159,7 @@ class StorageItem extends DataObject implements JsonSerializable
         return $item;
     }
 
-    public static function Image(int $id, $className, int $width = -1, int $height = -1)
+    public static function Image(int $id, $className, int $width = -1, int $height = -1) : URL
     {
         $item = StorageItem::Create($id, $className);
         return $item->hrefImage($width, $height);
@@ -184,5 +184,3 @@ class StorageItem extends DataObject implements JsonSerializable
 
     }
 }
-
-?>

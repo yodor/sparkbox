@@ -42,7 +42,7 @@ class DateValidator implements IInputValidator
 
     }
 
-    protected static function validateDate($year, $month, $day)
+    protected static function validateDate($year, $month, $day) : void
     {
 
         if ($year < 1) {
@@ -101,5 +101,3 @@ class DateValidator implements IInputValidator
     }
 
 }
-
-?>

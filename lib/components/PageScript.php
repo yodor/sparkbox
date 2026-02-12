@@ -23,4 +23,3 @@ abstract class PageScript extends Script implements IPageComponent, IPageScript
         parent::renderImpl();
     }
 }
-?>

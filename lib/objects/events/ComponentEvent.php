@@ -5,5 +5,3 @@ class ComponentEvent extends SparkEvent
 {
     const string COMPONENT_CREATED = "created";
 }
-
-?>

@@ -11,5 +11,3 @@ class TimeField extends InputFieldTag
     }
 
 }
-
-?>

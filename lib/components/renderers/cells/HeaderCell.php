@@ -79,5 +79,3 @@ class HeaderCell extends TableCell implements IGETConsumer
         return array(Paginator::KEY_ORDER_BY, Paginator::KEY_ORDER_DIR);
     }
 }
-
-?>

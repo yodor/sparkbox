@@ -69,4 +69,3 @@ class DataList extends Container
         return $this->getAttribute("id");
     }
 }
-?>

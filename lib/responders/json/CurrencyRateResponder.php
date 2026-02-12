@@ -70,5 +70,3 @@ class CurrencyRateResponder extends JSONResponder
 
     }
 }
-
-?>

@@ -3,7 +3,7 @@ class JSONComponent extends Component {
 
     /**
      * Create JSONComponent calling backend responder name '$name'
-     * @param name
+     * @param responder_name
      */
     constructor(responder_name) {
         super();

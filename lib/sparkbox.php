@@ -91,6 +91,11 @@ Spark::Set(Config::CACHE_PATH, Spark::CachePath(), true);
 
 
 //Spark::DefineConfig();
+include_once("objects/SparkEventManager.php");
+include_once("pages/HTMLHead.php");
+include_once("pages/HTMLBody.php");
+SparkEventManager::register(ComponentEvent::class, HTMLHead::Instance());
+SparkEventManager::register(ComponentEvent::class, HTMLBody::Instance());
 
 //
 //define SKIP_DB to skip creating a default connection to DB
@@ -98,7 +103,6 @@ if (Spark::Get(Config::DB_ENABLED) && !defined("SKIP_DB")) {
 
     include_once("dbdriver/DBDriver.php");
     include_once("dbdriver/DBConnections.php");
-    include_once("objects/SparkEventManager.php");
     include_once("objects/SparkObserver.php");
 
     //fetch local config
@@ -118,5 +122,3 @@ function exception_error_handler(int $errNo, string $errStr, string $errFile, in
 }
 //make all errors an exception even the warnings
 //set_error_handler("exception_error_handler", E_ALL);
-
-?>

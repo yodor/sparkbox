@@ -11,5 +11,3 @@ interface IGETConsumer
     public function getParameterNames() : array;
 
 }
-
-?>

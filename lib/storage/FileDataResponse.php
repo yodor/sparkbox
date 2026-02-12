@@ -13,7 +13,7 @@ class FileDataResponse extends BeanDataResponse
     }
 
     //do nothing StorageObject buffer already contains the data
-    protected function process()
+    protected function process(): void
     {
 
     }

@@ -115,5 +115,3 @@ class TableColumn extends SparkObject
     }
 
 }
-
-?>

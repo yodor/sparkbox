@@ -235,7 +235,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
         return $this->bean;
     }
 
-    public function renderArchive()
+    public function renderArchive() : void
     {
 
         echo "<div class='archive'>";

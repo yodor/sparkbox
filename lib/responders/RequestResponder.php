@@ -252,5 +252,3 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
     }
 
 }
-
-?>

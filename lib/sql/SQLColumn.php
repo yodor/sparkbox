@@ -130,5 +130,3 @@ class SQLColumn implements ISQLGet
         return $result;
     }
 }
-
-?>

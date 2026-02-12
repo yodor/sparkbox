@@ -145,7 +145,7 @@ class SQLSelect extends SQLStatement
         }
     }
 
-    public function combineWith(SQLSelect $other)
+    public function combineWith(SQLSelect $other) : SQLSelect
     {
         $csql = clone $this;
 
@@ -170,5 +170,3 @@ class SQLSelect extends SQLStatement
         return $sel;
     }
 }
-
-?>

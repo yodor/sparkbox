@@ -78,5 +78,3 @@ class UserInputForm extends InputForm
 
     }
 }
-
-?>

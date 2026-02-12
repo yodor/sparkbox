@@ -39,4 +39,3 @@ class BufferedPage extends SparkPage
         echo $this->buffer->get();
     }
 }
-?>

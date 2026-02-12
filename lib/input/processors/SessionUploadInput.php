@@ -284,5 +284,3 @@ class SessionUploadInput extends InputProcessor
 
     }
 }
-
-?>

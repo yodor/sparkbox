@@ -12,11 +12,11 @@ include_once("components/renderers/IPhotoRenderer.php");
 class GalleryView extends Container
 {
     /**
-     * @var DBTableBean
+     * @var DBTableBean|null
      */
-    protected DBTableBean $bean;
+    protected ?DBTableBean $bean = null;
 
-    protected AbstractResultView $view;
+    protected ?AbstractResultView $view = null;
 
     const int MODE_GRID = 1;
     const int MODE_LIST = 2;
@@ -105,7 +105,7 @@ class GalleryView extends Container
         return $arr;
     }
 
-    public function getViewMode()
+    public function getViewMode() : int
     {
         return $this->view_mode;
     }
@@ -116,9 +116,9 @@ class GalleryView extends Container
     }
 
     /**
-     * @return DBTableBean|null
+     * @return DBTableBean
      */
-    public function getBean()
+    public function getBean() : DBTableBean
     {
         return $this->bean;
     }
@@ -198,5 +198,3 @@ class GalleryView extends Container
 
 
 }
-
-?>

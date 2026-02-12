@@ -6,5 +6,3 @@ interface IObserver {
     public function onEvent(SparkEvent $event) : void;
 
 }
-
-?>

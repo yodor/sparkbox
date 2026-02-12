@@ -39,7 +39,7 @@ class TranslatePhraseResponder extends JSONResponder
         $this->trID = (int)$this->url->get("trID")->value();
     }
 
-    protected function _store(JSONResponse $ret)
+    protected function _store(JSONResponse $ret) : void
     {
 
         $trrow = array();
@@ -74,7 +74,7 @@ class TranslatePhraseResponder extends JSONResponder
 
     }
 
-    protected function _fetch(JSONResponse $response)
+    protected function _fetch(JSONResponse $response) : void
     {
 
         $qry = $this->bean->queryLanguageID($this->langID);
@@ -99,7 +99,7 @@ class TranslatePhraseResponder extends JSONResponder
 
     }
 
-    protected function _clear(JSONResponse $response)
+    protected function _clear(JSONResponse $response) : void
     {
 
         $affectedRows = $this->bean->delete($this->trID);
@@ -115,5 +115,3 @@ class TranslatePhraseResponder extends JSONResponder
     }
 
 }
-
-?>

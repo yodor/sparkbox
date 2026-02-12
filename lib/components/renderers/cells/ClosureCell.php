@@ -32,5 +32,3 @@ class ClosureCell extends TableCell
     }
 
 }
-
-?>

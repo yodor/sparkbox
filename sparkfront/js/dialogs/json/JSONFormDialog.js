@@ -40,11 +40,11 @@ class JSONFormDialog extends JSONDialog {
 
     buttonAction(action) {
 
-        if (action == "confirm") {
+        if (action === "confirm") {
 
             this.submitForm();
 
-        } else if (action == "cancel") {
+        } else if (action === "cancel") {
 
             this.cancelForm();
 

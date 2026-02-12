@@ -70,7 +70,7 @@ class TranslateBeanResponder extends JSONResponder
         $this->query = $itr;
     }
 
-    protected function _store(JSONResponse $ret)
+    protected function _store(JSONResponse $ret) : void
     {
 
         $translation = DBConnections::Open()->escape(trim($_REQUEST["translation"]));
@@ -102,7 +102,7 @@ class TranslateBeanResponder extends JSONResponder
 
     }
 
-    protected function _fetch(JSONResponse $response)
+    protected function _fetch(JSONResponse $response) : void
     {
 
         $this->query->select->fields()->set("translated");
@@ -118,7 +118,7 @@ class TranslateBeanResponder extends JSONResponder
 
     }
 
-    protected function _clear(JSONResponse $ret)
+    protected function _clear(JSONResponse $ret) : void
     {
 
         $delete = new SQLDelete($this->query->select);
@@ -148,5 +148,3 @@ class TranslateBeanResponder extends JSONResponder
     }
 
 }
-
-?>

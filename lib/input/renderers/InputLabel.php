@@ -101,5 +101,3 @@ class InputLabel extends LabelSpan implements IErrorRenderer
     }
 
 }
-
-?>

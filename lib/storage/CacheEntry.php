@@ -45,5 +45,3 @@ abstract class CacheEntry
 
     public abstract function remove() : void;
 }
-
-?>

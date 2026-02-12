@@ -95,5 +95,3 @@ abstract class SQLStatement implements ISQLGet
     }
 
 }
-
-?>

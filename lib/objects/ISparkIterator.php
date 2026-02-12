@@ -7,5 +7,3 @@ interface ISparkIterator
     public function next() : ?SparkObject;
     public function key() : int|string|null;
 }
-
-?>

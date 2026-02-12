@@ -148,7 +148,7 @@ class ImageCell extends TableCell implements IPhotoRenderer
 
     }
 
-    protected function renderImageItems()
+    protected function renderImageItems() : void
     {
         $num = count($this->elements);
 
@@ -201,5 +201,3 @@ class ImageCell extends TableCell implements IPhotoRenderer
     }
 
 }
-
-?>

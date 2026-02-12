@@ -210,5 +210,3 @@ class MenuItem extends MenuItemList
     }
 
 }
-
-?>

@@ -30,5 +30,3 @@ CREATE TABLE `translation_beans` (
     }
 
 }
-
-?>

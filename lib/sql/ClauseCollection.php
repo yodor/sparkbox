@@ -88,5 +88,3 @@ class ClauseCollection extends SparkList implements ISQLGet
         return $result;
     }
 }
-
-?>

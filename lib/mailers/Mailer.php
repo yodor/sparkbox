@@ -16,7 +16,7 @@ abstract class Mailer
         $this->from_email = Spark::Get(Config::DEFAULT_SERVICE_EMAIL); //senders e-mail address
     }
 
-    public function send()
+    public function send() : bool
     {
 
         $headers = $this->processHeaders();
@@ -53,5 +53,3 @@ abstract class Mailer
         return $str;
     }
 }
-
-?>

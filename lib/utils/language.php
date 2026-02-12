@@ -11,7 +11,7 @@ if (defined("TRANSLATOR_ENABLED") &&
 
 }
 
-function trbean(int $id, string $field_name, array &$row, string $tableName)
+function trbean(int $id, string $field_name, array &$row, string $tableName) : void
 {
     $translator = Translator::Instance();
     if ($translator->isEnabled()) {
@@ -31,5 +31,3 @@ function tr(string $phrase): string
     }
     return $phrase;
 }
-
-?>

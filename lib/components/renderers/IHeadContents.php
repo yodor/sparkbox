@@ -18,5 +18,3 @@ interface IHeadContents
      */
     public function requiredMeta() : array;
 }
-
-?>

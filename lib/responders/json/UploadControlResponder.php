@@ -53,7 +53,7 @@ abstract class UploadControlResponder extends JSONResponder
      */
     abstract public function validator() : UploadDataValidator;
 
-    protected function _upload(JSONResponse $resp)
+    protected function _upload(JSONResponse $resp) : void
     {
 
         Debug::ErrorLog("Creating temporary DataInput object ... ");
@@ -111,7 +111,7 @@ abstract class UploadControlResponder extends JSONResponder
      * @param FileStorageObject $uploadObject
      * @return void
      */
-    private function assignUploadObject(JSONResponse $resp, FileStorageObject $uploadObject)
+    private function assignUploadObject(JSONResponse $resp, FileStorageObject $uploadObject) : void
     {
         Debug::ErrorLog("...");
 
@@ -160,7 +160,7 @@ abstract class UploadControlResponder extends JSONResponder
             "html" => $html);
     }
 
-    protected function _remove(JSONResponse $resp)
+    protected function _remove(JSONResponse $resp): void
     {
         Debug::ErrorLog("...");
 
@@ -178,5 +178,3 @@ abstract class UploadControlResponder extends JSONResponder
     }
 
 }
-
-?>

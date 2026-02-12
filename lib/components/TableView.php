@@ -137,5 +137,3 @@ class TableView extends AbstractResultView implements IHeadContents
         $v->advance();
     }
 }
-
-?>

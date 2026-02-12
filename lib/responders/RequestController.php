@@ -72,7 +72,7 @@ class RequestController
         return isset(self::$responders[$name]);
     }
 
-    public static function Process()
+    public static function Process() : void
     {
         $isJson = RequestController::isJSONRequest();
 
@@ -143,5 +143,3 @@ class RequestController
     }
 
 }
-
-?>

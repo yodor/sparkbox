@@ -20,10 +20,9 @@ class JSONComponentResponder extends JSONResponder
         $this->component = $component;
     }
 
-    public function _render(JSONResponse $resp)
+    public function _render(JSONResponse $resp) : void
     {
         $this->component->render();
     }
 
 }
-?>

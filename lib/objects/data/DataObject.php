@@ -44,4 +44,3 @@ class DataObject extends SparkObject implements IDataResultProcessor
         $this->value = $data[$key] ?? "";
     }
 }
-?>

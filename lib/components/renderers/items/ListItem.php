@@ -25,5 +25,3 @@ class ListItem extends DataIteratorItem
         $this->positionMeta->setContent(($this->position+1));
     }
 }
-
-?>

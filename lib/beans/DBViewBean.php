@@ -33,5 +33,3 @@ class DBViewBean extends DBTableBean
     }
 
 }
-
-?>

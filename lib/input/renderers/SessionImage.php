@@ -12,5 +12,3 @@ class SessionImage extends SessionUpload
     }
 
 }
-
-?>

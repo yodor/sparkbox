@@ -26,7 +26,7 @@ class UsersBean extends DBTableBean
     }
 
     //email
-    public function emailExists(string $email)
+    public function emailExists(string $email) : array|null
     {
         return $this->getResult("email", $email);
     }
@@ -110,5 +110,3 @@ class UsersBean extends DBTableBean
     }
 
 }
-
-?>

@@ -40,4 +40,3 @@ class Meta extends Component
         return $this->getAttribute("property");
     }
 }
-?>

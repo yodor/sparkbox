@@ -357,7 +357,7 @@ class ImagePopup extends SparkObject {
 
         parentNode.querySelectorAll(".ImagePopup:not([href])").forEach( (element) => {
 
-            element.addEventListener("click", (event)=>document.imagePopup.show(element,event));
+            element.addEventListener("click", (event)=>document.imagePopup.show(element));
 
         });
     }

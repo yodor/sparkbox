@@ -18,8 +18,8 @@ class HTMLPage extends Container
         $this->setComponentClass("");
         $this->setClassName("");
 
-        $this->head = new HTMLHead();
-        $this->body = new HTMLBody();
+        $this->head = HTMLHead::Instance();
+        $this->body = HTMLBody::Instance();
 
         $this->setAttribute("lang", substr(Spark::Get(Config::DEFAULT_LANGUAGE_ISO3), 0,2));
 
@@ -66,5 +66,3 @@ class HTMLPage extends Container
     }
 
 }
-
-?>

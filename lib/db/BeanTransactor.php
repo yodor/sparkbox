@@ -279,5 +279,3 @@ class BeanTransactor extends SparkObject implements IBeanEditor
     }
 
 }
-
-?>

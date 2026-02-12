@@ -1,5 +1,5 @@
 <?php
-include_once("templates/admin/BeanEditorPage.php");
+include_once("components/templates/admin/BeanEditorPage.php");
 include_once("forms/AdminUserForm.php");
 include_once("beans/AdminUsersBean.php");
 include_once("auth/AdminAuthenticator.php");

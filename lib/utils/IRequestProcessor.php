@@ -14,5 +14,3 @@ interface IRequestProcessor
      */
     public function isProcessed() : bool;
 }
-
-?>

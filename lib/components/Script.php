@@ -31,5 +31,3 @@ class Script extends Container
     }
 
 }
-
-?>

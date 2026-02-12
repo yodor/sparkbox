@@ -23,7 +23,7 @@ class MySQLiResult extends DBResult
         }
     }
 
-    protected function assert_resource()
+    protected function assert_resource() : void
     {
         if (!($this->result instanceof mysqli_result)) throw new Exception("Not a valid mysqli_resource");
     }
@@ -76,4 +76,3 @@ class MySQLiResult extends DBResult
         return $this->result->fetch_fields();
     }
 }
-?>

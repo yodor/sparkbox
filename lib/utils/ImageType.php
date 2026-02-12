@@ -13,5 +13,3 @@ enum ScaleMode : int
     case MODE_CROP = 1;
     case MODE_THUMB = 2;
 }
-
-?>

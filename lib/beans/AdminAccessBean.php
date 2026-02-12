@@ -23,5 +23,3 @@ CREATE TABLE `admin_access` (
     }
 
 }
-
-?>

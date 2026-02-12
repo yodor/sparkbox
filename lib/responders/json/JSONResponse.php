@@ -24,12 +24,10 @@
         header("Content-Type: application/json");
     }
 
-    public function send()
+    public function send() : void
     {
         $this->sendHeaders();
         echo json_encode($this);
     }
 
 }
-
-?>

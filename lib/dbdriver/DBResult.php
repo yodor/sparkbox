@@ -13,4 +13,3 @@ abstract class DBResult
 
     abstract public function fields() : array;
 }
-?>

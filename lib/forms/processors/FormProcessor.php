@@ -203,5 +203,3 @@ class FormProcessor implements IFormProcessor, IBeanEditor
     }
 
 }
-
-?>

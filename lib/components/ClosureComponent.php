@@ -36,5 +36,3 @@ class ClosureComponent extends Container
         ($this->closure)($this);
     }
 }
-
-?>

@@ -118,5 +118,3 @@ class DBCacheEntry extends CacheEntry
         $this->bean->delete($this->entryID);
     }
 }
-
-?>

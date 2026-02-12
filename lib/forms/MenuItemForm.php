@@ -62,7 +62,7 @@ class MenuItemForm extends InputForm
 
     }
 
-    public function load()
+    public function load() : void
     {
 
         if (isset($_GET["page_id"])) {
@@ -88,5 +88,3 @@ class MenuItemForm extends InputForm
         }
     }
 }
-
-?>

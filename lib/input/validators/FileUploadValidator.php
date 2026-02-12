@@ -13,5 +13,3 @@ class FileUploadValidator extends UploadDataValidator
 
     }
 }
-
-?>

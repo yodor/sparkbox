@@ -30,4 +30,3 @@ class PathParameter extends DataParameter
         return $this->doSlug;
     }
 }
-?>

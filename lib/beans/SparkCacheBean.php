@@ -20,4 +20,3 @@ class SparkCacheBean extends DBTableBean
         parent::__construct("sparkcache", $dbdriver);
     }
 }
-?>

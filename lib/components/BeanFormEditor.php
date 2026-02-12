@@ -257,5 +257,3 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor
     }
 
 }
-
-?>

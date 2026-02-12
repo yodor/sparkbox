@@ -22,9 +22,9 @@ class InsertImageDialog extends ConfirmMessageDialog {
 
     buttonAction(action) {
 
-        if (action == "confirm") {
+        if (action === "confirm") {
             this.confirm();
-        } else if (action == "cancel") {
+        } else if (action === "cancel") {
             this.remove();
         }
 
@@ -57,7 +57,7 @@ class InsertImageDialog extends ConfirmMessageDialog {
 
         const image_tag = document.createElement("IMG");
 
-        if (form.render_mode.value == "fit_prc") {
+        if (form.render_mode.value === "fit_prc") {
             if (width>0) {
                 image_tag.setAttribute("width", "" + width + "%");
             }
@@ -65,7 +65,7 @@ class InsertImageDialog extends ConfirmMessageDialog {
                 image_tag.setAttribute("height", "" + height + "%");
             }
         }
-        else if (form.render_mode.value == "fit_px") {
+        else if (form.render_mode.value === "fit_px") {
             image_url.searchParams.set("width", ""+width);
             image_url.searchParams.set("height", ""+height);
         }
@@ -124,18 +124,18 @@ class MCEImageBrowserDialog extends JSONDialog {
         let response = result.response;
         let imageID = this.request.getParameter("imageID");
 
-        if (funct == "renderDimensionDialog") {
+        if (funct === "renderDimensionDialog") {
 
             this.insert_image.setContents(response.contents);
             this.insert_image.setImageID(this.request.getParameter("imageID"));
             this.insert_image.show();
 
-        } else if (funct == "remove") {
+        } else if (funct === "remove") {
 
             let element = this.collection.querySelector("[imageID='" + imageID + "']");
             element.remove();
 
-        } else if (funct == "find") {
+        } else if (funct === "find") {
 
             this.collection.innerHTML = "";
             this.appendResponseItems(response);

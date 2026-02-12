@@ -10,7 +10,7 @@ class ClosureItem extends DataIteratorItem
      * Calls closure during setData with parameters $data and $this
      * @param Closure|null $closure
      */
-    public function __construct(?Closure $closure=null)
+    public function __construct(?Closure $closure = null)
     {
         parent::__construct();
         $this->setClassName("ClosureItem");
@@ -23,12 +23,12 @@ class ClosureItem extends DataIteratorItem
         return $this->closure;
     }
 
-    public function setClosure(Closure $closure) : void
+    public function setClosure(Closure $closure): void
     {
         $this->closure = $closure;
     }
 
-    public function setData(array $data) : void
+    public function setData(array $data): void
     {
         if ($this->closure instanceof Closure) {
             ($this->closure)($data, $this);
@@ -36,5 +36,3 @@ class ClosureItem extends DataIteratorItem
     }
 
 }
-
-?>

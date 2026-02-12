@@ -229,10 +229,10 @@ abstract class DBTableBean
         return $this->beanQuery($select);
     }
 
-
     /**
      * Create query that select all columns of this table
      * @return SQLQuery
+     * @throws Exception
      */
     public function queryFull(): SQLQuery
     {
@@ -630,7 +630,7 @@ abstract class DBTableBean
 
     }
 
-    protected function prepareValues(array $row, SQLStatement $statement)
+    protected function prepareValues(array $row, SQLStatement $statement) : void
     {
 
         $keys = array();
@@ -667,5 +667,3 @@ abstract class DBTableBean
     }
 
 }
-
-?>

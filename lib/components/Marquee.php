@@ -37,5 +37,3 @@ class Marquee extends Component
         $this->viewport->render();
     }
 }
-
-?>

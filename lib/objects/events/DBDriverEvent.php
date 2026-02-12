@@ -10,4 +10,3 @@ class DBDriverEvent extends SparkEvent {
         parent::__construct($name, $source);
     }
 }
-?>

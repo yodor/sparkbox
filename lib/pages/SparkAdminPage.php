@@ -304,5 +304,3 @@ class SparkAdminPage extends SparkPage
 
 
 }
-
-?>

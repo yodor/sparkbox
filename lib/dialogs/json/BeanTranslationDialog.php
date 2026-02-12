@@ -119,5 +119,3 @@ class BeanTranslationDialog extends JSONDialog implements IPageComponent
 
 
 }
-
-?>

@@ -32,5 +32,3 @@ class SelectItem extends DataIteratorItem
     }
 
 }
-
-?>

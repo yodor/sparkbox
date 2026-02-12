@@ -87,10 +87,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
      */
     protected string $description = "";
 
-    /**
-     * @var array IPageComponent
-     */
-    protected array $page_components = array();
+
 
     /**
      * @var ActionCollection
@@ -133,60 +130,6 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
         $this->actions = $actions;
     }
 
-    /**
-     * Handle component event COMPONENT_CREATED
-     * Add required CSS and JS files to the head for components implementing IHeadContents
-     * Add component to page_components if implementing IPageComponent
-     *
-     * @param SparkEvent $event
-     * @return void
-     */
-    protected function componentEvent(SparkEvent $event) : void
-    {
-        if (!($event instanceof ComponentEvent)) return;
-        if (!$event->isEvent(ComponentEvent::COMPONENT_CREATED)) return;
-
-        $cmp = $event->getSource();
-
-        if ($cmp instanceof HTMLHead) return;
-        if ($cmp instanceof HTMLPage) return;
-        if ($cmp instanceof HTMLBody) return;
-
-        if ($cmp instanceof IPageComponent) {
-            if ($cmp instanceof IPageScript) {
-                $this->page_components[] = $cmp;
-            }
-            else {
-                if ($cmp instanceof ITemplate) {
-                    $template = new Template();
-                    $template->setID($cmp->templateID());
-                    $template->items()->append($cmp);
-                    $this->page_components[$template->getID()] = $template;
-                }
-                else {
-                    $this->page_components[get_class($cmp)] = $cmp;
-                }
-            }
-        }
-
-        //SparkPage constructors add css files directly to the head section
-        //use prepend to allow override of component defined styles
-        if ($this->head()) {
-            if ($cmp instanceof IHeadContents) {
-                $css_files = $cmp->requiredStyle();
-                foreach ($css_files as $key => $url) {
-                    $this->head()->addCSS($url, true);
-                }
-
-                $js_files = $cmp->requiredScript();
-                foreach ($js_files as $key => $url) {
-                    //no prepend here
-                    $this->head()->addJS($url);
-                }
-            }
-        }
-    }
-
     protected function headInitialize() : void
     {
         $this->head()->addMeta("viewport", "width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes");
@@ -221,7 +164,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
     {
         Debug::ErrorLog("--- CTOR ---");
 
-        SparkEventManager::register(ComponentEvent::class, new SparkObserver($this->componentEvent(...)));
+
         parent::__construct();
 
         self::$instance = $this;
@@ -395,10 +338,6 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
     public function finishRender(): void
     {
         //still inside the body section
-
-        //append dialog templates and pagescripts
-        $this->renderPageComponents();
-
         parent::finishRender();
         //</html> ended here
 
@@ -412,20 +351,10 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
     }
 
     /**
-     * Render all component implementing the IFinalRenderer before closing the BODY
-     */
-    protected function renderPageComponents() : void
-    {
-        foreach ($this->page_components as $idx => $cmp) {
-            $cmp->render();
-        }
-    }
-
-    /**
      * Show message as a popup if Session "alert" key is set
      * Clears the Session "alert" key
      */
-    protected function processMessages()
+    protected function processMessages() : void
     {
         $alert = Session::GetAlert();
         if ($alert) {

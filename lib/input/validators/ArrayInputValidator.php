@@ -74,5 +74,3 @@ class ArrayInputValidator implements IInputValidator
     }
 
 }
-
-?>

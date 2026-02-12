@@ -37,5 +37,3 @@ class FAQItemInputForm extends InputForm
     }
 
 }
-
-?>

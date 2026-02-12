@@ -17,5 +17,3 @@ class CheckItem extends RadioItem
         return DataIteratorItem::createInputName();
     }
 }
-
-?>

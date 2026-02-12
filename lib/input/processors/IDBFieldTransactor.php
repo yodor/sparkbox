@@ -14,5 +14,3 @@ interface IDBFieldTransactor
 
 
 }
-
-?>

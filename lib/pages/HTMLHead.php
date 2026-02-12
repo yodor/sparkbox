@@ -3,9 +3,23 @@ include_once("components/Container.php");
 include_once("components/Meta.php");
 include_once("components/Link.php");
 include_once("components/Script.php");
+include_once("objects/IObserver.php");
+include_once("components/ClosureComponent.php");
 
-class HTMLHead extends Container
+class HTMLHead extends Container implements IObserver
 {
+
+    protected static string $cssLayers = "@layer reset, base, theme, components, utilities;";
+
+    protected static ?HTMLHead $instance = null;
+
+    public static function Instance(): HTMLHead
+    {
+        if (self::$instance == null) {
+            self::$instance = new HTMLHead();
+        }
+        return self::$instance;
+    }
 
     /**
      * @var Component
@@ -54,7 +68,7 @@ class HTMLHead extends Container
     protected array $canonical_params = array();
 
 
-    public function __construct()
+    private function __construct()
     {
         parent::__construct(false);
         //no css class
@@ -80,6 +94,12 @@ class HTMLHead extends Container
         $this->favicon->setHref("//" . Spark::Get(Config::SITE_DOMAIN) . Spark::Get(Config::LOCAL) . "/favicon.ico");
         $this->items()->append($this->favicon);
 
+        $cssLayers = new Component(false);
+        $cssLayers->setTagName("style");
+        $cssLayers->setComponentClass("");
+        $cssLayers->setContents(HTMLHead::$cssLayers);
+        $this->items()->append($cssLayers);
+
         $meta = new ClosureComponent($this->renderMeta(...), false);
         $this->items()->append($meta);
 
@@ -94,6 +114,8 @@ class HTMLHead extends Container
 
         $language = new ClosureComponent($this->renderLanguage(...), false);
         $this->items()->append($language);
+
+
 
     }
 
@@ -332,10 +354,24 @@ class HTMLHead extends Container
         return $this->canonical_params;
     }
 
+    public function onEvent(SparkEvent $event): void
+    {
+        if (!($event instanceof ComponentEvent)) return;
+        if (!$event->isEvent(ComponentEvent::COMPONENT_CREATED)) return;
+        
+        $cmp = $event->getSource();
+        if (!($cmp instanceof IHeadContents)) return;
 
+        $css_files = $cmp->requiredStyle();
+        foreach ($css_files as $key => $url) {
+            $this->addCSS($url, true);
+        }
 
+        $js_files = $cmp->requiredScript();
+        foreach ($js_files as $key => $url) {
+            //no prepend here
+            $this->addJS($url);
+        }
 
-
-
+    }
 }
-?>

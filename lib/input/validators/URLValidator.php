@@ -29,5 +29,3 @@ class URLValidator implements IInputValidator
     }
 
 }
-
-?>

@@ -73,4 +73,3 @@ class SparkObject implements jsonSerializable
         return get_object_vars($this);
     }
 }
-?>

@@ -13,5 +13,3 @@ class DateField extends InputFieldTag
 
 
 }
-
-?>

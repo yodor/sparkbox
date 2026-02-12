@@ -32,4 +32,3 @@ class Template extends Container
     }
 
 }
-?>

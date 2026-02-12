@@ -15,7 +15,7 @@ class DBConnections extends SparkObject
      * @param DBConnection $dbconn
      * @return void
      */
-    public static function Add(DBConnection $dbconn) : void
+    public static function Add(DBConnection $dbconn): void
     {
         self::$available_connections[$dbconn->getName()] = $dbconn;
     }
@@ -30,7 +30,7 @@ class DBConnections extends SparkObject
      * Return connection names
      * @return array
      */
-    public static function Names() : array
+    public static function Names(): array
     {
         return array_keys(self::$available_connections);
     }
@@ -62,34 +62,30 @@ class DBConnections extends SparkObject
             $driver = $conn->get();
             if ($driver instanceof DBDriver) return $driver;
             throw new Exception("Unable to get valid connection to database using connection name '$conn_name'");
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             Debug::ErrorLog("Unable to open connection with '$conn_name'");
             throw $e;
         }
 
     }
 
-    public static function Count() : int
+    public static function Count(): int
     {
         return self::$active_count;
     }
 
-    public static function connectionEvent(SparkEvent $event) : void
+    public static function connectionEvent(SparkEvent $event): void
     {
-        if ($event instanceof DBDriverEvent) {
+        if (!($event instanceof DBDriverEvent)) return;
 
-            if ($event->isEvent(DBDriverEvent::OPENED)) {
-                self::$active_count++;
-                Debug::ErrorLog("Opened - active count: ".self::$active_count);
-            }
-            else if ($event->isEvent(DBDriverEvent::CLOSED)) {
-                self::$active_count--;
-                Debug::ErrorLog("Closed - active count: ".self::$active_count);
-            }
+        if ($event->isEvent(DBDriverEvent::OPENED)) {
+            self::$active_count++;
+            Debug::ErrorLog("Opened - active count: " . self::$active_count);
+        } else if ($event->isEvent(DBDriverEvent::CLOSED)) {
+            self::$active_count--;
+            Debug::ErrorLog("Closed - active count: " . self::$active_count);
         }
+
 
     }
 }
-
-?>

@@ -2,7 +2,7 @@
 
 class DataObjectInput extends InputProcessor
 {
-    protected DataObject $object;
+    protected ?DataObject $object = null;
 
     public function __construct(DataInput $input, DataObject $object)
     {
@@ -12,7 +12,7 @@ class DataObjectInput extends InputProcessor
         $this->object->setName($input->getName());
     }
 
-    public function getDataObject()
+    public function getDataObject() : DataObject
     {
         return $this->object;
     }

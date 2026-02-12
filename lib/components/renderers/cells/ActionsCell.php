@@ -49,5 +49,3 @@ class ActionsCell extends TableCell implements IActionCollection
     }
 
 }
-
-?>

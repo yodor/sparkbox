@@ -10,5 +10,3 @@ interface IErrorRenderer
 
     public function getErrorRenderMode() : int;
 }
-
-?>

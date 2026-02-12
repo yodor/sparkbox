@@ -29,5 +29,3 @@ class EnumFieldValidator implements IInputValidator
     }
 
 }
-
-?>

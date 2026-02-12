@@ -20,4 +20,3 @@ class SimpleTextValidator implements IInputValidator
 
     }
 }
-?>

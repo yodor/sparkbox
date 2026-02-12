@@ -42,5 +42,3 @@ class AdminLoginPage extends SparkPage
     }
 
 }
-
-?>

@@ -24,5 +24,3 @@ class ErrorResponse extends SparkHTTPResponse
     }
 
 }
-
-?>

@@ -1,5 +1,5 @@
 <?php
-include_once("templates/admin/BeanListPage.php");
+include_once("components/templates/admin/BeanListPage.php");
 include_once("beans/LanguagesBean.php");
 include_once("beans/SiteTextsBean.php");
 

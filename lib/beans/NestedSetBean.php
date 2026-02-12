@@ -101,7 +101,7 @@ class NestedSetBean extends DBTableBean
     {
         $lastid = parent::insert($row, $db);
 
-        $this->reconstructNestedSet($db);
+        $this->reconstructNestedSet();
 
         return $lastid;
     }
@@ -669,5 +669,3 @@ class NestedSetBean extends DBTableBean
     }
 
 }
-
-?>

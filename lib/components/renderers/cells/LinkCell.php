@@ -25,5 +25,3 @@ class LinkCell extends TableCell
 
 
 }
-
-?>

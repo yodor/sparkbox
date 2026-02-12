@@ -125,7 +125,7 @@ class ChangePositionResponder extends RequestResponder
 
                             let input_position = new InputMessageDialog();
                             input_position.buttonAction = function (action) {
-                                if (action == "confirm") {
+                                if (action === "confirm") {
 
                                     let position = input_position.input().val();
 
@@ -134,7 +134,7 @@ class ChangePositionResponder extends RequestResponder
 
                                     window.location.href = url.href;
 
-                                } else if (action == "cancel") {
+                                } else if (action === "cancel") {
 
                                     window.location.href = "<?php echo $this->cancel_url;?>";
                                 }

@@ -1,5 +1,5 @@
 <?php
-include_once("templates/admin/AdminPageTemplate.php");
+include_once("components/templates/admin/AdminPageTemplate.php");
 include_once("components/BeanFormEditor.php");
 /**
  * If request condition is BeanKeyCondition will use it to set where filter on the view bean and add field to the transactor
@@ -71,7 +71,7 @@ class BeanEditorPage extends AdminPageTemplate
 
     public function getEditor(): BeanFormEditor
     {
-        if ($this->view instanceof BeanFromEditor) return $this->view;
+        if ($this->view instanceof BeanFormEditor) return $this->view;
         throw new Exception("Incorrect view class");
     }
 }

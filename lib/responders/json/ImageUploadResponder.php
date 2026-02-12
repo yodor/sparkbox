@@ -76,5 +76,3 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
     }
 
 }
-
-?>

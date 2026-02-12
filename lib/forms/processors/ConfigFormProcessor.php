@@ -26,5 +26,3 @@ class ConfigFormProcessor extends FormProcessor
     }
 
 }
-
-?>

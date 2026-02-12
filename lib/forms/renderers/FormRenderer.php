@@ -211,5 +211,3 @@ class FormRenderer extends Form
     }
 
 }
-
-?>

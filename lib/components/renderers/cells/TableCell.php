@@ -56,5 +56,3 @@ class TableCell extends Container implements IDataResultProcessor
         $this->dataAttributes[$name] = 1;
     }
 }
-
-?>

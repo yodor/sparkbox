@@ -17,5 +17,3 @@ interface IRenderer
     public function finishRender(): void;
 
 }
-
-?>

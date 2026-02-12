@@ -188,5 +188,3 @@ class MenuItemList extends SparkList
 
 
 }
-
-?>

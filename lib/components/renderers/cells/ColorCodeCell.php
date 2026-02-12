@@ -25,5 +25,3 @@ class ColorCodeCell extends TableCell
     }
 
 }
-
-?>

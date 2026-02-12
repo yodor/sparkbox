@@ -44,4 +44,3 @@ class LDJsonScript extends Script
         parent::processAttributes();
     }
 }
-?>

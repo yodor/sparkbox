@@ -34,5 +34,3 @@ class MenuListRenderer extends Component {
         }
     }
 }
-
-?>

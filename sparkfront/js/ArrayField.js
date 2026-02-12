@@ -67,7 +67,7 @@ class ArrayField extends Component {
 
     /**
      *
-     * @param element {HTMLElement} Remove button of the element being removed from ArrayContents
+     * @param remove_button {HTMLElement} Remove button of the element being removed from ArrayContents
      */
     removeItem(remove_button) {
 

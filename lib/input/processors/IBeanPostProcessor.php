@@ -10,5 +10,3 @@ interface IBeanPostProcessor
     public function loadPostData(array $data) : void;
 
 }
-
-?>

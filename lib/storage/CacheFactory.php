@@ -189,5 +189,3 @@ class CacheFactory
         return $cacheEntry;
     }
 }
-
-?>

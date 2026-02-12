@@ -103,5 +103,3 @@ class ArrayDataIterator implements IDataIterator
         return NULL;
     }
 }
-
-?>

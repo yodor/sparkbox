@@ -34,5 +34,3 @@ class NumericValidator implements IInputValidator
     }
 
 }
-
-?>

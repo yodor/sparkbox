@@ -11,5 +11,3 @@ class PhoneField extends InputFieldTag
     }
 
 }
-
-?>

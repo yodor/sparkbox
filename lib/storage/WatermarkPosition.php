@@ -1,4 +1,5 @@
 <?php
+
 enum WatermarkPosition: int {
 
     case TOP_LEFT = 1;
@@ -6,4 +7,3 @@ enum WatermarkPosition: int {
     case BOTTOM_LEFT = 3;
     case BOTTOM_RIGHT = 4;
 }
-?>

@@ -82,5 +82,3 @@ class PageSessionMenu extends MenuItemList
     }
 
 }
-
-?>

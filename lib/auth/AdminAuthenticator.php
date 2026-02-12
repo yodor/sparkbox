@@ -37,5 +37,3 @@ class AdminAuthenticator extends Authenticator
         }
     }
 }
-
-?>

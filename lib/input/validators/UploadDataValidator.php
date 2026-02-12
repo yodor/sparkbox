@@ -116,5 +116,3 @@ abstract class UploadDataValidator implements IInputValidator
 
 
 }
-
-?>

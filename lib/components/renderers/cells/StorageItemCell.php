@@ -65,5 +65,3 @@ class StorageItemCell extends TableCell
     }
 
 }
-
-?>

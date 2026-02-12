@@ -21,5 +21,3 @@ CREATE TABLE `user_remember` (
     }
 
 }
-
-?>

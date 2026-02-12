@@ -11,11 +11,11 @@ class PhraseTranslationDialog extends JSONDialog {
 
     buttonAction(action) {
 
-        if (action == "Translate") {
+        if (action === "Translate") {
 
             this.store();
 
-        } else if (action == "Close") {
+        } else if (action === "Close") {
 
             this.remove();
         }
@@ -36,13 +36,13 @@ class PhraseTranslationDialog extends JSONDialog {
 
         const response = result.response;
 
-        if (funct == "fetch") {
+        if (funct === "fetch") {
 
             this.phraseInput.value = response.phrase;
             this.translationInput.value = response.translation;
 
         }
-        else if (funct == "store") {
+        else if (funct === "store") {
 
             const html = "<span>" + this.translationInput.value + "</span>";
 
@@ -58,7 +58,7 @@ class PhraseTranslationDialog extends JSONDialog {
             this.remove();
 
         }
-        else if (funct == "clear") {
+        else if (funct === "clear") {
 
             const textID = this.request.getParameter("textID");
             const trID = this.request.getParameter("trID");
@@ -123,4 +123,3 @@ class PhraseTranslationDialog extends JSONDialog {
 
 
 }
-

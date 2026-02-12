@@ -25,7 +25,7 @@ class TextCaptchaField extends TextField
         }
     }
 
-    protected function initResult()
+    protected function initResult() : void
     {
         $n1 = random_int(1, 10);
         $n2 = random_int(1, 10);
@@ -55,7 +55,7 @@ class TextCaptchaField extends TextField
         Session::Set($this->dataInput->getName().".captcha.result", $this->result);
     }
 
-    public function resetResult()
+    public function resetResult() : void
     {
         Session::Remove($this->dataInput->getName().".captcha.result");
     }

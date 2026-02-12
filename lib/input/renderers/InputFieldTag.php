@@ -34,5 +34,3 @@ abstract class InputFieldTag extends InputField
 
 
 }
-
-?>

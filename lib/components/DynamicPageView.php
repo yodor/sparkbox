@@ -86,7 +86,7 @@ class DynamicPageView extends Container implements IRequestProcessor
 
     }
 
-    public function setBean(DBTableBean $bean)
+    public function setBean(DBTableBean $bean) : void
     {
         $this->bean = $bean;
     }

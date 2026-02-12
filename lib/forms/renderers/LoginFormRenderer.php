@@ -85,5 +85,3 @@ class LoginFormRenderer extends FormRenderer
     }
 
 }
-
-?>

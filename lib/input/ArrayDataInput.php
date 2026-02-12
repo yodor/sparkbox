@@ -134,5 +134,3 @@ class ArrayDataInput extends DataInput
     }
 
 }
-
-?>

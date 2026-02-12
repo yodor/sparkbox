@@ -611,5 +611,3 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
 }
-
-?>

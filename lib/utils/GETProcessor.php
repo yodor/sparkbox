@@ -141,5 +141,3 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
 
 
 }
-
-?>

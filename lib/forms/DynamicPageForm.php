@@ -57,5 +57,3 @@ class DynamicPageForm extends InputForm
     }
 
 }
-
-?>

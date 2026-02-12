@@ -27,5 +27,3 @@ class DateCell extends TableCell
     }
 
 }
-
-?>

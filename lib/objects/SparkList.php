@@ -144,4 +144,3 @@ class SparkList extends SparkObject implements ISparkCollection
     }
 
 }
-?>

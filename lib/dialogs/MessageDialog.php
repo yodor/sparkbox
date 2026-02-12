@@ -174,5 +174,3 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
 
 
 }
-
-?>

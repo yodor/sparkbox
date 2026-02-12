@@ -135,5 +135,3 @@ class CSVTemplateLoader
         echo "</tr>";
     }
 }
-
-?>

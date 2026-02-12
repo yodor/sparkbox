@@ -5,7 +5,7 @@ include_once("dbdriver/MySQLiResult.php");
 class MySQLiDriver extends DBDriver
 {
     /**
-     * @var mysqli
+     * @var mysqli|null
      */
     private ?mysqli $conn = null;
 
@@ -159,5 +159,3 @@ class MySQLiDriver extends DBDriver
     }
 
 }
-
-?>

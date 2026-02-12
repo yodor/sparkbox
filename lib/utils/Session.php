@@ -160,5 +160,3 @@ class Session
         Session::Remove(Session::ALERT);
     }
 }
-
-?>

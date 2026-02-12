@@ -1,5 +1,5 @@
 <?php
-include_once("templates/admin/AdminPageTemplate.php");
+include_once("components/templates/admin/AdminPageTemplate.php");
 
 include_once("beans/CurrenciesBean.php");
 include_once("beans/CurrencyRatesBean.php");
@@ -133,9 +133,9 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
                 input.value = old_value;
 
                 input_dialog.buttonAction = function (action) {
-                    if (action == "cancel") {
+                    if (action === "cancel") {
                         input_dialog.remove();
-                    } else if (action == "confirm") {
+                    } else if (action === "confirm") {
                         let value = parseFloat(input.value);
 
                         //dialog.remove();

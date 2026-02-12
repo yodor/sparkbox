@@ -529,7 +529,7 @@ final class Spark {
     }
 
 
-    static public function Base64URLDecode($input)
+    static public function Base64URLDecode($input) : false|string
     {
         return base64_decode(strtr($input, '-_', '+/'));
     }
@@ -581,4 +581,3 @@ final class Spark {
     //    return $data;
     //}
 }
-?>

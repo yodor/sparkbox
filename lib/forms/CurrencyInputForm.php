@@ -16,5 +16,3 @@ class CurrencyInputForm extends InputForm
     }
 
 }
-
-?>

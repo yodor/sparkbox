@@ -286,5 +286,3 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
     }
 
 }
-
-?>

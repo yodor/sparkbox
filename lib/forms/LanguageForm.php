@@ -19,5 +19,3 @@ class LanguageForm extends InputForm
     }
 
 }
-
-?>

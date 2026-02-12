@@ -12,5 +12,3 @@ class RadioField extends DataIteratorField
     }
 
 }
-
-?>

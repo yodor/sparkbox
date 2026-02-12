@@ -132,5 +132,3 @@ class ResultViewFooter extends Container
 
     }
 }
-
-?>

@@ -5,7 +5,7 @@ include_once("input/DataInput.php");
 class TimeValidator implements IInputValidator
 {
 
-    public static function isValidTime($value)
+    public static function isValidTime($value) : bool
     {
         $pieces = explode(":", $value);
 
@@ -28,7 +28,7 @@ class TimeValidator implements IInputValidator
         return $ret;
     }
 
-    protected static function validateTime($hour, $minute)
+    protected static function validateTime($hour, $minute) : void
     {
 
         if ($hour < 0 || $hour > 23) {
@@ -60,5 +60,3 @@ class TimeValidator implements IInputValidator
     }
 
 }
-
-?>

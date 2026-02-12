@@ -184,5 +184,3 @@ class StorageObject
     }
 
 }
-
-?>

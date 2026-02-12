@@ -14,5 +14,3 @@ class DBEnumIterator extends ArrayDataIterator
         parent::__construct($ret);
     }
 }
-
-?>

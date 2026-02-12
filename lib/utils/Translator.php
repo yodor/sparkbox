@@ -334,4 +334,3 @@ class Translator implements IRequestProcessor, IGETConsumer
         return false;
     }
 }
-?>

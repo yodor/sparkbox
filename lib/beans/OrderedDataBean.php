@@ -265,5 +265,3 @@ abstract class OrderedDataBean extends DBTableBean
     }
 
 }
-
-?>

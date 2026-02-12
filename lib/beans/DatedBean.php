@@ -134,5 +134,3 @@ class DatedBean extends DBTableBean
     // 			//return $row["total"];
     // 	}
 }
-
-?>

@@ -11,5 +11,3 @@ class PasswordField extends InputFieldTag
     }
 
 }
-
-?>

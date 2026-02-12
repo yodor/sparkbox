@@ -175,5 +175,3 @@ abstract class DataIteratorField extends InputField
     }
 
 }
-
-?>

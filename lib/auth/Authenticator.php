@@ -331,5 +331,3 @@ abstract class Authenticator
 
     }
 }
-
-?>

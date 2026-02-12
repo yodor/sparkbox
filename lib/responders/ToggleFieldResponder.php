@@ -72,5 +72,3 @@ class ToggleFieldResponder extends RequestResponder
     }
 
 }
-
-?>

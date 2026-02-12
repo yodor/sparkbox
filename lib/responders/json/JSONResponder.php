@@ -130,5 +130,3 @@ abstract class JSONResponder extends RequestResponder
     }
 
 }
-
-?>

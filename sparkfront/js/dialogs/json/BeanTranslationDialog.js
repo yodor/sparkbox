@@ -17,11 +17,11 @@ class BeanTranslationDialog extends JSONDialog {
     }
 
     buttonAction(action) {
-        if (action == "Translate") {
+        if (action === "Translate") {
             this.store();
-        } else if (action == "Clear") {
+        } else if (action === "Clear") {
             this.clear();
-        } else if (action == "Close") {
+        } else if (action === "Close") {
             this.remove();
         }
     }
@@ -66,16 +66,16 @@ class BeanTranslationDialog extends JSONDialog {
         let response = result.response;
         let message = response.message;
 
-        if (funct == "store") {
+        if (funct === "store") {
 
             showAlert(message);
 
-        } else if (funct == "fetch") {
+        } else if (funct === "fetch") {
 
             if (!response.translation) showAlert(message);
             this.translationInput.value = response.translation;
 
-        } else if (funct == "clear") {
+        } else if (funct === "clear") {
 
             this.translationInput.value = "";
             showAlert(message);
@@ -118,4 +118,3 @@ class BeanTranslationDialog extends JSONDialog {
 
 
 }
-

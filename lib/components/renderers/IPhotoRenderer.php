@@ -8,5 +8,3 @@ interface IPhotoRenderer
 
     public function getPhotoHeight(): int;
 }
-
-?>

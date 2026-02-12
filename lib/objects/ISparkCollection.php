@@ -13,4 +13,3 @@ interface ISparkCollection
     public function iterator(): SparkIterator;
     public function contains(SparkObject $object) : bool;
 }
-?>

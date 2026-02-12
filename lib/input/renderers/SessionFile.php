@@ -12,5 +12,3 @@ class SessionFile extends SessionUpload
     }
 
 }
-
-?>

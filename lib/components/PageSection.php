@@ -40,5 +40,3 @@ class PageSection extends Container
         return $this->space_right;
     }
 }
-
-?>

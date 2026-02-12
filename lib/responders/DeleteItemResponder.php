@@ -58,5 +58,3 @@ class DeleteItemResponder extends RequestResponder
     }
 
 }
-
-?>

@@ -15,5 +15,3 @@ class AnyValueValidator implements IInputValidator
     }
 
 }
-
-?>

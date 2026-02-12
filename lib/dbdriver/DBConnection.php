@@ -71,4 +71,3 @@ class DBConnection extends SparkObject
         if (!($this->conn instanceof DBDriver)) throw new Exception("Unsupported DBDriver: " . $this->driver);
     }
 }
-?>

@@ -13,5 +13,3 @@ class UserAuthenticator extends Authenticator
     }
 
 }
-
-?>

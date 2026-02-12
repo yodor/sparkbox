@@ -1,5 +1,5 @@
 <?php
-include_once("templates/admin/AdminPageTemplate.php");
+include_once("components/templates/admin/AdminPageTemplate.php");
 include_once("objects/ActionCollection.php");
 include_once("components/KeywordSearch.php");
 include_once("responders/DeleteItemResponder.php");
@@ -301,5 +301,7 @@ class BeanListPage extends AdminPageTemplate
         return $this->view;
 
     }
+
+
 
 }

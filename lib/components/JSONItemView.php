@@ -15,7 +15,7 @@ class ItemViewResponder extends JSONResponder
         $this->view = $view;
     }
 
-    public function _renderItems(JSONResponse $resp)
+    public function _renderItems(JSONResponse $resp) : void
     {
         Debug::ErrorLog("... start");
         $this->view->processResponse($resp);
@@ -83,7 +83,7 @@ class JSONItemView extends ItemView
         AbstractResultView::finishRender();
     }
 
-    public function processResponse(JSONResponse $resp)
+    public function processResponse(JSONResponse $resp) : void
     {
         //$this->processIterator();
         ob_start();
@@ -93,4 +93,3 @@ class JSONItemView extends ItemView
     }
 
 }
-?>

@@ -21,7 +21,7 @@ class SparkEvent extends Event {
     }
 
     isEvent(message) {
-        return (this.message == message);
+        return (this.message === message);
     }
 
 }

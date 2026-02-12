@@ -12,5 +12,3 @@ class PasswordValidator extends EmptyValueValidator
     }
 
 }
-
-?>

@@ -39,5 +39,3 @@ class ForgotPasswordMailer extends Mailer
     }
 
 }
-
-?>

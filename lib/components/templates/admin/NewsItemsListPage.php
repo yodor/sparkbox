@@ -1,5 +1,5 @@
 <?php
-include_once("templates/admin/BeanListPage.php");
+include_once("components/templates/admin/BeanListPage.php");
 include_once("components/renderers/cells/ImageCell.php");
 include_once("components/renderers/cells/DateCell.php");
 

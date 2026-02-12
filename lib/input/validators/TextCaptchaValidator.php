@@ -33,5 +33,3 @@ class TextCaptchaValidator implements IInputValidator
     }
 
 }
-
-?>

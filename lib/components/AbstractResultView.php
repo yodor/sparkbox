@@ -359,5 +359,3 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         }
     }
 }
-
-?>

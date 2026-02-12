@@ -69,4 +69,3 @@ class BreadcrumbList extends Container implements IHeadContents
     }
 
 }
-?>

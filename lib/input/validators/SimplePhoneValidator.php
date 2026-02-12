@@ -30,5 +30,3 @@ class SimplePhoneValidator implements IInputValidator
     }
 
 }
-
-?>

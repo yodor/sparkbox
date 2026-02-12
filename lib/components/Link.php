@@ -31,5 +31,3 @@ class Link extends Component
         return $this->getAttribute("rel");
     }
 }
-
-?>
