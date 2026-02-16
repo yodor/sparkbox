@@ -167,14 +167,10 @@ class SparkFile {
      * @return string
      * @throws Exception
      */
-    public function read(?int $length = null) : string
+    public function read(int $length = 8192) : false|string
     {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
-        $res = @fread($this->handle, $length);
-        if ($res === FALSE) {
-            throw new Exception("Unable to read from file: ".error_get_last()["message"]);
-        }
-        return $res;
+        return @fread($this->handle, $length);
     }
 
     /**

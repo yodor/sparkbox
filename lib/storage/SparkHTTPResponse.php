@@ -222,6 +222,17 @@ class SparkHTTPResponse
             $this->setHeader("ETag", $file->getEtag());
         }
 
+        // Disable zlib output compression (prevents full-response buffering for gzip)
+        ini_set('zlib.output_compression', '0');
+
+        // Clear any existing output buffers
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        // Enable implicit flushing (automatically flushes after every output block)
+        ob_implicit_flush(true);
+
         $this->sendHeaders();
 
         $file->open('r');
