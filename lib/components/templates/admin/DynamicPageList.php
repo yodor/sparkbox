@@ -55,14 +55,11 @@ class DynamicPageList extends BeanListPage
 
         if ($this->is_chooser) {
             $act->append(Action::RowSeparator());
-            $act->append(
-                new Action("Choose", $this->chooser_return_url,
-                    array(
-                        new DataParameter("page_id", $this->bean->key()),
-                        //new URLParameter("page_class", get_class($this->bean))
-                    )
-                )
-            );
+            $returnURL = new URL($this->chooser_return_url);
+            $returnURL->add(new DataParameter("page_id", $this->bean->key()));
+            $returnAction = new Action("Choose");
+            $returnAction->setURL($returnURL);
+            $act->append($returnAction);
         }
     }
 

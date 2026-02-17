@@ -46,6 +46,8 @@ class MenuItemForm extends InputForm
         $field->getRenderer()->input()->setAttribute("rows","3");
         $field->getRenderer()->input()->setAttribute("cols","60");
         $this->addInput($field);
+
+        $this->load();
     }
 
     public function loadBeanData($editID, DBTableBean $bean): array
@@ -64,7 +66,6 @@ class MenuItemForm extends InputForm
 
     public function load() : void
     {
-
         if (isset($_GET["page_id"])) {
 
             $page_id = (int)$_GET["page_id"];
@@ -73,6 +74,7 @@ class MenuItemForm extends InputForm
 
             $this->getInput("link")->setValue($link_url);
         }
+
 
     }
 
