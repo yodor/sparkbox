@@ -6,6 +6,47 @@ include_once("utils/IRequestProcessor.php");
 include_once("forms/renderers/FormRenderer.php");
 include_once("components/TextComponent.php");
 
+class SubmitSearchScript extends PageScript
+{
+
+    function code(): string
+    {
+        return <<<JS
+        function submitSearch(event) {
+    
+            const submitter = event.submitter;
+        
+            if (!submitter) {
+                console.warn('No submitter detected');
+                return;
+            }
+        
+            const buttonName = submitter.name;
+            const buttonValue = submitter.value;
+            
+            const form = document.forms.KeywordSearchForm;
+            const query = form.keyword.value;
+            if (submitter.value === "search") {
+                if (query.length < 3) {
+                    showAlert("Input search term");
+                    return false;
+                }
+                return true;
+            }
+            else if (submitter.value === "clear") {
+                if (query.length > 0) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+JS;
+    }
+}
 class KeywordSearch extends FormRenderer implements IRequestProcessor
 {
 
@@ -19,6 +60,8 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
     public function __construct()
     {
+
+        new SubmitSearchScript();
 
         $this->form = new KeywordSearchForm();
 
@@ -51,6 +94,8 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         $submit_clear->setValue(KeywordSearch::ACTION_CLEAR);
         $submit_clear->setAttribute("action", KeywordSearch::ACTION_CLEAR);
         $this->getButtons()->items()->append($submit_clear);
+
+        $this->form->getRenderer()->setAttribute("onSubmit", "return submitSearch(event)");
 
     }
 
