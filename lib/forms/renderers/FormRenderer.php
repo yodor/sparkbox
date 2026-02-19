@@ -17,8 +17,12 @@ class InputGroupRenderer extends Container
 
         $legend = new Component(false);
         $legend->setTagName("legend");
-        $legend->setContents($this->group->getDescription());
+        $legend->setContents($this->group->getTitle());
         $this->items()->append($legend);
+
+        $description = new Component(false);
+        $description->setContents($this->group->getDescription());
+        $this->items()->append($description);
     }
 
 }

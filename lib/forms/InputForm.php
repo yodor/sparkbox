@@ -4,6 +4,7 @@ include_once("beans/IBeanEditor.php");
 
 class InputGroup extends SparkObject {
 
+    protected string $title = "";
 
     /**
      * @var string Description of this input group
@@ -15,14 +16,14 @@ class InputGroup extends SparkObject {
      */
     protected array $contents = array();
 
-    public function __construct(string $name, string $description="")
+    public function __construct(string $name, string $title="")
     {
         parent::__construct();
 
         $this->contents = array();
 
         $this->setName($name);
-        $this->setDescription($description);
+        $this->setTitle($title);
 
     }
 
@@ -98,6 +99,16 @@ class InputGroup extends SparkObject {
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getTitle() : string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
     }
 
 }
