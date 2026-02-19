@@ -23,10 +23,10 @@ class SparkGTM {
         }
         try {
             if (!event.gtm) throw "No gtm set";
-            //GTAGObject
+            //GTMCommand
             const gtm = event.gtm;
 
-            if (!gtm.command || !gtm.type || !gtm.parameters) throw "Not a valid GTAGObject object";
+            if (!gtm.command || !gtm.type || !gtm.parameters) throw "Not a valid GTMCommand object";
 
             const command = gtm.command; //string 'event'
             const type = gtm.type; //string 'conversion'

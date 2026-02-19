@@ -16,7 +16,6 @@ include_once("utils/IActionCollection.php");
 include_once("objects/ActionCollection.php");
 include_once("utils/script/FBPixel.php");
 include_once("utils/script/GTAG.php");
-include_once("objects/data/GTAGObject.php");
 
 class SparkLocationScript extends PageScript
 {
@@ -267,7 +266,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
     {
         if (!$this->description) {
             $config = ConfigBean::Factory();
-            $config->setSection("seo");
+            $config->setSection("store_config");
             $this->description = $config->get("meta_description");
         }
     }

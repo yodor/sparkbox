@@ -10,4 +10,6 @@ enum GTMConvParam : string
     case VIEW_PDP = "conv_view_pdp";
     case VIEW_PLP = "conv_view_plp";
 
+    case VIEW_ANY_PAGE = "conv_view_any_page";
+
 }

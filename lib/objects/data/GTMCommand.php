@@ -2,19 +2,18 @@
 include_once("objects/data/DataObject.php");
 include_once("utils/IScript.php");
 
-class GTAGObject extends DataObject implements IScript
+class GTMCommand extends DataObject implements IScript
 {
     const string COMMAND_CONFIG = "config";
     const string COMMAND_SET = "set";
     const string COMMAND_EVENT = "event";
+    const string COMMAND_CONSENT = "consent";
 
     protected string $command = "";
     protected string $type = "";
-    protected string $param_template = "";
     protected array $parameters = array();
-    protected string $parameters_js = "";
 
-    public function __construct(string $command = GTAGObject::COMMAND_EVENT)
+    public function __construct(string $command = GTMCommand::COMMAND_EVENT)
     {
         parent::__construct();
         $this->command = $command;
@@ -70,34 +69,15 @@ class GTAGObject extends DataObject implements IScript
         $this->parameters = $parameters;
     }
 
-
-    /**
-     * Return the result of template parameters after replacing with data
-     * @return string
-     */
-    public function getPrametersJS() : string
-    {
-        return $this->parameters_js;
-    }
-
-    public function setParamTemplate(string $template) : void
-    {
-        $this->param_template = $template;
-    }
-
-    public function getParamTemplate(): string
-    {
-        return $this->param_template;
-    }
-
     public function script() : Script
     {
         $script = new Script();
+        $parameters = json_encode($this->parameters);
         $contents = <<<JS
-
-        gtag( '{$this->command}', '{$this->type}', {$this->parameters_js} );
+        onPageLoad(function(){
+            document.sparkGTM.gtag( '{$this->command}', '{$this->type}', {$parameters} );    
+        });
 JS;
-
         $script->setContents($contents);
         return $script;
     }
@@ -106,8 +86,11 @@ JS;
     {
         parent::setData($data);
 
-        $replace = array("%" . $this->name . "%" => $this->value);
-        $this->parameters_js = strtr($this->param_template, $replace);
+        foreach ($this->parameters as $name => $value) {
+            if (isset($data[$name])) {
+                $this->parameters[$name] = $data[$name];
+            }
+        }
 
     }
 
