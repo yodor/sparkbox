@@ -95,6 +95,12 @@ class JSONFormDialog extends JSONDialog {
             showAlert(response.message);
         }
         else {
+            //send conversion event if gtm is present
+            if (response.gtm) {
+                let sparkEvent = new SparkEvent(SparkEvent.GTM_EVENT);
+                sparkEvent.gtm = response.gtm;
+                document.dispatchEvent(sparkEvent);
+            }
             this.remove();
             showAlert(response.message);
         }

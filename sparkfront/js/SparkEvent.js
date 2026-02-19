@@ -1,6 +1,8 @@
 class SparkEvent extends Event {
 
     static DOM_UPDATED = "DOMUpdate";
+    static GTM_EVENT = "SPARK_GTM_EVENT";
+
     /**
      *
      * @param message {string}
