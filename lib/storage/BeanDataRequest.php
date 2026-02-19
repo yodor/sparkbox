@@ -19,6 +19,8 @@ class BeanDataRequest
     public function __construct()
     {
 
+        ini_set('zlib.output_compression', '0');
+
         try {
 
             if (!isset($_GET[BeanDataRequest::KEY_CMD])) {
