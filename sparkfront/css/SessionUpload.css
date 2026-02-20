@@ -118,12 +118,35 @@
     position: relative;
     margin-left: 1em;
     margin-top: 1em;
+    display:inline-flex;
+    flex-direction: row;
 }
 
 .InputField.SessionUpload .ArrayContents .Element .thumbnail {
 
 
 }
+.InputField.SessionUpload .ArrayContents .Element .info {
+    display: flex;
+    flex-direction: column;
+    gap:0.5em;
+}
+
+.InputField.SessionUpload .ArrayContents .Element .info .item {
+    display:flex;
+    flex-direction: row;
+    gap:0.5em;
+}
+.InputField.SessionUpload .ArrayContents .Element .info .item .label:after {
+    content: ": ";
+}
+.InputField.SessionUpload .ArrayContents .Element .info .item .label {
+    display: none;
+}
+
+/*.InputField.SessionUpload .ArrayContents .Element .info .item.filename {*/
+/*    display: none;*/
+/*}*/
 
 .InputField.SessionUpload .ArrayContents .Element .remove_button {
 

@@ -17,6 +17,10 @@ class SessionUpload extends Component {
         this.slots = null;
         this.fileInput = null;
         this.max_slots = 0;
+
+        this.chunk_size = -1;
+        this.totalChunks = -1;
+        this.chunkIndex = -1;
     }
 
     setField(field) {
@@ -44,6 +48,8 @@ class SessionUpload extends Component {
             element.addEventListener("click", (event)=>this.removeSlot(element));
         });
 
+        this.chunk_size = parseInt(this.fileInput.getAttribute("chunk_size"));
+
     }
 
 
@@ -55,13 +61,25 @@ class SessionUpload extends Component {
 
         if (event.isEvent(JSONRequest.EVENT_STARTED)) {
             this.controls.setAttribute("working", "");
-            this.updateProgress(0);
+            if (this.totalChunks===-1 || this.totalChunks>0 && this.chunkIndex === (this.totalChunks - 1)) {
+                this.updateProgress(0);
+            }
         }
         else if (event.isEvent(JSONRequest.EVENT_PROGRESS)) {
-            this.updateProgress(event.percent);
+
+            let percentVal = parseInt(event.percent);
+
+            if (this.totalChunks>0) {
+                const donePercent = this.chunkIndex * (100 / this.totalChunks);
+                percentVal = donePercent + (percentVal / this.totalChunks);
+            }
+            this.updateProgress(percentVal);
+
         }
         else if (event.isEvent(JSONRequest.EVENT_FINISHED)) {
-            this.controls.removeAttribute("working");
+            if (this.totalChunks===-1 || this.totalChunks>0 && this.chunkIndex === (this.totalChunks - 1)) {
+                this.controls.removeAttribute("working");
+            }
             this.request.clearPost();
         }
 
@@ -69,10 +87,9 @@ class SessionUpload extends Component {
 
     updateProgress(value)
     {
-        let percentVal = parseInt(value)+"%";
-
-        this.controls.querySelector(".bar").style.width = percentVal;
-        this.controls.querySelector(".percent").innerText = percentVal;
+        value = parseInt(value);
+        this.controls.querySelector(".bar").style.width = value + "%";
+        this.controls.querySelector(".percent").innerText = value + "%";
     }
 
     uploadFileChanged(event) {
@@ -102,17 +119,81 @@ class SessionUpload extends Component {
 
         this.request.setFunction(SessionUpload.FUNCTION_UPLOAD);
 
-        let fileData = new FormData();
-        for (let a=0;a<this.fileInput.files.length;a++) {
-            fileData.append(this.fileInput.getAttribute("name"), this.fileInput.files[a]);
-        }
-        this.request.setPostFormData(fileData);
+        if (this.chunk_size>0) {
 
-        this.request.onSuccess = this.uploadSuccess.bind(this);
-        this.request.start();
+            let file = this.fileInput.files[0];
+            this.totalChunks = Math.ceil(file.size / this.chunk_size);
+            this.chunkIndex = 0;
+            console.log("Using chunked upload | chunk_size: " + this.chunk_size + " | totalChunks: " + this.totalChunks);
+            this.uploadChunk();
+        }
+        else {
+            let fileData = new FormData();
+            for (let a = 0; a < this.fileInput.files.length; a++) {
+                fileData.append(this.fileInput.getAttribute("name"), this.fileInput.files[a]);
+            }
+            this.request.setPostFormData(fileData);
+
+            this.request.onSuccess = this.uploadSuccess.bind(this);
+            this.request.start();
+        }
     }
 
 
+    uploadChunk() {
+
+        this.request.clearPost();
+
+        let file = this.fileInput.files[0];
+
+        const start = this.chunkIndex * this.chunk_size;
+        const end = Math.min(start + this.chunk_size, file.size);
+
+        const chunk = file.slice(start, end);
+
+        // const fileId= `${file.name}-${file.size}-${Date.now()}`; // Unique identifier
+
+        const fileData = new FormData();
+        fileData.append(this.fileInput.getAttribute("name"), chunk);
+        fileData.append('chunkIndex', this.chunkIndex);
+        fileData.append('chunkSize', this.chunk_size);
+        fileData.append('totalChunks', this.totalChunks);
+        fileData.append('fileName', file.name);
+        //fileData.append('fileId', fileId);
+
+        this.request.setPostFormData(fileData);
+        this.request.onSuccess = this.uploadChunkSuccess.bind(this);
+        this.request.start();
+
+    }
+    /**
+     *
+     * @param result {JSONRequestResult}
+     */
+    uploadChunkSuccess(result) {
+
+        let response = result.response;
+
+        if (!Object.hasOwn(response, 'chunkIndex')) {
+            console.log(result);
+            throw "Incorrect response received";
+        }
+        if (response.chunkIndex !== this.chunkIndex) {
+            throw "Chunk index response mismatch";
+        }
+
+        let nextChunk =  parseInt(response.chunkIndex) + 1;
+
+        if (nextChunk < this.totalChunks) {
+            this.chunkIndex = nextChunk;
+            this.uploadChunk();
+        }
+        else {
+            //all chunk success
+            console.log("uploadChunkSuccess: All chunk success");
+            this.uploadSuccess(result);
+        }
+    }
     /**
      *
      * @param result {JSONRequestResult}
@@ -124,8 +205,6 @@ class SessionUpload extends Component {
         const response = result.response;
 
         if (response.contents) showAlert(response.contents);
-
-        console.log(result);
 
         for (let a = 0; a < response.object_count; a++) {
             let current_object = response.objects[a];
