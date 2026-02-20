@@ -42,9 +42,10 @@ class Script extends Container
     protected function processAttributes(): void
     {
         parent::processAttributes();
-        if (!$this->getContents()) {
+        if ($this->srcURL->toString()) {
             $this->setAttribute("src", $this->srcURL->fullURL()->toString());
         }
+
     }
 
 }
