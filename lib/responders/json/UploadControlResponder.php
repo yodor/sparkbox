@@ -2,6 +2,7 @@
 include_once("responders/json/JSONResponder.php");
 include_once("storage/FileStorageObject.php");
 include_once("utils/SessionData.php");
+include_once("input/processors/UploadDataInput.php");
 
 abstract class UploadControlResponder extends JSONResponder
 {
@@ -78,7 +79,7 @@ abstract class UploadControlResponder extends JSONResponder
         $value = $input->getValue();
 
         if (is_array($value)) {
-            Debug::ErrorLog("Processing multiple uploeded files: ".count($value));
+            Debug::ErrorLog("Processing multiple uploaded files: ".count($value));
             foreach ($value as $idx=>$uploadObject) {
                 $error = $input->getErrorAt($idx);
                 if ($error) {
@@ -111,7 +112,7 @@ abstract class UploadControlResponder extends JSONResponder
      * @param FileStorageObject $uploadObject
      * @return void
      */
-    private function assignUploadObject(JSONResponse $resp, FileStorageObject $uploadObject) : void
+    protected function assignUploadObject(JSONResponse $resp, FileStorageObject $uploadObject) : void
     {
         Debug::ErrorLog("...");
 
