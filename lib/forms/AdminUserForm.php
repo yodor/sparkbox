@@ -43,11 +43,11 @@ class AdminUserForm extends InputForm
         $this->addInput($field);
 
         //
-        $field = new DataInput("access_level", "Access Level", 1);
+        $field = DataInputFactory::Create(InputType::SELECT, "access_level", "Access Level", 1);
 
         $enum = new DBEnumIterator("admin_users", "access_level");
 
-        $rend = new SelectField($field);
+        $rend = $field->getRenderer();
         $rend->setDefaultOption(null);
         $rend->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_VALUE);
         $rend->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
@@ -57,9 +57,9 @@ class AdminUserForm extends InputForm
         $this->addInput($field);
 
         //
-        $field = new DataInput("role", "Menu Access Level", 0);
+        $field =  DataInputFactory::Create(InputType::CHECKBOX, "role", "Menu Access Level", 0);
         $field->getProcessor()->setTransactBean(new AdminAccessBean());
-        $rend = new CheckField($field);
+        $rend = $field->getRenderer();
         $rend->getItemRenderer()->setValueKey(ArrayDataIterator::KEY_VALUE);
         $rend->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
         $rend->setIterator(new ArrayDataIterator($this->roles));

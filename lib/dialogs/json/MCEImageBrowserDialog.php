@@ -11,7 +11,7 @@ class MCEImageBrowserDialog extends JSONDialog
      */
     protected InputComponent $icmp;
 
-    protected ArrayDataInput $image_input;
+    protected DataInput $image_input;
 
     public function __construct()
     {

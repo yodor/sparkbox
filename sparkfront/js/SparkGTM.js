@@ -54,3 +54,8 @@ class SparkGTM {
 }
 
 document.sparkGTM = new SparkGTM();
+document.sparkGTM.gtag('js', new Date());
+function gtag()
+{
+    document.sparkGTM.gtag(arguments);
+}

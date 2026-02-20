@@ -16,8 +16,7 @@ class KeywordSearchForm extends InputForm
     {
         parent::__construct();
 
-        $keyword = new DataInput("keyword", "Keyword", 0);
-        new TextField($keyword);
+        $keyword = DataInputFactory::Create(InputType::TEXT, "keyword", "Keyword", 0);
         $this->addInput($keyword);
     }
 

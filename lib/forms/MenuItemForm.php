@@ -21,9 +21,9 @@ class MenuItemForm extends InputForm
         $field->getRenderer()->getAddonContainer()->items()->append($action);
         $this->addInput($field);
 
-        $field = new DataInput("parentID", "Parent Menu", 1);
+        $field = DataInputFactory::Create(InputType::NESTED_SELECT, "parentID", "Parent Menu", 1);
 
-        $rend = new NestedSelectField($field);
+        $rend = $field->getRenderer();
 
         $rend->setDefaultOption("--- TOP ---", "0");
 

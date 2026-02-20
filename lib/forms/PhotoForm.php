@@ -9,8 +9,7 @@ class PhotoForm extends InputForm
     {
         parent::__construct();
 
-        $field = new DataInput("caption", "Caption", 0);
-        new TextField($field);
+        $field = DataInputFactory::Create(InputType::TEXT, "caption", "Caption", 0);
         $field->enableTranslator(true);
         $this->addInput($field);
 

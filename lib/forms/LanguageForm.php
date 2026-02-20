@@ -8,12 +8,10 @@ class LanguageForm extends InputForm
     {
         parent::__construct();
 
-        $field = new DataInput("lang_code", "Language Code", 1);
-        new TextField($field);
+        $field = DataInputFactory::Create(InputType::TEXT,"lang_code", "Language Code", 1);
         $this->addInput($field);
 
-        $field = new DataInput("language", "Language Name", 1);
-        new TextField($field);
+        $field = DataInputFactory::Create(InputType::TEXT,"language", "Language Name", 1);
         $this->addInput($field);
 
     }

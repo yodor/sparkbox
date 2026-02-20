@@ -9,36 +9,28 @@ class DynamicPageForm extends InputForm
     {
         parent::__construct();
 
-        $field = new DataInput("item_title", "Title", 1);
+        $field = DataInputFactory::Create(InputType::TEXT,"item_title", "Title", 1);
         $field->enableTranslator(true);
-        new TextField($field);
         $this->addInput($field);
 
-        $field = new DataInput("content", "Content", 1);
+        $field = DataInputFactory::Create(InputType::MCE_TEXTAREA, "content", "Content", 1);
         $field->enableTranslator(true);
-        new MCETextArea($field);
-
         $this->addInput($field);
 
-        $field = new DataInput("keywords", "Keywords", 0);
-        new TextField($field);
+        $field = DataInputFactory::Create(InputType::TEXT, "keywords", "Menu Group (separate with ';')", 0);
         $this->addInput($field);
 
-        $field = new DataInput("item_date", "Date", 0);
-        new DateField($field);
-        $field->setValidator(new DateValidator());
-
+        $field = DataInputFactory::Create(InputType::DATE,"item_date", "Date", 0);
         $this->addInput($field);
 
-        $field = new DataInput("visible", "Visible", 0);
-        new CheckField($field);
+        $field = DataInputFactory::Create(InputType::CHECKBOX, "visible", "Visible", 0);
         $this->addInput($field);
 
-        $field = new DataInput("render_class", "CSS Class Name", 0);
+        $field = DataInputFactory::Create(InputType::SELECT, "render_class", "CSS Class Name", 0);
         //
         $sel = new ArrayDataIterator(array("Normal", "Notices"));
         //
-        $rend = new SelectField($field);
+        $rend = $field->getRenderer();
         $rend->setIterator($sel);
         //
         $rend->setDefaultOption(null);

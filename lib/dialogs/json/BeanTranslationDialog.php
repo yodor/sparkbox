@@ -44,6 +44,8 @@ class BeanTranslationDialog extends JSONDialog implements IPageComponent
 
         $this->content->items()->clear();
 
+        include_once("input/DataInputFactory.php");
+
         $phraseInput = DataInputFactory::Create(InputType::TEXTAREA, "original_text", "Original Text", 0);
         $phraseInput->getRenderer()->input()->setAttribute("rows", 5);
         $phraseInput->getRenderer()->input()->setAttribute("readonly");
@@ -57,10 +59,8 @@ class BeanTranslationDialog extends JSONDialog implements IPageComponent
         $this->content->items()->append($translation);
 
 
-        include_once("input/DataInputFactory.php");
-        $ls = new DataInput("langID", "Language", 1);
 
-        $renderer = new SelectField($ls);
+        $ls = DataInputFactory::Create(InputType::SELECT,"langID", "Language", 1);
 
         include_once("beans/LanguagesBean.php");
         $lb = new LanguagesBean();
@@ -68,9 +68,9 @@ class BeanTranslationDialog extends JSONDialog implements IPageComponent
         $lb->select()->where()->add("langID", 1 ,">");
         $qry = $lb->query();
         $qry->select->fields()->set("langID", "language");
-        $renderer->setIterator($qry);
-        $renderer->getItemRenderer()->setValueKey("langID");
-        $renderer->getItemRenderer()->setLabelKey("language");
+        $ls->getRenderer()->setIterator($qry);
+        $ls->getRenderer()->getItemRenderer()->setValueKey("langID");
+        $ls->getRenderer()->getItemRenderer()->setLabelKey("language");
 
         $this->input = $ls;
 

@@ -3,6 +3,7 @@ include_once("storage/CacheEntry.php");
 include_once("storage/FileCacheEntry.php");
 include_once("storage/DBCacheEntry.php");
 include_once("beans/SparkCacheBean.php");
+include_once("storage/SparkFile.php");
 
 class CacheFactory
 {

@@ -89,6 +89,7 @@ class DataInputFactory
 
             case InputType::SELECT_MULTI:
                 include_once("input/renderers/SelectField.php");
+                $input = new ArrayDataInput($name, $label, $required);
                 new SelectMultipleField($input);
                 break;
 
