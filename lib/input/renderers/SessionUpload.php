@@ -2,6 +2,7 @@
 include_once("components/LabelSpan.php");
 include_once("input/renderers/ArrayField.php");
 include_once("components/renderers/IPhotoRenderer.php");
+include_once("components/TextComponent.php");
 
 abstract class SessionUpload extends InputField
 {
@@ -187,5 +188,3 @@ abstract class SessionUpload extends InputField
     }
 
 }
-
-?>

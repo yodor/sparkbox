@@ -58,7 +58,7 @@ class UploadDataInput extends InputProcessor
 
         Debug::ErrorLog("upload_status: " . $upload_status);
 
-        if ($upload_status == UPLOAD_ERR_NO_FILE) {
+        if ($upload_status === UPLOAD_ERR_NO_FILE) {
             Debug::ErrorLog("No file selected for upload");
             return;
         }

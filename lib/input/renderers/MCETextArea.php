@@ -1,5 +1,5 @@
 <?php
-//do not include circular references from MCEImageBrowserDialog
+include_once("input/renderers/TextArea.php");
 
 class MCETextArea extends TextArea
 {
@@ -53,5 +53,3 @@ class MCETextArea extends TextArea
     }
 
 }
-
-?>
