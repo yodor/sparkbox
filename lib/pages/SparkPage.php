@@ -153,6 +153,8 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/Tooltip.js");
 
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkGTM.js");
+
     }
     /**
      * Set the default static instance
