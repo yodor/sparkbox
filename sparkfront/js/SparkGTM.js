@@ -13,7 +13,7 @@ class SparkGTM {
 
     /**
      * SparkEvent
-     * @param event
+     * @param event {SparkEvent}
      */
     handleEvent(event) {
 
@@ -54,8 +54,9 @@ class SparkGTM {
 }
 
 document.sparkGTM = new SparkGTM();
-document.sparkGTM.gtag('js', new Date());
-function gtag()
-{
+onPageLoad(function() {
+    document.sparkGTM.gtag('js', new Date());
+});
+function gtag(arguments) {
     document.sparkGTM.gtag(arguments);
 }
