@@ -9,6 +9,6 @@ class GTAG extends Script
 
         $this->setAttribute("async");
         $this->setAttribute("fetchpriority","low");
-        $this->setSrc("https://www.googletagmanager.com/gtm.js?id=".$gtmID);
+        $this->setSrc("https://www.googletagmanager.com/gtag/js?id=".$gtmID);
     }
 }
