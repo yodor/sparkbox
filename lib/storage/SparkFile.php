@@ -184,6 +184,33 @@ class SparkFile {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         return flock($this->handle, $operation, $would_block);
     }
+
+    public function seek(int $offset, int $whence = SEEK_SET) : int
+    {
+        if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
+
+        $result = @fseek($this->handle, $offset, $whence);
+
+        if ($result === -1) {
+            throw new Exception("Seek to position failed: ".error_get_last()["message"]);
+        }
+        return $result;
+    }
+    public function truncate(int $position) : bool
+    {
+        if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
+        $result = @ftruncate($this->handle, $position);
+        if ($result === false) {
+            throw new Exception("Truncate to position failed: ".error_get_last()["message"]);
+        }
+        return $result;
+    }
+    public function flush() : bool
+    {
+        if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
+        return @fflush($this->handle);
+    }
+
     public function passthru() : void
     {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
