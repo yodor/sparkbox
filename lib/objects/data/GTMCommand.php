@@ -72,12 +72,21 @@ class GTMCommand extends DataObject implements IScript
     public function script() : Script
     {
         $script = new Script();
-        $parameters = json_encode($this->parameters);
-        $contents = <<<JS
+
+$contents = <<<JS
+        onPageLoad(function(){
+            document.sparkGTM.gtag( '{$this->command}', '{$this->type}');    
+        });
+JS;
+        if (count($this->parameters) > 0) {
+            $parameters = json_encode($this->parameters);
+$contents = <<<JS
         onPageLoad(function(){
             document.sparkGTM.gtag( '{$this->command}', '{$this->type}', {$parameters} );    
         });
 JS;
+        }
+
         $script->setContents($contents);
         return $script;
     }
