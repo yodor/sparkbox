@@ -26,13 +26,17 @@ class SparkGTM {
             //GTMCommand
             const gtm = event.gtm;
 
-            if (!gtm.command || !gtm.type || !gtm.parameters) throw "Not a valid GTMCommand object";
+            if (!gtm.command || !gtm.type ) throw "Not a valid GTMCommand object";
 
-            const command = gtm.command; //string 'event'
-            const type = gtm.type; //string 'conversion'
-            const parameters = gtm.parameters; //object { send_to: 'AW-123456789/abcDEF123_456GHI789'}
+            if (gtm.parameters)
+            {
+                this.gtag(gtm.command, gtm.type, gtm.parameters);
+            }
+            else {
+                this.gtag(gtm.command, gtm.type);
+            }
 
-            this.gtag(command, type, parameters);
+
         }
         catch (e) {
             console.log(e);
