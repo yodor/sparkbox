@@ -30,9 +30,11 @@ class SparkGTM {
 
             if (gtm.parameters)
             {
+                //console.log(gtm);
                 this.gtag(gtm.command, gtm.type, gtm.parameters);
             }
             else {
+                //console.log(gtm);
                 this.gtag(gtm.command, gtm.type);
             }
 
