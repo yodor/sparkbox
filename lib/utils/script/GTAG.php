@@ -3,6 +3,7 @@ include_once("components/Script.php");
 
 class GTAG extends Script
 {
+    //default gtag without gtmID, later on configured using GTMCommand 'config'
     public function __construct(string $gtmID="")
     {
         parent::__construct();
