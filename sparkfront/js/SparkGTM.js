@@ -1,14 +1,7 @@
 class SparkGTM {
 
     constructor() {
-        window.dataLayer = window.dataLayer || [];
         document.addEventListener(SparkEvent.GTM_EVENT, (event) => this.handleEvent(event));
-    }
-
-
-    gtag() {
-        // console.log(arguments);
-        window.dataLayer.push(arguments);
     }
 
     /**
@@ -28,17 +21,11 @@ class SparkGTM {
 
             if (!gtm.command || !gtm.type ) throw "Not a valid GTMCommand object";
 
-            if (gtm.parameters)
-            {
-                //console.log(gtm);
-                this.gtag(gtm.command, gtm.type, gtm.parameters);
+            if (!gtm.parameters) {
+                gtag(gtm.command, gtm.type);
+            } else {
+                gtag(gtm.command, gtm.type, gtm.parameters);
             }
-            else {
-                //console.log(gtm);
-                this.gtag(gtm.command, gtm.type);
-            }
-
-
         }
         catch (e) {
             console.log(e);
@@ -51,7 +38,7 @@ class SparkGTM {
      */
     emitConversion(conversionID) {
         if (conversionID) {
-            this.gtag('event','conversion', {
+            gtag('event','conversion', {
                 send_to: conversionID
             });
         }
@@ -59,9 +46,11 @@ class SparkGTM {
 
 }
 
-document.sparkGTM = new SparkGTM();
-document.sparkGTM.gtag('js', new Date());
 
-function gtag(arguments) {
-    document.sparkGTM.gtag(arguments);
+window.dataLayer = window.dataLayer || [];
+function gtag() {
+    window.dataLayer.push(arguments);
 }
+gtag('js', new Date());
+
+document.sparkGTM = new SparkGTM();
