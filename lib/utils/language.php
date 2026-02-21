@@ -1,15 +1,7 @@
 <?php
 include_once("utils/Translator.php");
 
-
-
-if (defined("TRANSLATOR_ENABLED") &&
-    !defined("SKIP_DB") &&
-    !defined("SKIP_TRANSLATOR") &&
-    !defined("STORAGE_REQUEST")) {
-    $translator = Translator::Instance();
-
-}
+$translator = Translator::Instance();
 
 function trbean(int $id, string $field_name, array &$row, string $tableName) : void
 {
