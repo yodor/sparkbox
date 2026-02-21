@@ -6,11 +6,12 @@ class Debug {
 
     static public function ErrorLog($obj, $msg = NULL, $arr = NULL) : void
     {
+        if (!isset($GLOBALS["DEBUG_OUTPUT"]))  return;
+
         error_log(Debug::Message($obj, $msg, $arr));
     }
     static private function Message($obj, $msg = NULL, $arr = NULL) : string
     {
-        if (!isset($GLOBALS["DEBUG_OUTPUT"])) return "";
 
         $class = "";
         $message = "";
