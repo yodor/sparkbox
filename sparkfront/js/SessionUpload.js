@@ -154,12 +154,10 @@ class SessionUpload extends Component {
         // const fileId= `${file.name}-${file.size}-${Date.now()}`; // Unique identifier
 
         const fileData = new FormData();
-        fileData.append(this.fileInput.getAttribute("name"), chunk);
+        fileData.append(this.fileInput.getAttribute("name"), chunk, file.name);
         fileData.append('chunkIndex', this.chunkIndex);
         fileData.append('chunkSize', this.chunk_size);
         fileData.append('totalChunks', this.totalChunks);
-        fileData.append('fileName', file.name);
-        //fileData.append('fileId', fileId);
 
         this.request.setPostFormData(fileData);
         this.request.onSuccess = this.uploadChunkSuccess.bind(this);

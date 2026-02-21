@@ -59,6 +59,13 @@ class Config {
     const string MEMORY_LIMIT = "MEMORY_LIMIT";
 
     /**
+     * Equal to ini_get upload_max_filesize in byte
+     * Static(int)
+     */
+    const string UPLOAD_MAX_FILESIZE = "UPLOAD_MAX_FILESIZE";
+
+
+    /**
      * Domain for cookies.
      * Default '.SITE_DOMAIN'
      * Static(string)

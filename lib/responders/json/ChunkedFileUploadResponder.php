@@ -16,7 +16,7 @@ class ChunkedFileUploadResponder extends ChunkedUploadControlResponder
 
         if (!($object instanceof FileStorageObject)) throw new Exception("Expecting FileStorageObject");
 
-        $cacheFile = $this->getCacheFile($object);
+        $cacheFile = $this->getCacheEntry($object->UID())->getFile();
         $filename = $object->getFilename();
         $mime = $cacheFile->getMIME();
         $uid = $object->UID();
@@ -25,15 +25,46 @@ class ChunkedFileUploadResponder extends ChunkedUploadControlResponder
 
         ob_start();
 
-        echo "<div class='Element' tooltip='$filename'>";
-        echo "<span class='thumbnail'><img src='" . Spark::Get(Config::SPARK_LOCAL) . "/images/mimetypes/generic.png'></span>";
-        echo "<div class='info'>";
-            echo "<div class='item filename'><span class='label'>Name</span><span>$filename</span></div>";
-            echo "<div class='item filesize'><span class='label'>Size</span><span>" . Spark::ByteLabel($cacheFile->length()) . "</span></div>";
-        echo "</div>";
-        echo "<span class='remove_button' action='Remove'></span>";
-        echo "<input type=hidden name='uid_{$field_name}[]' value='$uid' >";
-        echo "</div>";
+        $element = new Container(false);
+        $element->setComponentClass("Element");
+        $element->setTooltip($filename);
+
+        $thumbnail = new Container(false);
+        $thumbnail->setComponentClass("Thumbnail");
+        $element->items()->append($thumbnail);
+
+        $image = new Image();
+        $image->setAttribute("src", Spark::Get(Config::SPARK_LOCAL) . "/images/mimetypes/generic.png");
+        $thumbnail->items()->append($image);
+
+        $info = new Container(false);
+        $info->setComponentClass("info");
+        $element->items()->append($info);
+
+        $item = new LabelSpan();
+        $item->setComponentClass("item");
+        $item->addClassName("filename");
+        $item->label()->setContents(tr("Name"));
+        $item->span()->setContents($filename);
+        $info->items()->append($item);
+
+        $item = new LabelSpan();
+        $item->setComponentClass("item");
+        $item->addClassName("filename");
+        $item->label()->setContents(tr("Size"));
+        $item->span()->setContents(Spark::ByteLabel($cacheFile->length()));
+        $info->items()->append($item);
+
+        $button = new Component(false);
+        $button->setComponentClass("remove_button");
+        $button->setAttribute("action", "Remove");
+
+        $element->items()->append($button);
+
+        $input = new Input("hidden", "uid_{$field_name}[]", $uid);
+        $element->items()->append($input);
+
+        $element->render();
 
         $html = ob_get_contents();
 

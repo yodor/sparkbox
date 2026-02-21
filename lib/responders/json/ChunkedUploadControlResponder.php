@@ -11,8 +11,9 @@ abstract class ChunkedUploadControlResponder extends UploadControlResponder
     protected int $chunkIndex = -1;
     protected int $chunkSize = -1;
 
-    protected string $fileName = "";
     protected string $cachePath = "";
+
+    protected ?FileCacheEntry $cacheEntry = null;
 
     /**
      * ChunkedUploadControlResponder constructor.
@@ -46,9 +47,6 @@ abstract class ChunkedUploadControlResponder extends UploadControlResponder
             if ($this->chunkIndex < 0) throw new Exception("Chunk index invalid (less)");
             if ($this->chunkIndex > $this->totalChunks) throw new Exception("Total chunks invalid (max)");
 
-            if (!isset($_POST["fileName"])) throw new Exception("Filename not passed");
-            $this->fileName = $_POST["fileName"];
-
             if (!file_exists($this->cachePath)) {
                 if (!mkdir($this->cachePath, 0755, true)) {
                     throw new Exception("Unable to create the cache store path");
@@ -77,20 +75,38 @@ abstract class ChunkedUploadControlResponder extends UploadControlResponder
 
     /**
      * Assign result to JSONResponse
-     * 1. calls createResponseObject and assign to the object field of $resp
-     * 2. storeToSession the $uploadObject
-     * 3. increment object_count field of $resp
-     *
+     * store this chunk to the cache file using storeUploadObject call
+     * set chinkIndex to the current received chunkIndex to the response
+     * if this is isLastChunk return objectCount (1) and createResponseObject - the html to display back into as Element
      * @param JSONResponse $resp
      * @param FileStorageObject $uploadObject
      * @return void
+     * @throws
      */
     protected function assignUploadObject(JSONResponse $resp, FileStorageObject $uploadObject) : void
     {
         Debug::ErrorLog("...");
 
-//        //!Do store first
-//        //StorageObject can change UID depending on storage type used
+        //initialize and store UID from the initial chunk
+        if ($this->chunkIndex === 0) {
+
+            //store shadow - empty data just UID and filename.
+            //After main form is submitted UID can be retrieved and full length file can be accessed from FileCacheEntry
+            $object = new FileStorageObject();
+            $object->setUID($uploadObject->UID());
+            $object->setFilename($uploadObject->getFilename());
+
+            $this->data->set($uploadObject->UID(), $object);
+            $this->data->set("UID", $uploadObject->UID());
+
+        }
+        else {
+            $firstChunkUID = $this->data->get("UID");
+            $uploadObject->setUID($firstChunkUID);
+        }
+
+
+        //store chunk contents to the cache file
         $this->storeUploadObject($uploadObject);
 
         $resp->chunkIndex = $this->chunkIndex;
@@ -108,47 +124,32 @@ abstract class ChunkedUploadControlResponder extends UploadControlResponder
             $resp->object_count = count($resp->objects);
         }
 
-
-
     }
 
 
-    protected function getCacheFile(FileStorageObject $uploadObject) : SparkFile
+    public function getCacheEntry(string $uid) : FileCacheEntry
     {
+        if (!$this->cacheEntry) {
+            $cacheEntry = CacheFactory::PageCacheEntry($uid);
+            if (!($cacheEntry instanceof FileCacheEntry)) throw new Exception("Invalid cacheEntry");
+            $this->cacheEntry = $cacheEntry;
+        }
 
-        $cacheFile = new SparkFile();
-        $cacheFile->setFilename($uploadObject->UID()."-".$uploadObject->getFilename());
-        $cacheFile->setPath($this->cachePath);
-        return $cacheFile;
+        return $this->cacheEntry;
     }
 
     /**
-     * Store upload object
-     * Default is to use the StorageObject into session using the StorageObject UID
+     * Store each chunk represented in the FileStorageObject to the cache file
      * @param FileStorageObject $uploadObject
      * @return void
+     * @throws
      */
     protected function storeUploadObject(FileStorageObject $uploadObject) : void
     {
-        //store the original data in the session array by the field name and UID
-        //
 
-        //set filename as blob is without filename
-        $uploadObject->setFilename($this->fileName);
+        $cacheFile = $this->getCacheEntry($uploadObject->UID())->getFile();
 
-        if ($this->chunkIndex === 0) {
-            //data is unique per session. store filename with the first created UID and use later on
-            $this->data->set("UID", $uploadObject->UID());
-            $this->data->set($uploadObject->UID(), $uploadObject);
-        }
-        else {
-            $firstChunkUID = $this->data->get("UID");
-            $uploadObject->setUID($firstChunkUID);
-        }
-
-        $cacheFile = $this->getCacheFile($uploadObject);
-
-        Debug::ErrorLog("Using cacheFile: " . $cacheFile->getFilename());
+        Debug::ErrorLog("Storing chunk [".($this->chunkIndex+1)." of $this->totalChunks] into cacheFile: " . $cacheFile->getFilename());
 
         try {
 
@@ -199,7 +200,7 @@ abstract class ChunkedUploadControlResponder extends UploadControlResponder
         return array(
             "name" => $uploadObject->getFilename(),
             "uid" => $uploadObject->UID(),
-            "mime" => $this->getCacheFile($uploadObject)->getMIME(),
+            "mime" => $this->getCacheEntry($uploadObject->UID())->getFile()->getMime(),
             "html" => $html);
     }
 
@@ -207,25 +208,15 @@ abstract class ChunkedUploadControlResponder extends UploadControlResponder
     protected function _remove(JSONResponse $resp): void
     {
 
-        Debug::ErrorLog("...");
-
-        if (!isset($_GET[UploadControlResponder::PARAM_UID])) throw new Exception("UID not passed");
+        parent::_remove($resp);
 
         $uid = (string)$_GET[UploadControlResponder::PARAM_UID];
 
-        if (strlen($uid) > 50) throw new Exception("UID maximum size reached");
-
-        $object = $this->data->get($uid);
-        if (! ($object instanceof FileStorageObject)) throw new Exception("Incorrect FileStorageObject found for this UID");
-
-        $sparkFile = $this->getCacheFile($object);
+        $sparkFile = $this->getCacheEntry($uid)->getFile();
         Debug::ErrorLog("Removing cache file: " .$sparkFile->getFilename());
         $sparkFile->remove();
 
-        Debug::ErrorLog("Removing UID[$uid] from session data");
-        $this->data->remove($uid);
-
-        Debug::ErrorLog("Finished");
+        $this->data->remove("UID");
 
     }
 

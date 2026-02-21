@@ -28,7 +28,9 @@ abstract class SessionUpload extends InputField
         $field_elements = new Container();
         $field_elements->setComponentClass("FieldElements");
 
-        $details = $this->createDetails();
+        $details = new Container(false);
+        $details->setComponentClass("Details");
+        $this->fillDetails($details);
         $field_elements->items()->append($details);
 
         $button = Button::TextButton("Browse","browse");
@@ -122,14 +124,17 @@ abstract class SessionUpload extends InputField
         }
     }
 
-    public function createDetails() : Container
+    protected function fillDetails(Container $details) : void
     {
-        $details =  new Container(false);
-        $details->setComponentClass("Details");
+
 
         $limits = new Container(false);
         $limits->setComponentClass("Limits");
         $details->items()->append($limits);
+
+        $max_size = new LabelSpan("UPLOAD_MAX_FILESIZE", Spark::ByteLabel(Spark::Get(Config::UPLOAD_MAX_FILESIZE)));
+        $max_size->setAttribute("field", "max_filesize");
+        $limits->items()->append($max_size);
 
         $max_size = new LabelSpan("UPLOAD_MAX_SIZE", Spark::ByteLabel(Spark::Get(Config::UPLOAD_MAX_SIZE)));
         $max_size->setAttribute("field", "max_size");
@@ -147,7 +152,6 @@ abstract class SessionUpload extends InputField
         $max_slots->setAttribute("field", "max_slots");
         $limits->items()->append($max_slots);
 
-        return $details;
     }
 
     protected function renderItems() : void

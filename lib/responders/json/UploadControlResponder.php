@@ -37,6 +37,7 @@ abstract class UploadControlResponder extends JSONResponder
         $field_name = $_GET[UploadControlResponder::PARAM_FIELD_NAME];
         $this->field_name = str_replace("[]", "", $field_name);
 
+        //per user session per field name
         $this->data = new SessionData(SessionData::Prefix($this->field_name,SessionData::UPLOAD_CONTROL));
     }
 
@@ -66,7 +67,8 @@ abstract class UploadControlResponder extends JSONResponder
         //validator will be called for each element of the ArrayDataInput
         $input->setValidator($validator);
 
-        //set processor to the input
+        //set processor to the input.
+        //creates new FileStorageObject with new UID
         new UploadDataInput($input);
 
         Debug::ErrorLog("Loading input processor with _POST data");

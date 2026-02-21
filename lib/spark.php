@@ -118,6 +118,7 @@ final class Spark {
         //$umf = Marshall::FromByteLabel(ini_get("upload_max_filesize"));
         Spark::Set(Config::UPLOAD_MAX_SIZE, Marshall::FromByteLabel(ini_get("post_max_size")), true);
         Spark::Set(Config::MEMORY_LIMIT, Marshall::FromByteLabel(ini_get("memory_limit")), true);
+        Spark::Set(Config::UPLOAD_MAX_FILESIZE, Marshall::FromByteLabel(ini_get("upload_max_filesize")), true);
         //end static values
 
         //
