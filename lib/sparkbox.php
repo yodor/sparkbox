@@ -1,15 +1,5 @@
 <?php
 
-// $base_dir  = __DIR__; // Absolute path to your installation, ex: /var/www/mywebsite
-// $doc_root  = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', $_SERVER['SCRIPT_FILENAME']); # ex: /var/www
-// $base_url  = preg_replace("!^${doc_root}!", '', $base_dir); # ex: '' or '/mywebsite'
-// $protocol  = empty($_SERVER['HTTPS']) ? 'http' : 'https';
-// $port      = $_SERVER['SERVER_PORT'];
-// $disp_port = ($protocol == 'http' && $port == 80 || $protocol == 'https' && $port == 443) ? '' : ":$port";
-// $domain    = $_SERVER['SERVER_NAME'];
-// $full_url  = "${protocol}://${domain}${disp_port}${base_url}"; # Ex: 'http://example.com', 'https://example.com/mywebsite', etc.
-
-//define these to any value
 
 //no forced redirect to https if it is in http
 //$GLOBALS["FORCE_HTTPS"] = "";
@@ -122,3 +112,7 @@ function exception_error_handler(int $errNo, string $errStr, string $errFile, in
 }
 //make all errors an exception even the warnings
 //set_error_handler("exception_error_handler", E_ALL);
+
+register_shutdown_function(function(){
+    CacheFactory::CleanupPageCache();
+});

@@ -344,11 +344,6 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 
         ob_end_flush();
 
-        if (Spark::GetBoolean(Config::PAGE_CACHE_ENABLED)) {
-            register_shutdown_function(function(){
-                CacheFactory::CleanupPageCache();
-            });
-        }
     }
 
     /**
