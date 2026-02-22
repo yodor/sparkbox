@@ -104,33 +104,33 @@ abstract class Authenticator
     {
 
         if (!$this->session->contains(SessionData::AUTH_TOKEN)) {
-            Debug::ErrorLog($this, "SessionData does not have auth_token set");
+            Debug::ErrorLog("SessionData does not have auth_token set");
             return NULL;
         }
 
         $token = $this->session->get(SessionData::AUTH_TOKEN);
 
         if (!($token instanceof AuthToken)) {
-            Debug::ErrorLog($this, "AuthContext un-serialize failed");
+            Debug::ErrorLog("AuthContext un-serialize failed");
             Session::Remove(SessionData::AUTH_TOKEN);
             return NULL;
         }
 
-        Debug::ErrorLog($this, "AuthToken un-serialized from session");
+        Debug::ErrorLog("AuthToken un-serialized from session");
 
         if ($token->validateCookies($this->session->name()) !== TRUE) {
-            Debug::ErrorLog($this, "AuthContext validation failed");
+            Debug::ErrorLog("AuthContext validation failed");
             Session::Remove(SessionData::AUTH_TOKEN);
             return NULL;
         }
 
-        Debug::ErrorLog($this, "Cookie validation success");
+        Debug::ErrorLog("Cookie validation success");
 
         //check if account is enabled
         if ($this->bean->haveColumn("suspended")) {
             $suspend_status = (int)$this->bean->getValue($token->getID(), "suspended");
             if ($suspend_status > 0) {
-                Debug::ErrorLog($this, "Account is suspended");
+                Debug::ErrorLog("Account is suspended");
                 return NULL;
             }
         }
@@ -151,7 +151,7 @@ abstract class Authenticator
     public function login(string $username, string $pass, string $rand, bool $remember_me = FALSE, bool $check_password_only = FALSE) : void
     {
 
-        Debug::ErrorLog($this, "Using loginToken: " . $rand);
+        Debug::ErrorLog("Using loginToken: " . $rand);
 
         $db = DBConnections::Open();
 
@@ -232,16 +232,16 @@ abstract class Authenticator
      */
     protected function createAuthToken(int $id) : void
     {
-        Debug::ErrorLog($this, "Regenerating session ID");
+        Debug::ErrorLog("Regenerating session ID");
 
         session_regenerate_id(TRUE);
 
         $token = new AuthToken($id);
 
-        Debug::ErrorLog($this, "Creating cookies for SessionData name: " . $this->session->name());
+        Debug::ErrorLog("Creating cookies for SessionData name: " . $this->session->name());
         $token->storeCookies($this->session->name());
 
-        Debug::ErrorLog($this, "Serializing auth_token in SessionData");
+        Debug::ErrorLog("Serializing auth_token in SessionData");
         $this->session->set(SessionData::AUTH_TOKEN, $token);
 
         //remove the current login token
@@ -251,7 +251,7 @@ abstract class Authenticator
 
     protected function fillSessionData(array $row, int $userID) : void
     {
-        Debug::ErrorLog($this, "fill common SessionData");
+        Debug::ErrorLog("fill common SessionData");
 
         if (isset($row[SessionData::EMAIL])) {
             $this->session->set(SessionData::EMAIL, $row[SessionData::EMAIL]);

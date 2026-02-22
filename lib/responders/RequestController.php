@@ -13,7 +13,7 @@ class RequestController
 
     public static function isJSONRequest(): bool
     {
-        return isset($_REQUEST[JSONResponder::KEY_JSONREQUEST]);
+        return Spark::isJSONRequest();
     }
 
     public static function isResponderRequest(): bool

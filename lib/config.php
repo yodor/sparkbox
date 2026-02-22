@@ -239,4 +239,7 @@ class Config {
      */
     const string SITE_TITLE = "SITE_TITLE";
 
+
+    const string KEY_JSON_REQUEST = "JSONRequest";
+
 }

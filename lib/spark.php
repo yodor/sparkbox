@@ -557,6 +557,23 @@ final class Spark {
         return implode(Spark::Get(Config::TITLE_PATH_SEPARATOR), $title);
     }
 
+    static public function isStorageRequest() : bool
+    {
+        return (strcasecmp(Spark::RequestScript(), "storage.php")===0);
+    }
+
+    static public function isJSONRequest() : bool
+    {
+        return isset($_REQUEST[Config::KEY_JSON_REQUEST]);
+    }
+
+    static public function RequestScript() : string
+    {
+        return isset($_SERVER['SCRIPT_FILENAME'])
+            ? basename($_SERVER['SCRIPT_FILENAME'])
+            : 'unknown';
+    }
+
     //static public function parse_signed_request($signed_request, $secret)
     //{
     //    list($encoded_sig, $payload) = explode('.', $signed_request, 2);

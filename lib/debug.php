@@ -1,91 +1,90 @@
 <?php
 class Debug {
 
+    public static int $traceDepth = 1;
+
     private function __construct()
     {}
 
-    static public function ErrorLog($obj, $msg = NULL, $arr = NULL) : void
+    static public function ErrorLog(string $message, ?array $array = null) : void
     {
-        if (!isset($GLOBALS["DEBUG_OUTPUT"]))  return;
+        if (!isset($GLOBALS["DEBUG_OUTPUT"])) return;
+        Debug::$traceDepth = intval($GLOBALS["DEBUG_OUTPUT"]);
 
-        error_log(Debug::Message($obj, $msg, $arr));
-    }
-    static private function Message($obj, $msg = NULL, $arr = NULL) : string
-    {
-
-        $class = "";
-        $message = "";
-        $array = array();
-
-        if (is_object($obj)) {
-            $class = get_class($obj);
-            $message = $msg;
-            $array = $arr;
-        }
-        else {
-            $message = $obj;
-            $array = $msg;
-        }
-
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 0);
-
-        $first = $bt[0];
-        $parent = $first;
-
-        $file = basename($first["file"]);
-
-        if (count($bt) > 0) {
-            //$last = $bt[count($bt)-1];
-
-            $index = 1;
-
-            while ($index < count($bt)) {
-                $parent = $bt[$index];
-                if (isset($parent["class"])) {
-                    break;
-                }
-                $index++;
-            }
-        }
-
-        $last = $bt[count($bt) - 1];
-
-        $url = basename($_SERVER['SCRIPT_FILENAME']);
-        if (isset($last["file"])) {
-            $url = basename($last["file"]);
-        }
-
-        $line = $first["line"];
-
-        $file2 = $url;
-        if (isset($parent["file"])) {
-            $file2 = basename($parent["file"]);
-        }
-        $line2 = 0;
-        if (isset($parent["line"])) {
-            $line2 = $parent["line"];
-        }
-        else if (isset($first["line"])) {
-            $line2 = $first["line"];
-        }
-
-        if (strlen($class) < 1) {
-            if (isset($parent["class"])) {
-                $class = $parent["class"];
-            }
-        }
-        $function = $parent["function"];
-
-        $time = "";
-        if (isset($GLOBALS["DEBUG_OUTPUT_MICROTIME"])) {
-            $time = Spark::MicroTime();
-        }
-
-        if (is_array($array)) {
+        if (!is_null($array)) {
             $message .= " " . Debug::GetArrayText($array);
         }
 
-        return "$time $url [$file2:$line2] [$class::$function] $message";
+        // Clean message
+        $message = str_replace(["\r", "\n"], ' ', trim($message));
+
+        error_log(Spark::RequestScript()." ".Debug::Backtrace()." ".$message);
+    }
+
+    static private function Backtrace() : string
+    {
+
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 0);
+
+        //How many top frames to skip (default 2 = skip the logger ErrorLog and Output)
+        $relevantTrace = array_slice($trace, 2);
+
+        // Build call chain
+        $chainParts = [];
+        foreach ($relevantTrace as $frame) {
+            $file = isset($frame['file']) ? basename($frame['file']) : 'unknown';
+            $line = isset($frame['line']) ? $frame['line'] : '?';
+            $chainParts[] = "{$file}:{$line}";
+        }
+
+        $chainParts = array_reverse($chainParts);
+
+        //remove inner
+
+        $callChain = [];
+        //full chain
+        if (Debug::$traceDepth === -1) {
+            $callChain = $chainParts;
+        }
+        else if (Debug::$traceDepth === 0) {
+            //no chain
+        }
+        else {
+            $partsCount = count($chainParts);
+            if ($partsCount >= 2 + Debug::$traceDepth) {
+                $callChain[] = $chainParts[1]; //first after request name script
+
+                for ($a = $partsCount - Debug::$traceDepth; $a < $partsCount ; $a++) {
+                    $callChain[] = $chainParts[$a];
+                }
+            }
+            else {
+                $callChain = $chainParts;
+            }
+        }
+
+
+        $callChain = implode(' > ', $callChain) ? : '—';
+
+        // Function/method name from the direct caller (first relevant frame)
+        $caller = $relevantTrace[0] ?? [];
+        $functionPart = '';
+        if (isset($caller['class']) && isset($caller['function'])) {
+            $functionPart = $caller['class'] . $caller['type'] . $caller['function'];
+        } elseif (isset($caller['function'])) {
+            $functionPart = $caller['function'];
+        } else {
+            $functionPart = 'global scope';
+        }
+
+        // Final log line
+        return sprintf(
+            "%s [%s]",
+            $callChain,
+            $functionPart
+        );
+
+
     }
 
     static private function GetArrayText(array $arr) : string

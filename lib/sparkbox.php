@@ -79,40 +79,42 @@ ini_set("date.timezone", Spark::Get(Config::TIMEZONE));
 //set path and create folder if not exists
 Spark::Set(Config::CACHE_PATH, Spark::CachePath(), true);
 
-
-//Spark::DefineConfig();
-include_once("objects/SparkEventManager.php");
-include_once("pages/HTMLHead.php");
-include_once("pages/HTMLBody.php");
-SparkEventManager::register(ComponentEvent::class, HTMLHead::Instance());
-SparkEventManager::register(ComponentEvent::class, HTMLBody::Instance());
-
-//
-//define SKIP_DB to skip creating a default connection to DB
-if (Spark::Get(Config::DB_ENABLED) && !defined("SKIP_DB")) {
-
+//creating a default connection to DB
+if (Spark::Get(Config::DB_ENABLED)) {
     include_once("dbdriver/DBDriver.php");
     include_once("dbdriver/DBConnections.php");
-    include_once("objects/SparkObserver.php");
 
     //fetch local config
     include_once("config/dbconfig.php");
-    SparkEventManager::register(DBDriverEvent::class, new SparkObserver(DBConnections::connectionEvent(...)));
+
+    //include_once("objects/SparkObserver.php");
+    //SparkEventManager::register(DBDriverEvent::class, new SparkObserver(DBConnections::connectionEvent(...)));
 }
 
-include_once("utils/language.php");
+if (!Spark::isStorageRequest()) {
+    include_once("utils/language.php");
+
+    if (!Spark::isJSONRequest()) {
+        include_once("objects/SparkEventManager.php");
+        include_once("pages/HTMLHead.php");
+        include_once("pages/HTMLBody.php");
+        SparkEventManager::register(ComponentEvent::class, HTMLHead::Instance());
+        SparkEventManager::register(ComponentEvent::class, HTMLBody::Instance());
+    }
+
+    register_shutdown_function(function(){
+        include_once("storage/CacheFactory.php");
+        CacheFactory::CleanupPageCache();
+    });
+
+    include_once("utils/ErrorHandler.php");
+    function exception_error_handler(int $errNo, string $errStr, string $errFile, int $errLine) {
+        throw new ErrorHandler($errNo, $errStr, $errFile, $errLine);
+    }
+    //make all errors an exception even the warnings
+    //set_error_handler("exception_error_handler", E_ALL);
+}
 
 
 //global site wide function
 @include_once("config/globals.php");
-
-include_once("utils/ErrorHandler.php");
-function exception_error_handler(int $errNo, string $errStr, string $errFile, int $errLine) {
-    throw new ErrorHandler($errNo, $errStr, $errFile, $errLine);
-}
-//make all errors an exception even the warnings
-//set_error_handler("exception_error_handler", E_ALL);
-
-register_shutdown_function(function(){
-    CacheFactory::CleanupPageCache();
-});

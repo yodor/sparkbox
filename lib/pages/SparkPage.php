@@ -218,7 +218,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 
         Debug::ErrorLog("Authorization failed");
 
-        if (isset($_GET[JSONResponder::KEY_JSONREQUEST])) {
+        if (Spark::isJSONRequest()) {
             $response = new JSONResponse("RequestController");
             $message = tr("Your session has expired.");
             $message.= "<BR>";
