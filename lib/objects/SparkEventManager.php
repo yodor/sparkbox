@@ -1,4 +1,6 @@
 <?php
+include_once("objects/SparkEvent.php");
+include_once("objects/SparkObserver.php");
 
 class SparkEventManager
 {
