@@ -33,7 +33,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
         parent::__construct();
 
         //default thumbnail size
-        $this->setPhotoSize(-1, 64);
+        $this->setPhotoSize(0, 64);
 
     }
 

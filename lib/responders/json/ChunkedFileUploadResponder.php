@@ -75,6 +75,7 @@ class ChunkedFileUploadResponder extends ChunkedUploadControlResponder
 
     public function validator() : UploadDataValidator
     {
+        //use the normal FileUploadValidator for all the chunks ChunkedFileValidator is only for the final post
         return new FileUploadValidator();
     }
 

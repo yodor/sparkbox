@@ -69,15 +69,60 @@ abstract class UploadDataValidator implements IInputValidator
     {
         Debug::ErrorLog("Using input: '{$input->getName()}'");
 
+//        $content_length = 0;
+//        if (isset($_SERVER["CONTENT_LENGTH"])) {
+//            $content_length = $_SERVER['CONTENT_LENGTH'];
+//        }
+//
+//        Debug::ErrorLog("Content length: " . $content_length);
+
+        $object = $this->validateObject($input);
+
+        $this->validateSize($input, $object);
+
+        $this->validateMime($input, $object);
+
+    }
 
 
-        $content_length = 0;
-        if (isset($_SERVER["CONTENT_LENGTH"])) {
-            $content_length = $_SERVER['CONTENT_LENGTH'];
+    abstract public function processObject(StorageObject $object) : void;
+
+    protected function validateSize(DataInput $input, StorageObject $object) : void
+    {
+        if ($object->buffer()->length()<1 || empty($object->UID())) {
+            Debug::ErrorLog("FileStorageObject is empty ...");
+            if ($input->isRequired()) {
+                if (!$input->getForm() || $input->getForm()->getEditID() < 1) {
+                    throw new Exception("No file uploaded");
+                }
+            }
         }
+    }
 
-        Debug::ErrorLog("Content length: " . $content_length);
+    protected function validateMime(DataInput $input, StorageObject $object) : void
+    {
+        $objectMime = $this->getObjectMime($input, $object);
 
+        if (count($this->accept_mimes)>0) {
+            Debug::ErrorLog("Accepting mime types: ", $this->accept_mimes);
+            Debug::ErrorLog("Uploaded mime type: ".$objectMime);
+            if (!in_array($objectMime, $this->accept_mimes)) {
+                Debug::ErrorLog("Wrong mime type ...");
+                throw new Exception(tr("Wrong mime type: ") . $objectMime . "<Br>".tr("Accepted mime types: ") . implode(';', $this->accept_mimes));
+            }
+        }
+        else {
+            Debug::ErrorLog("Accepting all mime types");
+        }
+    }
+
+    protected function getObjectMime(DataInput $input, StorageObject $object) : string
+    {
+        return $object->buffer()->mime();
+    }
+
+    protected function validateObject(DataInput $input) : StorageObject
+    {
         //UploadDataInput processor always create default empty FileStorageObject
         $object = $input->getValue();
 
@@ -86,33 +131,6 @@ abstract class UploadDataValidator implements IInputValidator
         }
 
         Debug::ErrorLog("StorageObject class: " . get_class($object));
-
-        if ($object->buffer()->length()<1 || empty($object->UID())) {
-            Debug::ErrorLog("FileStorageObject is empty ...");
-            if ($input->isRequired()) {
-                if (!$input->getForm() || $input->getForm()->getEditID() < 1) {
-                    throw new Exception("No file uploaded");
-                }
-            }
-            return;
-        }
-
-        if (count($this->accept_mimes)>0) {
-            Debug::ErrorLog("Accepting mime types: ", $this->accept_mimes);
-            Debug::ErrorLog("Uploaded mime type: ".$object->buffer()->mime());
-            if (!in_array($object->buffer()->mime(), $this->accept_mimes)) {
-                Debug::ErrorLog("Wrong mime type ...");
-                throw new Exception(tr("Wrong mime type: ") . $object->buffer()->mime() . "<Br>".tr("Accepted mime types: ") . implode(';', $this->accept_mimes));
-            }
-        }
-        else {
-            Debug::ErrorLog("Accepting all mime types");
-        }
-
+        return $object;
     }
-
-
-    abstract public function processObject(StorageObject $object) : void;
-
-
 }

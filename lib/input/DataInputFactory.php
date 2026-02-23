@@ -188,7 +188,11 @@ class DataInputFactory
 
                 include_once("input/renderers/SessionChunkedFile.php");
                 include_once("input/processors/SessionUploadInput.php");
+                //for each chunk used inside the responder for the temporary DataInput
                 include_once("input/validators/FileUploadValidator.php");
+                //for final post
+                include_once("input/validators/ChunkedFileUploadValidator.php");
+
                 include_once("responders/json/ChunkedFileUploadResponder.php");
 
                 $input = new ArrayDataInput($name, $label, $required);
@@ -197,7 +201,7 @@ class DataInputFactory
 
                 $processor = new SessionUploadInput($input);
 
-                $validator = new FileUploadValidator();
+                $validator = new ChunkedFileUploadValidator();
                 $input->setValidator($validator);
 
                 break;
