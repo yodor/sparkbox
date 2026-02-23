@@ -77,7 +77,7 @@ $contents = <<<JS
 gtag('{$this->command}', '{$this->type}');
 JS;
         if (count($this->parameters) > 0) {
-            $parameters = json_encode($this->parameters);
+$parameters = json_encode($this->parameters);
 $contents = <<<JS
 gtag('{$this->command}', '{$this->type}', {$parameters});
 JS;
