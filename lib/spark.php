@@ -497,7 +497,7 @@ final class Spark {
 
         $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
-        if (Spark::Get(Config::DB_ENABLED)) {
+        if (Spark::GetBoolean(Config::DB_ENABLED)) {
             return DBConnections::Open()->escape($ret);
         }
         else {

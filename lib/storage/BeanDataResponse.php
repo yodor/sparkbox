@@ -70,7 +70,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         $this->cacheEntry = NULL;
 
-        if (Spark::Get(Config::STORAGE_CACHE_ENABLED) && !$this->skip_cache) {
+        if (Spark::GetBoolean(Config::STORAGE_CACHE_ENABLED) && !$this->skip_cache) {
             $this->cacheEntry = CacheFactory::BeanCacheEntry($this->cacheName(), $this->className, $this->id);
         }
 

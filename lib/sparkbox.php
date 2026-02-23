@@ -80,7 +80,7 @@ ini_set("date.timezone", Spark::Get(Config::TIMEZONE));
 Spark::Set(Config::CACHE_PATH, Spark::CachePath(), true);
 
 //creating a default connection to DB
-if (Spark::Get(Config::DB_ENABLED)) {
+if (Spark::GetBoolean(Config::DB_ENABLED)) {
     include_once("dbdriver/DBDriver.php");
     include_once("dbdriver/DBConnections.php");
 
