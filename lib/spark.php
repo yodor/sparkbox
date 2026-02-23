@@ -332,7 +332,8 @@ final class Spark {
 
     static public function AttributeValue(string $value) : string
     {
-        return htmlentities(Spark::Unescape($value), ENT_QUOTES, "UTF-8");
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, "UTF-8");
+        //return htmlentities(Spark::Unescape($value), ENT_QUOTES, "UTF-8");
     }
     static public function Unescape(?string $input, $checkbr = 0) : string
     {
@@ -496,7 +497,7 @@ final class Spark {
 
         $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
 
-        if (DBConnections::Count()>0) {
+        if (Spark::Get(Config::DB_ENABLED)) {
             return DBConnections::Open()->escape($ret);
         }
         else {
