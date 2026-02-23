@@ -17,23 +17,6 @@ include_once("objects/ActionCollection.php");
 include_once("utils/script/FBPixel.php");
 include_once("utils/script/GTAG.php");
 
-class SparkLocationScript extends PageScript
-{
-    public function code() : string
-    {
-        $page_local = new Script();
-        $local = Spark::Get(Config::LOCAL);
-        $spark_local = Spark::Get(Config::SPARK_LOCAL);
-        $storage_local = Spark::Get(Config::STORAGE_LOCAL);
-        return <<<JS
-        const LOCAL = "$local";
-        const SPARK_LOCAL = "$spark_local";
-        const STORAGE_LOCAL = "$storage_local";
-JS;
-
-    }
-
-}
 
 class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 {
@@ -135,9 +118,21 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
 
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/SparkPage.css");
 
-//        $this->head()->addJS(SPARK_LOCAL . "/js/jquery-3.7.1.min.js");
-        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/js.cookie.min.js");
+        $sparkJS = new Script();
+        $local = Spark::Get(Config::LOCAL);
+        $spark_local = Spark::Get(Config::SPARK_LOCAL);
+        $storage_local = Spark::Get(Config::STORAGE_LOCAL);
 
+$configJS = <<<JS
+document.Spark = {
+    LOCAL: "$local",
+    SPARK_LOCAL: "$spark_local",
+    STORAGE_LOCAL: "$storage_local"
+};
+JS;
+        $sparkJS->setContents($configJS);
+
+        $this->head()->addScript($sparkJS);
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkObject.js");
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkEvent.js");
 
@@ -150,11 +145,16 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/JSONRequest.js");
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/JSONComponent.js");
 
-
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/Tooltip.js");
 
+        //cookies library
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/js.cookie.min.js");
+
+        //gtm
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkGTM.js");
 
+        //use gtm
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkCookies.js");
     }
     /**
      * Set the default static instance
@@ -173,8 +173,6 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
         $this->authorize();
 
         $this->headInitialize();
-
-        $location = new SparkLocationScript();
 
         $this->actions = new ActionCollection();
 

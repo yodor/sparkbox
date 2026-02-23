@@ -1,25 +1,34 @@
+/**
+ * Cookies consent manager
+ */
+
 class SparkCookies extends SparkObject
 {
+
     constructor() {
         super();
-        this.defaultCookies = {
-            "ad_user_data": "denied", //Whether user data can be sent to Google for advertising purposes
-            "ad_personalization": "denied", //Whether data can be used for ad personalization
-            "ad_storage": "granted", //Whether ad cookies can be read/written
-            "analytics_storage": "granted" //Whether analytics cookies can be read/written
-        };
-        this.acceptedCookies = {
-            "ad_user_data": "denied",
-            "ad_personalization": "denied",
-            "ad_storage": "granted",
-            "analytics_storage": "granted"
+        SparkCookies.COOKIE_ATTRIBUTES = {
+            expires: 365,           // days
+            path: document.Spark.LOCAL,
+            secure: true,           // must be true on HTTPS
+            sameSite: 'Lax'         // or 'Strict' depending on requirements
         };
     }
 
-    accept() {
-        Cookies.set('accept_cookies', 1, { expires: 3650 });
+    accept(personalized) {
+        Cookies.set('accept_cookies', 1, SparkCookies.COOKIE_ATTRIBUTES);
+
+        let consent_user = SparkGTM.DefaultConsent;
+
+        if (personalized) {
+            consent_user = personalized;
+        }
+
+        Cookies.set('consent_user', JSON.stringify(consent_user), SparkCookies.COOKIE_ATTRIBUTES);
+
         this.checkAccepted();
         this.updateCookiesPanel();
+
     }
 
     isAccepted() {
@@ -36,14 +45,22 @@ class SparkCookies extends SparkObject
         let isAccepted = this.isAccepted();
         document.querySelector(".section.cookies").setAttribute("accepted", isAccepted);
 
-        let event = new SparkEvent(SparkEvent.GTM_EVENT, null);
+        let consent_update = SparkGTM.DefaultConsent;
 
-        if (isAccepted) {
-            event.gtm = {command:"consent", type:"update", parameters:this.acceptedCookies};
+        let consent_user = Cookies.get('consent_user');
+        if (consent_user) {
+            consent_update = JSON.parse(consent_user);
         }
-        else {
-            event.gtm = {command:"consent", type:"update", parameters:this.defaultCookies};
-        }
+
+        let event_consent = new SparkEvent(SparkEvent.GTM_EVENT, null);
+        event_consent.gtm = {command:"consent", type:"update", parameters:consent_update};
+        document.dispatchEvent(event_consent);
+
+        let event = new SparkEvent(SparkEvent.GTM_EVENT, null);
+        event.gtm = {command:"event", type:"consent_updated"};
         document.dispatchEvent(event);
+
     }
 }
+
+document.sparkCookies = new SparkCookies();

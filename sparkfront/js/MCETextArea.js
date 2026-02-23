@@ -23,7 +23,7 @@ class MCETextArea extends Component {
             extended_valid_elements: 'img[*],a[*]',
 
             // Location of TinyMCE script
-            script_url: SPARK_LOCAL + '/js/tiny_mce/tinymce.min.js',
+            script_url: document.Spark.LOCAL + '/js/tiny_mce/tinymce.min.js',
 
             strict_loading_mode: true,
             theme: "silver",

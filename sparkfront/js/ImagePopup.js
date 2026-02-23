@@ -216,7 +216,7 @@ class ImagePopup extends SparkObject {
         const itemClass = current.getAttribute("itemClass");
         const itemID = current.getAttribute("itemID");
 
-        let url = new URL(STORAGE_LOCAL, location.href);
+        let url = new URL(document.Spark.STORAGE_LOCAL, location.href);
         url.searchParams.set("cmd", "image");
         url.searchParams.set("class", itemClass);
         url.searchParams.set("id", itemID);

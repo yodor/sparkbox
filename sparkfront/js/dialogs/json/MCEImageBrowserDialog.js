@@ -50,7 +50,7 @@ class InsertImageDialog extends ConfirmMessageDialog {
             return;
         }
 
-        let image_url = new URL(STORAGE_LOCAL, location.href);
+        let image_url = new URL(document.Spark.STORAGE_LOCAL, location.href);
         image_url.searchParams.set("cmd", "image");
         image_url.searchParams.set("class", this.itemClass);
         image_url.searchParams.set("id", this.imageID);

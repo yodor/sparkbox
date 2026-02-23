@@ -1,6 +1,16 @@
 class SparkGTM {
-
+    static DefaultConsent = {
+        "ad_user_data": "denied", //Whether user data can be sent to Google for advertising purposes
+        "ad_personalization": "denied", //Whether data can be used for ad personalization
+        "ad_storage": "granted", //Whether ad cookies can be read/written
+        "analytics_storage": "granted" //Whether analytics cookies can be read/written
+    }
     constructor() {
+
+        gtag('consent', 'default', SparkGTM.DefaultConsent);
+
+        gtag('js', new Date());
+
         document.addEventListener(SparkEvent.GTM_EVENT, (event) => this.handleEvent(event));
     }
 
@@ -51,6 +61,5 @@ window.dataLayer = window.dataLayer || [];
 function gtag() {
     window.dataLayer.push(arguments);
 }
-gtag('js', new Date());
 
 document.sparkGTM = new SparkGTM();
