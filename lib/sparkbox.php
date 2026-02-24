@@ -3,7 +3,7 @@
 
 if (!defined("APP_PATH")) throw new Exception("APP_PATH is not defined");
 
-require_once(APP_PATH."/config/boot.php");
+if (file_exists(APP_PATH."/config/boot.php")) include_once(APP_PATH."/config/boot.php");
 
 if (defined("REQUEST_THROTTLE_USERAGENT")) {
     include_once("ratelimit.php");
@@ -41,7 +41,7 @@ Spark::EnableBeanLocation("class/auth/");
 
 
 //call local deployment configuration
-include_once(APP_PATH."/config/settings.php");
+if (file_exists(APP_PATH."/config/settings.php")) include_once(APP_PATH."/config/settings.php");
 
 //merge get/post into the request array prevent cookie mix in
 $_REQUEST = array_merge($_GET, $_POST);
