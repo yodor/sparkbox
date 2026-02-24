@@ -1,13 +1,9 @@
 <?php
 
 
-//no forced redirect to https if it is in http
-//$GLOBALS["FORCE_HTTPS"] = "";
-//no subdomain redirect
-//$GLOBALS["NO_SUBDOMAIN_REDIRECT"] = "";
-//default redirect subdomains or set to the desired subdomains
-//$GLOBALS["REDIRECT_SUBDOMAINS"] = "www;mail";
-if (!isset($install_path)) throw new Exception("Install path is not defined");
+if (!defined("APP_PATH")) throw new Exception("APP_PATH is not defined");
+
+require_once(APP_PATH."/config/boot.php");
 
 if (defined("REQUEST_THROTTLE_USERAGENT")) {
     include_once("ratelimit.php");
@@ -24,9 +20,19 @@ include_once("spark.php");
 
 //debugging helper
 include_once("debug.php");
+if (defined("DEBUG_LEVEL")) {
+    Debug::$traceDepth = intval(DEBUG_LEVEL);
+}
+if (getenv("DEBUG_LEVEL", true)!==false) {
+    Debug::$traceDepth = intval(getenv("DEBUG_LEVEL", true));
+}
 
+Spark::Set(Config::SPARKBOX_PATH, realpath(dirname(__DIR__)), true);
 
-Spark::Initialize($install_path);
+// /sparkbox/lib;.
+Spark::IncludePath(Spark::Get(Config::SPARKBOX_PATH).DIRECTORY_SEPARATOR."lib");
+
+Spark::Initialize();
 
 Spark::EnableBeanLocation("beans/");
 Spark::EnableBeanLocation("auth/");
@@ -35,7 +41,7 @@ Spark::EnableBeanLocation("class/auth/");
 
 
 //call local deployment configuration
-include_once("config/defaults.php");
+include_once(APP_PATH."/config/settings.php");
 
 //merge get/post into the request array prevent cookie mix in
 $_REQUEST = array_merge($_GET, $_POST);
@@ -85,13 +91,14 @@ if (Spark::GetBoolean(Config::DB_ENABLED)) {
     include_once("dbdriver/DBConnections.php");
 
     //fetch local config
-    include_once("config/dbconfig.php");
+    require_once(APP_PATH."/config/dbconfig.php");
 
     //include_once("objects/SparkObserver.php");
     //SparkEventManager::register(DBDriverEvent::class, new SparkObserver(DBConnections::connectionEvent(...)));
 }
 
 if (!Spark::isStorageRequest()) {
+
     include_once("utils/language.php");
 
     if (!Spark::isJSONRequest()) {
@@ -116,5 +123,14 @@ if (!Spark::isStorageRequest()) {
 }
 
 
-//global site wide function
-@include_once("config/globals.php");
+//other libs initialisation
+if (file_exists(APP_PATH."/config/include.php")) include_once(APP_PATH."/config/include.php");
+//set app include path
+Spark::IncludePath(APP_PATH);
+//boot complete local app initialization
+if (file_exists(APP_PATH."/config/app.php")) include_once(APP_PATH."/config/app.php");
+
+if (Spark::isStorageRequest()) {
+    include_once("sparkstorage.php");
+    exit;
+}

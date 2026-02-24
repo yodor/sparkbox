@@ -78,7 +78,7 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->url->add(new URLParameter("width", $width));
         $this->url->add(new URLParameter("height", $height));
 
-        if (Spark::Get(Config::STORAGE_ITEM_SLUG)) {
+        if (Spark::GetBoolean(Config::STORAGE_ITEM_SLUG)) {
             return $this->SlugURL();
         }
         else {
@@ -133,7 +133,7 @@ class StorageItem extends DataObject implements JsonSerializable
             $cmd = "data";
         }
 
-        $this->url = new URL(Spark::Get(Config::STORAGE_LOCAL));
+        $this->url = new URL(Spark::Get(Config::STORAGE_URL));
 
         $this->url->add(new URLParameter("cmd", $cmd));
         $this->url->add(new URLParameter("class", $this->className));

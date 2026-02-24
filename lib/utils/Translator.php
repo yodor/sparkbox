@@ -26,27 +26,27 @@ class Translator implements IRequestProcessor, IGETConsumer
     }
     /**
      * All captured texts for translation during translatePhrase()
-     * @var SiteTextsBean
+     * @var SiteTextsBean|null
      */
-    protected SiteTextsBean $phrases;
+    protected ?SiteTextsBean $phrases = null;
 
     /**
      * Translated content of the captured phrases
-     * @var TranslationPhrasesBean
+     * @var TranslationPhrasesBean|null
      */
-    protected TranslationPhrasesBean $translated_phrases;
+    protected ?TranslationPhrasesBean $translated_phrases = null;
 
     /**
      * Translated bean content
-     * @var BeanTranslationsBean
+     * @var BeanTranslationsBean|null
      */
-    protected BeanTranslationsBean $translated_beans;
+    protected ?BeanTranslationsBean $translated_beans = null;
 
     /**
      * Available languages
-     * @var LanguagesBean
+     * @var LanguagesBean|null
      */
-    protected LanguagesBean $languages;
+    protected ?LanguagesBean $languages = null;
 
     /**
      * The currently active language - Primary key value from LanguagesBean
@@ -102,6 +102,12 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     private function __construct()
     {
+        if (!Spark::GetBoolean(Config::TRANSLATOR_ENABLED)) {
+            Debug::ErrorLog("Translator not enabled in config");
+            $this->setEnabled(false);
+            return;
+        }
+
         try {
             $this->initialize();
             $this->processInput();

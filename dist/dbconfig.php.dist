@@ -1,0 +1,16 @@
+<?php
+//
+//SparkBox Default DB Connection initialization sample file
+//Location: APP_PATH/config/dbconfig.php
+//
+
+$prop = new DBConnection();
+$prop->driver = "MySQLi";
+
+$prop->database = "database_name";
+$prop->user = "user_name";
+$prop->pass = "user_pass";
+$prop->host = "127.0.0.1";
+$prop->port = "3306";
+
+DBConnections::Add($prop);

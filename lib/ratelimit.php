@@ -21,7 +21,7 @@ function readPacket($fh) : array
     flock($fh, LOCK_UN);
     return $data;
 }
-function rateCheck(string $install_path) : void
+function rateCheck() : void
 {
     $names = explode("|", REQUEST_THROTTLE_USERAGENT);
 
@@ -40,7 +40,7 @@ function rateCheck(string $install_path) : void
 
         if (!str_contains($userAgent, $nameMatch)) continue;
 
-        $installID = hash('xxh3', $install_path);
+        $installID = hash('xxh3', constant("SPARK_APP_ROOT"));
 
         //temporary file for each installation and userAgent name
         $tmpFile = sys_get_temp_dir() . "/" . $nameMatch . "-" . $installID;
@@ -90,5 +90,5 @@ function rateCheck(string $install_path) : void
 
 
 }
-if (!isset($install_path))throw new Exception("INSTALL_PATH not set");
-rateCheck($install_path);
+
+rateCheck();

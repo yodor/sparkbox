@@ -28,7 +28,7 @@ class SparkWatermark
             //no watermark filename in config
             if ($watermarkFilename) {
 
-                $filename = Spark::Get(Config::INSTALL_PATH).DIRECTORY_SEPARATOR.$watermarkFilename;
+                $filename = Spark::Get(Config::APP_PATH).DIRECTORY_SEPARATOR.$watermarkFilename;
 
                 $this->file = new SparkFile(realpath($filename));
                 Debug::ErrorLog("Watermark using file: ". $this->file->getAbsoluteFilename());

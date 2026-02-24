@@ -121,7 +121,7 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
         $sparkJS = new Script();
         $local = Spark::Get(Config::LOCAL);
         $spark_local = Spark::Get(Config::SPARK_LOCAL);
-        $storage_local = Spark::Get(Config::STORAGE_LOCAL);
+        $storage_local = Spark::Get(Config::STORAGE_URL);
 
 $configJS = <<<JS
 document.Spark = {

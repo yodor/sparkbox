@@ -1,0 +1,11 @@
+; .user.ini.dist — Configuration template
+;
+; INSTRUCTIONS:
+; 1. Copy this file to .user.ini in the document root
+;    cp .user.ini.dist WWW_ROOT/.user.ini
+; 2. Replace placeholders with real values for this environment
+;
+;user_ini.cache_ttl = 60
+;include_path = "_ABSOLUTE_SPARKBOX_PATH_/lib"
+;auto_prepend_file = "_ABSOLUTE_APP_PATH_/sparkboot.php"
+;error_log = "_ABSOLUTE_LOG_PATH_/php-errors.log"

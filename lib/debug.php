@@ -1,15 +1,22 @@
 <?php
-class Debug {
+final class Debug {
 
-    public static int $traceDepth = 1;
+    /**
+     * DEBUG_LEVEL constant value define("DEBUG_LEVEL", value) in APP_PATH/config/boot.php
+     * DEBUG_LEVEL = -2 or unset : debug is disabled
+     * DEBUG_LEVEL = -1 : full function call chain and message
+     * DEBUG_LEVEL = 0 : no function call chain and message
+     * DEBUG_LEVEL = 1 : first-last function call chain and message
+     * DEBUG_LEVEL = >1 : first-last chain with addition 'level' number of chains from bottom call and message
+     * @var int
+     */
+    public static int $traceDepth = -2;
 
-    private function __construct()
-    {}
+    private function __construct() {}
 
-    static public function ErrorLog(string $message, ?array $array = null) : void
+    final static public function ErrorLog(string $message, ?array $array = null) : void
     {
-        if (!isset($GLOBALS["DEBUG_OUTPUT"])) return;
-        Debug::$traceDepth = intval($GLOBALS["DEBUG_OUTPUT"]);
+        if (Debug::$traceDepth == -2) return; //disabled
 
         if (!is_null($array)) {
             $message .= " " . Debug::GetArrayText($array);
@@ -104,7 +111,7 @@ class Debug {
             }
             else if (is_array($val)) {
                 //$message = print_r($val, true);
-                $message = Debug::GetArrayText($val);
+                $message = "Array [ ".Debug::GetArrayText($val)." ]";
             }
             else if (is_object($val)) {
                 $message = get_class($val);

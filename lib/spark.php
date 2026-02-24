@@ -1,6 +1,9 @@
 <?php
 final class Marshall {
-    static public function String(mixed $value): string
+
+    private function __construct() {}
+
+    final static public function String(mixed $value): string
     {
         if (is_string($value)) {
             return $value;
@@ -14,7 +17,7 @@ final class Marshall {
         return (string) $value;
     }
 
-    static public function Boolean(mixed $value): bool
+    final static public function Boolean(mixed $value): bool
     {
         if (is_string($value)) {
             $value = trim(strtolower($value));
@@ -25,7 +28,7 @@ final class Marshall {
 
         return (bool) $value;
     }
-    static public function Float(mixed $value): float
+    final static public function Float(mixed $value): float
     {
         if (is_numeric($value)) {
             return (float) $value;
@@ -41,7 +44,7 @@ final class Marshall {
         throw new Exception("Invalid float: " . $value);
     }
 
-    static public function Integer(mixed $value): int
+    final static public function Integer(mixed $value): int
     {
         if (is_numeric($value)) {
             return (int) $value;
@@ -63,7 +66,7 @@ final class Marshall {
      * @param string $umf
      * @return int
      */
-    static public function FromByteLabel(string $umf) : int
+    final static public function FromByteLabel(string $umf) : int
     {
         $result = 0;
         $sizes = array("K", "M", "G", "T", "P", "E", "Z", "Y");
@@ -85,25 +88,38 @@ final class Spark {
     static array $constDefines = array();
     static array $beanLocations = array();
 
-    private function __construct()
-    {}
+    final private function __construct() {
 
-    static public function Initialize(string $install_path) : void
+    }
+
+    /**
+     * Add $path to the current include_path
+     * @param string $path
+     * @return void
+     */
+    final static function IncludePath(string $path) : void
+    {
+        $includes = array_flip(explode(PATH_SEPARATOR, get_include_path()));
+        $includes[realpath($path)] = true;
+        unset($includes["."]);
+        $includes["."] = true;
+        set_include_path(implode(PATH_SEPARATOR, array_keys($includes)));
+        //error_log("Include Path: " . get_include_path());
+    }
+
+    final static public function Initialize() : void
     {
 
-        Spark::Set(Config::INSTALL_PATH, $install_path, true);
+        Spark::Set(Config::APP_PATH, constant("APP_PATH"), true);
 
-        //static values can not be overwritten
-        //$doc_root = preg_replace("!${_SERVER['SCRIPT_NAME']}$!", '', realpath($_SERVER['SCRIPT_FILENAME']));
-        //$location = preg_replace("!^${doc_root}!", '', $install_path);
         $doc_full = realpath($_SERVER['DOCUMENT_ROOT']);
-        $location = preg_replace("!^{$doc_full}!", "", $install_path);
+        $location = preg_replace("!^{$doc_full}!", "", constant("APP_PATH"));
 
         Spark::Set(Config::LOCAL, $location, true);
         Spark::Set(Config::SPARK_LOCAL, $location . "/sparkfront", true);
 
         Spark::Set(Config::ADMIN_LOCAL, $location . "/admin", true);
-        Spark::Set(Config::STORAGE_LOCAL, $location . "/storage.php", true);
+        Spark::Set(Config::STORAGE_URL, $location . "/storage.php", true);
 
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         Spark::Set(Config::SITE_PROTOCOL, $protocol, true);
@@ -177,10 +193,10 @@ final class Spark {
         Spark::Set(Config::SITE_TITLE, "Default SparkBox Site");
     }
 
-    static public function CachePath() : string
+    final static public function CachePath() : string
     {
 
-        $result = dirname(Spark::Get(Config::INSTALL_PATH)) . DIRECTORY_SEPARATOR . "sparkcache" . DIRECTORY_SEPARATOR . Spark::Get(Config::SITE_TITLE);
+        $result = dirname(Spark::Get(Config::APP_PATH)) . DIRECTORY_SEPARATOR . "sparkcache" . DIRECTORY_SEPARATOR . Spark::Get(Config::SITE_TITLE);
 
         if (!file_exists($result)) {
             Debug::ErrorLog("Creating cache folder: " . $result);
@@ -191,7 +207,7 @@ final class Spark {
         return $result;
     }
 
-    static public function EnableBeanLocation(string $class_location, bool $enabled=true) : void
+    final static public function EnableBeanLocation(string $class_location, bool $enabled=true) : void
     {
         Spark::$beanLocations[$class_location] = $enabled;
     }
@@ -202,7 +218,7 @@ final class Spark {
      * @return void
      * @throws Exception
      */
-    static public function LoadBeanClass(string $class_name) : void
+    final static public function LoadBeanClass(string $class_name) : void
     {
         Debug::ErrorLog("Including bean class: $class_name");
         foreach (Spark::$beanLocations as $location => $enabled) {
@@ -230,7 +246,7 @@ final class Spark {
      * @return void
      * @throws Exception
      */
-    static public function Set(string $name, string|float|int|bool $value, bool $isStatic=false) : void
+    final static public function Set(string $name, string|float|int|bool $value, bool $isStatic=false) : void
     {
         if (isset(Spark::$constDefines[$name])) {
             throw new Exception("Static '$name' already assigned");
@@ -241,7 +257,7 @@ final class Spark {
         }
     }
 
-    static public function Get(string $name, string $default="") : string|float|int|bool
+    final static public function Get(string $name, string $default="") : string|float|int|bool
     {
         if (isset(Spark::$defines[$name])) {
             return Spark::$defines[$name];
@@ -249,22 +265,22 @@ final class Spark {
         else return $default;
 
     }
-    static public function GetBoolean(string $name) : bool
+    final static public function GetBoolean(string $name) : bool
     {
         $result = Spark::Get($name);
         return Marshall::Boolean($result);
     }
-    static public function GetString(string $name) : string
+    final static public function GetString(string $name) : string
     {
         $result = Spark::Get($name);
         return Marshall::String($result);
     }
-    static public function GetInteger(string $name) : int
+    final static public function GetInteger(string $name) : int
     {
         $result = Spark::Get($name);
         return Marshall::Integer($result);
     }
-    static public function GetFloat(string $name) : float
+    final static public function GetFloat(string $name) : float
     {
         $result = Spark::Get($name);
         return Marshall::Float($result);
@@ -275,7 +291,7 @@ final class Spark {
      * Export each config variable as constant using define() function. Skip already defined.
      * @return void
      */
-    static public function DefineConfig() : void
+    final static public function DefineConfig() : void
     {
         foreach (Spark::$defines as $key => $val) {
             if (defined($key)) {
@@ -285,7 +301,7 @@ final class Spark {
         }
     }
 
-    static public function Dump() : void
+    final static public function Dump() : void
     {
         foreach (Spark::$defines as $key => $val) {
             echo $key . "=>" . $val;
@@ -299,12 +315,12 @@ final class Spark {
      * @param string $algorithm Default algorithm xxh3
      * @return string
      */
-    static public function Hash(string $data, string $algorithm="xxh3") : string
+    final static public function Hash(string $data, string $algorithm="xxh3") : string
     {
         return hash('xxh3', $data);
     }
 
-    static public function Slugify(string $text) : string
+    final static public function Slugify(string $text) : string
     {
         // Convert to lowercase and normalize special characters
         $text = mb_strtolower($text, 'UTF-8');
@@ -325,17 +341,17 @@ final class Spark {
         return $text;
     }
 
-    static public function IsEmptyPassword($password) : bool
+    final static public function IsEmptyPassword($password) : bool
     {
         return (strcmp($password, "d41d8cd98f00b204e9800998ecf8427e") == 0);
     }
 
-    static public function AttributeValue(string $value) : string
+    final static public function AttributeValue(string $value) : string
     {
         return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, "UTF-8");
         //return htmlentities(Spark::Unescape($value), ENT_QUOTES, "UTF-8");
     }
-    static public function Unescape(?string $input, $checkbr = 0) : string
+    final static public function Unescape(?string $input, $checkbr = 0) : string
     {
         if (!is_null($input)) {
             $search = array("\\\\", "\\0", "\\n", "\\r", "\Z", "\'", '\"');
@@ -344,7 +360,7 @@ final class Spark {
         }
         return "";
     }
-    static public function ReplaceTags(string $text, string $replacement=" ") : string
+    final static public function ReplaceTags(string $text, string $replacement=" ") : string
     {
 
         // ----- remove HTML TAGs -----
@@ -361,7 +377,7 @@ final class Spark {
         return $text;
 
     }
-    static public function MetaDescription(string $value, int $max_length = -1) : string
+    final static public function MetaDescription(string $value, int $max_length = -1) : string
     {
 
         $value = str_replace("\\r\\n", " ", $value);
@@ -377,7 +393,7 @@ final class Spark {
         return $value;
     }
 
-    static public function DeleteFolder(string $dirPath) : void
+    final static public function DeleteFolder(string $dirPath) : void
     {
         if (!is_dir($dirPath)) {
             throw new RuntimeException("$dirPath must be a directory");
@@ -396,14 +412,14 @@ final class Spark {
         }
         rmdir($dirPath);
     }
-    static public function DateFormat(string $date, bool $time = TRUE) : string
+    final static public function DateFormat(string $date, bool $time = TRUE) : string
     {
         $tm = "";
         if ($time) $tm = "H:i";
 
         return date("j F Y $tm", strtotime($date));
     }
-    static public function MicroTime() : float
+    final static public function MicroTime() : float
     {
         list($usec, $sec) = explode(" ", microtime());
         return ((float)$usec + (float)$sec);
@@ -417,13 +433,13 @@ final class Spark {
      * @param array|null $arr
      * @return bool
      */
-    static public function strcmp_isset(string $key, string $val, ?array $arr = NULL): bool
+    final static public function strcmp_isset(string $key, string $val, ?array $arr = NULL): bool
     {
         if (!$arr) $arr = $_GET;
         return (isset($arr[$key]) && (strcmp($arr[$key], $val) == 0));
     }
 
-    static public function HtmlStrip(string $data_str, string $allowable_tags = "<center><p><span><div><br><a>", array $allowable_attrs = array('href','src','alt','title')) : string
+    final static public function HtmlStrip(string $data_str, string $allowable_tags = "<center><p><span><div><br><a>", array $allowable_attrs = array('href','src','alt','title')) : string
     {
         // define allowable tags
         // define allowable attributes
@@ -458,12 +474,12 @@ final class Spark {
 
     }
 
-    static public function DefaultAcceptedTags() : string
+    final static public function DefaultAcceptedTags() : string
     {
         return "<br><p><a><ul><ol><li><b><u><i><h1><h2><h3><h4><h5><h6><center><sub><sup><hr><img><object><video><embed><iframe><strong><em><span>";
     }
 
-    static public function SanitizeInput(array|string $value, $accepted_tags = NULL) : array|string
+    final static public function SanitizeInput(array|string $value, $accepted_tags = NULL) : array|string
     {
         if (is_array($value)) return Spark::SafeArray($value, $accepted_tags);
         return Spark::SafeValue($value, $accepted_tags);
@@ -490,7 +506,7 @@ final class Spark {
 
     }
 
-//if get_magic_quotes_gpc();         // 1 then post data is already escaped
+    //if get_magic_quotes_gpc();         // 1 then post data is already escaped
     static private function SafeValue($val, $accepted_tags = NULL) : string
     {
         if (is_null($accepted_tags)) $accepted_tags = Spark::DefaultAcceptedTags();
@@ -524,14 +540,14 @@ final class Spark {
         return strtr($unescaped_string, $replacementMap);
     }
 
-    static public function ByteLabel($size) : string
+    final static public function ByteLabel($size) : string
     {
         $filesizename = array(" Bytes", " KB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB");
         return $size ? round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $filesizename[$i] : '0 Bytes';
     }
 
 
-    static public function Base64URLDecode($input) : false|string
+    final static public function Base64URLDecode($input) : false|string
     {
         return base64_decode(strtr($input, '-_', '+/'));
     }
@@ -551,24 +567,24 @@ final class Spark {
         return $title;
     }
 
-    static public function SiteTitle(array $path) : string
+    final static public function SiteTitle(array $path) : string
     {
         $title = Spark::SiteTitleArray($path);
 
         return implode(Spark::Get(Config::TITLE_PATH_SEPARATOR), $title);
     }
 
-    static public function isStorageRequest() : bool
+    final static public function isStorageRequest() : bool
     {
-        return (strcasecmp(Spark::RequestScript(), "storage.php")===0);
+        return isset($_GET["StorageRequest"]) || (strcasecmp(Spark::RequestScript(), "storage.php")===0);
     }
 
-    static public function isJSONRequest() : bool
+    final static public function isJSONRequest() : bool
     {
         return isset($_REQUEST[Config::KEY_JSON_REQUEST]);
     }
 
-    static public function RequestScript() : string
+    final static public function RequestScript() : string
     {
         return isset($_SERVER['SCRIPT_FILENAME'])
             ? basename($_SERVER['SCRIPT_FILENAME'])

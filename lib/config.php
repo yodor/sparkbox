@@ -1,39 +1,43 @@
 <?php
-class Config {
+enum Config
+{
 
     /**
      * Backend cache path
-     * Static(string): 'Parent folder of install_path'/sparkcache/SITE_TITLE;
+     * Static(string): 'Parent folder of APP_PATH'/sparkcache/SITE_TITLE;
      */
     const string CACHE_PATH = "CACHE_PATH";
     /**
-     * App/Site root deployment location - Server-side path
+     * App/Site root - Server-side path
      * Static(string)
      */
-    const string INSTALL_PATH = "INSTALL_PATH";
+    const string APP_PATH = "APP_PATH";
+
+    const string SPARKBOX_PATH = "SPARKBOX_PATH";
+
     /**
-     * App/Site root deployment - HTTP accessible - without ending slash
+     * App root/deployment URL - without ending slash
      * Static(string)
      */
     const string LOCAL = "LOCAL";
     /**
-     * SparkBox frontend classes location (js/css/images) - HTTP accessible - without ending slash
+     * SparkBox frontend classes URL (js/css/images) - without ending slash
      * Default to LOCAL/sparkfront
      * Static(string)
      */
     const string SPARK_LOCAL = "SPARK_LOCAL";
     /**
-     * Administrative module location - HTTP accessible - without ending slash
+     * Administrative module URL - without ending slash
      * Default to LOCAL/admin
      * Static(string)
      */
     const string ADMIN_LOCAL = "ADMIN_LOCAL";
     /**
-     * Data bean storage location - HTTP accessible - without ending slash
+     * Storage backend access URL
      * Default to LOCAL/storage.php
      * Static(string)
      */
-    const string STORAGE_LOCAL = "STORAGE_LOCAL";
+    const string STORAGE_URL = "STORAGE_URL";
     /**
      * Current protocol
      * Static(string)
