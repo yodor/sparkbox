@@ -196,7 +196,7 @@ final class Spark {
     final static public function CachePath() : string
     {
 
-        $result = dirname(Spark::Get(Config::APP_PATH)) . DIRECTORY_SEPARATOR . "sparkcache" . DIRECTORY_SEPARATOR . Spark::Get(Config::SITE_TITLE);
+        $result = dirname(Spark::Get(Config::APP_PATH)) . DIRECTORY_SEPARATOR . "sparkcache" . DIRECTORY_SEPARATOR . mb_strtolower(Spark::Get(Config::SITE_TITLE));
 
         if (!file_exists($result)) {
             Debug::ErrorLog("Creating cache folder: " . $result);
