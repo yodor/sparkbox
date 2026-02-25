@@ -119,7 +119,7 @@ final class Spark {
         Spark::Set(Config::SPARK_LOCAL, $location . "/sparkfront", true);
 
         Spark::Set(Config::ADMIN_LOCAL, $location . "/admin", true);
-        Spark::Set(Config::STORAGE_URL, $location . "/storage.php", true);
+        Spark::Set(Config::STORAGE_URL, $location . "/sparkboot.php?StorageRequest", true);
 
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         Spark::Set(Config::SITE_PROTOCOL, $protocol, true);
