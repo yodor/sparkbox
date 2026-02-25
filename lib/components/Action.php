@@ -40,7 +40,7 @@ class Action extends DataIteratorItem
         $this->url = new URL($href);
 
         if ($action) {
-            $this->setAttribute("action", $action);
+            $this->setAction($action);
             $this->setContents($action);
         }
 
