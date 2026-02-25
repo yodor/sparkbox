@@ -7,15 +7,13 @@ class MenuItemRenderer extends Container
     protected ?Component $linkTag  = null;
     protected ?MenuListRenderer $submenu = null;
 
+    public static string $href_prefix = "";
+    public static bool $append_parent_href = false;
+
     public function __construct()
     {
         parent::__construct(false);
         $this->setComponentClass("Item");
-
-//        $container = new Container(false);
-//        $container->setComponentClass("Outer");
-//
-//        $this->items()->append($container);
 
         $this->linkTag = new Component(false);
         $this->linkTag->setTagName("a");
@@ -57,7 +55,8 @@ class MenuItemRenderer extends Container
         }
 
         if ($item->getHref()) {
-            $this->linkTag->setAttribute("href", $item->getHref());
+            $href = MenuItemRenderer::PathHref($item);
+            $this->linkTag->setAttribute("href", $href);
             $this->linkTag->setAttribute("itemprop","url");
         }
 
@@ -69,8 +68,6 @@ class MenuItemRenderer extends Container
         }
 
         $this->linkTag->setContents($contents);
-
-
 
         if ($item->count() > 0) {
             $this->setAttribute("have_submenu", "1");
@@ -88,4 +85,26 @@ class MenuItemRenderer extends Container
 
     }
 
+    public static function PathHref(MenuItem $item) : string
+    {
+        $result = $item->getHref();
+
+        if (MenuItemRenderer::$append_parent_href) {
+            $href = array();
+            $href[] = $item->getHref();
+
+            $current = $item;
+            while ($parent = $current->getParent()) {
+                $href[] = $parent->getHref();
+                $current = $parent;
+            }
+
+            $result = implode("/", array_reverse($href));
+        }
+
+        if (MenuItemRenderer::$href_prefix) {
+            $result = MenuItemRenderer::$href_prefix . $result;
+        }
+        return $result;
+    }
 }

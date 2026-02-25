@@ -20,7 +20,10 @@ class MenuListRenderer extends Component {
             $this->setRenderEnabled(true);
         }
     }
-
+    public function getItemList() : ?MenuItemList
+    {
+        return $this->itemList;
+    }
     protected function renderImpl(): void
     {
         static $renderer = new MenuItemRenderer();
