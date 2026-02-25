@@ -138,17 +138,20 @@ class MenuItem extends MenuItemList
      * @param bool $mode
      * @return void
      */
-    public function setSelected(bool $mode) : void
+    public function setSelected(bool $mode, bool $alsoParents = true) : void
     {
         $this->selected = $mode;
 
-        $current = $this;
-        while ($parent = $current->getParent()) {
-            if ($parent instanceof MenuItem) {
-                $parent->setSelected($mode);
-                $current = $parent;
+        if ($alsoParents) {
+            $current = $this;
+            while ($parent = $current->getParent()) {
+                if ($parent instanceof MenuItem) {
+                    $parent->setSelected($mode);
+                    $current = $parent;
+                }
             }
         }
+
     }
 
     public function setTarget(string $target) : void
