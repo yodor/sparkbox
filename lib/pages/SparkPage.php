@@ -6,7 +6,7 @@ include_once("objects/SparkEventManager.php");
 
 include_once("components/renderers/IHeadContents.php");
 include_once("components/renderers/IPageComponent.php");
-include_once("components/Template.php");
+include_once("components/HTMLTemplate.php");
 
 include_once("beans/ConfigBean.php");
 

@@ -38,7 +38,7 @@ class HTMLBody extends Container implements IObserver
         }
         else {
             if ($cmp instanceof ITemplate) {
-                $template = new Template();
+                $template = new HTMLTemplate();
                 $template->setID($cmp->templateID());
                 $template->items()->append($cmp);
                 $this->page_components[$template->getID()] = $template;

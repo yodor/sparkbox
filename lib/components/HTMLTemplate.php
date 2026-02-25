@@ -1,7 +1,7 @@
 <?php
 include_once("components/Container.php");
 
-class Template extends Container
+class HTMLTemplate extends Container
 {
 
     protected string $id = "";
