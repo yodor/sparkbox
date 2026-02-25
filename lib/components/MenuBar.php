@@ -24,8 +24,7 @@ class MenuBar extends Container
     /**
      * @var MenuItemList
      */
-    protected MenuItemList $menu;
-
+    protected ?MenuItemList $menu = null;
     /**
      * @var MenuListRenderer
      */
@@ -38,7 +37,7 @@ class MenuBar extends Container
 
     protected MenuBarInitScript $initScript;
 
-    public function __construct(MenuItemList $menu)
+    public function __construct(?MenuItemList $menu=null)
     {
         parent::__construct(false);
         $this->setComponentClass("MenuBar");
@@ -48,8 +47,6 @@ class MenuBar extends Container
         $this->setAttribute("itemtype","https://schema.org/SiteNavigationElement");
         $this->setAttribute("role", "menu");
 
-        $this->menu = $menu;
-
         $this->toggle = new Component(false);
         $this->toggle->setTagName("SPAN");
         $this->toggle->setContents( "<div></div>");
@@ -57,18 +54,15 @@ class MenuBar extends Container
 
         $this->bar = new MenuListRenderer();
         $this->bar->setComponentClass("ItemList");
-        $this->bar->setItemList($menu);
 
         $this->items->append($this->toggle);
         $this->items->append($this->bar);
 
         $this->initScript = new MenuBarInitScript();
 
-        if ($this->menu->getName()) {
-            $this->setAttribute("id", $this->menu->getName());
-            $this->initScript->setName($this->menu->getName());
+        if ($menu) {
+            $this->setMenu($menu);
         }
-
     }
 
     public function requiredStyle() : array
@@ -85,9 +79,19 @@ class MenuBar extends Container
         return $arr;
     }
 
-    public function getMenu(): MenuItemList
+    public function getMenu(): ?MenuItemList
     {
         return $this->menu;
+    }
+    public function setMenu(MenuItemList $itemList) : void
+    {
+        $this->menu = $itemList;
+        $this->bar->setItemList($itemList);
+
+        if ($this->menu->getName()) {
+            $this->setAttribute("id", $this->menu->getName());
+            $this->initScript->setName($this->menu->getName());
+        }
     }
 
     public function getBar() : MenuListRenderer
