@@ -16,6 +16,66 @@ class MenuItemList extends SparkList
         }
     }
 
+    public function matchPath(int &$idx, array $matchPath, array &$matched) : void
+    {
+        if ($idx > count($matchPath)-1) return;
+
+        //Debug::ErrorLog("Start Matching: IDX=$idx PathSegment: $matchPath[$idx] : ItemListCount: {$this->count()}");
+
+        $found = null;
+
+        $iterator = $this->iterator();
+        while ($item = $iterator->next()) {
+            if (!($item instanceof MenuItem)) continue;
+
+            if (strcasecmp($matchPath[$idx], $item->getHref()) === 0) {
+                $found = $item;
+                break;
+            }
+        }
+
+        if ($found instanceof MenuItem) {
+            $matched[] = $item;
+            $idx++;
+            $found->matchPath($idx, $matchPath, $matched);
+        }
+
+    }
+    public static function splitPath(string $path): array
+    {
+        // Split by / and filter out empty elements
+        $parts = array_filter(
+            explode('/', $path),
+            fn($segment) => $segment !== ''
+        );
+
+        // Re-index the array (optional but cleaner)
+        return array_values($parts);
+    }
+
+    public function selectPath(string $path, bool $setSelected = true) : array
+    {
+        if ($setSelected) {
+            $this->deselect();
+        }
+
+        $matchPath = MenuItem::splitPath($path);
+
+        $idx = 0;
+        $matched = array();
+
+        $this->matchPath($idx, $matchPath, $matched);
+
+        if ($setSelected) {
+            if (count($matched) > 0) {
+                $last = end($matched);
+                if ($last instanceof MenuItem) {
+                    $last->setSelected(true, true);
+                }
+            }
+        }
+        return $matched;
+    }
     /**
      * Select active MenuItem by matching the current page URL with the MenuItem url
      * Matches by full url, then scriptName only, then scriptPath only
@@ -28,12 +88,14 @@ class MenuItemList extends SparkList
     const string MATCH_PATH = "MATCH_PATH";
     const array DEFAULT_SELECT_MATCHERS = array(MenuItemList::MATCH_FULL,MenuItemList::MATCH_PARTIAL,MenuItemList::MATCH_SCRIPT,MenuItemList::MATCH_PATH);
 
-    public function selectActive(array $matchers = MenuItemList::DEFAULT_SELECT_MATCHERS, bool $match_first=true) : ?MenuItem
+    public function selectActive(array $matchers = MenuItemList::DEFAULT_SELECT_MATCHERS, bool $match_first=true, ?URL $pageURL = null) : ?MenuItem
     {
 
         Debug::ErrorLog("Select matchers: ", $matchers);
 
-        $pageURL = URL::Current();
+        if (is_null($pageURL)) {
+            $pageURL = URL::Current();
+        }
 
         Debug::ErrorLog("Current URL: " . $pageURL->toString());
 
