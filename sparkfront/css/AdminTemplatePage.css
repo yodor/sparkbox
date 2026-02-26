@@ -1,0 +1,140 @@
+.admin_layout {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+    max-height:100%;
+    width:100%;
+    max-width: 100%;
+
+    box-sizing: border-box;
+    /*border:2px dashed red;*/
+
+    container-type: inline-size;
+}
+
+.basePane {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+}
+
+.basePane .sidePane {
+    display: flex;
+    flex-direction: column;
+
+    width: 200px;
+    min-width: 200px;
+
+    box-sizing: border-box;
+    border-right:2px solid  #b9b3a3;
+
+    background-image: url(../images/admin/admin_header.png);
+    background-attachment: fixed;
+}
+.basePane .sidePane .user_data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    color: white;
+    padding:1em;
+}
+.basePane .sidePane .admin_menu {
+    position: sticky;
+    top: 0;
+}
+
+.basePane .mainPane {
+    flex-grow: 1;
+    position: relative;
+}
+
+.basePane .mainPane .header {
+    display: flex;
+    flex-direction: column;
+
+    position: sticky;
+    top: 0;
+
+    border-bottom:2px dashed green;
+
+    z-index: 2;
+
+    background-color: white;
+
+
+}
+
+.basePane .mainPane .header .actions_title {
+    display: flex;
+    flex-direction: row;
+    padding:0.5em;
+    gap:0.5em;
+}
+
+.basePane .mainPane .header .actions_title .actions {
+    display: flex;
+    flex-direction: row;
+
+    gap:0.5em;
+}
+
+.basePane .mainPane .header .actions_title .title {
+    font-size: 1.5em;
+    flex-grow: 1;
+}
+
+.basePane .mainPane .header .filters {
+    display: flex;
+    flex-direction: row;
+}
+
+.basePane .mainPane .base {
+    padding-left:1em;
+    padding-top:1em;
+}
+
+
+
+.basePane .mainPane .header .actions_title .Action {
+    width: 2em;
+    height: 2em;
+
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.actions_title .Action[action]:not([action='']) {
+    background-repeat: no-repeat;
+    /*   content: attr(title) ": ";  */
+    color: transparent;
+}
+
+.actions_title .Action[action='Add'] {
+    background-image: url("../images/page_actions/green_plus.png");
+}
+
+.actions_title .Action[action='Multi-Add'] {
+    background-image: url("../images/page_actions/green_multi_plus.png");
+}
+
+.actions_title .Action[action='Back'] {
+    background-image: url("../images/page_actions/green_left.png");
+}
+
+.actions_title .Action[action='Help'] {
+    background-image: url("../images/dialog/question.svg");
+}
+
+.base .help.summary {
+    display:block;
+    margin-bottom:1em;
+
+    font-style:italic;
+}
+.base .helpPane {
+    padding:1em;
+    border:1px dashed green;
+    display: none;
+}
