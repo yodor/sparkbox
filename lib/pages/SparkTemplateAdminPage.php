@@ -19,6 +19,7 @@ include_once("components/ClosureComponent.php");
 
 include_once("auth/AuthContext.php");
 include_once("components/TextComponent.php");
+include_once("utils/Navigation.php");
 
 class SparkTemplateAdminPage extends SparkPage implements IObserver
 {
@@ -30,21 +31,18 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
     const string ACTION_BACK = "Back";
     const string ACTION_EDIT = "Edit";
     const string ACTION_DELETE = "Delete";
+    const string ACTION_HELP = "Help";
 
     protected MenuBar $menu_bar;
 
-//    protected Navigation $navigation;
+    protected Navigation $navigation;
 
-    protected Container $sidePane;
+    protected Container $filters;
 
-    protected Container $pageCaption;
-
-    protected Container $page_actions;
-    protected Container $page_filters;
+    protected Container $base;
 
     //
     protected string $path = "";
-    protected array $selectedPath = array();
 
     public function __construct()
     {
@@ -56,7 +54,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         parent::__construct();
 
         //control gets here only if authorized
-//        $this->navigation = new Navigation("AdminPageLib");
+        $this->navigation = new Navigation("SparkAdmin");
 
         if (isset($_GET["path"])) {
             $this->path = $_GET["path"];
@@ -71,77 +69,114 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         MenuItemRenderer::$append_parent_href = true;
         MenuItemRenderer::$href_prefix = Spark::Get(Config::ADMIN_LOCAL) . "2/";
 
-        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminPage.css");
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminTemplatePage.css");
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminMenu.css");
 
         $this->body()->addClassName("admin_layout");
 
-        $this->sidePane = $this->createSidePane();
+        $headerPane = new Container(false);
+        $headerPane->setComponentClass("headerPane");
+        $this->items()->append($headerPane);
 
+        $basePane = new Container(false);
+        $basePane->setComponentClass("basePane");
+        $this->items()->append($basePane);
 
-        $this->pageCaption = new Container(false);
-        $this->pageCaption->setComponentClass("page_caption");
+            $sidePane = $this->createSidePane();
+            $sidePane->setComponentClass("sidePane");
+            $basePane->items()->append($sidePane);
 
-        $this->page_actions = new Container(false);
-        $this->page_actions->setComponentClass("page_actions");
-        $this->pageCaption->items()->append($this->page_actions);
+            $mainPane = $this->createMainPane();
+            $mainPane->setComponentClass("mainPane");
+            $basePane->items()->append($mainPane);
 
-        $this->page_filters = new Container(false);
-        $this->page_filters->setComponentClass("page_filters");
-        $this->pageCaption->items()->append($this->page_filters);
+            $helpPane = $this->createHelpPane();
+            $helpPane->setComponentClass("helpPane");
+            $basePane->items()->append($helpPane);
+
+        $footerPane = new Container(false);
+        $footerPane->setComponentClass("footerPane");
+        $this->items()->append($footerPane);
 
         $this->setTitle(tr("Administration"));
 
         $dialog = new JSONFormDialog();
 
-
         SparkEventManager::register(TemplateEvent::class, $this);
 
         $this->addParameterName("path");
+
     }
 
     protected function createSidePane() : Container
     {
-        $container = new Container(false);
-        $container->setComponentClass("sidePane");
+        $sidePane = new Container(false);
+        $sidePane->setComponentClass("sidePane");
 
-        $adminHeader = new Container(false);
-        $adminHeader->setComponentClass("admin_header");
-        $container->items()->append($adminHeader);
+        $adminData = new Container(false);
+        $adminData->setComponentClass("user_data");
+        $sidePane->items()->append($adminData);
 
         $username = $this->context->getData()->get(SessionData::FULLNAME);
         if ($username) {
             $adminName = new TextComponent($username);
             $adminName->setComponentClass("username");
-            $adminHeader->items()->append($adminName);
+            $adminData->items()->append($adminName);
         }
 
         $buttonLogout = Button::LocationButton("Logout", new URL(Spark::Get(Config::ADMIN_LOCAL) . "/logout.php"));
-        $adminHeader->items()->append($buttonLogout);
+        $adminData->items()->append($buttonLogout);
 
-        $container->items()->append($this->menu_bar);
+        $sidePane->items()->append($this->menu_bar);
 
-        return $container;
+        return $sidePane;
     }
 
-//    public function navigation() : Navigation
-//    {
-//        return $this->navigation;
-//    }
-
-    public function getPageCaption() : Container
+    protected function createMainPane() : Container
     {
-        return $this->pageCaption;
+        $mainPane = new Container(false);
+        $mainPane->setComponentClass("mainPane");
+
+        $header = new Container(false);
+        $header->setComponentClass("header");
+        $mainPane->items()->append($header);
+
+            $caption = new Container(false);
+            $caption->setComponentClass("actions_title");
+            $header->items()->append($caption);
+
+                $actions = new Container(false);
+                $actions->setComponentClass("actions");
+                $caption->items()->append($actions);
+
+                $title = new Container(false);
+                $title->setComponentClass("title");
+                $caption->items()->append($title);
+
+            $this->filters = new Container(false);
+            $this->filters->setComponentClass("filters");
+            $header->items()->append($this->filters);
+
+        $this->base = new Container(false);
+        $this->base->setComponentClass("base");
+        $mainPane->items()->append($this->base);
+
+        $footer = new Container(false);
+        $footer->setComponentClass("footer");
+        $mainPane->items()->append($footer);
+
+        return $mainPane;
+    }
+    protected function createHelpPane() : Container
+    {
+        $helpPane = new Container(false);
+        $helpPane->setComponentClass("helpPane");
+        return $helpPane;
     }
 
-    public function getPageActions() : Container
+    public function navigation() : Navigation
     {
-        return $this->page_actions;
-    }
-
-    public function getPageFilters() : Container
-    {
-        return $this->page_filters;
+        return $this->navigation;
     }
 
     /**
@@ -163,107 +198,102 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $this->preferred_title = Spark::SiteTitle($selected_path);
     }
 
-//    protected function updateNavigation(): void
-//    {
-//        $dynmenu = $this->menu_bar->getMenu();
-//
-//        $path = "";
-//        if (isset($_GET["path"])) {
-//            $path = $_GET["path"];
-//        }
-//
-//        $dynmenu->selectPath($path);
-//
-//
-//        //page does not set a name, try and get the selected menu item and use for page name/caption
-//        if (!$this->name) {
-//            $selected = $dynmenu->getSelectedPath();
-//            //default name of page from MenuItem
-//            $itemsTotal = count($selected);
-//            if ($itemsTotal > 0) {
-//                $item = $selected[$itemsTotal-1];
-//                if ($item instanceof MenuItem) {
-//                    $this->name = $item->getName();
-//
-//                }
-//            }
-//        }
-//
-//        //push even if unnamed page
-//        $this->navigation->push($this->name);
-//    }
+    protected function updateNavigation(): void
+    {
+        $selectedPath = $this->menu_bar->getMenu()->selectPath($this->path);
+        Debug::ErrorLog("Location: $this->path | Matched: ", $selectedPath);
+
+        $name = $this->getName();
+
+        if (!$name) {
+            end($selectedPath);
+            $item = current($selectedPath);
+            //default name of page from MenuItem
+            if ($item instanceof MenuItem) {
+                $name = $item->getName();
+            }
+        }
+        if (!$name) {
+            $name = "Unnamed";
+        }
+
+        $this->setName($name);
+
+        //push even if unnamed page?
+        $this->navigation->push($this->getName());
+    }
 
     /**
      * Update page actions and page caption title
      * @return void
      */
-    protected function updatePageActions(): void
+    protected function setPageActions(): void
     {
-        //$back_action = $this->navigation->back();
 
-        //prepend the back action
+        $actions_title = $this->items()
+            ->getByContainerClass("basePane")->items()
+            ->getByContainerClass("mainPane")->items()
+            ->getByContainerClass("header")->items()
+            ->getByContainerClass("actions_title");
 
-        $last = end($this->selectedPath);
-        if (isset($_GET["action"])) {
+        $actions = $actions_title->items()
+            ->getByContainerClass("actions");
 
-        }
-        else {
-            $last = prev($this->selectedPath);
-        }
-
-        if ($last) {
+        $this->navigation->end();
+        $this->navigation->prev();
+        $url = $this->navigation->current();
+        if ($url instanceof URL) {
             $back_action = new Action();
-            $back_action->setContents("");
             $back_action->setAction(SparkTemplateAdminPage::ACTION_BACK);
-            $back_action->setTooltip("Go back");
-
-
-            $back_action->getURL()->fromString(MenuItemRenderer::PathHref($last));
-            $this->page_actions->items()->append($back_action);
+            $back_action->setURL($url);
+            $actions->items()->append($back_action);
         }
 
         //fill all actions into the page actions container
         foreach ($this->actions->toArray() as $action) {
-            $this->page_actions->items()->append($action);
+            $actions->items()->append($action);
         }
 
-        //set the page title
-        $title = new TextComponent($this->name);
-        $title->setClassName("page_title");
-        $this->page_actions->items()->append($title);
+        $help_action = new Action();
+        $help_action->setAction(SparkTemplateAdminPage::ACTION_HELP);
+        //$back_action->setURL($url);
+        $actions_title->items()->append($help_action);
     }
 
-    public function startRender(): void
+    protected function setPageName() : void
     {
+        $title = $this->items()
+            ->getByContainerClass("basePane")->items()
+            ->getByContainerClass("mainPane")->items()
+            ->getByContainerClass("header")->items()
+            ->getByContainerClass("actions_title")->items()
+            ->getByContainerClass("title");
 
-        //$this->updateNavigation();
-        $this->updatePageActions();
-
-        //allow processing of responders, constructTitle and prepareMetaTitle
-        parent::startRender();
-
-        echo "\n<!-- startRender SparkAdminPage -->\n";
-
-        $this->sidePane->render();
-
-        echo "<div class='page_area' >";
-
-        $this->pageCaption->render();
-
-        echo "<div class='page_contents'>";
-
-
+        $title->setContents($this->getName());
     }
 
-    public function finishRender(): void
+    public function update(?TemplateContent $content=null) : void
     {
-        echo "</div>"; //page_contents
+        if (!is_null($content)) {
+            $this->setName($content->config()->title);
 
-        echo "</div>";//page_area
+            if ($content->config()->summary) {
+                $summary = new TextComponent($content->config()->summary, "help summary");
+                $this->base->items()->append($summary);
+            }
 
-        echo "\n<!-- finishRender SparkAdminPage -->\n";
+            $this->base->items()->append($content->component());
+            foreach( Spark::ClassChain($content) as $pos=>$name) {
+                $this->base->addClassName($name);
+            }
+            $content->fillPageActions($this->getActions());
+            $content->fillPageFilters($this->filters);
+        }
 
-        parent::finishRender();
+        $this->updateNavigation();
+
+        $this->setPageName();
+        $this->setPageActions();
     }
 
     public function getMenuBar() : MenuBar
@@ -280,9 +310,5 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         if ($menu instanceof MenuItemList) {
             $this->menu_bar->setMenu($menu);
         }
-
-        $this->selectedPath = $menu->selectPath($this->path);
-        Debug::ErrorLog("Location: $this->path | Matched: ", $this->selectedPath);
-
     }
 }
