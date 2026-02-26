@@ -9,10 +9,13 @@ class Navigation
     protected string $name;
     protected SessionData $urldata;
 
+    protected array $keys;
+
     public function __construct(string $name="Navigation")
     {
         $this->name = $name;
         $this->urldata = new SessionData($this->name);
+        $this->keys = $this->urldata->keys();
     }
 
     /**
@@ -21,11 +24,13 @@ class Navigation
      * @return void
      * @throws Exception
      */
-    public function push(string $pageName) : void
+    public function push(string $pageName, ?URL $pageURL = null) : void
     {
 
         //current URL
-        $pageURL = URL::Current();
+        if (is_null($pageURL)) {
+            $pageURL = URL::Current();
+        }
 
         if (RequestController::isJSONRequest()) {
             Debug::ErrorLog("Not pushing JSONRequest ...");
@@ -36,16 +41,16 @@ class Navigation
             return;
         }
 
-        Debug::ErrorLog("Pushing $pageName - Current URL: ".$pageURL);
+        Debug::ErrorLog("Push [$pageName] - URL: ".$pageURL);
 
         if ($this->urldata->count()>0) {
-            //check if is already present and splice
-            Debug::ErrorLog("Rebuilding navigation entries");
+            //check if is already present and slice
+            //Debug::ErrorLog("Rebuilding navigation entries");
 
             $clearRemaining = false;
 
-            $pages = $this->urldata->keys();
-            foreach ($pages as $page) {
+            //page names
+            foreach ($this->keys as $page) {
                 if ($clearRemaining) {
                     $this->urldata->remove($page);
                 }
@@ -53,18 +58,25 @@ class Navigation
                     //get the stored url
                     $storedURL = $this->urldata->get($page);
 
-                    if ($storedURL == $pageURL) {
-                        Debug::ErrorLog("Current page url is already in the navigation as '$page' - Clearing remaining entries");
+                    //loose comparison
+                    if (strcmp($storedURL->toString(),$pageURL->toString())===0) {
+                        Debug::ErrorLog("URL already exists with page [$page] - Clearing remaining entries");
                         $clearRemaining = true;
                     }
                 }
             }
-
         }
 
-        Debug::ErrorLog("Adding page to navigation '$pageName' => $pageURL");
-        //navigation entries are constructed by using $pagename as unique key not the url
         $this->urldata->set($pageName, $pageURL);
+
+        $this->keys = $this->urldata->keys();
+
+        //debug
+        $urls = array();
+        foreach ($this->keys as $key) {
+            $urls[$key] = $this->urldata->get($key);
+        }
+        Debug::ErrorLog("Current navigation: ", $urls);
 
     }
 
@@ -79,8 +91,36 @@ class Navigation
         else {
             Debug::ErrorLog("Clearing all navigation entries");
             $this->urldata->removeAll();
-
+            $this->keys = $this->urldata->keys();
         }
+    }
+
+    public function end() : void
+    {
+        end($this->keys);
+    }
+    public function prev() : void
+    {
+        prev($this->keys);
+    }
+    public function next() : void
+    {
+        next($this->keys);
+    }
+    public function reset() : void
+    {
+        reset($this->keys);
+    }
+
+    public function current() : ?URL
+    {
+        $key = current($this->keys);
+        if ($key) {
+            $url = $this->urldata->get($key);
+            Debug::ErrorLog("Returning Entry [$key] - URL: ".$url);
+            return $url;
+        }
+        return null;
     }
 
     public function back() : ?Action
@@ -105,7 +145,7 @@ class Navigation
             }
             else {
                 $action = new Action($pageName, $storedURL->toString());
-                Debug::ErrorLog("Using href: ".$action->getURL());
+                Debug::ErrorLog("Using URL: ".$action->getURL());
                 break;
             }
         }

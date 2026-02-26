@@ -65,8 +65,6 @@ class BeanKeyCondition extends RequestParameterCondition
         return $this->data[$name];
     }
 
-
-
     /**
      * Return the URLParameter ie getURLParamter()->text() would return 'glrID=1'
      * @return URLParameter
