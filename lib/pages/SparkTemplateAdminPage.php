@@ -72,6 +72,8 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminTemplatePage.css");
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminMenu.css");
 
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/AdminTemplate.js");
+
         $this->body()->addClassName("admin_layout");
 
         $headerPane = new Container(false);
@@ -90,9 +92,9 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
             $mainPane->setComponentClass("mainPane");
             $basePane->items()->append($mainPane);
 
-            $helpPane = $this->createHelpPane();
-            $helpPane->setComponentClass("helpPane");
-            $basePane->items()->append($helpPane);
+//            $helpPane = $this->createHelpPane();
+//            $helpPane->setComponentClass("helpPane");
+//            $basePane->items()->append($helpPane);
 
         $footerPane = new Container(false);
         $footerPane->setComponentClass("footerPane");
@@ -160,6 +162,10 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $this->base = new Container(false);
         $this->base->setComponentClass("base");
         $mainPane->items()->append($this->base);
+
+        $helpPane = $this->createHelpPane();
+        $helpPane->setComponentClass("helpPane");
+        $this->base->items()->append($helpPane);
 
         $footer = new Container(false);
         $footer->setComponentClass("footer");
@@ -256,7 +262,9 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
         $help_action = new Action();
         $help_action->setAction(SparkTemplateAdminPage::ACTION_HELP);
-        //$back_action->setURL($url);
+        $help_action->setAttribute("path", $this->path);
+        $help_action->setAttribute("sink", "helpPane");
+        $help_action->setAttribute("onClick", "javascript:document.helpFetcher.fetch(this)");
         $actions_title->items()->append($help_action);
     }
 
