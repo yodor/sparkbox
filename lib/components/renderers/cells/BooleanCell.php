@@ -12,8 +12,8 @@ class BooleanCell extends TableCell
     {
         parent::__construct();
 
-        $this->true_value = $true_value;
-        $this->false_value = $false_value;
+        $this->true_value = tr($true_value);
+        $this->false_value = tr($false_value);
 
         $this->addClassName("Boolean");
 
@@ -24,7 +24,7 @@ class BooleanCell extends TableCell
         parent::setData($data);
 
         $value = $data[$this->column->getName()]??false;
-        $this->setContents( ($value) ? tr($this->true_value) : tr($this->false_value));
+        $this->setContents( ($value) ? $this->true_value : $this->false_value );
 
     }
 }
