@@ -591,6 +591,17 @@ final class Spark {
             : 'unknown';
     }
 
+    final static public function Split(string $text, string $separator="/"): array
+    {
+        // Split by / and filter out empty elements
+        $parts = array_filter(
+            explode($separator, $text),
+            fn($segment) => $segment !== ''
+        );
+
+        // Re-index the array (optional but cleaner)
+        return array_values($parts);
+    }
     //static public function parse_signed_request($signed_request, $secret)
     //{
     //    list($encoded_sig, $payload) = explode('.', $signed_request, 2);

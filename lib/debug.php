@@ -109,6 +109,9 @@ final class Debug {
             else if ($val instanceof MenuItem) {
                 $message = get_class($val) . "[" . $val->getName()."] => ".$val->getHref();
             }
+            else if ($val instanceof URL) {
+                $message = get_class($val) . "[".$val."]";
+            }
             else if (is_array($val)) {
                 //$message = print_r($val, true);
                 $message = "Array [ ".Debug::GetArrayText($val)." ]";
