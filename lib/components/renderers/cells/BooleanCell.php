@@ -23,7 +23,8 @@ class BooleanCell extends TableCell
     {
         parent::setData($data);
 
-        $this->setContents( ($data[$this->column->getName()]) ? tr($this->true_value) : tr($this->false_value));
+        $value = $data[$this->column->getName()]??false;
+        $this->setContents( ($value) ? tr($this->true_value) : tr($this->false_value));
 
     }
 }
