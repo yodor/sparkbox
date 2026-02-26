@@ -16,7 +16,7 @@ class MenuItemList extends SparkList
         }
     }
 
-    public function matchPath(int &$idx, array $matchPath, array &$matched) : void
+    protected function matchPath(int &$idx, array $matchPath, array &$matched) : void
     {
         if ($idx > count($matchPath)-1) return;
 
@@ -41,17 +41,6 @@ class MenuItemList extends SparkList
         }
 
     }
-    public static function splitPath(string $path): array
-    {
-        // Split by / and filter out empty elements
-        $parts = array_filter(
-            explode('/', $path),
-            fn($segment) => $segment !== ''
-        );
-
-        // Re-index the array (optional but cleaner)
-        return array_values($parts);
-    }
 
     public function selectPath(string $path, bool $setSelected = true) : array
     {
@@ -59,7 +48,7 @@ class MenuItemList extends SparkList
             $this->deselect();
         }
 
-        $matchPath = MenuItem::splitPath($path);
+        $matchPath = Spark::Split($path);
 
         $idx = 0;
         $matched = array();

@@ -602,6 +602,15 @@ final class Spark {
         // Re-index the array (optional but cleaner)
         return array_values($parts);
     }
+
+    final static public function ClassChain(object $object) : array
+    {
+        $class_chain = class_parents($object, false);
+        array_pop($class_chain);
+        $class_chain = array_reverse($class_chain);
+        $class_chain[] = get_class($object);
+        return $class_chain;
+    }
     //static public function parse_signed_request($signed_request, $secret)
     //{
     //    list($encoded_sig, $payload) = explode('.', $signed_request, 2);

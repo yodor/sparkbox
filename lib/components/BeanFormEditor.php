@@ -9,7 +9,7 @@ include_once("forms/processors/FormProcessor.php");
 include_once("dialogs/json/BeanTranslationDialog.php");
 include_once("objects/events/BeanFormEditorEvent.php");
 
-class BeanFormEditor extends FormRenderer implements IBeanEditor
+class BeanFormEditor extends FormRenderer implements IBeanEditor, IRequestProcessor
 {
 
     protected array $messages = array();
@@ -256,4 +256,8 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor
 
     }
 
+    public function isProcessed(): bool
+    {
+        return !($this->processor->getStatus() === IFormProcessor::STATUS_NOT_PROCESSED);
+    }
 }

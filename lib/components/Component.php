@@ -108,11 +108,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         $this->chained_component_class = $chained_component_class;
 
         if ($this->chained_component_class) {
-            $class_chain = class_parents($this);
-            array_pop($class_chain);
-            $class_chain = array_reverse($class_chain);
-            $class_chain[] = get_class($this);
-            $this->setComponentClass(implode(" ", $class_chain));
+            $this->setComponentClass(implode(" ", Spark::ClassChain($this)));
         }
         else {
             $this->setComponentClass(get_class($this));
