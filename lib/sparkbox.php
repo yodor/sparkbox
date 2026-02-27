@@ -29,16 +29,11 @@ if (getenv("DEBUG_LEVEL", true)!==false) {
 
 Spark::Set(Config::SPARKBOX_PATH, realpath(dirname(__DIR__)), true);
 
-// /sparkbox/lib;.
-Spark::IncludePath(Spark::Get(Config::SPARKBOX_PATH).DIRECTORY_SEPARATOR."lib");
+//append sparkbox/lib to include_path and loader locations
+Spark::IncludePath(Spark::PathParts(Spark::GetString(Config::SPARKBOX_PATH),"lib"), "");
+
 
 Spark::Initialize();
-
-Spark::EnableBeanLocation("beans/");
-Spark::EnableBeanLocation("auth/");
-Spark::EnableBeanLocation("class/beans/");
-Spark::EnableBeanLocation("class/auth/");
-
 
 //call local deployment configuration
 if (file_exists(APP_PATH."/config/settings.php")) include_once(APP_PATH."/config/settings.php");
@@ -123,10 +118,10 @@ if (!Spark::isStorageRequest()) {
 }
 
 
-//other libs initialisation
+//other libs initialization
 if (file_exists(APP_PATH."/config/include.php")) include_once(APP_PATH."/config/include.php");
 //set app include path
-Spark::IncludePath(APP_PATH);
+Spark::IncludePath(Spark::PathParts(APP_PATH), "class");
 //boot complete local app initialization
 if (file_exists(APP_PATH."/config/app.php")) include_once(APP_PATH."/config/app.php");
 

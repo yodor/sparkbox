@@ -286,7 +286,7 @@ abstract class Authenticator
 
     public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK) : ?AuthContext
     {
-        Debug::ErrorLog("AuthorizeContext using contextName: $contextName");
+        Debug::ErrorLog("Using contextName: $contextName");
 
         //administrator access
         if ($adminOK) {
@@ -305,28 +305,21 @@ abstract class Authenticator
         }
 
         try {
-            Spark::LoadBeanClass($contextName);
-        }
-        catch (Exception $e) {
-            Debug::ErrorLog("Authenticator class can not be loaded");
-            throw new Exception("Unable to locate the authorization class");
-        }
+            $auth = SparkLoader::Factory("auth")->instance($contextName, Authenticator::class);
 
-        $auth = new $contextName();
-
-        if ($auth instanceof Authenticator) {
+            if (! ($auth instanceof Authenticator)) throw new Exception("Loaded class is not instance of Authenticator");
 
             $context = $auth->authorize($user_data);
             if (!$context) {
-                Debug::ErrorLog("Authorization failed");
                 throw new Exception("This resource is protected. Please login first.");
             }
             Debug::ErrorLog("Authorization success");
             return $context;
 
         }
-        else {
-            throw new Exception("No suitable authenticator class");
+        catch (Exception $e) {
+            Debug::ErrorLog("Authorization failed: " . $e->getMessage());
+            throw new Exception("Authorization failed: ".$e->getMessage());
         }
 
     }

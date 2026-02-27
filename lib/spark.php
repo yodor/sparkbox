@@ -1,4 +1,136 @@
 <?php
+final class SparkLoader
+{
+
+    /**
+     * Locations to search during include:
+     * 'key' => Hold the absolute path to search
+     * 'value' => prefix to append to the path
+     * @var array
+     */
+    protected static array $locations = array();
+
+    /**
+     * Current search prefix ex: 'beans', 'auth', 'forms'
+     * @var string
+     */
+    protected string $prefix = "";
+
+
+    /**
+     *  Default search locations are initialized from SparkBox::IncludePath using
+     *  $location = "/sparkbox_path/lib", prefix = "";
+     *  $location = "/spark_module_path/lib", prefix = "module";
+     *  $location = "/app_path", prefix = "class";
+     *
+     * @param string $searchPrefix
+     * @return SparkLoader
+     */
+    public static function Factory(string $searchPrefix = ""): SparkLoader
+    {
+        return new SparkLoader($searchPrefix);
+    }
+
+
+    /**
+     * Add $location to the loader search locations using prefix $prefix
+     *
+     * @param string $location
+     * @param string $prefix
+     * @return void
+     */
+    public static function AddLocation(string $location, string $prefix): void
+    {
+        SparkLoader::$locations[realpath($location)] = $prefix;
+        //Debug::ErrorLog("Loader locations: " , SparkLoader::$locations);
+    }
+
+    /**
+     * Setup Class loader to search all enabled locations and using current search prefix - $prefix
+     *
+     * @param string $prefix
+     */
+    private function __construct(string $prefix="")
+    {
+        $this->prefix = $prefix;
+        //Debug::ErrorLog("Using prefix [$this->prefix]: ", SparkLoader::$locations);
+    }
+
+    /**
+     * Search all SparkLoader::$locations and try to include $fileName from there using the current search prefix
+     * Stop searching on first match if $includeAll is false
+     * @param string $fileName
+     * @param bool $includeAll Default True - include all files named $fileName searching all locations
+     * @return void
+     */
+    public function include(string $fileName, bool $includeAll = true) : void
+    {
+
+        Debug::ErrorLog("Searching: $fileName.php | Include all: $includeAll");
+
+        $found = 0;
+        foreach (SparkLoader::$locations as $includePath => $includePrefix) {
+
+            //Debug::ErrorLog("Searching: $fileName.php in $includePath/$includePrefix/{$this->prefix}");
+
+            $includeFile = Spark::PathParts($includePath, $includePrefix, $this->prefix, $fileName . ".php");
+
+            if (file_exists($includeFile)) {
+                $found++;
+                //Debug::ErrorLog("Including: ".$includeFile);
+                include_once($includeFile);
+
+                if (!$includeAll) break;
+            }
+            else {
+                //Debug::ErrorLog("File not found: ".$includeFile);
+            }
+        }
+        Debug::ErrorLog("Included [$found] files");
+
+    }
+
+    /**
+     * Load class definition $className
+     *
+     * @param string $className
+     * @return void
+     * @throws Exception Throws if class_exists($className) returns false
+     */
+    public function define(string $className) : void
+    {
+        if (class_exists($className, FALSE)) {
+            Debug::ErrorLog("Class already defined: ".$className);
+            return;
+        }
+
+        //stop on first match
+        $this->include($className, false);
+
+        if (!class_exists($className, FALSE)) {
+            Debug::ErrorLog("Class load failed: $className");
+            throw new Exception("Class load failed: " . $className);
+        }
+        Debug::ErrorLog("Class definition loaded: ".$className);
+    }
+
+    /**
+     * Load class definition for $className and create a new instance checking type is $classType
+     *
+     * @param string $className
+     * @param string $classType
+     * @return mixed
+     * @throws Exception
+     */
+    public function instance(string $className, string $classType) : object
+    {
+        $this->define($className);
+        $object = new $className();
+        Debug::ErrorLog("Created object[".get_class($object)."] - Requested instance of $classType");
+        if (!($object instanceof $classType)) throw new Exception("Object is not instance of $classType");
+        return new $className();
+    }
+}
 final class Marshall {
 
     private function __construct() {}
@@ -86,24 +218,30 @@ final class Spark {
 
     static array $defines = array();
     static array $constDefines = array();
-    static array $beanLocations = array();
 
-    final private function __construct() {
+    final private function __construct() {}
 
+    final static function PathParts(string ... $parts) : string
+    {
+        return implode(DIRECTORY_SEPARATOR, $parts);
     }
 
     /**
-     * Add $path to the current include_path
+     * Add $path to the current include_path and SparkLoader locations enabling loader prefix $loaderPrefix
      * @param string $path
+     * @param string $loaderPrefix
      * @return void
      */
-    final static function IncludePath(string $path) : void
+    final static function IncludePath(string $path, string $loaderPrefix) : void
     {
         $includes = array_flip(explode(PATH_SEPARATOR, get_include_path()));
         $includes[realpath($path)] = true;
         unset($includes["."]);
         $includes["."] = true;
         set_include_path(implode(PATH_SEPARATOR, array_keys($includes)));
+
+        SparkLoader::AddLocation($path, $loaderPrefix);
+
         //error_log("Include Path: " . get_include_path());
     }
 
@@ -205,37 +343,6 @@ final class Spark {
         }
 
         return $result;
-    }
-
-    final static public function EnableBeanLocation(string $class_location, bool $enabled=true) : void
-    {
-        Spark::$beanLocations[$class_location] = $enabled;
-    }
-
-    /**
-     * Load class definition
-     * @param string $class_name
-     * @return void
-     * @throws Exception
-     */
-    final static public function LoadBeanClass(string $class_name) : void
-    {
-        Debug::ErrorLog("Including bean class: $class_name");
-        foreach (Spark::$beanLocations as $location => $enabled) {
-            if (!$enabled) continue;
-            $class_file = $location . $class_name . ".php";
-            Debug::ErrorLog("Trying file: ".$class_file);
-            @include_once($class_file);
-            if (class_exists($class_name, FALSE)) {
-                Debug::ErrorLog("Class load success");
-                break;
-            }
-        }
-
-        if (!class_exists($class_name, FALSE)) {
-            Debug::ErrorLog("Class load failed");
-            throw new Exception("Bean class not found: " . $class_name);
-        }
     }
 
     /**
@@ -348,7 +455,8 @@ final class Spark {
 
     final static public function AttributeValue(string $value) : string
     {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, "UTF-8");
+        return htmlspecialchars(Spark::Unescape($value), ENT_QUOTES | ENT_HTML5, "UTF-8");
+        //old version
         //return htmlentities(Spark::Unescape($value), ENT_QUOTES, "UTF-8");
     }
     final static public function Unescape(?string $input, $checkbr = 0) : string
