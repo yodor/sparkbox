@@ -39,6 +39,8 @@
 
     color: white;
     padding:1em;
+
+    background-color: #464646;
 }
 .basePane .sidePane .admin_menu {
     position: sticky;

@@ -98,8 +98,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
     {
 
         if ($config->beanClass) {
-            Spark::LoadBeanClass($config->beanClass);
-            $this->setBean(new $config->beanClass());
+            $this->setBean(SparkLoader::Factory("beans")->instance($config->beanClass, DBTableBean::class));
         }
         if ($config->condition) {
             $this->setRequestCondition($config->condition);
@@ -107,7 +106,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
 
         if (!$config->title) {
             $config->title = $this->getContentTitle();
-            if ($this->bean instanceof DBTableBean) $config->title .= ": " . get_class($this->bean);
+            if (!is_null($this->bean)) $config->title .= ": " . get_class($this->bean);
         }
 
         $this->config = $config;

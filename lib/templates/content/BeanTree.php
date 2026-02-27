@@ -65,7 +65,7 @@ class BeanTree extends BeanList
     public function treeView(): NestedSetTreeView
     {
         if ($this->cmp instanceof NestedSetTreeView) return $this->cmp;
-        throw new Exception("Not a NestedSetTreeView");
+        throw new Exception("Incorrect component class - expected NestedSetTreeView");
     }
 
     protected function getContentTitle(): string

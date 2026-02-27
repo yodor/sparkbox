@@ -3,8 +3,10 @@ include_once("objects/SparkEvent.php");
 
 class TemplateEvent extends SparkEvent
 {
-    const string CONFIG_CREATED = "CONFIG_CREATED";
+    const string CONFIG_CHANGED = "CONFIG_CREATED";
+
     const string CONTENT_CREATED = "CONTENT_CREATED";
+    const string CONTENT_SETUP = "CONTENT_SETUP";
 
     const string CONTENT_INITIALIZED = "CONTENT_INITIALIZED";
 

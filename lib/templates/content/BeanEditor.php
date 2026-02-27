@@ -61,8 +61,7 @@ class BeanEditor extends TemplateContent
     {
         parent::setup($config);
         if ($config->formClass) {
-            Spark::LoadBeanClass($config->formClass);
-            $this->setForm(new $config->formClass());
+            $this->setForm(SparkLoader::Factory("forms")->instance($config->formClass, InputForm::class));
         }
     }
 

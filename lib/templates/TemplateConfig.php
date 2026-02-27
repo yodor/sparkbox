@@ -63,8 +63,8 @@ class TemplateConfig extends SparkObject
     public ?SQLSelect $iterator = null;
 
     /**
-     * Current path value from _GET
+     * Current configuration filename
      * @var string
      */
-    public string $path = "";
+    public string $filename = "";
 }

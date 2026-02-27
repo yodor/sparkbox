@@ -7,6 +7,8 @@ include_once("beans/AdminAccessBean.php");
 include_once("responders/ChangePositionResponder.php");
 include_once("responders/DeleteItemResponder.php");
 include_once("responders/ToggleFieldResponder.php");
+
+
 include_once("dialogs/json/JSONFormDialog.php");
 
 include_once("utils/BeanKeyCondition.php");
@@ -20,6 +22,10 @@ include_once("components/ClosureComponent.php");
 include_once("auth/AuthContext.php");
 include_once("components/TextComponent.php");
 include_once("utils/Navigation.php");
+
+include_once("templates/Template.php");
+include_once("store/responders/json/AdminHelpResponder.php");
+
 
 class SparkTemplateAdminPage extends SparkPage implements IObserver
 {
@@ -104,9 +110,32 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
         $dialog = new JSONFormDialog();
 
+        $helpFetcher = new AdminHelpResponder();
+
         SparkEventManager::register(TemplateEvent::class, $this);
 
         $this->addParameterName("path");
+
+    }
+
+    public function initialize() : void
+    {
+
+        $path = $this->path;
+        if (!$path) {
+            $path = "home";
+        }
+
+
+        try {
+            //fire TemplateEvent::MENU_CREATED
+            SparkLoader::Factory("admin")->include("menu");
+            Template::PathConfig($path);
+        }
+        catch (Exception $e) {
+            Template::Config(Template::Plain("Error:$path", $e->getMessage()));
+            Debug::ErrorLog("Initialization failed: ".$e->getMessage());
+        }
 
     }
 
@@ -209,6 +238,12 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $selectedPath = $this->menu_bar->getMenu()->selectPath($this->path);
         Debug::ErrorLog("Location: $this->path | Matched: ", $selectedPath);
 
+//        $pathParts = Spark::Split($this->path);
+
+//        if (count($selectedPath)==count($pathParts)) {
+//            $this->navigation->clear();
+//        }
+
         $name = $this->getName();
 
         if (!$name) {
@@ -227,6 +262,8 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
         //push even if unnamed page?
         $this->navigation->push($this->getName());
+
+
     }
 
     /**
@@ -313,10 +350,26 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
     public function onEvent(SparkEvent $event): void
     {
         if (!($event instanceof TemplateEvent)) return;
-        if (!$event->isEvent(TemplateEvent::MENU_CREATED)) return;
-        $menu = $event->getSource();
-        if ($menu instanceof MenuItemList) {
-            $this->menu_bar->setMenu($menu);
+        if ($event->isEvent(TemplateEvent::MENU_CREATED)) {
+            $menu = $event->getSource();
+            if ($menu instanceof MenuItemList) {
+                $this->menu_bar->setMenu($menu);
+            }
+        }
+        else if ($event->isEvent(TemplateEvent::CONFIG_CHANGED)) {
+            try {
+                $content = Template::LoadContent();
+                if (!($content instanceof TemplateContent)) {
+                    throw new Exception("LoadContent returned wrong or null content");
+                }
+            }
+            catch (Exception $e) {
+                Template::Config(Template::Plain("Error:{$this->path}","TemplateEvent::CONFIG_CHANGED: ".$e->getMessage()));
+                Debug::ErrorLog("TemplateEvent::CONFIG_CHANGED failed: ".$e->getMessage());
+            }
+        }
+        else if ($event->isEvent(TemplateEvent::CONTENT_INPUT_PROCESSED)) {
+            $this->update($event->getSource());
         }
     }
 }

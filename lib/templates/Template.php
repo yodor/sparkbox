@@ -6,8 +6,12 @@ include_once("objects/SparkObserver.php");
 
 final class Template
 {
-    //TODO: set config location to realpath Spark::Get(Config::ADMIN_LOCAL)
-    public static string $ConfigLocation = "path/";
+
+    static private string $PrefixTemplateContent = "templates/content";
+
+    static private string $PrefixPathConfig = "admin/path";
+
+    static private ?TemplateConfig $config = null;
 
     private function __construct()
     {
@@ -60,58 +64,80 @@ final class Template
         return $config;
     }
 
-    public static function Content(string $path, TemplateConfig $config): TemplateContent
+    /**
+     * Set/Get the active TemplateConfig configuration used to LoadContent
+     *
+     * @param TemplateConfig|null $config Set $config as the active TemplateConfig
+     * @return TemplateConfig|null Return the current active TemplateConfig
+     */
+    public static function Config(?TemplateConfig $config=null): ?TemplateConfig
+    {
+        if (!is_null($config)) {
+            Template::$config = $config;
+            SparkEventManager::emit(new TemplateEvent(TemplateEvent::CONFIG_CHANGED, Template::$config));
+        }
+
+        return Template::$config;
+    }
+
+    /**
+     * Load content using the active TemplateConfig configuration
+     * @return TemplateContent
+     * @throws Exception
+     */
+    public static function LoadContent(): TemplateContent
     {
 
-        if ($config->contentClass) {
-            Spark::EnableBeanLocation("templates/content/");
-            Spark::LoadBeanClass($config->contentClass);
+        if (!(Template::$config instanceof TemplateConfig)) {
+            throw new Exception("TemplateConfig not initialized yet");
         }
 
-        if (!is_null($config->observer)) {
-            SparkEventManager::register(TemplateEvent::class, new SparkObserver($config->observer));
+        if (!Template::$config->contentClass) throw new Exception("TemplateConfig contentClass is empty");
+
+        if (!is_null(Template::$config->observer)) {
+            SparkEventManager::register(TemplateEvent::class, new SparkObserver(Template::$config->observer));
         }
 
-        $cmp = new $config->contentClass();
+        $cmp = SparkLoader::Factory(Template::$PrefixTemplateContent)->instance(Template::$config->contentClass, TemplateContent::class);
+        if (!$cmp instanceof TemplateContent) throw new Exception("Content class not instance of TemplateContent");
+        SparkEventManager::emit(new TemplateEvent(TemplateEvent::CONTENT_CREATED, $cmp));
 
-        if ($cmp instanceof TemplateContent) {
-            $cmp->setup($config);
-        }
-        else {
-            throw new Exception("Content class not instance of TemplateContent");
-        }
+        $cmp->setup(Template::$config);
+        SparkEventManager::emit(new TemplateEvent(TemplateEvent::CONTENT_SETUP, $cmp));
+
+        $cmp->initialize();
+        SparkEventManager::emit(new TemplateEvent(TemplateEvent::CONTENT_INITIALIZED, $cmp));
+
+        $cmp->processInput();
+        SparkEventManager::emit(new TemplateEvent(TemplateEvent::CONTENT_INPUT_PROCESSED, $cmp));
 
         return $cmp;
 
     }
 
-    public static function Config(string $path, ?int $editor = null): TemplateConfig
+    /**
+     * Search all loader enabled locations using prefix 'admin/path' and include path file that set the active configuration
+     * @param string $path
+     * @param int|null $editor
+     * @return void
+     * @throws Exception
+     */
+    public static function PathConfig(string $path) : void
     {
-        Debug::ErrorLog("Locating file for path [$path]");
-
-        $config = null;
 
         $path = Spark::Split($path, "/");
         $path = implode(".", $path);
 
-        $includeFile = Template::$ConfigLocation . $path . ".php";
+        //search all include paths for code to call Template::Configure
+        SparkLoader::Factory(Template::$PrefixPathConfig)->include($path);
 
-        if (file_exists($includeFile)) {
-
-            Debug::ErrorLog("Using include file: $includeFile");
-            include_once($includeFile);
-
-        } else {
-            Debug::ErrorLog("Include file not found: $includeFile");
-            throw new Exception("Include[$includeFile] for path [$path] not found");
+        if (!(Template::$config instanceof TemplateConfig)) {
+            throw new Exception("TemplateConfig not initialized after searching [admin/path] locations for [$path.php]");
         }
 
-        if (!($config instanceof TemplateConfig)) {
-            throw new Exception("Include[$includeFile] for path [$path] did not initialize TemplateConfig");
-        }
+        Template::$config->filename = $path;
 
-        $config->path = $path;
 
-        return $config;
+
     }
 }

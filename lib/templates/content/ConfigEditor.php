@@ -1,11 +1,8 @@
 <?php
-
-
 include_once("templates/TemplateContent.php");
-
 include_once("beans/ConfigBean.php");
 
-class ConfigEditor extends \templates\TemplateContent
+class ConfigEditor extends TemplateContent
 {
 
     /**
@@ -22,7 +19,7 @@ class ConfigEditor extends \templates\TemplateContent
 
     public function __construct()
     {
-        \templates\TemplateContent::__construct();
+        parent::__construct();
 
         $this->processor = new ConfigFormProcessor();
 
@@ -34,16 +31,13 @@ class ConfigEditor extends \templates\TemplateContent
     public function initialize(): void
     {
         // TODO: Implement initialize() method.
+        $this->cmp = new FormRenderer($this->form);
     }
 
     public function setForm(InputForm $form): void
     {
         $this->form = $form;
-
-        $rend = new FormRenderer($form);
-
         $this->bean->loadForm($form);
-
     }
 
     public function getForm(): InputForm
@@ -79,9 +73,10 @@ class ConfigEditor extends \templates\TemplateContent
     }
 
 
-    public function component(): Component
+    public function formRenderer(): FormRenderer
     {
-        return $this->form->getRenderer();
+        if ($this->cmp instanceof FormRenderer) return $this->cmp;
+        throw new Exception("Incorrect component class - expected FormRenderer");
     }
 
 }

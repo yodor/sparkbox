@@ -294,7 +294,7 @@ class BeanList extends TemplateContent
     public function tableView(): TableView
     {
         if ($this->cmp instanceof TableView) return $this->cmp;
-        throw new Exception("Not a TableView");
+        throw new Exception("Incorrect component class - expected TableView");
     }
 
     public function setup(TemplateConfig $config): void
