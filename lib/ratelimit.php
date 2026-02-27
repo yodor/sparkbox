@@ -40,7 +40,7 @@ function rateCheck() : void
 
         if (!str_contains($userAgent, $nameMatch)) continue;
 
-        $installID = hash('xxh3', constant("SPARK_APP_ROOT"));
+        $installID = hash('xxh3', constant("APP_PATH"));
 
         //temporary file for each installation and userAgent name
         $tmpFile = sys_get_temp_dir() . "/" . $nameMatch . "-" . $installID;
