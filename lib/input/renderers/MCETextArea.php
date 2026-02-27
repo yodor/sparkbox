@@ -18,6 +18,14 @@ class MCETextArea extends TextArea
 
     }
 
+    protected function processAttributes(): void
+    {
+        parent::processAttributes();
+
+        $dataValue = Spark::Unescape($this->dataInput->getValue());
+        $this->input->setContents($dataValue);
+    }
+
     public function requiredStyle(): array
     {
         $arr = parent::requiredStyle();

@@ -70,7 +70,7 @@ class ConfigBean extends DBTableBean
 
     }
 
-    public function set(string $key, $val) : void
+    public function set(string $key, object|array|string $val) : void
     {
 
         $key = DBConnections::Open()->escape($key);
@@ -78,10 +78,10 @@ class ConfigBean extends DBTableBean
         $this->deleteRef("config_key", $key);
 
         if (is_object($val) || is_array($val)) {
-            $val = serialize($val);
+            $val = DBConnections::Open()->escape(serialize($val));
         }
-        if (!is_null($val)) {
-            $val = DBConnections::Open()->escape($val);
+        else {
+            $val = Spark::SanitizeInput($val);
         }
         $section = DBConnections::Open()->escape($this->section);
         $data = array("config_key" => $key, "config_val" => $val, "section" => $section);
@@ -93,7 +93,7 @@ class ConfigBean extends DBTableBean
     {
         foreach ($form->inputs() as $field_name => $field) {
             $stored_value = $this->get($field_name);
-            $field->setValue($stored_value);
+            $field->setValue(Spark::Unescape($stored_value));
         }
     }
 }
