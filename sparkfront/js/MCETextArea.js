@@ -12,39 +12,33 @@ class MCETextArea extends Component {
 
     }
 
-    /**
-     * Overriden in MCESetupObject.js
-     * @returns {{schema: string, strict_loading_mode: boolean, convert_newlines_to_brs: boolean, plugins: string, branding: boolean, verify_html: number, media_restrict: boolean, script_url: string, force_br_newlines: boolean, invalid_elements: string, forced_root_block: boolean, newline_behavior: string, menubar: boolean, toolbar2: string, content_style: string, toolbar1: string, force_p_newlines: boolean, remove_linebreaks: boolean, width: string, resize: string, theme: string, entity_encoding: string, extended_valid_elements: string, height: string}}
-     */
+
     defaultSetup() {
         return {
             schema: 'html5',
 
-            extended_valid_elements: 'img[*],a[*]',
+            extended_valid_elements: 'img[*],a[*],span[*]',
 
             // Location of TinyMCE script
             script_url: document.Spark.LOCAL + '/js/tiny_mce/tinymce.min.js',
 
             strict_loading_mode: true,
-            theme: "silver",
+            //theme: "silver",
 
-            //
             entity_encoding: "raw",
 
-            // force_p_newlines: false,
-            force_br_newlines: true,
-            convert_newlines_to_brs: true,
-            remove_linebreaks: true,
-            // forced_root_block: false,
-            newline_behavior: 'linebreak',
+            newline_behavior: 'linebreak',      // Enter → <br>; Shift+Enter also → <br>
+            remove_trailing_brs: false,         // Optional: preserve trailing <br> if needed
+            //forced_root_block: false,           // Explicitly disable block creation (pairs well with linebreak mode)
 
-            ///ver 4
+
             menubar: false,
             toolbar1: 'undo redo | styles | fontfamily fontsize | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
             toolbar2: 'code|link unlink anchor | image media  | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser',
             plugins: 'link image lists charmap anchor insertdatetime media code',
 
             style_formats: [
+                { title: 'Paragraph', block: 'p' },
                 { title: 'Heading 1', block: 'h1' },
                 { title: 'Heading 2', block: 'h2' },
                 { title: 'Heading 3', block: 'h3' },
@@ -102,33 +96,54 @@ class MCETextArea extends Component {
             mce_setup_object = this.defaultSetup();
         }
 
-        let instance = this;
-
-        mce_setup_object.setup = function (editor) {
+        mce_setup_object.setup = (editor) => {
 
             editor.ui.registry.addButton('spark_imagebrowser', {
                 text: 'Image Browser',
                 onAction: () => {
-                    instance.onInsertImage(editor);
+                    this.onInsertImage(editor);
                 }
             });
 
 
-            // editor.on("change keyup", function (e) {
+            // editor.on("change keyup", (e) => {
             //     console.log('change keyup');
             //     editor.save(); // updates this instance's textarea
             // });
 
-            editor.on('init', function (event) {
-                instance.onEditorInit(editor);
+            editor.on('init', (event) => {
+                this.onEditorInit(editor);
+            });
+
+            editor.on('BeforeSetContent', (e) => {
+
+                e.content = this.cleanup(e.content);
+
+            });
+
+            editor.on('GetContent', (e) => {
+
+                e.content = this.cleanup(e.content);
+
             });
         };
+
 
         mce_setup_object.selector = this.selector();
 
         //mce_area.tinymce(mce_setup_object);
         tinymce.init(mce_setup_object);
 
+    }
+    cleanup(content)
+    {
+        // Step 1: Replace real control characters (most common case)
+        let processed = content
+            .replace(/\r\n/g, '')     // Windows-style first
+            .replace(/[\r\n]/g, '');  // Any remaining \r or \n
 
+        // Step 2: If content was double-escaped or literal \\r\\n present (e.g., from JSON mishandling)
+        processed = processed.replace(/\\r\\n|\\r|\\n/g, '');
+        return processed;
     }
 }
