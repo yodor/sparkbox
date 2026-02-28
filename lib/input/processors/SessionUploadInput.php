@@ -140,7 +140,7 @@ class SessionUploadInput extends InputProcessor
                 Debug::ErrorLog("Appending StorageObject UID: " . $storage_object->UID() . " to field values");
 
             } else {
-                Debug::ErrorLog("[$uid] is not StorageObject - removing from session array");
+                Debug::ErrorLog("[$uid] is not StorageObject - removing from session array: ".get_class($storage_object));
                 $session_data->remove($uid);
             }
 
@@ -166,7 +166,7 @@ class SessionUploadInput extends InputProcessor
         $session_data->destroy();
     }
 
-    public function transactValue(BeanTransactor $transactor) : void
+    public function transactValue(IValueTransactor $transactor) : void
     {
 
         $name = $this->input->getName();

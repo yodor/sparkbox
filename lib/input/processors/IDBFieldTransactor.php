@@ -4,7 +4,7 @@ include_once("dbdriver/DBDriver.php");
 
 interface IDBFieldTransactor
 {
-    public function transactValue(BeanTransactor $transactor) : void;
+    public function transactValue(IValueTransactor $transactor) : void;
 
     public function beforeCommit(BeanTransactor $transactor, DBDriver $db, string $item_key) : void;
 

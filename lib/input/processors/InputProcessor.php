@@ -45,12 +45,6 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      */
     public array $renderer_source_copy_fields = array();
 
-    /**
-     * Override the default accepted tags during sanitizeInput in loadPostData().
-     * Default is = DefaultAcceptedTags()
-     * @var string
-     */
-    public string $accepted_tags;
 
     /**
      * The primary key values for each result loaded from the 'transact_bean' during load bean data
@@ -84,8 +78,6 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
     {
         $this->input = $input;
         $this->input->setProcessor($this);
-
-        $this->accepted_tags = Spark::DefaultAcceptedTags();
 
         $this->transact_column = $input->getName();
     }
@@ -287,7 +279,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
      * @return void
      * @throws Exception
      */
-    public function transactValue(BeanTransactor $transactor) : void
+    public function transactValue(IValueTransactor $transactor) : void
     {
 
         $name = $this->input->getName();
@@ -436,7 +428,8 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
             $value = $data[$name];
 
-            $value = Spark::SanitizeInput($value, $this->accepted_tags);
+            $allowHTML = ($this->input->getRenderer() instanceof MCETextArea);
+            $value = Spark::SanitizeInput($value, $allowHTML);
 
             $this->input->setValue($value);
 

@@ -453,12 +453,29 @@ final class Spark {
         return (strcmp($password, "d41d8cd98f00b204e9800998ecf8427e") == 0);
     }
 
+    /**
+     * Escapes a string to be safe for HTML attribute values and element content.
+     *
+     * Reverses any prior custom escaping, then applies HTML5-safe escaping.
+     * Safe to use in: attribute values (value="", data-*, title="") and between html tags lik <textarea>.
+     *
+     * @param string $value Input string (possibly previously escaped)
+     * @return string       Escaped string safe for HTML output
+     */
     final static public function AttributeValue(string $value) : string
     {
         return htmlspecialchars(Spark::Unescape($value), ENT_QUOTES | ENT_HTML5, "UTF-8");
-        //old version
-        //return htmlentities(Spark::Unescape($value), ENT_QUOTES, "UTF-8");
     }
+
+
+    /**
+     * Reverses custom escaping of backslashes, quotes, and control characters.
+     * Returns empty string if input is null.
+     *
+     * @param string|null $input   Input string to unescape
+     * @param int         $checkbr Unused parameter (kept for compatibility)
+     * @return string              Unescaped string
+     */
     final static public function Unescape(?string $input, $checkbr = 0) : string
     {
         if (!is_null($input)) {
@@ -582,50 +599,50 @@ final class Spark {
 
     }
 
-    final static public function DefaultAcceptedTags() : string
+    final static public function SanitizeInput(array|string $value, bool $allowHTML = false) : array|string
     {
-        return "<br><p><a><ul><ol><li><b><u><i><h1><h2><h3><h4><h5><h6><center><sub><sup><hr><img><object><video><embed><iframe><strong><em><span>";
+        if (is_array($value)) return Spark::SafeArray($value, $allowHTML);
+        return Spark::SafeValue($value, $allowHTML);
     }
 
-    final static public function SanitizeInput(array|string $value, $accepted_tags = NULL) : array|string
+    static private function SafeArray(array $arr, bool $allowHTML = false) : array
     {
-        if (is_array($value)) return Spark::SafeArray($value, $accepted_tags);
-        return Spark::SafeValue($value, $accepted_tags);
-    }
-
-    static private function SafeArray($arr, $accepted_tags = NULL) : array
-    {
-        if (is_null($accepted_tags)) $accepted_tags = Spark::DefaultAcceptedTags();
-
         $safe_ret = array();
         foreach ($arr as $key => $val) {
             if (is_array($val)) {
-                $safe_ret[$key] = Spark::SafeArray($val, $accepted_tags);
+                $safe_ret[$key] = Spark::SafeArray($val, $allowHTML);
             }
             else {
-
-                $safe_ret[$key] = Spark::SafeValue($val, $accepted_tags);
-
+                $safe_ret[$key] = Spark::SafeValue($val, $allowHTML);
             }
-
         }
-
         return $safe_ret;
-
     }
 
-    //if get_magic_quotes_gpc();         // 1 then post data is already escaped
-    static private function SafeValue($val, $accepted_tags = NULL) : string
+    private static function SafeValue(string $input, bool $allowHTML = false): string
     {
-        if (is_null($accepted_tags)) $accepted_tags = Spark::DefaultAcceptedTags();
+        $input = trim($input);
 
-        $ret = strip_tags(html_entity_decode(stripslashes(trim($val))), $accepted_tags);
+        $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        $nohtml = strip_tags($input);
+        //html content check
+        if ($input !== $nohtml) {
+            // HTML path: preserve allowed formatting, remove dangerous attributes
+            if ($allowHTML) {
+                include_once("utils/CleanHTML.php");
+                $input = CleanHTML::Sanitize($input);
+            }
+            else {
+                $input = $nohtml;
+            }
+        }
 
         if (Spark::GetBoolean(Config::DB_ENABLED)) {
-            return DBConnections::Open()->escape($ret);
+            return DBConnections::Open()->escape($input);
         }
         else {
-            return Spark::EscapeHelper($ret);
+            return Spark::EscapeHelper($input);
         }
     }
 

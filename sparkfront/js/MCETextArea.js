@@ -17,7 +17,7 @@ class MCETextArea extends Component {
         return {
             schema: 'html5',
 
-            extended_valid_elements: 'img[*],a[*],span[*]',
+            extended_valid_elements: 'img[*],a[*]',
 
             // Location of TinyMCE script
             script_url: document.Spark.LOCAL + '/js/tiny_mce/tinymce.min.js',
@@ -34,7 +34,7 @@ class MCETextArea extends Component {
 
             menubar: false,
             toolbar1: 'undo redo | styles | fontfamily fontsize | bold italic underline strikethrough | alignleft aligncenter alignright | bullist numlist outdent indent blockquote',
-            toolbar2: 'code|link unlink anchor | image media  | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser',
+            toolbar2: 'code|link unlink anchor | image media  | insertdatetime preview | forecolor backcolor | charmap | spark_imagebrowser | pageembed',
             plugins: 'link image lists charmap anchor insertdatetime media code',
 
             style_formats: [
@@ -47,7 +47,7 @@ class MCETextArea extends Component {
                 { title: 'Heading 6', block: 'h6' }
             ],
 
-            invalid_elements: 'iframe,object,embed',
+            //invalid_elements: 'iframe,object,embed',
 
             resize: 'both',
 

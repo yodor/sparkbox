@@ -37,7 +37,7 @@ class DataObjectInput extends InputProcessor
 
     }
 
-    public function transactValue(BeanTransactor $transactor) : void
+    public function transactValue(IValueTransactor $transactor) : void
     {
         $name = $this->input->getName();
 

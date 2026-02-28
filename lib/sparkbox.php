@@ -20,11 +20,12 @@ include_once("spark.php");
 
 //debugging helper
 include_once("debug.php");
-if (defined("DEBUG_LEVEL")) {
-    Debug::$traceDepth = intval(DEBUG_LEVEL);
-}
+
 if (getenv("DEBUG_LEVEL", true)!==false) {
     Debug::$traceDepth = intval(getenv("DEBUG_LEVEL", true));
+}
+if (defined("DEBUG_LEVEL")) {
+    Debug::$traceDepth = intval(DEBUG_LEVEL);
 }
 
 Spark::Set(Config::SPARKBOX_PATH, realpath(dirname(__DIR__)), true);

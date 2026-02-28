@@ -4,6 +4,7 @@ include_once("objects/SparkObserver.php");
 include_once("forms/InputForm.php");
 include_once("beans/IBeanEditor.php");
 include_once("objects/events/BeanTransactorEvent.php");
+include_once("beans/IValueTransactor.php");
 
 /**
  * Process all DataInput controls from an InputForm and prepare values to be stored in a DBTableBean
@@ -11,7 +12,7 @@ include_once("objects/events/BeanTransactorEvent.php");
  * Handles add data to 'DBTableBean' and edit data from 'DBTableBean'
  * Class BeanTransactor
  */
-class BeanTransactor extends SparkObject implements IBeanEditor
+class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransactor
 {
 
     protected array $values = array();

@@ -1,6 +1,7 @@
 <?php
 include_once("utils/Session.php");
-
+include_once("storage/FileStorageObject.php");
+include_once("storage/ImageStorageObject.php");
 /**
  * Store array in session
  */

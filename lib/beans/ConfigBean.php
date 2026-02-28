@@ -42,25 +42,24 @@ class ConfigBean extends DBTableBean
         return $this->section;
     }
 
-    public function get(string $key, $default_value = "") : mixed
+    public function get(string $key, string $default_value = "") : object|string
     {
+        $ret = $default_value;
 
-        $key = DBConnections::Open()->escape($key);
-        $section = DBConnections::Open()->escape($this->section);
+        $query = $this->queryField("config_key", $key, 1, "config_val");
+        $query->select->where()->add("section", "'$this->section'");
 
-        $qry = $this->queryField("config_key", $key, 1, "config_val");
-        $qry->select->where()->add("section", "'$section'");
-        $result = $default_value;
+        $query->exec();
 
-        if ($qry->exec() && $data = $qry->next()) {
-            $result = $data["config_val"];
-            $serial = @unserialize($result);
-            if ($serial) {
-                $result = $serial;
+        if ($result = $query->nextResult()) {
+            $ret = $result->get("config_val");
+            $object = @unserialize($ret);
+            if (is_object($object)) {
+                $ret = $object;
             }
         }
 
-        return $result;
+        return $ret;
     }
 
     public function clear(string $key) : void
@@ -70,30 +69,50 @@ class ConfigBean extends DBTableBean
 
     }
 
-    public function set(string $key, object|array|string $val) : void
+    /**
+     * @param string $key
+     * @param string $val
+     * @return void
+     * @throws Exception
+     */
+    public function set(string $key, string $val) : void
     {
 
-        $key = DBConnections::Open()->escape($key);
+        $db = DBConnections::Open();
+        try {
 
-        $this->deleteRef("config_key", $key);
+            $db->transaction();
 
-        if (is_object($val) || is_array($val)) {
-            $val = DBConnections::Open()->escape(serialize($val));
+            $this->deleteRef("config_key", $key, $db);
+
+            $data = array("config_key" => $key, "config_val" => $val, "section" => $this->section);
+            $this->insert($data, $db);
+
+            $db->commit();
         }
-        else {
-            $val = Spark::SanitizeInput($val);
+        catch (Exception $e) {
+            Debug::ErrorLog("Exception setting value for key='$key': ".$e->getMessage());
+            $db->rollback();
+            throw $e;
         }
-        $section = DBConnections::Open()->escape($this->section);
-        $data = array("config_key" => $key, "config_val" => $val, "section" => $section);
-        $this->insert($data);
 
     }
 
+    /**
+     * TODO remove form loading
+     * @param InputForm $form
+     * @return void
+     */
     public function loadForm(InputForm $form) : void
     {
         foreach ($form->inputs() as $field_name => $field) {
             $stored_value = $this->get($field_name);
-            $field->setValue(Spark::Unescape($stored_value));
+            if (is_object($stored_value)) {
+                $field->setValue($stored_value);
+            }
+            else {
+                $field->setValue(Spark::Unescape($stored_value));
+            }
         }
     }
 }
