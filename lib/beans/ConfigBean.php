@@ -75,7 +75,7 @@ class ConfigBean extends DBTableBean
      * @return void
      * @throws Exception
      */
-    public function set(string $key, string $val) : void
+    public function set(string $key, string|null $val) : void
     {
 
         $db = DBConnections::Open();
