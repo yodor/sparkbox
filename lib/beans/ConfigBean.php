@@ -42,7 +42,7 @@ class ConfigBean extends DBTableBean
         return $this->section;
     }
 
-    public function get(string $key, string $default_value = "") : object|string
+    public function get(string $key, string $default_value = "") : object|string|null
     {
         $ret = $default_value;
 
