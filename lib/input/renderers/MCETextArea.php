@@ -36,7 +36,10 @@ class MCETextArea extends TextArea
     public function requiredScript(): array
     {
         $arr = parent::requiredScript();
-        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/tiny_mce/tinymce.min.js";
+        //$arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/tiny_mce/tinymce.min.js";
+        $arr[] = "https://cdn.jsdelivr.net/npm/tinymce@latest/tinymce.min.js";
+
+
         $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/MCETextArea.js";
         return $arr;
     }

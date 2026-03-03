@@ -25,9 +25,9 @@ class MCETextArea extends Component {
             strict_loading_mode: true,
             //theme: "silver",
 
-            entity_encoding: "raw",
+            // entity_encoding: "raw",
 
-            newline_behavior: 'linebreak',      // Enter → <br>; Shift+Enter also → <br>
+            // newline_behavior: 'linebreak',      // Enter → <br>; Shift+Enter also → <br>
             remove_trailing_brs: false,         // Optional: preserve trailing <br> if needed
             //forced_root_block: false,           // Explicitly disable block creation (pairs well with linebreak mode)
 
