@@ -206,14 +206,18 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function getMaxPosition(): int
+    public function getMaxPosition(?SQLSelect $selectMax = null): int
     {
         $db = $this->db;
         $sql = "";
 
-        $selectMax = clone $this->select;
+        if (is_null($selectMax)) {
+            $selectMax = clone $this->select;
+        }
+
         $selectMax->fields()->setExpression(" MAX(position) ", "max_position");
 
+        //Debug::ErrorLog("Querying max_position: ".$selectMax->getSQL());
         $result = $db->query($selectMax->getSQL());
 
         if (!($result instanceof DBResult)) throw new Exception ("Error getting max position");
