@@ -23,11 +23,39 @@ class SparkEventManager
      * @return void
      * @throws Exception if event_class is not subclass of SparkEvent
      */
-    public static function register(string $event_class, IObserver $observer) : void
+    public static function register(string $event_class, IObserver $observer): void
     {
         if (!is_subclass_of($event_class, 'SparkEvent')) throw new Exception("Incorrect event_class - expecting SparkEvent subclass");
-        Debug::ErrorLog(get_class($observer)." observing $event_class");
+        $parentClass = "NULL";
+        if ($observer instanceof SparkObserver) {
+            if ($observer->getParent()) {
+                $parentClass = get_class($observer->getParent());
+            }
+        }
+        Debug::ErrorLog(get_class($observer) . "[$parentClass] observing $event_class");
         self::$subscribers[$event_class][] = $observer;
+    }
+
+    public static function unregister(string $event_class, IObserver $observer): void
+    {
+        foreach (self::$subscribers[$event_class] as $index => $subscriber) {
+            if ($subscriber === $observer) {
+                Debug::ErrorLog("Unregistering " . get_class($observer) . " from observing $event_class");
+                unset(self::$subscribers[$event_class][$index]);
+            }
+        }
+    }
+
+    public static function unregisterClosure(string $event_class, Closure $closure): void
+    {
+        foreach (self::$subscribers[$event_class] as $index => $subscriber) {
+            if ($subscriber instanceof SparkObserver) {
+                if ($subscriber->getCallback() === $closure) {
+                    Debug::ErrorLog("Unregistering closure from observing $event_class");
+                    unset(self::$subscribers[$event_class][$index]);
+                }
+            }
+        }
     }
 
     public static function subscribedEvents() : array

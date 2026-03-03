@@ -11,9 +11,9 @@ class SparkObject implements jsonSerializable
      */
     protected string $name = "";
 
-    public function __construct()
+    public function __construct(?SparkObject $parent = null)
     {
-
+        $this->parent = $parent;
     }
 
     public function getName(): string
@@ -57,7 +57,7 @@ class SparkObject implements jsonSerializable
      */
     public function equals( SparkObject $other ) : bool
     {
-        return (strcmp($this->hash(), $other->hash())==0);
+        return (strcmp($this->hash(), $other->hash())===0);
     }
 
     /**

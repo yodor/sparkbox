@@ -5,15 +5,16 @@ include_once("objects/SparkEvent.php");
 /**
  * Default adapter class using Closure callback
  */
-class SparkObserver implements IObserver
+class SparkObserver extends SparkObject implements IObserver
 {
     /**
      * @var Closure
      */
     protected Closure $callback;
 
-    public function __construct(Closure $closure)
+    public function __construct(Closure $closure, ?SparkObject $parent = null)
     {
+        parent::__construct($parent);
         $this->callback = $closure;
     }
 
