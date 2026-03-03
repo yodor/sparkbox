@@ -1,7 +1,45 @@
 <?php
 include_once("responders/RequestResponder.php");
 include_once("dialogs/InputMessageDialog.php");
+class InputPositionResponderScript extends PageScript
+{
+    protected string $cancelURL;
 
+    public function setCancelURL(string $cancelURL) : void
+    {
+        $this->cancelURL = $cancelURL;
+    }
+
+    public function code() : string
+    {
+        return <<<JS
+        onPageLoad(function () {
+            let input_position = new InputMessageDialog();
+            input_position.buttonAction = function(action) {
+                if (action === "confirm") {
+
+                    let position = input_position.input.value;
+
+                    let url = new URL(window.location.href);
+                    url.searchParams.set("position", position);
+
+                    window.location.href = url.href;
+
+                } 
+                else if (action == "cancel") {
+                    //console.log("Cancel");
+                    document.location.replace("{$this->cancelURL}");
+                }
+            };
+
+            input_position.initialize();
+            
+            input_position.show();
+        });
+JS;
+
+    }
+}
 class ChangePositionResponder extends RequestResponder
 {
 
@@ -112,40 +150,12 @@ class ChangePositionResponder extends RequestResponder
                 }
                 else {
                     //dialog is added as page_component
-                    //append buffer with init code only
                     $dialog = new InputMessageDialog();
                     $dialog->getInput()->setName("position");
                     $dialog->getInput()->setLabel("Input new position");
 
-                    $dialog->buffer()->start();
-                    ?>
-                    <script type="text/javascript">
-
-                        onPageLoad(function () {
-
-                            let input_position = new InputMessageDialog();
-                            input_position.buttonAction = function (action) {
-                                if (action === "confirm") {
-
-                                    let position = input_position.input().val();
-
-                                    let url = new URL(window.location.href);
-                                    url.searchParams.set("position", position);
-
-                                    window.location.href = url.href;
-
-                                } else if (action === "cancel") {
-
-                                    window.location.href = "<?php echo $this->cancel_url;?>";
-                                }
-                            }
-
-                            input_position.show();
-                        });
-
-                    </script>
-                    <?php
-                    $dialog->buffer()->end();
+                    $script = new InputPositionResponderScript();
+                    $script->setCancelURL($this->cancel_url);
 
                 }
             }
@@ -155,5 +165,3 @@ class ChangePositionResponder extends RequestResponder
     }
 
 }
-
-?>

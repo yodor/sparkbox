@@ -29,6 +29,8 @@ class ConfirmResponderScript extends PageScript
                     document.location.replace("{$this->cancelURL}");
                 }
             };
+            
+            confirm_dialog.initialize();
             confirm_dialog.show();
         });
 JS;
