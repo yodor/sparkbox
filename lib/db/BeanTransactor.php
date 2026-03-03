@@ -271,6 +271,11 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
         else {
             Debug::ErrorLog("doing insert");
 
+            if (isset($this->values[$this->bean->key()])) {
+                Debug::ErrorLog("Bean Key ID should not be present in insert values removing key: [{$this->bean->key()}] => ".$this->values[$this->bean->key()]);
+                unset($this->values[$this->bean->key()]);
+            }
+
             $lastID = $this->bean->insert($this->values, $db);
             if ($lastID < 1) throw new Exception("Unable to insert: " . $db->getError());
 
