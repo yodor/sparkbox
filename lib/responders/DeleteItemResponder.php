@@ -42,6 +42,7 @@ class DeleteItemResponder extends RequestResponder
     {
         $action = parent::createAction($title);
         $action->getURL()->add(new DataParameter("item_id", $this->bean->key()));
+        $action->setTooltip(tr("Delete element"));
         return $action;
     }
 
