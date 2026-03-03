@@ -66,7 +66,7 @@ final class SparkLoader
     public function include(string $fileName, bool $includeAll = true) : void
     {
 
-        Debug::ErrorLog("Searching: $fileName.php | Include all: $includeAll");
+        Debug::ErrorLog("Searching: $fileName.php | Include all: ".($includeAll ? "Yes" : "No"));
 
         $found = 0;
         foreach (SparkLoader::$locations as $includePath => $includePrefix) {
@@ -334,10 +334,12 @@ final class Spark {
     final static public function CachePath() : string
     {
 
-        $result = dirname(Spark::Get(Config::APP_PATH)) . DIRECTORY_SEPARATOR . "sparkcache" . DIRECTORY_SEPARATOR . mb_strtolower(Spark::Get(Config::SITE_TITLE));
+        $appFolder = basename(Spark::Get(Config::APP_PATH));
+        $parentFolder = dirname(Spark::Get(Config::APP_PATH));
+        $result = $parentFolder . DIRECTORY_SEPARATOR . "sparkcache" . DIRECTORY_SEPARATOR . $appFolder;
 
         if (!file_exists($result)) {
-            Debug::ErrorLog("Creating cache folder: " . $result);
+            Debug::ErrorLog("Creating app root cache folder: " . $result);
             @mkdir($result, 0777, TRUE);
             if (!file_exists($result)) throw new Exception("Unable to create cache folder: " . $result);
         }
