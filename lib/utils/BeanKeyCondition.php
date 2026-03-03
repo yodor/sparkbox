@@ -19,6 +19,12 @@ class BeanKeyCondition extends RequestParameterCondition
 
     protected array $fields = array();
 
+    public static function ForBean(string $beanClassName, string $redirectURL, array $fields = array()): BeanKeyCondition
+    {
+        $bean = SparkLoader::Factory("beans")->instance($beanClassName, DBTableBean::class);
+        return new BeanKeyCondition($bean, $redirectURL, $fields);
+    }
+
     /**
      * Will fetch the bean fields specified in the $fields array parameter that can be accessed later from getData
      *
