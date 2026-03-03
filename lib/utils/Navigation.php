@@ -56,13 +56,16 @@ class Navigation
                 }
                 else {
                     //get the stored url
-                    $storedURL = $this->urldata->get($page);
-
-                    //loose comparison
-                    if (strcmp($storedURL->toString(),$pageURL->toString())===0) {
-                        Debug::ErrorLog("URL already exists with page [$page] - Clearing remaining entries");
-                        $clearRemaining = true;
+                    if (strcmp($page, $pageName) === 0) {
+//                        $storedURL = $this->urldata->get($page);
+//
+//                        //loose comparison
+//                        if (strcmp($storedURL->toString(),$pageURL->toString())==0) {
+                            Debug::ErrorLog("URL already exists with page [$page] - Clearing remaining entries");
+                            $clearRemaining = true;
+//                        }
                     }
+
                 }
             }
         }
