@@ -85,8 +85,15 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
     }
 
+    /**
+     * Load post data into form fields using each field processor and call validate
+     * @param InputForm $form
+     * @return void
+     */
     public function process(InputForm $form) : void
     {
+        $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
+
         $submitKey = FormRenderer::SUBMIT_NAME;
         $submitValue = "";
 
@@ -96,9 +103,8 @@ class FormProcessor implements IFormProcessor, IBeanEditor
 
         $form_name = $form->getName();
 
-        if (strcmp($submitValue, $form_name) != 0) {
+        if (strcmp($submitValue, $form_name) !== 0) {
             Debug::ErrorLog("STATUS_NOT_PROCESSED - _REQUEST[$submitKey] not equal to '$form_name' ");
-            $this->status = IFormProcessor::STATUS_NOT_PROCESSED;
             return;
         }
 
