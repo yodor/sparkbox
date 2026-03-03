@@ -19,13 +19,9 @@ class MCETextArea extends Component {
 
             extended_valid_elements: 'img[*],a[*]',
 
-            // Location of TinyMCE script
-            script_url: document.Spark.LOCAL + '/js/tiny_mce/tinymce.min.js',
-
             strict_loading_mode: true,
-            //theme: "silver",
 
-            // entity_encoding: "raw",
+            entity_encoding: "raw",
 
             // newline_behavior: 'linebreak',      // Enter → <br>; Shift+Enter also → <br>
             remove_trailing_brs: false,         // Optional: preserve trailing <br> if needed
@@ -61,7 +57,6 @@ class MCETextArea extends Component {
             //content_css: "/mycontent.css",
             content_style: "p { margin: 0; } body { line-height: 1; }",
 
-            //ver 7
             license_key: 'gpl',
 
             relative_urls : false,
