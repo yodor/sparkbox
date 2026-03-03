@@ -11,7 +11,7 @@ class CleanHTML
      * @var string
      */
     public static string $defaultAllowedTags =
-        "<p><a><ul><ol><li><b><u><i><h1><h2><h3><h4><h5><h6><sub><sup><hr><strong><em><span><img><video><iframe>";
+        "<br><p><a><ul><ol><li><b><u><i><h1><h2><h3><h4><h5><h6><sub><sup><hr><strong><em><span><img><video><iframe>";
 
     /**
      * Default allowed domains for embedded content (iframes, video src, etc.)
