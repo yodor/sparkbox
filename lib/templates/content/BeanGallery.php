@@ -20,9 +20,9 @@ class BeanGallery extends BeanList
     public function initialize(): void
     {
 
-        if ($this->request_condition instanceof BeanKeyCondition) {
-            $this->bean->select()->where()->addURLParameter($this->request_condition->getURLParameter());
-            $this->query->select->where()->addURLParameter($this->request_condition->getURLParameter());
+        if (Template::Condition() instanceof BeanKeyCondition) {
+            $this->bean->select()->where()->addURLParameter(Template::Condition()->getURLParameter());
+            $this->query->select->where()->addURLParameter(Template::Condition()->getURLParameter());
         }
 
         $h_delete = new DeleteItemResponder($this->bean);

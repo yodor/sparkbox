@@ -3,19 +3,63 @@ include_once("templates/TemplateConfig.php");
 include_once("templates/TemplateContent.php");
 include_once("objects/events/TemplateEvent.php");
 include_once("objects/SparkObserver.php");
+include_once("utils/RequestParameterCondition.php");
+include_once("utils/BeanKeyCondition.php");
 
 final class Template
 {
 
     static private string $PrefixTemplateContent = "templates/content";
 
-    static private string $PrefixPathConfig = "admin/path";
+    static private string $PrefixTemplateHandlers = "templates/handlers";
 
-    static private ?TemplateConfig $config = null;
+    static private string $Module = "";
+
+    static private string $ModulePathFolder = "path";
+
+    static private ?TemplateConfig $Config = null;
+
+    static private ?BeanKeyCondition $Condition = null;
 
     private function __construct()
     {
 
+    }
+
+    public static function PathURL(string $path) : URL
+    {
+        $url = new URL();
+        $url->add(new URLParameter("path", $path));
+        return $url;
+    }
+
+    public static function SetModule(string $module) : void
+    {
+        Template::$Module = $module;
+
+    }
+
+    public static function Condition(?BeanKeyCondition $condition = null) : ?BeanKeyCondition
+    {
+        if (!is_null($condition)) {
+            Template::$Condition = $condition;
+        }
+        return Template::$Condition;
+    }
+
+    public static function ModuleLocation() : string
+    {
+        return Template::$PrefixTemplateHandlers.DIRECTORY_SEPARATOR.Template::$Module;
+    }
+
+    public static function WrapObserver(Closure $current, ?Closure $parent=null) : Closure
+    {
+        return function (...$args) use ($current, $parent) {
+            if ($parent instanceof Closure) {
+                $parent(...$args);
+            }
+            return $current(...$args);
+        };
     }
 
     public static function List(string $beanClass): TemplateConfig
@@ -73,11 +117,18 @@ final class Template
     public static function Config(?TemplateConfig $config=null): ?TemplateConfig
     {
         if (!is_null($config)) {
-            Template::$config = $config;
-            SparkEventManager::emit(new TemplateEvent(TemplateEvent::CONFIG_CHANGED, Template::$config));
+
+            //remove old observer
+            if (!is_null(Template::$Config) && Template::$Config->observer) {
+                Debug::ErrorLog("Removing previous TemplateConfig::observer");
+                SparkEventManager::unregisterClosure(TemplateEvent::class, Template::$Config->observer);
+            }
+
+            Template::$Config = $config;
+            SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, Template::$Config));
         }
 
-        return Template::$config;
+        return Template::$Config;
     }
 
     /**
@@ -88,21 +139,22 @@ final class Template
     public static function LoadContent(): TemplateContent
     {
 
-        if (!(Template::$config instanceof TemplateConfig)) {
+        if (!(Template::$Config instanceof TemplateConfig)) {
             throw new Exception("TemplateConfig not initialized yet");
         }
 
-        if (!Template::$config->contentClass) throw new Exception("TemplateConfig contentClass is empty");
+        if (!Template::$Config->contentClass) throw new Exception("TemplateConfig contentClass is empty");
 
-        if (!is_null(Template::$config->observer)) {
-            SparkEventManager::register(TemplateEvent::class, new SparkObserver(Template::$config->observer));
+        $cmp = SparkLoader::Factory(Template::$PrefixTemplateContent)->instance(Template::$Config->contentClass, TemplateContent::class);
+        if (!($cmp instanceof TemplateContent)) throw new Exception("Content class not instance of TemplateContent");
+
+        if (!is_null(Template::$Config->observer)) {
+            SparkEventManager::register(TemplateEvent::class, new SparkObserver(Template::$Config->observer));
         }
 
-        $cmp = SparkLoader::Factory(Template::$PrefixTemplateContent)->instance(Template::$config->contentClass, TemplateContent::class);
-        if (!$cmp instanceof TemplateContent) throw new Exception("Content class not instance of TemplateContent");
         SparkEventManager::emit(new TemplateEvent(TemplateEvent::CONTENT_CREATED, $cmp));
 
-        $cmp->setup(Template::$config);
+        $cmp->setup(Template::$Config);
         SparkEventManager::emit(new TemplateEvent(TemplateEvent::CONTENT_SETUP, $cmp));
 
         $cmp->initialize();
@@ -125,17 +177,22 @@ final class Template
     public static function PathConfig(string $path) : void
     {
 
+        Debug::ErrorLog("Using path: ".$path);
+
         $path = Spark::Split($path, "/");
         $path = implode(".", $path);
 
-        //search all include paths for code to call Template::Configure
-        SparkLoader::Factory(Template::$PrefixPathConfig)->include($path);
+        $modulePath = Template::ModuleLocation();
+        $modulePath.= DIRECTORY_SEPARATOR.Template::$ModulePathFolder;
 
-        if (!(Template::$config instanceof TemplateConfig)) {
-            throw new Exception("TemplateConfig not initialized after searching [admin/path] locations for [$path.php]");
+        //search all include paths for code to call Template::Configure
+        SparkLoader::Factory($modulePath)->include($path);
+
+        if (!(Template::$Config instanceof TemplateConfig)) {
+            throw new Exception("TemplateConfig not initialized after searching [$modulePath] for [$path.php]");
         }
 
-        Template::$config->filename = $path;
+        Template::$Config->filename = $path;
 
 
 

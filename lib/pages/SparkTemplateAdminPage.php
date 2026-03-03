@@ -72,8 +72,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
         $this->menu_bar->setAttribute("noattach");
 
-        MenuItemRenderer::$append_parent_href = true;
-        MenuItemRenderer::$href_prefix = Spark::Get(Config::ADMIN_LOCAL) . "2/";
+
 
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminTemplatePage.css");
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminMenu.css");
@@ -113,6 +112,8 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $helpFetcher = new AdminHelpResponder();
 
         SparkEventManager::register(TemplateEvent::class, $this);
+        SparkEventManager::register(TemplateMenuEvent::class, $this);
+        SparkEventManager::register(TemplateConfigEvent::class, $this);
 
         $this->addParameterName("path");
 
@@ -128,13 +129,16 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
 
         try {
+            MenuItemRenderer::$append_parent_href = true;
+            MenuItemRenderer::$href_prefix = Spark::Get(Config::ADMIN_LOCAL) . "2/";
+            Template::SetModule("admin");
             //fire TemplateEvent::MENU_CREATED
-            SparkLoader::Factory("admin")->include("menu");
+            SparkLoader::Factory(Template::ModuleLocation())->include("menu");
             Template::PathConfig($path);
         }
         catch (Exception $e) {
             Template::Config(Template::Plain("Error:$path", $e->getMessage()));
-            Debug::ErrorLog("Initialization failed: ".$e->getMessage());
+            Debug::ErrorLog("PathConfig failed: ".$e->getMessage());
         }
 
     }
@@ -349,25 +353,18 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
     public function onEvent(SparkEvent $event): void
     {
-        if (!($event instanceof TemplateEvent)) return;
-        if ($event->isEvent(TemplateEvent::MENU_CREATED)) {
+
+        if ($event->isEvent(TemplateMenuEvent::CREATED)) {
             $menu = $event->getSource();
             if ($menu instanceof MenuItemList) {
                 $this->menu_bar->setMenu($menu);
             }
         }
-        else if ($event->isEvent(TemplateEvent::CONFIG_CHANGED)) {
-            try {
-                $content = Template::LoadContent();
-                if (!($content instanceof TemplateContent)) {
-                    throw new Exception("LoadContent returned wrong or null content");
-                }
-            }
-            catch (Exception $e) {
-                Template::Config(Template::Plain("Error:{$this->path}","TemplateEvent::CONFIG_CHANGED: ".$e->getMessage()));
-                Debug::ErrorLog("TemplateEvent::CONFIG_CHANGED failed: ".$e->getMessage());
-            }
+
+        else if ($event->isEvent(TemplateConfigEvent::UPDATE)) {
+            $content = Template::LoadContent();
         }
+
         else if ($event->isEvent(TemplateEvent::CONTENT_INPUT_PROCESSED)) {
             $this->update($event->getSource());
         }

@@ -37,7 +37,6 @@ class ConfigEditor extends TemplateContent
     public function setForm(InputForm $form): void
     {
         $this->form = $form;
-        $this->bean->loadForm($form);
     }
 
     public function getForm(): InputForm
@@ -50,14 +49,10 @@ class ConfigEditor extends TemplateContent
         return $this->processor;
     }
 
-    public function setConfigSection(string $section): void
+    public function setSection(string $section): void
     {
 
         $this->bean->setSection($section);
-
-        if ($this->form) {
-            $this->bean->loadForm($this->form);
-        }
 
     }
 
@@ -71,7 +66,6 @@ class ConfigEditor extends TemplateContent
             exit;
         }
     }
-
 
     public function formRenderer(): FormRenderer
     {

@@ -190,14 +190,14 @@ class BeanList extends TemplateContent
 
             $paramCmd = new URLParameter(RequestResponder::KEY_COMMAND, ChangePositionResponder::class);
             $paramItemId = new DataParameter("item_id", $bkey);
-            $paramType = new URLParameter("type", "previous");
+            $paramType = new URLParameter("type", "");
             //
             $act->append(Action::RowSeparator());
 
             $actionPrev = TemplateContent::CreateAction("previous", tr("Previous"));
             $paramType->setValue($actionPrev->getAction());
             $actionPrev->getURL()->add($paramCmd);
-            $actionPrev->getURL()->add($paramType);
+            $actionPrev->getURL()->add(clone $paramType);
             $actionPrev->getURL()->add($paramItemId);
             $actionPrev->setTooltip(tr("Move element one position backward"));
             $act->append($actionPrev);
@@ -207,7 +207,7 @@ class BeanList extends TemplateContent
             $actionNext = TemplateContent::CreateAction("next", tr("Next"));
             $paramType->setValue($actionNext->getAction());
             $actionNext->getURL()->add($paramCmd);
-            $actionNext->getURL()->add($paramType);
+            $actionNext->getURL()->add(clone $paramType);
             $actionNext->getURL()->add($paramItemId);
             $actionNext->setTooltip(tr("Move element one position forward"));
             $act->append($actionNext);
@@ -217,7 +217,7 @@ class BeanList extends TemplateContent
             $actionFirst = TemplateContent::CreateAction("first", tr("First"));
             $paramType->setValue($actionFirst->getAction());
             $actionFirst->getURL()->add($paramCmd);
-            $actionFirst->getURL()->add($paramType);
+            $actionFirst->getURL()->add(clone $paramType);
             $actionFirst->getURL()->add($paramItemId);
             $actionFirst->setTooltip(tr("Move element to first position"));
             $act->append($actionFirst);
@@ -227,7 +227,7 @@ class BeanList extends TemplateContent
             $actionLast = TemplateContent::CreateAction("last", tr("Last"));
             $paramType->setValue($actionLast->getAction());
             $actionLast->getURL()->add($paramCmd);
-            $actionLast->getURL()->add($paramType);
+            $actionLast->getURL()->add(clone $paramType);
             $actionLast->getURL()->add($paramItemId);
             $actionLast->setTooltip("Move element to last position");
             $act->append($actionLast);
@@ -237,7 +237,7 @@ class BeanList extends TemplateContent
             $actionPos = TemplateContent::CreateAction("fixed", tr("Set Position"));
             $paramType->setValue($actionPos->getAction());
             $actionPos->getURL()->add($paramCmd);
-            $actionPos->getURL()->add($paramType);
+            $actionPos->getURL()->add(clone $paramType);
             $actionPos->getURL()->add($paramItemId);
             $actionPos->setTooltip("Specify element position");
             $act->append($actionPos);
@@ -290,6 +290,15 @@ class BeanList extends TemplateContent
 
     }
 
+    public function getItemActions() : ActionsCell
+    {
+        $tableView = $this->tableView();
+        $actionsColumn = $tableView->getColumn("actions");
+        $actionsCell = $actionsColumn->getCellRenderer();
+        if ($actionsCell instanceof ActionsCell) return $actionsCell;
+        throw new Exception("ActionsCell not set");
+
+    }
 
     public function tableView(): TableView
     {
@@ -299,10 +308,13 @@ class BeanList extends TemplateContent
 
     public function setup(TemplateConfig $config): void
     {
-        parent::setup($config);
-
+        if ($config->iterator) $this->setIterator($config->iterator);
         if ($config->listFields) $this->setListFields($config->listFields);
         if ($config->searchField) $this->getSearch()->getForm()->setColumns($config->searchField);
+
+        parent::setup($config);
+
+
     }
 
     protected function getContentTitle(): string

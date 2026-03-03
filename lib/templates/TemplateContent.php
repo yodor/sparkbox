@@ -8,7 +8,6 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
 {
     protected ?TemplateConfig $config = null;
     protected ?Component $cmp = null;
-    protected ?RequestParameterCondition $request_condition = null;
     protected ?DBTableBean $bean = null;
 
     protected ?SQLQuery $query = null;
@@ -36,19 +35,24 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
         return $this->cmp;
     }
 
-    public static function CreateAction(string $action, ?string $contents = "", string $appendPath = ""): Action
+    public static function CreateAction(string $action, ?string $contents = "", string $usePath = ""): Action
     {
         $act = new Action();
         $act->setURL(SparkTemplateAdminPage::Instance()->currentURL());
         $act->setAction($action);
-        $act->getURL()->add(new URLParameter("action", $action));
+        //$act->getURL()->add(new URLParameter("action", $action));
         if (!is_null($contents)) {
             $act->setContents($contents);
         }
-        if ($appendPath) {
+        if ($usePath) {
             $pathParam = $act->getURL()->get("path");
             if ($pathParam instanceof URLParameter) {
-                $pathParam->setValue($pathParam->value() . "/" . $appendPath);
+                if (str_starts_with($usePath, "/")) {
+                    $pathParam->setValue($usePath);
+                }
+                else {
+                    $pathParam->setValue($pathParam->value() . "/" . $usePath);
+                }
             }
         }
         return $act;
@@ -84,24 +88,11 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
 
     }
 
-    public function setRequestCondition(RequestParameterCondition $condition): void
-    {
-        $this->request_condition = $condition;
-    }
-
-    public function getRequestCondition(): RequestParameterCondition
-    {
-        return $this->request_condition;
-    }
-
     public function setup(TemplateConfig $config): void
     {
 
         if ($config->beanClass) {
             $this->setBean(SparkLoader::Factory("beans")->instance($config->beanClass, DBTableBean::class));
-        }
-        if ($config->condition) {
-            $this->setRequestCondition($config->condition);
         }
 
         if (!$config->title) {
