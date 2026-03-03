@@ -46,7 +46,7 @@ class KeywordSearchForm extends InputForm
 
     protected function clauseValue(string $key, string $val): SQLClause
     {
-        if (strcmp($key, "keyword")!=0) {
+        if (strcmp($key, "keyword")!==0) {
             return parent::clauseValue($key, $val);
         }
 

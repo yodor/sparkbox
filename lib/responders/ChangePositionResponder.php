@@ -100,7 +100,7 @@ class ChangePositionResponder extends RequestResponder
         }
 
         if ($this->bean instanceof OrderedDataBean) {
-            if (strcmp($this->type, "fixed") == 0) {
+            if (strcmp($this->type, "fixed") === 0) {
                 if ($this->position < 1) {
                     $this->need_redirect = FALSE;
                 }
@@ -121,30 +121,30 @@ class ChangePositionResponder extends RequestResponder
     {
 
         if ($this->bean instanceof NestedSetBean) {
-            if (strcmp($this->type, "left") == 0) {
+            if (strcmp($this->type, "left") === 0) {
                 $this->bean->moveLeft($this->item_id);
 
             }
-            else if (strcmp($this->type, "right") == 0) {
+            else if (strcmp($this->type, "right") === 0) {
                 $this->bean->moveRight($this->item_id);
             }
         }
 
         else if ($this->bean instanceof OrderedDataBean) {
 
-            if (strcmp($this->type, "first") == 0) {
+            if (strcmp($this->type, "first") === 0) {
                 $this->bean->reorderTop($this->item_id);
             }
-            else if (strcmp($this->type, "last") == 0) {
+            else if (strcmp($this->type, "last") === 0) {
                 $this->bean->reorderBottom($this->item_id);
             }
-            else if (strcmp($this->type, "previous") == 0) {
+            else if (strcmp($this->type, "previous") === 0) {
                 $this->bean->reorderUp($this->item_id);
             }
-            else if (strcmp($this->type, "next") == 0) {
+            else if (strcmp($this->type, "next") === 0) {
                 $this->bean->reorderDown($this->item_id);
             }
-            else if (strcmp($this->type, "fixed") == 0) {
+            else if (strcmp($this->type, "fixed") === 0) {
                 if ($this->position > 0) {
                     $this->bean->reorderFixed($this->item_id, $this->position);
                 }

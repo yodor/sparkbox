@@ -147,7 +147,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             return;
         }
 
-        if (strcmp($this->transact_bean->getTableName(), $transactor->getBean()->getTableName()) == 0) {
+        if (strcmp($this->transact_bean->getTableName(), $transactor->getBean()->getTableName()) === 0) {
             throw new Exception("Unable to transact - DataInput '" . $this->input->getName() . "' have transact-bean equal to the main bean - '" . get_class($this->transact_bean) . "'");
         }
 

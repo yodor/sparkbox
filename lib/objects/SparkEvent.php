@@ -39,7 +39,7 @@ class SparkEvent extends SparkObject
      */
     public function isEvent(string $name) : bool
     {
-        return (strcmp($this->name, $name)==0);
+        return (strcmp($this->name, $name)===0);
     }
 
 }

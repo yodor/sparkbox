@@ -185,7 +185,7 @@ class InputForm extends SparkObject implements IBeanEditor
 
     public function addGroup(InputGroup $group): void
     {
-        if (strcmp($group->getName(), InputForm::DEFAULT_GROUP)==0) {
+        if (strcmp($group->getName(), InputForm::DEFAULT_GROUP)===0) {
             throw new Exception("InputGroup name '".InputForm::DEFAULT_GROUP."' is reserved");
         }
         $this->groups[$group->getName()] = $group;
@@ -562,7 +562,7 @@ class InputForm extends SparkObject implements IBeanEditor
 
             $val = $input->getValue();
 
-            if ($val > -1 && strcmp($val, "") != 0) {
+            if ($val > -1 && strcmp($val, "") !== 0) {
 
                 $field_name = str_replace("|", ".", $name);
 

@@ -157,7 +157,7 @@ class ResultViewHeader extends Container
             $link->get(Paginator::KEY_ORDER_BY)->setValue($sortField->getName());
             $link->get(Paginator::KEY_ORDER_DIR)->setValue($sortField->getDirection());
 
-            if ($selectedField && strcmp($sortField->getName(), $selectedField->getName()) == 0) {
+            if ($selectedField && strcmp($sortField->getName(), $selectedField->getName()) === 0) {
                 $this->sort->getDataInput()->setValue($link->toString());
             }
 
@@ -175,7 +175,7 @@ class ResultViewHeader extends Container
 
         //next click toggle direction
         $direction = OrderColumn::ASC;
-        if (strcmp($activeOrdering->getDirection(), OrderColumn::ASC) == 0) {
+        if (strcmp($activeOrdering->getDirection(), OrderColumn::ASC) === 0) {
             $direction = OrderColumn::DESC;
         }
         $link->get(Paginator::KEY_ORDER_DIR)->setValue($direction);

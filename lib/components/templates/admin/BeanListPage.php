@@ -289,7 +289,7 @@ class BeanListPage extends AdminPageTemplate
 
             $idColumn = $this->view->getColumn($this->query->key());
             if ($this->view->haveColumn("position")) {
-                if (strcmp($idColumn->getLabel(), "ID")==0) {
+                if (strcmp($idColumn->getLabel(), "ID")===0) {
                     $this->view->removeColumn($this->query->key());
                 }
                 $this->view->getColumn("position")->setAlignClass("center");

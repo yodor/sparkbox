@@ -100,7 +100,7 @@ abstract class DBTableBean
         if (!($result instanceof DBResult)) throw new Exception("Unable to query table fields");
 
         while ($row = $result->fetch()) {
-            if (strcmp($row["Key"], "PRI") == 0) {
+            if (strcmp($row["Key"], "PRI") === 0) {
                 $this->prkey = $row["Field"];
             }
 

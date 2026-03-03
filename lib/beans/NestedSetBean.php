@@ -468,7 +468,7 @@ class NestedSetBean extends DBTableBean
      */
     public function selectTree(array $columns = array(), string $prefix = "node"): SQLSelect
     {
-        if (strcmp($prefix, "node") != 0 && strcmp($prefix, "parent") != 0) {
+        if (strcmp($prefix, "node") !== 0 && strcmp($prefix, "parent") !== 0) {
             throw new Exception("Prefix should be 'node' or 'parent'");
         }
 

@@ -452,7 +452,7 @@ final class Spark {
 
     final static public function IsEmptyPassword($password) : bool
     {
-        return (strcmp($password, "d41d8cd98f00b204e9800998ecf8427e") == 0);
+        return (strcmp($password, "d41d8cd98f00b204e9800998ecf8427e") === 0);
     }
 
     /**
@@ -563,7 +563,7 @@ final class Spark {
     final static public function strcmp_isset(string $key, string $val, ?array $arr = NULL): bool
     {
         if (!$arr) $arr = $_GET;
-        return (isset($arr[$key]) && (strcmp($arr[$key], $val) == 0));
+        return (isset($arr[$key]) && (strcmp($arr[$key], $val) === 0));
     }
 
     final static public function HtmlStrip(string $data_str, string $allowable_tags = "<center><p><span><div><br><a>", array $allowable_attrs = array('href','src','alt','title')) : string

@@ -42,7 +42,7 @@ class SelectField extends DataIteratorField
 
     protected function compareValue(string $item_value, string $field_value) : bool
     {
-        return (strcmp($item_value, $field_value)==0);
+        return (strcmp($item_value, $field_value)===0);
     }
 
 }

@@ -71,7 +71,7 @@ class SparkAdminPage extends SparkPage
         $menuItems = $this->initMainMenu();
 
         $access_level = $this->context->getData()->get(AdminAuthenticator::SESSION_DATA_ACCESS_LEVEL);
-        if (strcmp($access_level, AdminAuthenticator::ACCESS_LIMITED) == 0) {
+        if (strcmp($access_level, AdminAuthenticator::ACCESS_LIMITED) === 0) {
             $roles = $this->context->getData()->get(AdminAuthenticator::SESSION_DATA_ENABLED_ROLES);
 
             $enabledMenu = array();
@@ -88,7 +88,7 @@ class SparkAdminPage extends SparkPage
             $menuItems = $enabledMenu;
 
             $currentBasePath = pathInfo(URL::Current()->toString(), PATHINFO_DIRNAME);
-            if (strcmp($currentBasePath, Spark::Get(Config::ADMIN_LOCAL) ) != 0) {
+            if (strcmp($currentBasePath, Spark::Get(Config::ADMIN_LOCAL) ) !== 0) {
 
                 $found = false;
                 foreach ($enabledMenu as $menuItem) {

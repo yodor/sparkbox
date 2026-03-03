@@ -140,7 +140,7 @@ class Navigation
 
         foreach ($pages as $pageName) {
             $storedURL = $this->urldata->get($pageName);
-            if (strcmp($storedURL->getScriptName(), $current_script)==0) {
+            if (strcmp($storedURL->getScriptName(), $current_script)===0) {
                 continue;
             }
             else {

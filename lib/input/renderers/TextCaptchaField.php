@@ -40,11 +40,11 @@ class TextCaptchaField extends TextField
 
         $this->oper = $this->available_operands[random_int(0,1)];
 
-        if (strcmp($this->oper, "+")==0) {
+        if (strcmp($this->oper, "+")===0) {
             $this->result = $this->var1 + $this->var2;
             $this->label = $this->var1." + ".$this->var2." = ? ";
         }
-        else if (strcmp($this->oper, "-")==0) {
+        else if (strcmp($this->oper, "-")===0) {
             $this->result = $this->var1 - $this->var2;
             $this->label = $this->var1." - ".$this->var2." = ? ";
         }

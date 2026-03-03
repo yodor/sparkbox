@@ -25,7 +25,7 @@ class AdminAuthenticator extends Authenticator
 
         $this->session->set(AdminAuthenticator::SESSION_DATA_ACCESS_LEVEL, $access_level);
 
-        if (strcmp($access_level, AdminAuthenticator::ACCESS_LIMITED) == 0) {
+        if (strcmp($access_level, AdminAuthenticator::ACCESS_LIMITED) === 0) {
             $admin_access = new AdminAccessBean();
             $qry = $admin_access->queryField("userID", $userID, 0, "role");
             $numResults = $qry->exec();

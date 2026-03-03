@@ -18,7 +18,7 @@ class ComponentCollection extends SparkList {
         $comparator = function (Component $object, mixed ...$args) {
             list($value, $attribute_name) = $args;
 
-            if (strcmp($object->getAttribute($attribute_name), $value) == 0) {
+            if (strcmp($object->getAttribute($attribute_name), $value) === 0) {
                 return TRUE;
             }
             return FALSE;
@@ -36,7 +36,7 @@ class ComponentCollection extends SparkList {
     public function getByContent(string $parameter): ?Component
     {
         $comparator = function (Component $object, string $parameter) {
-            if (strcmp(strip_tags($object->getContents()), $parameter) == 0) {
+            if (strcmp(strip_tags($object->getContents()), $parameter) === 0) {
                 return TRUE;
             }
             return FALSE;
@@ -53,7 +53,7 @@ class ComponentCollection extends SparkList {
     public function getByName(string $name): ?Component
     {
         $comparator = function (Component $object, string $name) {
-            if (strcmp($object->getName(), $name) == 0) {
+            if (strcmp($object->getName(), $name) === 0) {
                 return TRUE;
             }
             return FALSE;
@@ -70,7 +70,7 @@ class ComponentCollection extends SparkList {
     public function getByClassName(string $name): ?Component
     {
         $comparator = function (Component $cmp, string $name)  {
-            if (strcmp($name, $cmp->getClassName()) == 0) {
+            if (strcmp($name, $cmp->getClassName()) === 0) {
                 return TRUE;
             }
             return FALSE;
@@ -87,7 +87,7 @@ class ComponentCollection extends SparkList {
     public function getByComponentClass(string $name): ?Component
     {
         $comparator = function (Component $cmp, string $name)  {
-            if (strcmp($name, $cmp->getComponentClass()) == 0) {
+            if (strcmp($name, $cmp->getComponentClass()) === 0) {
                 return TRUE;
             }
             return FALSE;
@@ -104,7 +104,7 @@ class ComponentCollection extends SparkList {
     public function getByContainerClass(string $name): ?Container
     {
         $comparator = function (Component $cmp, string $name)  {
-            if (strcmp($name, $cmp->getComponentClass()) == 0) {
+            if (strcmp($name, $cmp->getComponentClass()) === 0) {
                 return TRUE;
             }
             return FALSE;

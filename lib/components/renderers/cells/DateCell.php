@@ -18,7 +18,7 @@ class DateCell extends TableCell
     {
         parent::setData($data);
         $value = $this->getContents();
-        if (strcmp($value, "0000-00-00") == 0 || strlen($value) < 1) {
+        if (strcmp($value, "0000-00-00") === 0 || strlen($value) < 1) {
             $this->setContents("N/A");
         }
         else {

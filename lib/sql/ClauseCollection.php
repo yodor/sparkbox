@@ -51,7 +51,7 @@ class ClauseCollection extends SparkList implements ISQLGet
     {
         foreach ($this->elements as $idx=>$clause) {
             if (!($clause instanceof SQLClause))continue;
-            if (strcmp($clause->getExpression(), $expression)==0) {
+            if (strcmp($clause->getExpression(), $expression)===0) {
                 unset($this->elements[$idx]);
             }
         }

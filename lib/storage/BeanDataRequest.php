@@ -44,10 +44,10 @@ class BeanDataRequest
 
             $resp = NULL;
 
-            if (strcmp($this->cmd, BeanDataRequest::CMD_DATA) == 0) {
+            if (strcmp($this->cmd, BeanDataRequest::CMD_DATA) === 0) {
                 $resp = new FileDataResponse($id, $className);
             }
-            else if (strcmp($this->cmd, BeanDataRequest::CMD_PHOTO) == 0) {
+            else if (strcmp($this->cmd, BeanDataRequest::CMD_PHOTO) === 0) {
                 $resp = new ImageDataResponse($id, $className);
             }
             if (!($resp instanceof BeanDataResponse)) {

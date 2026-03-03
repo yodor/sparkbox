@@ -280,7 +280,7 @@ class BeanList extends TemplateContent
 
             $idColumn = $this->cmp->getColumn($this->query->key());
             if ($this->cmp->haveColumn("position")) {
-                if (strcmp($idColumn->getLabel(), "ID") == 0) {
+                if (strcmp($idColumn->getLabel(), "ID") === 0) {
                     $this->cmp->removeColumn($this->query->key());
                 }
                 $this->cmp->getColumn("position")->setAlignClass("center");

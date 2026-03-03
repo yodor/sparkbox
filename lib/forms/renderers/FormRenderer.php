@@ -165,7 +165,7 @@ class FormRenderer extends Form
             if (count($inputNames)<1) continue;
 
             $container = null;
-            if (count($group_names)==1 && strcmp($group_name, InputForm::DEFAULT_GROUP)==0) {
+            if (count($group_names)==1 && strcmp($group_name, InputForm::DEFAULT_GROUP)===0) {
                 //single group - with name default no rendering using input group
                 $container = new Container(false);
                 $container->wrapper_enabled = false;

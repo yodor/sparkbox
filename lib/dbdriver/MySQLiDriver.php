@@ -142,7 +142,7 @@ class MySQLiDriver extends DBDriver
         $found = FALSE;
         $result = $this->queryFields($table);
         while ($row = $result->fetch()) {
-            if (strcmp($row["Field"], $field_name) != 0) continue;
+            if (strcmp($row["Field"], $field_name) !== 0) continue;
             $ret = $row["Type"];
             $found = TRUE;
             break;
