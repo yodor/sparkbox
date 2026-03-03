@@ -35,26 +35,24 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
         return $this->cmp;
     }
 
+    /**
+     * Create new Action object using Template::PathURL and URL::Current as sourceURL for its href.
+     * $usePath can be relative or absolute (to the Template::ModuleLocation)
+     * @param string $action
+     * @param string|null $contents
+     * @param string $usePath
+     * @return Action
+     */
     public static function CreateAction(string $action, ?string $contents = "", string $usePath = ""): Action
     {
         $act = new Action();
-        $act->setURL(SparkTemplateAdminPage::Instance()->currentURL());
+        $act->setURL(Template::PathURL($usePath, URL::Current()));
         $act->setAction($action);
         //$act->getURL()->add(new URLParameter("action", $action));
         if (!is_null($contents)) {
             $act->setContents($contents);
         }
-        if ($usePath) {
-            $pathParam = $act->getURL()->get("path");
-            if ($pathParam instanceof URLParameter) {
-                if (str_starts_with($usePath, "/")) {
-                    $pathParam->setValue($usePath);
-                }
-                else {
-                    $pathParam->setValue($pathParam->value() . "/" . $usePath);
-                }
-            }
-        }
+
         return $act;
     }
 

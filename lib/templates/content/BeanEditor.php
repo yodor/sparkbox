@@ -41,14 +41,7 @@ class BeanEditor extends TemplateContent
 
     public function initialize(): void
     {
-
         $this->cmp = new BeanFormEditor($this->bean, $this->form);
-
-        if (Template::Condition() instanceof BeanKeyCondition) {
-            $this->bean->select()->where()->addURLParameter(Template::Condition()->getURLParameter());
-            $this->cmp->getTransactor()->appendURLParameter(Template::Condition()->getURLParameter());
-        }
-
     }
 
     public function editor(): BeanFormEditor

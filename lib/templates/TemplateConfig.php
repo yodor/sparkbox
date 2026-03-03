@@ -67,4 +67,6 @@ class TemplateConfig extends SparkObject
      * @var string
      */
     public string $filename = "";
+
+    public bool $clearNavigation = false;
 }

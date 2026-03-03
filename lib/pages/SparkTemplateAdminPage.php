@@ -131,7 +131,9 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         try {
             MenuItemRenderer::$append_parent_href = true;
             MenuItemRenderer::$href_prefix = Spark::Get(Config::ADMIN_LOCAL) . "2/";
-            Template::SetModule("admin");
+
+            Template::SetModule("admin", MenuItemRenderer::$href_prefix);
+
             //fire TemplateEvent::MENU_CREATED
             SparkLoader::Factory(Template::ModuleLocation())->include("menu");
             Template::PathConfig($path);
@@ -242,12 +244,6 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $selectedPath = $this->menu_bar->getMenu()->selectPath($this->path);
         Debug::ErrorLog("Location: $this->path | Matched: ", $selectedPath);
 
-//        $pathParts = Spark::Split($this->path);
-
-//        if (count($selectedPath)==count($pathParts)) {
-//            $this->navigation->clear();
-//        }
-
         $name = $this->getName();
 
         if (!$name) {
@@ -292,7 +288,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         if ($url instanceof URL) {
             $back_action = new Action();
             $back_action->setAction(SparkTemplateAdminPage::ACTION_BACK);
-            $back_action->setURL($url);
+            $back_action->setURL(Template::PathURL("", $url));
             $actions->items()->append($back_action);
         }
 
@@ -309,7 +305,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $actions_title->items()->append($help_action);
     }
 
-    protected function setPageName() : void
+    protected function setPageTitle() : void
     {
         $title = $this->items()
             ->getByContainerClass("basePane")->items()
@@ -335,13 +331,18 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
             foreach( Spark::ClassChain($content) as $pos=>$name) {
                 $this->base->addClassName($name);
             }
+
             $content->fillPageActions($this->getActions());
             $content->fillPageFilters($this->filters);
+
+            if ($content->config()->clearNavigation) {
+                $this->navigation->clear();
+            }
         }
 
         $this->updateNavigation();
 
-        $this->setPageName();
+        $this->setPageTitle();
         $this->setPageActions();
     }
 

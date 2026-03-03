@@ -20,11 +20,6 @@ class BeanGallery extends BeanList
     public function initialize(): void
     {
 
-        if (Template::Condition() instanceof BeanKeyCondition) {
-            $this->bean->select()->where()->addURLParameter(Template::Condition()->getURLParameter());
-            $this->query->select->where()->addURLParameter(Template::Condition()->getURLParameter());
-        }
-
         $h_delete = new DeleteItemResponder($this->bean);
 
         $h_repos = new ChangePositionResponder($this->bean);

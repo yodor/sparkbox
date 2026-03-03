@@ -15,6 +15,8 @@ final class Template
 
     static private string $Module = "";
 
+    static private string $ModuleLocation = "";
+
     static private string $ModulePathFolder = "path";
 
     static private ?TemplateConfig $Config = null;
@@ -26,17 +28,51 @@ final class Template
 
     }
 
-    public static function PathURL(string $path) : URL
+    /**
+     * Create/Convert url to 'path url' style - copying parameters from sourceURL if present.
+     * If $path parameter is present it overwrites the source path parameter
+     * If $path parameter is relative - path is appended to $sourceURL path
+     * If $path parameter is absolute (starting with '/') - path is replaced with $path
+     * Resulting url path is Template::$ModuleLocation + $path
+     *
+     * @param string $path
+     * @param URL|null $sourceURL
+     * @return URL
+     */
+    public static function PathURL(string $path, ?URL $sourceURL = null) : URL
     {
-        $url = new URL();
-        $url->add(new URLParameter("path", $path));
-        return $url;
+        $path = rtrim($path, '/');
+
+        $result = new URL();
+        if (!is_null($sourceURL)) {
+            $result = clone $sourceURL;
+        }
+
+        $pathParam = new URLParameter("path");
+        if ($result->contains("path")) {
+            $pathParam = $result->get("path");
+        }
+        else {
+            $result->add($pathParam);
+        }
+
+        if (str_starts_with($path, "/")) {
+            $pathParam->setValue($path);
+        }
+        else {
+            $pathParam->setValue(rtrim($pathParam->value(),"/") . "/" . $path);
+        }
+
+        $script = Template::$ModuleLocation . rtrim($pathParam->value(), "/");
+        $result->remove("path");
+        $result->setScriptName($script);
+        return $result;
     }
 
-    public static function SetModule(string $module) : void
+    public static function SetModule(string $module, string $location) : void
     {
         Template::$Module = $module;
-
+        Template::$ModuleLocation = rtrim($location, '/');
     }
 
     public static function Condition(?BeanKeyCondition $condition = null) : ?BeanKeyCondition

@@ -59,19 +59,20 @@
     position: sticky;
     top: 0;
 
-    border-bottom:2px dashed green;
+    border-bottom:1px solid #aaaaaa;
 
     z-index: 2;
 
     background-color: white;
 
-
+    gap:0.5em;
+    padding:0.5em;
 }
 
 .basePane .mainPane .header .actions_title {
     display: flex;
     flex-direction: row;
-    padding:0.5em;
+    /*margin:0.5em;*/
     gap:0.5em;
 }
 
@@ -90,6 +91,7 @@
 .basePane .mainPane .header .filters {
     display: flex;
     flex-direction: row;
+    /*margin:0.5em;*/
 }
 
 .basePane .mainPane .base {

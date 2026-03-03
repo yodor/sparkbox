@@ -95,6 +95,7 @@ class BeanList extends TemplateContent
     protected function setBeanQuery(): void
     {
 
+        //copy of bean select
         $qry = $this->bean->query();
         $sel = $qry->select;
         $sel->fields()->set($this->bean->key());
@@ -172,14 +173,18 @@ class BeanList extends TemplateContent
     {
 
         $editAction = TemplateContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, SparkTemplateAdminPage::ACTION_EDIT);
+        $editAction->setTooltip(tr("Edit element"));
         $editAction->getURL()->add(new DataParameter("editID", $this->getIterator()->key()));
+
         $act->append($editAction);
 
         $act->append(Action::PipeSeparator());
 
         if ($this->bean instanceof DBTableBean) {
             $h_delete = new DeleteItemResponder($this->bean);
-            $act->append($h_delete->createAction());
+            $deleteAction = $h_delete->createAction();
+            $deleteAction->setURL(Template::PathURL("", $deleteAction->getURL()));
+            $act->append($deleteAction);
         }
 
         if ($this->bean instanceof OrderedDataBean) {
@@ -255,6 +260,8 @@ class BeanList extends TemplateContent
     {
 
         if (!$this->query) throw new Exception("Query not set yet");
+
+        //echo $this->query->select->getSQL();
 
         $this->cmp = new TableView($this->query);
 
