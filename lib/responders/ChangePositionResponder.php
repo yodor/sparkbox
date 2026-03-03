@@ -18,12 +18,16 @@ class InputPositionResponderScript extends PageScript
             input_position.buttonAction = function(action) {
                 if (action === "confirm") {
 
-                    let position = input_position.input.value;
+                    let position = parseInt(input_position.input.value);
+                    if (position > 0) {
+                        let url = new URL(window.location.href);
+                        url.searchParams.set("position", position);
 
-                    let url = new URL(window.location.href);
-                    url.searchParams.set("position", position);
-
-                    window.location.href = url.href;
+                        window.location.href = url.href;
+                    }
+                    else {
+                        showAlert("Incorrect position");
+                    }
 
                 } 
                 else if (action == "cancel") {
