@@ -96,6 +96,7 @@ class MessageDialog extends TemplateComponent {
 
     remove() {
         super.remove();
+        MessageDialog.indexCounter--;
         this.shown = false;
     }
 
@@ -127,7 +128,7 @@ function showAlert(text) {
     };
 
     dialog.show();
-
+    dialog.element.style.zIndex = 100 + parseInt(dialog.index);
     return dialog;
 
 }
