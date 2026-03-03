@@ -7,9 +7,11 @@ class KeywordSearch extends Component {
     initialize() {
         super.initialize();
 
-        this.element.addEventListener('submit', (event)=> {
-            return this.onSubmit(event);
-        });
+        if (this.element instanceof HTMLFormElement) {
+            this.element.addEventListener('submit', (event) => {
+                return this.onSubmit(event);
+            });
+        }
     }
 
     submitURL(event) {
