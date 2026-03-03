@@ -314,7 +314,7 @@ abstract class DBTableBean
     }
 
     /**
-     * Retrieve single result row where primary key value = '$id'
+     * Retrieve single result row where primary key value = '$id' - Uses the current bean select
      * All columns are selected unless $columns is not empty then only primary key + $columns are selected
      * If ID is not found throws Exception
      * @param int $id
