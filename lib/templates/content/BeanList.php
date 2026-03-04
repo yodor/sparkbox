@@ -31,6 +31,7 @@ class BeanList extends TemplateContent
 
     /**
      * Called just before rendering is about to start to process the user input
+     * Default implementation processed the keyword search
      */
     public function processInput(): void
     {

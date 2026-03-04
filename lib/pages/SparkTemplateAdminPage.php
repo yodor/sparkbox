@@ -1,5 +1,5 @@
 <?php
-include_once("pages/SparkPage.php");
+include_once("pages/SparkTemplatePage.php");
 
 include_once("auth/AdminAuthenticator.php");
 include_once("beans/AdminAccessBean.php");
@@ -23,11 +23,11 @@ include_once("auth/AuthContext.php");
 include_once("components/TextComponent.php");
 include_once("utils/Navigation.php");
 
-include_once("templates/Template.php");
+
 include_once("store/responders/json/AdminHelpResponder.php");
 
 
-class SparkTemplateAdminPage extends SparkPage implements IObserver
+class SparkTemplateAdminPage extends SparkTemplatePage
 {
 
     /**
@@ -47,8 +47,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
     protected Container $base;
 
-    //
-    protected string $path = "";
+
 
     public function __construct()
     {
@@ -62,19 +61,11 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         //control gets here only if authorized
         $this->navigation = new Navigation("SparkAdmin");
 
-        if (isset($_GET["path"])) {
-            $this->path = $_GET["path"];
-        }
-
-
         $this->menu_bar = new MenuBar(new MenuItemList());
         $this->menu_bar->setClassName("admin_menu");
-
         $this->menu_bar->setAttribute("noattach");
 
-
-
-        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminTemplatePage.css");
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/SparkTemplateAdminPage.css");
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminMenu.css");
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/AdminTemplate.js");
@@ -111,37 +102,23 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
         $helpFetcher = new AdminHelpResponder();
 
-        SparkEventManager::register(TemplateEvent::class, $this);
+
+        //initialize menu and module
+        MenuItemRenderer::$append_parent_href = true;
+        MenuItemRenderer::$href_prefix = Spark::Get(Config::ADMIN_LOCAL) . "2/";
+
+        Template::SetModule("admin", MenuItemRenderer::$href_prefix);
+
         SparkEventManager::register(TemplateMenuEvent::class, $this);
-        SparkEventManager::register(TemplateConfigEvent::class, $this);
 
-        $this->addParameterName("path");
-
+        //fire TemplateEvent::MENU_CREATED
+        SparkLoader::Factory(Template::ModuleLocation())->include("menu");
     }
 
     public function initialize() : void
     {
 
-        $path = $this->path;
-        if (!$path) {
-            $path = "home";
-        }
-
-
-        try {
-            MenuItemRenderer::$append_parent_href = true;
-            MenuItemRenderer::$href_prefix = Spark::Get(Config::ADMIN_LOCAL) . "2/";
-
-            Template::SetModule("admin", MenuItemRenderer::$href_prefix);
-
-            //fire TemplateEvent::MENU_CREATED
-            SparkLoader::Factory(Template::ModuleLocation())->include("menu");
-            Template::PathConfig($path);
-        }
-        catch (Exception $e) {
-            Template::Config(Template::Plain("Error:$path", $e->getMessage()));
-            Debug::ErrorLog("PathConfig failed: ".$e->getMessage());
-        }
+        parent::initialize();
 
     }
 
@@ -317,27 +294,27 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $title->setContents($this->getName());
     }
 
-    public function update(?TemplateContent $content=null) : void
+    public function update(TemplateContent $content) : void
     {
-        if (!is_null($content)) {
-            $this->setName($content->config()->title);
+        parent::update($content);
 
-            if ($content->config()->summary) {
-                $summary = new TextComponent($content->config()->summary, "help summary");
-                $this->base->items()->append($summary);
-            }
+        $this->setName($content->config()->title);
 
-            $this->base->items()->append($content->component());
-            foreach( Spark::ClassChain($content) as $pos=>$name) {
-                $this->base->addClassName($name);
-            }
+        if ($content->config()->summary) {
+            $summary = new TextComponent($content->config()->summary, "help summary");
+            $this->base->items()->append($summary);
+        }
 
-            $content->fillPageActions($this->getActions());
-            $content->fillPageFilters($this->filters);
+        $this->base->items()->append($content->component());
+        foreach( Spark::ClassChain($content) as $pos=>$name) {
+            $this->base->addClassName($name);
+        }
 
-            if ($content->config()->clearNavigation) {
-                $this->navigation->clear();
-            }
+        $content->fillPageActions($this->getActions());
+        $content->fillPageFilters($this->filters);
+
+        if ($content->config()->clearNavigation) {
+            $this->navigation->clear();
         }
 
         $this->updateNavigation();
@@ -346,14 +323,10 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $this->setPageActions();
     }
 
-    public function getMenuBar() : MenuBar
-    {
-        return $this->menu_bar;
-    }
-
-
     public function onEvent(SparkEvent $event): void
     {
+        //handle Template::LoadContent
+        parent::onEvent($event);
 
         if ($event->isEvent(TemplateMenuEvent::CREATED)) {
             $menu = $event->getSource();
@@ -362,12 +335,10 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
             }
         }
 
-        else if ($event->isEvent(TemplateConfigEvent::UPDATE)) {
-            $content = Template::LoadContent();
-        }
+    }
 
-        else if ($event->isEvent(TemplateEvent::CONTENT_INPUT_PROCESSED)) {
-            $this->update($event->getSource());
-        }
+    public function getMenuBar() : MenuBar
+    {
+        return $this->menu_bar;
     }
 }
