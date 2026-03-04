@@ -17,7 +17,6 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
     public function __construct()
     {
         parent::__construct();
-
     }
 
     public function setBean(DBTableBean $bean): void

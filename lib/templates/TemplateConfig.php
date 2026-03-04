@@ -1,8 +1,37 @@
 <?php
 include_once("objects/SparkObject.php");
 
+class TemplateConfigEvent extends SparkEvent
+{
+    const string UPDATE = "UPDATE";
+
+}
+
 class TemplateConfig extends SparkObject
 {
+
+    protected static ?TemplateConfig $Active = null;
+
+    public function __construct()
+    {
+        parent::__construct();
+        TemplateConfig::Deactivate();
+        TemplateConfig::$Active = $this;
+    }
+
+    public static function Deactivate() : void
+    {
+        if (!is_null(TemplateConfig::$Active) && TemplateConfig::$Active->observer) {
+            Debug::ErrorLog("Removing previous TemplateConfig::observer");
+            SparkEventManager::unregisterClosure(TemplateConfigEvent::class, TemplateConfig::$Active->observer);
+        }
+        TemplateConfig::$Active = null;
+    }
+
+    public static function Active(): ?TemplateConfig
+    {
+        return TemplateConfig::$Active;
+    }
 
     /**
      * Used to create the page caption contents fills page->setName
