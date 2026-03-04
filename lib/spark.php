@@ -77,7 +77,7 @@ final class SparkLoader
 
             if (file_exists($includeFile)) {
                 $found++;
-                //Debug::ErrorLog("Including: ".$includeFile);
+                Debug::ErrorLog("Including: ".$includeFile);
                 include_once($includeFile);
 
                 if (!$includeAll) break;
@@ -128,7 +128,7 @@ final class SparkLoader
         $object = new $className();
         Debug::ErrorLog("Created object[".get_class($object)."] - Requested instance of $classType");
         if (!($object instanceof $classType)) throw new Exception("Object is not instance of $classType");
-        return new $className();
+        return $object;
     }
 }
 final class Marshall {
