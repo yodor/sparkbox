@@ -47,7 +47,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
     protected Container $base;
 
-
+    protected static ?MenuItemList $Menu = null;
 
     public function __construct()
     {
@@ -109,11 +109,21 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
         Template::SetModule("admin", MenuItemRenderer::$href_prefix);
 
-        SparkEventManager::register(TemplateMenuEvent::class, $this);
+        SparkTemplateAdminPage::$Menu = null;
+        SparkLoader::Factory(Template::ModuleLocation())->include("menu", true);
 
-        //fire TemplateEvent::MENU_CREATED
-        SparkLoader::Factory(Template::ModuleLocation())->include("menu");
+        if (SparkTemplateAdminPage::$Menu instanceof MenuItemList) {
+
+            //register late after all inclusions are to allow their event registration if there is
+            SparkEventManager::register(TemplateMenuEvent::class, $this);
+
+            //fire TemplateEvent::MENU_CREATED
+            SparkEventManager::emit(new TemplateMenuEvent(TemplateMenuEvent::CREATED, SparkTemplateAdminPage::$Menu));
+        }
+
     }
+
+
 
     public function initialize() : void
     {
@@ -329,10 +339,14 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         parent::onEvent($event);
 
         if ($event->isEvent(TemplateMenuEvent::CREATED)) {
-            $menu = $event->getSource();
-            if ($menu instanceof MenuItemList) {
-                $this->menu_bar->setMenu($menu);
+
+            //Debug::ErrorLog("MenuItemList top level count: ". SparkTemplateAdminPage::$Menu->count());
+            foreach (Template::DisabledPaths() as $idx=>$disabledPath) {
+                SparkTemplateAdminPage::$Menu->removePath($disabledPath);
             }
+
+            $this->menu_bar->setMenu(SparkTemplateAdminPage::$Menu);
+
         }
 
     }
@@ -340,5 +354,12 @@ class SparkTemplateAdminPage extends SparkTemplatePage
     public function getMenuBar() : MenuBar
     {
         return $this->menu_bar;
+    }
+
+    public static function SetMenu(MenuItemList $menu) : void
+    {
+        //TODO: unregister listeners ?
+        SparkTemplateAdminPage::$Menu = $menu;
+
     }
 }

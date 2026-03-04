@@ -63,7 +63,7 @@ final class SparkLoader
      * @param bool $includeAll Default True - include all files named $fileName searching all locations
      * @return void
      */
-    public function include(string $fileName, bool $includeAll = true) : void
+    public function include(string $fileName, bool $includeAll) : void
     {
 
         Debug::ErrorLog("Searching: $fileName.php | Include all: ".($includeAll ? "Yes" : "No"));

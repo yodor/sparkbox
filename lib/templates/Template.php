@@ -23,6 +23,9 @@ final class Template
 
     static private ?BeanKeyCondition $Condition = null;
 
+
+    static private array $DisabledPaths = array();
+
     private function __construct()
     {
 
@@ -39,7 +42,7 @@ final class Template
      * @param URL|null $sourceURL
      * @return URL
      */
-    public static function PathURL(string $path, ?URL $sourceURL = null) : URL
+    public static function PathURL(string $path, ?URL $sourceURL = null): URL
     {
         $path = rtrim($path, '/');
 
@@ -51,16 +54,14 @@ final class Template
         $pathParam = new URLParameter("path");
         if ($result->contains("path")) {
             $pathParam = $result->get("path");
-        }
-        else {
+        } else {
             $result->add($pathParam);
         }
 
         if (str_starts_with($path, "/")) {
             $pathParam->setValue($path);
-        }
-        else {
-            $pathParam->setValue(rtrim($pathParam->value(),"/") . "/" . $path);
+        } else {
+            $pathParam->setValue(rtrim($pathParam->value(), "/") . "/" . $path);
         }
 
         $script = Template::$ModuleLocation . rtrim($pathParam->value(), "/");
@@ -69,13 +70,13 @@ final class Template
         return $result;
     }
 
-    public static function SetModule(string $module, string $location) : void
+    public static function SetModule(string $module, string $location): void
     {
         Template::$Module = $module;
         Template::$ModuleLocation = rtrim($location, '/');
     }
 
-    public static function Condition(?BeanKeyCondition $condition = null) : ?BeanKeyCondition
+    public static function Condition(?BeanKeyCondition $condition = null): ?BeanKeyCondition
     {
         if (!is_null($condition)) {
             Template::$Condition = $condition;
@@ -83,12 +84,12 @@ final class Template
         return Template::$Condition;
     }
 
-    public static function ModuleLocation() : string
+    public static function ModuleLocation(): string
     {
-        return Template::$PrefixTemplateHandlers.DIRECTORY_SEPARATOR.Template::$Module;
+        return Template::$PrefixTemplateHandlers . DIRECTORY_SEPARATOR . Template::$Module;
     }
 
-    public static function WrapObserver(Closure $current, ?Closure $parent=null) : Closure
+    public static function WrapObserver(Closure $current, ?Closure $parent = null): Closure
     {
         return function (...$args) use ($current, $parent) {
             if ($parent instanceof Closure) {
@@ -145,26 +146,20 @@ final class Template
     }
 
     /**
-     * Set/Get the active TemplateConfig configuration used to LoadContent
+     * Set the active TemplateConfig configuration used to LoadContent
      *
      * @param TemplateConfig|null $config Set $config as the active TemplateConfig
-     * @return TemplateConfig|null Return the current active TemplateConfig
+     *
      */
-    public static function Config(?TemplateConfig $config=null): ?TemplateConfig
+    public static function SetConfig(?TemplateConfig $config = null): void
     {
-        if (!is_null($config)) {
-
-            //remove old observer
-            if (!is_null(Template::$Config) && Template::$Config->observer) {
-                Debug::ErrorLog("Removing previous TemplateConfig::observer");
-                SparkEventManager::unregisterClosure(TemplateEvent::class, Template::$Config->observer);
-            }
-
-            Template::$Config = $config;
-            SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, Template::$Config));
+        //remove old observer
+        if (!is_null(Template::$Config) && Template::$Config->observer) {
+            Debug::ErrorLog("Removing previous TemplateConfig::observer");
+            SparkEventManager::unregisterClosure(TemplateEvent::class, Template::$Config->observer);
         }
 
-        return Template::$Config;
+        Template::$Config = $config;
     }
 
     /**
@@ -184,6 +179,7 @@ final class Template
         $cmp = SparkLoader::Factory(Template::$PrefixTemplateContent)->instance(Template::$Config->contentClass, TemplateContent::class);
         if (!($cmp instanceof TemplateContent)) throw new Exception("Content class not instance of TemplateContent");
 
+        //register here - allow modification during PathConfig inclusion
         if (!is_null(Template::$Config->observer)) {
             SparkEventManager::register(TemplateEvent::class, new SparkObserver(Template::$Config->observer));
         }
@@ -203,15 +199,40 @@ final class Template
 
     }
 
+    public static function DisablePath(string $path): void
+    {
+        $path = rtrim(strtolower($path),"/");
+        Debug::ErrorLog("Disabling path: $path");
+        Template::$DisabledPaths[$path] = 1;
+    }
+
+    public static function DisabledPaths() : array
+    {
+        return array_keys(Template::$DisabledPaths);
+    }
+
+    private static function PathAccess(string $path) : void
+    {
+        Debug::ErrorLog("Checking path access for path: $path");
+
+        foreach (Template::$DisabledPaths as $disablePath => $enabled) {
+            if (str_starts_with($path, $disablePath)) {
+                throw new Exception("PathAccess Denied");
+            }
+        }
+    }
     /**
-     * Search all loader enabled locations using prefix 'admin/path' and include path file that set the active configuration
+     * Includes '$path' file from all SparkLoader enabled locations using prefix Template::ModuleLocation()
+     * Clears old TemplateConfig
+     * Emits TemplateConfigEvent::UPDATE if Template::$Config is not null after
      * @param string $path
-     * @param int|null $editor
      * @return void
      * @throws Exception
      */
     public static function PathConfig(string $path) : void
     {
+
+        Template::PathAccess($path);
 
         Debug::ErrorLog("Using path: ".$path);
 
@@ -221,8 +242,11 @@ final class Template
         $modulePath = Template::ModuleLocation();
         $modulePath.= DIRECTORY_SEPARATOR.Template::$ModulePathFolder;
 
+        //cleanup old config remove observer
+        Template::SetConfig(null);
+
         //search all include paths for code to call Template::Configure
-        SparkLoader::Factory($modulePath)->include($path);
+        SparkLoader::Factory($modulePath)->include($path, true);
 
         if (!(Template::$Config instanceof TemplateConfig)) {
             throw new Exception("TemplateConfig not initialized after searching [$modulePath] for [$path.php]");
@@ -230,7 +254,16 @@ final class Template
 
         Template::$Config->filename = $path;
 
+        //Emit here after all including is done. Allow later included code to register for events or modify config
+        SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, Template::$Config));
 
+    }
+    public static function ErrorConfig(string $title, string $message): void
+    {
 
+        Template::SetConfig(Template::Plain($title, $message));
+
+        //Emit here
+        SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, Template::$Config));
     }
 }

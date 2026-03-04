@@ -18,6 +18,9 @@ class SparkTemplatePage extends SparkPage implements IObserver
 
         $this->addParameterName("path");
 
+        if (isset($_GET["path"])) {
+            $this->path = rtrim(strtolower($_GET["path"]),"/");
+        }
     }
 
     /**
@@ -29,9 +32,6 @@ class SparkTemplatePage extends SparkPage implements IObserver
      */
     public function initialize() : void
     {
-        if (isset($_GET["path"])) {
-            $this->path = $_GET["path"];
-        }
 
         $path = $this->path;
         if (!$path) {
@@ -43,9 +43,8 @@ class SparkTemplatePage extends SparkPage implements IObserver
             $this->body->setAttribute("path", $path);
         }
         catch (Exception $e) {
-            //fire default config
-            Template::Config(Template::Plain("Error:$path", $e->getMessage()));
             Debug::ErrorLog("PathConfig failed: ".$e->getMessage());
+            Template::ErrorConfig("Error:$path", $e->getMessage());
         }
     }
 

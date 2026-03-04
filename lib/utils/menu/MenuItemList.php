@@ -42,6 +42,22 @@ class MenuItemList extends SparkList
 
     }
 
+    public function removePath(string $path) : void
+    {
+        Debug::ErrorLog("Removing path: $path");
+        $result = $this->selectPath($path, false);
+
+        foreach ($result as $idx=>$item) {
+            if (!($item instanceof MenuItem)) continue;
+
+            $parentItem = $item->getParent();
+            if (!($parentItem instanceof MenuItem)) continue;
+
+            $parentItem->removeObject($item);
+        }
+
+    }
+
     public function selectPath(string $path, bool $setSelected = true) : array
     {
         if ($setSelected) {
