@@ -148,7 +148,6 @@ class MenuBar extends Component {
             const borderBottom = parseFloat(style.borderBottom);
             const borderLeft = parseFloat(style.borderLeft);
             const borderRight = parseFloat(style.borderRight);
-console.log(borderBottom);
 
             if (item.closest(".ItemList.Submenu")) {
                 //open submenu to the right
