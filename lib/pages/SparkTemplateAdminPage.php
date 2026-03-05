@@ -1,7 +1,7 @@
 <?php
 include_once("pages/SparkTemplatePage.php");
 
-include_once("auth/AdminAuthenticator.php");
+
 include_once("beans/AdminAccessBean.php");
 
 include_once("responders/ChangePositionResponder.php");
@@ -117,6 +117,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
             SparkEventManager::emit(new TemplateMenuEvent(TemplateMenuEvent::CREATED, SparkTemplateAdminPage::$Menu));
         }
 
+        //TODO: check menu access
     }
 
 
