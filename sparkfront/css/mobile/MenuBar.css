@@ -76,9 +76,12 @@
     padding-left:0em;
     color:white;
 }
-.MenuBar[open] .Item[active="1"] > .Submenu .Item:first-of-type {
-    padding-top:1.5em;
+.MenuBar[open] .Item[active="1"] > .Submenu {
+    margin-top:0.5em;
 }
+/*.MenuBar[open] .Item[active="1"] > .Submenu .Item:first-of-type {*/
+/*    padding-top:1.5em;*/
+/*}*/
 .MenuBar[open] .Item {
     color: black;
     /*border-top: 1px dotted gray;*/
