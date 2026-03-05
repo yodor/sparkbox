@@ -130,3 +130,11 @@ if (Spark::isStorageRequest()) {
     include_once("sparkstorage.php");
     exit;
 }
+//define modules
+include_once("templates/ModuleConfig.php");
+$adminModule = new ModuleConfig();
+$adminModule->name = "admin";
+$adminModule->location = Spark::Get(Config::ADMIN_LOCAL);
+$adminModule->pageClass = SparkTemplateAdminPage::class;
+$adminModule->authClass = AdminAuthenticator::class;
+Spark::SetObject(Config::MODULE_ADMIN, $adminModule);

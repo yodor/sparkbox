@@ -72,6 +72,21 @@ class RequestController
         return isset(self::$responders[$name]);
     }
 
+    public static function ProcessDynamic() : void
+    {
+        if (!RequestController::isJSONRequest()) {
+            return;
+        }
+        if (!RequestController::isResponderRequest()) {
+            return;
+        }
+        $responderClass = $_REQUEST[RequestResponder::KEY_COMMAND];
+        $responder = SparkLoader::Factory("responders")->instance($responderClass, JSONResponder::class);
+        if (!($responder instanceof JSONResponder)) throw new Exception("Object is not ".JSONResponder::class);
+        RequestController::Add($responder);
+
+        RequestController::Process();
+    }
     public static function Process() : void
     {
         $isJson = RequestController::isJSONRequest();

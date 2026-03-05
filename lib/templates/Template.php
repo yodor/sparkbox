@@ -268,4 +268,47 @@ final class Template
         //Emit here
         SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, $config));
     }
+
+    public static function ModuleInit(ModuleConfig $config, string $initName="init") : void
+    {
+        Template::SetModule($config->name, $config->location);
+
+        //search all include locations for a code that instantiate a TemplateConfig object
+        SparkLoader::Factory(Template::ModuleLocation())->include($initName, true);
+    }
+
+    public static function ModuleResponse() : void
+    {
+
+        $config = ModuleConfig::Active();
+        if (is_null($config)) throw new Exception("No active ModuleConfig");
+        if ($config->authClass) {
+            try {
+                $object = SparkLoader::Factory("auth")->instance($config->authClass, Authenticator::class);
+                if (!($object instanceof Authenticator)) throw new Exception("Result not instance of Authenticator");
+                $config->authContext = $object->authorize();
+                if (!($config->authContext instanceof AuthContext)) throw new Exception("Authorization failed");
+
+            } catch (Exception $e) {
+                //redirect login
+                Session::setAlert($e->getMessage());
+                header("Location: ".Template::ModuleLocation()."/login.php");
+                exit;
+            }
+        }
+        try {
+            include_once("responders/RequestController.php");
+            RequestController::ProcessDynamic();
+        }
+        catch (Exception $e) {
+            Session::setAlert($e->getMessage());
+        }
+
+        $page = SparkLoader::Factory("pages")->instance($config->pageClass, SparkTemplatePage::class);
+        if (!($page instanceof SparkTemplatePage)) throw new Exception("Object is not instance of SparkTemplatePage");
+
+        $page->initialize();
+        $page->render();
+
+    }
 }

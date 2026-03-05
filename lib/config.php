@@ -2,6 +2,7 @@
 enum Config
 {
 
+    const string MODULE_ADMIN = "MODULE_ADMIN";
     /**
      * Backend cache path
      * Static(string): 'Parent folder of APP_PATH'/sparkcache/SITE_TITLE;

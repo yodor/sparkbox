@@ -348,6 +348,23 @@ final class Spark {
         return $result;
     }
 
+    final static public function SetObject(string $name, object $object, bool $isStatic=false) : void
+    {
+        if (isset(Spark::$constDefines[$name])) {
+            throw new Exception("Static '$name' already assigned");
+        }
+        Spark::$defines[$name] = $object;
+        if ($isStatic) {
+            Spark::$constDefines[$name] = true;
+        }
+    }
+    final static public function GetObject(string $name, ?object $default=null) : object
+    {
+        if (isset(Spark::$defines[$name])) {
+            return Spark::$defines[$name];
+        }
+        else return $default;
+    }
     /**
      * Assign global variable. If static is set value can be set only once.
      * @param string $name

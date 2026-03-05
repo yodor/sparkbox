@@ -52,10 +52,6 @@ class SparkTemplateAdminPage extends SparkTemplatePage
     public function __construct()
     {
 
-        $this->auth = new AdminAuthenticator();
-        $this->loginURL = Spark::Get(Config::ADMIN_LOCAL) . "2/login.php";
-        $this->authorized_access = TRUE;
-
         parent::__construct();
 
         //control gets here only if authorized
@@ -141,7 +137,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         $adminData->setComponentClass("user_data");
         $sidePane->items()->append($adminData);
 
-        $username = $this->context->getData()->get(SessionData::FULLNAME);
+        $username = ModuleConfig::Active()->authContext->getData()->get(SessionData::FULLNAME);
         if ($username) {
             $adminName = new TextComponent($username);
             $adminName->setComponentClass("username");
