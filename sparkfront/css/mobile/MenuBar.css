@@ -34,7 +34,9 @@
     width: calc(100vw);
     height: auto;
 
-    box-shadow: 0 8px 8px -8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0.2em 0.2em 0 rgba(0, 0, 0, 0.8);
+    /*border-bottom:1px solid black;*/
+    /*border-top:1px solid black;*/
 }
 
 .MenuBar[open] .ItemList .Item {
@@ -52,11 +54,12 @@
     padding-right:0;
 
 }
+
 /*only active items' submenu is visible*/
 .MenuBar[open] .Item[active="1"] > .Submenu {
 
     position: relative;
-    background-color: white;
+    background-color: inherit;
     border: none;
 
     display:flex;
@@ -69,7 +72,13 @@
 
     /*margin-top:0.5em;*/
 }
-
+.MenuBar[open] .Item[active="1"] > .Submenu > .Item {
+    padding-left:0em;
+    color:white;
+}
+.MenuBar[open] .Item[active="1"] > .Submenu .Item:first-of-type {
+    padding-top:1.5em;
+}
 .MenuBar[open] .Item {
     color: black;
     /*border-top: 1px dotted gray;*/
@@ -77,4 +86,3 @@
 .MenuBar[open] .Item:first-of-type {
     border-top: none;
 }
-
