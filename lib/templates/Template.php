@@ -18,15 +18,51 @@ final class Template
 
     static private string $ModuleLocation = "";
 
-    static private string $ModulePathFolder = "path";
+    const string MODULE_PATH_FOLDER = "path";
 
     static private ?BeanKeyCondition $Condition = null;
 
     static private array $DisabledPaths = array();
 
     private function __construct()
-    {}
+    {
+    }
 
+    public static function AsciiOnly(string $value): string
+    {
+        return preg_replace('/[^A-Za-z]/', '', $value);
+    }
+    /**
+     * Reformat or clean path string
+     * ex with separator '.' : /some/module/path -> some.module.path
+     * ex with separator '/' : //some/..//module/ -> /some/module
+     *
+     * @param string $path Path string ex '/some/module/option'
+     * @param string $separator Separator char to use in reformating
+     * @param bool $prependRoot Prepend the separator char to the result
+     * @return string
+     */
+    public static function FormatPath(string $path, string $implodeSeparator, bool $prependRoot): string
+    {
+
+        $path = strtolower($path);
+        $path = str_replace(".", "", $path);
+        $path = str_replace("..", "", $path);
+
+        $parts = Spark::Split($path, "/");
+        //filter ascii only
+        array_walk($parts, function (string &$value, string|int $key): void {
+            $value = Template::AsciiOnly($value);
+        });
+
+        $path = implode($implodeSeparator, $parts);
+
+        if ($prependRoot) {
+            $path = $implodeSeparator.$path;
+        }
+
+        return $path;
+    }
     /**
      * Create/Convert url to 'path url' style - copying parameters from sourceURL if present.
      * If $path parameter is present it overwrites the source path parameter
@@ -60,15 +96,21 @@ final class Template
             $pathParam->setValue(rtrim($pathParam->value(), "/") . "/" . $path);
         }
 
-        $script = Template::$ModuleLocation . rtrim($pathParam->value(), "/");
+        $script = Template::$ModuleLocation . DIRECTORY_SEPARATOR. Template::FormatPath($pathParam->value(), "/", false);
         $result->remove("path");
         $result->setScriptName($script);
         return $result;
     }
 
+    /**
+     * Set the active module
+     * @param string $module Module name
+     * @param string $location Module access location in document root
+     * @return void
+     */
     public static function SetModule(string $module, string $location): void
     {
-        Template::$Module = $module;
+        Template::$Module = Template::AsciiOnly(trim($module, ' /'));
         Template::$ModuleLocation = rtrim($location, '/');
     }
 
@@ -80,6 +122,13 @@ final class Template
         return Template::$Condition;
     }
 
+    /**
+     * Get the active module location.
+     * Template::$PrefixTemplateModules."/".Template::$Module
+     * ex: template/modules/<module_name>
+     *
+     * @return string
+     */
     public static function ModuleLocation(): string
     {
         return Template::$PrefixTemplateModules . DIRECTORY_SEPARATOR . Template::$Module;
@@ -95,54 +144,13 @@ final class Template
         };
     }
 
-    public static function List(string $beanClass): TemplateConfig
-    {
-        $config = new TemplateConfig();
-        $config->beanClass = $beanClass;
-        $config->contentClass = BeanList::class;
-        return $config;
-    }
 
-    public static function Tree(string $beanClass): TemplateConfig
-    {
-        $config = new TemplateConfig();
-        $config->contentClass = BeanTree::class;
-
-        $config->beanClass = $beanClass;
-        return $config;
-    }
-
-    public static function Gallery(string $beanClass): TemplateConfig
-    {
-        $config = new TemplateConfig();
-        $config->contentClass = BeanGallery::class;
-
-        $config->beanClass = $beanClass;
-        return $config;
-    }
-
-    public static function Editor(string $beanClass, string $formClass): TemplateConfig
-    {
-        $config = new TemplateConfig();
-        $config->contentClass = BeanEditor::class;
-
-        $config->beanClass = $beanClass;
-        $config->formClass = $formClass;
-        return $config;
-    }
-
-    public static function Plain(string $title, string $summary) : TemplateConfig
-    {
-        $config = new TemplateConfig();
-        $config->contentClass = Plain::class;
-        $config->title = $title;
-        $config->summary = $summary;
-
-        return $config;
-    }
 
     /**
-     * Load content using the active TemplateConfig configuration
+     * Using the TemplateConfig::Active()
+     * Create instance of TemplateContent using config->contentClass.
+     * Calls setup, initialize, processInput, emitting corresponding events.
+     * Registers listener using config->observer.
      * @return TemplateContent
      * @throws Exception
      */
@@ -179,6 +187,11 @@ final class Template
 
     }
 
+    /**
+     * Append path to the disabled paths array
+     * @param string $path
+     * @return void
+     */
     public static function DisablePath(string $path): void
     {
         $path = rtrim(strtolower($path),"/");
@@ -186,11 +199,22 @@ final class Template
         Template::$DisabledPaths[$path] = 1;
     }
 
+    /**
+     * Return the current disabled paths array values
+     * @return array
+     */
     public static function DisabledPaths() : array
     {
         return array_keys(Template::$DisabledPaths);
     }
 
+    /**
+     * Check Template::DisabledPaths() array for presence
+     *
+     * @param string $path
+     * @return void
+     * @throws Exception Throws if path is present in the disabled paths
+     */
     private static function PathAccess(string $path) : void
     {
         Debug::ErrorLog("Checking path access for path: $path");
@@ -204,11 +228,11 @@ final class Template
 
     /**
      * Includes '$path' file from all SparkLoader enabled locations using prefix Template::ModuleLocation()
-     * Clears old TemplateConfig
-     * Emits TemplateConfigEvent::UPDATE if Template::$Config is not null after
+     * Calls TemplateConfig::Deactivate() to clear any old config
+     * Emits TemplateConfigEvent::UPDATE if TemplateConfig::Active() is not null
      * @param string $path
      * @return void
-     * @throws Exception
+     * @throws Exception Throws if TemplateConfig::Active() is null
      */
     public static function PathConfig(string $path) : void
     {
@@ -216,20 +240,20 @@ final class Template
 
         Debug::ErrorLog("Using path: ".$path);
 
-        $path = Spark::Split($path, "/");
-        $path = implode(".", $path);
+        //convert //some/path/ to some.path
+        $path = Template::FormatPath($path, ".", false);
 
-        $modulePath = Template::ModuleLocation();
-        $modulePath.= DIRECTORY_SEPARATOR.Template::$ModulePathFolder;
+        $moduleLocation = Spark::PathParts(Template::ModuleLocation(),Template::MODULE_PATH_FOLDER);
 
         TemplateConfig::Deactivate();
 
-        //search all include paths for code to call Template::Configure
-        SparkLoader::Factory($modulePath)->include($path, true);
+        //search all include locations for a code that instantiate a TemplateConfig object
+        SparkLoader::Factory($moduleLocation)->include($path, true);
 
+        //TemplateConfig CTOR set a static instance accessible using the TemplateConfig::Active() method
         $config = TemplateConfig::Active();
         if (is_null($config)) {
-            throw new Exception("TemplateConfig not initialized after searching [$modulePath] for [$path.php]");
+            throw new Exception("TemplateConfig not initialized after searching [$moduleLocation] for [$path.php]");
         }
 
         $config->filename = $path;
@@ -240,7 +264,7 @@ final class Template
 
     public static function ErrorConfig(string $title, string $message): void
     {
-        $config = Template::Plain($title, $message);
+        $config = TemplateConfig::Plain($title, $message);
         //Emit here
         SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, $config));
     }

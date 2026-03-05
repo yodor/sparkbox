@@ -134,14 +134,19 @@
         background-image: url("../images/dialog/question.svg");
     }
 
-    .base .help.summary {
-        display:block;
+    .base .helpPane {
+        
+        border:1px dashed green;
+        display: none;
         margin-bottom:1em;
+    }
+
+
+    .base .helpPane .summary {
 
         font-style:italic;
     }
-    .base .helpPane {
-        padding:1em;
-        border:1px dashed green;
-        display: none;
+
+    .base .helpPane .error {
+
     }

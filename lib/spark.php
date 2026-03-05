@@ -59,6 +59,7 @@ final class SparkLoader
     /**
      * Search all SparkLoader::$locations and try to include $fileName from there using the current search prefix
      * Stop searching on first match if $includeAll is false
+     * Filename is appended with suffix with .php
      * @param string $fileName
      * @param bool $includeAll Default True - include all files named $fileName searching all locations
      * @return void

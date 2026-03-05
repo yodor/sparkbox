@@ -5,7 +5,7 @@ include_once("templates/Template.php");
 class SparkTemplatePage extends SparkPage implements IObserver
 {
     //
-    protected string $path = "";
+    protected string $path = "home";
 
     public function __construct()
     {
@@ -19,7 +19,7 @@ class SparkTemplatePage extends SparkPage implements IObserver
         $this->addParameterName("path");
 
         if (isset($_GET["path"])) {
-            $this->path = rtrim(strtolower($_GET["path"]),"/");
+            $this->path = Template::FormatPath($_GET["path"],"/", true);
         }
     }
 
@@ -33,18 +33,13 @@ class SparkTemplatePage extends SparkPage implements IObserver
     public function initialize() : void
     {
 
-        $path = $this->path;
-        if (!$path) {
-            $path = "home";
-        }
-
         try {
-            Template::PathConfig($path);
-            $this->body->setAttribute("path", $path);
+            Template::PathConfig($this->path);
+            $this->body->setAttribute("path", $this->path);
         }
         catch (Exception $e) {
             Debug::ErrorLog("PathConfig failed: ".$e->getMessage());
-            Template::ErrorConfig("Error:$path", $e->getMessage());
+            Template::ErrorConfig("Error:{$this->path}", $e->getMessage());
         }
     }
 
@@ -60,7 +55,7 @@ class SparkTemplatePage extends SparkPage implements IObserver
     }
 
     /**
-     * Handle calling Template::LoadContent when Template::Config is changed
+     * Handle calling Template::LoadContent when Template::Active() is changed
      * Calls the update() method after event TemplateEvent::CONTENT_INPUT_PROCESSED
      * @param SparkEvent $event
      * @return void

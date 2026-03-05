@@ -24,7 +24,7 @@ include_once("components/TextComponent.php");
 include_once("utils/Navigation.php");
 
 
-include_once("store/responders/json/AdminHelpResponder.php");
+include_once("responders/json/TemplateHelpResponder.php");
 
 
 class SparkTemplateAdminPage extends SparkTemplatePage
@@ -68,7 +68,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/SparkTemplateAdminPage.css");
         $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminMenu.css");
 
-        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/AdminTemplate.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/TemplateHelp.js");
 
         $this->body()->addClassName("admin_layout");
 
@@ -100,7 +100,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
         $dialog = new JSONFormDialog();
 
-        $helpFetcher = new AdminHelpResponder();
+        $helpFetcher = new TemplateHelpResponder();
 
 
         //initialize menu and module
@@ -288,7 +288,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         $help_action->setAction(SparkTemplateAdminPage::ACTION_HELP);
         $help_action->setAttribute("path", $this->path);
         $help_action->setAttribute("sink", "helpPane");
-        $help_action->setAttribute("onClick", "javascript:document.helpFetcher.fetch(this)");
+        $help_action->setAttribute("onClick", "javascript:document.templateHelp.fetch(this)");
         $actions_title->items()->append($help_action);
     }
 
@@ -310,9 +310,8 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
         $this->setName($content->config()->title);
 
-        if ($content->config()->summary) {
-            $summary = new TextComponent($content->config()->summary, "help summary");
-            $this->base->items()->append($summary);
+        if ($content->config()->description) {
+            $content->component()->setCaption($content->config()->description);
         }
 
         $this->base->items()->append($content->component());

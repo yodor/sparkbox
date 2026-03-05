@@ -12,6 +12,75 @@ class TemplateConfig extends SparkObject
 
     protected static ?TemplateConfig $Active = null;
 
+    public static function List(string $beanClass): TemplateConfig
+    {
+        $config = new TemplateConfig();
+        $config->beanClass = $beanClass;
+        $config->contentClass = BeanList::class;
+        return $config;
+    }
+
+    public static function Tree(string $beanClass): TemplateConfig
+    {
+        $config = new TemplateConfig();
+        $config->contentClass = BeanTree::class;
+
+        $config->beanClass = $beanClass;
+        return $config;
+    }
+
+    public static function Gallery(string $beanClass): TemplateConfig
+    {
+        $config = new TemplateConfig();
+        $config->contentClass = BeanGallery::class;
+
+        $config->beanClass = $beanClass;
+        return $config;
+    }
+
+    /**
+     * Create TemplateConfig for loading BeanEditor TemplateContent
+     *
+     * @param string $beanClass
+     * @param string $formClass
+     * @return TemplateConfig
+     */
+    public static function Editor(string $beanClass, string $formClass): TemplateConfig
+    {
+        $config = new TemplateConfig();
+        $config->contentClass = BeanEditor::class;
+
+        $config->beanClass = $beanClass;
+        $config->formClass = $formClass;
+        return $config;
+    }
+
+    /**
+     * Create TemplateConfig for loading Plain TemplateContent
+     * @param string $title
+     * @param string $description
+     * @return TemplateConfig
+     */
+    public static function Plain(string $title, string $description) : TemplateConfig
+    {
+        $config = new TemplateConfig();
+        $config->contentClass = Plain::class;
+        $config->title = $title;
+        $config->description = $description;
+
+        return $config;
+    }
+
+    public static function WrapObserver(Closure $current, ?Closure $parent = null): Closure
+    {
+        return function (...$args) use ($current, $parent) {
+            if ($parent instanceof Closure) {
+                $parent(...$args);
+            }
+            return $current(...$args);
+        };
+    }
+
     public function __construct()
     {
         parent::__construct();
@@ -40,27 +109,22 @@ class TemplateConfig extends SparkObject
     public string $title = "";
 
     /**
-     * Create instance of this class during content Template::Create()
+     * Informative text description. For top level menu pages or error pages
+     * @var string
+     */
+    public string $description = "";
+
+    /**
+     * Create instance of this class during Template::LoadContent()
      * @var string
      */
     public string $contentClass = "";
-
-    /**
-     * Informative text contents. For top level menu pages. Informative
-     * @var string
-     */
-    public string $summary = "";
 
     /**
      * Create listener for TemplateEvents
      * @var Closure|null
      */
     public ?Closure $observer = null;
-
-    /**
-     * @var RequestParameterCondition|null
-     */
-    public ?RequestParameterCondition $condition = null;
 
     /**
      * DBTableBean class name for BeanList and BeanEditor

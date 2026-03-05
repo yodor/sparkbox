@@ -1,7 +1,7 @@
-class HelpFetcher {
+class TemplateHelp {
     constructor() {
         this.request = new JSONRequest();
-        this.request.setResponder("AdminHelpResponder");
+        this.request.setResponder("TemplateHelpResponder");
         this.request.setFunction("fetch");
         this.target = null;
     }
@@ -22,7 +22,7 @@ class HelpFetcher {
         this.request.onSuccess = (result) => {
             this.target.innerHTML = result.response.message;
 
-            elm.setAttribute("onClick", "javascript:document.helpFetcher.toggle();");
+            elm.setAttribute("onClick", "javascript:document.templateHelp.toggle();");
 
             this.toggle();
         };
@@ -43,4 +43,4 @@ class HelpFetcher {
     }
 }
 
-document.helpFetcher = new HelpFetcher();
+document.templateHelp = new TemplateHelp();
