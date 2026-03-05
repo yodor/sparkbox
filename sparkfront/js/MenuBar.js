@@ -138,15 +138,27 @@ class MenuBar extends Component {
             const pos = new Point(0,0);
             const rect = item.getBoundingClientRect()
 
+            // Computed style gives us margin values (always in px when retrieved)
+            const style = window.getComputedStyle(item);
+            const marginTop    = parseFloat(style.marginTop);
+            const marginBottom = parseFloat(style.marginBottom);
+            const marginLeft   = parseFloat(style.marginLeft);
+            const marginRight  = parseFloat(style.marginRight);
+            const borderTop = parseFloat(style.borderTop);
+            const borderBottom = parseFloat(style.borderBottom);
+            const borderLeft = parseFloat(style.borderLeft);
+            const borderRight = parseFloat(style.borderRight);
+console.log(borderBottom);
+
             if (item.closest(".ItemList.Submenu")) {
                 //open submenu to the right
-                pos.x = rect.width;
+                pos.x = rect.width - marginRight - borderRight;
                 pos.y = 0;
             }
             else {
                 //open submenu down below
                 pos.x = 0;
-                pos.y = rect.height;
+                pos.y = rect.height - marginBottom - borderBottom;
             }
 
             subMenu.setAttribute("open", "");
