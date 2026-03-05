@@ -52,6 +52,8 @@ class SparkTemplateAdminPage extends SparkTemplatePage
     public function __construct()
     {
 
+        $this->context = ModuleConfig::Active()->authContext;
+
         parent::__construct();
 
         //control gets here only if authorized
@@ -124,9 +126,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
     public function initialize() : void
     {
-
         parent::initialize();
-
     }
 
     protected function createSidePane() : Container
@@ -138,7 +138,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         $adminData->setComponentClass("user_data");
         $sidePane->items()->append($adminData);
 
-        $username = ModuleConfig::Active()->authContext->getData()->get(SessionData::FULLNAME);
+        $username = $this->context->getData()->get(SessionData::FULLNAME);
         if ($username) {
             $adminName = new TextComponent($username);
             $adminName->setComponentClass("username");
