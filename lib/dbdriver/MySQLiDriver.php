@@ -44,10 +44,14 @@ class MySQLiDriver extends DBDriver
 
     public function __destruct()
     {
-        if ($this->conn instanceof mysqli) {
-            $this->conn->close();
-            SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED));
+        if (is_null($this->conn)) {
+            Debug::ErrorLog("Handle is already closed");
+            return;
         }
+
+        $this->conn->close();
+        $this->conn = null;
+        SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED));
     }
 
     public function connection(): mysqli
