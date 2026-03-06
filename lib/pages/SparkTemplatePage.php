@@ -72,4 +72,10 @@ class SparkTemplatePage extends SparkPage implements IObserver
             $this->update($content);
         }
     }
+
+    //
+    public function currentURL(): URL
+    {
+        return Template::PathURL("", parent::currentURL());
+    }
 }
