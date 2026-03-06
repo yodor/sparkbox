@@ -31,6 +31,10 @@ final class SparkLoader
         return new SparkLoader($searchPrefix);
     }
 
+    public static function Locations() : array
+    {
+        return SparkLoader::$locations;
+    }
 
     /**
      * Add $location to the loader search locations using prefix $prefix
