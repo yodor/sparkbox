@@ -37,7 +37,7 @@ class HeaderCell extends TableCell implements IGETConsumer
             return;
         }
 
-        $url = URL::Current();
+        $url = SparkPage::Instance()->currentURL();
         $url->add(new URLParameter(Paginator::KEY_ORDER_BY, $this->column->getName()));
         $url->add(new URLParameter(Paginator::KEY_ORDER_DIR, "ASC"));
 

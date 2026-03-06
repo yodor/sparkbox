@@ -47,16 +47,8 @@ class ResultViewFooter extends Container
     {
 
         //allow slugified urls
+        //do not clear parameters - work only with the Paginator::KEY_PAGE page parameter
         $link = SparkPage::Instance()->currentURL();
-        $supported_params = SparkPage::Instance()->getParameterNames();
-
-        $paginator_params = $this->paginator->getParameterNames();
-        foreach ($paginator_params as $idx=>$name) {
-            if (str_contains($name, Paginator::KEY_PAGE))continue;
-            $supported_params[] = $name;
-        }
-
-        URL::Clean($link, $supported_params);
 
         $action = new Action();
         $action->setComponentClass("");

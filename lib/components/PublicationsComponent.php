@@ -141,7 +141,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
         $this->bean = $bean;
 
-        $this->url = URL::Current();
+        $this->url = SparkPage::Instance()->currentURL();
 
         if ($link_page) {
             $this->url->fromString($link_page);

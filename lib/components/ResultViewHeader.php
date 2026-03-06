@@ -35,7 +35,7 @@ class ResultViewHeader extends Container
         $this->viewMode = new Container(false);
         $this->viewMode->setComponentClass("view_mode");
 
-        $link = URL::Current();
+        $link = SparkPage::Instance()->currentURL();
         $link->remove(Paginator::KEY_PAGE);
         $link->add(new URLParameter(Paginator::KEY_VIEW, "list"));
 
