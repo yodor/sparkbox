@@ -63,7 +63,9 @@ final class Template
 
         return $path;
     }
+
     /**
+     * 'pathify' url - transfer 'path' query parameter value to the URL path
      * Create/Convert url to 'path url' style - copying parameters from sourceURL if present.
      * If $path parameter is present it overwrites the source path parameter
      * If $path parameter is relative - path is appended to $sourceURL path
