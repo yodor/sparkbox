@@ -214,7 +214,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
         if ($num < 1) {
             $qry->select->where()->clear();
-            $qry->select->order_by = $this->bean->getDateColumn() . " DESC ";
+            $qry->select->order_by = " newsID DESC, ".$this->bean->getDateColumn() . " DESC ";
             $qry->select->limit = 1;
             $qry->exec();
         }
