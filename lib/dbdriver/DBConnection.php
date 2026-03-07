@@ -4,11 +4,11 @@ include_once("dbdriver/DBDriver.php");
 
 class DBConnection extends SparkObject
 {
-    protected ?DBDriver $conn = NULL;
+    protected ?DBDriver $driver = null;
 
     const string DEFAULT_NAME = "default";
 
-    public string $driver = "MySQLi";
+    public string $driverClass = "MySQLi";
     public string $database = "";
     public string $user = "";
     public string $pass = "";
@@ -19,6 +19,11 @@ class DBConnection extends SparkObject
 
     protected bool $persistent = false;
 
+    /**
+     * Wraps DBDriver and manages connected state
+     * @param string $connectionName
+     * @param bool $persistent
+     */
     public function __construct(string $connectionName=DBConnection::DEFAULT_NAME, bool $persistent=false)
     {
         parent::__construct();
@@ -41,33 +46,65 @@ class DBConnection extends SparkObject
         return $this->variables;
     }
 
-    public function get(): ?DBDriver
+    public function driver(): ?DBDriver
     {
-        return $this->conn;
+        return $this->driver;
     }
 
+    /**
+     * Close driver connection and set instance to null
+     * @return void
+     */
     public function close() : void
     {
-        if ($this->conn instanceof DBDriver) {
-            $this->conn = null;
+        if (is_null($this->driver)) return;
+        if ($this->driver->isConnected()) {
+            $this->driver()->disconnect();
         }
+        $this->driver = null;
     }
 
+    /**
+     * Check if the $this->driver instance is not null and driver->isConnected returns true
+     * @return bool
+     */
     public function isOpen() : bool
     {
-        return ($this->conn instanceof DBDriver);
+        return !is_null($this->driver) && $this->driver->isConnected();
     }
 
+    /**
+     * Opens connection to the database using the specified driverClass.
+     * If isOpen is true does nothing.
+     * Checks if driver is null and create new instance of driverClass.
+     * Calls driver->connect() to restore connection if driver->isConnected() is false.
+     * @return void
+     * @throws Exception
+     */
     public function open() : void
     {
-        $this->close();
+        if ($this->isOpen()) return;
 
-        switch ($this->driver) {
-            case "MySQLi":
-                include_once("dbdriver/MySQLiDriver.php");
-                $this->conn = new MySQLiDriver($this);
-                break;
+        if (is_null($this->driver)) {
+            $this->driver = DBConnections::CreateDriver($this->driverClass, $this);
         }
-        if (!($this->conn instanceof DBDriver)) throw new Exception("Unsupported DBDriver: " . $this->driver);
+
+        if (!$this->driver->isConnected()) {
+            $this->driver->connect();
+        }
+    }
+
+    /**
+     * Serialize the connection properties only without the driver instance
+     * @return array
+     */
+    public function __serialize(): array
+    {
+        $result = parent::__serialize();
+
+        //all without DBDriver
+        unset($result["driver"]);
+
+        return $result;
     }
 }

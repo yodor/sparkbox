@@ -76,7 +76,7 @@ class ArrayDataIterator implements IDataIterator
 
     public static function FromSelect(SQLSelect $qry, $prkey, $label) : ArrayDataIterator
     {
-        $db = DBConnections::Open();
+        $db = DBConnections::Driver();
 
         $result = $db->query($qry->getSQL());
 

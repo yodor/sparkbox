@@ -25,7 +25,15 @@ class SparkEventManager
      */
     public static function register(string $event_class, IObserver $observer): void
     {
-        if (!is_subclass_of($event_class, 'SparkEvent')) throw new Exception("Incorrect event_class - expecting SparkEvent subclass");
+        if (!class_exists($event_class)) {
+            SparkLoader::Factory(SparkLoader::PREFIX_EVENTS)->define($event_class);
+        }
+
+        if (!class_exists($event_class)) {
+            throw new Exception("Class not defined: $event_class");
+        }
+
+        if (!is_subclass_of($event_class, SparkEvent::class)) throw new Exception("Incorrect event_class - expecting SparkEvent subclass");
         $parentClass = "NULL";
         if ($observer instanceof SparkObserver) {
             if ($observer->getParent()) {

@@ -27,17 +27,20 @@ if (getenv("DEBUG_LEVEL", true)!==false) {
 if (defined("DEBUG_LEVEL")) {
     Debug::$traceDepth = intval(DEBUG_LEVEL);
 }
+//Debug::$traceDepth = -1;
+Debug::ErrorLog("-");
+Debug::ErrorLog("---- NEW REQUEST ----");
+Debug::ErrorLog("-");
 
 Spark::Set(Config::SPARKBOX_PATH, realpath(dirname(__DIR__)), true);
 
 //append sparkbox/lib to include_path and loader locations
 Spark::IncludePath(Spark::PathParts(Spark::GetString(Config::SPARKBOX_PATH),"lib"), "");
 
-
 Spark::Initialize();
 
 //call local deployment configuration
-if (file_exists(APP_PATH."/config/settings.php")) include_once(APP_PATH."/config/settings.php");
+if (is_file(APP_PATH."/config/settings.php")) include_once(APP_PATH."/config/settings.php");
 
 //merge get/post into the request array prevent cookie mix in
 $_REQUEST = array_merge($_GET, $_POST);
@@ -88,12 +91,14 @@ if (Spark::GetBoolean(Config::DB_ENABLED)) {
 
     //fetch local config
     require_once(APP_PATH."/config/dbconfig.php");
-
-    //include_once("objects/SparkObserver.php");
-    //SparkEventManager::register(DBDriverEvent::class, new SparkObserver(DBConnections::connectionEvent(...)));
 }
 
 if (!Spark::isStorageRequest()) {
+
+    if (Spark::GetBoolean(Config::DB_ENABLED)) {
+        include_once("objects/SparkObserver.php");
+        SparkEventManager::register(DBDriverEvent::class, new SparkObserver(DBConnections::DriverEvent(...)));
+    }
 
     include_once("utils/language.php");
 
@@ -119,22 +124,16 @@ if (!Spark::isStorageRequest()) {
 }
 
 
-//other libs initialization
-if (file_exists(APP_PATH."/config/include.php")) include_once(APP_PATH."/config/include.php");
-//set app include path
+//other libs initialization - allow searching app path last
+if (is_file(APP_PATH."/config/include.php")) include_once(APP_PATH."/config/include.php");
+
+//add app include path under class/ folder
 Spark::IncludePath(Spark::PathParts(APP_PATH), "class");
+
 //boot complete local app initialization
-if (file_exists(APP_PATH."/config/app.php")) include_once(APP_PATH."/config/app.php");
+if (is_file(APP_PATH."/config/app.php")) include_once(APP_PATH."/config/app.php");
 
 if (Spark::isStorageRequest()) {
     include_once("sparkstorage.php");
     exit;
 }
-//define modules
-include_once("templates/ModuleConfig.php");
-$adminModule = new ModuleConfig();
-$adminModule->name = "admin";
-$adminModule->location = Spark::Get(Config::ADMIN_LOCAL);
-$adminModule->pageClass = SparkTemplateAdminPage::class;
-$adminModule->authClass = AdminAuthenticator::class;
-Spark::SetObject(Config::MODULE_ADMIN, $adminModule);

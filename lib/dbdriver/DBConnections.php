@@ -1,14 +1,25 @@
 <?php
-include_once("objects/SparkObject.php");
 include_once("dbdriver/DBDriver.php");
 include_once("dbdriver/DBConnection.php");
 
-class DBConnections extends SparkObject
+class DBConnections
 {
 
     protected static array $available_connections = array();
 
     protected static int $active_count = 0;
+
+
+    public static function DriverEvent(DBDriverEvent $event): void
+    {
+        if ($event->isEvent(DBDriverEvent::OPENED)) {
+            self::$active_count++;
+            Debug::ErrorLog("Opened - active count: " . self::$active_count);
+        } else if ($event->isEvent(DBDriverEvent::CLOSED)) {
+            self::$active_count--;
+            Debug::ErrorLog("Closed - active count: " . self::$active_count);
+        }
+    }
 
     /**
      * Add connection to this collection
@@ -46,46 +57,45 @@ class DBConnections extends SparkObject
     }
 
     /**
-     * Return connection to db using connection name $conn_name if not specified the default connection name is used
-     * If connection is not open a call to open will be made as to ensure valid DBDriver connection is returned in connected state
+     * Return DBDriver of the connection with name $conn_name or DBConnection::DEFAULT_NAME if omitted.
+     * Ensures valid DBDriver connection is returned in connected state by checking the connection current state
+     *
      * @param string $conn_name
      * @return DBDriver
      * @throws Exception
      */
-    public static function Open(string $conn_name = DBConnection::DEFAULT_NAME): DBDriver
+    public static function Driver(string $conn_name = DBConnection::DEFAULT_NAME): DBDriver
     {
         try {
             $conn = self::Get($conn_name);
-            if (!$conn->isOpen()) {
-                $conn->open();
-            }
-            $driver = $conn->get();
-            if ($driver instanceof DBDriver) return $driver;
-            throw new Exception("Unable to get valid connection to database using connection name '$conn_name'");
+            $conn->open();
+            $driver = $conn->driver();
+            if (!is_null($driver)) return $driver;
+            throw new Exception("DBConnection::driver() is null");
         } catch (Exception $e) {
-            Debug::ErrorLog("Unable to open connection with '$conn_name'");
+            Debug::ErrorLog("Error: ".$e->getMessage());
             throw $e;
         }
 
     }
 
-    public static function Count(): int
+    public static function ActiveCount(): int
     {
         return self::$active_count;
     }
 
-    public static function connectionEvent(SparkEvent $event): void
+    public static function Count() : int
     {
-        if (!($event instanceof DBDriverEvent)) return;
+        return count(self::$available_connections);
+    }
 
-        if ($event->isEvent(DBDriverEvent::OPENED)) {
-            self::$active_count++;
-            Debug::ErrorLog("Opened - active count: " . self::$active_count);
-        } else if ($event->isEvent(DBDriverEvent::CLOSED)) {
-            self::$active_count--;
-            Debug::ErrorLog("Closed - active count: " . self::$active_count);
+    public static function CreateDriver(string $driverClass, DBConnection $conn): DBDriver
+    {
+        switch ($driverClass) {
+            case "MySQLi":
+                include_once("dbdriver/MySQLiDriver.php");
+                return new MySQLiDriver($conn);
         }
-
-
+        throw new Exception("Unsupported driver '$driverClass'");
     }
 }

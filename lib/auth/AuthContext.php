@@ -3,6 +3,11 @@ include_once("utils/SessionData.php");
 
 class AuthContext
 {
+    const string EMAIL = "email";
+    const string FULLNAME = "fullname";
+
+    const string AUTH_TOKEN = "auth_token";
+    const string LOGIN_TOKEN = "login_token";
 
     protected int $id = -1;
     protected SessionData $data;

@@ -1,6 +1,11 @@
 <?php
 include_once("templates/TemplateContent.php");
 include_once("components/KeywordSearch.php");
+include_once("components/TableView.php");
+
+include_once("responders/ChangePositionResponder.php");
+include_once("responders/DeleteItemResponder.php");
+include_once("responders/ToggleFieldResponder.php");
 
 class BeanList extends TemplateContent
 {
@@ -184,7 +189,7 @@ class BeanList extends TemplateContent
         if ($this->bean instanceof DBTableBean) {
             $h_delete = new DeleteItemResponder($this->bean);
             $deleteAction = $h_delete->createAction();
-            $deleteAction->setURL(Template::PathURL("", $deleteAction->getURL()));
+            $deleteAction->setURL(Module::PathURL("", $deleteAction->getURL()));
             $act->append($deleteAction);
         }
 

@@ -103,7 +103,7 @@ class MenuItemRenderer extends Container
         }
 
         if (MenuItemRenderer::$href_prefix) {
-            $result = MenuItemRenderer::$href_prefix . $result;
+            $result = Spark::PathParts(MenuItemRenderer::$href_prefix , $result);
         }
         return $result;
     }

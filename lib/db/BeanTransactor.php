@@ -202,7 +202,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
     public function processBean() : void
     {
 
-        $db = DBConnections::Open();
+        $db = DBConnections::Driver();
 
         try {
             $db->transaction();

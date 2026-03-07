@@ -11,19 +11,23 @@ class MySQLiDriver extends DBDriver
 
 
     /**
-     * @param DBConnection $props
+     * @return void
      * @throws Exception
      */
-    public function __construct(DBConnection $props)
+    public function connect() : void
     {
+        if ($this->isConnected()) {
+            Debug::ErrorLog("Connection is already open");
+            return;
+        }
 
-        $host = $props->host;
+        $host = $this->props->host;
 
-        if ($props->isPersistent()) {
+        if ($this->props->isPersistent()) {
             $host = "p:" . $host;
         }
 
-        $this->conn = @new mysqli($host, $props->user, $props->pass, $props->database, $props->port);
+        $this->conn = @new mysqli($host, $this->props->user, $this->props->pass, $this->props->database, $this->props->port);
 
         if ($this->conn->connect_errno) {
             throw new Exception("Error connecting to database server: " . $this->conn->connect_error);
@@ -39,19 +43,25 @@ class MySQLiDriver extends DBDriver
         $this->conn->query("SET character_set_connection = 'utf8'");
         $this->conn->query("SET character_set_client = 'utf8'");
 
+        Debug::ErrorLog("Opening connection to database server");
         SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::OPENED));
     }
 
-    public function __destruct()
+    public function disconnect() : void
     {
         if (is_null($this->conn)) {
-            Debug::ErrorLog("Handle is already closed");
+            //Debug::ErrorLog("Handle is already closed");
             return;
         }
 
         $this->conn->close();
         $this->conn = null;
         SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED));
+    }
+
+    public function isConnected(): bool
+    {
+        return !is_null($this->conn);
     }
 
     public function connection(): mysqli

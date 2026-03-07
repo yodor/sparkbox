@@ -45,7 +45,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
     public static function CreateAction(string $action, ?string $contents = "", string $usePath = ""): Action
     {
         $act = new Action();
-        $act->setURL(Template::PathURL($usePath, URL::Current()));
+        $act->setURL(Module::PathURL($usePath, URL::Current()));
         $act->setAction($action);
         //$act->getURL()->add(new URLParameter("action", $action));
         if (!is_null($contents)) {

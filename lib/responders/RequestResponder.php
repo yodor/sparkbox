@@ -183,8 +183,8 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
 
         //re-path temporary
         if ($this->redirect->contains("path")) {
-            include_once("templates/Template.php");
-            $this->redirect = Template::PathURL("", $this->redirect);
+            include_once("templates/Module.php");
+            $this->redirect = Module::PathURL("", $this->redirect);
         }
 
         if (!$this->cancel_url) {

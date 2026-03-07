@@ -10,15 +10,7 @@ include_once("utils/BeanKeyCondition.php");
 final class Template
 {
 
-    static private string $PrefixTemplateContent = "templates/content";
-
-    static private string $PrefixTemplateModules = "templates/modules";
-
-    static private string $Module = "";
-
-    static private string $ModuleLocation = "";
-
-    const string MODULE_PATH_FOLDER = "path";
+    const string PREFIX_CONTENT = "templates/content";
 
     static private ?BeanKeyCondition $Condition = null;
 
@@ -32,6 +24,7 @@ final class Template
     {
         return preg_replace('/[^A-Za-z]/', '', $value);
     }
+
     /**
      * Reformat or clean path string
      * ex with separator '.' : /some/module/path -> some.module.path
@@ -64,76 +57,12 @@ final class Template
         return $path;
     }
 
-    /**
-     * 'pathify' url - transfer 'path' query parameter value to the URL path
-     * Create/Convert url to 'path url' style - copying parameters from sourceURL if present.
-     * If $path parameter is present it overwrites the source path parameter
-     * If $path parameter is relative - path is appended to $sourceURL path
-     * If $path parameter is absolute (starting with '/') - path is replaced with $path
-     * Resulting url path is Template::$ModuleLocation + $path
-     *
-     * @param string $path
-     * @param URL|null $sourceURL
-     * @return URL
-     */
-    public static function PathURL(string $path, ?URL $sourceURL = null): URL
-    {
-        $path = rtrim($path, '/');
-
-        $result = new URL();
-        if (!is_null($sourceURL)) {
-            $result = clone $sourceURL;
-        }
-
-        $pathParam = new URLParameter("path");
-        if ($result->contains("path")) {
-            $pathParam = $result->get("path");
-        } else {
-            $result->add($pathParam);
-        }
-
-        if (str_starts_with($path, "/")) {
-            $pathParam->setValue($path);
-        } else {
-            $pathParam->setValue(rtrim($pathParam->value(), "/") . "/" . $path);
-        }
-
-        $script = Template::$ModuleLocation . DIRECTORY_SEPARATOR. Template::FormatPath($pathParam->value(), "/", false);
-        $result->remove("path");
-        $result->setScriptName($script);
-        return $result;
-    }
-
-    /**
-     * Set the active module
-     * @param string $module Module name
-     * @param string $location Module access location in document root
-     * @return void
-     */
-    public static function SetModule(string $module, string $location): void
-    {
-        Template::$Module = Template::AsciiOnly(trim($module, ' /'));
-        Template::$ModuleLocation = rtrim($location, '/');
-    }
-
     public static function Condition(?BeanKeyCondition $condition = null): ?BeanKeyCondition
     {
         if (!is_null($condition)) {
             Template::$Condition = $condition;
         }
         return Template::$Condition;
-    }
-
-    /**
-     * Get the active module location.
-     * Template::$PrefixTemplateModules."/".Template::$Module
-     * ex: template/modules/<module_name>
-     *
-     * @return string
-     */
-    public static function ModuleLocation(): string
-    {
-        return Template::$PrefixTemplateModules . DIRECTORY_SEPARATOR . Template::$Module;
     }
 
     public static function WrapObserver(Closure $current, ?Closure $parent = null): Closure
@@ -160,13 +89,11 @@ final class Template
     {
 
         $config = TemplateConfig::Active();
-        if (is_null($config)) {
-            throw new Exception("No active TemplateConfig");
-        }
+        if (is_null($config)) throw new Exception("No active TemplateConfig");
 
         if (!$config->contentClass) throw new Exception("TemplateConfig contentClass is empty");
 
-        $cmp = SparkLoader::Factory(Template::$PrefixTemplateContent)->instance($config->contentClass, TemplateContent::class);
+        $cmp = SparkLoader::Factory(Template::PREFIX_CONTENT)->instance($config->contentClass, TemplateContent::class);
         if (!($cmp instanceof TemplateContent)) throw new Exception("Content class not instance of TemplateContent");
 
         //register here - allow modification during PathConfig inclusion
@@ -245,7 +172,7 @@ final class Template
         //convert //some/path/ to some.path
         $path = Template::FormatPath($path, ".", false);
 
-        $moduleLocation = Spark::PathParts(Template::ModuleLocation(),Template::MODULE_PATH_FOLDER);
+        $moduleLocation = Spark::PathParts(Module::Prefix(), Module::PATH_FOLDER);
 
         TemplateConfig::Deactivate();
 
@@ -271,46 +198,5 @@ final class Template
         SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, $config));
     }
 
-    public static function ModuleInit(ModuleConfig $config, string $initName="init") : void
-    {
-        Template::SetModule($config->name, $config->location);
 
-        //search all include locations for a code that instantiate a TemplateConfig object
-        SparkLoader::Factory(Template::ModuleLocation())->include($initName, true);
-    }
-
-    public static function ModuleResponse() : void
-    {
-
-        $config = ModuleConfig::Active();
-        if (is_null($config)) throw new Exception("No active ModuleConfig");
-        if ($config->authClass) {
-            try {
-                $object = SparkLoader::Factory("auth")->instance($config->authClass, Authenticator::class);
-                if (!($object instanceof Authenticator)) throw new Exception("Result not instance of Authenticator");
-                $config->authContext = $object->authorize();
-                if (!($config->authContext instanceof AuthContext)) throw new Exception("Authorization failed");
-
-            } catch (Exception $e) {
-                //redirect login
-                Session::setAlert($e->getMessage());
-                header("Location: ".Template::ModuleLocation()."/login.php");
-                exit;
-            }
-        }
-        try {
-            include_once("responders/RequestController.php");
-            RequestController::ProcessDynamic();
-        }
-        catch (Exception $e) {
-            Session::setAlert($e->getMessage());
-        }
-
-        $page = SparkLoader::Factory("pages")->instance($config->pageClass, SparkTemplatePage::class);
-        if (!($page instanceof SparkTemplatePage)) throw new Exception("Object is not instance of SparkTemplatePage");
-
-        $page->initialize();
-        $page->render();
-
-    }
 }

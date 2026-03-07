@@ -4,20 +4,21 @@ enum Config
 
     const string MODULE_ADMIN = "MODULE_ADMIN";
     /**
-     * Backend cache path
+     * Backend absolute cache path
      * Static(string): 'Parent folder of APP_PATH'/sparkcache/SITE_TITLE;
      */
     const string CACHE_PATH = "CACHE_PATH";
     /**
-     * App/Site root - Server-side path
+     * App/Site root - Server-side absolute path
      * Static(string)
      */
     const string APP_PATH = "APP_PATH";
-
-    const string SPARKBOX_PATH = "SPARKBOX_PATH";
-
     /**
-     * App root/deployment URL - without ending slash
+     * Backend absolute path to sparkbox deployment
+     */
+    const string SPARKBOX_PATH = "SPARKBOX_PATH";
+    /**
+     * App root/deployment location URL - without ending slash relative to DOCUMENT_ROOT
      * Static(string)
      */
     const string LOCAL = "LOCAL";

@@ -8,11 +8,7 @@ include_once("storage/ImageStorageObject.php");
 class SessionData
 {
     //data key
-    const string EMAIL = "email";
-    const string FULLNAME = "fullname";
     const string MENU = "menu";
-    const string AUTH_TOKEN = "auth_token";
-    const string LOGIN_TOKEN = "login_token";
 
     //session name
     const string UPLOAD_CONTROL = "upload_control";

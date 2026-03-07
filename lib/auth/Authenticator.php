@@ -103,16 +103,16 @@ abstract class Authenticator
     public function authorize(?array $user_data = NULL) : ?AuthContext
     {
 
-        if (!$this->session->contains(SessionData::AUTH_TOKEN)) {
+        if (!$this->session->contains(AuthContext::AUTH_TOKEN)) {
             Debug::ErrorLog("SessionData does not have auth_token set");
             return NULL;
         }
 
-        $token = $this->session->get(SessionData::AUTH_TOKEN);
+        $token = $this->session->get(AuthContext::AUTH_TOKEN);
 
         if (!($token instanceof AuthToken)) {
             Debug::ErrorLog("AuthContext un-serialize failed");
-            Session::Remove(SessionData::AUTH_TOKEN);
+            Session::Remove(AuthContext::AUTH_TOKEN);
             return NULL;
         }
 
@@ -120,7 +120,7 @@ abstract class Authenticator
 
         if ($token->validateCookies($this->session->name()) !== TRUE) {
             Debug::ErrorLog("AuthContext validation failed");
-            Session::Remove(SessionData::AUTH_TOKEN);
+            Session::Remove(AuthContext::AUTH_TOKEN);
             return NULL;
         }
 
@@ -153,7 +153,7 @@ abstract class Authenticator
 
         Debug::ErrorLog("Using loginToken: " . $rand);
 
-        $db = DBConnections::Open();
+        $db = DBConnections::Driver();
 
         $username = $db->escape($username);
 
@@ -242,10 +242,10 @@ abstract class Authenticator
         $token->storeCookies($this->session->name());
 
         Debug::ErrorLog("Serializing auth_token in SessionData");
-        $this->session->set(SessionData::AUTH_TOKEN, $token);
+        $this->session->set(AuthContext::AUTH_TOKEN, $token);
 
         //remove the current login token
-        $this->session->remove(SessionData::LOGIN_TOKEN);
+        $this->session->remove(AuthContext::LOGIN_TOKEN);
 
     }
 
@@ -253,11 +253,11 @@ abstract class Authenticator
     {
         Debug::ErrorLog("fill common SessionData");
 
-        if (isset($row[SessionData::EMAIL])) {
-            $this->session->set(SessionData::EMAIL, $row[SessionData::EMAIL]);
+        if (isset($row[AuthContext::EMAIL])) {
+            $this->session->set(AuthContext::EMAIL, $row[AuthContext::EMAIL]);
         }
-        if (isset($row[SessionData::FULLNAME])) {
-            $this->session->set(SessionData::FULLNAME, $row[SessionData::FULLNAME]);
+        if (isset($row[AuthContext::FULLNAME])) {
+            $this->session->set(AuthContext::FULLNAME, $row[AuthContext::FULLNAME]);
         }
 
     }
@@ -270,7 +270,7 @@ abstract class Authenticator
     public function createLoginToken() : string
     {
         $token = Authenticator::RandomToken(32);
-        $this->session->set(SessionData::LOGIN_TOKEN, $token);
+        $this->session->set(AuthContext::LOGIN_TOKEN, $token);
         return $token;
     }
 
@@ -281,7 +281,7 @@ abstract class Authenticator
      */
     public function loginToken() : mixed
     {
-        return $this->session->get(SessionData::LOGIN_TOKEN);
+        return $this->session->get(AuthContext::LOGIN_TOKEN);
     }
 
     public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK) : ?AuthContext
@@ -305,7 +305,7 @@ abstract class Authenticator
         }
 
         try {
-            $auth = SparkLoader::Factory("auth")->instance($contextName, Authenticator::class);
+            $auth = SparkLoader::Factory(SparkLoader::PREFIX_AUTH)->instance($contextName, Authenticator::class);
 
             if (! ($auth instanceof Authenticator)) throw new Exception("Loaded class is not instance of Authenticator");
 

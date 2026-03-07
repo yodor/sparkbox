@@ -165,7 +165,6 @@ JS;
     {
         Debug::ErrorLog("--- CTOR ---");
 
-
         parent::__construct();
 
         self::$instance = $this;
@@ -181,6 +180,12 @@ JS;
 
     }
 
+
+    public function initialize() : void
+    {
+        //
+    }
+
     /**
      * Authorize this page usage if this->auth assigned with Authenticator prior to this method call
      *
@@ -192,7 +197,7 @@ JS;
      * @return void
      * @throws Exception
      */
-    public function authorize(): void
+    protected function authorize(): void
     {
         if (!($this->auth instanceof Authenticator)) {
             Debug::ErrorLog("Authenticator is not set");

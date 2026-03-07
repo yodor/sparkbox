@@ -2,6 +2,11 @@
 final class SparkLoader
 {
 
+    const string PREFIX_BEANS = "beans";
+    const string PREFIX_FORMS = "forms";
+    const string PREFIX_PAGES = "pages";
+    const string PREFIX_AUTH = "auth";
+    const string PREFIX_EVENTS = "objects/events";
     /**
      * Locations to search during include:
      * 'key' => Hold the absolute path to search
@@ -26,7 +31,7 @@ final class SparkLoader
      * @param string $searchPrefix
      * @return SparkLoader
      */
-    public static function Factory(string $searchPrefix = ""): SparkLoader
+    public static function Factory(string $searchPrefix): SparkLoader
     {
         return new SparkLoader($searchPrefix);
     }
@@ -38,14 +43,16 @@ final class SparkLoader
 
     /**
      * Add $location to the loader search locations using prefix $prefix
-     *
+     * $location is made absolute using PathParts and realpath
+     * $prefix is mb_trimmed for space and / so is always not absolute
      * @param string $location
      * @param string $prefix
      * @return void
      */
     public static function AddLocation(string $location, string $prefix): void
     {
-        SparkLoader::$locations[realpath($location)] = $prefix;
+        $location = Spark::PathParts(realpath($location));
+        SparkLoader::$locations[$location] = mb_trim(Spark::PathParts($prefix), "/");
         //Debug::ErrorLog("Loader locations: " , SparkLoader::$locations);
     }
 
@@ -54,8 +61,11 @@ final class SparkLoader
      *
      * @param string $prefix
      */
-    private function __construct(string $prefix="")
+    private function __construct(string $prefix)
     {
+        $prefix = mb_trim($prefix," /");
+        if (!$prefix) throw new Exception("No loader prefix specified");
+
         $this->prefix = $prefix;
         //Debug::ErrorLog("Using prefix [$this->prefix]: ", SparkLoader::$locations);
     }
@@ -67,32 +77,31 @@ final class SparkLoader
      * @param string $fileName
      * @param bool $includeAll Default True - include all files named $fileName searching all locations
      * @return void
+     * @throws Exception
      */
     public function include(string $fileName, bool $includeAll) : void
     {
 
-        Debug::ErrorLog("Searching: $fileName.php | Include all: ".($includeAll ? "Yes" : "No"));
+        if (!$fileName) throw new Exception("Parameter mismatch - fileName empty");
+        Debug::ErrorLog("Searching: [{$this->prefix}] -> $fileName.php | Include all: ".($includeAll ? "Yes" : "No"));
 
         $found = 0;
         foreach (SparkLoader::$locations as $includePath => $includePrefix) {
 
-            //Debug::ErrorLog("Searching: $fileName.php in $includePath/$includePrefix/{$this->prefix}");
-
             $includeFile = Spark::PathParts($includePath, $includePrefix, $this->prefix, $fileName . ".php");
+            //Debug::ErrorLog("Trying: $includeFile");
 
-            if (file_exists($includeFile)) {
+            if (is_file($includeFile)) {
                 $found++;
                 Debug::ErrorLog("Including: ".$includeFile);
                 include_once($includeFile);
 
                 if (!$includeAll) break;
             }
-            else {
-                //Debug::ErrorLog("File not found: ".$includeFile);
-            }
-        }
-        Debug::ErrorLog("Included [$found] files");
 
+        }
+
+        Debug::ErrorLog("Included [$found] files");
     }
 
     /**
@@ -226,13 +235,26 @@ final class Spark {
 
     final private function __construct() {}
 
+    /**
+     * Combine '$parts' using '/' and return absolute path starting with '/'
+     *
+     * @param string ...$parts
+     * @return string
+     */
     final static function PathParts(string ... $parts) : string
     {
-        return implode(DIRECTORY_SEPARATOR, $parts);
+        $pathParts = Spark::Split(implode("/", $parts), "/");
+
+        $result = array();
+        foreach ($pathParts as $idx => $part) {
+            $part=trim($part);
+            if ($part) $result[] = $part;
+        }
+        return "/".implode("/", $result);
     }
 
     /**
-     * Add $path to the current include_path and SparkLoader locations enabling loader prefix $loaderPrefix
+     * Add '$path' to the current include_path and SparkLoader locations with loader prefix '$loaderPrefix'
      * @param string $path
      * @param string $loaderPrefix
      * @return void
@@ -246,8 +268,6 @@ final class Spark {
         set_include_path(implode(PATH_SEPARATOR, array_keys($includes)));
 
         SparkLoader::AddLocation($path, $loaderPrefix);
-
-        //error_log("Include Path: " . get_include_path());
     }
 
     final static public function Initialize() : void
@@ -417,21 +437,6 @@ final class Spark {
         return Marshall::Float($result);
     }
 
-
-    /**
-     * Export each config variable as constant using define() function. Skip already defined.
-     * @return void
-     */
-    final static public function DefineConfig() : void
-    {
-        foreach (Spark::$defines as $key => $val) {
-            if (defined($key)) {
-                continue;
-            }
-            define($key, $val);
-        }
-    }
-
     final static public function Dump() : void
     {
         foreach (Spark::$defines as $key => $val) {
@@ -561,6 +566,7 @@ final class Spark {
         }
         rmdir($dirPath);
     }
+
     final static public function DateFormat(string $date, bool $time = TRUE) : string
     {
         $tm = "";
@@ -663,7 +669,7 @@ final class Spark {
         }
 
         if (Spark::GetBoolean(Config::DB_ENABLED)) {
-            return DBConnections::Open()->escape($input);
+            return DBConnections::Driver()->escape($input);
         }
         else {
             return Spark::EscapeHelper($input);

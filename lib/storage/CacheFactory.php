@@ -103,7 +103,7 @@ class CacheFactory
             $delete = new SQLDelete($bean->select());
             $delete->where()->add("className", "'PageCache'");
             $delete->where()->addExpression("(($timestamp - lastModified) > ".Spark::GetInteger(Config::PAGE_CACHE_TTL).")", " AND ");
-            $db = $bean->getDB();
+            $db = DBConnections::Driver();
             try {
                 $db->transaction();
                 $db->query($delete->getSQL());

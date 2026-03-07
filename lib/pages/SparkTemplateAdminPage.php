@@ -1,31 +1,11 @@
 <?php
 include_once("pages/SparkTemplatePage.php");
-
-
-include_once("beans/AdminAccessBean.php");
-
-include_once("responders/ChangePositionResponder.php");
-include_once("responders/DeleteItemResponder.php");
-include_once("responders/ToggleFieldResponder.php");
-
-
-include_once("dialogs/json/JSONFormDialog.php");
-
-include_once("utils/BeanKeyCondition.php");
-include_once("sql/SQLSelect.php");
-
 include_once("components/MenuBar.php");
-include_once("components/BeanFormEditor.php");
-include_once("components/TableView.php");
-include_once("components/ClosureComponent.php");
-
-include_once("auth/AuthContext.php");
 include_once("components/TextComponent.php");
 include_once("utils/Navigation.php");
 
-
+include_once("dialogs/json/JSONFormDialog.php");
 include_once("responders/json/TemplateHelpResponder.php");
-
 
 class SparkTemplateAdminPage extends SparkTemplatePage
 {
@@ -52,7 +32,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
     public function __construct()
     {
 
-        $this->context = ModuleConfig::Active()->authContext;
+        $this->context = Module::AuthContext();
 
         parent::__construct();
 
@@ -103,12 +83,10 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
         //initialize menu and module
         MenuItemRenderer::$append_parent_href = true;
-        MenuItemRenderer::$href_prefix = Spark::Get(Config::ADMIN_LOCAL) . "2/";
-
-        Template::SetModule("admin", MenuItemRenderer::$href_prefix);
+        MenuItemRenderer::$href_prefix = Module::Location();
 
         SparkTemplateAdminPage::$Menu = null;
-        SparkLoader::Factory(Template::ModuleLocation())->include("menu", true);
+        SparkLoader::Factory(Module::Prefix())->include("menu", true);
 
         if (SparkTemplateAdminPage::$Menu instanceof MenuItemList) {
 
@@ -138,7 +116,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         $adminData->setComponentClass("user_data");
         $sidePane->items()->append($adminData);
 
-        $username = $this->context->getData()->get(SessionData::FULLNAME);
+        $username = $this->context->getData()->get(AuthContext::FULLNAME);
         if ($username) {
             $adminName = new TextComponent($username);
             $adminName->setComponentClass("username");
@@ -272,7 +250,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         if ($url instanceof URL) {
             $back_action = new Action();
             $back_action->setAction(SparkTemplateAdminPage::ACTION_BACK);
-            $back_action->setURL(Template::PathURL("", $url));
+            $back_action->setURL(Module::PathURL("", $url));
             $actions->items()->append($back_action);
         }
 

@@ -57,7 +57,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->id = $id;
         $this->className = $className;
 
-        $this->bean = SparkLoader::Factory("beans")->instance($className, DBTableBean::class);
+        $this->bean = SparkLoader::Factory(SparkLoader::PREFIX_BEANS)->instance($className, DBTableBean::class);
 
         if (isset($_GET["field"])) {
             $this->field = $_GET["field"];

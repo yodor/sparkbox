@@ -44,7 +44,7 @@ class TranslatePhraseResponder extends JSONResponder
 
         $trrow = array();
 
-        $trrow["translated"] = DBConnections::Open()->escape(trim($_REQUEST["translation"]));
+        $trrow["translated"] = DBConnections::Driver()->escape(trim($_REQUEST["translation"]));
         if (strlen($trrow["translated"]) < 1) throw new Exception(tr("Input translation"));
 
         try {

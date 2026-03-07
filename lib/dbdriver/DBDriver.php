@@ -6,7 +6,6 @@ include_once("objects/events/DBDriverEvent.php");
 
 abstract class DBDriver
 {
-
     public static function Enum2Array(string $enum_str) : array
     {
         $enum_str = str_replace("enum(", "", $enum_str);
@@ -16,9 +15,22 @@ abstract class DBDriver
         return explode(",", $enum_str);
     }
 
-    abstract function __construct(DBConnection $conn);
+    protected ?DBConnection $props = null;
 
-    abstract function __destruct();
+    public function __construct(DBConnection $props)
+    {
+        $this->props = $props;
+    }
+
+    public function __destruct()
+    {
+        $this->disconnect();
+    }
+
+    abstract public function connect() : void;
+    abstract public function disconnect() : void;
+
+    abstract public function isConnected() : bool;
 
     abstract public function affectedRows() : int;
 
@@ -45,4 +57,15 @@ abstract class DBDriver
     abstract public function tableExists(string $table) : bool;
 
     abstract public function fieldType(string $table, string $field_name) : string;
+
+    public function __serialize(): array
+    {
+        return array("props"=>$this->props);
+    }
+    public function __deserialize(array $data): void
+    {
+        $this->props = $data["props"];
+        $this->connect();
+    }
+
 }

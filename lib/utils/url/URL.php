@@ -42,7 +42,7 @@ class URL implements IGETConsumer, IDataResultProcessor
         return new URL($ret);
     }
 
-    public function __construct(?string $url="")
+    public function __construct(string $url="")
     {
         if (strlen($url)>0) {
             $this->fromString($url);
@@ -170,13 +170,13 @@ class URL implements IGETConsumer, IDataResultProcessor
             }
 
             $names = array_keys($parameters);
-            //consctruct pairs to be imploded using &
+            //construct pairs to be imploded using &
             $pairs = array();
             foreach ($names as $idx => $name) {
                 $param = $this->get($name);
                 if ($param instanceof PathParameter) continue;
                 if ($param->isResource()) {
-                    //handle paramterized resource named using #resource.%param%
+                    //handle parametrized resource named using #resource.%param%
                     //parameter value is done in setData of URLParameter
                     $resource = (strlen($param->value())<1) ? $param->name() : $param->value();
                 }

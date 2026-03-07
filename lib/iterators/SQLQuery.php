@@ -1,30 +1,31 @@
 <?php
 include_once("iterators/IDataIterator.php");
+include_once("dbdriver/IDBDriverAccess.php");
 
-class SQLQuery implements IDataIterator
+class SQLQuery implements IDataIterator, IDBDriverAccess
 {
 
     /**
      * @var SQLSelect|null
      */
-    public ?SQLSelect $select;
+    public ?SQLSelect $select = null;
 
     /**
-     * @var DBDriver
+     * @var DBDriver|null
      */
-    protected DBDriver $db;
+    protected ?DBDriver $db = null;
 
     /**
      * Primary key for this iterator
      * @var string
      */
-    protected string $key;
+    protected string $key = "";
 
     /**
      * Main table
      * @var string
      */
-    protected string $name;
+    protected string $name = "";
 
 
     /**
@@ -47,7 +48,7 @@ class SQLQuery implements IDataIterator
         $this->key = $primaryKey;
         $this->name = $tableName;
 
-        $this->db = DBConnections::Open();
+        $this->db = DBConnections::Driver();
         $this->bean = NULL;
         $this->res = NULL;
     }
@@ -157,9 +158,9 @@ class SQLQuery implements IDataIterator
         return $this->db;
     }
 
-    public function setDB(DBDriver $db) : void
+    public function setDB(DBDriver $driver) : void
     {
-        $this->db = $db;
+        $this->db = $driver;
     }
 
     public function name(): string

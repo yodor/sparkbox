@@ -78,7 +78,7 @@ class ConfigBean extends DBTableBean
     public function set(string $key, string|null $val) : void
     {
 
-        $db = DBConnections::Open();
+        $db = DBConnections::Driver();
         try {
 
             $db->transaction();

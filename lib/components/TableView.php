@@ -94,24 +94,18 @@ class TableView extends AbstractResultView implements IHeadContents
 
     protected function renderItems() : void
     {
-
         $names = array_keys($this->columns);
         foreach ($names as $pos => $name) {
 
             $column = $this->getColumn($name);
-//
-//            $emptyRow = array();
-//
+
             $header = $column->getHeaderCellRenderer();
-//            if ($column->getAlignClass()) {
-//                $header->addClassName($column->getAlignClass());
-//            }
-//            $header->setData($emptyRow);
+
             $header->render();
         }
-
         parent::renderItems();
     }
+
     protected function renderItem(RawResult $result) : void
     {
         static $v = new ValueInterleave();
@@ -129,7 +123,7 @@ class TableView extends AbstractResultView implements IHeadContents
             }
 
             $cell->setData($result->toArray());
-            $cell->setAttribute("title", $column->getName());
+            $cell->setAttribute("column", $column->getName());
             $cell->setAttribute("parity", $v->value());
             $cell->render();
         }

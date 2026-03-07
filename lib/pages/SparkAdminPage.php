@@ -154,7 +154,7 @@ class SparkAdminPage extends SparkPage
         $adminHeader->setComponentClass("admin_header");
         $container->items()->append($adminHeader);
 
-        $username = $this->context->getData()->get(SessionData::FULLNAME);
+        $username = $this->context->getData()->get(AuthContext::FULLNAME);
         if ($username) {
             $adminName = new TextComponent($username);
             $adminName->setComponentClass("username");

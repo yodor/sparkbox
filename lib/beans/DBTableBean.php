@@ -1,22 +1,23 @@
 <?php
 include_once("dbdriver/DBDriver.php");
+include_once("dbdriver/IDBDriverAccess.php");
 include_once("iterators/SQLQuery.php");
 include_once("sql/SQLSelect.php");
 include_once("sql/SQLInsert.php");
 include_once("sql/SQLUpdate.php");
 include_once("sql/SQLDelete.php");
 
-abstract class DBTableBean
+abstract class DBTableBean implements IDBDriverAccess
 {
 
     /**
-     * Primary key
+     * Table primary key column name
      * @var string
      */
     protected string $prkey = "";
 
     /**
-     * Table
+     * Table name
      * @var string
      */
     protected string $table = "";
@@ -28,9 +29,9 @@ abstract class DBTableBean
     protected string $createString = "";
 
     /**
-     * @var DBDriver
+     * @var DBDriver|null
      */
-    protected DBDriver $db;
+    protected ?DBDriver $db = null;
 
     /**
      * Column names of this table as keys and the column storage type as value
@@ -40,47 +41,38 @@ abstract class DBTableBean
 
 
     /**
-     * @var SQLSelect
+     * @var SQLSelect|null
      */
-    protected SQLSelect $select;
+    protected ?SQLSelect $select = null;
 
 
     /**
-     * DBTableBean constructor. Specify the table name to work with in the '$table_name' parameter.
-     * The default global DBDriver is used unless specified in the '$dbdriver' parameter
-     * @param string $table_name
-     * @param DBDriver|null $dbdriver
+     * DB table access wrapper.
+     * The default connection DBDriver will be used if '$driver' parameter is null
+     * @param string $tableName
+     * @param DBDriver|null $driver
      * @throws Exception
      */
-    public function __construct(string $table_name, ?DBDriver $dbdriver = NULL)
+    public function __construct(string $tableName, ?DBDriver $driver = NULL)
     {
-        $this->table = $table_name;
+        $this->table = $tableName;
 
-        if ($dbdriver) {
-            $this->db = $dbdriver;
+        if (!is_null($driver)) {
+            $this->db = $driver;
         }
         else {
-            $this->db = DBConnections::Open();
+            $this->db = DBConnections::Driver();
         }
 
-        $this->initFields();
-
-        $this->select = new SQLSelect();
-
-        $this->select->from = $this->table;
-
+        $this->initialize();
     }
 
-    public function __destruct()
-    {
-
-    }
 
     /**
      * @return void
      * @throws Exception
      */
-    protected function initFields() : void
+    protected function initialize() : void
     {
 
         $this->columns = array();
@@ -109,6 +101,9 @@ abstract class DBTableBean
             $this->columns[$field_name] = $row["Type"];
         }
         $result->free();
+
+        $this->select = new SQLSelect();
+        $this->select->from = $this->table;
        
     }
 
@@ -136,9 +131,9 @@ abstract class DBTableBean
         return $this->table;
     }
 
-    public function setDB(DBDriver $db) : void
+    public function setDB(DBDriver $driver) : void
     {
-        $this->db = $db;
+        $this->db = $driver;
     }
 
     public function getDB() : DBDriver
@@ -597,7 +592,7 @@ abstract class DBTableBean
     {
         if ($this instanceof SparkCacheBean) return;
 
-        $cache_file = Spark::Get(Config::CACHE_PATH) . "/" . get_class($this) . "/" . $id;
+        $cache_file = Spark::PathParts(Spark::Get(Config::CACHE_PATH) , get_class($this) , $id);
         Debug::ErrorLog("Checking cache folder: '$cache_file'");
         if (!is_dir($cache_file)) {
             Debug::ErrorLog("'$cache_file' not a folder");
@@ -664,6 +659,19 @@ abstract class DBTableBean
             $statement->set($key, $value);
         }
 
+    }
+
+    public function __serialize() : array
+    {
+        return array("table" => $this->table, "driver"=>$this->db);
+    }
+
+    public function __unserialize(array $data) : void
+    {
+        $this->table = $data["table"];
+        //unserialize of dbdriver already connects
+        $this->db = $data["driver"];
+        $this->initialize();
     }
 
 }

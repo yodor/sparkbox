@@ -5,7 +5,7 @@
 //
 
 $prop = new DBConnection();
-$prop->driver = "MySQLi";
+$prop->driverClass = "MySQLi";
 
 $prop->database = "database_name";
 $prop->user = "user_name";

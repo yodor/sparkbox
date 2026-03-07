@@ -32,14 +32,13 @@ class SparkTemplatePage extends SparkPage implements IObserver
      */
     public function initialize() : void
     {
-
         try {
             Template::PathConfig($this->path);
             $this->body->setAttribute("path", $this->path);
         }
         catch (Exception $e) {
             Debug::ErrorLog("PathConfig failed: ".$e->getMessage());
-            Template::ErrorConfig("Error:{$this->path}", $e->getMessage());
+            Template::ErrorConfig("Error:{$this->path}", $e->getMessage()." - ".$e->getTraceAsString());
         }
     }
 
@@ -76,6 +75,6 @@ class SparkTemplatePage extends SparkPage implements IObserver
     //
     public function currentURL(): URL
     {
-        return Template::PathURL("", parent::currentURL());
+        return Module::PathURL("", parent::currentURL());
     }
 }
