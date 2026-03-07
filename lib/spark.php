@@ -52,7 +52,9 @@ final class SparkLoader
     public static function AddLocation(string $location, string $prefix): void
     {
         $location = Spark::PathParts(realpath($location));
-        SparkLoader::$locations[$location] = mb_trim(Spark::PathParts($prefix), "/");
+
+        //TODO: mb_trim in 8.4
+        SparkLoader::$locations[$location] = trim(Spark::PathParts($prefix), "/");
         //Debug::ErrorLog("Loader locations: " , SparkLoader::$locations);
     }
 
@@ -63,7 +65,8 @@ final class SparkLoader
      */
     private function __construct(string $prefix)
     {
-        $prefix = mb_trim($prefix," /");
+        //TODO: mb_trim in 8.4
+        $prefix = trim($prefix," /");
         if (!$prefix) throw new Exception("No loader prefix specified");
 
         $this->prefix = $prefix;
