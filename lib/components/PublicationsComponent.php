@@ -151,7 +151,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
         $this->selected_ID = array();
 
         $qry = $this->bean->query(...$this->columns);
-        $qry->select->order_by = $this->bean->getDateColumn() . " DESC";
+        $qry->select->order_by = " newsID DESC, ".$this->bean->getDateColumn() . " DESC";
         $qry->select->limit = 3;
 
         $this->itemView = new ItemView($qry);
@@ -196,7 +196,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
     public function processInput(): void
     {
 
-        $qry = $this->bean->query($this->bean->key(), $this->bean->getDateColumn());
+        $qry = $this->bean->query($this->bean->key(), $this->bean->getDateColumn(), "item_title");
 
 
         $num = -1;
@@ -219,7 +219,11 @@ class PublicationsComponent extends Container implements IRequestProcessor
             $qry->exec();
         }
 
+        $itemTitle = null;
         while ($item = $qry->next()) {
+            if (is_null($itemTitle)) {
+                $itemTitle = $item["item_title"];
+            }
             $this->selected_ID[] = $item[$this->bean->key()];
             if (!$this->selected_month || $this->selected_year) {
                 $this->selected_month = date("n", strtotime($item[$this->bean->getDateColumn()]));
@@ -227,6 +231,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
             }
 
         }
+        SparkPage::Instance()->setTitle($itemTitle);
 
     }
 
