@@ -20,9 +20,9 @@ class UsersBean extends DBTableBean
  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-    public function __construct()
+    public function __construct(string $table="users", ?DBDriver $driver=null)
     {
-        parent::__construct("users");
+        parent::__construct($table, $driver);
     }
 
     //email

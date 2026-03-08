@@ -1,7 +1,7 @@
 <?php
-include_once("beans/DBTableBean.php");
+include_once("beans/UsersBean.php");
 
-class AdminUsersBean extends DBTableBean
+class AdminUsersBean extends UsersBean
 {
 
     protected string $createString = "CREATE TABLE `admin_users` (
@@ -23,9 +23,9 @@ class AdminUsersBean extends DBTableBean
  CONSTRAINT `admin_users_ibfk_1` FOREIGN KEY (`adminID`) REFERENCES `admin_users` (`userID`) ON DELETE SET NULL ON UPDATE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
-    public function __construct()
+    public function __construct(string $table="admin_users", ?DBDriver $driver=null)
     {
-        parent::__construct("admin_users");
+        parent::__construct($table, $driver);
     }
 
     public function delete(int $id, ?DBDriver $db = NULL) : int
@@ -41,23 +41,5 @@ class AdminUsersBean extends DBTableBean
 
     }
 
-    //email
-    public function emailExists(string $email) : ?array
-    {
-        return $this->getResult("email", $email);
-
-    }
-
-    public function email(int $userID) : ?string
-    {
-        return $this->getValue($userID, "email");
-    }
-
-    public function email2id(string $email) : int
-    {
-        $row = $this->getResult("email", $email);
-        if (!$row) return -1;
-        return (int)$row[$this->key()];
-    }
 
 }
