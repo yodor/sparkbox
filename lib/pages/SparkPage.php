@@ -310,6 +310,10 @@ JS;
         //can set header to redirect
         RequestController::process();
 
+        //close write after responders are processed, Upload responders etc
+        //TODO:
+        //Session::Close();
+
         //assign values to preferred_title and description properties
         $this->applyTitleDescription();
 

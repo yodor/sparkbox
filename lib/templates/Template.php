@@ -91,6 +91,17 @@ final class Template
         $config = TemplateConfig::Active();
         if (is_null($config)) throw new Exception("No active TemplateConfig");
 
+        if ($config->requireAuth) {
+            $authContext = Module::Active()->getAuthContext();
+            if (is_null($authContext)) {
+                Session::SetAlert("Authorization Required");
+                $loginPage = Module::PathURL("login");
+                Debug::ErrorLog("Authorization required for this content - redirecting to login page: $loginPage");
+                header("Location: ".$loginPage);
+                exit;
+            }
+        }
+
         if (!$config->contentClass) throw new Exception("TemplateConfig contentClass is empty");
 
         $cmp = SparkLoader::Factory(Template::PREFIX_CONTENT)->instance($config->contentClass, TemplateContent::class);
@@ -172,7 +183,7 @@ final class Template
         //convert //some/path/ to some.path
         $path = Template::FormatPath($path, ".", false);
 
-        $moduleLocation = Spark::PathParts(Module::Prefix(), Module::PATH_FOLDER);
+        $moduleLocation = Spark::PathParts(Module::Active()->getPreifx(), Module::PATH_FOLDER);
 
         TemplateConfig::Deactivate();
 
@@ -194,6 +205,7 @@ final class Template
     public static function ErrorConfig(string $title, string $message): void
     {
         $config = TemplateConfig::Plain($title, $message);
+        $config->requireAuth = false;
         //Emit here
         SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, $config));
     }

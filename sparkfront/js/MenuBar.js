@@ -52,21 +52,25 @@ class MenuBar extends Component {
             return;
         }
 
-
-        this.toggle = this.element.querySelector(".toggle");
-        this.toggle.addEventListener("click", ()=>this.toggleMenu());
-
         this.itemList = this.element.querySelector(".ItemList");
-        this.itemList.querySelectorAll(".Item").forEach((barItem)=>{
 
-            if (!this.isTouchEnabled() && !this.element.hasAttribute("noattach")) {
-                barItem.addEventListener("mouseenter", () => this.menuEnter(barItem));
-                barItem.addEventListener("mouseleave", () => this.menuLeave(barItem));
-            }
+        if (this.itemList) {
 
-            barItem.addEventListener("click", (event)=>this.menuAction(barItem, event));
+            this.toggle = this.element.querySelector(".toggle");
+            this.toggle.addEventListener("click", ()=>this.toggleMenu());
 
-        });
+            this.itemList.querySelectorAll(".Item").forEach((barItem)=>{
+
+                if (!this.isTouchEnabled() && !this.element.hasAttribute("noattach")) {
+                    barItem.addEventListener("mouseenter", () => this.menuEnter(barItem));
+                    barItem.addEventListener("mouseleave", () => this.menuLeave(barItem));
+                }
+
+                barItem.addEventListener("click", (event)=>this.menuAction(barItem, event));
+
+            });
+
+        }
 
     }
 

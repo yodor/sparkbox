@@ -69,4 +69,13 @@ class Button extends Input
         return $arr;
     }
 
+    /**
+     * Set the action attribute to '$action'
+     * @param string $action
+     * @return void
+     */
+    public function setAction(string $action) : void
+    {
+        $this->setAttribute("action", $action);
+    }
 }

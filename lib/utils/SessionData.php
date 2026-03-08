@@ -40,6 +40,11 @@ class SessionData
 
     }
 
+    public function __destruct()
+    {
+        Debug::ErrorLog("SessionData [$this->name] destructor");
+    }
+
     public function removeAll() : void
     {
         $keys = array_keys($this->data);

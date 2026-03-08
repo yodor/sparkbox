@@ -32,7 +32,9 @@
     flex-direction: row;
     flex-wrap: wrap;
 
-    align-items: flex-start;
+    justify-items: flex-start;
+    align-items: center;
+
 }
 
 .FormRenderer[layout="VBox"]  .SubmitLine .Buttons {
@@ -44,4 +46,3 @@
     align-items: flex-end;
     gap:0.5em;
 }
-

@@ -29,7 +29,7 @@ class ForgotPasswordProcessor extends FormProcessor
 
         $random_pass = Authenticator::RandomToken(8);
         $loginURL = new URL(Spark::Get(Config::ADMIN_LOCAL)."/login.php");
-        $fpm = new ForgotPasswordMailer($email, $random_pass, $loginURL->fullURL());
+        $fpm = new ForgotPasswordMailer($email, $random_pass, $loginURL);
         $db = DBConnections::Driver();
         try {
             $db->transaction();

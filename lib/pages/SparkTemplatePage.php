@@ -62,6 +62,7 @@ class SparkTemplatePage extends SparkPage implements IObserver
      */
     public function onEvent(SparkEvent $event) : void
     {
+        //config is created load its content
         if ($event->isEvent(TemplateConfigEvent::UPDATE)) {
             Template::LoadContent();
         }

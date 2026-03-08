@@ -48,7 +48,12 @@ class Module
      * Current active AuthContext after calling Authenticate
      * @var AuthContext|null
      */
-    protected ?AuthContext $auth = null;
+    protected ?AuthContext $context = null;
+
+    /**
+     *  Current active Authenticator.
+     */
+    protected ?Authenticator $authenticator = null;
 
     /**
      * Current active Module instance
@@ -58,7 +63,6 @@ class Module
 
     private function __construct(string $name, string $location)
     {
-        Module::$instance = $this;
         $this->name = $name;
         $this->location = $location;
     }
@@ -68,10 +72,24 @@ class Module
         return new Module($name, $location);
     }
 
-    public static function Active() : ?Module
+    public static function Active() : Module
     {
+        if (is_null(Module::$instance)) throw new Exception("Module is not initialized");
         return Module::$instance;
     }
+
+    /**
+     * Set Active() instance to this
+     * Include all init.php relative to Module::Prefix()
+     * @return void
+     * @throws Exception
+     */
+    public function initialize() : void
+    {
+        Module::$instance = $this;
+        SparkLoader::Factory(Module::Active()->getPreifx())->include(Module::INIT_NAME, true);
+    }
+
 
     /**
      * Get the active module SparkLoader prefix:
@@ -82,44 +100,44 @@ class Module
      *
      * @return string
      */
-    public static function Prefix(): string
+    public function getPreifx(): string
     {
-        return Module::PREFIX . "/" . Module::Active()->name;
+        return Module::PREFIX . "/" . $this->name;
     }
 
     /**
      * Active module absolute path from DOCUMENT_ROOT
      * @return string
      */
-    public static function Location(): string
+    public function getLocation(): string
     {
-        $config = Module::Active();
-        if (is_null($config)) throw new Exception("No active Module");
-
-        return $config->location;
+        return $this->location;
     }
 
     /**
      * Active Module name reference
      * @return string
      */
-    public static function Name(): string
+    public function getName(): string
     {
-        $config = Module::Active();
-        if (is_null($config)) throw new Exception("No active Module");
-
-        return $config->name;
-
+        return $this->name;
     }
 
     /**
-     * Include all init.php relative to Module::Prefix()
-     * @return void
-     * @throws Exception
+     * Return the module AuthContext. Not null after successful authorize.
+     * @return AuthContext|null
      */
-    public static function Initialize() : void
+    public function getAuthContext() : ?AuthContext
     {
-        SparkLoader::Factory(Module::Prefix())->include(Module::INIT_NAME, true);
+        return $this->context;
+    }
+
+    /**
+     * @return Authenticator|null
+     */
+    public function getAuthenticator() : ?Authenticator
+    {
+        return $this->authenticator;
     }
 
     /**
@@ -127,45 +145,60 @@ class Module
      * @return void
      * @throws Exception
      */
-    public static function Authorize() : void
+    protected function authorize() : void
     {
-        $config = Module::Active();
-        if (is_null($config)) throw new Exception("No active Module");
 
-        if ($config->authClass) {
-            try {
-                $object = SparkLoader::Factory(SparkLoader::PREFIX_AUTH)->instance($config->authClass, Authenticator::class);
-                if (!($object instanceof Authenticator)) throw new Exception("Object is not instance of Authenticator");
-                $authContext = $object->authorize();
-                if (!($authContext instanceof AuthContext)) throw new Exception("Authorization failed");
-                $config->auth = $authContext;
+        $this->context = null;
+        $this->authenticator = null;
 
-            } catch (Exception $e) {
-                //redirect login
-                $loginPage = Spark::PathParts($config->location, "login.php");
-                Debug::ErrorLog("--- Redirecting to login page: $loginPage");
-                Session::setAlert($e->getMessage());
-                header("Location: $loginPage");
-                exit;
+        if ($this->authClass) {
+
+            $object = SparkLoader::Factory(SparkLoader::PREFIX_AUTH)->instance($this->authClass, Authenticator::class);
+            if (!($object instanceof Authenticator)) throw new Exception("Object is not instance of Authenticator");
+            $this->authenticator = $object;
+
+            $authContext = $object->authorize();
+            if ($authContext instanceof AuthContext) {
+                $this->context = $authContext;
+                Debug::ErrorLog("Authorization Successful");
             }
+            else {
+                Debug::ErrorLog("Authorization Failed");
+            }
+
         }
         else {
             Debug::ErrorLog("Authorization skipped - no authClass set");
         }
     }
 
+
     /**
-     * Return the active module current AuthContext. Available after calling Authorize
-     * @return AuthContext|null
+     * Process session stored RequestResponders
+     * Unserialize all Responders from session and try processing them early here
+     * @return void
      * @throws Exception
      */
-    public static function AuthContext() : ?AuthContext
+    public static function ProcessResponders() : void
     {
-        $config = Module::Active();
-        if (is_null($config)) throw new Exception("No active Module");
-        return $config->auth;
-    }
 
+//        if (!RequestController::isJSONRequest()) {
+//            Debug::ErrorLog("Not a JSONRequest request");
+//            return;
+//        }
+//        if (!RequestController::isResponderRequest()) {
+//            Debug::ErrorLog("Not a Responder Request");
+//            return;
+//        }
+//        $responderClass = $_REQUEST[RequestResponder::KEY_COMMAND];
+//        Debug::ErrorLog("Creating responder class: $responderClass");
+//
+//        $responder = SparkLoader::Factory("responders/json/")->instance($responderClass, JSONResponder::class);
+//        if (!($responder instanceof JSONResponder)) throw new Exception("Object is not ".JSONResponder::class);
+//
+//        Debug::ErrorLog("Calling RequestController::Process()");
+//        RequestController::Process();
+    }
     /**
      * Process the request using the current active module
      * Calls RequestController::ProcessDynamic()
@@ -174,14 +207,20 @@ class Module
     public static function Response() : void
     {
         $config = Module::Active();
-        if (is_null($config)) throw new Exception("No active Module");
+        if (is_null($config)) throw new Exception("Module is not initialized");
 
-        try {
-            include_once("responders/RequestController.php");
-            RequestController::ProcessDynamic();
-        }
-        catch (Exception $e) {
-            Session::setAlert($e->getMessage());
+        //authorize
+        $config->authorize();
+
+        //process stored responders
+        if (!is_null($config->getAuthContext())) {
+            try {
+                include_once("responders/RequestController.php");
+                Module::ProcessResponders();
+            }
+            catch (Exception $e) {
+                Session::setAlert($e->getMessage());
+            }
         }
 
         if ($config->pageClass) {
@@ -232,7 +271,7 @@ class Module
         $pathParam->setValue(Spark::PathParts($pathValue));
 
         //absolute path from document root
-        $script = Spark::PathParts(Module::Location(), $pathParam->value());
+        $script = Spark::PathParts(Module::Active()->getLocation(), $pathParam->value());
         $result->remove("path");
         $result->setScriptName($script);
         return $result;

@@ -32,7 +32,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
     public function __construct()
     {
 
-        $this->context = Module::AuthContext();
+        $this->context = Module::Active()->getAuthContext();
 
         parent::__construct();
 
@@ -74,8 +74,6 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         $footerPane->setComponentClass("footerPane");
         $this->items()->append($footerPane);
 
-        $this->setTitle(tr("Administration"));
-
         $dialog = new JSONFormDialog();
 
         $helpFetcher = new TemplateHelpResponder();
@@ -83,10 +81,14 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
         //initialize menu and module
         MenuItemRenderer::$append_parent_href = true;
-        MenuItemRenderer::$href_prefix = Module::Location();
+        MenuItemRenderer::$href_prefix = Module::Active()->getLocation();
 
         SparkTemplateAdminPage::$Menu = null;
-        SparkLoader::Factory(Module::Prefix())->include("menu", true);
+
+        //authorized already
+        if (Module::Active()->getAuthContext()) {
+            SparkLoader::Factory(Module::Active()->getPreifx())->include("menu", true);
+        }
 
         if (SparkTemplateAdminPage::$Menu instanceof MenuItemList) {
 
@@ -116,15 +118,19 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         $adminData->setComponentClass("user_data");
         $sidePane->items()->append($adminData);
 
-        $username = $this->context->getData()->get(AuthContext::FULLNAME);
-        if ($username) {
-            $adminName = new TextComponent($username);
-            $adminName->setComponentClass("username");
-            $adminData->items()->append($adminName);
+        $authContext = Module::Active()->getAuthContext();
+        if (!is_null($authContext)) {
+            $username = $authContext->getData()->get(AuthContext::FULLNAME);
+            if ($username) {
+                $adminName = new TextComponent($username);
+                $adminName->setComponentClass("username");
+                $adminData->items()->append($adminName);
+            }
+
+            $buttonLogout = Button::LocationButton("Logout", Module::PathURL("logout"));
+            $adminData->items()->append($buttonLogout);
         }
 
-        $buttonLogout = Button::LocationButton("Logout", new URL(Spark::Get(Config::ADMIN_LOCAL) . "/logout.php"));
-        $adminData->items()->append($buttonLogout);
 
         $sidePane->items()->append($this->menu_bar);
 
@@ -189,6 +195,8 @@ class SparkTemplateAdminPage extends SparkTemplatePage
      */
     protected function applyTitleDescription(): void
     {
+
+        if ($this->preferred_title) return;
 
         $dynmenu = $this->menu_bar->getMenu();
 

@@ -25,42 +25,40 @@ JS;
 class LoginFormRenderer extends FormRenderer
 {
 
-    public bool $fbLoginEnabled = FALSE;
-
     /**
      * @var AuthenticatorResponder
      */
     protected AuthenticatorResponder $responder;
-    protected Action $action;
+
+    const string ACTION_LOGIN = "login";
+    const string ACTION_PASSWORD = "password";
 
     public function __construct(LoginForm $form, AuthenticatorResponder $responder)
     {
         parent::__construct($form);
 
         $this->setClassName("LoginFormRenderer");
-
+        //TODO
         $this->responder = $responder;
 
         $this->setLayout(FormRenderer::LAYOUT_VBOX);
 
         $this->submitButton->setName(RequestResponder::KEY_COMMAND);
-        $this->submitButton->setValue($this->responder->getName());
+        $this->submitButton->setValue($responder->getName());
 
-        $this->submitButton->setAttribute("action", "login");
+        $this->submitButton->setAction(LoginFormRenderer::ACTION_LOGIN);
         $this->submitButton->setContents(tr("Login"));
 
         $this->setAttribute("autocomplete", "on");
 
-        $this->action = new Action(tr("Forgot Password?"), "forgot_password.php");
+        $action = new Action();
+        $action->setAction(LoginFormRenderer::ACTION_PASSWORD);
+        $action->setContents(tr("Forgot Password?"));
+        $action->getURL()->fromString("forgot_password.php");
 
-        $this->getTextSpace()->items()->append($this->action);
+        $this->getTextSpace()->items()->append($action);
 
         new LoginFormScript($form);
-    }
-
-    public function forgotPasswordAction() : Action
-    {
-        return $this->action;
     }
 
     public function requiredScript() : array
@@ -78,6 +76,11 @@ class LoginFormRenderer extends FormRenderer
         return $arr;
     }
 
+    /**
+     * TODO:
+     * @return void
+     * @throws Exception
+     */
     protected function processAttributes(): void
     {
         parent::processAttributes();

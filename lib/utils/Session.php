@@ -3,6 +3,7 @@
 class Session
 {
     protected static bool $is_started = false;
+    protected static bool $write_open = true;
 
     const string ALERT = "alert";
 
@@ -64,7 +65,9 @@ class Session
     public static function Close() : void
     {
         if (Session::$is_started) {
+            Debug::ErrorLog("Releasing write lock: " . session_id());
             session_write_close();
+            Session::$write_open = false;
         }
     }
 
