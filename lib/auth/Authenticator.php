@@ -11,13 +11,13 @@ abstract class Authenticator
 {
 
     /**
-     * @var DBTableBean
+     * @var UsersBean
      */
-    protected DBTableBean $bean;
+    protected UsersBean $bean;
 
     protected SessionData $session;
 
-    public function __construct(string $context_name, DBTableBean $bean)
+    public function __construct(string $context_name, UsersBean $bean)
     {
         $this->bean = $bean;
         $this->session = new SessionData($context_name);
@@ -30,7 +30,7 @@ abstract class Authenticator
 
     /**
      * Return random string from sha256 hash of random data
-     * @param int $length Default 8 symbols
+     * @param int $length
      * @return string
      */
     public static function RandomToken(int $length) : string
@@ -136,6 +136,39 @@ abstract class Authenticator
         }
 
         return new AuthContext($token->getID(), $this->session);
+
+    }
+
+    /**
+     * Set a random password to user with email '$email'
+     * Creates 'random string' using Authenticator::RandomToken(8)
+     * Password is stored in DB by hashing the 'random string' using Authenticator::PasswordHash - currently md5
+     * @param string $email
+     * @return string The 'random string' that can be used on the login forms or emailed back to the user
+     * @throws Exception If email is not found
+     */
+    public function randomPassword(string $email) : string
+    {
+
+        $userID = $this->bean->email2id($email);
+
+        if ($userID<1) {
+            throw new Exception(tr("This email is not registered with us"));
+        }
+
+        $db = DBConnections::Driver();
+        try {
+            $db->transaction();
+            $result = Authenticator::RandomToken(8);
+            $update["password"] = Authenticator::PasswordHash($result);
+            if (!$this->bean->update($userID, $update, $db)) throw new Exception("Password change failed: " . $db->getError());
+            $db->commit();
+            return $result;
+        }
+        catch (Exception $e) {
+            $db->rollback();
+            throw $e;
+        }
 
     }
 
@@ -322,5 +355,15 @@ abstract class Authenticator
             throw new Exception("Authorization failed: ".$e->getMessage());
         }
 
+    }
+
+    /**
+     * TODO: switch away from MD5 - update client side LoginForm code to use SHA
+     * @param string $plainText
+     * @return string
+     */
+    public static function PasswordHash(string $plainText) : string
+    {
+        return md5($plainText);
     }
 }
