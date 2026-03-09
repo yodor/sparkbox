@@ -1,7 +1,10 @@
 <?php
+include_once("objects/ISparkSerialize.php");
+include_once("objects/SparkSerialized.php");
+
 include_once("storage/DataBuffer.php");
 
-class StorageObject
+class StorageObject implements ISparkSerializable
 {
 
     final public const float Serial = 1.0;
@@ -183,4 +186,8 @@ class StorageObject
         }
     }
 
+    public function wrap(): ISparkUnserializable
+    {
+        return new SparkSerialized($this);
+    }
 }

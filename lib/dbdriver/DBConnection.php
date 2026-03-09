@@ -95,16 +95,18 @@ class DBConnection extends SparkObject
     }
 
     /**
-     * Serialize the connection properties only without the driver instance
+     * Serialize empty properties
      * @return array
      */
     public function __serialize(): array
     {
-        $result = parent::__serialize();
 
-        //all without DBDriver
-        unset($result["driver"]);
-
-        return $result;
+        return array();
     }
+
+    public function __unserialize(array $data):void
+    {
+
+    }
+
 }

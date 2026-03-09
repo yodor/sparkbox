@@ -104,7 +104,8 @@ abstract class DBTableBean implements IDBDriverAccess
 
         $this->select = new SQLSelect();
         $this->select->from = $this->table;
-       
+
+        Debug::ErrorLog("DBTableBean[$this->table]");
     }
 
     /**
@@ -663,14 +664,14 @@ abstract class DBTableBean implements IDBDriverAccess
 
     public function __serialize() : array
     {
-        return array("table" => $this->table, "driver"=>$this->db);
+        return array("table" => $this->table, "connection_name"=>$this->db->getConnectionName());
     }
 
     public function __unserialize(array $data) : void
     {
         $this->table = $data["table"];
-        //unserialize of dbdriver already connects
-        $this->db = $data["driver"];
+        //should already be present inside DBConnections
+        $this->db = DBConnections::Driver($data["connection_name"]);
         $this->initialize();
     }
 

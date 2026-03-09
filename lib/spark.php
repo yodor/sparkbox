@@ -36,9 +36,54 @@ final class SparkLoader
         return new SparkLoader($searchPrefix);
     }
 
-    public static function Locations() : array
+    public static function ClassMap(object $object, array &$result, array &$visited = [] ): void
     {
-        return SparkLoader::$locations;
+        // Use object identity (spl_object_id) to detect cycles
+        $oid = spl_object_id($object);
+
+        // Already visited → prevent recursion loop
+        if (isset($visited[$oid])) return;
+
+        // Mark as visited before processing
+        $visited[$oid] = true;
+
+        $ref = new ReflectionObject($object);
+        $file = $ref->getFileName();
+
+        //Record only classes with a valid source file
+        if (!$file) return;
+
+        $result[get_class($object)] = $file;
+
+        foreach ($ref->getProperties() as $prop) {
+            $type = $prop->getType();
+            if (!$type) continue;
+
+            // Optional safeguard: skip uninitialized properties (PHP 7.4+)
+            if (!$prop->isInitialized($object)) continue;
+
+            $value = $prop->getValue($object);
+            if (!is_object($value)) continue;
+
+            SparkLoader::ClassMap($value, $result, $visited);
+        }
+    }
+
+    public static function GetPrefix(string $className, string $filePath) : string
+    {
+
+        $result = "";
+        foreach (SparkLoader::$locations as $location => $prefix) {
+            if (str_starts_with($filePath, $location)) {
+                $result = str_replace($location, "", $filePath);
+                $result = str_replace($prefix, "", $result);
+                $result = str_replace($className, "", $result);
+                $result = str_replace(".php", "", $result);
+            }
+        }
+        $result = trim($result, " /");
+        //Debug::ErrorLog("Loader prefix [$result] -> $className");
+        return $result;
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 include_once("utils/Session.php");
-include_once("storage/FileStorageObject.php");
-include_once("storage/ImageStorageObject.php");
+include_once("objects/ISparkSerialize.php");
+
 /**
  * Store array in session
  */
@@ -67,13 +67,21 @@ class SessionData
 
     public function set(string $key, mixed $val) : void
     {
-        $this->data[$key] = $val;
+        $result = $val;
+        if ($val instanceof ISparkSerializable) {
+            $result = $val->wrap();
+        }
+        $this->data[$key] = $result;
     }
 
     public function get(string $key) : mixed
     {
         if (!isset($this->data[$key])) throw new Exception("SessionData key not found: " . $key);
-        return $this->data[$key];
+        $value = $this->data[$key];
+        if ($value instanceof ISparkUnserializable) {
+            return $value->unwrap();
+        }
+        return $value;
     }
 
     public function contains(string $key) : bool

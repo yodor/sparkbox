@@ -22,6 +22,11 @@ abstract class DBDriver
         $this->props = $props;
     }
 
+    public function getConnectionName() : string
+    {
+        return $this->props->getName();
+    }
+
     public function __destruct()
     {
         $this->disconnect();
@@ -60,12 +65,11 @@ abstract class DBDriver
 
     public function __serialize(): array
     {
-        return array("props"=>$this->props);
+        return array("connection_name"=>$this->props->getName());
     }
-    public function __deserialize(array $data): void
+    public function __unserialize(array $data): void
     {
-        $this->props = $data["props"];
-        $this->connect();
+        $this->props = DBConnections::Get($data["connection_name"]);
     }
 
 }

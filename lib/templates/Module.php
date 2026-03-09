@@ -32,6 +32,8 @@ class Module
      */
     const string PATH_FOLDER = "path";
 
+    const string DEFAULT_NAME = "default";
+
     /**
      * Module name reference
      * @var string
@@ -61,12 +63,26 @@ class Module
      */
     protected static ?Module $instance = null;
 
+    /**
+     * Set the instance name and location
+     * Actual location is Spark::Get(Config::LOCAL) + $location
+     * @param string $name Module name reference
+     * @param string $location Relative path to Spark::Get(Config::LOCAL)
+     * @return Module
+     */
     private function __construct(string $name, string $location)
     {
         $this->name = $name;
-        $this->location = $location;
+        $this->location = Spark::PathParts(Spark::Get(Config::LOCAL), $location);
     }
 
+    /**
+     * Return new 'factory' instance of Module using '$name' and '$location'
+     * Actual location is Spark::Get(Config::LOCAL) + $location
+     * @param string $name Module name reference
+     * @param string $location Relative path to Spark::Get(Config::LOCAL)
+     * @return Module
+     */
     public static function Factory(string $name, string $location) : Module
     {
         return new Module($name, $location);
@@ -179,7 +195,7 @@ class Module
      * @return void
      * @throws Exception
      */
-    public static function ProcessResponders() : void
+    private function processResponders() : void
     {
 
 //        if (!RequestController::isJSONRequest()) {
@@ -216,7 +232,7 @@ class Module
         if (!is_null($config->getAuthContext())) {
             try {
                 include_once("responders/RequestController.php");
-                Module::ProcessResponders();
+                $config->processResponders();
             }
             catch (Exception $e) {
                 Session::setAlert($e->getMessage());
@@ -224,6 +240,7 @@ class Module
         }
 
         if ($config->pageClass) {
+
             $page = SparkLoader::Factory(SparkLoader::PREFIX_PAGES)->instance($config->pageClass, SparkPage::class);
             if ($page instanceof SparkPage) {
                 //handle path parameters , load module content from module path folder

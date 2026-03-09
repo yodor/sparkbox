@@ -1,5 +1,7 @@
 <?php
-class SparkObject implements jsonSerializable
+include_once("objects/ISparkSerialize.php");
+
+class SparkObject implements jsonSerializable, ISparkSerializable
 {
     /**
      * @var SparkObject|null
@@ -71,5 +73,10 @@ class SparkObject implements jsonSerializable
     public function __serialize(): array
     {
         return get_object_vars($this);
+    }
+
+    public function wrap(): ISparkUnserializable
+    {
+        return new SparkSerialized($this);
     }
 }
