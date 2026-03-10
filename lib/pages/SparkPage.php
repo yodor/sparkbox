@@ -16,6 +16,7 @@ include_once("utils/IActionCollection.php");
 include_once("objects/ActionCollection.php");
 include_once("utils/script/FBPixel.php");
 include_once("utils/script/GTAG.php");
+include_once("components/SessionAlertPageScript.php");
 
 
 class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
@@ -100,6 +101,11 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
             return $this->context->getID();
         }
         return -1;
+    }
+
+    public function getAuthenticator() : ?Authenticator
+    {
+        return $this->auth;
     }
 
     public function getActions(): ActionCollection
@@ -305,14 +311,18 @@ JS;
         //head output buffer
         ob_start();
 
+        //TODO: handle inside module
         //JSONReponders exit execution
         //can create IPageComponents
         //can set header to redirect
-        RequestController::process();
+        RequestController::Process();
+
+        //process session alerts
+        new SessionAlertPageScript();
 
         //close write after responders are processed, Upload responders etc
-        //TODO:
-        //Session::Close();
+        Session::Close();
+        ///
 
         //assign values to preferred_title and description properties
         $this->applyTitleDescription();
@@ -324,13 +334,10 @@ JS;
         parent::startRender();
         //<body> is in output buffer now
 
-        //show session alerts - !will start session
-        $this->processMessages();
-
         //push head until including the body tag - browser can fetch css and scripts while we do the body contents
         ob_end_flush();
 
-        //disable session work from here on
+
 
         //body output buffer
         ob_start(null, 4096);
@@ -351,25 +358,6 @@ JS;
 
         ob_end_flush();
 
-    }
-
-    /**
-     * Show message as a popup if Session "alert" key is set
-     * Clears the Session "alert" key
-     */
-    protected function processMessages() : void
-    {
-        $alert = Session::GetAlert();
-        if ($alert) {
-            ?>
-            <script type='text/javascript'>
-                onPageLoad(function () {
-                    showAlert(<?php echo json_encode($alert);?>);
-                });
-            </script>
-            <?php
-        }
-        Session::ClearAlert();
     }
 
     /**
