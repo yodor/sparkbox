@@ -137,7 +137,8 @@ abstract class Authenticator
             //Debug::ErrorLog("Password: ".$result);
 
             $this->bean->checkPasswordColumn();
-            $update["password"] = new PasswordHash($result)->getValue();
+            $hash = new PasswordHash($result);
+            $update["password"] = $hash->getValue();
             if (!$this->bean->update($userID, $update)) throw new Exception($this->bean->getDB()->getError());
 
             return $result;
