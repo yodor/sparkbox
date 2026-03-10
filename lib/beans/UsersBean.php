@@ -8,7 +8,7 @@ class UsersBean extends DBTableBean
  `userID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `email` varchar(255) NOT NULL,
  `phone` varchar(32) NOT NULL DEFAULT '',
- `password` varchar(32) NOT NULL DEFAULT '',
+ `password` varchar(255) NOT NULL DEFAULT '',
  `last_active` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
  `counter` int(11) unsigned NOT NULL DEFAULT '0',
  `fullname` varchar(255) NOT NULL DEFAULT '',
@@ -23,6 +23,21 @@ class UsersBean extends DBTableBean
     public function __construct(string $table="users", ?DBDriver $driver=null)
     {
         parent::__construct($table, $driver);
+        $columnType = $this->columnType("password");
+        if (!str_starts_with(strtolower($columnType), "varchar(255)")) {
+            //modify column
+            Debug::ErrorLog("Upgrading password column type to varchar(255)");
+            $this->db->query("ALTER TABLE `{$this->table}` MODIFY COLUMN password VARCHAR(255) NOT NULL");
+        }
+        $this->initColumnTypes();
+
+    }
+
+    public function checkPasswordColumn(string $check_type = "varchar(255)") : void
+    {
+        $columnType = strtolower($this->columnType("password"));
+        $checkType = strtolower($check_type);
+        if (!str_starts_with($columnType, $check_type)) throw new Exception("Storage column wrong type: ".$columnType);
     }
 
     //email

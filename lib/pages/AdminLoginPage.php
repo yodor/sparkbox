@@ -31,7 +31,7 @@ class AdminLoginPage extends SparkPage
 
         $form = new LoginForm();
 
-        $afr = new LoginFormRenderer($form, $responder);
+        $afr = new LoginFormRenderer($form, $responder::class, $responder->getAuthenticator()->produceLoginToken());
         $afr->setCaption(Spark::Get(Config::SITE_TITLE) . "<BR><small>" . tr("Administration") . "</small>");
 
         $this->items()->append($afr);

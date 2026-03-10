@@ -7,7 +7,7 @@ class AdminUsersBean extends UsersBean
     protected string $createString = "CREATE TABLE `admin_users` (
  `userID` int(11) unsigned NOT NULL AUTO_INCREMENT,
  `email` varchar(255) CHARACTER SET ascii NOT NULL,
- `password` varchar(32) CHARACTER SET ascii NOT NULL,
+ `password` varchar(255) CHARACTER SET ascii NOT NULL,
  `context` text CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
  `level` int(11) NOT NULL DEFAULT '0',
  `access_level` enum('Limited Access','Full Access') NOT NULL DEFAULT 'Limited Access',

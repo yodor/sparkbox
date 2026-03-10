@@ -7,15 +7,12 @@ class AuthenticatorResponder extends RequestResponder
 {
 
     /**
-     * @var Authenticator
+     * @var Authenticator|null
      */
-    protected Authenticator $auth;
-
-    protected string $randsalt = "";
+    protected ?Authenticator $auth = null;
 
     protected string $email = "";
-    protected string $pass = "";
-    protected bool $remember = FALSE;
+    protected string $challenge = "";
 
     public function __construct(Authenticator $auth)
     {
@@ -29,39 +26,48 @@ class AuthenticatorResponder extends RequestResponder
         return $this->auth;
     }
 
-
     /**
      * @return void
      * @throws Exception
      */
     protected function parseParams() : void
     {
-        if (!isset($_REQUEST["email"])) throw new Exception("Username not passed");
-        if (!isset($_REQUEST["pass"])) throw new Exception("Password not passed");
+        if (!isset($_REQUEST["email"])) throw new Exception("Email not passed");
+        if (!isset($_REQUEST["password"])) throw new Exception("Password not passed");
+        if (!isset($_REQUEST["challenge"])) throw new Exception("Challenge not passed");
 
-        $this->randsalt = $this->auth->loginToken();
+        $this->email = $_REQUEST["email"];
+        $this->challenge = $_REQUEST["challenge"];
 
-        $this->email = $_POST["email"];
-        $this->pass = substr($_POST["pass"], 0, 32);
-
-        $this->remember = isset($_POST["remember"]);
     }
 
     public function createAction(string $title = "") : ?Action
     {
-
         return NULL;
-
     }
 
     /**
+     * Do login and rethrow exception on failure
      * @return void
      * @throws Exception
      */
     protected function processImpl() : void
     {
-        //throws exception on login error
-        $this->auth->login($this->email, $this->pass, $this->randsalt, $this->remember);
+
+        try {
+            $password = substr($_REQUEST["password"], 0, 255);
+            unset($_REQUEST["password"]);
+            $this->auth->login($this->email, $password, $this->challenge);
+        }
+        catch (Exception $e) {
+            //TODO: ratelimit
+            Debug::ErrorLog("Login failed: ".$e->getMessage());
+            sleep(3);
+            throw $e;
+        }
+        finally {
+            unset($password);
+        }
 
     }
 

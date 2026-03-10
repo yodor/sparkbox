@@ -348,6 +348,8 @@ final class Spark {
         Spark::Set(Config::UPLOAD_MAX_FILESIZE, Marshall::FromByteLabel(ini_get("upload_max_filesize")), true);
         //end static values
 
+        Spark::Set(Config::PASSWORD_TYPE, PASSWORD_BCRYPT);
+        Spark::SetObject(Config::PASSWORD_OPTIONS, array('cost' => 12));
         //
         Spark::Set(Config::TITLE_PATH_SEPARATOR, " :: ");
 
@@ -420,23 +422,28 @@ final class Spark {
         return $result;
     }
 
-    final static public function SetObject(string $name, object $object, bool $isStatic=false) : void
+    static private function CheckStatic(string $name) : void
     {
         if (isset(Spark::$constDefines[$name])) {
             throw new Exception("Static '$name' already assigned");
         }
+    }
+    final static public function SetObject(string $name, object|array|null $object, bool $isStatic=false) : void
+    {
+        Spark::CheckStatic($name);
         Spark::$defines[$name] = $object;
         if ($isStatic) {
             Spark::$constDefines[$name] = true;
         }
     }
-    final static public function GetObject(string $name, ?object $default=null) : object
+    final static public function GetObject(string $name, object|array|null $default=null) : object|array|null
     {
         if (isset(Spark::$defines[$name])) {
             return Spark::$defines[$name];
         }
         else return $default;
     }
+
     /**
      * Assign global variable. If static is set value can be set only once.
      * @param string $name
@@ -447,9 +454,7 @@ final class Spark {
      */
     final static public function Set(string $name, string|float|int|bool $value, bool $isStatic=false) : void
     {
-        if (isset(Spark::$constDefines[$name])) {
-            throw new Exception("Static '$name' already assigned");
-        }
+        Spark::CheckStatic($name);
         Spark::$defines[$name] = $value;
         if ($isStatic) {
             Spark::$constDefines[$name] = true;

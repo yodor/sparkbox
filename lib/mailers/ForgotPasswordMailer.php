@@ -10,7 +10,7 @@ class ForgotPasswordMailer extends Mailer
      * @param string $random_pass the password
      * @param string $login_url url of the login page
      */
-    public function __construct(string $email, string $random_pass, string $login_url="")
+    public function __construct(string $email, string $random_pass, ?URL $login_url=null)
     {
         parent::__construct();
 
@@ -26,7 +26,7 @@ class ForgotPasswordMailer extends Mailer
         $message .= "\r\n";
         if ($login_url) {
             $message .= tr("Use the following link to log into your account").": "."\r\n";
-            $message .= "<a href='$login_url'>$login_url</a>\r\n";
+            $message .= "<a href='{$login_url->fullURL()}'>{$login_url->fullURL()}</a>\r\n";
             $message .= "\r\n";
         }
         $message .= tr("Sincerely").",\r\n";

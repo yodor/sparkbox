@@ -17,10 +17,10 @@ class LoginForm extends InputForm
         $field->getRenderer()->input()?->setAttribute("autocomplete", "on");
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(InputType::HIDDEN, "rand", "rand", 1);
+        $field = DataInputFactory::Create(InputType::HIDDEN, "token", "token", 1);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(InputType::HIDDEN, "pass", "pass_hash", 1);
+        $field = DataInputFactory::Create(InputType::HIDDEN, "challenge", "challenge", 1);
         $this->addInput($field);
 
     }

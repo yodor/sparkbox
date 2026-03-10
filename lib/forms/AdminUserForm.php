@@ -26,21 +26,16 @@ class AdminUserForm extends InputForm
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(InputType::PASSWORD, "pass", "Create Password", 0);
-        $field->getProcessor()->skip_transaction = TRUE;
+        $field = DataInputFactory::Create(InputType::PASSWORD, "password", "Create Password", 0);
         $field->getRenderer()->input()?->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
         //
-        $field = DataInputFactory::Create(InputType::PASSWORD, "pass1", "Repeat Password", 0);
+        $field = DataInputFactory::Create(InputType::PASSWORD, "password_compare", "Repeat Password", 0);
         $field->getProcessor()->skip_transaction = TRUE;
         $field->getRenderer()->input()?->setAttribute("autocomplete", "off");
         $this->addInput($field);
 
-        //
-        $field = DataInputFactory::Create(InputType::HIDDEN, "password_hash", "Password Hash", 1);
-        $field->getProcessor()->setTargetColumn("password");
-        $this->addInput($field);
 
         //
         $field = DataInputFactory::Create(InputType::SELECT, "access_level", "Access Level", 1);
@@ -84,28 +79,10 @@ class AdminUserForm extends InputForm
 
         parent::validate();
 
-        $password_hash = $this->getInput("password_hash"); //hold md5 input
+        $password = $this->getInput("password")->getValue(); //hold the input that is rendered
+        $password_compare = $this->getInput("password_compare")->getValue(); //hold the input that is rendered
 
-        $f_pass = $this->getInput("pass"); //hold the input that is rendered
-        $f_pass1 = $this->getInput("pass1"); //hold the input that is rendered
-
-        if (Spark::IsEmptyPassword($password_hash->getValue())) {
-            if ($this->getEditID() > 0) {
-                $password_hash->getProcessor()->skip_transaction = TRUE;
-
-            }
-            else {
-                $f_pass->setError("Empty password");
-                $f_pass1->setError("Empty password");
-            }
-        }
-        else {
-
-            if (strlen($password_hash->getValue()) != 32) {
-                $f_pass->setError("Password length");
-                $f_pass1->setError("Password length");
-            }
-        }
+        if (strcmp($password, $password_compare) !== 0) throw new Exception(tr("Passwords do not match"));
 
         $req_email = $this->getInput("email")->getValue();
         $existing = $this->getBean()->getResult("email", $req_email);

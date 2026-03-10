@@ -25,26 +25,27 @@ JS;
 class LoginFormRenderer extends FormRenderer
 {
 
-    /**
-     * @var AuthenticatorResponder
-     */
-    protected AuthenticatorResponder $responder;
-
     const string ACTION_LOGIN = "login";
     const string ACTION_PASSWORD = "password";
 
-    public function __construct(LoginForm $form, AuthenticatorResponder $responder)
+    /**
+     * @param LoginForm $form
+     * @param string $responderName AuthenticatorResponder::clsas
+     * @param string $token hmac challenge token
+     * @throws Exception
+     */
+    public function __construct(LoginForm $form, string $responderName, string $token)
     {
         parent::__construct($form);
 
+        $this->form->getInput("token")->setValue($token);
+
         $this->setClassName("LoginFormRenderer");
-        //TODO
-        $this->responder = $responder;
 
         $this->setLayout(FormRenderer::LAYOUT_VBOX);
 
         $this->submitButton->setName(RequestResponder::KEY_COMMAND);
-        $this->submitButton->setValue($responder->getName());
+        $this->submitButton->setValue($responderName);
 
         $this->submitButton->setAction(LoginFormRenderer::ACTION_LOGIN);
         $this->submitButton->setContents(tr("Login"));
@@ -58,13 +59,12 @@ class LoginFormRenderer extends FormRenderer
 
         $this->getTextSpace()->items()->append($action);
 
-        new LoginFormScript($form);
+        new LoginFormScript($this->form);
     }
 
     public function requiredScript() : array
     {
         $arr = parent::requiredScript();
-        $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/md5.js";
         $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/js/LoginForm.js";
         return $arr;
     }
@@ -74,17 +74,6 @@ class LoginFormRenderer extends FormRenderer
         $arr = parent::requiredStyle();
         $arr[] = Spark::Get(Config::SPARK_LOCAL) . "/css/LoginForm.css";
         return $arr;
-    }
-
-    /**
-     * TODO:
-     * @return void
-     * @throws Exception
-     */
-    protected function processAttributes(): void
-    {
-        parent::processAttributes();
-        $this->form->getInput("rand")->setValue($this->responder->getAuthenticator()->createLoginToken());
     }
 
 }

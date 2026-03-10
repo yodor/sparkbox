@@ -49,7 +49,7 @@ class Password extends TemplateContent
                 if (!$email) throw new Exception("Empty email");
 
                 $authenticator = Module::Active()->getAuthenticator();
-                $random_pass = $authenticator->randomPassword($email);
+                $random_pass = $authenticator->setRandomPassword($email);
 
                 $loginURL = Module::PathURL("login");
                 $fpm = new ForgotPasswordMailer($email, $random_pass, $loginURL);

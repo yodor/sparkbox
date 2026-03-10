@@ -3,6 +3,7 @@ class LoginForm extends Component {
         super();
         this.setClass("FORM");
         this.form = null;
+
     }
 
     initialize() {
@@ -16,22 +17,35 @@ class LoginForm extends Component {
                 throw "Component element is not a HTMLFormElement";
             }
 
-            if (!(typeof hex_hmac_md5 === 'function')) throw "Required hashing function not defined";
-            if (!this.form.querySelector("INPUT[name='email']")) throw "Required field 'email' not found";
-            if (!this.form.querySelector("INPUT[name='password']")) throw "Required field 'password' not found";
+            const required = ['email', 'password', 'token', 'challenge'];
 
-            //do not check the rand as this class is reused from the registerform
-            // if (!this.form.querySelector("INPUT[type='hidden'][name='rand']")) throw "Required field 'rand' not found";
-
-            if (!this.form.querySelector("INPUT[type='hidden'][name='pass']")) throw "Required field 'pass' not found";
+            const missing = this.getMissingFields(required);
+            if (missing.length === 0) {
+                //console.log('All required fields are present.');
+            } else {
+                throw 'Missing fields:' + missing;
+            }
 
             this.form.addEventListener("submit", (event) => this.onSubmit(event));
 
 
         } catch (exx) {
-            alert("Unable to attach with requested Form: " + exx + " " + this.selector());
+            console.log(exx);
+            showAlert("Initialize failed: " + exx + " " + this.selector());
         }
 
+    }
+
+    /**
+     * Checks whether all specified field names are present in this.formData
+     *
+     * @param {string[]} requiredFieldNames - Array of field names (name attributes) to verify
+     * @returns {string[]}  all required fields that are missing
+     */
+    getMissingFields(requiredFieldNames) {
+
+        const formData = new FormData(this.form);
+        return requiredFieldNames.filter(name => !formData.has(name));
     }
 
     async onSubmit(event) {
@@ -43,6 +57,7 @@ class LoginForm extends Component {
             return;
 
         } catch (exx) {
+            console.log(exx);
             showAlert(exx);
         }
 
@@ -51,25 +66,35 @@ class LoginForm extends Component {
 
     async processPassword() {
 
-        this.form.password.value = this.form.password.value.trim();
+        const formData = new FormData(this.form);
+        const password = formData.get("password");
 
-        if (this.form.password.value.length < 1) throw "Input your password to continue.";
-        if (this.form.password.value.length < 6) throw "Minimum password of 6 symbols required.";
+        //store trimmed password back to the form
+        this.form.password.value = password;
 
-        this.form.pass.value = hex_md5(this.form.password.value);
+        if (password < 1) throw "Input your password to continue.";
+        if (password < 6) throw "Minimum password of 6 symbols required.";
 
-        //login forms have rand
-        if (this.form.rand) {
-            let rand = this.form.rand.value;
-            this.form.pass.value = hex_hmac_md5(this.form.pass.value, rand);
-            this.form.rand.value = "";
-        }
+        const token = formData.get("token").trim();
+        if (token.length!==32) throw "Token length wrong: "+ token.length;
+        //console.log("Token: " + token);
 
-        this.form.password.value = "";
+        const password_digest = await this.hex_digest(password);
+        //console.log("Password hex digest: " + password_digest);
+
+        //prepare challenge using token as data and password_digest as key
+        const challenge = await this.hex_hmac(password_digest, token);
+        //console.log("Token hex HMAC: " + challenge);
+
+        //store the challenge
+        this.form.challenge.value = challenge;
+        //clean token - not needed back
+        this.form.token.value = "";
+
 
     }
 
-    async hmac(hmac_key, hmac_message) {
+    async hex_hmac(hmac_key, hmac_message) {
         // encoder to convert string to Uint8Array
         let enc = new TextEncoder("utf-8");
 
@@ -83,16 +108,28 @@ class LoginForm extends Component {
             false, // export = false
             ["sign", "verify"] // what this key can do
         );
-        const signature =  await  window.crypto.subtle.sign(
+        const signature =  await window.crypto.subtle.sign(
             "HMAC",
             key,
             enc.encode(hmac_message)
         );
 
-        let signature_uint8 = new Uint8Array(signature);
-        //hex
-        return Array.prototype.map.call(signature_uint8, x => x.toString(16).padStart(2, '0')).join("");
+        return this.toHex(signature);
+    }
 
+    async hex_digest(message) {
+        let enc = new TextEncoder("utf-8");
+
+        const hash = await window.crypto.subtle.digest(
+            "SHA-256", enc.encode(message)
+        );
+        return this.toHex(hash)
+    }
+
+    toHex(data) {
+        let data_uint8 = new Uint8Array(data);
+        //hex
+        return Array.prototype.map.call(data_uint8, x => x.toString(16).padStart(2, '0')).join("");
     }
 
     async processEmail() {

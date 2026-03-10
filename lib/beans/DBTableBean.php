@@ -75,8 +75,6 @@ abstract class DBTableBean implements IDBDriverAccess
     protected function initialize() : void
     {
 
-        $this->columns = array();
-
         if (!$this->db->tableExists($this->table)) {
             if (strlen($this->createString) < 1) {
                 throw new Exception("Table '$this->table' was not found in the active connection and no create string is set to recreate the table");
@@ -88,8 +86,20 @@ abstract class DBTableBean implements IDBDriverAccess
             throw new Exception("Table '$this->table' is not available in the active DB connection");
         }
 
+        $this->initColumnTypes();
+
+        $this->select = new SQLSelect();
+        $this->select->from = $this->table;
+
+        Debug::ErrorLog("DBTableBean[$this->table]");
+    }
+
+    protected function initColumnTypes() : void
+    {
+        $this->columns = array();
+
         $result = $this->db->queryFields($this->table);
-        if (!($result instanceof DBResult)) throw new Exception("Unable to query table fields");
+        if (!($result instanceof DBResult)) throw new Exception("Unable to query table columns");
 
         while ($row = $result->fetch()) {
             if (strcmp($row["Key"], "PRI") === 0) {
@@ -101,13 +111,8 @@ abstract class DBTableBean implements IDBDriverAccess
             $this->columns[$field_name] = $row["Type"];
         }
         $result->free();
-
-        $this->select = new SQLSelect();
-        $this->select->from = $this->table;
-
-        Debug::ErrorLog("DBTableBean[$this->table]");
+//        Debug::ErrorLog("Columns: ", $this->columns);
     }
-
     /**
      * @return void
      * @throws Exception

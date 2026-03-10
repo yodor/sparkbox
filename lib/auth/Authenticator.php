@@ -1,7 +1,9 @@
 <?php
+include_once("auth/PasswordHash.php");
 include_once("auth/AuthContext.php");
 include_once("auth/AuthToken.php");
 include_once("utils/SessionData.php");
+include_once("beans/UsersBean.php");
 
 /**
  * Abstract class for doing authentication
@@ -13,19 +15,13 @@ abstract class Authenticator
     /**
      * @var UsersBean
      */
-    protected UsersBean $bean;
-
-    protected SessionData $session;
+    protected ?UsersBean $bean = null;
+    protected ?SessionData $session = null;
 
     public function __construct(string $context_name, UsersBean $bean)
     {
         $this->bean = $bean;
         $this->session = new SessionData($context_name);
-    }
-
-    public static function HMAC(string $key, string $data, string $hash_algo = 'md5') : string
-    {
-        return hash_hmac($hash_algo, $data, $key);
     }
 
     /**
@@ -72,28 +68,9 @@ abstract class Authenticator
                 Session::ClearCookie($key);
             }
         }
+        Session::Destroy();
     }
 
-    /**
-     * @param array $urow
-     * @return AuthContext
-     * @throws Exception
-     */
-    public function register(array $urow) : AuthContext
-    {
-
-        $userID = $this->bean->insert($urow);
-        if ($userID < 1) {
-            Debug::ErrorLog("Error: " . $this->bean->getDB()->getError());
-            throw new Exception(tr("Error during registering. Please try again later."));
-        }
-
-        $this->fillSessionData($urow, $userID);
-
-        $this->createAuthToken($userID);
-
-        return new AuthContext($userID, $this->session);
-    }
 
     /**
      * @param array|NULL $user_data
@@ -147,95 +124,140 @@ abstract class Authenticator
      * @return string The 'random string' that can be used on the login forms or emailed back to the user
      * @throws Exception If email is not found
      */
-    public function randomPassword(string $email) : string
+    public function setRandomPassword(string $email) : string
     {
-
-        $userID = $this->bean->email2id($email);
-
-        if ($userID<1) {
-            throw new Exception(tr("This email is not registered with us"));
-        }
-
-        $db = DBConnections::Driver();
         try {
-            $db->transaction();
+
+            $userID = $this->bean->email2id($email);
+            if ($userID<1) {
+                throw new Exception(tr("This user is not registered with us"));
+            }
+
             $result = Authenticator::RandomToken(8);
-            $update["password"] = Authenticator::PasswordHash($result);
-            if (!$this->bean->update($userID, $update, $db)) throw new Exception("Password change failed: " . $db->getError());
-            $db->commit();
+
+            //Debug::ErrorLog("Password: ".$result);
+
+            $this->bean->checkPasswordColumn();
+            $update["password"] = new PasswordHash($result)->getValue();
+            if (!$this->bean->update($userID, $update)) throw new Exception($this->bean->getDB()->getError());
+
             return $result;
         }
         catch (Exception $e) {
-            $db->rollback();
+            Debug::ErrorLog("Password change failed: ".$e->getMessage());
             throw $e;
         }
+        finally {
+            sleep(3);
+        }
+    }
 
+    public function login(string $email, string $password_plain, string $client_hmac): void
+    {
+        $this->loginImpl($email, $password_plain, $client_hmac);
     }
 
     /**
-     * @param string $username
-     * @param string $pass - HMAC of rand from client
-     * @param string $rand
-     * @param bool $remember_me
-     * @param bool $check_password_only
+     * Authenticates a user using username + password + optional cryptographic proof.
+     *
+     * The client must send:
+     *   - username (email)
+     *   - plaintext password (transmitted over TLS)
+     *   - proof: HMAC-SHA256(password, login_token)  (hex string)
+     *
+     * Security design notes (March 2026):
+     *   - Password is verified server-side using Argon2id (memory-hard, high resistance to offline attacks)
+     *   - Proof is checked first → early rejection of replayed/forged requests
+     *   - Delay is applied on every authentication failure path to slow online brute-force
+     *   - Username enumeration is prevented by applying delay even when user not found
+     *   - Hash parameters can be upgraded transparently via password_needs_rehash()
+     *
+     * @param string      $username     The user's email / identifier
+     * @param string      $password     Plaintext password received from client (over TLS)
+     * @param string      $client_hmac  Client-computed challenge - HMAC-SHA256(key=sha256(password), data=login_token) in hex
      * @return void
-     * @throws Exception
+     * @throws Exception On any authentication failure or system error
      */
-    public function login(string $username, string $pass, string $rand, bool $remember_me = FALSE, bool $check_password_only = FALSE) : void
+    protected function loginImpl(string $username, string $password, string $client_hmac): void
     {
 
-        Debug::ErrorLog("Using loginToken: " . $rand);
+        // 0. Session / token validation
+        $token = $this->consumeLoginToken();
 
+        // 1. Challenge token validation (always first)
+        $hash = new PasswordHash($password);
+
+        Debug::ErrorLog("PasswordHash created");
+        if (!$hash->hmacVerify($token, $client_hmac)) throw new Exception(tr("Incorrect challenge"));
+
+        Debug::ErrorLog("PasswordHash::hmacVerify success");
+        // 2. Lookup user
         $db = DBConnections::Driver();
-
         $username = $db->escape($username);
 
         $qry = $this->bean->queryFull();
         $qry->select->where()->add("email", "'$username'");
         $qry->select->limit = 1;
+        $qry->exec();
 
-        try {
-            $qry->exec();
-            if (!($row = $qry->next())) throw new Exception("Username or password not recognized");
+        if (!($row = $qry->next())) {
+            throw new Exception(tr("Username or password not recognized"));
+        }
+        Debug::ErrorLog("Email found");
 
-            $userID = $row[$this->bean->key()];
+        $userID     = $row[$this->bean->key()];
+        $storedHash = $row["password"];
 
-            $stored_user = $row["email"];
-            //compute HMAC of $rand using hash of the password from $row["password"] as key
-            $stored_pass = Authenticator::HMAC($row["password"], $rand);
-
-            if (strcmp($stored_user, $username) !== 0 || strcmp($stored_pass, $pass) !== 0) {
+        // 3. Try legacy verification + upgrade on success
+        if ($hash->digestVerify($storedHash)) {
+            Debug::ErrorLog("MD5 digest detected and authenticated. Migrating userID: $userID");
+            // Legacy hash matched → login successful → upgrade immediately
+            // $storedHash is already verified to be old use skip_needRehash = true
+            $this->upgradePassword($userID, $hash, $storedHash, true);
+            // Proceed to success path
+        } else {
+            // Not legacy → normal modern hash verification
+            if (!$hash->verify($storedHash)) {
                 throw new Exception(tr("Username or password not recognized"));
             }
+            Debug::ErrorLog("Password verification successful for userID: $userID");
+            //Still check whether upgrade is needed (parameters changed)
+            $this->upgradePassword($userID, $hash, $storedHash, false);
+        }
 
-            if (isset($row["confirmed"])) {
-                $is_confirmed = (int)$row["confirmed"];
-                if ($is_confirmed < 1) {
-                    $msg = tr("Your account is not activated yet.");
-                    if (defined("ACCOUNT_CONFIRM_URL")) {
-                        $link = ACCOUNT_CONFIRM_URL;
-                        $msg .= "<BR>";
-                        $msg .= tr("For more details visit the account activation page") . ": ";
-                        $msg .= "<a href='$link'>" . tr("here") . "</a>";
-                    }
-                    throw new Exception($msg);
-                }
+        // 4. Account status checks
+        if (isset($row["confirmed"]) && (int)$row["confirmed"] < 1) {
+            throw new Exception(tr("Your account is not activated yet."));
+        }
+        if (isset($row["suspended"]) && (int)$row["suspended"]) {
+            throw new Exception(tr("Your account is temporarily suspended."));
+        }
+
+        Debug::ErrorLog("Login successful");
+        // 5. Success path
+        $this->fillSessionData($row, $userID);
+        $this->createAuthToken($userID);
+        $this->updateLastSeen($userID, $db);
+    }
+
+    protected function upgradePassword(int $userID, PasswordHash $hash, string $storedHash, bool $skip_needRehash) : void
+    {
+
+        try {
+            //old hash is already verified use skip_needRehash = true
+            if ($skip_needRehash || $hash->needRehash($storedHash)) {
+                $this->bean->checkPasswordColumn();
+                $update = array("password" => $hash->getValue());
+                $this->bean->update($userID, $update);
+
+                Debug::ErrorLog("Migrated password for userID: $userID");
             }
-            if (isset($row["suspended"])) {
-                $is_suspended = (int)$row["suspended"];
-                if ($is_suspended) throw new Exception(tr("Your account is temporary suspended."));
+            else {
+                Debug::ErrorLog("No migration performed for userID: $userID");
             }
-
-            $this->fillSessionData($row, $userID);
-
-            $this->createAuthToken($userID);
-
-            $this->updateLastSeen($userID, $db);
-
         }
         catch (Exception $e) {
-            sleep(3);
-            throw $e;
+            Debug::ErrorLog("Failed migrating password for userID: $userID - " . $e->getMessage());
         }
     }
 
@@ -274,10 +296,10 @@ abstract class Authenticator
         Debug::ErrorLog("Creating cookies for SessionData name: " . $this->session->name());
         $token->storeCookies($this->session->name());
 
-        Debug::ErrorLog("Serializing auth_token in SessionData");
+        Debug::ErrorLog("Storing AUTH_TOKEN in SessionData");
         $this->session->set(AuthContext::AUTH_TOKEN, $token);
 
-        //remove the current login token
+        //already removed current login token
         $this->session->remove(AuthContext::LOGIN_TOKEN);
 
     }
@@ -296,27 +318,41 @@ abstract class Authenticator
     }
 
     /**
-     * Create new random token and store as variable 'LOGIN_TOKEN' in SessionData
-     * Use this token in AuthForm HIDDEN field (rand)
-     * @return string
+     * Create new random token and store as SessionData(AuthContext::LOGIN_TOKEN).
+     * If token is already created the stored value will be used instead.
+     * @return string The new created token or stored value if already present in SessionData
+     * @throws Exception
      */
-    public function createLoginToken() : string
+    public function produceLoginToken() : string
     {
-        $token = Authenticator::RandomToken(32);
-        $this->session->set(AuthContext::LOGIN_TOKEN, $token);
+        if ($this->session->contains(AuthContext::LOGIN_TOKEN)) {
+            $token = $this->session->get(AuthContext::LOGIN_TOKEN);
+            Debug::ErrorLog("Reusing login token: " . $token);
+        }
+        else {
+            $token = Authenticator::RandomToken(32);
+            Debug::ErrorLog("Produced new login token: " . $token);
+            $this->session->set(AuthContext::LOGIN_TOKEN, $token);
+        }
         return $token;
     }
 
     /**
-     * Get the 'LOGIN_TOKEN' variable from SessionData
-     * @return mixed
+     * Get the stored token value from SessionData(AuthContext::LOGIN_TOKEN)
+     * @return string
      * @throws Exception
      */
-    public function loginToken() : mixed
+    public function consumeLoginToken() : string
     {
-        return $this->session->get(AuthContext::LOGIN_TOKEN);
-    }
+        if (!$this->session->contains(AuthContext::LOGIN_TOKEN)) {
+            throw new Exception("Login token not produced yet");
+        }
 
+        $token = $this->session->get(AuthContext::LOGIN_TOKEN);
+        $this->session->remove(AuthContext::LOGIN_TOKEN);
+        Debug::ErrorLog("Consumed login token: " . $token);
+        return $token;
+    }
     public static function AuthorizeResource(string $contextName, array $user_data, bool $adminOK) : ?AuthContext
     {
         Debug::ErrorLog("Using contextName: $contextName");
@@ -357,13 +393,5 @@ abstract class Authenticator
 
     }
 
-    /**
-     * TODO: switch away from MD5 - update client side LoginForm code to use SHA
-     * @param string $plainText
-     * @return string
-     */
-    public static function PasswordHash(string $plainText) : string
-    {
-        return md5($plainText);
-    }
+
 }

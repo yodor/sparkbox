@@ -248,4 +248,7 @@ enum Config
 
     const string KEY_JSON_REQUEST = "JSONRequest";
 
+    const string PASSWORD_TYPE = "PASSWORD_TYPE";
+    const string PASSWORD_OPTIONS = "PASSWORD_OPTIONS";
+
 }

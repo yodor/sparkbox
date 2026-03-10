@@ -23,16 +23,16 @@ class Login extends TemplateContent
         $responder->setCancelUrl(Module::PathURL("login"));
         $responder->setSuccessUrl(Module::PathURL(""));
 
-        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-        header("Expires: 0");
-
-
-        $lfr = new LoginFormRenderer(new LoginForm(), $responder);
+        //create login token in session for next request handled from AuthenticatorResponder to find during Authenticator::login()
+        $lfr = new LoginFormRenderer(new LoginForm(), $responder::class, $responder->getAuthenticator()->produceLoginToken());
         $action = $lfr->getTextSpace()->items()->getByAction(LoginFormRenderer::ACTION_PASSWORD);
         if ($action instanceof Action) {
             $action->setURL(Module::PathURL("password"));
         }
         $this->cmp = $lfr;
+
+        header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+        header("Expires: 0");
     }
 
     public function component(): Component
