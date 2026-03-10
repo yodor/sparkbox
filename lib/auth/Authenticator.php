@@ -29,14 +29,14 @@ abstract class Authenticator
      * @param int $length
      * @return string
      */
-    public static function RandomToken(int $length) : string
+    public static function RandomToken(int $length): string
     {
         // Generate string with random data
         $hash_result = hash('sha256', Spark::MicroTime() . "|" . rand());
 
         $hash_len = strlen($hash_result);
 
-        if ($length>$hash_len) {
+        if ($length > $hash_len) {
             $length = $hash_len;
         }
 
@@ -113,7 +113,6 @@ abstract class Authenticator
         }
 
         return new AuthContext($token->getID(), $this->session);
-
     }
 
     /**
@@ -124,12 +123,12 @@ abstract class Authenticator
      * @return string The 'random string' that can be used on the login forms or emailed back to the user
      * @throws Exception If email is not found
      */
-    public function setRandomPassword(string $email) : string
+    public function setRandomPassword(string $email): string
     {
         try {
 
             $userID = $this->bean->email2id($email);
-            if ($userID<1) {
+            if ($userID < 1) {
                 throw new Exception(tr("This user is not registered with us"));
             }
 
@@ -142,12 +141,10 @@ abstract class Authenticator
             if (!$this->bean->update($userID, $update)) throw new Exception($this->bean->getDB()->getError());
 
             return $result;
-        }
-        catch (Exception $e) {
-            Debug::ErrorLog("Password change failed: ".$e->getMessage());
+        } catch (Exception $e) {
+            Debug::ErrorLog("Password change failed: " . $e->getMessage());
             throw $e;
-        }
-        finally {
+        } finally {
             sleep(3);
         }
     }
@@ -157,6 +154,20 @@ abstract class Authenticator
         $this->loginImpl($email, $password_plain, $client_hmac);
     }
 
+    /**
+     * Verify login token challenge
+     * @param PasswordHash $hash
+     * @param string $client_hmac
+     * @return void
+     * @throws Exception
+     */
+    public function verifyTokenHMAC(PasswordHash $hash, string $client_hmac) : void
+    {
+        $token = $this->consumeLoginToken();
+        Debug::ErrorLog("PasswordHash()");
+        if (!$hash->hmacVerify($token, $client_hmac)) throw new Exception(tr("Incorrect challenge"));
+        Debug::ErrorLog("PasswordHash()->hmacVerify success");
+    }
     /**
      * Authenticates a user using username + password + optional cryptographic proof.
      *
@@ -181,16 +192,11 @@ abstract class Authenticator
     protected function loginImpl(string $username, string $password, string $client_hmac): void
     {
 
-        // 0. Session / token validation
-        $token = $this->consumeLoginToken();
-
         // 1. Challenge token validation (always first)
         $hash = new PasswordHash($password);
 
-        Debug::ErrorLog("PasswordHash created");
-        if (!$hash->hmacVerify($token, $client_hmac)) throw new Exception(tr("Incorrect challenge"));
+        $this->verifyTokenHMAC($hash, $client_hmac);
 
-        Debug::ErrorLog("PasswordHash::hmacVerify success");
         // 2. Lookup user
         $db = DBConnections::Driver();
         $username = $db->escape($username);

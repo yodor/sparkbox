@@ -1,9 +1,17 @@
 class LoginForm extends Component {
+    static MODE_LOGIN = 1;
+    static MODE_REGISTER = 2;
+
     constructor() {
         super();
         this.setClass("FORM");
         this.form = null;
-
+        this.mode = LoginForm.MODE_LOGIN;
+        /**
+         * Array of field names (name attributes) to verify if present as inputs
+         * @type {string[]}
+         */
+        this.required = ['email', 'password', 'token', 'challenge'];
     }
 
     initialize() {
@@ -17,9 +25,9 @@ class LoginForm extends Component {
                 throw "Component element is not a HTMLFormElement";
             }
 
-            const required = ['email', 'password', 'token', 'challenge'];
+            const formData = new FormData(this.form);
 
-            const missing = this.getMissingFields(required);
+            const missing = this.required.filter(name => !formData.has(name));
             if (missing.length === 0) {
                 //console.log('All required fields are present.');
             } else {
@@ -36,24 +44,12 @@ class LoginForm extends Component {
 
     }
 
-    /**
-     * Checks whether all specified field names are present in this.formData
-     *
-     * @param {string[]} requiredFieldNames - Array of field names (name attributes) to verify
-     * @returns {string[]}  all required fields that are missing
-     */
-    getMissingFields(requiredFieldNames) {
-
-        const formData = new FormData(this.form);
-        return requiredFieldNames.filter(name => !formData.has(name));
-    }
-
     async onSubmit(event) {
 
         try {
-
             await this.processEmail();
             await this.processPassword();
+            await this.process();
             return;
 
         } catch (exx) {
@@ -143,6 +139,9 @@ class LoginForm extends Component {
         if (!emailFilter.test(this.form.email.value)) {              //test email for illegal
             throw "Please enter a valid email address.";
         }
+
+    }
+    async process() {
 
     }
 }
