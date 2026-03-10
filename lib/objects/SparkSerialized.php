@@ -23,7 +23,7 @@ class SparkSerialized implements ISparkUnserializable
         }
         $result["references"] = $refs;
 
-        Debug::ErrorLog("Serializing [".get_class($this->object)."] -> ", $result);
+        Debug::ErrorLog("Serializing [".get_class($this->object)."] -> ", array_keys($result));
 
         $result["blob"] = serialize($this->object);
 
@@ -33,15 +33,15 @@ class SparkSerialized implements ISparkUnserializable
     public function __unserialize(array $data) : void
     {
 
-        if (!isset($data['version'])) throw new Exception("Version empty");
-        if (strcmp($data["version"], SparkSerialized::VERSION) !== 0) throw new Exception("Version miss-match");
-        if (!isset($data["references"])) throw new Exception("references not found in serialized data input");
-        if (!isset($data["blob"])) throw new Exception("blob not found in serialized data input");
+        if (!isset($data["version"])) throw new Exception("Version not found");
+        if (strcmp($data["version"], SparkSerialized::VERSION) !== 0) throw new Exception("Wrong version");
 
-        if (!is_array($data["references"])) throw new Exception("references not found in serialized data input");
+        if (!isset($data["blob"])) throw new Exception("Blob not found");
+
+        if (!isset($data["references"]) || !is_array($data["references"])) throw new Exception("References not found");
         $refs = $data["references"];
 
-        Debug::ErrorLog("Unserializing [BLOB] -> ", $refs);
+        Debug::ErrorLog("[BLOB] -> ", $refs);
         foreach ($refs as $className=>$loaderPrefix) {
             if ($loaderPrefix) {
                 SparkLoader::Factory($loaderPrefix)->define($className);
