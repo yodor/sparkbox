@@ -13,12 +13,18 @@ class SQLColumn implements ISQLGet, ISQLBinding
 
     protected string $bindingKey = "";
 
+    /**
+     * Construct SQLColumn using $name and $value
+     * Binding key is created as :$name if $name && $value are set
+     * @param string $name
+     * @param array|string $value
+     */
     public function __construct(string $name = "", array|string $value = "")
     {
         $this->name = $name;
         $this->value = $value;
         if ($name && $value) {
-            $this->bindingKey = ":$name";
+            $this->bindingKey = SQLStatement::FormatBindingKey($name);
         }
     }
 
@@ -157,17 +163,19 @@ class SQLColumn implements ISQLGet, ISQLBinding
         return $this->bindingKey;
     }
 
-    public function getBindingValue(): string
+    public function getBindingValue(): array|string|int|float|bool|null
     {
-        if (!$this->bindingKey) return "";
+        if (!$this->bindingKey) throw new Exception("Binding key empty");
 
+        $bindValue = $this->value;
         if (is_array($this->value)) {
-            return implode(";", $this->value);
+            $bindValue = implode(";", $this->value);
         }
-        else if (strlen(trim($this->value)) > 0) {
-            return $this->value;
-        }
-        return "";
+
+        if (SQLStatement::IsBoundSafe($bindValue)) return $bindValue;
+
+        throw new Exception("[$this->bindingKey] value is not SQLStatement::IsBoundSafe");
+
     }
 
     public function collectSQL(bool $do_prepared): string

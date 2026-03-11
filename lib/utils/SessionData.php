@@ -1,7 +1,7 @@
 <?php
 include_once("utils/Session.php");
 include_once("objects/ISparkSerialize.php");
-
+include_once("objects/SparkSerialized.php");
 /**
  * Store array in session
  */

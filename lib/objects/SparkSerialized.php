@@ -24,6 +24,7 @@ class SparkSerialized implements ISparkUnserializable
         $result["references"] = $refs;
 
         Debug::ErrorLog("Serializing [".get_class($this->object)."] -> ", array_keys($result));
+        Debug::ErrorLog("Serializing [".get_class($this->object)."] -> ", $refs);
 
         $result["blob"] = serialize($this->object);
 

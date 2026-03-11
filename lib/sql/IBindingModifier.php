@@ -1,5 +1,14 @@
 <?php
 
 interface IBindingModifier {
-    public function bind(string $bindingKey, string|array $value) : void;
+
+    /**
+     * Append custom binding to the binding collection. Throws exception if binding key is empty.
+     *
+     * @param string $bindingKey
+     * @param array|string|int|float|bool|null $value
+     * @return void
+     * @throws Exception If bindingKey is empty
+     */
+    public function bind(string $bindingKey, array|string|int|float|bool|null $value) : void;
 }

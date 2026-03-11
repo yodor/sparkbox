@@ -44,8 +44,10 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding
     }
 
     /**
-     * Set the bindingKey as ":$expr" if $value is not empty
-     * Custom bindings can be used by calling SQLStatement::bind()
+     * Set the internal bindingKey to ":$expr" if \$value is not empty.
+     *
+     * Custom bindings can be used by calling SQLStatement::bind($key, $value) under IBindingModifier
+     *
      * @param string $expr
      * @param string $value
      * @param string $operator
@@ -56,8 +58,9 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding
         $this->expr = $expr;
         $this->value = $value;
         $this->operator = $operator;
+
         if ($this->value) {
-            $this->bindingKey = ":".$this->expr;
+            $this->bindingKey = SQLStatement::FormatBindingKey($this->expr);
         }
 
     }
@@ -106,11 +109,13 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding
         return $this->bindingKey;
     }
 
-    public function getBindingValue(): string
+    public function getBindingValue(): array|string|int|float|bool|null
     {
-        if ($this->bindingKey) {
-            return $this->value;
-        }
-        return "";
+        if (!$this->bindingKey) throw new Exception("Binding key is empty");
+
+        if (SQLStatement::IsBoundSafe($this->value)) return $this->value;
+
+        throw new Exception("[$this->bindingKey] value is not SQLStatement::IsBoundSafe");
+
     }
 }

@@ -52,6 +52,7 @@ class Session
             setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 
             //Destroy the session
+            session_write_close();
             session_destroy();
 
             //Verify session file deletion (if file-based storage)

@@ -101,6 +101,6 @@ class SQLInsert extends SQLStatement
         }
 
         // Твоят вариант: Елегантна изолация за единичен ред
-        return $this->fieldset->getBindings();
+        return parent::getBindings();
     }
 }

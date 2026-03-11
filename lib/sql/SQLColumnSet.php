@@ -180,9 +180,14 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
         $result = array();
         foreach ($this->fields as $name => $col) {
             if (!($col instanceof ISQLBinding)) continue;
-            if ($col->getBindingKey()) {
-                $result[$col->getBindingKey()] = $col->getBindingValue();
+            $bindingKey = $col->getBindingKey();
+            if (!$bindingKey) continue;
+
+            $value = $col->getBindingValue();
+            if (SQLStatement::IsBoundSafe($value)) {
+                $result[$bindingKey] = $value;
             }
+            else throw new Exception("[$bindingKey] value is not SQLStatement::IsBoundSafe");
         }
         return $result;
     }
