@@ -36,6 +36,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection
      */
     public abstract function getSQL() : string;
     public abstract function getPreparedSQL() : string;
+    public abstract function collectSQL(bool $do_prepared) : string;
 
     public function __construct(?SQLStatement $other = null)
     {

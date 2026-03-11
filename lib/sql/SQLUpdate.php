@@ -29,7 +29,7 @@ class SQLUpdate extends SQLStatement
         $sql .= implode(", ", $set);
 
         if ($this->whereset->count()>0) {
-            $sql.= $this->whereset->collectSQL($do_prepared);
+            $sql.= " WHERE " . $this->whereset->collectSQL($do_prepared);
         }
 
         return $sql;

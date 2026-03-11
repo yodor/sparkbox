@@ -37,10 +37,10 @@ class SQLColumn implements ISQLGet, ISQLBinding
 
     /**
      * Set column value to $value
-     * @param string $value
+     * @param array|string $value
      * @return void
      */
-    public function setValue(string $value) : void
+    public function setValue(array|string $value) : void
     {
         $this->value = $value;
     }
