@@ -1,7 +1,7 @@
 <?php
 include_once("sql/ISQLGet.php");
 
-class SQLColumn implements ISQLGet
+class SQLColumn implements ISQLGet, ISQLBinding
 {
     protected string $prefix = "";
 
@@ -11,10 +11,15 @@ class SQLColumn implements ISQLGet
     protected string $name = "";
     protected array|string $value = "";
 
+    protected string $bindingKey = "";
+
     public function __construct(string $name = "", array|string $value = "")
     {
         $this->name = $name;
         $this->value = $value;
+        if ($name && $value) {
+            $this->bindingKey = ":$name";
+        }
     }
 
     public function setName(string $name) : void
@@ -22,6 +27,7 @@ class SQLColumn implements ISQLGet
         if (strlen(trim($name))<1) throw new Exception("SQLColumn name can not be empty");
 
         $this->name = trim($name);
+        $this->bindingKey = ":$name";
     }
 
     public function getName() : string
@@ -101,12 +107,7 @@ class SQLColumn implements ISQLGet
         $this->alias = $alias_name;
     }
 
-    /**
-     * Return the sql string for this column
-     *
-     * @return string
-     */
-    public function getSQL() : string
+    protected function constructSQL(bool $do_prepared) : string
     {
         if ($this->expression) {
             return $this->expression." AS ".$this->alias;
@@ -121,12 +122,61 @@ class SQLColumn implements ISQLGet
             $result .= " AS ".$this->alias;
         }
         else {
-            if (is_array($this->value)) {
-                $result .= " = " . implode(";", $this->value);
-            } else if (strlen(trim($this->value)) > 0) {
-                $result .= " = " . $this->value;
+            if ($do_prepared) {
+                if (is_array($this->value) || strlen(trim($this->value)) > 0) {
+                    $result .= " = " . $this->bindingKey;
+                }
+            }
+            else {
+                if (is_array($this->value)) {
+                    $result .= " = " . implode(";", $this->value);
+                } else if (strlen(trim($this->value)) > 0) {
+                    $result .= " = " . $this->value;
+                }
             }
         }
         return $result;
+    }
+    /**
+     * Return the sql string for this column
+     *
+     * @return string
+     */
+    public function getSQL() : string
+    {
+        return $this->constructSQL(false);
+    }
+
+    public function getPreparedSQL(): string
+    {
+        return $this->constructSQL(true);
+    }
+
+    public function getBindingKey() : string
+    {
+        return $this->bindingKey;
+    }
+
+    public function getBindingValue(): string
+    {
+        if (!$this->bindingKey) return "";
+
+        if (is_array($this->value)) {
+            return implode(";", $this->value);
+        }
+        else if (strlen(trim($this->value)) > 0) {
+            return $this->value;
+        }
+        return "";
+    }
+
+    public function collectSQL(bool $do_prepared): string
+    {
+        if ($do_prepared) {
+            return $this->getPreparedSQL();
+        }
+        else {
+            return $this->getSQL();
+        }
     }
 }

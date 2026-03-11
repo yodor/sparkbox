@@ -2,9 +2,9 @@
 include_once("sql/ClauseCollection.php");
 include_once("sql/ISQLGet.php");
 
-abstract class SQLStatement implements ISQLGet
+abstract class SQLStatement implements ISQLGet, IBindingCollection
 {
-    protected SQLColumnSet $fieldset;
+    protected ?SQLColumnSet $fieldset = null;
 
     /**
      * SELECT, UPDATE, DELETE, INSERT
@@ -15,7 +15,7 @@ abstract class SQLStatement implements ISQLGet
     /**
      * @var ClauseCollection
      */
-    protected ClauseCollection $whereset;
+    protected ?ClauseCollection $whereset = null;
 
     /**
      * Table name for the statement
@@ -35,6 +35,7 @@ abstract class SQLStatement implements ISQLGet
      * @throws Exception
      */
     public abstract function getSQL() : string;
+    public abstract function getPreparedSQL() : string;
 
     public function __construct(?SQLStatement $other = null)
     {
@@ -94,4 +95,17 @@ abstract class SQLStatement implements ISQLGet
         return $this->fieldset->getColumn($name);
     }
 
+    public function getBindings(): array
+    {
+        $fieldsetBindings = $this->fieldset->getBindings();
+        $wheresetBindings = $this->whereset->getBindings();
+        $result = array();
+        foreach ($fieldsetBindings as $bindingKey => $bindingValue) {
+            $result[$bindingKey] = $bindingValue;
+        }
+        foreach ($wheresetBindings as $bindingKey => $bindingValue) {
+            $result[$bindingKey] = $bindingValue;
+        }
+        return $result;
+    }
 }

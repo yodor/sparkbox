@@ -704,6 +704,8 @@ final class Spark {
 
     private static function SafeValue(string $input, bool $allowHTML = false): string
     {
+        include_once("utils/InputSanitizer.php");
+
         $input = trim($input);
 
         $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
@@ -713,13 +715,15 @@ final class Spark {
         if ($input !== $nohtml) {
             // HTML path: preserve allowed formatting, remove dangerous attributes
             if ($allowHTML) {
-                include_once("utils/CleanHTML.php");
-                $input = CleanHTML::Sanitize($input);
+
+                $input = InputSanitizer::HTML($input);
             }
             else {
                 $input = $nohtml;
             }
         }
+
+        $input = InputSanitizer::SQL($input);
 
         if (Spark::GetBoolean(Config::DB_ENABLED)) {
             return DBConnections::Driver()->escape($input);

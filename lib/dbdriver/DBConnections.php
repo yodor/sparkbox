@@ -95,6 +95,9 @@ class DBConnections
             case "MySQLi":
                 include_once("dbdriver/MySQLiDriver.php");
                 return new MySQLiDriver($conn);
+            case "PDO":
+                include_once("dbdriver/PDODriver.php");
+                return new PDODriver($conn);
         }
         throw new Exception("Unsupported driver '$driverClass'");
     }

@@ -1,11 +1,11 @@
 <?php
 include_once("sql/SQLClause.php");
 include_once("objects/SparkList.php");
-
+include_once("sql/IBindingCollection.php");
 /**
  * SQL Where clause collection
  */
-class ClauseCollection extends SparkList implements ISQLGet
+class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
 {
 
     public function __construct()
@@ -67,11 +67,10 @@ class ClauseCollection extends SparkList implements ISQLGet
 
     }
 
-    public function getSQL(string $prepend = "WHERE"): string
+    public function collectSQL(bool $do_prepared) : string
     {
-        if ($this->count() <1) return "";
 
-        $result = " $prepend ";
+        $result = "";
 
         $last_clause = NULL;
         $iterator = $this->iterator();
@@ -79,10 +78,38 @@ class ClauseCollection extends SparkList implements ISQLGet
             if (!($object instanceof SQLClause))continue;
             //skip gluing of first clause
             if (!is_null($last_clause)) {
-                $result .= " " . $last_clause->getGlue() . " ";
+                $result.= " " . $last_clause->getGlue() . " ";
             }
-            $result .= $object->getSQL();
+            $result.= $object->collectSQL($do_prepared);
             $last_clause = $object;
+        }
+
+        return $result;
+    }
+
+    public function getSQL(): string
+    {
+        if ($this->count() <1) return "";
+        return $this->collectSQL(false);
+    }
+
+    public function getPreparedSQL(): string
+    {
+        if ($this->count() <1) return "";
+        return $this->collectSQL(true);
+    }
+
+    public function getBindings() : array
+    {
+        $result = array();
+
+        $iterator = $this->iterator();
+        while ($object = $iterator->next()) {
+            if (!($object instanceof ISQLBinding))continue;
+            if ($object->getBindingKey()) {
+                //result is :expr=>value
+                $result[$object->getBindingKey()] = $object->getBindingValue();
+            }
         }
 
         return $result;

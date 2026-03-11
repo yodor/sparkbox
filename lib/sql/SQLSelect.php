@@ -40,8 +40,12 @@ class SQLSelect extends SQLStatement
     }
 
 
+    public function getPreparedSQL(): string
+    {
+        return $this->collectSQL(true);
+    }
 
-    public function getSQL() : string
+    public function collectSQL(bool $do_prepared) : string
     {
         if ($this->fieldset->count() < 1) throw new Exception("Empty fieldset");
 
@@ -57,12 +61,12 @@ class SQLSelect extends SQLStatement
             $sql .= " SQL_NO_CACHE ";
         }
 
-        $sql .= $this->fieldset->getSQL();
+        $sql .= $this->fieldset->collectSQL($do_prepared);
 
         $sql .= " FROM $this->from ";
 
         if ($this->whereset->count()>0) {
-            $sql.=$this->whereset->getSQL();
+            $sql.=" WHERE ".$this->whereset->collectSQL($do_prepared);
         }
 
         if (strlen(trim($this->group_by)) > 0) {
@@ -79,6 +83,11 @@ class SQLSelect extends SQLStatement
         }
 
         return $sql;
+    }
+
+    public function getSQL() : string
+    {
+        return $this->collectSQL(false);
     }
 
     public function combine(SQLSelect $other) : void
@@ -169,4 +178,5 @@ class SQLSelect extends SQLStatement
 
         return $sel;
     }
+
 }

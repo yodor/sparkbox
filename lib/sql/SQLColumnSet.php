@@ -1,7 +1,7 @@
 <?php
 include_once("sql/SQLColumn.php");
 
-class SQLColumnSet implements ISQLGet
+class SQLColumnSet implements ISQLGet, IBindingCollection
 {
 
     /**
@@ -155,14 +155,35 @@ class SQLColumnSet implements ISQLGet
         return $result;
     }
 
-    public function getSQL() : string
+    public function collectSQL(bool $do_prepared) : string
     {
         $result = array();
         foreach ($this->fields as $name=>$col) {
             if (!($col instanceof SQLColumn)) continue;
-            $result[] = $col->getSQL();
+            $result[] = $col->collectSQL($do_prepared);
         }
         return implode(" , ", $result);
     }
 
+    public function getSQL() : string
+    {
+        return $this->collectSQL(false);
+    }
+
+    public function getPreparedSQL(): string
+    {
+        return $this->collectSQL(true);
+    }
+
+    public function getBindings(): array
+    {
+        $result = array();
+        foreach ($this->fields as $name => $col) {
+            if (!($col instanceof ISQLBinding)) continue;
+            if ($col->getBindingKey()) {
+                $result[$col->getBindingKey()] = $col->getBindingValue();
+            }
+        }
+        return $result;
+    }
 }

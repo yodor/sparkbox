@@ -4,7 +4,7 @@
  * Utility class for cleaning HTML input to prevent XSS attacks
  * using DOMDocument + DOMXPath with a whitelist-based approach.
  */
-class CleanHTML
+class InputSanitizer
 {
     /**
      * Default allowed tags (as a concatenated string with angle brackets)
@@ -32,7 +32,7 @@ class CleanHTML
      * @param array|null  $allowedDomains Optional override of allowed domains
      * @return string                     Sanitized HTML fragment
      */
-    public static function sanitize(
+    public static function HTML(
         string $html,
         ?string $allowedTags = null,
         ?array $allowedDomains = null
@@ -174,5 +174,35 @@ class CleanHTML
         preg_match_all('/[a-zA-Z0-9]+/', $tagString, $matches);
         $tags = array_map('strtolower', $matches[0]);
         return array_unique($tags);
+    }
+
+    public static function SQL($input) {
+        if (is_array($input)) {
+            return array_map(InputSanitizer::SQL(...), $input);
+        }
+
+        $sql_patterns = [
+            '/\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|RENAME|REPLACE|GRANT|REVOKE)\b/i',
+            '/\b(UNION|JOIN|HAVING|ORDER\s+BY|GROUP\s+BY|LIMIT|OFFSET|FETCH|INTO|VALUES|WHERE)\b/i',
+            '/\b(0x[0-9a-f]+|0b[01]+)\b/i',
+            '/\b(INFORMATION_SCHEMA|SLEEP|BENCHMARK|LOAD_FILE|OUTFILE)\b/i',
+            '/--\s?/', '/\/\*.*?\*\//s', '/#/'
+        ];
+
+        $output = $input;
+        $max_iterations = 3; // Safety cap to prevent DoS
+        $iteration = 0;
+
+        // Keep cleaning until the string stops changing or we hit the cap
+        do {
+            $before = $output;
+            $output = preg_replace($sql_patterns, '', $output);
+            $iteration++;
+        } while ($output !== $before && $iteration < $max_iterations);
+
+        // Final removal of structural characters
+        $output = str_replace(["'", '"', ";", "\\", "`"], "", $output);
+
+        return trim($output);
     }
 }

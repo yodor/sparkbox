@@ -13,21 +13,30 @@ class SQLUpdate extends SQLStatement
 
     public function getSQL() : string
     {
+        return $this->collectSQL(false);
+    }
+
+    public function collectSQL(bool $do_prepared): string
+    {
         $sql = $this->type . " " . $this->from;
         $sql .= " SET ";
         $set = array();
         $names = $this->fieldset->names();
         foreach ($names as $columnName) {
             $column = $this->fieldset->getColumn($columnName);
-            $set[] = $column->getSQL();
+            $set[] = $column->collectSQL($do_prepared);
         }
         $sql .= implode(", ", $set);
 
         if ($this->whereset->count()>0) {
-            $sql.= $this->whereset->getSQL();
+            $sql.= $this->whereset->collectSQL($do_prepared);
         }
 
         return $sql;
     }
 
+    public function getPreparedSQL(): string
+    {
+        return $this->collectSQL(true);
+    }
 }
