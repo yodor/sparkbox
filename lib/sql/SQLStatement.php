@@ -1,6 +1,8 @@
 <?php
 include_once("sql/ClauseCollection.php");
 include_once("sql/ISQLGet.php");
+include_once("sql/IBindingCollection.php");
+include_once("sql/IBindingModifier.php");
 
 abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModifier
 {
