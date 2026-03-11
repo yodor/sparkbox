@@ -43,6 +43,14 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding
         return $this->glue;
     }
 
+    /**
+     * Set the bindingKey as ":$expr" if $value is not empty
+     * Custom bindings can be used by calling SQLStatement::bind()
+     * @param string $expr
+     * @param string $value
+     * @param string $operator
+     * @return void
+     */
     public function setExpression(string $expr, string $value, string $operator = SQLClause::DEFAULT_OPERATOR) : void
     {
         $this->expr = $expr;

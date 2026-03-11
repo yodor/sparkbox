@@ -2,8 +2,10 @@
 include_once("sql/ClauseCollection.php");
 include_once("sql/ISQLGet.php");
 
-abstract class SQLStatement implements ISQLGet, IBindingCollection
+abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModifier
 {
+    protected array $externalBindings = array();
+
     protected ?SQLColumnSet $fieldset = null;
 
     /**
@@ -96,17 +98,36 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection
         return $this->fieldset->getColumn($name);
     }
 
+    /**
+     * Summarize all bindings from fieldset, whereset and any added using the bind() method
+     * @return array
+     */
     public function getBindings(): array
     {
-        $fieldsetBindings = $this->fieldset->getBindings();
-        $wheresetBindings = $this->whereset->getBindings();
+
         $result = array();
-        foreach ($fieldsetBindings as $bindingKey => $bindingValue) {
-            $result[$bindingKey] = $bindingValue;
-        }
-        foreach ($wheresetBindings as $bindingKey => $bindingValue) {
-            $result[$bindingKey] = $bindingValue;
-        }
+        $this->replaceKeyAppend($result, $this->fieldset->getBindings());
+        $this->replaceKeyAppend($result, $this->whereset->getBindings());
+        $this->replaceKeyAppend($result, $this->externalBindings);
+
         return $result;
+    }
+
+    private function replaceKeyAppend(array& $target, array $bindings) : void
+    {
+        foreach ($bindings as $bindingKey => $bindingValue) {
+            $target[$bindingKey] = $bindingValue;
+        }
+    }
+
+    /**
+     * Append custom binding to this binding collection
+     * @param string $bindingKey
+     * @param string|array $value
+     * @return void
+     */
+    public function bind(string $bindingKey, string|array $value) : void
+    {
+        $this->externalBindings[$bindingKey] = $value;
     }
 }
