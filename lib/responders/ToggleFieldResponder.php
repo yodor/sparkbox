@@ -62,10 +62,8 @@ class ToggleFieldResponder extends RequestResponder
     protected function processImpl() : void
     {
 
-        $field_name = DBConnections::Driver()->escape($this->field_name);
-
         $update_row = array();
-        $update_row[$field_name] = $this->status;
+        $update_row[$this->field_name] = $this->status;
 
         $this->bean->update($this->item_id, $update_row);
 

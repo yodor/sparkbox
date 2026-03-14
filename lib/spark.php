@@ -723,14 +723,14 @@ final class Spark {
             }
         }
 
-        $input = InputSanitizer::SQL($input);
+        return InputSanitizer::SQL($input);
 
-        if (Spark::GetBoolean(Config::DB_ENABLED)) {
-            return DBConnections::Driver()->escape($input);
-        }
-        else {
-            return Spark::EscapeHelper($input);
-        }
+//        if (Spark::GetBoolean(Config::DB_ENABLED)) {
+//            return DBConnections::Driver()->escape($input);
+//        }
+//        else {
+//            return Spark::EscapeHelper($input);
+//        }
     }
 
     static private function EscapeHelper(string $unescaped_string): string

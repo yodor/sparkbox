@@ -1,6 +1,8 @@
 <?php
 include_once("iterators/IDataIterator.php");
 include_once("dbdriver/IDBDriverAccess.php");
+include_once("sql/SQLStatement.php");
+include_once("sql/SQLSelect.php");
 
 class SQLQuery implements IDataIterator, IDBDriverAccess
 {
@@ -8,7 +10,7 @@ class SQLQuery implements IDataIterator, IDBDriverAccess
     /**
      * @var SQLSelect|null
      */
-    public ?SQLSelect $select = null;
+    public ?SQLStatement $select = null;
 
     /**
      * @var DBDriver|null
@@ -33,6 +35,10 @@ class SQLQuery implements IDataIterator, IDBDriverAccess
      */
     protected ?DBResult $res = null;
 
+    /**
+     * Only available after calling count()
+     * @var int 
+     */
     protected int $numResults = -1;
 
     /**
@@ -48,9 +54,9 @@ class SQLQuery implements IDataIterator, IDBDriverAccess
         $this->key = $primaryKey;
         $this->name = $tableName;
 
-        $this->db = DBConnections::Driver();
         $this->bean = NULL;
         $this->res = NULL;
+        $this->db = DBConnections::Driver();
     }
 
     public function __destruct()
@@ -64,6 +70,8 @@ class SQLQuery implements IDataIterator, IDBDriverAccess
             $this->res->free();
         }
         $this->res = NULL;
+        $this->numResults = -1;
+
     }
 
     public function __clone()
@@ -72,36 +80,52 @@ class SQLQuery implements IDataIterator, IDBDriverAccess
     }
 
     /**
-     * Execute the query and return the number of result rows
-     * @return int Number of result rows
-     * @throws Exception
+     * Executes the provided or default statement.
+     * Sets the internal statement pointer and fetches the DBResult.
+     * @param SQLStatement|null $statement Optional external statement to execute
+     * @throws Exception If database is not connected or query fails
      */
-    public function exec(?SQLStatement $statement = null): int
+    public function exec(?SQLStatement $statement = null): void
     {
-        if ($this->res instanceof DBResult) {
-            $this->res->free();
-        }
+        if (!$this->db) throw new Exception("Database driver not initialized");
 
-        $sql = "";
-        if ($statement instanceof SQLStatement) {
-            $sql = $statement->getSQL();
-        }
-        else if ($this->select instanceof SQLSelect) {
-            $sql = $this->select->getSQL();
-        }
-        else {
-            throw new Exception("No statement to execute");
-        }
-        //true or DBResult
-        $this->res = $this->db->query($sql);
+        $this->free();
 
-        $this->numResults = 0;
+        $driver = $this->db;
 
-        if ($this->res instanceof DBResult) {
-            $this->numResults = $this->res->numRows();
+        if ($this->db->hasActiveStatement()) {
+            Debug::ErrorLog("Connection is alread having active statement. Opening new connection ...");
+            $driver = DBConnections::CreateDriver();
+            //upgrade connection
+            $this->db = $driver;
         }
+        //clear cached count
+        $this->numResults = -1;
 
-        return $this->numResults;
+        // Assign the statement to use (either passed or default from constructor)
+        if (!is_null($statement)) $this->select = $statement;
+
+        if (!($this->select instanceof SQLStatement)) throw new Exception("SQLStatement is not set");
+
+        try {
+
+            // Execute query in unbuffered mode
+            $result = $driver->query($this->select);
+
+            //we have result
+            if ($result instanceof DBResult) {
+                //Debug::ErrorLog("Setting result for fetching next");
+                $this->res = $result;
+            }
+
+        } catch (Exception $e) {
+
+            $this->free();
+
+            Debug::ErrorLog("SQLQuery Execution Error: " . $e->getMessage());
+
+            throw $e;
+        }
     }
 
     /**
@@ -114,6 +138,7 @@ class SQLQuery implements IDataIterator, IDBDriverAccess
         if (!($this->res instanceof DBResult)) throw new Exception("Not executed yet or no valid result");
 
         $data = $this->res->fetch();
+
         if (is_array($data)) return $data;
 
         $this->free();
@@ -138,6 +163,10 @@ class SQLQuery implements IDataIterator, IDBDriverAccess
         return null;
     }
 
+    /**
+     * Current iterator is ready for fetching
+     * @return bool
+     */
     public function isActive() : bool
     {
         return (!is_null($this->res));
@@ -168,9 +197,58 @@ class SQLQuery implements IDataIterator, IDBDriverAccess
         return $this->name;
     }
 
+    /**
+     * Returns the total number of rows (lazy initialization) or affectedRows
+     * @return int
+     * @throws Exception
+     */
     public function count(): int
     {
-        return $this->numResults;
+        Debug::ErrorLog("Executing count query");
+        // Return cached result if already calculated
+        if ($this->numResults !== -1) return $this->numResults;
+
+        // Use SQL_CALC_FOUND_ROWS logic only for SELECT statements
+        if ($this->select instanceof SQLSelect) {
+
+            $driver = $this->db;
+
+            if ($this->db->hasActiveStatement()) {
+                Debug::ErrorLog("Connection is alread having active statement. Opening new connection ...");
+                $driver = DBConnections::CreateDriver();
+            }
+
+            $select = clone $this->select;
+            $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
+
+            //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
+            //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
+            //set limit to 0 as this is SQL_CALC_FOUND_ROWS we don't want any results in the buffer
+            $select->limit = "0";
+
+            $result = $driver->query($select);
+            if (!($result instanceof DBResult)) {
+                Debug::ErrorLog("Error executing SQL_CALC_FOUND_ROWS: " . $select->getSQL());
+                throw new Exception("Unable to query SQL_CALC_FOUND_ROWS");
+            }
+            $result->free();
+
+            //fetch the actual calculated number
+            $result = $driver->query("SELECT FOUND_ROWS() as total_results LIMIT 1");
+            if (!($result instanceof DBResult)) {
+                Debug::ErrorLog("Error fetching FOUND_ROWS: " . $select->getSQL());
+                throw new Exception("Unable to fetch FOUND_ROWS");
+            }
+
+            $this->numResults = $result->fetchResult()->get("total_results");
+            $result->free();
+            return $this->numResults;
+        }
+        else {
+            if (!$this->isActive()) throw new Exception("Non-Select query needs to be executed first to return the affected row count");
+
+            return $this->res->numRows();
+        }
     }
 
     public function setBean(DBTableBean $bean) : void

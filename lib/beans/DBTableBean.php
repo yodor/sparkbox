@@ -91,7 +91,7 @@ abstract class DBTableBean implements IDBDriverAccess
         $this->select = new SQLSelect();
         $this->select->from = $this->table;
 
-        Debug::ErrorLog("DBTableBean[$this->table]");
+        //Debug::ErrorLog("DBTableBean[$this->table]");
     }
 
     protected function initColumnTypes() : void
@@ -111,7 +111,7 @@ abstract class DBTableBean implements IDBDriverAccess
             $this->columns[$field_name] = $row["Type"];
         }
         $result->free();
-//        Debug::ErrorLog("Columns: ", $this->columns);
+        //Debug::ErrorLog("Columns: ", $this->columns);
     }
     /**
      * @return void
@@ -207,8 +207,11 @@ abstract class DBTableBean implements IDBDriverAccess
     public function getCount(): int
     {
         $qry = $this->query();
+        $qry->select->fields()->reset();
         $qry->select->fields()->set($this->prkey);
-        return $qry->exec();
+        $qry->select->limit = "0";
+        return $qry->count();
+
     }
 
     /**
@@ -253,15 +256,15 @@ abstract class DBTableBean implements IDBDriverAccess
      */
     public function queryField(string $field, string $value, int $limit = 0, string ...$columns): SQLQuery
     {
-        $field = $this->db->escape($field);
-        $value = $this->db->escape($value);
+//        $field = $this->db->escape($field);
+//        $value = $this->db->escape($value);
 
         $select = clone $this->select;
         $select->fields()->set($this->prkey);
         $select->fields()->set($field);
         $select->fields()->set(...$columns);
 
-        $select->where()->add($field, "'$value'");
+        $select->where()->add($field, $value);
         if ($limit > 0) {
             $select->limit = $limit;
         }
@@ -269,10 +272,15 @@ abstract class DBTableBean implements IDBDriverAccess
         return $this->beanQuery($select);
     }
 
+    /**
+     * Return new SQLQuery using the select passed
+     *
+     * @param SQLSelect $select
+     * @return SQLQuery
+     */
     protected function beanQuery(SQLSelect $select) : SQLQuery
     {
         $qry = new SQLQuery($select, $this->prkey, $this->getTableName());
-        $qry->setDB($this->db);
         $qry->setBean($this);
         return $qry;
     }
@@ -289,7 +297,9 @@ abstract class DBTableBean implements IDBDriverAccess
     public function getResult(string $column, string $value, string ...$columns) : ?array
     {
         $qry = $this->queryField($column, $value, 1, ...$columns);
+
         $qry->exec();
+
         return $qry->next();
     }
 
@@ -303,7 +313,7 @@ abstract class DBTableBean implements IDBDriverAccess
      */
     public function getValue(int $id, string $column): ?string
     {
-        $column = $this->db->escape($column);
+//        $column = $this->db->escape($column);
 
         $qry = $this->queryField($this->prkey, $id, 1, $column);
 
@@ -331,11 +341,12 @@ abstract class DBTableBean implements IDBDriverAccess
         }
 
         $qry = $this->queryField($this->prkey, $id, 1, ...$columns);
+        $qry->exec();
 
-        $num = $qry->exec();
-        if ($num < 1) throw new Exception("No such ID");
-
-        return $qry->next();
+        if ($result = $qry->next()) {
+            return $result;
+        }
+        throw new Exception("No such ID");
     }
 
     /**
@@ -350,11 +361,13 @@ abstract class DBTableBean implements IDBDriverAccess
     {
 
         $qry = $this->queryField($column, $value, 1, ...$columns);
+        $qry->exec();
 
-        $num = $qry->exec();
-        if ($num < 1) throw new Exception("No such ID");
+        if ($result = $qry->next()) {
+            return $result;
+        }
+        throw new Exception("No such Ref");
 
-        return $qry->next();
 
     }
 
@@ -429,10 +442,8 @@ abstract class DBTableBean implements IDBDriverAccess
             $delete->from = $this->table;
             $delete->where()->add($this->prkey, $id);
 
-            $sql = $delete->getSQL();
-
             //true or exception is thrown in db->query
-            $db->query($sql);
+            $db->query($delete);
               
             $this->manageCache($id);
         };
@@ -457,17 +468,13 @@ abstract class DBTableBean implements IDBDriverAccess
         $code = function (DBDriver $db) use ($column, $value, $keep_ids) {
 
             $delete = new SQLDelete($this->select);
-            $value = $db->escape($value);
-            if ($this->needQuotes($column, $value)) {
-                $delete->where()->add($column, "'$value'");
-            }
-            else {
-                $delete->where()->add($column, $value);
-            }
+            //$value = $db->escape($value);
+            $delete->where()->add($column, $value);
 
             if (count($keep_ids) > 0) {
                 $keep_list_ids = implode(",", $keep_ids);
-                $delete->where()->add($this->prkey, "($keep_list_ids)", " NOT IN ", " AND ");
+                $delete->where()->addExpression("$this->prkey NOT IN (:keep_list_ids)");
+                $delete->bind(":keep_list_ids", $keep_list_ids);
             }
 
             //fetch id of resulting rows first to properly manage the cache
@@ -475,7 +482,7 @@ abstract class DBTableBean implements IDBDriverAccess
             $select->fields()->reset();
             $select->fields()->set($this->prkey);
 
-            $result = $db->query($select->getSQL());
+            $result = $db->query($select);
             if (!($result instanceof DBResult)) throw new Exception("Unable to query affected ID list: ".$select->getSQL());
 
             $idlist = array();
@@ -484,7 +491,7 @@ abstract class DBTableBean implements IDBDriverAccess
             }
             Debug::ErrorLog("Affected ID list: ", $idlist);
 
-            $db->query($delete->getSQL());
+            $db->query($delete);
 
             foreach ($idlist as $id) {
                 $this->manageCache((int)$id);
@@ -494,25 +501,6 @@ abstract class DBTableBean implements IDBDriverAccess
 
         return $this->handleTransaction($code, $db);
 
-    }
-
-    public function needQuotes(string $key, &$value = "") : bool
-    {
-        $storage_type = $this->columns[$key];
-
-        if ($this->isNumeric($key)) return FALSE;
-
-        if (str_contains($storage_type, "datetime") ||
-            str_contains($storage_type, "date") ||
-            str_contains($storage_type, "timestamp")) {
-            if (strlen(trim($value))==0) {
-                $value = "NULL";
-                return FALSE;
-            }
-            if (str_ends_with(trim($value), ")")) return FALSE;
-            return TRUE;
-        }
-        return TRUE;
     }
 
     public function isNumeric($key): bool
@@ -537,7 +525,11 @@ abstract class DBTableBean implements IDBDriverAccess
     }
 
     /**
-     * Try to insert $row data into this table and return the last insert ID
+     * Create SQLInsert construct binding values with the bean columns.
+     * Values with keys that do not correspond to columns of this bean are dropped.
+     * Try to insert $id of this table with row data and return the last insert ID
+     * Executed in transaction.
+     *
      * @param array $row
      * @param DBDriver|null $db
      * @return int last insert ID
@@ -550,11 +542,11 @@ abstract class DBTableBean implements IDBDriverAccess
 
         $insert = new SQLInsert();
         $insert->from = $this->table;
-        $this->prepareValues($row, $insert);
+        $this->bindValues($row, $insert);
 
         $code = function (DBDriver $db) use (&$insertID , $insert) {
 
-            $db->query($insert->getSQL());
+            $db->query($insert);
 
             //NOTE!!! lastID return the first auto_increment of a multi insert transaction
             $insertID = $db->lastID();
@@ -568,7 +560,11 @@ abstract class DBTableBean implements IDBDriverAccess
     }
 
     /**
-     * Try to update $id of this table with row data
+     * Create SQLUpdate construct binding values with the bean columns.
+     * Values with keys that do not correspond to columns of this bean are dropped.
+     * Try to update $id of this table with row data.
+     * Executed in transaction.
+     *
      * @param int $id
      * @param array $row
      * @param DBDriver|null $db
@@ -579,11 +575,11 @@ abstract class DBTableBean implements IDBDriverAccess
     {
         $update = new SQLUpdate($this->select);
         $update->where()->add($this->prkey, $id);
-        $this->prepareValues($row, $update);
+        $this->bindValues($row, $update);
 
         $code = function (DBDriver $db) use ($id, $update) {
 
-            $db->query($update->getSQL());
+            $db->query($update);
 
             $this->manageCache($id);
 
@@ -621,7 +617,7 @@ abstract class DBTableBean implements IDBDriverAccess
 
         try {
             $this->db->transaction();
-            $this->db->query($delete->getSQL());
+            $this->db->query($delete);
             $this->db->commit();
         }
         catch (Exception $e) {
@@ -631,40 +627,29 @@ abstract class DBTableBean implements IDBDriverAccess
 
     }
 
-    protected function prepareValues(array $row, SQLStatement $statement) : void
+    protected function bindValues(array $row, SQLStatement $statement) : void
     {
+        $columnNames = $this->columnNames();
 
-        $keys = array();
+        foreach ($row as $key => $value) {
+            // 1. skip keys that do not reference column names in this bean
+            if (!in_array($key, $columnNames)) continue;
 
-        foreach ($row as $key => $val) {
-            //drop keys that are not columns of 'this' table
-            if (!in_array($key, $this->columnNames())) continue;
-            $keys[] = $key;
-        }
-
-        foreach ($keys as $key) {
-            $value = $row[$key];
-            //Debug::ErrorLog("Checking key='$key' : Value: ".$value. " STRLEN: ".strlen($value)." is_null: ".is_null($value));
-
-            //TODO check usage
+            //TODO: check usage and throw
+            // 2. take the first element from array only
             if (is_array($value)) {
                 if (count($value) < 1) continue;
                 $value = $value[0];
             }
 
-            if (is_null($value)) {
-                $value = "NULL";
-            }
-            else if ($this->isNumeric($key) && strlen($value) < 1) {
-                $value = "NULL";
-            }
-            else if ($this->needQuotes($key, $value) === TRUE) {
-                $value = "'" . $value . "'";
+            // 3.For numeric columns set to null
+            else if ($this->isNumeric($key) && strlen((string)$value) < 1) {
+                $value = null;
             }
 
+            //bind
             $statement->set($key, $value);
         }
-
     }
 
     public function __serialize() : array
@@ -676,7 +661,7 @@ abstract class DBTableBean implements IDBDriverAccess
     {
         $this->table = $data["table"];
         //should already be present inside DBConnections
-        $this->db = DBConnections::Driver($data["connection_name"]);
+        $this->db = DBConnections::CreateDriver($data["connection_name"]);
         $this->initialize();
     }
 

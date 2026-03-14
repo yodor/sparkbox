@@ -253,29 +253,33 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     {
         if ($this->results_paginated) return;
 
-        $select = clone $this->iterator->select;
-        $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
+        //unbuffered mode
+        //get the result count only - possible to count without exec only for select type queries
+        $this->total_rows = $this->iterator->count();
 
-        //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
-        //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
-        $select->limit = "0";
-
-        $db = $this->iterator->getDB();
-        $result = $db->query($select->getSQL());
-        if (! ($result instanceof DBResult) ) {
-            Debug::ErrorLog("Error executing SQL_CALC_FOUND_ROWS: " . $select->getSQL());
-            throw new Exception("Unable to query SQL_CALC_FOUND_ROWS");
-        }
-        $result->free();
-
-        $result = $db->query("SELECT FOUND_ROWS() as total_results");
-        if (! ($result instanceof DBResult) ) {
-            Debug::ErrorLog("Error fetching FOUND_ROWS: " . $select->getSQL());
-            throw new Exception("Unable to fetch FOUND_ROWS");
-        }
-
-        $this->total_rows = $result->fetchResult()->get("total_results");
-        $result->free();
+//        $select = clone $this->iterator->select;
+//        $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
+//
+//        //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
+//        //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
+//        $select->limit = "0";
+//
+//        $db = $this->iterator->getDB();
+//        $result = $db->query($select->getSQL());
+//        if (! ($result instanceof DBResult) ) {
+//            Debug::ErrorLog("Error executing SQL_CALC_FOUND_ROWS: " . $select->getSQL());
+//            throw new Exception("Unable to query SQL_CALC_FOUND_ROWS");
+//        }
+//        $result->free();
+//
+//        $result = $db->query("SELECT FOUND_ROWS() as total_results");
+//        if (! ($result instanceof DBResult) ) {
+//            Debug::ErrorLog("Error fetching FOUND_ROWS: " . $select->getSQL());
+//            throw new Exception("Unable to fetch FOUND_ROWS");
+//        }
+//
+//        $this->total_rows = $result->fetchResult()->get("total_results");
+//        $result->free();
 
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
@@ -304,11 +308,15 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             return;
         }
 
+        //might be already be paginated by page head calling AppendHeadLinks
         $this->paginate();
 
         //echo "Final SQL: ".$this->iterator->select->getSQL();
+        //exec will clear cached count for all results so count will return only paginated
 
-        $this->paged_rows = $this->iterator->exec();
+        $this->paged_rows = $this->iterator->count();
+        //exec after count
+        $this->iterator->exec();
     }
 
     protected function renderItems() : void
@@ -325,7 +333,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
 
     public static function AppendHeadLinks(AbstractResultView $view, SparkPage $sparkPage) : void
     {
-        //execute pagination query
+        //execute pagination query - only count results no fetching from db server
         $view->paginate();
 
         $paginator = $view->getPaginator();

@@ -3,7 +3,7 @@ include_once("sql/SQLSelect.php");
 
 interface IDataIterator
 {
-    public function exec(): int;
+    public function exec(): void;
 
     public function next() : ?array;
 

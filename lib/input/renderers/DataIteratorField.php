@@ -79,7 +79,7 @@ abstract class DataIteratorField extends InputField
 
         $position = 0;
 
-        $num = $this->iterator->exec();
+        $this->iterator->exec();
 
         //ArrayField appends [] to the dataInput
         $this->item->setName($this->dataInput->getName());

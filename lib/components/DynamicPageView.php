@@ -58,14 +58,13 @@ class DynamicPageView extends Container implements IRequestProcessor
             $query->select->where()->add($this->bean->key(), $id);
             $query->select->limit = 1;
 
-            $num = $query->exec();
-
-            if ($num < 1) {
-                throw new Exception("Page not found");
-            }
+            $query->exec();
 
             if ($this->result = $query->nextResult()) {
                 if (!$this->result->get("visible")) throw new Exception("Page is currently unavailable");
+            }
+            else {
+                throw new Exception("Page not found");
             }
 
             $title_cmp = $this->items()->getByName("title");

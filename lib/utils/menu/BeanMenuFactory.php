@@ -88,7 +88,7 @@ class BeanMenuFactory
      * @return void
      * @throws Exception
      */
-    protected function fill(MenuItemList $parent) : void
+    protected function fill(MenuItemList $parent, ?SQLQuery $qry = null) : void
     {
 
         $parentID = 0;
@@ -99,9 +99,9 @@ class BeanMenuFactory
         $this->select->where()->clear();
         $this->select->where()->add("parentID", $parentID);
 
-        $qry = new SQLQuery();
+        if (is_null($qry)) $qry = new SQLQuery($this->select);
 
-        if ($qry->exec($this->select) < 1) return;
+        $qry->exec();
 
         while ($result = $qry->nextResult()) {
             $parent->append($this->createItem($result));
@@ -121,7 +121,6 @@ class BeanMenuFactory
     protected function createItem(RawResult $result) : MenuItem
     {
         $menuID = (int)$result->get($this->value_key);
-        trbean($menuID, $this->label_key, $result->arrayRef(), $this->bean->getTableName());
 
         $href = "";
 

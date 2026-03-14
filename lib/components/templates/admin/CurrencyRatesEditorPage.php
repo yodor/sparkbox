@@ -24,7 +24,7 @@ class CurrencyRatesEditorPage extends AdminPageTemplate
 
         $cb = new CurrenciesBean();
         $cb_qry = $cb->queryFull();
-        $num = $cb_qry->exec();
+        $cb_qry->exec();
         $this->curr = array();
         while ($row = $cb_qry->next()) {
             $this->curr[] = $row;

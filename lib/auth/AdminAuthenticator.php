@@ -27,11 +27,11 @@ class AdminAuthenticator extends Authenticator
 
         if (strcmp($access_level, AdminAuthenticator::ACCESS_LIMITED) === 0) {
             $admin_access = new AdminAccessBean();
-            $qry = $admin_access->queryField("userID", $userID, 0, "role");
-            $numResults = $qry->exec();
+            $query = $admin_access->queryField("userID", $userID, 0, "role");
+            $query->exec();
             $roles = array();
-            while ($row = $qry->next()) {
-                $roles[]=$row["role"];
+            while ($result = $query->nextResult()) {
+                $roles[]=$result->get("role");
             }
             $this->session->set(AdminAuthenticator::SESSION_DATA_ENABLED_ROLES, $roles);
         }

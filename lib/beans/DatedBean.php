@@ -105,9 +105,12 @@ class DatedBean extends DBTableBean
     public function publicationsCount(string $d_year, string $d_month): int
     {
         $qry = $this->query($this->key());
-        $qry->select->where()->add("MONTH($this->date_column)", "'$d_month'")->add("YEAR($this->date_column)", "'$d_year'");
-        $qry->select->limit = " 1 ";
-        return $qry->exec();
+        $qry->select->where()->addExpression("MONTH({$this->date_column}) = :d_month");
+        $qry->select->bind(":d_month", $d_month);
+        $qry->select->where()->addExpression("YEAR({$this->date_column}) = :d_year");
+        $qry->select->bind(":d_year", $d_year);
+
+        return $qry->count();
     }
 
     // 	public function pastEventsBefore($year, $month, $limit=1){

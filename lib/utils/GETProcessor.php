@@ -34,7 +34,7 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
 
         $this->collection = new ClauseCollection();
         $this->closure = function(GETProcessor $filter) {
-            $filter->getClauseCollection()->add($filter->getName(), "'" . $filter->getValue() . "'");
+            $filter->getClauseCollection()->add($filter->getName(), $filter->getValue());
         };
 
         $this->value = "";

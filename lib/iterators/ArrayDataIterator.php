@@ -37,12 +37,12 @@ class ArrayDataIterator implements IDataIterator
     }
     /**
      * Start data iterator and return number of items in this collection
-     * @return int
+     * @return void
      */
-    public function exec(): int
+    public function exec(): void
     {
         $this->pos = -1;
-        return count($this->values);
+
     }
 
     public function isActive() : bool
@@ -72,30 +72,6 @@ class ArrayDataIterator implements IDataIterator
             return $this->values[$this->pos];
         }
         return NULL;
-    }
-
-    public static function FromSelect(SQLSelect $qry, $prkey, $label) : ArrayDataIterator
-    {
-        $db = DBConnections::Driver();
-
-        $result = $db->query($qry->getSQL());
-
-        $arr = array();
-        while ($row = $result->fetch()) {
-
-            $arr_key = $row[$prkey];
-            $arr_val = $row[$label];
-
-            if (is_null($arr_key)) {
-                $arr_key = "NULL";
-                $arr_val = "NULL";
-            }
-
-            $arr[$arr_key] = $arr_val;
-        }
-
-
-        return new ArrayDataIterator($arr, $prkey, $label);
     }
 
     public function bean(): ?DBTableBean

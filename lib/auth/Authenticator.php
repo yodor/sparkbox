@@ -199,11 +199,8 @@ abstract class Authenticator
         $this->verifyTokenHMAC($hash, $client_hmac);
 
         // 2. Lookup user
-        $db = DBConnections::Driver();
-        $username = $db->escape($username);
-
         $qry = $this->bean->queryFull();
-        $qry->select->where()->add("email", "'$username'");
+        $qry->select->where()->add("email", $username);
         $qry->select->limit = 1;
         $qry->exec();
 
@@ -268,23 +265,16 @@ abstract class Authenticator
         }
     }
 
-    protected function updateLastSeen(int $userID, DBDriver $db) : void
+    protected function updateLastSeen(int $userID) : void
     {
 
         $update = new SQLUpdate($this->bean->select());
-        $update->set("counter", "counter+1");
-        $update->set("last_active", "CURRENT_TIMESTAMP");
+        $update->setExpression("counter", "counter + 1");
+        $update->setExpression("last_active" , "CURRENT_TIMESTAMP");
         $update->where()->add($this->bean->key(), $userID);
 
-        try {
-            $db->transaction();
-            $db->query($update->getSQL());
-            $db->commit();
-        }
-        catch (Exception $e) {
-            $db->rollback();
-            throw $e;
-        }
+        $this->bean->getDB()->query($update);
+
     }
 
     /**

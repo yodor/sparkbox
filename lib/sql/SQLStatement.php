@@ -103,6 +103,46 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     }
 
     /**
+     * Configures a column in the statement fieldset to use a raw SQL expression
+     * instead of a simple value with automatic name-derived binding.
+     *
+     * This method transitions the column to "Manual Mode":
+     * 1. Disables automatic PDO binding for this specific column.
+     * ($column->getBindingKey() returns an empty string)
+     * 2. Allows for database-side calculations (arithmetic, functions, subqueries).
+     * 3. Supports manual parameter binding for high-security custom logic.
+     *
+     * * Basic usage with SQL functions:
+     *
+     * $stmt->setExpression("update_date", "NOW()");
+     * $stmt->setExpression("rgt", "rgt + 2");
+     *
+     * * Advanced usage with manual binding (Prepared Statement):
+     *
+     * $stmt->setExpression("rgt", "rgt + :value");
+     * $stmt->bind(":value", 2);
+     *
+     * @param string $name The name of the column/field to target.
+     * @param string $expression The raw SQL fragment (e.g., "NOW()", "rgt + :val").
+     * @return void
+     * @throws Exception If expression validation fails in SQLColumn.
+     */
+    public function setExpression(string $name, string $expression) : void
+    {
+        // 1. Initialize a new SQLColumn without a value to prevent
+        // the automatic generation of a PDO bindingKey.
+        $column = new SQLColumn($name, "");
+
+        // 2. Set the raw SQL expression. Passing an empty string for alias
+        // ensures the collectSQL method treats this as an UPDATE/SET assignment.
+        $column->setExpression($expression, "");
+
+        // 3. Register the configured column object into the statement's fieldset
+        // so it can be included during the SQL generation process.
+        $this->fieldset->setColumn($column);
+    }
+
+    /**
      * Return SQLColumn named '$name' from fieldset collection
      * @param string $name
      * @return SQLColumn
@@ -140,8 +180,9 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
      * @return void
      * @throws Exception throws exception if value is not bound safe
      */
-    private static function replaceKeyAppend(array& $target, array $bindings) : void
+    protected static function replaceKeyAppend(array& $target, array $bindings) : void
     {
+//        Debug::ErrorLog("Appending Bindings: ", $bindings);
         foreach ($bindings as $bindingKey => $bindingValue) {
             if (SQLStatement::IsBoundSafe($bindingValue)) {
                 $target[$bindingKey] = $bindingValue;
@@ -158,12 +199,24 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
 
     /**
      * Format input to be used as a bindingKey by prepending it with ":"
-     * @param string $name
+     * and ensuring it contains only valid characters for PDO.
+     * * @param string $name
      * @return string
      */
     public static function FormatBindingKey(string $name) : string
     {
-        return ":".$name;
+
+        $name = trim($name);
+
+        //Cover cases like "node.catID", "user-name" или "table alias.field"
+        $safeName = preg_replace('/[^a-zA-Z0-9_]/', '_', $name);
+
+        //No starting digit (PDO requirement) - append "p_"
+        if (preg_match('/^[0-9]/', $safeName)) {
+            $safeName = "p_" . $safeName;
+        }
+
+        return ":" . $safeName;
     }
 
     /**

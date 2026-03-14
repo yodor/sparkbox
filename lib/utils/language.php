@@ -5,6 +5,8 @@ $translator = Translator::Instance();
 
 function trbean(int $id, string $field_name, array &$row, string $tableName) : void
 {
+    if ($id<0 || empty($field_name)||empty($tableName)) return;
+
     $translator = Translator::Instance();
     if ($translator->isEnabled()) {
         $translator->translateBean($id, $field_name, $row, $tableName);

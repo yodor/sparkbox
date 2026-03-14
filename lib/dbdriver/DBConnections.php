@@ -8,16 +8,19 @@ class DBConnections
     protected static array $available_connections = array();
 
     protected static int $active_count = 0;
-
+    protected static int $max_active_count = 0;
 
     public static function DriverEvent(DBDriverEvent $event): void
     {
         if ($event->isEvent(DBDriverEvent::OPENED)) {
             self::$active_count++;
-            Debug::ErrorLog("Opened - active count: " . self::$active_count);
+            if (self::$active_count > self::$max_active_count) {
+                self::$max_active_count = self::$active_count;
+            }
+            Debug::ErrorLog("Opened - active count: " . self::$active_count . " - max count: " . self::$max_active_count);
         } else if ($event->isEvent(DBDriverEvent::CLOSED)) {
             self::$active_count--;
-            Debug::ErrorLog("Closed - active count: " . self::$active_count);
+            Debug::ErrorLog("Closed - active count: " . self::$active_count . " - max count: " . self::$max_active_count);
         }
     }
 
@@ -56,27 +59,56 @@ class DBConnections
         return array_key_exists($connection_name, self::$available_connections);
     }
 
+    protected static array $drivers = array();
+
     /**
-     * Return DBDriver of the connection with name $conn_name or DBConnection::DEFAULT_NAME if omitted.
-     * Ensures valid DBDriver connection is returned in connected state by checking the connection current state
-     *
+     * Return reusable DBDriver for connection properties named '$conn_name' or DBConnection::DEFAULT_NAME if omitted.
+     * DBDriver instance is reused on subsequent calls
+     * Usually one global per app instance is needed. Remaining objects create additional connections where needed ie SQLQuery
      * @param string $conn_name
      * @return DBDriver
      * @throws Exception
      */
     public static function Driver(string $conn_name = DBConnection::DEFAULT_NAME): DBDriver
     {
+        if (isset(self::$drivers[$conn_name])) {
+            return self::$drivers[$conn_name];
+        }
+
         try {
-            $conn = self::Get($conn_name);
-            $conn->open();
-            $driver = $conn->driver();
-            if (!is_null($driver)) return $driver;
-            throw new Exception("DBConnection::driver() is null");
+            $driver = self::CreateDriver($conn_name);
+            self::$drivers[$conn_name] = $driver;
+            return $driver;
         } catch (Exception $e) {
             Debug::ErrorLog("Error: ".$e->getMessage());
             throw $e;
         }
 
+    }
+
+    /**
+     * Create driver using $conn_name properties and open connection
+     * @param string $conn_name
+     * @return DBDriver
+     * @throws Exception
+     */
+    public static function CreateDriver(string $conn_name = DBConnection::DEFAULT_NAME): DBDriver
+    {
+        $props = self::Get($conn_name);
+
+        $driver = null;
+
+        switch ($props->driverClass) {
+            case "MySQLi":
+                include_once("dbdriver/MySQLiDriver.php");
+                $driver = new MySQLiDriver($props);
+            case "PDO":
+                include_once("dbdriver/PDODriver.php");
+                $driver = new PDODriver($props);
+        }
+        if (is_null($driver)) throw new Exception("Unsupported driver '{$props->driverClass}'");
+        $driver->connect();
+        return $driver;
     }
 
     public static function ActiveCount(): int
@@ -89,16 +121,5 @@ class DBConnections
         return count(self::$available_connections);
     }
 
-    public static function CreateDriver(string $driverClass, DBConnection $conn): DBDriver
-    {
-        switch ($driverClass) {
-            case "MySQLi":
-                include_once("dbdriver/MySQLiDriver.php");
-                return new MySQLiDriver($conn);
-            case "PDO":
-                include_once("dbdriver/PDODriver.php");
-                return new PDODriver($conn);
-        }
-        throw new Exception("Unsupported driver '$driverClass'");
-    }
+
 }

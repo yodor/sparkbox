@@ -52,7 +52,7 @@ class TranslatorPage extends BeanListPage
         }
 
         $query = $this->bean->queryFull();
-        $num = $query->exec();
+        $query->exec();
         $count = 0;
         while ($result = $query->nextResult()) {
             $textID = $result->get($this->bean->key());
@@ -61,7 +61,7 @@ class TranslatorPage extends BeanListPage
             if (strlen($hash_value)!=32) {
                 continue;
             }
-            $update = array("value"=>$query->getDB()->escape($value), "hash_value"=>Spark::Hash($value));
+            $update = array("value"=>$value, "hash_value"=>Spark::Hash($value));
             if (!$this->bean->update($textID, $update)) throw new Exception("Unable to update hash_value");
             $count++;
         }

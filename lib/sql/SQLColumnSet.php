@@ -50,17 +50,29 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
     }
 
     /**
-     * Add direct sql expression to the column collection using alias name as name
-     * Existing column named '$alias' would be replaced with the newly created column
+     * Add direct sql expression to the column collection using '$alias_name' as the column name.
+     *
+     * Existing column named '$alias_name' would be replaced with the newly created column.
+     *
+     * No automatic binding is created.
+     *
      * @param string $expression SQL select expression string
-     * @param string $alias Alias name
+     * @param string $alias_name Alias name
      * @throws Exception
      */
-    public function setExpression(string $expression, string $alias) : void
+    public function setExpression(string $expression, string $alias_name) : void
     {
-        $column = new SQLColumn();
-        $column->setExpression($expression, $alias);
-        $this->fields[$column->getName()] = $column;
+        // Using trim to ensure we don't accept strings with only whitespace
+        $expression = trim($expression);
+        $alias_name = trim($alias_name);
+
+        if ($expression === "" || $alias_name === "") {
+            throw new Exception("SQL expression and alias must be non-empty strings.");
+        }
+
+        $column = new SQLColumn($alias_name);
+        $column->setExpression($expression, $alias_name);
+        $this->fields[$alias_name] = $column;
     }
 
     public function copyTo(SQLColumnSet $other) : void
@@ -86,8 +98,7 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
             if (!(trim($item)))continue;
             $pair = preg_split("/ as /i", $item);
 
-            $column = new SQLColumn();
-            $column->setName($pair[0]);
+            $column = new SQLColumn($pair[0]);
             if (isset($pair[1])) {
                 $column->setAlias($pair[1]);
             }
@@ -190,5 +201,22 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
             else throw new Exception("[$bindingKey] value is not SQLStatement::IsBoundSafe");
         }
         return $result;
+    }
+
+    /**
+     * Calculates the total number of rows based on the column with the most values.
+     */
+    public function getRowCount(): int
+    {
+        $maxRows = 0;
+        foreach ($this->fields as $column) {
+            $val = $column->getValue();
+            if (is_array($val)) {
+                $maxRows = max($maxRows, count($val));
+            } elseif ($val !== "" || $val === 0 || $val === "0") {
+                $maxRows = max($maxRows, 1);
+            }
+        }
+        return $maxRows;
     }
 }

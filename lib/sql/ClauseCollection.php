@@ -34,10 +34,10 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
     /**
      * Create new SQLClause and append it to this collection.
      *
-     * $clause->setExpression(name $name, value $value, operator $operator)
-     * $clause->setGlue($glue)
+     * $clause->setExpression(name '$name', value '$value', operator '$operator')
+     * $clause->setGlue('$glue')
      *
-     * By design SQLClause create a bindingKey if $name and $value are not empty
+     * By design SQLClause create a bindingKey if '$name' and '$value' are not empty.
      *
      * @param string $name
      * @param string $value
@@ -57,6 +57,14 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
         return $this;
     }
 
+    /**
+     * Create new SQLClause without value so no automatic binding is done
+     *
+     * @param string $expression
+     * @param string $glue
+     * @return $this
+     * @throws Exception
+     */
     public function addExpression(string $expression, string $glue = SQLClause::DEFAULT_GLUE) : ClauseCollection
     {
         return $this->add($expression, "", "", $glue);

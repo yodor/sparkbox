@@ -55,12 +55,14 @@ class DBCacheEntry extends CacheEntry
         $query->select->where()->add("className", "'{$this->className}'");
         $query->select->where()->add("beanID", $this->beanID);
 
-        //should be only one match
+        $this->resultCount = $query->count();
 
-        $this->resultCount = $query->exec();
         Debug::ErrorLog("Result count: ".$this->resultCount);
 
         if ($this->resultCount > 0) {
+            //should be only one match
+            $query->exec();
+
             $this->result = $query->nextResult();
             $this->entryID = (int)$this->result->get($this->bean->key());
             Debug::ErrorLog("EntryID: ".$this->entryID);

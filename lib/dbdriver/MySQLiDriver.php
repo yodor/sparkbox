@@ -23,9 +23,6 @@ class MySQLiDriver extends DBDriver
 
         $host = $this->props->host;
 
-        if ($this->props->isPersistent()) {
-            $host = "p:" . $host;
-        }
 
         $this->conn = @new mysqli($host, $this->props->user, $this->props->pass, $this->props->database, $this->props->port);
 
@@ -98,21 +95,26 @@ class MySQLiDriver extends DBDriver
      * @return true|DBResult
      * @throws Exception
      */
-    public function query(string $str) : true|DBResult
+    public function query(SQLStatement|string $statement) : true|DBResult
     {
 
         try {
-            $res = $this->conn->query($str);
+            $sql = $statement;
+            if ($statement instanceof SQLStatement) {
+                $sql = $statement->getSQL();
+            }
+            $res = $this->conn->query($sql);
             if ($res === false) throw new Exception("Result is false");
+
+            if ($res instanceof mysqli_result) return new MySQLiResult($res);
+
+            return true;
         }
         catch (Exception $e) {
-            Debug::ErrorLog("Query exception: ".$e->getMessage()." | Connection Error: ".$this->conn->error." | SQL: $str");
-            throw new Exception("Query exception: ".$e->getMessage());
+            Debug::ErrorLog("Error: ".$e->getMessage()." | Connection Error: ".$this->conn->error." | SQL: $sql");
+            throw new Exception("Error: ".$e->getMessage());
         }
 
-        if ($res instanceof mysqli_result) return new MySQLiResult($res);
-
-        return true;
     }
 
     public function affectedRows(): int

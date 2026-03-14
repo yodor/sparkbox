@@ -11,96 +11,77 @@ class SQLInsert extends SQLStatement
 
     protected function wrapBrackets(array $input): string
     {
-        return "(" . implode(",", $input) . ")";
+        return "(" . implode(", ", $input) . ")";
     }
 
-    protected function rowToSQL(bool $do_prepared, ?int $idx = null): string
+    /**
+     * Generates values fragment for a specific row.
+     */
+    protected function rowToSQL(bool $do_prepared, int $idx, int $totalRows): string
     {
         $placeholders = array();
-        $names = $this->fieldset->names();
-
-        foreach ($names as $name) {
+        foreach ($this->fieldset->names() as $name) {
             $column = $this->fieldset->getColumn($name);
+
+            if ($column->getExpression()) {
+                $placeholders[] = $column->getExpression();
+                continue;
+            }
 
             if ($do_prepared) {
                 $key = $column->getBindingKey();
-                if (!is_null($idx)) {
-                    $key .= "_" . $idx;
-                }
-                $placeholders[] = $key;
+                // Use indexed keys only if we have multiple rows
+                $placeholders[] = ($totalRows > 1) ? $key . "_" . $idx : $key;
             } else {
-                $val = $column->getValue();
-                $placeholders[] = is_array($val) ? $val[$idx] : $val;
+                $val = $column->getValueAtIndex($idx);
+                $placeholders[] = is_null($val) ? 'NULL' : $val;
             }
         }
-
         return $this->wrapBrackets($placeholders);
     }
 
     public function collectSQL(bool $do_prepared): string
     {
-        if ($this->fieldset->count() < 1) {
-            throw new Exception("Empty fieldset for INSERT");
+        $rowCount = $this->fieldset->getRowCount();
+        if ($rowCount < 1) {
+            throw new Exception("No data provided for INSERT");
         }
 
         $sql = $this->type . " " . $this->from . " ";
-        $sql .= $this->wrapBrackets($this->fieldset->names());
-        $sql .= " VALUES ";
+        $sql .= $this->wrapBrackets($this->fieldset->names()) . " VALUES ";
 
-        $values = $this->fieldset->values();
-        $multi_count = 0;
-        foreach ($values as $v) {
-            if (is_array($v)) { $multi_count = count($v); break; }
+        $rows = array();
+        for ($i = 0; $i < $rowCount; $i++) {
+            $rows[] = $this->rowToSQL($do_prepared, $i, $rowCount);
         }
 
-        if ($multi_count > 0) {
-            $rows = array();
-            for ($i = 0; $i < $multi_count; $i++) {
-                $rows[] = $this->rowToSQL($do_prepared, $i);
-            }
-            $sql .= implode(",", $rows);
-        } else {
-            $sql .= $this->rowToSQL($do_prepared);
-        }
-
-        return $sql;
-    }
-
-    public function getSQL(): string
-    {
-        return $this->collectSQL(false);
-    }
-
-    public function getPreparedSQL(): string
-    {
-        return $this->collectSQL(true);
+        return $sql . implode(", ", $rows);
     }
 
     public function getBindings(): array
     {
-        $values = $this->fieldset->values();
+        $rowCount = $this->fieldset->getRowCount();
+        $names = $this->fieldset->names();
+        $bindings = array();
 
-        // 1. Бърза проверка за multi-insert
-        $multi_count = 0;
-        foreach ($values as $v) {
-            if (is_array($v)) { $multi_count = count($v); break; }
-        }
+        for ($i = 0; $i < $rowCount; $i++) {
+            foreach ($names as $name) {
+                $column = $this->fieldset->getColumn($name);
+                $key = $column->getBindingKey();
 
-        // 2. Генериране на биндингите
-        if ($multi_count > 0) {
-            $bindings = array();
-            $names = $this->fieldset->names();
-            for ($i = 0; $i < $multi_count; $i++) {
-                foreach ($names as $name) {
-                    $column = $this->fieldset->getColumn($name);
-                    $fullKey = $column->getBindingKey() . "_" . $i;
-                    $bindings[$fullKey] = $values[$name][$i] ?? null;
+                if ($key) {
+                    $fullKey = ($rowCount > 1) ? $key . "_" . $i : $key;
+                    $bindings[$fullKey] = $column->getValueAtIndex($i);
                 }
             }
-            return $bindings;
         }
 
-        // Твоят вариант: Елегантна изолация за единичен ред
-        return parent::getBindings();
+        // Merge manual bind() calls (external bindings)
+        SQLStatement::replaceKeyAppend($bindings, $this->externalBindings);
+
+        return $bindings;
     }
+
+    public function getSQL(): string { return $this->collectSQL(false); }
+    public function getPreparedSQL(): string { return $this->collectSQL(true); }
 }

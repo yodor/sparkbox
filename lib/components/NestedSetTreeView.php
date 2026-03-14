@@ -166,7 +166,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             $this->iterator->select->setMode(SQLSelect::SQL_CACHE);
         }
 
-        $num = $this->iterator->exec();
+        $this->iterator->exec();
 
         echo "<ul class='NodeChilds'>";
 
@@ -187,8 +187,6 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             if ($rgt == $lft + 1) {
                 $branch_type = NestedSetTreeView::BRANCH_LEAF;
             }
-
-            trbean($nodeID, $this->item->getLabelKey(), $row, $this->iterator->name());
 
             while (count($path) > 0 && $lft > $path[count($path) - 1]) {
                 array_pop($path);

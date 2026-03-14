@@ -21,34 +21,23 @@ class SQLColumn implements ISQLGet, ISQLBinding
      */
     public function __construct(string $name = "", array|string $value = "")
     {
-        $this->name = $name;
-        $this->value = $value;
-        if ($name && $value) {
-            $this->bindingKey = SQLStatement::FormatBindingKey($name);
-        }
-    }
-
-    public function setName(string $name) : void
-    {
-        if (strlen(trim($name))<1) throw new Exception("SQLColumn name can not be empty");
-
         $this->name = trim($name);
-        $this->bindingKey = ":$name";
+        if (empty($this->name)) {
+            throw new Exception("SQLColumn name can not be empty");
+        }
+
+        $this->value = $value;
+
+        // Binding key is generated ONLY here during construction
+        if ($this->value !== "" || $this->value === 0 || $this->value === "0") {
+            $this->bindingKey = SQLStatement::FormatBindingKey($this->name);
+        }
+
     }
 
     public function getName() : string
     {
         return $this->name;
-    }
-
-    /**
-     * Set column value to $value
-     * @param array|string $value
-     * @return void
-     */
-    public function setValue(array|string $value) : void
-    {
-        $this->value = $value;
     }
 
     /**
@@ -80,6 +69,19 @@ class SQLColumn implements ISQLGet, ISQLBinding
         return $this->value;
     }
 
+    /**
+     * Returns the value for a specific row index.
+     * Handles both scalar values and arrays.
+     */
+    public function getValueAtIndex(int $idx): mixed
+    {
+        if (is_array($this->value)) {
+            return $this->value[$idx] ?? null;
+        }
+        // For single values, we return the value only for the first row (index 0)
+        return ($idx === 0) ? $this->value : null;
+    }
+
     public function setAlias(string $alias) : void
     {
         $this->alias = trim($alias);
@@ -100,62 +102,111 @@ class SQLColumn implements ISQLGet, ISQLBinding
         return $this->prefix;
     }
 
-    public function setExpression(string $expression, string $alias_name) : void
+    /**
+     * Configures the column to use a raw SQL expression instead of a simple value.
+     * * This method:
+     * 1. Disables automatic PDO parameter binding by clearing the bindingKey.
+     * 2. Clears any previously set literal value.
+     * 3. Sets the raw SQL expression (e.g., "NOW()", "rgt + 2").
+     * 4. Ensures the column has a valid name or alias for SQL generation.
+     *
+     * @param string $expression The raw SQL fragment (e.g., "COUNT(*)", "price + 10").
+     * @param string $alias_name Optional alias or column name.
+     * @return void
+     * @throws Exception If expression is empty or if no identity (name/alias) exists.
+     */
+    public function setExpression(string $expression, string $alias_name = "") : void
     {
-        $alias_name = trim($alias_name);
-        if (empty($alias_name)) throw new Exception("SQLColumn alias can not be empty");
-
         $expression = trim($expression);
-        if (empty($expression)) throw new Exception("SQLColumn expression can not be empty");
+        $alias_name = trim($alias_name);
+
+        if ($expression === "") {
+            throw new Exception("SQL expression must be non-empty strings.");
+        }
 
         $this->expression = $expression;
-        $this->name = $alias_name;
-        $this->alias = $alias_name;
+        $this->bindingKey = "";
+        $this->value = "";
+
+        if ($alias_name) {
+            $this->alias = $alias_name;
+        }
     }
 
-    protected function constructSQL(bool $do_prepared) : string
+    public function getExpression() : string
     {
+        return $this->expression;
+    }
+
+    /**
+     * Generates the SQL fragment for this column.
+     * * Priority Logic:
+     * 1. If an expression exists:
+     * - Returns "expression AS alias" if an alias is set (SELECT context).
+     * - Returns "prefix.name = expression" if no alias is set (UPDATE/INSERT context).
+     * 2. If no expression exists:
+     * - Returns "prefix.name AS alias" if an alias is set.
+     * - Returns "prefix.name = :bindingKey" for prepared statements (if bindingKey exists).
+     * - Returns "prefix.name = value" as a fallback for literal values.
+     *
+     * @param bool $do_prepared Whether to use PDO parameter binding placeholders.
+     * @return string The generated SQL fragment.
+     * @throws Exception
+     */
+    public function collectSQL(bool $do_prepared) : string
+    {
+        // 1. Prepare the base identifier (prefix.name)
+        $currentName = ($this->prefix ? $this->prefix . "." : "") . $this->name;
+
+        // 2. PRIORITY: Raw SQL Expression
         if ($this->expression) {
-            return $this->expression." AS ".$this->alias;
+            if ($this->alias) {
+                return $this->expression . " AS " . $this->alias;
+            }
+            return $currentName . " = " . $this->expression;
         }
 
-        $result = "";
-        if ($this->prefix) {
-            $result.= $this->prefix.".";
+        // 3. CONFLICT CHECK: Validate state consistency
+        // A column cannot have an alias (SELECT) and a value/binding (UPDATE) simultaneously.
+        if ($this->alias && ($this->bindingKey || !empty($this->value))) {
+            throw new Exception("SQLColumn Conflict: Column [{$this->name}] cannot have both an alias and an assigned value.");
         }
-        $result .= $this->name;
+
+        // 4. ALIAS HANDLING (Select Context)
         if ($this->alias) {
-            $result .= " AS ".$this->alias;
+            return $currentName . " AS " . $this->alias;
+        }
+
+        // 5. MODE BRANCHING: Prepared Statement vs Literal/Direct SQL (Update Context)
+        if ($do_prepared) {
+            /** --- MODE: PDO Prepared Statement --- **/
+            if ($this->bindingKey) {
+                return $currentName . " = " . $this->bindingKey;
+            }
         }
         else {
-            if ($do_prepared) {
-                if (is_array($this->value) || strlen(trim($this->value)) > 0) {
-                    $result .= " = " . $this->bindingKey;
-                }
+            /** --- MODE: Literal SQL (Legacy/Debug/Direct) --- **/
+            if (is_array($this->value)) {
+                return $currentName . " = " . implode(";", $this->value);
             }
-            else {
-                if (is_array($this->value)) {
-                    $result .= " = " . implode(";", $this->value);
-                } else if (strlen(trim($this->value)) > 0) {
-                    $result .= " = " . $this->value;
-                }
+
+            if (strlen(trim((string)$this->value)) > 0) {
+                return $currentName . " = " . $this->value;
             }
         }
-        return $result;
+
+        // 6. FINAL FALLBACK: Standard field identifier
+        return $currentName;
     }
-    /**
-     * Return the sql string for this column
-     *
-     * @return string
-     */
+
     public function getSQL() : string
     {
-        return $this->constructSQL(false);
+        return $this->collectSQL(false);
     }
 
     public function getPreparedSQL(): string
     {
-        return $this->constructSQL(true);
+        return $this->collectSQL(true);
     }
 
     public function getBindingKey() : string
@@ -178,13 +229,6 @@ class SQLColumn implements ISQLGet, ISQLBinding
 
     }
 
-    public function collectSQL(bool $do_prepared): string
-    {
-        if ($do_prepared) {
-            return $this->getPreparedSQL();
-        }
-        else {
-            return $this->getSQL();
-        }
-    }
+
+
 }

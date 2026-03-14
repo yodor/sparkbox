@@ -32,6 +32,8 @@ abstract class DBDriver
         $this->disconnect();
     }
 
+    abstract public function hasActiveStatement() : bool;
+
     abstract public function connect() : void;
     abstract public function disconnect() : void;
 
@@ -41,7 +43,7 @@ abstract class DBDriver
 
     abstract public function getError(): string;
 
-    abstract public function query(string $str) : true|DBResult;
+    abstract public function query(SQLStatement|string $statement) : true|DBResult;
 
     abstract public function dateTime(int $add_days = 0, string $interval_type = " DAY ") : string;
 

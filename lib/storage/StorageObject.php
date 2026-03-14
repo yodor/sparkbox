@@ -54,7 +54,7 @@ class StorageObject implements ISparkSerializable
     public function serializeDB() : string
     {
 
-        return DBConnections::Driver()->escape(serialize($this));
+        return serialize($this);
 
     }
 
@@ -84,7 +84,7 @@ class StorageObject implements ISparkSerializable
 
         if ($doEscape) {
 
-            $row[$this->dataKey] = DBConnections::Driver()->escape($this->buffer->data());
+            $row[$this->dataKey] = $this->buffer->data();
 
         }
         $row["mime"] = $this->buffer->mime();

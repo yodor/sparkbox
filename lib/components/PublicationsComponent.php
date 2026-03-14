@@ -204,12 +204,12 @@ class PublicationsComponent extends Container implements IRequestProcessor
         if (isset($_GET[$this->bean->key()])) {
             $itemID = (int)$_GET[$this->bean->key()];
             $qry->select->where()->add($this->bean->key(), $itemID);
-            $num = $qry->exec();
+            $qry->exec();
         }
         else if (isset($_GET["year"]) && isset($_GET["month"])) {
             $qry->select->where()->add("MONTH({$this->bean->getDateColumn()})", (int)$_GET["month"]);
             $qry->select->where()->add("YEAR({$this->bean->getDateColumn()})", (int)$_GET["year"]);
-            $num = $qry->exec();
+            $qry->exec();
         }
 
         if ($num < 1) {

@@ -47,7 +47,7 @@ class TranslateBeanResponder extends JSONResponder
         $this->beanID = (int)$_GET["beanID"];
 
         if (!isset($_GET["field_name"])) throw new Exception("field_name not passed");
-        $this->field_name = DBConnections::Driver()->escape($_GET["field_name"]);
+        $this->field_name = $_GET["field_name"];
 
         if (!isset($_GET["bean_class"])) throw new Exception("bean_class not passed");
         $this->bean_class = $_GET["bean_class"];
@@ -61,8 +61,8 @@ class TranslateBeanResponder extends JSONResponder
 
 
         $itr = $this->translations->queryFull();
-        $itr->select->where()->add("table_name", "'$this->table_name'");
-        $itr->select->where()->add("field_name", "'$this->field_name'");
+        $itr->select->where()->add("table_name", $this->table_name);
+        $itr->select->where()->add("field_name", $this->field_name);
         $itr->select->where()->add("bean_id", $this->beanID);
         $itr->select->where()->add("langID", $this->langID);
         $itr->select->limit = " 1 ";
@@ -73,12 +73,13 @@ class TranslateBeanResponder extends JSONResponder
     protected function _store(JSONResponse $ret) : void
     {
 
-        $translation = DBConnections::Driver()->escape(trim($_REQUEST["translation"]));
+        $translation = trim($_REQUEST["translation"]);
         if (strlen($translation) < 1) throw new Exception(tr("Input a text to be used as translation"));
 
         $btID = -1;
 
-        if ($this->query->exec() && $trow = $this->query->next()) {
+        $this->query->exec();
+        if ($trow = $this->query->next()) {
             $btID = $trow[$this->query->key()];
         }
 
@@ -109,7 +110,9 @@ class TranslateBeanResponder extends JSONResponder
 
         $response->translation = "";
 
-        if ($this->query->exec() && $trow = $this->query->next()) {
+        $this->query->exec();
+
+        if ($trow = $this->query->next()) {
             $response->translation = $trow["translated"];
         }
         else {
@@ -129,7 +132,7 @@ class TranslateBeanResponder extends JSONResponder
 
         try {
             $db->transaction();
-            $db->query($delete->getSQL());
+            $db->query($delete);
 
             if ($db->affectedRows()>0) {
                 $ret->message = tr("Bean translation removed");

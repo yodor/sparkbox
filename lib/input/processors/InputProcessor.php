@@ -311,7 +311,9 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             $iterator->select->fields()->set(...$this->renderer_source_copy_fields);
             $iterator->select->where()->add($name, $value);
             $iterator->select->limit = 1;
-            if ($iterator->exec() && $data = $iterator->next()) {
+            $iterator->exec();
+
+            if ($data = $iterator->next()) {
                 foreach ($this->renderer_source_copy_fields as $idx => $key) {
                     $transactor->appendValue($key, $data[$key]);
                 }
@@ -376,7 +378,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
         $qry = $this->transact_bean->query($this->transact_bean->key(), $name);
         $qry->select->where()->add($column, $value);
-        $num = $qry->exec();
+        $qry->exec();
         Debug::ErrorLog("Using SQL: ".$qry->select->getSQL());
 
         while ($tbResult = $qry->nextResult()) {

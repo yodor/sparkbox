@@ -94,6 +94,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
     }
 
     /**
+     * TODO: check binding
      * Add value '$val' using key name '$key' only during insert operation
      * @param string $key
      * @param $val
@@ -202,7 +203,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
     public function processBean() : void
     {
 
-        $db = DBConnections::Driver();
+        $db = DBConnections::CreateDriver();
 
         try {
             $db->transaction();

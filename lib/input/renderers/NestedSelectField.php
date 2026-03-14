@@ -16,7 +16,7 @@ class NestedSelectField extends SelectField
 
         $this->renderDefaultItem();
 
-        $num = $this->iterator->exec();
+        $this->iterator->exec();
 
         $path = array();
 
@@ -30,8 +30,6 @@ class NestedSelectField extends SelectField
 
             $lft = $row["lft"];
             $rgt = $row["rgt"];
-
-            trbean($nodeID, $this->getItemRenderer()->getLabelKey(), $row, $this->iterator->name());
 
             while (count($path) > 0 && $lft > $path[count($path) - 1]) {
                 array_pop($path);

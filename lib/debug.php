@@ -28,7 +28,7 @@ final class Debug {
         error_log(Spark::RequestScript()." ".Debug::Backtrace()." ".$message);
     }
 
-    static private function Backtrace() : string
+    static public function Backtrace(int $chainDepth=-2) : string
     {
 
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 0);
@@ -46,22 +46,25 @@ final class Debug {
 
         $chainParts = array_reverse($chainParts);
 
-        //remove inner
+        $traceDepth = Debug::$traceDepth;
+        if ($chainDepth!=-2) {
+            $traceDepth = $chainDepth;
+        }
 
         $callChain = [];
         //full chain
-        if (Debug::$traceDepth === -1) {
+        if ($traceDepth === -1) {
             $callChain = $chainParts;
         }
-        else if (Debug::$traceDepth === 0) {
+        else if ($traceDepth === 0) {
             //no chain
         }
         else {
             $partsCount = count($chainParts);
-            if ($partsCount >= 2 + Debug::$traceDepth) {
+            if ($partsCount >= 2 + $traceDepth) {
                 $callChain[] = $chainParts[1]; //first after request name script
 
-                for ($a = $partsCount - Debug::$traceDepth; $a < $partsCount ; $a++) {
+                for ($a = $partsCount - $traceDepth; $a < $partsCount ; $a++) {
                     $callChain[] = $chainParts[$a];
                 }
             }

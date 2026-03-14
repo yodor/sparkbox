@@ -52,7 +52,7 @@ class KeywordSearchForm extends InputForm
 
         $clause = new SQLClause();
 
-        $allWords = explode(" ", DBConnections::Driver()->escape($val));
+        $allWords = explode(" ", $val);
 
         $resultAll = array();
 

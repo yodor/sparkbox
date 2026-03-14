@@ -224,9 +224,10 @@ class Translator implements IRequestProcessor, IGETConsumer
     protected function changeLanguage(string $language, int $langID) : void
     {
         $qry = $this->languages->queryFull();
-        $qry->select->where()->add("langID", $langID, "=", "OR");
-        $qry->select->where()->add("language", "'$language'", "=", "OR");
-        if ($qry->exec() && $data = $qry->next()) {
+        $qry->select->where()->add("langID", $langID);
+        $qry->select->where()->add("language", $language);
+        $qry->exec();
+        if ($data = $qry->next()) {
             $this->language = $data;
             $this->langID = $data[$this->languages->key()];
             $this->storeLanguage();
@@ -243,7 +244,8 @@ class Translator implements IRequestProcessor, IGETConsumer
         if (defined("DEFAULT_LANGUAGE")) {
             //query default language from define
             $qry = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1, "lang_code");
-            if ($qry->exec() && $data = $qry->next()) {
+            $qry->exec();
+            if ($data = $qry->next()) {
                 $this->language = $data;
                 $this->langID = $data[$this->languages->key()];
             }
@@ -256,8 +258,8 @@ class Translator implements IRequestProcessor, IGETConsumer
             $qry = $this->languages->queryFull();
             $qry->select->limit = 1;
             $qry->select->order_by = $this->languages->key();
-
-            if ($qry->exec() && $data = $qry->next()) {
+            $qry->exec();
+            if ($data = $qry->next()) {
                 $this->language = $data;
                 $this->langID = $data[$this->languages->key()];
             }
@@ -273,18 +275,23 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     public function translateBean(int $id, string $field_name, array &$data, string $tableName) : void
     {
+
+
         try {
+            if ($id<1 || empty($field_name) || empty($tableName)) throw new Exception("ID, field_name and table name required parameters");
+
             $qry = $this->translated_beans->query();
             $qry->select->fields()->set("translated");
             $where = $qry->select->where();
             $where->add("langID", $this->langID);
-            $where->add("field_name", "'$field_name'");
-            $where->add("table_name", "'$tableName'");
-            $where->Add("bean_id", $id);
+            $where->add("field_name", $field_name);
+            $where->add("table_name", $tableName);
+            $where->add("bean_id", $id);
 
             $qry->select->limit = " 1 ";
+            $qry->exec();
 
-            if ($qry->exec() && $result = $qry->next()) {
+            if ($result = $qry->next()) {
                 $data[$field_name] = $result["translated"];
             }
         }
@@ -296,38 +303,50 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     public function translatePhrase(string $phrase): string
     {
-        $result = $phrase;
 
-        if (strlen(trim($phrase)) == 0) return $result;
+        if (strlen(trim($phrase)) == 0) return $phrase;
 
-        try {
+//        try {
             $phrase_hash = Spark::Hash($phrase);
 
             $qry = $this->translated_phrases->queryLanguageID($this->langID);
-            $qry->select->where()->add("hash_value", "'$phrase_hash'");
+            $qry->select->where()->add("hash_value", $phrase_hash);
             $qry->select->limit = 1;
 
-            if ($qry->exec() && $data = $qry->next()) {
-                if ($data["trID"]>0) {
-                    $result = $data["translation"];
-                }
-            }
-            else {
-                //Capture new phrase. Insert into SiteTextsBean - disable temporary
-                $phrase_data = array("value"=>$qry->getDB()->escape($phrase), "hash_value"=>$phrase_hash);
-                try {
-                    $this->phrases->insert($phrase_data);
-                }
-                catch (Exception $ex) {
-                    throw new Exception("Unable to capture new phrase: ". $ex->getMessage());
-                }
-            }
-        }
-        catch (Exception $e) {
-            Debug::ErrorLog("Error: ".$e->getMessage());
-        }
+            $qry->exec();
 
-        return $result;
+
+            if ($data = $qry->nextResult()) {
+                //phrase is already captured - check if translation exists for the current langID
+                $textID = (int)$data->get("textID");
+
+                if ((int)$data->get("trID")>0) {
+                    //return translated version
+                    return $data->get("translation");
+                }
+                else {
+                    //translation not done yet
+                    return $phrase;
+                }
+
+            }
+
+            //Capture new phrase. Insert into SiteTextsBean
+            try {
+                $phrase_data = array("value"=>$phrase, "hash_value"=>$phrase_hash);
+                $trID = $this->phrases->insert($phrase_data);
+                Debug::ErrorLog("Captured new phrase with trID: $trID");
+            }
+            catch (Exception $ex) {
+                throw new Exception("Failed capturing new phrase [$phrase_hash]: ". $ex->getMessage());
+            }
+
+//        }
+//        catch (Exception $e) {
+//            Debug::ErrorLog("Error: ".$e->getMessage());
+//        }
+
+        return $phrase;
     }
 
     /**

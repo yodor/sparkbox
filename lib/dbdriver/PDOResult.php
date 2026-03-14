@@ -3,14 +3,20 @@ include_once("dbdriver/DBResult.php");
 
 class PDOResult extends DBResult
 {
+
+    public string $createdBy = '';
+
     /**
      * @var PDOStatement|null
      */
-    protected ?PDOStatement $result;
+    protected ?PDOStatement $result = null;
 
     public function __construct(PDOStatement $result)
     {
+
         $this->result = $result;
+        $this->createdBy = Debug::Backtrace(-1);
+
     }
 
     public function __destruct()
@@ -33,10 +39,10 @@ class PDOResult extends DBResult
      * Internal check to ensure the resource is still valid
      * @throws Exception
      */
-    protected function assert_resource() : void
+    protected function assert_resource(): void
     {
         if (!($this->result instanceof PDOStatement)) {
-            throw new Exception("Not a valid PDO_resource or result already freed.");
+            throw new Exception("Invalid PDOStatement resource.");
         }
     }
 
@@ -47,15 +53,31 @@ class PDOResult extends DBResult
      */
     public function fetch(): ?array
     {
-        $this->assert_resource();
+        if (!$this->result) {
+            return null;
+        }
 
         try {
             $record = $this->result->fetch(PDO::FETCH_ASSOC);
-            // Returns null when no more records are found
-            return ($record !== false) ? $record : null;
+
+            // Ако резултатът е изчерпан (null/false), затваряме автоматично
+            if ($record === false) {
+
+                $error = $this->result->errorInfo();
+                if (!empty($error[2])) {
+                    Debug::ErrorLog("PDO Fetch Warning: " . $error[2]);
+                }
+
+                $this->free();
+                return null;
+            }
+
+            return $record;
         } catch (PDOException $e) {
-            throw new Exception("Error fetching the PDO result: " . $e->getMessage());
+            $this->free(); // Затваряме и при грешка, за да не "забие" драйвера
+            throw new Exception("PDO Fetch Error: " . $e->getMessage());
         }
+
     }
 
     /**
@@ -71,12 +93,10 @@ class PDOResult extends DBResult
         return null;
     }
 
-    /**
-     * Returns the number of rows in the result set
-     */
     public function numRows(): int
     {
-        return ($this->result) ? $this->result->rowCount() : 0;
+        // For PDO, rowCount() returns the number of affected rows (INSERT/UPDATE/DELETE)
+        return ($this->result instanceof PDOStatement) ? $this->result->rowCount() : 0;
     }
 
     /**
@@ -100,5 +120,10 @@ class PDOResult extends DBResult
         }
 
         return $fields;
+    }
+
+    public function isActive() : bool
+    {
+        return !is_null($this->result);
     }
 }

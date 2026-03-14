@@ -20,28 +20,38 @@ class PDODriver extends DBDriver
 
 
         // Construct DSN (Data Source Name)  //charset=utf8mb4
-        $dsn = "mysql:host=$host;dbname=$db;port=$port;charset=utf8";
+        $dsn = "mysql:host=$host;dbname=$db;port=$port;charset=utf8mb4";
 
-        $options = [
+        $options = array(
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-//            PDO::MYSQL_ATTR_INIT_COMMAND => "SET AUTOCOMMIT = 0",
-        ];
+            // allow reusing of named parameters
+            PDO::ATTR_EMULATE_PREPARES   => true,
+
+            // turn off multi-statement
+            PDO\MYSQL::ATTR_MULTI_STATEMENTS => false,
+
+            // unbuffered mode
+            PDO\MYSQL::ATTR_USE_BUFFERED_QUERY => false,
+
+            PDO\MYSQL::ATTR_INIT_COMMAND        => "SET AUTOCOMMIT=0",
+        );
+
 
         try {
+
             $this->conn = new PDO($dsn, $user, $pass, $options);
 
             //$this->conn->set_charset("utf8");
             //$this->conn->autocommit(FALSE);
 
-            $this->conn->exec("SET AUTOCOMMIT = 0");
-            $this->conn->exec("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ");
-            $this->conn->exec("SET collation_connection = 'utf8_general_ci' ");
-
-            $this->conn->exec("SET character_set_results = 'utf8'");
-            $this->conn->exec("SET character_set_connection = 'utf8'");
-            $this->conn->exec("SET character_set_client = 'utf8'");
+//            $this->conn->exec("SET AUTOCOMMIT = 0");
+//            $this->conn->exec("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ");
+//            $this->conn->exec("SET collation_connection = 'utf8_general_ci' ");
+//
+//            $this->conn->exec("SET character_set_results = 'utf8'");
+//            $this->conn->exec("SET character_set_connection = 'utf8'");
+//            $this->conn->exec("SET character_set_client = 'utf8'");
 
             Debug::ErrorLog("Opening PDO connection to database server");
             SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::OPENED));
@@ -53,9 +63,13 @@ class PDODriver extends DBDriver
 
     public function disconnect(): void
     {
+        if ($this->current) {
+            $this->current->free();
+            $this->current=null;
+        }
         if (is_null($this->conn)) return;
-
-        $this->conn = null; // В PDO затварянето става чрез унищожаване на обекта
+        $this->conn = null; // Closing is in the destructor in PDO
+        Debug::ErrorLog("Closing PDO connection");
         SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED));
     }
 
@@ -67,26 +81,117 @@ class PDODriver extends DBDriver
     // Inside PDODriver class
     protected int $lastAffectedRows = 0;
 
-    public function query(string $str): true|DBResult
+    /**
+     * Main query entry point.
+     * @param SQLStatement|string $statement
+     * @return PDOResult
+     * @throws Exception
+     */
+    public function query(SQLStatement|string $statement): PDOResult
     {
-        try {
-            $stmt = $this->conn->query($str);
-            if ($stmt === false) throw new Exception("Query failed");
+        $this->lastAffectedRows = 0;
 
-            // Store affected rows for non-SELECT queries
+        if ($statement instanceof SQLStatement) {
+            return $this->queryPrepared($statement);
+        }
+        return $this->queryRaw($statement);
+    }
+
+    protected ?PDOResult $current = null;
+    /**
+     *
+     * @param PDOStatement $stmt
+     * @return PDOResult
+     */
+    protected function statementResult(PDOStatement $stmt): PDOResult
+    {
+        if (!is_null($this->current)) {
+            throw new Exception("Active statement found created by: ".$this->current->createdBy);
+        }
+
+        // If the query returns data (SELECT, DESCRIBE, etc.)
+        if ($stmt->columnCount() > 0) {
+            // Critical: Store affected rows immediately after execution
             $this->lastAffectedRows = $stmt->rowCount();
+        }
 
-            if ($stmt->columnCount() > 0) {
-                return new PDOResult($stmt);
+        $this->current = new PDOResult($stmt);
+        return $this->current;
+    }
+
+    /**
+     * Current connection is active. Open new one ?
+     * @return bool
+     */
+    public function hasActiveStatement() : bool
+    {
+        return !is_null($this->current) && $this->current->isActive();
+    }
+
+    protected function assert_current() : void
+    {
+        if (!is_null($this->current)) {
+            if ($this->current->isActive()) {
+                throw new Exception("StackTrace: ".Debug::Backtrace(-1)." | Active statement from: ".$this->current->createdBy);
             }
-            return true;
-        } catch (PDOException $e) {
-            $this->lastAffectedRows = 0;
-            Debug::ErrorLog("PDO Query exception: " . $e->getMessage() . " | SQL: $str");
-            throw new Exception("Query exception: " . $e->getMessage());
+            else {
+                //free current instance
+                $this->current = null;
+            }
         }
     }
 
+    protected function queryRaw(string $sql): PDOResult
+    {
+        try {
+            $this->assert_current();
+
+            $stmt = $this->conn->query($sql);
+            if ($stmt === false) throw new Exception("query failed");
+
+            return $this->statementResult($stmt);
+        }
+        catch (Exception $e) {
+            Debug::ErrorLog("Error: " . $e->getMessage() . " | SQL: " . ($sql ?? ""));
+            throw new Exception("Error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Executes a prepared statement using SQLStatement object
+     * @param SQLStatement $statement
+     * @return PDOResult
+     * @throws Exception
+     */
+    protected function queryPrepared(SQLStatement $statement): PDOResult
+    {
+
+        try {
+            $this->assert_current();
+
+            $sql = $statement->getPreparedSQL();
+            Debug::ErrorLog("Prepared SQL: " . $sql);
+            $bindings = $statement->getBindings();
+            Debug::ErrorLog("Bindings: " , $bindings);
+
+            $stmt = $this->conn->prepare($sql);
+            if ($stmt === false) throw new Exception("prepare failed");
+            if (!$stmt->execute($bindings)) throw new Exception("execute failed");
+
+            return $this->statementResult($stmt);
+        }
+        catch (Exception $e) {
+            $message = "";
+            if (isset($sql)) $message .= "SQL: ".$sql;
+            if (isset($bindings)) $message .= " | Bindings: " . print_r($bindings, true);
+            Debug::ErrorLog("Error: " . $e->getMessage() . " | " .$message);
+            throw new Exception("Error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Returns the number of rows affected by the last query
+     */
     public function affectedRows(): int
     {
         return $this->lastAffectedRows;
@@ -99,17 +204,28 @@ class PDODriver extends DBDriver
 
     public function transaction(?string $name = null): bool
     {
+        $this->connect();
+        //If we are already in transaction do nothing. PDO does not support multiple transactions
+        if ($this->conn->inTransaction()) {
+            return true;
+        }
         return $this->conn->beginTransaction();
     }
 
     public function commit(?string $name = null): bool
     {
-        return $this->conn->commit();
+        if ($this->isConnected() && $this->conn->inTransaction()) {
+            return $this->conn->commit();
+        }
+        return false;
     }
 
     public function rollback(?string $name = null): bool
     {
-        return $this->conn->rollback();
+        if ($this->isConnected() && $this->conn->inTransaction()) {
+            return $this->conn->rollBack();
+        }
+        return false;
     }
 
     public function escape(string $data): string
@@ -118,7 +234,7 @@ class PDODriver extends DBDriver
     }
 
     // Помощни методи, които изисква DBDriver
-    public function queryFields(string $table): true|DBResult
+    public function queryFields(string $table): DBResult
     {
         return $this->query("DESCRIBE $table");
     }
@@ -126,7 +242,9 @@ class PDODriver extends DBDriver
     public function tableExists(string $table): bool
     {
         try {
-            $res = $this->query("SELECT 1 FROM `$table` LIMIT 1");
+            $result = $this->query("SELECT 1 FROM `$table` LIMIT 1");
+            $result->free();
+
             return true;
         } catch (Exception $e) {
             return false;
@@ -137,10 +255,17 @@ class PDODriver extends DBDriver
     {
         // copy MySQLiDriver logic
         $result = $this->queryFields($table);
+        $ret = "";
         while ($row = $result->fetch()) {
-            if ($row["Field"] === $field_name) return $row["Type"];
+            if ($row["Field"] === $field_name) {
+                $ret = $row["Type"];
+                break;
+            }
         }
+        $result->free();
+        if ($ret) return $ret;
         throw new Exception("Field [$field_name] does not exist in table: $table");
+
     }
 
     public function dateTime(int $add_days = 0, string $interval_type = " DAY "): string

@@ -47,7 +47,7 @@ class ConfigBean extends DBTableBean
         $ret = $default_value;
 
         $query = $this->queryField("config_key", $key, 1, "config_val");
-        $query->select->where()->add("section", "'$this->section'");
+        $query->select->where()->add("section", $this->section);
 
         $query->exec();
 
@@ -58,6 +58,8 @@ class ConfigBean extends DBTableBean
                 $ret = $object;
             }
         }
+
+        $query = null;
 
         return $ret;
     }
@@ -78,21 +80,20 @@ class ConfigBean extends DBTableBean
     public function set(string $key, string|null $val) : void
     {
 
-        $db = DBConnections::Driver();
         try {
 
-            $db->transaction();
+            $this->db->transaction();
 
-            $this->deleteRef("config_key", $key, $db);
+            $this->deleteRef("config_key", $key, $this->db);
 
             $data = array("config_key" => $key, "config_val" => $val, "section" => $this->section);
-            $this->insert($data, $db);
+            $this->insert($data, $this->db);
 
-            $db->commit();
+            $this->db->commit();
         }
         catch (Exception $e) {
             Debug::ErrorLog("Exception setting value for key='$key': ".$e->getMessage());
-            $db->rollback();
+            $this->db->rollback();
             throw $e;
         }
 

@@ -59,7 +59,7 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding
         $this->value = $value;
         $this->operator = $operator;
 
-        if ($this->value) {
+        if (strlen($this->value)>0) {
             $this->bindingKey = SQLStatement::FormatBindingKey($this->expr);
         }
 
