@@ -67,7 +67,7 @@ class BeanTranslationDialog extends JSONDialog implements IPageComponent
 
         $lb->select()->where()->add("langID", 1 ,">");
         $qry = $lb->query();
-        $qry->select->fields()->set("langID", "language");
+        $qry->stmt->fields()->set("langID", "language");
         $ls->getRenderer()->setIterator($qry);
         $ls->getRenderer()->getItemRenderer()->setValueKey("langID");
         $ls->getRenderer()->getItemRenderer()->setLabelKey("language");

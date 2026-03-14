@@ -3,6 +3,12 @@ include_once("sql/SQLStatement.php");
 
 class SQLInsert extends SQLStatement
 {
+    /**
+     * ON Clause Value
+     * @var string
+     */
+    public string $on = "";
+
     public function __construct(?SQLStatement $other = null)
     {
         parent::__construct($other);
@@ -17,10 +23,11 @@ class SQLInsert extends SQLStatement
     /**
      * Generates values fragment for a specific row.
      */
-    protected function rowToSQL(bool $do_prepared, int $idx, int $totalRows): string
+    protected function rowToSQL(int $idx, int $totalRows): string
     {
         $placeholders = array();
         foreach ($this->fieldset->names() as $name) {
+
             $column = $this->fieldset->getColumn($name);
 
             if ($column->getExpression()) {
@@ -28,19 +35,15 @@ class SQLInsert extends SQLStatement
                 continue;
             }
 
-            if ($do_prepared) {
-                $key = $column->getBindingKey();
-                // Use indexed keys only if we have multiple rows
-                $placeholders[] = ($totalRows > 1) ? $key . "_" . $idx : $key;
-            } else {
-                $val = $column->getValueAtIndex($idx);
-                $placeholders[] = is_null($val) ? 'NULL' : $val;
-            }
+            $key = $column->getBindingKey();
+            // Use indexed keys only if we have multiple rows
+            $placeholders[] = ($totalRows > 1) ? $key . "_" . $idx : $key;
+
         }
         return $this->wrapBrackets($placeholders);
     }
 
-    public function collectSQL(bool $do_prepared): string
+    public function getSQL(): string
     {
         $rowCount = $this->fieldset->getRowCount();
         if ($rowCount < 1) {
@@ -52,10 +55,14 @@ class SQLInsert extends SQLStatement
 
         $rows = array();
         for ($i = 0; $i < $rowCount; $i++) {
-            $rows[] = $this->rowToSQL($do_prepared, $i, $rowCount);
+            $rows[] = $this->rowToSQL($i, $rowCount);
         }
 
-        return $sql . implode(", ", $rows);
+        $sql = $sql . implode(", ", $rows);
+        if (strlen(trim($this->on)) > 0) {
+            $sql .= " ON ".$this->on;
+        }
+        return $sql;
     }
 
     public function getBindings(): array
@@ -82,6 +89,4 @@ class SQLInsert extends SQLStatement
         return $bindings;
     }
 
-    public function getSQL(): string { return $this->collectSQL(false); }
-    public function getPreparedSQL(): string { return $this->collectSQL(true); }
 }

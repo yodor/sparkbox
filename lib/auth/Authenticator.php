@@ -200,8 +200,8 @@ abstract class Authenticator
 
         // 2. Lookup user
         $qry = $this->bean->queryFull();
-        $qry->select->where()->add("email", $username);
-        $qry->select->limit = 1;
+        $qry->stmt->where()->add("email", $username);
+        $qry->stmt->limit = 1;
         $qry->exec();
 
         if (!($row = $qry->next())) {
@@ -241,7 +241,7 @@ abstract class Authenticator
         // 5. Success path
         $this->fillSessionData($row, $userID);
         $this->createAuthToken($userID);
-        $this->updateLastSeen($userID, $db);
+        $this->updateLastSeen($userID);
     }
 
     protected function upgradePassword(int $userID, PasswordHash $hash, string $storedHash, bool $skip_needRehash) : void
@@ -267,14 +267,13 @@ abstract class Authenticator
 
     protected function updateLastSeen(int $userID) : void
     {
-
         $update = new SQLUpdate($this->bean->select());
         $update->setExpression("counter", "counter + 1");
         $update->setExpression("last_active" , "CURRENT_TIMESTAMP");
         $update->where()->add($this->bean->key(), $userID);
 
-        $this->bean->getDB()->query($update);
-
+        $query = new SQLQuery();
+        $query->exec($update);
     }
 
     /**

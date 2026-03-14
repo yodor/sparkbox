@@ -61,11 +61,11 @@ class TranslateBeanResponder extends JSONResponder
 
 
         $itr = $this->translations->queryFull();
-        $itr->select->where()->add("table_name", $this->table_name);
-        $itr->select->where()->add("field_name", $this->field_name);
-        $itr->select->where()->add("bean_id", $this->beanID);
-        $itr->select->where()->add("langID", $this->langID);
-        $itr->select->limit = " 1 ";
+        $itr->stmt->where()->add("table_name", $this->table_name);
+        $itr->stmt->where()->add("field_name", $this->field_name);
+        $itr->stmt->where()->add("bean_id", $this->beanID);
+        $itr->stmt->where()->add("langID", $this->langID);
+        $itr->stmt->limit = " 1 ";
 
         $this->query = $itr;
     }
@@ -106,7 +106,7 @@ class TranslateBeanResponder extends JSONResponder
     protected function _fetch(JSONResponse $response) : void
     {
 
-        $this->query->select->fields()->set("translated");
+        $this->query->stmt->fields()->set("translated");
 
         $response->translation = "";
 
@@ -124,26 +124,22 @@ class TranslateBeanResponder extends JSONResponder
     protected function _clear(JSONResponse $ret) : void
     {
 
-        $delete = new SQLDelete($this->query->select);
-
         $ret->translation = "";
 
-        $db = DBConnections::Driver();
-
         try {
-            $db->transaction();
-            $db->query($delete);
+            $delete = new SQLDelete($this->query->stmt);
+            $query = new SQLQuery();
+            $query->exec($delete);
 
-            if ($db->affectedRows()>0) {
+            if ($query->affectedRows()>0) {
                 $ret->message = tr("Bean translation removed");
             }
             else {
                 $ret->message = tr("No bean translation found for clearing");
             }
-            $db->commit();
         }
         catch (Exception $e) {
-            $db->rollback();
+
             $ret->message = $e->getMessage();
         }
 

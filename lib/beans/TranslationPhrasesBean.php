@@ -30,8 +30,8 @@ CREATE TABLE `translation_phrases` (
         $sel = new SQLSelect();
 
         $sel->fields()->set("st.hash_value AS hash", "st.textID", "st.value AS phrase", "tp.translated AS translation");
-        $sel->fields()->setExpression(" COALESCE(tp.trID, -1) ", "trID");
-        $sel->fields()->setExpression(" COALESCE(tp.langID, :langID) ", "langID");
+        $sel->fields()->setAliasExpression(" COALESCE(tp.trID, -1) ", "trID");
+        $sel->fields()->setAliasExpression(" COALESCE(tp.langID, :langID) ", "langID");
 
         $sel->from = " site_texts st LEFT JOIN translation_phrases tp ON tp.textID=st.textID AND tp.langID=:langID ";
 

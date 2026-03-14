@@ -35,16 +35,6 @@ class PDOResult extends DBResult
         }
     }
 
-    /**
-     * Internal check to ensure the resource is still valid
-     * @throws Exception
-     */
-    protected function assert_resource(): void
-    {
-        if (!($this->result instanceof PDOStatement)) {
-            throw new Exception("Invalid PDOStatement resource.");
-        }
-    }
 
     /**
      * Fetch the next row as an associative array
@@ -60,7 +50,7 @@ class PDOResult extends DBResult
         try {
             $record = $this->result->fetch(PDO::FETCH_ASSOC);
 
-            // Ако резултатът е изчерпан (null/false), затваряме автоматично
+            //no more records in this result-set - $record is (null/false) - free the result - isActive = false
             if ($record === false) {
 
                 $error = $this->result->errorInfo();
@@ -73,6 +63,7 @@ class PDOResult extends DBResult
             }
 
             return $record;
+
         } catch (PDOException $e) {
             $this->free(); // Затваряме и при грешка, за да не "забие" драйвера
             throw new Exception("PDO Fetch Error: " . $e->getMessage());
@@ -83,6 +74,7 @@ class PDOResult extends DBResult
     /**
      * Fetch the next row wrapped in a RawResult object
      * @return RawResult|null
+     * @throws Exception
      */
     public function fetchResult(): ?RawResult
     {
@@ -93,19 +85,27 @@ class PDOResult extends DBResult
         return null;
     }
 
-    public function numRows(): int
+    /**
+     * Return the affected row count during (INSERT/UPDATE/DELETE) or -1 if this is a select
+     *
+     * @return int
+     */
+    public function affectedRows(): int
     {
-        // For PDO, rowCount() returns the number of affected rows (INSERT/UPDATE/DELETE)
-        return ($this->result instanceof PDOStatement) ? $this->result->rowCount() : 0;
+        if (!$this->isActive()) return -1;
+
+        //Returns the number of affected rows (INSERT/UPDATE/DELETE) - for SELECT not available
+        return $this->result->rowCount();
     }
 
     /**
-     * Returns metadata for the result columns
+     * Returns metadata for the result columns. (INSERT/UPDATE/DELETE) - return empty array here
      * @return array
      */
     public function fields(): array
     {
-        $this->assert_resource();
+        if (!$this->isActive()) return [];
+
         $fields = [];
 
         $colCount = $this->result->columnCount();
@@ -114,7 +114,6 @@ class PDOResult extends DBResult
             // Convert to object to maintain compatibility with mysqli->fetch_field()
             $fields[] = (object)[
                 'name' => $meta['name'],
-                'table' => $meta['table'] ?? '',
                 'type' => $meta['native_type'] ?? ''
             ];
         }
@@ -122,8 +121,12 @@ class PDOResult extends DBResult
         return $fields;
     }
 
+    /**
+     * True if this statement has result-set ready to fetch
+     * @return bool
+     */
     public function isActive() : bool
     {
-        return !is_null($this->result);
+        return (!is_null($this->result) && $this->result->columnCount() > 0);
     }
 }

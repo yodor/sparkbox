@@ -108,19 +108,19 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
         $bean = new MCEImagesBean();
         $qry = $bean->query();
-        $qry->select->where()->add("section", "'$this->section_name'");
-        $qry->select->where()->add("section_key", "'$this->section_key'");
+        $qry->stmt->where()->add("section", "'$this->section_name'");
+        $qry->stmt->where()->add("section_key", "'$this->section_key'");
 
         if ($this->ownerID > 0) {
-            $qry->select->where()->add("ownerID", $this->ownerID);
+            $qry->stmt->where()->add("ownerID", $this->ownerID);
         }
 
         if (isset($_GET["imageID"])) {
             $imageID = (int)$_GET["imageID"];
-            $qry->select->where()->add("imageID", $imageID);
+            $qry->stmt->where()->add("imageID", $imageID);
         }
 
-        $qry->select->fields()->set("section", "section_key", "imageID", "ownerID", "auth_context", "photo");
+        $qry->stmt->fields()->set("section", "section_key", "imageID", "ownerID", "auth_context", "photo");
 
         $qry->exec();
 

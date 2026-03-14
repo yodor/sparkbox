@@ -40,7 +40,7 @@ class AdminUserForm extends InputForm
         //
         $field = DataInputFactory::Create(InputType::SELECT, "access_level", "Access Level", 1);
 
-        $enum = new DBEnumIterator("admin_users", "access_level");
+        $enum = new DBEnumIterator(new AdminUsersBean(), "access_level");
 
         $rend = $field->getRenderer();
         $rend->setDefaultOption(null);

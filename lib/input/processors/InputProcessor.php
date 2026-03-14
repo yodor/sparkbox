@@ -307,10 +307,10 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             Debug::ErrorLog("renderer_source_copy_fields ... using renderer iterator to query additional values");
             $iterator = $this->input->getRenderer()->getIterator();
             if (!($iterator instanceof SQLQuery)) throw new Exception("Unsupported iterator");
-            $iterator->select->fields()->reset();
-            $iterator->select->fields()->set(...$this->renderer_source_copy_fields);
-            $iterator->select->where()->add($name, $value);
-            $iterator->select->limit = 1;
+            $iterator->stmt->fields()->reset();
+            $iterator->stmt->fields()->set(...$this->renderer_source_copy_fields);
+            $iterator->stmt->where()->add($name, $value);
+            $iterator->stmt->limit = 1;
             $iterator->exec();
 
             if ($data = $iterator->next()) {
@@ -377,9 +377,9 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         $values = array();
 
         $qry = $this->transact_bean->query($this->transact_bean->key(), $name);
-        $qry->select->where()->add($column, $value);
+        $qry->stmt->where()->add($column, $value);
         $qry->exec();
-        Debug::ErrorLog("Using SQL: ".$qry->select->getSQL());
+        Debug::ErrorLog("Using: ".$qry->stmt->debugSQL());
 
         while ($tbResult = $qry->nextResult()) {
             $tbValue = $tbResult->get($name);

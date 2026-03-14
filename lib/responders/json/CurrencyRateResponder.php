@@ -41,20 +41,25 @@ class CurrencyRateResponder extends JSONResponder
     {
         $bean = new CurrencyRatesBean();
 
-        $db = DBConnections::Driver();
+        $db = $bean->getDB();
         try {
+
             $db->transaction();
-            $sel = "DELETE FROM currency_rates WHERE (srcID='$this->srcID' AND dstID='$this->dstID') OR (dstID='$this->srcID' AND srcID='$this->dstID')";
-            $db->query($sel);
+
+            $delete = new SQLDelete();
+            $delete->from = $bean->getTableName();
+            $delete->where()->addExpression("(srcID=:srcID AND dstID=:dstID) OR (dstID=:srcID AND srcID=:dstID)");
+            $delete->bind(":srcID", $this->srcID);
+            $delete->bind(":dstID", $this->dstID);
+
+            $db->query($delete);
 
             //forward rate
             $data_forward = array("srcID"=>$this->srcID, "dstID"=>$this->dstID, "rate"=>$this->rate);
-
-            if (!$bean->insert($data_forward, $db)) throw new Exception("Error updating forward quote:"."<HR>".$db->getError());
+            if (!$bean->insert($data_forward, $db)) throw new Exception("Error updating forward quote:".$db->getError());
 
             $data_backward = array("dstID"=>$this->srcID, "srcID"=>$this->dstID, "rate"=>round(1.0/$this->rate,2));
-
-            if (!$bean->insert($data_backward, $db)) throw new Exception("Error updating backward quote:"."<HR>".$db->getError());
+            if (!$bean->insert($data_backward, $db)) throw new Exception("Error updating backward quote:".$db->getError());
 
             $db->commit();
 

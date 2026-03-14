@@ -98,19 +98,15 @@ abstract class DBTableBean implements IDBDriverAccess
     {
         $this->columns = array();
 
-        $result = $this->db->queryFields($this->table);
-        if (!($result instanceof DBResult)) throw new Exception("Unable to query table columns");
+        $columnTypes = $this->db->columnTypes($this->table);
 
-        while ($row = $result->fetch()) {
-            if (strcmp($row["Key"], "PRI") === 0) {
-                $this->prkey = $row["Field"];
+        foreach ($columnTypes as $columnName => $details) {
+            if (strcmp($details["Key"], "PRI") === 0) {
+                $this->prkey = $columnName;
             }
-
-            $field_name = $row["Field"];
-
-            $this->columns[$field_name] = $row["Type"];
+            $this->columns[$columnName] = $details["Type"];
         }
-        $result->free();
+
         //Debug::ErrorLog("Columns: ", $this->columns);
     }
     /**
@@ -122,7 +118,7 @@ abstract class DBTableBean implements IDBDriverAccess
 
         try {
             $this->db->transaction();
-            $this->db->query($this->createString);
+            $this->db->queryRaw($this->createString);
             $this->db->commit();
         }
         catch (Exception $e) {
@@ -207,9 +203,9 @@ abstract class DBTableBean implements IDBDriverAccess
     public function getCount(): int
     {
         $qry = $this->query();
-        $qry->select->fields()->reset();
-        $qry->select->fields()->set($this->prkey);
-        $qry->select->limit = "0";
+        $qry->stmt->fields()->reset();
+        $qry->stmt->fields()->set($this->prkey);
+        $qry->stmt->limit = "0";
         return $qry->count();
 
     }
@@ -346,6 +342,7 @@ abstract class DBTableBean implements IDBDriverAccess
         if ($result = $qry->next()) {
             return $result;
         }
+        
         throw new Exception("No such ID");
     }
 
@@ -478,17 +475,18 @@ abstract class DBTableBean implements IDBDriverAccess
             }
 
             //fetch id of resulting rows first to properly manage the cache
+            //copy whereset from $delete
             $select = new SQLSelect($delete);
             $select->fields()->reset();
             $select->fields()->set($this->prkey);
 
             $result = $db->query($select);
-            if (!($result instanceof DBResult)) throw new Exception("Unable to query affected ID list: ".$select->getSQL());
-
             $idlist = array();
-            while ($data = $result->fetchResult()) {
-                $idlist[] = intval($data->get($this->prkey));
+            while ($data = $result->fetch()) {
+                $idlist[] = (int)$data[$this->prkey];
             }
+            $result->free();
+
             Debug::ErrorLog("Affected ID list: ", $idlist);
 
             $db->query($delete);
@@ -546,7 +544,7 @@ abstract class DBTableBean implements IDBDriverAccess
 
         $code = function (DBDriver $db) use (&$insertID , $insert) {
 
-            $db->query($insert);
+            $result = $db->query($insert);
 
             //NOTE!!! lastID return the first auto_increment of a multi insert transaction
             $insertID = $db->lastID();
@@ -610,18 +608,16 @@ abstract class DBTableBean implements IDBDriverAccess
             Debug::ErrorLog("Unable to delete cache folder: $cache_file");
         }
 
-        $delete = new SQLDelete();
-        $delete->from = "sparkcache";
-        $delete->where()->add("className", get_class($this));
-        $delete->where()->add("beanID", $id);
-
         try {
-            $this->db->transaction();
-            $this->db->query($delete);
-            $this->db->commit();
+            $delete = new SQLDelete();
+            $delete->from = "sparkcache";
+            $delete->where()->add("className", get_class($this));
+            $delete->where()->add("beanID", $id);
+            $query = new SQLQuery();
+            $query->exec($delete);
         }
         catch (Exception $e) {
-            $this->db->rollBack();
+
             Debug::ErrorLog("Unable to delete from sparkcache table: ".$e->getMessage());
         }
 

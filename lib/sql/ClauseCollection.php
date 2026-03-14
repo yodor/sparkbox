@@ -19,7 +19,7 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
         //if ($clause->equals($clause_existing)) {
 
         if ($this->contains($object)) {
-            Debug::ErrorLog("Clause already exists: ".$object->getSQL());
+            Debug::ErrorLog("Clause already exists: " . $object->getSQL());
             return;
         }
         parent::append($object);
@@ -90,9 +90,9 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
 
     }
 
-    public function collectSQL(bool $do_prepared) : string
+    public function getSQL() : string
     {
-
+        if ($this->count() <1) return "";
         $result = "";
 
         $last_clause = NULL;
@@ -103,23 +103,11 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
             if (!is_null($last_clause)) {
                 $result.= " " . $last_clause->getGlue() . " ";
             }
-            $result.= $object->collectSQL($do_prepared);
+            $result.= $object->getSQL();
             $last_clause = $object;
         }
 
         return $result;
-    }
-
-    public function getSQL(): string
-    {
-        if ($this->count() <1) return "";
-        return $this->collectSQL(false);
-    }
-
-    public function getPreparedSQL(): string
-    {
-        if ($this->count() <1) return "";
-        return $this->collectSQL(true);
     }
 
     public function getBindings() : array

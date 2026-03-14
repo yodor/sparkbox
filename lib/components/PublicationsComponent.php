@@ -151,8 +151,8 @@ class PublicationsComponent extends Container implements IRequestProcessor
         $this->selected_ID = array();
 
         $qry = $this->bean->query(...$this->columns);
-        $qry->select->order_by = $this->bean->getDateColumn() . " DESC, newsID DESC";
-        $qry->select->limit = 3;
+        $qry->stmt->order_by = $this->bean->getDateColumn() . " DESC, newsID DESC";
+        $qry->stmt->limit = 3;
 
         $this->itemView = new ItemView($qry);
 
@@ -197,24 +197,24 @@ class PublicationsComponent extends Container implements IRequestProcessor
     {
 
         $qry = $this->bean->query($this->bean->key(), $this->bean->getDateColumn(), "item_title");
-        $qry->select->order_by = $this->bean->getDateColumn() . " DESC , newsID DESC ";
+        $qry->stmt->order_by = $this->bean->getDateColumn() . " DESC , newsID DESC ";
 
         $num = -1;
 
         if (isset($_GET[$this->bean->key()])) {
             $itemID = (int)$_GET[$this->bean->key()];
-            $qry->select->where()->add($this->bean->key(), $itemID);
+            $qry->stmt->where()->add($this->bean->key(), $itemID);
             $qry->exec();
         }
         else if (isset($_GET["year"]) && isset($_GET["month"])) {
-            $qry->select->where()->add("MONTH({$this->bean->getDateColumn()})", (int)$_GET["month"]);
-            $qry->select->where()->add("YEAR({$this->bean->getDateColumn()})", (int)$_GET["year"]);
+            $qry->stmt->where()->add("MONTH({$this->bean->getDateColumn()})", (int)$_GET["month"]);
+            $qry->stmt->where()->add("YEAR({$this->bean->getDateColumn()})", (int)$_GET["year"]);
             $qry->exec();
         }
 
         if ($num < 1) {
-            $qry->select->where()->clear();
-            $qry->select->limit = 1;
+            $qry->stmt->where()->clear();
+            $qry->stmt->limit = 1;
             $qry->exec();
         }
 

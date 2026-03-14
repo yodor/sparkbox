@@ -71,31 +71,37 @@ class MySQLiDriver extends DBDriver
         return $this->conn->error;
     }
 
-    public function dateTime(int $add_days = 0, $interval_type = " DAY ") : string
+
+    public function hasResultSet(): bool
     {
-        $result = $this->query("SELECT DATE_ADD(now(), INTERVAL $add_days $interval_type) as datetime");
-        if (!($result instanceof DBResult)) throw new Exception("Unable to query dateTime: ".$this->getError());
-        $row = $result->fetch();
-        return $row["datetime"];
+        return false;
     }
 
-    public function timestamp() : int
+    public function queryRaw(string $sqlText): DBResult
     {
-        $result = $this->query("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP) as datetime");
-        if (!($result instanceof DBResult)) throw new Exception("Unable to query timestamp: ".$this->getError());
-        $row = $result->fetch();
-        return intval($row["datetime"]);
+        try {
+
+            $res = $this->conn->query($sqlText);
+            if ($res === false) throw new Exception("Result is false");
+
+            return new MySQLiResult();
+
+        }
+        catch (Exception $e) {
+            Debug::ErrorLog("Error: ".$e->getMessage()." | Connection Error: ".$this->conn->error." | SQL: $sqlText");
+            throw new Exception("Error: ".$e->getMessage());
+        }
     }
 
     /**
      * For successful queries which produce a result set, such as SELECT, SHOW, DESCRIBE or EXPLAIN,
      * mysqli_query will return a mysqli_result object.
      * For other successful queries mysqli_query will return true else throws exception
-     * @param string $str
-     * @return true|DBResult
+     * @param SQLStatement $statement
+     * @return DBResult
      * @throws Exception
      */
-    public function query(SQLStatement|string $statement) : true|DBResult
+    public function query(SQLStatement $statement) : DBResult
     {
 
         try {
@@ -106,9 +112,8 @@ class MySQLiDriver extends DBDriver
             $res = $this->conn->query($sql);
             if ($res === false) throw new Exception("Result is false");
 
-            if ($res instanceof mysqli_result) return new MySQLiResult($res);
+            return new MySQLiResult($res);
 
-            return true;
         }
         catch (Exception $e) {
             Debug::ErrorLog("Error: ".$e->getMessage()." | Connection Error: ".$this->conn->error." | SQL: $sql");
@@ -147,31 +152,29 @@ class MySQLiDriver extends DBDriver
         return $this->conn->real_escape_string($data);
     }
 
-    public function queryFields(string $table) : true|DBResult
+    public function columnTypes(string $tableName): array
     {
-        return $this->query("show fields from $table");
-    }
+        //Field   //Type             //Null //Key   //Default   //Extra
+        //userID  //int(11) unsigned //NO   //PRI   //NULL      //auto_increment
+        $types = array();
 
-    public function fieldType(string $table, string $field_name) : string
-    {
-        $ret = "";
-        $found = FALSE;
-        $result = $this->queryFields($table);
-        while ($row = $result->fetch()) {
-            if (strcmp($row["Field"], $field_name) !== 0) continue;
-            $ret = $row["Type"];
-            $found = TRUE;
-            break;
+        $result = $this->queryRaw("DESCRIBE $tableName");
+        while ($data = $result->fetch()) {
+            $columnName = $data["Field"];
+            $types[$columnName] = $data;
         }
-        if (!$found) throw new Exception("Field [$field_name] does not exist in table: $table");
-        return $ret;
+        return $types;
     }
 
-    public function tableExists(string $table) : bool
+    public function tableExists(string $tableName): bool
     {
-        $res = $this->query("show tables like '$table'");
-        if ($res->numRows() < 1) return FALSE;
-        return TRUE;
+        try {
+            $result = $this->queryRaw("SELECT 1 FROM `{$tableName}` LIMIT 1");
+            $result->free();
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
 }

@@ -14,7 +14,7 @@ class SQLDelete extends SQLStatement
      * Generates the DELETE SQL.
      * Throws an exception if no WHERE conditions are set to prevent accidental full table wipe.
      */
-    public function collectSQL(bool $do_prepared): string
+    public function getSQL(): string
     {
         // ЗАЩИТА: Проверка дали имаме поне едно условие
         if ($this->whereset->count() === 0) {
@@ -22,7 +22,7 @@ class SQLDelete extends SQLStatement
         }
 
         $sql = $this->type . " FROM " . $this->from;
-        $sql .= " WHERE " . $this->whereset->collectSQL($do_prepared);
+        $sql .= " WHERE " . $this->whereset->getSQL();
 
         return $sql;
     }
@@ -35,6 +35,4 @@ class SQLDelete extends SQLStatement
         return $bindings;
     }
 
-    public function getSQL(): string { return $this->collectSQL(false); }
-    public function getPreparedSQL(): string { return $this->collectSQL(true); }
 }

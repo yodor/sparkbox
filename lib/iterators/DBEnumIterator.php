@@ -3,14 +3,18 @@ include_once("iterators/ArrayDataIterator.php");
 
 class DBEnumIterator extends ArrayDataIterator
 {
-    public function __construct(string $table_name, string $table_field)
+    public function __construct(DBTableBean $bean, string $columnName)
     {
-        $db = DBConnections::Driver();
+        $columnType = $bean->columnType($columnName);
+        parent::__construct(DBEnumIterator::Enum2Array($columnType));
+    }
 
-        $ret = $db->fieldType($table_name, $table_field);
+    public static function Enum2Array(string $enum_type) : array
+    {
+        $enum_type = str_replace("enum(", "", $enum_type);
+        $enum_type = str_replace(")", "", $enum_type);
+        $enum_type = str_replace("'", "", $enum_type);
 
-        $ret = $db->Enum2Array($ret);
-
-        parent::__construct($ret);
+        return explode(",", $enum_type);
     }
 }

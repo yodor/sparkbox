@@ -15,11 +15,9 @@ class DBConnection extends SparkObject
 
     protected array $variables = array();
 
-
     /**
-     * Wraps DBDriver and manages connected state
+     * Holds dsn data for creating a connection to DB server
      * @param string $connectionName
-     * @param bool $persistent
      */
     public function __construct(string $connectionName=DBConnection::DEFAULT_NAME)
     {
@@ -37,18 +35,5 @@ class DBConnection extends SparkObject
         return $this->variables;
     }
 
-    /**
-     * Serialize empty properties
-     * @return array
-     */
-    public function __serialize(): array
-    {
-        return array();
-    }
-
-    public function __unserialize(array $data):void
-    {
-
-    }
 
 }

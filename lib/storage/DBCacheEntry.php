@@ -51,9 +51,9 @@ class DBCacheEntry extends CacheEntry
     {
         Debug::ErrorLog("Doing cache query ...");
         $query = $this->bean->queryFull();
-        $query->select->where()->add("cacheName", "'{$this->cacheName}'");
-        $query->select->where()->add("className", "'{$this->className}'");
-        $query->select->where()->add("beanID", $this->beanID);
+        $query->stmt->where()->add("cacheName", "'{$this->cacheName}'");
+        $query->stmt->where()->add("className", "'{$this->className}'");
+        $query->stmt->where()->add("beanID", $this->beanID);
 
         $this->resultCount = $query->count();
 
@@ -82,15 +82,15 @@ class DBCacheEntry extends CacheEntry
     public function store(string $data, int $lastModified = 0): void
     {
         if ($this->haveData()) {
-            $data = array("data" => $this->bean->getDB()->escape($data), "lastModified" => $lastModified);
+            $data = array("data" => $data, "lastModified" => $lastModified);
             $this->bean->update($this->entryID, $data);
         }
         else {
             $data = array(
-                "cacheName" => $this->bean->getDB()->escape($this->cacheName),
-                "className" => $this->bean->getDB()->escape($this->className),
+                "cacheName" => $this->cacheName,
+                "className" => $this->className,
                 "beanID" => $this->beanID,
-                "data" => $this->bean->getDB()->escape($data),
+                "data" => $data,
                 "lastModified" => $lastModified
             );
             $this->entryID = $this->bean->insert($data);

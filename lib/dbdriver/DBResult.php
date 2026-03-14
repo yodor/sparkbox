@@ -9,7 +9,18 @@ abstract class DBResult
 
     abstract public function free() : void;
 
-    abstract public function numRows(): int;
+    /**
+     * The number af affected rows during INSERT/UPDATE/DELETE or -1
+     * @return int
+     */
+    abstract public function affectedRows(): int;
 
     abstract public function fields() : array;
+
+    /**
+     * Result is active and ready to fetch more data
+     * Return false for INSERT/UPDATE/DELETE
+     * @return bool
+     */
+    abstract public function isActive() : bool;
 }

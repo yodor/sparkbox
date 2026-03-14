@@ -65,7 +65,7 @@ class NestedSetBean extends DBTableBean
     {
         $select = new SQLSelect();
         $select->from = $this->table;
-        $select->fields()->setExpression(" MAX(rgt) ", "max_rgt");
+        $select->fields()->setAliasExpression(" MAX(rgt) ", "max_rgt");
         $select->limit = " 1 ";
         $query = new SQLQuery($select);
         $query->exec();
@@ -458,6 +458,8 @@ class NestedSetBean extends DBTableBean
         while ($result = $query->nextResult()) {
             $idlist[] = (int)$result->get($this->prkey);
         }
+        $query->free();
+
         return $idlist;
     }
 
@@ -639,7 +641,7 @@ class NestedSetBean extends DBTableBean
         $sel = $this->selectAggregated("$relation_table.$prkey", $columns);
 
         if ($with_count) {
-            $sel->fields()->setExpression("COUNT($relation_table.$relation_prkey)", "related_count");
+            $sel->fields()->setAliasExpression("COUNT($relation_table.$relation_prkey)", "related_count");
         }
 
         return $sel->combineWith($result);

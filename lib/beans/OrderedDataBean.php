@@ -219,7 +219,7 @@ abstract class OrderedDataBean extends DBTableBean
             $selectMax = clone $this->select;
         }
 
-        $selectMax->fields()->setExpression(" MAX(position) ", "max_position");
+        $selectMax->fields()->setAliasExpression(" MAX(position) ", "max_position");
 
         //Debug::ErrorLog("Querying max_position: ".$selectMax->getSQL());
         $result = $db->query($selectMax);
@@ -237,7 +237,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         $query = $this->query("position", "$ref_key", $this->prkey);
 
-        $query->select->where()->add($ref_key, $ref_val);
+        $query->stmt->where()->add($ref_key, $ref_val);
         $query->exec();
 
         $positions = array();
@@ -256,7 +256,7 @@ abstract class OrderedDataBean extends DBTableBean
             foreach ($positions as $id=>$pos)
             {
 
-                $update = new SQLUpdate($query->select);
+                $update = new SQLUpdate($query->stmt);
                 $update->set("position", $pos);
                 $update->where()->add($this->prkey, $id);
 

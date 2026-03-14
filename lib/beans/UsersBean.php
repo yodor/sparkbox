@@ -27,7 +27,8 @@ class UsersBean extends DBTableBean
         if (!str_starts_with(strtolower($columnType), "varchar(255)")) {
             //modify column
             Debug::ErrorLog("Upgrading password column type to varchar(255)");
-            $this->db->query("ALTER TABLE `{$this->table}` MODIFY COLUMN password VARCHAR(255) NOT NULL");
+            $result = $this->db->queryRaw("ALTER TABLE `{$this->table}` MODIFY COLUMN password VARCHAR(255) NOT NULL");
+            $result->free();
         }
         $this->initColumnTypes();
 
@@ -37,7 +38,7 @@ class UsersBean extends DBTableBean
     {
         $columnType = strtolower($this->columnType("password"));
         $checkType = strtolower($check_type);
-        if (!str_starts_with($columnType, $check_type)) throw new Exception("Storage column wrong type: ".$columnType);
+        if (!str_starts_with($columnType, $checkType)) throw new Exception("Storage column wrong type: ".$columnType);
     }
 
     //email
@@ -104,20 +105,14 @@ class UsersBean extends DBTableBean
         $is_confirmed = (int)$this->getValue($userID_email, "confirmed");
         if ($is_confirmed>0) throw new Exception(tr("This profile is already activated."));
 
-
         $email = strtolower(trim($email));
         $confirm_code = strtolower(trim($confirm_code));
 
-
         $code = function (DBDriver $db) use ($email, $confirm_code) {
-
             $update = new SQLUpdate($this->select);
-
             $update->set("confirmed", 1);
-
             $update->where()->add("email", $email);
             $update->where()->add("confirm_code", $confirm_code);
-
             $db->query($update);
         };
 

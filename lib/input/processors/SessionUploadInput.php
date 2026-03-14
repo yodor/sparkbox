@@ -258,7 +258,7 @@ class SessionUploadInput extends InputProcessor
                 $data = array();
                 $data[$item_key] = $transactor->getLastID();
 
-                $data[$name] = $db->escape(serialize($value));
+                $data[$name] = serialize($value);
 
                 $data["position"] = $position;
 

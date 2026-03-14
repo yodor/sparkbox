@@ -47,7 +47,7 @@ class ConfigBean extends DBTableBean
         $ret = $default_value;
 
         $query = $this->queryField("config_key", $key, 1, "config_val");
-        $query->select->where()->add("section", $this->section);
+        $query->stmt->where()->add("section", $this->section);
 
         $query->exec();
 
@@ -59,7 +59,7 @@ class ConfigBean extends DBTableBean
             }
         }
 
-        $query = null;
+        $query->free();
 
         return $ret;
     }

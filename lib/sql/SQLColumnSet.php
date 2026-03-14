@@ -1,4 +1,6 @@
 <?php
+include_once("sql/ISQLGet.php");
+include_once("sql/IBindingCollection.php");
 include_once("sql/SQLColumn.php");
 
 class SQLColumnSet implements ISQLGet, IBindingCollection
@@ -50,26 +52,37 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
     }
 
     /**
-     * Add direct sql expression to the column collection using '$alias_name' as the column name.
+     * Add direct sql expression to the column collection using '$alias_name'
      *
      * Existing column named '$alias_name' would be replaced with the newly created column.
      *
      * No automatic binding is created.
      *
+     * * Direct expression
+     *
+     * \$select->fields()->setAliasExpression("count(pvl.logID)", "cnt") -> count(pvl.logID) AS cnt
+     *
+     * * Expression with manual binding parameter
+     *
+     * \$select->fields()->setAliasExpression("COALESCE(tp.langID, :langID)", "langID");
+     * \$select->bind(":langID", \$langID);
+     *  -> after binding COALESCE(tp.langID, \$langID) AS langID
+     *
      * @param string $expression SQL select expression string
      * @param string $alias_name Alias name
      * @throws Exception
      */
-    public function setExpression(string $expression, string $alias_name) : void
+    public function setAliasExpression(string $expression, string $alias_name) : void
     {
         // Using trim to ensure we don't accept strings with only whitespace
         $expression = trim($expression);
         $alias_name = trim($alias_name);
 
         if ($expression === "" || $alias_name === "") {
-            throw new Exception("SQL expression and alias must be non-empty strings.");
+            throw new Exception("SQL expression and alias_name must be non-empty strings.");
         }
 
+        //no binding
         $column = new SQLColumn($alias_name);
         $column->setExpression($expression, $alias_name);
         $this->fields[$alias_name] = $column;
@@ -98,6 +111,7 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
             if (!(trim($item)))continue;
             $pair = preg_split("/ as /i", $item);
 
+            //no binding key creation no value is set hasValue is false
             $column = new SQLColumn($pair[0]);
             if (isset($pair[1])) {
                 $column->setAlias($pair[1]);
@@ -166,24 +180,14 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
         return $result;
     }
 
-    public function collectSQL(bool $do_prepared) : string
+    public function getSQL() : string
     {
         $result = array();
         foreach ($this->fields as $name=>$col) {
             if (!($col instanceof SQLColumn)) continue;
-            $result[] = $col->collectSQL($do_prepared);
+            $result[] = $col->getSQL();
         }
         return implode(" , ", $result);
-    }
-
-    public function getSQL() : string
-    {
-        return $this->collectSQL(false);
-    }
-
-    public function getPreparedSQL(): string
-    {
-        return $this->collectSQL(true);
     }
 
     public function getBindings(): array

@@ -1,8 +1,11 @@
 <?php
-include_once("sql/ClauseCollection.php");
 include_once("sql/ISQLGet.php");
 include_once("sql/IBindingCollection.php");
 include_once("sql/IBindingModifier.php");
+
+include_once("sql/SQLColumnSet.php");
+include_once("sql/ClauseCollection.php");
+
 
 abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModifier
 {
@@ -10,6 +13,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
 
     protected ?SQLColumnSet $fieldset = null;
 
+    protected string $meta = "";
     /**
      * SELECT, UPDATE, DELETE, INSERT
      * @var string
@@ -35,10 +39,6 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
 
     public abstract function getSQL() : string;
 
-    public abstract function getPreparedSQL() : string;
-
-    public abstract function collectSQL(bool $do_prepared) : string;
-
     public function __construct(?SQLStatement $other = null)
     {
         $this->fieldset = new SQLColumnSet();
@@ -48,6 +48,8 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
         if ($other) {
             $this->from = $other->from;
             $other->where()->copyTo($this->whereset);
+            //copy bindings
+            $this->externalBindings = $other->externalBindings;
         }
     }
 
@@ -73,30 +75,30 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     }
 
     /**
-     * Create new SQLColumn using (name \$name, value \$value) and append to the internal fieldset collection.
+     * Create new SQLColumn using ('$name', '$value') and append to the internal fieldset collection.
+     * Usage for simple column = value assignments.
      *
-     * No quoting or escaping is done.
+     * SQLColumn state after this call:
      *
-     * If SQLColumn with name $name already exists in the fieldset collection it will be replaced with this newly created one.
+     * * bindingKey -> ':$name'
+     * * value -> '$value'
+     * * hasValue -> true
      *
-     * By design SQLColumn creates bindingKey using prepending ':' to \$name so this should only be used for safe to be used in prepared statement
+     * $update->set("p.stock_amount", $amount);
+     * SQL result p.stock_amount = :p_stock_amount
+     * This will bind ":p_stock_amount" -> $amount
      *
-     * Example using SQLUpdate:
-     *
-     * $update->set("p.stock_amount", "p.stock_amount - \$amount");
-     *
-     * will create bindingKey ':p.stock_amount' with then bound value 'p.stock_amount - \$amount'
-     *
-     * Correct usage - bind value as statement binding value
-     *
-     * $update->set("p.stock_amount = p.stock_amount - :amount");
-     * $update->bind(":amount", \$amount);
+     * $update->setExpression("p.stock_amount", "p.stock_amount - 1") - OK
+     * OR
+     * $update->setExpression("p.stock_amount", "p.stock_amount - :amount"); OK
+     * $update->bind(":amount", $amount); OK
      *
      * @param string $name
-     * @param string $value
+     * @param array|string|float|int|bool|null $value
      * @return void
+     * @throws Exception
      */
-    public function set(string $name, string $value) : void
+    public function set(string $name, array|string|float|int|bool|null $value) : void
     {
         $column = new SQLColumn($name, $value);
         $this->fieldset->setColumn($column);
@@ -107,7 +109,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
      * instead of a simple value with automatic name-derived binding.
      *
      * This method transitions the column to "Manual Mode":
-     * 1. Disables automatic PDO binding for this specific column.
+     * 1. Disables automatic binding for this specific column.
      * ($column->getBindingKey() returns an empty string)
      * 2. Allows for database-side calculations (arithmetic, functions, subqueries).
      * 3. Supports manual parameter binding for high-security custom logic.
@@ -122,20 +124,20 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
      * $stmt->setExpression("rgt", "rgt + :value");
      * $stmt->bind(":value", 2);
      *
-     * @param string $name The name of the column/field to target.
+     * @param string $column_name The name of the column/field to target.
      * @param string $expression The raw SQL fragment (e.g., "NOW()", "rgt + :val").
      * @return void
      * @throws Exception If expression validation fails in SQLColumn.
      */
-    public function setExpression(string $name, string $expression) : void
+    public function setExpression(string $column_name, string $expression) : void
     {
         // 1. Initialize a new SQLColumn without a value to prevent
         // the automatic generation of a PDO bindingKey.
-        $column = new SQLColumn($name, "");
+        $column = new SQLColumn($column_name);
 
         // 2. Set the raw SQL expression. Passing an empty string for alias
         // ensures the collectSQL method treats this as an UPDATE/SET assignment.
-        $column->setExpression($expression, "");
+        $column->setExpression($expression);
 
         // 3. Register the configured column object into the statement's fieldset
         // so it can be included during the SQL generation process.
@@ -154,8 +156,9 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     }
 
     /**
-     * Summarize all bindings from fieldset, whereset and any added using the bind() method
+     * Summarize all bindings from fieldset, whereset and any externally added using the bind() method
      * @return array
+     * @throws Exception
      */
     public function getBindings(): array
     {
@@ -189,6 +192,20 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
             }
             else throw new Exception("[$bindingKey] is not SQLStatement::IsBoundSafe");
         }
+    }
+
+    /**
+     * Copy all bindings from $source and set as external bindings to $target
+     *
+     * @param SQLStatement $target
+     * @param SQLStatement $source
+     * @return void
+     * @throws Exception
+     */
+    public static function CopyBindings(SQLStatement $target, SQLStatement $source) : void
+    {
+        Debug::ErrorLog("Copying bindings for SQLStatement");
+        SQLStatement::replaceKeyAppend($target->externalBindings, $source->getBindings());
     }
 
     public function bind(string $bindingKey, array|string|int|float|bool|null $value) : void
@@ -229,5 +246,19 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     {
         if ( is_scalar($value) || is_array($value) || is_null($value) ) return true;
         return false;
+    }
+
+    public function getMeta() : string
+    {
+        return $this->meta;
+    }
+
+    public function setMeta(string $meta) : void
+    {
+        $this->meta = $meta;
+    }
+    public function debugSQL() : string
+    {
+        return "SQL: ". $this->getSQL()." | Bindings: ".print_r($this->getBindings(), true);
     }
 }

@@ -6,14 +6,6 @@ include_once("objects/events/DBDriverEvent.php");
 
 abstract class DBDriver
 {
-    public static function Enum2Array(string $enum_str) : array
-    {
-        $enum_str = str_replace("enum(", "", $enum_str);
-        $enum_str = str_replace(")", "", $enum_str);
-        $enum_str = str_replace("'", "", $enum_str);
-
-        return explode(",", $enum_str);
-    }
 
     protected ?DBConnection $props = null;
 
@@ -32,38 +24,98 @@ abstract class DBDriver
         $this->disconnect();
     }
 
-    abstract public function hasActiveStatement() : bool;
+    /**
+     * Do we have un-fetched result-set waiting ?
+     * During nested queries app logic can decide to open additional connection using DBConnections::CreateDriver()
+     * @return bool
+     */
+    abstract public function hasResultSet() : bool;
 
+    /**
+     * Open connection to DB server
+     * @return void
+     */
     abstract public function connect() : void;
+
+    /**
+     * Disconnect from DB server
+     * @return void
+     */
     abstract public function disconnect() : void;
 
+    /**
+     * Is connected
+     * @return bool
+     */
     abstract public function isConnected() : bool;
 
+    /**
+     * Number of affected rows from INSERT/DELETE/UPDATE or -1
+     * @return int
+     */
     abstract public function affectedRows() : int;
 
+    /**
+     * @return string
+     */
     abstract public function getError(): string;
 
-    abstract public function query(SQLStatement|string $statement) : true|DBResult;
+    /**
+     * Do prepare/execute cycle and return DBResult
+     * @param SQLStatement $statement
+     * @return DBResult
+     */
+    abstract public function query(SQLStatement $statement) : DBResult;
 
-    abstract public function dateTime(int $add_days = 0, string $interval_type = " DAY ") : string;
+    /**
+     * Query using raw SQL - only for system stuff
+     * @param string $sqlText
+     * @return DBResult
+     */
+    abstract public function queryRaw(string $sqlText) : DBResult;
 
-    abstract public function timestamp() : int;
-
+    /**
+     * Proxy method - Returns the ID of the last inserted row or sequence value
+     * @return int
+     */
     abstract public function lastID(): int;
 
+    /**
+     * Commits a transaction
+     * @param string|null $name
+     * @return bool
+     */
     abstract public function commit(?string $name = null) : bool;
 
+    /**
+     * Rolls back a transaction
+     * @param string|null $name
+     * @return bool
+     */
     abstract public function rollback(?string $name = null) : bool;
 
+    /**
+     * @param string|null $name
+     * @return bool
+     */
     abstract public function transaction(?string $name = null) : bool;
 
-    abstract public function escape(string $data) : string;
+    /**
+     * Describe table columns using format
+     * * Field,Type,Null,Key,Default,Extra
+     * * ex Field=>userID , Type=>int(11) unsigned, Null=>NO, Key=>PRI, Default=>NULL, Extra=>auto_increment
+     * @param string $tableName
+     * @return array<string, array{Field: string, Type:string, Null:string, Key:string, Default:string, Extra:string}>
+     * @throws Exception
+     */
+    abstract public function columnTypes(string $tableName) : array;
 
-    abstract public function queryFields(string $table) : true|DBResult;
-
-    abstract public function tableExists(string $table) : bool;
-
-    abstract public function fieldType(string $table, string $field_name) : string;
+    /**
+     * Check if a table named - '$tableName' exist in the current connection
+     * @param string $tableName
+     * @return bool
+     */
+    abstract public function tableExists(string $tableName) : bool;
 
     public function __serialize(): array
     {

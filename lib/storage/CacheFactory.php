@@ -99,24 +99,25 @@ class CacheFactory
 
         if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_DATABASE)==0) {
 
-            $bean = new SparkCacheBean();
-            $delete = new SQLDelete($bean->select());
-            $delete->where()->add("className", "PageCache");
-            $delete->where()->addExpression("((:timestamp - lastModified) > :pageCacheTTL)");
-            $delete->bind(":timestamp", $timestamp);
-            $delete->bind(":pageCacheTTL", Spark::GetInteger(Config::PAGE_CACHE_TTL));
 
-            $db = DBConnections::CreateDriver();
             try {
-                $db->transaction();
-                $db->query($delete);
-                $numEntries = $db->affectedRows();
-                $db->commit();
+
+                $bean = new SparkCacheBean();
+
+                $delete = new SQLDelete($bean->select());
+                $delete->where()->add("className", "PageCache");
+                $delete->where()->addExpression("((:timestamp - lastModified) > :pageCacheTTL)");
+                $delete->bind(":timestamp", $timestamp);
+                $delete->bind(":pageCacheTTL", Spark::GetInteger(Config::PAGE_CACHE_TTL));
+
+                $query = new SQLQuery();
+                $query->exec($delete);
+                $numEntries = $query->affectedRows();
                 touch($cleanup_file);
                 Debug::ErrorLog("DB PageCache cleanup complete. Affected rows: " . $numEntries);
             }
             catch (Exception $e) {
-                $db->rollback();
+
                 Debug::ErrorLog("Unable to cleanup PageCache: " . $e->getMessage());
             }
 

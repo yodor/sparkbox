@@ -28,8 +28,8 @@ class AdminUsersListPage extends BeanListPage
 
 
         $qry = $bean->query();
-        $qry->select->fields()->set( "userID", "email", "fullname", "access_level",  "date_created", "last_active", "counter", "suspend");
-        $qry->select->fields()->setExpression("(SELECT group_concat(ac.role SEPARATOR '; ') FROM admin_access ac WHERE ac.userID=admin_users.userID)", "roles");
+        $qry->stmt->fields()->set( "userID", "email", "fullname", "access_level",  "date_created", "last_active", "counter", "suspend");
+        $qry->stmt->fields()->setAliasExpression("(SELECT group_concat(ac.role SEPARATOR '; ') FROM admin_access ac WHERE ac.userID=admin_users.userID)", "roles");
 
         $view = new TableView($qry);
 

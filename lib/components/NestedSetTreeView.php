@@ -148,7 +148,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         //$result = basename($url->toString())."-".get_class($this)."-".$this->getName();
         $result = parent::getCacheName();
         if ($this->iterator instanceof SQLQuery) {
-            $result.="-".$this->iterator->select->getSQL();
+            $result.="-".$this->iterator->getCacheName();
         }
         return $result;
     }
@@ -163,7 +163,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         $open_tags = 0;
 
         if ($this->iterator instanceof SQLQuery) {
-            $this->iterator->select->setMode(SQLSelect::SQL_CACHE);
+            $this->iterator->stmt->setMode(SQLSelect::SQL_CACHE);
         }
 
         $this->iterator->exec();

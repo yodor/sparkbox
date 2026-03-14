@@ -39,13 +39,7 @@ class SQLSelect extends SQLStatement
         return isset($this->modeMask[$mode_clause]);
     }
 
-
-    public function getPreparedSQL(): string
-    {
-        return $this->collectSQL(true);
-    }
-
-    public function collectSQL(bool $do_prepared) : string
+    public function getSQL() : string
     {
         if ($this->fieldset->count() < 1) throw new Exception("Empty fieldset");
 
@@ -61,12 +55,12 @@ class SQLSelect extends SQLStatement
             $sql .= " SQL_NO_CACHE ";
         }
 
-        $sql .= $this->fieldset->collectSQL($do_prepared);
+        $sql .= $this->fieldset->getSQL();
 
         $sql .= " FROM $this->from ";
 
         if ($this->whereset->count()>0) {
-            $sql.=" WHERE ".$this->whereset->collectSQL($do_prepared);
+            $sql.=" WHERE ".$this->whereset->getSQL();
         }
 
         if (strlen(trim($this->group_by)) > 0) {
@@ -85,11 +79,13 @@ class SQLSelect extends SQLStatement
         return $sql;
     }
 
-    public function getSQL() : string
-    {
-        return $this->collectSQL(false);
-    }
-
+    /**
+     * Combine/Copy properties from other to '$this'
+     * Merge/replace $this->externalBindings with $other->externalBindings
+     * @param SQLSelect $other
+     * @return void
+     * @throws Exception
+     */
     public function combine(SQLSelect $other) : void
     {
 
@@ -152,6 +148,8 @@ class SQLSelect extends SQLStatement
         if (strlen(trim($other->limit)) > 0) {
             $this->limit .= " " . $other->limit;
         }
+
+        SQLStatement::replaceKeyAppend($this->externalBindings, $other->getBindings());
     }
 
     public function combineWith(SQLSelect $other) : SQLSelect
@@ -164,17 +162,22 @@ class SQLSelect extends SQLStatement
     }
 
     /**
-     * Return new SQLSelect selecting this SQLSelect as a derived table
+     * Return new SQLSelect selecting this as a derived table '$as_name' default "relation".
+     * External bindings are copied to the resulting SQLSelect.
+     *
      * @param string $as_name
      * @return SQLSelect
      * @throws Exception
      */
     public function getAsDerived(string $as_name="relation") : SQLSelect
     {
-        $sel = new SQLSelect();
         $tsel = clone $this;
         $tsel->clearMode();
+
+        $sel = new SQLSelect();
         $sel->from = " (".$tsel->getSQL().") AS $as_name ";
+
+        SQLStatement::replaceKeyAppend($sel->externalBindings, $this->getBindings());
 
         return $sel;
     }

@@ -65,11 +65,6 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding
 
     }
 
-    public function getSQL() : string
-    {
-        return $this->expr . " " . $this->operator . " " . $this->value;
-    }
-
     public function getExpression() : string
     {
         return $this->expr;
@@ -89,20 +84,11 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding
         $this->operator = $operator;
     }
 
-    public function collectSQL(bool $do_prepared): string
-    {
-        if ($do_prepared) {
-            return $this->getPreparedSQL();
-        }
-        else {
-            return $this->getSQL();
-        }
-    }
-
-    public function getPreparedSQL(): string
+    public function getSQL(): string
     {
         return $this->expr . " " . $this->operator . " " . $this->bindingKey;
     }
+
 
     public function getBindingKey() : string
     {

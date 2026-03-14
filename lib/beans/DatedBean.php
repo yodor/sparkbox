@@ -34,15 +34,18 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query($this->key());
-        $qry->select->fields()->setExpression(" YEAR($this->date_column) ", "year");
-        $qry->select->order_by = " $this->date_column DESC ";
-        $qry->select->group_by = " YEAR($this->date_column) DESC  ";
+        $qry->stmt->fields()->setAliasExpression(" YEAR($this->date_column) ", "year");
+        $qry->stmt->order_by = " $this->date_column DESC ";
+        $qry->stmt->group_by = " YEAR($this->date_column) DESC  ";
         $qry->exec();
 
         $data = array();
         while ($row = $qry->next()) {
             $data[] = $row["year"];
         }
+
+        $qry->free();
+
         return $data;
     }
 
@@ -57,8 +60,8 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query($this->key());
-        $qry->select->where()->add("MONTH($this->date_column)", "'$d_month'")->add("YEAR($this->date_column)", "'$d_year'");
-        $qry->select->order_by = " $this->date_column DESC ";
+        $qry->stmt->where()->add("MONTH($this->date_column)", "'$d_month'")->add("YEAR($this->date_column)", "'$d_year'");
+        $qry->stmt->order_by = " $this->date_column DESC ";
         $qry->exec();
 
         $data = array();
@@ -81,8 +84,8 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query($this->key());
-        $qry->select->fields()->setExpression("DAY($this->date_column)", "day");
-        $qry->select->where()->add("MONTH($this->date_column)", "'$d_month'")->add("YEAR($this->date_column)", "'$d_year'");
+        $qry->stmt->fields()->setAliasExpression("DAY($this->date_column)", "day");
+        $qry->stmt->where()->add("MONTH($this->date_column)", "'$d_month'")->add("YEAR($this->date_column)", "'$d_year'");
         $qry->exec();
 
         $data = array();
@@ -105,10 +108,10 @@ class DatedBean extends DBTableBean
     public function publicationsCount(string $d_year, string $d_month): int
     {
         $qry = $this->query($this->key());
-        $qry->select->where()->addExpression("MONTH({$this->date_column}) = :d_month");
-        $qry->select->bind(":d_month", $d_month);
-        $qry->select->where()->addExpression("YEAR({$this->date_column}) = :d_year");
-        $qry->select->bind(":d_year", $d_year);
+        $qry->stmt->where()->addExpression("MONTH({$this->date_column}) = :d_month");
+        $qry->stmt->bind(":d_month", $d_month);
+        $qry->stmt->where()->addExpression("YEAR({$this->date_column}) = :d_year");
+        $qry->stmt->bind(":d_year", $d_year);
 
         return $qry->count();
     }

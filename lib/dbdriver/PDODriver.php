@@ -29,12 +29,12 @@ class PDODriver extends DBDriver
             PDO::ATTR_EMULATE_PREPARES   => true,
 
             // turn off multi-statement
-            PDO\MYSQL::ATTR_MULTI_STATEMENTS => false,
+            PDO::MYSQL_ATTR_MULTI_STATEMENTS => false,
 
             // unbuffered mode
-            PDO\MYSQL::ATTR_USE_BUFFERED_QUERY => false,
+            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
 
-            PDO\MYSQL::ATTR_INIT_COMMAND        => "SET AUTOCOMMIT=0",
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET AUTOCOMMIT=0",
         );
 
 
@@ -79,23 +79,7 @@ class PDODriver extends DBDriver
     }
 
     // Inside PDODriver class
-    protected int $lastAffectedRows = 0;
-
-    /**
-     * Main query entry point.
-     * @param SQLStatement|string $statement
-     * @return PDOResult
-     * @throws Exception
-     */
-    public function query(SQLStatement|string $statement): PDOResult
-    {
-        $this->lastAffectedRows = 0;
-
-        if ($statement instanceof SQLStatement) {
-            return $this->queryPrepared($statement);
-        }
-        return $this->queryRaw($statement);
-    }
+    protected int $lastAffectedRows = -1;
 
     protected ?PDOResult $current = null;
     /**
@@ -105,55 +89,64 @@ class PDODriver extends DBDriver
      */
     protected function statementResult(PDOStatement $stmt): PDOResult
     {
-        if (!is_null($this->current)) {
-            throw new Exception("Active statement found created by: ".$this->current->createdBy);
-        }
 
-        // If the query returns data (SELECT, DESCRIBE, etc.)
+        $result = new PDOResult($stmt);
+
+        // Most reliable way to check for result set
         if ($stmt->columnCount() > 0) {
-            // Critical: Store affected rows immediately after execution
+            // This is a SELECT / SHOW / EXPLAIN / DESCRIBE / CALL returning rows
+            //result set number of rows is not known
+            $this->lastAffectedRows = -1;
+
+            //only one active in unbuffered mode
+            $this->current = $result;
+
+        } else {
+            // This is INSERT / UPDATE / DELETE / REPLACE / CREATE / DROP / etc.
             $this->lastAffectedRows = $stmt->rowCount();
+            // or get last insert id: $pdo->lastInsertId()
+            //do not track as current but PDOResult->numRows() can still be used as 'affected rows' from the rest of the app
         }
 
-        $this->current = new PDOResult($stmt);
-        return $this->current;
+        return $result;
     }
 
     /**
-     * Current connection is active. Open new one ?
+     * Do we have un-fetched result-set waiting ?
+     * During nested queries app logic can decide to open additional connection to the DB server using DBConnections::CreateDriver()
      * @return bool
      */
-    public function hasActiveStatement() : bool
+    public function hasResultSet() : bool
     {
         return !is_null($this->current) && $this->current->isActive();
     }
 
-    protected function assert_current() : void
+    /**
+     * Throw if we have non fully fetched result set
+     * @return void
+     * @throws Exception
+     */
+    protected function assertResultSet() : void
     {
-        if (!is_null($this->current)) {
-            if ($this->current->isActive()) {
-                throw new Exception("StackTrace: ".Debug::Backtrace(-1)." | Active statement from: ".$this->current->createdBy);
-            }
-            else {
-                //free current instance
-                $this->current = null;
-            }
-        }
+        if ($this->hasResultSet())
+            throw new Exception("Fetch active result-set first: ".Debug::Backtrace(-1)." | Active statement from: ".$this->current->createdBy);
     }
 
-    protected function queryRaw(string $sql): PDOResult
+    public function queryRaw(string $sqlText): PDOResult
     {
-        try {
-            $this->assert_current();
+        $this->lastAffectedRows = -1;
 
-            $stmt = $this->conn->query($sql);
-            if ($stmt === false) throw new Exception("query failed");
+        $this->assertResultSet();
+
+        try {
+            $stmt = $this->conn->query($sqlText);
+            if ($stmt === false) throw new Exception("Query failed: ".$this->getError());
 
             return $this->statementResult($stmt);
         }
         catch (Exception $e) {
-            Debug::ErrorLog("Error: " . $e->getMessage() . " | SQL: " . ($sql ?? ""));
-            throw new Exception("Error: " . $e->getMessage());
+            Debug::ErrorLog("Error: " . $e->getMessage() . " | SQL: " . ($sqlText ?? ""));
+            throw $e;
         }
     }
 
@@ -163,20 +156,26 @@ class PDODriver extends DBDriver
      * @return PDOResult
      * @throws Exception
      */
-    protected function queryPrepared(SQLStatement $statement): PDOResult
+    public function query(SQLStatement $statement): PDOResult
     {
+        $this->lastAffectedRows = -1;
+
+        $this->assertResultSet();
 
         try {
-            $this->assert_current();
-
-            $sql = $statement->getPreparedSQL();
-            Debug::ErrorLog("Prepared SQL: " . $sql);
+            $sql = $statement->getSQL();
+            //Debug::ErrorLog("Prepared SQL: " . $sql);
             $bindings = $statement->getBindings();
-            Debug::ErrorLog("Bindings: " , $bindings);
+            //Debug::ErrorLog("Bindings: " , $bindings);
+
+            $meta = $statement->getMeta();
+            if ($meta) {
+                Debug::ErrorLog("Executing query[$meta] : ".$sql, $bindings);
+            }
 
             $stmt = $this->conn->prepare($sql);
-            if ($stmt === false) throw new Exception("prepare failed");
-            if (!$stmt->execute($bindings)) throw new Exception("execute failed");
+            if ($stmt === false) throw new Exception("Prepare failed: ".$this->getError());
+            if (!$stmt->execute($bindings)) throw new Exception("Execute failed: ".$this->getError());
 
             return $this->statementResult($stmt);
         }
@@ -185,7 +184,7 @@ class PDODriver extends DBDriver
             if (isset($sql)) $message .= "SQL: ".$sql;
             if (isset($bindings)) $message .= " | Bindings: " . print_r($bindings, true);
             Debug::ErrorLog("Error: " . $e->getMessage() . " | " .$message);
-            throw new Exception("Error: " . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -228,58 +227,26 @@ class PDODriver extends DBDriver
         return false;
     }
 
-    public function escape(string $data): string
+    public function columnTypes(string $tableName): array
     {
-        return trim($this->conn->quote($data), "'");
+        $types = array();
+        $result = $this->queryRaw("DESCRIBE $tableName");
+        while ($data = $result->fetch()) {
+            $columnName = $data["Field"];
+            $types[$columnName] = $data;
+        }
+        return $types;
     }
 
-    // Помощни методи, които изисква DBDriver
-    public function queryFields(string $table): DBResult
-    {
-        return $this->query("DESCRIBE $table");
-    }
-
-    public function tableExists(string $table): bool
+    public function tableExists(string $tableName): bool
     {
         try {
-            $result = $this->query("SELECT 1 FROM `$table` LIMIT 1");
+            $result = $this->queryRaw("SELECT 1 FROM `{$tableName}` LIMIT 1");
             $result->free();
-
             return true;
         } catch (Exception $e) {
             return false;
         }
-    }
-
-    public function fieldType(string $table, string $field_name): string
-    {
-        // copy MySQLiDriver logic
-        $result = $this->queryFields($table);
-        $ret = "";
-        while ($row = $result->fetch()) {
-            if ($row["Field"] === $field_name) {
-                $ret = $row["Type"];
-                break;
-            }
-        }
-        $result->free();
-        if ($ret) return $ret;
-        throw new Exception("Field [$field_name] does not exist in table: $table");
-
-    }
-
-    public function dateTime(int $add_days = 0, string $interval_type = " DAY "): string
-    {
-        $result = $this->query("SELECT DATE_ADD(now(), INTERVAL $add_days $interval_type) as datetime");
-        $row = $result->fetch();
-        return $row["datetime"];
-    }
-
-    public function timestamp(): int
-    {
-        $result = $this->query("SELECT UNIX_TIMESTAMP(CURRENT_TIMESTAMP) as dt");
-        $row = $result->fetch();
-        return (int)$row["dt"];
     }
 
     public function getError(): string

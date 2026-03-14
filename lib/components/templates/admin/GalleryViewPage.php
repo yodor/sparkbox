@@ -18,7 +18,7 @@ class GalleryViewPage extends BeanListPage
 
         if ($this->request_condition instanceof BeanKeyCondition) {
             $this->bean->select()->where()->addURLParameter($this->request_condition->getURLParameter());
-            $this->query->select->where()->addURLParameter($this->request_condition->getURLParameter());
+            $this->query->stmt->where()->addURLParameter($this->request_condition->getURLParameter());
         }
 
         $h_delete = new DeleteItemResponder($this->bean);

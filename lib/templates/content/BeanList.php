@@ -50,7 +50,7 @@ class BeanList extends TemplateContent
 
             $clauses = $this->search->getForm()->prepareClauseCollection("OR");
             //$clauses->copyTo($this->query->select->where());
-            $this->query->select->having = $clauses->getSQL("");
+            $this->query->stmt->having = $clauses->getSQL();
 
         }
     }
@@ -103,7 +103,7 @@ class BeanList extends TemplateContent
 
         //copy of bean select
         $qry = $this->bean->query();
-        $sel = $qry->select;
+        $sel = $qry->stmt;
         $sel->fields()->set($this->bean->key());
 
         foreach ($this->fields as $name => $label) {

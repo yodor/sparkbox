@@ -1,6 +1,6 @@
 <?php
 
-interface ICacheable
+interface ICacheable extends ICacheIdentifier
 {
     public function setCacheable(bool $mode) : void;
     public function isCacheable() : bool;

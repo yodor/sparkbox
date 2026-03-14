@@ -28,14 +28,12 @@ CREATE TABLE `languages` (
     {
         parent::createTable();
 
-        try {
-            $this->db->transaction();
-            $this->db->query("INSERT INTO languages (language, lang_code) values ('" . Spark::Get(Config::DEFAULT_LANGUAGE) . "','" . Spark::Get(Config::DEFAULT_LANGUAGE_ISO3) . "');");
-            $this->db->commit();
-        }
-        catch (Exception $e) {
-            $this->db->rollback();
-            throw $e;
-        }
+        $insert = new SQLInsert();
+        $insert->from = "languages";
+        $insert->set("language", Spark::Get(Config::DEFAULT_LANGUAGE));
+        $insert->set("lang_code", Spark::Get(Config::DEFAULT_LANGUAGE_ISO3));
+        $query = new SQLQuery();
+        $query->exec($insert);
+
     }
 }

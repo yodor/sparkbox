@@ -224,8 +224,8 @@ class Translator implements IRequestProcessor, IGETConsumer
     protected function changeLanguage(string $language, int $langID) : void
     {
         $qry = $this->languages->queryFull();
-        $qry->select->where()->add("langID", $langID);
-        $qry->select->where()->add("language", $language);
+        $qry->stmt->where()->add("langID", $langID);
+        $qry->stmt->where()->add("language", $language);
         $qry->exec();
         if ($data = $qry->next()) {
             $this->language = $data;
@@ -256,8 +256,8 @@ class Translator implements IRequestProcessor, IGETConsumer
         else {
             //query the first language
             $qry = $this->languages->queryFull();
-            $qry->select->limit = 1;
-            $qry->select->order_by = $this->languages->key();
+            $qry->stmt->limit = 1;
+            $qry->stmt->order_by = $this->languages->key();
             $qry->exec();
             if ($data = $qry->next()) {
                 $this->language = $data;
@@ -281,14 +281,14 @@ class Translator implements IRequestProcessor, IGETConsumer
             if ($id<1 || empty($field_name) || empty($tableName)) throw new Exception("ID, field_name and table name required parameters");
 
             $qry = $this->translated_beans->query();
-            $qry->select->fields()->set("translated");
-            $where = $qry->select->where();
+            $qry->stmt->fields()->set("translated");
+            $where = $qry->stmt->where();
             $where->add("langID", $this->langID);
             $where->add("field_name", $field_name);
             $where->add("table_name", $tableName);
             $where->add("bean_id", $id);
 
-            $qry->select->limit = " 1 ";
+            $qry->stmt->limit = " 1 ";
             $qry->exec();
 
             if ($result = $qry->next()) {
@@ -310,8 +310,8 @@ class Translator implements IRequestProcessor, IGETConsumer
             $phrase_hash = Spark::Hash($phrase);
 
             $qry = $this->translated_phrases->queryLanguageID($this->langID);
-            $qry->select->where()->add("hash_value", $phrase_hash);
-            $qry->select->limit = 1;
+            $qry->stmt->where()->add("hash_value", $phrase_hash);
+            $qry->stmt->limit = 1;
 
             $qry->exec();
 

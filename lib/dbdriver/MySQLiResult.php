@@ -5,9 +5,12 @@ class MySQLiResult extends DBResult
 {
     protected ?mysqli_result $result;
 
-    public function __construct(mysqli_result $result)
+    public function __construct(?mysqli_result $result=null)
     {
-        $this->result = $result;
+        if ($result instanceof mysqli_result) {
+            $this->result = $result;
+        }
+
     }
 
     public function __destruct()
@@ -59,7 +62,7 @@ class MySQLiResult extends DBResult
      * @return int
      * @throws Exception
      */
-    public function numRows(): int
+    public function affectedRows(): int
     {
         $this->assert_resource();
         return $this->result->num_rows;
@@ -74,5 +77,11 @@ class MySQLiResult extends DBResult
     {
         $this->assert_resource();
         return $this->result->fetch_fields();
+    }
+
+    public function isActive(): bool
+    {
+        if ($this->result instanceof mysqli_result) return true;
+        return false;
     }
 }

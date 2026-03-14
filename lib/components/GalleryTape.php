@@ -101,7 +101,7 @@ class GalleryTape extends Component implements IDataIteratorRenderer
 
         if (!($this->iterator instanceof SQLQuery)) return "";
 
-        return parent::getCacheName()."-".$this->iterator->select->getSQL();
+        return parent::getCacheName()."-".$this->iterator->getCacheName();
 
     }
 

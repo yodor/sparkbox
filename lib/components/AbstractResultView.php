@@ -202,7 +202,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $result = parent::getCacheName();
         if ($this->iterator instanceof SQLQuery) {
 
-            $select = clone $this->iterator->select;
+            $select = clone $this->iterator->stmt;
 
             $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
             $pageFilter = $this->paginator->getLimitingSelect();
@@ -210,7 +210,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             $select->combine($pageFilter);
             $select->combine($orderFilter);
 
-            $result.= "-".$select->getSQL();//."-".URL::Current()->toString();
+            $result.= "-".$this->iterator->getCacheName();
         }
         return $result;
     }
@@ -286,8 +286,8 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
         $pageFilter = $this->paginator->getLimitingSelect();
 
-        $this->iterator->select->combine($pageFilter);
-        $this->iterator->select->combine($orderFilter);
+        $this->iterator->stmt->combine($pageFilter);
+        $this->iterator->stmt->combine($orderFilter);
 
         $this->results_paginated = true;
     }

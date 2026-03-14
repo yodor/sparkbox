@@ -22,11 +22,11 @@ class SQLUpdate extends SQLStatement
     /**
      * Generates the complete UPDATE SQL statement.
      * Throws an exception if no WHERE conditions are set to prevent data corruption.
-     * * @param bool $do_prepared Whether to generate for a prepared statement.
+     * *
      * @return string
      * @throws Exception If whereset is empty.
      */
-    public function collectSQL(bool $do_prepared): string
+    public function getSQL(): string
     {
         // SAFETY CHECK: Prevent mass updates without a WHERE clause.
         // Updating a whole table by accident is a critical failure.
@@ -49,14 +49,14 @@ class SQLUpdate extends SQLStatement
                     $column->getName() . " = " . $column->getExpression();
             } else {
                 // Use column's internal SQL generation (handles prefixes and binding keys).
-                $set[] = $column->collectSQL($do_prepared);
+                $set[] = $column->getSQL();
             }
         }
 
         $sql .= implode(", ", $set);
 
         // Append the WHERE clause (already verified as non-empty above).
-        $sql .= " WHERE " . $this->whereset->collectSQL($do_prepared);
+        $sql .= " WHERE " . $this->whereset->getSQL();
 
         return $sql;
     }
@@ -92,13 +92,4 @@ class SQLUpdate extends SQLStatement
         return $bindings;
     }
 
-    public function getSQL(): string
-    {
-        return $this->collectSQL(false);
-    }
-
-    public function getPreparedSQL(): string
-    {
-        return $this->collectSQL(true);
-    }
 }
