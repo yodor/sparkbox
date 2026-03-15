@@ -201,7 +201,7 @@ class InputSanitizer
         } while ($output !== $before && $iteration < $max_iterations);
 
         // Final removal of structural characters
-        $output = str_replace(["'", '"', ";", "\\", "`"], "", $output);
+        //$output = str_replace(["'", '"', ";", "\\", "`"], "", $output);
 
         return trim($output);
     }
