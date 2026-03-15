@@ -108,8 +108,8 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
 
         $bean = new MCEImagesBean();
         $qry = $bean->query();
-        $qry->stmt->where()->add("section", "'$this->section_name'");
-        $qry->stmt->where()->add("section_key", "'$this->section_key'");
+        $qry->stmt->where()->add("section", $this->section_name);
+        $qry->stmt->where()->add("section_key", $this->section_key);
 
         if ($this->ownerID > 0) {
             $qry->stmt->where()->add("ownerID", $this->ownerID);
@@ -166,7 +166,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $bean_row["auth_context"] = get_class($this->auth_context);
         }
 
-        $bean_row["photo"] = $uploadObject->serializeDB();
+        $bean_row["photo"] = serialize($uploadObject);
 
         $imageID = $bean->insert($bean_row);
         if ($imageID < 1) throw new Exception("Unable to insert image object: " . $bean->getDB()->getError());

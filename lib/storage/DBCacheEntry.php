@@ -51,8 +51,8 @@ class DBCacheEntry extends CacheEntry
     {
         Debug::ErrorLog("Doing cache query ...");
         $query = $this->bean->queryFull();
-        $query->stmt->where()->add("cacheName", "'{$this->cacheName}'");
-        $query->stmt->where()->add("className", "'{$this->className}'");
+        $query->stmt->where()->add("cacheName", $this->cacheName);
+        $query->stmt->where()->add("className", $this->className);
         $query->stmt->where()->add("beanID", $this->beanID);
 
         $this->resultCount = $query->count();

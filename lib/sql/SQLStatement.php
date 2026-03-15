@@ -248,11 +248,21 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
         return false;
     }
 
+    /**
+     * Get the accessible meta name for this statement
+     * @return string
+     */
     public function getMeta() : string
     {
         return $this->meta;
     }
 
+    /**
+     * Set the accessible 'meta name' for this statement to '$meta'
+     * Used during debug if '$meta' is not empty PDODriver logs the query data
+     * @param string $meta
+     * @return void
+     */
     public function setMeta(string $meta) : void
     {
         $this->meta = $meta;
