@@ -578,7 +578,7 @@ class InputForm extends SparkObject implements IBeanEditor
     protected function clauseValue(string $field_name, string $val): SQLClause
     {
         $clause = new SQLClause();
-        $clause->setExpression($field_name, $val, "=");
+        $clause->setExpression($field_name, $val);
         return $clause;
     }
 

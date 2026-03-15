@@ -46,10 +46,11 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
      * @return $this
      * @throws Exception
      */
-    public function add(string $name, string $value, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
+    public function add(string $name, array|string|float|int|bool|null $value, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
     {
         $clause = new SQLClause();
-        $clause->setExpression($name, $value, $operator);
+        $clause->setExpression($name, $value);
+        $clause->setOperator($operator);
         $clause->setGlue($glue);
 
         $this->append($clause);
@@ -122,7 +123,7 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
 
             //result is :expr=>value
             $value = $object->getBindingValue();
-            if (SQLStatement::IsBoundSafe($value)) {
+            if (SQLStatement::IsBindingValueSafe($value)) {
                 $result[$bindingKey] = $value;
             }
             else throw new Exception("[$bindingKey] value is not SQLStatement::IsBoundSafe");

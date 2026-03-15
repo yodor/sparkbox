@@ -199,7 +199,7 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
             if (!$bindingKey) continue;
 
             $value = $col->getBindingValue();
-            if (SQLStatement::IsBoundSafe($value)) {
+            if (SQLStatement::IsBindingValueSafe($value)) {
                 $result[$bindingKey] = $value;
             }
             else throw new Exception("[$bindingKey] value is not SQLStatement::IsBoundSafe");

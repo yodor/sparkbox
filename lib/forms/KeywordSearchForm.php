@@ -9,21 +9,12 @@ class KeywordSearchForm extends InputForm
      */
     protected array $queryColumns = array();
 
-    protected array $searchExpressions = array();
-    protected array $compareOperators = array();
-
     public function __construct()
     {
         parent::__construct();
 
         $keyword = DataInputFactory::Create(InputType::TEXT, "keyword", "Keyword", 0);
         $this->addInput($keyword);
-    }
-
-    public function setCompareExpression(string $column, array $expressions, string $compare_operator = "LIKE"): void
-    {
-        $this->searchExpressions[$column] = $expressions;
-        $this->compareOperators[$column] = $compare_operator;
     }
 
     public function setColumns(array $queryColumns): void
@@ -52,42 +43,26 @@ class KeywordSearchForm extends InputForm
 
         $clause = new SQLClause();
 
+        //split input into space delimited keywords
         $allWords = explode(" ", $val);
 
         $resultAll = array();
 
         foreach ($allWords as $idx => $keyword) {
-
             $result = array();
-
             foreach ($this->queryColumns as $idx1 => $column) {
-
-                if (isset($this->searchExpressions[$column])) {
-
-                    foreach ($this->searchExpressions[$column] as $idx2 => $expression) {
-
-                        $expression = str_replace("{keyword}", $keyword, $expression);
-                        $operator = $this->compareOperators[$column];
-                        $result[] = " $column $operator '$expression' ";
-
-                    }
-
-                }
-                else {
-
-                    $result[] = " $column LIKE '%$keyword%' ";
-
-                }
-
+                $result[] = " $column LIKE :keyword ";
             }
-
             $resultAll[] = "( " . implode(" OR ", $result) . " )";
-
         }
         $expr = "( " . implode(" AND ", $resultAll) . " )";
 
-        //set expression directly
-        $clause->setExpression($expr, "", "");
+        //'%$keyword%'
+        //set expression only - no automatic binding key, clear hasValue and operator
+        //bind the value
+        //ie getSQL for this clause return ( $column LIKE :keyword) and during binding collection :keyword=>%$keyword%
+        $clause->setExpression($expr);
+        $clause->bind(":keyword", "%$keyword%");
         return $clause;
 
     }

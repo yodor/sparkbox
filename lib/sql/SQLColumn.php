@@ -218,7 +218,7 @@ class SQLColumn implements ISQLGet, ISQLBinding
         if (!$this->bindingKey) throw new Exception("Binding key empty");
         if (!$this->hasValue) throw new Exception("No assigned value");
 
-        if (SQLStatement::IsBoundSafe($this->value)) return $this->value;
+        if (SQLStatement::IsBindingValueSafe($this->value)) return $this->value;
 
         throw new Exception("[$this->bindingKey] value is not SQLStatement::IsBoundSafe");
     }

@@ -187,7 +187,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     {
 //        Debug::ErrorLog("Appending Bindings: ", $bindings);
         foreach ($bindings as $bindingKey => $bindingValue) {
-            if (SQLStatement::IsBoundSafe($bindingValue)) {
+            if (SQLStatement::IsBindingValueSafe($bindingValue)) {
                 $target[$bindingKey] = $bindingValue;
             }
             else throw new Exception("[$bindingKey] is not SQLStatement::IsBoundSafe");
@@ -237,12 +237,50 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     }
 
     /**
+     * Validates whether the provided string is a valid PDO named parameter binding key.
+     *
+     * This method enforces that the binding key **must start with a colon (:)**,
+     * as is conventional when calling bind() methods.
+     *
+     * Valid examples:
+     *   - ":userId"
+     *   - ":email"
+     *   - ":limit_offset"
+     *
+     * Invalid examples:
+     *   - "userId"        (missing colon)
+     *   - ":123start"     (starts with digit after colon)
+     *   - ":user-name"    (contains invalid character)
+     *   - "" or ":"       (empty or only colon)
+     *
+     * @param string $bindName The binding key as typically passed to bind() — must start with ":"
+     * @return bool
+     */
+    public static function IsBindingKeySafe(string $bindName): bool
+    {
+        // Must start with colon
+        if (!str_starts_with($bindName, ':')) return false;
+
+        // Extract the name part (everything after the colon)
+        $key = substr($bindName, 1);
+
+        // After removing colon: must not be empty
+        if ($key === '') return false;
+
+        // Practical length limit
+        if (strlen($key) > 100) return false;
+
+        // Must start with letter or underscore
+        // Followed by letters, digits, underscores only
+        return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key) === 1;
+    }
+    /**
      * Check if value is safe to be used as value during named parameter binding.
      * True if (is_scalar($value) || is_null($value) || is_array($value))
      * @param mixed $value
      * @return bool True if value is scalar, array or null
      */
-    public static function IsBoundSafe(mixed $value) : bool
+    public static function IsBindingValueSafe(mixed $value) : bool
     {
         if ( is_scalar($value) || is_array($value) || is_null($value) ) return true;
         return false;
