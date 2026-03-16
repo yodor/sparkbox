@@ -94,7 +94,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
     }
 
     /**
-     * TODO: check binding
+     * Add insert time binding value
      * Add value '$val' using key name '$key' only during insert operation
      * @param string $key
      * @param $val
@@ -104,6 +104,12 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
         $this->insert_values[$key] = $val;
     }
 
+    /**
+     * Add update time binding value
+     * @param string $key
+     * @param $val
+     * @return void
+     */
     public function assignUpdateValue(string $key, $val) : void
     {
         $this->update_values[$key] = $val;

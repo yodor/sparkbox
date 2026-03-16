@@ -113,7 +113,7 @@ class UsersBean extends DBTableBean
             $update->set("confirmed", 1);
             $update->where()->add("email", $email);
             $update->where()->add("confirm_code", $confirm_code);
-            $db->query($update);
+            $db->query($update)->free();
         };
 
         return $this->handleTransaction($code, $db);

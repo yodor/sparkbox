@@ -52,7 +52,7 @@ class CurrencyRateResponder extends JSONResponder
             $delete->bind(":srcID", $this->srcID);
             $delete->bind(":dstID", $this->dstID);
 
-            $db->query($delete);
+            $db->query($delete)->free();
 
             //forward rate
             $data_forward = array("srcID"=>$this->srcID, "dstID"=>$this->dstID, "rate"=>$this->rate);

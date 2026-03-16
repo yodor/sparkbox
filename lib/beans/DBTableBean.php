@@ -380,6 +380,8 @@ abstract class DBTableBean implements IDBDriverAccess
 
         if (!$db) {
             $use_transaction = TRUE;
+            //TODO: No select query should be active
+            // if global connection has active result-set create new temporary driver for the transaction
             $db = $this->db;
             Debug::ErrorLog("Starting DB transaction with local DBDriver instance");
             $db->transaction();
@@ -439,11 +441,14 @@ abstract class DBTableBean implements IDBDriverAccess
 
             //exception is thrown in db->query
             $db->query($delete)->free();
-              
-            $this->manageCache($id);
+
         };
 
-        return $this->handleTransaction($code, $db);
+        $affectedRows = $this->handleTransaction($code, $db);
+
+        $this->manageCache($id);
+
+        return $affectedRows;
     }
 
     /**
@@ -460,7 +465,9 @@ abstract class DBTableBean implements IDBDriverAccess
     {
         if (!in_array($column, $this->columnNames())) throw new Exception("Column '$column' not found in this bean table");
 
-        $code = function (DBDriver $db) use ($column, $value, $keep_ids) {
+        $idlist = array();
+
+        $code = function (DBDriver $db) use ($column, $value, $keep_ids, &$idlist) {
 
             $delete = new SQLDelete($this->select);
             //$value = $db->escape($value);
@@ -487,16 +494,16 @@ abstract class DBTableBean implements IDBDriverAccess
 
             Debug::ErrorLog("Affected ID list: ", $idlist);
 
-            $db->query($delete);
-
-            foreach ($idlist as $id) {
-                $this->manageCache((int)$id);
-            }
+            $db->query($delete)->free();
 
         };
+        $affectedRows =  $this->handleTransaction($code, $db);
 
-        return $this->handleTransaction($code, $db);
+        foreach ($idlist as $id) {
+            $this->manageCache((int)$id);
+        }
 
+        return $affectedRows;
     }
 
     public function isNumeric($key): bool
@@ -542,15 +549,17 @@ abstract class DBTableBean implements IDBDriverAccess
 
         $code = function (DBDriver $db) use (&$insertID , $insert) {
 
-            $result = $db->query($insert);
+            $db->query($insert)->free();
 
             //NOTE!!! lastID return the first auto_increment of a multi insert transaction
             $insertID = $db->lastID();
 
-            $this->manageCache($insertID);
+
         };
 
-        $this->handleTransaction($code, $db);
+        $affectedRows = $this->handleTransaction($code, $db);
+
+        $this->manageCache($insertID);
 
         return $insertID;
     }
@@ -559,7 +568,7 @@ abstract class DBTableBean implements IDBDriverAccess
      * Create SQLUpdate construct binding values with the bean columns.
      * Values with keys that do not correspond to columns of this bean are dropped.
      * Try to update $id of this table with row data.
-     * Executed in transaction.
+     * Executed in transaction if $db passed is NULL
      *
      * @param int $id
      * @param array $row
@@ -574,16 +583,15 @@ abstract class DBTableBean implements IDBDriverAccess
         $this->bindValues($row, $update);
 
         $code = function (DBDriver $db) use ($id, $update) {
-
-            $db->query($update);
-
-            $this->manageCache($id);
-
+            $db->query($update)->free();
         };
 
         //handle transaction returns the number of affected rows
-        return $this->handleTransaction($code, $db);
+        $affectedRows = $this->handleTransaction($code, $db);
 
+        $this->manageCache($id);
+
+        return $affectedRows;
     }
 
     protected function manageCache(int $id) : void
@@ -621,7 +629,7 @@ abstract class DBTableBean implements IDBDriverAccess
 
     }
 
-    protected function bindValues(array $row, SQLStatement $statement) : void
+    protected function bindValues(array $row, SQLInsert|SQLUpdate $statement) : void
     {
         $columnNames = $this->columnNames();
 
@@ -641,8 +649,9 @@ abstract class DBTableBean implements IDBDriverAccess
                 $value = null;
             }
 
-            //bind
+            //set column values - auto-binding
             $statement->set($key, $value);
+
         }
     }
 

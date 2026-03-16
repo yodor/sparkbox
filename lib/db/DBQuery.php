@@ -136,6 +136,7 @@ class DBQuery implements IDBDriverAccess
      */
     public function setDB(DBDriver $driver) : void
     {
+        //TODO check external driver with assignDriver
         $this->driver = $driver;
     }
 
