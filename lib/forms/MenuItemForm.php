@@ -27,7 +27,7 @@ class MenuItemForm extends InputForm
 
         $rend->setDefaultOption("--- TOP ---", "0");
 
-        $rend->setIterator(new SQLQuery($source->selectTree(array("menu_title")), "menuID", $source->getTableName()));
+        $rend->setIterator(new SelectQuery($source->selectTree(array("menu_title")), "menuID", $source->getTableName()));
         $rend->getItemRenderer()->setValueKey("menuID");
         $rend->getItemRenderer()->setLabelKey("menu_title");
 

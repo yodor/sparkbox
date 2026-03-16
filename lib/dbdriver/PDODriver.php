@@ -53,7 +53,6 @@ class PDODriver extends DBDriver
 //            $this->conn->exec("SET character_set_connection = 'utf8'");
 //            $this->conn->exec("SET character_set_client = 'utf8'");
 
-            Debug::ErrorLog("Opening PDO connection to database server");
             SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::OPENED));
 
         } catch (PDOException $e) {
@@ -63,14 +62,15 @@ class PDODriver extends DBDriver
 
     public function disconnect(): void
     {
-        if ($this->current) {
+        if ($this->current instanceof PDOResult) {
             $this->current->free();
             $this->current=null;
         }
-        if (is_null($this->conn)) return;
-        $this->conn = null; // Closing is in the destructor in PDO
-        Debug::ErrorLog("Closing PDO connection");
-        SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED));
+
+        if ($this->conn instanceof PDO) {
+            $this->conn = null; // Closing is in the destructor in PDO
+            SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED));
+        }
     }
 
     public function isConnected(): bool
@@ -102,6 +102,8 @@ class PDODriver extends DBDriver
             $this->current = $result;
 
         } else {
+
+            $this->current = null;
             // This is INSERT / UPDATE / DELETE / REPLACE / CREATE / DROP / etc.
             $this->lastAffectedRows = $stmt->rowCount();
             // or get last insert id: $pdo->lastInsertId()
@@ -118,7 +120,7 @@ class PDODriver extends DBDriver
      */
     public function hasResultSet() : bool
     {
-        return !is_null($this->current) && $this->current->isActive();
+        return (!is_null($this->current) && $this->current->isActive());
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 include_once("dbdriver/DBDriver.php");
 include_once("dbdriver/IDBDriverAccess.php");
-include_once("iterators/SQLQuery.php");
+include_once("iterators/SelectQuery.php");
 include_once("sql/SQLSelect.php");
 include_once("sql/SQLInsert.php");
 include_once("sql/SQLUpdate.php");
@@ -138,7 +138,7 @@ abstract class DBTableBean implements IDBDriverAccess
         $this->db = $driver;
     }
 
-    public function getDB() : DBDriver
+    public function getDB() : ?DBDriver
     {
         return $this->db;
     }
@@ -203,27 +203,27 @@ abstract class DBTableBean implements IDBDriverAccess
     public function getCount(): int
     {
         $qry = $this->query();
-        $qry->stmt->fields()->reset();
-        $qry->stmt->fields()->set($this->prkey);
+        $qry->stmt->reset();
+        $qry->stmt->set($this->prkey);
         $qry->stmt->limit = "0";
         return $qry->count();
 
     }
 
     /**
-     * Create default query selecting columns specified in the '$columns' list
-     * If no columns are specified the default columns as set in 'this' SQLSelect instance are used
-     * Current SQLSelect is cloned and passed to the SQLQuery constructor
+     * Create default query cloning $this->select().
+     * If no columns are specified all columns from $this->select() are used.
+     *
      * @param string ...$columns
-     * @return SQLQuery
+     * @return SelectQuery
      * @throws Exception
      */
-    public function query(string ...$columns): SQLQuery
+    public function query(string ...$columns): SelectQuery
     {
         $select = clone $this->select;
         if (sizeof($columns)>0) {
-            $select->fields()->reset();
-            $select->fields()->set(...$columns);
+            $select->reset();
+            $select->set(...$columns);
         }
 
         return $this->beanQuery($select);
@@ -231,34 +231,32 @@ abstract class DBTableBean implements IDBDriverAccess
 
     /**
      * Create query that select all columns of this table
-     * @return SQLQuery
+     * @return SelectQuery
      * @throws Exception
      */
-    public function queryFull(): SQLQuery
+    public function queryFull(): SelectQuery
     {
         return $this->query(...$this->columnNames());
     }
 
     /**
-     * Construct SQLSelect querying the table for column '$field' = '$value'
+     * Create new SelectQuery selecting all rows matching column '$field' = '$value'
      * Result columns names are the primary key, '$field' and all column names passed in $columns list
-     * SQLQuery is initialized using the resulting SQLSelect, '$this' bean and '$this->db' and returned from this method call
+     * SelectQuery is initialized using the resulting SQLSelect, '$this' bean and '$this->db' and returned from this method call
+     *
      * @param string $field Column being matched
      * @param string $value Value to match the column value with
      * @param int $limit Limit results count in the limit clause
      * @param string ...$columns Additional result columns for the query
-     * @return SQLQuery Initialized with resulting select and using beanQuery method
+     * @return SelectQuery Initialized with resulting select and using beanQuery method
      * @throws Exception
      */
-    public function queryField(string $field, string $value, int $limit = 0, string ...$columns): SQLQuery
+    public function queryField(string $field, string $value, int $limit = 0, string ...$columns): SelectQuery
     {
-//        $field = $this->db->escape($field);
-//        $value = $this->db->escape($value);
-
         $select = clone $this->select;
-        $select->fields()->set($this->prkey);
-        $select->fields()->set($field);
-        $select->fields()->set(...$columns);
+        $select->set($this->prkey);
+        $select->set($field);
+        $select->set(...$columns);
 
         $select->where()->add($field, $value);
         if ($limit > 0) {
@@ -269,14 +267,14 @@ abstract class DBTableBean implements IDBDriverAccess
     }
 
     /**
-     * Return new SQLQuery using the select passed
+     * Return new SelectQuery using the select passed
      *
      * @param SQLSelect $select
-     * @return SQLQuery
+     * @return SelectQuery
      */
-    protected function beanQuery(SQLSelect $select) : SQLQuery
+    protected function beanQuery(SQLSelect $select) : SelectQuery
     {
-        $qry = new SQLQuery($select, $this->prkey, $this->getTableName());
+        $qry = new SelectQuery($select, $this->prkey, $this->getTableName());
         $qry->setBean($this);
         return $qry;
     }
@@ -439,8 +437,8 @@ abstract class DBTableBean implements IDBDriverAccess
             $delete->from = $this->table;
             $delete->where()->add($this->prkey, $id);
 
-            //true or exception is thrown in db->query
-            $db->query($delete);
+            //exception is thrown in db->query
+            $db->query($delete)->free();
               
             $this->manageCache($id);
         };
@@ -477,8 +475,8 @@ abstract class DBTableBean implements IDBDriverAccess
             //fetch id of resulting rows first to properly manage the cache
             //copy whereset from $delete
             $select = new SQLSelect($delete);
-            $select->fields()->reset();
-            $select->fields()->set($this->prkey);
+            $select->reset();
+            $select->set($this->prkey);
 
             $result = $db->query($select);
             $idlist = array();
@@ -613,7 +611,7 @@ abstract class DBTableBean implements IDBDriverAccess
             $delete->from = "sparkcache";
             $delete->where()->add("className", get_class($this));
             $delete->where()->add("beanID", $id);
-            $query = new SQLQuery();
+            $query = new DBQuery();
             $query->exec($delete);
         }
         catch (Exception $e) {

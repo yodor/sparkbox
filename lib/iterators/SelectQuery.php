@@ -1,21 +1,17 @@
 <?php
+include_once("db/DBQuery.php");
 include_once("iterators/IDataIterator.php");
 include_once("dbdriver/IDBDriverAccess.php");
 include_once("storage/ICacheIdentifier.php");
 include_once("sql/SQLStatement.php");
 
-class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
+class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
 {
 
     /**
-     * @var SQLStatement|null
+     * @var SQLSelect|null
      */
-    public ?SQLStatement $stmt = null;
-
-    /**
-     * @var DBDriver|null
-     */
-    protected ?DBDriver $db = null;
+    public ?SQLSelect $stmt = null;
 
     /**
      * Primary key for this iterator
@@ -29,13 +25,6 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
      */
     protected string $name = "";
 
-
-    /**
-     * Current result
-     * @var DBResult|null
-     */
-    protected ?DBResult $res = null;
-
     /**
      * Only available after calling count()
      * @var int 
@@ -48,91 +37,36 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
      */
     protected ?DBTableBean $bean = null;
 
-    public function __construct(?SQLSelect $select=null, string $primaryKey = "id", string $tableName = "")
+    public function __construct(SQLSelect $select, string $primaryKey = "id", string $tableName = "")
     {
+        parent::__construct();
+
         $this->stmt = $select;
+
         $this->key = $primaryKey;
         $this->name = $tableName;
-
-        $this->bean = NULL;
-        $this->res = NULL;
-
     }
 
-    public function __destruct()
-    {
-        $this->free();
-    }
-
+    /**
+     * Called in start of exec and during DTOR
+     * @return void
+     */
     public function free() : void
     {
-        if ($this->res instanceof DBResult) {
-            $this->res->free();
-        }
-        $this->res = null;
+        parent::free();
         $this->numResults = -1;
-
     }
 
-    public function __clone()
+    public function exec(?SQLStatement $statement = null) : void
     {
-        $this->stmt = clone $this->stmt;
-    }
-
-    /**
-     * Proxy method for DBResult->affectedRows
-     * @return int
-     */
-    public function affectedRows() : int
-    {
-        //select ?
-        if (!is_null($this->res) && !$this->res->isActive()) {
-            return $this->res->affectedRows();
-        }
-        return -1;
-    }
-    /**
-     * Executes the provided or default statement.
-     * Sets the internal statement pointer and fetches the DBResult.
-     * @param SQLStatement|null $statement Optional external statement to execute
-     * @throws Exception If database is not connected or query fails
-     */
-    public function exec(?SQLStatement $statement = null): void
-    {
-        //no driver set use the default global connection
-        if (!$this->db) $this->db = DBConnections::Driver();
-
-        $this->free();
-
-        // Assign the statement to use (either passed or default from constructor)
-        if (!is_null($statement)) $this->stmt = $statement;
-
-        if (!($this->stmt instanceof SQLStatement)) throw new Exception("SQLStatement is null");
-
-        //already active result-set for fetching
-        if ($this->db->hasResultSet()) {
-            //unbuffered mode handling
-            Debug::ErrorLog("Current connection result-set is still active. Opening new connection ...");
-            $this->db = DBConnections::CreateDriver($this->db->getConnectionName());
-        }
-
+        if (!is_null($statement)) throw new Exception("Can only exec SQLSelect from the constructor call.");
         //clear cached count
         $this->numResults = -1;
-
-        try {
-            // Execute query in unbuffered mode
-            $this->res = $this->db->query($this->stmt);
-
-        } catch (Exception $e) {
-            Debug::ErrorLog("Executing statement failed: " . $e->getMessage());
-            $this->free();
-            throw $e;
-        }
+        parent::exec($this->stmt);
     }
 
     /**
-     * Return the result record data array or null if eof
-     * Calls DBResult->free()
+     * Return the result record data array or null if EOF calls DBResult->free()
      *
      * @return array|null
      * @throws Exception
@@ -141,7 +75,7 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
     {
         if (!$this->isActive()) throw new Exception("No active result to fetch");
 
-        $data = $this->res->fetch();
+        $data = $this->result->fetch();
         if (is_array($data)) return $data;
 
         $this->free();
@@ -159,7 +93,7 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
     {
         if (!$this->isActive()) throw new Exception("No active result to fetch");
 
-        $data = $this->res->fetchResult();
+        $data = $this->result->fetchResult();
         if ($data instanceof RawResult) return $data;
 
         $this->free();
@@ -173,7 +107,7 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
      */
     public function isActive() : bool
     {
-        return (!is_null($this->res) && $this->res->isActive());
+        return (!is_null($this->result) && $this->result->isActive());
     }
 
     /**
@@ -195,20 +129,6 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
         $this->key = $key;
     }
 
-    /**
-     * Return the current DBDriver
-     * @return DBDriver
-     */
-    public function getDB(): DBDriver
-    {
-        return $this->db;
-    }
-
-    public function setDB(DBDriver $driver) : void
-    {
-        $this->db = $driver;
-    }
-
     public function name(): string
     {
         return $this->name;
@@ -221,22 +141,11 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
      */
     public function count(): int
     {
-        if (!($this->stmt instanceof SQLSelect)) {
-            throw new Exception("Incorrect statement");
-        }
-
         // Return cached result if already calculated
         if ($this->numResults !== -1) return $this->numResults;
 
-        // Use SQL_CALC_FOUND_ROWS logic only for SELECT statements
-        Debug::ErrorLog("Using SQL_CALC_FOUND_ROWS");
-
-        $driver = $this->db ?? DBConnections::Driver();
-
-        if ($driver->hasResultSet()) {
-            Debug::ErrorLog("Current connection has active result-set. Creating temporary driver connection ...");
-            $driver = DBConnections::CreateDriver();
-        }
+        //get suitable driver. if new driver was created it will get out of context and auto deleted
+        $driver = $this->assignDriver();
 
         $select = clone $this->stmt;
         $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
@@ -254,6 +163,8 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
 
         $this->numResults = $result->fetchResult()->get("total_results");
         $result->free();
+
+        Debug::ErrorLog("SQL_CALC_FOUND_ROWS: ".$this->numResults);
 
         return $this->numResults;
     }
@@ -281,4 +192,5 @@ class SQLQuery implements IDataIterator, IDBDriverAccess, ICacheIdentifier
     {
         return $this->stmt->debugSQL();
     }
+
 }

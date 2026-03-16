@@ -10,6 +10,8 @@ class SQLColumn implements ISQLGet, ISQLBinding
     protected string $expression = "";
 
     protected string $name = "";
+
+    //allow array here to handle multi-insert
     protected array|string|float|int|bool|null $value = null;
 
     protected string $bindingKey = "";
@@ -48,30 +50,20 @@ class SQLColumn implements ISQLGet, ISQLBinding
     }
 
     /**
-     * Append $value to this column values
-     * If current column value is empty a new array will be created and $value will be appended to it
-     * If current column value is already array, $value will be appended to it
+     * Special case for SQLColumn initalized with array() as value
+     * Append $value to the array passed in the constructor
+     *
      * @param string $value
      * @return void
+     * @throws Exception If this column was not initialized with array
      */
-    public function addValue(string $value) : void
+    public function addValue(string|float|int|bool|null $value) : void
     {
-        if (is_array($this->value)) {
-            $this->value[] = $value;
-            return;
-        }
-
-        if ($this->value) {
-            $this->value = array($this->value);
-        }
-        else {
-            $this->value = array();
-        }
-
+        if (!is_array($this->value)) throw new Exception("SQLColumn is not initialized with array value");
         $this->value[] = $value;
     }
 
-    public function getValue() : array|string
+    public function getValue() : array|string|float|int|bool|null
     {
         if (!$this->hasValue) throw new Exception("SQLColumn has no value");
         return $this->value;
@@ -90,8 +82,10 @@ class SQLColumn implements ISQLGet, ISQLBinding
      * Returns the value for a specific row index.
      * Handles both scalar values and arrays.
      */
-    public function getValueAtIndex(int $idx): mixed
+    public function getValueAtIndex(int $idx): string|float|int|bool|null
     {
+        if (!$this->hasValue) return null;
+
         if (is_array($this->value)) {
             return $this->value[$idx] ?? null;
         }
@@ -213,7 +207,7 @@ class SQLColumn implements ISQLGet, ISQLBinding
         return $this->bindingKey;
     }
 
-    public function getBindingValue(): array|string|int|float|bool|null
+    public function getBindingValue(): string|int|float|bool|null
     {
         if (!$this->bindingKey) throw new Exception("Binding key empty");
         if (!$this->hasValue) throw new Exception("No assigned value");

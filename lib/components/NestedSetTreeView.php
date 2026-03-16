@@ -5,7 +5,7 @@ include_once("components/renderers/items/DataIteratorItem.php");
 
 include_once("beans/NestedSetBean.php");
 include_once("iterators/IDataIterator.php");
-include_once("iterators/SQLQuery.php");
+include_once("iterators/SelectQuery.php");
 
 class NestedSetTreeView extends Component implements IDataIteratorRenderer
 {
@@ -22,9 +22,9 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     protected int $branch_render_mode = NestedSetTreeView::MODE_BRANCHES_FOLDED;
 
     /**
-     * @var SQLQuery|null
+     * @var SelectQuery|null
      */
-    protected ?SQLQuery $iterator = NULL;
+    protected ?SelectQuery $iterator = NULL;
 
     /**
      * @var DataIteratorItem|null
@@ -71,7 +71,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
     public function setIterator(IDataIterator $query): void
     {
-        if (!$query instanceof SQLQuery) throw new Exception("Incorrect iterator");
+        if (!$query instanceof SelectQuery) throw new Exception("Incorrect iterator");
         $this->iterator = $query;
         $this->setAttribute("source", $this->iterator->name());
     }
@@ -147,7 +147,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
         //$url->setClearPageParams(true);
         //$result = basename($url->toString())."-".get_class($this)."-".$this->getName();
         $result = parent::getCacheName();
-        if ($this->iterator instanceof SQLQuery) {
+        if ($this->iterator instanceof SelectQuery) {
             $result.="-".$this->iterator->getCacheName();
         }
         return $result;
@@ -162,7 +162,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
         $open_tags = 0;
 
-        if ($this->iterator instanceof SQLQuery) {
+        if ($this->iterator instanceof SelectQuery) {
             $this->iterator->stmt->setMode(SQLSelect::SQL_CACHE);
         }
 

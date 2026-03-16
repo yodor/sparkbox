@@ -34,7 +34,7 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query($this->key());
-        $qry->stmt->fields()->setAliasExpression(" YEAR($this->date_column) ", "year");
+        $qry->stmt->setAliasExpression(" YEAR($this->date_column) ", "year");
         $qry->stmt->order_by = " $this->date_column DESC ";
         $qry->stmt->group_by = " YEAR($this->date_column) DESC  ";
         $qry->exec();
@@ -86,7 +86,7 @@ class DatedBean extends DBTableBean
     {
 
         $qry = $this->query($this->key());
-        $qry->stmt->fields()->setAliasExpression("DAY($this->date_column)", "day");
+        $qry->stmt->setAliasExpression("DAY($this->date_column)", "day");
         $qry->stmt->where()->add("MONTH($this->date_column)", $d_month);
         $qry->stmt->where()->add("YEAR($this->date_column)", $d_year);
         $qry->exec();

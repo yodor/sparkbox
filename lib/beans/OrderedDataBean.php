@@ -19,6 +19,7 @@ abstract class OrderedDataBean extends DBTableBean
     {
 
         $code = function (DBDriver $db) use ($id) {
+
             $pos = (int)$this->getValue($id, "position");
 
             Debug::ErrorLog("Deleting item with position: $pos");
@@ -30,7 +31,7 @@ abstract class OrderedDataBean extends DBTableBean
             $update->where()->addExpression("position > :pos");
             $update->bind(":pos", $pos);
 
-            $db->query($update);
+            $db->query($update)->free();
 
         };
 
@@ -42,7 +43,7 @@ abstract class OrderedDataBean extends DBTableBean
     {
         if (!isset($row["position"])) {
             Debug::ErrorLog("Position field is missing - using max(position) + 1");
-            $pos = $this->getMaxPosition();
+            $pos = $this->getMaxPosition($db);
             $row["position"] = ($pos + 1);
         }
         return parent::insert($row, $db);
@@ -53,14 +54,11 @@ abstract class OrderedDataBean extends DBTableBean
 
         $pos = (int)$this->getValue($id, "position");
 
-        $maxp = $this->getMaxPosition();
+        $maxp = $this->getMaxPosition($db);
 
-        Debug::ErrorLog("ID: $id position - current: $pos max: $maxp new: $new_pos");
-
-        //if ($new_pos > $maxp) $new_pos = $maxp;
         if ($new_pos < 1) $new_pos = 1;
 
-        Debug::ErrorLog("Using pos: $new_pos");
+        Debug::ErrorLog("ID[$id] position $pos -> $new_pos | MAX: $maxp");
 
         $code = function (DBDriver $db) use ($id, $pos, $new_pos) {
 
@@ -68,18 +66,18 @@ abstract class OrderedDataBean extends DBTableBean
             $update->setExpression("position", "position - 1");
             $update->where()->addExpression("position > :pos");
             $update->bind(":pos", $pos);
-            $db->query($update);
+            $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->setExpression("position", "position + 1");
             $update->where()->addExpression("position >= :new_pos");
             $update->bind(":new_pos", $new_pos);
-            $db->query($update);
+            $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", $new_pos);
             $update->where()->add($this->prkey, $id);
-            $db->query($update);
+            $db->query($update)->free();
         };
 
         $this->handleTransaction($code, $db);
@@ -95,19 +93,19 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at top position");
         }
 
-        Debug::ErrorLog("ID: $id position - current: $pos new: 1");
+        Debug::ErrorLog("ID[$id] reposition: $pos -> 1");
 
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
             $update->setExpression("position", "position + 1");
             $update->where()->addExpression("position < :pos");
             $update->bind(":pos", $pos);
-            $db->query($update);
+            $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", 1);
             $update->where()->add($this->prkey, $id);
-            $db->query($update);
+            $db->query($update)->free();
         };
 
         $this->handleTransaction($code, $db);
@@ -118,26 +116,25 @@ abstract class OrderedDataBean extends DBTableBean
     {
 
         $pos = (int)$this->getValue($id, "position");
-
-        $max_pos = $this->getMaxPosition();
+        $max_pos = $this->getMaxPosition($db);
 
         if ($pos == $max_pos) {
             throw new Exception("Already at bottom position");
         }
 
-        Debug::ErrorLog("ID: $id position - current: $pos new: $max_pos");
+        Debug::ErrorLog("ID[$id] reposition: $pos -> $max_pos");
 
         $code = function (DBDriver $db) use ($id, $pos, $max_pos) {
             $update = new SQLUpdate($this->select);
             $update->setExpression("position", "position - 1");
             $update->where()->addExpression("position > :pos");
             $update->bind(":pos", $pos);
-            $db->query($update);
+            $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", $max_pos);
             $update->where()->add($this->prkey , $id);
-            $db->query($update);
+            $db->query($update)->free();
 
         };
 
@@ -155,23 +152,23 @@ abstract class OrderedDataBean extends DBTableBean
             throw new Exception("Already at top position");
         }
 
-        Debug::ErrorLog("ID: $id position - current: $pos new: " . ($pos - 1));
+        Debug::ErrorLog("ID[$id] - reposition $pos -> " . ($pos - 1));
 
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
             $update->set("position", -1);
             $update->where()->add($this->prkey, $id);
-            $db->query($update);
+            $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->setExpression("position", " position + 1 ");
             $update->where()->add("position", ($pos - 1));
-            $db->query($update);
+            $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", ($pos - 1));
             $update->where()->add($this->prkey, $id);
-            $db->query($update);
+            $db->query($update)->free();
         };
 
         $this->handleTransaction($code, $db);
@@ -182,28 +179,29 @@ abstract class OrderedDataBean extends DBTableBean
     {
         $pos = (int)$this->getValue($id, "position");
 
-        $max_pos = $this->getMaxPosition();
+        $max_pos = $this->getMaxPosition($db);
         if ($pos + 1 > $max_pos) {
             throw new Exception("Already at bottom position");
         }
 
-        Debug::ErrorLog("ID: $id position - current: $pos new: " . ($pos + 1));
+        Debug::ErrorLog("ID[$id] reposition $pos -> " . ($pos + 1));
 
         $code = function (DBDriver $db) use ($id, $pos) {
+
             $update = new SQLUpdate($this->select);
             $update->set("position", -1);
             $update->where()->add($this->prkey, $id);
-            $db->query($update);
+            $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->setExpression("position", "position - 1");
             $update->where()->add("position", ($pos + 1));
-            $db->query($update);
+            $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", ($pos + 1));
             $update->where()->add($this->prkey, $id);
-            $db->query($update);
+            $db->query($update)->free();
 
         };
 
@@ -211,65 +209,18 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function getMaxPosition(?SQLSelect $selectMax = null): int
+    public function getMaxPosition(?DBDriver $db): int
     {
-        $db = $this->db;
+        $db = $db ?? $this->db;
 
-        if (is_null($selectMax)) {
-            $selectMax = clone $this->select;
-        }
+        $selectMax = clone $this->select;
+        $selectMax->setAliasExpression(" MAX(position) ", "max_position");
 
-        $selectMax->fields()->setAliasExpression(" MAX(position) ", "max_position");
-
-        //Debug::ErrorLog("Querying max_position: ".$selectMax->getSQL());
-        $result = $db->query($selectMax);
-
-        if (!($result instanceof DBResult)) throw new Exception ("Error getting max position");
-
-        $row = $result->fetch();
-
-        return (int)$row["max_position"];
-
-    }
-
-    public function rebuildReferentialOrdering(string $ref_key, string $ref_val) : void
-    {
-
-        $query = $this->query("position", "$ref_key", $this->prkey);
-
-        $query->stmt->where()->add($ref_key, $ref_val);
+        $query = new SelectQuery($selectMax);
+        $query->setDB($db);
         $query->exec();
 
-        $positions = array();
-        $position = 0;
-        while ($result = $query->nextResult()) {
-            $id = $result->get($this->prkey);
-            $position++;
-            $positions[$id] = $position;
-        }
-
-        Debug::ErrorLog("Using positions: ", $positions);
-
-        try {
-            $this->db->transaction();
-
-            foreach ($positions as $id=>$pos)
-            {
-
-                $update = new SQLUpdate($query->stmt);
-                $update->set("position", $pos);
-                $update->where()->add($this->prkey, $id);
-
-                $this->db->query($update);
-
-            }
-            $this->db->commit();
-        }
-        catch (Exception $e) {
-            $this->db->rollback();
-            throw $e;
-        }
-
+        return (int)$query->nextResult()->get("max_position");
     }
 
 }

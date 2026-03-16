@@ -25,7 +25,7 @@ class UserGroupsBean extends DBTableBean
     {
         $qry = $this->query();
         $qry->stmt->where()->add("userID", $userID)->add("groupID", $groupID);
-        $qry->stmt->fields()->set("userID");
+        $qry->stmt->set("userID");
         $qry->stmt->limit = " 1 ";
         $qry->exec();
         if ($qry->next()) {

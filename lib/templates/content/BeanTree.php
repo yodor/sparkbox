@@ -54,7 +54,7 @@ class BeanTree extends BeanList
 
         $tv->setName(get_class($this->bean));
 
-        $tv->setIterator(new SQLQuery($this->bean->selectTree(array_keys($this->fields)), $this->bean->key(), $this->bean->getTableName()));
+        $tv->setIterator(new SelectQuery($this->bean->selectTree(array_keys($this->fields)), $this->bean->key(), $this->bean->getTableName()));
         $tv->getItemRenderer()->setLabelKey(array_keys($this->fields)[0]);
 
         $this->cmp = $tv;

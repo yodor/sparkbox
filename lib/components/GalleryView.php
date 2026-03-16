@@ -26,7 +26,7 @@ class GalleryView extends Container
     protected ?ActionCollection $actions = null;
 
 
-    public function __construct(DBTableBean $bean, ?SQLQuery $query=NULL)
+    public function __construct(DBTableBean $bean, ?SelectQuery $query=NULL)
     {
         parent::__construct();
 

@@ -272,7 +272,7 @@ abstract class Authenticator
         $update->setExpression("last_active" , "CURRENT_TIMESTAMP");
         $update->where()->add($this->bean->key(), $userID);
 
-        $query = new SQLQuery();
+        $query = new DBQuery();
         $query->exec($update);
     }
 

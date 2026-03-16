@@ -92,7 +92,7 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
         }
     }
 
-    public function bind(string $bindingKey, array|string|float|int|bool|null $value) : void
+    public function bind(string $bindingKey, string|float|int|bool|null $value) : void
     {
         if (!SQLStatement::IsBindingKeySafe($bindingKey)) throw new InvalidArgumentException("Binding key incorrect");
         if (!SQLStatement::IsBindingValueSafe($value)) throw new InvalidArgumentException("Binding value incorrect");
@@ -142,7 +142,7 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
         return $this->bindingKey;
     }
 
-    public function getBindingValue(): array|string|int|float|bool|null
+    public function getBindingValue(): string|int|float|bool|null
     {
         if (!$this->bindingKey) throw new Exception("Binding key is empty");
 

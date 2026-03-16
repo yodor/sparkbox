@@ -201,9 +201,9 @@ class TemplateConfig extends SparkObject
     public ?array $listFields = null;
 
     /**
-     * @var SQLQuery|null
+     * @var SelectQuery|null
      */
-    public ?SQLQuery $iterator = null;
+    public ?SelectQuery $iterator = null;
 
     /**
      * Current configuration filename

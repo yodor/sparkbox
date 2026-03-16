@@ -281,7 +281,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             if ($id<1 || empty($field_name) || empty($tableName)) throw new Exception("ID, field_name and table name required parameters");
 
             $qry = $this->translated_beans->query();
-            $qry->stmt->fields()->set("translated");
+            $qry->stmt->set("translated");
             $where = $qry->stmt->where();
             $where->add("langID", $this->langID);
             $where->add("field_name", $field_name);

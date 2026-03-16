@@ -10,7 +10,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
     protected ?Component $cmp = null;
     protected ?DBTableBean $bean = null;
 
-    protected ?SQLQuery $query = null;
+    protected ?SelectQuery $query = null;
 
     protected bool $inputProcessed = false;
 

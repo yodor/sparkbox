@@ -7,10 +7,9 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
 {
 
     /**
-     * @var array SQLColumn collection
+     * @var array<string, SQLColumn> column name to SQLColumn collection
      */
     protected array $fields = array();
-
 
     public function __construct()
     {
@@ -24,100 +23,11 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
         }
     }
 
-    /**
-     * Set prefix to all columns in this collection
-     * Effectively during getSQL of column it would return $prefix.col_name
-     * @param string $prefix the prefix to add
-     */
-    public function setPrefix(string $prefix) : void
-    {
-        foreach ($this->fields as $name => $col) {
-            if ($col instanceof SQLColumn) {
-                $col->setPrefix($prefix);
-            }
-        }
-    }
-
-    /**
-     * Clear prefix value from the columns in this collection
-     * @return void
-     */
-    public function clearPrefix() : void
-    {
-        foreach ($this->fields as $name => $col) {
-            if ($col instanceof SQLColumn) {
-                $col->setPrefix("");
-            }
-        }
-    }
-
-    /**
-     * Add direct sql expression to the column collection using '$alias_name'
-     *
-     * Existing column named '$alias_name' would be replaced with the newly created column.
-     *
-     * No automatic binding is created.
-     *
-     * * Direct expression
-     *
-     * \$select->fields()->setAliasExpression("count(pvl.logID)", "cnt") -> count(pvl.logID) AS cnt
-     *
-     * * Expression with manual binding parameter
-     *
-     * \$select->fields()->setAliasExpression("COALESCE(tp.langID, :langID)", "langID");
-     * \$select->bind(":langID", \$langID);
-     *  -> after binding COALESCE(tp.langID, \$langID) AS langID
-     *
-     * @param string $expression SQL select expression string
-     * @param string $alias_name Alias name
-     * @throws Exception
-     */
-    public function setAliasExpression(string $expression, string $alias_name) : void
-    {
-        // Using trim to ensure we don't accept strings with only whitespace
-        $expression = trim($expression);
-        $alias_name = trim($alias_name);
-
-        if ($expression === "" || $alias_name === "") {
-            throw new Exception("SQL expression and alias_name must be non-empty strings.");
-        }
-
-        //no binding
-        $column = new SQLColumn($alias_name);
-        $column->setExpression($expression, $alias_name);
-        $this->fields[$alias_name] = $column;
-    }
-
     public function copyTo(SQLColumnSet $other) : void
     {
         foreach ($this->fields as $name => $col) {
             if (!($col instanceof SQLColumn)) continue;
             $other->setColumn($col);
-        }
-    }
-
-    /**
-     * Set column names for this collection
-     * 'AS' alias is parsed and assigned ie 'column1 as column' will create aliased SQLColumn
-     *
-     * @param string ...$columns Array of column names to set to this collection
-     * @throws Exception
-     */
-    public function set(string ...$columns) : void
-    {
-        $this->unset("*");
-
-        foreach ($columns as $item) {
-            if (!(trim($item)))continue;
-            $pair = preg_split("/ as /i", $item);
-
-            //no binding key creation no value is set hasValue is false
-            $column = new SQLColumn($pair[0]);
-            if (isset($pair[1])) {
-                $column->setAlias($pair[1]);
-            }
-
-            $this->fields[$column->getName()] = $column;
         }
     }
 
@@ -142,6 +52,10 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
         if ($this->isSet($name)) unset($this->fields[$name]);
     }
 
+    /**
+     * Clear/empty this columnset
+     * @return void
+     */
     public function reset() : void
     {
         $this->fields = array();
@@ -163,21 +77,6 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
     public function names() : array
     {
         return array_keys($this->fields);
-    }
-
-    /**
-     * Return the values of the columns as column_name=>column_value
-     *
-     * @return array
-     */
-    public function values() : array
-    {
-        $result = array();
-        foreach ($this->fields as $name => $col) {
-            if (!($col instanceof SQLColumn)) continue;
-            $result[$name] = $col->getValue();
-        }
-        return $result;
     }
 
     public function getSQL() : string
@@ -207,20 +106,5 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
         return $result;
     }
 
-    /**
-     * Calculates the total number of rows based on the column with the most values.
-     */
-    public function getRowCount(): int
-    {
-        $maxRows = 0;
-        foreach ($this->fields as $column) {
-            $val = $column->getValue();
-            if (is_array($val)) {
-                $maxRows = max($maxRows, count($val));
-            } elseif ($val !== "" || $val === 0 || $val === "0") {
-                $maxRows = max($maxRows, 1);
-            }
-        }
-        return $maxRows;
-    }
+
 }

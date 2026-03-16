@@ -20,9 +20,9 @@ class TranslateBeanResponder extends JSONResponder
     protected BeanTranslationsBean $translations;
 
     /**
-     * @var SQLQuery
+     * @var SelectQuery
      */
-    protected SQLQuery $query;
+    protected SelectQuery $query;
 
     public function __construct()
     {
@@ -106,7 +106,7 @@ class TranslateBeanResponder extends JSONResponder
     protected function _fetch(JSONResponse $response) : void
     {
 
-        $this->query->stmt->fields()->set("translated");
+        $this->query->stmt->set("translated");
 
         $response->translation = "";
 
@@ -128,7 +128,7 @@ class TranslateBeanResponder extends JSONResponder
 
         try {
             $delete = new SQLDelete($this->query->stmt);
-            $query = new SQLQuery();
+            $query = new DBQuery();
             $query->exec($delete);
 
             if ($query->affectedRows()>0) {

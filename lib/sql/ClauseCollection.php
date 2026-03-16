@@ -16,7 +16,6 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
     public function append(SparkObject $object) : void
     {
         if (!($object instanceof SQLClause)) throw new Exception("Incorrect object for this collection");
-        //if ($clause->equals($clause_existing)) {
 
         if ($this->contains($object)) {
             Debug::ErrorLog("Clause already exists: " . $object->getSQL());
@@ -26,40 +25,62 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
     }
 
 
-    public function addURLParameter(URLParameter $param): ClauseCollection
-    {
-        return $this->add($param->name(), $param->value(TRUE));
-    }
-
     /**
-     * Create new SQLClause and append it to this collection.
      *
-     * $clause->setExpression(name '$name', value '$value', operator '$operator')
-     * $clause->setGlue('$glue')
+     * Create new column matching SQLClause using name and value from \$param URLParameter.
+     * Proxy method for \$this->add()
      *
-     * By design SQLClause create a bindingKey if '$name' and '$value' are not empty.
-     *
-     * @param string $name
-     * @param string $value
+     * @param URLParameter $param
      * @param string $operator
      * @param string $glue
      * @return $this
      * @throws Exception
      */
-    public function add(string $name, array|string|float|int|bool|null $value, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
+    public function addURLParameter(URLParameter $param, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
     {
+        return $this->add($param->name(), $param->value(), $operator, $glue);
+    }
+
+    /**
+     *
+     * Create new column matching SQLClause and append it to this clause collection.
+     *
+     * $clause->setExpression(name '$name', value '$value')
+     * $clause->setOperator('$operator')
+     * $clause->setGlue('$glue')
+     *
+     * By design SQLClause create a bindingKey if '$name' and '$value' are not empty.
+     *
+     * @param string $name
+     * @param string|float|int|bool|null $value
+     * @param string $operator
+     * @param string $glue
+     * @return $this
+     * @throws Exception
+     */
+    public function add(string $name, string|float|int|bool|null $value, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
+    {
+        if (strlen(trim($name))<1) throw new Exception("Name cannot be empty");
+
         $clause = new SQLClause();
         $clause->setExpression($name, $value);
         $clause->setOperator($operator);
         $clause->setGlue($glue);
-
         $this->append($clause);
 
         return $this;
     }
 
     /**
-     * Create new SQLClause without value so no automatic binding is done
+     * Create new expression matching SQLClause without value - so no automatic binding is done.
+     *
+     * * addExpression("stock_amount > 0"); -> no binding direct SQL expression
+     *
+     * If using expressions containing custom binding key an additional call to $collection->bind() should be
+     * made to bind the required value.
+     *
+     * * ->addExpression("product_attributes LIKE :author_param");
+     * * ->bind(":author_param", "%Author:$author_name%");
      *
      * @param string $expression
      * @param string $glue
@@ -68,7 +89,13 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
      */
     public function addExpression(string $expression, string $glue = SQLClause::DEFAULT_GLUE) : ClauseCollection
     {
-        return $this->add($expression, "", "", $glue);
+        $clause = new SQLClause();
+        $clause->setExpression($expression);
+        $clause->setGlue($glue);
+        $clause->setOperator("");
+        $this->append($clause);
+
+        return $this;
     }
 
     public function removeExpression(string $expression) : void

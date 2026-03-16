@@ -15,9 +15,9 @@ interface ISQLBinding {
     /**
      * Get the value to be used as binding value during prepared statement binding.
      *
-     * @return array|string|int|float|bool|null value to be used as binding value
+     * @return string|int|float|bool|null value to be used as binding value
      * @throws Exception if bindingKey is empty or value is not SQLStatement::IsBoundSafe
      */
-    public function getBindingValue() : array|string|int|float|bool|null;
+    public function getBindingValue() : string|int|float|bool|null;
 
 }

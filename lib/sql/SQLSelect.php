@@ -1,9 +1,14 @@
 <?php
 include_once("sql/SQLStatement.php");
 include_once("sql/SQLColumnSet.php");
+include_once("sql/CanModifyColumnName.php");
+include_once("sql/CanSetColumnAliasExpression.php");
 
 class SQLSelect extends SQLStatement
 {
+
+    use CanModifyColumnName;
+    use CanSetColumnAliasExpression;
 
     const int SQL_CALC_FOUND_ROWS = 1;
     const int SQL_CACHE = 2;
@@ -89,8 +94,8 @@ class SQLSelect extends SQLStatement
     public function combine(SQLSelect $other) : void
     {
 
-        if ($other->fields()->count() > 0) {
-            $other->fields()->copyTo($this->fieldset);
+        if ($other->fieldset->count() > 0) {
+            $other->fieldset->copyTo($this->fieldset);
         }
 
         if (strlen(trim($other->from)) > 0) {
@@ -181,5 +186,7 @@ class SQLSelect extends SQLStatement
 
         return $sel;
     }
+
+
 
 }

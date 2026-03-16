@@ -13,10 +13,8 @@ class PDOResult extends DBResult
 
     public function __construct(PDOStatement $result)
     {
-
         $this->result = $result;
         $this->createdBy = Debug::Backtrace(-1);
-
     }
 
     public function __destruct()
@@ -127,6 +125,6 @@ class PDOResult extends DBResult
      */
     public function isActive() : bool
     {
-        return (!is_null($this->result) && $this->result->columnCount() > 0);
+        return !is_null($this->result) && ($this->result->columnCount() > 0);
     }
 }

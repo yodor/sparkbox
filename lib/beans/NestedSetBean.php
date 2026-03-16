@@ -2,44 +2,13 @@
 include_once("beans/DBTableBean.php");
 include_once("sql/SQLSelect.php");
 include_once("sql/SQLUpdate.php");
+include_once("utils/Node.php");
 
-class Node {
-
-    protected int $parentID = -1;
-    protected int $lft = -1;
-    protected int $rgt = -1;
-    protected int $size = -1;
-    protected int $id = -1;
-
-    public function __construct(int $id, array $data) {
-        $this->lft = (int)$data['lft'];
-        $this->rgt = (int)$data['rgt'];
-        $this->size = $this->rgt  - $this->lft + 1;
-        $this->parentID = $data['parentID'];
-        $this->id = $id;
-    }
-    public function id() : int
-    {
-        return $this->id;
-    }
-    public function parentID() : int
-    {
-        return $this->parentID;
-    }
-    public function lft() : int
-    {
-        return $this->lft;
-    }
-    public function rgt() : int
-    {
-        return $this->rgt;
-    }
-    public function size() : int
-    {
-        return $this->size;
-    }
-}
-
+/**
+ * NestedSetBean implements the classic nested-set (lft/rgt) model for hierarchical data.
+ *
+ * Extends DBTableBean and requires the columns `lft`, `rgt`, and `parentID`.
+ */
 class NestedSetBean extends DBTableBean
 {
 
@@ -53,6 +22,13 @@ class NestedSetBean extends DBTableBean
     //  PRIMARY KEY (`menuID`)
     // ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
+    /**
+     * Constructs the bean and validates required nested-set columns.
+     *
+     * @param string $table_name Table name.
+     * @param DBDriver|null $dbdriver Database driver (optional).
+     * @throws Exception If `lft`, `rgt`, or `parentID` columns are missing.
+     */
     public function __construct(string $table_name, ?DBDriver $dbdriver = NULL)
     {
         parent::__construct($table_name, $dbdriver);
@@ -61,13 +37,20 @@ class NestedSetBean extends DBTableBean
         }
     }
 
-    protected function getMaxRgt(): int
+    /**
+     * Returns the highest rgt value currently stored in the table.
+     *
+     * @return int
+     * @throws Exception If the query fails.
+     */
+    private function getMaxRgt(): int
     {
+        //clean select not the bean one that might have filtering applied
         $select = new SQLSelect();
         $select->from = $this->table;
-        $select->fields()->setAliasExpression(" MAX(rgt) ", "max_rgt");
+        $select->setAliasExpression(" MAX(rgt) ", "max_rgt");
         $select->limit = " 1 ";
-        $query = new SQLQuery($select);
+        $query = new SelectQuery($select);
         $query->exec();
 
         if ($result = $query->nextResult()) {
@@ -78,371 +61,21 @@ class NestedSetBean extends DBTableBean
     }
 
     /**
-     * Fetch node data for the given $nodeID and return Node wrapper object
+     * Fetches node data and wraps it in a Node object.
      *
-     * @param int $nodeID
+     * @param int $nodeID Primary key.
      * @return Node
      * @throws Exception
      */
-    protected function getNode(int $nodeID) : Node
+    public function getNode(int $nodeID) : Node
     {
         $nodeData = $this->getByID($nodeID, "lft", "rgt", "parentID");
         return new Node($nodeID, $nodeData);
     }
 
-    protected function getIDLeft(Node $node): int
-    {
-        $select = new SQLSelect();
-        $select->fields()->set($this->prkey);
-        $select->from = $this->table;
-        $select->where()->add("lft", $node->rgt() + 1);
-        $select->limit = " 1 ";
-
-        $query = new SQLQuery($select);
-        $query->exec();
-
-        if ($result = $query->nextResult()) {
-            return (int)$result->get($this->prkey);
-        }
-        return -1;
-    }
-
-    protected function getIDRight(Node $node): int
-    {
-        $select = new SQLSelect();
-        $select->fields()->set($this->prkey);
-        $select->from = $this->table;
-        $select->where()->add("rgt", $node->lft() - 1);
-        $select->limit = " 1 ";
-
-        $query = new SQLQuery($select);
-        $query->exec();
-
-        if ($result = $query->nextResult()) {
-            return (int)$result->get($this->prkey);
-        }
-        return -1;
-    }
-
-    public function moveLeft(int $id, ?DBDriver $db = NULL) : void
-    {
-        if (!$db) $db = $this->db;
-
-        try {
-
-            $db->transaction();
-
-            $node = $this->getNode($id);
-
-            $brotherID = $this->getIDRight($node);
-            if (!$brotherID) throw new Exception("Already at first position");
-
-            $brother = $this->getNode($brotherID);
-
-            $idlist = implode(",", $this->childrenID($node));
-
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft - :brotherSize ");
-            $update->setExpression("rgt", " rgt - :brotherSize ");
-            $update->bind(":brotherSize", $brother->size());
-
-            $update->where()->addExpression(" (lft BETWEEN :nodeLft  AND :nodeRgt) ");
-            $update->bind(":nodeLft", $node->lft());
-            $update->bind(":nodeRgt", $node->rgt());
-            $db->query($update);
-
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft + :nodeSize ");
-            $update->setExpression("rgt", " rgt + :nodeSize ");
-            $update->bind(":nodeSize", $node->size());
-
-            $update->where()->addExpression(" (lft BETWEEN :brotherLft AND :brotherRgt )");
-            $update->bind(":brotherLft", $brother->lft());
-            $update->bind(":brotherRgt", $brother->rgt());
-            $update->where()->addExpression("$this->prkey NOT IN (:idlist)");
-            $update->bind(":idlist", $idlist);
-            $db->query($update);
-
-            $db->commit();
-
-        }
-        catch (Exception $e) {
-            $db->rollback();
-            throw $e;
-        }
-
-    }
-
-    public function insert(array $row, ?DBDriver $db = NULL): int
-    {
-        $lastid = -1;
-
-        if (!$db) $db = $this->db;
-
-        //defaults to the top level if not specified
-        $parentID = 0;
-        if (isset($row["parentID"])) {
-            //insert using the parentID specified or as top level node
-            $parentID = (int)$row["parentID"];
-        }
-	
-        try {
-            $db->transaction();
-
-            if ($parentID > 0) {
-                $parentNode = $this->getNode($parentID);
-
-                $row["lft"] = $parentNode->rgt();
-                $row["rgt"] = $parentNode->rgt() + 1;
-
-                $update = new SQLUpdate($this->select);
-                $update->setExpression("rgt", "rgt + 2");
-                $update->where()->addExpression(" rgt >= :parentRgt ");
-                $update->bind(":parentRgt", $parentNode->rgt());
-                $db->query($update);
-
-                $update = new SQLUpdate($this->select);
-                $update->setExpression("lft", "lft + 2");
-                $update->where()->addExpression(" lft > :parentRgt ");
-                $update->bind(":parentRgt", $parentNode->rgt());
-                $db->query($update);
-
-                $lastid = parent::insert($row, $db);
-            }
-            else {
-                $lft = $this->getMaxRgt() + 1;
-                $row["lft"] = $lft;
-                $row["rgt"] = $lft + 1;
-                $lastid = parent::insert($row, $db);
-            }
-
-            $db->commit();
-        }
-        catch (Exception $e) {
-            $db->rollback();
-            throw $e;
-        }
-        return $lastid;
-    }
-
-
-
-    public function update(int $id, array $row, ?DBDriver $db = NULL) : int
-    {
-
-        if (!$db) $db = $this->db;
-
-        $oldNode = $this->getNode($id);
-
-        $new_parentID = (int)$row["parentID"];
-
-        if ($new_parentID == $id) throw new Exception("Can not re-parent to self");
-
-        if ($oldNode->parentID() == $new_parentID) return parent::update($id, $row, $db);
-
-        if ($new_parentID > 0 && $this->isChildOf($oldNode, $new_parentID)) {
-            throw new Exception("Can not re-parent to child category");
-        }
-
-        $lastid = -1;
-
-        try {
-            $db->transaction();
-
-            $new_lft = -1;
-
-            if ($new_parentID > 0) {
-                $parentNode = $this->getNode($new_parentID);
-                $new_lft = $parentNode->rgt();
-            }
-            else {
-                //re-parent to top
-                $max_rgt = $this->getMaxRgt();
-                $new_lft = $max_rgt + 1;
-            }
-            //$new_rgt = $new_lft + $oldNode->size() - 1;
-
-            $extent = $oldNode->size();
-            $distance = $new_lft - $oldNode->lft();
-
-            $tmppos = $oldNode->lft();
-
-            if ($distance < 0) {
-                $distance -= $extent;
-                $tmppos += $extent;
-            }
-
-            //make space
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", "lft + :extent");
-            $update->where()->addExpression("lft >= :new_lft ");
-            $update->bind(":extent", $extent);
-            $update->bind(":new_lft", $new_lft);
-            $db->query($update);
-
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("rgt", "rgt + :extent");
-            $update->bind(":extent", $extent);
-
-            $update->where()->addExpression("rgt >= :new_lft");
-            $update->bind(":new_lft", $new_lft);
-            $db->query($update);
-
-            //move into new space
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", "lft + :distance");
-            $update->setExpression("rgt", "rgt + :distance");
-            $update->bind(":distance", $distance);
-
-            $update->where()->addExpression(" (lft >= :temppos AND rgt < :temp_pos + :extent) ");
-            $update->bind(":temppos", $tmppos);
-            $update->bind(":extent", $extent);
-            $db->query($update);
-
-            //remove old space
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", "lft - :extent");
-            $update->bind(":extent", $extent);
-
-            $update->where()->addExpression("lft > :rgt");
-            $update->bind(":rgt", $oldNode->rgt());
-            $db->query($update);
-
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("rgt", "rgt - :extent");
-            $update->bind(":extent", $extent);
-
-            $update->where()->addExpression("rgt > :rgt");
-            $update->bind(":rgt", $oldNode->rgt());
-            $db->query($update);
-
-            $affectedRows = parent::update($id, $row, $db);
-
-            $db->commit();
-
-            return $affectedRows;
-        }
-        catch (Exception $e) {
-            $db->rollback();
-            throw $e;
-        }
-
-    }
-
-
-
-    public function delete(int $id, ?DBDriver $db = NULL): int
-    {
-
-        Debug::ErrorLog("Deleting ID: $id");
-
-        $affectedRows = 0;
-
-        if (!$db) {
-            $db = $this->db;
-        }
-
-        $node = $this->getNode($id);
-
-
-        try {
-
-            $db->transaction();
-
-            $affectedRows = parent::delete($id, $db);
-
-            Debug::ErrorLog("Deleted node ID: $id");
-
-            Debug::ErrorLog("Re-parenting child nodes ...");
-
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft - 1 ");
-            $update->setExpression("rgt", " rgt - 1 ");
-            $update->where()->addExpression("(lft BETWEEN :nodeLft AND :nodeRgt)");
-            $update->bind(":nodeLft", $node->lft());
-            $update->bind(":nodeRgt", $node->rgt());
-            $db->query($update);
-
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("rgt", " rgt - 2 ");
-            $update->where()->addExpression("rgt > :nodeRgt");
-            $update->bind(":nodeRgt", $node->rgt());
-            $db->query($update);
-
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft - 2 ");
-            $update->where()->addExpression(" lft > :nodeRgt ");
-            $update->bind(":nodeRgt", $node->rgt());
-            $db->query($update);
-
-            $update = new SQLUpdate($this->select);
-            $update->set("parentID", $node->parentID());
-            $update->where()->add("parentID", $id);
-            $db->query($update);
-
-            $db->commit();
-        }
-        catch (Exception $ex) {
-            Debug::ErrorLog("Rolling back for error: " . $ex->getMessage());
-            $db->rollback();
-            throw $ex;
-        }
-
-        return $affectedRows;
-
-    }
-
     /**
-     * Reconstruct the nested-set tree using parentID relation
-     * @param int $lft
-     * @param int $cnt
-     * @param int $parentID
-     * @return void
-     * @throws Exception
-     */
-    public function reconstructNestedSet(int &$lft = -1, int &$cnt = 0, int $parentID = 0) : void
-    {
-
-        $select = new SQLSelect();
-        $select->fields()->set($this->prkey, "lft", "rgt", "parentID");
-        $select->from = $this->table;
-        $select->where()->add("parentID", $parentID);
-        $select->order_by = " $this->prkey ASC , lft ASC ";
-
-        $query = new SQLQuery($select);
-        $query->exec();
-
-        while ($result = $query->nextResult()) {
-            $nodeID = (int)$result->get($this->prkey);
-            $lft++;
-
-            $this->db->transaction();
-            $update = new SQLUpdate();
-            $update->from = $this->table;
-            $update->set("lft", $lft);
-            $update->set("rgt", $cnt);
-            $update->where()->add($this->prkey, $nodeID);
-            $this->db->query($update);
-            $this->db->commit();
-
-            $cnt++;
-            $this->reconstructNestedSet($lft, $cnt, $nodeID);
-
-            $this->db->transaction();
-            $update = new SQLUpdate();
-            $update->from = $this->table;
-            $update->set("rgt", $cnt);
-            $update->where()->add($this->prkey, $nodeID);
-            $this->db->query($update);
-            $this->db->commit();
-            $lft = $cnt;
-            $cnt++;
-        }
-
-    }
-
-    /**
-     * Return array with IDs of the child nodes
+     * Returns an array of all descendant node IDs (including the node itself).
+     *
      * @param Node $node
      * @return array
      * @throws Exception
@@ -450,8 +83,8 @@ class NestedSetBean extends DBTableBean
     private function childrenID(Node $node) : array
     {
         $select = $this->nodeSelect($node);
-        $select->fields()->set($this->prkey);//prkey only select
-        $query = new SQLQuery($select, $this->prkey);
+        $select->set($this->prkey);//prkey only select
+        $query = new SelectQuery($select, $this->prkey);
         $query->exec();
 
         $idlist = array();
@@ -464,9 +97,10 @@ class NestedSetBean extends DBTableBean
     }
 
     /**
-     * Select all child nodes of the given node
-     * ie lft and rgt are between node.lft and node.rgt
-     * selected columns are $this->prkey, "lft", "rgt", "parentID"
+     * Builds a SELECT that returns all descendants of the given node.
+     *
+     * Selected columns: prkey, lft, rgt, parentID.
+     *
      * @param Node $node
      * @return SQLSelect
      * @throws Exception
@@ -475,7 +109,7 @@ class NestedSetBean extends DBTableBean
     {
         $select = new SQLSelect();
         $select->from = $this->table;
-        $select->fields()->set($this->prkey, "lft", "rgt", "parentID");
+        $select->set($this->prkey, "lft", "rgt", "parentID");
         $select->where()->addExpression("( lft BETWEEN :nodeLft AND :nodeRgt )");
         $select->bind(":nodeLft", $node->lft());
         $select->bind(":nodeRgt", $node->rgt());
@@ -483,7 +117,8 @@ class NestedSetBean extends DBTableBean
     }
 
     /**
-     * Return true if $id is found as primary key inside the Node children
+     * Checks whether the given ID belongs to the subtree of the node.
+     *
      * @param Node $node
      * @param int $id
      * @return bool
@@ -496,33 +131,137 @@ class NestedSetBean extends DBTableBean
         $select->where()->add($this->prkey, $id);
         $select->limit = " 1 ";
 
-        $query = new SQLQuery($this->select);
-
+        $query = new SelectQuery($select);
         $query->exec();
-
         if ($query->nextResult()) return true;
-
         return false;
     }
 
+    /**
+     * Returns the ID of the next sibling (node immediately to the right).
+     *
+     * @return int ID of next sibling or -1 if none exists
+     * @throws Exception
+     */
+    private function getNextSiblingID(Node $node): int
+    {
+        $select = new SQLSelect();
+        $select->set($this->prkey);
+        $select->from = $this->table;
+        $select->where()->add("lft", $node->rgt() + 1);
+        $select->limit = " 1 ";
+
+        $query = new SelectQuery($select);
+        $query->exec();
+
+        if ($result = $query->nextResult()) {
+            return (int)$result->get($this->prkey);
+        }
+        return -1;
+    }
+
+    /**
+     * Returns the ID of the previous sibling (node immediately to the left).
+     *
+     * @return int ID of previous sibling or -1 if none exists
+     * @throws Exception
+     */
+    private function getPreviousSiblingID(Node $node): int
+    {
+        $select = new SQLSelect();
+        $select->set($this->prkey);
+        $select->from = $this->table;
+        $select->where()->add("rgt", $node->lft() - 1);
+        $select->limit = " 1 ";
+
+        $query = new SelectQuery($select);
+        $query->exec();
+
+        if ($result = $query->nextResult()) {
+            return (int)$result->get($this->prkey);
+        }
+        return -1;
+    }
+
+    /**
+     * Moves the specified node one position to the left among its siblings
+     * (swaps position with the previous sibling).
+     *
+     * @param int $id The primary key of the node to move
+     * @param DBDriver|null $db Optional database driver to use within transaction
+     * @return void
+     * @throws Exception When the node is already the leftmost sibling
+     */
+    public function moveLeft(int $id, ?DBDriver $db = NULL) : void
+    {
+
+        $node = $this->getNode($id);
+
+        $brotherID = $this->getPreviousSiblingId($node);
+        if ($brotherID === -1) throw new Exception("Node is already at the first (leftmost) position among siblings");
+
+        $brother = $this->getNode($brotherID);
+
+        $idlist = implode(",", $this->childrenID($node));
+
+        $code = function (DBDriver $db) use ($node, $brother, $idlist)
+        {
+            // Shift the target node and its subtree LEFT by the size of the previous sibling
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("lft", " lft - :brotherSize ");
+            $update->setExpression("rgt", " rgt - :brotherSize ");
+            $update->bind(":brotherSize", $brother->size());
+
+            $update->where()->addExpression(" (lft BETWEEN :nodeLft  AND :nodeRgt) ");
+            $update->bind(":nodeLft", $node->lft());
+            $update->bind(":nodeRgt", $node->rgt());
+            $db->query($update)->free();
+
+            // Shift the previous sibling and everything between them RIGHT by the size of the target node
+            // (excluding the target subtree itself)
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("lft", " lft + :nodeSize ");
+            $update->setExpression("rgt", " rgt + :nodeSize ");
+            $update->bind(":nodeSize", $node->size());
+
+            $update->where()->addExpression(" (lft BETWEEN :brotherLft AND :brotherRgt )");
+            $update->bind(":brotherLft", $brother->lft());
+            $update->bind(":brotherRgt", $brother->rgt());
+            $update->where()->addExpression("$this->prkey NOT IN (:idlist)");
+            $update->bind(":idlist", $idlist);
+            $db->query($update)->free();
+
+        };
+
+        $this->handleTransaction($code, $db);
+
+    }
+
+    /**
+     * Moves the specified node one position to the right among its siblings
+     * (swaps position with the next sibling).
+     *
+     * @param int $id The primary key of the node to move
+     * @param DBDriver|null $db Optional database driver to use within transaction
+     * @return void
+     * @throws Exception When the node is already the rightmost sibling
+     */
     public function moveRight(int $id, ?DBDriver $db = NULL) : void
     {
-        if (!$db) $db = $this->db;
 
-        try {
+        $node = $this->getNode($id);
 
-            $db->transaction();
+        $brotherID = $this->getNextSiblingID($node);
+        if ($brotherID === -1) throw new Exception("Node is already at the last (rightmost) position among siblings");
 
-            $node = $this->getNode($id);
+        $brother = $this->getNode($brotherID);
 
-            $brotherID = $this->getIDLeft($node);
-            if (!$brotherID) throw new Exception("Already in last position");
+        //fetch before
+        $idlist = implode(" , ", $this->childrenID($node));
 
-            $brother = $this->getNode($brotherID);
+        $code = function(DBDriver $db) use ($node, $brother, $idlist) {
 
-            //fetch before
-            $idlist = implode(" , ", $this->childrenID($node));
-
+            // Shift the target node and its subtree RIGHT by the size of the next sibling
             $update = new SQLUpdate($this->select);
             $update->setExpression("lft", " lft + :brotherSize");
             $update->setExpression("rgt", " rgt + :brotherSize");
@@ -531,8 +270,10 @@ class NestedSetBean extends DBTableBean
             $update->where()->addExpression("( lft  BETWEEN :nodeLft AND :nodeRgt )");
             $update->bind(":nodeLft", $node->lft());
             $update->bind(":nodeRgt", $node->rgt());
-            $db->query($update);
+            $db->query($update)->free();
 
+            // Shift the next sibling and everything between them LEFT by the size of the target node
+            // (excluding the target subtree itself)
             $update = new SQLUpdate($this->select);
             $update->setExpression("lft", " lft - :nodeSize ");
             $update->setExpression("rgt", " rgt - :nodeSize ");
@@ -543,20 +284,326 @@ class NestedSetBean extends DBTableBean
             $update->bind(":brotherRgt", $brother->rgt());
             $update->where()->addExpression("$this->prkey NOT IN (:idlist)");
             $update->bind(":idlist", $idlist);
-            $db->query($update);
 
-            $db->commit();
-        }
-        catch (Exception $e) {
-            $db->rollback();
-            throw $e;
-        }
+            $db->query($update)->free();
+        };
+
+        $this->handleTransaction($code, $db);
 
     }
 
     /**
+     * Inserts a new node, automatically calculating lft/rgt.
+     *
+     * If parentID is omitted or 0, the node becomes a root.
+     *
+     * @param array $row Data row (parentID optional).
+     * @param DBDriver|null $db Optional driver.
+     * @return int New primary key.
+     * @throws Exception
+     */
+    public function insert(array $row, ?DBDriver $db = NULL): int
+    {
+        //defaults to the top level if not specified
+        $parentID = 0;
+        if (isset($row["parentID"])) {
+            //insert using the parentID specified or as top level node
+            $parentID = (int)$row["parentID"];
+        }
+
+        if ($parentID == 0) {
+            $lft = $this->getMaxRgt() + 1;
+            $row["lft"] = $lft;
+            $row["rgt"] = $lft + 1;
+            return parent::insert($row, $db);
+        }
+
+        $lastID = -1;
+
+        $code = function (DBDriver $db) use ($row, $parentID, &$lastID) {
+
+            $parentNode = $this->getNode($parentID);
+
+            $row["lft"] = $parentNode->rgt();
+            $row["rgt"] = $parentNode->rgt() + 1;
+
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("rgt", "rgt + 2");
+            $update->where()->addExpression(" rgt >= :parentRgt ");
+            $update->bind(":parentRgt", $parentNode->rgt());
+            $db->query($update)->free();
+
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("lft", "lft + 2");
+            $update->where()->addExpression(" lft > :parentRgt ");
+            $update->bind(":parentRgt", $parentNode->rgt());
+            $db->query($update)->free();
+
+            $lastID = parent::insert($row, $db);
+
+        };
+        $this->handleTransaction($code, $db);
+
+        return $lastID;
+    }
+
+    /**
+     * Updates a node, including optional re-parenting with full lft/rgt adjustment.
+     *
+     * Prevents self-parenting and descendant-to-ancestor moves.
+     *
+     * @param int $id Node ID.
+     * @param array $row New data (parentID triggers re-parenting).
+     * @param DBDriver|null $db Optional driver.
+     * @return int Affected rows.
+     * @throws Exception On invalid re-parenting.
+     */
+    public function update(int $id, array $row, ?DBDriver $db = NULL) : int
+    {
+
+        $node = $this->getNode($id);
+        $new_parentID = (int)$row["parentID"];
+
+        if ($new_parentID == $id) throw new Exception("Can not re-parent to self");
+
+        if ($node->parentID() == $new_parentID) return parent::update($id, $row, $db);
+
+        if ($new_parentID > 0 && $this->isChildOf($node, $new_parentID)) {
+            throw new Exception("Can not re-parent to child category");
+        }
+
+        $code = function(DBDriver $db) use($row, $new_parentID, $node)
+        {
+            $new_lft = -1;
+
+            if ($new_parentID > 0) {
+                $parentNode = $this->getNode($new_parentID);
+                $new_lft = $parentNode->rgt();
+            } else {
+                //re-parent to top
+                $max_rgt = $this->getMaxRgt();
+                $new_lft = $max_rgt + 1;
+            }
+            //$new_rgt = $new_lft + $oldNode->size() - 1;
+
+            $extent = $node->size();
+            $distance = $new_lft - $node->lft();
+
+            $tmppos = $node->lft();
+
+            if ($distance < 0) {
+                $distance -= $extent;
+                $tmppos += $extent;
+            }
+
+            //make space
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("lft", "lft + :extent");
+            $update->where()->addExpression("lft >= :new_lft ");
+            $update->bind(":extent", $extent);
+            $update->bind(":new_lft", $new_lft);
+            $db->query($update)->free();
+
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("rgt", "rgt + :extent");
+            $update->bind(":extent", $extent);
+
+            $update->where()->addExpression("rgt >= :new_lft");
+            $update->bind(":new_lft", $new_lft);
+            $db->query($update)->free();
+
+            //move into new space
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("lft", "lft + :distance");
+            $update->setExpression("rgt", "rgt + :distance");
+            $update->bind(":distance", $distance);
+
+            $update->where()->addExpression(" (lft >= :temppos AND rgt < :temp_pos + :extent) ");
+            $update->bind(":temppos", $tmppos);
+            $update->bind(":extent", $extent);
+            $db->query($update)->free();
+
+            //remove old space
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("lft", "lft - :extent");
+            $update->bind(":extent", $extent);
+
+            $update->where()->addExpression("lft > :rgt");
+            $update->bind(":rgt", $node->rgt());
+            $db->query($update)->free();
+
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("rgt", "rgt - :extent");
+            $update->bind(":extent", $extent);
+
+            $update->where()->addExpression("rgt > :rgt");
+            $update->bind(":rgt", $node->rgt());
+            $db->query($update)->free();
+
+            parent::update($node->id(), $row, $db);
+
+        };
+
+        return $this->handleTransaction($code, $db);
+
+    }
+
+    /**
+     * Deletes the node and re-parents its children to its former parent.
+     *
+     * Adjusts all lft/rgt values to close the gap.
+     *
+     * @param int $id Node ID.
+     * @param DBDriver|null $db Optional driver.
+     * @return int Affected rows.
+     * @throws Exception
+     */
+    public function delete(int $id, ?DBDriver $db = NULL): int
+    {
+
+        $node = $this->getNode($id);
+
+        $code = function(DBDriver $db) use ($node) {
+
+            Debug::ErrorLog("Deleting ID: ".$node->id());
+            parent::delete($node->id(), $db);
+
+            Debug::ErrorLog("Re-parenting child nodes ...");
+
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("lft", " lft - 1 ");
+            $update->setExpression("rgt", " rgt - 1 ");
+            $update->where()->addExpression("(lft BETWEEN :nodeLft AND :nodeRgt)");
+            $update->bind(":nodeLft", $node->lft());
+            $update->bind(":nodeRgt", $node->rgt());
+            $db->query($update)->free();
+
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("rgt", " rgt - 2 ");
+            $update->where()->addExpression("rgt > :nodeRgt");
+            $update->bind(":nodeRgt", $node->rgt());
+            $db->query($update)->free();
+
+            $update = new SQLUpdate($this->select);
+            $update->setExpression("lft", " lft - 2 ");
+            $update->where()->addExpression(" lft > :nodeRgt ");
+            $update->bind(":nodeRgt", $node->rgt());
+            $db->query($update)->free();
+
+            $update = new SQLUpdate($this->select);
+            $update->set("parentID", $node->parentID());
+            $update->where()->add("parentID", $node->id());
+            $db->query($update)->free();
+        };
+
+        return $this->handleTransaction($code, $db);
+
+    }
+
+    /**
+     * Rebuilds lft/rgt values for the entire tree from parentID.
+     *
+     * - Single SELECT
+     * - Builds full in-memory graph of Node objects (pointers)
+     * - Single iterative traversal
+     * - Single transaction write-back
+     * - Fully compatible with unbuffered PDO
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function reconstructNestedSet(): void
+    {
+        // Phase 1: Bulk load → create Node objects
+        $select = new SQLSelect();
+        $select->set($this->prkey, "parentID");
+        $select->from = $this->table;
+        $select->order_by = "$this->prkey ASC";
+
+        $query = new SelectQuery($select);
+        $query->exec();
+
+        $allNodes = [];     // id → Node
+        $childrenMap = [];  // parentID → [childId, ...] (preserves order)
+
+        while ($row = $query->next()) {
+            $id  = (int)$row[$this->prkey];
+            $pid = (int)$row["parentID"];
+
+            $allNodes[$id] = new Node($id, [
+                'lft'      => 0,
+                'rgt'      => 0,
+                'parentID' => $pid
+            ]);
+
+            $childrenMap[$pid] = $childrenMap[$pid] ?? [];
+            $childrenMap[$pid][] = $id;
+        }
+        $query->free();
+
+        if (empty($allNodes)) {
+            return;
+        }
+
+        // Phase 2: Build the full graph using pointers
+        foreach ($allNodes as $node) {
+            $pid = $node->parentID();
+            if ($pid !== 0 && isset($allNodes[$pid])) {
+                $allNodes[$pid]->addChild($node);   // sets both parent and child links
+            }
+        }
+
+        // Phase 3: Iterative DFS to assign lft/rgt (using the live graph)
+        $counter = 1;
+        $stack = [];
+
+        // Seed roots (parentID = 0)
+        $roots = $childrenMap[0] ?? [];
+        foreach (array_reverse($roots) as $id) {
+            $stack[] = ['node' => $allNodes[$id], 'entering' => true];
+        }
+
+        while ($stack) {
+            $frame = array_pop($stack);
+            $node  = $frame['node'];
+
+            if ($frame['entering']) {
+                $node->setLft($counter++);
+                $stack[] = ['node' => $node, 'entering' => false];
+
+                // Push children in reverse (so pop() restores original order)
+                foreach (array_reverse($node->children()) as $child) {
+                    $stack[] = ['node' => $child, 'entering' => true];
+                }
+            } else {
+                $node->setRgt($counter++);
+            }
+        }
+
+        // Phase 4: Single transaction write-back
+        $this->db->transaction();
+
+        foreach ($allNodes as $node) {
+            $upd = new SQLUpdate();
+            $upd->from = $this->table;
+            $upd->set("lft", $node->lft());
+            $upd->set("rgt", $node->rgt());
+            $upd->where()->add($this->prkey, $node->id());
+            $this->db->query($upd);
+        }
+
+        $this->db->commit();
+    }
+
+    /**
+     * Returns a SELECT suitable for tree listing (self-join on node/parent).
+     *
+     * Use prefix 'node' for simple lists or 'parent' for aggregated lists.
+     *
      * When doing simple tree list use $prefix='node'
+     *
      * When doing aggregate tree list use $prefix='parent'
+     *
      * @param array $columns Columns to select from this bean prefixed with '$prefix.'
      * @param string $prefix 'node' or 'parent'
      * @return SQLSelect
@@ -578,7 +625,7 @@ class NestedSetBean extends DBTableBean
 
         $sel = new SQLSelect();
 
-        $sel->fields()->set(...$fields);
+        $sel->set(...$fields);
 
         $sel->from = " $this->table AS node, $this->table AS parent ";
         $sel->where()->addExpression("( node.lft BETWEEN parent.lft AND parent.rgt )");
@@ -592,8 +639,10 @@ class NestedSetBean extends DBTableBean
     }
 
     /**
-     * @param string $nodeEquals
-     * @param array $fieldNames
+     * Returns aggregated tree data for a specific node.
+     *
+     * @param string $nodeEquals Expression or value for the target node.
+     * @param array $fieldNames Additional fields.
      * @return SQLSelect
      * @throws Exception
      */
@@ -601,29 +650,26 @@ class NestedSetBean extends DBTableBean
     {
         $prkey = $this->prkey;
 
-        //select the parent.prkey and lft/rgt
-        //add where clause
         $sel = $this->selectTree($fieldNames, "parent");
 
         $sel->where()->addExpression("node.$prkey = $nodeEquals");
-
-       // $sel->group_by = " ";
-
-        //$sel->order_by = " node.lft ";
 
         return $sel;
     }
 
     /**
-     * Aggregate the tree select counting items from '$relation_table' contained in each branch of the tree
-     * '$relation_table' should have column name equal to this bean prkey
-     * The count is returned in column named 'related_count'
-     * '$relation' is cloned first
-     * @param SQLSelect $relation
-     * @param string $relation_table
-     * @param string $relation_prkey
-     * @param array $columns
-     * @param bool $with_count
+     * Joins the tree with a related table and optionally counts related rows per branch.
+     *
+     * Aggregate the tree select counting items from '$relation_table' contained
+     * in each branch of the tree.
+     * * '$relation_table' should have column name equal to this bean prkey
+     * * The count is returned in column named 'related_count'
+     * * '$relation' is cloned first
+     * @param SQLSelect $relation Base query on the relation table.
+     * @param string $relation_table Related table name.
+     * @param string $relation_prkey Its primary-key column.
+     * @param array $columns Extra columns.
+     * @param bool $with_count Include related_count column.
      * @return SQLSelect
      * @throws Exception
      */
@@ -634,14 +680,14 @@ class NestedSetBean extends DBTableBean
         $result = clone $relation;
         //reset the fields but keep the where clauses
         //resulting select is only for drawing the tree
-        $result->fields()->reset();
+        $result->reset();
 
         $prkey = $this->prkey;
 
         $sel = $this->selectAggregated("$relation_table.$prkey", $columns);
 
         if ($with_count) {
-            $sel->fields()->setAliasExpression("COUNT($relation_table.$relation_prkey)", "related_count");
+            $sel->setAliasExpression("COUNT($relation_table.$relation_prkey)", "related_count");
         }
 
         return $sel->combineWith($result);
@@ -649,12 +695,12 @@ class NestedSetBean extends DBTableBean
     }
 
     /**
-     * Used to do table aggregation.
-     * Selects node and its child nodes for aggregation
-     * @param SQLSelect $other
-     * @param string $relation_table
-     * @param int $nodeID
-     * @param array $columns
+     * Selects a node and all its descendants joined with another table for aggregation.
+     *
+     * @param SQLSelect $other Query on the related table.
+     * @param string $relation_table Related table.
+     * @param int $nodeID Node to start from (0 = roots).
+     * @param array $columns Columns to return.
      * @return SQLSelect
      * @throws Exception
      */
@@ -676,7 +722,7 @@ class NestedSetBean extends DBTableBean
         }
 
         $sel = new SQLSelect();
-        $sel->fields()->set(...$fields);
+        $sel->set(...$fields);
 
         // Using cross join syntax for clarity in nested sets
         $sel->from = " {$this->table} AS node , {$this->table} AS child ";
@@ -702,9 +748,10 @@ class NestedSetBean extends DBTableBean
     }
 
     /**
-     * Query nodeID and its parent nodes
-     * @param int $nodeID
-     * @param array $fieldNames
+     * Returns the chain of ancestor nodes for the given node.
+     *
+     * @param int $nodeID Starting node.
+     * @param array $fieldNames Extra fields to return.
      * @return array
      * @throws Exception
      */
@@ -712,7 +759,7 @@ class NestedSetBean extends DBTableBean
     {
         $sel = $this->selectAggregated($nodeID, $fieldNames);
 
-        $qry = new SQLQuery($sel, $this->prkey, $this->table);
+        $qry = new SelectQuery($sel, $this->prkey, $this->table);
         $qry->exec();
 
         $ret = array();

@@ -110,7 +110,7 @@ class CacheFactory
                 $delete->bind(":timestamp", $timestamp);
                 $delete->bind(":pageCacheTTL", Spark::GetInteger(Config::PAGE_CACHE_TTL));
 
-                $query = new SQLQuery();
+                $query = new DBQuery();
                 $query->exec($delete);
                 $numEntries = $query->affectedRows();
                 touch($cleanup_file);

@@ -306,9 +306,9 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         if (count($this->renderer_source_copy_fields) > 0 && $value) {
             Debug::ErrorLog("renderer_source_copy_fields ... using renderer iterator to query additional values");
             $iterator = $this->input->getRenderer()->getIterator();
-            if (!($iterator instanceof SQLQuery)) throw new Exception("Unsupported iterator");
-            $iterator->stmt->fields()->reset();
-            $iterator->stmt->fields()->set(...$this->renderer_source_copy_fields);
+            if (!($iterator instanceof SelectQuery)) throw new Exception("Unsupported iterator");
+            $iterator->stmt->reset();
+            $iterator->stmt->set(...$this->renderer_source_copy_fields);
             $iterator->stmt->where()->add($name, $value);
             $iterator->stmt->limit = 1;
             $iterator->exec();

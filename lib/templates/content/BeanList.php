@@ -16,9 +16,9 @@ class BeanList extends TemplateContent
     protected array $fields = array();
 
     /**
-     * @var SQLQuery|null
+     * @var SelectQuery|null
      */
-    protected ?SQLQuery $query = null;
+    protected ?SelectQuery $query = null;
 
 
     protected ?KeywordSearch $search = null;
@@ -29,7 +29,7 @@ class BeanList extends TemplateContent
         $this->search = new KeywordSearch();
     }
 
-    public function getIterator(): SQLQuery
+    public function getIterator(): SelectQuery
     {
         return $this->query;
     }
@@ -89,7 +89,7 @@ class BeanList extends TemplateContent
         $this->fields = $list_fields;
 
         //query is already set
-        if ($this->query instanceof SQLQuery) return;
+        if ($this->query instanceof SelectQuery) return;
 
         //no bean is set yet
         if (!$this->bean) return;
@@ -104,11 +104,11 @@ class BeanList extends TemplateContent
         //copy of bean select
         $qry = $this->bean->query();
         $sel = $qry->stmt;
-        $sel->fields()->set($this->bean->key());
+        $sel->set($this->bean->key());
 
         foreach ($this->fields as $name => $label) {
             if ($this->bean->haveColumn($name)) {
-                $sel->fields()->set($name);
+                $sel->set($name);
             }
         }
 
@@ -127,7 +127,7 @@ class BeanList extends TemplateContent
         parent::setBean($bean);
 
         //query is already setup nothing to do
-        if ($this->query instanceof SQLQuery) return;
+        if ($this->query instanceof SelectQuery) return;
 
         //no list fields set yet. query fields will be set when setListFields is called
         if (count($this->fields) < 1) return;
@@ -137,12 +137,12 @@ class BeanList extends TemplateContent
 
     /**
      * Set the iterator that will be used
-     * @param SQLQuery $itr
+     * @param SelectQuery $itr
      * @throws Exception
      */
     public function setIterator(IDataIterator $itr): void
     {
-        if (!$itr instanceof SQLQuery) throw new Exception("Incorrect IDataIterator - expected SQLQuery");
+        if (!$itr instanceof SelectQuery) throw new Exception("Incorrect IDataIterator - expected SelectQuery");
         $this->query = $itr;
     }
 

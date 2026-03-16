@@ -6,7 +6,6 @@ include_once("sql/IBindingModifier.php");
 include_once("sql/SQLColumnSet.php");
 include_once("sql/ClauseCollection.php");
 
-
 abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModifier
 {
     protected array $externalBindings = array();
@@ -59,11 +58,6 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
         $this->fieldset = clone $this->fieldset;
     }
 
-    public function fields(): SQLColumnSet
-    {
-        return $this->fieldset;
-    }
-
     public function where(): ClauseCollection
     {
         return $this->whereset;
@@ -72,87 +66,6 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     public function getType() : string
     {
         return $this->type;
-    }
-
-    /**
-     * Create new SQLColumn using ('$name', '$value') and append to the internal fieldset collection.
-     * Usage for simple column = value assignments.
-     *
-     * SQLColumn state after this call:
-     *
-     * * bindingKey -> ':$name'
-     * * value -> '$value'
-     * * hasValue -> true
-     *
-     * $update->set("p.stock_amount", $amount);
-     * SQL result p.stock_amount = :p_stock_amount
-     * This will bind ":p_stock_amount" -> $amount
-     *
-     * $update->setExpression("p.stock_amount", "p.stock_amount - 1") - OK
-     * OR
-     * $update->setExpression("p.stock_amount", "p.stock_amount - :amount"); OK
-     * $update->bind(":amount", $amount); OK
-     *
-     * @param string $name
-     * @param array|string|float|int|bool|null $value
-     * @return void
-     * @throws Exception
-     */
-    public function set(string $name, array|string|float|int|bool|null $value) : void
-    {
-        $column = new SQLColumn($name, $value);
-        $this->fieldset->setColumn($column);
-    }
-
-    /**
-     * Configures a column in the statement fieldset to use a raw SQL expression
-     * instead of a simple value with automatic name-derived binding.
-     *
-     * This method transitions the column to "Manual Mode":
-     * 1. Disables automatic binding for this specific column.
-     * ($column->getBindingKey() returns an empty string)
-     * 2. Allows for database-side calculations (arithmetic, functions, subqueries).
-     * 3. Supports manual parameter binding for high-security custom logic.
-     *
-     * * Basic usage with SQL functions:
-     *
-     * $stmt->setExpression("update_date", "NOW()");
-     * $stmt->setExpression("rgt", "rgt + 2");
-     *
-     * * Advanced usage with manual binding (Prepared Statement):
-     *
-     * $stmt->setExpression("rgt", "rgt + :value");
-     * $stmt->bind(":value", 2);
-     *
-     * @param string $column_name The name of the column/field to target.
-     * @param string $expression The raw SQL fragment (e.g., "NOW()", "rgt + :val").
-     * @return void
-     * @throws Exception If expression validation fails in SQLColumn.
-     */
-    public function setExpression(string $column_name, string $expression) : void
-    {
-        // 1. Initialize a new SQLColumn without a value to prevent
-        // the automatic generation of a PDO bindingKey.
-        $column = new SQLColumn($column_name);
-
-        // 2. Set the raw SQL expression. Passing an empty string for alias
-        // ensures the collectSQL method treats this as an UPDATE/SET assignment.
-        $column->setExpression($expression);
-
-        // 3. Register the configured column object into the statement's fieldset
-        // so it can be included during the SQL generation process.
-        $this->fieldset->setColumn($column);
-    }
-
-    /**
-     * Return SQLColumn named '$name' from fieldset collection
-     * @param string $name
-     * @return SQLColumn
-     * @throws Exception
-     */
-    public function get(string $name): SQLColumn
-    {
-        return $this->fieldset->getColumn($name);
     }
 
     /**
@@ -208,7 +121,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
         SQLStatement::replaceKeyAppend($target->externalBindings, $source->getBindings());
     }
 
-    public function bind(string $bindingKey, array|string|int|float|bool|null $value) : void
+    public function bind(string $bindingKey, string|int|float|bool|null $value) : void
     {
         if (!$bindingKey) throw new Exception("bindingKey is empty");
         $this->externalBindings[$bindingKey] = $value;
@@ -282,7 +195,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
      */
     public static function IsBindingValueSafe(mixed $value) : bool
     {
-        if ( is_scalar($value) || is_array($value) || is_null($value) ) return true;
+        if ( is_scalar($value) || is_null($value) ) return true;
         return false;
     }
 

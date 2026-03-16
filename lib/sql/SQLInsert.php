@@ -1,8 +1,13 @@
 <?php
 include_once("sql/SQLStatement.php");
+include_once("sql/CanSetColumnValue.php");
+include_once("sql/CanSetRawColumns.php");
 
 class SQLInsert extends SQLStatement
 {
+    use CanSetColumnValue;
+    use CanSetRawColumns;
+
     /**
      * ON Clause Value
      * @var string
@@ -45,7 +50,8 @@ class SQLInsert extends SQLStatement
 
     public function getSQL(): string
     {
-        $rowCount = $this->fieldset->getRowCount();
+        $rowCount = $this->getRowCount();
+
         if ($rowCount < 1) {
             throw new Exception("No data provided for INSERT");
         }
@@ -54,25 +60,28 @@ class SQLInsert extends SQLStatement
         $sql .= $this->wrapBrackets($this->fieldset->names()) . " VALUES ";
 
         $rows = array();
+
         for ($i = 0; $i < $rowCount; $i++) {
             $rows[] = $this->rowToSQL($i, $rowCount);
         }
 
         $sql = $sql . implode(", ", $rows);
+
         if (strlen(trim($this->on)) > 0) {
             $sql .= " ON ".$this->on;
         }
+
         return $sql;
     }
 
     public function getBindings(): array
     {
-        $rowCount = $this->fieldset->getRowCount();
-        $names = $this->fieldset->names();
+        $rowCount = $this->getRowCount();
+
         $bindings = array();
 
         for ($i = 0; $i < $rowCount; $i++) {
-            foreach ($names as $name) {
+            foreach ($this->fieldset->names() as $name) {
                 $column = $this->fieldset->getColumn($name);
                 $key = $column->getBindingKey();
 
@@ -89,4 +98,24 @@ class SQLInsert extends SQLStatement
         return $bindings;
     }
 
+
+    /**
+     * Calculates the total number of rows based on the column with the most values.
+     */
+    public function getRowCount(): int
+    {
+        $maxRows = 0;
+        foreach ($this->fieldset->names() as $idx => $columnName) {
+            $column = $this->fieldset->getColumn($columnName);
+            if (!$column->hasValue()) continue;
+
+            $val = $column->getValue();
+            if (is_array($val)) {
+                $maxRows = max($maxRows, count($val));
+            } else {
+                $maxRows = max($maxRows, 1);
+            }
+        }
+        return $maxRows;
+    }
 }

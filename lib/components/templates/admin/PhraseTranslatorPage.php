@@ -7,7 +7,7 @@ include_once("beans/TranslationPhrasesBean.php");
 include_once("components/KeywordSearch.php");
 include_once("dialogs/json/PhraseTranslationDialog.php");
 
-include_once("iterators/SQLQuery.php");
+include_once("iterators/SelectQuery.php");
 include_once("components/PageScript.php");
 
 class PhraseTranslatorInit extends PageScript

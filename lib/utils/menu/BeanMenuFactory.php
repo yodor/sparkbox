@@ -50,12 +50,12 @@ class BeanMenuFactory
 
         $this->select = clone $this->bean->select();
 
-        $this->select->fields()->set($this->value_key, $this->label_key);
+        $this->select->set($this->value_key, $this->label_key);
 
         $fieldsAddition = array("link", "seo_title", "seo_description");
         foreach($fieldsAddition as $key=>$value) {
             if ($this->bean->haveColumn($value)) {
-                $this->select->fields()->set($value);
+                $this->select->set($value);
             }
         }
 
@@ -72,7 +72,7 @@ class BeanMenuFactory
     {
         $this->target_url = new URL($build_href);
         $this->target_url->add(new DataParameter($this->bean->key()));
-        $this->select->fields()->unset("link");
+        $this->select->unset("link");
     }
 
     public function menu() : MenuItemList
@@ -88,7 +88,7 @@ class BeanMenuFactory
      * @return void
      * @throws Exception
      */
-    protected function fill(MenuItemList $parent, ?SQLQuery $qry = null) : void
+    protected function fill(MenuItemList $parent, ?SelectQuery $qry = null) : void
     {
 
         $parentID = 0;
@@ -99,7 +99,7 @@ class BeanMenuFactory
         $this->select->where()->clear();
         $this->select->where()->add("parentID", $parentID);
 
-        if (is_null($qry)) $qry = new SQLQuery($this->select);
+        if (is_null($qry)) $qry = new SelectQuery($this->select);
 
         $qry->exec();
 

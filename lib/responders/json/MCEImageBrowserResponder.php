@@ -120,7 +120,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $qry->stmt->where()->add("imageID", $imageID);
         }
 
-        $qry->stmt->fields()->set("section", "section_key", "imageID", "ownerID", "auth_context", "photo");
+        $qry->stmt->set("section", "section_key", "imageID", "ownerID", "auth_context", "photo");
 
         $qry->exec();
 

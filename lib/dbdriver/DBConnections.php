@@ -63,8 +63,13 @@ class DBConnections
 
     /**
      * Return reusable DBDriver for connection properties named '$conn_name' or DBConnection::DEFAULT_NAME if omitted.
-     * DBDriver instance is reused on subsequent calls
-     * Usually one global per app instance is needed. Remaining objects create additional connections where needed ie SQLQuery
+     *
+     * DBDriver instance is reused on subsequent calls.
+     *
+     * Usually one global per app instance is needed.
+     * When driver is in blocked state ie $driver->hasResultSet() is true -
+     * fetching of result is not yet finished - app can call CreateDriver to open new connection
+     *
      * @param string $conn_name
      * @return DBDriver
      * @throws Exception

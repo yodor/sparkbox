@@ -61,9 +61,9 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     protected ?Component $list_empty = null;
 
     /**
-     * @var SQLQuery|IDataIterator|null
+     * @var SelectQuery|IDataIterator|null
      */
-    protected ?SQLQuery $iterator = null;
+    protected ?SelectQuery $iterator = null;
 
     protected Container $viewport;
 
@@ -148,7 +148,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
      */
     public function setIterator(IDataIterator $itr): void
     {
-        if (!($itr instanceof SQLQuery)) throw new Exception("Unsuitable iterator. Expecting SQLQuery");
+        if (!($itr instanceof SelectQuery)) throw new Exception("Unsuitable iterator. Expecting SelectQuery");
         $this->iterator = $itr;
     }
 
@@ -200,7 +200,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     public function getCacheName() : string
     {
         $result = parent::getCacheName();
-        if ($this->iterator instanceof SQLQuery) {
+        if ($this->iterator instanceof SelectQuery) {
 
             $select = clone $this->iterator->stmt;
 
@@ -292,14 +292,14 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $this->results_paginated = true;
     }
     /**
-     * Execute the assigned SQLQuery and prepare the paginator values.
+     * Execute the assigned SelectQuery and prepare the paginator values.
      * Need to call this once
      * @return void
      * @throws Exception
      */
     public function processIterator() : void
     {
-        if (!($this->iterator instanceof SQLQuery)) {
+        if (!($this->iterator instanceof SelectQuery)) {
             Debug::ErrorLog("No iterator set");
             return;
         }

@@ -1,6 +1,7 @@
 <?php
 include_once("sql/SQLStatement.php");
-include_once("sql/SQLSelect.php");
+include_once("sql/CanSetColumnValue.php");
+include_once("sql/CanSetColumnNameExpression.php");
 
 /**
  * Class SQLUpdate
@@ -9,6 +10,9 @@ include_once("sql/SQLSelect.php");
  */
 class SQLUpdate extends SQLStatement
 {
+    use CanSetColumnValue;
+    use CanSetColumnNameExpression;
+
     /**
      * SQLUpdate constructor.
      * @param SQLStatement|null $other Optional statement to copy from (e.g., from a SELECT).
@@ -91,5 +95,6 @@ class SQLUpdate extends SQLStatement
 
         return $bindings;
     }
+
 
 }
