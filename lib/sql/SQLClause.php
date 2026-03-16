@@ -19,9 +19,13 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
      */
     const string DEFAULT_GLUE = "AND";
 
-    protected string $expr = "";
+    /**
+     * SQL text of the expression
+     * @var string
+     */
+    protected string $expression = "";
 
-    protected array|string|float|int|bool|null $value = null;
+    protected string|float|int|bool|null $value = null;
 
     protected string $operator = SQLClause::DEFAULT_OPERATOR;
 
@@ -29,7 +33,8 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
 
     protected string $bindingKey = "";
 
-    protected bool $hasValue = false;
+    //has expression value - ie use the operator
+    protected bool $hasExpressionValue = false;
 
     /**
      * Create empty SQLClause
@@ -44,8 +49,8 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
         $this->glue = SQLClause::DEFAULT_GLUE;
         $this->operator = SQLClause::DEFAULT_OPERATOR;
         $this->bindingKey = "";
-        $this->hasValue = false;
-        $this->expr = "";
+        $this->hasExpressionValue = false;
+        $this->expression = "";
     }
 
     public function setGlue(string $glue) : void
@@ -67,27 +72,28 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
      * ex: $clause->setExpression("name LIKE :name");
      * $statement->bind(":name", $name);
      *
+     *  Plain usage is for column matching ie itemID = 34 usually created from the where clause collection
+     *
      * @param string $expr
-     * @param array|string|float|int|bool|null $value
-     * @param string $operator
+     * @param string|float|int|bool|null $value
      * @return void
      * @throws Exception
      */
-    public function setExpression(string $expr, array|string|float|int|bool|null $value = null) : void
+    public function setExpression(string $expr, string|float|int|bool|null $value = null) : void
     {
         if (strlen(trim($expr)) == 0) throw new Exception("Invalid expression");
 
-        $this->expr = $expr;
-        $this->hasValue = false;
+        $this->expression = $expr;
+        $this->hasExpressionValue = false;
 
         if (func_num_args() >= 2) {
             //value is provided - create binding key and store the value even if it is empty string
             $this->value = $value;
             $this->bindingKey = SQLStatement::FormatBindingKey(Spark::Hash($expr));
-            $this->hasValue = true;
+            $this->hasExpressionValue = true;
         }
         else {
-            //clear the operator - no value not used actually as hasValue is false
+            //clear the operator - no value
             $this->operator = "";
         }
     }
@@ -97,16 +103,17 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
         if (!SQLStatement::IsBindingKeySafe($bindingKey)) throw new InvalidArgumentException("Binding key incorrect");
         if (!SQLStatement::IsBindingValueSafe($value)) throw new InvalidArgumentException("Binding value incorrect");
         $this->bindingKey = $bindingKey;
+        //reset the value to the binding value. do not set hasValue
         $this->value = $value;
-        $this->hasValue = true;
+
     }
 
     public function getExpression() : string
     {
-        return $this->expr;
+        return $this->expression;
     }
 
-    public function getValue() : string
+    public function getValue() : string|float|int|bool|null
     {
         return $this->value;
     }
@@ -115,6 +122,7 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
     {
         return $this->operator;
     }
+
     public function setOperator(string $operator) : void
     {
         $this->operator = $operator;
@@ -128,12 +136,15 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
      */
     public function getSQL(): string
     {
-        if ($this->hasValue && $this->expr) {
-            return $this->expr . " " . $this->operator . " " . $this->bindingKey;
+
+        if ($this->hasExpressionValue) {
+            return $this->expression . " " . $this->operator . " " . $this->bindingKey;
         }
-        //might return transient bindings if $this->expr is empty and there are binding added.
-        //ie clause is empty but contains bindings
-        return $this->expr;
+
+        //might return transient binding if $this->expression is empty and only bind() method was called.
+        //ie clause is empty but contains binding value
+        //expression is plain sql or contains binding inside
+        return $this->expression;
     }
 
 
