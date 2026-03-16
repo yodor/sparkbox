@@ -18,13 +18,16 @@ class PDODriver extends DBDriver
         $user = $this->props->user;
         $pass = $this->props->pass;
 
-
         // Construct DSN (Data Source Name)  //charset=utf8mb4
         $dsn = "mysql:host=$host;dbname=$db;port=$port;charset=utf8mb4";
 
         $options = array(
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+
+            //allow autocommit control with beginTransaction
+            PDO::ATTR_AUTOCOMMIT           => true,
+
             // allow reusing of named parameters
             PDO::ATTR_EMULATE_PREPARES   => true,
 
@@ -33,8 +36,6 @@ class PDODriver extends DBDriver
 
             // unbuffered mode
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
-
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET AUTOCOMMIT=0",
         );
 
 
@@ -62,10 +63,7 @@ class PDODriver extends DBDriver
 
     public function disconnect(): void
     {
-        if ($this->current instanceof PDOResult) {
-            $this->current->free();
-            $this->current=null;
-        }
+        $this->clearActiveResult();
 
         if ($this->conn instanceof PDO) {
             $this->conn = null; // Closing is in the destructor in PDO
@@ -81,7 +79,7 @@ class PDODriver extends DBDriver
     // Inside PDODriver class
     protected int $lastAffectedRows = -1;
 
-    protected ?PDOResult $current = null;
+    protected ?PDOResult $active = null;
     /**
      *
      * @param PDOStatement $stmt
@@ -92,64 +90,56 @@ class PDODriver extends DBDriver
 
         $result = new PDOResult($stmt);
 
+        // This is a SELECT / SHOW / EXPLAIN / DESCRIBE / CALL returning rows
         // Most reliable way to check for result set
-        if ($stmt->columnCount() > 0) {
-            // This is a SELECT / SHOW / EXPLAIN / DESCRIBE / CALL returning rows
+        if ($result->isActive()) {
             //result set number of rows is not known
             $this->lastAffectedRows = -1;
-
             //only one active in unbuffered mode
-            $this->current = $result;
+            $this->active = $result;
 
-        } else {
-
-            $this->current = null;
+        }
+        else {
             // This is INSERT / UPDATE / DELETE / REPLACE / CREATE / DROP / etc.
-            $this->lastAffectedRows = $stmt->rowCount();
+            $this->lastAffectedRows = $result->affectedRows();
             // or get last insert id: $pdo->lastInsertId()
-            //do not track as current but PDOResult->numRows() can still be used as 'affected rows' from the rest of the app
+            //do not track as current but PDOResult->affectedRows() can still be used as 'affected rows' from the rest of the app
         }
 
         return $result;
     }
 
+    private function clearActiveResult() : void
+    {
+        if ($this->active) {
+            //Debug::ErrorLog("This is NOT SELECT QUERY clearing current");
+            $this->active->free();
+            $this->active = null;
+        }
+    }
     /**
      * Do we have un-fetched result-set waiting ?
      * During nested queries app logic can decide to open additional connection to the DB server using DBConnections::CreateDriver()
      * @return bool
      */
-    public function hasResultSet() : bool
+    public function hasActiveResult() : bool
     {
-        return (!is_null($this->current) && $this->current->isActive());
+        return (!is_null($this->active) && $this->active->isActive());
     }
 
     /**
      * Throw if we have non fully fetched result set
+     * clear any active statement set from previous call to statementResult()
      * @return void
      * @throws Exception
      */
-    protected function assertResultSet() : void
+    protected function assert_active() : void
     {
-        if ($this->hasResultSet())
-            throw new Exception("Fetch active result-set first: ".Debug::Backtrace(-1)." | Active statement from: ".$this->current->createdBy);
-    }
-
-    public function queryRaw(string $sqlText): PDOResult
-    {
-        $this->lastAffectedRows = -1;
-
-        $this->assertResultSet();
-
-        try {
-            $stmt = $this->conn->query($sqlText);
-            if ($stmt === false) throw new Exception("Query failed: ".$this->getError());
-
-            return $this->statementResult($stmt);
+        if ($this->hasActiveResult()) {
+            throw new Exception("Fetch active result-set first");
         }
-        catch (Exception $e) {
-            Debug::ErrorLog("Error: " . $e->getMessage() . " | SQL: " . ($sqlText ?? ""));
-            throw $e;
-        }
+
+        $this->clearActiveResult();
     }
 
     /**
@@ -162,7 +152,7 @@ class PDODriver extends DBDriver
     {
         $this->lastAffectedRows = -1;
 
-        $this->assertResultSet();
+        $this->assert_active();
 
         try {
             $sql = $statement->getSQL();
@@ -172,14 +162,20 @@ class PDODriver extends DBDriver
 
             $meta = $statement->getMeta();
             if ($meta) {
-                Debug::ErrorLog("Executing query[$meta] : ".$sql, $bindings);
+                Debug::ErrorLog("Executing [$meta] : ".$sql, $bindings);
             }
 
             $stmt = $this->conn->prepare($sql);
             if ($stmt === false) throw new Exception("Prepare failed: ".$this->getError());
+
             if (!$stmt->execute($bindings)) throw new Exception("Execute failed: ".$this->getError());
 
-            return $this->statementResult($stmt);
+            $result =  $this->statementResult($stmt);
+//            if ($this->active) {
+//                $this->active = Debug::Backtrace(-1) . $sql;
+//            }
+            return $result;
+
         }
         catch (Exception $e) {
             $message = "";
@@ -198,57 +194,39 @@ class PDODriver extends DBDriver
         return $this->lastAffectedRows;
     }
 
+    /**
+     * Returns the ID of the last inserted row or sequence value
+     * Proxy method to $this->conn->lastInsertId()
+     * @return int
+     */
     public function lastID(): int
     {
         return (int)$this->conn->lastInsertId();
     }
 
-    public function transaction(?string $name = null): bool
+    public function transaction(?string $name = null): void
     {
-        $this->connect();
         //If we are already in transaction do nothing. PDO does not support multiple transactions
         if ($this->conn->inTransaction()) {
-            return true;
+            Debug::ErrorLog("Already inside transaction.");
+            return;
         }
-        return $this->conn->beginTransaction();
+        if (!$this->conn->beginTransaction()) throw new Exception("Starting transaction failed: ".$this->getError());
+        Debug::ErrorLog("Beginning transaction.");
     }
 
-    public function commit(?string $name = null): bool
+    public function commit(?string $name = null): void
     {
-        if ($this->isConnected() && $this->conn->inTransaction()) {
-            return $this->conn->commit();
-        }
-        return false;
+        if (!$this->conn->inTransaction()) throw new Exception("Not in transaction: ".$this->getError());
+        if (!$this->conn->commit()) throw new Exception("Commit failed: ".$this->getError());
+        Debug::ErrorLog("Commited transaction.");
     }
 
-    public function rollback(?string $name = null): bool
+    public function rollback(?string $name = null): void
     {
-        if ($this->isConnected() && $this->conn->inTransaction()) {
-            return $this->conn->rollBack();
-        }
-        return false;
-    }
-
-    public function columnTypes(string $tableName): array
-    {
-        $types = array();
-        $result = $this->queryRaw("DESCRIBE $tableName");
-        while ($data = $result->fetch()) {
-            $columnName = $data["Field"];
-            $types[$columnName] = $data;
-        }
-        return $types;
-    }
-
-    public function tableExists(string $tableName): bool
-    {
-        try {
-            $result = $this->queryRaw("SELECT 1 FROM `{$tableName}` LIMIT 1");
-            $result->free();
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
+        if (!$this->conn->inTransaction()) throw new Exception("Not in transaction: ".$this->getError());
+        if (!$this->conn->rollBack()) throw new Exception("Rollback failed: ".$this->getError());
+        Debug::ErrorLog("Rolled back transaction.");
     }
 
     public function getError(): string

@@ -1,6 +1,6 @@
 <?php
 
-class AuthToken
+class AuthToken implements ISerializable
 {
     const string HASH = "hash";
     const string ID = "id";

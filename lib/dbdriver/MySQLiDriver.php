@@ -72,25 +72,9 @@ class MySQLiDriver extends DBDriver
     }
 
 
-    public function hasResultSet(): bool
+    public function hasActiveResult(): bool
     {
         return false;
-    }
-
-    public function queryRaw(string $sqlText): DBResult
-    {
-        try {
-
-            $res = $this->conn->query($sqlText);
-            if ($res === false) throw new Exception("Result is false");
-
-            return new MySQLiResult();
-
-        }
-        catch (Exception $e) {
-            Debug::ErrorLog("Error: ".$e->getMessage()." | Connection Error: ".$this->conn->error." | SQL: $sqlText");
-            throw new Exception("Error: ".$e->getMessage());
-        }
     }
 
     /**
@@ -132,49 +116,21 @@ class MySQLiDriver extends DBDriver
         return $this->conn->insert_id;
     }
 
-    public function commit(?string $name = null) : bool
+    public function commit(?string $name = null) : void
     {
-        return $this->conn->commit(0 , $name);
+        $this->conn->commit(0 , $name);
     }
 
-    public function rollback(?string $name = null) : bool
+    public function rollback(?string $name = null) : void
     {
-        return $this->conn->rollback(0 , $name);
+        $this->conn->rollback(0 , $name);
     }
 
-    public function transaction(?string $name = null) : bool
+    public function transaction(?string $name = null) : void
     {
-        return $this->conn->begin_transaction(0, $name);
+        $this->conn->begin_transaction(0, $name);
     }
 
-    public function escape(string $data) : string
-    {
-        return $this->conn->real_escape_string($data);
-    }
 
-    public function columnTypes(string $tableName): array
-    {
-        //Field   //Type             //Null //Key   //Default   //Extra
-        //userID  //int(11) unsigned //NO   //PRI   //NULL      //auto_increment
-        $types = array();
-
-        $result = $this->queryRaw("DESCRIBE $tableName");
-        while ($data = $result->fetch()) {
-            $columnName = $data["Field"];
-            $types[$columnName] = $data;
-        }
-        return $types;
-    }
-
-    public function tableExists(string $tableName): bool
-    {
-        try {
-            $result = $this->queryRaw("SELECT 1 FROM `{$tableName}` LIMIT 1");
-            $result->free();
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
 
 }

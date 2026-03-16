@@ -1,7 +1,8 @@
 <?php
 include_once("utils/Session.php");
-include_once("objects/ISparkSerialize.php");
-include_once("objects/SparkSerialized.php");
+include_once("objects/ISparkSeal.php");
+include_once("objects/ISparkUnseal.php");
+include_once("objects/SparkSealed.php");
 /**
  * Store array in session
  */
@@ -65,10 +66,10 @@ class SessionData
         return $this->name;
     }
 
-    public function set(string $key, mixed $val) : void
+    public function set(string $key, ISparkSeal|ISerializable|array|string|float|int|bool $val) : void
     {
         $result = $val;
-        if ($val instanceof ISparkSerializable) {
+        if ($val instanceof ISparkSeal) {
             $result = $val->wrap();
         }
         $this->data[$key] = $result;
@@ -78,7 +79,7 @@ class SessionData
     {
         if (!isset($this->data[$key])) throw new Exception("SessionData key not found: " . $key);
         $value = $this->data[$key];
-        if ($value instanceof ISparkUnserializable) {
+        if ($value instanceof ISparkUnseal) {
             return $value->unwrap();
         }
         return $value;

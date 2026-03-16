@@ -1,7 +1,7 @@
 <?php
 include_once("dbdriver/IDBDriverAccess.php");
 
-class DBQuery implements IDBDriverAccess
+class DBQuery extends SparkObject
 {
     /**
      * @var int last result INSERT/UPDATE/DELETE affectedRows
@@ -19,13 +19,12 @@ class DBQuery implements IDBDriverAccess
      */
     private ?DBDriver $driver = null;
 
-    private bool $driver_created = false;
-
     public function __construct()
     {
+        parent::__construct();
+
         $this->result = NULL;
-        $this->driver = NULL;
-        $this->driver_created = false;
+        $this->driver = null;
     }
 
     public function __destruct()
@@ -43,11 +42,14 @@ class DBQuery implements IDBDriverAccess
         }
         $this->result = NULL;
 
-        //only close driver if it is created by '$this'
-        if ($this->driver && $this->driver_created) {
-           // Debug::ErrorLog("Closing created driver during exec call");
-            $this->driver = null;
+        //can support external driver using getDB/setDB
+        if ($this->driver instanceof DBDriver) {
+            if ($this->driver->getParent() === $this) {
+                Debug::ErrorLog("Closing self created driver");
+                $this->driver = null; //calls DTOR
+            }
         }
+
     }
 
     /**
@@ -61,35 +63,42 @@ class DBQuery implements IDBDriverAccess
         return $this->affectedRows;
     }
 
-
     /**
      * Executes the provided statement and sets $this->affectedRows
-     *
+     * Passing $db uses the passed driver, if this is select $db life should be ensured externally to this call
+     * Does not set $this->driver unless it is self created driver and a select statement
      *
      * @param SQLStatement $statement Statement to execute
      * @throws Exception
      */
-    public function exec(SQLStatement $statement): void
+    public function exec(SQLStatement $statement, ?DBDriver $db=null): void
     {
 
         $this->free();
 
-        $driver = $this->assignDriver();
+        //use provided or global from assignDriver or temp then it has parent to this
+        $driver = $db ?? $this->assignDriver();
 
         try {
-            // Execute query in unbuffered mode
-            $this->result = $driver->query($statement);
 
-            if (!$this->result->isActive()) {
+            // Execute query in unbuffered mode
+            $result = $driver->query($statement);
+
+            if (!$result->isActive()) {
                 //store affected rows but not keep the driver - INSERT/DELETE/UPDATE
-                $this->affectedRows = $this->result->affectedRows();
+                $this->affectedRows = $driver->affectedRows();
             }
             else {
-                //keep the driver for the active result to be fetched - SelectQuery
-                $this->driver = $driver;
+                //select statement store for further fetching from SelectQuery
+                $this->result = $result;
+                //keep driver if self created and is select
+                if ($driver->getParent() === $this) {
+                    $this->driver = $driver;
+                }
             }
 
         } catch (Exception $e) {
+
             Debug::ErrorLog("Executing statement failed: " . $e->getMessage());
             $this->free();
             throw $e;
@@ -110,36 +119,14 @@ class DBQuery implements IDBDriverAccess
     {
         $driver = DBConnections::Driver();
         //already active result-set for fetching
-        if ($driver->hasResultSet()) {
+        if ($driver->hasActiveResult()) {
             //unbuffered mode handling
-            //Debug::ErrorLog("Driver has active result-set active. Creating new temporary driver.");
-            //not kept anywhere else than during this call. SelectQuery uses this during the count() method
+            //SelectQuery::count() uses to open temp connection on blocked result-fetching
             $driver = DBConnections::CreateDriver($driver->getConnectionName());
-            $this->driver_created = true;
+            //own it
+            $driver->setParent($this);
         }
         return $driver;
     }
-
-    /**
-     * Return the current DBDriver
-     * @return DBDriver|null
-     */
-    public function getDB(): ?DBDriver
-    {
-        return $this->driver;
-    }
-
-    /**
-     * Set db for multi-exec usage in transaction style queries
-     * @param DBDriver $driver
-     * @return void
-     */
-    public function setDB(DBDriver $driver) : void
-    {
-        //TODO check external driver with assignDriver
-        $this->driver = $driver;
-    }
-
-
 
 }

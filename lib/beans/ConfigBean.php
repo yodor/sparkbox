@@ -77,7 +77,7 @@ class ConfigBean extends DBTableBean
      * @return void
      * @throws Exception
      */
-    public function set(string $key, string|null $val) : void
+    public function set(string $key, DBSerializable|string|null $val) : void
     {
 
         try {

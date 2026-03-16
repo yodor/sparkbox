@@ -31,7 +31,7 @@ class ConfigFormProcessor extends FormProcessor implements IValueTransactor
     public function appendValue(string $key, $val) : void
     {
         if ($val instanceof StorageObject) {
-            $val = $val->serializeDB();
+            $val = serialize($val);
         }
         $this->bean->set($key, $val);
     }

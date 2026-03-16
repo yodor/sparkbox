@@ -7,7 +7,7 @@ include_once("utils/Paginator.php");
 include_once("utils/IGETConsumer.php");
 
 
-class URL implements IGETConsumer, IDataResultProcessor
+class URL implements IGETConsumer, IDataResultProcessor, ISerializable
 {
 
     protected bool $is_script = FALSE;
@@ -403,6 +403,11 @@ class URL implements IGETConsumer, IDataResultProcessor
                 $pageURL->remove($name);
             }
         }
+    }
+
+    public function __serialize(): array
+    {
+        return get_object_vars($this);
     }
 
 }

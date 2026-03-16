@@ -1,13 +1,16 @@
 <?php
 include_once("objects/SparkObject.php");
+include_once("objects/ISparkUnseal.php");
+include_once("objects/ISerializable.php");
+include_once("objects/IUnserializable.php");
 
-class SparkSerialized implements ISparkUnserializable
+class SparkSealed implements ISparkUnseal, ISerializable
 {
     const string VERSION = "1.0";
 
-    protected ?ISparkSerializable $object = null;
+    protected ?ISparkSeal $object = null;
 
-    public function __construct(ISparkSerializable $object)
+    public function __construct(ISparkSeal $object)
     {
         $this->object = $object;
     }
@@ -15,7 +18,7 @@ class SparkSerialized implements ISparkUnserializable
     public function __serialize() : array
     {
         $result = array();
-        $result["version"] = SparkSerialized::VERSION;
+        $result["version"] = SparkSealed::VERSION;
         $refs = array();
         SparkLoader::ClassMap($this->object, $refs);
         foreach ($refs as $className=>$classPath) {
@@ -34,7 +37,7 @@ class SparkSerialized implements ISparkUnserializable
     {
 
         if (!isset($data["version"])) throw new Exception("Version not found");
-        if (strcmp($data["version"], SparkSerialized::VERSION) !== 0) throw new Exception("Wrong version");
+        if (strcmp($data["version"], SparkSealed::VERSION) !== 0) throw new Exception("Wrong version");
 
         if (!isset($data["blob"])) throw new Exception("Blob not found");
 
@@ -52,12 +55,12 @@ class SparkSerialized implements ISparkUnserializable
         }
 
         $object = unserialize($data['blob']);
-        if (!($object instanceof ISparkSerializable)) throw new Exception("blob not instance of ISparkSerializable");
+        if (!($object instanceof ISparkSeal)) throw new Exception("blob not instance of ISparkSerializable");
         $this->object = $object;
     }
 
 
-    public function unwrap(): ISparkSerializable
+    public function unwrap(): ISparkSeal
     {
         return $this->object;
     }

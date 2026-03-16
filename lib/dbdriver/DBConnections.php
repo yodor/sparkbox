@@ -111,6 +111,7 @@ class DBConnections
                 include_once("dbdriver/PDODriver.php");
                 $driver = new PDODriver($props);
         }
+
         if (is_null($driver)) throw new Exception("Unsupported driver '{$props->driverClass}'");
         $driver->connect();
         return $driver;

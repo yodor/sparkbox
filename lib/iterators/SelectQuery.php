@@ -57,12 +57,12 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $this->numResults = -1;
     }
 
-    public function exec(?SQLStatement $statement = null) : void
+    public function exec(?SQLStatement $statement = null, ?DBDriver $db = null) : void
     {
         if (!is_null($statement)) throw new Exception("Can only exec SQLSelect from the constructor call.");
         //clear cached count
         $this->numResults = -1;
-        parent::exec($this->stmt);
+        parent::exec($this->stmt, $db);
     }
 
     /**
@@ -144,7 +144,8 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         // Return cached result if already calculated
         if ($this->numResults !== -1) return $this->numResults;
 
-        //get suitable driver. if new driver was created it will get out of context and auto deleted
+        //get suitable driver
+        //if new driver was created it will get out of context and auto deleted
         $driver = $this->assignDriver();
 
         $select = clone $this->stmt;
@@ -159,7 +160,7 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $result->free();
 
         //fetch the actual calculated number
-        $result = $driver->queryRaw("SELECT FOUND_ROWS() as total_results LIMIT 1");
+        $result = $driver->query(new RawSQLSelect("SELECT FOUND_ROWS() as total_results LIMIT 1"));
 
         $this->numResults = $result->fetchResult()->get("total_results");
         $result->free();

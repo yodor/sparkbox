@@ -20,20 +20,26 @@ CREATE TABLE `languages` (
         parent::__construct("languages");
     }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
-    protected function createTable() : void
+    protected static function CreateTable(string $createText) : void
     {
-        parent::createTable();
+        parent::CreateTable($createText);
 
-        $insert = new SQLInsert();
-        $insert->from = "languages";
-        $insert->set("language", Spark::Get(Config::DEFAULT_LANGUAGE));
-        $insert->set("lang_code", Spark::Get(Config::DEFAULT_LANGUAGE_ISO3));
         $query = new DBQuery();
-        $query->exec($insert);
+        try {
+            $insert = new SQLInsert();
+            $insert->from = "languages";
+            $insert->set("language", Spark::Get(Config::DEFAULT_LANGUAGE));
+            $insert->set("lang_code", Spark::Get(Config::DEFAULT_LANGUAGE_ISO3));
+
+            $query->exec($insert);
+        }
+        catch (Exception $ex) {
+            Debug::ErrorLog("Unable to insert default language: ".$ex->getMessage());
+            throw $ex;
+        }
+        finally {
+            $query->free();
+        }
 
     }
 }

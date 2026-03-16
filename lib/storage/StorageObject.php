@@ -1,10 +1,11 @@
 <?php
-include_once("objects/ISparkSerialize.php");
-include_once("objects/SparkSerialized.php");
+include_once("objects/ISerializable.php");
+include_once("objects/IUnserializable.php");
+include_once("objects/SparkSealed.php");
 
 include_once("storage/DataBuffer.php");
 
-class StorageObject implements ISparkSerializable
+class StorageObject implements ISparkSeal, ISerializable, IUnserializable
 {
 
     final public const float Serial = 1.0;
@@ -49,13 +50,6 @@ class StorageObject implements ISparkSerializable
     public function buffer() : DataBuffer
     {
         return $this->buffer;
-    }
-
-    public function serializeDB() : string
-    {
-
-        return serialize($this);
-
     }
 
     public function UID() : string
@@ -186,8 +180,8 @@ class StorageObject implements ISparkSerializable
         }
     }
 
-    public function wrap(): ISparkUnserializable
+    public function wrap(): ISparkUnseal
     {
-        return new SparkSerialized($this);
+        return new SparkSealed($this);
     }
 }

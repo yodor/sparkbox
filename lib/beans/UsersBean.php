@@ -27,8 +27,18 @@ class UsersBean extends DBTableBean
         if (!str_starts_with(strtolower($columnType), "varchar(255)")) {
             //modify column
             Debug::ErrorLog("Upgrading password column type to varchar(255)");
-            $result = $this->db->queryRaw("ALTER TABLE `{$this->table}` MODIFY COLUMN password VARCHAR(255) NOT NULL");
-            $result->free();
+            $sql = "ALTER TABLE `{$this->table}` MODIFY COLUMN password VARCHAR(255) NOT NULL";
+            $query = new SelectQuery(new RawSQLSelect($sql));
+            try {
+                $query->exec();
+                $query->next();
+            }
+            catch (Exception $e) {
+                Debug::ErrorLog("Upgrading failed: ".$e->getMessage());
+            }
+            finally {
+                $query->free();
+            }
         }
         $this->initColumnTypes();
 

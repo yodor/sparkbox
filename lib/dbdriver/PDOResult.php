@@ -14,7 +14,7 @@ class PDOResult extends DBResult
     public function __construct(PDOStatement $result)
     {
         $this->result = $result;
-        $this->createdBy = Debug::Backtrace(-1);
+        //$this->createdBy = Debug::Backtrace(-1);
     }
 
     public function __destruct()
@@ -90,7 +90,7 @@ class PDOResult extends DBResult
      */
     public function affectedRows(): int
     {
-        if (!$this->isActive()) return -1;
+        if ($this->isActive()) return -1;
 
         //Returns the number of affected rows (INSERT/UPDATE/DELETE) - for SELECT not available
         return $this->result->rowCount();

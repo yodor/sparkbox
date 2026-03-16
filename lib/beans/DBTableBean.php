@@ -6,8 +6,11 @@ include_once("sql/SQLSelect.php");
 include_once("sql/SQLInsert.php");
 include_once("sql/SQLUpdate.php");
 include_once("sql/SQLDelete.php");
+include_once("sql/RawSQLSelect.php");
+include_once("objects/ISerializable.php");
+include_once("objects/IUnserializable.php");
 
-abstract class DBTableBean implements IDBDriverAccess
+abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnserializable
 {
 
     /**
@@ -75,15 +78,11 @@ abstract class DBTableBean implements IDBDriverAccess
     protected function initialize() : void
     {
 
-        if (!$this->db->tableExists($this->table)) {
+        if (!DBTableBean::TableExists($this->table)) {
             if (strlen($this->createString) < 1) {
                 throw new Exception("Table '$this->table' was not found in the active connection and no create string is set to recreate the table");
             }
-            $this->createTable();
-        }
-
-        if (!$this->db->tableExists($this->table)) {
-            throw new Exception("Table '$this->table' is not available in the active DB connection");
+            DBTableBean::CreateTable($this->createString);
         }
 
         $this->initColumnTypes();
@@ -98,7 +97,7 @@ abstract class DBTableBean implements IDBDriverAccess
     {
         $this->columns = array();
 
-        $columnTypes = $this->db->columnTypes($this->table);
+        $columnTypes = DBTableBean::ColumnTypes($this->table);
 
         foreach ($columnTypes as $columnName => $details) {
             if (strcmp($details["Key"], "PRI") === 0) {
@@ -109,23 +108,79 @@ abstract class DBTableBean implements IDBDriverAccess
 
         //Debug::ErrorLog("Columns: ", $this->columns);
     }
+
     /**
+     * Describe table columns using format
+     * * Field,Type,Null,Key,Default,Extra
+     * * ex Field=>userID , Type=>int(11) unsigned, Null=>NO, Key=>PRI, Default=>NULL, Extra=>auto_increment
+     * @param string $tableName
+     * @return array<string, array{Field: string, Type:string, Null:string, Key:string, Default:string, Extra:string}>
+     * @throws Exception
+     */
+    protected static function ColumnTypes(string $tableName): array
+    {
+        $types = array();
+
+        $query = new SelectQuery(new RawSQLSelect("DESCRIBE `$tableName`"));
+        try {
+            $query->exec();
+            while ($data = $query->next()) {
+                $columnName = $data["Field"];
+                $types[$columnName] = $data;
+            }
+        }
+        catch (Exception $ex) {
+            Debug::ErrorLog("DESCRIBE failed: ".$ex->getMessage());
+        }
+        finally {
+            $query->free();
+        }
+
+        return $types;
+    }
+
+    /**
+     * Check if a table named - '$tableName' exist in the current connection
+     * @param string $tableName
+     * @return bool
+     */
+    protected static function TableExists(string $tableName): bool
+    {
+        $tableok = false;
+        $query = new SelectQuery(new RawSQLSelect("SELECT 1 FROM `{$tableName}` LIMIT 1"));
+
+        try {
+            $query->exec(); // throw if table does not exist as PDO::ERRMODE_EXCEPTION is true
+            $query->next();
+            $tableok = true;
+
+        } catch (Exception $e) {
+            Debug::ErrorLog("Check failed: ".$e->getMessage());
+            $tableok = false;
+        }
+        finally {
+            $query->free();
+        }
+        return $tableok;
+    }
+
+    /**
+     * @param string $createText
      * @return void
      * @throws Exception
      */
-    protected function createTable() : void
+    protected static function CreateTable(string $createText) : void
     {
-
+        $query = new SelectQuery(new RawSQLSelect($createText));
         try {
-            $this->db->transaction();
-            $this->db->queryRaw($this->createString);
-            $this->db->commit();
+            $query->exec();
         }
         catch (Exception $e) {
-            $this->db->rollback();
             throw $e;
         }
-
+        finally {
+            $query->free();
+        }
     }
 
     public function getTableName() : string
