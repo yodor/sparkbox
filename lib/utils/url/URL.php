@@ -2,7 +2,9 @@
 include_once("utils/url/URLParameter.php");
 include_once("utils/url/DataParameter.php");
 include_once("utils/url/PathParameter.php");
-
+include_once("utils/url/LiteralURLParameter.php");
+include_once("objects/ISerializable.php");
+include_once("components/renderers/items/IDataResultProcessor.php");
 include_once("utils/Paginator.php");
 include_once("utils/IGETConsumer.php");
 
@@ -158,17 +160,24 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
 
         return $filtered;
     }
-
     /**
      * Returns the query string portion only (without the leading '?').
-     * Respects clear_page_param and clear_params for consistency with toString().
-     * Only includes regular parameters that have non-empty values.
+     * * Respects clear_page_param and clear_params for consistency with toString().
+     * * Only includes regular parameters that have non-empty values.
+     *
+     * Note: LiteralURLParameter instances are treated specially in the query string:
+     * their values are inserted without any percent-encoding to preserve placeholders
+     * (e.g. {search_term_string} for schema.org urlTemplate).
+     *
+     * This behavior is currently limited to query parameters and does not apply to
+     * path segments or fragments in toString(). If literal values are needed in those
+     * contexts in the future, add corresponding instanceof checks there.
      *
      * @return string Empty string if no query parameters remain after filtering
      */
     public function getQueryString(): string
     {
-        $queryPairs = [];
+        $parts = [];
 
         foreach ($this->getFilteredParameters() as $param) {
             // Skip PathParameter and Resource parameters
@@ -176,23 +185,35 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
                 continue;
             }
 
-            $value = $param->value(false);   // never quoted
+            $rawValue = $param->value();
+            if ($rawValue === '') {
+                continue;
+            }
 
-            if ($value !== '') {
-                $queryPairs[$param->name()] = $value;
+            $name = $param->name();
+
+            if ($param instanceof LiteralURLParameter) {
+                // Schema / template case: no encoding at all
+                $parts[] = $name . '=' . $rawValue;
+            } else {
+                // Standard case: encode both name and value (RFC 3986)
+                $encName  = rawurlencode($name);
+                $encValue = rawurlencode($rawValue);
+                $parts[]  = $encName . '=' . $encValue;
             }
         }
 
-        if (empty($queryPairs)) {
+        if (empty($parts)) {
             return '';
         }
 
-        return http_build_query(
-            $queryPairs,
-            '',
-            '&',
-            PHP_QUERY_RFC3986
-        );
+        return implode('&', $parts);
+//        return http_build_query(
+//            $parts,
+//            '',
+//            '&',
+//            PHP_QUERY_RFC3986
+//        );
     }
 
     public function toString(): string
@@ -209,9 +230,12 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
         $pathParts = [];
         $fragment  = '';
 
+        // Note: LiteralURLParameter is currently only respected in getQueryString().
+        // Path segments and fragments are always encoded.
+        // If literal behavior is ever needed here, add instanceof checks.
         foreach ($filteredParams as $param) {
             $name  = $param->name();
-            $value = $param->value(false);
+            $value = $param->value();
 
             if ($param instanceof PathParameter) {
                 $encoded = rawurlencode($value);
@@ -277,7 +301,11 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
     public function fullURL(): URL
     {
 
-        $result = new URL($this->toString());
+        //clone and set as absolute if not already absolute
+        $result = clone $this;
+
+        //loose parameter types ie Literal, Data, Path
+        //$result = new URL($this->toString());
 
         if (!$this->isAbsolute()) {
             // Case 2: Relative URL → use site configuration

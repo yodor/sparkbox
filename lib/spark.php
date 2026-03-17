@@ -338,7 +338,9 @@ final class Spark {
         $site_domain = $_SERVER["HTTP_HOST"];
         Spark::Set(Config::SITE_DOMAIN, $site_domain, true);
 
-        Spark::Set(Config::SITE_URL, $protocol . $site_domain . $location, true);
+        include_once("utils/url/URL.php");
+        $site_url = new URL($location);
+        Spark::SetObject(Config::SITE_URL, $site_url->fullURL() , true);
 
         Spark::Set(Config::COOKIE_DOMAIN, ".".$site_domain, true); // or .domain.com
 
