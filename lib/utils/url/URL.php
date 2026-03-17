@@ -37,7 +37,7 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
     {
         $ret = $_SERVER["SCRIPT_NAME"];
         if ($_SERVER["QUERY_STRING"]) {
-            $ret .= "?" . rawurldecode($_SERVER["QUERY_STRING"]);
+            $ret .= "?" . $_SERVER["QUERY_STRING"];
         }
         return new URL($ret);
     }
