@@ -1,10 +1,14 @@
 <?php
 include_once("objects/SparkObject.php");
 include_once("objects/ISparkUnseal.php");
+include_once("objects/ISparkSeal.php");
 include_once("objects/ISerializable.php");
 include_once("objects/IUnserializable.php");
 
-class SparkSealed implements ISparkUnseal, ISerializable
+/**
+ * DTO like serializer
+ */
+class SparkSealed implements ISparkUnseal, ISerializable, IUnserializable
 {
     const string VERSION = "1.0";
 
@@ -26,9 +30,9 @@ class SparkSealed implements ISparkUnseal, ISerializable
         }
         $result["references"] = $refs;
 
-        Debug::ErrorLog("Serializing [".get_class($this->object)."] -> ", array_keys($result));
-
         $result["blob"] = serialize($this->object);
+
+        Debug::ErrorLog("Sealed [".get_class($this->object)."] - blob size: ".strlen($result["blob"]));
 
         return $result;
     }

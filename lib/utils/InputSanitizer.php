@@ -176,17 +176,15 @@ class InputSanitizer
         return array_unique($tags);
     }
 
-    public static function SQL($input) {
-        if (is_array($input)) {
-            return array_map(InputSanitizer::SQL(...), $input);
-        }
+    public static function SQL(string $input) : string
+    {
 
         $sql_patterns = [
             '/\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|RENAME|REPLACE|GRANT|REVOKE)\b/i',
             '/\b(UNION|JOIN|HAVING|ORDER\s+BY|GROUP\s+BY|LIMIT|OFFSET|FETCH|INTO|VALUES|WHERE)\b/i',
             '/\b(0x[0-9a-f]+|0b[01]+)\b/i',
             '/\b(INFORMATION_SCHEMA|SLEEP|BENCHMARK|LOAD_FILE|OUTFILE)\b/i',
-            '/--\s?/', '/\/\*.*?\*\//s', '/#/'
+            '/--\s?/', '/\/\*.*?\*\//s'
         ];
 
         $output = $input;

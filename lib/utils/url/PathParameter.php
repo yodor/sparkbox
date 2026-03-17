@@ -13,9 +13,9 @@ class PathParameter extends DataParameter
         $this->appendPathSeparator=$appendPathSeparator;
     }
 
-    public function value(bool $quoted=false): string
+    public function value(): string
     {
-        $value = parent::value($quoted);
+        $value = parent::value();
         if ($this->doSlug) {
             $value = Spark::Slugify($value);
         }

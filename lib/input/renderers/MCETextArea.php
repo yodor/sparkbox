@@ -22,8 +22,8 @@ class MCETextArea extends TextArea
     {
         parent::processAttributes();
 
-        $dataValue = Spark::Unescape($this->dataInput->getValue());
-        $this->input->setContents($dataValue);
+        //$dataValue = Spark::Unescape();
+        $this->input->setContents($this->dataInput->getValue());
     }
 
     public function requiredStyle(): array

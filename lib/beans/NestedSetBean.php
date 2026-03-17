@@ -202,9 +202,9 @@ class NestedSetBean extends DBTableBean
 
         $brother = $this->getNode($brotherID);
 
-        $idlist = implode(",", $this->childrenID($node));
+        $children = $this->childrenID($node);
 
-        $code = function (DBDriver $db) use ($node, $brother, $idlist)
+        $code = function (DBDriver $db) use ($node, $brother, $children)
         {
             // Shift the target node and its subtree LEFT by the size of the previous sibling
             $update = new SQLUpdate($this->select);
@@ -227,8 +227,10 @@ class NestedSetBean extends DBTableBean
             $update->where()->addExpression(" (lft BETWEEN :brotherLft AND :brotherRgt )");
             $update->bind(":brotherLft", $brother->lft());
             $update->bind(":brotherRgt", $brother->rgt());
-            $update->where()->addExpression("$this->prkey NOT IN (:idlist)");
-            $update->bind(":idlist", $idlist);
+            //bind ids and get the placeholders comma separated
+            $idlist = $update->bindList($children);
+            $update->where()->addExpression("$this->prkey NOT IN ($idlist)");
+
             $db->query($update)->free();
 
         };
@@ -257,9 +259,9 @@ class NestedSetBean extends DBTableBean
         $brother = $this->getNode($brotherID);
 
         //fetch before
-        $idlist = implode(" , ", $this->childrenID($node));
+        $children = $this->childrenID($node);
 
-        $code = function(DBDriver $db) use ($node, $brother, $idlist) {
+        $code = function(DBDriver $db) use ($node, $brother, $children) {
 
             // Shift the target node and its subtree RIGHT by the size of the next sibling
             $update = new SQLUpdate($this->select);
@@ -282,8 +284,10 @@ class NestedSetBean extends DBTableBean
             $update->where()->addExpression("( lft  BETWEEN :brotherLft AND :brotherRgt )");
             $update->bind(":brotherLft", $brother->lft());
             $update->bind(":brotherRgt", $brother->rgt());
-            $update->where()->addExpression("$this->prkey NOT IN (:idlist)");
-            $update->bind(":idlist", $idlist);
+
+            $idlist = $update->bindList($children);
+            $update->where()->addExpression("$this->prkey NOT IN ($idlist)");
+
 
             $db->query($update)->free();
         };

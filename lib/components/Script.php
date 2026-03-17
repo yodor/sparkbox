@@ -43,7 +43,7 @@ class Script extends Container
     {
         parent::processAttributes();
         if ($this->srcURL->toString()) {
-            $this->setAttribute("src", $this->srcURL->fullURL()->toString());
+            $this->setAttribute("src", $this->srcURL);
         }
 
     }

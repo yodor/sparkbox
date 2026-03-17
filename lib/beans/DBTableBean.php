@@ -435,28 +435,23 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         if (!$db) {
             $use_transaction = TRUE;
-            //TODO: No select query should be active
-            // if global connection has active result-set create new temporary driver for the transaction
             $db = $this->db;
-            Debug::ErrorLog("Starting DB transaction with local DBDriver instance");
+            Debug::ErrorLog("Starting DB transaction using the bean assigned driver connection");
             $db->transaction();
         }
         else {
-            Debug::ErrorLog("Not starting transaction - using DBDriver from function call parameter");
+            Debug::ErrorLog("Not starting DB transaction - received driver connection from function call parameter");
         }
 
         try {
 
             Debug::ErrorLog("Executing closure function");
-
             //either throw or succeed
             $code($db);
-
             $affectedRows = $db->affectedRows();
             Debug::ErrorLog("Closure finished - affected rows: " . $affectedRows);
             
             if ($use_transaction) {
-                Debug::ErrorLog("Committing DB transaction");
                 $db->commit();
             }
 
@@ -494,16 +489,13 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             $delete->from = $this->table;
             $delete->where()->add($this->prkey, $id);
 
-            //exception is thrown in db->query
             $db->query($delete)->free();
 
+            $this->manageCache($id, $db);
         };
 
-        $affectedRows = $this->handleTransaction($code, $db);
+        return $this->handleTransaction($code, $db);
 
-        $this->manageCache($id);
-
-        return $affectedRows;
     }
 
     /**
@@ -520,22 +512,23 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     {
         if (!in_array($column, $this->columnNames())) throw new Exception("Column '$column' not found in this bean table");
 
-        $idlist = array();
 
-        $code = function (DBDriver $db) use ($column, $value, $keep_ids, &$idlist) {
+        $code = function (DBDriver $db) use ($column, $value, $keep_ids) {
+
+            Debug::ErrorLog("Keeping: ", $keep_ids);
 
             $delete = new SQLDelete($this->select);
-            //$value = $db->escape($value);
             $delete->where()->add($column, $value);
 
+            //delete all referenced but keep the ids passed inside $keep_ids
             if (count($keep_ids) > 0) {
-                $keep_list_ids = implode(",", $keep_ids);
-                $delete->where()->addExpression("$this->prkey NOT IN (:keep_list_ids)");
-                $delete->bind(":keep_list_ids", $keep_list_ids);
+                $keep_list = $delete->bindList($keep_ids);
+                $delete->where()->addExpression("$this->prkey NOT IN ($keep_list)");
             }
+            $delete->setMeta("DeleteRef: ".get_class($this));
 
             //fetch id of resulting rows first to properly manage the cache
-            //copy whereset from $delete
+            //copy $delete whereset and bindings
             $select = new SQLSelect($delete);
             $select->reset();
             $select->set($this->prkey);
@@ -547,18 +540,20 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             }
             $result->free();
 
-            Debug::ErrorLog("Affected ID list: ", $idlist);
+            Debug::ErrorLog("Manage cache using: ", $idlist);
 
             $db->query($delete)->free();
 
+            $affectedRows = $db->affectedRows();
+            Debug::ErrorLog("Affected rows from DeleteRef: ". $affectedRows);
+
+            foreach ($idlist as $id) {
+                $this->manageCache((int)$id, $db);
+            }
+
         };
-        $affectedRows =  $this->handleTransaction($code, $db);
+        return $this->handleTransaction($code, $db);
 
-        foreach ($idlist as $id) {
-            $this->manageCache((int)$id);
-        }
-
-        return $affectedRows;
     }
 
     public function isNumeric($key): bool
@@ -605,16 +600,13 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         $code = function (DBDriver $db) use (&$insertID , $insert) {
 
             $db->query($insert)->free();
-
-            //NOTE!!! lastID return the first auto_increment of a multi insert transaction
             $insertID = $db->lastID();
 
+            $this->manageCache($insertID, $db);
 
         };
 
         $affectedRows = $this->handleTransaction($code, $db);
-
-        $this->manageCache($insertID);
 
         return $insertID;
     }
@@ -639,17 +631,15 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         $code = function (DBDriver $db) use ($id, $update) {
             $db->query($update)->free();
+            $this->manageCache($id, $db);
         };
 
         //handle transaction returns the number of affected rows
-        $affectedRows = $this->handleTransaction($code, $db);
+        return $this->handleTransaction($code, $db);
 
-        $this->manageCache($id);
-
-        return $affectedRows;
     }
 
-    protected function manageCache(int $id) : void
+    protected function manageCache(int $id, DBDriver $db) : void
     {
         if ($this instanceof SparkCacheBean) return;
 
@@ -669,18 +659,19 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             Debug::ErrorLog("Unable to delete cache folder: $cache_file");
         }
 
-        try {
-            $delete = new SQLDelete();
-            $delete->from = "sparkcache";
-            $delete->where()->add("className", get_class($this));
-            $delete->where()->add("beanID", $id);
-            $query = new DBQuery();
-            $query->exec($delete);
-        }
-        catch (Exception $e) {
-
-            Debug::ErrorLog("Unable to delete from sparkcache table: ".$e->getMessage());
-        }
+        //TODO
+//        try {
+//            $delete = new SQLDelete();
+//            $delete->from = "sparkcache";
+//            $delete->where()->add("className", get_class($this));
+//            $delete->where()->add("beanID", $id);
+//            $query = new DBQuery();
+//            $query->exec($delete, $db);
+//        }
+//        catch (Exception $e) {
+//
+//            Debug::ErrorLog("Unable to delete from sparkcache table: ".$e->getMessage());
+//        }
 
     }
 
@@ -700,7 +691,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             }
 
             // 3.For numeric columns set to null
-            else if ($this->isNumeric($key) && strlen((string)$value) < 1) {
+            else if ($this->isNumeric($key) && (strlen((string)$value) < 1 || strcasecmp((string)$value, "null") === 0)) {
                 $value = null;
             }
 

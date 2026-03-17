@@ -546,7 +546,7 @@ final class Spark {
      */
     final static public function AttributeValue(string $value) : string
     {
-        return htmlspecialchars(Spark::Unescape($value), ENT_QUOTES | ENT_HTML5, "UTF-8");
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, "UTF-8");
     }
 
 
@@ -708,14 +708,13 @@ final class Spark {
 
         $input = trim($input);
 
-        $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        //$input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
         $nohtml = strip_tags($input);
         //html content check
         if ($input !== $nohtml) {
             // HTML path: preserve allowed formatting, remove dangerous attributes
             if ($allowHTML) {
-
                 $input = InputSanitizer::HTML($input);
             }
             else {
@@ -725,12 +724,6 @@ final class Spark {
 
         return InputSanitizer::SQL($input);
 
-//        if (Spark::GetBoolean(Config::DB_ENABLED)) {
-//            return DBConnections::Driver()->escape($input);
-//        }
-//        else {
-//            return Spark::EscapeHelper($input);
-//        }
     }
 
     static private function EscapeHelper(string $unescaped_string): string

@@ -5,25 +5,15 @@ class URLParameter implements IDataResultProcessor
 {
     protected string $name = "";
     protected string $value = "";
-    protected string $field = "";
 
     public function __construct(string $name, ?string $value = "", bool $is_slug = false)
     {
         $this->name = $name;
-
-        //data parameter - parse field name
-        if (str_starts_with($value, "%") && str_ends_with($value, "%")) {
-            $this->field = substr($value, 1, strlen($value)-1);
-        }
-
         $this->value = $value;
     }
 
-    public function value(bool $quoted=false): string
+    public function value(): string
     {
-        if ($quoted) {
-            return "'".$this->value."'";
-        }
         return $this->value;
     }
 
@@ -37,41 +27,13 @@ class URLParameter implements IDataResultProcessor
         return $this->name;
     }
 
-    public function field() : string
-    {
-        return $this->field;
-    }
-
     public function isResource() : bool
     {
         return str_starts_with($this->name, "#");
     }
 
-    /**
-     * Return concatenation of name=value string
-     * @param bool $quoteValue quote result in single quotes if true
-     * @return string
-     */
-    public function text(bool $quoteValue = FALSE) : string
-    {
-        $ret = $this->name;
-        if ($this->value) {
-            $ret .= "=";
-            if ($quoteValue) $ret .= "'";
-            $ret .= $this->value;
-            if ($quoteValue) $ret .= "'";
-        }
-        return $ret;
-    }
-
     public function setData(array $data) : void
     {
-        if ($this->field) {
-            if (isset($data[$this->field])) {
-                $this->value = $data[$this->field];
-            }
-        }
-
         if ($this->isResource()) {
             //parameterized resource ie ?prodID=385#ProductPhotosBean.%ppID%
             //make value equal to #ProductPhotosBean.34 if ppID is found as data key in $data
@@ -83,7 +45,6 @@ class URLParameter implements IDataResultProcessor
             }
             $this->value = $parametrized;
         }
-
     }
 
 }

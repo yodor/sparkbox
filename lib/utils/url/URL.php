@@ -21,7 +21,7 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
     protected string $protocol = "";
 
     /**
-     * @var array  All url parameters name/value pairs
+     * @var array<string, URLParameter>  All url parameters name/value pairs
      */
     protected array $parameters = array();
 
@@ -136,74 +136,126 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
         return array_keys($this->parameters);
     }
 
+    /**
+     * Returns a filtered copy of parameters respecting clear_page_param and clear_params.
+     * Used internally by toString() and getQueryString() to ensure consistent behavior.
+     */
+    protected function getFilteredParameters(): array
+    {
+        $filtered = $this->parameters;
+
+        // Remove Paginator parameters if requested
+        if ($this->clear_page_param) {
+            foreach (Paginator::Instance()->getParameterNames() as $name) {
+                unset($filtered[$name]);
+            }
+        }
+
+        // Remove explicitly cleared parameters
+        foreach ($this->clear_params as $key) {
+            unset($filtered[$key]);
+        }
+
+        return $filtered;
+    }
 
     /**
-     * Return string representation of this URL object
-     * @return string
+     * Returns the query string portion only (without the leading '?').
+     * Respects clear_page_param and clear_params for consistency with toString().
+     * Only includes regular parameters that have non-empty values.
+     *
+     * @return string Empty string if no query parameters remain after filtering
      */
+    public function getQueryString(): string
+    {
+        $queryPairs = [];
+
+        foreach ($this->getFilteredParameters() as $param) {
+            // Skip PathParameter and Resource parameters
+            if ($param instanceof PathParameter || $param->isResource()) {
+                continue;
+            }
+
+            $value = $param->value(false);   // never quoted
+
+            if ($value !== '') {
+                $queryPairs[$param->name()] = $value;
+            }
+        }
+
+        if (empty($queryPairs)) {
+            return '';
+        }
+
+        return http_build_query(
+            $queryPairs,
+            '',
+            '&',
+            PHP_QUERY_RFC3986
+        );
+    }
+
     public function toString(): string
     {
+
         if ($this->is_script) {
-            //return the data applied to script name
-            if ($this->script_name_data) return $this->script_name_data;
-            //return original version
-            return $this->script_name;
+            return $this->script_name_data ?: $this->script_name;
         }
 
-        $parameters = $this->parameters;
+        // Get filtered parameters once (respects clear_page_param and clear_params)
+        $filteredParams = $this->getFilteredParameters();
 
-        //clear parameters from the Paginator
-        if ($this->clear_page_param) {
-            $paginator_parameters = Paginator::Instance()->getParameterNames();
-            foreach($paginator_parameters as $name) {
-                if (array_key_exists($name, $parameters)) unset($parameters[$name]);
-            }
-        }
+        // Build path segments and fragment
+        $pathParts = [];
+        $fragment  = '';
 
-        $script_query = "";
-        $resource = "";
+        foreach ($filteredParams as $param) {
+            $name  = $param->name();
+            $value = $param->value(false);
 
-        if (count($parameters) > 0) {
-            //remove parameter names found in the clear_params array
-            foreach ($this->clear_params as $key) {
-                if (array_key_exists($key, $parameters)) unset($parameters[$key]);
-            }
-
-            $names = array_keys($parameters);
-            //construct pairs to be imploded using &
-            $pairs = array();
-            foreach ($names as $idx => $name) {
-                $param = $this->get($name);
-                if ($param instanceof PathParameter) continue;
-                if ($param->isResource()) {
-                    //handle parametrized resource named using #resource.%param%
-                    //parameter value is done in setData of URLParameter
-                    $resource = (strlen($param->value())<1) ? $param->name() : $param->value();
+            if ($param instanceof PathParameter) {
+                $encoded = rawurlencode($value);
+                $pathParts[] = $encoded;
+                if ($param->isAppendPathSeparator()) {
+                    $pathParts[] = '/';
                 }
-                else {
-                    $pairs[] = $param->text();
-                }
-            }
-
-            $script_query = implode("&", $pairs);
-        }
-
-        $result = $this->script_name;
-        //sluged parameters
-        foreach ($parameters as $idx => $parameter) {
-            if ($parameter instanceof PathParameter) {
-                $result.= $parameter->value();
-                if ($parameter->isAppendPathSeparator()) $result.="/";
+            } elseif ($param->isResource()) {
+                $fragmentValue = ($value === '') ? $name : $value;
+                $fragment = '#' . rawurlencode(ltrim($fragmentValue, '#'));
             }
         }
 
-        if (strlen($script_query)>0) {
-            $result .= "?";
-            $result .= $script_query;
+        // Assemble the final URL
+        $result = rtrim($this->script_name, '/');
+
+        if (!empty($pathParts)) {
+            $result .= '/' . implode('', $pathParts);
         }
 
-        if (strlen($resource)>0) {
-            $result .= $resource;
+        // Use the shared getQueryString() method
+        $query = $this->getQueryString();
+        if ($query !== '') {
+            $result .= '?' . $query;
+        }
+
+        if ($fragment !== '') {
+            $result .= $fragment;
+        }
+
+
+
+        if ($this->isAbsolute()) {
+
+            //normalize path
+            if ($result === '' || !str_starts_with($result, '/')) {
+                $result = '/' . ltrim($result, '/');
+            }
+
+            $authority = $this->protocol . '://' . $this->domain;
+            if (str_starts_with($result, $authority)) {
+                return $result;
+            }
+            return $authority . ($result[0] === '/' ? '' : '/') . $result;
         }
 
         return $result;
@@ -213,21 +265,126 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
     {
         return $this->toString();
     }
+
     /**
-     * Full url including protocol and domain
-     * Uses fullURL() from functions
+     * Returns a new URL instance representing the full absolute URL.
+     *
+     * If the original input contained a scheme and host, those are preserved.
+     * Otherwise, the site's configured protocol and domain (from Spark/Config) are usws.
+     *
      * @return URL
      */
-    public function fullURL() : URL
+    public function fullURL(): URL
     {
-        $domain =  Spark::Get(Config::SITE_PROTOCOL).Spark::Get(Config::SITE_DOMAIN);
-        $url = str_replace($domain, "", $this->toString());
-        if (str_starts_with($url, "http://") || str_starts_with($url, "https://")) {
+
+        $result = new URL($this->toString());
+
+        if (!$this->isAbsolute()) {
+            // Case 2: Relative URL → use site configuration
+            $proto = Spark::Get(Config::SITE_PROTOCOL, 'https://');  // default fallback
+            $domain = Spark::Get(Config::SITE_DOMAIN, 'localhost');
+
+            $domain = trim($domain, ' :/');
+
+            // Normalize protocol (ensure it ends with ://)
+            if (!str_ends_with($proto, '://')) {
+                $proto = rtrim($proto, '/') . '://';
+            }
+
+            $result->setProtocol($proto);
+            $result->setDomain($domain);
         }
-        else {
-            $url = $domain.$url;
+
+        return $result;
+    }
+
+    /**
+     * Returns the protocol part of the URL (e.g. "https", "http").
+     * Returns empty string if the URL is relative or protocol was not present.
+     */
+    public function getProtocol(): string
+    {
+        return $this->protocol;
+    }
+
+    /**
+     * Returns the domain/host part of the URL (e.g. "example.com", "cdn.jsdelivr.net").
+     * May include port if present (e.g. "localhost:8080").
+     * Returns empty string for relative URLs.
+     */
+    public function getDomain(): string
+    {
+        return $this->domain;
+    }
+
+    /**
+     * Sets the protocol (e.g. "https", "http").
+     * Does NOT include the "://" part.
+     */
+    public function setProtocol(string $protocol): void
+    {
+        $this->protocol = trim($protocol, ':/');
+    }
+
+    /**
+     * Sets the domain/host part (e.g. "example.com", "sub.domain:8080").
+     */
+    public function setDomain(string $domain): void
+    {
+        $this->domain = trim($domain);
+    }
+
+    /**
+     * Returns the full authority part (scheme://host[:port]).
+     * Returns empty string for relative URLs.
+     */
+    public function getAuthority(): string
+    {
+        if ($this->protocol === '' && $this->domain === '') {
+            return '';
         }
-        return new URL($url);
+
+        $authority = $this->protocol;
+        if ($authority !== '') {
+            $authority .= '://';
+        }
+
+        $authority .= $this->domain;
+
+        return $authority;
+    }
+
+    /**
+     * Returns true if this URL contains scheme and authority (host) part.
+     * Treats protocol-relative URLs (//example.com/...) as absolute.
+     */
+    public function isAbsolute(): bool
+    {
+        return $this->protocol !== '' || $this->domain !== '';
+    }
+
+    /**
+     * Returns true if this URL has no scheme and no host (path-relative or root-relative).
+     */
+    public function isRelative(): bool
+    {
+        return !$this->isAbsolute();
+    }
+
+    /**
+     * Returns the path portion only (script_name), normalized with leading slash.
+     * For absolute URLs this is the path after the authority.
+     * For relative URLs this is the main content.
+     */
+    public function getPath(): string
+    {
+        $path = $this->script_name ?: '/';
+
+        if (!str_starts_with($path, '/')) {
+            $path = '/' . $path;
+        }
+
+        return $path;
     }
 
     public function getScriptName() : string
@@ -246,89 +403,92 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
     }
 
     /**
-     * Reset this url removing any existing data and rebuild using build_string
-     * @param string $build_string
-     * @return void
+     * Returns the fragment portion only (without the leading '#').
      */
-    public function fromString(string $build_string) : void
+    public function getFragment(): string
     {
+        foreach ($this->parameters as $param) {
+            if ($param->isResource()) {
+                $value = $param->value();
+                return ($value === '') ? ltrim($param->name(), '#') : ltrim($value, '#');
+            }
+        }
+        return '';
+    }
 
+    /**
+     * Parses a URL string and populates the internal state of this URL object.
+     *
+     * Supports:
+     * - Relative paths: "/products/view/123" or "edit.php?id=5"
+     * - Absolute URLs: "https://example.com/path"
+     * - Protocol-relative URLs: "//cdn.jsdelivr.net/npm/tinymce@latest/tinymce.min.js"
+     * - JavaScript pseudo-URLs: "javascript:..."
+     * - URLs with query strings and fragments
+     */
+    public function fromString(string $build_string): void
+    {
         $this->reset();
-
         $build_string = trim($build_string);
 
-        if (strlen($build_string)<1) return;
+        if (strlen($build_string) < 1) {
+            return;
+        }
 
-        if (str_starts_with($build_string, "javascript:")) {
-            $this->is_script = TRUE;
+        // Handle JavaScript pseudo-URLs
+        if (str_starts_with($build_string, 'javascript:')) {
+            $this->is_script = true;
             $this->script_name = $build_string;
             return;
         }
 
-        //TODO: some urls are relateive
-        //"?cmd=copy_product$href_add" - should take only parameters from this string
-        //"banners/list.php?itemID=123" - should take only path of current URL without the script file
+        // Parse the URL using PHP's native parser
+        $parsed = parse_url($build_string);
+        if ($parsed === false) {
+            throw new \InvalidArgumentException("Cannot parse URL: " . $build_string);
+        }
 
-        //cut domain and protocol first
-//        if (str_contains($build_string, "://")) {
-//            list($this->protocol, $build_string) = explode("://", $build_string);
-//        }
-//
-//        //first position of '/'
-//        $pos = strpos($build_string, "/");
-//        $this->domain = substr($build_string, 0,  $pos);
-//
-//        if ($pos>0) {
-//            //from first position of '/' to the end
-//            $build_string = substr($build_string, $pos);
-//        }
+        // === Protocol & Domain / Authority Handling ===
 
-        $resource_param = null;
-        //have #resource
-        if (str_contains($build_string, "#")) {
-            list($build_string, $resource) = explode("#", $build_string);
-            if (isset($resource) && strlen($resource) > 0) {
-                $resource_param = new URLParameter("#$resource");
+        // Standard absolute URL with scheme (https://, http://, etc.)
+        if (isset($parsed['scheme'])) {
+            $this->protocol = $parsed['scheme'];
+        }
+
+        // Protocol-relative URL: "//cdn.example.com/path"
+        // parse_url() puts the host in 'path' in this case, so we need special handling
+        if ($this->protocol === '' && str_starts_with($build_string, '//')) {
+            $this->domain = $parsed['host'] ?? '';
+            if (isset($parsed['port'])) {
+                $this->domain .= ':' . $parsed['port'];
+            }
+            // For protocol-relative, the path starts after the host
+            $this->script_name = $parsed['path'] ?? '/';
+        }
+        // Normal absolute or relative URL
+        else {
+            $this->domain = $parsed['host'] ?? '';
+
+            if (isset($parsed['port'])) {
+                $this->domain .= ':' . $parsed['port'];
+            }
+
+            // Path becomes script_name
+            $this->script_name = $parsed['path'] ?? '/';
+        }
+
+        // === Query Parameters ===
+        if (isset($parsed['query']) && $parsed['query'] !== '') {
+            parse_str($parsed['query'], $params);
+            foreach ($params as $k => $v) {
+                $this->add(new URLParameter($k, (string)$v));
             }
         }
 
-        $script_query = "";
-        $script_name = $build_string;
-
-        if (str_contains($build_string, "?")) {
-            //overwrite
-            list($script_name, $script_query) = explode("?", $build_string);
+        // === Fragment / Resource ===
+        if (isset($parsed['fragment']) && $parsed['fragment'] !== '') {
+            $this->add(new URLParameter('#' . $parsed['fragment']));
         }
-
-        $this->script_name = $script_name;
-
-        //if (!$this->script_name)throw new Exception("Emptry Script name");
-
-        //TODO: Check usage is correct during buildFrom
-        //copy current query parameters if script name is not set - ie local page request
-//        if (strlen($this->script_name) < 1) {
-//            foreach ($_GET as $key => $param) {
-//                $this->add(new URLParameter($key, $param));
-//            }
-//        }
-
-        //overwrite with pairs from the $build_string
-        $static_pairs = explode("&", $script_query);
-        foreach ($static_pairs as $idx => $pair) {
-            if (strlen(trim($pair))<1) continue;
-            $param_name = $pair;
-            $param_value = "";
-            if (str_contains($pair, "=")) {
-                list($param_name, $param_value) = explode("=", $pair);
-            }
-            if (strlen(trim($param_name))>0) {
-                $this->add(new URLParameter($param_name, $param_value));
-            }
-        }
-
-        //finally append the resource if any
-        if ($resource_param instanceof URLParameter) $this->add($resource_param);
-
     }
 
     /**

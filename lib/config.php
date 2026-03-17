@@ -41,7 +41,7 @@ enum Config
      */
     const string STORAGE_URL = "STORAGE_URL";
     /**
-     * Current protocol
+     * Current protocol - https://
      * Static(string)
      */
     const string SITE_PROTOCOL = "SITE_PROTOCOL";

@@ -77,7 +77,7 @@ class ConfigBean extends DBTableBean
      * @return void
      * @throws Exception
      */
-    public function set(string $key, DBSerializable|string|null $val) : void
+    public function set(string $key, ISerializable|string|float|int|bool|null $val) : void
     {
 
         try {
@@ -85,7 +85,9 @@ class ConfigBean extends DBTableBean
             $this->db->transaction();
 
             $this->deleteRef("config_key", $key, $this->db);
-
+            if ($val instanceof ISerializable) {
+                $val = serialize($val);
+            }
             $data = array("config_key" => $key, "config_val" => $val, "section" => $this->section);
             $this->insert($data, $this->db);
 
@@ -108,12 +110,7 @@ class ConfigBean extends DBTableBean
     {
         foreach ($form->inputs() as $field_name => $field) {
             $stored_value = $this->get($field_name);
-            if (is_object($stored_value)) {
-                $field->setValue($stored_value);
-            }
-            else {
-                $field->setValue(Spark::Unescape($stored_value));
-            }
+            $field->setValue($stored_value);
         }
     }
 }
