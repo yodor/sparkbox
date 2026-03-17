@@ -306,15 +306,17 @@ class Translator implements IRequestProcessor, IGETConsumer
 
         if (strlen(trim($phrase)) == 0) return $phrase;
 
-//        try {
+        try {
             $phrase_hash = Spark::Hash($phrase);
 
             $qry = $this->translated_phrases->queryLanguageID($this->langID);
             $qry->stmt->where()->add("hash_value", $phrase_hash);
             $qry->stmt->limit = 1;
+            //$qry->stmt->setMeta("QueryPhrase");
 
             $qry->exec();
 
+            $translated = "";
 
             if ($data = $qry->nextResult()) {
                 //phrase is already captured - check if translation exists for the current langID
@@ -322,14 +324,15 @@ class Translator implements IRequestProcessor, IGETConsumer
 
                 if ((int)$data->get("trID")>0) {
                     //return translated version
-                    return $data->get("translation");
+                    $translated = $data->get("translation");
                 }
                 else {
                     //translation not done yet
-                    return $phrase;
+                    $translated = $phrase;
                 }
-
             }
+            $qry->free();
+            if ($translated) return $translated;
 
             //Capture new phrase. Insert into SiteTextsBean
             try {
@@ -341,10 +344,10 @@ class Translator implements IRequestProcessor, IGETConsumer
                 throw new Exception("Failed capturing new phrase [$phrase_hash]: ". $ex->getMessage());
             }
 
-//        }
-//        catch (Exception $e) {
-//            Debug::ErrorLog("Error: ".$e->getMessage());
-//        }
+        }
+        catch (Exception $e) {
+            Debug::ErrorLog("Error: ".$e->getMessage());
+        }
 
         return $phrase;
     }

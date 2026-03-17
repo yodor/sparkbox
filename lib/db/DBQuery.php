@@ -30,7 +30,6 @@ class DBQuery extends SparkObject
     public function __destruct()
     {
         $this->free();
-
     }
 
     public function free() : void
@@ -45,7 +44,7 @@ class DBQuery extends SparkObject
         //can support external driver using getDB/setDB
         if ($this->driver instanceof DBDriver) {
             if ($this->driver->getParent() === $this) {
-                Debug::ErrorLog("Closing self created driver");
+                //Debug::ErrorLog("Closing self created driver");
                 $this->driver = null; //calls DTOR
             }
         }
@@ -125,6 +124,7 @@ class DBQuery extends SparkObject
             $driver = DBConnections::CreateDriver($driver->getConnectionName());
             //own it
             $driver->setParent($this);
+            //Debug::ErrorLog("Opening new driver connection: ". Debug::Backtrace(-1));
         }
         return $driver;
     }
