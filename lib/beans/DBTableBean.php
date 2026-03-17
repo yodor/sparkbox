@@ -93,6 +93,21 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         //Debug::ErrorLog("DBTableBean[$this->table]");
     }
 
+    /**
+     * Clear elements that reference column names not existing in this bean columns
+     * @param array $columns the column names
+     * @return array<string> filter result containing only column names that are referenced from this bean
+     */
+    public function existingColumns(array $columns) : array
+    {
+        foreach ($columns as $idx=>$column) {
+            if (!$this  ->haveColumn($column)) {
+                unset($columns[$idx]);
+            }
+        }
+        return $columns;
+    }
+
     protected function initColumnTypes() : void
     {
         $this->columns = array();
