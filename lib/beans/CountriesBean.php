@@ -23,12 +23,15 @@ CREATE TABLE countries (
         $qry = $c->queryField("country_code", $code, 1);
         $qry->exec();
 
+        $result = -1;
         if ($crrow = $qry->next()) {
-            return (int)$crrow[$c->key()];
+            $result =  (int)$crrow[$c->key()];
         }
-        else {
-            throw new Exception("country code not found");
-        }
+        $qry->free();
+
+        if ($result>0) return $result;
+
+        throw new Exception("country code not found");
     }
 
 }

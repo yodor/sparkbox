@@ -50,10 +50,12 @@ class NestedSetBean extends DBTableBean
         $select->from = $this->table;
         $select->setAliasExpression(" MAX(rgt) ", "max_rgt");
         $select->limit = " 1 ";
+
         $query = new SelectQuery($select);
         $query->exec();
 
         if ($result = $query->nextResult()) {
+            $query->free();
             return (int)$result->get("max_rgt");
         }
 
@@ -133,7 +135,10 @@ class NestedSetBean extends DBTableBean
 
         $query = new SelectQuery($select);
         $query->exec();
-        if ($query->nextResult()) return true;
+        if ($query->nextResult()) {
+            $query->free();
+            return true;
+        }
         return false;
     }
 
@@ -155,6 +160,7 @@ class NestedSetBean extends DBTableBean
         $query->exec();
 
         if ($result = $query->nextResult()) {
+            $query->free();
             return (int)$result->get($this->prkey);
         }
         return -1;
@@ -178,6 +184,7 @@ class NestedSetBean extends DBTableBean
         $query->exec();
 
         if ($result = $query->nextResult()) {
+            $query->free();
             return (int)$result->get($this->prkey);
         }
         return -1;
@@ -770,7 +777,9 @@ class NestedSetBean extends DBTableBean
         while ($row = $qry->next()) {
             $ret[] = $row;
         }
+        $qry->free();
         return $ret;
+
     }
 
 }

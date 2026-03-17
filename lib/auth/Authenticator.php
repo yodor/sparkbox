@@ -207,6 +207,8 @@ abstract class Authenticator
         if (!($row = $qry->next())) {
             throw new Exception(tr("Username or password not recognized"));
         }
+        $qry->free();
+
         Debug::ErrorLog("Email found");
 
         $userID     = $row[$this->bean->key()];

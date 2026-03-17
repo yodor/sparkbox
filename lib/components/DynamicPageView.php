@@ -61,6 +61,7 @@ class DynamicPageView extends Container implements IRequestProcessor
             $query->exec();
 
             if ($this->result = $query->nextResult()) {
+                $query->free();
                 if (!$this->result->get("visible")) throw new Exception("Page is currently unavailable");
             }
             else {

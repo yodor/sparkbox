@@ -26,6 +26,8 @@ class TranslatorPage extends BeanListPage
             $menu[] = $item;
         }
 
+        $qry->free();
+
         $this->page->setPageMenu($menu);
 
         $this->getSearch()->getForm()->setColumns(array("value"));
@@ -65,6 +67,8 @@ class TranslatorPage extends BeanListPage
             if (!$this->bean->update($textID, $update)) throw new Exception("Unable to update hash_value");
             $count++;
         }
+        $query->free();
+
         $url->remove("rehash");
         Session::SetAlert("Rehash complete: ".$count);
         header("Location:".$url);

@@ -67,10 +67,10 @@ class DatedBean extends DBTableBean
         $qry->exec();
 
         $data = array();
-
         while ($row = $qry->next()) {
             $data[] = $row;
         }
+        $qry->free();
 
         return $data;
     }
@@ -92,10 +92,10 @@ class DatedBean extends DBTableBean
         $qry->exec();
 
         $data = array();
-
         while ($row = $qry->next()) {
             $data[] = $row["day"];
         }
+        $qry->free();
 
         return $data;
     }

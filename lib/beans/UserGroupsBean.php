@@ -29,8 +29,10 @@ class UserGroupsBean extends DBTableBean
         $qry->stmt->limit = " 1 ";
         $qry->exec();
         if ($qry->next()) {
+            $qry->free();
             return true;
         }
+        $qry->free();
         return false;
     }
 

@@ -218,8 +218,11 @@ abstract class OrderedDataBean extends DBTableBean
 
         $query = new SelectQuery($selectMax);
         $query->exec();
-
-        return (int)$query->nextResult()->get("max_position");
+        if ($result = $query->nextResult()) {
+            $query->free();
+            return (int)$result->get("max_position");
+        }
+        return -1;
     }
 
 }

@@ -33,6 +33,7 @@ class AdminAuthenticator extends Authenticator
             while ($result = $query->nextResult()) {
                 $roles[]=$result->get("role");
             }
+            $query->free();
             $this->session->set(AdminAuthenticator::SESSION_DATA_ENABLED_ROLES, $roles);
         }
     }

@@ -346,10 +346,10 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     public function getResult(string $column, string $value, string ...$columns) : ?array
     {
         $qry = $this->queryField($column, $value, 1, ...$columns);
-
         $qry->exec();
-
-        return $qry->next();
+        $result = $qry->next();
+        $qry->free();
+        return $result;
     }
 
     /**
@@ -362,15 +362,14 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
      */
     public function getValue(int $id, string $column): ?string
     {
-//        $column = $this->db->escape($column);
+        $result = null;
 
         $qry = $this->queryField($this->prkey, $id, 1, $column);
-
         $qry->exec();
-        if ($row = $qry->next()) {
-            return $row[$column];
+        if ($result = $qry->next()) {
+            $qry->free();
         }
-        return NULL;
+        return $result;
     }
 
     /**
@@ -393,6 +392,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         $qry->exec();
 
         if ($result = $qry->next()) {
+            $qry->free();
             return $result;
         }
         
@@ -414,6 +414,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         $qry->exec();
 
         if ($result = $qry->next()) {
+            $qry->free();
             return $result;
         }
         throw new Exception("No such Ref");
