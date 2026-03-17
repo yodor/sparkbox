@@ -2,18 +2,18 @@
 include_once("components/Component.php");
 include_once("utils/menu/MenuItemList.php");
 include_once("components/renderers/menus/MenuListRenderer.php");
+include_once("components/InlinePageScript.php");
 
-class MenuBarInitScript extends PageScript
+class MenuBarInitScript extends InlinePageScript implements IPageComponent
 {
 
     public function code() : string
     {
+        $name = $this->getName();
         return <<<JS
-        onPageLoad(function(){
-            const menu_bar = new MenuBar();
-            menu_bar.setID("{$this->getName()}");
-            menu_bar.initialize();
-        });
+const menu_bar = new MenuBar();
+menu_bar.setID("$name");
+menu_bar.initialize();
 JS;
     }
 
