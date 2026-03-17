@@ -4,7 +4,7 @@ include_once("utils/url/DataParameter.php");
 include_once("utils/url/PathParameter.php");
 include_once("utils/url/LiteralURLParameter.php");
 include_once("objects/ISerializable.php");
-include_once("components/renderers/items/IDataResultProcessor.php");
+include_once("utils/IDataResultProcessor.php");
 include_once("utils/Paginator.php");
 include_once("utils/IGETConsumer.php");
 

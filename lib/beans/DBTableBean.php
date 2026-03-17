@@ -101,9 +101,22 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     public function existingColumns(array $columns) : array
     {
         foreach ($columns as $idx=>$column) {
-            if (!$this  ->haveColumn($column)) {
+            if (!$this->haveColumn($column)) {
                 unset($columns[$idx]);
             }
+        }
+        return $columns;
+    }
+
+    /**
+     * Clear elements that reference column names not existing in this bean columns
+     * @param array $columns the column names
+     * @return array<string> filter result containing only column names that are referenced from this bean
+     */
+    public function ensureColumns(array $columns) : array
+    {
+        foreach ($columns as $idx=>$column) {
+            if (!$this->haveColumn($column)) throw new Exception("Required column missing");
         }
         return $columns;
     }
@@ -378,11 +391,11 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     public function getValue(int $id, string $column): ?string
     {
         $result = null;
-
         $qry = $this->queryField($this->prkey, $id, 1, $column);
         $qry->exec();
         if ($result = $qry->next()) {
             $qry->free();
+            $result = $result[$column];
         }
         return $result;
     }

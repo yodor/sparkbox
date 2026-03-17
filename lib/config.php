@@ -79,7 +79,8 @@ enum Config
     const string COOKIE_DOMAIN = "COOKIE_DOMAIN";
 
     /**
-     * App/Site current URL without path and ending slash '/'
+     * App/Site current full absolute URL ending slash '/'
+     * i.e. protocol + domain + app_location
      * Static(string)
      */
     const string SITE_URL = "SITE_URL";

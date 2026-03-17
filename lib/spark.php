@@ -1,4 +1,6 @@
 <?php
+include_once("utils/url/URL.php");
+
 final class SparkLoader
 {
 
@@ -321,16 +323,24 @@ final class Spark {
     final static public function Initialize() : void
     {
 
+
         Spark::Set(Config::APP_PATH, constant("APP_PATH"), true);
 
         $doc_full = realpath($_SERVER['DOCUMENT_ROOT']);
-        $location = preg_replace("!^{$doc_full}!", "", constant("APP_PATH"));
+        $location = rtrim(trim(preg_replace("!^{$doc_full}!", "", constant("APP_PATH"))), "/");
+
+        //relative path
+        $locationURL = new URL($location);
 
         Spark::Set(Config::LOCAL, $location, true);
+
         Spark::Set(Config::SPARK_LOCAL, $location . "/sparkfront", true);
 
         Spark::Set(Config::ADMIN_LOCAL, $location . "/admin", true);
-        Spark::Set(Config::STORAGE_URL, $location . "/sparkboot.php?StorageRequest", true);
+
+        $storageURL = new URL($locationURL);
+        $storageURL->add(new URLParameter("StorageRequest", 1));
+        Spark::Set(Config::STORAGE_URL, $storageURL, true);
 
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         Spark::Set(Config::SITE_PROTOCOL, $protocol, true);
@@ -338,9 +348,8 @@ final class Spark {
         $site_domain = $_SERVER["HTTP_HOST"];
         Spark::Set(Config::SITE_DOMAIN, $site_domain, true);
 
-        include_once("utils/url/URL.php");
-        $site_url = new URL($location);
-        Spark::SetObject(Config::SITE_URL, $site_url->fullURL() , true);
+
+        Spark::Set(Config::SITE_URL, $locationURL->fullURL()->toString() , true);
 
         Spark::Set(Config::COOKIE_DOMAIN, ".".$site_domain, true); // or .domain.com
 
