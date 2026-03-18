@@ -15,7 +15,9 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
     protected string $beanClass = "";
 
-    protected string $dateFormat = "j M Y";
+    protected string $dateFormat = "d MMMM y";
+
+    protected IntlDateFormatter $formatter;
 
     public function __construct(string $beanClass)
     {
@@ -27,6 +29,15 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
         if (empty($beanClass)) throw new Exception("Empty bean class");
         $this->beanClass = $beanClass;
+
+        $this->formatter = new IntlDateFormatter(
+            locale:          Spark::Get(Config::DEFAULT_LOCALE),
+            dateType:        IntlDateFormatter::NONE,   // no date part
+            timeType:        IntlDateFormatter::NONE,   // no time part
+            timezone:        'UTC',                     // timezone usually irrelevant here
+            calendar:        IntlDateFormatter::GREGORIAN,
+            pattern:         $this->dateFormat
+        );
     }
 
     public function setURL(URL $url) : void
@@ -57,7 +68,7 @@ class PublicationItem extends DataIteratorItem implements IPhotoRenderer
 
         echo "<div class='cell details'>";
         echo "<span class='title'>" . $this->data["item_title"] . "</span>";
-        echo "<span class='date'>" . date($this->dateFormat, strtotime($this->data["item_date"])) . "</span>";
+        echo "<span class='date'>" . $this->formatter->format(strtotime($this->data["item_date"])) . "</span>";
         echo "</div>";
 
         echo "</a>";
@@ -199,16 +210,22 @@ class PublicationsComponent extends Container implements IRequestProcessor
         $qry = $this->bean->query($this->bean->key(), $this->bean->getDateColumn(), "item_title");
         $qry->stmt->order_by = $this->bean->getDateColumn() . " DESC , newsID DESC ";
 
+        $itemID = -1;
+        $year = -1;
+        $month = -1;
+
         if (isset($_GET[$this->bean->key()])) {
             $itemID = (int)$_GET[$this->bean->key()];
             $qry->stmt->where()->add($this->bean->key(), $itemID);
         }
         else if (isset($_GET["year"]) && isset($_GET["month"])) {
+            $year = (int)$_GET["year"];
+            $month = (int)$_GET["month"];
             $qry->stmt->where()->addExpression("MONTH({$this->bean->getDateColumn()}) = :month");
-            $qry->stmt->bind(":month", (int)$_GET["month"]);
+            $qry->stmt->bind(":month", $month);
 
             $qry->stmt->where()->addExpression("YEAR({$this->bean->getDateColumn()}) = :year");
-            $qry->stmt->bind(":year", (int)$_GET["year"]);
+            $qry->stmt->bind(":year", $year);
         }
 
         $num = $qry->count();
@@ -216,6 +233,7 @@ class PublicationsComponent extends Container implements IRequestProcessor
         if ($num < 1) {
             $qry->stmt->where()->clear();
             $qry->stmt->limit = 1;
+            $itemID = -1;
         }
 
         $qry->exec();
@@ -234,6 +252,9 @@ class PublicationsComponent extends Container implements IRequestProcessor
             }
 
         }
+        if ($itemID < 1) {
+            $itemTitle = tr("News Archive: Year: $year Month: $month");
+        }
         SparkPage::Instance()->setTitle($itemTitle);
 
     }
@@ -248,67 +269,49 @@ class PublicationsComponent extends Container implements IRequestProcessor
 
         echo "<div class='archive'>";
 
-        $month_list = array();
-
-        for ($a=1;$a<=12;$a++) {
-            $month_list[] = date("F", mktime(0, 0, 0, $a));
-        }
-        //$month_list = array("January", "February", "March", "April", "May", "June", "July", "August", "September",
-         //                   "October", "November", "December");
-
-        $v = new ValueInterleave();
-
-        $cls = $v->value();
 
         $year_list = $this->bean->getYears();
 
         for ($a = 0; $a < count($year_list); $a++) {
 
             $year = $year_list[$a];
-            echo "<div class='archive_year $cls' >";
+
+            echo "<div class='archive_year' >";
             echo "<a onClick='toggleArchiveYear(" . $year . ")'>$year</a>";
             echo "</div>";
 
             echo "<div class='months' year='$year'>";
 
             echo "<div class='list'>";
-            $c = 0;
-            for ($b = 0; $b < count($month_list); $b++) {
 
-                $month = $month_list[$b];
+            for ($b = 1; $b <= 12; $b++) {
 
-                if ($c == 0) echo "<div class='row'>";
+                $month = self::MonthName($b);
 
-                $have_data = $this->bean->publicationsCount($year, $b+1);
+                $have_data = $this->bean->publicationsCount($year, $b);
 
                 if ($have_data > 0) {
                     $url = new URL();
                     $url->copyParametersFrom($this->url);
                     $url->add(new URLParameter("year", $year));
-                    $url->add(new URLParameter("month", $b+1));
+                    $url->add(new URLParameter("month", $b));
                     $active = "";
-                    if ( $b+1 == $this->selected_month) {
+                    if ( $b == $this->selected_month) {
                         $active = "selected";
                     }
                     echo "<a href='{$url->toString()}' $active class='item'>";
-                    echo tr($month);
+                    echo $month;
                     echo "</a>";
                 }
                 else {
                     echo "<span class='item'>";
-                    echo tr($month);
+                    echo $month;
                     echo "</span>";
                 }
 
-                $c++;
-                if ($c == 3) {
-                    echo "</div>";
-                    $c = 0;
-                }
 
             }
 
-            $v->advance();
             echo "</div>";
             echo "</div>";
         }
@@ -318,8 +321,8 @@ class PublicationsComponent extends Container implements IRequestProcessor
         <script type='text/javascript'>
 
             function toggleArchiveYear(year) {
-                document.querySelector(".months").style.display = "none";
-                document.querySelector(".months[year='" + year + "']").style.display = "block";
+                document.querySelectorAll(".months[year]").forEach(elm => elm.classList.remove("active"));
+                document.querySelector(".months[year='" + year + "']").classList.add("active");
             }
 
             onPageLoad(function () {
@@ -340,4 +343,35 @@ class PublicationsComponent extends Container implements IRequestProcessor
         $this->renderArchive();
     }
 
+    /**
+     * Returns full or abbreviated month name in the desired locale
+     *
+     * @param int    $monthNumber  1–12
+     * @param bool   $short        false = full name, true = abbreviated (3 letters)
+     * @return string
+     */
+    public static function MonthName(int $monthNumber, bool $short = false): string
+    {
+        if ($monthNumber < 1 || $monthNumber > 12) {
+            throw new InvalidArgumentException('Month must be between 1 and 12');
+        }
+
+        $pattern = $short ? 'MMM' : 'MMMM';
+
+        $formatter = new IntlDateFormatter(
+            locale:          Spark::Get(Config::DEFAULT_LOCALE),
+            dateType:        IntlDateFormatter::NONE,
+            timeType:        IntlDateFormatter::NONE,
+            timezone:        'UTC',
+            calendar:        IntlDateFormatter::GREGORIAN,
+            pattern:         $pattern
+        );
+
+        // Most reliable: use DateTime + format('U') → integer timestamp
+        $dt = new DateTime();
+        $dt->setDate(2000, $monthNumber, 1);
+        $dt->setTime(12, 0, 0);           // noon avoids midnight DST issues
+
+        return $formatter->format($dt);
+    }
 }

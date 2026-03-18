@@ -71,7 +71,7 @@ ini_set("session.gc_maxlifetime", 1440);
 
 ini_set("zlib.output_compression", 1);
 
-ini_set('intl.default_locale', Spark::Get(Config::DEFAULT_LOCALE));
+ini_set('intl.default_locale', Locale::canonicalize(Spark::Get(Config::DEFAULT_LOCALE)??"en_US"));
 
 //disable automatic output buffering this is handled manually in SparkPage
 //in php.ini
