@@ -42,25 +42,24 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
     }
 
     /**
-     *
      * Create new column matching SQLClause and append it to this clause collection.
+     * Automatic binding is created using name and value parameters.
      *
-     * $clause->setExpression(name '$name', value '$value')
-     * $clause->setOperator('$operator')
-     * $clause->setGlue('$glue')
-     *
-     * By design SQLClause create a bindingKey if '$name' and '$value' are not empty.
+     * * \$clause->setExpression(\$name, \$value);
+     * * \$clause->setOperator(\$operator);
+     * * \$clause->setGlue(\$glue);
      *
      * @param string $name
      * @param string|float|int|bool|null $value
      * @param string $operator
      * @param string $glue
      * @return $this
-     * @throws Exception
+     * @throws Exception If name or value is empty
      */
     public function add(string $name, string|float|int|bool|null $value, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
     {
         if (strlen(trim($name))<1) throw new Exception("Name cannot be empty");
+        if (is_string($value) && strlen(trim($value))<1) throw new Exception("Value cannot be empty");
 
         $clause = new SQLClause();
         $clause->setExpression($name, $value);

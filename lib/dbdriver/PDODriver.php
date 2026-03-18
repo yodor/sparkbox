@@ -168,7 +168,11 @@ class PDODriver extends DBDriver
             $stmt = $this->conn->prepare($sql);
             if ($stmt === false) throw new Exception("Prepare failed: ".$this->getError());
 
-            if (!$stmt->execute($bindings)) throw new Exception("Execute failed: ".$this->getError());
+            foreach ($bindings as $key => $value) {
+                $stmt->bindValue($key, $value, PDODriver::BindingType($value));
+            }
+
+            if (!$stmt->execute()) throw new Exception("Execute failed: ".$this->getError());
 
             $result =  $this->statementResult($stmt);
 //            if ($this->active) {
@@ -184,6 +188,19 @@ class PDODriver extends DBDriver
             Debug::ErrorLog("Error: " . $e->getMessage() . " | " .$message);
             throw $e;
         }
+    }
+
+    /**
+     * Very simple but effective type mapper
+     */
+    private static function BindingType(string|float|int|bool|null $value): int
+    {
+        return match (true) {
+            is_null($value)  => PDO::PARAM_NULL,
+            is_bool($value)  => PDO::PARAM_BOOL,
+            is_int($value)   => PDO::PARAM_INT,
+            default          => PDO::PARAM_STR,
+        };
     }
 
     /**
