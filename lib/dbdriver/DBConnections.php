@@ -104,12 +104,10 @@ class DBConnections
         $driver = null;
 
         switch ($props->driverClass) {
-            case "MySQLi":
-                include_once("dbdriver/MySQLiDriver.php");
-                $driver = new MySQLiDriver($props);
             case "PDO":
                 include_once("dbdriver/PDODriver.php");
                 $driver = new PDODriver($props);
+                break;
         }
 
         if (is_null($driver)) throw new Exception("Unsupported driver '{$props->driverClass}'");

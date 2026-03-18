@@ -199,24 +199,28 @@ class PublicationsComponent extends Container implements IRequestProcessor
         $qry = $this->bean->query($this->bean->key(), $this->bean->getDateColumn(), "item_title");
         $qry->stmt->order_by = $this->bean->getDateColumn() . " DESC , newsID DESC ";
 
-        $num = -1;
-
         if (isset($_GET[$this->bean->key()])) {
             $itemID = (int)$_GET[$this->bean->key()];
             $qry->stmt->where()->add($this->bean->key(), $itemID);
-            $qry->exec();
         }
         else if (isset($_GET["year"]) && isset($_GET["month"])) {
-            $qry->stmt->where()->add("MONTH({$this->bean->getDateColumn()})", (int)$_GET["month"]);
-            $qry->stmt->where()->add("YEAR({$this->bean->getDateColumn()})", (int)$_GET["year"]);
-            $qry->exec();
+            $qry->stmt->where()->addExpression("MONTH({$this->bean->getDateColumn()}) = :month");
+            $qry->stmt->bind(":month", (int)$_GET["month"]);
+
+            $qry->stmt->where()->addExpression("YEAR({$this->bean->getDateColumn()}) = :year");
+            $qry->stmt->bind(":year", (int)$_GET["year"]);
         }
+
+        $num = $qry->count();
 
         if ($num < 1) {
             $qry->stmt->where()->clear();
             $qry->stmt->limit = 1;
-            $qry->exec();
         }
+
+        $qry->exec();
+
+        $qry->stmt->setMeta("NewsQuery");
 
         $itemTitle = null;
         while ($item = $qry->next()) {

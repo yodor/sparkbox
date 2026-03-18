@@ -1,6 +1,7 @@
 <?php
 include_once("objects/SparkObject.php");
 
+#[Sensitive]
 class DBConnection extends SparkObject
 {
 
@@ -9,6 +10,8 @@ class DBConnection extends SparkObject
     public string $driverClass = "PDO";
     public string $database = "";
     public string $user = "";
+
+    #[Sensitive]
     public string $pass = "";
     public string $host = "";
     public string $port = "";
@@ -35,5 +38,13 @@ class DBConnection extends SparkObject
         return $this->variables;
     }
 
+    public function __serialize(): array
+    {
+        return ["connection_name"=>$this->name];
+    }
 
+    public function __unserialize(array $data): void
+    {
+        $this->name = $data["connection_name"];
+    }
 }
