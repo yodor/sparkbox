@@ -103,7 +103,8 @@ class Component extends SparkObject
 
         this.element = document.querySelector(this.selector());
         if (! (this.element instanceof Element)) {
-            console.log("DOM query failed: " + this.selector());
+            //console.log("DOM query failed: " + this.selector());
+            throw "DOM query failed for selector: "+this.selector();
         }
         else {
            // console.log("Element created for: " + this.selector());

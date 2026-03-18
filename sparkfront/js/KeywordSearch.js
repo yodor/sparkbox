@@ -54,7 +54,11 @@ class KeywordSearch extends Component {
 }
 onPageLoad(function() {
 
-    let ks = new KeywordSearch();
-    ks.initialize();
+    //silence the exception some pages prefer not to render this component
+    try {
+        let ks = new KeywordSearch();
+        ks.initialize();
+    }
+    catch (e) {}
 
 })
