@@ -111,6 +111,7 @@
 }
 .DatedItem .date {
     font-style: italic;
+    margin-bottom:1em;
 }
 .DatedItem .thumbnail {
     display:block;
