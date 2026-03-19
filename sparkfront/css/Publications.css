@@ -1,101 +1,128 @@
 /*latest news*/
-.PublicationsComponent .ItemView  {
+.Publications.latest {
     display:block;
 }
-.PublicationsComponent .ItemView .viewport {
-    display:table;
-    border-spacing: 0;
-    width:100%;
+
+.Publications.latest .viewport {
+    display:flex;
+    flex-direction: column;
+    gap:0.5em;
 }
 
-.PublicationsComponent .ItemView .item {
-    display: table-row;
-    text-decoration: none;
+.Publications.latest .viewport .item {
+    display: flex;
+    flex-direction: row;
+    gap:0.5em;
 }
 
-.PublicationsComponent .ItemView .item .cell {
-    display: table-cell;
-    vertical-align: top;
-    padding-bottom:0.5em;
-}
-
-.PublicationsComponent .ItemView  .item .cell.image {
+.Publications.latest .viewport .item .thumbnail {
 
 }
 
-.PublicationsComponent .ItemView  .item .cell.image IMG {
-    display: block;
+.Publications.latest .viewport .item .thumbnail .Image {
+    display:block;
 }
 
-.PublicationsComponent .ItemView .item .cell.details {
-    width:100%;
-    box-sizing: border-box;
-    padding-left:0.3em;
-}
-.PublicationsComponent .ItemView .item .cell.details SPAN {
-    display: block;
+.Publications.latest .viewport .item .details {
+    display: flex;
+    flex-direction: column;
+
     text-decoration: none;
     color: black;
+
 }
 
-.PublicationsComponent .ItemView  .item .cell.details SPAN.Title {
-    font-size: 100%;
-    font-weight: bold;
+.Publications.latest .viewport .item .details .title {
+    font-size:100%;
+    /*font-weight: bold;*/
 }
 
-.PublicationsComponent .ItemView  .cell.details SPAN.date {
-    font-size: 50%;
+.Publications.latest .viewport .item .details .date {
+
+    font-size: 80%;
     font-style: italic;
-
 }
 
 
 /*archive items*/
 
-.PublicationsComponent .archive {
+.DatedArchive {
+    display:flex;
+    flex-direction: column;
+    gap:0.5em;
+    overflow: hidden;
+}
 
+.DatedArchive .year {
+    display:flex;
+    flex-direction: column;
+}
+
+.DatedArchive .year .label {
     display:block;
-}
-
-.PublicationsComponent .archive .archive_year {
-    padding-top:0.5em;
-    padding-bottom:0.5em;
-}
-
-.PublicationsComponent .archive .archive_year A {
     font-size: 1.5em;
     font-weight: bold;
     cursor: pointer;
-}
-
-.PublicationsComponent .archive .months {
-    display: none;
-}
-.PublicationsComponent .archive .months.active {
-    display:block;
-}
-
-.PublicationsComponent .archive .months .list {
-    display: grid;
-    grid-template-rows: auto;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap:0.5em;
-    /*padding-top:0.5em;*/
-    /*padding-bottom:1em;*/
-}
-.PublicationsComponent .archive .months .list .item {
-    text-transform:capitalize;
-}
-
-.PublicationsComponent .archive .months .list a.item {
-
-    text-transform:capitalize;
-    font-weight: bold;
-    text-decoration: none;
     color: black;
 }
 
-.PublicationsComponent .archive .months .list a.item[selected] {
+.DatedArchive .year.open .label {
     text-decoration: underline;
+}
+
+.DatedArchive .year.open .months {
+    display: grid;
+}
+
+.DatedArchive .year .months  {
+    display: none;
+    grid-template-rows: auto;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:0.5em;
+    animation: flowFromLeft 0.2s ease-in-out forwards;
+}
+
+.DatedArchive .year .months .item {
     text-transform:capitalize;
+    text-decoration:none;
+    color: black;
+    font-weight: normal;
+}
+
+.DatedArchive .year .months A.item:any-link {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.DatedArchive .year .months A.item.selected:any-link {
+    font-weight: bold;
+    text-decoration: underline;
+
+}
+/**/
+.DatedItem  {
+    display:flex;
+    flex-direction: column;
+}
+.DatedItem .title {
+    display:block;
+    /*padding-right:1em;*/
+}
+.DatedItem .date {
+    font-style: italic;
+}
+.DatedItem .thumbnail {
+    display:block;
+
+}
+
+.DatedItem .thumbnail .Image {
+    display:block;
+    max-width: 100%;
+    width:100%;
+}
+
+.DatedItem .content {
+    font-style: italic;
+    padding-right:1em;
 }

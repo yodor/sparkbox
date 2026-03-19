@@ -3,8 +3,11 @@ include_once("beans/DBTableBean.php");
 
 class DatedBean extends DBTableBean
 {
+    protected IntlDateFormatter $formatter;
 
-    protected string $date_column;
+    protected string $date_column = "";
+
+    protected string $default_order = "";
 
     /**
      * DatedPublicationBean constructor.
@@ -15,9 +18,24 @@ class DatedBean extends DBTableBean
     public function __construct(string $table_name, string $datefield = "item_date")
     {
         parent::__construct($table_name);
-        if (!$this->haveColumn($datefield)) throw new Exception("Date field not found in this bean table");
+        if (!$this->haveColumn($datefield)) throw new Exception("Date column not found in this bean table");
         $this->date_column = $datefield;
 
+        $this->formatter = new IntlDateFormatter(
+            locale:          Spark::Get(Config::DEFAULT_LOCALE),
+            dateType:        IntlDateFormatter::NONE,   // no date part
+            timeType:        IntlDateFormatter::NONE,   // no time part
+            timezone:        'UTC',                     // timezone usually irrelevant here
+            calendar:        IntlDateFormatter::GREGORIAN,
+            pattern:         "d MMMM y"
+        );
+
+        $this->default_order = $this->date_column . " DESC , ".$this->prkey . " DESC ";
+    }
+
+    public function getOrder() : string
+    {
+        return $this->default_order;
     }
 
     public function getDateColumn(): string
@@ -26,99 +44,200 @@ class DatedBean extends DBTableBean
     }
 
     /**
+     * Default pattern is "d MMMM y"
+     * Default locale is Spark::Get(Config::DEFAULT_LOCALE) or en_US
+     *
+     * @return IntlDateFormatter
+     */
+    public function getDateFormatter() : IntlDateFormatter
+    {
+        return $this->formatter;
+    }
+
+    public function formatDate(int $timestamp, ?string $format=null) : string
+    {
+        $currentPatter = $this->formatter->getPattern();
+
+        if ($format) {
+            $this->formatter->setPattern($format);
+        }
+
+        $result = $this->formatter->format($timestamp);
+
+        $this->formatter->setPattern($currentPatter);
+
+        return $result;
+    }
+
+
+    public function queryID(int $itemID, string ...$columns) : SelectQuery
+    {
+        $query = $this->query($this->key(), ...$columns);
+        $query->stmt->where()->add($this->prkey, $itemID);
+        $query->stmt->order_by = $this->default_order;
+        return $query;
+    }
+
+    public function queryDefault(string ...$columns) : SelectQuery
+    {
+        $query = $this->query($this->key(), ...$columns);
+        $query->stmt->order_by = $this->default_order;
+        return $query;
+    }
+
+
+    /**
+     * Query publications for specified month and year
+     * @param int $year
+     * @param int $month
+     * @param string ...$columns
+     * @return SelectQuery
+     * @throws Exception
+     */
+    public function queryMonthYear(int $year, int $month, string ...$columns) : SelectQuery
+    {
+        if ($year<1) throw new Exception("Year must be greater than 0");
+
+        if ($month<1 || $month>12) throw new Exception("Incorrect month number");
+        $query = $this->query($this->key(), ...$columns);
+
+        $query->stmt->where()->addExpression("MONTH($this->date_column) = :month");
+        $query->stmt->bind(":month", $month);
+
+        $query->stmt->where()->addExpression("YEAR($this->date_column) = :year");
+        $query->stmt->bind(":year", $year);
+
+        $query->stmt->order_by = $this->default_order;
+
+        return $query;
+    }
+
+    /**
+     * Return array of all days for a given $year and $month that have publication
+     * @param int $year
+     * @param int $month
+     * @return array<int> 1-31
+     * @throws Exception
+     */
+    public function days(int $year, int $month) : array
+    {
+
+        $query = $this->queryMonthYear($year, $month);
+
+        $query->stmt->setAliasExpression("DAY($this->date_column)", "day");
+
+        $query->stmt->group_by = " DAY($this->date_column) ";
+
+        $query->exec();
+
+        $data = array();
+        while ($result = $query->next()) {
+            $data[] = (int)$result["day"];
+        }
+        $query->free();
+
+        return $data;
+    }
+
+    /**
+     * Return array of all months of $year having publications
+     * @return array<int> 1-12
+     * @throws Exception
+     */
+    public function months(int $year): array
+    {
+        if ($year<1) throw new Exception("Year must be greater than 0");
+
+        $query = $this->query($this->key());
+        $query->stmt->setAliasExpression("MONTH($this->date_column)", "month");
+        $query->stmt->where()->addExpression("YEAR($this->date_column) = :year");
+        $query->stmt->bind(":year", $year);
+        $query->stmt->order_by = $this->default_order;
+        $query->stmt->group_by = " MONTH($this->date_column) ASC ";
+
+        $query->stmt->setMeta("MonthsQuery");
+
+        $query->exec();
+
+        $data = array();
+        while ($result = $query->next()) {
+            $data[] = (int)$result["month"];
+        }
+        $query->free();
+
+        return $data;
+    }
+    /**
      * return array of all years having publications
-     * @return array
+     * @return array<int>
      * @throws Exception
      */
-    public function getYears(): array
+    public function years(): array
     {
+        $query = $this->query($this->key());
+        $query->stmt->setAliasExpression("YEAR($this->date_column)", "year");
+        $query->stmt->order_by = $this->default_order;
+        $query->stmt->group_by = " YEAR($this->date_column) DESC ";
 
-        $qry = $this->query($this->key());
-        $qry->stmt->setAliasExpression(" YEAR($this->date_column) ", "year");
-        $qry->stmt->order_by = " $this->date_column DESC ";
-        $qry->stmt->group_by = " YEAR($this->date_column) DESC  ";
-        $qry->exec();
+        $query->stmt->setMeta("YearsQuery");
+
+        $query->exec();
 
         $data = array();
-        while ($row = $qry->next()) {
-            $data[] = $row["year"];
+        while ($result = $query->next()) {
+            $data[] = (int)$result["year"];
         }
-
-        $qry->free();
+        $query->free();
 
         return $data;
     }
 
-    /**
-     * Return array of all publications for given month and year
-     * @param string $d_year
-     * @param string $d_month
-     * @return array
-     * @throws Exception
-     */
-    public function filterMonthList(string $d_year, string $d_month) : array
-    {
 
-        $qry = $this->query($this->key());
-        $qry->stmt->where()->add("MONTH($this->date_column)", $d_month);
-        $qry->stmt->where()->add("YEAR($this->date_column)", $d_year);
-
-        $qry->stmt->order_by = " $this->date_column DESC ";
-        $qry->exec();
-
-        $data = array();
-        while ($row = $qry->next()) {
-            $data[] = $row;
-        }
-        $qry->free();
-
-        return $data;
-    }
-
-    /**
-     * Return the day part of the publications date in a given month and year
-     * @param string $d_year
-     * @param string $d_month
-     * @return array
-     * @throws Exception
-     */
-    public function filterDayList(string $d_year, string $d_month) : array
-    {
-
-        $qry = $this->query($this->key());
-        $qry->stmt->setAliasExpression("DAY($this->date_column)", "day");
-        $qry->stmt->where()->add("MONTH($this->date_column)", $d_month);
-        $qry->stmt->where()->add("YEAR($this->date_column)", $d_year);
-        $qry->exec();
-
-        $data = array();
-        while ($row = $qry->next()) {
-            $data[] = $row["day"];
-        }
-        $qry->free();
-
-        return $data;
-    }
 
     /**
      * Return the number of publications in a given month and year
      *
-     * @param string $d_year Year ex.2020
-     * @param string $d_month Month ex.6
+     * @param int $year Year ex.2020
+     * @param int $month Month ex.6 (1-12)
      * @return int
      * @throws Exception
      */
-    public function publicationsCount(string $d_year, string $d_month): int
+    public function count(int $year, int $month): int
     {
-        $qry = $this->query($this->key());
-        $qry->stmt->where()->addExpression("MONTH({$this->date_column}) = :d_month");
-        $qry->stmt->bind(":d_month", $d_month);
-        $qry->stmt->where()->addExpression("YEAR({$this->date_column}) = :d_year");
-        $qry->stmt->bind(":d_year", $d_year);
-
-        return $qry->count();
+        return $this->queryMonthYear($year, $month)->count();
     }
 
+    /**
+     * Returns full or abbreviated month name in the desired locale
+     *
+     * @param int    $monthNumber  1–12
+     * @param bool   $short        false = full name, true = abbreviated (3 letters)
+     * @return string
+     */
+    public static function MonthName(int $monthNumber, bool $short = false): string
+    {
+        if ($monthNumber < 1 || $monthNumber > 12) {
+            throw new InvalidArgumentException('Month must be between 1 and 12');
+        }
+
+        $pattern = $short ? 'MMM' : 'MMMM';
+
+        $formatter = new IntlDateFormatter(
+            locale:          Spark::Get(Config::DEFAULT_LOCALE),
+            dateType:        IntlDateFormatter::NONE,
+            timeType:        IntlDateFormatter::NONE,
+            timezone:        'UTC',
+            calendar:        IntlDateFormatter::GREGORIAN,
+            pattern:         $pattern
+        );
+
+        // Most reliable: use DateTime + format('U') → integer timestamp
+        $dt = new DateTime();
+        $dt->setDate(2000, $monthNumber, 1);
+        $dt->setTime(12, 0, 0);           // noon avoids midnight DST issues
+
+        return $formatter->format($dt);
+    }
     // 	public function pastEventsBefore($year, $month, $limit=1){
     // 			$select = "SELECT SQL_CALC_FOUND_ROWS *, MONTH({$this->datefield}) AS month, YEAR({$this->datefield}) AS year FROM {$this->table} WHERE {$this->filter} AND ( MONTH({$this->datefield})<$month and YEAR({$this->datefield})=$year) OR  YEAR({$this->datefield})<$year ORDER BY {$this->datefield} DESC LIMIT $limit";
     // 			$total = -1;
