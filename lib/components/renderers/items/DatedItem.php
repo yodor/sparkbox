@@ -24,6 +24,7 @@ class DatedItem extends DataIteratorItem implements IDataResultConsumer
 
         $this->title = new Component(false);
         $this->title->setComponentClass("title");
+        $this->title->addClassName("Caption");
 
         $this->date = new Component(false);
         $this->date->setComponentClass("date");
