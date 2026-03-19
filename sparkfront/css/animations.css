@@ -1,0 +1,48 @@
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@keyframes flowFromRight {
+    from {
+        /*opacity: 0;*/
+        transform: translateX(100%);
+    }
+    to {
+        /*opacity: 1;*/
+        transform: translateX(0);
+    }
+}
+@keyframes flowFromLeft {
+    from {
+        /*opacity: 0;*/
+        transform: translateX(-100%);
+    }
+    to {
+        /*opacity: 1;*/
+        transform: translateX(0);
+    }
+}
+@keyframes flowFromBottom {
+    from {
+        /*opacity: 0;*/
+        transform: translateY(100%);
+    }
+    to {
+        /*opacity: 1;*/
+        transform: translateY(0);
+    }
+}
+@keyframes flowFromTop {
+    from {
+        /*opacity: 0;*/
+        transform: translateY(-100%);
+    }
+    to {
+        /*opacity: 1;*/
+        transform: translateY(0);
+    }
+}
