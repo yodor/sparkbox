@@ -155,7 +155,7 @@ class DatedBean extends DBTableBean
         $query->stmt->order_by = $this->default_order;
         $query->stmt->group_by = " MONTH($this->date_column) ASC ";
 
-        $query->stmt->setMeta("MonthsQuery");
+//        $query->stmt->setMeta("MonthsQuery");
 
         $query->exec();
 
@@ -179,7 +179,7 @@ class DatedBean extends DBTableBean
         $query->stmt->order_by = $this->default_order;
         $query->stmt->group_by = " YEAR($this->date_column) DESC ";
 
-        $query->stmt->setMeta("YearsQuery");
+//        $query->stmt->setMeta("YearsQuery");
 
         $query->exec();
 
