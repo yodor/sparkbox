@@ -149,9 +149,9 @@ class SQLSelect extends SQLStatement
         else if (strlen(trim($other->order_by)) > 0) {
             $this->order_by .= $other->order_by;
         }
-
+        //TODO: Limit can not be combined
         if (strlen(trim($other->limit)) > 0) {
-            $this->limit .= " " . $other->limit;
+            $this->limit = " " . $other->limit;
         }
 
         SQLStatement::replaceKeyAppend($this->externalBindings, $other->getBindings());
