@@ -262,6 +262,12 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
         $pageFilter = $this->paginator->getLimitingSelect();
 
+        //if stmt is already having a limit pagination will not work
+        if ($this->iterator->stmt->limit) {
+            Debug::ErrorLog("LIMIT already set before pagination");
+            $this->iterator->stmt->setMeta("LimitAlreadySet");
+        }
+
         $this->iterator->stmt->combine($pageFilter);
         $this->iterator->stmt->combine($orderFilter);
 

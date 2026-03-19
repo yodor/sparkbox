@@ -149,8 +149,9 @@ class SQLSelect extends SQLStatement
         else if (strlen(trim($other->order_by)) > 0) {
             $this->order_by .= $other->order_by;
         }
-        //TODO: Limit can not be combined
+        //Limit can not be combined. During pagination the main select is combined with the paged
         if (strlen(trim($other->limit)) > 0) {
+            //do not set pagination limit if there is already limit in the select set
             if ($this->limit) {
 
             }
