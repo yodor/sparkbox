@@ -257,30 +257,6 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         //get the result count only - possible to count without exec only for select type queries
         $this->total_rows = $this->iterator->count();
 
-//        $select = clone $this->iterator->select;
-//        $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
-//
-//        //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
-//        //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
-//        $select->limit = "0";
-//
-//        $db = $this->iterator->getDB();
-//        $result = $db->query($select->getSQL());
-//        if (! ($result instanceof DBResult) ) {
-//            Debug::ErrorLog("Error executing SQL_CALC_FOUND_ROWS: " . $select->getSQL());
-//            throw new Exception("Unable to query SQL_CALC_FOUND_ROWS");
-//        }
-//        $result->free();
-//
-//        $result = $db->query("SELECT FOUND_ROWS() as total_results");
-//        if (! ($result instanceof DBResult) ) {
-//            Debug::ErrorLog("Error fetching FOUND_ROWS: " . $select->getSQL());
-//            throw new Exception("Unable to fetch FOUND_ROWS");
-//        }
-//
-//        $this->total_rows = $result->fetchResult()->get("total_results");
-//        $result->free();
-
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
         $orderFilter = $this->paginator->getOrderingSelect($this->default_order);

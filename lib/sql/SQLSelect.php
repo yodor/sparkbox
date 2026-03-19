@@ -151,7 +151,12 @@ class SQLSelect extends SQLStatement
         }
         //TODO: Limit can not be combined
         if (strlen(trim($other->limit)) > 0) {
-            $this->limit = " " . $other->limit;
+            if ($this->limit) {
+
+            }
+            else {
+                $this->limit = " " . $other->limit;
+            }
         }
 
         SQLStatement::replaceKeyAppend($this->externalBindings, $other->getBindings());

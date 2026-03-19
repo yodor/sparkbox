@@ -35,7 +35,7 @@ class Publications
         $this->view->addClassName(get_class($bean));
         $this->view->getHeader()->setRenderEnabled(false);
 //        $this->view->getFooter()->setRenderEnabled(false);
-        $this->view->setItemsPerPage(12);
+        $this->view->setItemsPerPage(5);
 
         $rendererFull = new DatedItem($this->bean);
         $this->view->setItemRenderer($rendererFull);
@@ -57,7 +57,8 @@ class Publications
 
         //all news items?
         $queryLatest = $this->bean->queryDefault(...$rendererShort->collectDataKeys());
-//        $queryLatest->stmt->limit = ;
+        //do not paginate
+        $queryLatest->stmt->limit = 3;
         $this->latest->setIterator($queryLatest);
 
         $this->archive = new DatedArchive($this->bean, $this->url);
