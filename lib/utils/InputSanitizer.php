@@ -203,4 +203,57 @@ class InputSanitizer
 
         return trim($output);
     }
+
+    /**
+     * Checks if the provided string is suitable as a single-word SQL column name.
+     *
+     * Validation rules:
+     * 1. Must be a non-empty string
+     * 2. Must contain exactly one word (no whitespace characters)
+     * 3. Must start with a letter or underscore
+     * 4. May contain only letters (a-z A-Z), digits (0-9), and underscores
+     * 5. Must not match common SQL reserved keywords
+     * 6. Length should not exceed 63 characters (PostgreSQL default limit)
+     *
+     * @param mixed $input The value to validate
+     * @return bool
+     */
+    static public function SafeSQLColumn(string $input): bool
+    {
+
+        $s = trim($input);
+        if ($s === '') {
+            return false;
+        }
+
+        // Reasonable length limit (can be adjusted per database)
+        if (strlen($s) > 32) {
+            return false;
+        }
+
+        // No whitespace allowed (ensures exactly one "word")
+        if (preg_match('/\s/', $s)) {
+            return false;
+        }
+
+        // Must match: starts with letter or _, then letters/digits/_
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $s)) {
+            return false;
+        }
+
+        // Basic list of common reserved words (case-insensitive)
+        $reserved = [
+            'select', 'insert', 'update', 'delete', 'from', 'where', 'group', 'by',
+            'having', 'order', 'limit', 'offset', 'join', 'inner', 'left', 'right',
+            'full', 'outer', 'on', 'as', 'and', 'or', 'not', 'null', 'true', 'false',
+            'user', 'table', 'index', 'view', 'trigger', 'function', 'column', 'key',
+            'default', 'constraint', 'primary', 'foreign', 'unique', 'check'
+        ];
+
+        if (in_array(strtolower($s), $reserved, true)) {
+            return false;
+        }
+
+        return true;
+    }
 }
