@@ -87,9 +87,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         $this->initColumnTypes();
 
-        $this->select = new SQLSelect();
-        $this->select->from = $this->table;
-
+        $this->select = SQLSelect::Table($this->table);
         //Debug::ErrorLog("DBTableBean[$this->table]");
     }
 
@@ -288,7 +286,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         $qry = $this->query();
         $qry->stmt->reset();
         $qry->stmt->set($this->prkey);
-        $qry->stmt->limit = "0";
+        $qry->stmt->limit(0);
         return $qry->count();
 
     }
@@ -343,7 +341,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         $select->where()->add($field, $value);
         if ($limit > 0) {
-            $select->limit = $limit;
+            $select->limit($limit);
         }
 
         return $this->beanQuery($select);
@@ -514,8 +512,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
             Debug::ErrorLog("Going to delete ID: $id");
             //TODO: select with joins clause needs table specification before the FROM statement in the DELETE statement
-            $delete = new SQLDelete();
-            $delete->from = $this->table;
+            $delete = SQLDelete::Table($this->table);
             $delete->where()->add($this->prkey, $id);
 
             $db->query($delete)->free();
@@ -544,7 +541,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         $code = function (DBDriver $db) use ($column, $value, $keep_ids) {
 
-            Debug::ErrorLog("Keeping: ", $keep_ids);
+            Debug::ErrorLog("Keeping ID list: ", $keep_ids);
 
             $delete = new SQLDelete($this->select);
             $delete->where()->add($column, $value);
@@ -554,7 +551,6 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
                 $keep_list = $delete->bindList($keep_ids);
                 $delete->where()->addExpression("$this->prkey NOT IN ($keep_list)");
             }
-            $delete->setMeta("DeleteRef: ".get_class($this));
 
             //fetch id of resulting rows first to properly manage the cache
             //copy $delete whereset and bindings
@@ -569,7 +565,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             }
             $result->free();
 
-            Debug::ErrorLog("Manage cache using: ", $idlist);
+            Debug::ErrorLog("Manage cache using ID list: ", $idlist);
 
             $db->query($delete)->free();
 
@@ -622,8 +618,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         $insertID = -1;
 
-        $insert = new SQLInsert();
-        $insert->from = $this->table;
+        $insert = SQLInsert::Table($this->table);
         $this->bindValues($row, $insert);
 
         $code = function (DBDriver $db) use (&$insertID , $insert) {

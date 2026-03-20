@@ -58,7 +58,7 @@
     width:1.7em;
     height:1.7em;
 
-
+    background-color: transparent;
     background-repeat:no-repeat;
 
     background-position: 50% 50%;
@@ -66,6 +66,9 @@
     filter: invert(.5);
 
     vertical-align: bottom;
+    border:none;
+    outline:none;
+    cursor:pointer;
 }
 
 .ResultViewHeader .sort_fields .direction[direction="ASC"] {
@@ -126,18 +129,3 @@
     content: ":";
     margin-right: 0.5em;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

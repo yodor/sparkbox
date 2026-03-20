@@ -7,7 +7,6 @@ class DatedBean extends DBTableBean
 
     protected string $date_column = "";
 
-    protected string $default_order = "";
 
     /**
      * DatedPublicationBean constructor.
@@ -30,12 +29,12 @@ class DatedBean extends DBTableBean
             pattern:         "d MMMM y"
         );
 
-        $this->default_order = $this->date_column . " DESC , ".$this->prkey . " DESC ";
     }
 
-    public function getOrder() : string
+    public function setDefaultOrder(SQLSelect $select) : void
     {
-        return $this->default_order;
+        $select->order($this->date_column, OrderDirection::DESC);
+        $select->order($this->prkey , OrderDirection::DESC);
     }
 
     public function getDateColumn(): string
@@ -74,14 +73,15 @@ class DatedBean extends DBTableBean
     {
         $query = $this->query($this->key(), ...$columns);
         $query->stmt->where()->add($this->prkey, $itemID);
-        $query->stmt->order_by = $this->default_order;
+        $this->setDefaultOrder($query->stmt);
+
         return $query;
     }
 
     public function queryDefault(string ...$columns) : SelectQuery
     {
         $query = $this->query($this->key(), ...$columns);
-        $query->stmt->order_by = $this->default_order;
+        $this->setDefaultOrder($query->stmt);
         return $query;
     }
 
@@ -107,7 +107,7 @@ class DatedBean extends DBTableBean
         $query->stmt->where()->addExpression("YEAR($this->date_column) = :year");
         $query->stmt->bind(":year", $year);
 
-        $query->stmt->order_by = $this->default_order;
+        $this->setDefaultOrder($query->stmt);
 
         return $query;
     }
@@ -152,7 +152,7 @@ class DatedBean extends DBTableBean
         $query->stmt->setAliasExpression("MONTH($this->date_column)", "month");
         $query->stmt->where()->addExpression("YEAR($this->date_column) = :year");
         $query->stmt->bind(":year", $year);
-        $query->stmt->order_by = $this->default_order;
+        $this->setDefaultOrder($query->stmt);
         $query->stmt->group_by = " MONTH($this->date_column) ASC ";
 
 //        $query->stmt->setMeta("MonthsQuery");
@@ -176,7 +176,7 @@ class DatedBean extends DBTableBean
     {
         $query = $this->query($this->key());
         $query->stmt->setAliasExpression("YEAR($this->date_column)", "year");
-        $query->stmt->order_by = $this->default_order;
+        $this->setDefaultOrder($query->stmt);
         $query->stmt->group_by = " YEAR($this->date_column) DESC ";
 
 //        $query->stmt->setMeta("YearsQuery");

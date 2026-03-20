@@ -12,6 +12,14 @@ class SQLUpdate extends SQLStatement
 {
     use CanSetColumnValue;
     use CanSetColumnNameExpression;
+    use CanSetLimit;
+
+    static public function Table(string $tableExpr) : SQLUpdate
+    {
+        $result = new SQLUpdate();
+        $result->_from->expr($tableExpr);
+        return $result;
+    }
 
     /**
      * SQLUpdate constructor.
@@ -38,7 +46,7 @@ class SQLUpdate extends SQLStatement
             throw new Exception("Mass UPDATE operation blocked: whereset is empty. Provide at least one condition.");
         }
 
-        $sql = $this->type . " " . $this->from;
+        $sql = $this->type . " " . $this->_from;
         $sql .= " SET ";
 
         $set = array();
@@ -62,6 +70,7 @@ class SQLUpdate extends SQLStatement
         // Append the WHERE clause (already verified as non-empty above).
         $sql .= " WHERE " . $this->whereset->getSQL();
 
+        $sql .= $this->_limit->getSQL();
         return $sql;
     }
 

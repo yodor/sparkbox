@@ -3,18 +3,32 @@ include_once("sql/SQLStatement.php");
 include_once("sql/SQLColumnSet.php");
 include_once("sql/CanModifyColumnName.php");
 include_once("sql/CanSetColumnAliasExpression.php");
+include_once("sql/CanSetLimitWithOffset.php");
+include_once("sql/CanSetOrder.php");
+include_once("sql/CanUseFromExpression.php");
+
 
 class SQLSelect extends SQLStatement
 {
 
     use CanModifyColumnName;
     use CanSetColumnAliasExpression;
+    use CanSetLimitWithOffset;
+    use CanSetOrder;
+    use CanUseFromExpression;
 
     const int SQL_CALC_FOUND_ROWS = 1;
     const int SQL_CACHE = 2;
     const int SQL_NO_CACHE = 3;
 
     protected array $modeMask = array();
+
+    public static function Table(string $tableName) : SQLSelect
+    {
+        $result = new SQLSelect();
+        $result->_from->expr($tableName);
+        return $result;
+    }
 
     public function __construct(?SQLStatement $other = NULL)
     {
@@ -62,7 +76,7 @@ class SQLSelect extends SQLStatement
 
         $sql .= $this->fieldset->getSQL();
 
-        $sql .= " FROM $this->from ";
+        $sql .= " FROM $this->_from ";
 
         if ($this->whereset->count()>0) {
             $sql.=" WHERE ".$this->whereset->getSQL();
@@ -71,15 +85,14 @@ class SQLSelect extends SQLStatement
         if (strlen(trim($this->group_by)) > 0) {
             $sql .= " GROUP BY " . $this->group_by . " ";
         }
+
         if (strlen(trim($this->having)) > 0) {
             $sql .= " HAVING " . $this->having;
         }
-        if (strlen(trim($this->order_by)) > 0) {
-            $sql .= " ORDER BY " . $this->order_by . " ";
-        }
-        if (strlen(trim($this->limit)) > 0) {
-            $sql .= " LIMIT " . $this->limit . " ";
-        }
+
+        $sql .= $this->getOrderSQL();
+
+        $sql .= $this->_limit->getSQL();
 
         return $sql;
     }
@@ -98,25 +111,25 @@ class SQLSelect extends SQLStatement
             $other->fieldset->copyTo($this->fieldset);
         }
 
-        if (strlen(trim($other->from)) > 0) {
-            $check = strtolower(trim($other->from));
+        if (strlen(trim($other->_from)) > 0) {
+            $check = strtolower(trim($other->_from));
             if (str_starts_with($check, "join") ||
                 str_starts_with($check, "left join") ||
                 str_starts_with($check, "right join") ||
                 str_starts_with($check, "inner join")) {
-                if (strlen(trim($this->from))) {
-                    $this->from .= $other->from;
+                if (strlen(trim($this->_from))) {
+                    $this->_from->append($other->_from);
                 }
                 else {
-                    $this->from = $other->from;
+                    $this->_from = $other->_from;
                 }
             }
             else {
-                if (strlen(trim($this->from))) {
-                    $this->from .= " , " . $other->from;
+                if (strlen(trim($this->_from))) {
+                    $this->_from->append(" , " . $other->_from);
                 }
                 else {
-                    $this->from = $other->from;
+                    $this->_from = $other->_from;
                 }
             }
         }
@@ -141,24 +154,19 @@ class SQLSelect extends SQLStatement
             $this->having .= $other->having;
         }
 
-        if (strlen(trim($this->order_by)) > 0) {
-            if (strlen(trim($other->order_by)) > 0) {
-                $this->order_by .= " , " . $other->order_by;
-            }
-        }
-        else if (strlen(trim($other->order_by)) > 0) {
-            $this->order_by .= $other->order_by;
-        }
-        //Limit can not be combined. During pagination the main select is combined with the paged
-        if (strlen(trim($other->limit)) > 0) {
-            //do not set pagination limit if there is already limit in the select set
-            if ($this->limit) {
+        //combine and replace. all ordercolumns from other get into this order columns
+        $other->copyOrderTo($this->orderParameters);
 
-            }
-            else {
-                $this->limit = " " . $other->limit;
-            }
-        }
+        //Limit can not be combined. During pagination the main select is combined with the paged
+//        if ($other->isLimited()) {
+//            //do not set pagination limit if there is already limit in the select set
+//            if ($this->isLimited()) {
+//
+//            }
+//            else {
+//                $this->limit($other->count, $other->offset);
+//            }
+//        }
 
         SQLStatement::replaceKeyAppend($this->externalBindings, $other->getBindings());
     }
@@ -185,14 +193,11 @@ class SQLSelect extends SQLStatement
         $tsel = clone $this;
         $tsel->clearMode();
 
-        $sel = new SQLSelect();
-        $sel->from = " (".$tsel->getSQL().") AS $as_name ";
+        $sel = SQLSelect::Table(" (".$tsel->getSQL().") AS $as_name ");
 
         SQLStatement::replaceKeyAppend($sel->externalBindings, $this->getBindings());
 
         return $sel;
     }
-
-
 
 }

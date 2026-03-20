@@ -13,7 +13,7 @@ class FAQItemsListPage extends BeanListPage
         $bean = new FAQItemsBean();
 
         $qry = $bean->query();
-        $qry->stmt->from.= " fi LEFT JOIN faq_sections fs ON fs.fqsID = fi.fqsID ";
+        $qry->stmt->from()->append(" fi ")->leftJoin("faq_sections fs")->on("fs.fqsID = fi.fqsID");
         $qry->stmt->set("fi.fID", "fs.section_name", "fi.question", "fi.answer");
 
         $this->setIterator($qry);

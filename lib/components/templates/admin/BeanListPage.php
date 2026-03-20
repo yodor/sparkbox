@@ -260,7 +260,7 @@ class BeanListPage extends AdminPageTemplate
         }
 
         $this->view = new TableView($this->query);
-        $this->view->setDefaultOrder($this->query->key()." DESC");
+        $this->view->setDefaultOrder(new OrderColumn($this->query->key(), OrderDirection::DESC));
 
         $this->view->addColumn(new TableColumn($this->query->key(), "ID", TableColumn::ALIGN_CENTER));
 
@@ -285,7 +285,7 @@ class BeanListPage extends AdminPageTemplate
         $this->items()->append($this->view);
 
         if ($this->bean instanceof OrderedDataBean) {
-            $this->view->setDefaultOrder(" position ASC ");
+            $this->view->setDefaultOrder(new OrderColumn("position", OrderDirection::DESC));
 
             $idColumn = $this->view->getColumn($this->query->key());
             if ($this->view->haveColumn("position")) {

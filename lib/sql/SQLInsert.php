@@ -12,7 +12,14 @@ class SQLInsert extends SQLStatement
      * ON Clause Value
      * @var string
      */
-    public string $on = "";
+    protected string $on = "";
+
+    static public function Table(string $tableName) : SQLInsert
+    {
+        $result = new SQLInsert();
+        $result->_from->expr($tableName);
+        return $result;
+    }
 
     public function __construct(?SQLStatement $other = null)
     {
@@ -56,7 +63,7 @@ class SQLInsert extends SQLStatement
             throw new Exception("No data provided for INSERT");
         }
 
-        $sql = $this->type . " " . $this->from . " ";
+        $sql = $this->type . " " . $this->_from . " ";
         $sql .= $this->wrapBrackets($this->fieldset->names()) . " VALUES ";
 
         $rows = array();
@@ -118,4 +125,9 @@ class SQLInsert extends SQLStatement
         }
         return $maxRows;
     }
+    public function on(string $expr) : void
+    {
+        $this->on = $expr;
+    }
+
 }

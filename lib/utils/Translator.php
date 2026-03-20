@@ -256,8 +256,8 @@ class Translator implements IRequestProcessor, IGETConsumer
         else {
             //query the first language
             $qry = $this->languages->queryFull();
-            $qry->stmt->limit = 1;
-            $qry->stmt->order_by = $this->languages->key();
+            $qry->stmt->limit(1);
+            $qry->stmt->order($this->languages->key(), OrderDirection::ASC);
             $qry->exec();
             if ($data = $qry->next()) {
                 $this->language = $data;
@@ -288,7 +288,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             $where->add("table_name", $tableName);
             $where->add("bean_id", $id);
 
-            $qry->stmt->limit = " 1 ";
+            $qry->stmt->limit(1);
             $qry->exec();
 
             if ($result = $qry->next()) {
@@ -311,7 +311,7 @@ class Translator implements IRequestProcessor, IGETConsumer
 
             $qry = $this->translated_phrases->queryLanguageID($this->langID);
             $qry->stmt->where()->add("hash_value", $phrase_hash);
-            $qry->stmt->limit = 1;
+            $qry->stmt->limit(1);
             //$qry->stmt->setMeta("QueryPhrase");
 
             $qry->exec();

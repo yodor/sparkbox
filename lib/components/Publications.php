@@ -49,7 +49,8 @@ class Publications
         $this->latest->addClassName("latest");
         $this->latest->getHeader()->setRenderEnabled(false);
         $this->latest->getFooter()->setRenderEnabled(false);
-        $this->latest->setItemsPerPage($this->latestLimit);
+        //disable pagination and set limit to the iterator
+        $this->latest->setItemsPerPage(0);
 
         $rendererShort = new DatedHeadingItem($this->bean, $this->url);
         $rendererShort->getThumbnail()->image()->setPhotoSize(64, 64);
@@ -58,7 +59,7 @@ class Publications
         //all news items?
         $queryLatest = $this->bean->queryDefault(...$rendererShort->collectDataKeys());
         //do not paginate
-        $queryLatest->stmt->limit = 3;
+        $queryLatest->stmt->limit($this->latestLimit);
         $this->latest->setIterator($queryLatest);
 
         $this->archive = new DatedArchive($this->bean, $this->url);

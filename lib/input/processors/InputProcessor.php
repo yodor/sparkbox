@@ -310,7 +310,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             $iterator->stmt->reset();
             $iterator->stmt->set(...$this->renderer_source_copy_fields);
             $iterator->stmt->where()->add($name, $value);
-            $iterator->stmt->limit = 1;
+            $iterator->stmt->limit(1);
             $iterator->exec();
 
             if ($data = $iterator->next()) {

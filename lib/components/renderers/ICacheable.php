@@ -1,4 +1,5 @@
 <?php
+include_once("storage/ICacheIdentifier.php");
 
 interface ICacheable extends ICacheIdentifier
 {

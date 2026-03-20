@@ -22,10 +22,9 @@ class NestedSetTree
     {
         $this->bean = $bean;
 
-        $select = new SQLSelect();
+        $select = SQLSelect::Table($this->bean->getTableName());
         $select->set($this->bean->key(), "parentID", "lft", "rgt");
-        $select->from = $this->bean->getTableName();
-        $select->order_by = "lft ASC";           // ← critical: pre-order traversal
+        $select->order("lft", OrderDirection::ASC);           // ← critical: pre-order traversal
         $this->select = $select;
     }
 
@@ -144,8 +143,7 @@ class NestedSetTree
             $driver->transaction();
 
             foreach ($this->nodesById as $node) {
-                $upd = new SQLUpdate();
-                $upd->from = $this->bean->getTableName();
+                $upd = SQLUpdate::Table($this->bean->getTableName());
                 $upd->set("lft", $node->lft());
                 $upd->set("rgt", $node->rgt());
                 $upd->where()->add($this->bean->key(), $node->id());
@@ -207,8 +205,7 @@ class NestedSetTree
      */
     public function saveNode(Node $node): bool
     {
-        $upd = new SQLUpdate();
-        $upd->from = $this->bean->getTableName();
+        $upd = SQLUpdate::Table($this->bean->getTableName());
         $upd->set("lft", $node->lft());
         $upd->set("rgt", $node->rgt());
         $upd->where()->add($this->bean->key(), $node->id());

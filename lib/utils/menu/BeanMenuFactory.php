@@ -59,7 +59,7 @@ class BeanMenuFactory
             }
         }
 
-        $this->select->order_by = " lft ASC ";
+        $this->select->order("lft", OrderDirection::ASC);
     }
 
     /**

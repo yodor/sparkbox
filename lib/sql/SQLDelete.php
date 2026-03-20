@@ -4,6 +4,15 @@ include_once("sql/SQLSelect.php");
 
 class SQLDelete extends SQLStatement
 {
+    use CanSetLimit;
+
+    static public function Table(string $tableName) : SQLDelete
+    {
+        $result = new SQLDelete();
+        $result->_from->expr($tableName);
+        return $result;
+    }
+
     public function __construct(?SQLStatement $other = NULL)
     {
         parent::__construct($other);
@@ -21,9 +30,10 @@ class SQLDelete extends SQLStatement
             throw new Exception("Mass DELETE operation blocked: whereset is empty. Provide at least one condition.");
         }
 
-        $sql = $this->type . " FROM " . $this->from;
+        $sql = $this->type . " FROM " . $this->_from;
         $sql .= " WHERE " . $this->whereset->getSQL();
 
+        $sql .= $this->_limit->getSQL();
         return $sql;
     }
 

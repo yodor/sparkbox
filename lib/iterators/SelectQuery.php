@@ -154,7 +154,7 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
         //ie select (select field from table1) as custom_name from table2 having custom_name LIKE '%something%'
         //set limit to 0 as this is SQL_CALC_FOUND_ROWS we don't want any results in the buffer
-        $select->limit = "0";
+        $select->limit(0);
 
         $result = $driver->query($select);
         $result->free();
@@ -191,7 +191,7 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
 
     public function getCacheName() : string
     {
-        return $this->stmt->debugSQL();
+        return Spark::Hash($this->stmt->debugSQL());
     }
 
 }

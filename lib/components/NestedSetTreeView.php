@@ -162,10 +162,6 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
         $open_tags = 0;
 
-        if ($this->iterator instanceof SelectQuery) {
-            $this->iterator->stmt->setMode(SQLSelect::SQL_CACHE);
-        }
-
         $this->iterator->exec();
 
         echo "<ul class='NodeChilds'>";

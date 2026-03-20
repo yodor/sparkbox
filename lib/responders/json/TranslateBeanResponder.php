@@ -65,7 +65,7 @@ class TranslateBeanResponder extends JSONResponder
         $itr->stmt->where()->add("field_name", $this->field_name);
         $itr->stmt->where()->add("bean_id", $this->beanID);
         $itr->stmt->where()->add("langID", $this->langID);
-        $itr->stmt->limit = " 1 ";
+        $itr->stmt->limit(1);
 
         $this->query = $itr;
     }

@@ -271,7 +271,7 @@ class BeanList extends TemplateContent
 
         $this->cmp = new TableView($this->query);
 
-        $this->cmp->setDefaultOrder($this->query->key() . " DESC");
+        $this->cmp->setDefaultOrder(new OrderColumn($this->query->key() , OrderDirection::DESC));
 
         $this->cmp->addColumn(new TableColumn($this->query->key(), "ID", TableColumn::ALIGN_CENTER));
 
@@ -289,7 +289,7 @@ class BeanList extends TemplateContent
         }
 
         if ($this->bean instanceof OrderedDataBean) {
-            $this->cmp->setDefaultOrder(" position ASC ");
+            $this->cmp->setDefaultOrder(new OrderColumn("position" , OrderDirection::ASC));
 
             $idColumn = $this->cmp->getColumn($this->query->key());
             if ($this->cmp->haveColumn("position")) {

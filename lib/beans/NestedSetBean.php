@@ -46,10 +46,9 @@ class NestedSetBean extends DBTableBean
     private function getMaxRgt(): int
     {
         //clean select not the bean one that might have filtering applied
-        $select = new SQLSelect();
-        $select->from = $this->table;
+        $select = SQLSelect::Table($this->table);
         $select->setAliasExpression(" MAX(rgt) ", "max_rgt");
-        $select->limit = " 1 ";
+        $select->limit(1);
 
         $query = new SelectQuery($select);
         $query->exec();
@@ -109,8 +108,7 @@ class NestedSetBean extends DBTableBean
      */
     private function nodeSelect(Node $node) : SQLSelect
     {
-        $select = new SQLSelect();
-        $select->from = $this->table;
+        $select = SQLSelect::Table($this->table);
         $select->set($this->prkey, "lft", "rgt", "parentID");
         $select->where()->addExpression("( lft BETWEEN :nodeLft AND :nodeRgt )");
         $select->bind(":nodeLft", $node->lft());
@@ -131,7 +129,7 @@ class NestedSetBean extends DBTableBean
         $select = $this->nodeSelect($node);
         //check if $id is found between node lft and node rgt
         $select->where()->add($this->prkey, $id);
-        $select->limit = " 1 ";
+        $select->limit(1);
 
         $query = new SelectQuery($select);
         $query->exec();
@@ -150,11 +148,10 @@ class NestedSetBean extends DBTableBean
      */
     private function getNextSiblingID(Node $node): int
     {
-        $select = new SQLSelect();
+        $select = SQLSelect::Table($this->table);
         $select->set($this->prkey);
-        $select->from = $this->table;
         $select->where()->add("lft", $node->rgt() + 1);
-        $select->limit = " 1 ";
+        $select->limit(1);
 
         $query = new SelectQuery($select);
         $query->exec();
@@ -174,11 +171,10 @@ class NestedSetBean extends DBTableBean
      */
     private function getPreviousSiblingID(Node $node): int
     {
-        $select = new SQLSelect();
+        $select = SQLSelect::Table($this->table);
         $select->set($this->prkey);
-        $select->from = $this->table;
         $select->where()->add("rgt", $node->lft() - 1);
-        $select->limit = " 1 ";
+        $select->limit(1);
 
         $query = new SelectQuery($select);
         $query->exec();
@@ -526,10 +522,9 @@ class NestedSetBean extends DBTableBean
     public function reconstructNestedSet(): void
     {
         // Phase 1: Bulk load → create Node objects
-        $select = new SQLSelect();
+        $select = SQLSelect::Table($this->table);
         $select->set($this->prkey, "parentID");
-        $select->from = $this->table;
-        $select->order_by = "$this->prkey ASC";
+        $select->order($this->prkey, OrderDirection::ASC);
 
         $query = new SelectQuery($select);
         $query->exec();
@@ -595,8 +590,7 @@ class NestedSetBean extends DBTableBean
         $this->db->transaction();
 
         foreach ($allNodes as $node) {
-            $upd = new SQLUpdate();
-            $upd->from = $this->table;
+            $upd = SQLUpdate::Table($this->table);
             $upd->set("lft", $node->lft());
             $upd->set("rgt", $node->rgt());
             $upd->where()->add($this->prkey, $node->id());
@@ -634,17 +628,16 @@ class NestedSetBean extends DBTableBean
             $fields[] = "$prefix.$field";
         }
 
-        $sel = new SQLSelect();
+        $sel = SQLSelect::Table(" $this->table AS node, $this->table AS parent ");
 
         $sel->set(...$fields);
 
-        $sel->from = " $this->table AS node, $this->table AS parent ";
         $sel->where()->addExpression("( node.lft BETWEEN parent.lft AND parent.rgt )");
 
         $this->select->where()->copyTo($sel->where());
 
         $sel->group_by = " $prefix." . $this->prkey;
-        $sel->order_by = " $prefix.lft ";
+        $sel->order("$prefix.lft", OrderDirection::ASC);
 
         return $sel;
     }
@@ -732,11 +725,10 @@ class NestedSetBean extends DBTableBean
             $fields[] = "$prefix.$field";
         }
 
-        $sel = new SQLSelect();
+        // Using cross join syntax for clarity in nested sets
+        $sel = SQLSelect::Table(" {$this->table} AS node , {$this->table} AS child ");
         $sel->set(...$fields);
 
-        // Using cross join syntax for clarity in nested sets
-        $sel->from = " {$this->table} AS node , {$this->table} AS child ";
         // Core Nested Set logic: Find all children within the boundaries of the node
         $sel->where()->addExpression("(child.lft BETWEEN node.lft AND node.rgt)");
 

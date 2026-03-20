@@ -85,7 +85,7 @@ class GalleryView extends Container
         $this->view = $view;
 
         if ($this->bean instanceof OrderedDataBean) {
-            $view->setDefaultOrder(" position ASC ");
+            $view->setDefaultOrder(new OrderColumn("position", OrderDirection::ASC));
         }
 
         $view->getHeader()->getViewMode()->setRenderEnabled(true);

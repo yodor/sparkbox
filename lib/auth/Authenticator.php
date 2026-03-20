@@ -201,7 +201,7 @@ abstract class Authenticator
         // 2. Lookup user
         $qry = $this->bean->queryFull();
         $qry->stmt->where()->add("email", $username);
-        $qry->stmt->limit = 1;
+        $qry->stmt->limit(1);
         $qry->exec();
 
         if (!($row = $qry->next())) {

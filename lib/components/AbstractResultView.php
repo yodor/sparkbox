@@ -16,9 +16,9 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
 
     /**
      * SQL order by clause
-     * @var string
+     * @var OrderColumn|null
      */
-    protected string $default_order = "";
+    protected ?OrderColumn $default_order = null;
 
     protected bool $results_paginated = false;
     /**
@@ -123,10 +123,14 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     {
         return $this->list_empty->getContents();
     }
+
     /**
-     * Max number of results per page
-     * set to -1 to disable paged results
+     * Enable paginated results if `$item_count is > 0.
+     *
+     * Sets the number of items per page paginated.
+     *
      * @param int $item_count
+     * @return void
      */
     public function setItemsPerPage(int $item_count) : void
     {
@@ -150,6 +154,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     {
         if (!($itr instanceof SelectQuery)) throw new Exception("Unsuitable iterator. Expecting SelectQuery");
         $this->iterator = $itr;
+        $this->results_paginated = false;
     }
 
     public function setItemRenderer(DataIteratorItem $renderer): void
@@ -188,7 +193,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         return $this->footer;
     }
 
-    public function setDefaultOrder($default_order) : void
+    public function setDefaultOrder(OrderColumn $default_order) : void
     {
         $this->default_order = $default_order;
     }
@@ -200,15 +205,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     public function getCacheName() : string
     {
         $result = parent::getCacheName();
-        if ($this->iterator instanceof SelectQuery) {
-
-            $select = clone $this->iterator->stmt;
-
-            $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
-            $pageFilter = $this->paginator->getLimitingSelect();
-
-            $select->combine($pageFilter);
-            $select->combine($orderFilter);
+        if ($this->iterator instanceof ICacheIdentifier) {
 
             $result.= "-".$this->iterator->getCacheName();
         }
@@ -254,23 +251,19 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         if ($this->results_paginated) return;
 
         //unbuffered mode
-        //get the result count only - possible to count without exec only for select type queries
+        //get the result count only
         $this->total_rows = $this->iterator->count();
 
+        $this->paginator->applyOrder($this->iterator->stmt, $this->default_order);
+
+        //edge case - set default for footer visible without pagination
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
-        $orderFilter = $this->paginator->getOrderingSelect($this->default_order);
-        $pageFilter = $this->paginator->getLimitingSelect();
-
-        //if stmt is already having a limit pagination will not work
-        if ($this->iterator->stmt->limit) {
-            Debug::ErrorLog("LIMIT already set before pagination");
-            $this->iterator->stmt->setMeta("LimitAlreadySet");
+        if ($this->items_per_page>0) {
+            $this->paginator->applyLimit($this->iterator->stmt);
         }
 
-        $this->iterator->stmt->combine($pageFilter);
-        $this->iterator->stmt->combine($orderFilter);
-
+        $this->iterator->stmt->setMeta("ARV Paginated");
         $this->results_paginated = true;
     }
     /**

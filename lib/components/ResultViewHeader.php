@@ -5,6 +5,7 @@ include_once("components/LabelSpan.php");
 include_once("components/InputComponent.php");
 include_once("iterators/ArrayDataIterator.php");
 
+
 class ResultViewHeader extends Container
 {
     public bool $view_modes_enabled = FALSE;
@@ -22,7 +23,7 @@ class ResultViewHeader extends Container
     protected Action $pagePrev;
 
     protected InputComponent $sort;
-    protected Action $sortDir;
+    protected Component $sortDir;
 
     public function __construct(Paginator $paginator)
     {
@@ -35,18 +36,18 @@ class ResultViewHeader extends Container
         $this->viewMode = new Container(false);
         $this->viewMode->setComponentClass("view_mode");
 
-        $link = SparkPage::Instance()->currentURL();
-        $link->remove(Paginator::KEY_PAGE);
-        $link->add(new URLParameter(Paginator::KEY_VIEW, "list"));
 
-        $button_list = Button::Action("", $link->toString());
-        $button_list->setComponentClass("icon list");
-        $this->viewMode->items()->append($button_list);
+        $buttonList = Button::TextButton("", "list");
+        $buttonList->setComponentClass("icon list");
+        $buttonList->setAttribute("key", Paginator::KEY_VIEW);
+        $buttonList->setAttribute("onClick", "updateList(this)");
+        $this->viewMode->items()->append($buttonList);
 
-        $link->get(Paginator::KEY_VIEW)->setValue("grid");
-        $button_grid = Button::Action("", $link->toString());
-        $button_grid->setComponentClass("icon grid");
-        $this->viewMode->items()->append($button_grid);
+        $buttonGrid = Button::TextButton("", "grid");
+        $buttonGrid->setComponentClass("icon grid");
+        $buttonGrid->setAttribute("key", Paginator::KEY_VIEW);
+        $buttonGrid->setAttribute("onClick", "updateList(this)");
+        $this->viewMode->items()->append($buttonGrid);
 
         $this->viewMode->setRenderEnabled(false);
 
@@ -60,12 +61,16 @@ class ResultViewHeader extends Container
 
         $dataInput = DataInputFactory::Create(InputType::SELECT, Paginator::KEY_ORDER_BY, tr("Sort By"), 0);
         $dataInput->getRenderer()->setIterator(new ArrayDataIterator());
-        $dataInput->getRenderer()->input()->setAttribute("onChange", "changeSort(this);");
+        $dataInput->getRenderer()->input()->setAttribute("onChange", "updateList(this)");
+        $dataInput->getRenderer()->input()->setAttribute("key", Paginator::KEY_ORDER_BY);
         $this->sort = new InputComponent($dataInput);
         $this->sort->setComponentClass("sort_fields");
 
-        $this->sortDir = new Action();
+        //will use icon action holds the next direction and key the URL get key
+        $this->sortDir = Button::TextButton("", OrderDirection::ASC->value);
         $this->sortDir->setComponentClass("direction");
+        $this->sortDir->setAttribute("key", Paginator::KEY_ORDER_DIR);
+        $this->sortDir->setAttribute("onClick", "updateList(this)");
 
         $this->sort->items()->append($this->sortDir);
         $this->items()->append($this->sort);
@@ -92,6 +97,8 @@ class ResultViewHeader extends Container
         $this->pageNav->setRenderEnabled(false);
 
         $this->items()->append($this->pageNav);
+
+        new UpdateListInlineScript();
     }
 
     protected function renderCaption(): void
@@ -138,30 +145,21 @@ class ResultViewHeader extends Container
             $this->pageNext->setRenderEnabled(true);
         }
 
-
-
-        $link = SparkPage::Instance()->currentURL();
-        $link->remove(Paginator::KEY_PAGE);
-        $link->add(new URLParameter(Paginator::KEY_ORDER_BY, ""));
-        $link->add(new URLParameter(Paginator::KEY_ORDER_DIR, ""));
-
-        $selectedField = $this->paginator->getSelectedOrderColumn();
+        $activeColumn = $this->paginator->getActiveOrder();
 
         $items = $this->paginator->getOrderColumns();
 
-        //$iterator = $this->sort->getDataInput()->getRenderer()->getIterator();
+        //create select iterator values from paginator sorting columns
         $iterator = new ArrayDataIterator();
-        foreach ($items as $column => $sortField) {
-            if (!($sortField instanceof OrderColumn)) continue;
+        foreach ($items as $columnName => $orderColumn) {
+            if (!($orderColumn instanceof OrderColumn)) continue;
 
-            $link->get(Paginator::KEY_ORDER_BY)->setValue($sortField->getName());
-            $link->get(Paginator::KEY_ORDER_DIR)->setValue($sortField->getDirection());
-
-            if ($selectedField && strcmp($sortField->getName(), $selectedField->getName()) === 0) {
-                $this->sort->getDataInput()->setValue($link->toString());
+            if ($activeColumn && strcmp($orderColumn->getName(), $activeColumn->getName()) === 0) {
+                $this->sort->getDataInput()->setValue($activeColumn->getName());
             }
 
-            $iterator->appendValue($link->toString(), tr($sortField->getLabel()));
+            $label = $orderColumn->getLabel()??$orderColumn->getName();
+            $iterator->appendValue($orderColumn->getName(), tr($label));
         }
 
         $renderer = $this->sort->getDataInput()->getRenderer();
@@ -171,44 +169,18 @@ class ResultViewHeader extends Container
             $renderer->getItemRenderer()->setLabelKey(ArrayDataIterator::KEY_VALUE);
             $renderer->setIterator($iterator);
         }
-        $activeOrdering = $this->paginator->getActiveOrdering();
 
-        //next click toggle direction
-        $direction = OrderColumn::ASC;
-        if (strcmp($activeOrdering->getDirection(), OrderColumn::ASC) === 0) {
-            $direction = OrderColumn::DESC;
-        }
-        $link->get(Paginator::KEY_ORDER_DIR)->setValue($direction);
+        //prepare direction for next click toggle direction
+        $direction = $activeColumn?->getDirection();
+        $direction = $direction ?? OrderDirection::DESC;
 
-        $this->sortDir->setURL($link);
-        $this->sortDir->setAttribute("direction", $direction);
+        //icon shows the active listing direction
+        $this->sortDir->setAttribute("direction", $direction->value);
 
+        //toggle the direction - clicking the link will set the opposite direction
+        $direction = $direction->opposite();
+        $this->sortDir->setAction($direction->value);
 
-        ?>
-        <script type='text/javascript'>
-            function decodeHtmlEntities(text) {
-                const entities = {
-                    '&amp;': '&',
-                    '&lt;': '<',
-                    '&gt;': '>',
-                    '&quot;': '"',
-                    '&#39;': "'",
-                    // Add more entities as needed
-                };
-
-                // Replace named entities
-                let decodedText = text.replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, (match) => entities[match]);
-
-                // Replace numeric entities (e.g., &#123;)
-                decodedText = decodedText.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec));
-
-                return decodedText;
-            }
-            function changeSort(sel) {
-                window.location.href = decodeHtmlEntities(sel.options[sel.options.selectedIndex].value);
-            }
-        </script>
-        <?php
         parent::startRender();
     }
 

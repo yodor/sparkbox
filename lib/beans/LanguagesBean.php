@@ -26,8 +26,7 @@ CREATE TABLE `languages` (
 
         $query = new DBQuery();
         try {
-            $insert = new SQLInsert();
-            $insert->from = "languages";
+            $insert = SQLInsert::Table("languages");
             $insert->set("language", Spark::Get(Config::DEFAULT_LANGUAGE));
             $insert->set("lang_code", Spark::Get(Config::DEFAULT_LANGUAGE_ISO3));
 

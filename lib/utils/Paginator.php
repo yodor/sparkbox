@@ -1,56 +1,56 @@
 <?php
 include_once("utils/IGETConsumer.php");
 include_once("objects/SparkObject.php");
+include_once("sql/OrderColumn.php");
+include_once("utils/InputSanitizer.php");
+include_once("components/InlinePageScript.php");
 
-class OrderColumn extends SparkObject
+class UpdateListInlineScript extends InlinePageScript implements IPageComponent
 {
-    const string ASC = "ASC";
-    const string DESC = "DESC";
 
-    protected string $label = "";
-    protected string $direction = OrderColumn::DESC;
-
-    static function Empty() : OrderColumn
+    public function __construct()
     {
-        return new OrderColumn("", "", "");
+        parent::__construct(false);
     }
 
-    public function __construct(string $name, string $label, string $order_direction = OrderColumn::DESC)
+    public function code(): string
     {
-        parent::__construct();
-        $this->name = $name;
-        $this->label = $label;
-        $this->direction = $order_direction;
-    }
+        $keyOrderBy = Paginator::KEY_ORDER_BY;
+        $keyOrderDir = Paginator::KEY_ORDER_DIR;
+        $keyPage = Paginator::KEY_PAGE;
 
-    /**
-     * Label for this sort column
-     * @return string
-     */
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
+        return <<<JS
+function updateList(elm) {
 
-    /**
-     * Initial ordering direction
-     * @return string
-     */
-    public function getDirection(): string
-    {
-        return $this->direction;
-    }
+    let url = new URL(window.location);
 
-    public function setDirection(string $direction): void
-    {
-        $this->direction = $direction;
+    let clearKeys = ['$keyOrderDir','$keyPage'];
+    if (clearKeys instanceof Array) {
+        clearKeys.forEach(key => url.searchParams.delete(key));
+    }    
+    
+    //require order by - get from the select
+    if (!url.searchParams.has("$keyOrderBy")) {
+        //use the first value of the select element
+        const orderByValue = elm.parentNode.querySelector("[name='$keyOrderBy']").value;
+        url.searchParams.set("$keyOrderBy", orderByValue);
     }
-
-    public function toString() : string
-    {
-        return $this->name." ".$this->direction;
+    
+    const key = elm.getAttribute("key");
+    let value = "";
+    if (elm instanceof HTMLSelectElement) {
+        value = elm.value;
     }
+    else {
+        value = elm.getAttribute("action");
+    }
+    url.searchParams.set(key, value);
+    // Redirect to updated URL (preserves path, hash, and other parts)
+    window.location = url;
+}
+JS;
 
+    }
 }
 
 class Paginator implements IGETConsumer
@@ -78,7 +78,7 @@ class Paginator implements IGETConsumer
 
     /**
      * Defined sort fields
-     * @var array
+     * @var array<string, OrderColumn>
      */
     protected array $order_columns = array();
 
@@ -119,19 +119,26 @@ class Paginator implements IGETConsumer
     public function __construct()
     {
 
-        $this->activeOrder = OrderColumn::Empty();
+        new UpdateListInlineScript();
 
-        if (isset($_GET[Paginator::KEY_ORDER_DIR])) {
-            $this->activeOrder->setDirection(Spark::SanitizeInput($_GET[Paginator::KEY_ORDER_DIR]));
-        }
+        $this->activeOrder = null;
 
+        //process GET variables and setup activeOrder
         if (isset($_GET[Paginator::KEY_ORDER_BY])) {
-            if (!$this->activeOrder->getDirection()) {
-                $this->activeOrder->setDirection(OrderColumn::DESC);
-            }
-            $this->activeOrder->setName(Spark::SanitizeInput($_GET[Paginator::KEY_ORDER_BY]));
-        }
 
+            $columnName = $_GET[Paginator::KEY_ORDER_BY];
+            if (InputSanitizer::SafeSQLColumn($columnName)) {
+                $this->activeOrder = new OrderColumn($columnName);
+                $this->activeOrder->setDirection(OrderDirection::DESC);
+
+                if (isset($_GET[Paginator::KEY_ORDER_DIR])) {
+                    $direction = OrderDirection::tryFrom($_GET[Paginator::KEY_ORDER_DIR]);
+                    if (!is_null($direction)) {
+                        $this->activeOrder->setDirection($direction);
+                    }
+                }
+            }
+        }
 
         if (isset($_GET[Paginator::KEY_PAGE])) {
             $this->page = (int)$_GET[Paginator::KEY_PAGE];
@@ -140,7 +147,7 @@ class Paginator implements IGETConsumer
         Paginator::$instance = $this;
     }
 
-    public function getActiveOrdering(): ?OrderColumn
+    public function getActiveOrder(): ?OrderColumn
     {
         return $this->activeOrder;
     }
@@ -153,36 +160,6 @@ class Paginator implements IGETConsumer
     public function getOrderColumns() : array
     {
         return $this->order_columns;
-    }
-
-    /**
-     * Return the selected ordercolumn referenced from _GET or the first ordercolumn if no reference is found.
-     * Returns null if no PaginatorOrderColumns are added
-     * @return OrderColumn|null
-     */
-    public function getSelectedOrderColumn() : ?OrderColumn
-    {
-        if (count($this->order_columns) == 0) return null;
-
-        $result = null;
-
-        //check if the query parameter matches order column name
-        foreach ($this->order_columns as $column => $sort_field) {
-            if (Spark::strcmp_isset(Paginator::KEY_ORDER_BY, $column)) {
-                $result = $sort_field;
-                break;
-            }
-        }
-
-        //return the first order column - ie default order
-        if (is_null($result)) {
-            foreach ($this->order_columns as $element) {
-                $result = $element;
-                break;
-            }
-        }
-
-        return $result;
     }
 
     public function itemsPerPage() : int
@@ -274,47 +251,35 @@ class Paginator implements IGETConsumer
 
     }
 
-    public function getOrderingSelect(string $default_order = "") : SQLSelect
+    public function applyOrder(SQLSelect $select, ?OrderColumn $defaultOrder = null) : void
     {
 
-        $filter = new SQLSelect();
-        $filter->from = "";
-        $filter->order_by = $default_order;
-
-        $selectedOrderColumn = $this->getSelectedOrderColumn();
-
-        if (!$selectedOrderColumn) {
-            //direct ordering passed in _GET
-            if ($this->activeOrder->getName()) {
-                if (!$this->activeOrder->getDirection()) {
-                    $this->activeOrder->setDirection(OrderColumn::DESC);
+        if ($this->activeOrder) {
+            $select->orderColumn($this->activeOrder);
+        }
+        else {
+            if (count($this->order_columns) > 0) {
+                foreach ($this->order_columns as $columnName=>$orderColumn) {
+                    $select->orderColumn($orderColumn);
+                    break;
                 }
-                $filter->order_by = $this->activeOrder->toString();
             }
-            return $filter;
+            else {
+                if ($defaultOrder) {
+                    $select->orderColumn($defaultOrder);
+                }
+            }
         }
 
-        //using PaginatorOrderColumn items
-        if (!$this->activeOrder->getDirection()) {
-            $this->activeOrder->setDirection($selectedOrderColumn->getDirection());
-        }
-        $this->activeOrder->setName($selectedOrderColumn->getName());
 
-        $filter->order_by = $this->activeOrder->toString();
-
-        return $filter;
     }
 
-    public function getLimitingSelect() : SQLSelect
+    public function applyLimit(SQLSelect $select) : void
     {
-
-        $filter = new SQLSelect();
-        $filter->from = "";
-
-        if ($this->ipp > 0) {
-            $filter->limit = " " . ($this->page * $this->ipp) . ", $this->ipp ";
+        //if stmt is already having a limit - pagination will not work
+        if ($select->isLimited()) {
+            throw new Exception("Pagination LIMIT is requested but Iterator already has LIMIT set");
         }
-
-        return $filter;
+        $select->limit($this->ipp, ($this->page * $this->ipp));
     }
 }

@@ -5,14 +5,21 @@ include_once("sql/IBindingModifier.php");
 
 include_once("sql/SQLColumnSet.php");
 include_once("sql/ClauseCollection.php");
+include_once("sql/FromExpression.php");
+include_once("sql/LimitExpression.php");
 
 abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModifier
 {
+    protected ?LimitExpression $_limit = null;
+
+    protected ?FromExpression $_from = null;
+
     protected array $externalBindings = array();
 
     protected ?SQLColumnSet $fieldset = null;
 
     protected string $meta = "";
+
     /**
      * SELECT, UPDATE, DELETE, INSERT
      * @var string
@@ -24,38 +31,40 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
      */
     protected ?ClauseCollection $whereset = null;
 
-    /**
-     * Table name for the statement
-     * Also for insert
-     * @var string Table name
-     */
-    public string $from = "";
-
     public string $group_by = "";
-    public string $order_by = "";
-    public string $limit = "";
+
     public string $having = "";
 
     public abstract function getSQL() : string;
 
+    /**
+     * Copy whereset and external bindings only
+     * @param SQLStatement|null $other
+     */
     public function __construct(?SQLStatement $other = null)
     {
+        $this->_from = new FromExpression();
+
         $this->fieldset = new SQLColumnSet();
         $this->whereset = new ClauseCollection();
 
         //copy the where clause collection
         if ($other) {
-            $this->from = $other->from;
+            $this->_from = clone $other->_from;
             $other->where()->copyTo($this->whereset);
             //copy bindings
             $this->externalBindings = $other->externalBindings;
         }
+
+        $this->_limit = new LimitExpression();
     }
 
     public function __clone() : void
     {
         $this->whereset = clone $this->whereset;
         $this->fieldset = clone $this->fieldset;
+        $this->_from = clone $this->_from;
+        $this->_limit = clone $this->_limit;
     }
 
     public function where(): ClauseCollection
