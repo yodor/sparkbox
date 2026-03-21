@@ -120,11 +120,13 @@ class PDOResult extends DBResult
     }
 
     /**
-     * True if this statement has result-set ready to fetch
+     * True if this statement has result-set ready to fetch ie $this->result->columnCount() > 0
      * @return bool
      */
     public function isActive() : bool
     {
+        // This is a SELECT / SHOW / EXPLAIN / DESCRIBE / CALL returning rows
+        // Most reliable way to check for result set
         return !is_null($this->result) && ($this->result->columnCount() > 0);
     }
 }

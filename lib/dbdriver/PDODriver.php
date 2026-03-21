@@ -21,6 +21,10 @@ class PDODriver extends DBDriver
         // Construct DSN (Data Source Name)  //charset=utf8mb4
         $dsn = "mysql:host=$host;dbname=$db;port=$port;charset=utf8mb4";
 
+        //if (PHP_MAJOR_VERSION < 8) throw new Exception("PHP Version 8.3 Required");
+        //if (PHP_MINOR_VERSION > 3) throw new Exception("PHP Version 8.3 Required");
+
+        //PHP 8.3 - Check mode options for 8.4 and up!!!
         $options = array(
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
