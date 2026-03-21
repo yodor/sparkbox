@@ -1,13 +1,15 @@
 <?php
 include_once("sql/SQLStatement.php");
 include_once("sql/CanSetColumnValue.php");
-include_once("sql/CanSetRawColumns.php");
+include_once("sql/CanCreateArrayValueColumn.php");
+include_once("sql/CanAccessColumnsDirectly.php");
 
 class SQLInsert extends SQLStatement
 {
     use CanSetColumnValue;
-    use CanSetRawColumns;
+    use CanCreateArrayValueColumn;
 
+    use CanAccessColumnsDirectly;
     /**
      * ON Clause Value
      * @var string
@@ -100,7 +102,7 @@ class SQLInsert extends SQLStatement
         }
 
         // Merge manual bind() calls (external bindings)
-        SQLStatement::replaceKeyAppend($bindings, $this->externalBindings);
+        SQLStatement::ReplaceKeyAppend($bindings, $this->externalBindings);
 
         return $bindings;
     }

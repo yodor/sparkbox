@@ -47,7 +47,7 @@ class NestedSetBean extends DBTableBean
     {
         //clean select not the bean one that might have filtering applied
         $select = SQLSelect::Table($this->table);
-        $select->setAliasExpression(" MAX(rgt) ", "max_rgt");
+        $select->setAliasExpression("MAX(rgt)", "max_rgt");
         $select->limit(1);
 
         $query = new SelectQuery($select);
@@ -110,9 +110,9 @@ class NestedSetBean extends DBTableBean
     {
         $select = SQLSelect::Table($this->table);
         $select->set($this->prkey, "lft", "rgt", "parentID");
-        $select->where()->addExpression("( lft BETWEEN :nodeLft AND :nodeRgt )");
-        $select->bind(":nodeLft", $node->lft());
-        $select->bind(":nodeRgt", $node->rgt());
+        $select->where()->addExpression("(lft BETWEEN :nodeL AND :nodeR)");
+        $select->where()->bind(":nodeL", $node->lft());
+        $select->where()->bind(":nodeR", $node->rgt());
         return $select;
     }
 
@@ -200,7 +200,7 @@ class NestedSetBean extends DBTableBean
 
         $node = $this->getNode($id);
 
-        $brotherID = $this->getPreviousSiblingId($node);
+        $brotherID = $this->getPreviousSiblingID($node);
         if ($brotherID === -1) throw new Exception("Node is already at the first (leftmost) position among siblings");
 
         $brother = $this->getNode($brotherID);
@@ -210,30 +210,31 @@ class NestedSetBean extends DBTableBean
         $code = function (DBDriver $db) use ($node, $brother, $children)
         {
             // Shift the target node and its subtree LEFT by the size of the previous sibling
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft - :brotherSize ");
-            $update->setExpression("rgt", " rgt - :brotherSize ");
-            $update->bind(":brotherSize", $brother->size());
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft - :bsize_L")->bind(":bsize_L", $brother->size());
+            $update->column("rgt")->set("rgt - :bsize_R")->bind(":bsize_R", $brother->size());
 
-            $update->where()->addExpression(" (lft BETWEEN :nodeLft  AND :nodeRgt) ");
-            $update->bind(":nodeLft", $node->lft());
-            $update->bind(":nodeRgt", $node->rgt());
+            $update->where()->addExpression("(lft BETWEEN :nodeL AND :nodeR)");
+            $update->where()->bind(":nodeL", $node->lft());
+            $update->where()->bind(":nodeR", $node->rgt());
+
+            $update->setMeta("UPDATE_1");
             $db->query($update)->free();
 
             // Shift the previous sibling and everything between them RIGHT by the size of the target node
             // (excluding the target subtree itself)
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft + :nodeSize ");
-            $update->setExpression("rgt", " rgt + :nodeSize ");
-            $update->bind(":nodeSize", $node->size());
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft + :nsize_L")->bind(":nsize_L", $node->size());
+            $update->column("rgt")->set("rgt + :nsize_R")->bind(":nsize_R", $node->size());
 
-            $update->where()->addExpression(" (lft BETWEEN :brotherLft AND :brotherRgt )");
-            $update->bind(":brotherLft", $brother->lft());
-            $update->bind(":brotherRgt", $brother->rgt());
+            $update->where()->addExpression("(lft BETWEEN :sizeL AND :sizeR)");
+            $update->where()->bind(":sizeL", $brother->lft());
+            $update->where()->bind(":sizeR", $brother->rgt());
             //bind ids and get the placeholders comma separated
-            $idlist = $update->bindList($children);
+            $idlist = $update->where()->bindList($children);
             $update->where()->addExpression("$this->prkey NOT IN ($idlist)");
 
+            $update->setMeta("UPDATE_2");
             $db->query($update)->free();
 
         };
@@ -267,28 +268,26 @@ class NestedSetBean extends DBTableBean
         $code = function(DBDriver $db) use ($node, $brother, $children) {
 
             // Shift the target node and its subtree RIGHT by the size of the next sibling
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft + :brotherSize");
-            $update->setExpression("rgt", " rgt + :brotherSize");
-            $update->bind(":brotherSize", $brother->size());
-
-            $update->where()->addExpression("( lft  BETWEEN :nodeLft AND :nodeRgt )");
-            $update->bind(":nodeLft", $node->lft());
-            $update->bind(":nodeRgt", $node->rgt());
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft + :bsize_L")->bind(":bsize_L", $brother->size());
+            $update->column("rgt")->set("rgt + :bsize_R")->bind(":bsize_R", $brother->size());
+            $update->where()->addExpression("(lft BETWEEN :nodeL AND :nodeR)");
+            $update->where()->bind(":nodeL", $node->lft());
+            $update->where()->bind(":nodeR", $node->rgt());
             $db->query($update)->free();
 
             // Shift the next sibling and everything between them LEFT by the size of the target node
             // (excluding the target subtree itself)
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft - :nodeSize ");
-            $update->setExpression("rgt", " rgt - :nodeSize ");
-            $update->bind(":nodeSize", $node->size());
+            $update = SQLUpdate::Table($this->table);
+            //no emulation of named placeholders use separate bindings
+            $update->column("lft")->set("lft - :nsize_L")->bind(":nsize_L", $node->size());
+            $update->column("rgt")->set("rgt - :nsize_R")->bind(":nsize_R", $node->size());
 
-            $update->where()->addExpression("( lft  BETWEEN :brotherLft AND :brotherRgt )");
-            $update->bind(":brotherLft", $brother->lft());
-            $update->bind(":brotherRgt", $brother->rgt());
+            $update->where()->addExpression("(lft BETWEEN :brotherL AND :brotherR)");
+            $update->where()->bind(":brotherL", $brother->lft());
+            $update->where()->bind(":brotherR", $brother->rgt());
 
-            $idlist = $update->bindList($children);
+            $idlist = $update->where()->bindList($children);
             $update->where()->addExpression("$this->prkey NOT IN ($idlist)");
 
 
@@ -334,16 +333,16 @@ class NestedSetBean extends DBTableBean
             $row["lft"] = $parentNode->rgt();
             $row["rgt"] = $parentNode->rgt() + 1;
 
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("rgt", "rgt + 2");
-            $update->where()->addExpression(" rgt >= :parentRgt ");
-            $update->bind(":parentRgt", $parentNode->rgt());
+            $update = SQLUpdate::Table($this->table);
+            $update->column("rgt")->set("rgt + 2");
+            $update->where()->addExpression(" rgt >= :parentR");
+            $update->where()->bind(":parentR", $parentNode->rgt());
             $db->query($update)->free();
 
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", "lft + 2");
-            $update->where()->addExpression(" lft > :parentRgt ");
-            $update->bind(":parentRgt", $parentNode->rgt());
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft + 2");
+            $update->where()->addExpression("lft > :parentR");
+            $update->where()->bind(":parentR", $parentNode->rgt());
             $db->query($update)->free();
 
             $lastID = parent::insert($row, $db);
@@ -404,47 +403,43 @@ class NestedSetBean extends DBTableBean
             }
 
             //make space
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", "lft + :extent");
-            $update->where()->addExpression("lft >= :new_lft ");
-            $update->bind(":extent", $extent);
-            $update->bind(":new_lft", $new_lft);
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft + :extent")->bind(":extent", $extent);
+            $update->where()->addExpression("lft >= :new_lft");
+            $update->where()->bind(":new_lft", $new_lft);
             $db->query($update)->free();
 
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("rgt", "rgt + :extent");
-            $update->bind(":extent", $extent);
+            $update = SQLUpdate::Table($this->table);
+            $update->column("rgt")->set("rgt + :extent")->bind(":extent", $extent);
 
             $update->where()->addExpression("rgt >= :new_lft");
-            $update->bind(":new_lft", $new_lft);
+            $update->where()->bind(":new_lft", $new_lft);
             $db->query($update)->free();
 
             //move into new space
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", "lft + :distance");
-            $update->setExpression("rgt", "rgt + :distance");
-            $update->bind(":distance", $distance);
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft + :distance_L")->bind(":distance_L", $distance);
+            $update->column("rgt")->set("rgt + :distance_R")->bind(":distance_R", $distance);
 
-            $update->where()->addExpression(" (lft >= :temppos AND rgt < :temp_pos + :extent) ");
-            $update->bind(":temppos", $tmppos);
-            $update->bind(":extent", $extent);
+            $update->where()->addExpression("(lft >= :temp_L AND rgt < :temp_R + :extent)");
+            $update->where()->bind(":temp_L", $tmppos);
+            $update->where()->bind(":temp_R", $tmppos);
+            $update->where()->bind(":extent", $extent);
             $db->query($update)->free();
 
             //remove old space
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", "lft - :extent");
-            $update->bind(":extent", $extent);
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft - :extent")->bind(":extent", $extent);
 
-            $update->where()->addExpression("lft > :rgt");
-            $update->bind(":rgt", $node->rgt());
+            $update->where()->addExpression("lft > :nodeR");
+            $update->where()->bind(":nodeR", $node->rgt());
             $db->query($update)->free();
 
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("rgt", "rgt - :extent");
-            $update->bind(":extent", $extent);
+            $update = SQLUpdate::Table($this->table);
+            $update->column("rgt")->set("rgt - :extent")->bind(":extent", $extent);
 
-            $update->where()->addExpression("rgt > :rgt");
-            $update->bind(":rgt", $node->rgt());
+            $update->where()->addExpression("rgt > :nodeR");
+            $update->where()->bind(":nodeR", $node->rgt());
             $db->query($update)->free();
 
             parent::update($node->id(), $row, $db);
@@ -477,27 +472,27 @@ class NestedSetBean extends DBTableBean
 
             Debug::ErrorLog("Re-parenting child nodes ...");
 
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft - 1 ");
-            $update->setExpression("rgt", " rgt - 1 ");
-            $update->where()->addExpression("(lft BETWEEN :nodeLft AND :nodeRgt)");
-            $update->bind(":nodeLft", $node->lft());
-            $update->bind(":nodeRgt", $node->rgt());
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft - 1");
+            $update->column("rgt")->set("rgt - 1");
+            $update->where()->addExpression("(lft BETWEEN :nodeL AND :nodeR)");
+            $update->where()->bind(":nodeL", $node->lft());
+            $update->where()->bind(":nodeR", $node->rgt());
             $db->query($update)->free();
 
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("rgt", " rgt - 2 ");
-            $update->where()->addExpression("rgt > :nodeRgt");
-            $update->bind(":nodeRgt", $node->rgt());
+            $update = SQLUpdate::Table($this->table);
+            $update->column("rgt")->set("rgt - 2");
+            $update->where()->addExpression("rgt > :nodeR");
+            $update->where()->bind(":nodeR", $node->rgt());
             $db->query($update)->free();
 
-            $update = new SQLUpdate($this->select);
-            $update->setExpression("lft", " lft - 2 ");
-            $update->where()->addExpression(" lft > :nodeRgt ");
-            $update->bind(":nodeRgt", $node->rgt());
+            $update = SQLUpdate::Table($this->table);
+            $update->column("lft")->set("lft - 2");
+            $update->where()->addExpression("lft > :nodeR");
+            $update->where()->bind(":nodeR", $node->rgt());
             $db->query($update)->free();
 
-            $update = new SQLUpdate($this->select);
+            $update = SQLUpdate::Table($this->table);
             $update->set("parentID", $node->parentID());
             $update->where()->add("parentID", $node->id());
             $db->query($update)->free();
@@ -760,17 +755,20 @@ class NestedSetBean extends DBTableBean
      */
     public function getParentNodes(int $nodeID, array $fieldNames = array()): array
     {
-        $sel = $this->selectAggregated($nodeID, $fieldNames);
+        $select = $this->selectAggregated($nodeID, $fieldNames);
 
-        $qry = new SelectQuery($sel, $this->prkey, $this->table);
-        $qry->exec();
+        $nodes = [];
 
-        $ret = array();
-        while ($row = $qry->next()) {
-            $ret[] = $row;
+        $query = new SelectQuery($select, $this->prkey, $this->table);
+
+        if ($query->count()==0) return $nodes;
+
+        $query->exec();
+        while ($row = $query->next()) {
+            $nodes[] = $row;
         }
-        $qry->free();
-        return $ret;
+        $query->free();
+        return $nodes;
 
     }
 

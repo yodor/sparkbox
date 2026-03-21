@@ -11,19 +11,19 @@ class LimitExpression {
         $this->offset = null;
     }
 
-    public function setLimit(int $count, ?int $offset = null) : void
+    public function set(int $count, ?int $offset = null) : void
     {
         $this->count = $count;
         $this->offset = $offset;
     }
 
-    public function clear() : void
+    public function empty() : void
     {
         $this->count = null;
         $this->offset = null;
     }
 
-    public function hasLimit() : bool
+    public function isEmpty() : bool
     {
         return !is_null($this->count);
     }

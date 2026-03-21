@@ -78,12 +78,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
         return $this->lastID;
     }
 
-    /**
-     * Add value to this transactor values. Will be commited with the main transaction
-     * @param string $key
-     * @param $val
-     */
-    public function appendValue(string $key, $val) : void
+    public function appendValue(string $key, DBValue|string|float|int|bool|null $val) : void
     {
         $this->values[$key] = $val;
     }
@@ -99,7 +94,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
      * @param string $key
      * @param $val
      */
-    public function assignInsertValue(string $key, $val) : void
+    public function assignInsertValue(string $key, DBValue|string|float|int|bool|null $val) : void
     {
         $this->insert_values[$key] = $val;
     }
@@ -110,7 +105,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
      * @param $val
      * @return void
      */
-    public function assignUpdateValue(string $key, $val) : void
+    public function assignUpdateValue(string $key, DBValue|string|float|int|bool|null $val) : void
     {
         $this->update_values[$key] = $val;
     }

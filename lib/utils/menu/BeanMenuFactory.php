@@ -5,6 +5,8 @@ include_once("utils/menu/MenuItemList.php");
 class BeanMenuFactory
 {
 
+    public bool $enableBeanTranslations = false;
+
     /**
      * @var MenuItemList|null
      */
@@ -80,11 +82,26 @@ class BeanMenuFactory
         $menu = new MenuItemList();
         $this->fill($menu);
         $menu->setName(get_class($this->bean));
+
+
+        if ($this->enableBeanTranslations) {
+
+            $iterator = $menu->iterator();
+            while ($item = $iterator->next()) {
+                if (! ($item instanceof MenuItem)) continue;
+                $data = [$this->label_key => $item->getName()];
+                trbean($item->getID(), $this->label_key, $data, $this->bean->getTableName());
+                $item->setName($data[$this->label_key]);
+            }
+
+
+        }
         return $menu;
     }
 
     /**
      * @param MenuItemList $parent
+     * @param SelectQuery|null $qry
      * @return void
      * @throws Exception
      */
@@ -104,6 +121,7 @@ class BeanMenuFactory
         $qry->exec();
 
         while ($result = $qry->nextResult()) {
+
             $parent->append($this->createItem($result));
         }
 

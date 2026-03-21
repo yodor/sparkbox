@@ -2,28 +2,55 @@
 include_once("sql/SQLClause.php");
 include_once("objects/SparkList.php");
 include_once("sql/IBindingCollection.php");
+include_once("objects/SparkMap.php");
+include_once("sql/CanSetExternalBinding.php");
+include_once("sql/CanSetExternalBindingList.php");
+
 /**
  * SQL Where clause collection
  */
-class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
+class ClauseCollection extends SparkObject implements ISQLGet, IBindingCollection, IBindingModifier
 {
+
+    use CanSetExternalBinding;
+    use CanSetExternalBindingList;
+
+    protected SparkMap $elements;
 
     public function __construct()
     {
         parent::__construct();
+        $this->elements = new SparkMap();
     }
 
-    public function append(SparkObject $object) : void
+    public function __clone() : void
     {
-        if (!($object instanceof SQLClause)) throw new Exception("Incorrect object for this collection");
-
-        if ($this->contains($object)) {
-            Debug::ErrorLog("Clause already exists: " . $object->getSQL());
-            return;
-        }
-        parent::append($object);
+        $this->elements = clone $this->elements;
     }
 
+    public function iterator() : SparkIterator
+    {
+        return $this->elements->iterator();
+    }
+
+    public function append(SQLClause $object) : void
+    {
+        if ($this->elements->isSet($object->hash())) {
+            Debug::ErrorLog("Clause hash exists - replacing clause: " . $object->getSQL());
+        }
+
+        $this->elements->add($object->hash(), $object);
+    }
+
+    public function count() : int
+    {
+        return $this->elements->count();
+    }
+
+    public function clear() : void
+    {
+        $this->elements->clear();
+    }
 
     /**
      *
@@ -99,10 +126,11 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
 
     public function removeExpression(string $expression) : void
     {
-        foreach ($this->elements as $idx=>$clause) {
+        $iterator = $this->elements->iterator();
+        while ($clause = $iterator->next()) {
             if (!($clause instanceof SQLClause))continue;
             if (strcmp($clause->getExpression(), $expression)===0) {
-                unset($this->elements[$idx]);
+                $this->elements->remove($iterator->key());
             }
         }
 
@@ -110,20 +138,25 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
 
     public function copyTo(ClauseCollection $other) : void
     {
-        $iterator = $this->iterator();
+
+        $iterator = $this->elements->iterator();
         while($clause = $iterator->next()) {
-            $other->append($clause);
+
+            if (!($clause instanceof SQLClause))continue;
+            $other->append(clone $clause);
+
         }
+        $this->copyExternaBindingsTo($other);
 
     }
 
     public function getSQL() : string
     {
-        if ($this->count() <1) return "";
+        if ($this->elements->count() <1) return "";
         $result = "";
 
         $last_clause = NULL;
-        $iterator = $this->iterator();
+        $iterator = $this->elements->iterator();
         while ($object = $iterator->next()) {
             if (!($object instanceof SQLClause))continue;
             //skip gluing of first clause
@@ -141,7 +174,7 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
     {
         $result = array();
 
-        $iterator = $this->iterator();
+        $iterator = $this->elements->iterator();
         while ($object = $iterator->next()) {
             if (!($object instanceof ISQLBinding))continue;
             $bindingKey = $object->getBindingKey();
@@ -155,6 +188,9 @@ class ClauseCollection extends SparkList implements ISQLGet, IBindingCollection
             else throw new Exception("[$bindingKey] value is not SQLStatement::IsBoundSafe");
         }
 
+        SQLStatement::ReplaceKeyAppend($result, $this->externalBindings);
+
         return $result;
     }
+
 }

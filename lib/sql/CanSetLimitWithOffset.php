@@ -7,7 +7,7 @@ trait CanSetLimitWithOffset
 
     public function limit(int $count, ?int $offset=null) : void
     {
-        $this->_limit->setLimit($count, $offset);
+        $this->_limit->set($count, $offset);
     }
 
 }

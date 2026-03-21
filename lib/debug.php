@@ -40,7 +40,7 @@ final class Debug {
         $chainParts = [];
         foreach ($relevantTrace as $frame) {
             $file = isset($frame['file']) ? basename($frame['file']) : 'unknown';
-            $line = isset($frame['line']) ? $frame['line'] : '?';
+            $line = $frame['line'] ?? '?';
             $chainParts[] = "{$file}:{$line}";
         }
 

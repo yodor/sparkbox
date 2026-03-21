@@ -34,6 +34,9 @@ class ConfigBean extends DBTableBean
 
     public function setSection(string $section) : void
     {
+        $section = trim($section);
+        if (strlen($section)==0) throw new Exception("Section name cannot be empty");
+
         $this->section = $section;
     }
 
@@ -42,62 +45,117 @@ class ConfigBean extends DBTableBean
         return $this->section;
     }
 
-    public function get(string $key, mixed $default_value = "") : mixed
+    protected function assert_section() : void
     {
-        $ret = $default_value;
+        if (strlen($this->section)==0) throw new Exception("Section cannot be empty");
+    }
 
-        $query = $this->queryField("config_key", $key, 1, "config_val");
+
+    protected function getKeyID(string $key) : int
+    {
+        $this->assert_section();
+
+        $query = $this->query($this->key(), "config_key", "section");
         $query->stmt->where()->add("section", $this->section);
+        $query->stmt->where()->add("config_key", $key);
+        $query->stmt->limit(1);
+        $keyID = -1;
+        if ($query->count() == 0) return $keyID;
 
         $query->exec();
+        if ($result = $query->next()) {
+            $keyID = (int)$result[$this->key()];
+        }
+        $query->free();
 
-        if ($result = $query->nextResult()) {
-            $ret = $result->get("config_val");
-            $object = @unserialize($ret);
+        return $keyID;
+    }
+
+    protected function getValueKey(string $key) : mixed
+    {
+        $this->assert_section();
+
+        $query = $this->query($this->key(), "config_key", "config_val", "section");
+        $query->stmt->where()->add("section", $this->section);
+        $query->stmt->where()->add("config_key", $key);
+        $query->stmt->limit(1);
+
+        if ($query->count() == 0) return null;
+
+        $value = null;
+        $query->exec();
+        if ($result = $query->next()) {
+            $value = $result["config_val"];
+        }
+        $query->free();
+
+        return $value;
+    }
+
+    public function get(string $key, mixed $default_value = "") : mixed
+    {
+        $this->assert_section();
+
+        $value = $this->getValueKey($key);
+
+        if (is_null($value)) {
+            if (func_get_args()>1) {
+                return $default_value;
+            }
+            return null;
+        }
+
+        if (is_string($value)) {
+            $object = @unserialize($value);
             if (is_object($object)) {
-                $ret = $object;
+                $value = $object;
             }
         }
 
-        $query->free();
-
-        return $ret;
+        return $value;
     }
 
     public function clear(string $key) : void
     {
-
+        $this->assert_section();
         $this->deleteRef("config_key", $key);
 
     }
 
     /**
+     * Store value under key `$key`
+     * Serializing ISerializable objects
      * @param string $key
-     * @param string $val
+     * @param ISerializable|string|float|int|bool|null $val
      * @return void
      * @throws Exception
      */
-    public function set(string $key, ISerializable|string|float|int|bool|null $val) : void
+    public function set(string $key, ISerializable|string|float|int|bool|null $val, ?DBDriver $driver=null) : void
     {
+        $this->assert_section();
 
-        try {
+        $keyID = $this->getKeyID($key);
 
-            $this->db->transaction();
+        //Debug::ErrorLog("Setting value to key: $key using keyID: $keyID");
 
-            $this->deleteRef("config_key", $key, $this->db);
-            if ($val instanceof ISerializable) {
-                $val = serialize($val);
-            }
-            $data = array("config_key" => $key, "config_val" => $val, "section" => $this->section);
-            $this->insert($data, $this->db);
-
-            $this->db->commit();
+        $storeValue = $val;
+        if ($val instanceof ISerializable) {
+            Debug::ErrorLog("Serializing value of class: ".get_class($val));
+            $storeValue = serialize($val);
         }
-        catch (Exception $e) {
-            Debug::ErrorLog("Exception setting value for key='$key': ".$e->getMessage());
-            $this->db->rollback();
-            throw $e;
+
+        $data = array("config_key" => $key, "config_val" => $storeValue, "section" => $this->section);
+        if ($keyID > 0) {
+            Debug::ErrorLog("Key[$keyID] exists - doing update");
+            //do update
+            $this->update($keyID, $data, $driver);
         }
+        else {
+            Debug::ErrorLog("Key ID not found - doing insert");
+            //do insert
+            $this->insert($data, $driver);
+        }
+
 
     }
 

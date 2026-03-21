@@ -39,28 +39,21 @@ class HeaderCell extends TableCell implements IGETConsumer
 
         $url = SparkPage::Instance()->currentURL();
         $url->add(new URLParameter(Paginator::KEY_ORDER_BY, $this->column->getName()));
-        $url->add(new URLParameter(Paginator::KEY_ORDER_DIR, "ASC"));
+        $url->add(new URLParameter(Paginator::KEY_ORDER_DIR, OrderDirection::ASC->value));
 
         if (Spark::strcmp_isset(Paginator::KEY_ORDER_BY, $this->column->getName())) {
 
             $this->orderDirection->setRenderEnabled(true);
 
-            //show the arrow link to change order direction
-            if (Spark::strcmp_isset(Paginator::KEY_ORDER_DIR, "ASC")) {
-
-                //current list is ordered ASC show up arrow and href with opposite direction
-                $url->get(Paginator::KEY_ORDER_DIR)->setValue("DESC");
-                $this->orderDirection->setAttribute("direction", "ASC");
-                $this->orderDirection->setURL($url);
-
+            $direction = OrderDirection::tryFrom($_GET[Paginator::KEY_ORDER_DIR]??"");
+            if (!isset($direction)) {
+                $direction = OrderDirection::ASC;
             }
-            else {
 
-                $url->get(Paginator::KEY_ORDER_DIR)->setValue("ASC");
-                $this->orderDirection->setAttribute("direction", "DESC");
-                $this->orderDirection->setURL($url);
-
-            }
+            //current list is ordered ASC show up arrow and href with opposite direction
+            $url->get(Paginator::KEY_ORDER_DIR)->setValue($direction->opposite()->value);
+            $this->orderDirection->setAttribute("direction", $direction->value);
+            $this->orderDirection->setURL($url);
 
         }
         else {

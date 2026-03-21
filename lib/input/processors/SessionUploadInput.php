@@ -182,7 +182,7 @@ class SessionUploadInput extends InputProcessor
         if (is_array($value)) {
 
             if (count($value) > 1) {
-                throw new Exception("Not possible to transact array of objects during to the main transaction row");
+                throw new Exception("Not possible to transact array of objects to the main transaction row");
             }
             if (count($value) < 1) {
                 Debug::ErrorLog("Array count is 0. Transacting NULL value to the main transaction row");

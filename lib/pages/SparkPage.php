@@ -382,5 +382,3 @@ JS;
         return $this->parameter_names;
     }
 }
-
-?>

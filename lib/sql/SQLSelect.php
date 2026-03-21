@@ -158,17 +158,8 @@ class SQLSelect extends SQLStatement
         $other->copyOrderTo($this->orderParameters);
 
         //Limit can not be combined. During pagination the main select is combined with the paged
-//        if ($other->isLimited()) {
-//            //do not set pagination limit if there is already limit in the select set
-//            if ($this->isLimited()) {
-//
-//            }
-//            else {
-//                $this->limit($other->count, $other->offset);
-//            }
-//        }
 
-        SQLStatement::replaceKeyAppend($this->externalBindings, $other->getBindings());
+        SQLStatement::ReplaceKeyAppend($this->externalBindings, $other->getBindings());
     }
 
     public function combineWith(SQLSelect $other) : SQLSelect
@@ -195,7 +186,7 @@ class SQLSelect extends SQLStatement
 
         $sel = SQLSelect::Table(" (".$tsel->getSQL().") AS $as_name ");
 
-        SQLStatement::replaceKeyAppend($sel->externalBindings, $this->getBindings());
+        SQLStatement::ReplaceKeyAppend($sel->externalBindings, $this->getBindings());
 
         return $sel;
     }

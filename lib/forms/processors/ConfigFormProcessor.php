@@ -4,6 +4,8 @@ include_once("forms/processors/FormProcessor.php");
 class ConfigFormProcessor extends FormProcessor implements IValueTransactor
 {
 
+    protected ?DBDriver $driver = null;
+
     public function __construct()
     {
         parent::__construct();
@@ -17,23 +19,35 @@ class ConfigFormProcessor extends FormProcessor implements IValueTransactor
 
         $input_names = $form->inputNames();
 
-        foreach ($input_names as $name) {
-            $input = $form->getInput($name);
-            $input->getProcessor()->transactValue($this);
+        $this->driver = DBConnections::Driver();
+        try {
+            $this->driver->transaction();
+
+            foreach ($input_names as $name) {
+                $input = $form->getInput($name);
+                $value = $input->getValue();
+                //Images are serialized already and are transacted as serialized strings
+                //only single StorageObject is supported?
+                $input->getProcessor()->transactValue($this);
+            }
+
+            $this->driver->commit();
         }
+        catch (Exception $e) {
+            Debug::ErrorLog("Transaction failed: ".$e->getMessage());
+            $this->driver->rollback();
+            throw $e;
+        }
+
     }
 
-    /**
-     * Add value to this transactor values. Will be commited with the main transaction
-     * @param string $key
-     * @param $value
-     */
-    public function appendValue(string $key, $val) : void
+
+    public function appendValue(string $key, float|bool|int|string|null $val): void
     {
-        if ($val instanceof StorageObject) {
-            $val = serialize($val);
+        if ($this->bean instanceof ConfigBean) {
+            $this->bean->set($key, $val, $this->driver);
+            return;
         }
-        $this->bean->set($key, $val);
+        throw new Exception("Incorrect bean - expecting ConfigBean");
     }
-
 }

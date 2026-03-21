@@ -28,13 +28,14 @@ trait CanSetColumnValue
      *   $update->bind(":amount", $amount);
      *
      * @param string $name
-     * @param array|string|float|int|bool|null $value
+     * @param string|float|int|bool|null $value
      * @return void
      * @throws Exception
      */
-    public function set(string $name, array|string|float|int|bool|null $value): void
+    public function set(string $name, string|float|int|bool|null $value): void
     {
-        $column = new SQLColumn($name, $value);
+        $column = new SQLColumn($name);
+        $column->setValue($value);
         $this->fieldset->setColumn($column);
     }
 }

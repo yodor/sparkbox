@@ -449,10 +449,7 @@ final class Spark {
     }
     final static public function GetObject(string $name, object|array|null $default=null) : object|array|null
     {
-        if (isset(Spark::$defines[$name])) {
-            return Spark::$defines[$name];
-        }
-        else return $default;
+        return Spark::$defines[$name] ?? $default;
     }
 
     /**
@@ -474,10 +471,7 @@ final class Spark {
 
     final static public function Get(string $name, string $default="") : string|float|int|bool
     {
-        if (isset(Spark::$defines[$name])) {
-            return Spark::$defines[$name];
-        }
-        else return $default;
+        return Spark::$defines[$name] ?? $default;
 
     }
     final static public function GetBoolean(string $name) : bool

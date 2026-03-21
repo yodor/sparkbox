@@ -77,7 +77,7 @@ class TranslatePhraseResponder extends JSONResponder
     protected function _fetch(JSONResponse $response) : void
     {
 
-        $qry = $this->bean->queryLanguageID($this->langID);
+        $qry = $this->bean->queryPhrase($this->langID);
 
         $qry->stmt->where()->add("st.textID", $this->textID);
 
@@ -93,7 +93,7 @@ class TranslatePhraseResponder extends JSONResponder
             $response->phrase = $data["phrase"];
             $response->translation = $data["translation"];
         }
-
+        $qry->free();
 
         $response->trID = $this->trID;
         $response->langID = $this->langID;

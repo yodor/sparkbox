@@ -129,6 +129,11 @@ class Translator implements IRequestProcessor, IGETConsumer
         return $this->enabled;
     }
 
+    /**
+     * If TRANSLATOR_ENABLED we get initialized
+     * @return void
+     * @throws Exception
+     */
     public function initialize() : void
     {
         Debug::ErrorLog("Initializing translator...");
@@ -146,31 +151,21 @@ class Translator implements IRequestProcessor, IGETConsumer
             Debug::ErrorLog(Translator::KEY_LANGUAGE_ID.": ".$langID);
         }
 
-
-        //no session or cookie set
         if ($langID > 0) {
-
             try {
                 $this->loadLanguageID($langID);
-            }
-            catch (Exception $e) {
-                Debug::ErrorLog("Session/Cookies contain unavailable language ID - Setting DEFAULT_LANGUAGE language");
+            } catch (Exception $e) {
+                Debug::ErrorLog("Cookies reference unavailable language ID");
                 $this->loadDefaultLanguage();
             }
         }
         else {
+            Debug::ErrorLog("Cookies does not have language ID yet");
             $this->loadDefaultLanguage();
         }
 
     }
 
-    protected function loadLanguageID(int $langID) : void
-    {
-        Debug::ErrorLog("Loading ".Translator::KEY_LANGUAGE_ID.": ".$langID);
-        $this->language = $this->languages->getByID($langID, "lang_code", "language");
-        $this->langID = $langID;
-        $this->storeLanguage();
-    }
 
     public function getParameterNames(): array
     {
@@ -195,7 +190,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             $langID = -1;
 
             if (isset($_GET[Translator::KEY_LANGUAGE])) {
-                $language = Spark::SanitizeInput($_GET[Translator::KEY_LANGUAGE]);
+                $language = substr($_GET[Translator::KEY_LANGUAGE],0, 32);
             }
             if (isset($_GET[Translator::KEY_LANGUAGE_ID])) {
                 $langID = (int)$_GET[Translator::KEY_LANGUAGE_ID];
@@ -213,7 +208,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             $url->remove(Translator::KEY_CHANGE_LANGUAGE);
             $url->remove(Translator::KEY_LANGUAGE_ID);
             $url->remove(Translator::KEY_LANGUAGE);
-            Debug::ErrorLog("Redirecting to: ".$url);
+            Debug::ErrorLog("Language change redirect: ".$url);
 
             header("Location: ".$url);
             exit;
@@ -221,52 +216,74 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     }
 
+    protected function loadLanguageID(int $langID) : void
+    {
+        Debug::ErrorLog("Loading ".Translator::KEY_LANGUAGE_ID.": ".$langID);
+        $this->language = $this->languages->getByID($langID, "lang_code", "language");
+        $this->langID = $langID;
+        $this->storeLanguage();
+    }
+
     protected function changeLanguage(string $language, int $langID) : void
     {
-        $qry = $this->languages->queryFull();
-        $qry->stmt->where()->add("langID", $langID);
-        $qry->stmt->where()->add("language", $language);
-        $qry->exec();
-        if ($data = $qry->next()) {
-            $this->language = $data;
-            $this->langID = $data[$this->languages->key()];
+        $query = $this->languages->queryFull();
+
+        $doQuery = false;
+        if ($langID>0) {
+            $query->stmt->where()->add("langID", $langID);
+            $doQuery = true;
+        }
+        if (strlen(trim($language))>0) {
+            $query->stmt->where()->add("language", $language);
+            $doQuery = true;
+        }
+
+        if ($doQuery) {
+
+            if ($query->count() == 0) {
+                Debug::ErrorLog("Requested language is not found");
+                $this->loadDefaultLanguage();
+                return;
+            }
+
+            $query->exec();
+            if ($data = $query->next()) {
+                $this->language = $data;
+                $this->langID = (int)$data[$this->languages->key()];
+            }
+            $query->free();
+
             $this->storeLanguage();
         }
         else {
-            Session::SetAlert("Request language not found");
+            $this->loadDefaultLanguage();
         }
-    }
 
+    }
 
     protected function loadDefaultLanguage() : void
     {
-        Debug::ErrorLog("Loading default language");
+        Debug::ErrorLog("Loading default configured language");
+
         if (defined("DEFAULT_LANGUAGE")) {
             //query default language from define
-            $qry = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1, "lang_code");
-            $qry->exec();
-            if ($data = $qry->next()) {
-                $this->language = $data;
-                $this->langID = $data[$this->languages->key()];
-            }
-            else {
-                throw new Exception("DEFAULT_LANGUAGE is set in config but the LanguagesBean does not contain this language");
-            }
+            $query = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1, "lang_code");
+            if ($query->count() == 0) throw new Exception("Configured DEFAULT_LANGUAGE is not available in LanguagesBean");
         }
         else {
             //query the first language
-            $qry = $this->languages->queryFull();
-            $qry->stmt->limit(1);
-            $qry->stmt->order($this->languages->key(), OrderDirection::ASC);
-            $qry->exec();
-            if ($data = $qry->next()) {
-                $this->language = $data;
-                $this->langID = $data[$this->languages->key()];
-            }
-            else {
-                throw new Exception("TRANSLATOR_ENABLED is set in config but LanguagesBean is empty");
-            }
+            $query = $this->languages->queryFull();
+            $query->stmt->limit(1);
+            $query->stmt->order($this->languages->key(), OrderDirection::ASC);
+            if ($query->count() == 0) throw new Exception("TRANSLATOR_ENABLED is set in config but LanguagesBean is empty");
         }
+
+        $query->exec();
+        if ($data = $query->next()) {
+            $this->language = $data;
+            $this->langID = $data[$this->languages->key()];
+        }
+        $query->free();
 
         $this->storeLanguage();
 
@@ -287,13 +304,12 @@ class Translator implements IRequestProcessor, IGETConsumer
             $where->add("field_name", $field_name);
             $where->add("table_name", $tableName);
             $where->add("bean_id", $id);
-
             $qry->stmt->limit(1);
             $qry->exec();
-
             if ($result = $qry->next()) {
                 $data[$field_name] = $result["translated"];
             }
+            $qry->free();
         }
         catch (Exception $e) {
             Debug::ErrorLog("Unable to translate: ".$e->getMessage());
@@ -306,50 +322,49 @@ class Translator implements IRequestProcessor, IGETConsumer
 
         if (strlen(trim($phrase)) == 0) return $phrase;
 
+        $translated = $phrase;
+
         try {
+
             $phrase_hash = Spark::Hash($phrase);
 
-            $qry = $this->translated_phrases->queryLanguageID($this->langID);
+            $qry = $this->translated_phrases->queryPhrase($this->langID);
             $qry->stmt->where()->add("hash_value", $phrase_hash);
             $qry->stmt->limit(1);
-            //$qry->stmt->setMeta("QueryPhrase");
 
+            if ($qry->count() == 0) {
+                $this->capturePhrase($phrase, $phrase_hash);
+                return $phrase;
+            }
             $qry->exec();
 
-            $translated = "";
-
             if ($data = $qry->nextResult()) {
-                //phrase is already captured - check if translation exists for the current langID
-                $textID = (int)$data->get("textID");
-
+                //translation is done for $this->langID ?
                 if ((int)$data->get("trID")>0) {
                     //return translated version
                     $translated = $data->get("translation");
                 }
-                else {
-                    //translation not done yet
-                    $translated = $phrase;
-                }
             }
             $qry->free();
-            if ($translated) return $translated;
-
-            //Capture new phrase. Insert into SiteTextsBean
-            try {
-                $phrase_data = array("value"=>$phrase, "hash_value"=>$phrase_hash);
-                $trID = $this->phrases->insert($phrase_data);
-                Debug::ErrorLog("Captured new phrase with trID: $trID");
-            }
-            catch (Exception $ex) {
-                throw new Exception("Failed capturing new phrase [$phrase_hash]: ". $ex->getMessage());
-            }
 
         }
         catch (Exception $e) {
             Debug::ErrorLog("Error: ".$e->getMessage());
         }
 
-        return $phrase;
+        return $translated;
+    }
+
+    protected function capturePhrase(string $phrase, string $phrase_hash) : void
+    {
+        try {
+            $phrase_data = array("value"=>$phrase, "hash_value"=>$phrase_hash);
+            $trID = $this->phrases->insert($phrase_data);
+            Debug::ErrorLog("Captured new phrase with trID: $trID");
+        }
+        catch (Exception $ex) {
+            throw new Exception("Failed capturing new phrase [$phrase_hash]: ". $ex->getMessage());
+        }
     }
 
     /**

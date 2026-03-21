@@ -135,7 +135,7 @@ class InputForm extends SparkObject implements IBeanEditor
 
     /**
      * Associative array with key = DataInput name and value = DataInput object
-     * @var array
+     * @var array<string, DataInput>
      */
     protected array $inputs = array();
 
@@ -560,26 +560,28 @@ class InputForm extends SparkObject implements IBeanEditor
 
             if ($input->skip_search_filter_processing) continue;
 
-            $val = $input->getValue();
+            $this->appendClause($input, $where, $glue);
 
-            if ($val > -1 && strcmp($val, "") !== 0) {
-
-                $field_name = str_replace("|", ".", $name);
-
-                $clause = $this->clauseValue($field_name, $val);
-                $clause->setGlue($glue);
-                $where->append($clause);
-
-            }
         }
         return $where;
     }
 
-    protected function clauseValue(string $field_name, string $val): SQLClause
+    protected function appendClause(DataInput $input, ClauseCollection $collection, string $glue = SQLClause::DEFAULT_GLUE): void
     {
-        $clause = new SQLClause();
-        $clause->setExpression($field_name, $val);
-        return $clause;
+        $value = $input->getValue();
+        $name = $input->getName();
+
+        if ($value > -1 && strcmp($value, "") !== 0) {
+
+            $field_name = str_replace("|", ".", $name);
+
+            $clause = new SQLClause();
+            $clause->setExpression($field_name, $value);
+            $clause->setGlue($glue);
+            $collection->append($clause);
+
+        }
+
     }
 
     /**

@@ -27,9 +27,9 @@ abstract class OrderedDataBean extends DBTableBean
             parent::delete($id, $db);
 
             $update = new SQLUpdate($this->select);
-            $update->setExpression("position", "position - 1");
+            $update->column("position")->set("position - 1");
             $update->where()->addExpression("position > :pos");
-            $update->bind(":pos", $pos);
+            $update->where()->bind(":pos", $pos);
 
             $db->query($update)->free();
 
@@ -63,15 +63,15 @@ abstract class OrderedDataBean extends DBTableBean
         $code = function (DBDriver $db) use ($id, $pos, $new_pos) {
 
             $update = new SQLUpdate($this->select);
-            $update->setExpression("position", "position - 1");
+            $update->column("position")->set("position - 1");
             $update->where()->addExpression("position > :pos");
-            $update->bind(":pos", $pos);
+            $update->where()->bind(":pos", $pos);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
-            $update->setExpression("position", "position + 1");
+            $update->column("position")->set("position + 1");
             $update->where()->addExpression("position >= :new_pos");
-            $update->bind(":new_pos", $new_pos);
+            $update->where()->bind(":new_pos", $new_pos);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
@@ -97,9 +97,9 @@ abstract class OrderedDataBean extends DBTableBean
 
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
-            $update->setExpression("position", "position + 1");
+            $update->column("position")->set("position + 1");
             $update->where()->addExpression("position < :pos");
-            $update->bind(":pos", $pos);
+            $update->where()->bind(":pos", $pos);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
@@ -126,9 +126,9 @@ abstract class OrderedDataBean extends DBTableBean
 
         $code = function (DBDriver $db) use ($id, $pos, $max_pos) {
             $update = new SQLUpdate($this->select);
-            $update->setExpression("position", "position - 1");
+            $update->column("position")->set("position - 1");
             $update->where()->addExpression("position > :pos");
-            $update->bind(":pos", $pos);
+            $update->where()->bind(":pos", $pos);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
@@ -161,7 +161,7 @@ abstract class OrderedDataBean extends DBTableBean
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
-            $update->setExpression("position", " position + 1 ");
+            $update->column("position")->set("position + 1");
             $update->where()->add("position", ($pos - 1));
             $db->query($update)->free();
 
@@ -194,7 +194,7 @@ abstract class OrderedDataBean extends DBTableBean
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
-            $update->setExpression("position", "position - 1");
+            $update->column("position")->set("position - 1");
             $update->where()->add("position", ($pos + 1));
             $db->query($update)->free();
 
@@ -215,6 +215,7 @@ abstract class OrderedDataBean extends DBTableBean
 
         $selectMax = clone $this->select;
         $selectMax->setAliasExpression(" MAX(position) ", "max_position");
+        $selectMax->setMeta("GET_MAX");
 
         $query = new SelectQuery($selectMax);
         $query->exec();

@@ -35,35 +35,43 @@ class KeywordSearchForm extends InputForm
         return $this->queryColumns;
     }
 
-    protected function clauseValue(string $key, string $val): SQLClause
+    protected function appendClause(DataInput $input, ClauseCollection $collection, string $glue = SQLClause::DEFAULT_GLUE): void
     {
-        if (strcmp($key, "keyword")!==0) {
-            return parent::clauseValue($key, $val);
+        if (strcmp($input->getName(), "keyword")!==0) {
+            parent::appendClause($input, $collection, $glue);
+            return;
         }
 
-        $clause = new SQLClause();
+        $value = $input->getValue();
+
+        if (strlen(trim($value))<1) {
+            return;
+        }
 
         //split input into space delimited keywords
-        $allWords = explode(" ", $val);
+        $allWords = explode(" ", $value);
+        if (count($allWords)<1) return;
+
+        $clause = new SQLClause();
 
         $resultAll = array();
 
         foreach ($allWords as $idx => $keyword) {
             $result = array();
             foreach ($this->queryColumns as $idx1 => $column) {
-                $result[] = " $column LIKE :keyword ";
+                $bindingKey = ":keyword_{$idx}_{$column}";
+                $result[] = " $column LIKE $bindingKey";
+                Debug::ErrorLog("Adding custom binding to clause: $bindingKey => %$keyword%");
+                $collection->bind($bindingKey, "%$keyword%");
             }
             $resultAll[] = "( " . implode(" OR ", $result) . " )";
         }
         $expr = "( " . implode(" AND ", $resultAll) . " )";
 
-        //'%$keyword%'
         //set expression only - no automatic binding key, clear hasValue and operator
-        //bind the value
-        //ie getSQL for this clause return ( $column LIKE :keyword) and during binding collection :keyword=>%$keyword%
         $clause->setExpression($expr);
-        $clause->bind(":keyword", "%$keyword%");
-        return $clause;
+
+        $collection->append($clause);
 
     }
 

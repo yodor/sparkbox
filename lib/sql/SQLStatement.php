@@ -7,14 +7,16 @@ include_once("sql/SQLColumnSet.php");
 include_once("sql/ClauseCollection.php");
 include_once("sql/FromExpression.php");
 include_once("sql/LimitExpression.php");
+include_once("sql/CanSetExternalBinding.php");
 
 abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModifier
 {
+
+    use CanSetExternalBinding;
+
     protected ?LimitExpression $_limit = null;
 
     protected ?FromExpression $_from = null;
-
-    protected array $externalBindings = array();
 
     protected ?SQLColumnSet $fieldset = null;
 
@@ -51,9 +53,12 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
         //copy the where clause collection
         if ($other) {
             $this->_from = clone $other->_from;
+
+            //copy whereset bindings and whereset external bindings too
             $other->where()->copyTo($this->whereset);
-            //copy bindings
-            $this->externalBindings = $other->externalBindings;
+
+            //copy statement bindings
+            $other->copyExternaBindingsTo($this);
         }
 
         $this->_limit = new LimitExpression();
@@ -65,6 +70,8 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
         $this->fieldset = clone $this->fieldset;
         $this->_from = clone $this->_from;
         $this->_limit = clone $this->_limit;
+
+        //$this->externalBindings = clone $this->externalBindings;
     }
 
     public function where(): ClauseCollection
@@ -86,9 +93,12 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     {
 
         $result = array();
-        $this->replaceKeyAppend($result, $this->fieldset->getBindings());
-        $this->replaceKeyAppend($result, $this->whereset->getBindings());
-        $this->replaceKeyAppend($result, $this->externalBindings);
+
+        SQLStatement::ReplaceKeyAppend($result, $this->fieldset->getBindings());
+        SQLStatement::ReplaceKeyAppend($result, $this->whereset->getBindings());
+
+        //CanSetExternalBindings
+        SQLStatement::ReplaceKeyAppend($result, $this->externalBindings);
 
         return $result;
     }
@@ -105,9 +115,9 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
      * @return void
      * @throws Exception throws exception if value is not bound safe
      */
-    protected static function replaceKeyAppend(array& $target, array $bindings) : void
+    public static function ReplaceKeyAppend(array & $target, array $bindings) : void
     {
-//        Debug::ErrorLog("Appending Bindings: ", $bindings);
+        //Debug::ErrorLog("Appending Bindings: ", $bindings);
         foreach ($bindings as $bindingKey => $bindingValue) {
             if (SQLStatement::IsBindingValueSafe($bindingValue)) {
                 $target[$bindingKey] = $bindingValue;
@@ -116,59 +126,6 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
         }
     }
 
-    /**
-     * Copy all bindings from $source and set as external bindings to $target
-     *
-     * @param SQLStatement $target
-     * @param SQLStatement $source
-     * @return void
-     * @throws Exception
-     */
-    public static function CopyBindings(SQLStatement $target, SQLStatement $source) : void
-    {
-        Debug::ErrorLog("Copying bindings for SQLStatement");
-        SQLStatement::replaceKeyAppend($target->externalBindings, $source->getBindings());
-    }
-
-    public function bind(string $bindingKey, string|int|float|bool|null $value) : void
-    {
-        if (!$bindingKey) throw new Exception("bindingKey is empty");
-        $this->externalBindings[$bindingKey] = $value;
-    }
-
-    /**
-     * Bind values and return unique binding key for each value - comma separated.
-     *
-     * Bind each value from the $list array to the internal statement bindings and return string suitable for using
-     * inside IN and NOT IN SQL constructs.
-     *
-     * For each element a binding key is constructed like this : "L_".Spark::Hash($value)."_".$idx
-     *
-     * Return all binding keys comma separated.
-     *
-     * * \$keep_list = $delete->bindList([1,2,3,4,5]);
-     * * \$delete->where()->addExpression("key NOT IN ($keep_list)");
-     *
-     * @param array<string|float|int|bool|null> $list
-     * @return string
-     * @throws Exception
-     */
-    public function bindList(array $list) : string
-    {
-        if (count($list) < 1) throw new Exception("list is empty");
-
-        $idx = 0;
-        $keysList = [];
-        foreach ($list as $value) {
-            if (!SQLStatement::IsBindingValueSafe($value)) throw new Exception("List element with incorrect binding value");
-            $bindingKey = SQLStatement::FormatBindingKey("L_".Spark::Hash($value)."_".$idx);
-            $keysList[] = $bindingKey;
-            $this->externalBindings[$bindingKey] = $value;
-            $idx++;
-        }
-
-        return implode(",", $keysList);
-    }
 
     /**
      * Format input to be used as a bindingKey by prepending it with ":"
@@ -191,6 +148,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
 
         return ":" . $safeName;
     }
+
 
     /**
      * Validates whether the provided string is a valid PDO named parameter binding key.

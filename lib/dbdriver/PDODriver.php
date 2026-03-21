@@ -29,7 +29,10 @@ class PDODriver extends DBDriver
             PDO::ATTR_AUTOCOMMIT           => true,
 
             // allow reusing of named parameters
-            PDO::ATTR_EMULATE_PREPARES   => true,
+            //PDO::ATTR_EMULATE_PREPARES   => true,
+
+            PDO::ATTR_EMULATE_PREPARES   => false,
+            PDO::ATTR_STRINGIFY_FETCHES  => false,
 
             // turn off multi-statement
             PDO::MYSQL_ATTR_MULTI_STATEMENTS => false,
@@ -42,17 +45,6 @@ class PDODriver extends DBDriver
         try {
 
             $this->conn = new PDO($dsn, $user, $pass, $options);
-
-            //$this->conn->set_charset("utf8");
-            //$this->conn->autocommit(FALSE);
-
-//            $this->conn->exec("SET AUTOCOMMIT = 0");
-//            $this->conn->exec("SET NAMES 'UTF8' COLLATE 'utf8_general_ci' ");
-//            $this->conn->exec("SET collation_connection = 'utf8_general_ci' ");
-//
-//            $this->conn->exec("SET character_set_results = 'utf8'");
-//            $this->conn->exec("SET character_set_connection = 'utf8'");
-//            $this->conn->exec("SET character_set_client = 'utf8'");
 
             SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::OPENED));
 

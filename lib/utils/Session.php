@@ -131,12 +131,7 @@ class Session
 
     public static function GetCookie(string $key, string $default = "") : string
     {
-        if (isset($_COOKIE[$key])) {
-            return $_COOKIE[$key];
-        }
-        else {
-            return $default;
-        }
+        return $_COOKIE[$key] ?? $default;
     }
 
     public static function HaveCookie(string $key) : bool

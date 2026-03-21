@@ -165,7 +165,7 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $this->numResults = $result->fetchResult()->get("total_results");
         $result->free();
 
-        Debug::ErrorLog("SQL_CALC_FOUND_ROWS: ".$this->numResults);
+//        Debug::ErrorLog("SQL_CALC_FOUND_ROWS: ".$this->numResults);
 
         return $this->numResults;
     }

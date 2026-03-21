@@ -102,10 +102,10 @@ class DatedBean extends DBTableBean
         $query = $this->query($this->key(), ...$columns);
 
         $query->stmt->where()->addExpression("MONTH($this->date_column) = :month");
-        $query->stmt->bind(":month", $month);
+        $query->stmt->where()->bind(":month", $month);
 
         $query->stmt->where()->addExpression("YEAR($this->date_column) = :year");
-        $query->stmt->bind(":year", $year);
+        $query->stmt->where()->bind(":year", $year);
 
         $this->setDefaultOrder($query->stmt);
 
@@ -151,7 +151,7 @@ class DatedBean extends DBTableBean
         $query = $this->query($this->key());
         $query->stmt->setAliasExpression("MONTH($this->date_column)", "month");
         $query->stmt->where()->addExpression("YEAR($this->date_column) = :year");
-        $query->stmt->bind(":year", $year);
+        $query->stmt->where()->bind(":year", $year);
         $this->setDefaultOrder($query->stmt);
         $query->stmt->group_by = " MONTH($this->date_column) ASC ";
 

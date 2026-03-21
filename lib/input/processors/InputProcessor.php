@@ -294,6 +294,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
         if (is_array($value)) throw new Exception("Unable to transact array as value");
         if (is_object($value)) throw new Exception("Unable to transact object as value");
+        //TODO: check if object implements ISerializable and serialize
 
         if ((is_null($value) || strlen($value) == 0) && $this->transact_empty_string_as_null) {
             $value = NULL;
@@ -318,6 +319,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
                     $transactor->appendValue($key, $data[$key]);
                 }
             }
+            $iterator->free();
         }
 
     }

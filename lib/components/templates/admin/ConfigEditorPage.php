@@ -74,6 +74,11 @@ class ConfigEditorPage extends AdminPageTemplate
             header("Location: " . $_SERVER['PHP_SELF']);
             exit;
         }
+        else if ($this->processor->getStatus() == IFormProcessor::STATUS_ERROR) {
+            Session::SetAlert("Update failed: ".$this->processor->getMessage());
+            //header("Location: " . $_SERVER['PHP_SELF']);
+            //exit;
+        }
     }
 
     protected function initPageActions(): void

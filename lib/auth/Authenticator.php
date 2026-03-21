@@ -270,8 +270,8 @@ abstract class Authenticator
     protected function updateLastSeen(int $userID) : void
     {
         $update = new SQLUpdate($this->bean->select());
-        $update->setExpression("counter", "counter + 1");
-        $update->setExpression("last_active" , "CURRENT_TIMESTAMP");
+        $update->column("counter")->set("counter + 1");
+        $update->column("last_active")->set("CURRENT_TIMESTAMP");
         $update->where()->add($this->bean->key(), $userID);
 
         $query = new DBQuery();

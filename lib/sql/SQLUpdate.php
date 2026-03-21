@@ -1,7 +1,7 @@
 <?php
 include_once("sql/SQLStatement.php");
 include_once("sql/CanSetColumnValue.php");
-include_once("sql/CanSetColumnNameExpression.php");
+include_once("sql/CanAccessColumnsDirectly.php");
 
 /**
  * Class SQLUpdate
@@ -11,7 +11,7 @@ include_once("sql/CanSetColumnNameExpression.php");
 class SQLUpdate extends SQLStatement
 {
     use CanSetColumnValue;
-    use CanSetColumnNameExpression;
+    use CanAccessColumnsDirectly;
     use CanSetLimit;
 
     static public function Table(string $tableExpr) : SQLUpdate
@@ -97,13 +97,14 @@ class SQLUpdate extends SQLStatement
         }
 
         // 2. Merge bindings from the WHERE clause.
-        $this->replaceKeyAppend($bindings, $this->whereset->getBindings());
+        $this->ReplaceKeyAppend($bindings, $this->whereset->getBindings());
 
         // 3. Merge manual external bindings from bind() calls.
-        $this->replaceKeyAppend($bindings, $this->externalBindings);
+        $this->ReplaceKeyAppend($bindings, $this->externalBindings);
 
         return $bindings;
     }
+
 
 
 }

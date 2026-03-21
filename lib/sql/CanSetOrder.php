@@ -67,7 +67,12 @@ trait CanSetOrder {
         return $sql;
     }
 
-    protected function copyOrderTo(array $other) : void
+    /**
+     * TODO reference of array
+     * @param array $other
+     * @return void
+     */
+    protected function copyOrderTo(array &$other) : void
     {
         foreach ($this->orderParameters as $name=> $value) {
             if ($value instanceof OrderColumn) {

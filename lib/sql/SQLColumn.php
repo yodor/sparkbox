@@ -2,7 +2,7 @@
 include_once("sql/ISQLGet.php");
 include_once("sql/ISQLBinding.php");
 
-class SQLColumn implements ISQLGet, ISQLBinding
+class SQLColumn implements ISQLGet, ISQLBinding, IBindingModifier
 {
     protected string $prefix = "";
 
@@ -29,24 +29,42 @@ class SQLColumn implements ISQLGet, ISQLBinding
      * @param array|string|float|int|bool|null $value
      * @throws Exception
      */
-    public function __construct(string $name, array|string|float|int|bool|null $value = null)
+    public function __construct(string $name)
     {
         if (strlen(trim($name))<1) throw new Exception("SQLColumn name can not be empty");
-
         $this->name = trim($name);
-
-        if (func_num_args() >= 2) {
-            //value is provided - create binding key and store the value even if it is empty string
-            $this->value = $value;
-            $this->bindingKey = SQLStatement::FormatBindingKey($this->name);
-            $this->hasValue = true;
-        }
-
+        $this->bindingKey = "";
+        $this->hasValue = false;
+        $this->value = null;
+        $this->expression = "";
+        $this->alias = "";
+        $this->prefix = "";
     }
 
     public function getName() : string
     {
         return $this->name;
+    }
+
+    //disable expression
+    public function createArray() : void
+    {
+        $this->value = [];
+        $this->nameBindEnable();
+    }
+
+    protected function nameBindEnable() : void
+    {
+        $this->bindingKey = SQLStatement::FormatBindingKey($this->name);
+        $this->hasValue = true;
+        $this->expression = "";
+    }
+
+    protected function nameBindDisable() : void
+    {
+        $this->bindingKey = "";
+        $this->hasValue = false;
+        $this->value = null;
     }
 
     /**
@@ -128,28 +146,56 @@ class SQLColumn implements ISQLGet, ISQLBinding
      * 1. Disables automatic PDO parameter binding by clearing the bindingKey.
      * 2. Clears any previously set literal value.
      * 3. Sets the raw SQL expression (e.g., "NOW()", "rgt + 2").
-     * 4. Ensures the column has a valid name or alias for SQL generation.
      *
      * @param string $expression The raw SQL fragment (e.g., "COUNT(*)", "price + 10").
-     * @param string $alias_name Optional alias or column name.
+     * @param string $alias_name Optional alias for column name.
      * @return void
-     * @throws Exception If expression is empty or if no identity (name/alias) exists.
+     * @throws Exception If expression is empty
      */
-    public function setExpression(string $expression, string $alias_name = "") : void
+    public function setExpression(string $expression) : void
     {
         $expression = trim($expression);
-        $alias_name = trim($alias_name);
-
         if (strlen(trim($expression))<1) throw new Exception("SQLColumn expression can not be empty");
 
         $this->expression = $expression;
-        $this->bindingKey = "";
-        $this->value = null;
-        $this->hasValue = false;
+        $this->nameBindDisable();
 
-        if ($alias_name) {
-            $this->alias = $alias_name;
-        }
+    }
+
+    public function setValue(string|float|int|bool|null $value) : void
+    {
+        $this->value = $value;
+        $this->nameBindEnable();
+    }
+
+    /**
+     * Configures a column in the statement fieldset to use a raw SQL expression
+     * instead of a simple value with automatic name-derived binding.
+     *
+     * This method transitions the column to "Manual Mode":
+     * * Disables automatic binding for this specific column. ($column->getBindingKey() returns an empty string)
+     * * Allows for database-side calculations (arithmetic, functions, subqueries).
+     * * Supports manual parameter binding for high-security custom logic.
+     * * Clears any previously set literal value.
+     * * Sets the raw SQL expression (e.g., "NOW()", "rgt + 2").
+     *
+     * * Basic usage with SQL functions:
+     *
+     * $stmt->column("update_date")->set("NOW()");
+     * $stmt->column("rgt")->set("rgt + 2");
+     *
+     * * Advanced usage with manual binding:
+     *
+     * $stmt->column("rgt")->set("rgt + :value")->bind(":value", 2);
+     *
+     * @param string $expression The raw SQL fragment (e.g., "NOW()", "rgt + :val").
+     * @return self
+     * @throws Exception If expression validation
+     */
+    public function set(string $expression) : SQLColumn
+    {
+        $this->setExpression($expression);
+        return $this;
     }
 
     public function getExpression() : string
@@ -183,8 +229,8 @@ class SQLColumn implements ISQLGet, ISQLBinding
             if ($this->alias) {
                 return $this->expression . " AS " . $this->alias;
             }
-            //SQLStatement setExpression
-            //expressions containing :named_parameters are handled using the SQLStatement bind()
+            //SQLStatement column()->set or setExpression()
+            //expressions containing :named_parameters are handled using bind()
             return $currentName . " = " . $this->expression;
         }
 
@@ -218,5 +264,12 @@ class SQLColumn implements ISQLGet, ISQLBinding
     }
 
 
-
+    public function bind(string $bindingKey, float|bool|int|string|null $value): void
+    {
+        if (!SQLStatement::FormatBindingKey($bindingKey)) throw new Exception("Binding key is not binding safe");
+        $this->bindingKey = $bindingKey;
+        //we might have expression set already
+        $this->hasValue = true;
+        $this->value = $value;
+    }
 }

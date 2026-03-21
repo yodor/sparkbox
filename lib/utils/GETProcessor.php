@@ -117,11 +117,9 @@ class GETProcessor extends SparkObject implements IRequestProcessor, ISQLSelectP
     protected function processClauseCollection() : void
     {
         if ($this->select instanceof SQLSelect) {
-            $iterator = $this->collection->iterator();
-            while ($clause = $iterator->next()) {
-                if (!($clause instanceof SQLClause)) continue;
-                $this->select->where()->append($clause);
-            }
+
+            $this->collection->copyTo($this->select->where());
+
         }
     }
 

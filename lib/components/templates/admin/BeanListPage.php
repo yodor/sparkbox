@@ -285,7 +285,7 @@ class BeanListPage extends AdminPageTemplate
         $this->items()->append($this->view);
 
         if ($this->bean instanceof OrderedDataBean) {
-            $this->view->setDefaultOrder(new OrderColumn("position", OrderDirection::DESC));
+            $this->view->setDefaultOrder(new OrderColumn("position", OrderDirection::ASC));
 
             $idColumn = $this->view->getColumn($this->query->key());
             if ($this->view->haveColumn("position")) {

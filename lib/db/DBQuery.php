@@ -76,7 +76,7 @@ class DBQuery extends SparkObject
         $this->free();
 
         //use provided or global from assignDriver or temp then it has parent to this
-        $driver = $db ?? $this->assignDriver();
+        $driver = $db ?? $this->assignDriver($statement);
 
         try {
 
@@ -114,7 +114,7 @@ class DBQuery extends SparkObject
      * @return DBDriver
      * @throws Exception
      */
-    protected function assignDriver() : DBDriver
+    protected function assignDriver(?SQLStatement $statement = null) : DBDriver
     {
         $driver = DBConnections::Driver();
         //already active result-set for fetching
@@ -125,6 +125,9 @@ class DBQuery extends SparkObject
             //own it
             $driver->setParent($this);
             //Debug::ErrorLog("Opening new driver connection: ". Debug::Backtrace(-1));
+//            if ($statement instanceof SQLSelect) {
+//                Debug::ErrorLog("Opening new connection for: " . $statement->debugSQL());
+//            }
         }
         return $driver;
     }

@@ -68,7 +68,6 @@ class Module
      * Actual location is Spark::Get(Config::LOCAL) + $location
      * @param string $name Module name reference
      * @param string $location Relative path to Spark::Get(Config::LOCAL)
-     * @return Module
      */
     private function __construct(string $name, string $location)
     {
@@ -223,8 +222,7 @@ class Module
     public static function Response() : void
     {
         $config = Module::Active();
-        if (is_null($config)) throw new Exception("Module is not initialized");
-
+ 
         //authorize
         $config->authorize();
 

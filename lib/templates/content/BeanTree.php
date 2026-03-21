@@ -42,22 +42,28 @@ class BeanTree extends BeanList
     public function initialize(): void
     {
 
-        $tv = new NestedSetTreeView();
+        $beanClass = get_class($this->bean);
+        if (!($this->bean instanceof NestedSetBean)) throw new Exception("Incorrect bean[$beanClass] - expecting NestedSetBean.");
+        $view = new NestedSetTreeView();
 
         $ir = new TextTreeItem();
 
-        $tv->setItemRenderer($ir);
+        $view->setItemRenderer($ir);
 
         $this->initItemActions($ir->getActions());
 
-        $tv->setBranchRenderMode(NestedSetTreeView::MODE_BRANCHES_UNFOLDED);
+        $view->setBranchRenderMode(NestedSetTreeView::MODE_BRANCHES_UNFOLDED);
 
-        $tv->setName(get_class($this->bean));
+        $view->setName($beanClass);
 
-        $tv->setIterator(new SelectQuery($this->bean->selectTree(array_keys($this->fields)), $this->bean->key(), $this->bean->getTableName()));
-        $tv->getItemRenderer()->setLabelKey(array_keys($this->fields)[0]);
+        $select = $this->bean->selectTree(array_keys($this->fields));
 
-        $this->cmp = $tv;
+        $query = new SelectQuery($select, $this->bean->key(), $this->bean->getTableName());
+
+        $view->setIterator($query);
+        $view->getItemRenderer()->setLabelKey(array_keys($this->fields)[0]);
+
+        $this->cmp = $view;
 
     }
 

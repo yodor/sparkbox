@@ -25,7 +25,7 @@ class SQLDelete extends SQLStatement
      */
     public function getSQL(): string
     {
-        // ЗАЩИТА: Проверка дали имаме поне едно условие
+        //fail check atleast one clause
         if ($this->whereset->count() === 0) {
             throw new Exception("Mass DELETE operation blocked: whereset is empty. Provide at least one condition.");
         }
@@ -40,8 +40,8 @@ class SQLDelete extends SQLStatement
     public function getBindings(): array
     {
         $bindings = array();
-        $this->replaceKeyAppend($bindings, $this->whereset->getBindings());
-        $this->replaceKeyAppend($bindings, $this->externalBindings);
+        $this->ReplaceKeyAppend($bindings, $this->whereset->getBindings());
+        $this->ReplaceKeyAppend($bindings, $this->externalBindings);
         return $bindings;
     }
 

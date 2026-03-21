@@ -47,7 +47,7 @@ class PhraseTranslatorPage extends BeanListPage
 
         $bean = new TranslationPhrasesBean();
 
-        $this->setIterator($bean->queryLanguageID($this->langID));
+        $this->setIterator($bean->queryPhrase($this->langID));
 
         $search_fields = array("st.value");
         $this->getSearch()->getForm()->setColumns($search_fields);

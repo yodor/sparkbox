@@ -263,7 +263,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             $this->paginator->applyLimit($this->iterator->stmt);
         }
 
-        $this->iterator->stmt->setMeta("ARV Paginated");
+//        $this->iterator->stmt->setMeta("ARV Paginated");
         $this->results_paginated = true;
     }
     /**

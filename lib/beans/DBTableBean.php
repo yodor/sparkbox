@@ -9,6 +9,7 @@ include_once("sql/SQLDelete.php");
 include_once("sql/RawSQLSelect.php");
 include_once("objects/ISerializable.php");
 include_once("objects/IUnserializable.php");
+include_once("db/DBExpression.php");
 
 abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnserializable
 {
@@ -288,7 +289,6 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         $qry->stmt->set($this->prkey);
         $qry->stmt->limit(0);
         return $qry->count();
-
     }
 
     /**
@@ -388,13 +388,17 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
      */
     public function getValue(int $id, string $column): ?string
     {
+        $query = $this->queryField($this->prkey, $id, 1, $column);
+        if($query->count() == 0) return null;
+
         $result = null;
-        $qry = $this->queryField($this->prkey, $id, 1, $column);
-        $qry->exec();
-        if ($result = $qry->next()) {
-            $qry->free();
+
+        $query->exec();
+        if ($result = $query->next()) {
             $result = $result[$column];
         }
+        $query->free();
+
         return $result;
     }
 
@@ -415,6 +419,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         }
 
         $qry = $this->queryField($this->prkey, $id, 1, ...$columns);
+
         $qry->exec();
 
         if ($result = $qry->next()) {
@@ -445,7 +450,6 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         }
         throw new Exception("No such Ref");
 
-
     }
 
     /**
@@ -467,16 +471,16 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             $db->transaction();
         }
         else {
-            Debug::ErrorLog("Not starting DB transaction - received driver connection from function call parameter");
+            //Debug::ErrorLog("Not starting DB transaction - received driver connection from function call parameter");
         }
 
         try {
 
-            Debug::ErrorLog("Executing closure function");
+            //Debug::ErrorLog("Executing closure function");
             //either throw or succeed
             $code($db);
             $affectedRows = $db->affectedRows();
-            Debug::ErrorLog("Closure finished - affected rows: " . $affectedRows);
+            Debug::ErrorLog("Closure function executed - affected rows: " . $affectedRows);
             
             if ($use_transaction) {
                 $db->commit();
@@ -548,7 +552,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
             //delete all referenced but keep the ids passed inside $keep_ids
             if (count($keep_ids) > 0) {
-                $keep_list = $delete->bindList($keep_ids);
+                $keep_list = $delete->where()->bindList($keep_ids);
                 $delete->where()->addExpression("$this->prkey NOT IN ($keep_list)");
             }
 
@@ -668,19 +672,19 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         if ($this instanceof SparkCacheBean) return;
 
         $cache_file = Spark::PathParts(Spark::Get(Config::CACHE_PATH) , get_class($this) , $id);
-        Debug::ErrorLog("Checking cache folder: '$cache_file'");
+        //Debug::ErrorLog("Checking cache folder: '$cache_file'");
         if (!is_dir($cache_file)) {
-            Debug::ErrorLog("'$cache_file' not a folder");
+            //Debug::ErrorLog("'$cache_file' not a folder");
             return;
         }
         try {
-            Debug::ErrorLog("Removing folder '$cache_file'");
+            //Debug::ErrorLog("Removing folder '$cache_file'");
             Spark::DeleteFolder($cache_file);
-            Debug::ErrorLog("Removing folder '$cache_file' complete");
+            //Debug::ErrorLog("Removing folder '$cache_file' complete");
         }
         catch (Exception $e) {
             //
-            Debug::ErrorLog("Unable to delete cache folder: $cache_file");
+            //Debug::ErrorLog("Unable to delete cache folder: $cache_file");
         }
 
         //TODO
@@ -704,23 +708,18 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         $columnNames = $this->columnNames();
 
         foreach ($row as $key => $value) {
-            // 1. skip keys that do not reference column names in this bean
+            //skip keys that do not reference column names in this bean
             if (!in_array($key, $columnNames)) continue;
 
-            //TODO: check usage and throw
-            // 2. take the first element from array only
-            if (is_array($value)) {
-                if (count($value) < 1) continue;
-                $value = $value[0];
+            if ($value instanceof DBExpression) {
+                //expression set - no binding
+                //should have trait CanExpressColumnsDirectly
+                $statement->column($key)->set($value->value());
             }
-
-            // 3.For numeric columns set to null
-            else if ($this->isNumeric($key) && (strlen((string)$value) < 1 || strcasecmp((string)$value, "null") === 0)) {
-                $value = null;
+            else {
+                //auto binding
+                $statement->set($key, $value);
             }
-
-            //set column values - auto-binding
-            $statement->set($key, $value);
 
         }
     }

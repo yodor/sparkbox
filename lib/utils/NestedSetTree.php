@@ -49,8 +49,8 @@ class NestedSetTree
         if ($rootId > 0) {
             $root = $this->bean->getNode($rootId);
             $this->select->where()->addExpression("lft BETWEEN :nodeLft AND :nodeRgt");
-            $this->select->bind(":nodeLft", $root->lft());
-            $this->select->bind(":nodeRgt", $root->rgt());
+            $this->select->where()->bind(":nodeLft", $root->lft());
+            $this->select->where()->bind(":nodeRgt", $root->rgt());
         }
 
         $query = new SelectQuery($this->select);

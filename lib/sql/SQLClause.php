@@ -9,6 +9,17 @@ include_once("sql/IBindingModifier.php");
  */
 class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingModifier
 {
+
+    /**
+     * Return hash of the object expression
+     * Uses the default sparkHash for actual hashing
+     * @return string Currently uses the sparkHash function that use xxh3 algorithm
+     */
+    public function hash(): string
+    {
+        return Spark::Hash($this->expression);
+    }
+
     /**
      * Connect the value to the expression using this operator by default
      */

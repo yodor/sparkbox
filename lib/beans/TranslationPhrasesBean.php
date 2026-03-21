@@ -25,18 +25,22 @@ CREATE TABLE `translation_phrases` (
         parent::__construct("translation_phrases");
     }
 
-    public function queryLanguageID(int $langID) : SelectQuery
+    /**
+     * Phrase query select - if phrase does not exist / not captured yet - returns zero results
+     * Always return 1 or more results if phrase is captured
+     * @param int $langID
+     * @return SelectQuery
+     * @throws Exception
+     */
+    public function queryPhrase(int $langID) : SelectQuery
     {
         $sel = new SQLSelect();
         $sel->from("site_texts st")->leftJoin("translation_phrases tp")->on("tp.textID=st.textID AND tp.langID=:langID");
 
-
-        $sel->set("st.hash_value AS hash", "st.textID", "st.value AS phrase", "tp.translated AS translation");
-
-        $sel->setAliasExpression(" COALESCE(tp.trID, -1) ", "trID");
-        $sel->setAliasExpression(" COALESCE(tp.langID, :langID) ", "langID");
+        $sel->set("st.hash_value AS hash", "st.textID", "st.value AS phrase", "tp.translated AS translation", "tp.trID", "tp.langID");
 
         $sel->bind(":langID", $langID);
+//        $sel->setMeta("queryPhrase");
 
         return new SelectQuery($sel, "textID");
     }
