@@ -38,17 +38,20 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
 
     public function getColumn(string $name) : SQLColumn
     {
+        $name = trim($name);
         if (!isSet($this->fields[$name])) throw new Exception("Column name '$name' not found");
         return $this->fields[$name];
     }
 
     public function isSet(string $name): bool
     {
+        $name = trim($name);
         return array_key_exists($name, $this->fields);
     }
 
     public function unset(string $name) : void
     {
+        $name = trim($name);
         if ($this->isSet($name)) unset($this->fields[$name]);
     }
 

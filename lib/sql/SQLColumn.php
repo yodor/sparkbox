@@ -32,7 +32,7 @@ class SQLColumn implements ISQLGet, ISQLBinding, IBindingModifier
     public function __construct(string $name)
     {
         if (strlen(trim($name))<1) throw new Exception("SQLColumn name can not be empty");
-        //if (!InputSanitizer::SafeSQLColumn($name)) throw new Exception("Incorrect column name: $name");
+        if (!InputSanitizer::SafeSQLColumn($name)) throw new Exception("Incorrect column name: $name");
         $this->name = trim($name);
         $this->bindingKey = "";
         $this->hasValue = false;

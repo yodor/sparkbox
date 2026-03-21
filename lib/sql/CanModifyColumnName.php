@@ -72,17 +72,34 @@ trait CanModifyColumnName
     public function set(string ...$columns) : void
     {
         $this->fieldset->unset("*");
+        //clean empty
+        foreach ($columns as $idx=>$columnName) {
+            if (!trim($columnName)) {
+                unset($columns[$idx]);
+            }
+        }
 
-        foreach ($columns as $item) {
-            if (!(trim($item)))continue;
-            $pair = preg_split("/ as /i", $item);
+        //split by , and trim empty
+        foreach ($columns as $idx=>$columnName) {
+            $columnMulti = explode(",", $columnName);
+            if (count($columnMulti)>0) {
+                unset($columns[$idx]);
+                foreach ($columnMulti as $columnNameInner) {
+                    $columnNameInner = trim($columnNameInner);
+                    if ($columnNameInner) $columns[] = trim($columnNameInner);
+                }
+            }
+        }
+
+        foreach ($columns as $columnName) {
+
+            $pair = preg_split("/ as /i", $columnName);
 
             //no binding key creation no value is set hasValue is false
             $column = new SQLColumn($pair[0]);
             if (isset($pair[1])) {
                 $column->setAlias($pair[1]);
             }
-
             $this->fieldset->setColumn($column);
         }
     }
