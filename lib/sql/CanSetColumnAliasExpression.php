@@ -33,7 +33,7 @@ trait CanSetColumnAliasExpression {
 
         //no binding
         $column = new SQLColumn($alias_name);
-        $column->setExpression($expression);
+        $column->set($expression);
         $column->setAlias($alias_name);
         $this->fieldset->setColumn($column);
     }

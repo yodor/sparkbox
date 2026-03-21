@@ -9,7 +9,6 @@ class SQLInsert extends SQLStatement
     use CanSetColumnValue;
     use CanCreateArrayValueColumn;
 
-    use CanAccessColumnsDirectly;
     /**
      * ON Clause Value
      * @var string

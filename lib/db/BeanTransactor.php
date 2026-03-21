@@ -5,7 +5,7 @@ include_once("forms/InputForm.php");
 include_once("beans/IBeanEditor.php");
 include_once("objects/events/BeanTransactorEvent.php");
 include_once("beans/IValueTransactor.php");
-
+include_once("db/IDBValue.php");
 /**
  * Process all DataInput controls from an InputForm and prepare values to be stored in a DBTableBean
  * Allows data to be stored into other DBTableBeans as set from the form DataInput fields
@@ -78,7 +78,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
         return $this->lastID;
     }
 
-    public function appendValue(string $key, DBValue|string|float|int|bool|null $val) : void
+    public function appendValue(string $key, IDBValue|string|float|int|bool|null $val) : void
     {
         $this->values[$key] = $val;
     }
@@ -94,7 +94,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
      * @param string $key
      * @param $val
      */
-    public function assignInsertValue(string $key, DBValue|string|float|int|bool|null $val) : void
+    public function assignInsertValue(string $key, IDBValue|string|float|int|bool|null $val) : void
     {
         $this->insert_values[$key] = $val;
     }
@@ -105,7 +105,7 @@ class BeanTransactor extends SparkObject implements IBeanEditor, IValueTransacto
      * @param $val
      * @return void
      */
-    public function assignUpdateValue(string $key, DBValue|string|float|int|bool|null $val) : void
+    public function assignUpdateValue(string $key, IDBValue|string|float|int|bool|null $val) : void
     {
         $this->update_values[$key] = $val;
     }

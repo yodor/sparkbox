@@ -19,14 +19,10 @@ trait CanAccessColumnsDirectly
         if ($this->fieldset->isSet($column_name)) {
             return $this->fieldset->getColumn($column_name);
         }
-        // 1. Initialize a new SQLColumn without a value to prevent
-        // the automatic generation of a PDO bindingKey.
+
+        //no binding - empty column
         $column = new SQLColumn($column_name);
-
-        // 2. Register the configured column object into the statement's fieldset
-        // so it can be included during the SQL generation process.
         $this->fieldset->setColumn($column);
-
         return $column;
     }
 }

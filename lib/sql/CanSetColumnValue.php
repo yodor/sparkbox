@@ -1,41 +1,59 @@
 <?php
 
 /**
- * Provides the public set() method for SQLUpdate and SQLInsert that support column value assignment.
+ * Provides the public set() method for SQLUpdate and SQLInsert that support column value or expression assignment.
  */
 trait CanSetColumnValue
 {
     /**
-     * Create new SQLColumn using ('$name', '$value') and append to the internal fieldset collection.
+     * Create or modify existing SQLColumn in the internal fieldset collection.
      *
-     * Usage for simple column = value assignments.
+     * If value is scalar - the column is configured using automatic name-derived binding for scalar values.
      *
-     * SQLColumn state after this call:
+     * If value is IDBValue - the column is configured using expression or expression with binding if bindingKey() is not empty
      *
-     * - bindingKey → ':$name'
-     * - value     → '$value'
-     * - hasValue  → true
+     * * Manual binding usage:
+     * $update->set("rgt", "rgt + :rgt")->bind(":rgt", 3) -> expression column with binding key ":rgt" and binding value 3.
+     * $update->set("rgt", new DBExpression("now()")) -> expression column without binding.
      *
-     * Example:
-     *   $update->set("p.stock_amount", $amount);
-     *   // SQL result: p.stock_amount = :p_stock_amount
-     *   // binds ":p_stock_amount" → $amount
+     * * Automatic binding
+     * $update->set("position", 3) -> value column with name-derived binding -> key ":position" and value 3
      *
-     * Also compatible with setExpression():
-     *   $update->setExpression("p.stock_amount", "p.stock_amount - 1");
-     *   or
-     *   $update->setExpression("p.stock_amount", "p.stock_amount - :amount");
-     *   $update->bind(":amount", $amount);
-     *
-     * @param string $name
+     * @param string $columnName
      * @param string|float|int|bool|null $value
-     * @return void
+     * @return SQLColumn the SQLColumn created or retrieved from the fieldset collection
      * @throws Exception
      */
-    public function set(string $name, string|float|int|bool|null $value): void
+    public function set(string $columnName, IDBValue|string|float|int|bool|null $value): SQLColumn
     {
-        $column = new SQLColumn($name);
-        $column->setValue($value);
+        $column = null;
+        if ($this->fieldset->isSet($columnName)) {
+            $column = $this->fieldset->getColumn($columnName);
+        }
+
+        //create new column
+        if (is_null($column)) $column = new SQLColumn($columnName);
+
+        //expression column with or without binding
+        if ($value instanceof IDBValue) {
+            if ($value->bindingKey()) {
+                //use binding key as expression directly
+                $column->set($value->bindingKey());
+                //bind value
+                $column->bind($value->bindingKey(), $value->value());
+            }
+            else {
+                //set raw SQL expression and clear binding
+                $column->set($value->value());
+            }
+        }
+        //value column
+        else {
+            //automatic name-derived binding
+            $column->setValue($value);
+        }
         $this->fieldset->setColumn($column);
+
+        return $column;
     }
 }

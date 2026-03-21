@@ -61,10 +61,11 @@ trait CanModifyColumnName
     }
 
     /**
-     * Create new SQLColumn from values in '$columns' parameter and append to the internal fieldset collection.
-     * * Existing column with the same name is replaced.
+     * Create new SQLColumn from values in '$columns' parameter and append each to the internal fieldset collection.
+     * * Existing column with the same name will be replaced.
      * * Each value is used as name for the created column.
      * * If value is in the format "name AS alias" alias is set to the column
+     * * Each value is exploded using ',' and used as separate column name
      *
      * @param string ...$columns Array of column names to set to this collection
      * @throws Exception

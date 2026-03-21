@@ -1,18 +1,23 @@
 <?php
-include_once("db/DBValue.php");
+include_once("db/IDBValue.php");
 
-class DBExpression extends DBValue {
+class DBExpression implements IDBValue {
 
-    protected string $expr = "";
+    protected ?string $value = null;
 
-    public function __construct(string $expr)
+    public function __construct(string $expression)
     {
-        parent::__construct();
-        $this->expr = $expr;
+        $this->value = $expression;
     }
 
-    public function value() : string
+    public function value() : string|float|int|bool|null
     {
-        return $this->expr;
+        return $this->value;
     }
+
+    public function bindingKey(): string|null
+    {
+        return null;
+    }
+
 }

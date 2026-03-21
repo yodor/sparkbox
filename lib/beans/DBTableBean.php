@@ -710,17 +710,8 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         foreach ($row as $key => $value) {
             //skip keys that do not reference column names in this bean
             if (!in_array($key, $columnNames)) continue;
-
-            if ($value instanceof DBExpression) {
-                //expression set - no binding
-                //should have trait CanExpressColumnsDirectly
-                $statement->column($key)->set($value->value());
-            }
-            else {
-                //auto binding
-                $statement->set($key, $value);
-            }
-
+            //can configure expression/binding if value is IDBValue with bindingKey
+            $statement->set($key, $value);
         }
     }
 

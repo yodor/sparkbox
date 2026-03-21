@@ -153,7 +153,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     /**
      * Validates whether the provided string is a valid PDO named parameter binding key.
      *
-     * This method enforces that the binding key **must start with a colon (:)**,
+     * This method enforces that the binding key must start with a colon (:)
      * as is conventional when calling bind() methods.
      *
      * Valid examples:
@@ -182,7 +182,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
         if ($key === '') return false;
 
         // Practical length limit
-        if (strlen($key) > 100) return false;
+        if (strlen($key) > 64) return false;
 
         // Must start with letter or underscore
         // Followed by letters, digits, underscores only
