@@ -79,7 +79,7 @@ class TranslatePhraseResponder extends JSONResponder
 
         $qry = $this->bean->queryPhrase($this->langID);
 
-        $qry->stmt->where()->add("st.textID", $this->textID);
+        $qry->stmt->where()->match("st.textID", $this->textID);
 
         //Debug::ErrorLog($qry->select->getSQL());
 

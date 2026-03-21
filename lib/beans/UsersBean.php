@@ -121,8 +121,8 @@ class UsersBean extends DBTableBean
         $code = function (DBDriver $db) use ($email, $confirm_code) {
             $update = new SQLUpdate($this->select);
             $update->set("confirmed", 1);
-            $update->where()->add("email", $email);
-            $update->where()->add("confirm_code", $confirm_code);
+            $update->where()->match("email", $email);
+            $update->where()->match("confirm_code", $confirm_code);
             $db->query($update)->free();
         };
 

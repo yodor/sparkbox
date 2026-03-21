@@ -55,7 +55,7 @@ class DynamicPageView extends Container implements IRequestProcessor
             //TODO: check item_title, content, visible is present in this bean
             $query = $this->bean->query("item_title", "content", "visible");
             $query->stmt->setAliasExpression("!isNull(photo)", "have_photo");
-            $query->stmt->where()->add($this->bean->key(), $id);
+            $query->stmt->where()->match($this->bean->key(), $id);
             $query->stmt->limit(1);
 
             $query->exec();

@@ -200,7 +200,7 @@ abstract class Authenticator
 
         // 2. Lookup user
         $qry = $this->bean->queryFull();
-        $qry->stmt->where()->add("email", $username);
+        $qry->stmt->where()->match("email", $username);
         $qry->stmt->limit(1);
         $qry->exec();
 
@@ -272,7 +272,7 @@ abstract class Authenticator
         $update = new SQLUpdate($this->bean->select());
         $update->column("counter")->set("counter + 1");
         $update->column("last_active")->set("CURRENT_TIMESTAMP");
-        $update->where()->add($this->bean->key(), $userID);
+        $update->where()->match($this->bean->key(), $userID);
 
         $query = new DBQuery();
         $query->exec($update);

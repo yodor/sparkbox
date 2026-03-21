@@ -151,20 +151,16 @@ class PDODriver extends DBDriver
         $this->assert_active();
 
         try {
-            $sql = $statement->getSQL();
-            //Debug::ErrorLog("Prepared SQL: " . $sql);
-            $bindings = $statement->getBindings();
-            //Debug::ErrorLog("Bindings: " , $bindings);
 
             $meta = $statement->getMeta();
             if ($meta) {
-                Debug::ErrorLog("Executing [$meta] : ".$sql, $bindings);
+                Debug::ErrorLog("Executing [$meta] : ".$statement->debugSQL());
             }
 
-            $stmt = $this->conn->prepare($sql);
+            $stmt = $this->conn->prepare($statement->getSQL());
             if ($stmt === false) throw new Exception("Prepare failed: ".$this->getError());
 
-            foreach ($bindings as $key => $value) {
+            foreach ($statement->getBindings() as $key => $value) {
                 $stmt->bindValue($key, $value, PDODriver::BindingType($value));
             }
 
@@ -178,10 +174,7 @@ class PDODriver extends DBDriver
 
         }
         catch (Exception $e) {
-            $message = "";
-            if (isset($sql)) $message .= "SQL: ".$sql;
-            if (isset($bindings)) $message .= " | Bindings: " . print_r($bindings, true);
-            Debug::ErrorLog("Error: " . $e->getMessage() . " | " .$message);
+            Debug::ErrorLog("Query Failed: " . $e->getMessage() . " | " .$statement->debugSQL());
             throw $e;
         }
     }

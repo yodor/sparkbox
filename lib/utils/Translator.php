@@ -230,11 +230,11 @@ class Translator implements IRequestProcessor, IGETConsumer
 
         $doQuery = false;
         if ($langID>0) {
-            $query->stmt->where()->add("langID", $langID);
+            $query->stmt->where()->match("langID", $langID);
             $doQuery = true;
         }
         if (strlen(trim($language))>0) {
-            $query->stmt->where()->add("language", $language);
+            $query->stmt->where()->match("language", $language);
             $doQuery = true;
         }
 
@@ -300,10 +300,10 @@ class Translator implements IRequestProcessor, IGETConsumer
             $qry = $this->translated_beans->query();
             $qry->stmt->set("translated");
             $where = $qry->stmt->where();
-            $where->add("langID", $this->langID);
-            $where->add("field_name", $field_name);
-            $where->add("table_name", $tableName);
-            $where->add("bean_id", $id);
+            $where->match("langID", $this->langID);
+            $where->match("field_name", $field_name);
+            $where->match("table_name", $tableName);
+            $where->match("bean_id", $id);
             $qry->stmt->limit(1);
             $qry->exec();
             if ($result = $qry->next()) {
@@ -329,7 +329,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             $phrase_hash = Spark::Hash($phrase);
 
             $qry = $this->translated_phrases->queryPhrase($this->langID);
-            $qry->stmt->where()->add("hash_value", $phrase_hash);
+            $qry->stmt->where()->match("hash_value", $phrase_hash);
             $qry->stmt->limit(1);
 
             if ($qry->count() == 0) {

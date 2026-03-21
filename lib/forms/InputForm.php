@@ -574,8 +574,9 @@ class InputForm extends SparkObject implements IBeanEditor
         if ($value > -1 && strcmp($value, "") !== 0) {
 
             $field_name = str_replace("|", ".", $name);
-
+            if (!InputSanitizer::SafeSQLColumn($field_name))throw new Exception("Incorrect column name: $field_name");
             $clause = new SQLClause();
+            //auto-bind ($field_name = :bindkey) => (value)
             $clause->setExpression($field_name, $value);
             $clause->setGlue($glue);
             $collection->append($clause);

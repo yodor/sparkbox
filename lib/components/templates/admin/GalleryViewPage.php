@@ -17,8 +17,8 @@ class GalleryViewPage extends BeanListPage
         $this->setListFields(array($this->bean->key()=>"ID", "position"=>"Position", "caption"=>"Caption", "date_upload"=>"Date Upload"));
 
         if ($this->request_condition instanceof BeanKeyCondition) {
-            $this->bean->select()->where()->addURLParameter($this->request_condition->getURLParameter());
-            $this->query->stmt->where()->addURLParameter($this->request_condition->getURLParameter());
+            $this->bean->select()->where()->matchURLParameter($this->request_condition->getURLParameter());
+            $this->query->stmt->where()->matchURLParameter($this->request_condition->getURLParameter());
         }
 
         $h_delete = new DeleteItemResponder($this->bean);

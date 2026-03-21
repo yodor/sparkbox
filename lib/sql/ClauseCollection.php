@@ -42,6 +42,11 @@ class ClauseCollection extends SparkObject implements ISQLGet, IBindingCollectio
         $this->elements->add($object->hash(), $object);
     }
 
+    public function remove(SQLClause $clause) : void
+    {
+        $this->elements->remove($clause->hash());
+    }
+
     public function count() : int
     {
         return $this->elements->count();
@@ -63,15 +68,15 @@ class ClauseCollection extends SparkObject implements ISQLGet, IBindingCollectio
      * @return $this
      * @throws Exception
      */
-    public function addURLParameter(URLParameter $param, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
+    public function matchURLParameter(URLParameter $param, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
     {
-        return $this->add($param->name(), $param->value(), $operator, $glue);
+        return $this->match($param->name(), $param->value(), $operator, $glue);
     }
 
     /**
      * Create new column matching SQLClause and append it to this clause collection.
      * Automatic binding is created using name and value parameters.
-     *
+     * If value is null operator is forced to "<=>" - mysql safe only
      * * \$clause->setExpression(\$name, \$value);
      * * \$clause->setOperator(\$operator);
      * * \$clause->setGlue(\$glue);
@@ -83,13 +88,22 @@ class ClauseCollection extends SparkObject implements ISQLGet, IBindingCollectio
      * @return $this
      * @throws Exception If name or value is empty
      */
-    public function add(string $name, string|float|int|bool|null $value, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
+    public function match(string $columnName, string|float|int|bool|null $value, string $operator = SQLClause::DEFAULT_OPERATOR, string $glue = SQLClause::DEFAULT_GLUE): ClauseCollection
     {
-        if (strlen(trim($name))<1) throw new Exception("Name cannot be empty");
+        if (strlen(trim($columnName))<1) throw new Exception("Name cannot be empty");
         if (is_string($value) && strlen(trim($value))<1) throw new Exception("Value cannot be empty");
 
+        if (!InputSanitizer::SafeSQLColumn($columnName)) throw new Exception("Incorrect column name for matching clause: $columnName");
+
+        //mysql version otherways not possible to auto bind. should use expression in this case
+        //ie where()->setExpression("prodID IS NULL"); no auto-binding
+        if (is_null($value)) {
+            Debug::ErrorLog("Forcing <=> operator for null value matching");
+            $operator = "<=>";
+        }
+
         $clause = new SQLClause();
-        $clause->setExpression($name, $value);
+        $clause->setExpression($columnName, $value);
         $clause->setOperator($operator);
         $clause->setGlue($glue);
         $this->append($clause);
@@ -113,7 +127,7 @@ class ClauseCollection extends SparkObject implements ISQLGet, IBindingCollectio
      * @return $this
      * @throws Exception
      */
-    public function addExpression(string $expression, string $glue = SQLClause::DEFAULT_GLUE) : ClauseCollection
+    public function expression(string $expression, string $glue = SQLClause::DEFAULT_GLUE) : ClauseCollection
     {
         $clause = new SQLClause();
         $clause->setExpression($expression);
@@ -124,6 +138,13 @@ class ClauseCollection extends SparkObject implements ISQLGet, IBindingCollectio
         return $this;
     }
 
+
+
+    /**
+     * Search the expression value of all clauses and remove any matching
+     * @param string $expression
+     * @return void
+     */
     public function removeExpression(string $expression) : void
     {
         $iterator = $this->elements->iterator();

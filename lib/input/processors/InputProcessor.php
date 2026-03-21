@@ -310,7 +310,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             if (!($iterator instanceof SelectQuery)) throw new Exception("Unsupported iterator");
             $iterator->stmt->reset();
             $iterator->stmt->set(...$this->renderer_source_copy_fields);
-            $iterator->stmt->where()->add($name, $value);
+            $iterator->stmt->where()->match($name, $value);
             $iterator->stmt->limit(1);
             $iterator->exec();
 
@@ -379,7 +379,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         $values = array();
 
         $qry = $this->transact_bean->query($this->transact_bean->key(), $name);
-        $qry->stmt->where()->add($column, $value);
+        $qry->stmt->where()->match($column, $value);
         $qry->exec();
         Debug::ErrorLog("Using: ".$qry->stmt->debugSQL());
 

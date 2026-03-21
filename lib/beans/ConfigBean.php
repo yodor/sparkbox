@@ -56,8 +56,8 @@ class ConfigBean extends DBTableBean
         $this->assert_section();
 
         $query = $this->query($this->key(), "config_key", "section");
-        $query->stmt->where()->add("section", $this->section);
-        $query->stmt->where()->add("config_key", $key);
+        $query->stmt->where()->match("section", $this->section);
+        $query->stmt->where()->match("config_key", $key);
         $query->stmt->limit(1);
         $keyID = -1;
         if ($query->count() == 0) return $keyID;
@@ -76,8 +76,8 @@ class ConfigBean extends DBTableBean
         $this->assert_section();
 
         $query = $this->query($this->key(), "config_key", "config_val", "section");
-        $query->stmt->where()->add("section", $this->section);
-        $query->stmt->where()->add("config_key", $key);
+        $query->stmt->where()->match("section", $this->section);
+        $query->stmt->where()->match("config_key", $key);
         $query->stmt->limit(1);
 
         if ($query->count() == 0) return null;

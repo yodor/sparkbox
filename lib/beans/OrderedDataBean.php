@@ -28,7 +28,7 @@ abstract class OrderedDataBean extends DBTableBean
 
             $update = new SQLUpdate($this->select);
             $update->column("position")->set("position - 1");
-            $update->where()->addExpression("position > :pos");
+            $update->where()->expression("position > :pos");
             $update->where()->bind(":pos", $pos);
 
             $db->query($update)->free();
@@ -64,19 +64,19 @@ abstract class OrderedDataBean extends DBTableBean
 
             $update = new SQLUpdate($this->select);
             $update->column("position")->set("position - 1");
-            $update->where()->addExpression("position > :pos");
+            $update->where()->expression("position > :pos");
             $update->where()->bind(":pos", $pos);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->column("position")->set("position + 1");
-            $update->where()->addExpression("position >= :new_pos");
+            $update->where()->expression("position >= :new_pos");
             $update->where()->bind(":new_pos", $new_pos);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", $new_pos);
-            $update->where()->add($this->prkey, $id);
+            $update->where()->match($this->prkey, $id);
             $db->query($update)->free();
         };
 
@@ -98,13 +98,13 @@ abstract class OrderedDataBean extends DBTableBean
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
             $update->column("position")->set("position + 1");
-            $update->where()->addExpression("position < :pos");
+            $update->where()->expression("position < :pos");
             $update->where()->bind(":pos", $pos);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", 1);
-            $update->where()->add($this->prkey, $id);
+            $update->where()->match($this->prkey, $id);
             $db->query($update)->free();
         };
 
@@ -127,13 +127,13 @@ abstract class OrderedDataBean extends DBTableBean
         $code = function (DBDriver $db) use ($id, $pos, $max_pos) {
             $update = new SQLUpdate($this->select);
             $update->column("position")->set("position - 1");
-            $update->where()->addExpression("position > :pos");
+            $update->where()->expression("position > :pos");
             $update->where()->bind(":pos", $pos);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", $max_pos);
-            $update->where()->add($this->prkey , $id);
+            $update->where()->match($this->prkey , $id);
             $db->query($update)->free();
 
         };
@@ -157,17 +157,17 @@ abstract class OrderedDataBean extends DBTableBean
         $code = function (DBDriver $db) use ($id, $pos) {
             $update = new SQLUpdate($this->select);
             $update->set("position", -1);
-            $update->where()->add($this->prkey, $id);
+            $update->where()->match($this->prkey, $id);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->column("position")->set("position + 1");
-            $update->where()->add("position", ($pos - 1));
+            $update->where()->match("position", ($pos - 1));
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", ($pos - 1));
-            $update->where()->add($this->prkey, $id);
+            $update->where()->match($this->prkey, $id);
             $db->query($update)->free();
         };
 
@@ -190,17 +190,17 @@ abstract class OrderedDataBean extends DBTableBean
 
             $update = new SQLUpdate($this->select);
             $update->set("position", -1);
-            $update->where()->add($this->prkey, $id);
+            $update->where()->match($this->prkey, $id);
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->column("position")->set("position - 1");
-            $update->where()->add("position", ($pos + 1));
+            $update->where()->match("position", ($pos + 1));
             $db->query($update)->free();
 
             $update = new SQLUpdate($this->select);
             $update->set("position", ($pos + 1));
-            $update->where()->add($this->prkey, $id);
+            $update->where()->match($this->prkey, $id);
             $db->query($update)->free();
 
         };

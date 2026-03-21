@@ -114,7 +114,7 @@ class BeanMenuFactory
         }
 
         $this->select->where()->clear();
-        $this->select->where()->add("parentID", $parentID);
+        $this->select->where()->match("parentID", $parentID);
 
         if (is_null($qry)) $qry = new SelectQuery($this->select);
 

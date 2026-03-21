@@ -211,9 +211,9 @@ class InputSanitizer
      * 1. Must be a non-empty string
      * 2. Must contain exactly one word (no whitespace characters)
      * 3. Must start with a letter or underscore
-     * 4. May contain only letters (a-z A-Z), digits (0-9), and underscores
+     * 4. May contain only letters (a-z / A-Z), digits (0-9), underscore '_' and dot '.' but not starting with '.'
      * 5. Must not match common SQL reserved keywords
-     * 6. Length should not exceed 63 characters (PostgreSQL default limit)
+     * 6. Length should not exceed 64 characters
      *
      * @param mixed $input The value to validate
      * @return bool
@@ -227,7 +227,7 @@ class InputSanitizer
         }
 
         // Reasonable length limit (can be adjusted per database)
-        if (strlen($s) > 32) {
+        if (strlen($s) > 64) {
             return false;
         }
 
@@ -236,8 +236,8 @@ class InputSanitizer
             return false;
         }
 
-        // Must match: starts with letter or _, then letters/digits/_
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $s)) {
+        // Must match: starts with letter or _, then letters/digits/_/.
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_.]*$/', $s)) {
             return false;
         }
 

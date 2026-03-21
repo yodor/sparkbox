@@ -32,6 +32,7 @@ class SQLColumn implements ISQLGet, ISQLBinding, IBindingModifier
     public function __construct(string $name)
     {
         if (strlen(trim($name))<1) throw new Exception("SQLColumn name can not be empty");
+        if (!InputSanitizer::SafeSQLColumn($name)) throw new Exception("Incorrect column name: $name");
         $this->name = trim($name);
         $this->bindingKey = "";
         $this->hasValue = false;
@@ -266,7 +267,7 @@ class SQLColumn implements ISQLGet, ISQLBinding, IBindingModifier
 
     public function bind(string $bindingKey, float|bool|int|string|null $value): void
     {
-        if (!SQLStatement::FormatBindingKey($bindingKey)) throw new Exception("Binding key is not binding safe");
+        if (!SQLStatement::IsBindingKeySafe($bindingKey)) throw new Exception("Binding key is not binding safe");
         $this->bindingKey = $bindingKey;
         //we might have expression set already
         $this->hasValue = true;

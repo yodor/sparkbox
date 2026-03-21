@@ -339,7 +339,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         $select->set($field);
         $select->set(...$columns);
 
-        $select->where()->add($field, $value);
+        $select->where()->match($field, $value);
         if ($limit > 0) {
             $select->limit($limit);
         }
@@ -517,7 +517,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             Debug::ErrorLog("Going to delete ID: $id");
             //TODO: select with joins clause needs table specification before the FROM statement in the DELETE statement
             $delete = SQLDelete::Table($this->table);
-            $delete->where()->add($this->prkey, $id);
+            $delete->where()->match($this->prkey, $id);
 
             $db->query($delete)->free();
 
@@ -548,12 +548,12 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             Debug::ErrorLog("Keeping ID list: ", $keep_ids);
 
             $delete = new SQLDelete($this->select);
-            $delete->where()->add($column, $value);
+            $delete->where()->match($column, $value);
 
             //delete all referenced but keep the ids passed inside $keep_ids
             if (count($keep_ids) > 0) {
                 $keep_list = $delete->where()->bindList($keep_ids);
-                $delete->where()->addExpression("$this->prkey NOT IN ($keep_list)");
+                $delete->where()->expression("$this->prkey NOT IN ($keep_list)");
             }
 
             //fetch id of resulting rows first to properly manage the cache
@@ -654,7 +654,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     public function update(int $id, array $row, ?DBDriver $db = NULL) : int
     {
         $update = new SQLUpdate($this->select);
-        $update->where()->add($this->prkey, $id);
+        $update->where()->match($this->prkey, $id);
         $this->bindValues($row, $update);
 
         $code = function (DBDriver $db) use ($id, $update) {

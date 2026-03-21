@@ -48,7 +48,7 @@ class NestedSetTree
 
         if ($rootId > 0) {
             $root = $this->bean->getNode($rootId);
-            $this->select->where()->addExpression("lft BETWEEN :nodeLft AND :nodeRgt");
+            $this->select->where()->expression("lft BETWEEN :nodeLft AND :nodeRgt");
             $this->select->where()->bind(":nodeLft", $root->lft());
             $this->select->where()->bind(":nodeRgt", $root->rgt());
         }
@@ -146,7 +146,7 @@ class NestedSetTree
                 $upd = SQLUpdate::Table($this->bean->getTableName());
                 $upd->set("lft", $node->lft());
                 $upd->set("rgt", $node->rgt());
-                $upd->where()->add($this->bean->key(), $node->id());
+                $upd->where()->match($this->bean->key(), $node->id());
                 $driver->query($upd)->free();
             }
 
@@ -208,7 +208,7 @@ class NestedSetTree
         $upd = SQLUpdate::Table($this->bean->getTableName());
         $upd->set("lft", $node->lft());
         $upd->set("rgt", $node->rgt());
-        $upd->where()->add($this->bean->key(), $node->id());
+        $upd->where()->match($this->bean->key(), $node->id());
 
         $driver = $this->bean->getDB() ?? DBConnections::Driver();
         $driver->query($upd)->free();

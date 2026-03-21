@@ -72,7 +72,7 @@ class DatedBean extends DBTableBean
     public function queryID(int $itemID, string ...$columns) : SelectQuery
     {
         $query = $this->query($this->key(), ...$columns);
-        $query->stmt->where()->add($this->prkey, $itemID);
+        $query->stmt->where()->match($this->prkey, $itemID);
         $this->setDefaultOrder($query->stmt);
 
         return $query;
@@ -101,10 +101,10 @@ class DatedBean extends DBTableBean
         if ($month<1 || $month>12) throw new Exception("Incorrect month number");
         $query = $this->query($this->key(), ...$columns);
 
-        $query->stmt->where()->addExpression("MONTH($this->date_column) = :month");
+        $query->stmt->where()->expression("MONTH($this->date_column) = :month");
         $query->stmt->where()->bind(":month", $month);
 
-        $query->stmt->where()->addExpression("YEAR($this->date_column) = :year");
+        $query->stmt->where()->expression("YEAR($this->date_column) = :year");
         $query->stmt->where()->bind(":year", $year);
 
         $this->setDefaultOrder($query->stmt);
@@ -150,7 +150,7 @@ class DatedBean extends DBTableBean
 
         $query = $this->query($this->key());
         $query->stmt->setAliasExpression("MONTH($this->date_column)", "month");
-        $query->stmt->where()->addExpression("YEAR($this->date_column) = :year");
+        $query->stmt->where()->expression("YEAR($this->date_column) = :year");
         $query->stmt->where()->bind(":year", $year);
         $this->setDefaultOrder($query->stmt);
         $query->stmt->group_by = " MONTH($this->date_column) ASC ";

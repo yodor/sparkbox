@@ -58,7 +58,7 @@ class BeanEditorPage extends AdminPageTemplate
         $view = new BeanFormEditor($this->bean, $this->form);
 
         if ($this->request_condition instanceof BeanKeyCondition) {
-            $this->bean->select()->where()->addURLParameter($this->request_condition->getURLParameter());
+            $this->bean->select()->where()->matchURLParameter($this->request_condition->getURLParameter());
             $view->getTransactor()->appendURLParameter($this->request_condition->getURLParameter());
         }
 
