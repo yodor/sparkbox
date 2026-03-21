@@ -226,6 +226,8 @@ class InputSanitizer
             return false;
         }
 
+        if ($input === "*") return true;
+
         // Reasonable length limit (can be adjusted per database)
         if (strlen($s) > 64) {
             return false;
@@ -237,7 +239,7 @@ class InputSanitizer
         }
 
         // Must match: starts with letter or _, then letters/digits/_/.
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_.]*$/', $s)) {
+        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_.*]*$/', $s)) {
             return false;
         }
 
