@@ -43,7 +43,7 @@ class FormRenderer extends Form
      */
     const string SUBMIT_NAME = "SubmitForm";
 
-
+    protected ?URL $actionURL = null;
     /**
      * Default submit button
      * @var Button
@@ -150,6 +150,9 @@ class FormRenderer extends Form
 
         parent::processAttributes();
         $this->setAttribute("layout", $this->layout);
+        if ($this->actionURL) {
+            $this->setAttribute("action", $this->actionURL);
+        }
 
     }
 
@@ -212,6 +215,15 @@ class FormRenderer extends Form
             $submit->setValue($submit_value);
             $submit->render();
         }
+    }
+
+    public function setAction(URL $url) : void
+    {
+        $this->actionURL = $url;
+    }
+    public function getAction() : ?URL
+    {
+        return $this->actionURL;
     }
 
 }
