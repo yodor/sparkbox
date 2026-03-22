@@ -1,7 +1,7 @@
 <?php
 trait CanSetColumnAliasExpression {
     /**
-     * Add direct sql expression to the column collection using '$alias_name'
+     * Add direct sql expression to the columns using '$alias_name'
      *
      * Existing column named '$alias_name' would be replaced with the newly created column.
      *
@@ -21,7 +21,7 @@ trait CanSetColumnAliasExpression {
      * @param string $alias_name Alias name
      * @throws Exception
      */
-    public function setAliasExpression(string $expression, string $alias_name) : void
+    public function alias(string $expression, string $alias_name) : void
     {
         // Using trim to ensure we don't accept strings with only whitespace
         $expression = trim($expression);
@@ -35,12 +35,23 @@ trait CanSetColumnAliasExpression {
         $column = new SQLColumn($alias_name);
         $column->set($expression);
         $column->setAlias($alias_name);
-        $this->fieldset->setColumn($column);
+        $this->fieldset->set($column);
     }
-    public function setColumnAlias(string $column_name, string $alias_name) : void
+
+    /**
+     * Create/Get new column named \$column_name for selection
+     *
+     * @param string $column_name
+     * @return IAliasedColumn
+     * @throws Exception
+     */
+    public function column(string $column_name) : IAliasedColumn
     {
-        $column = new SQLColumn($column_name);
-        $column->setAlias($alias_name);
-        $this->fieldset->setColumn($column);
+        $column = $this->fieldset->get($column_name);
+        if (is_null($column)) {
+            $column = new SQLColumn($column_name);
+            $this->fieldset->set($column);
+        }
+        return $column;
     }
 }

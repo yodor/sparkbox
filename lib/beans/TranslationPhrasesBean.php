@@ -37,7 +37,10 @@ CREATE TABLE `translation_phrases` (
         $sel = new SQLSelect();
         $sel->from("site_texts st")->leftJoin("translation_phrases tp")->on("tp.textID=st.textID AND tp.langID=:langID");
 
-        $sel->set("st.hash_value AS hash", "st.textID", "st.value AS phrase", "tp.translated AS translation", "tp.trID", "tp.langID");
+        $sel->columns("st.textID", "tp.trID", "tp.langID");
+        $sel->column("st.hash_value")->setAlias("hash");
+        $sel->column("st.value")->setAlias("phrase");
+        $sel->column("tp.translated")->setAlias("translation");
 
         $sel->bind(":langID", $langID);
 //        $sel->setMeta("queryPhrase");

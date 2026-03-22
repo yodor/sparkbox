@@ -21,15 +21,12 @@ trait CanSetColumnValue
      *
      * @param string $columnName
      * @param string|float|int|bool|null $value
-     * @return SQLColumn the SQLColumn created or retrieved from the fieldset collection
+     * @return void
      * @throws Exception
      */
-    public function set(string $columnName, IDBValue|string|float|int|bool|null $value): SQLColumn
+    public function set(string $columnName, IDBValue|string|float|int|bool|null $value): void
     {
-        $column = null;
-        if ($this->fieldset->isSet($columnName)) {
-            $column = $this->fieldset->getColumn($columnName);
-        }
+        $column = $this->fieldset->get($columnName);
 
         //create new column
         if (is_null($column)) $column = new SQLColumn($columnName);
@@ -52,8 +49,7 @@ trait CanSetColumnValue
             //automatic name-derived binding
             $column->setValue($value);
         }
-        $this->fieldset->setColumn($column);
+        $this->fieldset->set($column);
 
-        return $column;
     }
 }

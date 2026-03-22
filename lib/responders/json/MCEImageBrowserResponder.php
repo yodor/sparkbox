@@ -107,7 +107,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         Debug::ErrorLog("Section: '$this->section_name' Section Key: '$this->section_key'");
 
         $bean = new MCEImagesBean();
-        $qry = $bean->query();
+        $qry = $bean->query("section", "section_key", "imageID", "ownerID", "auth_context", "photo");
         $qry->stmt->where()->match("section", $this->section_name);
         $qry->stmt->where()->match("section_key", $this->section_key);
 
@@ -119,8 +119,6 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
             $imageID = (int)$_GET["imageID"];
             $qry->stmt->where()->match("imageID", $imageID);
         }
-
-        $qry->stmt->set("section", "section_key", "imageID", "ownerID", "auth_context", "photo");
 
         $qry->exec();
 

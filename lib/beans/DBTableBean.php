@@ -88,6 +88,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         $this->initColumnTypes();
 
+        //no columns are set in the default select
         $this->select = SQLSelect::Table($this->table);
         //Debug::ErrorLog("DBTableBean[$this->table]");
     }
@@ -210,7 +211,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         }
     }
 
-    public function getTableName() : string
+    public function table() : string
     {
         return $this->table;
     }
@@ -282,18 +283,18 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
      * @return int
      * @throws Exception
      */
-    public function getCount(): int
+    public function count(): int
     {
-        $qry = $this->query();
-        $qry->stmt->reset();
-        $qry->stmt->set($this->prkey);
+        $qry = $this->query($this->prkey);
         $qry->stmt->limit(0);
         return $qry->count();
     }
 
     /**
      * Create default query cloning $this->select().
-     * If no columns are specified all columns from $this->select() are used.
+     *
+     * If columns are specified, the select columns are reset and only specified columns are assigned
+     *
      *
      * @param string ...$columns
      * @return SelectQuery
@@ -302,9 +303,9 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     public function query(string ...$columns): SelectQuery
     {
         $select = clone $this->select;
-        if (sizeof($columns)>0) {
+        if (count($columns)>0) {
             $select->reset();
-            $select->set(...$columns);
+            $select->columns(...$columns);
         }
 
         return $this->beanQuery($select);
@@ -335,9 +336,9 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     public function queryField(string $field, string $value, int $limit = 0, string ...$columns): SelectQuery
     {
         $select = clone $this->select;
-        $select->set($this->prkey);
-        $select->set($field);
-        $select->set(...$columns);
+        $select->column($this->prkey);
+        $select->column($field);
+        $select->columns(...$columns);
 
         $select->where()->match($field, $value);
         if ($limit > 0) {
@@ -355,7 +356,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
      */
     protected function beanQuery(SQLSelect $select) : SelectQuery
     {
-        $qry = new SelectQuery($select, $this->prkey, $this->getTableName());
+        $qry = new SelectQuery($select, $this->prkey, $this->table());
         $qry->setBean($this);
         return $qry;
     }
@@ -560,7 +561,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             //copy $delete whereset and bindings
             $select = new SQLSelect($delete);
             $select->reset();
-            $select->set($this->prkey);
+            $select->column($this->prkey);
 
             $result = $db->query($select);
             $idlist = array();

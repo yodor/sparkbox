@@ -52,12 +52,12 @@ class BeanMenuFactory
 
         $this->select = clone $this->bean->select();
 
-        $this->select->set($this->value_key, $this->label_key);
+        $this->select->columns($this->value_key, $this->label_key);
 
         $fieldsAddition = array("link", "seo_title", "seo_description");
         foreach($fieldsAddition as $key=>$value) {
             if ($this->bean->haveColumn($value)) {
-                $this->select->set($value);
+                $this->select->columns($value);
             }
         }
 
@@ -90,7 +90,7 @@ class BeanMenuFactory
             while ($item = $iterator->next()) {
                 if (! ($item instanceof MenuItem)) continue;
                 $data = [$this->label_key => $item->getName()];
-                trbean($item->getID(), $this->label_key, $data, $this->bean->getTableName());
+                trbean($item->getID(), $this->label_key, $data, $this->bean->table());
                 $item->setName($data[$this->label_key]);
             }
 

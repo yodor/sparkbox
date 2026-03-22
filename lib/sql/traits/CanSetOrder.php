@@ -1,5 +1,6 @@
 <?php
-include_once("sql/OrderColumn.php");
+include_once("objects/OrderColumn.php");
+include_once("objects/OrderField.php");
 
 trait CanSetOrder {
 

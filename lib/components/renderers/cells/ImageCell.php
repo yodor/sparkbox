@@ -119,7 +119,7 @@ class ImageCell extends TableCell implements IPhotoRenderer
         $iterator = $this->column->getView()->getIterator();
 
         //iterator is the same table as the bean
-        if (strcmp($iterator->name(), $this->bean->getTableName()) === 0) {
+        if (strcmp($iterator->name(), $this->bean->table()) === 0) {
             $item = new StorageItem();
             $item->className = get_class($this->bean);
             $item->id = $data[$this->bean->key()];

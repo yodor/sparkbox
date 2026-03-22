@@ -218,7 +218,7 @@ class InputSanitizer
      * @param mixed $input The value to validate
      * @return bool
      */
-    static public function SafeSQLColumn(string $input): bool
+    static public function SafeSQLColumn(string $input, bool $allowDot = false): bool
     {
 
         $s = trim($input);
@@ -238,8 +238,13 @@ class InputSanitizer
             return false;
         }
 
-        // Must match: starts with letter or _, then letters/digits/_/.
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_.*]*$/', $s)) {
+        $dot = "";
+        if ($allowDot) {
+            $dot = ".";
+        }
+
+        // Must match: starts with letter or _, then letters/digits/_/
+        if (!preg_match("/^[a-zA-Z_][a-zA-Z0-9_*{$dot}]*$/", $s)) {
             return false;
         }
 

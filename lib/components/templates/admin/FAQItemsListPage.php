@@ -12,9 +12,8 @@ class FAQItemsListPage extends BeanListPage
         $sections = new FAQSectionsBean();
         $bean = new FAQItemsBean();
 
-        $qry = $bean->query();
+        $qry = $bean->query("fi.fID", "fs.section_name", "fi.question", "fi.answer");
         $qry->stmt->from()->append(" fi ")->leftJoin("faq_sections fs")->on("fs.fqsID = fi.fqsID");
-        $qry->stmt->set("fi.fID", "fs.section_name", "fi.question", "fi.answer");
 
         $this->setIterator($qry);
         $this->setListFields(array("section_name"=>"Section", "question"=>"Question", "answer"=>"Answer"));

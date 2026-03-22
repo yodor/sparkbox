@@ -1,15 +1,16 @@
 <?php
 include_once("sql/ISQLGet.php");
 include_once("sql/ISQLBinding.php");
+include_once("sql/column/IAliasedColumn.php");
+include_once("sql/column/IArrayColumn.php");
+include_once("sql/column/IExpressionColumn.php");
 
-class SQLColumn implements ISQLGet, ISQLBinding, IBindingModifier
+class SQLColumn extends SparkObject implements ISQLGet, ISQLBinding, IBindingModifier, IAliasedColumn, IArrayColumn, IExpressionColumn
 {
     protected string $prefix = "";
 
     protected string $alias = "";
     protected string $expression = "";
-
-    protected string $name = "";
 
     //allow array here to handle multi-insert
     protected array|string|float|int|bool|null $value = null;
@@ -28,20 +29,26 @@ class SQLColumn implements ISQLGet, ISQLBinding, IBindingModifier
      */
     public function __construct(string $name)
     {
-        if (strlen(trim($name))<1) throw new Exception("SQLColumn name can not be empty");
-        if (!InputSanitizer::SafeSQLColumn($name)) throw new Exception("Incorrect column name: $name");
-        $this->name = trim($name);
+        parent::__construct();
+
+        $name = trim($name);
+        if (strlen($name)<1) throw new Exception("SQLColumn name can not be empty");
+
+        $dotPos = strpos($name, '.');
+        $prefix = ($dotPos !== false) ? trim(substr($name, 0, $dotPos)) : "";
+        $name = ($dotPos !== false) ? trim(substr($name, $dotPos + 1)) : $name;
+
+        if (!InputSanitizer::SafeSQLColumn($name, false)) throw new Exception("Incorrect column name: $name");
+
+        $this->name = $name;
+        $this->prefix = $prefix;
+
         $this->bindingKey = "";
         $this->hasValue = false;
         $this->value = null;
         $this->expression = "";
         $this->alias = "";
-        $this->prefix = "";
-    }
 
-    public function getName() : string
-    {
-        return $this->name;
     }
 
     /**
@@ -99,6 +106,15 @@ class SQLColumn implements ISQLGet, ISQLBinding, IBindingModifier
     public function hasValue() : bool
     {
         return $this->hasValue;
+    }
+
+    /**
+     * Get the full name using the prefix
+     * @return string
+     */
+    public function getNamePrefix() : string
+    {
+        return ($this->prefix ? $this->prefix."." : "").$this->name;
     }
 
     /**
@@ -216,7 +232,7 @@ class SQLColumn implements ISQLGet, ISQLBinding, IBindingModifier
     {
 
         //base identifier (prefix.name)
-        $currentName = ($this->prefix ? $this->prefix . "." : "") . $this->name;
+        $currentName = $this->getNamePrefix();
 
         //PRIORITY: Raw SQL Expression
         if ($this->expression) {

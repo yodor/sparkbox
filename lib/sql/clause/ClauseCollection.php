@@ -1,10 +1,16 @@
 <?php
-include_once("sql/SQLClause.php");
-include_once("objects/SparkList.php");
+include_once("objects/SparkObject.php");
+
+include_once("sql/ISQLGet.php");
 include_once("sql/IBindingCollection.php");
+include_once("sql/IBindingModifier.php");
+
 include_once("objects/SparkMap.php");
-include_once("sql/CanSetExternalBinding.php");
-include_once("sql/CanSetExternalBindingList.php");
+include_once("sql/clause/SQLClause.php");
+
+include_once("sql/traits/CanSetExternalBinding.php");
+include_once("sql/traits/CanSetExternalBindingList.php");
+
 
 /**
  * SQL Where clause collection
@@ -93,7 +99,7 @@ class ClauseCollection extends SparkObject implements ISQLGet, IBindingCollectio
         if (strlen(trim($columnName))<1) throw new Exception("Name cannot be empty");
         if (is_string($value) && strlen(trim($value))<1) throw new Exception("Value cannot be empty");
 
-        if (!InputSanitizer::SafeSQLColumn($columnName)) throw new Exception("Incorrect column name for matching clause: $columnName");
+        if (!InputSanitizer::SafeSQLColumn($columnName, true)) throw new Exception("Incorrect column name for matching clause: $columnName");
 
         //mysql version otherways not possible to auto bind. should use expression in this case
         //ie where()->setExpression("prodID IS NULL"); no auto-binding

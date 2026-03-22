@@ -293,18 +293,19 @@ class Translator implements IRequestProcessor, IGETConsumer
     public function translateBean(int $id, string $field_name, array &$data, string $tableName) : void
     {
 
-
         try {
             if ($id<1 || empty($field_name) || empty($tableName)) throw new Exception("ID, field_name and table name required parameters");
 
-            $qry = $this->translated_beans->query();
-            $qry->stmt->set("translated");
+            $qry = $this->translated_beans->query("translated");
+
             $where = $qry->stmt->where();
             $where->match("langID", $this->langID);
             $where->match("field_name", $field_name);
             $where->match("table_name", $tableName);
             $where->match("bean_id", $id);
+
             $qry->stmt->limit(1);
+
             $qry->exec();
             if ($result = $qry->next()) {
                 $data[$field_name] = $result["translated"];

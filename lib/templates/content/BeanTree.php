@@ -58,7 +58,7 @@ class BeanTree extends BeanList
 
         $select = $this->bean->selectTree(array_keys($this->fields));
 
-        $query = new SelectQuery($select, $this->bean->key(), $this->bean->getTableName());
+        $query = new SelectQuery($select, $this->bean->key(), $this->bean->table());
 
         $view->setIterator($query);
         $view->getItemRenderer()->setLabelKey(array_keys($this->fields)[0]);

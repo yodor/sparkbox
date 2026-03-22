@@ -1,9 +1,10 @@
 <?php
+include_once("objects/SparkObject.php");
 include_once("sql/ISQLGet.php");
 include_once("sql/IBindingCollection.php");
-include_once("sql/SQLColumn.php");
+include_once("sql/column/SQLColumn.php");
 
-class SQLColumnSet implements ISQLGet, IBindingCollection
+class SQLColumnSet extends SparkObject implements ISQLGet, IBindingCollection
 {
 
     /**
@@ -13,7 +14,7 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
 
     public function __construct()
     {
-
+        parent::__construct();
     }
 
     public function __clone()
@@ -27,20 +28,24 @@ class SQLColumnSet implements ISQLGet, IBindingCollection
     {
         foreach ($this->fields as $name => $col) {
             if (!($col instanceof SQLColumn)) continue;
-            $other->setColumn($col);
+            $other->set($col);
         }
     }
 
-    public function setColumn(SQLColumn $column) : void
+    /**
+     * Assign to the collection using getNamePrefix as key
+     * @param SQLColumn $column
+     * @return void
+     */
+    public function set(SQLColumn $column) : void
     {
-        $this->fields[$column->getName()] = $column;
+        $column->setParent($this);
+        $this->fields[$column->getNamePrefix()] = $column;
     }
 
-    public function getColumn(string $name) : SQLColumn
+    public function get(string $name) : ?SQLColumn
     {
-        $name = trim($name);
-        if (!isSet($this->fields[$name])) throw new Exception("Column name '$name' not found");
-        return $this->fields[$name];
+        return $this->fields[$name] ?? null;
     }
 
     public function isSet(string $name): bool

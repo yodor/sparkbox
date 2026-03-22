@@ -58,7 +58,7 @@ class BeanListPage extends AdminPageTemplate
 
             $clauses = $this->keyword_search->getForm()->prepareClauseCollection("OR");
             //$clauses->copyTo($this->query->select->where());
-            $this->query->stmt->having = $clauses->getSQL();
+            $this->query->stmt->having($clauses->getSQL());
 
         }
 
@@ -105,13 +105,11 @@ class BeanListPage extends AdminPageTemplate
     protected function setBeanQuery() : void
     {
 
-        $qry = $this->bean->query();
-        $sel = $qry->stmt;
-        $sel->set($this->bean->key());
+        $qry = $this->bean->query($this->bean->key());
 
         foreach($this->fields as $name=>$label) {
             if ($this->bean->haveColumn($name)) {
-                $sel->set($name);
+                $qry->stmt->column($name);
             }
         }
 

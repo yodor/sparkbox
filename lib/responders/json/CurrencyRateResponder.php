@@ -46,7 +46,7 @@ class CurrencyRateResponder extends JSONResponder
 
             $db->transaction();
 
-            $delete = SQLDelete::Table($bean->getTableName());
+            $delete = SQLDelete::Table($bean->table());
             $delete->where()->expression("(srcID=:srcID AND dstID=:dstID) OR (dstID=:srcID AND srcID=:dstID)");
             $delete->where()->bind(":srcID", $this->srcID);
             $delete->where()->bind(":dstID", $this->dstID);

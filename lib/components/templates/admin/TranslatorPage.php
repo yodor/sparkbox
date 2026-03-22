@@ -16,8 +16,8 @@ class TranslatorPage extends BeanListPage
         $menu = array();
 
         $tr = new LanguagesBean();
-        $qry = $tr->query();
-        $qry->stmt->set("langID", "lang_code");
+        $qry = $tr->query("langID", "lang_code");
+
         $qry->exec();
 
         while ($row = $qry->next()) {

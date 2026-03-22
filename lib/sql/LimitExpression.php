@@ -1,6 +1,7 @@
 <?php
+include_once("sql/ISQLGet.php");
 
-class LimitExpression {
+class LimitExpression implements ISQLGet {
 
     protected ?int $count = null;
     protected ?int $offset = null;

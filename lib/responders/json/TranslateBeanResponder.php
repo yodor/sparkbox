@@ -106,7 +106,7 @@ class TranslateBeanResponder extends JSONResponder
     protected function _fetch(JSONResponse $response) : void
     {
 
-        $this->query->stmt->set("translated");
+        $this->query->stmt->columns("translated");
 
         $response->translation = "";
 

@@ -1,6 +1,6 @@
 <?php
 
-trait CanAccessColumnsDirectly
+trait CanSetColumnExpression
 {
      /**
      * Create/Return named column from the internal fieldset.
@@ -11,18 +11,18 @@ trait CanAccessColumnsDirectly
      * Allows direct access to the SQLColumn methods
      *
      * @param string $column_name
-     * @return SQLColumn The column with name $column_name created or already existing in the fieldset collection
+     * @return IExpressionColumn The column with name $column_name created or already existing in the fieldset collection
      * @throws Exception
      */
-    public function column(string $column_name) : SQLColumn
+    public function column(string $column_name) : IExpressionColumn
     {
-        if ($this->fieldset->isSet($column_name)) {
-            return $this->fieldset->getColumn($column_name);
-        }
+        $column = $this->fieldset->get($column_name);
+        //already exists
+        if (!is_null($column)) return $column;
 
-        //no binding - empty column
+        //create new column no binding - empty column
         $column = new SQLColumn($column_name);
-        $this->fieldset->setColumn($column);
+        $this->fieldset->set($column);
         return $column;
     }
 }

@@ -22,15 +22,15 @@ class NestedSetTree
     {
         $this->bean = $bean;
 
-        $select = SQLSelect::Table($this->bean->getTableName());
-        $select->set($this->bean->key(), "parentID", "lft", "rgt");
+        $select = SQLSelect::Table($this->bean->table());
+        $select->columns($this->bean->key(), "parentID", "lft", "rgt");
         $select->order("lft", OrderDirection::ASC);           // ← critical: pre-order traversal
         $this->select = $select;
     }
 
     public function setDataColumns(...$columns) : void
     {
-        $this->select->set(...$columns);
+        $this->select->columns(...$columns);
     }
 
     /**
@@ -143,7 +143,7 @@ class NestedSetTree
             $driver->transaction();
 
             foreach ($this->nodesById as $node) {
-                $upd = SQLUpdate::Table($this->bean->getTableName());
+                $upd = SQLUpdate::Table($this->bean->table());
                 $upd->set("lft", $node->lft());
                 $upd->set("rgt", $node->rgt());
                 $upd->where()->match($this->bean->key(), $node->id());
@@ -205,7 +205,7 @@ class NestedSetTree
      */
     public function saveNode(Node $node): bool
     {
-        $upd = SQLUpdate::Table($this->bean->getTableName());
+        $upd = SQLUpdate::Table($this->bean->table());
         $upd->set("lft", $node->lft());
         $upd->set("rgt", $node->rgt());
         $upd->where()->match($this->bean->key(), $node->id());

@@ -214,7 +214,7 @@ abstract class OrderedDataBean extends DBTableBean
         $db = $db ?? $this->db;
 
         $selectMax = clone $this->select;
-        $selectMax->setAliasExpression(" MAX(position) ", "max_position");
+        $selectMax->alias("MAX(position)", "max_position");
         $selectMax->setMeta("GET_MAX");
 
         $query = new SelectQuery($selectMax);

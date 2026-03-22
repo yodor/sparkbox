@@ -1,12 +1,12 @@
 <?php
 include_once("sql/SQLStatement.php");
-include_once("sql/SQLColumnSet.php");
-include_once("sql/CanModifyColumnName.php");
-include_once("sql/CanSetColumnAliasExpression.php");
-include_once("sql/CanSetLimitWithOffset.php");
-include_once("sql/CanSetOrder.php");
-include_once("sql/CanUseFromExpression.php");
-
+include_once("sql/HavingExpression.php");
+include_once("sql/traits/CanModifyColumnName.php");
+include_once("sql/traits/CanSetColumnAliasExpression.php");
+include_once("sql/traits/CanSetLimitWithOffset.php");
+include_once("sql/traits/CanSetOrder.php");
+include_once("sql/traits/CanUseFromExpression.php");
+include_once("sql/traits/CanUseHavingExpression.php");
 
 class SQLSelect extends SQLStatement
 {
@@ -15,13 +15,17 @@ class SQLSelect extends SQLStatement
     use CanSetColumnAliasExpression;
     use CanSetLimitWithOffset;
     use CanSetOrder;
+
     use CanUseFromExpression;
+    use CanUseHavingExpression;
 
     const int SQL_CALC_FOUND_ROWS = 1;
     const int SQL_CACHE = 2;
     const int SQL_NO_CACHE = 3;
 
     protected array $modeMask = array();
+
+    protected ?HavingExpression $_having = null;
 
     public static function Table(string $tableName) : SQLSelect
     {
@@ -34,6 +38,7 @@ class SQLSelect extends SQLStatement
     {
         parent::__construct($other);
         $this->type = "SELECT";
+        $this->_having = new HavingExpression();
     }
 
     public function clearMode() : void
@@ -60,6 +65,7 @@ class SQLSelect extends SQLStatement
 
     public function getSQL() : string
     {
+        if ($this->_from->isEmpty()) throw new Exception("Empty FROM expression");
         if ($this->fieldset->count() < 1) throw new Exception("Empty fieldset");
 
         $sql = $this->type . " ";
@@ -86,8 +92,8 @@ class SQLSelect extends SQLStatement
             $sql .= " GROUP BY " . $this->group_by . " ";
         }
 
-        if (strlen(trim($this->having)) > 0) {
-            $sql .= " HAVING " . $this->having;
+        if (!$this->_having->isEmpty()) {
+            $sql .= " HAVING " . $this->_having;
         }
 
         $sql .= $this->getOrderSQL();
@@ -145,14 +151,10 @@ class SQLSelect extends SQLStatement
             $this->group_by .= $other->group_by;
         }
 
-        if (strlen(trim($this->having)) > 0) {
-            if (strlen(trim($other->having)) > 0) {
-                $this->having .= " AND " . $other->having;
-            }
+        if (!$other->_having->isEmpty()) {
+            $this->_having->and($other->_having);
         }
-        else if (strlen(trim($other->having)) > 0) {
-            $this->having .= $other->having;
-        }
+
 
         //combine and replace. all ordercolumns from other get into this order columns
         $other->copyOrderTo($this->orderParameters);

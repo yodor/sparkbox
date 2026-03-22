@@ -15,8 +15,16 @@ trait CanModifyColumnName
     public function setPrefix(string $prefix) : void
     {
         foreach ($this->fieldset->names() as $idx => $name) {
-            $column = $this->fieldset->getColumn($name);
+            $column = $this->fieldset->get($name);
+            if (!$column) continue;
+
+            if ($column->getExpression()) continue;
+
             $column->setPrefix($prefix);
+
+            $this->fieldset->unset($name);
+
+            $this->fieldset->set($column);
         }
     }
 
@@ -70,7 +78,7 @@ trait CanModifyColumnName
      * @param string ...$columns Array of column names to set to this collection
      * @throws Exception
      */
-    public function set(string ...$columns) : void
+    public function columns(string ...$columns) : void
     {
         $this->fieldset->unset("*");
         //clean empty
@@ -97,12 +105,15 @@ trait CanModifyColumnName
             $pair = preg_split("/ as /i", $columnName);
 
             //no binding key creation no value is set hasValue is false
-            $column = new SQLColumn($pair[0]);
-            if (isset($pair[1])) {
-                $column->setAlias($pair[1]);
-            }
-            $this->fieldset->setColumn($column);
+            $name = $pair[0];
+            $alias = $pair[1] ?? "";
+
+            $column = new SQLColumn($name);
+            if ($alias) $column->setAlias($alias);
+
+            $this->fieldset->set($column);
         }
+
     }
 
     /**

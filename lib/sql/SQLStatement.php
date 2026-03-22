@@ -3,11 +3,13 @@ include_once("sql/ISQLGet.php");
 include_once("sql/IBindingCollection.php");
 include_once("sql/IBindingModifier.php");
 
-include_once("sql/SQLColumnSet.php");
-include_once("sql/ClauseCollection.php");
+include_once("sql/column/SQLColumnSet.php");
+include_once("sql/clause/ClauseCollection.php");
+
 include_once("sql/FromExpression.php");
 include_once("sql/LimitExpression.php");
-include_once("sql/CanSetExternalBinding.php");
+
+include_once("sql/traits/CanSetExternalBinding.php");
 
 abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModifier
 {
@@ -34,8 +36,6 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     protected ?ClauseCollection $whereset = null;
 
     public string $group_by = "";
-
-    public string $having = "";
 
     public abstract function getSQL() : string;
 

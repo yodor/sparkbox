@@ -23,9 +23,9 @@ class UserGroupsBean extends DBTableBean
 
     public function isMemberOf(int $userID, int $groupID) : bool
     {
-        $qry = $this->query();
-        $qry->stmt->where()->match("userID", $userID)->match("groupID", $groupID);
-        $qry->stmt->set("userID");
+        $qry = $this->query("userID");
+        $qry->stmt->where()->match("userID", $userID);
+        $qry->stmt->where()->match("groupID", $groupID);
         $qry->stmt->limit(1);
         $qry->exec();
         if ($qry->next()) {

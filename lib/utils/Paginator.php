@@ -1,7 +1,7 @@
 <?php
 include_once("utils/IGETConsumer.php");
 include_once("objects/SparkObject.php");
-include_once("sql/OrderColumn.php");
+include_once("objects/OrderColumn.php");
 include_once("utils/InputSanitizer.php");
 include_once("components/InlinePageScript.php");
 

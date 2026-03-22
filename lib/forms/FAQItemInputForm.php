@@ -16,9 +16,7 @@ class FAQItemInputForm extends InputForm
         $bean = new FAQSectionsBean();
 
         $rend = $field->getRenderer();
-
-        $qry = $bean->query();
-        $qry->stmt->set($bean->key(), "section_name");
+        $qry = $bean->query($bean->key(), "section_name");
         $rend->setIterator($qry);
 
         $rend->getItemRenderer()->setValueKey($bean->key());

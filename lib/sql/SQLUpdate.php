@@ -1,7 +1,8 @@
 <?php
 include_once("sql/SQLStatement.php");
-include_once("sql/CanSetColumnValue.php");
-include_once("sql/CanAccessColumnsDirectly.php");
+include_once("sql/traits/CanSetColumnValue.php");
+include_once("sql/traits/CanSetColumnExpression.php");
+include_once("sql/traits/CanSetLimit.php");
 
 /**
  * Class SQLUpdate
@@ -11,7 +12,7 @@ include_once("sql/CanAccessColumnsDirectly.php");
 class SQLUpdate extends SQLStatement
 {
     use CanSetColumnValue;
-    use CanAccessColumnsDirectly;
+    use CanSetColumnExpression;
     use CanSetLimit;
 
     static public function Table(string $tableExpr) : SQLUpdate
@@ -53,7 +54,8 @@ class SQLUpdate extends SQLStatement
         $names = $this->fieldset->names();
 
         foreach ($names as $columnName) {
-            $column = $this->fieldset->getColumn($columnName);
+            $column = $this->fieldset->get($columnName);
+            if (!$column) continue;
 
             // PRIORITY: Check for raw SQL expressions (e.g., "price = price + 10").
             if ($column->getExpression()) {
@@ -86,7 +88,8 @@ class SQLUpdate extends SQLStatement
 
         // 1. Process SET clause bindings
         foreach ($names as $name) {
-            $column = $this->fieldset->getColumn($name);
+            $column = $this->fieldset->get($name);
+            if (!$column) continue;
             $key = $column->getBindingKey();
 
             if ($key) {

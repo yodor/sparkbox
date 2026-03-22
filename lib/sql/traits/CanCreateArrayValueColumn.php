@@ -9,11 +9,11 @@ trait CanCreateArrayValueColumn {
      * @return SQLColumn
      * @throws Exception
      */
-    public function columnArray(string $column_name) : SQLColumn
+    public function columnArray(string $column_name) : IArrayColumn
     {
         $column = new SQLColumn($column_name);
         $column->createArray();
-        $this->fieldset->setColumn($column);
+        $this->fieldset->set($column);
         return $column;
     }
 }

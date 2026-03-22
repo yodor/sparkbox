@@ -1,8 +1,7 @@
 <?php
 include_once("sql/SQLStatement.php");
-include_once("sql/CanSetColumnValue.php");
-include_once("sql/CanCreateArrayValueColumn.php");
-include_once("sql/CanAccessColumnsDirectly.php");
+include_once("sql/traits/CanSetColumnValue.php");
+include_once("sql/traits/CanCreateArrayValueColumn.php");
 
 class SQLInsert extends SQLStatement
 {
@@ -41,7 +40,8 @@ class SQLInsert extends SQLStatement
         $placeholders = array();
         foreach ($this->fieldset->names() as $name) {
 
-            $column = $this->fieldset->getColumn($name);
+            $column = $this->fieldset->get($name);
+            if (!$column) continue;
 
             if ($column->getExpression()) {
                 $placeholders[] = $column->getExpression();
@@ -90,7 +90,8 @@ class SQLInsert extends SQLStatement
 
         for ($i = 0; $i < $rowCount; $i++) {
             foreach ($this->fieldset->names() as $name) {
-                $column = $this->fieldset->getColumn($name);
+                $column = $this->fieldset->get($name);
+                if (!$column) continue;
                 $key = $column->getBindingKey();
 
                 if ($key) {
@@ -110,11 +111,12 @@ class SQLInsert extends SQLStatement
     /**
      * Calculates the total number of rows based on the column with the most values.
      */
-    public function getRowCount(): int
+    protected function getRowCount(): int
     {
         $maxRows = 0;
         foreach ($this->fieldset->names() as $idx => $columnName) {
-            $column = $this->fieldset->getColumn($columnName);
+            $column = $this->fieldset->get($columnName);
+            if (!$column) continue;
             if (!$column->hasValue()) continue;
 
             $val = $column->getValue();
@@ -126,6 +128,7 @@ class SQLInsert extends SQLStatement
         }
         return $maxRows;
     }
+
     public function on(string $expr) : void
     {
         $this->on = $expr;

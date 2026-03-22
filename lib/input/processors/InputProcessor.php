@@ -147,7 +147,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             return;
         }
 
-        if (strcmp($this->transact_bean->getTableName(), $transactor->getBean()->getTableName()) === 0) {
+        if (strcmp($this->transact_bean->table(), $transactor->getBean()->table()) === 0) {
             throw new Exception("Unable to transact - DataInput '" . $this->input->getName() . "' have transact-bean equal to the main bean - '" . get_class($this->transact_bean) . "'");
         }
 
@@ -309,7 +309,7 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
             $iterator = $this->input->getRenderer()->getIterator();
             if (!($iterator instanceof SelectQuery)) throw new Exception("Unsupported iterator");
             $iterator->stmt->reset();
-            $iterator->stmt->set(...$this->renderer_source_copy_fields);
+            $iterator->stmt->columns(...$this->renderer_source_copy_fields);
             $iterator->stmt->where()->match($name, $value);
             $iterator->stmt->limit(1);
             $iterator->exec();

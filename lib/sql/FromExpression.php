@@ -1,11 +1,14 @@
 <?php
+include_once("sql/ExpressionBuilder.php");
 
-class FromExpression
+class FromExpression extends ExpressionBuilder
 {
-    protected string $buffer = "";
+
 
     public function __construct()
-    { }
+    {
+        parent::__construct();
+    }
 
     /**
      * Append " " + $text to the internal buffer
@@ -15,8 +18,26 @@ class FromExpression
      */
     public function append(string $text) : self
     {
-        if (strlen(trim($text)) < 1) throw new Exception("Keyword can not be empty");
+        if (strlen(trim($text)) < 1) throw new Exception("Text can not be empty");
         $this->buffer .= " ".$text;
+        return $this;
+    }
+
+    /**
+     * Set expression value to \$expr
+     * Return instance to self
+     * If \$expr is null do nothing and return instance only
+     *
+     * @param string|null $expr
+     * @return $this
+     * @throws Exception
+     */
+    public function expr(?string $expr=null) : self
+    {
+        if (!is_null($expr)) {
+            if (strlen(trim($expr))==0) throw new Exception("Expression must be a valid string");
+            $this->buffer = trim($expr);
+        }
         return $this;
     }
 
@@ -75,53 +96,4 @@ class FromExpression
         return $this->appendKeyword("ON", $joinExpr);
     }
 
-    /**
-     * Return the contents of the buffer
-     * @return string
-     */
-    public function toString() : string
-    {
-        return $this->buffer;
-    }
-
-    /**
-     * Return the contents of the buffer
-     * @return string
-     */
-    public function __toString() : string
-    {
-        return $this->toString();
-    }
-
-    /**
-     * Return instance to self
-     * If \$fromExpr is not empty and not null the internal buffer will be initialized with it.
-     * @param string|null $fromExpr
-     * @return $this
-     * @throws Exception
-     */
-    public function expr(?string $fromExpr=null) : self
-    {
-        if (!is_null($fromExpr)) {
-            if (strlen(trim($fromExpr))==0) throw new Exception("Expression must be a valid string");
-            $this->buffer = trim($fromExpr);
-        }
-        return $this;
-    }
-
-    /**
-     * Helper method to append to the internal buffer
-     * Appends " " + $keyword + " " + $fromExpr to the internal buffer
-     * @param string $keyword
-     * @param string $fromExpr
-     * @return $this
-     * @throws Exception
-     */
-    protected function appendKeyword(string $keyword, string $fromExpr) : self
-    {
-        if (strlen(trim($fromExpr)) < 1) throw new Exception("Keyword can not be empty");
-        if (strlen(trim($keyword)) < 1) throw new Exception("From expr can not be empty");
-        $this->buffer .= " $keyword ".$fromExpr;
-        return $this;
-    }
 }

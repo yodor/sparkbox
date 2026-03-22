@@ -1,5 +1,5 @@
 <?php
-include_once("sql/CanSetLimit.php");
+include_once("sql/traits/CanSetLimit.php");
 
 trait CanSetLimitWithOffset
 {

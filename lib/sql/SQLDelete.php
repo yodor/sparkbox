@@ -1,6 +1,6 @@
 <?php
 include_once("sql/SQLStatement.php");
-include_once("sql/SQLSelect.php");
+include_once("traits/CanSetLimit.php");
 
 class SQLDelete extends SQLStatement
 {

@@ -124,7 +124,7 @@ class DatedBean extends DBTableBean
 
         $query = $this->queryMonthYear($year, $month);
 
-        $query->stmt->setAliasExpression("DAY($this->date_column)", "day");
+        $query->stmt->alias("DAY($this->date_column)", "day");
 
         $query->stmt->group_by = " DAY($this->date_column) ";
 
@@ -149,7 +149,7 @@ class DatedBean extends DBTableBean
         if ($year<1) throw new Exception("Year must be greater than 0");
 
         $query = $this->query($this->key());
-        $query->stmt->setAliasExpression("MONTH($this->date_column)", "month");
+        $query->stmt->alias("MONTH($this->date_column)", "month");
         $query->stmt->where()->expression("YEAR($this->date_column) = :year");
         $query->stmt->where()->bind(":year", $year);
         $this->setDefaultOrder($query->stmt);
@@ -175,7 +175,7 @@ class DatedBean extends DBTableBean
     public function years(): array
     {
         $query = $this->query($this->key());
-        $query->stmt->setAliasExpression("YEAR($this->date_column)", "year");
+        $query->stmt->alias("YEAR($this->date_column)", "year");
         $this->setDefaultOrder($query->stmt);
         $query->stmt->group_by = " YEAR($this->date_column) DESC ";
 
@@ -202,7 +202,7 @@ class DatedBean extends DBTableBean
      * @return int
      * @throws Exception
      */
-    public function count(int $year, int $month): int
+    public function countBy(int $year, int $month): int
     {
         return $this->queryMonthYear($year, $month)->count();
     }

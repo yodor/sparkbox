@@ -26,10 +26,9 @@ class AdminUsersListPage extends BeanListPage
 
         $h_toggle = new ToggleFieldResponder($bean);
 
-
-        $qry = $bean->query();
-        $qry->stmt->set( "userID", "email", "fullname", "access_level",  "date_created", "last_active", "counter", "suspend");
-        $qry->stmt->setAliasExpression("(SELECT group_concat(ac.role SEPARATOR '; ') FROM admin_access ac WHERE ac.userID=admin_users.userID)", "roles");
+        $qry = $bean->query("userID", "email", "fullname", "access_level",  "date_created", "last_active", "counter", "suspend");
+        $qry->stmt->alias("(SELECT group_concat(ac.role SEPARATOR '; ') FROM admin_access ac WHERE ac.userID=admin_users.userID)",
+            "roles");
 
         $view = new TableView($qry);
 
