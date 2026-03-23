@@ -9,7 +9,7 @@ if (file_exists(APP_PATH."/config/boot.php")) include_once(APP_PATH."/config/boo
 if (defined("REQUEST_THROTTLE_USERAGENT")) {
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? "";
 
-    // English comment: Quick preliminary check to avoid class loading for regular browsers.
+    //Quick preliminary check to avoid class loading for regular browsers.
     if (empty(trim($userAgent)) || preg_match('/' . REQUEST_THROTTLE_USERAGENT . '/i', $userAgent)) {
 
         include_once("ratelimit.php");
