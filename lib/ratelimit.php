@@ -9,8 +9,8 @@
 class RateLimiter
 {
     // Static configuration properties (PascalCase)
-    public static int $ThrottleSeconds = 60;
-    public static int $MaxConnections = 2;
+    public static int $ThrottleSeconds = 30;
+    public static int $MaxConnections = 5;
     public static string $UserAgentPattern = "";
     public static bool $EnableDebug = false;
 
