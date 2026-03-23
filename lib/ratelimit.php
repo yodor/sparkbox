@@ -10,9 +10,9 @@ class RateLimiter
 {
     // Static configuration properties (PascalCase)
     public static int $ThrottleSeconds = 60;
-    public static int $MaxConnections = 1;
+    public static int $MaxConnections = 2;
     public static string $UserAgentPattern = "";
-    public static bool $EnableDebug = false;
+    public static bool $EnableDebug = true;
 
     private const int PACKET_SIZE = 12;
 
@@ -54,7 +54,7 @@ class RateLimiter
     {
         $fh = fopen($tmpFile, 'c+');
         if (!$fh) {
-            header($_SERVER["SERVER_PROTOCOL"] . ' 500 Internal Error');
+            header($_SERVER["SERVER_PROTOCOL"] . ' 500 Internal Error', true, 500);
             exit;
         }
 
@@ -66,12 +66,14 @@ class RateLimiter
             $timeNow   = microtime(true);
 
             if (self::ShouldThrottle($lastTime, $connCount, $timeNow)) {
+                flock($fh, LOCK_UN);
+                fclose($fh);
+
                 if (self::$EnableDebug) {
                     error_log("RateLimiter Blocked: $tmpFile (Count: $connCount)");
                 }
-                header($_SERVER["SERVER_PROTOCOL"] . ' 429 Too Many Requests');
-                flock($fh, LOCK_UN);
-                fclose($fh);
+
+                header($_SERVER["SERVER_PROTOCOL"] . ' 429 Too Many Requests', true, 429);
                 exit;
             }
 
