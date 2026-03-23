@@ -5,8 +5,26 @@ if (!defined("APP_PATH")) throw new Exception("APP_PATH is not defined");
 
 if (file_exists(APP_PATH."/config/boot.php")) include_once(APP_PATH."/config/boot.php");
 
+// --- Optimized Rate Limiting Boot Section ---
 if (defined("REQUEST_THROTTLE_USERAGENT")) {
-    include_once("ratelimit.php");
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? "";
+
+    // English comment: Quick preliminary check to avoid class loading for regular browsers.
+    if (empty(trim($userAgent)) || preg_match('/' . REQUEST_THROTTLE_USERAGENT . '/i', $userAgent)) {
+
+        include_once("ratelimit.php");
+
+        RateLimiter::$UserAgentPattern = REQUEST_THROTTLE_USERAGENT;
+
+        if (defined("REQUEST_THROTTLE_SECONDS")) {
+            RateLimiter::$ThrottleSeconds = REQUEST_THROTTLE_SECONDS;
+        }
+        if (defined("REQUEST_THROTTLE_CONNCOUNT")) {
+            RateLimiter::$MaxConnections = REQUEST_THROTTLE_CONNCOUNT;
+        }
+        // Start the check
+        RateLimiter::Check();
+    }
 }
 
 //auto https redirect

@@ -1,94 +1,98 @@
 <?php
 
-function storePacket($fh, array $data) : void
+class RateLimiter
 {
-    flock($fh, LOCK_EX);
-    rewind($fh);
-    fwrite($fh, serialize($data));
-    fflush($fh);
-    flock($fh, LOCK_UN);
-}
-function readPacket($fh) : array
-{
-    flock($fh, LOCK_SH);
-    rewind($fh);
-    $packet = fread($fh, 100);
-    @$data = unserialize($packet);
-    //var_dump($data);
-    if ($data === false) {
-        $data = array(0,0);
-    }
-    flock($fh, LOCK_UN);
-    return $data;
-}
-function rateCheck() : void
-{
-    $names = explode("|", REQUEST_THROTTLE_USERAGENT);
+    // Static properties in PascalCase
+    public static int $ThrottleSeconds = 60;
+    public static int $MaxConnections = 1;
+    public static string $UserAgentPattern = "";
 
-    $emptyUserAgent="EmptyUserAgent";
-    $userAgent = "";
-    if (isset($_SERVER['HTTP_USER_AGENT'])) {
-        $userAgent = trim($_SERVER['HTTP_USER_AGENT']);
+    private const int PACKET_SIZE = 12;
+
+    public static function Check(): void
+    {
+        // Local variable in camelCase
+        $botName = self::IdentifyBot();
+
+        if ($botName !== null) {
+            $installId = hash('xxh3', APP_PATH);
+            $tmpFile = sys_get_temp_dir() . "/ratelimit-{$botName}-{$installId}";
+
+            self::Process($tmpFile);
+        }
     }
 
-    if (strlen($userAgent)<1) {
-        $userAgent = $emptyUserAgent;
-        $names[] = $emptyUserAgent;
+    private static function IdentifyBot(): ?string
+    {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? "";
+
+        if (empty(trim($userAgent))) {
+            return "EmptyUA";
+        }
+
+        if (empty(self::$UserAgentPattern)) return null;
+
+        $pattern = '/' . self::$UserAgentPattern . '/i';
+        if (preg_match($pattern, $userAgent, $matches)) {
+            return strtolower($matches[0]);
+        }
+
+        return null;
     }
 
-    foreach ($names as $nameMatch) {
+    private static function Process(string $tmpFile): void
+    {
+        $fh = fopen($tmpFile, 'c+');
+        if (!$fh) {
+            header($_SERVER["SERVER_PROTOCOL"] . ' 500 Internal Error');
+            exit;
+        }
 
-        if (!str_contains($userAgent, $nameMatch)) continue;
-
-        $installID = hash('xxh3', constant("APP_PATH"));
-
-        //temporary file for each installation and userAgent name
-        $tmpFile = sys_get_temp_dir() . "/" . $nameMatch . "-" . $installID;
-
-        if ($fh = fopen($tmpFile, 'c+')) {
-
-            $data = readPacket($fh);
-
-            $lastTimeFloat = (float)$data[0]; //last access from this userAgent
-            $connCount = (int)$data[1]; //connection count
-
+        if (flock($fh, LOCK_EX)) {
+            // Parameters and local variables in camelCase
+            $data = self::ReadPacket($fh);
             $timeNow = microtime(true);
-            $timeDiff = $timeNow - $lastTimeFloat;
 
-            $connCount++;
-
-            //number of connection exceeded for the amount of time given
-            if ($connCount > REQUEST_THROTTLE_CONNCOUNT && $timeDiff < REQUEST_THROTTLE_SECONDS) {
-                // bail with http 429 Too Many Requests
-                header($_SERVER["SERVER_PROTOCOL"] . ' 429');
-//                    $data[0] = (float)$lastTimeFloat;
-//                    $data[1] = (int)$connCount;
-//                    storePacket($fh, $data);
+            if (self::ShouldThrottle($data[0], $data[1], $timeNow)) {
+                header($_SERVER["SERVER_PROTOCOL"] . ' 429 Too Many Requests');
+                flock($fh, LOCK_UN);
                 fclose($fh);
                 exit;
             }
-            if ($timeDiff > REQUEST_THROTTLE_SECONDS) {
-                //reset connection count
-                $data[0] = (float)$timeNow;
-                $data[1] = (int)1;
-                storePacket($fh, $data);
-                fclose($fh);
-                return;
+
+            $timeDiff = $timeNow - $data[0];
+            if ($timeDiff > self::$ThrottleSeconds) {
+                $data = [$timeNow, 1];
+            } else {
+                $data[1]++;
             }
 
-            //allow this request, store the current connection count
-            $data[0] = (float)$lastTimeFloat;
-            $data[1] = (int)$connCount;
-            storePacket($fh, $data);
-            fclose($fh);
+            self::StorePacket($fh, $data);
+            flock($fh, LOCK_UN);
         }
-        else {
-            header($_SERVER["SERVER_PROTOCOL"] . ' 430');
-            exit;
-        }
+        fclose($fh);
     }
 
+    private static function ShouldThrottle(float $lastTime, int $connCount, float $currentTime): bool
+    {
+        $timeDiff = $currentTime - $lastTime;
+        return ($connCount >= self::$MaxConnections && $timeDiff < self::$ThrottleSeconds);
+    }
 
+    private static function ReadPacket($fh): array
+    {
+        rewind($fh);
+        $packet = fread($fh, self::PACKET_SIZE);
+        if (strlen($packet) < self::PACKET_SIZE) return [0.0, 0];
+
+        $unpacked = unpack('d1/L2', $packet);
+        return [$unpacked[1], $unpacked[2]];
+    }
+
+    private static function StorePacket($fh, array $data): void
+    {
+        rewind($fh);
+        fwrite($fh, pack('dL', (float)$data[0], (int)$data[1]));
+        fflush($fh);
+    }
 }
-
-rateCheck();
