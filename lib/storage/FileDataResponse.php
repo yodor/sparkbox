@@ -5,11 +5,9 @@ include_once("storage/FileStorageObject.php");
 class FileDataResponse extends BeanDataResponse
 {
 
-    protected string $field = BeanDataResponse::FIELD_DATA;
-
     public function __construct(int $id, string $className)
     {
-        parent::__construct($id, $className);
+        parent::__construct($id, $className, BeanDataResponse::FIELD_DATA);
     }
 
     //do nothing StorageObject buffer already contains the data
@@ -21,7 +19,7 @@ class FileDataResponse extends BeanDataResponse
     protected function cacheName() : string
     {
         $parts = array();
-        $parts[] = $this->field;
+        $parts[] = BeanDataResponse::FIELD_DATA;
         return implode("-", $parts);
     }
 

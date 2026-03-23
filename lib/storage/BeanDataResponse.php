@@ -13,19 +13,28 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
     protected string $className = "";
     protected int $id = -1;
-    protected string $field = "";
+
+    private string $field = "";
 
     /**
-     * @var StorageObject
+     * @var StorageObject|null
      */
-    protected StorageObject $object;
-
-    protected ?CacheEntry $cacheEntry;
+    protected ?StorageObject $object = null;
 
     /**
-     * @var DBTableBean
+     * @var FileCacheEntry|null
      */
-    protected DBTableBean $bean;
+    protected ?FileCacheEntry $cacheEntry = null;
+
+    //meta for auth required
+    protected ?FileCacheEntry $authEntry = null;
+
+    protected string $authClass = "";
+
+    /**
+     * @var DBTableBean|null
+     */
+    protected ?DBTableBean $bean = null;
 
     protected bool $skip_cache = FALSE;
 
@@ -50,29 +59,36 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      * @param string $className
      * @throws Exception
      */
-    public function __construct(int $id, string $className)
+    public function __construct(int $id, string $className, string $fieldName)
     {
         parent::__construct();
 
         $this->id = $id;
         $this->className = $className;
+        $this->field = $fieldName;
 
-        $this->bean = SparkLoader::Factory(SparkLoader::PREFIX_BEANS)->instance($className, DBTableBean::class);
-
-        if (isset($_GET["field"])) {
-            $this->field = $_GET["field"];
-            $this->field_requested = TRUE;
-
-            Debug::ErrorLog("Using bean field: $this->field");
-        }
+        $this->bean = null;
 
         $this->cacheEntry = NULL;
+        $this->authEntry = NULL;
 
         if (Spark::GetBoolean(Config::STORAGE_CACHE_ENABLED) && !$this->skip_cache) {
-            $this->cacheEntry = CacheFactory::BeanCacheEntry($this->cacheName(), $this->className, $this->id);
+            $entryName = $this->cacheName();
+            $this->cacheEntry = CacheFactory::BeanCacheEntry($entryName, $this->className, $this->id);
+            $this->authEntry = CacheFactory::BeanCacheEntry($entryName.".auth", $this->className, $this->id);
         }
 
+    }
 
+    private function createBeanInstance() : void
+    {
+        if (!$this->bean) {
+            $bean = SparkLoader::Factory(SparkLoader::PREFIX_BEANS)->instance($this->className, DBTableBean::class);
+            if (!($bean instanceof DBTableBean)) throw new Exception("Incorrect object loaded - expecting DBTableBean");
+            if (!$bean->haveColumn($this->field)) throw new Exception("Column not found: " . $this->field);
+            if (!str_contains(strtolower($bean->columnType($this->field)), "blob")) throw new Exception("Column type incorrect: " . $this->field);
+            $this->bean = $bean;
+        }
     }
 
     /**
@@ -80,27 +96,37 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      */
     protected function authorizeAccess(): void
     {
-        Debug::ErrorLog("authorizeAccess ...");
 
+        if ($this->cacheEntry && $this->cacheEntry->haveData()) {
+            if (!$this->authEntry->haveData()) {
+                Debug::ErrorLog("Skipping authorize for cached blob - auth file not found");
+                return;
+            }
+        }
+
+        //create the instance here
+        $this->createBeanInstance();
+
+        //load bean class
         if (!$this->bean->haveColumn("auth_context")) {
             Debug::ErrorLog("No auth_context column defined");
             return;
         }
 
         //exclude blob type columns
-        $beanColumns = $this->bean->columns();
-        foreach ($beanColumns as $columnName => $storageType) {
-            if (str_contains($storageType, "blob")) {
-                unset($beanColumns[$columnName]);
+        $dataColumns = $this->bean->columnNames();
+        foreach ($dataColumns as $idx => $name) {
+            if (str_contains(strtolower($this->bean->columnType($name)), "blob")) {
+                unset($dataColumns[$idx]);
             }
         }
 
-        $dataColumns = array_keys($beanColumns);
         $data = $this->bean->getByID($this->id, ...$dataColumns);
 
         $auth_context = (string)$data["auth_context"];
+        $this->authClass = $auth_context;
 
-        if (strlen($auth_context) < 1) {
+        if (strlen(trim($auth_context)) < 1) {
             Debug::ErrorLog("auth_context not set for this id");
             return;
         }
@@ -110,29 +136,30 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         Session::Start();
         Authenticator::AuthorizeResource($auth_context, $data, TRUE);
         Session::Close();
+
     }
 
     /**
-     * Create and set the StorageObject with data from DB
+     *
+     * Fully load the blob data and set it to $this->object.
+     *
      * @return void
      * @throws Exception
      */
-    protected function loadBean() : void
+    protected function loadBlob() : void
     {
 
         Debug::ErrorLog("Loading ID: " . $this->id . " from " . $this->className);
 
-        $result = $this->bean->getByID($this->id);
+        $this->createBeanInstance();
+
+        //load fully
+        $result = $this->bean->getByID($this->id, ...$this->bean->columnNames());
         Debug::ErrorLog("Data keys loaded: ", array_keys($result));
 
-        if (!isset($result[$this->field])) {
-            Debug::ErrorLog("Required field name not found");
-            throw new Exception("Field name not found");
-        }
-
-        if (strlen($result[$this->field])<1) {
-            throw new Exception("Empty data");
-        }
+        //just in case
+        if (!isset($result[$this->field])) throw new Exception("Result missing column[$this->field]");
+        if (strlen($result[$this->field])<1) throw new Exception("No data in column[$this->field]");
 
         $object = @unserialize($result[$this->field]);
 
@@ -142,17 +169,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
             $this->object = $object;
         }
         else {
-
-            Debug::ErrorLog("Field[$this->field] does not contain StorageObject");
-
-            //Limit arbitrary data access from the result row
-            if ($this->field_requested) {
-                throw new Exception("Named field access restricted to StorageObject types only");
-            }
-
-            //Create storage object using the default data key
-            $this->object = StorageObject::CreateFrom($result, $this->field);
-
+            throw new Exception("Un-serialize of StorageObject failed");
         }
 
         if (isset($result["watermark_enabled"])) {
@@ -220,6 +237,8 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     protected function getBeanLastModified() : int
     {
 
+        $this->createBeanInstance();
+
         $last_modified = time();
 
         //default value
@@ -274,11 +293,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      */
     public function send() : void
     {
-        Debug::ErrorLog("Class: " . $this->className . " ID: " . $this->id . " Field: " . $this->field);
-
-        if (!$this->bean->haveColumn($this->field)) {
-            throw new Exception("Bean does not support this field");
-        }
+        Debug::ErrorLog("Class: " . $this->className . " ID: " . $this->id);
 
         //check auth_context field exists for this bean and authorize
         $this->authorizeAccess();
@@ -296,18 +311,18 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->setDispositionFilename($beanETag);
 
         $cacheName = $this->cacheName();
-        Debug::ErrorLog("Cache name is: ".$cacheName);
+        Debug::ErrorLog("Using blob CacheEntry[".$cacheName."]");
 
         //check if we have the data in cache (skip fetching blob data from DB and image processing if found)
         if ($this->cacheEntry && $this->cacheEntry->haveData()) {
-            Debug::ErrorLog("Bean data found in cache - sending cache data as a response");
+            Debug::ErrorLog("Blob contents found in cache - sending cached blob as a response");
             $this->setHeader("X-Tag", "SparkCache");
             $this->sendCacheEntry($this->cacheEntry);
             exit;
         }
 
         //fully load the bean data including the blob field
-        $this->loadBean();
+        $this->loadBlob();
 
         //do the magic - ie image resize; also set content length header
         $this->process();
@@ -316,6 +331,9 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         if ($this->cacheEntry) {
             Debug::ErrorLog("Storing cache file for this bean request");
             $this->cacheEntry->storeBuffer($this->object->buffer(), $lastModified);
+            if ($this->bean->haveColumn("auth_context")) {
+                $this->authEntry->store($this->authClass, $lastModified);
+            }
             Debug::ErrorLog("Sending cache file as a response");
             $this->sendCacheEntry($this->cacheEntry);
         }

@@ -184,9 +184,6 @@ class SparkHTTPResponse
         if ($cacheEntry instanceof FileCacheEntry) {
             $this->sendFile($cacheEntry->getFile());
         }
-        else if ($cacheEntry instanceof DBCacheEntry) {
-            $this->sendData($cacheEntry->getBuffer());
-        }
         else {
             throw new Exception("Unsupported CacheEntry type");
         }

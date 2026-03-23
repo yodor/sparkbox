@@ -237,7 +237,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
     /**
      * Return column names of this table
-     * @return array
+     * @return array<string> column names
      */
     public function columnNames(): array
     {
@@ -470,9 +470,6 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             $db = $this->db;
             Debug::ErrorLog("Starting DB transaction using the bean assigned driver connection");
             $db->transaction();
-        }
-        else {
-            //Debug::ErrorLog("Not starting DB transaction - received driver connection from function call parameter");
         }
 
         try {

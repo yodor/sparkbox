@@ -48,7 +48,7 @@ class SparkFile {
     public function setPath(string $path) : void
     {
         $this->close();
-        $this->path = $path."/";
+        $this->path = rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -86,12 +86,12 @@ class SparkFile {
     public function setAbsoluteFilename(string $absolute_file) : void
     {
         $this->close();
-        $path_parts = pathinfo($absolute_file);
-        $this->setFilename($path_parts["basename"]);
 
-        $path = $path_parts["dirname"];
-        if (empty($path))throw new Exception("Path empty");
-        $this->setPath($path);
+        $dir = pathinfo($absolute_file, PATHINFO_DIRNAME);
+        $name = pathinfo($absolute_file, PATHINFO_BASENAME);
+
+        $this->setPath($dir);
+        $this->setFilename($name);
     }
 
     /**

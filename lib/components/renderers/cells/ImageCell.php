@@ -123,9 +123,6 @@ class ImageCell extends TableCell implements IPhotoRenderer
             $item = new StorageItem();
             $item->className = get_class($this->bean);
             $item->id = $data[$this->bean->key()];
-
-            $item->field = $this->blob_field;
-
             $this->elements[] = $item;
         }
         else {

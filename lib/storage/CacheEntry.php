@@ -3,11 +3,17 @@
 abstract class CacheEntry
 {
 
+    protected string $entryName = "";
 
-
-    protected function __construct()
+    protected function __construct(string $entryName)
     {
+        if (strlen(trim($entryName)) < 1) throw new Exception("Cache entry name must not be empty");
+        $this->entryName = $entryName;
+    }
 
+    public function getEntryName(): string
+    {
+        return $this->entryName;
     }
 
     public abstract function haveData() : bool;

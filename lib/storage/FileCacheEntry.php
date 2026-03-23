@@ -1,5 +1,6 @@
 <?php
 include_once("storage/CacheEntry.php");
+include_once("storage/SparkFile.php");
 
 class FileCacheEntry extends CacheEntry
 {
@@ -9,20 +10,18 @@ class FileCacheEntry extends CacheEntry
      */
     protected ?SparkFile $file = null;
 
-    public function __construct(SparkFile $file)
+    public function __construct(string $cacheFolder, string $entryName)
     {
-        parent::__construct();
+        parent::__construct($entryName);
 
-        $this->file = $file;
-
-        Debug::ErrorLog("Using Cache Folder: " . basename($this->file->getPath()));
-        Debug::ErrorLog("Using Filename: " . $this->file->getFilename());
-        Debug::ErrorLog("Using Path: " . $this->file->getPath());
+        $this->file = new SparkFile($cacheFolder . DIRECTORY_SEPARATOR . $entryName);
+        //Debug::ErrorLog("EntryName[$entryName] => {$this->file->getAbsoluteFilename()}");
     }
 
     //replaced getFile()->exists();
     public function haveData(): bool
     {
+        //Debug::ErrorLog("HaveData for {$this->file->getAbsoluteFilename()} : ".($this->file->exists()?"YES":"NO"));
         return $this->file->exists();
     }
 

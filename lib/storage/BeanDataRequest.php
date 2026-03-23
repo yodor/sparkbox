@@ -13,8 +13,29 @@ class BeanDataRequest
     const string CMD_DATA = "data";
     const string CMD_PHOTO = "image";
 
+    const string KEY_ROUTE = "route";
+
     protected string $cmd = "";
     protected array $supported_commands = array(BeanDataRequest::CMD_DATA, BeanDataRequest::CMD_PHOTO);
+
+
+    public static function ConsumeRoute(bool $required, string ...$parameters) : void
+    {
+        if (!isset($_GET[BeanDataRequest::KEY_ROUTE])) return;
+
+        $parts = Spark::Split($_GET[BeanDataRequest::KEY_ROUTE]);
+
+        foreach ($parameters as $param) {
+            if (!empty($parts)) {
+                $_GET[$param] = array_shift($parts);
+            }
+            else {
+                if ($required) throw new Exception("Parameter[$param] not found in route");
+            }
+        }
+
+        $_GET[BeanDataRequest::KEY_ROUTE] = implode('/', $parts);
+    }
 
     public function __construct()
     {
@@ -22,6 +43,10 @@ class BeanDataRequest
         ini_set('zlib.output_compression', '0');
 
         try {
+
+
+            BeanDataRequest::ConsumeRoute(true, BeanDataRequest::KEY_CMD, BeanDataRequest::KEY_CLASS, BeanDataRequest::KEY_ID);
+
 
             if (!isset($_GET[BeanDataRequest::KEY_CMD])) {
                 throw new Exception("Missing storage access command");

@@ -1,7 +1,6 @@
 <?php
 include_once("storage/CacheEntry.php");
 include_once("storage/FileCacheEntry.php");
-include_once("storage/DBCacheEntry.php");
 include_once("beans/SparkCacheBean.php");
 include_once("storage/SparkFile.php");
 
@@ -13,10 +12,10 @@ class CacheFactory
      * @param string $cacheName - Cache name identifier (filename)
      * @param string $className - Bean class name
      * @param int $id - Bean primary key ID
-     * @return CacheEntry
+     * @return FileCacheEntry
      * @throws Exception
      */
-    public static function BeanCacheEntry(string $cacheName, string $className, int $id) : CacheEntry
+    public static function BeanCacheEntry(string $cacheName, string $className, int $id) : FileCacheEntry
     {
 
         if (empty($cacheName)) {
@@ -31,12 +30,7 @@ class CacheFactory
             throw new Exception("Incorrect ID");
         }
 
-        if (strcasecmp(Spark::Get(Config::BEAN_CACHE_BACKEND), CacheFactory::BACKEND_DATABASE)===0) {
-
-            return new DBCacheEntry($cacheName,  $className,  $id);
-
-        }
-        else if (strcasecmp(Spark::Get(Config::BEAN_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)===0) {
+        if (strcasecmp(Spark::Get(Config::BEAN_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)===0) {
 
             $cache_folder = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . $className . DIRECTORY_SEPARATOR . $id;
             if (!file_exists($cache_folder)) {
@@ -45,7 +39,7 @@ class CacheFactory
                 if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
             }
 
-            return new FileCacheEntry(new SparkFile($cache_folder . DIRECTORY_SEPARATOR . $cacheName));
+            return new FileCacheEntry($cache_folder, $cacheName);
 
         }
         else {
@@ -54,16 +48,18 @@ class CacheFactory
 
     }
 
-    public static function PageCacheEntry(string $cacheName) : CacheEntry
+    /**
+     * @param string $cacheName
+     * @return FileCacheEntry
+     * @throws Exception
+     */
+    public static function PageCacheEntry(string $cacheName) : FileCacheEntry
     {
         if (empty($cacheName)) {
             throw new Exception("Empty cache name identifier");
         }
 
-        if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_DATABASE)===0) {
-            return new DBCacheEntry($cacheName,  "PageCache",  0);
-        }
-        else if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)===0) {
+        if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)===0) {
 
             $cache_folder = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . "PageCache";
             if (!file_exists($cache_folder)) {
@@ -71,7 +67,7 @@ class CacheFactory
                 @mkdir($cache_folder, 0777, TRUE);
                 if (!file_exists($cache_folder)) throw new Exception("Unable to create cache folder: $cache_folder");
             }
-            return new FileCacheEntry(new SparkFile($cache_folder . DIRECTORY_SEPARATOR . $cacheName));
+            return new FileCacheEntry($cache_folder, $cacheName);
 
         }
         else {
@@ -97,58 +93,30 @@ class CacheFactory
 
         Debug::ErrorLog("Doing PageCache cleanup - now: $timestamp - TTL: ".Spark::GetInteger(Config::PAGE_CACHE_TTL));
 
-        if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_DATABASE)==0) {
+        $cache_folder = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . "PageCache";
 
-
-            try {
-
-                $bean = new SparkCacheBean();
-
-                $delete = new SQLDelete($bean->select());
-                $delete->where()->match("className", "PageCache");
-                $delete->where()->expression("((:timestamp - lastModified) > :pageCacheTTL)");
-                $delete->where()->bind(":timestamp", $timestamp);
-                $delete->where()->bind(":pageCacheTTL", Spark::GetInteger(Config::PAGE_CACHE_TTL));
-
-                $query = new DBQuery();
-                $query->exec($delete);
-                $numEntries = $query->affectedRows();
-                touch($cleanup_file);
-                Debug::ErrorLog("DB PageCache cleanup complete. Affected rows: " . $numEntries);
-            }
-            catch (Exception $e) {
-
-                Debug::ErrorLog("Unable to cleanup PageCache: " . $e->getMessage());
-            }
-
+        $handle = fopen($cleanup_file, 'a');
+        if (!$handle) {
+            Debug::ErrorLog("Unable to open cleanup file: " . $cleanup_file);
+            return;
         }
-        else if (strcasecmp(Spark::Get(Config::PAGE_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)==0) {
+        if (flock($handle, LOCK_EX | LOCK_NB)) {
+            // Perform task
+            $check_ttl = function ($item) use ($timestamp) {
+                $filestamp = filemtime($item);
+                $fileTTL = ($timestamp - $filestamp);
+                if ($fileTTL >= Spark::GetInteger(Config::PAGE_CACHE_TTL)) {
+                    Debug::ErrorLog("Removing stale cache entry: " . $item);
+                    unlink($item);
+                }
+            };
+            array_map($check_ttl, glob("$cache_folder/*", GLOB_NOSORT | GLOB_NOESCAPE));
+            touch($cleanup_file);
+            flock($handle, LOCK_UN);
+        }
+        //echo "File is locked. Skipping.\n";
+        fclose($handle);
 
-            $cache_folder = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . "PageCache";
-
-            $handle = fopen($cleanup_file, 'a');
-            if (!$handle) {
-                Debug::ErrorLog("Unable to open cleanup file: " . $cleanup_file);
-                return;
-            }
-            if (flock($handle, LOCK_EX | LOCK_NB)) {
-                // Perform task
-                $check_ttl = function ($item) use ($timestamp) {
-                    $filestamp = filemtime($item);
-                    $fileTTL = ($timestamp - $filestamp);
-                    if ($fileTTL >= Spark::GetInteger(Config::PAGE_CACHE_TTL)) {
-                        Debug::ErrorLog("Removing stale cache entry: " . $item);
-                        unlink($item);
-                    }
-                };
-                array_map($check_ttl, glob("$cache_folder/*", GLOB_NOSORT | GLOB_NOESCAPE));
-                touch($cleanup_file);
-                flock($handle, LOCK_UN);
-            } else {
-                //echo "File is locked. Skipping.\n";
-            }
-            fclose($handle);
-        } //CacheFactory::BACKEND_FILESYSTEM
     }
 
     /**
@@ -158,10 +126,10 @@ class CacheFactory
      * or component getCacheName() is empty string
      * Return new instance of CacheEntry if the entry is empty or the entry is expired
      * @param Component $cmp
-     * @return CacheEntry|bool
+     * @return FileCacheEntry|bool
      * @throws Exception
      */
-    public static function CacheEntryOutput(Component $cmp) : CacheEntry | bool
+    public static function CacheEntryOutput(Component $cmp) : FileCacheEntry | bool
     {
 
         if (!Spark::GetBoolean(Config::PAGE_CACHE_ENABLED)) return false;

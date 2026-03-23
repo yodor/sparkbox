@@ -16,6 +16,7 @@ trait CanUseFromExpression
      */
     public function from(?string $text=null) : FromExpression
     {
-        return $this->_from->expr($text);
+        if (!is_null($text) && strlen(trim($text))>0) return $this->_from->expr($text);
+        return $this->_from;
     }
 }

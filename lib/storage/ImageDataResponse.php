@@ -14,14 +14,14 @@ class ImageDataResponse extends BeanDataResponse
 
     const string FILTER_GRAY = "gray";
 
-    protected string $field = BeanDataResponse::FIELD_PHOTO;
-
     protected ImageScaler $scaler;
 
     public function __construct(int $id, string $className)
     {
         $width = 0;
         $height = 0;
+
+        BeanDataRequest::ConsumeRoute(false, ImageDataResponse::KEY_WIDTH, ImageDataResponse::KEY_HEIGHT, ImageDataResponse::KEY_SIZE);
 
         if (isset($_GET[ImageDataResponse::KEY_WIDTH])) {
             $width = (int)$_GET[ImageDataResponse::KEY_WIDTH];
@@ -45,7 +45,7 @@ class ImageDataResponse extends BeanDataResponse
             }
         }
         //call last - cache entry needs cacheName
-        parent::__construct($id, $className);
+        parent::__construct($id, $className, BeanDataResponse::FIELD_PHOTO);
     }
 
     protected function process(): void
@@ -69,7 +69,7 @@ class ImageDataResponse extends BeanDataResponse
     protected function cacheName() : string
     {
         $parts = array();
-        $parts[] = $this->field;
+        $parts[] = BeanDataResponse::FIELD_PHOTO;
         $parts[] = $this->scaler->getWidth();
         $parts[] = $this->scaler->getHeight();
         $parts[] = $this->scaler->getMode()->value;

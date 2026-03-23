@@ -7,7 +7,6 @@ class StorageItem extends DataObject implements JsonSerializable
 
     public int $id = -1;
     public string $className = "";
-    public string $field = "";
 
     protected ?URL $url = null;
 
@@ -23,13 +22,12 @@ class StorageItem extends DataObject implements JsonSerializable
         }
     }
 
-    public function __construct(int $id = -1, string $className = "", string $field = "")
+    public function __construct(int $id = -1, string $className = "")
     {
         parent::__construct();
 
         $this->id = $id;
         $this->className = $className;
-        $this->field = $field;
     }
 
     public function setType(int $type) : void
@@ -139,9 +137,7 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->url->add(new URLParameter("class", $this->className));
         $this->url->add(new URLParameter("id", (string)$this->id));
 
-        if ($this->field) {
-            $this->url->add(new URLParameter("field", $this->field));
-        }
+
     }
 
     public static function Create(int $id, $className) : StorageItem
