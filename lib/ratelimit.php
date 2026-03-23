@@ -1,22 +1,32 @@
 <?php
 
+/**
+ * RateLimiter Class
+ * Static properties and methods use PascalCase.
+ * Local variables and parameters use camelCase.
+ * English comments included for professional standard.
+ */
 class RateLimiter
 {
-    // Static properties in PascalCase
+    // Static configuration properties (PascalCase)
     public static int $ThrottleSeconds = 60;
     public static int $MaxConnections = 1;
     public static string $UserAgentPattern = "";
+    public static bool $EnableDebug = false;
 
     private const int PACKET_SIZE = 12;
 
     public static function Check(): void
     {
-        // Local variable in camelCase
         $botName = self::IdentifyBot();
 
         if ($botName !== null) {
             $installId = hash('xxh3', APP_PATH);
             $tmpFile = sys_get_temp_dir() . "/ratelimit-{$botName}-{$installId}";
+
+            if (self::$EnableDebug) {
+                error_log("RateLimiter::Check() - Target: $botName | File: $tmpFile");
+            }
 
             self::Process($tmpFile);
         }
@@ -49,25 +59,31 @@ class RateLimiter
         }
 
         if (flock($fh, LOCK_EX)) {
-            // Parameters and local variables in camelCase
             $data = self::ReadPacket($fh);
-            $timeNow = microtime(true);
 
-            if (self::ShouldThrottle($data[0], $data[1], $timeNow)) {
+            $lastTime  = (float)$data[0];
+            $connCount = (int)$data[1];
+            $timeNow   = microtime(true);
+
+            if (self::ShouldThrottle($lastTime, $connCount, $timeNow)) {
+                if (self::$EnableDebug) {
+                    error_log("RateLimiter Blocked: $tmpFile (Count: $connCount)");
+                }
                 header($_SERVER["SERVER_PROTOCOL"] . ' 429 Too Many Requests');
                 flock($fh, LOCK_UN);
                 fclose($fh);
                 exit;
             }
 
-            $timeDiff = $timeNow - $data[0];
+            $timeDiff = $timeNow - $lastTime;
+
             if ($timeDiff > self::$ThrottleSeconds) {
-                $data = [$timeNow, 1];
+                $updateData = [$timeNow, 1];
             } else {
-                $data[1]++;
+                $updateData = [$lastTime, $connCount + 1];
             }
 
-            self::StorePacket($fh, $data);
+            self::StorePacket($fh, $updateData);
             flock($fh, LOCK_UN);
         }
         fclose($fh);
@@ -83,16 +99,43 @@ class RateLimiter
     {
         rewind($fh);
         $packet = fread($fh, self::PACKET_SIZE);
-        if (strlen($packet) < self::PACKET_SIZE) return [0.0, 0];
 
-        $unpacked = unpack('d1/L2', $packet);
-        return [$unpacked[1], $unpacked[2]];
+        if (empty($packet) || strlen($packet) < self::PACKET_SIZE) {
+            if (self::$EnableDebug) {
+                error_log("RateLimiter::ReadPacket() - Initializing new data");
+            }
+            return [0.0, 0];
+        }
+
+        // Using named keys 't' for time and 'c' for count to avoid index confusion
+        $unpacked = @unpack('dt/Lc', $packet);
+
+        if ($unpacked === false || !isset($unpacked['t'], $unpacked['c'])) {
+            if (self::$EnableDebug) {
+                error_log("RateLimiter::ReadPacket() - Failed to unpack data");
+            }
+            return [0.0, 0];
+        }
+
+        if (self::$EnableDebug) {
+            error_log("RateLimiter::ReadPacket() - Loaded: Time=" . $unpacked['t'] . ", Count=" . $unpacked['c']);
+        }
+
+        return [(float)$unpacked['t'], (int)$unpacked['c']];
     }
 
     private static function StorePacket($fh, array $data): void
     {
         rewind($fh);
-        fwrite($fh, pack('dL', (float)$data[0], (int)$data[1]));
+        // Pack into binary: d (double), L (unsigned long 32-bit)
+        $binaryContent = pack('dL', (float)$data[0], (int)$data[1]);
+
+        ftruncate($fh, 0);
+        fwrite($fh, $binaryContent);
         fflush($fh);
+
+        if (self::$EnableDebug) {
+            error_log("RateLimiter::StorePacket() - Saved: Time=" . $data[0] . ", Count=" . $data[1]);
+        }
     }
 }
