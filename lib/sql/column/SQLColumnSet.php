@@ -3,12 +3,13 @@ include_once("objects/SparkObject.php");
 include_once("sql/ISQLGet.php");
 include_once("sql/IBindingCollection.php");
 include_once("sql/column/SQLColumn.php");
+include_once("sql/column/IColumnSetNameModifier.php");
 
-class SQLColumnSet extends SparkObject implements ISQLGet, IBindingCollection
+class SQLColumnSet extends SparkObject implements ISQLGet, IBindingCollection, IColumnSetNameModifier
 {
 
     /**
-     * @var array<string, SQLColumn> column name to SQLColumn collection
+     * @var array<string, SQLColumn> column prefixed name to SQLColumn map
      */
     protected array $fields = array();
 
@@ -33,7 +34,8 @@ class SQLColumnSet extends SparkObject implements ISQLGet, IBindingCollection
     }
 
     /**
-     * Assign to the collection using getNamePrefix as key
+     * Insert/Replace into the collection using SQLColumn::getNamePrefix() as key
+     *
      * @param SQLColumn $column
      * @return void
      */
@@ -43,45 +45,39 @@ class SQLColumnSet extends SparkObject implements ISQLGet, IBindingCollection
         $this->fields[$column->getNamePrefix()] = $column;
     }
 
-    public function get(string $name) : ?SQLColumn
-    {
-        return $this->fields[$name] ?? null;
-    }
-
-    public function isSet(string $name): bool
-    {
-        $name = trim($name);
-        return array_key_exists($name, $this->fields);
-    }
-
-    public function unset(string $name) : void
-    {
-        $name = trim($name);
-        if ($this->isSet($name)) unset($this->fields[$name]);
-    }
-
     /**
-     * Clear/empty this columnset
-     * @return void
+     * Search for $prefixedName and return if found
+     *
+     * @param string $prefixedName
+     * @return SQLColumn|null
      */
+    public function get(string $prefixedName) : ?SQLColumn
+    {
+        return $this->fields[$prefixedName] ?? null;
+    }
+
+    public function isSet(string $prefixedName): bool
+    {
+        $name = trim($prefixedName);
+        return array_key_exists($prefixedName, $this->fields);
+    }
+
+    public function unset(string $prefixedName) : void
+    {
+        $prefixedName = trim($prefixedName);
+        if ($this->isSet($prefixedName)) unset($this->fields[$prefixedName]);
+    }
+
     public function reset() : void
     {
         $this->fields = array();
     }
 
-    /**
-     * Return the number of assigned columns in this collection
-     * @return int
-     */
     public function count(): int
     {
         return count(array_keys($this->fields));
     }
 
-    /**
-     * Return the column names in this collection
-     * @return array
-     */
     public function names() : array
     {
         return array_keys($this->fields);
@@ -115,4 +111,26 @@ class SQLColumnSet extends SparkObject implements ISQLGet, IBindingCollection
     }
 
 
+    public function setPrefix(string $prefix): void
+    {
+        foreach ($this->fields as $prefixedName => $column) {
+
+            if (!$column) continue;
+
+            if ($column->getExpression()) continue;
+
+            $this->unset($prefixedName);
+
+            //clear/set the prefix
+            $column->setPrefix($prefix);
+
+            //set again
+            $this->set($column);
+        }
+    }
+
+    public function clearPrefix(): void
+    {
+        $this->setPrefix("");
+    }
 }

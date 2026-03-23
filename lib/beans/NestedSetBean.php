@@ -84,7 +84,7 @@ class NestedSetBean extends DBTableBean
     private function childrenID(Node $node) : array
     {
         $select = $this->nodeSelect($node);
-        $select->reset();
+        $select->columns()->reset();
         $select->column($this->prkey);//prkey only select
         $query = new SelectQuery($select, $this->prkey);
         $query->exec();
@@ -680,7 +680,7 @@ class NestedSetBean extends DBTableBean
         $result = clone $relation;
         //reset the fields but keep the where clauses
         //resulting select is only for drawing the tree
-        $result->reset();
+        $result->columns()->reset();
 
         $prkey = $this->prkey;
 

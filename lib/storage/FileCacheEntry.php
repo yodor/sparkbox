@@ -15,13 +15,13 @@ class FileCacheEntry extends CacheEntry
         parent::__construct($entryName);
 
         $this->file = new SparkFile($cacheFolder . DIRECTORY_SEPARATOR . $entryName);
-        //Debug::ErrorLog("EntryName[$entryName] => {$this->file->getAbsoluteFilename()}");
+        Debug::ErrorLog("EntryName[$entryName] => {$this->file->getAbsoluteFilename()}");
     }
 
     //replaced getFile()->exists();
     public function haveData(): bool
     {
-        //Debug::ErrorLog("HaveData for {$this->file->getAbsoluteFilename()} : ".($this->file->exists()?"YES":"NO"));
+        Debug::ErrorLog("HaveData for {$this->file->getAbsoluteFilename()} : ".($this->file->exists()?"YES":"NO"));
         return $this->file->exists();
     }
 

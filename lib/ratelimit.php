@@ -12,7 +12,7 @@ class RateLimiter
     public static int $ThrottleSeconds = 30;
     public static int $MaxConnections = 5;
     public static string $UserAgentPattern = "";
-    public static bool $EnableDebug = false;
+    public static bool $EnableDebug = true;
 
     private const int PACKET_SIZE = 12;
 

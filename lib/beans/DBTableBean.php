@@ -304,7 +304,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     {
         $select = clone $this->select;
         if (count($columns)>0) {
-            $select->reset();
+            $select->columns()->reset();
             $select->columns(...$columns);
         }
 
@@ -557,7 +557,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             //fetch id of resulting rows first to properly manage the cache
             //copy $delete whereset and bindings
             $select = new SQLSelect($delete);
-            $select->reset();
+            $select->columns()->reset();
             $select->column($this->prkey);
 
             $result = $db->query($select);

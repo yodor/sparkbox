@@ -4,83 +4,29 @@ trait CanModifyColumnName
 {
 
     /**
-     *
-     * Set prefix to all column names in the fieldset
-     *
-     * In effect each column name will be '$prefix.columnName'
-     *
-     * @param string $prefix the prefix to use
-     * @throws Exception
-     */
-    public function setPrefix(string $prefix) : void
-    {
-        foreach ($this->fieldset->names() as $idx => $name) {
-            $column = $this->fieldset->get($name);
-            if (!$column) continue;
-
-            if ($column->getExpression()) continue;
-
-            $column->setPrefix($prefix);
-
-            $this->fieldset->unset($name);
-
-            $this->fieldset->set($column);
-        }
-    }
-
-    /**
-     * Clear prefix from the column names in the fieldset
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function clearPrefix() : void
-    {
-        $this->setPrefix("");
-    }
-
-    /**
-     * Proxy method to check if column name is inside the fieldset collection
-     * @param string $name
-     * @return bool
-     */
-    public function isSet(string $name): bool
-    {
-        return $this->fieldset->isSet($name);
-    }
-
-    /**
-     * Proxy method fieldset->unset() remove column name from the fieldset
-     * @param string $name
-     */
-    public function unset(string $name) : void
-    {
-        $this->fieldset->unset($name);
-    }
-
-    /**
-     * Proxy method fieldset->reset() remove all columns
-     *
-     * @return void
-     */
-    public function reset() : void
-    {
-        $this->fieldset->reset();
-    }
-
-    /**
-     * Create new SQLColumn from values in '$columns' parameter and append each to the internal fieldset collection.
+     * Create new SQLColumn from values in '$columns' parameter and insert/replace each to the internal fieldset collection.
      * * Existing column with the same name will be replaced.
-     * * Each value is used as name for the created column.
+     * * Each value is used as name for the created column (can be prefixed already ie p.status)
      * * If value is in the format "name AS alias" alias is set to the column
      * * Each value is exploded using ',' and used as separate column name
      *
-     * @param string ...$columns Array of column names to set to this collection
+     * Examples:
+     *
+     * * $stmt->columns("userID", "status") -> add userID and status in the columnset
+     * * $stmt->columns("active_status as status, p.prodID", "b.name as aliased") ->
+     * add active_status as status, p.prodID, b.name as aliased to the columnset
+     *
+     * If no names are passed just return the fieldset under the IColumnSetNameModifier interface
+     *
+     * @param string ...$columns Array of column names/prefixed/aliased to set to this collection
+     * @return IColumnSetNameModifier
      * @throws Exception
      */
-    public function columns(string ...$columns) : void
+    public function columns(?string ...$columns) : IColumnSetNameModifier
     {
-        $this->fieldset->unset("*");
+
+        if (!$columns || count($columns) < 1) return $this->fieldset;
+
         //clean empty
         foreach ($columns as $idx=>$columnName) {
             if (!trim($columnName)) {
@@ -114,14 +60,7 @@ trait CanModifyColumnName
             $this->fieldset->set($column);
         }
 
+        return $this->fieldset;
     }
 
-    /**
-     * Proxy method fieldset->names() - Return column names currently set in the filedset
-     * @return array<string>
-     */
-    public function columnNames() : array
-    {
-        return $this->fieldset->names();
-    }
 }

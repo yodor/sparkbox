@@ -74,7 +74,7 @@ class BeanMenuFactory
     {
         $this->target_url = new URL($build_href);
         $this->target_url->add(new DataParameter($this->bean->key()));
-        $this->select->unset("link");
+        $this->select->columns()->unset("link");
     }
 
     public function menu() : MenuItemList
