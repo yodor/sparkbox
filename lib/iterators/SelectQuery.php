@@ -62,7 +62,16 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         if (!is_null($statement)) throw new Exception("Can only exec SQLSelect from the constructor call.");
         //clear cached count
         $this->numResults = -1;
-        parent::exec($this->stmt, $db);
+        $closure = function() use (&$db) {
+            parent::exec($this->stmt, $db);
+        };
+
+        $time = Spark::Benchmark($closure);
+//        if (strlen($this->stmt->getMeta())>0 || $time > 0.03) {
+//            Debug::ErrorLog("[Exec] - ".$this->stmt->debugSQL());
+//            Debug::ErrorLog("[Exec Bench] - {$time}");
+//        }
+
     }
 
     /**
@@ -134,9 +143,21 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         return $this->name;
     }
 
-    public function count() : int
+    public function count(?SQLSelect $lookup = null) : int
     {
-        return $this->countByCount();
+        $result = -1;
+        $closure = function () use (&$result, $lookup)
+        {
+            $result = $this->countByCount($lookup);
+        };
+
+        $time = Spark::Benchmark($closure);
+        if (strlen($this->stmt->getMeta())>0 || $time > 0.03) {
+            Debug::ErrorLog("[Count] - ".$this->stmt->debugSQL());
+            Debug::ErrorLog("[Count Bench] - {$time}");
+        }
+
+        return $result;
     }
 
     /**
@@ -145,18 +166,14 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
      * * @return int
      * @throws Exception
      */
-    protected function countByCount(): int
+    protected function countByCount(?SQLSelect $lookup = null): int
     {
-        if ($this->numResults !== -1) {
-            return $this->numResults;
-        }
-
-        $start = microtime(true); // Start execution timer
+        if ($this->numResults !== -1) return $this->numResults;
 
         $driver = $this->assignDriver();
 
         // 1. Clone the original statement to preserve its state
-        $innerStmt = clone $this->stmt;
+        $innerStmt = $lookup ? clone $lookup : clone $this->stmt;
 
         // 2. OPTIMIZATION: Clear all heavy columns from the INNER query.
         // Using a constant '1' prevents the execution of heavy subqueries (photos, attributes, etc.)
@@ -186,15 +203,6 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $result->free();
 
         // Log performance data if the result set is large
-        if ($this->numResults > 100) {
-            $end = microtime(true);
-            $executionTime = number_format($end - $start, 4);
-
-            Debug::ErrorLog("--- COUNT(*) SQL: " . $derivedSelect->debugSQL());
-            Debug::ErrorLog("--- COUNT(*) Result: " . $this->numResults);
-            Debug::ErrorLog("[Count Check] Execution Time: {$executionTime}s");
-        }
-
         return $this->numResults;
     }
 
@@ -203,18 +211,16 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
      * @return int
      * @throws Exception
      */
-    protected function countByFoundRows(): int
+    protected function countByFoundRows(?SQLSelect $lookup = null): int
     {
         // Return cached result if already calculated
         if ($this->numResults !== -1) return $this->numResults;
-
-        $start = microtime(true); // Започваме отброяването
 
         //get suitable driver
         //if new driver was created it will get out of context and auto deleted
         $driver = $this->assignDriver();
 
-        $select = clone $this->stmt;
+        $select = $lookup ? clone $lookup : clone $this->stmt;
         $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
 
         //do not reset the fields here as 'custom' columns might be used with grouping or having clauses
@@ -231,13 +237,6 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $this->numResults = $result->fetchResult()->get("total_results");
         $result->free();
 
-        if ($this->numResults>100) {
-            $end = microtime(true);
-            $executionTime = number_format($end - $start, 4);
-            Debug::ErrorLog("--- SQL_CALC_FOUND_ROWS: ".$select->debugSQL());
-            Debug::ErrorLog("--- SQL_CALC_FOUND_ROWS: " . $this->numResults);
-            Debug::ErrorLog("[Count Check] Results: {$this->numResults} | Time: {$executionTime}s");
-        }
         return $this->numResults;
     }
 
