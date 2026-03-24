@@ -56,4 +56,7 @@ interface IColumnSetNameModifier
     public function names() : array;
 
 
+    public function copyTo(IColumnSetNameModifier $other) : void;
+
+
 }
