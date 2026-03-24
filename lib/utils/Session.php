@@ -2,8 +2,8 @@
 
 class Session
 {
-    protected static bool $is_started = false;
-    protected static bool $write_open = true;
+    protected static bool $Started = false;
+    protected static bool $NeedSync = false;
 
     const string ALERT = "alert";
 
@@ -14,68 +14,94 @@ class Session
 
     public static function Start() : void
     {
-        if (!Session::$is_started) {
+        if (!Session::$Started) {
+
             $filename = "";
             $line = "";
             if (headers_sent($filename, $line)) {
                 throw new Exception("Headers already sent in $filename line $line");
             }
 
+            // Grouped cookie parameters - this replaces individual ini_set calls for cookies
             session_set_cookie_params([
-                "lifetime"   => 0,                     // session cookie (browser close)
-                "path"       => Spark::Get(Config::LOCAL),
-                "domain"     => Spark::Get(Config::COOKIE_DOMAIN),                    // current host; use '.example.com' for subdomains
-                "secure"     => true,                  // very strongly recommended
+                "lifetime"   => 0, // Session cookie (expires on browser close)
+                "path"       => Spark::Get(Config::LOCAL) ?: "/",
+                "domain"     => Spark::Get(Config::COOKIE_DOMAIN),
+                "secure"     => true,
                 "httponly"   => true,
-                "samesite"   => "Strict",                 // or 'Strict' for maximum CSRF protection
+                "samesite"   => "Strict",
             ]);
 
+            // Global session behavior settings
+            ini_set("session.use_strict_mode", 1);
+            ini_set("session.gc_maxlifetime", 1440); // 24 minutes server-side TTL
+
+            // Caching headers for dynamic pages
+            // "private" allows browser caching but forbids proxy caching (CDN/Varnish)
+            session_cache_limiter("private");
+            session_cache_expire(60); // 60 minutes browser cache freshness
+
             session_start();
-            Session::$is_started = TRUE;
+
+            Session::$Started = true;
+            Session::$NeedSync = false;
+
             Debug::ErrorLog("Starting session ID: " . session_id());
         }
     }
 
     public static function Destroy() : void
     {
-        if (Session::$is_started) {
-            //Unset individual session variables
-            foreach ($_SESSION as $key => $value) {
-                unset($_SESSION[$key]);
-            }
-            //Reset the session array
+        if (Session::$Started) {
+
+            //Reset the session array in memory
             $_SESSION = array();
 
             //Delete the session cookie
             $params = session_get_cookie_params();
 
-            setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+            setcookie(
+                session_name(),
+                '',
+                1,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                isset($params['httponly'])
+            );
 
             //Destroy the session
             session_write_close();
             session_destroy();
 
-            //Verify session file deletion (if file-based storage)
-            //unlink(session_save_path() . '/' . session_id());
-
-            Session::$is_started = FALSE;
+            Session::$Started = false;
+            Session::$NeedSync = false;
         }
 
     }
 
+    /**
+     * Releases the write lock to allow other concurrent requests (performance optimization).
+     */
     public static function Close() : void
     {
-        if (Session::$is_started) {
+        if (Session::$Started) {
             Debug::ErrorLog("Releasing write lock: " . session_id());
             session_write_close();
-            Session::$write_open = false;
+            Session::$NeedSync = false;
         }
     }
 
+    public static function NeedSync() : bool
+    {
+        return Session::$NeedSync;
+    }
 
     public static function Contains(string $key) : bool
     {
-        Session::Start();
+        if (!Session::$Started) {
+            Session::Start();
+        }
         return isset($_SESSION[$key]);
     }
 
@@ -97,33 +123,52 @@ class Session
 
     public static function Set(string $key, mixed $val) : void
     {
-        Session::Start();
+        if (!Session::$Started) {
+            Session::Start();
+        }
         $_SESSION[$key] = $val;
+        Session::$NeedSync = true;
     }
 
     public static function Remove(string $key) : void
     {
         if (Session::Contains($key)) {
             unset($_SESSION[$key]);
+            Session::$NeedSync = true;
         }
     }
 
     public static function SetCookie(string $key, string $val, $expire = 0) : void
     {
-        $cookie_path = Spark::Get(Config::LOCAL);
-        if (!$cookie_path) $cookie_path = "/";
+        $cookiePath = Spark::Get(Config::LOCAL) ?: "/";
 
         $_COOKIE[$key] = $val;
 
-        setcookie($key, $val, $expire, $cookie_path, Spark::Get(Config::COOKIE_DOMAIN), true, true);
+        setcookie(
+            $key,
+            $val,
+            $expire,
+            $cookiePath,
+            Spark::Get(Config::COOKIE_DOMAIN),
+            true,
+            true
+        );
     }
 
     public static function ClearCookie(string $key) : void
     {
-        $cookie_path = Spark::Get(Config::LOCAL);
-        if (!$cookie_path) $cookie_path = "/";
+        $cookiePath = Spark::Get(Config::LOCAL) ?: "/";
 
-        setcookie($key, "", 1, $cookie_path, Spark::Get(Config::COOKIE_DOMAIN), true, true);
+        setcookie(
+            $key,
+            "",
+            1,
+            $cookiePath,
+            Spark::Get(Config::COOKIE_DOMAIN),
+            true,
+            true
+        );
+
         if (isset($_COOKIE[$key])) {
             unset($_COOKIE[$key]);
         }

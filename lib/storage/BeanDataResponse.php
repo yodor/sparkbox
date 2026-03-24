@@ -57,6 +57,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     /**
      * @param int $id
      * @param string $className
+     * @param string $fieldName
      * @throws Exception
      */
     public function __construct(int $id, string $className, string $fieldName)
@@ -299,7 +300,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->authorizeAccess();
 
         $lastModified = $this->getLastModified();
-        $this->checkCacheLastModifed($lastModified);
+        $this->checkCacheLastModified($lastModified);
 
         $beanETag = $this->ETag();
         $this->checkCacheETag($beanETag);

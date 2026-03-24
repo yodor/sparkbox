@@ -1,6 +1,5 @@
 <?php
 
-
 if (!defined("APP_PATH")) throw new Exception("APP_PATH is not defined");
 
 if (file_exists(APP_PATH."/config/boot.php")) include_once(APP_PATH."/config/boot.php");
@@ -65,39 +64,18 @@ $_REQUEST = array_merge($_GET, $_POST);
 
 // error_reporting(E_ALL & ~E_WARNING);
 error_reporting(E_ALL);
+
 ini_set("display_errors", 1);
 ini_set("display_startup_errors", 0);
 
-ini_set("session.use_strict_mode", 1);
-ini_set("session.cookie_lifetime", 0);
-ini_set("session.use_cookies", 1);
-ini_set("session.use_only_cookies", 1);
-ini_set("session.cookie_secure", 1);
-ini_set("session.cookie_httponly", 1);
-//	"Lax" or "Strict"
-ini_set("session.cookie_samesite", "Strict");
-// Optional: longer session ID
-
-
-//overwritten from session_start do not set cache_limiter
-//try to enable only on specific pages
-//ini_set("session.cache_limiter", "private");
-//minutes - cache of the response
-//ini_set("session.cache_expire", 60); //1 hour
-//seconds
-ini_set("session.gc_maxlifetime", 1440);
-
-ini_set("zlib.output_compression", 1);
-
 ini_set('intl.default_locale', Locale::canonicalize(Spark::Get(Config::DEFAULT_LOCALE)??"en_US"));
+//important for storage cache to work is the timezone matching across the lamp stack, apache uses the system timezone
+//mysql driver uses date.timezone to set the mysql timezone
+ini_set("date.timezone", Spark::Get(Config::TIMEZONE));
 
 //disable automatic output buffering this is handled manually in SparkPage
 //in php.ini
 //ini_get("output_buffering", 0);
-
-//important for storage cache to work is the timezone matching across the lamp stack, apache uses the system timezone
-//mysql driver uses date.timezone to set the mysql timezone
-ini_set("date.timezone", Spark::Get(Config::TIMEZONE));
 
 //set path and create folder if not exists
 Spark::Set(Config::CACHE_PATH, Spark::CachePath(), true);
@@ -112,6 +90,8 @@ if (Spark::GetBoolean(Config::DB_ENABLED)) {
 }
 
 if (!Spark::isStorageRequest()) {
+
+    ini_set("zlib.output_compression", 1);
 
     if (Spark::GetBoolean(Config::DB_ENABLED)) {
         include_once("objects/SparkObserver.php");

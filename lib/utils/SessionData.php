@@ -19,6 +19,8 @@ class SessionData
 
     protected string $name = "";
 
+    protected bool $need_sync = false;
+
     public static function Prefix(string $name, string $prefix) : string
     {
         return $prefix."-".$name;
@@ -31,6 +33,7 @@ class SessionData
         if (!Session::Contains($name)) {
             Debug::ErrorLog("SessionData [$this->name] initializing empty data.");
             Session::Set($name, array());
+            $this->need_sync = true;
         }
 
         if (Session::Contains($name)) {
@@ -44,6 +47,9 @@ class SessionData
     public function __destruct()
     {
         Debug::ErrorLog("SessionData [$this->name] destructor");
+        if ($this->need_sync) {
+            Session::Close();
+        }
     }
 
     public function removeAll() : void
@@ -51,6 +57,7 @@ class SessionData
         $keys = array_keys($this->data);
         foreach ($keys as $idx=>$key) {
             unset($this->data[$key]);
+            $this->need_sync = true;
         }
     }
 
@@ -59,6 +66,8 @@ class SessionData
         Debug::ErrorLog("Removing SessionData [$this->name] from session");
         $this->removeAll();
         Session::Remove($this->name);
+        Session::Close();
+        $this->need_sync = false;
     }
 
     public function name() : string
@@ -73,6 +82,8 @@ class SessionData
             $result = $val->wrap();
         }
         $this->data[$key] = $result;
+
+        $this->need_sync = true;
     }
 
     public function get(string $key) : mixed
@@ -97,6 +108,7 @@ class SessionData
     {
         if ($this->contains($key)) {
             unset($this->data[$key]);
+            $this->need_sync = true;
         }
     }
 

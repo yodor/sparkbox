@@ -10,11 +10,21 @@ class SparkHTTPResponse
     protected string $disposition = "inline";
     protected string $disposition_filename = "";
 
-    public function __construct(int $max_age=3600, int $stale_while_revalidate=3600)
+    const int MAX_AGE_YEAR = 31536000;
+    const int MAX_AGE_HOUR = 3600;
+
+    public function __construct(int $max_age=SparkHTTPResponse::MAX_AGE_YEAR, int $stale_while_revalidate=SparkHTTPResponse::MAX_AGE_HOUR)
     {
+        //start on clean
+        header_remove();
+
+        //base headers
         $this->setHeader("Content-Transfer-Encoding", "binary");
-        //one hour expiration
-        $this->setHeader("Cache-Control", "public, must-revalidate, must-understand, max-age=$max_age, stale-while-revalidate=$stale_while_revalidate");
+
+        //variables from constructor - 1 hour default expiration
+        $cacheControl = "public, must-revalidate, must-understand, max-age=$max_age, stale-while-revalidate=$stale_while_revalidate";
+        $this->setHeader("Cache-Control", $cacheControl);
+
     }
 
     public function setDispositionFilename(string $disposition_filename) : void
@@ -50,22 +60,28 @@ class SparkHTTPResponse
      */
     public function setHeader(string $field, string $value = "") : void
     {
+        $field = trim($field);
         $this->headers[$field] = $value;
     }
 
     public function getHeader(string $field): string
     {
-        if ($this->haveHeader($field)) throw new Exception("Header not set");
-        return $this->headers[$field];
+        $field = trim($field);
+
+        if ($this->haveHeader($field)) return $this->headers[$field];
+
+        throw new Exception("Header not set");
     }
 
     public function removeHeader(string $field) : void
     {
-        if (isset($this->headers[$field])) unset($this->headers[$field]);
+        $field = trim($field);
+        if ($this->haveHeader($field)) unset($this->headers[$field]);
     }
 
     public function haveHeader(string $field) : bool
     {
+        $field = trim($field);
         return isset($this->headers[$field]);
     }
 
@@ -75,7 +91,7 @@ class SparkHTTPResponse
      * @param int $lastModified Compare with this timestamp
      * @return void
      */
-    public function checkCacheLastModifed(int $lastModified) : void
+    public function checkCacheLastModified(int $lastModified) : void
     {
         $modifiedSince = strtotime($this->requestModifiedSince());
 
@@ -164,14 +180,21 @@ class SparkHTTPResponse
      */
     protected function sendHeaders() : void
     {
+        $filename = "";
+        $line = "";
+        $result = headers_sent($filename, $line);
+        if ($result) {
+            throw new Exception("Headers already sent from: $filename:$line");
+        }
+
         foreach ($this->headers as $key => $val) {
             if (strlen($key) < 1) continue;
             if (strlen($val) < 1) {
-                header($key);
+                header($key,true);
                 //Debug::ErrorLog("Header: $key");
             }
             else {
-                header("$key: $val");
+                header("$key: $val", true);
                 //Debug::ErrorLog("Header: $key: $val");
             }
         }

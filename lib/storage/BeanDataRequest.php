@@ -39,11 +39,12 @@ class BeanDataRequest
 
     public function __construct()
     {
-
-        ini_set('zlib.output_compression', '0');
+        //disable gzip, stop other PHP cache headers (.htaccess to stop mod_expires)
+        ini_set("zlib.output_compression", 0);
+        ini_set('session.cache_limiter', ''); //stop php cache headers
+        session_cache_limiter("");
 
         try {
-
 
             BeanDataRequest::ConsumeRoute(true, BeanDataRequest::KEY_CMD, BeanDataRequest::KEY_CLASS, BeanDataRequest::KEY_ID);
 
