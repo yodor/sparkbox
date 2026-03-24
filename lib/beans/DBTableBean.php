@@ -583,7 +583,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
     }
 
-    public function isNumeric($key): bool
+    public function isNumeric(string $key): bool
     {
         $storage_type = $this->columns[$key];
         if ((str_contains($storage_type, "decimal")) ||
@@ -708,6 +708,11 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
         foreach ($row as $key => $value) {
             //skip keys that do not reference column names in this bean
             if (!in_array($key, $columnNames)) continue;
+
+            //handle empty single checkboxes
+            if ($this->isNumeric($key) && is_string($value) && strlen(trim($value))==0) {
+                $value = null;
+            }
             //can configure expression/binding if value is IDBValue with bindingKey
             $statement->set($key, $value);
         }
