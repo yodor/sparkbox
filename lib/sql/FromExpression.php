@@ -63,6 +63,10 @@ class FromExpression extends ExpressionBuilder
         return $this->appendKeyword("RIGHT JOIN", $joinExpr);
     }
 
+    public function straightJoin(string $joinExpr) : self
+    {
+        return $this->appendKeyword("STRAIGHT_JOIN", $joinExpr);
+    }
     /**
      * Append " " + "JOIN" + $joinExpr to the internal buffer
      * @param string $joinExpr
