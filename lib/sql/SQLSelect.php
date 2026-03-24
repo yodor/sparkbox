@@ -27,6 +27,10 @@ class SQLSelect extends SQLStatement
 
     protected ?HavingExpression $_having = null;
 
+    public ?SQLSelect $lateLookup = null;
+    public string $lateLookupTable = "";
+    public string $lateLookupKey = "";
+
     public static function Table(string $tableName) : SQLSelect
     {
         $result = new SQLSelect();
@@ -161,6 +165,17 @@ class SQLSelect extends SQLStatement
 
         //Limit can not be combined. During pagination the main select is combined with the paged
 
+        SQLStatement::ReplaceKeyAppend($this->externalBindings, $other->getBindings());
+    }
+
+    /**
+     * Get all bindings from $other and assign to this
+     * @param SQLSelect $other
+     * @return void
+     * @throws Exception
+     */
+    public function collectBindings(SQLSelect $other): void
+    {
         SQLStatement::ReplaceKeyAppend($this->externalBindings, $other->getBindings());
     }
 
