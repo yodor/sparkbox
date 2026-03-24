@@ -21,7 +21,7 @@ class ImageDataResponse extends BeanDataResponse
         $width = 0;
         $height = 0;
 
-        BeanDataRequest::ConsumeRoute(false, ImageDataResponse::KEY_WIDTH, ImageDataResponse::KEY_HEIGHT, ImageDataResponse::KEY_SIZE);
+        BeanDataRequest::ConsumeRoute(false, ImageDataResponse::KEY_WIDTH, ImageDataResponse::KEY_HEIGHT);
 
         if (isset($_GET[ImageDataResponse::KEY_WIDTH])) {
             $width = (int)$_GET[ImageDataResponse::KEY_WIDTH];
@@ -29,12 +29,6 @@ class ImageDataResponse extends BeanDataResponse
 
         if (isset($_GET[ImageDataResponse::KEY_HEIGHT])) {
             $height = (int)$_GET[ImageDataResponse::KEY_HEIGHT];
-        }
-
-        if (isset($_GET[ImageDataResponse::KEY_SIZE])) {
-            $size = (int)$_GET[ImageDataResponse::KEY_SIZE];
-            $width = $size;
-            $height = $size;
         }
 
         $this->scaler = new ImageScaler($width, $height);
