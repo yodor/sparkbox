@@ -16,6 +16,9 @@ class ImageDataResponse extends BeanDataResponse
 
     protected ImageScaler $scaler;
 
+    const int MAX_DIMENSION = 3840; // 4K
+    const int MIN_DIMENSION = 64;
+
     public function __construct(int $id, string $className)
     {
         $width = 0;
@@ -25,10 +28,18 @@ class ImageDataResponse extends BeanDataResponse
 
         if (isset($_GET[ImageDataResponse::KEY_WIDTH])) {
             $width = (int)$_GET[ImageDataResponse::KEY_WIDTH];
+            if ($width > 0) {
+                //clamp to [64, 3840]
+                $width = max(ImageDataResponse::MIN_DIMENSION, min($width, ImageDataResponse::MAX_DIMENSION));
+            }
         }
 
         if (isset($_GET[ImageDataResponse::KEY_HEIGHT])) {
             $height = (int)$_GET[ImageDataResponse::KEY_HEIGHT];
+            if ($height > 0) {
+                //clamp to [64, 3840]
+                $height = max(ImageDataResponse::MIN_DIMENSION, min($height, ImageDataResponse::MAX_DIMENSION));
+            }
         }
 
         $this->scaler = new ImageScaler($width, $height);
