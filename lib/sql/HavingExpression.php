@@ -12,8 +12,6 @@ class HavingExpression extends ExpressionBuilder {
      */
     public function and(string $expr) : self
     {
-        if (strlen(trim($expr))>0) throw new Exception("Expression empty");
-
         if (!$this->isEmpty()) {
             $this->appendKeyword("AND", $expr);
         }

@@ -96,4 +96,9 @@ class FromExpression extends ExpressionBuilder
         return $this->appendKeyword("ON", $joinExpr);
     }
 
+    public function and(string $joinExpr) : self
+    {
+        return $this->appendKeyword("AND", $joinExpr);
+    }
+
 }
