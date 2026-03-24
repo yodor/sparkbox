@@ -821,6 +821,14 @@ final class Spark {
         $class_chain[] = get_class($object);
         return $class_chain;
     }
+    final static public function Benchmark(Closure $closure) : float
+    {
+        $start = microtime(true);
+        $closure();
+        $end = microtime(true);
+        //execution time
+        return (float)number_format($end - $start, 4);
+    }
     //static public function parse_signed_request($signed_request, $secret)
     //{
     //    list($encoded_sig, $payload) = explode('.', $signed_request, 2);
