@@ -20,6 +20,10 @@ trait CanSetOrder {
         $this->orderColumn($column);
     }
 
+    public function orderClear() : void
+    {
+        $this->orderParameters = [];
+    }
 
     /**
      * Check usage and limit use of rand for result sets with many rows

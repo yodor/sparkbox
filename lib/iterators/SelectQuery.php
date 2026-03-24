@@ -134,15 +134,81 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         return $this->name;
     }
 
+    public function count() : int
+    {
+        return $this->countByCount();
+    }
+
+    /**
+     * Returns the total number of results using a nested COUNT(*) query.
+     * This approach is faster than SQL_CALC_FOUND_ROWS as it bypasses heavy columns and subqueries.
+     * * @return int
+     * @throws Exception
+     */
+    protected function countByCount(): int
+    {
+        if ($this->numResults !== -1) {
+            return $this->numResults;
+        }
+
+        $start = microtime(true); // Start execution timer
+
+        $driver = $this->assignDriver();
+
+        // 1. Clone the original statement to preserve its state
+        $innerStmt = clone $this->stmt;
+
+        // 2. OPTIMIZATION: Clear all heavy columns from the INNER query.
+        // Using a constant '1' prevents the execution of heavy subqueries (photos, attributes, etc.)
+        // inside the VIEW or SELECT list, which are irrelevant for counting rows.
+        $innerStmt->columns()->reset();
+        $innerStmt->alias("1", "temp");
+
+        // 3. Remove ORDER BY from the inner query as sorting is resource-intensive and unnecessary for counting
+        $innerStmt->orderClear();
+
+        // 4. Wrap the optimized inner statement as a Derived Table (subquery)
+        // This ensures that GROUP BY or HAVING clauses in the original query remain functional.
+        $derivedSelect = $innerStmt->getAsDerived("count_table");
+
+        // 5. Prepare the OUTER query for the final aggregation
+        $derivedSelect->columns()->reset();
+        $derivedSelect->alias("COUNT(*)", "total_results");
+
+        // 6. Clear LIMIT/OFFSET from the outer query to ensure it fetches the single aggregate result correctly
+        $derivedSelect->limitClear();
+
+        // Execute the optimized count query
+        $result = $driver->query($derivedSelect);
+        $data = $result->fetchResult();
+
+        $this->numResults = (int)$data->get("total_results");
+        $result->free();
+
+        // Log performance data if the result set is large
+        if ($this->numResults > 100) {
+            $end = microtime(true);
+            $executionTime = number_format($end - $start, 4);
+
+            Debug::ErrorLog("--- COUNT(*) SQL: " . $derivedSelect->debugSQL());
+            Debug::ErrorLog("--- COUNT(*) Result: " . $this->numResults);
+            Debug::ErrorLog("[Count Check] Execution Time: {$executionTime}s");
+        }
+
+        return $this->numResults;
+    }
+
     /**
      * Returns the total number of results during SELECT - (lazy initialization)
      * @return int
      * @throws Exception
      */
-    public function count(): int
+    protected function countByFoundRows(): int
     {
         // Return cached result if already calculated
         if ($this->numResults !== -1) return $this->numResults;
+
+        $start = microtime(true); // Започваме отброяването
 
         //get suitable driver
         //if new driver was created it will get out of context and auto deleted
@@ -165,8 +231,13 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $this->numResults = $result->fetchResult()->get("total_results");
         $result->free();
 
-//        Debug::ErrorLog("SQL_CALC_FOUND_ROWS: ".$this->numResults);
-
+        if ($this->numResults>100) {
+            $end = microtime(true);
+            $executionTime = number_format($end - $start, 4);
+            Debug::ErrorLog("--- SQL_CALC_FOUND_ROWS: ".$select->debugSQL());
+            Debug::ErrorLog("--- SQL_CALC_FOUND_ROWS: " . $this->numResults);
+            Debug::ErrorLog("[Count Check] Results: {$this->numResults} | Time: {$executionTime}s");
+        }
         return $this->numResults;
     }
 
