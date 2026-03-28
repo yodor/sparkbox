@@ -710,8 +710,10 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             if (!in_array($key, $columnNames)) continue;
 
             //handle empty single checkboxes
-            if ($this->isNumeric($key) && is_string($value) && strlen(trim($value))==0) {
-                $value = null;
+            if ($this->isNumeric($key) && is_string($value)) {
+                if (strlen(trim($value))==0 || strcmp(strtolower($value), "null") === 0) {
+                    $value = null;
+                }
             }
             //can configure expression/binding if value is IDBValue with bindingKey
             $statement->set($key, $value);
