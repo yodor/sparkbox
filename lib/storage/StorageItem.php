@@ -95,10 +95,16 @@ class StorageItem extends DataObject implements JsonSerializable
                 $url->add(new PathParameter($key, $key, false));
             }
         }
+        $filename = "";
         if ($this->getName()) {
-            $data["name"] = Spark::Slugify($this->getName()).".webp";
-            $url->add(new PathParameter("name", "name",false, false));
+            $filename = Spark::Slugify($this->getName());
         }
+        else {
+            $filename = $this->className.".".$this->id;
+        }
+        $data["name"] = $filename.".webp";
+
+        $url->add(new PathParameter("name", "name",false, false));
         $url->setData($data);
 
         return $url;
