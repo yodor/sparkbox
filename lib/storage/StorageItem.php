@@ -100,9 +100,9 @@ class StorageItem extends DataObject implements JsonSerializable
             $filename = Spark::Slugify($this->getName());
         }
         else {
-            $filename = $this->className.".".$this->id;
+            $filename = $this->className;
         }
-        $data["name"] = $filename.".webp";
+        $data["name"] = $filename.".".$this->id.".webp";
 
         $url->add(new PathParameter("name", "name",false, false));
         $url->setData($data);
