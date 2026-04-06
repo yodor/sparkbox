@@ -43,23 +43,26 @@ class SparkObject
     /**
      * Return simple hash of the object.
      *
-     * Hash value is constructed using get_object_vars and ksort
+     * Hash value is constructed using get_object_vars and ksort.
+     * Fast + reasonably safe (scalar-only objects, stable order not required).
      *
-     * Final value is hashed using Spark::Hash
-     * Fast + reasonably safe (scalar-only objects, stable order not required)
      * @return string Currently uses the sparkHash function that use xxh3 algorithm
      */
     public function hash(): string
     {
         $vars = get_object_vars($this);
-        ksort($vars); // crucial for stability
+        ksort($vars);
 
         $parts = [];
-        foreach ($vars as $k => $v) {
-            $parts[] = "\x1F".$k . "\x1F" . (string)$v; // \x1F = unit separator (rarely appears in data)
+        foreach ($vars as $key => $value) {
+            // Use json_encode for complex values to ensure stability and type safety
+            $serializedValue = is_scalar($value) ? (string)$value : json_encode($value);
+
+            // \x1F = unit separator, \x1E = record separator
+            $parts[] = "\x1F" . $key . "\x1F" . $serializedValue;
         }
 
-        return Spark::Hash(implode("\x1E", $parts));    // \x1E = record separator
+        return Spark::Hash(implode("\x1E", $parts));
     }
 
     /**
