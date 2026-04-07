@@ -38,7 +38,7 @@ class Session
 
             // Caching headers for dynamic pages
             // "private" allows browser caching but forbids proxy caching (CDN/Varnish)
-            //session_cache_limiter("private");
+            session_cache_limiter("private_no_expire");
             //session_cache_expire(5); // 60 minutes browser cache freshness
 
             SparkEventManager::emit(new SessionEvent(SessionEvent::STARTING));
