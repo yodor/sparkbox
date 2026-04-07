@@ -99,8 +99,6 @@ class TemplateConfig extends SparkObject
     }
     /**
      * Create TemplateConfig for loading Plain TemplateContent
-     * @param string $title
-     * @param string $description
      * @return TemplateConfig
      */
     public static function Login() : TemplateConfig
@@ -213,8 +211,16 @@ class TemplateConfig extends SparkObject
      */
     public string $filename = "";
 
+    /**
+     * History navigation is reset. Used during switching of main menus
+     * @var bool
+     */
     public bool $clearNavigation = false;
 
+    /**
+     * Content requires authentication
+     * @var bool
+     */
     public bool $requireAuth = true;
 
     /**

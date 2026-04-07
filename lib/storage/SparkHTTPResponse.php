@@ -13,7 +13,7 @@ class SparkHTTPResponse
     const int MAX_AGE_YEAR = 31536000;
     const int MAX_AGE_HOUR = 3600;
 
-    public function __construct(int $max_age=SparkHTTPResponse::MAX_AGE_HOUR, int $stale_while_revalidate=SparkHTTPResponse::MAX_AGE_HOUR)
+    public function __construct(int $max_age=0, int $stale_while_revalidate=SparkHTTPResponse::MAX_AGE_HOUR)
     {
         //start on clean
         header_remove();

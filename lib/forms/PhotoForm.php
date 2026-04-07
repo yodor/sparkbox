@@ -16,6 +16,9 @@ class PhotoForm extends InputForm
         $field = DataInputFactory::Create(InputType::SESSION_IMAGE, "photo", "Photo", 1);
         $this->addInput($field);
 
+        $field = DataInputFactory::Create(InputType::TEXT, "link", "Link", 0);
+        $this->addInput($field);
+
     }
 
 }
