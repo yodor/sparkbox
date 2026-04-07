@@ -36,13 +36,15 @@ class Session
             ini_set("session.use_strict_mode", 1);
             ini_set("session.gc_maxlifetime", 1440); // 24 minutes server-side TTL
 
-            // Caching headers for dynamic pages
-            // "private" allows browser caching but forbids proxy caching (CDN/Varnish)
-            session_cache_limiter("private_no_expire");
+            // 1. Turn off header generation
+            session_cache_limiter("");
             //session_cache_expire(5); // 60 minutes browser cache freshness
 
             SparkEventManager::emit(new SessionEvent(SessionEvent::STARTING));
             session_start();
+
+            // 2. Rule the headers
+            header("Cache-Control: private, must-revalidate, max-age=0");
 
             Session::$Started = true;
 
