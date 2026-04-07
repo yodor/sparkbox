@@ -62,12 +62,17 @@
 
         border-bottom:1px solid #aaaaaa;
 
-        z-index: 2;
+        z-index: 10;
 
         background-color: white;
 
         gap:0.5em;
         padding:0.5em;
+
+        background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent white */
+        backdrop-filter: blur(10px); /* Blur the background behind the element */
+        -webkit-backdrop-filter: blur(10px); /* Required for Safari support */
+
     }
 
     .basePane .mainPane .header .actions_title {
