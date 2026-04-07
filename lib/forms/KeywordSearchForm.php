@@ -59,7 +59,7 @@ class KeywordSearchForm extends InputForm
         foreach ($allWords as $idx => $keyword) {
             $result = array();
             foreach ($this->queryColumns as $idx1 => $column) {
-                $bindingKey = ":keyword_{$idx}_{$column}";
+                $bindingKey = SQLStatement::FormatBindingKey("keyword_{$idx}_{$column}");
                 $result[] = " $column LIKE $bindingKey";
                 Debug::ErrorLog("Adding custom binding to clause: $bindingKey => %$keyword%");
                 $collection->bind($bindingKey, "%$keyword%");

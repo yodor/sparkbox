@@ -119,7 +119,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
     protected function renderImpl(): void
     {
 
-        echo "<div class='header'>";
+        echo "<div class='heading'>";
 
         if ($this->position) {
             echo "<div class='position'>";
@@ -148,7 +148,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
         $this->image_popup->render();
 
-        echo "<div class='footer'>";
+        echo "<div class='trailer'>";
 
         $this->renderFooterAction("First");
         $this->renderFooterAction("Previous");

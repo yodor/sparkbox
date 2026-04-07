@@ -209,7 +209,7 @@ abstract class OrderedDataBean extends DBTableBean
 
     }
 
-    public function getMaxPosition(?DBDriver $db): int
+    public function getMaxPosition(?DBDriver $db = null): int
     {
         $db = $db ?? $this->db;
 
@@ -218,7 +218,7 @@ abstract class OrderedDataBean extends DBTableBean
         $selectMax->setMeta("GET_MAX");
 
         $query = new SelectQuery($selectMax);
-        $query->exec();
+        $query->exec(null, $db);
         if ($result = $query->nextResult()) {
             $query->free();
             return (int)$result->get("max_position");

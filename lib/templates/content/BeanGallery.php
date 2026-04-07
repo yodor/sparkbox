@@ -7,14 +7,13 @@ class BeanGallery extends BeanList
     public function __construct()
     {
         parent::__construct();
-
     }
 
     public function setBean(DBTableBean $bean): void
     {
         parent::setBean($bean);
+        //do nothing if query is null. GalleyView sets these during the CTOR call
         $this->setListFields(array($this->bean->key() => "ID", "position" => "Position", "caption" => "Caption", "date_upload" => "Date Upload"));
-
     }
 
     public function initialize(): void

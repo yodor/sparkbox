@@ -81,7 +81,7 @@ class DynamicPageView extends Container implements IRequestProcessor
             $this->processing_done = true;
         }
         catch (Exception $e) {
-            Session::Set(Session::ALERT, $e->getMessage());
+            Session::SetAlert($e->getMessage());
         }
 
     }

@@ -1,97 +1,85 @@
-
+.GalleryView .viewport {
+    gap:0.5em;
+}
 .GalleryViewItem {
 
-    vertical-align: top;
-    border: 1px dotted #efefef;
-
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
 
     box-sizing: border-box;
 
-    text-align: center;
-    /*   border:1px dotted red; */
-    margin-top: 10px;
-    margin-right: 10px;
-
+    border:1px solid #cccccc;
+    gap:0.5em;
 }
 
-.GalleryViewItem .header {
+.GalleryViewItem .heading {
     display: block;
-    padding: 0.5em;
-    background-color: #efefef;
+
+
     color: black;
     text-align:center;
-}
-
-.GalleryViewItem .header .item_position {
 
 }
 
-.GalleryViewItem .header .item_actions {
+.GalleryViewItem .heading .item_position {
+
+}
+
+.GalleryViewItem .heading .item_actions {
 
 }
 
 
 .GalleryViewItem .image_slot {
     position: relative;
-    /*   display:inline-block; */
-    display: table-cell;
-    text-align: center;
-    vertical-align: middle;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-position: center center;
     width:256px;
     height:256px;
+    align-content:center;
+    text-align:center;
+
+    border-top:1px solid #cccccc;
+    border-bottom:1px solid #cccccc;
 }
 
 .GalleryViewItem .image_slot IMG {
-    object-fit: cover;
-    max-height:256px;
-    max-width:256px;
+    object-fit: contain;
+    max-height:100%;
+    max-width:100%;
 }
 
-.GalleryViewItem .footer {
-    padding-top:0.5em;
-    padding-bottom:0.5em;
+.GalleryViewItem .trailer {
     display:flex;
     justify-content: space-evenly;
+    flex-direction:row;
+    flex-wrap:wrap;
+
+    padding-bottom:0.5em;
+
 }
-.GalleryViewItem .footer .reposition_action {
-    /*display: none;*/
-    /*width: 32px;*/
-    /*height: 32px;*/
-    /*position: absolute;*/
+.GalleryViewItem .trailer .reposition_action {
+
 }
-.GalleryViewItem .footer [action] {
+.GalleryViewItem .trailer [action] {
     width:1.5em;
     height:1.5em;
-    display:inline-block;
+
     background-size:contain;
-    color:transparent;
-    /*box-sizing: border-box;*/
+
+    background-position: center center;
+
 }
-.GalleryViewItem .footer [action="First"] {
+.GalleryViewItem .trailer [action="First"] {
     background-image: url("../images/list_actions/item_move_top.png");
-    background-position: center center;
-
 }
 
-.GalleryViewItem .footer [action="Last"] {
+.GalleryViewItem .trailer [action="Last"] {
     background-image: url("../images/list_actions/item_move_bottom.png");
-    background-position: center center;
-
 }
 
-.GalleryViewItem .footer [action="Previous"] {
+.GalleryViewItem .trailer [action="Previous"] {
     background-image: url("../images/list_actions/item_move_left.png");
-    background-position: center center;
-
 }
 
-.GalleryViewItem .footer [action="Next"] {
+.GalleryViewItem .trailer [action="Next"] {
     background-image: url("../images/list_actions/item_move_right.png");
-    background-position: center center;
-
 }
-

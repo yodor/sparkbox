@@ -8,19 +8,20 @@ interface IDataIterator
     public function next() : ?array;
 
     /**
+     * Accessible primary key name
      * @return string The primary key of this data iterator
      */
     public function key(): string;
 
-    /**
-     * Data source name (ie table name for DBTableBean)
-     * @return string
-     */
-    public function name(): string;
-
     public function count(): int;
 
     public function bean(): ?DBTableBean;
+
+    /**
+     * Accessible table name
+     * @return string
+     */
+    public function table() : string;
 
     /**
      * Check if the iterator is already executed

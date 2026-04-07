@@ -95,6 +95,7 @@ class TemplateConfig extends SparkObject
         $config->filename = "";
         $config->clearNavigation = false;
         $config->requireAuth = true;
+        $config->useCondition = false;
     }
     /**
      * Create TemplateConfig for loading Plain TemplateContent
@@ -154,6 +155,7 @@ class TemplateConfig extends SparkObject
 
     /**
      * Used to create the page caption contents fills page->setName
+     * Important for building navigation history - same name replace the back history
      * @var string
      */
     public string $title = "";
@@ -214,4 +216,15 @@ class TemplateConfig extends SparkObject
     public bool $clearNavigation = false;
 
     public bool $requireAuth = true;
+
+    /**
+     * Using Template::Condition to filter bean data of BeanEditor/GalleryView
+     *
+     * Signal TemplateContent to use Template::Condition data during setup() call to add match() on the default bean->select,
+     * by doing so subsequent query() calls of the bean would return filtered data for the iterators
+     *
+     * Signal BeanEditor to use Template::Condition data during initialize() call to assign insert value to the transactor
+     * @var bool
+     */
+    public bool $useCondition = false;
 }

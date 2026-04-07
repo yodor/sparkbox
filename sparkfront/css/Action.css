@@ -47,51 +47,36 @@
     padding-left: 12px;
     background-image: url("../images/list_actions/item_delete.png");
     background-repeat: no-repeat;
-    background-position: left center;
 }
 
 .Action[action="First"] {
-    padding-left: 12px;
     background-image: url("../images/list_actions/item_first.png");
     background-repeat: no-repeat;
-    background-position: left center;
 }
 
 .Action[action="Last"] {
-    padding-left: 12px;
     background-image: url("../images/list_actions/item_last.png");
     background-repeat: no-repeat;
-    background-position: left center;
 }
 
 .Action[action="Previous"] {
-    padding-left: 12px;
     background-image: url("../images/list_actions/item_prev.png");
     background-repeat: no-repeat;
-    background-position: left center;
 }
 
 .Action[action="Next"] {
-    padding-left: 12px;
     background-image: url("../images/list_actions/item_next.png");
     background-repeat: no-repeat;
-    background-position: left center;
-
 }
 
 .Action[action='inline-new'] {
-    padding-left: 13px;
     background-image: url("../images/list_actions/inline-new.png");
     background-repeat: no-repeat;
-    background-position: left center;
-
 }
 
 .Action[action="Remove"] {
-    padding-left: 12px;
     background-image: url("../images/list_actions/item_delete.png");
     background-repeat: no-repeat;
-    background-position: left center;
 }
 
 .ColorButton + .Action[action='inline-new'] {

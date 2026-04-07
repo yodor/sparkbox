@@ -60,11 +60,6 @@ class ArrayDataIterator implements IDataIterator
         return count($this->values);
     }
 
-    public function name(): string
-    {
-        return "";
-    }
-
     public function next() : ?array
     {
         $this->pos++;
@@ -77,5 +72,10 @@ class ArrayDataIterator implements IDataIterator
     public function bean(): ?DBTableBean
     {
         return NULL;
+    }
+
+    public function table(): string
+    {
+        return "";
     }
 }

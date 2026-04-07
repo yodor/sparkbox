@@ -1,9 +1,9 @@
 <?php
+include_once("objects/events/SessionEvent.php");
 
 class Session
 {
     protected static bool $Started = false;
-    protected static bool $NeedSync = false;
 
     const string ALERT = "alert";
 
@@ -19,7 +19,7 @@ class Session
             $filename = "";
             $line = "";
             if (headers_sent($filename, $line)) {
-                throw new Exception("Headers already sent in $filename line $line");
+                throw new Exception("Headers have already been sent: " . $filename. " : ". $line);
             }
 
             // Grouped cookie parameters - this replaces individual ini_set calls for cookies
@@ -41,12 +41,13 @@ class Session
             //session_cache_limiter("private");
             //session_cache_expire(5); // 60 minutes browser cache freshness
 
+            SparkEventManager::emit(new SessionEvent(SessionEvent::STARTING));
             session_start();
 
             Session::$Started = true;
-            Session::$NeedSync = false;
 
             Debug::ErrorLog("Starting session ID: " . session_id());
+            SparkEventManager::emit(new SessionEvent(SessionEvent::STARTED));
         }
     }
 
@@ -71,11 +72,11 @@ class Session
             );
 
             //Destroy the session
-            session_write_close();
+            Session::Close();
+            SparkEventManager::emit(new SessionEvent(SessionEvent::DESTROYING));
             session_destroy();
+            SparkEventManager::emit(new SessionEvent(SessionEvent::DESTROYED));
 
-            Session::$Started = false;
-            Session::$NeedSync = false;
         }
 
     }
@@ -86,15 +87,20 @@ class Session
     public static function Close() : void
     {
         if (Session::$Started) {
+            SparkEventManager::emit(new SessionEvent(SessionEvent::CLOSING));
             Debug::ErrorLog("Releasing write lock: " . session_id());
             session_write_close();
-            Session::$NeedSync = false;
+            Session::$Started = false;
+            SparkEventManager::emit(new SessionEvent(SessionEvent::CLOSED));
+        }
+        else {
+            Debug::ErrorLog("Session already closed");
         }
     }
 
-    public static function NeedSync() : bool
+    public static function IsStarted() : bool
     {
-        return Session::$NeedSync;
+        return Session::$Started;
     }
 
     public static function Contains(string $key) : bool
@@ -113,28 +119,18 @@ class Session
         return $default;
     }
 
-    public static function &GetRef(string $key) : mixed
-    {
-        if (Session::Contains($key)) {
-            return $_SESSION[$key];
-        }
-        throw new Exception("Key not found in session");
-    }
-
     public static function Set(string $key, mixed $val) : void
     {
         if (!Session::$Started) {
             Session::Start();
         }
         $_SESSION[$key] = $val;
-        Session::$NeedSync = true;
     }
 
     public static function Remove(string $key) : void
     {
         if (Session::Contains($key)) {
             unset($_SESSION[$key]);
-            Session::$NeedSync = true;
         }
     }
 

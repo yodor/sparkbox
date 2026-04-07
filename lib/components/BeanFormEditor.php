@@ -232,16 +232,15 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor, IRequestProces
             $url = $this->redirect_url;
             //externally set URL for redirection
             if ($url instanceof URL) {
-
             }
             else {
-                //add function - redirect to edit function
-                if ($this->editID<1) {
-                    $url = URL::Current();
-                    $url->add(new URLParameter("editID", $this->editID));
-                }
+                $url = URL::Current();
             }
 
+            //add function - redirect to edit function
+            $url->add(new URLParameter("editID", $this->transactor->getLastID()));
+
+            //Debug::ErrorLog("Session Message is: ".$message);
             Session::SetAlert($message);
             if ($url instanceof URL) {
                 Debug::ErrorLog("Redirecting to: " . $url);

@@ -14,16 +14,16 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
     public ?SQLSelect $stmt = null;
 
     /**
-     * Primary key for this iterator
+     * Accessible primary key for this iterator
      * @var string
      */
     protected string $key = "";
 
     /**
-     * Main table
+     * Accessible table name for this iterator
      * @var string
      */
-    protected string $name = "";
+    protected string $table = "";
 
     /**
      * Only available after calling count()
@@ -44,7 +44,7 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $this->stmt = $select;
 
         $this->key = $primaryKey;
-        $this->name = $tableName;
+        $this->table = $tableName;
     }
 
     /**
@@ -138,9 +138,14 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $this->key = $key;
     }
 
-    public function name(): string
+    public function table(): string
     {
-        return $this->name;
+        return $this->table;
+    }
+
+    public function setTable(string $table) : void
+    {
+        $this->table = $table;
     }
 
     public function count(?SQLSelect $lookup = null) : int

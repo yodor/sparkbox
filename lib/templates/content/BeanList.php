@@ -98,6 +98,11 @@ class BeanList extends TemplateContent
         $this->setBeanQuery();
     }
 
+    public function getListFields(): array
+    {
+        return $this->fields;
+    }
+
     protected function setBeanQuery(): void
     {
         //copy of bean select

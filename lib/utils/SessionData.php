@@ -6,7 +6,7 @@ include_once("objects/SparkSealed.php");
 /**
  * Store array in session
  */
-class SessionData
+class SessionData implements IObserver
 {
     //data key
     const string MENU = "menu";
@@ -14,8 +14,7 @@ class SessionData
     //session name
     const string UPLOAD_CONTROL = "upload_control";
 
-    //reference to S_SESSION[$name] data
-    protected array $data;
+    protected array $data = [];
 
     protected string $name = "";
 
@@ -32,24 +31,23 @@ class SessionData
 
         if (!Session::Contains($name)) {
             Debug::ErrorLog("SessionData [$this->name] initializing empty data.");
-            Session::Set($name, array());
-            $this->need_sync = true;
+            Session::Set($name, []);
         }
-
-        if (Session::Contains($name)) {
-            if (!is_array(Session::GetRef($name))) throw new Exception("Incorrect SessionData");
-            $this->data = &Session::GetRef($name);
+        else {
+            $sessionData = Session::Get($name);
+            if (!is_array($sessionData)) throw new Exception("SessionData is not array");
+            $this->data = $sessionData;
             Debug::ErrorLog("SessionData [$this->name] loaded - data count: ".count($this->data));
         }
 
+        //listen for close events and sync
+        SparkEventManager::register(SessionEvent::class, $this);
     }
 
     public function __destruct()
     {
-        Debug::ErrorLog("SessionData [$this->name] destructor");
-        if ($this->need_sync) {
-            Session::Close();
-        }
+        Debug::ErrorLog("SessionData [$this->name] DTOR");
+        $this->sync();
     }
 
     public function removeAll() : void
@@ -57,17 +55,15 @@ class SessionData
         $keys = array_keys($this->data);
         foreach ($keys as $idx=>$key) {
             unset($this->data[$key]);
-            $this->need_sync = true;
         }
+        $this->need_sync = true;
     }
 
     public function destroy() : void
     {
         Debug::ErrorLog("Removing SessionData [$this->name] from session");
-        $this->removeAll();
+        $this->data = [];
         Session::Remove($this->name);
-        Session::Close();
-        $this->need_sync = false;
     }
 
     public function name() : string
@@ -82,8 +78,16 @@ class SessionData
             $result = $val->wrap();
         }
         $this->data[$key] = $result;
-
         $this->need_sync = true;
+    }
+
+    public function sync() : void
+    {
+        if ($this->need_sync) {
+            Debug::ErrorLog("Saving SessionData[$this->name] to session ...");
+            Session::Set($this->name, $this->data);
+            $this->need_sync = false;
+        }
     }
 
     public function get(string $key) : mixed
@@ -120,5 +124,12 @@ class SessionData
     public function keys() : array
     {
         return array_keys($this->data);
+    }
+
+    public function onEvent(SparkEvent $event): void
+    {
+        if ($event->isEvent(SessionEvent::CLOSING)) {
+            $this->sync();
+        }
     }
 }

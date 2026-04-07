@@ -42,6 +42,26 @@ class BeanEditor extends TemplateContent
     public function initialize(): void
     {
         $this->cmp = new BeanFormEditor($this->bean, $this->form);
+
+        $transactor = $this->editor()->getTransactor();
+
+        //match reference bean from condition if set
+        if (Template::Condition() && $this->config->useCondition) {
+
+            //copy keyID
+            $keyID = Template::Condition()->getID();
+            $keyName = Template::Condition()->getBean()->key();
+
+            Debug::ErrorLog("useCondition is enabled - assigning transactor insert value $keyName=$keyID");
+            $transactor->assignInsertValue($keyName, $keyID);
+
+        }
+
+        if ($this->bean instanceof OrderedDataBean) {
+            $maxPosition = $this->bean->getMaxPosition() + 1;
+            Debug::ErrorLog("OrderedDataBean - assigning transactor insert value position=$maxPosition");
+            $transactor->assignInsertValue("position", $maxPosition);
+        }
     }
 
     public function editor(): BeanFormEditor

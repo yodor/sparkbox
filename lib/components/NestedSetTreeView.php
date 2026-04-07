@@ -73,7 +73,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
     {
         if (!$query instanceof SelectQuery) throw new Exception("Incorrect iterator");
         $this->iterator = $query;
-        $this->setAttribute("source", $this->iterator->name());
+        $this->setAttribute("source", $this->iterator->table());
     }
 
     public function getIterator(): IDataIterator

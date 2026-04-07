@@ -667,37 +667,29 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
     protected function manageCache(int $id, DBDriver $db) : void
     {
-        if ($this instanceof SparkCacheBean) return;
 
-        $cache_file = Spark::PathParts(Spark::Get(Config::CACHE_PATH) , get_class($this) , $id);
-        //Debug::ErrorLog("Checking cache folder: '$cache_file'");
-        if (!is_dir($cache_file)) {
-            //Debug::ErrorLog("'$cache_file' not a folder");
+        $className = get_class($this);
+
+        $cache_file = Spark::PathParts(Spark::Get(Config::CACHE_PATH) , $className , $id);
+
+        Debug::ErrorLog("Cache cleanup for $className [$id] - $cache_file");
+        if (!file_exists($cache_file)) {
+            Debug::ErrorLog("Cache folder does not exists");
             return;
         }
+        if (!is_dir($cache_file)) {
+            Debug::ErrorLog("Not folder: $cache_file");
+            return;
+        }
+
         try {
-            //Debug::ErrorLog("Removing folder '$cache_file'");
             Spark::DeleteFolder($cache_file);
-            //Debug::ErrorLog("Removing folder '$cache_file' complete");
+            Debug::ErrorLog("Cache folder $cache_file deleted");
         }
         catch (Exception $e) {
             //
-            //Debug::ErrorLog("Unable to delete cache folder: $cache_file");
+            Debug::ErrorLog("Unable to delete cache folder: $cache_file");
         }
-
-        //TODO
-//        try {
-//            $delete = new SQLDelete();
-//            $delete->from = "sparkcache";
-//            $delete->where()->add("className", get_class($this));
-//            $delete->where()->add("beanID", $id);
-//            $query = new DBQuery();
-//            $query->exec($delete, $db);
-//        }
-//        catch (Exception $e) {
-//
-//            Debug::ErrorLog("Unable to delete from sparkcache table: ".$e->getMessage());
-//        }
 
     }
 
