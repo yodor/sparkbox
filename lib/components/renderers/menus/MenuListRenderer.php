@@ -26,7 +26,7 @@ class MenuListRenderer extends Component {
     }
     protected function renderImpl(): void
     {
-        static $renderer = new MenuItemRenderer();
+        $renderer = new MenuItemRenderer();
 
         $iterator = $this->itemList->iterator();
         while ($item = $iterator->next()) {
