@@ -1,9 +1,9 @@
 <?php
 include_once("utils/url/URL.php");
-include_once("components/PageScript.php");
+include_once("components/InlineScript.php");
 include_once("dialogs/ConfirmMessageDialog.php");
 
-class ConfirmResponderScript extends PageScript
+class ConfirmResponderScript extends InlineScript implements IPageComponent
 {
     protected string $cancelURL;
 
@@ -12,29 +12,30 @@ class ConfirmResponderScript extends PageScript
         $this->cancelURL = $cancelURL;
     }
 
-    public function code() : string
+    protected function finalize() : void
     {
-        return <<<JS
-        onPageLoad(function () {
-            let confirm_dialog = new MessageDialog("ConfirmResponderDialog");
-            
-            confirm_dialog.buttonAction = function (action) {
-                if (action == "confirm") {
-                    //console.log("Confirm");
-                    const form = confirm_dialog.element.querySelector("FORM");
-                    form.submit();
-                    
-                } else if (action == "cancel") {
-                    //console.log("Cancel");
-                    document.location.replace("{$this->cancelURL}");
-                }
-            };
-            
-            confirm_dialog.initialize();
-            confirm_dialog.show();
-        });
-JS;
+        $this->enableOnPageLoad();
 
+        $code = <<<JS
+let confirm_dialog = new MessageDialog("ConfirmResponderDialog");
+
+confirm_dialog.buttonAction = function (action) {
+    if (action == "confirm") {
+        //console.log("Confirm");
+        const form = confirm_dialog.element.querySelector("FORM");
+        form.submit();
+        
+    } else if (action == "cancel") {
+        //console.log("Cancel");
+        document.location.replace("{$this->cancelURL}");
+    }
+};
+
+confirm_dialog.initialize();
+confirm_dialog.show();
+JS;
+        $this->setCode($code);
+        parent::finalize();
     }
 }
 class ConfirmResponderDialog extends ConfirmMessageDialog

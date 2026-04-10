@@ -8,17 +8,18 @@ include_once("components/KeywordSearch.php");
 include_once("dialogs/json/PhraseTranslationDialog.php");
 
 include_once("iterators/SelectQuery.php");
-include_once("components/PageScript.php");
+include_once("components/InlineScript.php");
 
-class PhraseTranslatorInit extends PageScript
+class PhraseTranslatorInit extends InlineScript implements IPageComponent
 {
-    public function code() : string
+    protected function finalize() : void
     {
-        return <<<JS
-
-            document.phraseTranslator = new PhraseTranslationDialog();
-            document.phraseTranslator.initialize();
+        $code = <<<JS
+document.phraseTranslator = new PhraseTranslationDialog();
+document.phraseTranslator.initialize();
 JS;
+        $this->setCode($code);
+        parent::finalize();
     }
 
 }

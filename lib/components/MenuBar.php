@@ -2,19 +2,25 @@
 include_once("components/Component.php");
 include_once("utils/menu/MenuItemList.php");
 include_once("components/renderers/menus/MenuListRenderer.php");
-include_once("components/InlinePageScript.php");
+include_once("components/InlineScript.php");
 
-class MenuBarInitScript extends InlinePageScript implements IPageComponent
+class MenuBarInitScript extends InlineScript implements IPageComponent
 {
 
-    public function code() : string
+    protected function finalize() : void
     {
-        $name = $this->getName();
-        return <<<JS
-const menu_bar = new MenuBar();
-menu_bar.setID("$name");
-menu_bar.initialize();
+        $this->enableOnPageLoad();
+        //force single instance inside page_components - same init for all menus as IPageComponent uses class and name for the key
+        $this->setName("");
+        $code = <<<JS
+document.querySelectorAll(".MenuBar").forEach((node) => {
+    const menuBar = new MenuBar();
+    menuBar.initializeNode(node);
+    menuBar.initialize();
+});
 JS;
+        $this->setCode($code);
+        parent::finalize();
     }
 
 }
@@ -83,15 +89,11 @@ class MenuBar extends Container
     {
         return $this->menu;
     }
+
     public function setMenu(MenuItemList $itemList) : void
     {
         $this->menu = $itemList;
         $this->bar->setItemList($itemList);
-
-        if ($this->menu->getName()) {
-            $this->setAttribute("id", $this->menu->getName());
-            $this->initScript->setName($this->menu->getName());
-        }
     }
 
     public function getBar() : MenuListRenderer
@@ -103,6 +105,5 @@ class MenuBar extends Container
     {
 
     }
-
 
 }

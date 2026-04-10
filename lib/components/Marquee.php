@@ -19,9 +19,9 @@ class Marquee extends Component
         return $result;
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
 
         $value = $this->buffer()->get();
 

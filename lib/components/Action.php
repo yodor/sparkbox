@@ -97,17 +97,17 @@ class Action extends DataIteratorItem
 
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
 
-        if ($this->url->toString()) {
-            $this->setAttribute("href", $this->url->toString());
+        $finalUrl = $this->url->toString();
+        if ($finalUrl) {
+            $this->setAttribute("href", $finalUrl);
         }
         else {
             $this->removeAttribute("href");
         }
-
     }
 
     public function getCheckCode() : ?Closure

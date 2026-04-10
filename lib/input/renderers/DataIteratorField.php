@@ -41,7 +41,7 @@ abstract class DataIteratorField extends InputField
         //prepare the default select value
         if (!is_null($this->default_label)) {
             $this->item->setName($this->dataInput->getName());
-            $this->item->setID(-1);
+            $this->item->setDataID(-1);
             $this->item->setKey(-1);
 
             $this->item->setValue($this->default_value);
@@ -91,7 +91,7 @@ abstract class DataIteratorField extends InputField
                 $id = $data[$this->iterator->key()];
             }
 
-            $this->item->setID((int)$id);
+            $this->item->setDataID((int)$id);
 
             $this->item->setPosition($position);
 

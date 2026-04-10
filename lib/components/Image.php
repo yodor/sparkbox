@@ -44,9 +44,9 @@ class Image extends Component implements IPhotoRenderer
         return $this->use_size_attributes;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
         if ($this->use_size_attributes) {
             if ($this->width > 0) {
                 $this->setAttribute("width", $this->width);

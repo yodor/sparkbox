@@ -17,8 +17,7 @@
 
     background-color: white;
     position: relative;
-    /*above mce*/
-    z-index:10;
+
     flex-grow:1;
 }
 

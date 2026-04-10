@@ -37,18 +37,15 @@ class Form extends Container
         $this->enctype = $enctype;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-
-        parent::processAttributes();
+        parent::syncAttrs();
         if ($this->method) {
             $this->setAttribute("method", $this->method);
         }
         if ($this->enctype) {
             $this->setAttribute("enctype", $this->enctype);
         }
-
     }
-
 
 }

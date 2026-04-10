@@ -22,12 +22,12 @@ class ClosureComponent extends Container
         $this->closure = $callback;
     }
 
-    protected function processAttributes(): void
+    public function render() : void
     {
-        parent::processAttributes();
         if (is_null($this->closure)) {
             $this->setRenderEnabled(false);
         }
+        parent::render();
     }
 
     protected function renderImpl(): void

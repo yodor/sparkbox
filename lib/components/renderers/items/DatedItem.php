@@ -57,7 +57,7 @@ class DatedItem extends DataIteratorItem implements IDataResultConsumer
         $this->date->setContents($this->bean->formatDate(strtotime($data["item_date"])));
 
 //        $this->thumbnail->setData($data);
-        $this->thumbnail->setID($this->id);
+        $this->thumbnail->setDataID($this->dataID);
 
         $this->content->setContents($data["content"]);
     }

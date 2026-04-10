@@ -23,12 +23,12 @@ class ColorCodeField extends InputFieldTag
         return $this->chooser;
     }
 
-    protected function processAttributes() : void
+    protected function finalize() : void
     {
 
-        parent::processAttributes();
+        parent::finalize();
 
-        $this->chooser->processAttributes();
+        $this->chooser->finalize();
 
         $chooser_name = $this->chooser->getName();
         $this->input->setAttribute("onChange", "this.form.$chooser_name.value=this.value;");

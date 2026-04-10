@@ -5,7 +5,8 @@ include_once("storage/StorageItem.php");
 include_once("components/Image.php");
 
 /**
- * Backend storage image reference
+ * Wrapper for backend StorageItem image type.
+ *
  */
 class ImageStorage extends Action
 {
@@ -55,6 +56,7 @@ class ImageStorage extends Action
      * ImagePopup is part of collection of items tagged with relation attributed named $relation
      * @param string $relation
      * @return void
+     * @throws Exception
      */
     public function setListRelation(string $relation) : void
     {
@@ -67,19 +69,20 @@ class ImageStorage extends Action
     }
 
     /**
-     * Set also the storageItem of the image to $id
+     * Transfer the id to the StorageItem of the image
+     * $this->image->getStorageItem()->id = $id
      * @param int $id
      * @return void
      */
-    public function setID(int $id) : void
+    public function setDataID(int $id) : void
     {
-        parent::setID($id);
+        parent::setDataID($id);
         $this->image->getStorageItem()->id = $id;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
 
         $this->setAttribute("itemID", $this->image->getStorageItem()->id);
         $this->setAttribute("itemClass", $this->image->getStorageItem()->className);

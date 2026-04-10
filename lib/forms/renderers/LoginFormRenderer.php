@@ -1,26 +1,26 @@
 <?php
 include_once("forms/renderers/FormRenderer.php");
-include_once("components/PageScript.php");
+include_once("components/InlineScript.php");
 
-class LoginFormScript extends PageScript
+class LoginFormScript extends InlineScript implements IPageComponent
 {
     protected LoginForm $form;
 
     public function __construct(LoginForm $form)
     {
         parent::__construct();
+
+        $this->enableOnPageLoad();
         $this->form = $form;
+
+        $code = <<<JS
+let auth_form = new LoginForm();
+auth_form.setName("{$this->form->getName()}");
+auth_form.initialize();
+JS;
+        $this->setCode($code);
     }
 
-    public function code() : string {
-        return <<<JS
-        onPageLoad(function () {
-                let auth_form = new LoginForm();
-                auth_form.setName("{$this->form->getName()}");
-                auth_form.initialize();
-        });
-JS;
-    }
 }
 class LoginFormRenderer extends FormRenderer
 {

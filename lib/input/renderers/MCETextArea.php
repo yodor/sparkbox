@@ -18,9 +18,9 @@ class MCETextArea extends TextArea
 
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
 
         //$dataValue = Spark::Unescape();
         $this->input->setContents($this->dataInput->getValue());

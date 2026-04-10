@@ -30,9 +30,9 @@ class ResultViewFooter extends Container
         $this->items()->append($this->resultsInfo);
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
 
         $text = "0";
         if ($this->paginator->totalPages() > 0) {

@@ -33,10 +33,10 @@ class SliderField extends InputFieldTag
         return $this->dataList;
     }
 
-    protected function processAttributes() : void
+    protected function finalize() : void
     {
 
-        parent::processAttributes();
+        parent::finalize();
 
         $dataValue = $this->dataInput->getValue();
         $value = (int)$dataValue;

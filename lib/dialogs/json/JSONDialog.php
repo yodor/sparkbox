@@ -18,9 +18,9 @@ class JSONDialog extends ConfirmMessageDialog
         return $arr;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
 
         $this->setAttribute(RequestResponder::KEY_COMMAND, $this->responder?->getName());
 

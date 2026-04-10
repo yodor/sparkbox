@@ -88,16 +88,15 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
 
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
-        if ($this->isChecked()) {
-            $this->checkbox->setAttribute("checked");
-        }
-        else {
-            $this->checkbox->removeAttribute("checked");
-        }
-        $this->checkbox->setAttribute("value", $this->getID());
+        parent::syncAttrs();
+
+        $this->isChecked()
+            ? $this->checkbox->setAttribute("checked")
+            : $this->checkbox->removeAttribute("checked");
+
+        $this->checkbox->setAttribute("value", $this->getDataID());
     }
 
     public function enableCheckbox(string $inputName) : void

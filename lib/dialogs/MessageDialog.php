@@ -151,9 +151,10 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
         $this->type = $type;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
+
         $this->setAttribute("type", $this->type);
 
         if ($this->singleInstance) {

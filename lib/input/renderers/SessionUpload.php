@@ -86,10 +86,10 @@ abstract class SessionUpload extends InputField
     }
 
     //SessionUpload is ArrayDataInput
-    protected function processAttributes() : void
+    protected function finalize() : void
     {
 
-        parent::processAttributes();
+        parent::finalize();
 
         $this->input->setName($this->dataInput->getName()."[]");
         $this->input->setAttribute("id", $this->input->getName());

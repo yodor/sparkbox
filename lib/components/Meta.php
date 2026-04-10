@@ -20,16 +20,6 @@ class Meta extends Component
         return $this->getAttribute("content");
     }
 
-    protected function processAttributes(): void
-    {
-        parent::processAttributes();
-        if (isset($this->attributes["name"])) {
-            $value = $this->attributes["name"];
-            unset($this->attributes["name"]);
-            $this->attributes = ["name" => $value] + $this->attributes;
-        }
-    }
-
     public function setProperty(string $value) : void
     {
         $this->setAttribute("property", $value);

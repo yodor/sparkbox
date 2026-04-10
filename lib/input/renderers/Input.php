@@ -1,6 +1,9 @@
 <?php
 include_once("components/Container.php");
 
+/**
+ * HTML Input Tag
+ */
 class Input extends Container
 {
 
@@ -40,9 +43,9 @@ class Input extends Container
     {
         return $this->getAttribute("value");
     }
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
         $value = $this->getValue();
         if (is_numeric($value)) {
 

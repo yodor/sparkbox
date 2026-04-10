@@ -116,7 +116,7 @@ class ItemView extends AbstractResultView
         $this->item_renderer->setPosition($this->position_index);
 
         if ($result->isSet($id)) {
-            $this->item_renderer->setID((int)$result->get($id));
+            $this->item_renderer->setDataID((int)$result->get($id));
         }
         $this->item_renderer->setData($result->toArray());
         $this->item_renderer->render();

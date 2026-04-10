@@ -209,7 +209,7 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
             $open_tags++;
 
             $item = $this->item;
-            $item->setID($nodeID);
+            $item->setDataID($nodeID);
             $item->setData($row);
             $item->setAttribute(NestedSetTreeView::ATTRIBUTE_BRANCH_TYPE, $branch_type);
             //move selection to javascript

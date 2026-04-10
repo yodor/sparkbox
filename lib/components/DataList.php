@@ -14,9 +14,9 @@ class DataListItem extends Component
         $this->setTagName("option");
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
         $this->setAttribute("value", $this->value);
         $this->setAttribute("label", $this->label);
     }
@@ -52,20 +52,4 @@ class DataList extends Container
 
     }
 
-    /**
-     * Set 'id' attribute value
-     */
-    public function setID(string $id): void
-    {
-        $this->setAttribute("id", $id);
-    }
-
-    /**
-     * Get 'id' attribute value
-     * @return string
-     */
-    public function getID(): string
-    {
-        return $this->getAttribute("id");
-    }
 }

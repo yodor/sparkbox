@@ -41,23 +41,22 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
 
     /**
+     * Map to track HTML ID ownership across all component instances
+     * @var array
+     */
+    private static array $IdMap = array();
+
+    /**
      * Collection of HTML element attribute name/values
      * @var array
      */
-    protected array $attributes = array();
+    private array $attributes = array();
 
     /**
      * Collection of CSS style name/values
      * @var array
      */
-    protected array $style = array();
-
-
-    /**
-     * Collection of attribute names that require their value as json encoded
-     * @var array
-     */
-    protected array $json_attributes = array();
+    private array $style = array();
 
 
     /**
@@ -205,6 +204,17 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         return $this->tagName;
     }
 
+    public function setName(string $name) : void
+    {
+        parent::setName($name);
+        if ($name) {
+            $this->setAttribute("name", $name);
+        }
+        else {
+            $this->removeAttribute("name");
+        }
+    }
+
     /**
      * Set inner contents - between opening and closing tags
      * @param string $contents
@@ -221,33 +231,46 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Process all attributes of this component.
-     * Called from startRender ie just before the tag is output.
-     * Marshal php object property name/value to attribute name/value.
-     * Ex property this->name is html attribute "name"
-     * Default is to set the name attribute if not empty
+     * Synchronizes internal object properties with HTML attributes.
+     * * This handles how the component "appears" in the DOM tree.
+     * Subclasses should overload this to map internal state (like URLs or sizes)
+     * to the attributes array before rendering.
      */
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        if ($this->name) {
-            $this->setAttribute("name", $this->name);
-        }
+        // Implementation in subclasses
+    }
+
+    /**
+     * Finalizes the component's state and structure before rendering.
+     * * Reserved for complex transformations, such as manipulating child components,
+     * conditional logic, or structural changes that go beyond simple attribute mapping.
+     * * Called from startRender just before the opening tag is echoed.
+     */
+    protected function finalize(): void
+    {
+        $this->syncAttrs();
     }
 
     public function startRender(): void
     {
-        $this->processAttributes();
-        $attrs = $this->prepareAttributes();
-        echo "<";
-        echo $this->tagName;
-        if ($attrs) echo " ".$attrs;
-//        if (!$this->closingTagRequired) {
-//            echo "/";
-//        }
-        echo ">";
+        if (!$this->render_enabled) return;
+
+        $this->finalize();
+
+        // Collect all markup parts using the consistent helper methods
+        $markupParts = array_filter([
+            $this->classToHtml(),
+            $this->attrsToHtml(),
+            $this->styleToHtml()
+        ]);
+
+        $markup = implode(" ", $markupParts);
+
+        echo "<{$this->tagName}" . ($markup ? " $markup" : "") . ">";
+
         $this->renderCaption();
     }
-
     /**
      *
      * @return void
@@ -262,6 +285,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
     protected function renderImpl(): void
     {
+        if (!$this->render_enabled) return;
+
         if ($this->translation_enabled) {
             echo tr($this->buffer->get());
         }
@@ -272,6 +297,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
     public function finishRender(): void
     {
+        if (!$this->render_enabled) return;
+
         if ($this->closingTagRequired) {
             echo "</$this->tagName>";
         }
@@ -401,20 +428,6 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Get the html attribute name/value array
-     * @return array
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    public function getStyles() : array
-    {
-        return $this->style;
-    }
-
-    /**
      * Get all CSS class names as string
      * @return string
      */
@@ -458,14 +471,53 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
+     * @param string $id
+     * @return void
+     * @throws Exception
+     */
+    public function setID(string $id): void
+    {
+        $this->setAttribute("id", $id);
+    }
+
+    /**
+     * @return string
+     */
+    public function getID(): string
+    {
+        return $this->getAttribute("id");
+    }
+
+    /**
      * Set html attribute '$name' to '$value'
      * @param string $name
      * @param string|null $value
      * @return void
+     * @throws Exception
      */
     public function setAttribute(string $name, ?string $value="") : void
     {
-        $this->attributes[$name] = trim((string)$value);
+        // Normalize attribute name to lowercase
+        $name = strtolower($name);
+        // HTML5 Attribute name validation:
+        // No spaces, control characters, or symbols like / > =
+        // We allow alphanumeric, dashes, underscores, and colons.
+        if (preg_match('/[^\w\-:]/', $name)) {
+            throw new Exception("Invalid HTML attribute name: '{$name}'. Use only alphanumeric, dashes, or colons.");
+        }
+
+        $value = trim((string)$value);
+
+        if ($name === "id") {
+            if (empty($value)) throw new Exception("HTML ID attribute cannot be empty.");
+
+            // If ID is already in the map, it's blocked, regardless of who owns it
+            if (isset(self::$IdMap[$value])) throw new Exception("HTML ID '{$value}' is already in use.");
+            self::$IdMap[$value] = true;
+        }
+
+        $this->attributes[$name] = $value;
+
     }
 
     /**
@@ -475,9 +527,20 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      */
     public function removeAttribute(string $name) : void
     {
+        // Normalize attribute name to lowercase
+        $name = strtolower($name);
+
+        if ($name === "id") {
+            $id = $this->getAttribute("id");
+            if ($id && isset(self::$IdMap[$id])) {
+                unset(self::$IdMap[$id]);
+            }
+        }
+
         if (isset($this->attributes[$name])) {
             unset($this->attributes[$name]);
         }
+
     }
 
     /**
@@ -488,12 +551,16 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
      */
     public function getAttribute(string $name): string
     {
+        $name = strtolower($name);
+
         if (isset($this->attributes[$name])) return $this->attributes[$name];
         return "";
     }
 
     public function hasAttribute(string $name) : bool
     {
+        $name = strtolower($name);
+
         return isset($this->attributes[$name]);
     }
 
@@ -501,6 +568,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     {
         $this->setAttribute("role", $role);
     }
+
     public function getRole() : string
     {
         return $this->getAttribute("role");
@@ -529,81 +597,71 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         return "";
     }
 
-    protected function getAttributesText(?array $src_attributes = NULL): string
+    /**
+     * Transforms the internal attributes array into a space-separated HTML string.
+     * Assumes all values are already processed (e.g., json_encoded) strings.
+     * Returns empty string if no attributes are present.
+     *
+     * @return string
+     */
+    private function attrsToHtml(): string
     {
-        if (!$src_attributes) $src_attributes = $this->attributes;
+        if (empty($this->attributes)) return "";
 
-        $attributes = array();
-        foreach ($src_attributes as $name => $value) {
+        $htmlAttributes = array();
+        foreach ($this->attributes as $name => $value) {
 
-            //value can be "0" or ""
+            //just in case cleanup
+            $safeName = Spark::AttributeName($name);
+
+            if (empty($safeName)) continue;
+
             if (is_null($value) || strlen($value) < 1) {
-                $attributes[] = $name;
+                $htmlAttributes[] = $safeName;
                 continue;
             }
 
-            if (is_array($value) || in_array($name, $this->json_attributes)) {
-                //Debug::ErrorLog("component attribute value is array: " . get_class($this) . ": $name");
-                $value = json_encode($value);
-            }
-
-            $attributes[] = $name . "='" . Spark::AttributeValue($value) . "'";
-
+            $htmlAttributes[] = "{$safeName}='" . Spark::AttributeValue($value) . "'";
         }
 
-        return trim(implode(" ", $attributes));
-
+        return implode(" ", $htmlAttributes);
     }
 
-    protected function getStyleText(): string
+    /**
+     * Formerly getStyleMarkup.
+     * Transforms the style array into a valid HTML 'style' attribute.
+     */
+    private function styleToHtml(): string
     {
-
-        $result = "";
-
-        $styles = array();
-        foreach ($this->style as $style_name => $value) {
+        $styles = [];
+        foreach ($this->style as $name => $value) {
             if (empty($value)) continue;
-            $styles[] = $style_name . ":" . $value;
+            $styles[] = "$name:$value";
         }
 
-        if (count($styles) > 0) {
-            $result = "style='".Spark::AttributeValue(implode("; ", $styles))."'";
-        }
-        return $result;
+        if (empty($styles)) return "";
 
+        return "style='" . Spark::AttributeValue(implode("; ", $styles)) . "'";
     }
 
-    protected function prepareAttributes() : string
+    /**
+     * Builds the 'class' attribute string including component and custom classes.
+     * @return string
+     */
+    private function classToHtml(): string
     {
-        $css = array();
+        $css = [];
 
-        //component class
         $componentClass = trim($this->getComponentClass());
-        if (!empty($componentClass)) {
-            $css[] = $componentClass;
-        }
+        if ($componentClass) $css[] = $componentClass;
 
-        //this class names
-        $className = trim($this->getClassName());
-        if (!empty($className)) {
-            $css[] = $className;
-        }
+        $extraClass = trim($this->getClassName());
+        if ($extraClass) $css[] = $extraClass;
 
-        $attrs = array();
-        if (count($css)>0) {
-            $attrs[] = "class='" . Spark::AttributeValue(implode(" ", $css)) . "'";
-        }
-        $attrs[] = $this->getAttributesText();
-        $attrs[] = $this->getStyleText();
-        return trim(implode(" ", $attrs));
+        if (empty($css)) return "";
 
+        return "class='" . Spark::AttributeValue(implode(" ", $css)) . "'";
     }
 
-    public function appendAttributes(array $attributes) : void
-    {
-        foreach ($attributes as $name => $value) {
-            $this->attributes[$name] = $value;
-        }
-    }
 
 }

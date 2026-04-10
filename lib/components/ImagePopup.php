@@ -26,9 +26,9 @@ class ImagePopup extends ImageStorage
         return $arr;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
         $titleValue = $this->getAttribute("title");
         $alt = $this->image->getAttribute("alt");
         if (!$alt && $titleValue) {

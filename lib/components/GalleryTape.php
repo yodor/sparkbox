@@ -24,10 +24,10 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
         $this->items()->append($this->image_popup);
     }
 
-    public function setID(int $id) : void
+    public function setDataID(int $id) : void
     {
-        parent::setID($id);
-        $this->image_popup->setID($id);
+        parent::setDataID($id);
+        $this->image_popup->setDataID($id);
     }
 
     public function setData(array $data) : void
@@ -180,7 +180,7 @@ class GalleryTape extends Component implements IDataIteratorRenderer
 
             $this->item_renderer->setAttribute("position", $pos);
 
-            $this->item_renderer->setID($itemID);
+            $this->item_renderer->setDataID($itemID);
             $this->item_renderer->setData($data);
             $this->item_renderer->render();
 

@@ -1,17 +1,21 @@
 <?php
-class DatedArchiveInitScript extends InlinePageScript implements IPageComponent
+class DatedArchiveInitScript extends InlineScript implements IPageComponent
 {
 
-    public function code(): string
+    protected function finalize(): void
     {
+        $this->enableOnPageLoad();
+
         $name = $this->getName();
 
-        return <<<JS
+        $code = <<<JS
 let archive = new DatedArchive();
 archive.setName("$name");
 archive.initialize();
 JS;
 
+        $this->setCode($code);
+        parent::finalize();
     }
 }
 

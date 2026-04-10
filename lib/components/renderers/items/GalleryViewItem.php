@@ -65,7 +65,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
             $this->setAttribute("ref_id", $this->urlparam->value());
         }
 
-        $this->image_popup->setID($photoID);
+        $this->image_popup->setDataID($photoID);
         $this->image_popup->image()->getStorageItem()->className = get_class($this->view->getBean());
 
         $tooltip = "";

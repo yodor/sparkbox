@@ -23,9 +23,9 @@ class HeaderCell extends TableCell implements IGETConsumer
 
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
 
         $this->addClassName($this->column->getAlignClass());
 

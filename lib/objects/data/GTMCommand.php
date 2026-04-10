@@ -1,8 +1,7 @@
 <?php
-include_once("objects/data/DataObject.php");
-include_once("utils/IScript.php");
+include_once("components/InlineScript.php");
 
-class GTMCommand extends DataObject implements IScript
+class GTMCommand extends InlineScript
 {
     const string COMMAND_CONFIG = "config";
     const string COMMAND_SET = "set";
@@ -64,38 +63,36 @@ class GTMCommand extends DataObject implements IScript
     {
         return $this->parameters;
     }
+
     public function setParameters(array $parameters) : void
     {
         $this->parameters = $parameters;
     }
 
-    public function script() : Script
+    protected function finalize() : void
     {
-        $script = new Script();
+        // Default arguments for the gtag function
+        $arguments = [
+            $this->command,
+            $this->type
+        ];
 
-$contents = <<<JS
-gtag('{$this->command}', '{$this->type}');
-JS;
+        // If parameters exist, append them to the arguments list
         if (count($this->parameters) > 0) {
-$parameters = json_encode($this->parameters);
-$contents = <<<JS
-gtag('{$this->command}', '{$this->type}', {$parameters});
-JS;
+            $arguments[] = $this->parameters;
         }
 
-        $script->setContents($contents);
-        return $script;
-    }
+        // Map each argument to its JSON-encoded string representation
+        $encodedArguments = array_map(function ($argument) {
+            return json_encode($argument);
+        }, $arguments);
 
-    public function setData(array $data) : void
-    {
-        parent::setData($data);
+        // Join arguments with a comma and space for the final JS call
+        $jsArguments = implode(', ', $encodedArguments);
 
-        foreach ($this->parameters as $name => $value) {
-            if (isset($data[$name])) {
-                $this->parameters[$name] = $data[$name];
-            }
-        }
+        $this->setCode("gtag({$jsArguments});");
+
+        parent::finalize();
 
     }
 

@@ -17,9 +17,9 @@ abstract class InputFieldTag extends InputField
         return new Input();
     }
 
-    protected function processAttributes() : void
+    protected function finalize() : void
     {
-        parent::processAttributes();
+        parent::finalize();
 
         $type = $this->input->getType();
 

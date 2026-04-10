@@ -20,7 +20,12 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
 
     protected mixed $value = null;
 
-    protected int $id = -1;
+    /**
+     * Data result row primary key value. Usually the autoincrement value of the row.
+     * Not set from setData interface.
+     * @var int
+     */
+    protected int $dataID = -1;
 
     //render html attributes from data_row
     protected array $data_attributes = array();
@@ -111,14 +116,14 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
      * @param int $id
      * @return void
      */
-    public function setID(int $id) : void
+    public function setDataID(int $id) : void
     {
-        $this->id = $id;
+        $this->dataID = $id;
     }
 
-    public function getID(): int
+    public function getDataID(): int
     {
-        return $this->id;
+        return $this->dataID;
     }
 
     /**
@@ -193,6 +198,7 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
      * Component $input might be 'this' if getInput() is not reimplemented
      * @param Component $input
      * @return void
+     * @throws Exception
      */
     protected function assignInputAttributes(Component $input) : void
     {
@@ -228,19 +234,15 @@ abstract class DataIteratorItem extends Container implements IDataResultProcesso
      * Item renderers are reused for each iterator step so clear values
      * Uses assignInputAttributes(getInput())
      * @return void
+     * @throws Exception
      */
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
+        //Assign attributes to the component in "context"
+        //call getInput to see if we are the main component or there is specialized child component (CheckBox, RadioBox)
         $this->assignInputAttributes($this->getInput());
 
-        //set actual name attribute using $this->name
-        //parent::processAttributes();
-        if ($this->name) {
-            $this->setAttribute("name", $this->name);
-        }
-        else {
-            $this->removeAttribute("name");
-        }
+        parent::finalize();
     }
 
     public function setSelected(bool $mode) : void

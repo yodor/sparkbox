@@ -1,7 +1,8 @@
 <?php
 include_once("responders/RequestResponder.php");
 include_once("dialogs/InputMessageDialog.php");
-class InputPositionResponderScript extends PageScript
+
+class InputPositionResponderScript extends InlineScript implements IPageComponent
 {
     protected string $cancelURL;
 
@@ -10,38 +11,38 @@ class InputPositionResponderScript extends PageScript
         $this->cancelURL = $cancelURL;
     }
 
-    public function code() : string
+    protected function finalize() : void
     {
-        return <<<JS
-        onPageLoad(function () {
-            let input_position = new InputMessageDialog();
-            input_position.buttonAction = function(action) {
-                if (action === "confirm") {
+        $this->enableOnPageLoad();
 
-                    let position = parseInt(input_position.input.value);
-                    if (position > 0) {
-                        let url = new URL(window.location.href);
-                        url.searchParams.set("position", position);
+        $code = <<<JS
+let input_position = new InputMessageDialog();
+input_position.buttonAction = function(action) {
+    if (action === "confirm") {
 
-                        window.location.href = url.href;
-                    }
-                    else {
-                        showAlert("Incorrect position");
-                    }
+        let position = parseInt(input_position.input.value);
+        if (position > 0) {
+            let url = new URL(window.location.href);
+            url.searchParams.set("position", position);
 
-                } 
-                else if (action == "cancel") {
-                    //console.log("Cancel");
-                    document.location.replace("{$this->cancelURL}");
-                }
-            };
+            window.location.href = url.href;
+        }
+        else {
+            showAlert("Incorrect position");
+        }
 
-            input_position.initialize();
-            
-            input_position.show();
-        });
+    } 
+    else if (action == "cancel") {
+        //console.log("Cancel");
+        document.location.replace("{$this->cancelURL}");
+    }
+};
+
+input_position.initialize();
+input_position.show();
 JS;
-
+        $this->setCode($code);
+        parent::finalize();
     }
 }
 class ChangePositionResponder extends RequestResponder

@@ -16,7 +16,7 @@ include_once("utils/IActionCollection.php");
 include_once("objects/ActionCollection.php");
 include_once("utils/script/FBPixel.php");
 include_once("utils/script/GTAG.php");
-include_once("components/SessionAlertPageScript.php");
+include_once("components/SessionAlertScript.php");
 
 
 class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
@@ -136,9 +136,9 @@ document.Spark = {
     STORAGE_LOCAL: "$storage_local"
 };
 JS;
-        $sparkJS->setContents($configJS);
-
+        $sparkJS->setCode($configJS);
         $this->head()->addScript($sparkJS);
+
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkObject.js");
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkEvent.js");
 
@@ -318,7 +318,7 @@ JS;
         RequestController::Process();
 
         //process session alerts
-        new SessionAlertPageScript();
+        new SessionAlertScript();
 
         //close write after responders are processed, Upload responders etc
         Session::Close();

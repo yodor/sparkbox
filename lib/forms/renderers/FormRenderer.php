@@ -145,10 +145,10 @@ class FormRenderer extends Form
      * Assign 'method' and 'layout' properties as attibutes
      * @return void
      */
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
+        parent::syncAttrs();
 
-        parent::processAttributes();
         $this->setAttribute("layout", $this->layout);
         if ($this->actionURL) {
             $this->setAttribute("action", $this->actionURL);

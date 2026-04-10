@@ -554,7 +554,10 @@ final class Spark {
         return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, "UTF-8");
     }
 
-
+    final static public function AttributeName(string $name) : string
+    {
+        return preg_replace('/[^\w\-:]/', '', $name);
+    }
     /**
      * Reverses custom escaping of backslashes, quotes, and control characters.
      * Returns empty string if input is null.

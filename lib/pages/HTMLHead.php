@@ -56,8 +56,8 @@ class HTMLHead extends Container implements IObserver
     protected array $opengraph = array();
 
     /**
-     * Array of Script|IScript
-     * @var array
+     * Array of Script
+     * @var array<Script>
      */
     protected array $scripts = array();
 
@@ -165,8 +165,6 @@ class HTMLHead extends Container implements IObserver
         foreach ($this->scripts as $object) {
             if ($object instanceof Script) {
                 $object->render();
-            } else if ($object instanceof IScript) {
-                $object->script()->render();
             }
         }
     }

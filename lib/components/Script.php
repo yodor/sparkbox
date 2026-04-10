@@ -5,6 +5,7 @@ include_once("utils/url/URL.php");
 class Script extends Container
 {
     protected URL $srcURL;
+    protected string $code = "";
 
     public function __construct()
     {
@@ -25,10 +26,21 @@ class Script extends Container
         return $this->getAttribute("type");
     }
 
+    public function setCode(string $code) : void
+    {
+        $this->code = $code;
+    }
+
+    public function getCode() : string
+    {
+        return $this->code;
+    }
+
     public function setSrc(string $src) : void
     {
         $this->srcURL->fromString($src);
     }
+
     public function getSrc() : string
     {
         return $this->srcURL->toString();
@@ -39,13 +51,20 @@ class Script extends Container
         return $this->srcURL;
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
-        if ($this->srcURL->toString()) {
-            $this->setAttribute("src", $this->srcURL);
-        }
+        parent::finalize();
 
+        //priority 1 - external script referenced by src URL
+        if ($this->srcURL->toString()) {
+            $this->setAttribute("src", $this->srcURL->toString());
+            //no contents if src is set
+            $this->setContents("");
+        }
+        //priority 2 - inline code
+        else if (!empty($this->code)) {
+            $this->setContents("\n$this->code\n");
+        }
     }
 
 }

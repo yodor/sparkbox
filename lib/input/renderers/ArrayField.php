@@ -108,11 +108,17 @@ class ArrayField extends InputField
         return $this->remove_action;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
         //needs the field attribute
         $this->setAttribute("field", $this->dataInput->getName());
+    }
+
+    protected function finalize(): void
+    {
+        parent::finalize();
+        //needs the field attribute
         $this->controls->setAttribute("field", $this->dataInput->getName());
         $this->array_contents->setAttribute("field", $this->dataInput->getName());
     }

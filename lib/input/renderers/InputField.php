@@ -121,6 +121,7 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
      * Default implementation for standard input html elements.
      * Set input name equal to dataInput name
      * @return void
+     * @throws Exception
      */
     protected function processInput() : void
     {
@@ -130,10 +131,11 @@ abstract class InputField extends Container implements IErrorRenderer, IDataIter
         }
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
 
+        //TODO rename/refactor
         $this->processInput();
 
         if ($this->addon_contents->items()->count()>0) {

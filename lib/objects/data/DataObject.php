@@ -5,11 +5,13 @@ class DataObject extends SparkObject implements IDataResultProcessor
 {
 
     protected mixed $value = "";
+    /**
+     * Data key name override.
+     * Used during setData to collect a matching value from the data array
+     * @var string
+     */
     protected string $valueKey = "";
 
-    /**
-     * DataObject constructor.
-     */
     public function __construct()
     {
         parent::__construct();

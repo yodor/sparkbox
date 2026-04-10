@@ -99,17 +99,27 @@ class Component extends SparkObject
         return this.element;
     }
 
+    /**
+     * Query the document and set the element instance to the dom Element of this component
+     * @returns {void}
+     */
     initialize() {
-
-        this.element = document.querySelector(this.selector());
-        if (! (this.element instanceof Element)) {
-            //console.log("DOM query failed: " + this.selector());
-            throw "DOM query failed for selector: "+this.selector();
-        }
-        else {
-           // console.log("Element created for: " + this.selector());
+        // Check if the element is already set via initializeNode
+        if (!this.element) {
+            this.element = document.querySelector(this.selector());
         }
 
+        if (!(this.element instanceof Element)) {
+            throw "DOM query failed for selector: " + this.selector();
+        }
+    }
+
+    /**
+     * Manually set the DOM element for this component
+     * @param element {HTMLElement}
+     */
+    initializeNode(element) {
+        this.element = element;
     }
 
 }

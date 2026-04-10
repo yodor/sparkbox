@@ -3,14 +3,13 @@ include_once("components/Script.php");
 
 class LDJsonScript extends Script
 {
-    protected array $data = array();
+
     protected string $context = "https://schema.org";
 
     public function __construct()
     {
         parent::__construct();
         $this->setType("application/ld+json");
-
     }
 
     public function setContext(string $context) : void
@@ -23,24 +22,33 @@ class LDJsonScript extends Script
         return $this->context;
     }
 
-    public function setLinkedData(LinkedData $linkedData) : void
+    public function setLinkedData(LinkedData $linkedData): void
     {
-        $data = array("@context"=>$this->context) + $linkedData->toArray();
-        $this->setData($data);
-    }
+        $ldArray = $linkedData->toArray();
 
-    public function setData(array $data) : void
-    {
-        $this->data = $data;
-        $this->setContents(json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-    }
-
-    protected function processAttributes(): void
-    {
-        if (count($this->data)<1) {
-            $this->setRenderEnabled(false);
+        //no type or data - do nothing
+        if (empty($linkedData->getType()) && count($ldArray) === 0) {
+            $this->setCode("");
             return;
         }
-        parent::processAttributes();
+
+        $data = array("@context" => $this->context) + $ldArray;
+
+        $json = json_encode($data,
+            JSON_THROW_ON_ERROR |
+            JSON_PRETTY_PRINT |
+            JSON_UNESCAPED_SLASHES |
+            JSON_UNESCAPED_UNICODE
+        );
+        $this->setCode($json);
+
+    }
+
+    public function render(): void
+    {
+        if (empty($this->getCode())) {
+            $this->setRenderEnabled(false);
+        }
+        parent::render();
     }
 }

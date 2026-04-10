@@ -212,9 +212,9 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         return $result;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
         $this->setAttribute("pagesTotal", $this->paginator->totalPages());
         $this->setAttribute("page", ($this->paginator->currentPage()+1));
     }

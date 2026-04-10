@@ -3,23 +3,17 @@ include_once("utils/IGETConsumer.php");
 include_once("objects/SparkObject.php");
 include_once("objects/OrderColumn.php");
 include_once("utils/InputSanitizer.php");
-include_once("components/InlinePageScript.php");
+include_once("components/InlineScript.php");
 
-class UpdateListInlineScript extends InlinePageScript implements IPageComponent
+class UpdateListInlineScript extends InlineScript implements IPageComponent
 {
-
-    public function __construct()
-    {
-        parent::__construct(false);
-    }
-
-    public function code(): string
+    protected function finalize(): void
     {
         $keyOrderBy = Paginator::KEY_ORDER_BY;
         $keyOrderDir = Paginator::KEY_ORDER_DIR;
         $keyPage = Paginator::KEY_PAGE;
 
-        return <<<JS
+        $code = <<<JS
 function updateList(elm) {
 
     let url = new URL(window.location);
@@ -49,7 +43,8 @@ function updateList(elm) {
     window.location = url;
 }
 JS;
-
+        $this->setCode($code);
+        parent::finalize();
     }
 }
 

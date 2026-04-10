@@ -18,9 +18,9 @@ class TextArea extends InputField
         return $input;
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
 
         $dataValue = Spark::AttributeValue((string)$this->dataInput->getValue());
 

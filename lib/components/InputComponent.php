@@ -54,13 +54,11 @@ class InputComponent extends Container
         return $this->dataInput;
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
 
         $this->setAttribute("field", $this->dataInput->getName());
-
-        $this->translator->setAttribute("field", $this->dataInput->getName());
 
         if ($this->dataInput->isRequired()) {
             $this->setAttribute("required", 1);
@@ -68,12 +66,21 @@ class InputComponent extends Container
         else {
             $this->removeAttribute("required");
         }
+    }
 
+    protected function finalize(): void
+    {
+        parent::finalize(); // This triggers syncAttrs()
+
+        // Update child component attributes
+        $this->translator->setAttribute("field", $this->dataInput->getName());
+
+        // Structural CSS changes
         if ($this->dataInput->getRenderer() instanceof HiddenField) {
             $this->addClassName("Hidden");
         }
 
-
+        // Logic for child component visibility
         if (Spark::GetBoolean(Config::TRANSLATOR_ENABLED) && $this->dataInput->translatorEnabled()) {
             $this->translator->setRenderEnabled(true);
         }

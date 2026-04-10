@@ -64,7 +64,7 @@ class DatedHeadingItem extends Action implements IDataResultConsumer
         $this->details->span()->setContents($this->bean->formatDate(strtotime($data["item_date"]), $this->dateFormat));
 
         $this->thumbnail->setData($data);
-        $this->thumbnail->setID($this->id);
+        $this->thumbnail->setDataID($this->dataID);
 
     }
 

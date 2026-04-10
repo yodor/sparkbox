@@ -83,13 +83,13 @@ class TableView extends AbstractResultView implements IHeadContents
     }
 
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
         $columnCount = count(array_keys($this->columns));
 
         $this->viewport->setStyle("grid-template-columns", "repeat($columnCount, auto)");
 
-        parent::processAttributes();
+        parent::finalize();
     }
 
     protected function renderItems() : void

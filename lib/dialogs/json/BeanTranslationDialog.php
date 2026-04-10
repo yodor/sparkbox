@@ -1,31 +1,35 @@
 <?php
 include_once("dialogs/json/JSONDialog.php");
 include_once("responders/json/TranslateBeanResponder.php");
-include_once("components/PageScript.php");
+include_once("components/InlineScript.php");
 
-class BeanTranslatorInit extends PageScript
+class BeanTranslatorInit extends InlineScript implements IPageComponent
 {
-    function code() : string
+    protected function finalize() : void
     {
+        $this->enableOnPageLoad();
+
         $alertText = tr("Please submit the form to enable translation");
 
-        return <<<JS
-        const beanDialog = new BeanTranslationDialog();
-        beanDialog.initialize();
+        $code = <<<JS
+const beanDialog = new BeanTranslationDialog();
+beanDialog.initialize();
 
-        document.querySelectorAll("[action='TranslateBeanField']").forEach((element) => {
-            
-            element.addEventListener("click", (event)=>{
-                let editID = document.querySelector(".BeanFormEditor").getAttribute("editID");
-                if (editID<1) {
-                    showAlert("$alertText");
-                    return;
-                }
-                beanDialog.show(element.getAttribute("field"), false);
-            });
-            
-        });
+document.querySelectorAll("[action='TranslateBeanField']").forEach((element) => {
+    
+    element.addEventListener("click", (event)=>{
+        let editID = document.querySelector(".BeanFormEditor").getAttribute("editID");
+        if (editID<1) {
+            showAlert("$alertText");
+            return;
+        }
+        beanDialog.show(element.getAttribute("field"), false);
+    });
+    
+});
 JS;
+        $this->setCode($code);
+        parent::finalize();
 
     }
 }

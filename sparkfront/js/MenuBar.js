@@ -135,6 +135,9 @@ class MenuBar extends Component {
      */
     menuEnter(item) {
 
+        //show in-front of the others
+        this.element.style.zIndex = "100";
+
         const subMenu = item.querySelector(".ItemList.Submenu");
 
         if (subMenu?.childNodes.length>0) {
@@ -185,6 +188,9 @@ class MenuBar extends Component {
         mitem.querySelectorAll(".ItemList.Submenu").forEach((item)=> {
             item.removeAttribute("open");
         });
+
+        //remove the inline z-index
+        this.element.style.zIndex = "";
 
         this.setItemSelected(mitem, false);
     }

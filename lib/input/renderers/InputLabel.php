@@ -69,12 +69,10 @@ class InputLabel extends LabelSpan implements IErrorRenderer
 
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
         $this->processErrorAttributes();
-
-//        $this->label->setAttribute("for", $this->dataInput->getName());
 
         $this->label->setContents($this->dataInput->getLabel());
 
@@ -84,7 +82,10 @@ class InputLabel extends LabelSpan implements IErrorRenderer
             }
         }
 
-        $id = $this->dataInput->getID();
+        $id = $this->dataInput->getRenderer()->input()?->getID("id");
+        if (!$id) {
+            $id = $this->dataInput->getRenderer()->getID("id");
+        }
         if ($id) {
             $this->label->setAttribute("for", $id);
         }

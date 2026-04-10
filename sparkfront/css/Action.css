@@ -47,6 +47,20 @@
     padding-left: 12px;
     background-image: url("../images/list_actions/item_delete.png");
     background-repeat: no-repeat;
+    background-position:left center;
+}
+.Action[action='inline-new'] {
+    padding-left: 12px;
+    background-image: url("../images/list_actions/inline-new.png");
+    background-repeat: no-repeat;
+    background-position:left center;
+}
+
+.Action[action="Remove"] {
+    padding-left: 12px;
+    background-image: url("../images/list_actions/item_delete.png");
+    background-repeat: no-repeat;
+    background-position:left center;
 }
 
 .Action[action="First"] {
@@ -69,15 +83,7 @@
     background-repeat: no-repeat;
 }
 
-.Action[action='inline-new'] {
-    background-image: url("../images/list_actions/inline-new.png");
-    background-repeat: no-repeat;
-}
 
-.Action[action="Remove"] {
-    background-image: url("../images/list_actions/item_delete.png");
-    background-repeat: no-repeat;
-}
 
 .ColorButton + .Action[action='inline-new'] {
     margin-left: 5px;

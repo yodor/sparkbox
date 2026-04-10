@@ -12,9 +12,9 @@ class SelectItem extends DataIteratorItem
         $this->tagName = "option";
     }
 
-    public function processAttributes(): void
+    public function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
 
         //no name for options
         $this->removeAttribute("name");

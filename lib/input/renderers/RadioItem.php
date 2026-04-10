@@ -52,9 +52,9 @@ class RadioItem extends DataIteratorItem
         return $this->getName();
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
 
         //DataIteratorField assigns name = dataInput name during renderItems
         //passthrough the name to the actual inputs

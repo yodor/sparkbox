@@ -26,9 +26,9 @@ class CheckboxTreeView extends DataIteratorField
         $this->items()->append(new ClosureComponent($this->renderItems(...),false));
     }
 
-    protected function processAttributes(): void
+    protected function finalize(): void
     {
-        parent::processAttributes();
+        parent::finalize();
         $this->ir->enableCheckbox($this->dataInput->getName());
         $this->treeView->setCheckedNodes(...$this->dataInput->getValue());
     }

@@ -11,10 +11,10 @@ abstract class NestedSetItem extends DataIteratorItem
 
     }
 
-    protected function processAttributes(): void
+    protected function syncAttrs(): void
     {
-        parent::processAttributes();
-        $this->setAttribute("nodeID", $this->id);
+        parent::syncAttrs();
+        $this->setAttribute("nodeID", $this->dataID);
         $this->setAttribute("active", (($this->selected) ? 1 : 0));
         $this->setAttribute("checked", (($this->checked) ? 1 : 0));
     }

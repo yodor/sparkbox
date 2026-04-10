@@ -4,51 +4,52 @@ include_once("forms/AdminUserForm.php");
 include_once("beans/AdminUsersBean.php");
 include_once("auth/AdminAuthenticator.php");
 
-class AdminUserScript extends PageScript
+class AdminUserScript extends InlineScript implements IPageComponent
 {
-    public function code() : string
+    protected function finalize() : void
     {
-        return <<<JS
-        function checkForm(frm) {
-                try {
+        $code = <<<JS
+function checkForm(frm) {
+        try {
 
-                    if (frm.pass.value.length > 0 || frm.pass1.value.length > 0) {
-                        if (frm.pass.value != frm.pass1.value) {
-                            throw "Passwords do not match";
-                        }
-                        if (frm.pass.value.length < 6) {
-                            throw "Minimum password length is 6";
-                        }
-                    }
-
-                    frm.password_hash.value = hex_md5(frm.pass.value);
-
-                    frm.pass.value = "";
-                    frm.pass1.value = "";
-                    return true;
-
-                } catch (e) {
-                    alert(e);
+            if (frm.pass.value.length > 0 || frm.pass1.value.length > 0) {
+                if (frm.pass.value != frm.pass1.value) {
+                    throw "Passwords do not match";
                 }
-                return false;
-        }
-        
-        function toggleRoles() {
-                const roles = document.querySelector(".InputComponent[field='role']");
-                const access = document.querySelector(".InputComponent [name='access_level']");
-
-                if (access.value == "Full Access") {
-                    roles.style.display = "none";
-                } else {
-                    roles.style.display = "";
+                if (frm.pass.value.length < 6) {
+                    throw "Minimum password length is 6";
                 }
-        }
+            }
 
-        onPageLoad(function () {
-            toggleRoles();
-        });
+            frm.password_hash.value = hex_md5(frm.pass.value);
+
+            frm.pass.value = "";
+            frm.pass1.value = "";
+            return true;
+
+        } catch (e) {
+            alert(e);
+        }
+        return false;
+}
+
+function toggleRoles() {
+        const roles = document.querySelector(".InputComponent[field='role']");
+        const access = document.querySelector(".InputComponent [name='access_level']");
+
+        if (access.value == "Full Access") {
+            roles.style.display = "none";
+        } else {
+            roles.style.display = "";
+        }
+}
+
+onPageLoad(function () {
+    toggleRoles();
+});
 JS;
-
+        $this->setCode($code);
+        parent::finalize();
     }
 }
 class AdminUserEditorPage extends BeanEditorPage

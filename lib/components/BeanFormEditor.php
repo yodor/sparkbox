@@ -89,9 +89,9 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor, IRequestProces
 
     }
 
-    public function processAttributes(): void
+    public function syncAttrs(): void
     {
-        parent::processAttributes();
+        parent::syncAttrs();
         $this->setAttribute("editID", $this->editID);
         $this->setAttribute("bean", get_class($this->bean));
         $this->setAttribute("form", get_class($this->form));
