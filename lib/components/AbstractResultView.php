@@ -28,11 +28,6 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
     protected int $total_rows = 0;
 
     /**
-     * @var int total number of results for the current iteration
-     */
-    protected int $paged_rows = 0;
-
-    /**
      * @var Paginator|null
      */
     protected ?Paginator $paginator = NULL;
@@ -290,6 +285,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
             $lookup->collectBindings($lateLookup);
             $lookup->collectBindings($this->iterator->stmt);
 
+//            echo "<HR>".$lookup->debugSQL();
             //Debug::ErrorLog("LateLookup: ".$lookup->debugSQL());
 
             //overwrite the active query to the lookup query
@@ -319,10 +315,6 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         //might be already be paginated by page head calling AppendHeadLinks
         $this->paginate();
 
-        //echo "Final SQL: ".$this->iterator->select->getSQL();
-        //exec will clear cached count for all results so count will return only paginated
-
-        $this->paged_rows = $this->iterator->count();
         //exec after count
         $this->iterator->exec();
     }
