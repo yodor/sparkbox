@@ -168,7 +168,9 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
     /**
      * Returns the total number of results using a nested COUNT(*) query.
      * This approach is faster than SQL_CALC_FOUND_ROWS as it bypasses heavy columns and subqueries.
-     * * @return int
+     * *
+     * @param SQLSelect|null $lookup
+     * @return int
      * @throws Exception
      */
     protected function countByCount(?SQLSelect $lookup = null): int

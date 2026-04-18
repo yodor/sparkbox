@@ -39,6 +39,7 @@ trait CanSetOrder {
      * @param string $name
      * @param OrderDirection|null $direction null means default ASC
      * @return void
+     * @throws Exception
      */
     public function order(string $name, ?OrderDirection $direction=null) : void
     {
