@@ -31,19 +31,15 @@ class SparkWatermark
                 $filename = Spark::Get(Config::APP_PATH).DIRECTORY_SEPARATOR.$watermarkFilename;
 
                 $this->file = new SparkFile(realpath($filename));
-                Debug::ErrorLog("Watermark using file: ". $this->file->getAbsoluteFilename());
+
                 if ($this->file->exists()) {
-                    $this->image = @imagecreatefromstring($this->file->getContents());
-                    if ($this->image !== FALSE) {
-                        $this->enabled = true;
-                        Debug::ErrorLog("Watermark image loaded");
-                    }
-                    else {
-                        Debug::ErrorLog("Unable to read image from this file");
-                    }
+
+                    Debug::ErrorLog("Using watermark: ". $this->file->getAbsoluteFilename());
+                    $this->enabled = true;
+
                 }
                 else {
-                    Debug::ErrorLog("Watermark filename not found");
+                    Debug::ErrorLog("Watermark file is not accessible: ". $this->file->getAbsoluteFilename());
                 }
             }
             else {
@@ -104,6 +100,13 @@ class SparkWatermark
     {
 
         if (!$this->enabled) throw new Exception("Watermark is not enabled");
+
+        if (!$this->image) {
+            $this->image = @imagecreatefromstring($this->file->getContents());
+            if ($this->image === FALSE) {
+                throw new Exception("Unable to read image from this file");
+            }
+        }
 
         $width = imagesx($h_source);
         $height = imagesy($h_source);
