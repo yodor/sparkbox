@@ -25,6 +25,8 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
      */
     protected string $table = "";
 
+    public bool $execLateLookup = false;
+
     /**
      * Only available after calling count()
      * @var int 
@@ -62,8 +64,18 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         if (!is_null($statement)) throw new Exception("Can only exec SQLSelect from the constructor call.");
         //clear cached count
         $this->numResults = -1;
+
         $closure = function() use (&$db) {
-            parent::exec($this->stmt, $db);
+
+            $stmt = $this->stmt;
+
+            if ($this->execLateLookup) {
+                if (strlen(trim($this->table))<1 || strlen(trim($this->key))<1) throw new Exception("Incorrect lateLookup setup");
+                $stmt = $this->stmt->lateLookup($this->table, $this->key);
+                //echo $stmt->debugSQL();
+            }
+
+            parent::exec($stmt, $db);
         };
 
         $time = Spark::Benchmark($closure);
@@ -148,12 +160,12 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         $this->table = $table;
     }
 
-    public function count(?SQLSelect $lookup = null) : int
+    public function count() : int
     {
         $result = -1;
-        $closure = function () use (&$result, $lookup)
+        $closure = function () use (&$result)
         {
-            $result = $this->countByCount($lookup);
+            $result = $this->countByCount();
         };
 
         $time = Spark::Benchmark($closure);
@@ -169,18 +181,17 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
      * Returns the total number of results using a nested COUNT(*) query.
      * This approach is faster than SQL_CALC_FOUND_ROWS as it bypasses heavy columns and subqueries.
      * *
-     * @param SQLSelect|null $lookup
      * @return int
      * @throws Exception
      */
-    protected function countByCount(?SQLSelect $lookup = null): int
+    protected function countByCount(): int
     {
         if ($this->numResults !== -1) return $this->numResults;
 
         $driver = $this->assignDriver();
 
         // 1. Clone the original statement to preserve its state
-        $innerStmt = $lookup ? clone $lookup : clone $this->stmt;
+        $innerStmt = clone $this->stmt;
 
         // 2. OPTIMIZATION: Clear all heavy columns from the INNER query.
         // Using a constant '1' prevents the execution of heavy subqueries (photos, attributes, etc.)
@@ -218,7 +229,7 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
      * @return int
      * @throws Exception
      */
-    protected function countByFoundRows(?SQLSelect $lookup = null): int
+    protected function countByFoundRows(): int
     {
         // Return cached result if already calculated
         if ($this->numResults !== -1) return $this->numResults;
@@ -227,7 +238,7 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         //if new driver was created it will get out of context and auto deleted
         $driver = $this->assignDriver();
 
-        $select = $lookup ? clone $lookup : clone $this->stmt;
+        $select = clone $this->stmt;
         $select->setMode(SQLSelect::SQL_CALC_FOUND_ROWS);
 
         //do not reset the fields here as 'custom' columns might be used with grouping or having clauses

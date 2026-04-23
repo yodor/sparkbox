@@ -712,9 +712,9 @@ class NestedSetBean extends DBTableBean
         $fields = array();
 
         //Ensure primary key is present
-        if (!in_array($this->prkey, $columns)) {
-            array_unshift($columns, $this->prkey);
-        }
+//        if (!in_array($this->prkey, $columns)) {
+//            array_unshift($columns, $this->prkey);
+//        }
 
         //prepend prefix to column names
         foreach ($columns as $idx => $field) {

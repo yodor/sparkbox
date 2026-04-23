@@ -27,10 +27,6 @@ class SQLSelect extends SQLStatement
 
     protected ?HavingExpression $_having = null;
 
-    public ?SQLSelect $lateLookup = null;
-    public string $lateLookupTable = "";
-    public string $lateLookupKey = "";
-
     public static function Table(string $tableName) : SQLSelect
     {
         $result = new SQLSelect();
@@ -208,4 +204,22 @@ class SQLSelect extends SQLStatement
         return $sel;
     }
 
+    public function lateLookup(string $lookupTable, string $lookupKey) : SQLSelect
+    {
+
+        $lookup = clone $this;
+        $lookup->columns()->reset();
+        $lookup->columns($lookupTable.".".$lookupKey);
+
+        //outer select
+        $stmt = new SQLSelect();
+        //copy the heavy columns to the outside lookup query
+        $this->columns()->copyTo($stmt->columns());
+
+        $stmt->from("(".$lookup->getSQL().") as lookup")->straightJoin($lookupTable)->on("$lookupTable.$lookupKey = lookup.$lookupKey");
+
+        $stmt->collectBindings($this);
+
+        return $stmt;
+    }
 }

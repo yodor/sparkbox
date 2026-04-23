@@ -246,7 +246,7 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         if ($this->results_paginated) return;
 
         //unbuffered mode, get the result count only, use the lateLookup if set
-        $this->total_rows = $this->iterator->count($this->iterator->stmt->lateLookup);
+        $this->total_rows = $this->iterator->count();
 
         //apply the order of the view
         $this->paginator->applyOrder($this->iterator->stmt, $this->default_order);
@@ -256,40 +256,6 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
 
         if ($this->items_per_page>0) {
             $this->paginator->applyLimit($this->iterator->stmt);
-        }
-
-        //transform to "late lookup"
-        if ($this->iterator->stmt->lateLookup instanceof SQLSelect) {
-
-            $lateLookup = $this->iterator->stmt->lateLookup;
-
-            $lookupTable = $this->iterator->stmt->lateLookupTable;
-            $lookupKey = $this->iterator->stmt->lateLookupKey;
-            if (strlen(trim($lookupTable))<1 || strlen(trim($lookupKey))<1)throw new Exception("Incorrect lateLookup setup");
-
-            //apply the main order and limit
-            $this->paginator->applyOrder($lateLookup, $this->default_order);
-            $this->paginator->applyLimit($lateLookup);
-
-            $lookup = new SQLSelect();
-            //copy the heavy columns to the outside lookup query
-            $this->iterator->stmt->columns()->copyTo($lookup->columns());
-
-            $lookup->from("(".$lateLookup->getSQL().") as lookup")->straightJoin($lookupTable)->on("$lookupTable.$lookupKey = lookup.$lookupKey");
-
-            //transfer order to the lookup query
-            $this->paginator->applyOrder($lookup, $this->default_order);
-            //$this->paginator->applyLimit($lookup);
-
-            //copy bindings from main and lookup
-            $lookup->collectBindings($lateLookup);
-            $lookup->collectBindings($this->iterator->stmt);
-
-//            echo "<HR>".$lookup->debugSQL();
-            //Debug::ErrorLog("LateLookup: ".$lookup->debugSQL());
-
-            //overwrite the active query to the lookup query
-            $this->iterator->stmt = $lookup;
         }
 
 //        $this->iterator->stmt->setMeta("ARV Paginated");
