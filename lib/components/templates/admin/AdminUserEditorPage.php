@@ -12,19 +12,19 @@ class AdminUserScript extends InlineScript implements IPageComponent
 function checkForm(frm) {
         try {
 
-            if (frm.pass.value.length > 0 || frm.pass1.value.length > 0) {
-                if (frm.pass.value != frm.pass1.value) {
+            if (frm.password.value.length > 0 || frm.password_compare.value.length > 0) {
+                if (frm.password.value != frm.password_compare.value) {
                     throw "Passwords do not match";
                 }
-                if (frm.pass.value.length < 6) {
+                if (frm.password.value.length < 6) {
                     throw "Minimum password length is 6";
                 }
             }
 
-            frm.password_hash.value = hex_md5(frm.pass.value);
+            //frm.password_hash.value = hex_md5(frm.pass.value);
 
-            frm.pass.value = "";
-            frm.pass1.value = "";
+            //frm.pass.value = "";
+            //frm.pass1.value = "";
             return true;
 
         } catch (e) {
