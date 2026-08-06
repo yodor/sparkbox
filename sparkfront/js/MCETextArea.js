@@ -18,6 +18,8 @@ class MCETextArea extends Component {
             schema: 'html5',
 
             extended_valid_elements: 'img[*],a[*],br',
+            remove_redundant_brs: false,
+            valid_elements: 'p/div,br,strong,em',
 
             strict_loading_mode: true,
 
