@@ -121,7 +121,13 @@ class DBQuery extends SparkObject
         if ($driver->hasActiveResult()) {
             //unbuffered mode handling
             //SelectQuery::count() uses to open temp connection on blocked result-fetching
-            $driver = DBConnections::CreateDriver($driver->getConnectionName(), true);
+            //try the second "AUX" connection
+            if (DBConnections::Exists("AUX")) {
+                $driver = DBConnections::Driver("AUX");
+            }
+            else {
+                $driver = DBConnections::CreateDriver($driver->getConnectionName());
+            }
             //own it
             $driver->setParent($this);
             //Debug::ErrorLog("Opening new driver connection: ". Debug::Backtrace(-1));

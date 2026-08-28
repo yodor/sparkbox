@@ -24,6 +24,11 @@ abstract class DBDriver extends SparkObject implements ISerializable, IUnseriali
         return $this->props->getName();
     }
 
+    public function getConnectionProperties() : DBConnection
+    {
+        return $this->props;
+    }
+
     public function __destruct()
     {
         $this->disconnect();

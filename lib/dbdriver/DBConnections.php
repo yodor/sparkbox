@@ -61,6 +61,14 @@ class DBConnections
 
     protected static array $drivers = array();
 
+    public static function DriverExists(string $conn_name): bool
+    {
+        if (isset(self::$drivers[$conn_name])) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Return reusable DBDriver for connection properties named '$conn_name' or DBConnection::DEFAULT_NAME if omitted.
      *
