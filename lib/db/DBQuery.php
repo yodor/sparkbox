@@ -125,7 +125,6 @@ class DBQuery extends SparkObject
             //try the second "AUX" connection
             if (DBConnections::Exists("AUX")) {
                 $driver = DBConnections::Driver("AUX");
-                echo "AUX";
             }
             else {
                 $driver = DBConnections::CreateDriver($driver->getConnectionName());
