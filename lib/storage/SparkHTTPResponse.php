@@ -12,8 +12,8 @@ class SparkHTTPResponse
 
     const int MAX_AGE_YEAR = 31536000;
     const int MAX_AGE_HOUR = 3600;
-
-    public function __construct(int $max_age=0, int $stale_while_revalidate=SparkHTTPResponse::MAX_AGE_HOUR)
+    const int MAX_AGE_WEEK = 604800;
+    public function __construct(int $max_age=SparkHTTPResponse::MAX_AGE_YEAR, int $stale_while_revalidate=SparkHTTPResponse::MAX_AGE_WEEK)
     {
         //start on clean
         header_remove();
@@ -22,7 +22,7 @@ class SparkHTTPResponse
         $this->setHeader("Content-Transfer-Encoding", "binary");
 
         //variables from constructor - 1 hour default expiration
-        $cacheControl = "public, must-revalidate, must-understand, max-age=$max_age, stale-while-revalidate=$stale_while_revalidate";
+        $cacheControl = "public, must-revalidate, must-understand, max-age=$max_age, stale-while-revalidate=$stale_while_revalidate, immutable";
         $this->setHeader("Cache-Control", $cacheControl);
 
     }
