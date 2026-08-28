@@ -42,12 +42,13 @@ class DBQuery extends SparkObject
         $this->result = NULL;
 
         //can support external driver using getDB/setDB
-        if ($this->driver instanceof DBDriver) {
-            if ($this->driver->getParent() === $this) {
-                //Debug::ErrorLog("Closing self created driver");
-                $this->driver = null; //calls DTOR
-            }
-        }
+        //do not free the driver
+//        if ($this->driver instanceof DBDriver) {
+//            if ($this->driver->getParent() === $this) {
+//                //Debug::ErrorLog("Closing self created driver");
+//                $this->driver = null; //calls DTOR
+//            }
+//        }
 
     }
 
