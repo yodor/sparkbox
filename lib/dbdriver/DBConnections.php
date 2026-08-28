@@ -74,14 +74,14 @@ class DBConnections
      * @return DBDriver
      * @throws Exception
      */
-    public static function Driver(string $conn_name = DBConnection::DEFAULT_NAME): DBDriver
+    public static function Driver(string $conn_name = DBConnection::DEFAULT_NAME, bool $persistent=false): DBDriver
     {
         if (isset(self::$drivers[$conn_name])) {
             return self::$drivers[$conn_name];
         }
 
         try {
-            $driver = self::CreateDriver($conn_name);
+            $driver = self::CreateDriver($conn_name, $persistent);
             self::$drivers[$conn_name] = $driver;
             return $driver;
         } catch (Exception $e) {
@@ -97,7 +97,7 @@ class DBConnections
      * @return DBDriver
      * @throws Exception
      */
-    public static function CreateDriver(string $conn_name = DBConnection::DEFAULT_NAME): DBDriver
+    public static function CreateDriver(string $conn_name = DBConnection::DEFAULT_NAME, bool $persistent=false): DBDriver
     {
         $props = self::Get($conn_name);
 
@@ -111,7 +111,7 @@ class DBConnections
         }
 
         if (is_null($driver)) throw new Exception("Unsupported driver '{$props->driverClass}'");
-        $driver->connect();
+        $driver->connect($persistent);
         return $driver;
     }
 

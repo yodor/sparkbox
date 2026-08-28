@@ -40,7 +40,7 @@ abstract class DBDriver extends SparkObject implements ISerializable, IUnseriali
      * Open connection to DB server
      * @return void
      */
-    abstract public function connect() : void;
+    abstract public function connect(bool $persistent=false) : void;
 
     /**
      * Disconnect from DB server

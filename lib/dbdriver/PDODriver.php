@@ -6,11 +6,13 @@ class PDODriver extends DBDriver
 {
     private ?PDO $conn = null;
 
-    public function connect(): void
+    public function connect(bool $persistent=false): void
     {
         if ($this->isConnected()) {
             return;
         }
+
+        if (Spark::isStorageRequest()) $persistent = true;
 
         $host = $this->props->host;
         $db   = $this->props->database;
@@ -43,6 +45,10 @@ class PDODriver extends DBDriver
 
             // unbuffered mode
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
+
+            // CRUCIAL FOR HOSTINGER FIREWALL: Reuses connections to prevent "Operation not permitted"
+            PDO::ATTR_PERSISTENT         => $persistent,
+
         );
 
 
