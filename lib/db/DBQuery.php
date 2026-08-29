@@ -45,7 +45,7 @@ class DBQuery extends SparkObject
         if ($this->driver instanceof DBDriver) {
             if ($this->driver->getParent() === $this) {
                 //Debug::ErrorLog("Closing self created driver");
-                $this->driver = null; //calls DTOR
+                $this->driver = null; //calls DTOR if this is the last reference
             }
         }
 
@@ -106,36 +106,43 @@ class DBQuery extends SparkObject
     }
 
 
-    /**
-     * Return suitable driver either the global one or create new if the global is already processing query
-     * return DBConnections::Driver() or DBConnections::CreateDriver($this->driver->getConnectionName())
-     * If new driver is created $this->driver_created flag is set and using during free()
-     *
-     * @return DBDriver
-     * @throws Exception
-     */
+//    /**
+//     * Return suitable driver either the global one or create new if the global is already processing query
+//     * return DBManager::Driver() or DBManager::CreateDriver($this->driver->getConnectionName())
+//     * If new driver is created $this->driver_created flag is set and using during free()
+//     *
+//     * @param SQLStatement|null $statement
+//     * @return DBDriver
+//     * @throws Exception
+//     */
+//    protected function assignDriver(?SQLStatement $statement = null) : DBDriver
+//    {
+//        $driver = DBManager::Driver();
+//        //already active result-set for fetching
+//        if ($driver->hasActiveResult()) {
+//            //unbuffered mode handling
+//            //SelectQuery::count() uses to open temp connection on blocked result-fetching
+//            //try the second "AUX" connection
+//            if (DBManager::Exists("AUX")) {
+//                $driver = DBManager::Driver("AUX");
+//            }
+//            else {
+//                $driver = DBManager::CreateDriver($driver->getConfig()->getName());
+//            }
+//            //own it
+//            $driver->setParent($this);
+//            //Debug::ErrorLog("Opening new driver connection: ". Debug::Backtrace(-1));
+////            if ($statement instanceof SQLSelect) {
+////                Debug::ErrorLog("Opening new connection for: " . $statement->debugSQL());
+////            }
+//        }
+//        return $driver;
+//    }
+
     protected function assignDriver(?SQLStatement $statement = null) : DBDriver
     {
-        $driver = DBConnections::Driver();
-        //already active result-set for fetching
-        if ($driver->hasActiveResult()) {
-            //unbuffered mode handling
-            //SelectQuery::count() uses to open temp connection on blocked result-fetching
-            //try the second "AUX" connection
-            if (DBConnections::Exists("AUX")) {
-                $driver = DBConnections::Driver("AUX");
-            }
-            else {
-                $driver = DBConnections::CreateDriver($driver->getConnectionName());
-            }
-            //own it
-            $driver->setParent($this);
-            //Debug::ErrorLog("Opening new driver connection: ". Debug::Backtrace(-1));
-//            if ($statement instanceof SQLSelect) {
-//                Debug::ErrorLog("Opening new connection for: " . $statement->debugSQL());
-//            }
-        }
+        $driver = DBManager::Driver();
+        $driver->setParent($this);
         return $driver;
     }
-
 }

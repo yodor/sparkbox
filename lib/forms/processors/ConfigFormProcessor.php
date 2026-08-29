@@ -19,7 +19,7 @@ class ConfigFormProcessor extends FormProcessor implements IValueTransactor
 
         $input_names = $form->inputNames();
 
-        $this->driver = DBConnections::Driver();
+        $this->driver = DBManager::Driver();
         try {
             $this->driver->transaction();
 

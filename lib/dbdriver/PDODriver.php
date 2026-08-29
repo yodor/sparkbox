@@ -6,13 +6,21 @@ class PDODriver extends DBDriver
 {
     private ?PDO $conn = null;
 
+
+    /**
+     * Open connection to DB server
+     * @param bool $persistent
+     * @return void
+     * @throws Exception
+     */
     public function connect(bool $persistent=false): void
     {
         if ($this->isConnected()) {
             return;
         }
 
-        if (Spark::isStorageRequest()) $persistent = true;
+        // Retain persistent choice on the driver instance
+        $this->persistent = $persistent;
 
         $host = $this->props->host;
         $db   = $this->props->database;
@@ -46,7 +54,7 @@ class PDODriver extends DBDriver
             // unbuffered mode
             PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
 
-            // CRUCIAL FOR HOSTINGER FIREWALL: Reuses connections to prevent "Operation not permitted"
+            // prefer persistent during storage asset requests
             PDO::ATTR_PERSISTENT         => $persistent,
 
         );
@@ -56,7 +64,7 @@ class PDODriver extends DBDriver
 
             $this->conn = new PDO($dsn, $user, $pass, $options);
 
-            SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::OPENED));
+            SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::OPENED, $this));
 
         } catch (PDOException $e) {
             throw new Exception("PDO Connection Error: " . $e->getMessage());
@@ -69,7 +77,7 @@ class PDODriver extends DBDriver
 
         if ($this->conn instanceof PDO) {
             $this->conn = null; // Closing is in the destructor in PDO
-            SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED));
+            SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::CLOSED, $this));
         }
     }
 
@@ -121,7 +129,7 @@ class PDODriver extends DBDriver
     }
     /**
      * Do we have un-fetched result-set waiting ?
-     * During nested queries app logic can decide to open additional connection to the DB server using DBConnections::CreateDriver()
+     * During nested queries app logic can decide to open additional connection to the DB server using DBManager::CreateDriver()
      * @return bool
      */
     public function hasActiveResult() : bool

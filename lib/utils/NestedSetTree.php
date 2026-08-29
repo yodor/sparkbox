@@ -137,7 +137,7 @@ class NestedSetTree
             }
         }
 
-        $driver = $this->bean->getDB() ?? DBConnections::Driver();
+        $driver = $this->bean->getDB() ?? DBManager::Driver();
         try {
             // Bulk write-back in one transaction
             $driver->transaction();
@@ -210,7 +210,7 @@ class NestedSetTree
         $upd->set("rgt", $node->rgt());
         $upd->where()->match($this->bean->key(), $node->id());
 
-        $driver = $this->bean->getDB() ?? DBConnections::Driver();
+        $driver = $this->bean->getDB() ?? DBManager::Driver();
         $driver->query($upd)->free();
 
         return true; // or return affected rows if needed

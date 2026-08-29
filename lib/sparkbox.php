@@ -83,7 +83,7 @@ Spark::Set(Config::CACHE_PATH, Spark::CachePath(), true);
 //creating a default connection to DB
 if (Spark::GetBoolean(Config::DB_ENABLED)) {
     include_once("dbdriver/DBDriver.php");
-    include_once("dbdriver/DBConnections.php");
+    include_once("dbdriver/DBManager.php");
 
     //fetch local config
     require_once(APP_PATH."/config/dbconfig.php");
@@ -95,7 +95,7 @@ if (!Spark::isStorageRequest()) {
 
     if (Spark::GetBoolean(Config::DB_ENABLED)) {
         include_once("objects/SparkObserver.php");
-        SparkEventManager::register(DBDriverEvent::class, new SparkObserver(DBConnections::DriverEvent(...)));
+        SparkEventManager::register(DBDriverEvent::class, new SparkObserver(DBManager::DriverEvent(...)));
     }
 
     include_once("utils/language.php");

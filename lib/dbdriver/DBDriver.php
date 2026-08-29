@@ -3,7 +3,7 @@ include_once("objects/SparkObject.php");
 include_once("objects/ISerializable.php");
 include_once("objects/IUnserializable.php");
 
-include_once("dbdriver/DBConnections.php");
+include_once("dbdriver/DBManager.php");
 include_once("dbdriver/RawResult.php");
 include_once("objects/SparkEventManager.php");
 include_once("objects/events/DBDriverEvent.php");
@@ -11,20 +11,25 @@ include_once("objects/events/DBDriverEvent.php");
 abstract class DBDriver extends SparkObject implements ISerializable, IUnserializable
 {
 
-    protected ?DBConnection $props = null;
+    /**
+     * Database connection configuration properties.
+     * @var DBConfig|null
+     */
+    protected ?DBConfig $props = null;
 
-    public function __construct(DBConnection $props)
+    protected bool $persistent = false;
+
+    public function __construct(DBConfig $props)
     {
         parent::__construct();
         $this->props = $props;
     }
 
-    public function getConnectionName() : string
-    {
-        return $this->props->getName();
-    }
-
-    public function getConnectionProperties() : DBConnection
+    /**
+     * Get the database connection configuration properties.
+     * @return DBConfig
+     */
+    public function getConfig() : DBConfig
     {
         return $this->props;
     }
@@ -34,16 +39,23 @@ abstract class DBDriver extends SparkObject implements ISerializable, IUnseriali
         $this->disconnect();
     }
 
+    public function isPersistent(): bool
+    {
+        return $this->persistent;
+    }
+
     /**
      * Do we have un-fetched result-set waiting ?
-     * During nested queries app logic can decide to open additional connection using DBConnections::CreateDriver()
+     * During nested queries app logic can decide to open additional connection using DBManager::CreateDriver()
      * @return bool
      */
     abstract public function hasActiveResult() : bool;
 
     /**
      * Open connection to DB server
+     * @param bool $persistent
      * @return void
+     * @throws Exception
      */
     abstract public function connect(bool $persistent=false) : void;
 
@@ -110,7 +122,7 @@ abstract class DBDriver extends SparkObject implements ISerializable, IUnseriali
 
     public function __unserialize(array $data): void
     {
-        $this->props = DBConnections::Get($data["connection_name"]);
+        $this->props = DBManager::Get($data["connection_name"]);
     }
 
 }

@@ -1,8 +1,11 @@
 <?php
 include_once("objects/SparkObject.php");
 
+/**
+ * Data object holding raw database configuration and DSN connection properties.
+ */
 #[Sensitive]
-class DBConnection extends SparkObject
+class DBConfig extends SparkObject
 {
 
     const string DEFAULT_NAME = "default";
@@ -22,7 +25,7 @@ class DBConnection extends SparkObject
      * Holds dsn data for creating a connection to DB server
      * @param string $connectionName
      */
-    public function __construct(string $connectionName=DBConnection::DEFAULT_NAME)
+    public function __construct(string $connectionName=DBConfig::DEFAULT_NAME)
     {
         parent::__construct();
         $this->name = $connectionName;

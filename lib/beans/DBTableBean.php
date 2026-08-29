@@ -65,7 +65,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             $this->db = $driver;
         }
         else {
-            $this->db = DBConnections::Driver();
+            $this->db = DBManager::Driver();
         }
 
         $this->initialize();
@@ -714,14 +714,14 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
     public function __serialize() : array
     {
-        return array("table" => $this->table, "connection_name"=>$this->db->getConnectionName());
+        return array("table" => $this->table, "connection_name"=>$this->db->getConfig()->getName());
     }
 
     public function __unserialize(array $data) : void
     {
         $this->table = $data["table"];
-        //should already be present inside DBConnections
-        $this->db = DBConnections::CreateDriver($data["connection_name"]);
+        //should already be present inside DBManager
+        $this->db = DBManager::Driver($data["connection_name"]);
         $this->initialize();
     }
 
