@@ -1,6 +1,5 @@
 <?php
-include_once("input/renderers/InputField.php");
-include_once("input/validators/DateValidator.php");
+include_once("input/renderers/InputFieldTag.php");
 
 class DateField extends InputFieldTag
 {

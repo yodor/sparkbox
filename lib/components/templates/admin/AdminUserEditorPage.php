@@ -21,10 +21,6 @@ function checkForm(frm) {
                 }
             }
 
-            //frm.password_hash.value = hex_md5(frm.pass.value);
-
-            //frm.pass.value = "";
-            //frm.pass1.value = "";
             return true;
 
         } catch (e) {
