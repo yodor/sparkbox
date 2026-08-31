@@ -100,6 +100,12 @@ class MenuItemList extends SparkList
 
         if (is_null($pageURL)) {
             $pageURL = URL::Current();
+
+            if (!$pageURL->getQueryString()) {
+                $pageURL = str_replace("index.php", "", $pageURL);
+                $pageURL = new URL($pageURL);
+            }
+
         }
 
         Debug::ErrorLog("Current URL: " . $pageURL->toString());
