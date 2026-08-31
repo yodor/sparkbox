@@ -42,7 +42,7 @@ class PageSessionMenu extends MenuItemList
             Debug::ErrorLog("'lastActive' MenuItem is NULL");
         }
 
-        $selectedItem = $this->selectActive();
+        $selectedItem = $this->selectActive(MenuItemList::DEFAULT_SELECT_MATCHERS, true, URL::Current());
 
         if ($selectedItem instanceof MenuItem) {
             //clear and append selected with $menuItems
