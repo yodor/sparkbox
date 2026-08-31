@@ -252,6 +252,11 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
         // Assemble the final URL
         $result = rtrim($this->script_name, '/');
 
+        // Preserve empty string if no script_name and no components exist
+        if ($result === '' && $this->script_name === '/') {
+            $result = '/';
+        }
+
         if (!empty($pathParts)) {
             $result .= '/' . implode('', $pathParts);
         }
