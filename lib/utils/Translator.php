@@ -334,6 +334,7 @@ class Translator implements IRequestProcessor, IGETConsumer
             $qry->stmt->limit(1);
 
             if ($qry->count() == 0) {
+                $qry->free();
                 $this->capturePhrase($phrase, $phrase_hash);
                 return $phrase;
             }
