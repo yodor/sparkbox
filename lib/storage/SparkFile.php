@@ -7,20 +7,35 @@ class SparkFile {
     protected mixed $handle = NULL;
 
     /**
-     * @param string $absolute_filename If not empty calls setAbsoluteFilename
-     * @throws Exception
+     * @param string $absolute_filename If not empty calls setAbsoluteFilename - must be an absolute path
+     * @throws Exception If $absolute_filename is not empty and not absolute
      */
     public function __construct(string $absolute_filename="")
     {
         $this->finfo = new finfo(FILEINFO_MIME_TYPE);
-        if ($absolute_filename) {
+        if ($absolute_filename !== "") {
             $this->setAbsoluteFilename($absolute_filename);
         }
     }
 
+    public function __destruct()
+    {
+        $this->close();
+    }
+
+    /**
+     * Last error message helper - error_get_last() can be null
+     * @param string $default
+     * @return string
+     */
+    protected static function LastError(string $default) : string
+    {
+        return error_get_last()["message"] ?? $default;
+    }
+
     public function getETag() : string
     {
-        return Spark::Hash($this->getFilename()."-".$this->lastModified());
+        return Spark::Hash($this->getAbsoluteFilename()."-".$this->lastModified());
     }
 
     /**
@@ -42,12 +57,15 @@ class SparkFile {
     }
 
     /**
+     * Set the folder of this file. The root folder "/" is kept as is.
      * @param string $path
      * @return void
+     * @throws Exception If $path is empty - an empty config value must not resolve to the filesystem root
      */
     public function setPath(string $path) : void
     {
         $this->close();
+        if (trim($path) === "") throw new Exception("Empty path");
         $this->path = rtrim($path, '/\\') . DIRECTORY_SEPARATOR;
     }
 
@@ -67,7 +85,7 @@ class SparkFile {
     {
         if (!$this->exists()) throw new Exception("File not found");
         $ret = @file_get_contents($this->getAbsoluteFilename());
-        if ($ret === FALSE) throw new Exception("Unable to read file: ".error_get_last()["message"]);
+        if ($ret === FALSE) throw new Exception("Unable to read file: ".SparkFile::LastError($this->getAbsoluteFilename()));
         return $ret;
     }
 
@@ -80,12 +98,19 @@ class SparkFile {
     }
 
     /**
+     * Set path and filename from an absolute filename.
+     * The value is not normalised ('..' is kept) - pass only paths built by code, never user input.
+     * For user supplied names use setPath() + setFilename() (setFilename keeps only the basename).
      * @param string $absolute_file The absolute filename (path + filename)
-     * @throws Exception
+     * @throws Exception If $absolute_file is not absolute
      */
     public function setAbsoluteFilename(string $absolute_file) : void
     {
         $this->close();
+
+        if (!str_starts_with($absolute_file, "/") && !preg_match('/^[A-Za-z]:[\\\/]/', $absolute_file)) {
+            throw new Exception("Not an absolute filename: '$absolute_file'");
+        }
 
         $dir = pathinfo($absolute_file, PATHINFO_DIRNAME);
         $name = pathinfo($absolute_file, PATHINFO_BASENAME);
@@ -95,11 +120,13 @@ class SparkFile {
     }
 
     /**
+     * MIME type detected from the file contents. 'application/octet-stream' if detection fails.
      * @return string
      */
     public function getMIME() : string
     {
-        return @$this->finfo->file($this->getAbsoluteFilename());
+        $mime = @$this->finfo->file($this->getAbsoluteFilename());
+        return (is_string($mime) && $mime !== "") ? $mime : "application/octet-stream";
     }
 
     /**
@@ -129,7 +156,7 @@ class SparkFile {
         $this->close();
         $resource = @fopen($this->getAbsoluteFilename(), $mode);
         if (!is_resource($resource)) {
-            throw new Exception("Unable to open file: ".error_get_last()["message"]);
+            throw new Exception("Unable to open file: ".SparkFile::LastError($this->getAbsoluteFilename()));
         }
         $this->handle = $resource;
     }
@@ -143,6 +170,7 @@ class SparkFile {
         if (is_resource($this->handle)) {
             $result = @fclose($this->handle);
         }
+        $this->handle = NULL;
         return $result;
     }
 
@@ -157,7 +185,7 @@ class SparkFile {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         $result = @fwrite($this->handle, $buffer, $length);
         if ($result === FALSE) {
-            throw new Exception("Unable to write to file: ".error_get_last()["message"]);
+            throw new Exception("Unable to write to file: ".SparkFile::LastError($this->getAbsoluteFilename()));
         }
         return $result;
     }
@@ -192,7 +220,7 @@ class SparkFile {
         $result = @fseek($this->handle, $offset, $whence);
 
         if ($result === -1) {
-            throw new Exception("Seek to position failed: ".error_get_last()["message"]);
+            throw new Exception("Seek to position failed: ".SparkFile::LastError($this->getAbsoluteFilename()));
         }
         return $result;
     }
@@ -201,7 +229,7 @@ class SparkFile {
         if (!is_resource($this->handle)) throw new Exception("Handle not a resource");
         $result = @ftruncate($this->handle, $position);
         if ($result === false) {
-            throw new Exception("Truncate to position failed: ".error_get_last()["message"]);
+            throw new Exception("Truncate to position failed: ".SparkFile::LastError($this->getAbsoluteFilename()));
         }
         return $result;
     }
@@ -217,34 +245,37 @@ class SparkFile {
         fpassthru($this->handle);
     }
 
+    /**
+     * Single stat call - no exists() check before it, the file can vanish in between
+     * @return int
+     * @throws Exception If the file does not exist or can not be stat-ed
+     */
     public function length() : int
     {
-        if (!$this->exists()) throw new Exception("File not found");
         $result = @filesize($this->getAbsoluteFilename());
-        if ($result === FALSE) throw new Exception("Unable to get filesize");
+        if ($result === FALSE) throw new Exception("File not found or not readable: ".$this->getAbsoluteFilename());
         return $result;
     }
 
     /**
-     * Remove the file from the filesystem
-     * @return bool True on success False on failure
-     * @throws Exception
+     * Remove the file from the filesystem. Removing a missing file is not an error.
+     * @return bool True if the file was removed, False if it did not exist or could not be removed
      */
     public function remove() : bool
     {
-        if (!$this->exists()) throw new Exception("File not found");
-        return unlink($this->getAbsoluteFilename());
+        return @unlink($this->getAbsoluteFilename());
     }
 
     /**
-     * Get last modified timestamp
+     * Get last modified timestamp - single stat call, the file can vanish between exists() and filemtime()
      * @return int Unix timestamp of file last modified date
-     * @throws Exception
+     * @throws Exception If the file does not exist or can not be stat-ed
      */
     public function lastModified() : int
     {
-        if (!$this->exists()) throw new Exception("File not found");
-        return filemtime($this->getAbsoluteFilename());
+        $result = @filemtime($this->getAbsoluteFilename());
+        if ($result === FALSE) throw new Exception("File not found or not readable: ".$this->getAbsoluteFilename());
+        return $result;
     }
 
     /**
