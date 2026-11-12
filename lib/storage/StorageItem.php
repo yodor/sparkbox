@@ -1,6 +1,7 @@
 <?php
 include_once("objects/data/DataObject.php");
 include_once("utils/url/URL.php");
+include_once("storage/StorageVersion.php");
 
 class StorageItem extends DataObject implements JsonSerializable
 {
@@ -107,6 +108,11 @@ class StorageItem extends DataObject implements JsonSerializable
         $url->add(new PathParameter("name", "name",false, false));
         $url->setData($data);
 
+        //keep the version token as query parameter (slug rewrite rule must use QSA)
+        if ($this->url->contains(StorageVersion::KEY)) {
+            $url->add(new URLParameter(StorageVersion::KEY, $this->url->get(StorageVersion::KEY)->value()));
+        }
+
         return $url;
     }
     public function hrefFile() : URL
@@ -142,6 +148,14 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->url->add(new URLParameter("cmd", $cmd));
         $this->url->add(new URLParameter("class", $this->className));
         $this->url->add(new URLParameter("id", (string)$this->id));
+
+        //version token - URL changes exactly when the row data changes, allows 'immutable' caching
+        if ($this->id > 0) {
+            $token = StorageVersion::Token($this->className, $this->id, ($this->type == StorageItem::TYPE_IMAGE));
+            if ($token !== "") {
+                $this->url->add(new URLParameter(StorageVersion::KEY, $token));
+            }
+        }
 
 
     }

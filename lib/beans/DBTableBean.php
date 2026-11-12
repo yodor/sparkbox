@@ -10,6 +10,7 @@ include_once("sql/RawSQLSelect.php");
 include_once("objects/ISerializable.php");
 include_once("objects/IUnserializable.php");
 include_once("db/DBExpression.php");
+include_once("storage/StorageVersion.php");
 
 abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnserializable
 {
@@ -675,11 +676,43 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
     }
 
+    /**
+     * Called for every row written through this bean (insert/update/delete).
+     * Deferred until the transaction commits - nothing happens for rolled back writes and no
+     * storage request can cache data that is not committed yet:
+     *  - moves the StorageVersion marker of the row (beans with blob columns only)
+     *  - deletes the bean cache folder CACHE_PATH/<BeanClass>/<id>
+     * @param int $id
+     * @param DBDriver $db
+     * @return void
+     */
     protected function manageCache(int $id, DBDriver $db) : void
     {
-
         $className = get_class($this);
+        $hasStorage = $this->haveStorageColumns();
 
+        $db->onCommit(function () use ($className, $id, $hasStorage) {
+            if ($hasStorage) {
+                StorageVersion::Touch($className, $id);
+            }
+            $this->deleteCacheFolder($className, $id);
+        });
+    }
+
+    /**
+     * True if this table has a blob column (data served through storage.php)
+     * @return bool
+     */
+    protected function haveStorageColumns() : bool
+    {
+        foreach ($this->columns as $type) {
+            if (str_contains(strtolower((string)$type), "blob")) return true;
+        }
+        return false;
+    }
+
+    protected function deleteCacheFolder(string $className, int $id) : void
+    {
         $cache_file = Spark::PathParts(Spark::Get(Config::CACHE_PATH) , $className , $id);
 
         Debug::ErrorLog("Cache cleanup for $className [$id] - $cache_file");

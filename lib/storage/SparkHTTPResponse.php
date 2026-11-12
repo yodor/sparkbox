@@ -12,8 +12,17 @@ class SparkHTTPResponse
 
     const int MAX_AGE_YEAR = 31536000;
     const int MAX_AGE_HOUR = 3600;
+    const int MAX_AGE_DAY = 86400;
     const int MAX_AGE_WEEK = 604800;
-    public function __construct(int $max_age=SparkHTTPResponse::MAX_AGE_YEAR, int $stale_while_revalidate=SparkHTTPResponse::MAX_AGE_WEEK)
+
+    /**
+     * Default Cache-Control: fresh for $max_age, then revalidated (ETag / Last-Modified) in the background
+     * for up to $stale_while_revalidate. Use setCacheControl() for 'immutable' (versioned URLs) or
+     * 'private' (authorized resources).
+     * @param int $max_age
+     * @param int $stale_while_revalidate
+     */
+    public function __construct(int $max_age=SparkHTTPResponse::MAX_AGE_DAY, int $stale_while_revalidate=SparkHTTPResponse::MAX_AGE_WEEK)
     {
         //start on clean
         header_remove();
@@ -21,10 +30,17 @@ class SparkHTTPResponse
         //base headers
         $this->setHeader("Content-Transfer-Encoding", "binary");
 
-        //variables from constructor - 1 hour default expiration
-        $cacheControl = "public, must-revalidate, must-understand, max-age=$max_age, stale-while-revalidate=$stale_while_revalidate, immutable";
-        $this->setHeader("Cache-Control", $cacheControl);
+        $this->setCacheControl("public, max-age=$max_age, stale-while-revalidate=$stale_while_revalidate");
+    }
 
+    /**
+     * Replace the Cache-Control header value
+     * @param string $value
+     * @return void
+     */
+    public function setCacheControl(string $value) : void
+    {
+        $this->setHeader("Cache-Control", $value);
     }
 
     public function setDispositionFilename(string $disposition_filename) : void

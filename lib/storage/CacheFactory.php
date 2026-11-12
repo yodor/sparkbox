@@ -26,6 +26,11 @@ class CacheFactory
             throw new Exception("Empty class name identifier");
         }
 
+        //className becomes a folder name - only plain PHP class names (no '/', '.', '..')
+        if (!Spark::ValidClassName($className)) {
+            throw new Exception("Incorrect class name identifier");
+        }
+
         if ($id < 1) {
             throw new Exception("Incorrect ID");
         }

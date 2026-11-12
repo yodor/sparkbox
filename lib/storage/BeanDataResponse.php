@@ -1,6 +1,7 @@
 <?php
 include_once("storage/SparkHTTPResponse.php");
 include_once("storage/CacheFactory.php");
+include_once("storage/StorageVersion.php");
 include_once("storage/FileStorageObject.php");
 include_once("auth/Authenticator.php");
 include_once("storage/DataBuffer.php");
@@ -64,6 +65,11 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     {
         parent::__construct();
 
+        //className comes from the request URL and is used in cache file paths - reject anything
+        //that is not a plain PHP class name before any filesystem access
+        if (!Spark::ValidClassName($className)) {
+            throw new Exception("Incorrect class name");
+        }
         $this->id = $id;
         $this->className = $className;
         $this->field = $fieldName;
@@ -180,7 +186,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
 
     /**
-     * Prepare and set 'ETag', 'Last-Modified' and 'Expires' HTML header fields.
+     * Prepare and set 'ETag' and 'Last-Modified' header fields.
      * If ETag is already set do nothing.
      * @return void
      * @throws Exception
@@ -192,10 +198,6 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         //set last modified from bean
         $modified = gmdate(SparkHTTPResponse::DATE_FORMAT, $last_modified);
         Debug::ErrorLog("Last-Modified: $modified");
-
-        //keep one year ahead from request time
-        $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
-        Debug::ErrorLog("Expires: $expires");
 
         $this->setHeader("ETag", SparkHTTPResponse::QuoteETag($this->ETag()));
 
@@ -213,6 +215,14 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     protected function getLastModified() : int
     {
         if ($this->last_modified!=-1) return $this->last_modified;
+
+        //StorageVersion marker is the source of truth - moved on every committed write through the bean
+        $version = StorageVersion::Get($this->className, $this->id);
+        if ($version > 0) {
+            $this->last_modified = $version;
+            return $this->last_modified;
+        }
+        Debug::ErrorLog("StorageVersion marker not available - using fallback last-modified");
 
         if ($this->cacheEntry && $this->cacheEntry->haveData()) {
             Debug::ErrorLog("Reading last-modified from filesystem");
@@ -302,6 +312,9 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $lastModified = $this->getLastModified();
         $beanETag = $this->ETag();
 
+        //Cache-Control for both the 304 and the full response
+        $this->applyCachePolicy();
+
         //If-None-Match decides when present, If-Modified-Since otherwise - exits with 304 on match
         $this->checkNotModified($beanETag, $lastModified);
 
@@ -315,7 +328,9 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         Debug::ErrorLog("Using blob CacheEntry[".$cacheName."]");
 
         //check if we have the data in cache (skip fetching blob data from DB and image processing if found)
-        if ($this->cacheEntry && $this->cacheEntry->haveData()) {
+        //cache entries are stored with mtime = last-modified of the data they hold - an entry with a
+        //different mtime holds an older version (or was written before the markers existed)
+        if ($this->cacheEntry && $this->cacheEntry->haveData() && $this->cacheEntryCurrent($lastModified)) {
             Debug::ErrorLog("Blob contents found in cache - sending cached blob as a response");
             $this->setHeader("X-Tag", "SparkCache");
             $this->sendCacheEntry($this->cacheEntry);
@@ -351,6 +366,60 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         exit;
 
+    }
+
+    /**
+     * Images return true - the version token includes the watermark
+     * @return bool
+     */
+    protected function isImage() : bool
+    {
+        return false;
+    }
+
+    /**
+     * Cache-Control by request:
+     *  - authorized resource (auth_context set)       -> private, no-cache (always revalidated, auth runs first)
+     *  - URL version token matches the current data   -> public, 1 year, immutable
+     *  - no / outdated token                          -> public, 1 day + stale-while-revalidate 1 week
+     * @return void
+     */
+    protected function applyCachePolicy() : void
+    {
+        if ($this->authClass !== "") {
+            $this->setCacheControl("private, no-cache");
+            return;
+        }
+
+        $requested = (string)($_GET[StorageVersion::KEY] ?? "");
+        if ($requested !== "") {
+            $current = StorageVersion::Token($this->className, $this->id, $this->isImage());
+            if ($current !== "" && hash_equals($current, $requested)) {
+                $this->setCacheControl("public, max-age=" . SparkHTTPResponse::MAX_AGE_YEAR . ", immutable");
+                return;
+            }
+            Debug::ErrorLog("Version token mismatch - requested: $requested current: $current");
+        }
+
+        $this->setCacheControl("public, max-age=" . SparkHTTPResponse::MAX_AGE_DAY . ", stale-while-revalidate=" . SparkHTTPResponse::MAX_AGE_WEEK);
+    }
+
+    /**
+     * True if the cache entry mtime matches '$lastModified'
+     * @param int $lastModified
+     * @return bool
+     */
+    protected function cacheEntryCurrent(int $lastModified) : bool
+    {
+        try {
+            $current = ($this->cacheEntry->lastModified() === $lastModified);
+        }
+        catch (Exception $e) {
+            //removed meanwhile
+            $current = false;
+        }
+        if (!$current) Debug::ErrorLog("Cache entry is outdated - regenerating");
+        return $current;
     }
 
     /**

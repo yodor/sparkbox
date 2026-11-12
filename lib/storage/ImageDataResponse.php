@@ -71,6 +71,11 @@ class ImageDataResponse extends BeanDataResponse
 
     }
 
+    protected function isImage() : bool
+    {
+        return true;
+    }
+
     protected function cacheName() : string
     {
         $parts = array();

@@ -82,6 +82,7 @@ class PDODriver extends DBDriver
                 Debug::ErrorLog("Rollback on disconnect failed: " . $e->getMessage());
             }
             $this->txDepth = 0;
+            $this->commitCallbacks = array();
         }
 
         if ($this->conn instanceof PDO) {
@@ -245,6 +246,42 @@ class PDODriver extends DBDriver
     }
 
     /**
+     * Callbacks to run after the outermost commit, indexed by the transaction depth they were registered at
+     * @var array<int, array<Closure>>
+     */
+    protected array $commitCallbacks = array();
+
+    public function onCommit(Closure $callback): void
+    {
+        if ($this->txDepth === 0) {
+            $callback();
+            return;
+        }
+        $this->commitCallbacks[$this->txDepth][] = $callback;
+    }
+
+    /**
+     * Run and clear all queued commit callbacks. A failing callback is logged, it can not undo the commit.
+     * @return void
+     */
+    protected function runCommitCallbacks(): void
+    {
+        $queued = $this->commitCallbacks;
+        $this->commitCallbacks = array();
+        ksort($queued);
+        foreach ($queued as $callbacks) {
+            foreach ($callbacks as $callback) {
+                try {
+                    $callback();
+                }
+                catch (Throwable $e) {
+                    Debug::ErrorLog("onCommit callback failed: " . $e->getMessage());
+                }
+            }
+        }
+    }
+
+    /**
      * Begin a transaction. Nested calls create a SAVEPOINT, so inner code can commit/rollback
      * its own part without ending the outer transaction.
      * @param string|null $name unused - savepoint names are generated from the depth
@@ -275,20 +312,32 @@ class PDODriver extends DBDriver
 
         $this->assert_active();
 
+        $level = $this->txDepth;
         $this->txDepth--;
 
         if ($this->txDepth > 0) {
             $this->conn->exec("RELEASE SAVEPOINT sp{$this->txDepth}");
             Debug::ErrorLog("Released SAVEPOINT sp{$this->txDepth}");
+            //released savepoint - its callbacks now belong to the enclosing level
+            if (isset($this->commitCallbacks[$level])) {
+                $this->commitCallbacks[$this->txDepth] = array_merge($this->commitCallbacks[$this->txDepth] ?? array(), $this->commitCallbacks[$level]);
+                unset($this->commitCallbacks[$level]);
+            }
             return;
         }
 
         //DDL statements (CREATE/ALTER/DROP ...) commit implicitly on the server side
         if (!$this->conn->inTransaction()) {
+            $this->commitCallbacks = array();
             throw new Exception("Transaction was ended implicitly by the server before commit");
         }
-        if (!$this->conn->commit()) throw new Exception("Commit failed: ".$this->getError());
+        if (!$this->conn->commit()) {
+            $this->commitCallbacks = array();
+            throw new Exception("Commit failed: ".$this->getError());
+        }
         Debug::ErrorLog("Commited transaction.");
+
+        $this->runCommitCallbacks();
     }
 
     /**
@@ -305,6 +354,12 @@ class PDODriver extends DBDriver
 
         //an unfetched result blocks the connection - discard it, we are aborting anyway
         $this->clearActiveResult();
+
+        //drop callbacks registered at this level (whole transaction when the level is 1)
+        $level = $this->txDepth;
+        foreach (array_keys($this->commitCallbacks) as $key) {
+            if ($key >= $level) unset($this->commitCallbacks[$key]);
+        }
 
         $this->txDepth--;
 

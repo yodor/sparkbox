@@ -122,6 +122,16 @@ abstract class DBDriver extends SparkObject implements ISerializable, IUnseriali
      */
     abstract public function inTransaction() : bool;
 
+    /**
+     * Run '$callback' after the outermost transaction commits successfully.
+     * Outside a transaction it runs immediately. Dropped on rollback (a savepoint rollback drops only
+     * the callbacks registered inside that savepoint). Used for side effects that must not happen
+     * for uncommitted data - cache invalidation, storage version markers.
+     * @param Closure $callback
+     * @return void
+     */
+    abstract public function onCommit(Closure $callback) : void;
+
     public function __serialize(): array
     {
         return array("connection_name"=>$this->props->getName());

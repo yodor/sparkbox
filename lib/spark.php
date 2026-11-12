@@ -504,6 +504,17 @@ final class Spark {
     }
 
     /**
+     * True if '$className' is a plain PHP class name (letters, digits, underscore, not starting with a digit).
+     * Use before a class name from a request ends up in a file path or a loader call - rejects '/', '.', '..'
+     * @param string $className
+     * @return bool
+     */
+    final static public function ValidClassName(string $className) : bool
+    {
+        return (bool)preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $className);
+    }
+
+    /**
      * Non-cryptographic hashing
      * @param string $data
      * @param string $algorithm Default algorithm xxh3
