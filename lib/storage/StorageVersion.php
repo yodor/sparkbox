@@ -1,14 +1,17 @@
 <?php
+include_once("storage/SparkFile.php");
+include_once("storage/CacheFactory.php");
+include_once("storage/SparkWatermark.php");
 
 /**
- * Per row change marker for storage data (images / files served by storage.php).
+ * Change marker of one row of storage data (images / files served by storage.php).
  *
- * Marker file: CACHE_PATH/<BeanClass>/<id>.v - its mtime is the time of the last write of that row
- * done through the bean (DBTableBean::manageCache). It sits next to the bean cache folder
- * CACHE_PATH/<BeanClass>/<id>/ so deleting that folder keeps the marker.
+ * Marker file: CACHE_PATH/<BeanClass>/<id>.v - next to the bean cache folder CACHE_PATH/<BeanClass>/<id>/
+ * (see CacheFactory::BeanCacheFolder) so deleting that folder keeps the marker. Its mtime is the time of
+ * the last committed write of that row done through the bean (DBTableBean::manageCache).
  *
  * The marker is the single source of last-modified time for storage responses (Last-Modified,
- * ETag) and for the version parameter of storage URLs. It does not depend on date columns of the
+ * ETag) and for the version token of storage URLs. It does not depend on date columns of the
  * table (zero dates, DATETIME without ON UPDATE, missing columns).
  *
  * Rows without a marker get one on first use with the current time - their URL and ETag change
@@ -25,57 +28,60 @@ class StorageVersion
     const string KEY = "v";
 
     /**
-     * @param string $className
-     * @param int $id
-     * @return string
-     * @throws Exception
+     * Marker file
+     * @var SparkFile
      */
-    protected static function MarkerFile(string $className, int $id) : string
+    protected SparkFile $marker;
+
+    /**
+     * Shared by all instances - watermark config does not change during a request
+     * @var SparkWatermark|null
+     */
+    protected static ?SparkWatermark $watermark = null;
+
+    /**
+     * @param string $className Bean class name
+     * @param int $id Row primary key
+     * @throws Exception If the class name or the id is not valid
+     */
+    public function __construct(string $className, int $id)
     {
-        if (!Spark::ValidClassName($className)) throw new Exception("Incorrect class name");
-        if ($id < 1) throw new Exception("Incorrect ID");
-        return Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . $className . DIRECTORY_SEPARATOR . $id . StorageVersion::SUFFIX;
+        $this->marker = new SparkFile(CacheFactory::BeanCacheFolder($className, $id) . StorageVersion::SUFFIX);
     }
 
     /**
-     * Create the class folder if needed
-     * @param string $markerFile
+     * Token format: base36 marker time [ '.' base36 watermark time ]
+     * @param string $token
      * @return bool
      */
-    protected static function EnsureFolder(string $markerFile) : bool
+    public static function ValidToken(string $token) : bool
     {
-        $folder = dirname($markerFile);
-        if (is_dir($folder)) return true;
-        @mkdir($folder, 0777, true);
-        return is_dir($folder);
+        return (bool)preg_match('/^[0-9a-z]+(\.[0-9a-z]+)?$/', $token);
     }
 
     /**
-     * Mark row '$id' of '$className' as changed now. Called on every write through the bean.
-     * Never throws - a failed marker update must not fail the DB write.
-     * @param string $className
-     * @param int $id
+     * Mark the row as changed now. Called after every committed write through the bean.
+     * Never throws - a failed marker update must not fail the write.
      * @return void
      */
-    public static function Touch(string $className, int $id) : void
+    public function touch() : void
     {
         try {
-            $file = StorageVersion::MarkerFile($className, $id);
-            if (!StorageVersion::EnsureFolder($file)) {
-                Debug::ErrorLog("StorageVersion: unable to create folder for: $file");
+            if (!$this->marker->ensurePath()) {
+                Debug::ErrorLog("StorageVersion: unable to create folder for: " . $this->marker->getAbsoluteFilename());
                 return;
             }
+            $this->marker->createExclusive();
+
             //time() may equal the current mtime when two writes happen within one second -
             //move forward by one second so every write produces a new version
             $now = time();
-            $current = @filemtime($file);
-            if ($current !== false && $current >= $now) {
+            $current = $this->marker->lastModified();
+            if ($current >= $now) {
                 $now = $current + 1;
             }
-            if (!@touch($file, $now)) {
-                Debug::ErrorLog("StorageVersion: unable to touch: $file");
-            }
-            clearstatcache(true, $file);
+            $this->marker->setLastModified($now);
+            clearstatcache(true, $this->marker->getAbsoluteFilename());
         }
         catch (Exception $e) {
             Debug::ErrorLog("StorageVersion: " . $e->getMessage());
@@ -83,77 +89,70 @@ class StorageVersion
     }
 
     /**
-     * Unix time of the last change of row '$id' of '$className'.
-     * Creates the marker with the current time if it does not exist.
-     * @param string $className
-     * @param int $id
+     * Unix time of the last change of the row. Creates the marker with the current time if it does not exist.
      * @return int Timestamp or 0 if the marker can not be read nor created
      */
-    public static function Get(string $className, int $id) : int
+    public function time() : int
     {
         try {
-            $file = StorageVersion::MarkerFile($className, $id);
+            return $this->marker->lastModified();
+        }
+        catch (Exception $e) {
+            //no marker yet
+        }
+
+        if (!$this->marker->ensurePath()) return 0;
+
+        //exclusive create - if another request created it first its time is used
+        if ($this->marker->createExclusive()) {
+            Debug::ErrorLog("StorageVersion: created marker: " . $this->marker->getAbsoluteFilename());
+        }
+
+        try {
+            return $this->marker->lastModified();
         }
         catch (Exception $e) {
             return 0;
         }
-
-        $mtime = @filemtime($file);
-        if ($mtime !== false) return $mtime;
-
-        if (!StorageVersion::EnsureFolder($file)) return 0;
-
-        //exclusive create - if another request created it first use its time
-        $handle = @fopen($file, "x");
-        if ($handle !== false) {
-            fclose($handle);
-            Debug::ErrorLog("StorageVersion: created marker: $file");
-        }
-        clearstatcache(true, $file);
-
-        $mtime = @filemtime($file);
-        return ($mtime === false) ? 0 : $mtime;
     }
 
     /**
-     * Version token for storage URLs: base36 of the row marker time, for images also the
+     * Version token for storage URLs: base36 of the marker time, for images also the
      * watermark file time (changing the watermark file changes all image URLs).
-     * @param string $className
-     * @param int $id
      * @param bool $isImage
      * @return string Empty string if no version is available
      */
-    public static function Token(string $className, int $id, bool $isImage) : string
+    public function token(bool $isImage) : string
     {
-        $version = StorageVersion::Get($className, $id);
-        if ($version < 1) return "";
+        $time = $this->time();
+        if ($time < 1) return "";
 
-        $token = base_convert((string)$version, 10, 36);
+        $token = base_convert((string)$time, 10, 36);
 
         if ($isImage) {
-            $watermark = StorageVersion::WatermarkTime();
+            $watermark = StorageVersion::Watermark()->lastModified();
             if ($watermark > 0) $token .= "." . base_convert((string)$watermark, 10, 36);
         }
         return $token;
     }
 
     /**
-     * mtime of the configured watermark file or 0 - cached per request
-     * @return int
+     * True if '$token' is the current version token
+     * @param string $token
+     * @param bool $isImage
+     * @return bool
      */
-    protected static function WatermarkTime() : int
+    public function matches(string $token, bool $isImage) : bool
     {
-        static $time = null;
-        if ($time !== null) return $time;
+        $current = $this->token($isImage);
+        return ($current !== "" && hash_equals($current, $token));
+    }
 
-        $time = 0;
-        if (Spark::GetBoolean(Config::IMAGE_SCALER_WATERMARK_ENABLED)) {
-            $filename = Spark::Get(Config::IMAGE_SCALER_WATERMARK_FILENAME);
-            if ($filename) {
-                $mtime = @filemtime(Spark::Get(Config::APP_PATH) . DIRECTORY_SEPARATOR . $filename);
-                if ($mtime !== false) $time = $mtime;
-            }
+    protected static function Watermark() : SparkWatermark
+    {
+        if (StorageVersion::$watermark === null) {
+            StorageVersion::$watermark = new SparkWatermark();
         }
-        return $time;
+        return StorageVersion::$watermark;
     }
 }

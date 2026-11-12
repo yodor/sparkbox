@@ -142,6 +142,22 @@ class StorageItem extends DataObject implements JsonSerializable
         return $this->url;
     }
 
+    /**
+     * Version token of the referenced row - empty for unset items (no class name / id)
+     * @return string
+     */
+    protected function versionToken() : string
+    {
+        if ($this->id < 1 || !Spark::ValidClassName($this->className)) return "";
+        try {
+            return (new StorageVersion($this->className, $this->id))->token($this->type == StorageItem::TYPE_IMAGE);
+        }
+        catch (Exception $e) {
+            Debug::ErrorLog("StorageItem version token: " . $e->getMessage());
+            return "";
+        }
+    }
+
     protected function buildURL() : void
     {
         $cmd = "image";
@@ -159,11 +175,9 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->url->add(new URLParameter("id", (string)$this->id));
 
         //version token - URL changes exactly when the row data changes, allows 'immutable' caching
-        if ($this->id > 0) {
-            $token = StorageVersion::Token($this->className, $this->id, ($this->type == StorageItem::TYPE_IMAGE));
-            if ($token !== "") {
-                $this->url->add(new URLParameter(StorageVersion::KEY, $token));
-            }
+        $token = $this->versionToken();
+        if ($token !== "") {
+            $this->url->add(new URLParameter(StorageVersion::KEY, $token));
         }
 
 

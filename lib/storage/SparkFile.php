@@ -289,4 +289,67 @@ class SparkFile {
         if (!$this->exists()) throw new Exception("File not found");
         touch($this->getAbsoluteFilename(), $lastModified);
     }
+
+    /**
+     * Create the folder of this file (recursive) if it does not exist
+     * @return bool True if the folder exists after the call
+     */
+    public function ensurePath() : bool
+    {
+        $path = $this->getPath();
+        if ($path === "") return false;
+        if (is_dir($path)) return true;
+        @mkdir($path, 0777, true);
+        return is_dir($path);
+    }
+
+    /**
+     * Create this file empty - only if it does not exist yet (exclusive create, safe under concurrency)
+     * @return bool True if this call created the file, False if it existed already or could not be created
+     */
+    public function createExclusive() : bool
+    {
+        $handle = @fopen($this->getAbsoluteFilename(), "x");
+        if ($handle === false) return false;
+        fclose($handle);
+        clearstatcache(true, $this->getAbsoluteFilename());
+        return true;
+    }
+
+    /**
+     * Replace the contents of this file atomically and set the last modified time (if non-zero).
+     * Writes a temporary file in the same folder, sets its mtime, then rename() it over this file.
+     * rename() on the same filesystem is atomic: readers see either the complete old file or the
+     * complete new one - never a truncated or half written file. Concurrent writers each use their
+     * own temporary file and the last rename wins.
+     * @param string $data
+     * @param int $lastModified
+     * @return int Number of bytes written
+     * @throws Exception
+     */
+    public function replace(string $data, int $lastModified = 0) : int
+    {
+        $this->close();
+
+        $target = $this->getAbsoluteFilename();
+        $temp = $target . "." . bin2hex(random_bytes(6)) . ".tmp";
+
+        $written = @file_put_contents($temp, $data);
+        if ($written !== strlen($data)) {
+            @unlink($temp);
+            throw new Exception("Unable to write file: " . SparkFile::LastError($temp));
+        }
+
+        if ($lastModified > 0) {
+            touch($temp, $lastModified);
+        }
+
+        if (!@rename($temp, $target)) {
+            @unlink($temp);
+            throw new Exception("Unable to replace file: " . SparkFile::LastError($target));
+        }
+
+        clearstatcache(true, $target);
+        return $written;
+    }
 }

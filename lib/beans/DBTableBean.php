@@ -11,6 +11,7 @@ include_once("objects/ISerializable.php");
 include_once("objects/IUnserializable.php");
 include_once("db/DBExpression.php");
 include_once("storage/StorageVersion.php");
+include_once("storage/CacheFactory.php");
 
 abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnserializable
 {
@@ -693,10 +694,29 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         $db->onCommit(function () use ($className, $id, $hasStorage) {
             if ($hasStorage) {
-                StorageVersion::Touch($className, $id);
+                (new StorageVersion($className, $id))->touch();
             }
-            $this->deleteCacheFolder($className, $id);
+            CacheFactory::DeleteBeanCache($className, $id);
         });
+    }
+
+    /**
+     * True if column '$columnName' is a blob type column (data served through storage.php)
+     * @param string $columnName
+     * @return bool
+     */
+    public function isBlobColumn(string $columnName) : bool
+    {
+        return str_contains(strtolower($this->columnType($columnName)), "blob");
+    }
+
+    /**
+     * Column names of this table excluding the blob type columns
+     * @return array<string>
+     */
+    public function dataColumnNames() : array
+    {
+        return array_values(array_filter($this->columnNames(), fn(string $name) => !$this->isBlobColumn($name)));
     }
 
     /**
@@ -705,35 +725,10 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
      */
     protected function haveStorageColumns() : bool
     {
-        foreach ($this->columns as $type) {
-            if (str_contains(strtolower((string)$type), "blob")) return true;
+        foreach ($this->columnNames() as $name) {
+            if ($this->isBlobColumn($name)) return true;
         }
         return false;
-    }
-
-    protected function deleteCacheFolder(string $className, int $id) : void
-    {
-        $cache_file = Spark::PathParts(Spark::Get(Config::CACHE_PATH) , $className , $id);
-
-        Debug::ErrorLog("Cache cleanup for $className [$id] - $cache_file");
-        if (!file_exists($cache_file)) {
-            Debug::ErrorLog("Cache folder does not exists");
-            return;
-        }
-        if (!is_dir($cache_file)) {
-            Debug::ErrorLog("Not folder: $cache_file");
-            return;
-        }
-
-        try {
-            Spark::DeleteFolder($cache_file);
-            Debug::ErrorLog("Cache folder $cache_file deleted");
-        }
-        catch (Exception $e) {
-            //
-            Debug::ErrorLog("Unable to delete cache folder: $cache_file");
-        }
-
     }
 
     protected function bindValues(array $row, SQLInsert|SQLUpdate $statement) : void

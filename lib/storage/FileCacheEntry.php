@@ -46,7 +46,7 @@ class FileCacheEntry extends CacheEntry
 
     /**
      * Store data to this cache entry file and set the last modified time (if non-zero)
-     * Written atomically - see writeAtomic()
+     * Written atomically - see SparkFile::replace()
      * @param string $data
      * @param int $lastModified
      * @return void
@@ -54,12 +54,13 @@ class FileCacheEntry extends CacheEntry
      */
     public function store(string $data, int $lastModified = 0): void
     {
-        $this->writeAtomic($data, $lastModified);
+        $written = $this->file->replace($data, $lastModified);
+        Debug::ErrorLog("Stored " . $written . " bytes" . ($lastModified > 0 ? " - last-modified: $lastModified" : ""));
     }
 
     /**
      * Store data from this buffer and set last modified time (if non-zero)
-     * Written atomically - see writeAtomic()
+     * Written atomically - see SparkFile::replace()
      * @param DataBuffer $data
      * @param int $lastModified
      * @return void
@@ -67,41 +68,25 @@ class FileCacheEntry extends CacheEntry
      */
     public function storeBuffer(DataBuffer $data, int $lastModified = 0): void
     {
-        $this->writeAtomic($data->data(), $lastModified);
+        $this->store($data->data(), $lastModified);
     }
 
     /**
-     * Write to a temporary file in the same folder, set its mtime, then rename() it over the entry.
-     * rename() on the same filesystem is atomic: readers see either the complete old file or the
-     * complete new one - never a truncated or half written file. Concurrent writers each use their
-     * own temporary file and the last rename wins.
-     * @param string $data
+     * Entries are stored with mtime = last-modified of the data they hold.
+     * An entry with a different mtime holds an older version (or was removed meanwhile).
      * @param int $lastModified
-     * @return void
-     * @throws Exception
+     * @return bool
      */
-    protected function writeAtomic(string $data, int $lastModified): void
+    public function isCurrent(int $lastModified): bool
     {
-        $target = $this->file->getAbsoluteFilename();
-        $temp = $target . "." . bin2hex(random_bytes(6)) . ".tmp";
-
-        $written = @file_put_contents($temp, $data);
-        if ($written !== strlen($data)) {
-            @unlink($temp);
-            throw new Exception("Unable to write cache file: " . (error_get_last()["message"] ?? $temp));
+        if (!$this->haveData()) return false;
+        try {
+            return ($this->file->lastModified() === $lastModified);
         }
-
-        if ($lastModified > 0) {
-            touch($temp, $lastModified);
+        catch (Exception $e) {
+            //removed meanwhile
+            return false;
         }
-
-        if (!@rename($temp, $target)) {
-            @unlink($temp);
-            throw new Exception("Unable to replace cache file: " . (error_get_last()["message"] ?? $target));
-        }
-
-        clearstatcache(true, $target);
-        Debug::ErrorLog("Stored " . $written . " bytes" . ($lastModified > 0 ? " - last-modified: $lastModified" : ""));
     }
 
     /**

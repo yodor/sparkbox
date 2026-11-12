@@ -34,6 +34,24 @@ class SparkHTTPResponse
     }
 
     /**
+     * Send a redirect response with all headers set so far.
+     * @param string $location Target URL
+     * @param int $code HTTP status code - 301, 302, 307, 308
+     * @param int $max_age If non-zero replaces Cache-Control with 'public, max-age=$max_age'
+     * @return void
+     */
+    public function sendRedirect(string $location, int $code = 301, int $max_age = 0) : void
+    {
+        http_response_code($code);
+        $this->setHeader("Location", $location);
+        if ($max_age > 0) {
+            $this->setCacheControl("public, max-age=$max_age");
+        }
+        $this->setHeader("Content-Length", "0");
+        $this->sendHeaders();
+    }
+
+    /**
      * Replace the Cache-Control header value
      * @param string $value
      * @return void

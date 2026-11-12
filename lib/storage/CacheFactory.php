@@ -1,13 +1,34 @@
 <?php
 include_once("storage/CacheEntry.php");
 include_once("storage/FileCacheEntry.php");
-include_once("beans/SparkCacheBean.php");
 include_once("storage/SparkFile.php");
 
 class CacheFactory
 {
     const string BACKEND_DATABASE = "database";
     const string BACKEND_FILESYSTEM = "filesystem";
+    /**
+     * Folder of the bean cache entries of row '$id' of bean class '$className': CACHE_PATH/<className>/<id>
+     * Single place defining the bean cache layout - StorageVersion markers live next to it (<id>.v)
+     * @param string $className - Bean class name (validated, becomes a folder name)
+     * @param int $id - Bean primary key ID
+     * @return string
+     * @throws Exception
+     */
+    public static function BeanCacheFolder(string $className, int $id) : string
+    {
+        //className becomes a folder name - only plain PHP class names (no '/', '.', '..')
+        if (!Spark::ValidClassName($className)) {
+            throw new Exception("Incorrect class name identifier");
+        }
+
+        if ($id < 1) {
+            throw new Exception("Incorrect ID");
+        }
+
+        return Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . $className . DIRECTORY_SEPARATOR . $id;
+    }
+
     /**
      * @param string $cacheName - Cache name identifier (filename)
      * @param string $className - Bean class name
@@ -22,22 +43,10 @@ class CacheFactory
             throw new Exception("Empty cache name identifier");
         }
 
-        if (empty($className)) {
-            throw new Exception("Empty class name identifier");
-        }
-
-        //className becomes a folder name - only plain PHP class names (no '/', '.', '..')
-        if (!Spark::ValidClassName($className)) {
-            throw new Exception("Incorrect class name identifier");
-        }
-
-        if ($id < 1) {
-            throw new Exception("Incorrect ID");
-        }
+        $cache_folder = CacheFactory::BeanCacheFolder($className, $id);
 
         if (strcasecmp(Spark::Get(Config::BEAN_CACHE_BACKEND), CacheFactory::BACKEND_FILESYSTEM)===0) {
 
-            $cache_folder = Spark::Get(Config::CACHE_PATH) . DIRECTORY_SEPARATOR . $className . DIRECTORY_SEPARATOR . $id;
             if (!file_exists($cache_folder)) {
                 Debug::ErrorLog("Creating cache folder: $cache_folder");
                 @mkdir($cache_folder, 0777, TRUE);
@@ -51,6 +60,38 @@ class CacheFactory
             throw new Exception("Incorrect backend type");
         }
 
+    }
+
+    /**
+     * Delete all cache entries of row '$id' of bean class '$className'
+     * Never throws - logs failures
+     * @param string $className
+     * @param int $id
+     * @return void
+     */
+    public static function DeleteBeanCache(string $className, int $id) : void
+    {
+        try {
+            $cache_folder = CacheFactory::BeanCacheFolder($className, $id);
+        }
+        catch (Exception $e) {
+            Debug::ErrorLog("Bean cache cleanup: " . $e->getMessage());
+            return;
+        }
+
+        Debug::ErrorLog("Cache cleanup for $className [$id] - $cache_folder");
+        if (!is_dir($cache_folder)) {
+            Debug::ErrorLog("Cache folder does not exists");
+            return;
+        }
+
+        try {
+            Spark::DeleteFolder($cache_folder);
+            Debug::ErrorLog("Cache folder $cache_folder deleted");
+        }
+        catch (Exception $e) {
+            Debug::ErrorLog("Unable to delete cache folder: $cache_folder");
+        }
     }
 
     /**

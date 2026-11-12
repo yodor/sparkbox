@@ -49,5 +49,12 @@ abstract class CacheEntry
      */
     public abstract function lastModified() : int;
 
+    /**
+     * True if this entry has data stored for exactly this last-modified time
+     * @param int $lastModified Unix timestamp of the current data
+     * @return bool
+     */
+    public abstract function isCurrent(int $lastModified) : bool;
+
     public abstract function remove() : void;
 }

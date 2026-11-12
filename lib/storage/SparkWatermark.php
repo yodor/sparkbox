@@ -66,6 +66,21 @@ class SparkWatermark
     {
         return $this->file;
     }
+
+    /**
+     * Last modified time of the watermark file - 0 if the watermark is not enabled
+     * @return int
+     */
+    public function lastModified() : int
+    {
+        if (!$this->enabled) return 0;
+        try {
+            return $this->file->lastModified();
+        }
+        catch (Exception $e) {
+            return 0;
+        }
+    }
     public function getImage() : ?GdImage
     {
         return $this->image;

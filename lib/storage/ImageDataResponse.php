@@ -24,8 +24,6 @@ class ImageDataResponse extends BeanDataResponse
         $width = 0;
         $height = 0;
 
-        BeanDataRequest::ConsumeRoute(false, ImageDataResponse::KEY_WIDTH, ImageDataResponse::KEY_HEIGHT);
-
         if (isset($_GET[ImageDataResponse::KEY_WIDTH])) {
             $width = (int)$_GET[ImageDataResponse::KEY_WIDTH];
             if ($width > 0) {
@@ -69,6 +67,15 @@ class ImageDataResponse extends BeanDataResponse
         //place result in buffer
         $this->scaler->process($buffer);
 
+    }
+
+    /**
+     * Slug URLs: .../<width>/<height>/... after cmd/class/id
+     * @return array<string>
+     */
+    public static function RouteParameters() : array
+    {
+        return array(ImageDataResponse::KEY_WIDTH, ImageDataResponse::KEY_HEIGHT);
     }
 
     protected function isImage() : bool

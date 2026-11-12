@@ -56,6 +56,18 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     protected bool $require_watermark = FALSE;
 
     /**
+     * The parsed request - version token and slug name
+     * @var BeanDataRequest|null
+     */
+    protected ?BeanDataRequest $request = null;
+
+    /**
+     * Change marker of the requested row - last-modified time and version token
+     * @var StorageVersion
+     */
+    protected StorageVersion $version;
+
+    /**
      * @param int $id
      * @param string $className
      * @param string $fieldName
@@ -74,7 +86,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->className = $className;
         $this->field = $fieldName;
 
-        BeanDataResponse::ConsumeVersionRoute();
+        $this->version = new StorageVersion($className, $id);
 
         $this->bean = null;
 
@@ -89,13 +101,27 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
     }
 
+    /**
+     * Route parameters following cmd/class/id in slug URLs - consumed by BeanDataRequest before construction
+     * @return array<string>
+     */
+    public static function RouteParameters() : array
+    {
+        return array();
+    }
+
+    public function setRequest(BeanDataRequest $request) : void
+    {
+        $this->request = $request;
+    }
+
     private function createBeanInstance() : void
     {
         if (!$this->bean) {
             $bean = SparkLoader::Factory(SparkLoader::PREFIX_BEANS)->instance($this->className, DBTableBean::class);
             if (!($bean instanceof DBTableBean)) throw new Exception("Incorrect object loaded - expecting DBTableBean");
             if (!$bean->haveColumn($this->field)) throw new Exception("Column not found: " . $this->field);
-            if (!str_contains(strtolower($bean->columnType($this->field)), "blob")) throw new Exception("Column type incorrect: " . $this->field);
+            if (!$bean->isBlobColumn($this->field)) throw new Exception("Column type incorrect: " . $this->field);
             $this->bean = $bean;
         }
     }
@@ -123,14 +149,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         }
 
         //exclude blob type columns
-        $dataColumns = $this->bean->columnNames();
-        foreach ($dataColumns as $idx => $name) {
-            if (str_contains(strtolower($this->bean->columnType($name)), "blob")) {
-                unset($dataColumns[$idx]);
-            }
-        }
-
-        $data = $this->bean->getByID($this->id, ...$dataColumns);
+        $data = $this->bean->getByID($this->id, ...$this->bean->dataColumnNames());
 
         $auth_context = (string)$data["auth_context"];
         $this->authClass = $auth_context;
@@ -219,7 +238,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         if ($this->last_modified!=-1) return $this->last_modified;
 
         //StorageVersion marker is the source of truth - moved on every committed write through the bean
-        $version = StorageVersion::Get($this->className, $this->id);
+        $version = $this->version->time();
         if ($version > 0) {
             $this->last_modified = $version;
             return $this->last_modified;
@@ -324,15 +343,14 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->setHeader("ETag", SparkHTTPResponse::QuoteETag($beanETag));
 
         //slug name from the URL if present otherwise the ETag - the extension is added when sending, from the content MIME type
-        $this->setDispositionFilename($this->dispositionName($beanETag));
+        $slugName = $this->request ? $this->request->getSlugName() : "";
+        $this->setDispositionFilename(($slugName !== "") ? $slugName : $beanETag);
 
         $cacheName = $this->cacheName();
         Debug::ErrorLog("Using blob CacheEntry[".$cacheName."]");
 
-        //check if we have the data in cache (skip fetching blob data from DB and image processing if found)
-        //cache entries are stored with mtime = last-modified of the data they hold - an entry with a
-        //different mtime holds an older version (or was written before the markers existed)
-        if ($this->cacheEntry && $this->cacheEntry->haveData() && $this->cacheEntryCurrent($lastModified)) {
+        //check if we have the current data in cache (skip fetching blob data from DB and image processing if found)
+        if ($this->cacheEntry && $this->cacheEntry->isCurrent($lastModified)) {
             Debug::ErrorLog("Blob contents found in cache - sending cached blob as a response");
             $this->setHeader("X-Tag", "SparkCache");
             $this->sendCacheEntry($this->cacheEntry);
@@ -371,99 +389,6 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     }
 
     /**
-     * Slug URLs carry the version token as a path segment before the trailing file name:
-     * .../<v>/<name>.<id>.webp  - the remaining route after cmd/class/id (and width/height for images)
-     * is [v, name] or just [name] for URLs without version. Query parameter 'v' takes precedence.
-     * @return void
-     */
-    protected static function ConsumeVersionRoute() : void
-    {
-        if (isset($_GET[StorageVersion::KEY])) return;
-        if (!isset($_GET[BeanDataRequest::KEY_ROUTE])) return;
-
-        $parts = Spark::Split((string)$_GET[BeanDataRequest::KEY_ROUTE]);
-        if (count($parts) < 2) return;
-
-        $token = (string)array_shift($parts);
-        //base36 marker time [. base36 watermark time]
-        if (!preg_match('/^[0-9a-z]+(\.[0-9a-z]+)?$/', $token)) return;
-
-        $_GET[StorageVersion::KEY] = $token;
-        $_GET[BeanDataRequest::KEY_ROUTE] = implode("/", $parts);
-    }
-
-    /**
-     * Send 301 to the request URL with version token '$requested' replaced by '$current' and exit.
-     * Slug URLs: the path segment before the file name. Query URLs: the 'v' parameter.
-     * Returns without sending if the token can not be located in the request URL.
-     * Requests without a version token are not redirected (JS built URLs, old links) - they get the 1 day rule.
-     * @param string $requested
-     * @param string $current
-     * @return void
-     */
-    protected function redirectToVersion(string $requested, string $current) : void
-    {
-        $uri = (string)($_SERVER["REQUEST_URI"] ?? "");
-        if ($uri === "") return;
-
-        $pos = strpos($uri, "?");
-        $path = ($pos === false) ? $uri : substr($uri, 0, $pos);
-        $query = ($pos === false) ? "" : substr($uri, $pos + 1);
-
-        //always a local absolute path - '//host/...' would be a protocol relative redirect
-        $path = "/" . ltrim($path, "/");
-
-        $params = array();
-        parse_str($query, $params);
-
-        if (isset($params[StorageVersion::KEY])) {
-            if ((string)$params[StorageVersion::KEY] !== $requested) return;
-            $params[StorageVersion::KEY] = $current;
-            $query = http_build_query($params, "", "&", PHP_QUERY_RFC3986);
-        }
-        else {
-            //slug: .../<v>/<name>
-            $segments = explode("/", $path);
-            $index = count($segments) - 2;
-            if ($index < 1 || $segments[$index] !== $requested) return;
-            $segments[$index] = $current;
-            $path = implode("/", $segments);
-        }
-
-        $location = $path . ($query !== "" ? "?" . $query : "");
-        Debug::ErrorLog("Redirecting outdated version to: $location");
-
-        http_response_code(301);
-        $this->setHeader("Location", $location);
-        //limit how long clients keep the redirect - the target moves again on the next update
-        $this->setCacheControl("public, max-age=" . SparkHTTPResponse::MAX_AGE_DAY);
-        $this->setHeader("Content-Length", "0");
-        $this->sendHeaders();
-        exit;
-    }
-
-    /**
-     * Disposition file name without extension: the slug name segment of the URL ('<name>.<id>' from
-     * '<name>.<id>.webp') if this is a slug request, '$fallback' otherwise
-     * @param string $fallback
-     * @return string
-     */
-    protected function dispositionName(string $fallback) : string
-    {
-        if (!isset($_GET[BeanDataRequest::KEY_ROUTE])) return $fallback;
-
-        $parts = Spark::Split((string)$_GET[BeanDataRequest::KEY_ROUTE]);
-        $name = (string)end($parts);
-
-        //drop a non numeric extension - keep '.<id>'
-        $name = preg_replace('/\.[A-Za-z][A-Za-z0-9]{0,4}$/', '', $name);
-        //header safe characters only - slug names are [a-z0-9-]
-        $name = preg_replace('/[^A-Za-z0-9._-]/', '', $name);
-
-        return ($name !== "") ? $name : $fallback;
-    }
-
-    /**
      * Images return true - the version token includes the watermark
      * @return bool
      */
@@ -487,41 +412,29 @@ abstract class BeanDataResponse extends SparkHTTPResponse
             return;
         }
 
-        $requested = (string)($_GET[StorageVersion::KEY] ?? "");
+        $requested = $this->request ? $this->request->getVersion() : "";
         if ($requested !== "") {
-            $current = StorageVersion::Token($this->className, $this->id, $this->isImage());
-            if ($current !== "" && hash_equals($current, $requested)) {
+
+            if ($this->version->matches($requested, $this->isImage())) {
                 $this->setCacheControl("public, max-age=" . SparkHTTPResponse::MAX_AGE_YEAR . ", immutable");
                 return;
             }
-            Debug::ErrorLog("Version token mismatch - requested: $requested current: $current");
 
             //outdated version -> 301 to the current one. Indexed image URLs pass their ranking to the
-            //new URL, old links and old cached HTML land on the current data. Exits on success.
-            if ($current !== "") {
-                $this->redirectToVersion($requested, $current);
+            //new URL, old links and old cached HTML land on the current data.
+            $current = $this->version->token($this->isImage());
+            Debug::ErrorLog("Version token mismatch - requested: $requested current: $current");
+
+            $location = ($current !== "") ? $this->request->versionURL($current) : "";
+            if ($location !== "") {
+                Debug::ErrorLog("Redirecting outdated version to: $location");
+                //limit how long clients keep the redirect - the target moves again on the next update
+                $this->sendRedirect($location, 301, SparkHTTPResponse::MAX_AGE_DAY);
+                exit;
             }
         }
 
         $this->setCacheControl("public, max-age=" . SparkHTTPResponse::MAX_AGE_DAY . ", stale-while-revalidate=" . SparkHTTPResponse::MAX_AGE_WEEK);
-    }
-
-    /**
-     * True if the cache entry mtime matches '$lastModified'
-     * @param int $lastModified
-     * @return bool
-     */
-    protected function cacheEntryCurrent(int $lastModified) : bool
-    {
-        try {
-            $current = ($this->cacheEntry->lastModified() === $lastModified);
-        }
-        catch (Exception $e) {
-            //removed meanwhile
-            $current = false;
-        }
-        if (!$current) Debug::ErrorLog("Cache entry is outdated - regenerating");
-        return $current;
     }
 
     /**
