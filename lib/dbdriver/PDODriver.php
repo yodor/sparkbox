@@ -58,6 +58,9 @@ class PDODriver extends DBDriver
         try {
 
             $this->conn = new PDO($dsn, $user, $pass, $options);
+            $this->txDepth = 0;
+
+            $this->applySessionVariables();
 
             SparkEventManager::emit(new DBDriverEvent(DBDriverEvent::OPENED, $this));
 
@@ -69,6 +72,17 @@ class PDODriver extends DBDriver
     public function disconnect(): void
     {
         $this->clearActiveResult();
+
+        if ($this->conn instanceof PDO && $this->txDepth > 0) {
+            Debug::ErrorLog("Disconnect with open transaction (depth {$this->txDepth}) - rolling back");
+            try {
+                if ($this->conn->inTransaction()) $this->conn->rollBack();
+            }
+            catch (PDOException $e) {
+                Debug::ErrorLog("Rollback on disconnect failed: " . $e->getMessage());
+            }
+            $this->txDepth = 0;
+        }
 
         if ($this->conn instanceof PDO) {
             $this->conn = null; // Closing is in the destructor in PDO
@@ -219,29 +233,123 @@ class PDODriver extends DBDriver
         return (int)$this->conn->lastInsertId();
     }
 
-    public function transaction(?string $name = null): void
+    /**
+     * Current transaction nesting depth. 0 = not in transaction, 1 = top level, >1 = savepoints
+     * @var int
+     */
+    protected int $txDepth = 0;
+
+    public function inTransaction(): bool
     {
-        //If we are already in transaction do nothing. PDO does not support multiple transactions
-        if ($this->conn->inTransaction()) {
-            Debug::ErrorLog("Already inside transaction.");
-            return;
-        }
-        if (!$this->conn->beginTransaction()) throw new Exception("Starting transaction failed: ".$this->getError());
-        Debug::ErrorLog("Beginning transaction.");
+        return $this->txDepth > 0;
     }
 
+    /**
+     * Begin a transaction. Nested calls create a SAVEPOINT, so inner code can commit/rollback
+     * its own part without ending the outer transaction.
+     * @param string|null $name unused - savepoint names are generated from the depth
+     * @throws Exception
+     */
+    public function transaction(?string $name = null): void
+    {
+        $this->assert_active();
+
+        if ($this->txDepth === 0) {
+            if (!$this->conn->beginTransaction()) throw new Exception("Starting transaction failed: ".$this->getError());
+            Debug::ErrorLog("Beginning transaction.");
+        }
+        else {
+            $this->conn->exec("SAVEPOINT sp{$this->txDepth}");
+            Debug::ErrorLog("Nested transaction - SAVEPOINT sp{$this->txDepth}");
+        }
+        $this->txDepth++;
+    }
+
+    /**
+     * Commit the innermost transaction level. Only the outermost commit really commits.
+     * @throws Exception
+     */
     public function commit(?string $name = null): void
     {
-        if (!$this->conn->inTransaction()) throw new Exception("Not in transaction: ".$this->getError());
+        if ($this->txDepth === 0) throw new Exception("Commit without transaction");
+
+        $this->assert_active();
+
+        $this->txDepth--;
+
+        if ($this->txDepth > 0) {
+            $this->conn->exec("RELEASE SAVEPOINT sp{$this->txDepth}");
+            Debug::ErrorLog("Released SAVEPOINT sp{$this->txDepth}");
+            return;
+        }
+
+        //DDL statements (CREATE/ALTER/DROP ...) commit implicitly on the server side
+        if (!$this->conn->inTransaction()) {
+            throw new Exception("Transaction was ended implicitly by the server before commit");
+        }
         if (!$this->conn->commit()) throw new Exception("Commit failed: ".$this->getError());
         Debug::ErrorLog("Commited transaction.");
     }
 
+    /**
+     * Roll back the innermost transaction level.
+     * Never throws when there is nothing to roll back - it is called from catch blocks and
+     * must not replace the original exception.
+     */
     public function rollback(?string $name = null): void
     {
-        if (!$this->conn->inTransaction()) throw new Exception("Not in transaction: ".$this->getError());
-        if (!$this->conn->rollBack()) throw new Exception("Rollback failed: ".$this->getError());
-        Debug::ErrorLog("Rolled back transaction.");
+        if ($this->txDepth === 0) {
+            Debug::ErrorLog("Rollback called without transaction - ignored");
+            return;
+        }
+
+        //an unfetched result blocks the connection - discard it, we are aborting anyway
+        $this->clearActiveResult();
+
+        $this->txDepth--;
+
+        try {
+            if ($this->txDepth > 0) {
+                $this->conn->exec("ROLLBACK TO SAVEPOINT sp{$this->txDepth}");
+                Debug::ErrorLog("Rolled back to SAVEPOINT sp{$this->txDepth}");
+            }
+            else if ($this->conn->inTransaction()) {
+                $this->conn->rollBack();
+                Debug::ErrorLog("Rolled back transaction.");
+            }
+        }
+        catch (PDOException $e) {
+            Debug::ErrorLog("Rollback failed: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Sync the session time_zone with PHP date.timezone, then apply DBConfig::getVariables()
+     *
+     * TIMESTAMP columns are stored in UTC and converted to/from text using the session time_zone,
+     * the app converts that text back with strtotime() using date.timezone - both must be the same
+     * DST-aware zone. Named zones need the server tz tables (mysql_tzinfo_to_sql). If they are
+     * missing the server default (usually SYSTEM) is kept as before and a warning is logged.
+     * @throws Exception
+     */
+    protected function applySessionVariables(): void
+    {
+        $zone = date_default_timezone_get();
+        try {
+            $this->conn->exec("SET SESSION time_zone = " . $this->conn->quote($zone));
+        }
+        catch (PDOException $e) {
+            Debug::ErrorLog("WARNING: cannot set session time_zone '$zone' (load tz tables with mysql_tzinfo_to_sql) - keeping server default: " . $e->getMessage());
+        }
+
+        $sets = array();
+        foreach ($this->props->getVariables() as $name => $value) {
+            if (!preg_match('/^[a-z_][a-z0-9_]*$/i', $name)) throw new Exception("Invalid session variable name: $name");
+            $sets[] = "SESSION $name = " . (is_int($value) ? $value : $this->conn->quote((string)$value));
+        }
+        if (count($sets) > 0) {
+            $this->conn->exec("SET " . implode(", ", $sets));
+        }
     }
 
     public function getError(): string

@@ -90,7 +90,7 @@ class PDOResult extends DBResult
      */
     public function affectedRows(): int
     {
-        if ($this->isActive()) return -1;
+        if (is_null($this->result) || $this->isActive()) return -1;
 
         //Returns the number of affected rows (INSERT/UPDATE/DELETE) - for SELECT not available
         return $this->result->rowCount();

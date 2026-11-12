@@ -584,16 +584,20 @@ class NestedSetBean extends DBTableBean
 
         // Phase 4: Single transaction write-back
         $this->db->transaction();
-
-        foreach ($allNodes as $node) {
-            $upd = SQLUpdate::Table($this->table);
-            $upd->set("lft", $node->lft());
-            $upd->set("rgt", $node->rgt());
-            $upd->where()->match($this->prkey, $node->id());
-            $this->db->query($upd);
+        try {
+            foreach ($allNodes as $node) {
+                $upd = SQLUpdate::Table($this->table);
+                $upd->set("lft", $node->lft());
+                $upd->set("rgt", $node->rgt());
+                $upd->where()->match($this->prkey, $node->id());
+                $this->db->query($upd)->free();
+            }
+            $this->db->commit();
         }
-
-        $this->db->commit();
+        catch (Exception $e) {
+            $this->db->rollback();
+            throw $e;
+        }
     }
 
     /**

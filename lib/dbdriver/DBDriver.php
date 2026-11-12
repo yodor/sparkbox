@@ -110,10 +110,17 @@ abstract class DBDriver extends SparkObject implements ISerializable, IUnseriali
     abstract public function rollback(?string $name = null) : void;
 
     /**
+     * Begin transaction. Nested calls are supported (savepoints)
      * @param string|null $name
-     * @return bool
+     * @return void
      */
     abstract public function transaction(?string $name = null) : void;
+
+    /**
+     * True while inside transaction() ... commit()/rollback()
+     * @return bool
+     */
+    abstract public function inTransaction() : bool;
 
     public function __serialize(): array
     {

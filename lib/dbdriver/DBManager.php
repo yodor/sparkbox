@@ -124,6 +124,17 @@ class DBManager
 
         $availableDriver = null;
 
+        // Inside a transaction all work must go through the transaction connection,
+        // otherwise reads miss uncommitted rows and writes escape the transaction.
+        $txDriver = self::TransactionDriver($connName);
+        if ($txDriver) {
+            if (!$txDriver->hasActiveResult() && $txDriver->isPersistent() === $persistent) {
+                return $txDriver;
+            }
+            Debug::ErrorLog("WARNING: transaction connection for '$connName' is busy with an active result - "
+                ."returning another connection; it will NOT see uncommitted data of the transaction");
+        }
+
         foreach (self::$drivers[$connName] as $idx => $driver) {
             // Phase 1: Skip drivers busy with un-fetched result sets
             if ($driver->hasActiveResult()) {
@@ -174,6 +185,21 @@ class DBManager
         }
 
         return $availableDriver;
+    }
+
+    /**
+     * Return the pooled driver currently inside a transaction for '$connName' or null.
+     * At most one transaction per connection name is expected during a request.
+     *
+     * @param string $connName
+     * @return DBDriver|null
+     */
+    public static function TransactionDriver(string $connName = DBConfig::DEFAULT_NAME): ?DBDriver
+    {
+        foreach (self::$drivers[$connName] ?? array() as $driver) {
+            if ($driver->inTransaction()) return $driver;
+        }
+        return null;
     }
 
     /**

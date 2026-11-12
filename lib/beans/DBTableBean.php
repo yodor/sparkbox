@@ -467,8 +467,18 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
         if (!$db) {
             $use_transaction = TRUE;
-            $db = $this->db;
-            Debug::ErrorLog("Starting DB transaction using the bean assigned driver connection");
+
+            //join the running transaction of this connection (as a savepoint) instead of
+            //the bean's own driver which may be a different pooled connection
+            $connName = $this->db->getConfig()->getName();
+            $db = DBManager::TransactionDriver($connName);
+            if ($db && $db->hasActiveResult()) {
+                throw new Exception("Transaction connection is busy with an active result - fetch it first or pass the transaction driver explicitly");
+            }
+            if (!$db) {
+                $db = DBManager::Driver($connName);
+            }
+
             $db->transaction();
         }
 
