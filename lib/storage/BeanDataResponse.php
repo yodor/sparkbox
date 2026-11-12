@@ -393,6 +393,56 @@ abstract class BeanDataResponse extends SparkHTTPResponse
     }
 
     /**
+     * Send 301 to the request URL with version token '$requested' replaced by '$current' and exit.
+     * Slug URLs: the path segment before the file name. Query URLs: the 'v' parameter.
+     * Returns without sending if the token can not be located in the request URL.
+     * Requests without a version token are not redirected (JS built URLs, old links) - they get the 1 day rule.
+     * @param string $requested
+     * @param string $current
+     * @return void
+     */
+    protected function redirectToVersion(string $requested, string $current) : void
+    {
+        $uri = (string)($_SERVER["REQUEST_URI"] ?? "");
+        if ($uri === "") return;
+
+        $pos = strpos($uri, "?");
+        $path = ($pos === false) ? $uri : substr($uri, 0, $pos);
+        $query = ($pos === false) ? "" : substr($uri, $pos + 1);
+
+        //always a local absolute path - '//host/...' would be a protocol relative redirect
+        $path = "/" . ltrim($path, "/");
+
+        $params = array();
+        parse_str($query, $params);
+
+        if (isset($params[StorageVersion::KEY])) {
+            if ((string)$params[StorageVersion::KEY] !== $requested) return;
+            $params[StorageVersion::KEY] = $current;
+            $query = http_build_query($params, "", "&", PHP_QUERY_RFC3986);
+        }
+        else {
+            //slug: .../<v>/<name>
+            $segments = explode("/", $path);
+            $index = count($segments) - 2;
+            if ($index < 1 || $segments[$index] !== $requested) return;
+            $segments[$index] = $current;
+            $path = implode("/", $segments);
+        }
+
+        $location = $path . ($query !== "" ? "?" . $query : "");
+        Debug::ErrorLog("Redirecting outdated version to: $location");
+
+        http_response_code(301);
+        $this->setHeader("Location", $location);
+        //limit how long clients keep the redirect - the target moves again on the next update
+        $this->setCacheControl("public, max-age=" . SparkHTTPResponse::MAX_AGE_DAY);
+        $this->setHeader("Content-Length", "0");
+        $this->sendHeaders();
+        exit;
+    }
+
+    /**
      * Disposition file name without extension: the slug name segment of the URL ('<name>.<id>' from
      * '<name>.<id>.webp') if this is a slug request, '$fallback' otherwise
      * @param string $fallback
@@ -426,7 +476,8 @@ abstract class BeanDataResponse extends SparkHTTPResponse
      * Cache-Control by request:
      *  - authorized resource (auth_context set)       -> private, no-cache (always revalidated, auth runs first)
      *  - URL version token matches the current data   -> public, 1 year, immutable
-     *  - no / outdated token                          -> public, 1 day + stale-while-revalidate 1 week
+     *  - outdated token                               -> 301 to the URL with the current token
+     *  - no token                                     -> public, 1 day + stale-while-revalidate 1 week
      * @return void
      */
     protected function applyCachePolicy() : void
@@ -444,6 +495,12 @@ abstract class BeanDataResponse extends SparkHTTPResponse
                 return;
             }
             Debug::ErrorLog("Version token mismatch - requested: $requested current: $current");
+
+            //outdated version -> 301 to the current one. Indexed image URLs pass their ranking to the
+            //new URL, old links and old cached HTML land on the current data. Exits on success.
+            if ($current !== "") {
+                $this->redirectToVersion($requested, $current);
+            }
         }
 
         $this->setCacheControl("public, max-age=" . SparkHTTPResponse::MAX_AGE_DAY . ", stale-while-revalidate=" . SparkHTTPResponse::MAX_AGE_WEEK);
