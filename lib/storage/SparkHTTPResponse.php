@@ -51,6 +51,27 @@ class SparkHTTPResponse
     {
         return $this->disposition_filename;
     }
+    /**
+     * Set the Content-Disposition header. If '$filename' has no extension (none or a numeric one like
+     * 'name.123') the extension for '$mime' is appended, so saved files get the right type.
+     * @param string $filename
+     * @param string $mime
+     * @return void
+     */
+    protected function setDispositionHeader(string $filename, string $mime) : void
+    {
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        if ($extension === "" || ctype_digit($extension)) {
+            $mimeExtension = Spark::MimeExtension($mime);
+            if ($mimeExtension !== "") $filename .= "." . $mimeExtension;
+        }
+        //quoted-string safe
+        $filename = str_replace(array("\"", "\\", "\r", "\n"), "", $filename);
+
+        Debug::ErrorLog("Using disposition filename: ".$filename);
+        $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
+    }
+
     public function setDisposition(string $disposition) : void
     {
         $this->disposition = $disposition;
@@ -287,9 +308,7 @@ class SparkHTTPResponse
             $filename = $file->getFilename();
         }
 
-        Debug::ErrorLog("Using disposition filename: ".$filename);
-
-        $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
+        $this->setDispositionHeader($filename, $file->getMIME());
 
         if (!$this->haveHeader("Last-Modified")) {
             $this->setHeader("Last-Modified", gmdate(SparkHTTPResponse::DATE_FORMAT, $file->lastModified()));
@@ -333,8 +352,7 @@ class SparkHTTPResponse
 
         $filename = $this->disposition_filename;
         if(!empty($filename)) {
-            Debug::ErrorLog("Using disposition filename: ".$filename);
-            $this->setHeader("Content-Disposition", $this->disposition."; filename=\"".$filename."\"");
+            $this->setDispositionHeader($filename, $buffer->mime());
         }
         else {
             Debug::ErrorLog("Disposition filename not set - not using disposition header");

@@ -515,6 +515,29 @@ final class Spark {
     }
 
     /**
+     * File name extension for a MIME type - common web and office types. Empty string if unknown.
+     * @param string $mime
+     * @return string extension without the dot
+     */
+    final static public function MimeExtension(string $mime) : string
+    {
+        $mime = strtolower(trim(explode(";", $mime)[0]));
+        $map = array(
+            "image/webp" => "webp", "image/jpeg" => "jpg", "image/jpg" => "jpg", "image/png" => "png",
+            "image/gif" => "gif", "image/svg+xml" => "svg", "image/avif" => "avif",
+            "application/pdf" => "pdf", "application/zip" => "zip", "application/json" => "json",
+            "text/plain" => "txt", "text/csv" => "csv", "text/html" => "html", "application/xml" => "xml", "text/xml" => "xml",
+            "application/msword" => "doc", "application/vnd.ms-excel" => "xls", "application/vnd.ms-powerpoint" => "ppt",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => "docx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => "xlsx",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation" => "pptx",
+            "application/vnd.oasis.opendocument.text" => "odt", "application/vnd.oasis.opendocument.spreadsheet" => "ods",
+            "audio/mpeg" => "mp3", "video/mp4" => "mp4", "video/webm" => "webm",
+        );
+        return $map[$mime] ?? "";
+    }
+
+    /**
      * Non-cryptographic hashing
      * @param string $data
      * @param string $algorithm Default algorithm xxh3

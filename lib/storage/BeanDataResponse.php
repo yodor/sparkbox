@@ -74,6 +74,8 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->className = $className;
         $this->field = $fieldName;
 
+        BeanDataResponse::ConsumeVersionRoute();
+
         $this->bean = null;
 
         $this->cacheEntry = NULL;
@@ -321,8 +323,8 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->setHeader("Last-Modified", gmdate(SparkHTTPResponse::DATE_FORMAT, $lastModified));
         $this->setHeader("ETag", SparkHTTPResponse::QuoteETag($beanETag));
 
-        //prefer ETag as disposition filename
-        $this->setDispositionFilename($beanETag);
+        //slug name from the URL if present otherwise the ETag - the extension is added when sending, from the content MIME type
+        $this->setDispositionFilename($this->dispositionName($beanETag));
 
         $cacheName = $this->cacheName();
         Debug::ErrorLog("Using blob CacheEntry[".$cacheName."]");
@@ -366,6 +368,49 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         exit;
 
+    }
+
+    /**
+     * Slug URLs carry the version token as a path segment before the trailing file name:
+     * .../<v>/<name>.<id>.webp  - the remaining route after cmd/class/id (and width/height for images)
+     * is [v, name] or just [name] for URLs without version. Query parameter 'v' takes precedence.
+     * @return void
+     */
+    protected static function ConsumeVersionRoute() : void
+    {
+        if (isset($_GET[StorageVersion::KEY])) return;
+        if (!isset($_GET[BeanDataRequest::KEY_ROUTE])) return;
+
+        $parts = Spark::Split((string)$_GET[BeanDataRequest::KEY_ROUTE]);
+        if (count($parts) < 2) return;
+
+        $token = (string)array_shift($parts);
+        //base36 marker time [. base36 watermark time]
+        if (!preg_match('/^[0-9a-z]+(\.[0-9a-z]+)?$/', $token)) return;
+
+        $_GET[StorageVersion::KEY] = $token;
+        $_GET[BeanDataRequest::KEY_ROUTE] = implode("/", $parts);
+    }
+
+    /**
+     * Disposition file name without extension: the slug name segment of the URL ('<name>.<id>' from
+     * '<name>.<id>.webp') if this is a slug request, '$fallback' otherwise
+     * @param string $fallback
+     * @return string
+     */
+    protected function dispositionName(string $fallback) : string
+    {
+        if (!isset($_GET[BeanDataRequest::KEY_ROUTE])) return $fallback;
+
+        $parts = Spark::Split((string)$_GET[BeanDataRequest::KEY_ROUTE]);
+        $name = (string)end($parts);
+
+        //drop a non numeric extension - keep '.<id>'
+        $name = preg_replace('/\.[A-Za-z][A-Za-z0-9]{0,4}$/', '', $name);
+        //header safe characters only - slug names are [a-z0-9-]
+        $name = preg_replace('/[^A-Za-z0-9._-]/', '', $name);
+
+        return ($name !== "") ? $name : $fallback;
     }
 
     /**

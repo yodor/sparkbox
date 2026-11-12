@@ -103,15 +103,24 @@ class StorageItem extends DataObject implements JsonSerializable
         else {
             $filename = $this->className;
         }
-        $data["name"] = $filename.".".$this->id.".webp";
+        //images: extension of the configured scaler output format
+        //files: no extension - the real one is not known here, storage.php adds it to the
+        //Content-Disposition filename from the content MIME type
+        $data["name"] = $filename.".".$this->id;
+        if ($this->type == StorageItem::TYPE_IMAGE) {
+            $extension = Spark::MimeExtension((string)Spark::Get(Config::IMAGE_SCALER_OUTPUT_FORMAT));
+            $data["name"] .= "." . ($extension ?: "webp");
+        }
+
+        //version token as the last path segment before the file name: .../<v>/<name>.<id>.webp
+        //BeanDataResponse reads it back from the route
+        if ($this->url->contains(StorageVersion::KEY)) {
+            $data[StorageVersion::KEY] = $this->url->get(StorageVersion::KEY)->value();
+            $url->add(new PathParameter(StorageVersion::KEY, StorageVersion::KEY, false));
+        }
 
         $url->add(new PathParameter("name", "name",false, false));
         $url->setData($data);
-
-        //keep the version token as query parameter (slug rewrite rule must use QSA)
-        if ($this->url->contains(StorageVersion::KEY)) {
-            $url->add(new URLParameter(StorageVersion::KEY, $this->url->get(StorageVersion::KEY)->value()));
-        }
 
         return $url;
     }
