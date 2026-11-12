@@ -31,10 +31,6 @@ class PDODriver extends DBDriver
         // Construct DSN (Data Source Name)  //charset=utf8mb4
         $dsn = "mysql:host=$host;dbname=$db;port=$port;charset=utf8mb4";
 
-        //if (PHP_MAJOR_VERSION < 8) throw new Exception("PHP Version 8.3 Required");
-        //if (PHP_MINOR_VERSION > 3) throw new Exception("PHP Version 8.3 Required");
-
-        //PHP 8.3 - Check mode options for 8.4 and up!!!
         $options = array(
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -48,16 +44,15 @@ class PDODriver extends DBDriver
             PDO::ATTR_EMULATE_PREPARES   => false,
             PDO::ATTR_STRINGIFY_FETCHES  => false,
 
-            // turn off multi-statement
-            PDO::MYSQL_ATTR_MULTI_STATEMENTS => false,
-
-            // unbuffered mode
-            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
-
             // prefer persistent during storage asset requests
             PDO::ATTR_PERSISTENT         => $persistent,
-
         );
+
+        $my = class_exists(\Pdo\Mysql::class);
+        // turn off multi-statement
+        $options[$my ? \Pdo\Mysql::ATTR_MULTI_STATEMENTS : PDO::MYSQL_ATTR_MULTI_STATEMENTS] = false;
+        // unbuffered mode
+        $options[$my ? \Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY] = false;
 
 
         try {
