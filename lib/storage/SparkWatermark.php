@@ -30,16 +30,18 @@ class SparkWatermark
 
                 $filename = Spark::Get(Config::APP_PATH).DIRECTORY_SEPARATOR.$watermarkFilename;
 
-                $this->file = new SparkFile(realpath($filename));
+                //realpath() returns false for a missing file - keep an empty SparkFile then
+                $realname = realpath($filename);
+                $this->file = new SparkFile(($realname === false) ? "" : $realname);
 
-                if ($this->file->exists()) {
+                if ($realname !== false && $this->file->exists()) {
 
                     Debug::ErrorLog("Using watermark: ". $this->file->getAbsoluteFilename());
                     $this->enabled = true;
 
                 }
                 else {
-                    Debug::ErrorLog("Watermark file is not accessible: ". $this->file->getAbsoluteFilename());
+                    Debug::ErrorLog("Watermark file is not accessible: ". $filename);
                 }
             }
             else {

@@ -197,7 +197,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $expires = gmdate(SparkHTTPResponse::DATE_FORMAT, strtotime("+1 year"));
         Debug::ErrorLog("Expires: $expires");
 
-        $this->setHeader("ETag", $this->ETag());
+        $this->setHeader("ETag", SparkHTTPResponse::QuoteETag($this->ETag()));
 
         $this->setHeader("Last-Modified", $modified);
 
@@ -300,13 +300,13 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->authorizeAccess();
 
         $lastModified = $this->getLastModified();
-        $this->checkCacheLastModified($lastModified);
-
         $beanETag = $this->ETag();
-        $this->checkCacheETag($beanETag);
+
+        //If-None-Match decides when present, If-Modified-Since otherwise - exits with 304 on match
+        $this->checkNotModified($beanETag, $lastModified);
 
         $this->setHeader("Last-Modified", gmdate(SparkHTTPResponse::DATE_FORMAT, $lastModified));
-        $this->setHeader("ETag", $beanETag);
+        $this->setHeader("ETag", SparkHTTPResponse::QuoteETag($beanETag));
 
         //prefer ETag as disposition filename
         $this->setDispositionFilename($beanETag);
@@ -330,11 +330,13 @@ abstract class BeanDataResponse extends SparkHTTPResponse
 
         //store to cache
         if ($this->cacheEntry) {
-            Debug::ErrorLog("Storing cache file for this bean request");
-            $this->cacheEntry->storeBuffer($this->object->buffer(), $lastModified);
+            //store the auth entry BEFORE the data: authorizeAccess() skips authorization when the data
+            //entry exists without an auth entry - writing data first leaves a window for that
             if ($this->bean->haveColumn("auth_context")) {
                 $this->authEntry->store($this->authClass, $lastModified);
             }
+            Debug::ErrorLog("Storing cache file for this bean request");
+            $this->cacheEntry->storeBuffer($this->object->buffer(), $lastModified);
             Debug::ErrorLog("Sending cache file as a response");
             $this->sendCacheEntry($this->cacheEntry);
         }

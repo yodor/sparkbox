@@ -108,43 +108,84 @@ class SparkHTTPResponse
 
 
     /**
-     * Compare request ETag with this response ETag
+     * Compare the request If-None-Match list with '$ETag' (unquoted value)
      * Call sendNotModified on match
      * @param string $ETag Compare with this ETag
      * @return void
      */
     public function checkCacheETag(string $ETag) : void
     {
-        //browser is sending ETag
-        $requestETag = $this->requestETag();
-        Debug::ErrorLog("Request ETag is: ".$requestETag);
-        Debug::ErrorLog("Response ETag is: ".$ETag);
-        if (strcasecmp($requestETag, $ETag)==0) {
+        $tags = $this->requestETags();
+        Debug::ErrorLog("Request ETags: ".implode(", ", $tags)." | Response ETag: ".$ETag);
+        if (in_array("*", $tags, true) || in_array($ETag, $tags, true)) {
             Debug::ErrorLog("Request ETag match response ETag - responding with HTTP/304");
-            $this->sendNotModified();
+            $this->sendNotModified($ETag);
             exit;
         }
     }
 
     /**
-     * Send HTTP 304 response
-     * Set headers Last-Modified and ETag using $this->requestModifiedSince() and $this->requestETag();
-     * Send all headers set by calling sendHeaders()
+     * Conditional request handling (RFC 9110 13.2.2):
+     * If the request has If-None-Match only the ETag decides and If-Modified-Since is ignored,
+     * otherwise If-Modified-Since is compared with '$lastModified'.
+     * Sends HTTP 304 and exits on match.
+     * @param string $ETag Unquoted ETag value of the current representation
+     * @param int $lastModified Unix timestamp of the current representation
      * @return void
      */
-    public function sendNotModified() : void
+    public function checkNotModified(string $ETag, int $lastModified) : void
     {
+        if (count($this->requestETags()) > 0) {
+            $this->checkCacheETag($ETag);
+            return;
+        }
+        $this->checkCacheLastModified($lastModified);
+    }
 
-        $this->setHeader("HTTP/2 304 Not Modified");
+    /**
+     * Parse If-None-Match into a list of unquoted ETag values. W/ prefixes are dropped (weak comparison).
+     * @return array<string>
+     */
+    public function requestETags() : array
+    {
+        $tags = array();
+        foreach (explode(",", $this->requestETag()) as $tag) {
+            $tag = trim($tag);
+            if ($tag === "") continue;
+            if (str_starts_with($tag, "W/")) $tag = substr($tag, 2);
+            $tags[] = trim($tag, '"');
+        }
+        return $tags;
+    }
 
-        $requestModifiedSince = $this->requestModifiedSince();
-        if ($requestModifiedSince) {
-            $this->setHeader("Last-Modified", $requestModifiedSince);
+    /**
+     * Format ETag value for the ETag header - quoted as required by RFC 9110
+     * @param string $ETag
+     * @return string
+     */
+    public static function QuoteETag(string $ETag) : string
+    {
+        return '"' . trim($ETag, '"') . '"';
+    }
+
+    /**
+     * Send HTTP 304 response with all headers set so far.
+     * '$ETag' (unquoted) is sent as the response ETag when given, the request If-Modified-Since is
+     * echoed as Last-Modified when no Last-Modified header is set yet.
+     * @param string $ETag
+     * @return void
+     */
+    public function sendNotModified(string $ETag = "") : void
+    {
+        http_response_code(304);
+
+        if ($ETag !== "") {
+            $this->setHeader("ETag", SparkHTTPResponse::QuoteETag($ETag));
         }
 
-        $requestETag = $this->requestETag();
-        if ($requestETag) {
-            $this->setHeader("ETag", $requestETag);
+        $requestModifiedSince = $this->requestModifiedSince();
+        if ($requestModifiedSince && !$this->haveHeader("Last-Modified")) {
+            $this->setHeader("Last-Modified", $requestModifiedSince);
         }
 
         $this->sendHeaders();
@@ -239,7 +280,7 @@ class SparkHTTPResponse
         }
 
         if (!$this->haveHeader("ETag")) {
-            $this->setHeader("ETag", $file->getEtag());
+            $this->setHeader("ETag", SparkHTTPResponse::QuoteETag($file->getEtag()));
         }
 
         // Disable zlib output compression (prevents full-response buffering for gzip)

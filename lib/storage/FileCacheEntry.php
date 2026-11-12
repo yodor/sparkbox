@@ -46,6 +46,7 @@ class FileCacheEntry extends CacheEntry
 
     /**
      * Store data to this cache entry file and set the last modified time (if non-zero)
+     * Written atomically - see writeAtomic()
      * @param string $data
      * @param int $lastModified
      * @return void
@@ -53,20 +54,12 @@ class FileCacheEntry extends CacheEntry
      */
     public function store(string $data, int $lastModified = 0): void
     {
-        $this->file->open('w');
-        $this->file->lock(LOCK_EX);
-        $this->file->write($data);
-        $this->file->lock(LOCK_UN);
-        $this->file->close();
-        Debug::ErrorLog("Stored " . $this->file->length() . " bytes");
-        if ($lastModified > 0) {
-            $this->file->setLastModified($lastModified);
-            Debug::ErrorLog("File last-modified set to: " . $lastModified);
-        }
+        $this->writeAtomic($data, $lastModified);
     }
 
     /**
-     * Store data from this buffer and set last modified time (if non-sero)
+     * Store data from this buffer and set last modified time (if non-zero)
+     * Written atomically - see writeAtomic()
      * @param DataBuffer $data
      * @param int $lastModified
      * @return void
@@ -74,16 +67,41 @@ class FileCacheEntry extends CacheEntry
      */
     public function storeBuffer(DataBuffer $data, int $lastModified = 0): void
     {
-        $this->file->open('w');
-        $this->file->lock(LOCK_EX);
-        $this->file->write($data->data());
-        $this->file->lock(LOCK_UN);
-        $this->file->close();
-        Debug::ErrorLog("Stored " . $this->file->length() . " bytes");
-        if ($lastModified > 0) {
-            $this->file->setLastModified($lastModified);
-            Debug::ErrorLog("File last-modified set to: " . $lastModified);
+        $this->writeAtomic($data->data(), $lastModified);
+    }
+
+    /**
+     * Write to a temporary file in the same folder, set its mtime, then rename() it over the entry.
+     * rename() on the same filesystem is atomic: readers see either the complete old file or the
+     * complete new one - never a truncated or half written file. Concurrent writers each use their
+     * own temporary file and the last rename wins.
+     * @param string $data
+     * @param int $lastModified
+     * @return void
+     * @throws Exception
+     */
+    protected function writeAtomic(string $data, int $lastModified): void
+    {
+        $target = $this->file->getAbsoluteFilename();
+        $temp = $target . "." . bin2hex(random_bytes(6)) . ".tmp";
+
+        $written = @file_put_contents($temp, $data);
+        if ($written !== strlen($data)) {
+            @unlink($temp);
+            throw new Exception("Unable to write cache file: " . (error_get_last()["message"] ?? $temp));
         }
+
+        if ($lastModified > 0) {
+            touch($temp, $lastModified);
+        }
+
+        if (!@rename($temp, $target)) {
+            @unlink($temp);
+            throw new Exception("Unable to replace cache file: " . (error_get_last()["message"] ?? $target));
+        }
+
+        clearstatcache(true, $target);
+        Debug::ErrorLog("Stored " . $written . " bytes" . ($lastModified > 0 ? " - last-modified: $lastModified" : ""));
     }
 
     /**
