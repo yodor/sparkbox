@@ -80,6 +80,11 @@ ini_set("date.timezone", Spark::Get(Config::TIMEZONE));
 //set path and create folder if not exists
 Spark::Set(Config::CACHE_PATH, Spark::CachePath(), true);
 
+if (Spark::GetBoolean(Config::PHPMAILER_ENABLED)) {
+    //fetch local config
+    require_once(APP_PATH."/config/mailer.php");
+}
+
 //creating a default connection to DB
 if (Spark::GetBoolean(Config::DB_ENABLED)) {
     include_once("dbdriver/DBDriver.php");
