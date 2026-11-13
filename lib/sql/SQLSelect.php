@@ -41,6 +41,13 @@ class SQLSelect extends SQLStatement
         $this->_having = new HavingExpression();
     }
 
+    public function __clone() : void
+    {
+        parent::__clone();
+        //not shared between the clones - combine() appends to it
+        $this->_having = clone $this->_having;
+    }
+
     public function clearMode() : void
     {
         $this->modeMask = array();

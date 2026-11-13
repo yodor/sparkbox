@@ -25,11 +25,16 @@ class SQLColumnSet extends SparkObject implements ISQLGet, IBindingCollection, I
         }
     }
 
+    /**
+     * Copy clones of all columns to '$other' - the sets never share SQLColumn instances
+     * @param IColumnSetNameModifier $other
+     * @return void
+     */
     public function copyTo(IColumnSetNameModifier $other) : void
     {
         foreach ($this->fields as $name => $col) {
             if (!($col instanceof SQLColumn)) continue;
-            $other->set($col);
+            $other->set(clone $col);
         }
     }
 
