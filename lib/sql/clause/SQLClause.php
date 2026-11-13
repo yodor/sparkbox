@@ -17,7 +17,9 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
      */
     public function hash(): string
     {
-        return Spark::Hash($this->expression);
+        //operator is part of the identity: 'price >= x' and 'price <= y' are two clauses,
+        //matching the same column with the same operator again replaces the clause
+        return Spark::Hash($this->expression . "|" . $this->operator);
     }
 
     /**
@@ -43,6 +45,12 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
     protected string $glue = SQLClause::DEFAULT_GLUE;
 
     protected string $bindingKey = "";
+
+    /**
+     * Binding key is derived from hash() (expression and operator) - not set using bind()
+     * @var bool
+     */
+    protected bool $autoBindingKey = false;
 
     //has expression value - ie use the operator
     protected bool $hasExpressionValue = false;
@@ -101,7 +109,9 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
             //convert to column match expression
             //value is provided - create auto binding key using hash of expression and store the value even if it is empty string
             $this->value = $value;
-            $this->bindingKey = SQLStatement::FormatBindingKey("A_".Spark::Hash($expr));
+            //derived on use from hash() - the operator is set after the expression
+            $this->bindingKey = "";
+            $this->autoBindingKey = true;
             $this->hasExpressionValue = true;
         }
         else {
@@ -116,6 +126,7 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
         if (!SQLStatement::IsBindingValueSafe($value)) throw new InvalidArgumentException("Binding value incorrect");
         if (is_null($value)) throw new InvalidArgumentException("Bind clause value can not be null");
         $this->bindingKey = $bindingKey;
+        $this->autoBindingKey = false;
         //reset the value to the binding value. do not set hasValue
         $this->value = $value;
     }
@@ -150,7 +161,7 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
     {
 
         if ($this->hasExpressionValue) {
-            return $this->expression . " " . $this->operator . " " . $this->bindingKey;
+            return $this->expression . " " . $this->operator . " " . $this->getBindingKey();
         }
 
         //might return transient binding if $this->expression is empty and only bind() method was called.
@@ -162,16 +173,17 @@ class SQLClause extends SparkObject implements ISQLGet, ISQLBinding, IBindingMod
 
     public function getBindingKey() : string
     {
+        if ($this->autoBindingKey) return SQLStatement::FormatBindingKey("A_" . $this->hash());
         return $this->bindingKey;
     }
 
     public function getBindingValue(): string|int|float|bool|null
     {
-        if (!$this->bindingKey) throw new Exception("Binding key is empty");
+        if (!$this->getBindingKey()) throw new Exception("Binding key is empty");
 
         if (SQLStatement::IsBindingValueSafe($this->value)) return $this->value;
 
-        throw new Exception("[$this->bindingKey] value is not SQLStatement::IsBoundSafe");
+        throw new Exception("[{$this->getBindingKey()}] value is not SQLStatement::IsBoundSafe");
 
     }
 }
