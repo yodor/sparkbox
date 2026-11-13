@@ -140,6 +140,13 @@ The admin is being reworked into modules (`admin2`): a module maps a linear list
 The same structure is planned for checkout. Work in progress.
 
 
+Tests
+-----
+
+`tests/` holds regression tests for the core and a runner for site smoke tests — see
+[tests/README.md](tests/README.md). Run `php tests/run.php` before pushing.
+
+
 Diagrams
 --------
 

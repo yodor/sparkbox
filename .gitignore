@@ -4,3 +4,5 @@ error*log
 .ftpquota
 .well-known
 .idea
+tests/config.php
+tests/sparkcache/
