@@ -125,11 +125,8 @@ class SQLSelect extends SQLStatement
         }
 
         if (strlen(trim($other->_from)) > 0) {
-            $check = strtolower(trim($other->_from));
-            if (str_starts_with($check, "join") ||
-                str_starts_with($check, "left join") ||
-                str_starts_with($check, "right join") ||
-                str_starts_with($check, "inner join")) {
+            //join expressions are appended, table lists are separated with ','
+            if (preg_match('/^(join|straight_join|(left|right|inner|cross|natural)(\s+outer)?\s+join)\b/i', trim($other->_from))) {
                 if (strlen(trim($this->_from))) {
                     $this->_from->append($other->_from);
                 }
@@ -211,9 +208,28 @@ class SQLSelect extends SQLStatement
         return $sel;
     }
 
+    /**
+     * Deferred join ("late row lookup").
+     * The inner query does the filtering, joining, grouping, ordering and limiting reading only the key of
+     * '$lookupTable', the outer query joins '$lookupTable' back by the key and reads the selected columns
+     * for the found rows only.
+     *
+     *  SELECT <columns> FROM (SELECT t.key FROM ... WHERE ... ORDER BY ... LIMIT ...) AS lookup
+     *  STRAIGHT_JOIN t ON t.key = lookup.key ORDER BY ...
+     *
+     * The selected columns must be readable from '$lookupTable' - qualify them with the table name.
+     * The order is applied to both queries: the inner one selects the page, the outer one keeps it in
+     * order - a derived table does not keep its order through the join. Order names are resolved by
+     * MySQL against the selected columns first, so in the inner query only the key is visible by name,
+     * in the outer query all the selected columns.
+     *
+     * @param string $lookupTable
+     * @param string $lookupKey
+     * @return SQLSelect
+     * @throws Exception
+     */
     public function lateLookup(string $lookupTable, string $lookupKey) : SQLSelect
     {
-
         $lookup = clone $this;
         $lookup->columns()->reset();
         $lookup->columns($lookupTable.".".$lookupKey);
@@ -224,6 +240,9 @@ class SQLSelect extends SQLStatement
         $this->columns()->copyTo($stmt->columns());
 
         $stmt->from("(".$lookup->getSQL().") as lookup")->straightJoin($lookupTable)->on("$lookupTable.$lookupKey = lookup.$lookupKey");
+
+        //keep the order of the inner query
+        $this->copyOrderTo($stmt->orderParameters);
 
         $stmt->collectBindings($this);
 

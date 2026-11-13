@@ -190,9 +190,9 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
     }
     /**
      * Check if value is safe to be used as value during named parameter binding.
-     * True if (is_scalar($value) || is_null($value) || is_array($value))
+     * True if (is_scalar($value) || is_null($value))
      * @param mixed $value
-     * @return bool True if value is scalar, array or null
+     * @return bool True if value is scalar or null
      */
     public static function IsBindingValueSafe(mixed $value) : bool
     {
