@@ -1,0 +1,8 @@
+<?php
+//
+// SMTP settings and credentials - copy to APP_PATH/config/mailer.php and set the password.
+// config/mailer.php is listed in .gitignore - never commit it.
+//
+Spark::Set(Config::PHPMAILER_SMTP_HOST, "smtp.host.name");
+Spark::Set(Config::PHPMAILER_SMTP_PORT, 465);
+Spark::Set(Config::PHPMAILER_SMTP_PASSWORD, "");
