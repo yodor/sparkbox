@@ -1,4 +1,5 @@
 <?php
+include_once("sql/SQLSelect.php");
 
 class RawSQLSelect extends SQLSelect
 {

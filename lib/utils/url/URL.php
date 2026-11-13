@@ -38,8 +38,10 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
     public static function Current() : URL
     {
         $ret = $_SERVER["SCRIPT_NAME"];
-        if ($_SERVER["QUERY_STRING"]) {
-            $ret .= "?" . $_SERVER["QUERY_STRING"];
+        //not set by every SAPI when the query string is empty
+        $query = $_SERVER["QUERY_STRING"] ?? "";
+        if ($query !== "") {
+            $ret .= "?" . $query;
         }
         return new URL($ret);
     }
