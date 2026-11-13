@@ -6,7 +6,7 @@ include_once("utils/ImageType.php");
 class ImageScaler
 {
 
-    const array SupportedMimes  = array(ImageType::TYPE_JPG->value, ImageType::TYPE_JPEG->value, ImageType::TYPE_PNG->value, ImageType::TYPE_WEBP->value);
+    const array SupportedMimes = array(ImageType::TYPE_JPG->value, ImageType::TYPE_JPEG->value, ImageType::TYPE_PNG->value, ImageType::TYPE_WEBP->value);
 
 
     /**
@@ -29,8 +29,8 @@ class ImageScaler
     //resulting image width and height
     public function __construct(int $width, int $height)
     {
-        if ($width<1)$width = 0;
-        if ($height<1)$height = 0;
+        if ($width < 1) $width = 0;
+        if ($height < 1) $height = 0;
 
         $this->width = $width;
         $this->height = $height;
@@ -49,12 +49,12 @@ class ImageScaler
 
     }
 
-    public function setGrayFilterEnabled(bool $mode) : void
+    public function setGrayFilterEnabled(bool $mode): void
     {
         $this->grayFilterEnabled = $mode;
     }
 
-    public function isGrayFilterEnabled() : bool
+    public function isGrayFilterEnabled(): bool
     {
         return $this->grayFilterEnabled;
     }
@@ -70,7 +70,7 @@ class ImageScaler
      * @param int $output_quality
      * @return void
      */
-    public function setOutputQuality(int $output_quality) : void
+    public function setOutputQuality(int $output_quality): void
     {
         $this->output_quality = $output_quality;
     }
@@ -88,7 +88,7 @@ class ImageScaler
      * @return void
      * @throws Exception
      */
-    public function setOutputFormat(string $mime) : void
+    public function setOutputFormat(string $mime): void
     {
         $format = ImageType::tryFrom($mime);
 
@@ -120,7 +120,7 @@ class ImageScaler
         return $this->height;
     }
 
-    public function process(DataBuffer $buffer) : void
+    public function process(DataBuffer $buffer): void
     {
 
         if ($this->mode === ScaleMode::MODE_CROP) {
@@ -135,7 +135,8 @@ class ImageScaler
             $this->processFull($buffer);
         }
     }
-    protected function imageFromBuffer(DataBuffer $buffer) : GdImage
+
+    protected function imageFromBuffer(DataBuffer $buffer): GdImage
     {
         $h_source = @imagecreatefromstring($buffer->data());
         if ($h_source === FALSE) {
@@ -152,12 +153,12 @@ class ImageScaler
      * @return void
      * @throws Exception
      */
-    protected function processFull(DataBuffer $buffer) : void
+    protected function processFull(DataBuffer $buffer): void
     {
         if ($this->watermark->isEnabled()) {
             $h_source = $this->imageFromBuffer($buffer);
             $this->setImageData($buffer, $h_source);
-            $h_source=null;
+            $h_source = null;
         }
 
     }
@@ -169,7 +170,7 @@ class ImageScaler
      * @return void
      * @throws Exception
      */
-    protected function processCrop(DataBuffer $buffer) : void
+    protected function processCrop(DataBuffer $buffer): void
     {
         $h_source = $this->imageFromBuffer($buffer);
 
@@ -214,7 +215,7 @@ class ImageScaler
      * @return void
      * @throws Exception
      */
-    protected function processThumb(DataBuffer $buffer) : void
+    protected function processThumb(DataBuffer $buffer): void
     {
 
         $h_source = $this->imageFromBuffer($buffer);
@@ -247,7 +248,7 @@ class ImageScaler
      * @return void
      * @throws Exception
      */
-    protected function setImageData(DataBuffer $buffer, GdImage $h_source) : void
+    protected function setImageData(DataBuffer $buffer, GdImage $h_source): void
     {
         Debug::ErrorLog("Set image data ...");
 
@@ -263,7 +264,9 @@ class ImageScaler
         if ($this->output_format === ImageType::TYPE_PNG) {
             imagesavealpha($h_source, TRUE);
             imagepng($h_source);
-        } else if ($this->output_format === ImageType::TYPE_JPEG) {
+        }
+        //"image/jpg" is a common alias - encode as JPEG, not the WebP fallback
+        else if ($this->output_format === ImageType::TYPE_JPEG || $this->output_format === ImageType::TYPE_JPG) {
             imagejpeg($h_source, NULL, $this->output_quality);
         } else {
             imagewebp($h_source, NULL, $this->output_quality);
@@ -280,7 +283,7 @@ class ImageScaler
      * @param int $height
      * @return GdImage
      */
-    protected function createImage(int $width, int $height) : GdImage
+    protected function createImage(int $width, int $height): GdImage
     {
         $h_thumbnail = imagecreatetruecolor($width, $height);
         imageantialias($h_thumbnail, TRUE);

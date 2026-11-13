@@ -251,6 +251,12 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         //apply the order of the view
         $this->paginator->applyOrder($this->iterator->stmt, $this->default_order);
 
+        //rows with equal sort values (same price ...) come back in any order and each page is a separate
+        //query - a row can show on two pages or on none. The unique key as last sort column makes paging stable.
+        if ($this->items_per_page > 0) {
+            $this->appendKeyOrder();
+        }
+
         //calculate
         $this->paginator->calculate($this->total_rows, $this->items_per_page);
 
@@ -261,6 +267,25 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
 //        $this->iterator->stmt->setMeta("ARV Paginated");
         $this->results_paginated = true;
     }
+    /**
+     * Append the iterator key (table qualified when the table is known) as the last sort column
+     * if the order does not contain it already
+     * @return void
+     */
+    protected function appendKeyOrder() : void
+    {
+        $key = $this->iterator->key();
+        if ($key === "") return;
+
+        $table = $this->iterator->table();
+        $qualified = ($table !== "") ? "$table.$key" : $key;
+
+        $stmt = $this->iterator->stmt;
+        if ($stmt->isOrderedBy($key) || $stmt->isOrderedBy($qualified)) return;
+
+        $stmt->order($qualified, OrderDirection::ASC);
+    }
+
     /**
      * Execute the assigned SelectQuery and prepare the paginator values.
      * Need to call this once

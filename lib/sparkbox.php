@@ -66,10 +66,15 @@ $_REQUEST = array_merge($_GET, $_POST);
 error_reporting(E_ALL);
 
 ini_set("display_errors", 1);
+//storage (binary) and JSON responses are not read by people - a displayed warning would corrupt the
+//image bytes / the JSON and can stop header() from working. Errors are still logged.
+if (Spark::isStorageRequest() || Spark::isJSONRequest()) {
+    ini_set("display_errors", 0);
+}
 ini_set("display_startup_errors", 0);
 
 ini_set('intl.default_locale', Locale::canonicalize(Spark::Get(Config::DEFAULT_LOCALE)??"en_US"));
-//important for storage cache to work is the timezone matching across the lamp stack, apache uses the system timezone
+//PHP time zone - PDODriver sets the DB session time_zone to the same zone
 //mysql driver uses date.timezone to set the mysql timezone
 ini_set("date.timezone", Spark::Get(Config::TIMEZONE));
 

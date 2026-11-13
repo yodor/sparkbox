@@ -20,6 +20,16 @@ trait CanSetOrder {
         $this->orderColumn($column);
     }
 
+    /**
+     * True if the order list contains column '$name' (exact name as passed to order())
+     * @param string $name
+     * @return bool
+     */
+    public function isOrderedBy(string $name) : bool
+    {
+        return isset($this->orderParameters[trim($name)]);
+    }
+
     public function orderClear() : void
     {
         $this->orderParameters = [];

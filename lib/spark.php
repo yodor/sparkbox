@@ -545,7 +545,7 @@ final class Spark {
      */
     final static public function Hash(string $data, string $algorithm="xxh3") : string
     {
-        return hash('xxh3', $data);
+        return hash($algorithm, $data);
     }
 
     final static public function Slugify(string $text) : string
