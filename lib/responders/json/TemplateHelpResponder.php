@@ -15,23 +15,24 @@ class TemplateHelpResponder extends JSONResponder
         if (!isset($_GET["path"])) throw new Exception("No path specified");
     }
 
+    /**
+     * Help of the path from the module 'help/<language>/' folders - site, store, core (first found)
+     * templates/modules/<module>/help/bgn/store.products.html
+     */
     public function _fetch(JSONResponse $response) : void
     {
-
         $path = Template::FormatPath($_GET["path"], ".", false);
 
         $language = "bgn";
-        $parts = ["help", $language, "$path.html"];
+        $prefix = Module::Active()->getPreifx() . "/help/" . $language;
+        $file = SparkLoader::Factory($prefix)->find($path, "html");
 
-        $file = implode("/", $parts);
-
-        if (file_exists($file)) {
+        if ($file !== "") {
             $response->message = file_get_contents($file);
         }
         else {
-            $response->message = "<div class='error'>Help file not found: $file</div>";
+            $response->message = "<div class='error'>" . tr("Help is not available for this page") . "</div>";
         }
-
     }
 
 }

@@ -1,5 +1,5 @@
 -- Tables used by the core tests - recreated on every run
-DROP TABLE IF EXISTS contacts, photos, items, cats, docs, pics, ranges;
+DROP TABLE IF EXISTS contacts, photos, items, cats, docs, pics, ranges, admin_access, admin_users;
 CREATE TABLE contacts (crID INT AUTO_INCREMENT PRIMARY KEY, fullname VARCHAR(50));
 CREATE TABLE photos (pid INT AUTO_INCREMENT PRIMARY KEY, photo LONGBLOB, caption VARCHAR(50));
 CREATE TABLE cats (catID INT PRIMARY KEY, cname VARCHAR(20));

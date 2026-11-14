@@ -93,6 +93,27 @@ class Module
         return new Module($name, $location);
     }
 
+    /**
+     * Entry point of a module folder (its index.php): create module '$name' located at the folder of the
+     * requested script, include its init.php files and process the request.
+     * The folder name is free - the module works the same from /admin2/ or /admin/.
+     * @param string $name Module name - templates/modules/<name>
+     * @return void
+     * @throws Exception
+     */
+    public static function Run(string $name) : void
+    {
+        $folder = str_replace(chr(92), "/", dirname((string)($_SERVER["SCRIPT_NAME"] ?? "/")));
+        $local = (string)Spark::Get(Config::LOCAL);
+        if ($local !== "" && str_starts_with($folder, $local)) {
+            $folder = substr($folder, strlen($local));
+        }
+
+        $module = Module::Factory($name, trim($folder, "/") . "/");
+        $module->initialize();
+        Module::Response();
+    }
+
     public static function Active() : Module
     {
         if (is_null(Module::$instance)) throw new Exception("Module is not initialized");

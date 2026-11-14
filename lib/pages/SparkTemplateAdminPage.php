@@ -338,6 +338,15 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         return $this->menu_bar;
     }
 
+    /**
+     * The menu set by the module menu.php files so far - later menu.php files (store, site) extend it
+     * @return MenuItemList|null
+     */
+    public static function Menu() : ?MenuItemList
+    {
+        return SparkTemplateAdminPage::$Menu;
+    }
+
     public static function SetMenu(MenuItemList $menu) : void
     {
         //TODO: unregister listeners ?

@@ -79,7 +79,8 @@ class Translator implements IRequestProcessor, IGETConsumer
      */
     public function activeCode() : string
     {
-        return $this->language["lang_code"];
+        //no active language when the translator is disabled
+        return (string)($this->language["lang_code"] ?? "");
     }
 
     /**
@@ -88,7 +89,10 @@ class Translator implements IRequestProcessor, IGETConsumer
      */
     public function activeCodeISO2() : string
     {
-        return substr($this->language["lang_code"], 0,2);
+        $code = $this->activeCode();
+        if ($code !== "") return substr($code, 0, 2);
+        //translator disabled - language of the configured locale
+        return (string)Locale::getPrimaryLanguage((string)(Spark::Get(Config::DEFAULT_LOCALE) ?? "en_US"));
     }
 
     /**
@@ -97,7 +101,7 @@ class Translator implements IRequestProcessor, IGETConsumer
      */
     public function activeName() : string
     {
-        return $this->language["language"];
+        return (string)($this->language["language"] ?? "");
     }
 
     private function __construct()

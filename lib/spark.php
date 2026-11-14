@@ -121,6 +121,23 @@ final class SparkLoader
     }
 
     /**
+     * Absolute filename of '$fileName.$extension' under this loader prefix - most specific location first
+     * (site, then store, then core - the reverse of the include order) so a site file replaces the library one.
+     * @param string $fileName
+     * @param string $extension
+     * @return string Empty string if not found in any location
+     */
+    public function find(string $fileName, string $extension = "php") : string
+    {
+        if (!$fileName) return "";
+        foreach (array_reverse(SparkLoader::$locations, true) as $includePath => $includePrefix) {
+            $file = Spark::PathParts($includePath, $includePrefix, $this->prefix, $fileName . "." . $extension);
+            if (is_file($file)) return $file;
+        }
+        return "";
+    }
+
+    /**
      * Search all SparkLoader::$locations and try to include $fileName from there using the current search prefix
      * Stop searching on first match if $includeAll is false
      * Filename is appended with suffix with .php
