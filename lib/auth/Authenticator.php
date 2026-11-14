@@ -25,27 +25,15 @@ abstract class Authenticator
     }
 
     /**
-     * Return random string from sha256 hash of random data
-     * @param int $length
+     * Random hex string from a cryptographically secure source - login challenges, auth cookies,
+     * confirmation codes, order references
+     * @param int $length number of hex characters
      * @return string
      */
     public static function RandomToken(int $length): string
     {
-        // Generate string with random data
-        $hash_result = hash('sha256', Spark::MicroTime() . "|" . rand());
-
-        $hash_len = strlen($hash_result);
-
-        if ($length > $hash_len) {
-            $length = $hash_len;
-        }
-
-        // Position Limiting
-        $start_point = $hash_len - $length;
-
-        // Take a random starting point in the randomly
-        // Generated String, not going any higher than $start_point
-        return substr($hash_result, rand(0, $start_point), $length);
+        if ($length < 1) return "";
+        return substr(bin2hex(random_bytes((int)ceil($length / 2))), 0, $length);
     }
 
     /**
@@ -132,7 +120,7 @@ abstract class Authenticator
     /**
      * Set a random password to user with email '$email'
      * Creates 'random string' using Authenticator::RandomToken(8)
-     * Password is stored in DB by hashing the 'random string' using Authenticator::PasswordHash - currently md5
+     * Password is stored as PasswordHash (Config::PASSWORD_TYPE)
      * @param string $email
      * @return string The 'random string' that can be used on the login forms or emailed back to the user
      * @throws Exception If email is not found
@@ -219,6 +207,8 @@ abstract class Authenticator
         $qry->exec();
 
         if (!($row = $qry->next())) {
+            //same cost as a password check - the response time does not tell if the email is registered
+            $hash->getValue();
             throw new Exception(tr("Username or password not recognized"));
         }
         $qry->free();
@@ -377,7 +367,7 @@ abstract class Authenticator
             include_once("auth/AdminAuthenticator.php");
             $auth_admin = new AdminAuthenticator();
             $context = $auth_admin->authorize();
-            if ($auth_admin->authorize()) {
+            if ($context) {
                 Debug::ErrorLog("AdminAuthenticator authorization success");
                 return $context;
             }

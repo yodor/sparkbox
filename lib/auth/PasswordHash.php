@@ -38,11 +38,6 @@ class PasswordHash
         if (!in_array($this->type, password_algos())) {
             throw new Exception(tr("Unsupported hash type: ".$this->type));
         }
-//        if (in_array("argon2id", password_algos())) {
-//            $this->type = "argon2id";
-//        } else {
-//            $this->type = "2y";
-//        }
 
         $options = Spark::GetObject(Config::PASSWORD_OPTIONS);
         if (!is_array($options)) {
@@ -52,24 +47,6 @@ class PasswordHash
 
         $this->value = null;
         //
-    }
-
-    protected function defaultOptions(): array
-    {
-        if (strcmp($this->type, "argon2id") === 0) {
-            return array(
-                'memory_cost' => 1 << 16,   // 64 MiB
-                'time_cost' => 4,         // number of iterations
-                'threads' => 4          // degree of parallelism
-            );
-        }
-        if (strcmp($this->type,"2y" ) === 0) {
-            return array(
-                'cost' => 12
-            );
-        }
-
-        throw new Exception("Unsupported password hash type");
     }
 
     public function getType(): string

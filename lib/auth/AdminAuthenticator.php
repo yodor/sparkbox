@@ -37,4 +37,20 @@ class AdminAuthenticator extends Authenticator
             $this->session->set(AdminAuthenticator::SESSION_DATA_ENABLED_ROLES, $roles);
         }
     }
+
+    /**
+     * For standalone admin scripts outside the admin module (site tools): continue only with a logged in
+     * administrator, otherwise redirect to the admin module login (Config::ADMIN_LOCAL)
+     * @return AuthContext
+     */
+    public static function RequireLogin() : AuthContext
+    {
+        Session::Start();
+        $context = (new AdminAuthenticator())->authorize();
+        if (is_null($context)) {
+            header("Location: " . Spark::Get(Config::ADMIN_LOCAL) . "/login");
+            exit;
+        }
+        return $context;
+    }
 }

@@ -55,7 +55,7 @@ class AuthToken implements ISerializable
         $cookie_hash = Session::GetCookie($contextName . "_" . AuthToken::HASH);
         $cookie_id = (int)Session::GetCookie($contextName . "_" . AuthToken::ID);
 
-        if (strcmp($cookie_hash, $this->hash) === 0 && $cookie_id == $this->id) {
+        if (hash_equals($this->hash, (string)$cookie_hash) && $cookie_id == $this->id) {
             Debug::ErrorLog("Cookie values matched successfully");
             return TRUE;
         }
