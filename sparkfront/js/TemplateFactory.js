@@ -7,14 +7,14 @@ class TemplateFactory {
     /**
      * Get firstChild of template #id
      * @param id {string}
-     * @returns {Node}
+     * @returns {Element}
      */
     getElement(id) {
         const template = document.querySelector( "template#" + id);
         if (!template) throw "template#"+id+ " not found";
 
         //scripts are added to DOM
-        return template.content.firstChild;
+        return template.content.firstElementChild;
     }
 
     /**
