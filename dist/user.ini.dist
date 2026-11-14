@@ -1,0 +1,17 @@
+; .user.ini.dist - PHP settings template for PHP-FPM / CGI web servers
+;
+; INSTRUCTIONS:
+; 1. Copy this file to .user.ini in the document root
+;    cp dist/user.ini.dist <document root>/.user.ini
+; 2. Replace the placeholders with the real paths of this environment
+; 3. Do NOT commit .user.ini - list it in the site .gitignore
+;
+; Servers running PHP as a module (Apache mod_php, LiteSpeed - e.g. Hostinger) ignore this file:
+; set the same values in .htaccess with php_value (dist/htaccess.dist).
+
+; seconds PHP keeps this file cached (default 300)
+user_ini.cache_ttl = 60
+
+include_path = "_ABSOLUTE_SPARKBOX_PATH_/lib"
+auto_prepend_file = "_ABSOLUTE_APP_PATH_/sparkboot.php"
+;error_log = "_ABSOLUTE_LOG_PATH_/php-errors.log"

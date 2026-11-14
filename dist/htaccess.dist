@@ -1,7 +1,22 @@
-# SparkBox site .htaccess - add these lines to the site's .htaccess (document root)
+#
+# SparkBox site .htaccess - template for the document root
+#   cp dist/htaccess.dist <document root>/.htaccess  and replace the _PLACEHOLDERS_
+#
+# PHP settings: web servers running PHP as a module (Apache mod_php, LiteSpeed - e.g. Hostinger) read
+# them from here. PHP-FPM / CGI servers ignore these lines and use .user.ini instead (dist/user.ini.dist).
+#
+
+<IfModule mod_php.c>
+    php_value include_path "_ABSOLUTE_SPARKBOX_PATH_/lib"
+    php_value auto_prepend_file "_ABSOLUTE_APP_PATH_/sparkboot.php"
+</IfModule>
 
 <IfModule mod_rewrite.c>
-    RewriteEngine on
+    Options +FollowSymLinks
+    RewriteEngine On
+
+    # storage: images and files of beans - /assets/<route> is answered by sparkbox (storage.php logic)
+    RewriteRule ^assets/(.*)$ sparkboot.php?StorageRequest=1&route=$1 [E=IS_SPARK_ASSET:1,QSA,L]
 
     # versioned CSS / JS (?v=<file time>, added by HTMLHead): the URL changes whenever the file changes,
     # so browsers and the CDN may keep each version for a year without asking again

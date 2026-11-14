@@ -25,15 +25,17 @@ Requirements
 - Extensions: pdo_mysql, gd, fileinfo, intl (transliteration of slugs), mbstring
 - MariaDB or MySQL — load the time zone tables (`mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql`)
   so the DB session follows the configured PHP time zone
-- Apache with mod_rewrite (`.user.ini` support for per-directory PHP settings)
+- Apache or LiteSpeed with mod_rewrite (and mod_headers for the long caching of versioned CSS / JS)
 
 
 Setting up a site
 -----------------
 
-1. Copy `user.ini.dist` to the document root as `.user.ini` and set
-   `include_path` (SparkBox `lib`), `auto_prepend_file` (the site `sparkboot.php`) and `error_log`.
-2. Copy `sparkboot.php.dist` to the document root as `sparkboot.php`. It defines `APP_PATH` and loads
+1. Copy `dist/htaccess.dist` to the document root as `.htaccess`. It holds the storage rewrite, the
+   long caching of versioned CSS / JS, and — for PHP running as a server module (Apache mod_php,
+   LiteSpeed) — `include_path` (SparkBox `lib`) and `auto_prepend_file` (the site `sparkboot.php`).
+   PHP-FPM / CGI servers read these two from `.user.ini` instead: copy `dist/user.ini.dist`.
+2. Copy `dist/sparkboot.php.dist` to the document root as `sparkboot.php`. It defines `APP_PATH` and loads
    `sparkbox.php` — every request goes through it.
 3. Create the configuration files in `APP_PATH/config/` (all optional except `dbconfig.php` when the
    database is enabled). They are loaded in this order:

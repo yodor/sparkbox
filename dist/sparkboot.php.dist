@@ -1,6 +1,6 @@
 <?php
 //
-//SparkBox boot script - set as auto prepend from .user.ini
+//SparkBox boot script - set as auto_prepend_file (.user.ini or .htaccess php_value - see dist/)
 //
 //Location: APP_PATH/
 //
