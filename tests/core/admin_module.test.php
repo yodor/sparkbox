@@ -175,6 +175,13 @@ test("limited access administrator sees and opens only the sections of its roles
     assertSame(302, $status, "early responder bypassed the access check");
 });
 
+test("translator menu lists the languages", function () {
+    TestPDO()->exec("INSERT IGNORE INTO languages (langID, lang_code, language) VALUES (1, 'bgn', 'Bulgarian')");
+    [, , $body] = httpRequest("admin/index.php", "path=%2Fhome", array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fhome");
+    assertTrue(str_contains($body, "/admin/settings/languages/translator/phrases?langID=1"), "language link missing");
+    assertTrue(str_contains($body, ">BGN<"), "language code missing");
+});
+
 //last - ends the session used by the tests above
 test("logout returns to login", function () {
     [$status, $headers] = coreAdmin("/logout");

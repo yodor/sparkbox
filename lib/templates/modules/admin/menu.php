@@ -22,7 +22,21 @@ $menu->append($settings);
 
 $settings->append(new MenuItem("Admins", "admins"));
 $languages = new MenuItem("Languages", "languages");
-$languages->append(new MenuItem("Translator", "translator"));
+$translator = new MenuItem("Translator", "translator");
+$languages->append($translator);
 $settings->append($languages);
+
+//one translator entry per language - its phrases
+include_once("beans/LanguagesBean.php");
+$languagesBean = new LanguagesBean();
+$query = $languagesBean->query($languagesBean->key(), "lang_code");
+$query->exec();
+while ($row = $query->next()) {
+    $code = strtoupper((string)$row["lang_code"]);
+    $item = new MenuItem($code, "phrases?langID=" . (int)$row[$languagesBean->key()]);
+    $item->enableTranslation(false);
+    $translator->append($item);
+}
+$query->free();
 
 SparkTemplateAdminPage::SetMenu($menu);

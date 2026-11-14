@@ -220,10 +220,11 @@
 
 
     /* forms - carried over from the old admin (sparkbox and sparkstore AdminPage_base.css) */
-    .basePane .mainPane .FormRenderer[layout="VBox"][name] {
+    /* every admin form - page editors and the forms in dialogs */
+    .FormRenderer[layout="VBox"][name] {
         gap: 1em;
     }
-    .basePane .mainPane .FormRenderer[name] .InputLabel {
+    .FormRenderer[name] .InputLabel {
         font-style: oblique;
         font-weight: 600;
         font-size: 120%;
