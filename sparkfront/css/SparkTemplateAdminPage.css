@@ -155,3 +155,65 @@
     .base .helpPane .error {
 
     }
+
+    /* wide content (long lists) scrolls inside the main pane - the page itself never scrolls sideways */
+    .basePane .mainPane {
+        min-width: 0;
+    }
+    .basePane .mainPane .base {
+        overflow-x: auto;
+    }
+
+    /* many page actions or filters wrap instead of widening the header */
+    .basePane .mainPane .header .actions_title,
+    .basePane .mainPane .header .actions_title .actions,
+    .basePane .mainPane .header .filters,
+    .basePane .mainPane .header .filters FORM {
+        flex-wrap: wrap;
+    }
+
+    /* phones and narrow windows: the side pane goes on top, the menu folds behind its toggle */
+    @container (max-width: 700px) {
+
+        .basePane {
+            flex-direction: column;
+        }
+
+        .basePane .sidePane {
+            width: auto;
+            min-width: 0;
+            border-right: none;
+            border-bottom: 2px solid #b9b3a3;
+        }
+
+        .basePane .sidePane .user_data {
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 0.5em 1em;
+        }
+
+        .basePane .sidePane .admin_menu {
+            position: static;
+        }
+
+        .basePane .sidePane .admin_menu .toggle {
+            display: block;
+        }
+
+        .basePane .sidePane .admin_menu > .ItemList {
+            display: none;
+        }
+
+        .basePane .sidePane .admin_menu[open] > .ItemList {
+            display: flex;
+        }
+
+        .basePane .mainPane .base {
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+        }
+
+        .basePane .mainPane .header .actions_title .title {
+            font-size: 1.2em;
+        }
+    }

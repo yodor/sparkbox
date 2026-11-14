@@ -9,7 +9,7 @@ include_once("forms/processors/FormProcessor.php");
 include_once("dialogs/json/BeanTranslationDialog.php");
 include_once("objects/events/BeanFormEditorEvent.php");
 
-include_once("pages/SparkAdminPage.php");
+include_once("pages/SparkPage.php");
 
 class BeanFormEditor extends FormRenderer implements IBeanEditor, IRequestProcessor
 {
