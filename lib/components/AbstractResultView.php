@@ -268,8 +268,9 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $this->results_paginated = true;
     }
     /**
-     * Append the iterator key (table qualified when the table is known) as the last sort column
-     * if the order does not contain it already
+     * Append the iterator key as the last sort column if the order does not contain it already.
+     * The bare key name is used: ORDER BY resolves it against the selected columns first (the key is
+     * always selected - rows are read by it), a table qualified name breaks for derived tables.
      * @return void
      */
     protected function appendKeyOrder() : void
@@ -277,13 +278,13 @@ abstract class AbstractResultView extends Container implements IDataIteratorRend
         $key = $this->iterator->key();
         if ($key === "") return;
 
-        $table = $this->iterator->table();
-        $qualified = ($table !== "") ? "$table.$key" : $key;
-
         $stmt = $this->iterator->stmt;
-        if ($stmt->isOrderedBy($key) || $stmt->isOrderedBy($qualified)) return;
+        if ($stmt->isOrderedBy($key)) return;
 
-        $stmt->order($qualified, OrderDirection::ASC);
+        $table = $this->iterator->table();
+        if ($table !== "" && $stmt->isOrderedBy("$table.$key")) return;
+
+        $stmt->order($key, OrderDirection::ASC);
     }
 
     /**
