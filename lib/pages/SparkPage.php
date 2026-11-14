@@ -143,7 +143,6 @@ JS;
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkEvent.js");
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/CallStack.js");
-        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/TemplateFactory.js");
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/Component.js");
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/TemplateComponent.js");
