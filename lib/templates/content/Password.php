@@ -2,7 +2,7 @@
 include_once("templates/TemplateContent.php");
 include_once("forms/InputForm.php");
 include_once("forms/renderers/FormRenderer.php");
-include_once("store/mailers/ForgotPasswordMailer.php");
+include_once("mailers/ForgotPasswordMailer.php");
 include_once("forms/processors/FormProcessor.php");
 
 class Password extends TemplateContent
@@ -49,24 +49,24 @@ class Password extends TemplateContent
                 if (!$email) throw new Exception("Empty email");
 
                 $authenticator = Module::Active()->getAuthenticator();
-                $random_pass = $authenticator->setRandomPassword($email);
-
                 $loginURL = Module::PathURL("login");
-                $fpm = new ForgotPasswordMailer($email, $random_pass, $loginURL);
-                $fpm->send();
-
-                Debug::ErrorLog("Password reset successful: " . $email);
-                Session::SetAlert(tr("Your new password was sent to your email") . ": " .$email);
-
-                Debug::ErrorLog("Redirecting: " . $loginURL);
+                try {
+                    $random_pass = $authenticator->setRandomPassword($email);
+                    $fpm = new ForgotPasswordMailer($email, $random_pass, $loginURL);
+                    $fpm->send();
+                    Debug::ErrorLog("Password reset successful: " . $email);
+                }
+                catch (Exception $e) {
+                    //the same answer for unknown emails - the page does not tell which emails are registered
+                    Debug::ErrorLog("Password reset failed for email '$email': " . $e->getMessage());
+                }
+                Session::SetAlert(tr("If this email is registered, a new password was sent to it"));
                 header("Location: " . $loginURL);
                 exit;
             }
             catch (Exception $e) {
-                Debug::ErrorLog("Password reset failed for email '$email': " . $e->getMessage());
-                Session::SetAlert(tr("Password reset failed: ".$e->getMessage()));
+                Session::SetAlert(tr("Password reset failed"));
             }
-
         }
         else {
             Session::setAlert($proc->getMessage());
