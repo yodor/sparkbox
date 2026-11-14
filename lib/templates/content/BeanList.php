@@ -23,10 +23,42 @@ class BeanList extends TemplateContent
 
     protected ?KeywordSearch $search = null;
 
+    /**
+     * Page action "Add"
+     * @var bool
+     */
+    protected bool $addEnabled = true;
+
+    /**
+     * Item action "Edit"
+     * @var bool
+     */
+    protected bool $editEnabled = true;
+
     public function __construct()
     {
         parent::__construct();
         $this->search = new KeywordSearch();
+    }
+
+    /**
+     * Show the "Add" page action - set before the page fills its actions (CONTENT_SETUP / CONTENT_INITIALIZED)
+     * @param bool $mode
+     * @return void
+     */
+    public function setAddEnabled(bool $mode) : void
+    {
+        $this->addEnabled = $mode;
+    }
+
+    /**
+     * Show the "Edit" item action - set before initialize() (CONTENT_SETUP)
+     * @param bool $mode
+     * @return void
+     */
+    public function setEditEnabled(bool $mode) : void
+    {
+        $this->editEnabled = $mode;
     }
 
     public function getIterator(): SelectQuery
@@ -154,6 +186,8 @@ class BeanList extends TemplateContent
      */
     public function fillPageActions(ActionCollection $collection): void
     {
+        if (!$this->addEnabled) return;
+
         $actionCreate = TemplateContent::CreateAction(SparkTemplateAdminPage::ACTION_ADD, SparkTemplateAdminPage::ACTION_ADD);
         $actionCreate->getURL()->add(new URLParameter("editID", -1));
         $actionCreate->setTooltip("Add new element to this collection");
@@ -181,13 +215,15 @@ class BeanList extends TemplateContent
     protected function initItemActions(ActionCollection $act): void
     {
 
-        $editAction = TemplateContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, SparkTemplateAdminPage::ACTION_EDIT);
-        $editAction->setTooltip(tr("Edit element"));
-        $editAction->getURL()->add(new DataParameter("editID", $this->getIterator()->key()));
+        if ($this->editEnabled) {
+            $editAction = TemplateContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, SparkTemplateAdminPage::ACTION_EDIT);
+            $editAction->setTooltip(tr("Edit element"));
+            $editAction->getURL()->add(new DataParameter("editID", $this->getIterator()->key()));
 
-        $act->append($editAction);
+            $act->append($editAction);
 
-        $act->append(Action::PipeSeparator());
+            $act->append(Action::PipeSeparator());
+        }
 
         if ($this->bean instanceof DBTableBean) {
             $h_delete = new DeleteItemResponder($this->bean);

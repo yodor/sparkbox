@@ -75,6 +75,32 @@ test("responders that are not early still go through the page", function () {
     assertSame(302, $status, "MCE browser must not be processed early");
 });
 
+test("saving a form: add a FAQ section and edit it (POST, redirect, database)", function () {
+    $post = function (string $query, array $fields) : array {
+        return httpRequest("admin/index.php", $query, array("Cookie" => coreAdminCookies()), "/admin/index.php?" . $query,
+            array("post" => $fields + array("SubmitForm" => "FAQSectionInputForm")));
+    };
+
+    [$status, $headers] = $post("path=%2Fcontent%2Ffaq%2Fsections&editID=-1", array("section_name" => "Shipping"));
+    assertSame(302, $status, "no redirect after add");
+    assertTrue((bool)preg_match("/editID=(\\d+)/", $headers["location"] ?? "", $m), "redirect without editID: " . ($headers["location"] ?? ""));
+    $id = (int)$m[1];
+    assertSame("Shipping", TestPDO()->query("SELECT section_name FROM faq_sections WHERE fqsID=$id")->fetchColumn());
+
+    [$status] = $post("path=%2Fcontent%2Ffaq%2Fsections&editID=$id", array("section_name" => "Delivery"));
+    assertSame(302, $status, "no redirect after update");
+    assertSame("Delivery", TestPDO()->query("SELECT section_name FROM faq_sections WHERE fqsID=$id")->fetchColumn());
+});
+
+test("saving a form with a missing required field shows the error and writes nothing", function () {
+    $before = (int)TestPDO()->query("SELECT COUNT(*) FROM faq_sections")->fetchColumn();
+    [$status, , $body] = httpRequest("admin/index.php", "path=%2Fcontent%2Ffaq%2Fsections&editID=-1", array("Cookie" => coreAdminCookies()),
+        "/admin/index.php?path=%2Fcontent%2Ffaq%2Fsections&editID=-1", array("post" => array("section_name" => "", "SubmitForm" => "FAQSectionInputForm")));
+    assertSame(200, $status);
+    assertSame($before, (int)TestPDO()->query("SELECT COUNT(*) FROM faq_sections")->fetchColumn());
+    assertTrue(str_contains($body, "error"), "no error shown");
+});
+
 //last - ends the session used by the tests above
 test("logout returns to login", function () {
     [$status, $headers] = coreAdmin("/logout");

@@ -2,7 +2,8 @@
 /**
  * Run a request of the test application (tests/app) through php-cgi and the real sparkbox.php bootstrap.
  * Returns array(status, headers (lower case names), body). headers["set-cookie"] is a list of "name=value".
- * Options: root, include_path, prepend, script_file (absolute path of a script outside the document root).
+ * Options: root, include_path, prepend, script_file (absolute path of a script outside the document root),
+ * post (array of fields - sends a POST request with them).
  */
 function httpRequest(string $script, string $query = "", array $headers = array(), string $requestURI = "", array $options = array()) : array
 {
@@ -15,13 +16,19 @@ function httpRequest(string $script, string $query = "", array $headers = array(
     $lib = realpath(TESTS_PATH . "/../lib");
     $isTestApp = !isset($options["root"]);
     $env = array(
-        "PATH" => getenv("PATH"), "REDIRECT_STATUS" => "1", "REQUEST_METHOD" => "GET", "GATEWAY_INTERFACE" => "CGI/1.1",
+        "PATH" => getenv("PATH"), "REDIRECT_STATUS" => "1", "REQUEST_METHOD" => isset($options["post"]) ? "POST" : "GET", "GATEWAY_INTERFACE" => "CGI/1.1",
         "SERVER_NAME" => "localhost", "SERVER_PORT" => "80", "HTTP_HOST" => "localhost", "HTTP_USER_AGENT" => "sparkbox-tests",
         "DOCUMENT_ROOT" => $app, "SCRIPT_FILENAME" => $options["script_file"] ?? "$app/$script", "SCRIPT_NAME" => "/$script",
         "SPARK_TESTS" => "1",
         "QUERY_STRING" => $query, "REQUEST_URI" => ($requestURI !== "") ? $requestURI : "/$script?$query",
         "SPARK_TEST_CACHE" => TestCachePath(),
     );
+    $postBody = "";
+    if (isset($options["post"])) {
+        $postBody = http_build_query($options["post"]);
+        $env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+        $env["CONTENT_LENGTH"] = (string)strlen($postBody);
+    }
     foreach ($headers as $name => $value) {
         $env["HTTP_" . strtoupper(str_replace("-", "_", $name))] = $value;
     }
@@ -32,8 +39,10 @@ function httpRequest(string $script, string $query = "", array $headers = array(
     if ($includePath !== "") $command .= " -d include_path=" . escapeshellarg($includePath);
     if ($prepend !== "") $command .= " -d auto_prepend_file=" . escapeshellarg($prepend);
 
-    $process = proc_open($command, array(1 => array("pipe", "w"), 2 => array("pipe", "w")), $pipes, $app, $env);
+    $process = proc_open($command, array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w")), $pipes, $app, $env);
     if (!is_resource($process)) skip("unable to start php-cgi");
+    fwrite($pipes[0], $postBody);
+    fclose($pipes[0]);
     $output = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
     fclose($pipes[2]);
