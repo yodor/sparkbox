@@ -2,6 +2,7 @@
 include_once("storage/SparkFile.php");
 include_once("storage/CacheFactory.php");
 include_once("storage/SparkWatermark.php");
+include_once("utils/url/IVersion.php");
 
 /**
  * Change marker of one row of storage data (images / files served by storage.php).
@@ -18,20 +19,22 @@ include_once("storage/SparkWatermark.php");
  * once, after that only writes through the bean move it forward.
  * Writes done with raw SQL bypassing the bean are not tracked (same as the bean cache).
  */
-class StorageVersion
+class StorageVersion implements IVersion
 {
     const string SUFFIX = ".v";
 
-    /**
-     * URL parameter name of the version token
-     */
-    const string KEY = "v";
 
     /**
      * Marker file
      * @var SparkFile
      */
     protected SparkFile $marker;
+
+    /**
+     * Image versions include the watermark file time
+     * @var bool
+     */
+    protected bool $isImage = false;
 
     /**
      * Shared by all instances - watermark config does not change during a request
@@ -42,11 +45,13 @@ class StorageVersion
     /**
      * @param string $className Bean class name
      * @param int $id Row primary key
+     * @param bool $isImage token includes the watermark file time (images are watermarked)
      * @throws Exception If the class name or the id is not valid
      */
-    public function __construct(string $className, int $id)
+    public function __construct(string $className, int $id, bool $isImage = false)
     {
         $this->marker = new SparkFile(CacheFactory::BeanCacheFolder($className, $id) . StorageVersion::SUFFIX);
+        $this->isImage = $isImage;
     }
 
     /**
@@ -119,17 +124,16 @@ class StorageVersion
     /**
      * Version token for storage URLs: base36 of the marker time, for images also the
      * watermark file time (changing the watermark file changes all image URLs).
-     * @param bool $isImage
      * @return string Empty string if no version is available
      */
-    public function token(bool $isImage) : string
+    public function token() : string
     {
         $time = $this->time();
         if ($time < 1) return "";
 
         $token = base_convert((string)$time, 10, 36);
 
-        if ($isImage) {
+        if ($this->isImage) {
             $watermark = StorageVersion::Watermark()->lastModified();
             if ($watermark > 0) $token .= "." . base_convert((string)$watermark, 10, 36);
         }
@@ -139,12 +143,11 @@ class StorageVersion
     /**
      * True if '$token' is the current version token
      * @param string $token
-     * @param bool $isImage
      * @return bool
      */
-    public function matches(string $token, bool $isImage) : bool
+    public function matches(string $token) : bool
     {
-        $current = $this->token($isImage);
+        $current = $this->token();
         return ($current !== "" && hash_equals($current, $token));
     }
 

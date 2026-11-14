@@ -1,0 +1,14 @@
+# SparkBox site .htaccess - add these lines to the site's .htaccess (document root)
+
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+
+    # versioned CSS / JS (?v=<file time>, added by HTMLHead): the URL changes whenever the file changes,
+    # so browsers and the CDN may keep each version for a year without asking again
+    RewriteCond %{QUERY_STRING} (^|&)v=
+    RewriteRule \.(css|js)$ - [E=SPARK_VERSIONED:1]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=31536000, immutable" env=SPARK_VERSIONED
+</IfModule>

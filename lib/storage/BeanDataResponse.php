@@ -86,7 +86,7 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $this->className = $className;
         $this->field = $fieldName;
 
-        $this->version = new StorageVersion($className, $id);
+        $this->version = new StorageVersion($className, $id, $this->isImage());
 
         $this->bean = null;
 
@@ -415,14 +415,14 @@ abstract class BeanDataResponse extends SparkHTTPResponse
         $requested = $this->request ? $this->request->getVersion() : "";
         if ($requested !== "") {
 
-            if ($this->version->matches($requested, $this->isImage())) {
+            if ($this->version->matches($requested)) {
                 $this->setCacheControl("public, max-age=" . SparkHTTPResponse::MAX_AGE_YEAR . ", immutable");
                 return;
             }
 
             //outdated version -> 301 to the current one. Indexed image URLs pass their ranking to the
             //new URL, old links and old cached HTML land on the current data.
-            $current = $this->version->token($this->isImage());
+            $current = $this->version->token();
             Debug::ErrorLog("Version token mismatch - requested: $requested current: $current");
 
             $location = ($current !== "") ? $this->request->versionURL($current) : "";

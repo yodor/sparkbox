@@ -114,9 +114,9 @@ class StorageItem extends DataObject implements JsonSerializable
 
         //version token as the last path segment before the file name: .../<v>/<name>.<id>.webp
         //BeanDataResponse reads it back from the route
-        if ($this->url->contains(StorageVersion::KEY)) {
-            $data[StorageVersion::KEY] = $this->url->get(StorageVersion::KEY)->value();
-            $url->add(new PathParameter(StorageVersion::KEY, StorageVersion::KEY, false));
+        if ($this->url->getVersion() !== "") {
+            $data[URL::KEY_VERSION] = $this->url->getVersion();
+            $url->add(new PathParameter(URL::KEY_VERSION, URL::KEY_VERSION, false));
         }
 
         $url->add(new PathParameter("name", "name",false, false));
@@ -142,22 +142,6 @@ class StorageItem extends DataObject implements JsonSerializable
         return $this->url;
     }
 
-    /**
-     * Version token of the referenced row - empty for unset items (no class name / id)
-     * @return string
-     */
-    protected function versionToken() : string
-    {
-        if ($this->id < 1 || !Spark::ValidClassName($this->className)) return "";
-        try {
-            return (new StorageVersion($this->className, $this->id))->token($this->type == StorageItem::TYPE_IMAGE);
-        }
-        catch (Exception $e) {
-            Debug::ErrorLog("StorageItem version token: " . $e->getMessage());
-            return "";
-        }
-    }
-
     protected function buildURL() : void
     {
         $cmd = "image";
@@ -175,9 +159,13 @@ class StorageItem extends DataObject implements JsonSerializable
         $this->url->add(new URLParameter("id", (string)$this->id));
 
         //version token - URL changes exactly when the row data changes, allows 'immutable' caching
-        $token = $this->versionToken();
-        if ($token !== "") {
-            $this->url->add(new URLParameter(StorageVersion::KEY, $token));
+        if ($this->id > 0 && Spark::ValidClassName($this->className)) {
+            try {
+                $this->url->setVersion(new StorageVersion($this->className, $this->id, $this->type == StorageItem::TYPE_IMAGE));
+            }
+            catch (Exception $e) {
+                Debug::ErrorLog("StorageItem version: " . $e->getMessage());
+            }
         }
 
 

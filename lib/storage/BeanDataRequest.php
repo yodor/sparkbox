@@ -134,8 +134,8 @@ class BeanDataRequest
      */
     protected function consumeRouteTail() : void
     {
-        if (isset($_GET[StorageVersion::KEY]) && StorageVersion::ValidToken((string)$_GET[StorageVersion::KEY])) {
-            $this->version = (string)$_GET[StorageVersion::KEY];
+        if (isset($_GET[URL::KEY_VERSION]) && StorageVersion::ValidToken((string)$_GET[URL::KEY_VERSION])) {
+            $this->version = (string)$_GET[URL::KEY_VERSION];
         }
 
         if (!isset($_GET[BeanDataRequest::KEY_ROUTE])) return;
@@ -209,8 +209,8 @@ class BeanDataRequest
         else {
             $params = array();
             parse_str($query, $params);
-            if ((string)($params[StorageVersion::KEY] ?? "") !== $this->version) return "";
-            $params[StorageVersion::KEY] = $token;
+            if ((string)($params[URL::KEY_VERSION] ?? "") !== $this->version) return "";
+            $params[URL::KEY_VERSION] = $token;
             $query = http_build_query($params, "", "&", PHP_QUERY_RFC3986);
         }
 

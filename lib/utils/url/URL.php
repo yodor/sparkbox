@@ -1,4 +1,5 @@
 <?php
+include_once("utils/url/IVersion.php");
 include_once("utils/url/URLParameter.php");
 include_once("utils/url/DataParameter.php");
 include_once("utils/url/PathParameter.php");
@@ -11,6 +12,11 @@ include_once("utils/IGETConsumer.php");
 
 class URL implements IGETConsumer, IDataResultProcessor, ISerializable
 {
+    /**
+     * Query parameter name of the version token (setVersion())
+     */
+    const string KEY_VERSION = "v";
+
 
     protected bool $is_script = FALSE;
 
@@ -420,6 +426,28 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
         }
 
         return $path;
+    }
+
+    /**
+     * Add the version token of '$version' as query parameter 'v' - the URL then changes exactly when the
+     * resource changes and can be cached for a long time
+     * @param IVersion $version
+     * @return bool false if the version has no token (nothing added)
+     */
+    public function setVersion(IVersion $version) : bool
+    {
+        $token = $version->token();
+        if ($token === "") return false;
+        $this->add(new URLParameter(URL::KEY_VERSION, $token));
+        return true;
+    }
+
+    /**
+     * @return string The version token of this URL - empty string if it has none
+     */
+    public function getVersion() : string
+    {
+        return $this->contains(URL::KEY_VERSION) ? (string)$this->get(URL::KEY_VERSION)->value() : "";
     }
 
     public function getScriptName() : string

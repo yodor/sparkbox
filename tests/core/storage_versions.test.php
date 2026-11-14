@@ -59,8 +59,8 @@ test("time() creates a missing marker, token() is base36 of it", function () {
     $version = new StorageVersion("PhotosBean", 999);
     $time = $version->time();
     assertTrue($time > 0);
-    assertSame(base_convert((string)$time, 10, 36), $version->token(false));
-    assertTrue($version->matches($version->token(false), false));
+    assertSame(base_convert((string)$time, 10, 36), $version->token());
+    assertTrue($version->matches($version->token()));
 });
 
 test("invalid class names and ids are rejected", function () {

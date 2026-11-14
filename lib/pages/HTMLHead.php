@@ -1,4 +1,6 @@
 <?php
+include_once("utils/url/URL.php");
+include_once("utils/url/FileVersion.php");
 include_once("components/Container.php");
 include_once("components/Meta.php");
 include_once("components/Link.php");
@@ -282,8 +284,21 @@ class HTMLHead extends Container implements IObserver
     public function addJS(string $url) : void
     {
         $js = new Script();
-        $js->setSrc($url);
+        $js->setSrc(HTMLHead::Versioned($url));
         $this->addScript($js);
+    }
+
+    /**
+     * Local file URL with its file version added ('/sparkfront/css/Action.css?v=toie5w') - other URLs are
+     * returned exactly as given
+     * @param string $url
+     * @return string
+     */
+    protected static function Versioned(string $url) : string
+    {
+        $versioned = new URL($url);
+        if ($versioned->isAbsolute()) return $url;
+        return $versioned->setVersion(new FileVersion($versioned->getScriptName())) ? $versioned->toString() : $url;
     }
 
     /**
@@ -293,7 +308,7 @@ class HTMLHead extends Container implements IObserver
     public function addCSS(string $url, bool $prepend=false) : void
     {
         $cssLink = new Link();
-        $cssLink->setHref($url);
+        $cssLink->setHref(HTMLHead::Versioned($url));
         //overwrite first
         $this->cssLinks[$url] = $cssLink;
 
