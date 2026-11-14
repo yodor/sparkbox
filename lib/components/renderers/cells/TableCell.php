@@ -16,6 +16,12 @@ class TableCell extends Container implements IDataResultProcessor
 
     protected array $dataAttributes = array();
 
+    /**
+     * Escape the value as text - for values entered by visitors (contact requests, client data)
+     * @var bool
+     */
+    protected bool $escapeContents = false;
+
     public function __construct(string $tagName = "div")
     {
         parent::__construct(false);
@@ -33,9 +39,20 @@ class TableCell extends Container implements IDataResultProcessor
         $this->column = $tc;
     }
 
+    /**
+     * Render the value as text (HTML special characters escaped)
+     * @param bool $mode
+     * @return void
+     */
+    public function setEscapeContents(bool $mode) : void
+    {
+        $this->escapeContents = $mode;
+    }
+
     public function setData(array $data) : void
     {
-        $this->setContents($data[$this->column->getName()] ?? "");
+        $value = (string)($data[$this->column->getName()] ?? "");
+        $this->setContents($this->escapeContents ? htmlspecialchars($value) : $value);
 
         foreach ($this->dataAttributes as $name => $value) {
             if (isset($data[$name])) {
