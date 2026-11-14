@@ -45,6 +45,37 @@ test("home, content and settings render with the core menu only", function () {
     assertTrue(!str_contains($body, ">Store<"), "store menu in a non-store site");
 });
 
+
+test("content sections render (lists and add forms) without the store", function () {
+    foreach (array("/content/pages", "/content/news", "/content/faq", "/content/faq/sections", "/content/menus") as $path) {
+        foreach (array("", "&editID=-1") as $edit) {
+            [$status, $headers, $body] = httpRequest("admin/index.php", "path=" . urlencode($path) . $edit,
+                array("Cookie" => coreAdminCookies()), "/admin/index.php?path=" . urlencode($path) . $edit);
+            $label = $path . $edit;
+            assertSame(200, $status, $label . (isset($headers["location"]) ? " → " . $headers["location"] : ""));
+            foreach (array("Fatal error", "<b>Warning</b>", "<b>Deprecated</b>", "SQLSTATE", "Error:/") as $marker) {
+                assertTrue(!str_contains($body, $marker), "$label contains '$marker'");
+            }
+        }
+    }
+});
+
+test("early responder answers without creating the page", function () {
+    //the pages gallery path file redirects without a page ID - an early responder answers before it runs
+    [$status, , $body] = httpRequest("admin/index.php", "path=%2Fcontent%2Fpages%2Fgallery&JSONRequest=1&responder=TemplateHelpResponder&type=fetch",
+        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fcontent%2Fpages%2Fgallery");
+    assertSame(200, $status);
+    assertTrue(json_decode($body) !== null, "not JSON: " . substr($body, 0, 120));
+});
+
+test("responders that are not early still go through the page", function () {
+    //DeleteItemResponder is not a JSON responder - the path file runs and redirects (no page ID)
+    [$status] = httpRequest("admin/index.php", "path=%2Fcontent%2Fpages%2Fgallery&JSONRequest=1&responder=MCEImageBrowserResponder&type=find",
+        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fcontent%2Fpages%2Fgallery");
+    assertSame(302, $status, "MCE browser must not be processed early");
+});
+
+//last - ends the session used by the tests above
 test("logout returns to login", function () {
     [$status, $headers] = coreAdmin("/logout");
     assertSame(302, $status);

@@ -70,6 +70,18 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
     //match JSONRequest.js KEY_COMMAND
     const string KEY_COMMAND = "responder";
 
+    /**
+     * True if this responder can process a JSON request before the page is created
+     * (Module::Response() creates it by name from the request): no constructor arguments, everything read
+     * from the request and the module auth context. Subclasses opt in by returning true - and a subclass
+     * that needs the page again returns false.
+     * @return bool
+     */
+    public static function EarlyProcessing() : bool
+    {
+        return false;
+    }
+
     //
     const string KEY_CONFIRM = "confirm_request";
 

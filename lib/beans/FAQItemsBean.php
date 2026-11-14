@@ -1,4 +1,5 @@
 <?php
+include_once("beans/FAQSectionsBean.php");
 include_once("beans/DBTableBean.php");
 
 class FAQItemsBean extends DBTableBean
@@ -15,6 +16,8 @@ class FAQItemsBean extends DBTableBean
 
     public function __construct()
     {
+        //faq_items references faq_sections - make sure it exists before this table is created
+        new FAQSectionsBean();
         parent::__construct("faq_items");
     }
 

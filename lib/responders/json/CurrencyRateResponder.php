@@ -3,6 +3,15 @@ include_once("responders/json/JSONResponder.php");
 
 class CurrencyRateResponder extends JSONResponder
 {
+
+    /**
+     * Early processing - reads the rates from the request
+     */
+    public static function EarlyProcessing() : bool
+    {
+        return true;
+    }
+
     protected int $srcID = -1;
     protected int $dstID = -1;
     protected int $crID = -1;

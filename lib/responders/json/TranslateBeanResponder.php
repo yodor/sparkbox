@@ -6,6 +6,15 @@ include_once("responders/json/JSONResponder.php");
 class TranslateBeanResponder extends JSONResponder
 {
 
+    /**
+     * Early processing - reads the bean, field and language from the request
+     */
+    public static function EarlyProcessing() : bool
+    {
+        return true;
+    }
+
+
     protected int $langID = -1;
     protected int $beanID = -1;
 

@@ -4,6 +4,15 @@ include_once("responders/json/JSONResponder.php");
 class TemplateHelpResponder extends JSONResponder
 {
 
+    /**
+     * Early processing - reads the path from the request
+     */
+    public static function EarlyProcessing() : bool
+    {
+        return true;
+    }
+
+
     public function __construct()
     {
         parent::__construct();

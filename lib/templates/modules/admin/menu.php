@@ -10,6 +10,13 @@ $menu = new MenuItemList();
 $content = new MenuItem("Content", "content");
 $menu->append($content);
 
+$content->append(new MenuItem("Pages", "pages"));
+$content->append(new MenuItem("News", "news"));
+$faq = new MenuItem("FAQ", "faq");
+$faq->append(new MenuItem("Sections", "sections"));
+$content->append($faq);
+$content->append(new MenuItem("Menus", "menus"));
+
 $settings = new MenuItem("Settings", "settings");
 $menu->append($settings);
 

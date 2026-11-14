@@ -61,6 +61,21 @@ class TemplateConfig extends SparkObject
      * @param string $description
      * @return TemplateConfig
      */
+    /**
+     * ConfigEditor for config section '$section' using form '$formClass'
+     * @param string $section ConfigBean section name
+     * @param string $formClass
+     * @return TemplateConfig
+     */
+    public static function Config(string $section, string $formClass) : TemplateConfig
+    {
+        $config = TemplateConfig::Factory();
+        $config->contentClass = ConfigEditor::class;
+        $config->configSection = $section;
+        $config->formClass = $formClass;
+        return $config;
+    }
+
     public static function Plain(string $title, string $description) : TemplateConfig
     {
         $config = TemplateConfig::Factory();
@@ -89,6 +104,7 @@ class TemplateConfig extends SparkObject
         $config->observer = null;
         $config->beanClass = "";
         $config->formClass = "";
+        $config->configSection = "";
         $config->searchField = null;
         $config->listFields = null;
         $config->iterator = null;
@@ -233,4 +249,10 @@ class TemplateConfig extends SparkObject
      * @var bool
      */
     public bool $useCondition = false;
+
+    /**
+     * ConfigBean section edited by ConfigEditor
+     * @var string
+     */
+    public string $configSection = "";
 }

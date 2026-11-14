@@ -1,6 +1,8 @@
 <?php
 include_once("templates/TemplateContent.php");
 include_once("beans/ConfigBean.php");
+include_once("forms/processors/ConfigFormProcessor.php");
+include_once("forms/renderers/FormRenderer.php");
 
 class ConfigEditor extends TemplateContent
 {
@@ -56,15 +58,38 @@ class ConfigEditor extends TemplateContent
 
     }
 
+    public function setup(TemplateConfig $config): void
+    {
+        parent::setup($config);
+        if ($config->configSection) {
+            $this->setSection($config->configSection);
+        }
+        if ($config->formClass) {
+            $this->setForm(SparkLoader::Factory(SparkLoader::PREFIX_FORMS)->instance($config->formClass, InputForm::class));
+        }
+    }
+
     public function processInput(): void
     {
+        //current values of the section
+        $this->bean->loadForm($this->form);
+
         $this->processor->process($this->form);
 
         if ($this->processor->getStatus() == IFormProcessor::STATUS_OK) {
-            Session::SetAlert("Configuration Updated");
-            header("Location: " . $_SERVER['PHP_SELF']);
+            Session::SetAlert(tr("Configuration Updated"));
+            //back to the same module path (PHP_SELF would be the module index.php)
+            header("Location: " . Module::PathURL("", URL::Current()));
             exit;
         }
+        else if ($this->processor->getStatus() == IFormProcessor::STATUS_ERROR) {
+            Session::SetAlert(tr("Update failed") . ": " . $this->processor->getMessage());
+        }
+    }
+
+    protected function getContentTitle(): string
+    {
+        return tr("Configuration");
     }
 
     public function formRenderer(): FormRenderer

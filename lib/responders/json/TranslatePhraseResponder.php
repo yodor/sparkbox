@@ -7,6 +7,15 @@ class TranslatePhraseResponder extends JSONResponder
 {
 
     /**
+     * Early processing - reads the phrase and language from the request
+     */
+    public static function EarlyProcessing() : bool
+    {
+        return true;
+    }
+
+
+    /**
      * @var TranslationPhrasesBean
      */
     protected TranslationPhrasesBean $bean;

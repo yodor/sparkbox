@@ -263,6 +263,11 @@ class Module
             }
         }
 
+        //responders that do not need the page answer here - the page is not created at all
+        if (!is_null($config->getAuthContext())) {
+            $config->processEarlyResponder();
+        }
+
         if ($config->pageClass) {
 
             $page = SparkLoader::Factory(SparkLoader::PREFIX_PAGES)->instance($config->pageClass, SparkPage::class);
@@ -280,6 +285,34 @@ class Module
                 throw new Exception("Module pageClass object is not instance of SparkPage");
             }
         }
+    }
+
+    /**
+     * JSON request for a responder with RequestResponder::EarlyProcessing() = true: create it by name
+     * (responders/json/<name>.php in any location) and process it. Returns if the request is not for such
+     * a responder - it is then processed normally after the page is created.
+     * @return void
+     * @throws Exception
+     */
+    protected function processEarlyResponder() : void
+    {
+        include_once("responders/RequestController.php");
+
+        if (!RequestController::isJSONRequest() || !RequestController::isResponderRequest()) return;
+
+        $name = (string)$_REQUEST[RequestResponder::KEY_COMMAND];
+        if (!Spark::ValidClassName($name)) return;
+
+        $loader = SparkLoader::Factory("responders/json");
+        if ($loader->find($name) === "") return;
+        $loader->define($name);
+
+        if (!is_a($name, JSONResponder::class, true) || !$name::EarlyProcessing()) return;
+
+        Debug::ErrorLog("Early processing: $name");
+        $loader->instance($name, JSONResponder::class);
+        //JSON request - exits after the response
+        RequestController::Process();
     }
 
     /**

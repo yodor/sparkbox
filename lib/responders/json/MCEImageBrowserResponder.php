@@ -45,6 +45,15 @@ class ImageDimensionForm extends InputForm
 class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageSection
 {
 
+    /**
+     * Not early - section and owner are set by the page (BeanFormEditor)
+     */
+    public static function EarlyProcessing() : bool
+    {
+        return false;
+    }
+
+
     protected string $field_name = "";
 
     protected string $section_name = "global";

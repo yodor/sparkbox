@@ -78,7 +78,7 @@ class BeanFormEditor extends FormRenderer implements IBeanEditor, IRequestProces
                 $responder = $renderer->getImageBrowser()->getResponder();
                 if ($responder instanceof MCEImageBrowserResponder) {
                     $responder->setSection(get_class($this->form), $fieldName);
-                    $responder->setOwnerID(SparkAdminPage::Instance()->getUserID());
+                    $responder->setOwnerID(SparkPage::Instance()?->getUserID() ?? -1);
                 }
 
             }

@@ -7,6 +7,15 @@ include_once("input/processors/UploadDataInput.php");
 abstract class UploadControlResponder extends JSONResponder
 {
 
+    /**
+     * Early processing - uploads read the field name and the data from the request. Chunked uploads send one request per chunk, none of them needs the page.
+     */
+    public static function EarlyProcessing() : bool
+    {
+        return true;
+    }
+
+
     //json request required parameter names
     public const string PARAM_FIELD_NAME = "field_name";
     public const string PARAM_UID = "uid";
