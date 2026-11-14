@@ -101,6 +101,80 @@ test("saving a form with a missing required field shows the error and writes not
     assertTrue(str_contains($body, "error"), "no error shown");
 });
 
+function adminPost(string $query, array $fields, string $cookies = "") : array
+{
+    return httpRequest("admin/index.php", $query, array("Cookie" => ($cookies !== "" ? $cookies : coreAdminCookies())),
+        "/admin/index.php?" . $query, array("post" => $fields));
+}
+
+function loginCookies(string $email, string $password) : string
+{
+    [, $headers, $body] = httpRequest("admin_login.php", http_build_query(array("email" => $email, "password" => $password)), array(), "",
+        array("script_file" => realpath(TESTS_PATH . "/harness/admin_login.php")));
+    return str_contains($body, "LOGGED_IN") ? implode("; ", $headers["set-cookie"]) : "";
+}
+
+test("settings sections render", function () {
+    TestPDO()->exec("INSERT IGNORE INTO languages (langID, lang_code, language) VALUES (1, 'bgn', 'Bulgarian')");
+    foreach (array("/settings/admins", "/settings/languages", "/settings/languages/translator") as $path) {
+        foreach (array("", "&editID=-1") as $edit) {
+            if ($edit && str_ends_with($path, "translator")) continue;
+            [$status, $headers, $body] = httpRequest("admin/index.php", "path=" . urlencode($path) . $edit,
+                array("Cookie" => coreAdminCookies()), "/admin/index.php?path=" . urlencode($path) . $edit);
+            assertSame(200, $status, $path . $edit . (isset($headers["location"]) ? " → " . $headers["location"] : ""));
+            foreach (array("Fatal error", "<b>Warning</b>", "<b>Deprecated</b>", "SQLSTATE", "Error:/") as $marker) {
+                assertTrue(!str_contains($body, $marker), "$path$edit contains '$marker'");
+            }
+        }
+    }
+    [$status, , $body] = httpRequest("admin/index.php", "path=%2Fsettings%2Flanguages%2Ftranslator%2Fphrases&langID=1",
+        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fsettings%2Flanguages%2Ftranslator%2Fphrases&langID=1");
+    assertSame(200, $status, "phrases");
+    assertTrue(!str_contains($body, "Fatal error") && !str_contains($body, "<b>Warning</b>"), "phrases has errors");
+});
+
+test("new administrator: password stored as hash, can log in, suspended cannot", function () {
+    [$status, $headers] = adminPost("path=%2Fsettings%2Fadmins&editID=-1", array(
+        "email" => "editor@core.test", "fullname" => "Editor", "password" => "editor-pass", "password_compare" => "editor-pass",
+        "access_level" => "Full Access", "SubmitForm" => "AdminUserForm"));
+    assertSame(302, $status, "no redirect after add");
+    $row = TestPDO()->query("SELECT userID, password FROM admin_users WHERE email='editor@core.test'")->fetch();
+    assertTrue(is_array($row), "account not created");
+    assertTrue($row["password"] !== "editor-pass" && password_get_info($row["password"])["algo"] !== null, "password not stored as hash");
+    assertTrue(loginCookies("editor@core.test", "editor-pass") !== "", "new administrator cannot log in");
+
+    //editing without a password keeps it
+    adminPost("path=%2Fsettings%2Fadmins&editID=" . $row["userID"], array(
+        "email" => "editor@core.test", "fullname" => "Editor Renamed", "password" => "", "password_compare" => "",
+        "access_level" => "Full Access", "SubmitForm" => "AdminUserForm"));
+    assertSame($row["password"], TestPDO()->query("SELECT password FROM admin_users WHERE userID=" . $row["userID"])->fetchColumn(), "empty password field replaced the password");
+
+    TestPDO()->exec("UPDATE admin_users SET suspend=1 WHERE userID=" . $row["userID"]);
+    assertSame("", loginCookies("editor@core.test", "editor-pass"), "suspended administrator logged in");
+});
+
+test("limited access administrator sees and opens only the sections of its roles", function () {
+    [$status] = adminPost("path=%2Fsettings%2Fadmins&editID=-1", array(
+        "email" => "limited@core.test", "fullname" => "Limited", "password" => "limited-pass", "password_compare" => "limited-pass",
+        "access_level" => "Limited Access", "role" => array("Content"), "SubmitForm" => "AdminUserForm"));
+    assertSame(302, $status, "limited account not created");
+    $cookies = loginCookies("limited@core.test", "limited-pass");
+    assertTrue($cookies !== "", "limited administrator cannot log in");
+
+    [$status, , $body] = httpRequest("admin/index.php", "path=%2Fcontent", array("Cookie" => $cookies), "/admin/index.php?path=%2Fcontent");
+    assertSame(200, $status, "content denied");
+    assertTrue(!str_contains($body, ">Settings<"), "Settings shown in the menu");
+
+    [$status, $headers] = httpRequest("admin/index.php", "path=%2Fsettings%2Fadmins", array("Cookie" => $cookies), "/admin/index.php?path=%2Fsettings%2Fadmins");
+    assertSame(302, $status, "settings not denied");
+    assertTrue(str_ends_with($headers["location"] ?? "", "/admin/home"), $headers["location"] ?? "");
+
+    //early responders are behind the same check
+    [$status] = httpRequest("admin/index.php", "path=%2Fsettings%2Flanguages%2Ftranslator&JSONRequest=1&responder=TemplateHelpResponder&type=fetch",
+        array("Cookie" => $cookies), "/admin/index.php?path=%2Fsettings%2Flanguages%2Ftranslator");
+    assertSame(302, $status, "early responder bypassed the access check");
+});
+
 //last - ends the session used by the tests above
 test("logout returns to login", function () {
     [$status, $headers] = coreAdmin("/logout");

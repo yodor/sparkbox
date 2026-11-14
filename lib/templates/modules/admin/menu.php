@@ -21,6 +21,8 @@ $settings = new MenuItem("Settings", "settings");
 $menu->append($settings);
 
 $settings->append(new MenuItem("Admins", "admins"));
-$settings->append(new MenuItem("Languages", "languages"));
+$languages = new MenuItem("Languages", "languages");
+$languages->append(new MenuItem("Translator", "translator"));
+$settings->append($languages);
 
 SparkTemplateAdminPage::SetMenu($menu);

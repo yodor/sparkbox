@@ -83,11 +83,10 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         MenuItemRenderer::$append_parent_href = true;
         MenuItemRenderer::$href_prefix = Module::Active()->getLocation();
 
-        SparkTemplateAdminPage::$Menu = null;
-
         //authorized already
         if (Module::Active()->getAuthContext()) {
-            SparkLoader::Factory(Module::Active()->getPreifx())->include("menu", true);
+            SparkTemplateAdminPage::LoadMenu();
+            $this->filterMenu();
         }
 
         if (SparkTemplateAdminPage::$Menu instanceof MenuItemList) {
@@ -336,6 +335,38 @@ class SparkTemplateAdminPage extends SparkTemplatePage
     public function getMenuBar() : MenuBar
     {
         return $this->menu_bar;
+    }
+
+    /**
+     * Include the module menu.php files once (core, store, site) and return the menu they built.
+     * Used by the page and by the module access check - the menu files run only once per request.
+     * @return MenuItemList|null
+     */
+    public static function LoadMenu() : ?MenuItemList
+    {
+        static $loaded = false;
+        if (!$loaded) {
+            $loaded = true;
+            SparkTemplateAdminPage::$Menu = null;
+            SparkLoader::Factory(Module::Active()->getPreifx())->include("menu", true);
+        }
+        return SparkTemplateAdminPage::$Menu;
+    }
+
+    /**
+     * Remove the top level menu items the module access check denies (limited access roles)
+     * @return void
+     */
+    protected function filterMenu() : void
+    {
+        $menu = SparkTemplateAdminPage::$Menu;
+        if (!($menu instanceof MenuItemList)) return;
+        foreach ($menu->toArray() as $item) {
+            if (!($item instanceof MenuItem)) continue;
+            if (!Module::Active()->canAccess($item->getHref())) {
+                $menu->remove($menu->indexOf($item));
+            }
+        }
     }
 
     /**

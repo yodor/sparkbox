@@ -6,6 +6,7 @@ include_once("beans/AdminUsersBean.php");
 include_once("beans/AdminAccessBean.php");
 
 include_once("iterators/DBEnumIterator.php");
+include_once("input/processors/PasswordInputProcessor.php");
 
 class AdminUserForm extends InputForm
 {
@@ -28,6 +29,8 @@ class AdminUserForm extends InputForm
         //
         $field = DataInputFactory::Create(InputType::PASSWORD, "password", "Create Password", 0);
         $field->getRenderer()->input()?->setAttribute("autocomplete", "off");
+        //stored as hash, empty keeps the current password
+        new PasswordInputProcessor($field);
         $this->addInput($field);
 
         //
@@ -83,6 +86,10 @@ class AdminUserForm extends InputForm
         $password_compare = $this->getInput("password_compare")->getValue(); //hold the input that is rendered
 
         if (strcmp($password, $password_compare) !== 0) throw new Exception(tr("Passwords do not match"));
+        //a new account needs a password, an existing one keeps it when the field is empty
+        if ($this->getEditID() < 1 && strlen((string)$password) < 1) {
+            $this->getInput("password")->setError(tr("Create a password for the new account"));
+        }
 
         $req_email = $this->getInput("email")->getValue();
         $existing = $this->getBean()->getResult("email", $req_email);

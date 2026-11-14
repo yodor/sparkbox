@@ -2,7 +2,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS contacts, photos, items, cats, docs, pics, ranges, admin_access, admin_users;
 -- content tables are created by their beans - dropped so every run starts like a fresh install
-DROP TABLE IF EXISTS faq_items, faq_sections, page_photos, dynamic_pages, news_items, menu_items, config;
+DROP TABLE IF EXISTS faq_items, faq_sections, page_photos, dynamic_pages, news_items, menu_items, config, translation_phrases, site_texts, languages;
 SET FOREIGN_KEY_CHECKS = 1;
 CREATE TABLE contacts (crID INT AUTO_INCREMENT PRIMARY KEY, fullname VARCHAR(50));
 CREATE TABLE photos (pid INT AUTO_INCREMENT PRIMARY KEY, photo LONGBLOB, caption VARCHAR(50));

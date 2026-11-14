@@ -64,6 +64,14 @@ class Module
     protected array $publicPaths = array();
 
     /**
+     * Optional access check of an authorized request: fn(string $path): bool - false redirects to 'home'.
+     * Runs before early responders and before any path file. Set from the module init.php
+     * (admin: limited access roles).
+     * @var Closure|null
+     */
+    public ?Closure $accessCheck = null;
+
+    /**
      * Current active Module instance
      * @var Module|null
      */
@@ -188,6 +196,17 @@ class Module
     }
 
     /**
+     * Result of the access check for '$path' - true without an access check
+     * @param string $path
+     * @return bool
+     */
+    public function canAccess(string $path) : bool
+    {
+        if (is_null($this->accessCheck)) return true;
+        return (bool)($this->accessCheck)($path);
+    }
+
+    /**
      * Return the module AuthContext. Not null after successful authorize.
      * @return AuthContext|null
      */
@@ -261,6 +280,13 @@ class Module
                 header("Location: " . $loginPage);
                 exit;
             }
+        }
+
+        if (!is_null($config->getAuthContext()) && !$config->canAccess((string)($_GET["path"] ?? ""))) {
+            Session::SetAlert(tr("Access denied"));
+            Debug::ErrorLog("Access denied by the module access check");
+            header("Location: " . Module::PathURL("home"));
+            exit;
         }
 
         //responders that do not need the page answer here - the page is not created at all

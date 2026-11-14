@@ -77,6 +77,19 @@ abstract class Authenticator
      * @return AuthContext|null
      * @throws Exception
      */
+    /**
+     * Column marking a suspended account: 'suspend' (users and admin_users tables) or 'suspended'
+     * (older users table definitions). Empty string if the table has neither.
+     * @return string
+     */
+    protected function suspendColumn() : string
+    {
+        foreach (array("suspend", "suspended") as $column) {
+            if ($this->bean->haveColumn($column)) return $column;
+        }
+        return "";
+    }
+
     public function authorize(?array $user_data = NULL) : ?AuthContext
     {
 
@@ -104,8 +117,9 @@ abstract class Authenticator
         Debug::ErrorLog("Cookie validation success");
 
         //check if account is enabled
-        if ($this->bean->haveColumn("suspended")) {
-            $suspend_status = (int)$this->bean->getValue($token->getID(), "suspended");
+        $suspendColumn = $this->suspendColumn();
+        if ($suspendColumn !== "") {
+            $suspend_status = (int)$this->bean->getValue($token->getID(), $suspendColumn);
             if ($suspend_status > 0) {
                 Debug::ErrorLog("Account is suspended");
                 return NULL;
@@ -235,7 +249,8 @@ abstract class Authenticator
         if (isset($row["confirmed"]) && (int)$row["confirmed"] < 1) {
             throw new Exception(tr("Your account is not activated yet."));
         }
-        if (isset($row["suspended"]) && (int)$row["suspended"]) {
+        $suspendColumn = $this->suspendColumn();
+        if ($suspendColumn !== "" && (int)($row[$suspendColumn] ?? 0) > 0) {
             throw new Exception(tr("Your account is temporarily suspended."));
         }
 

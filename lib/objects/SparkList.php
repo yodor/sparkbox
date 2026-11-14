@@ -61,44 +61,44 @@ class SparkList extends SparkObject implements ISparkCollection
     public function remove(int $index) : void
     {
         if (isset($this->elements[$index])) {
-            unset($this->elements[$index]);
+            //keep the indexes sequential - insert(), indexOf() rely on them
+            array_splice($this->elements, $index, 1);
         }
     }
 
     /**
-     * Remove all occurrences of $object from this list
+     * Remove all occurrences of $object (the same instance) from this list
      * @param SparkObject $object
      * @return void
      */
     public function removeAll(SparkObject $object) : void
     {
-        $keys = array_keys($this->elements, $object);
-        foreach ($keys as $key) {
-            unset($this->elements[$key]);
-        }
+        $this->elements = array_values(array_filter($this->elements, fn($element) => $element !== $object));
     }
 
     /**
-     * Remove first occurrence of $object from this list
+     * Remove first occurrence of $object (the same instance) from this list
      * @param SparkObject $object
      * @return void
      */
     public function removeObject(SparkObject $object) : void
     {
-        $keys = array_keys($this->elements, $object);
-        foreach ($keys as $key) {
-            unset($this->elements[$key]);
-            break;
-        }
+        $index = $this->indexOf($object);
+        if ($index >= 0) $this->remove($index);
     }
 
+    /**
+     * Index of the first occurrence of $object (the same instance) at or after $from
+     * @param SparkObject $object
+     * @param int $from
+     * @return int -1 if not found
+     */
     public function indexOf(SparkObject $object, int $from=0) : int
     {
-        $keys = array_keys($this->elements, $object);
-
-        $value = array_search($from, $keys);
-        if ($value === false) return -1;
-        return $value;
+        foreach ($this->elements as $index => $element) {
+            if ($index >= $from && $element === $object) return $index;
+        }
+        return -1;
     }
 
     /**

@@ -419,6 +419,7 @@ final class Spark {
         Spark::Set(Config::DEFAULT_LOCALE, "en-us");
 
         Spark::Set(Config::STORAGE_CACHE_ENABLED, TRUE);
+        Spark::Set(Config::EMAIL_DOMAIN_CHECK, TRUE);
 
         Spark::Set(Config::PAGE_CACHE_ENABLED, FALSE);
         Spark::Set(Config::PAGE_CACHE_TTL, 86400);

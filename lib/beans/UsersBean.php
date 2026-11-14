@@ -13,7 +13,7 @@ class UsersBean extends DBTableBean
  `counter` int(11) unsigned NOT NULL DEFAULT '0',
  `fullname` varchar(255) NOT NULL DEFAULT '',
  `date_signup` datetime NOT NULL,
- `suspended` tinyint(1) NOT NULL DEFAULT '0',
+ `suspend` tinyint(1) NOT NULL DEFAULT '0',
  `confirmed` tinyint(1) NOT NULL DEFAULT '0',
  `confirm_code` varchar(32) DEFAULT '',
  PRIMARY KEY (`userID`),

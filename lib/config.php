@@ -161,6 +161,11 @@ enum Config
      */
     const string DEFAULT_SERVICE_EMAIL = "DEFAULT_SERVICE_EMAIL";
     /**
+     * EmailValidator checks the MX record of the email domain
+     * Default(bool): TRUE
+     */
+    const string EMAIL_DOMAIN_CHECK = "EMAIL_DOMAIN_CHECK";
+    /**
      * Enable or disable Automatic language translations
      * Used in tr() and trbean()
      * Default(bool): false

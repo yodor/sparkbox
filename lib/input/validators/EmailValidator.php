@@ -5,9 +5,12 @@ class EmailValidator implements IInputValidator
 {
     protected bool $domain_check_enabled = TRUE;
 
-    public function __construct(bool $domain_check_enabled = TRUE)
+    /**
+     * @param bool|null $domain_check_enabled null uses Config::EMAIL_DOMAIN_CHECK
+     */
+    public function __construct(?bool $domain_check_enabled = null)
     {
-        $this->domain_check_enabled = $domain_check_enabled;
+        $this->domain_check_enabled = $domain_check_enabled ?? Spark::GetBoolean(Config::EMAIL_DOMAIN_CHECK);
     }
 
     public function validate(DataInput $input) : void
