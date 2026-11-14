@@ -14,6 +14,15 @@ final class Debug {
 
     private function __construct() {}
 
+    /**
+     * True if debug logging is enabled (DEBUG_LEVEL set)
+     * @return bool
+     */
+    final static public function IsEnabled() : bool
+    {
+        return Debug::$traceDepth != -2;
+    }
+
     final static public function ErrorLog(string $message, ?array $array = null) : void
     {
         if (Debug::$traceDepth == -2) return; //disabled

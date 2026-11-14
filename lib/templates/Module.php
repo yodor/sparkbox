@@ -58,6 +58,12 @@ class Module
     protected ?Authenticator $authenticator = null;
 
     /**
+     * Paths reachable without authorization (login, password) - keys in Template::FormatPath() form "/login"
+     * @var array<string, bool>
+     */
+    protected array $publicPaths = array();
+
+    /**
      * Current active Module instance
      * @var Module|null
      */
@@ -139,6 +145,28 @@ class Module
     }
 
     /**
+     * Declare paths reachable without authorization. All other paths redirect to 'login' before any
+     * path file is included.
+     * @param string ...$paths path names as used in URLs ("login", "password")
+     * @return void
+     */
+    public function addPublicPath(string ...$paths) : void
+    {
+        foreach ($paths as $path) {
+            $this->publicPaths[Template::FormatPath($path, "/", true)] = true;
+        }
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function isPublicPath(string $path) : bool
+    {
+        return isset($this->publicPaths[Template::FormatPath($path, "/", true)]);
+    }
+
+    /**
      * Return the module AuthContext. Not null after successful authorize.
      * @return AuthContext|null
      */
@@ -189,51 +217,28 @@ class Module
 
 
     /**
-     * Process session stored RequestResponders
-     * Unserialize all Responders from session and try processing them early here
-     * @return void
-     * @throws Exception
-     */
-    private function processResponders() : void
-    {
-
-//        if (!RequestController::isJSONRequest()) {
-//            Debug::ErrorLog("Not a JSONRequest request");
-//            return;
-//        }
-//        if (!RequestController::isResponderRequest()) {
-//            Debug::ErrorLog("Not a Responder Request");
-//            return;
-//        }
-//        $responderClass = $_REQUEST[RequestResponder::KEY_COMMAND];
-//        Debug::ErrorLog("Creating responder class: $responderClass");
-//
-//        $responder = SparkLoader::Factory("responders/json/")->instance($responderClass, JSONResponder::class);
-//        if (!($responder instanceof JSONResponder)) throw new Exception("Object is not ".JSONResponder::class);
-//
-//        Debug::ErrorLog("Calling RequestController::Process()");
-//        RequestController::Process();
-    }
-    /**
-     * Process the request using the current active module
-     * Calls RequestController::ProcessDynamic()
-     * Loads and initializes and renders the pageClass assigned
+     * Process the request using the current active module:
+     *  - authorize
+     *  - redirect to 'login' before any path file runs if not authorized and the path is not public
+     *  - create the page - path config, template content (creates its responders)
+     *  - process the responders - redirects and JSON responses happen before any output
+     *  - render
      */
     public static function Response() : void
     {
         $config = Module::Active();
- 
+
         //authorize
         $config->authorize();
 
-        //process stored responders
-        if (!is_null($config->getAuthContext())) {
-            try {
-                include_once("responders/RequestController.php");
-                $config->processResponders();
-            }
-            catch (Exception $e) {
-                Session::setAlert($e->getMessage());
+        if ($config->authClass && is_null($config->getAuthContext())) {
+            $path = (string)($_GET["path"] ?? "");
+            if (!$config->isPublicPath($path)) {
+                Session::SetAlert("Authorization Required");
+                $loginPage = Module::PathURL("login");
+                Debug::ErrorLog("Authorization required for path '$path' - redirecting to login page: $loginPage");
+                header("Location: " . $loginPage);
+                exit;
             }
         }
 
@@ -243,6 +248,11 @@ class Module
             if ($page instanceof SparkPage) {
                 //handle path parameters , load module content from module path folder
                 $page->initialize();
+
+                //responders created by the page and its content
+                include_once("responders/RequestController.php");
+                RequestController::Process();
+
                 $page->render();
             }
             else {

@@ -188,7 +188,10 @@ final class SparkLoader
      */
     public function instance(string $className, string $classType) : object
     {
+        //class names come from configuration and from requests - check before any constructor runs
+        if (!Spark::ValidClassName($className)) throw new Exception("Incorrect class name");
         $this->define($className);
+        if (!is_a($className, $classType, true)) throw new Exception("Class $className is not $classType");
         $object = new $className();
         Debug::ErrorLog("Created object[".get_class($object)."] - Requested instance of $classType");
         if (!($object instanceof $classType)) throw new Exception("Object is not instance of $classType");

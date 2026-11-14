@@ -56,7 +56,8 @@ class TranslateBeanResponder extends JSONResponder
 
         if ($this->beanID < 1) throw new Exception("bean_id parameter incorrect");
 
-        $bean = new $this->bean_class();
+        //class name from the request - only beans
+        $bean = SparkLoader::Factory(SparkLoader::PREFIX_BEANS)->instance($this->bean_class, DBTableBean::class);
         $this->table_name = $bean->getTableName();
 
 

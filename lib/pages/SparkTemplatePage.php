@@ -38,7 +38,10 @@ class SparkTemplatePage extends SparkPage implements IObserver
         }
         catch (Exception $e) {
             Debug::ErrorLog("PathConfig failed: ".$e->getMessage());
-            Template::ErrorConfig("Error:{$this->path}", $e->getMessage()." - ".$e->getTraceAsString());
+            //the error is always shown, the trace only with debug enabled
+            $message = $e->getMessage();
+            if (Debug::IsEnabled()) $message .= " - " . $e->getTraceAsString();
+            Template::ErrorConfig("Error:{$this->path}", $message);
         }
     }
 

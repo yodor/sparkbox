@@ -11,6 +11,12 @@ class RequestController
 
     protected static array $responders = array();
 
+    /**
+     * Process() runs once per request - Module::Response() calls it before rendering, SparkPage::startRender() for classic pages
+     * @var bool
+     */
+    protected static bool $processed = false;
+
     public static function isJSONRequest(): bool
     {
         return Spark::isJSONRequest();
@@ -46,6 +52,7 @@ class RequestController
         $name = $responder->getName();
         if (isset(self::$responders[$name])) {
             Debug::ErrorLog("Removing: '$name'");
+            unset(self::$responders[$name]);
             SparkEventManager::emit(new RequestControllerEvent(RequestControllerEvent::RESPONDER_REMOVED, $responder));
         }
     }
@@ -74,6 +81,9 @@ class RequestController
 
     public static function Process() : void
     {
+        if (self::$processed) return;
+        self::$processed = true;
+
         $isJson = RequestController::isJSONRequest();
 
         $names = array_keys(self::$responders);
