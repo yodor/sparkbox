@@ -16,7 +16,7 @@ class SparkObject {
      * remove callback function
      * @param func {Function}
      */
-    removeOvserver(func) {
+    removeObserver(func) {
         this.observers = this.observers.filter(
             function (item) {
                 if (item !== func) {
@@ -37,4 +37,3 @@ class SparkObject {
         });
     }
 }
-
