@@ -182,6 +182,16 @@ test("translator menu lists the languages", function () {
     assertTrue(str_contains($body, ">BGN<"), "language code missing");
 });
 
+test("forgot password works without the store and does not reveal registered emails", function () {
+    [$status, , $body] = httpRequest("admin/index.php", "path=%2Fpassword", array(), "/admin/index.php?path=%2Fpassword");
+    assertSame(200, $status, "password page");
+    assertTrue(!str_contains($body, "Fatal error") && !str_contains($body, "<b>Warning</b>"), "password page has errors");
+    [$status, $headers] = httpRequest("admin/index.php", "path=%2Fpassword", array(), "/admin/index.php?path=%2Fpassword",
+        array("post" => array("email" => "nobody@core.test", "SubmitForm" => "InputForm")));
+    assertSame(302, $status, "unknown email: no redirect");
+    assertTrue(str_ends_with($headers["location"] ?? "", "/admin/login"), $headers["location"] ?? "");
+});
+
 //last - ends the session used by the tests above
 test("logout returns to login", function () {
     [$status, $headers] = coreAdmin("/logout");
