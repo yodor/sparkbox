@@ -257,16 +257,11 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
             }
         }
 
-        // Assemble the final URL
-        $result = rtrim($this->script_name, '/');
-
-        // Preserve empty string if no script_name and no components exist
-        if ($result === '' && $this->script_name === '/') {
-            $result = '/';
-        }
-
+        // Assemble the final URL - the path keeps its trailing slash ('/products/category/1/knigi/');
+        // it is only joined without doubling it when path parameters follow
+        $result = $this->script_name;
         if (!empty($pathParts)) {
-            $result .= '/' . implode('', $pathParts);
+            $result = rtrim($result, '/') . '/' . implode('', $pathParts);
         }
 
         // Use the shared getQueryString() method
@@ -426,6 +421,16 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
         }
 
         return $path;
+    }
+
+    /**
+     * The URL the visitor requested: its public path and query string (REQUEST_URI). For rewritten
+     * requests this is the slug or module path ('/products/5/kniga/'), not the script that answers it.
+     * @return URL
+     */
+    public static function Requested() : URL
+    {
+        return new URL((string)($_SERVER["REQUEST_URI"] ?? "/"));
     }
 
     /**
