@@ -40,6 +40,7 @@ class UsersBean extends DBTableBean
                 $query->free();
             }
         }
+        DBTableBean::ForgetColumnTypes($this->table);
         $this->initColumnTypes();
 
     }

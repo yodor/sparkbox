@@ -81,11 +81,13 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     protected function initialize() : void
     {
 
-        if (!DBTableBean::TableExists($this->table)) {
+        //the column types tell if the table exists - one DESCRIBE per table and request (see ColumnTypes)
+        if (count(DBTableBean::ColumnTypes($this->table)) < 1) {
             if (strlen($this->createString) < 1) {
                 throw new Exception("Table '$this->table' was not found in the active connection and no create string is set to recreate the table");
             }
             DBTableBean::CreateTable($this->createString);
+            DBTableBean::ForgetColumnTypes($this->table);
         }
 
         $this->initColumnTypes();
@@ -149,6 +151,10 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
      */
     protected static function ColumnTypes(string $tableName): array
     {
+        //table definitions do not change during a request - beans of the same table share one DESCRIBE
+        $cacheKey = DBTableBean::ColumnTypesKey($tableName);
+        if (isset(DBTableBean::$columnTypesCache[$cacheKey])) return DBTableBean::$columnTypesCache[$cacheKey];
+
         $types = array();
 
         $query = new SelectQuery(new RawSQLSelect("DESCRIBE `$tableName`"));
@@ -166,32 +172,31 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             $query->free();
         }
 
+        //only existing tables are kept - a missing table is checked again (it may be created)
+        if (count($types) > 0) DBTableBean::$columnTypesCache[$cacheKey] = $types;
+
         return $types;
     }
 
     /**
-     * Check if a table named - '$tableName' exist in the current connection
-     * @param string $tableName
-     * @return bool
+     * DESCRIBE results per database and table for the current request
+     * @var array<string, array>
      */
-    protected static function TableExists(string $tableName): bool
+    protected static array $columnTypesCache = array();
+
+    protected static function ColumnTypesKey(string $tableName) : string
     {
-        $tableok = false;
-        $query = new SelectQuery(new RawSQLSelect("SELECT 1 FROM `{$tableName}` LIMIT 1"));
+        return DBManager::Driver()->getConfig()->database . "." . $tableName;
+    }
 
-        try {
-            $query->exec(); // throw if table does not exist as PDO::ERRMODE_EXCEPTION is true
-            $query->next();
-            $tableok = true;
-
-        } catch (Exception $e) {
-            Debug::ErrorLog("Check failed: ".$e->getMessage());
-            $tableok = false;
-        }
-        finally {
-            $query->free();
-        }
-        return $tableok;
+    /**
+     * Drop the remembered column types of '$tableName' - after the table was created or altered
+     * @param string $tableName
+     * @return void
+     */
+    public static function ForgetColumnTypes(string $tableName) : void
+    {
+        unset(DBTableBean::$columnTypesCache[DBTableBean::ColumnTypesKey($tableName)]);
     }
 
     /**
