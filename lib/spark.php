@@ -598,15 +598,16 @@ final class Spark {
     /**
      * Escapes a string to be safe for HTML attribute values and element content.
      *
-     * Reverses any prior custom escaping, then applies HTML5-safe escaping.
-     * Safe to use in: attribute values (value="", data-*, title="") and between html tags lik <textarea>.
+     * Existing entities are kept as they are (no double escaping - imported text may already contain
+     * '&amp;' or '&quot;'), everything else is escaped HTML5-safe.
+     * Safe to use in: attribute values (value="", data-*, title="") and between html tags like <textarea>.
      *
      * @param string $value Input string (possibly previously escaped)
      * @return string       Escaped string safe for HTML output
      */
     final static public function AttributeValue(string $value) : string
     {
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, "UTF-8");
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, "UTF-8", false);
     }
 
     final static public function AttributeName(string $name) : string

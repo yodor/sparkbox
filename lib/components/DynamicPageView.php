@@ -69,7 +69,7 @@ class DynamicPageView extends Container implements IRequestProcessor
             }
 
             $title_cmp = $this->items()->getByName("title");
-            $title_cmp->setContents($this->result->get("item_title"));
+            $title_cmp->setText((string)$this->result->get("item_title"));
 
             $content_cmp = $this->items()->getByName("content");
             $content_cmp->setContents($this->result->get("content"));

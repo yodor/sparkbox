@@ -168,10 +168,10 @@ class TextTreeItem extends NestedSetItem implements IActionCollection
 
 
         if ($this->render_related_count && isset($this->data[$this->key_related_count])) {
-            $this->text_action->setContents($this->label." (".$this->data[$this->key_related_count].")");
+            $this->text_action->setContents(Spark::AttributeValue($this->label)." (".(int)$this->data[$this->key_related_count].")");
         }
         else {
-            $this->text_action->setContents($this->label);
+            $this->text_action->setText($this->label);
         }
     }
 

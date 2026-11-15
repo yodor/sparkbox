@@ -60,14 +60,9 @@ class MenuItemRenderer extends Container
             $this->linkTag->setAttribute("itemprop","url");
         }
 
-        $contents = "<meta itemprop='name' content='".$item->getName()."'>";
-        $contents.= $item->getName();
-
-        if ($item->needTranslate()) {
-            $contents = tr($item->getName());
-        }
-
-        $this->linkTag->setContents($contents);
+        $name = $item->needTranslate() ? tr($item->getName()) : $item->getName();
+        $name = Spark::AttributeValue($name);
+        $this->linkTag->setContents("<meta itemprop='name' content='$name'>" . $name);
 
         if ($item->count() > 0) {
             $this->setAttribute("have_submenu", "1");

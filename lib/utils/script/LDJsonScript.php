@@ -34,11 +34,13 @@ class LDJsonScript extends Script
 
         $data = array("@context" => $this->context) + $ldArray;
 
+        //JSON_HEX_TAG: '<' and '>' as \u003C / \u003E - a text containing '</script>' cannot end the script element
         $json = json_encode($data,
             JSON_THROW_ON_ERROR |
             JSON_PRETTY_PRINT |
             JSON_UNESCAPED_SLASHES |
-            JSON_UNESCAPED_UNICODE
+            JSON_UNESCAPED_UNICODE |
+            JSON_HEX_TAG
         );
         $this->setCode($json);
 

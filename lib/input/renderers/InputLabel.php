@@ -63,7 +63,7 @@ class InputLabel extends LabelSpan implements IErrorRenderer
             $this->setTooltip($error);
         }
         else {
-            $this->error_details->setContents($error);
+            $this->error_details->setText($error);
             $this->error_details->setRenderEnabled(true);
         }
 

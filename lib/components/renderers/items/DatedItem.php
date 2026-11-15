@@ -52,7 +52,7 @@ class DatedItem extends DataIteratorItem implements IDataResultConsumer
     {
         parent::setData($data);
 
-        $this->title->setContents($this->label);
+        $this->title->setText($this->label);
 
         $this->date->setContents($this->bean->formatDate(strtotime($data["item_date"])));
 

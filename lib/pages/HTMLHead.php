@@ -123,7 +123,7 @@ class HTMLHead extends Container implements IObserver
 
     public function setTitle(string $text): void
     {
-        $this->title->setContents($text);
+        $this->title->setText($text);
     }
 
     public function getTitle(): string

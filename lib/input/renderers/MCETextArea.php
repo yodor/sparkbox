@@ -22,8 +22,8 @@ class MCETextArea extends TextArea
     {
         parent::finalize();
 
-        //$dataValue = Spark::Unescape();
-        $this->input->setContents($this->dataInput->getValue());
+        //escaped inside <textarea> - the browser gives the editor the HTML back as it was
+        $this->input->setText((string)$this->dataInput->getValue());
     }
 
     public function requiredStyle(): array

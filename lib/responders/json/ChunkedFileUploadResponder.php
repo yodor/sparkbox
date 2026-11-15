@@ -45,7 +45,7 @@ class ChunkedFileUploadResponder extends ChunkedUploadControlResponder
         $item->setComponentClass("item");
         $item->addClassName("filename");
         $item->label()->setContents(tr("Name"));
-        $item->span()->setContents($filename);
+        $item->span()->setText($filename);
         $info->items()->append($item);
 
         $item = new LabelSpan();

@@ -60,7 +60,7 @@ class DatedHeadingItem extends Action implements IDataResultConsumer
     {
         parent::setData($data);
 
-        $this->details->label()->setContents($data["item_title"]);
+        $this->details->label()->setText((string)$data["item_title"]);
         $this->details->span()->setContents($this->bean->formatDate(strtotime($data["item_date"]), $this->dateFormat));
 
         $this->thumbnail->setData($data);
