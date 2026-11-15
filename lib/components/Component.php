@@ -216,9 +216,14 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Set inner contents - between opening and closing tags
-     * @param string $contents
+     * Set the inner contents (between the opening and closing tags) as HTML - written to the page as it is.
+     *
+     * For literals, tr() texts and HTML built or stored on purpose (descriptions, rich-text pages,
+     * formatPrice() output, markup assembled from escaped parts). Anything that comes from visitors,
+     * clients, imports or the database as plain text goes through setText() instead.
+     * @param string $contents HTML
      * @return void
+     * @see Component::setText()
      */
     public function setContents(string $contents) : void
     {
@@ -226,16 +231,25 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Set the contents as text: HTML special characters are escaped - for values that come from visitors,
-     * clients or any data that is not HTML. setContents() takes HTML as it is.
-     * @param string $text
+     * Set the inner contents as text: HTML special characters are escaped (Spark::AttributeValue - existing
+     * entities are kept, so imported text is not escaped twice). The text shows exactly as given and
+     * cannot add markup to the page.
+     *
+     * For product, category and person names, addresses, notes, attribute and filter values, file names,
+     * error messages - any value that is not HTML on purpose. To build markup from such values, escape each
+     * part with Spark::AttributeValue() and pass the result to setContents().
+     * @param string $text plain text
      * @return void
+     * @see Component::setContents()
      */
     public function setText(string $text) : void
     {
         $this->setContents(Spark::AttributeValue($text));
     }
 
+    /**
+     * @return string The inner contents as they will be written - HTML (text set with setText() is escaped)
+     */
     public function getContents(): string
     {
         return $this->buffer->get();
@@ -363,6 +377,12 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         return $this->getCaptionComponent()->getContents();
     }
 
+    /**
+     * Set the caption contents as HTML (setContents() of the caption component) - for data use
+     * getCaptionComponent()->setText()
+     * @param string $caption
+     * @return void
+     */
     public function setCaption(string $caption) : void
     {
         $this->getCaptionComponent()->setContents($caption);
@@ -398,7 +418,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Set 'tooltip' attribute value.
+     * Set 'tooltip' attribute value - plain text, attribute values are escaped when rendered.
      * If empty $text remove the attribute if it was previously set
      * @param string $text
      * @return void
@@ -423,7 +443,7 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Set 'title' attribute value
+     * Set 'title' attribute value - plain text, attribute values are escaped when rendered.
      * If empty $text remove the attribute if it was previously set
      * @param string $text
      * @return void
@@ -500,7 +520,8 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
     }
 
     /**
-     * Set html attribute '$name' to '$value'
+     * Set html attribute '$name' to '$value'. Values are plain text: they are escaped when rendered
+     * (Spark::AttributeValue), so data can be passed as it is - do not escape it before.
      * @param string $name
      * @param string|null $value
      * @return void

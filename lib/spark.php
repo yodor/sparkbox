@@ -600,6 +600,8 @@ final class Spark {
      *
      * Existing entities are kept as they are (no double escaping - imported text may already contain
      * '&amp;' or '&quot;'), everything else is escaped HTML5-safe.
+     * The one escaping function of the framework: Component attributes, Component::setText() and markup
+     * assembled from data all use it.
      * Safe to use in: attribute values (value="", data-*, title="") and between html tags like <textarea>.
      *
      * @param string $value Input string (possibly previously escaped)
