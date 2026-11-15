@@ -1,6 +1,7 @@
 <?php
 include_once("input/DataInputFactory.php");
 include_once("beans/IBeanEditor.php");
+include_once("components/LabelSpan.php");
 
 class InputGroup extends SparkObject {
 
@@ -636,23 +637,21 @@ class InputForm extends SparkObject implements IBeanEditor
 
     }
 
-    //TODO deprecated move to CreatePlainRenderer
+    /**
+     * Print the input values as a label / value list
+     * @deprecated use CreatePlainRenderer() - a component that can be placed in any container
+     */
     public function renderPlain(): void
     {
-        echo "<div class='FormValueList' name='".$this->getName()."'>";
-
-        foreach ($this->inputs() as $index => $field) {
-            if (!($field instanceof DataInput))continue;
-
-            echo "<div class='item'>";
-            echo "<label>" . tr($field->getLabel()) . ": </label>";
-            $value = strip_tags(stripslashes((string)$field->getValue()));
-            echo "<span>$value</span>";
-            echo "</div>";
-        }
-
-        echo "</div>";
+        $this->CreatePlainRenderer()->render();
     }
+
+    /**
+     * The input values as a label / value list (order details, confirmation e-mails):
+     * <div class='FormValueList' name='<form>'><div class='item'><span class='label'>..</span><span>..</span></div>..
+     * Values are shown as text - tags removed, HTML escaped, line breaks kept.
+     * @return Container
+     */
     public function CreatePlainRenderer() : Container
     {
         $cnt = new Container(false);
@@ -664,9 +663,9 @@ class InputForm extends SparkObject implements IBeanEditor
 
             $item = new LabelSpan();
             $item->setComponentClass("item");
-            $item->label()->setContents($field->getLabel());
+            $item->label()->setText(tr($field->getLabel()));
             $value = strip_tags(stripslashes((string)$field->getValue()));
-            $item->span()->setContents($value);
+            $item->span()->setContents(nl2br(Spark::AttributeValue($value)));
 
             $cnt->items()->append($item);
         }
