@@ -176,33 +176,6 @@ class InputSanitizer
         return array_unique($tags);
     }
 
-    public static function SQL(string $input) : string
-    {
-
-        $sql_patterns = [
-            '/\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|RENAME|REPLACE|GRANT|REVOKE)\b/i',
-            '/\b(UNION|JOIN|HAVING|ORDER\s+BY|GROUP\s+BY|LIMIT|OFFSET|FETCH|INTO|VALUES|WHERE)\b/i',
-            '/\b(0x[0-9a-f]+|0b[01]+)\b/i',
-            '/\b(INFORMATION_SCHEMA|SLEEP|BENCHMARK|LOAD_FILE|OUTFILE)\b/i',
-            '/--\s?/', '/\/\*.*?\*\//s'
-        ];
-
-        $output = $input;
-        $max_iterations = 3; // Safety cap to prevent DoS
-        $iteration = 0;
-
-        // Keep cleaning until the string stops changing or we hit the cap
-        do {
-            $before = $output;
-            $output = preg_replace($sql_patterns, '', $output);
-            $iteration++;
-        } while ($output !== $before && $iteration < $max_iterations);
-
-        // Final removal of structural characters
-        //$output = str_replace(["'", '"', ";", "\\", "`"], "", $output);
-
-        return trim($output);
-    }
 
     /**
      * Checks if the provided string is suitable as a single-word SQL column name.

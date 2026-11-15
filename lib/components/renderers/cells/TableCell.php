@@ -52,7 +52,12 @@ class TableCell extends Container implements IDataResultProcessor
     public function setData(array $data) : void
     {
         $value = (string)($data[$this->column->getName()] ?? "");
-        $this->setContents($this->escapeContents ? htmlspecialchars($value) : $value);
+        if ($this->escapeContents) {
+            $this->setText($value);
+        }
+        else {
+            $this->setContents($value);
+        }
 
         foreach ($this->dataAttributes as $name => $value) {
             if (isset($data[$name])) {

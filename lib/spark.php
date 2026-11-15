@@ -785,7 +785,9 @@ final class Spark {
             }
         }
 
-        return InputSanitizer::SQL($input);
+        //no SQL keyword filtering here: queries bind their values (PDO), and removing words like 'where',
+        //'select' or 'order by' corrupted ordinary text ("Where the Crawdads Sing" -> "the Crawdads Sing")
+        return $input;
 
     }
 

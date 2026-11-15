@@ -225,6 +225,17 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
         $this->buffer->set($contents);
     }
 
+    /**
+     * Set the contents as text: HTML special characters are escaped - for values that come from visitors,
+     * clients or any data that is not HTML. setContents() takes HTML as it is.
+     * @param string $text
+     * @return void
+     */
+    public function setText(string $text) : void
+    {
+        $this->setContents(Spark::AttributeValue($text));
+    }
+
     public function getContents(): string
     {
         return $this->buffer->get();
