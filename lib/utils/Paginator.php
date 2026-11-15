@@ -1,5 +1,6 @@
 <?php
 include_once("utils/IGETConsumer.php");
+include_once("utils/url/URL.php");
 include_once("objects/SparkObject.php");
 include_once("objects/OrderColumn.php");
 include_once("utils/InputSanitizer.php");
@@ -135,11 +136,29 @@ class Paginator implements IGETConsumer
             }
         }
 
+        //the URL counts pages from 1 (?page=2 is the second page), currentPage() from 0
         if (isset($_GET[Paginator::KEY_PAGE])) {
-            $this->page = (int)$_GET[Paginator::KEY_PAGE];
+            $this->page = max(0, (int)$_GET[Paginator::KEY_PAGE] - 1);
         }
 
         Paginator::$instance = $this;
+    }
+
+    /**
+     * Point '$url' to page '$index' (0 = first page): the first page has no page parameter - one address
+     * for it - the others ?page=<index + 1>
+     * @param URL $url
+     * @param int $index
+     * @return void
+     */
+    public static function SetPage(URL $url, int $index) : void
+    {
+        if ($index < 1) {
+            $url->remove(Paginator::KEY_PAGE);
+        }
+        else {
+            $url->add(new URLParameter(Paginator::KEY_PAGE, (string)($index + 1)));
+        }
     }
 
     public function getActiveOrder(): ?OrderColumn

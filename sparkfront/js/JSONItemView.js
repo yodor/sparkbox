@@ -16,7 +16,8 @@ function loadMoreResults(button_source)
         let request = new JSONRequest();
         request.setResponder("ItemViewResponder");
         request.setFunction("renderItems");
-        request.setParameter("page", "" + currentPage);
+        //the page parameter counts from 1, currentPage is the index from 0
+        request.setParameter("page", "" + (currentPage + 1));
 
         request.onSuccess = function (result) {
 
@@ -27,7 +28,7 @@ function loadMoreResults(button_source)
             button_source.removeAttribute("working");
 
             let url = new URL(document.location.href);
-            url.searchParams.set("page", currentPage);
+            url.searchParams.set("page", currentPage + 1);
             window.history.pushState({}, "", url.href);
 
         };

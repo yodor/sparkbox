@@ -131,17 +131,17 @@ class ResultViewHeader extends Container
         //allow slugified urls
         $link = SparkPage::Instance()->currentURL();
 
-        $link->add(new URLParameter(Paginator::KEY_PAGE));
-
         if ($this->paginator->currentPage() > 0) {
-            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->currentPage() - 1));
-            $this->pagePrev->setURL($link);
+            $prev = clone $link;
+            Paginator::SetPage($prev, $this->paginator->currentPage() - 1);
+            $this->pagePrev->setURL($prev);
             $this->pagePrev->setRenderEnabled(true);
         }
 
         if (($this->paginator->currentPage() + 1) < $this->paginator->totalPages()) {
-            $link->get(Paginator::KEY_PAGE)->setValue(($this->paginator->currentPage() + 1));
-            $this->pageNext->setURL($link);
+            $next = clone $link;
+            Paginator::SetPage($next, $this->paginator->currentPage() + 1);
+            $this->pageNext->setURL($next);
             $this->pageNext->setRenderEnabled(true);
         }
 

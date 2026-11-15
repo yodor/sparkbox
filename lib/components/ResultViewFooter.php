@@ -59,14 +59,12 @@ class ResultViewFooter extends Container
 
         if ($this->paginator->currentPage() > 0) {
 
-            $link->remove(Paginator::KEY_PAGE);
+            Paginator::SetPage($link, 0);
             $action->setTitle(tr("First"));
             $action->setContents(" <<  ");
             $action->render();
 
-            if ($this->paginator->currentPage() - 1 > 0) {
-                $link->add(new URLParameter(Paginator::KEY_PAGE, $this->paginator->currentPage() - 1));
-            }
+            Paginator::SetPage($link, $this->paginator->currentPage() - 1);
             $action->setTitle(tr("Prev"));
             $action->setContents(" <  ");
             $action->setAttribute("rel", "prev");
@@ -76,10 +74,7 @@ class ResultViewFooter extends Container
 
         while ($a < $this->paginator->pageListEnd()) {
 
-            $link->add(new URLParameter(Paginator::KEY_PAGE, $a));
-            if ($a<1) {
-                $link->remove(Paginator::KEY_PAGE);
-            }
+            Paginator::SetPage($link, $a);
 
             $action->setClassName("");
             $action->removeAttribute("rel");
@@ -109,13 +104,13 @@ class ResultViewFooter extends Container
 
         if (($this->paginator->currentPage() + 1) < $this->paginator->totalPages()) {
 
-            $link->add(new URLParameter(Paginator::KEY_PAGE, ($this->paginator->currentPage() + 1)));
+            Paginator::SetPage($link, $this->paginator->currentPage() + 1);
             $action->setAttribute("rel","next");
             $action->setTitle(tr("Next"));
             $action->setContents(" > ");
             $action->render();
 
-            $link->add(new URLParameter(Paginator::KEY_PAGE, ($this->paginator->totalPages() - 1)));
+            Paginator::SetPage($link, $this->paginator->totalPages() - 1);
             $action->removeAttribute("rel");
             $action->setTitle(tr("Last"));
             $action->setContents(" >> ");
