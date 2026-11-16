@@ -94,11 +94,7 @@ final class Template
         if ($config->requireAuth) {
             $authContext = Module::Active()->getAuthContext();
             if (is_null($authContext)) {
-                Session::SetAlert("Authorization Required");
-                $loginPage = Module::PathURL("login");
-                Debug::ErrorLog("Authorization required for this content - redirecting to login page: $loginPage");
-                header("Location: ".$loginPage);
-                exit;
+                Module::Active()->loginRedirect("this content");
             }
         }
 

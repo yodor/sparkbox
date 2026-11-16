@@ -34,6 +34,30 @@ test("protected path redirects to the module login, login page is public", funct
     assertSame(200, $status);
 });
 
+/**
+ * Alerts of the page (showAlert calls)
+ */
+function coreAlerts(string $body) : string
+{
+    preg_match_all('/showAlert\(("(?:[^"\\\\]|\\\\.)*")\)/', $body, $m);
+    return implode(" | ", array_map("json_decode", $m[1]));
+}
+
+test("login redirect: the module alert at the login page - none when the module sets it empty", function () {
+    //the admin: a protected path → login with "Authorization Required"
+    [, $headers] = coreAdmin("/home", false);
+    [, , $login] = httpRequest("admin/index.php", "path=%2Flogin", array("Cookie" => implode("; ", $headers["set-cookie"])), "/admin/index.php?path=%2Flogin");
+    assertTrue(str_contains(coreAlerts($login), "Authorization Required"), "default alert: " . coreAlerts($login));
+
+    foreach (array("" => "", "Please log in" => "Please log in") as $alert => $expected) {
+        [$status, $headers] = httpRequest("module_login.php", http_build_query(array("alert" => $alert)));
+        assertSame(302, $status);
+        assertTrue(str_ends_with($headers["location"] ?? "", "/admin/login"), "to login");
+        [, , $login] = httpRequest("admin/index.php", "path=%2Flogin", array("Cookie" => implode("; ", $headers["set-cookie"])), "/admin/index.php?path=%2Flogin");
+        assertSame($expected, coreAlerts($login), "alert '$alert'");
+    }
+});
+
 test("home, content and settings render with the core menu only", function () {
     foreach (array("/home", "/content", "/settings") as $path) {
         [$status, $headers, $body] = coreAdmin($path);

@@ -72,6 +72,13 @@ class Module
     public ?Closure $accessCheck = null;
 
     /**
+     * Alert shown at the login page when a path needs login (translated with tr()). Empty: no alert - for
+     * modules where the login is a normal step (the checkout cashier). Set from the module init.php.
+     * @var string
+     */
+    public string $loginAlert = "Authorization Required";
+
+    /**
      * Current active Module instance
      * @var Module|null
      */
@@ -274,11 +281,7 @@ class Module
         if ($config->authClass && is_null($config->getAuthContext())) {
             $path = (string)($_GET["path"] ?? "");
             if (!$config->isPublicPath($path)) {
-                Session::SetAlert("Authorization Required");
-                $loginPage = Module::PathURL("login");
-                Debug::ErrorLog("Authorization required for path '$path' - redirecting to login page: $loginPage");
-                header("Location: " . $loginPage);
-                exit;
+                $config->loginRedirect("path '$path'");
             }
         }
 
@@ -311,6 +314,20 @@ class Module
                 throw new Exception("Module pageClass object is not instance of SparkPage");
             }
         }
+    }
+
+    /**
+     * Redirect to the module 'login' path (with the loginAlert, if any) and stop
+     * @param string $reason for the log
+     * @return never
+     */
+    public function loginRedirect(string $reason) : never
+    {
+        if ($this->loginAlert !== "") Session::SetAlert(tr($this->loginAlert));
+        $loginPage = Module::PathURL("login");
+        Debug::ErrorLog("Authorization required for $reason - redirecting to login page: $loginPage");
+        header("Location: " . $loginPage);
+        exit;
     }
 
     /**
