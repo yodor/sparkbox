@@ -62,7 +62,19 @@
     }
 }
 
-/* spam trap of the enquiry forms (ContactRequestFormResponder::SPAM_TRAP) - people never see or fill it */
-.JSONFormDialog .InputComponent[field='website'] {
-    display: none;
+/* form inputs use the dialog width - sites style the rest */
+.Dialog.JSONFormDialog .Inner .Content FORM {
+    align-self: stretch;
+}
+@media (min-width: 600px) {
+    .Dialog.JSONFormDialog .Inner .Content FORM {
+        min-width: 22em;
+    }
+}
+.Dialog.JSONFormDialog .Inner .Content FORM .InputField .Input {
+    width: 100%;
+    box-sizing: border-box;
+}
+.Dialog.JSONFormDialog .Inner .Content FORM .TextArea .Input {
+    min-height: 6em;
 }

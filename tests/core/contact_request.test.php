@@ -28,11 +28,11 @@ function mailCount() : int
     return preg_match_all("/^Subject: /m", (string)@file_get_contents(TestMailLog()));
 }
 
-test("the dialog renders the form with the hidden spam trap", function () {
+test("the dialog renders the form, no extra fields", function () {
     $json = enquiry("ContactRequestFormResponder");
     assertSame("OK", $json["status"], $json["message"] ?? "");
     assertTrue(str_contains($json["contents"], "name='ContactRequestForm'"), "form missing");
-    assertTrue(str_contains($json["contents"], "field='website'"), "spam trap missing");
+    assertTrue(!str_contains($json["contents"], "field='website'"), "spam trap field shown");
 });
 
 test("missing values: the form comes back with errors, no mail", function () {
@@ -69,13 +69,6 @@ test("accepted enquiry: mailed to the owner, Reply-To the visitor, text escaped,
     assertTrue(!str_contains($mail, "<b>it</b>"), "visitor text not escaped");
     assertSame(1, substr_count(strtolower($mail), "<html"), "template applied twice");
     assertTrue(!(bool)TestPDO()->query("SHOW TABLES LIKE 'contact_requests'")->fetch(), "a contact_requests table was created");
-});
-
-test("spam trap filled: answered as accepted, no mail", function () {
-    $before = mailCount();
-    $json = enquiry("ContactRequestFormResponder", array("fullname" => "Bot", "email" => "bot@example.com", "query" => "buy", "website" => "http://spam"));
-    assertSame("OK", $json["status"]);
-    assertSame($before, mailCount(), "spam mailed");
 });
 
 test("enquiry about an item: the item is linked with its details", function () {

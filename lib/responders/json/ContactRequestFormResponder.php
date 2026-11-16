@@ -9,15 +9,12 @@ include_once("objects/data/GTMConversionCommand.php");
  * Sent from DEFAULT_SERVICE_EMAIL to recipient() - DEFAULT_SERVICE_EMAIL here, the store and the sites override it
  * with their owner's address; Reply-To the visitor's e-mail, so the owner answers with Reply.
  * A failed send keeps the dialog open with an error, so the enquiry is not lost without notice.
- * Spam trap: input 'website', hidden by CSS - a filled value is answered as accepted and not sent.
  *
  * Page: new ContactRequestFormResponder(); JS: new JSONFormDialog() with setResponder("ContactRequestFormResponder")
  * Enquiries about one item (product): setAbout() - linked in the mail with its details.
  */
 class ContactRequestFormResponder extends JSONFormResponder
 {
-    const string SPAM_TRAP = "website";
-
     protected string $aboutTitle = "";
     protected ?URL $aboutURL = null;
     protected array $aboutDetails = array();
@@ -33,17 +30,6 @@ class ContactRequestFormResponder extends JSONFormResponder
      * @var string
      */
     protected string $mailSubject = "";
-
-    public function __construct()
-    {
-        parent::__construct();
-
-        //spam trap - people do not see it (JSONFormDialog.css), bots fill every field
-        $trap = DataInputFactory::Create(InputType::TEXT, ContactRequestFormResponder::SPAM_TRAP, "Website", 0);
-        $trap->getRenderer()->input()?->setAttribute("autocomplete", "off");
-        $trap->getRenderer()->input()?->setAttribute("tabindex", "-1");
-        $this->form->addInput($trap);
-    }
 
     protected function createForm(): InputForm
     {
@@ -95,16 +81,9 @@ class ContactRequestFormResponder extends JSONFormResponder
     {
         parent::onProcessSuccess($resp);
 
-        if (trim((string)$this->form->getInput(ContactRequestFormResponder::SPAM_TRAP)->getValue()) !== "") {
-            Debug::ErrorLog("Contact enquiry dropped - spam trap filled");
-            $resp->message = tr($this->acceptedMessage);
-            return;
-        }
-
         //label => value for the mail, in form order
         $values = array();
         foreach ($this->form->inputNames() as $name) {
-            if ($name === ContactRequestFormResponder::SPAM_TRAP) continue;
             $input = $this->form->getInput($name);
             $values[tr($input->getLabel())] = (string)$input->getValue();
         }
