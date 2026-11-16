@@ -108,7 +108,11 @@ class DataInput extends DataObject
             $this->validator->validate($this);
         }
         catch (Exception $e) {
-            if ($this->isRequired()) {
+            //optional inputs: empty is fine, but a typed value that fails (an e-mail with a typo) is shown as an
+            //error instead of being dropped without a word
+            $value = $this->getValue();
+            $typed = is_array($value) ? count($value) > 0 : trim((string)$value) !== "";
+            if ($this->isRequired() || $typed) {
                 $this->setError($e->getMessage());
             }
             else {

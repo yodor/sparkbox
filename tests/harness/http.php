@@ -36,6 +36,8 @@ function httpRequest(string $script, string $query = "", array $headers = array(
     $includePath = $options["include_path"] ?? ($isTestApp ? $lib . PATH_SEPARATOR . $app : "");
     $prepend = $options["prepend"] ?? ($isTestApp ? TESTS_PATH . "/harness/sparkboot.php" : "");
     $command = escapeshellarg($cgi) . " -d error_log=" . escapeshellarg(TestCachePath() . "/http.log");
+    //mail sent with PHP mail() is captured in TestMailLog() - tests never send real mail
+    $command .= " -d sendmail_path=" . escapeshellarg("tee -a " . escapeshellarg(TestMailLog()) . " > /dev/null");
     if ($includePath !== "") $command .= " -d include_path=" . escapeshellarg($includePath);
     if ($prepend !== "") $command .= " -d auto_prepend_file=" . escapeshellarg($prepend);
 
@@ -67,4 +69,13 @@ function httpRequest(string $script, string $query = "", array $headers = array(
         $parsed[$name] = $value;
     }
     return array($status, $parsed, $body);
+}
+
+/**
+ * File that collects the mail of the HTTP level requests (sendmail_path of php-cgi)
+ * @return string
+ */
+function TestMailLog() : string
+{
+    return TestCachePath() . "/mail.log";
 }

@@ -61,3 +61,8 @@
         height: 32px;
     }
 }
+
+/* spam trap of the enquiry forms (ContactRequestFormResponder::SPAM_TRAP) - people never see or fill it */
+.JSONFormDialog .InputComponent[field='website'] {
+    display: none;
+}
