@@ -85,6 +85,18 @@ class Module
     public string $loginPath = "login";
 
     /**
+     * Page class per module path (addPagePath()) - path => array(class, file to include)
+     * @var array<string, array>
+     */
+    protected array $pagePaths = array();
+
+    /**
+     * Old addresses of the module (addRedirect()) - path => module path
+     * @var array<string, string>
+     */
+    protected array $redirects = array();
+
+    /**
      * Current active Module instance
      * @var Module|null
      */
@@ -200,6 +212,74 @@ class Module
     }
 
     /**
+     * Page class for a path of the module (and the paths below it) instead of pageClass - modules whose paths need
+     * different pages (products: list, details). A page without the TemplatePage trait does its own work:
+     * initialize(), processInput() (when it has one), render().
+     * @param string $path module path ("details")
+     * @param string $pageClass
+     * @param string $include file of the class (include path) - included when the path is requested
+     * @return void
+     */
+    public function addPagePath(string $path, string $pageClass, string $include = "") : void
+    {
+        $this->pagePaths[Template::FormatPath($path, "/", true)] = array($pageClass, $include);
+    }
+
+    /**
+     * Page class of '$path': the one of the path (or the nearest path above it) set by addPagePath(), else pageClass.
+     * Its file is included.
+     * @param string $path
+     * @return string
+     */
+    public function pageClassFor(string $path) : string
+    {
+        $path = Template::FormatPath($path, "/", true);
+        while (true) {
+            if (isset($this->pagePaths[$path])) {
+                [$class, $include] = $this->pagePaths[$path];
+                if ($include !== "") include_once($include);
+                return $class;
+            }
+            if ($path === "/" || $path === "") break;
+            $path = rtrim(dirname($path), "/") ?: "/";
+        }
+        return $this->pageClass;
+    }
+
+    /**
+     * An old address of the module answers with 301 to '$target' (a module path, "" the module folder) - the query
+     * of the request is kept
+     * @param string $path old path ("list.php")
+     * @param string $target
+     * @return void
+     */
+    public function addRedirect(string $path, string $target) : void
+    {
+        $this->redirects[Template::FormatPath($path, "/", true)] = $target;
+    }
+
+    /**
+     * Answer an old address (addRedirect()) with 301 - before anything else of the request
+     * @param string $path
+     * @return void
+     */
+    protected function processRedirect(string $path) : void
+    {
+        $key = Template::FormatPath($path, "/", true);
+        if (!isset($this->redirects[$key])) return;
+
+        $target = $this->redirects[$key];
+        $url = ($target === "") ? new URL(rtrim($this->location, "/") . "/") : Module::PathURL($target);
+        foreach ($_GET as $name => $value) {
+            if ($name === "path" || !is_scalar($value)) continue;
+            $url->add(new URLParameter((string)$name, (string)$value));
+        }
+        Debug::ErrorLog("Module redirect: $path -> " . $url->toString());
+        header("Location: " . $url->toString(), true, 301);
+        exit;
+    }
+
+    /**
      * @param string $path
      * @return bool
      */
@@ -281,6 +361,9 @@ class Module
     {
         $config = Module::Active();
 
+        //old addresses first
+        $config->processRedirect((string)($_GET["path"] ?? ""));
+
         //authorize
         $config->authorize();
 
@@ -303,12 +386,18 @@ class Module
             $config->processEarlyResponder();
         }
 
-        if ($config->pageClass) {
+        $pageClass = $config->pageClassFor((string)($_GET["path"] ?? ""));
+        if ($pageClass) {
 
-            $page = SparkLoader::Factory(SparkLoader::PREFIX_PAGES)->instance($config->pageClass, SparkPage::class);
+            $page = SparkLoader::Factory(SparkLoader::PREFIX_PAGES)->instance($pageClass, SparkPage::class);
             if ($page instanceof SparkPage) {
                 //handle path parameters , load module content from module path folder
                 $page->initialize();
+
+                //a page that does its own work (no TemplatePage trait): its input, as its own script did
+                if (method_exists($page, "processInput")) {
+                    $page->processInput();
+                }
 
                 //responders created by the page and its content
                 include_once("responders/RequestController.php");
