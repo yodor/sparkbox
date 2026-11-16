@@ -34,6 +34,17 @@ class URL implements IGETConsumer, IDataResultProcessor, ISerializable
     protected array $parameters = array();
 
     protected bool $clear_page_param = FALSE;
+
+    /**
+     * A clone gets its own parameters - setData() / setValue() on the clone do not change the original
+     */
+    public function __clone()
+    {
+        foreach ($this->parameters as $name => $parameter) {
+            $this->parameters[$name] = clone $parameter;
+        }
+    }
+
     protected array $clear_params = array();
 
     /**

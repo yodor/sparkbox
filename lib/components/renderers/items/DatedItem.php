@@ -13,6 +13,12 @@ class DatedItem extends DataIteratorItem implements IDataResultConsumer
     protected ?Component $content = null;
     protected ?ImageStorage $thumbnail = null;
 
+    /**
+     * Address of the item (PublicationURL) - the title links to it
+     * @var URL|null
+     */
+    protected ?URL $itemURL = null;
+
     public function  __construct(DatedBean $bean)
     {
         parent::__construct();
@@ -48,11 +54,26 @@ class DatedItem extends DataIteratorItem implements IDataResultConsumer
 
     }
 
+    /**
+     * The title links to the item address (data keys of the item)
+     * @param URL|null $url
+     * @return void
+     */
+    public function setItemURL(?URL $url) : void
+    {
+        $this->itemURL = $url;
+    }
+
     public function setData(array $data) : void
     {
         parent::setData($data);
 
         $this->title->setText($this->label);
+        if ($this->itemURL instanceof URL) {
+            $this->itemURL->setData($data);
+            $this->title->setTagName("a");
+            $this->title->setAttribute("href", $this->itemURL->toString());
+        }
 
         $this->date->setContents($this->bean->formatDate(strtotime($data["item_date"])));
 

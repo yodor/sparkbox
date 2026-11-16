@@ -50,17 +50,23 @@ class DatedArchive extends Container {
 
         $this->bean = $bean;
 
-        $this->url = new URL($moduleURL->toString());
-        $this->url->add(new DataParameter("year"));
-        $this->url->add(new DataParameter("month"));
-        $this->url->remove($this->bean->key());
-
-        $currentURL = URL::Current();
-        if ($currentURL->contains("year")) {
-            $this->selectedYear = (int)$currentURL->get("year")->value();
+        //a prepared archive address (PublicationArchiveURL) or the module address with ?year=&month=
+        if ($moduleURL->contains("year")) {
+            $this->url = clone $moduleURL;
         }
-        if ($currentURL->contains("month")) {
-            $this->selectedMonth = (int)$currentURL->get("month")->value();
+        else {
+            $this->url = new URL($moduleURL->toString());
+            $this->url->add(new DataParameter("year"));
+            $this->url->add(new DataParameter("month"));
+            $this->url->remove($this->bean->key());
+        }
+
+        //the request (a rewritten address has them in the query of the script)
+        if (isset($_GET["year"])) {
+            $this->selectedYear = (int)$_GET["year"];
+        }
+        if (isset($_GET["month"])) {
+            $this->selectedMonth = (int)$_GET["month"];
         }
 
         $yearList = $this->bean->years();
@@ -121,7 +127,7 @@ class DatedArchive extends Container {
                 $this->url->setData(["year"=>$year,"month"=>$month]);
 
                 $cmp->setTagName("a");
-                $cmp->setAttribute("href", $this->url);
+                $cmp->setAttribute("href", $this->url->toString());
 
                 if ($this->selectedYear == $year && $this->selectedMonth == $month) {
                     $cmp->addClassName("selected");

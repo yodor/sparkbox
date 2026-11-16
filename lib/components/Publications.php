@@ -22,7 +22,13 @@ class Publications
 
     protected array $columns = array();
 
-    public function __construct(DatedBean $bean, URL $moduleURL)
+    /**
+     * @param DatedBean $bean
+     * @param URL $moduleURL the module address - items ?<key>=, archive ?year=&month=
+     * @param URL|null $itemURL address of an item (PublicationURL) - the latest list and the item titles link to it
+     * @param URL|null $archiveURL address of an archive month (PublicationArchiveURL)
+     */
+    public function __construct(DatedBean $bean, URL $moduleURL, ?URL $itemURL = null, ?URL $archiveURL = null)
     {
         HTMLHead::Instance()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/Publications.css");
 
@@ -38,6 +44,7 @@ class Publications
         $this->view->setItemsPerPage(5);
 
         $rendererFull = new DatedItem($this->bean);
+        if ($itemURL instanceof URL) $rendererFull->setItemURL(clone $itemURL);
         $this->view->setItemRenderer($rendererFull);
 
         $this->columns = $rendererFull->collectDataKeys();
@@ -52,7 +59,7 @@ class Publications
         //disable pagination and set limit to the iterator
         $this->latest->setItemsPerPage(0);
 
-        $rendererShort = new DatedHeadingItem($this->bean, $this->url);
+        $rendererShort = new DatedHeadingItem($this->bean, $itemURL ?? $this->url);
         $rendererShort->getThumbnail()->image()->setPhotoSize(64, 64);
         $this->latest->setItemRenderer($rendererShort);
 
@@ -62,7 +69,7 @@ class Publications
         $queryLatest->stmt->limit($this->latestLimit);
         $this->latest->setIterator($queryLatest);
 
-        $this->archive = new DatedArchive($this->bean, $this->url);
+        $this->archive = new DatedArchive($this->bean, $archiveURL ?? $this->url);
         $this->archive->addClassName(get_class($bean));
     }
 

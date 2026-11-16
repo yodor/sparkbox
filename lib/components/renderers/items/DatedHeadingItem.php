@@ -25,8 +25,14 @@ class DatedHeadingItem extends Action implements IDataResultConsumer
         $this->bean = $bean;
 
 
-        $this->setURL(new URL($moduleURL->toString()));
-        $this->getURL()->add(new DataParameter($this->bean->key()));
+        //a prepared item address (PublicationURL) or the module address with ?<key>=
+        if ($moduleURL->contains($this->bean->key())) {
+            $this->setURL(clone $moduleURL);
+        }
+        else {
+            $this->setURL(new URL($moduleURL->toString()));
+            $this->getURL()->add(new DataParameter($this->bean->key()));
+        }
 
         $this->setClassName("item");
 

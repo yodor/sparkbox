@@ -24,3 +24,14 @@ test("URL::Requested is the address the visitor asked for", function () {
     assertSame("/products/5/kniga/", $url->getScriptName());
     assertSame("2", $url->get("page")->value());
 });
+
+test("a cloned URL has its own parameters - data set on the clone does not change the original", function () {
+    $url = new URL("/news/archive/");
+    $url->add(new PathParameter("year", "year", false));
+    $url->add(new PathParameter("month", "month", false));
+    $url->setData(array("year" => 2026, "month" => 3));
+    $copy = clone $url;
+    $copy->setData(array("year" => 2026, "month" => 4));
+    assertSame("/news/archive/2026/3/", $url->toString());
+    assertSame("/news/archive/2026/4/", $copy->toString());
+});

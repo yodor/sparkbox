@@ -24,7 +24,8 @@ class DatedBean extends DBTableBean
             locale:          Spark::Get(Config::DEFAULT_LOCALE),
             dateType:        IntlDateFormatter::NONE,   // no date part
             timeType:        IntlDateFormatter::NONE,   // no time part
-            timezone:        'UTC',                     // timezone usually irrelevant here
+            //the time zone of the dates - strtotime() reads them as local midnight (UTC showed the day before)
+            timezone:        date_default_timezone_get(),
             calendar:        IntlDateFormatter::GREGORIAN,
             pattern:         "d MMMM y"
         );
