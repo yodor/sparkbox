@@ -58,6 +58,12 @@ test("login redirect: the module alert at the login page - none when the module 
     }
 });
 
+test("login redirect: the module loginPath", function () {
+    [$status, $headers] = httpRequest("module_login.php", http_build_query(array("alert" => "", "path" => "guest")));
+    assertSame(302, $status);
+    assertTrue(str_ends_with($headers["location"] ?? "", "/admin/guest"), "to the login path: " . ($headers["location"] ?? ""));
+});
+
 test("home, content and settings render with the core menu only", function () {
     foreach (array("/home", "/content", "/settings") as $path) {
         [$status, $headers, $body] = coreAdmin($path);

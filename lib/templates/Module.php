@@ -79,6 +79,12 @@ class Module
     public string $loginAlert = "Authorization Required";
 
     /**
+     * Module path a request without login is sent to (must be a public path). Set from the module init.php.
+     * @var string
+     */
+    public string $loginPath = "login";
+
+    /**
      * Current active Module instance
      * @var Module|null
      */
@@ -317,14 +323,14 @@ class Module
     }
 
     /**
-     * Redirect to the module 'login' path (with the loginAlert, if any) and stop
+     * Redirect to the module loginPath (with the loginAlert, if any) and stop
      * @param string $reason for the log
      * @return never
      */
     public function loginRedirect(string $reason) : never
     {
         if ($this->loginAlert !== "") Session::SetAlert(tr($this->loginAlert));
-        $loginPage = Module::PathURL("login");
+        $loginPage = Module::PathURL($this->loginPath);
         Debug::ErrorLog("Authorization required for $reason - redirecting to login page: $loginPage");
         header("Location: " . $loginPage);
         exit;
