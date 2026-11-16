@@ -255,6 +255,13 @@ test("menu item editor: Choose Dynamic Page - the pages list in chooser mode, Pr
         [, , $editor] = coreAdminQuery("/content/menus", array("editID" => -1, "page_id" => $id));
         assertTrue(str_contains($editor, "value='/pages/$id/chooser-page/'"), "link of the chosen page");
 
+        //a site in a folder of the document root (LOCAL '/app'): the link is stored from the site root, the menu adds LOCAL
+        $query = http_build_query(array("path" => "/content/menus", "editID" => -1, "page_id" => $id));
+        [, , $editor] = httpRequest("app/admin/index.php", $query, array("Cookie" => coreAdminCookies()), "/app/admin/index.php?$query",
+            array("root" => realpath(TESTS_PATH), "include_path" => realpath(TESTS_PATH . "/../lib") . PATH_SEPARATOR . realpath(TESTS_PATH . "/app"),
+                "prepend" => TESTS_PATH . "/harness/sparkboot.php"));
+        assertTrue(str_contains($editor, "value='/pages/$id/chooser-page/'"), "link of the chosen page under a folder");
+
         //a chooser address outside the admin is refused
         [, , $list] = coreAdminQuery("/content/pages", array("chooser" => base64_encode("https://example.com/admin/x")));
         assertTrue(!str_contains($list, "Choose Page"), "chooser outside the admin");

@@ -79,7 +79,13 @@ class MenuItemForm extends InputForm
             $pages = new DynamicPagesBean();
             $row = $pages->getResult($pages->key(), (string)$page_id, "item_title");
             if (is_array($row)) {
-                $this->getInput("link")->setValue(DynamicPageURL::Page($page_id, (string)$row["item_title"])->toString());
+                //stored from the site root like the other links - the menu adds LOCAL (BeanMenuFactory)
+                $link = DynamicPageURL::Page($page_id, (string)$row["item_title"])->toString();
+                $local = Spark::Get(Config::LOCAL);
+                if ($local !== "" && $local !== "/" && str_starts_with($link, $local . "/")) {
+                    $link = substr($link, strlen($local));
+                }
+                $this->getInput("link")->setValue($link);
             }
         }
 
