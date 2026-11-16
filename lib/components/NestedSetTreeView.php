@@ -1,4 +1,5 @@
 <?php
+include_once("components/InlineScript.php");
 include_once("components/Component.php");
 include_once("components/renderers/IDataIteratorRenderer.php");
 include_once("components/renderers/items/DataIteratorItem.php");
@@ -232,19 +233,23 @@ class NestedSetTreeView extends Component implements IDataIteratorRenderer
 
     }
 
-    //do not cache script code
+    /**
+     * The tree script is rendered after the (cacheable) tree
+     * @return void
+     */
     public function render(): void
     {
         parent::render();
-        ?>
-        <script type='text/javascript'>
-            onPageLoad(function () {
-                let tree_view = new TreeView();
-                tree_view.setName("<?php echo $this->getName(); ?>");
-                tree_view.initialize();
-                tree_view.setSelectedID(<?php echo $this->getSelectedID();?>);
-            });
-        </script>
-        <?php
+
+        $script = new InlineScript(true);
+        $name = json_encode($this->getName());
+        $selectedID = $this->getSelectedID();
+        $script->setCode(<<<JS
+        let tree_view = new TreeView();
+        tree_view.setName($name);
+        tree_view.initialize();
+        tree_view.setSelectedID($selectedID);
+JS);
+        $script->render();
     }
 }

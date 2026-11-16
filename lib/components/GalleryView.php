@@ -126,8 +126,8 @@ class GalleryView extends Container
     protected function initActions() : void
     {
 
+        //the editor of the row: the same page (module path) with editID
         $url = URL::Current();
-        $url->setScriptName("add.php");
         $url->add(new DataParameter("editID", $this->bean->key()));
         $action_edit = new Action("Edit");
         $action_edit->setURL($url);

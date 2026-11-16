@@ -3,6 +3,17 @@ include_once("components/renderers/items/DataIteratorItem.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/ItemView.php");
 include_once("components/Action.php");
+include_once("components/ClosureComponent.php");
+
+/**
+ * One photo of a GalleryView (admin galleries):
+ *
+ * heading
+ *   position ('#n' when the row has a position)
+ *   item_actions (Edit | Delete)
+ * image_slot (ImagePopup)
+ * trailer (First, Previous, Next, Last)
+ */
 
 class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPhotoRenderer
 {
@@ -30,6 +41,9 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
      */
     protected ?URLParameter $urlparam = null;
 
+    protected Container $positionBox;
+    protected Component $positionText;
+
     public function __construct(GalleryView $view)
     {
         parent::__construct();
@@ -42,6 +56,28 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
         $this->image_popup->setClassName("image_slot");
         $this->actions = new ActionCollection();
         $this->image_popup->setAttribute("relation", "GalleryViewItem");
+
+        $heading = new Container(false);
+        $heading->setComponentClass("heading");
+
+        $this->positionBox = new Container(false);
+        $this->positionBox->setComponentClass("position");
+        $this->positionText = new Component(false);
+        $this->positionText->setTagName("span");
+        $this->positionText->setComponentClass("");
+        $this->positionBox->items()->append($this->positionText);
+        $heading->items()->append($this->positionBox);
+
+        $itemActions = new ClosureComponent($this->renderItemActions(...), true, false);
+        $itemActions->setComponentClass("item_actions");
+        $heading->items()->append($itemActions);
+
+        $this->items()->append($heading);
+        $this->items()->append($this->image_popup);
+
+        $trailer = new ClosureComponent($this->renderTrailer(...), true, false);
+        $trailer->setComponentClass("trailer");
+        $this->items()->append($trailer);
     }
 
     public function requiredStyle(): array
@@ -118,45 +154,42 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
     protected function renderImpl(): void
     {
+        //'#n' only when the row has a position
+        $this->positionBox->setRenderEnabled((bool)$this->position);
+        $this->positionText->setText("#" . $this->position);
 
-        echo "<div class='heading'>";
+        parent::renderImpl();
+    }
 
-        if ($this->position) {
-            echo "<div class='position'>";
-            echo "<span>#$this->position</span>";
-            echo "</div>";
-        }
-
-        echo "<div class='item_actions'>";
-
+    /**
+     * Edit | Delete of the row
+     * @return void
+     */
+    protected function renderItemActions() : void
+    {
         $edit = $this->actions->getByAction("Edit");
         if ($edit instanceof Action) {
             $edit->render();
         }
 
-        $pipe = Action::PipeSeparator();
-        $pipe->render();
+        Action::PipeSeparator()->render();
 
         $delete = $this->actions->getByAction("Delete");
         if ($delete instanceof Action) {
             $delete->render();
         }
+    }
 
-        echo "</div>"; // item actions
-
-        echo "</div>"; //header
-
-        $this->image_popup->render();
-
-        echo "<div class='trailer'>";
-
+    /**
+     * Position change actions of the row
+     * @return void
+     */
+    protected function renderTrailer() : void
+    {
         $this->renderFooterAction("First");
         $this->renderFooterAction("Previous");
         $this->renderFooterAction("Next");
         $this->renderFooterAction("Last");
-
-        echo "</div>";
-
     }
 
     public function renderFooterAction(string $action): void

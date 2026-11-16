@@ -1,5 +1,7 @@
 <?php
-include_once("components/Component.php");
+include_once("components/Container.php");
+include_once("components/ClosureComponent.php");
+include_once("components/InlineScript.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/renderers/items/DataIteratorItem.php");
 include_once("components/renderers/IDataIteratorRenderer.php");
@@ -78,7 +80,16 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 
 }
 
-class GalleryTape extends Component implements IDataIteratorRenderer
+/**
+ * Horizontal tape of item renderers (one per iterator row) with left / right buttons (GalleryTape.js)
+ *
+ * contents
+ *   button left
+ *   viewport
+ *     slots - the item renderer once per row
+ *   button right
+ */
+class GalleryTape extends Container implements IDataIteratorRenderer
 {
 
     /**
@@ -88,12 +99,31 @@ class GalleryTape extends Component implements IDataIteratorRenderer
 
     protected DataIteratorItem $item_renderer;
 
-    protected $default_renderer;
+    protected Container $contents;
 
     public function __construct()
     {
         parent::__construct();
 
+        $this->contents = new Container(false);
+        $this->contents->setComponentClass("contents");
+
+        $left = new Component(false);
+        $left->setComponentClass("button left");
+        $this->contents->items()->append($left);
+
+        $viewport = new Container(false);
+        $viewport->setComponentClass("viewport");
+        $slots = new ClosureComponent($this->renderSlots(...), true, false);
+        $slots->setComponentClass("slots");
+        $viewport->items()->append($slots);
+        $this->contents->items()->append($viewport);
+
+        $right = new Component(false);
+        $right->setComponentClass("button right");
+        $this->contents->items()->append($right);
+
+        $this->items()->append($this->contents);
     }
 
     public function getCacheName() : string
@@ -161,55 +191,38 @@ class GalleryTape extends Component implements IDataIteratorRenderer
         $this->iterator->exec();
     }
 
-    protected function renderImpl(): void
+    /**
+     * The item renderer once per iterator row, with its position
+     * @return void
+     */
+    protected function renderSlots() : void
     {
-
-        echo "<div class='contents'>";
-
-        echo "<div class='button left'></div>";
-
-        echo "<div class='viewport'>";
-
-        echo "<div class='slots'>";
-
         $pos = 0;
-
         while ($data = $this->iterator->next()) {
-
-            $itemID = $data[$this->iterator->key()];
-
             $this->item_renderer->setAttribute("position", $pos);
-
-            $this->item_renderer->setDataID($itemID);
+            $this->item_renderer->setDataID($data[$this->iterator->key()]);
             $this->item_renderer->setData($data);
             $this->item_renderer->render();
-
             $pos++;
         }
-        echo "</div>"; //slots
-
-        echo "</div>"; //viewport
-
-        echo "<div class='button right' ></div>";
-
-        echo "</div>";
     }
 
+    /**
+     * The tape script is rendered after the (cacheable) tape
+     * @return void
+     */
     public function render(): void
     {
         parent::render();
-        ?>
-        <script type='text/javascript'>
-            onPageLoad(function () {
 
-                let gallery_tape = new GalleryTape();
-                gallery_tape.setName("<?php echo $this->getName();?>");
-                gallery_tape.initialize();
-
-            });
-
-        </script>
-        <?php
+        $script = new InlineScript(true);
+        $name = json_encode($this->getName());
+        $script->setCode(<<<JS
+        let gallery_tape = new GalleryTape();
+        gallery_tape.setName($name);
+        gallery_tape.initialize();
+JS);
+        $script->render();
     }
 
 }
