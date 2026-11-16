@@ -27,6 +27,13 @@ trait TemplatePage
     protected bool $pathBodyClass = false;
 
     /**
+     * The address of this page set by its content (a page with its own URL - /pages/<id>/<slug>/): canonical and
+     * language links use it
+     * @var URL|null
+     */
+    protected ?URL $contentURL = null;
+
+    /**
      * Register for the template events and read the path parameter
      * @return void
      */
@@ -99,11 +106,23 @@ trait TemplatePage
     abstract public function update(TemplateContent $content) : void;
 
     /**
-     * The current URL as a module path URL
+     * The address of this page when the content has its own URL (setContentURL()), otherwise the current URL as
+     * a module path URL
      * @return URL
      */
     public function currentURL() : URL
     {
+        if ($this->contentURL instanceof URL) return clone $this->contentURL;
         return Module::PathURL("", parent::currentURL());
+    }
+
+    /**
+     * The content's own address - canonical and language links
+     * @param URL $url
+     * @return void
+     */
+    public function setContentURL(URL $url) : void
+    {
+        $this->contentURL = $url;
     }
 }

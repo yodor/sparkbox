@@ -661,11 +661,12 @@ final class Spark {
         $value = Spark::ReplaceTags($value);
         $value = preg_replace("/[^\wA-Za-z0-9\-\%\?\!\;\:\.\, ]/u", "",$value);
 
-        if ($max_length>0) {
-            //cut to the exact size
+        $value = trim($value);
+        //longer than max_length: cut to the size, then back to the last space (when there is one)
+        if ($max_length > 0 && mb_strlen($value) > $max_length) {
             $value = mb_substr($value, 0, $max_length);
-            //reverse to the last space
-            $value = mb_substr($value, 0, mb_strrpos($value, " "));
+            $space = mb_strrpos($value, " ");
+            if ($space !== false && $space > 0) $value = mb_substr($value, 0, $space);
         }
         return $value;
     }

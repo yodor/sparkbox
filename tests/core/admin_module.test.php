@@ -223,6 +223,50 @@ test("forgot password works without the store and does not reveal registered ema
 });
 
 //last - ends the session used by the tests above
+/**
+ * Admin page with extra query parameters
+ */
+function coreAdminQuery(string $path, array $params) : array
+{
+    $query = http_build_query(array_merge(array("path" => $path), $params));
+    return httpRequest("admin/index.php", $query, array("Cookie" => coreAdminCookies()), "/admin/index.php?$query");
+}
+
+test("menu item editor: Choose Dynamic Page - the pages list in chooser mode, Preview, the chosen page address", function () {
+    $pdo = TestPDO();
+    //the dynamic pages table (the bean creates it)
+    coreAdmin("/content/pages");
+    $pdo->exec("INSERT INTO dynamic_pages (item_title, item_date, visible, content, keywords, position) VALUES ('Chooser Page', now(), 1, '<p>c</p>', 'chooser_test;', 1)");
+    $id = (int)$pdo->lastInsertId();
+    try {
+        [$status, $headers, $editor] = coreAdminQuery("/content/menus", array("editID" => -1));
+        assertSame(200, $status, "menu item editor: " . ($headers["location"] ?? ""));
+        assertTrue((bool)preg_match("#href='(/admin/content/pages\\?chooser=[^']+)'#", $editor, $m), "Choose Dynamic Page link");
+        $chooser = urldecode(html_entity_decode(explode("chooser=", $m[1])[1]));
+
+        [$status, , $list] = coreAdminQuery("/content/pages", array("chooser" => $chooser));
+        assertSame(200, $status, "pages list in chooser mode");
+        assertTrue(str_contains($list, "Choose Page"), "Choose Page action");
+        assertTrue((bool)preg_match("#href='([^']*page_id={$id}[^']*)'#", $list, $c), "Choose Page link of the page");
+        assertTrue((str_contains(html_entity_decode($c[1]), "/admin/content/menus") || str_contains(html_entity_decode($c[1]), "path=%2Fcontent%2Fmenus")) && str_contains(html_entity_decode($c[1]), "editID=-1"), "back to the menu item editor: " . $c[1]);
+        assertTrue((bool)preg_match("#href='[^']*/pages/$id/chooser-page/'[^>]*target='_blank'|target='_blank'[^>]*href='[^']*/pages/$id/chooser-page/'#", $list), "Preview of the page");
+
+        //back with the page: its address in the link field
+        [, , $editor] = coreAdminQuery("/content/menus", array("editID" => -1, "page_id" => $id));
+        assertTrue(str_contains($editor, "value='/pages/$id/chooser-page/'"), "link of the chosen page");
+
+        //a chooser address outside the admin is refused
+        [, , $list] = coreAdminQuery("/content/pages", array("chooser" => base64_encode("https://example.com/admin/x")));
+        assertTrue(!str_contains($list, "Choose Page"), "chooser outside the admin");
+        //without chooser: Preview only
+        [, , $list] = coreAdmin("/content/pages");
+        assertTrue(!str_contains($list, "Choose Page") && str_contains($list, "/pages/$id/chooser-page/"), "list without chooser");
+    }
+    finally {
+        $pdo->exec("DELETE FROM dynamic_pages WHERE dpID = $id");
+    }
+});
+
 test("logout returns to login", function () {
     [$status, $headers] = coreAdmin("/logout");
     assertSame(302, $status);

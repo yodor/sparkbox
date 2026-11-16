@@ -1,6 +1,8 @@
 <?php
 include_once("forms/InputForm.php");
 include_once("beans/MenuItemsBean.php");
+include_once("beans/DynamicPagesBean.php");
+include_once("utils/url/DynamicPageURL.php");
 
 class MenuItemForm extends InputForm
 {
@@ -16,8 +18,13 @@ class MenuItemForm extends InputForm
 
         $field = DataInputFactory::Create(InputType::TEXT, "link", "Link", 1);
 
-        $link = URL::Current();
-        $action = new Action("Choose Dynamic Page", Spark::Get(Config::ADMIN_LOCAL) . "/content/pages/list.php?chooser=".base64_encode($link->toString()));
+        //the dynamic pages list of the admin in chooser mode - its 'Choose Page' comes back here with page_id
+        $back = URL::Current();
+        $back->remove("page_id");
+        $choose = Module::PathURL("/content/pages");
+        $choose->add(new URLParameter("chooser", base64_encode($back->toString())));
+        $action = new Action("Choose Dynamic Page", $choose->toString());
+        $action->setContents(tr("Choose Dynamic Page"));
         $field->getRenderer()->getAddonContainer()->items()->append($action);
         $this->addInput($field);
 
@@ -66,13 +73,14 @@ class MenuItemForm extends InputForm
 
     public function load() : void
     {
+        //chosen in the dynamic pages list: the address of the page (the pages module)
         if (isset($_GET["page_id"])) {
-
             $page_id = (int)$_GET["page_id"];
-
-            $link_url = "/pages/index.php?id=$page_id";
-
-            $this->getInput("link")->setValue($link_url);
+            $pages = new DynamicPagesBean();
+            $row = $pages->getResult($pages->key(), (string)$page_id, "item_title");
+            if (is_array($row)) {
+                $this->getInput("link")->setValue(DynamicPageURL::Page($page_id, (string)$row["item_title"])->toString());
+            }
         }
 
 
