@@ -195,21 +195,5 @@ class MenuItem extends MenuItemList
         $this->h = $height;
     }
 
-    protected function matchItems(Closure $matcher) : ?MenuItem
-    {
-        //exhaust the submenu items first
-        $result = parent::matchItems($matcher);
-
-        //none from submenu
-        if (is_null($result)) {
-            //try this item
-            if ($matcher($this, new URL(urldecode($this->getHref())))) {
-                $result = $this;
-            }
-        }
-
-        return $result;
-
-    }
 
 }

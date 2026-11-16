@@ -87,97 +87,122 @@ class MenuItemList extends SparkList
         return $matched;
     }
     /**
-     * Select active MenuItem by matching the current page URL with the MenuItem url
-     * Matches by full url, then scriptName only, then scriptPath only
-     * Constructs a selection path array containing MenuItems - from top parent MenuItem to selected MenuItem
-     * @throws Exception
+     * Select the item whose link points to the page, with its parents.
+     *
+     * An item matches an address when its path is the address path or a folder of it (whole segments) and its
+     * query parameters are all in the address with the same values - the 'Books' item /products/category/110/books/
+     * stays selected on /products/category/110/books/?page=2. The home link '/' matches the home only.
+     * 'index.php' at the end of a path is its folder; letter case and url encoding are not compared.
+     * Links to other hosts, '#' and 'javascript:' links do not match.
+     *
+     * The best match: the longest path, then more parameters, then the earlier address, then the deeper item.
+     *
+     * @param URL|string ...$addresses the addresses of the page, the preferred first - default URL::Requested().
+     * A page can add the addresses of its place, ex. the category of a product.
+     * @return MenuItem|null the selected item
      */
-    const string MATCH_FULL = "MATCH_FULL";
-    const string MATCH_PARTIAL = "MATCH_PARTIAL";
-    const string MATCH_SCRIPT = "MATCH_SCRIPT";
-    const string MATCH_PATH = "MATCH_PATH";
-    const array DEFAULT_SELECT_MATCHERS = array(MenuItemList::MATCH_FULL,MenuItemList::MATCH_PARTIAL,MenuItemList::MATCH_SCRIPT,MenuItemList::MATCH_PATH);
-
-    public function selectActive(array $matchers = MenuItemList::DEFAULT_SELECT_MATCHERS, bool $match_first=true, ?URL $pageURL = null) : ?MenuItem
+    public function selectActive(URL|string ...$addresses) : ?MenuItem
     {
-
-        Debug::ErrorLog("Select matchers: ", $matchers);
-
-        if (is_null($pageURL)) {
-            $pageURL = URL::Current();
-
-            if (!$pageURL->getQueryString()) {
-                $pageURL = str_replace("index.php", "", $pageURL);
-                $pageURL = new URL($pageURL);
-            }
-
+        if (count($addresses) == 0) {
+            $addresses[] = URL::Requested();
         }
 
-        Debug::ErrorLog("Current URL: " . $pageURL->toString());
-
-        $match_code = array();
-
-        $match_full = function (MenuItem $item, URL $itemURL) use ($pageURL) {
-            $match = (strcmp(mb_strtolower($itemURL->toString()), mb_strtolower($pageURL->toString())) === 0);
-            if ($match) {
-                Debug::ErrorLog("Match full URL: " . $itemURL->toString() . " - matches");
-            }
-            return $match;
-        };
-        $match_code[MenuItemList::MATCH_FULL] = $match_full;
-
-        $match_partial = function (MenuItem $item, URL $itemURL) use ($pageURL) {
-            $match = (str_starts_with(mb_strtolower($pageURL->toString()), mb_strtolower($itemURL->toString())));
-            if ($match) {
-                Debug::ErrorLog("Match partial URL: " . $itemURL->toString() . " - matches");
-            }
-            return $match;
-        };
-        $match_code[MenuItemList::MATCH_PARTIAL] = $match_partial;
-
-        $match_script = function (MenuItem $item, URL $itemURL) use ($pageURL) {
-            $match = (strcmp(mb_strtolower($itemURL->getScriptName()), mb_strtolower($pageURL->getScriptName())) === 0);
-            if ($match) {
-                Debug::ErrorLog("Match scriptName: " . $itemURL->getScriptName() . " - matches");
-            }
-            return $match;
-        };
-        $match_code[MenuItemList::MATCH_SCRIPT] = $match_script;
-
-        $match_path = function (MenuItem $item, URL $itemURL) use ($pageURL) {
-            $match = (strcmp(mb_strtolower($itemURL->getScriptPath()), mb_strtolower($pageURL->getScriptPath())) === 0);
-            if ($match) {
-                Debug::ErrorLog("Match scriptPath: " . $itemURL->getScriptPath() . " - matches");
-            }
-            return $match;
-        };
-        $match_code[MenuItemList::MATCH_PATH] = $match_path;
+        $pages = array();
+        foreach ($addresses as $address) {
+            $page = MenuItemList::LinkParts((string)$address);
+            if (!is_null($page)) $pages[] = $page;
+        }
 
         $this->deselect();
 
-        $selected_item = null;
-
-        foreach ($matchers as $idx=>$mode) {
-            $code = $match_code[$mode];
-
-            Debug::ErrorLog("Using: ".$mode);
-
-            $match_item = $this->matchItems($code);
-
-            if ($match_item instanceof MenuItem) {
-                $selected_item = $match_item;
-                //keep matching
-                if ($match_first) {
-                    break;
+        $best = null;
+        $bestRank = null;
+        $this->forEachItem(function (MenuItem $item, int $depth) use ($pages, &$best, &$bestRank) {
+            $link = MenuItemList::LinkParts($item->getHref());
+            if (is_null($link)) return;
+            foreach ($pages as $idx => $page) {
+                $score = MenuItemList::LinkScore($link, $page);
+                if ($score < 0) continue;
+                //compared in order: score, the earlier address, the deeper item
+                $rank = array($score, -$idx, $depth);
+                if (is_null($bestRank) || $rank > $bestRank) {
+                    $best = $item;
+                    $bestRank = $rank;
                 }
             }
+        });
+
+        if ($best instanceof MenuItem) {
+            Debug::ErrorLog("Selected menu item: " . $best->getName() . " - " . $best->getHref());
+            $best->setSelected(true);
         }
 
-        if ($selected_item instanceof MenuItem) {
-            $selected_item->setSelected(true);
+        return $best;
+    }
+
+    /**
+     * Calls $visit(MenuItem $item, int $depth) for every item - each item before its sub items. Depth 0 is the top.
+     */
+    public function forEachItem(Closure $visit, int $depth = 0) : void
+    {
+        $iterator = $this->iterator();
+        while ($item = $iterator->next()) {
+            if (!($item instanceof MenuItem)) continue;
+            $visit($item, $depth);
+            $item->forEachItem($visit, $depth + 1);
+        }
+    }
+
+    /**
+     * The path segments and query parameters of a link to this site - null for links to other hosts, '#...',
+     * 'javascript:', 'mailto:' and the like
+     * @return array|null [segments, parameters]
+     */
+    public static function LinkParts(string $link) : ?array
+    {
+        $link = trim($link);
+        if ($link === "" || str_starts_with($link, "#")) return null;
+
+        $parts = parse_url($link);
+        if ($parts === false) return null;
+        if (isset($parts["scheme"]) && !in_array(strtolower($parts["scheme"]), array("http", "https"))) return null;
+        if (isset($parts["host"])) {
+            $host = strtolower((string)($_SERVER["HTTP_HOST"] ?? ""));
+            $host = preg_replace("/:\\d+$/", "", $host);
+            if (strcasecmp($parts["host"], $host) !== 0) return null;
         }
 
-        return $selected_item;
+        $path = mb_strtolower(rawurldecode($parts["path"] ?? "/"));
+        $path = preg_replace("#(^|/)index\\.php$#", "/", $path);
+        $segments = array_values(array_filter(explode("/", $path), fn(string $segment) => $segment !== ""));
+
+        $parameters = array();
+        if (isset($parts["query"])) {
+            parse_str($parts["query"], $parameters);
+        }
+        return array($segments, $parameters);
+    }
+
+    /**
+     * How well a link matches a page address (parts of LinkParts) - -1 for no match
+     */
+    public static function LinkScore(array $link, array $page) : int
+    {
+        [$linkSegments, $linkParameters] = $link;
+        [$pageSegments, $pageParameters] = $page;
+
+        //the home link matches the home only
+        if (count($linkSegments) == 0 && count($pageSegments) > 0) return -1;
+
+        if (count($linkSegments) > count($pageSegments)) return -1;
+        if (array_slice($pageSegments, 0, count($linkSegments)) !== $linkSegments) return -1;
+
+        foreach ($linkParameters as $name => $value) {
+            if (!array_key_exists($name, $pageParameters)) return -1;
+            if (mb_strtolower(json_encode($value)) !== mb_strtolower(json_encode($pageParameters[$name]))) return -1;
+        }
+
+        return count($linkSegments) * 100 + count($linkParameters);
     }
 
     /**
@@ -241,27 +266,6 @@ class MenuItemList extends SparkList
 
 
 
-    /**
-     * Call match method of each MenuItem element in this list
-     * Return the first MenuItem whose match method return true using the closure call
-     *
-     * @param Closure $matcher Closure function to execute during matching
-     * @return MenuItem|null The matching MenuItem or NULL if none of the elements match
-     * @throws Exception Throws exception if element from items is not instance of MenuItem
-     */
-    protected function matchItems(Closure $matcher) : ?MenuItem
-    {
-        $result = null;
-
-        $iterator = $this->iterator();
-        while ($item = $iterator->next()){
-            if (! ($item instanceof MenuItem)) continue;
-            $result = $item->matchItems($matcher);
-            if ($result instanceof MenuItem) break;
-        }
-
-        return $result;
-    }
 
 
 
