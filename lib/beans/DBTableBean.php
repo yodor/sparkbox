@@ -206,15 +206,16 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
      */
     protected static function CreateTable(string $createText) : void
     {
-        $query = new SelectQuery(new RawSQLSelect($createText));
+        //a table may reference a table that is not created yet (fresh install, beans created in any order):
+        //foreign key checks are off for the CREATE only, on the same connection - the constraint is kept and
+        //works once the referenced table exists
+        $db = DBManager::Driver();
+        $db->query(new RawSQLSelect("SET @spark_fk_checks = @@foreign_key_checks, foreign_key_checks = 0"))->free();
         try {
-            $query->exec();
-        }
-        catch (Exception $e) {
-            throw $e;
+            $db->query(new RawSQLSelect($createText))->free();
         }
         finally {
-            $query->free();
+            $db->query(new RawSQLSelect("SET foreign_key_checks = IFNULL(@spark_fk_checks, 1)"))->free();
         }
     }
 
