@@ -34,7 +34,7 @@ class ForgotPasswordMailer extends Mailer
         $message .= "\r\n";
         $message .= "<a href='".Spark::Get(Config::SITE_URL)."'>".Spark::Get(Config::SITE_URL)."</a>";
 
-        $this->body = $this->templateMessage($message);
+        $this->body = $message; //send() wraps it in the HTML document
 
     }
 
