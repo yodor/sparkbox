@@ -370,7 +370,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     }
 
     /**
-     * Retrieve single result (limit = 1) where column '$column' has value '$value'
+     * Retrieve single result (limit = 1) where column '$column' has value '$value' - null when there is none
      * primary key and $column columns are selected, select additional columns using $columns variadic array
      * @param string $column
      * @param string $value
@@ -389,7 +389,7 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
 
     /**
      * Retrieve the value of column '$column' where primary key value = '$id'
-     * Return NULL if no matching result is found
+     * Return NULL if no matching result is found (one query)
      * @param int $id
      * @param string $column
      * @return string|null
@@ -397,68 +397,46 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
      */
     public function getValue(int $id, string $column): ?string
     {
-        $query = $this->queryField($this->prkey, $id, 1, $column);
-        if($query->count() == 0) return null;
-
-        $result = null;
-
-        $query->exec();
-        if ($result = $query->next()) {
-            $result = $result[$column];
-        }
-        $query->free();
-
-        return $result;
+        $row = $this->getResult($this->prkey, (string)$id, $column);
+        if (!is_array($row) || !isset($row[$column])) return null;
+        return (string)$row[$column];
     }
 
     /**
      * Retrieve single result row where primary key value = '$id' - Uses the current bean select
      * All columns are selected unless $columns is not empty then only primary key + $columns are selected
-     * If ID is not found throws Exception
+     * Use getResult() when a missing row is not an error (it returns null)
      * @param int $id
      * @param string ...$columns
-     * @return array|null
-     * @throws Exception
+     * @return array
+     * @throws Exception "No such ID" when there is no row with this ID
      */
-    public function getByID(int $id, string ...$columns) : ?array
+    public function getByID(int $id, string ...$columns) : array
     {
         //use only columns passed in columns + the primary key
         if (count($columns)<1) {
             $columns = $this->columnNames();
         }
 
-        $qry = $this->queryField($this->prkey, $id, 1, ...$columns);
-
-        $qry->exec();
-
-        if ($result = $qry->next()) {
-            $qry->free();
-            return $result;
-        }
-        
-        throw new Exception("No such ID");
+        $result = $this->getResult($this->prkey, (string)$id, ...$columns);
+        if (!is_array($result)) throw new Exception("No such ID");
+        return $result;
     }
 
     /**
      * Retrieve single result row where $column = '$value' , additional '$columns' are used if specified
+     * @deprecated use getResult() - it returns null instead of throwing
      * @param string $column
      * @param int $value
      * @param string ...$columns
-     * @return array|null
-     * @throws Exception
+     * @return array
+     * @throws Exception "No such Ref" when there is no matching row
      */
-    public function getByRef(string $column, int $value, string ...$columns): ?array
+    public function getByRef(string $column, int $value, string ...$columns): array
     {
-
-        $qry = $this->queryField($column, $value, 1, ...$columns);
-        $qry->exec();
-
-        if ($result = $qry->next()) {
-            $qry->free();
-            return $result;
-        }
-        throw new Exception("No such Ref");
-
+        $result = $this->getResult($column, (string)$value, ...$columns);
+        if (!is_array($result)) throw new Exception("No such Ref");
+        return $result;
     }
 
     /**
