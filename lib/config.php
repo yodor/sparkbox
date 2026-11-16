@@ -152,12 +152,14 @@ enum Config
 
     /**
      * Mailer class sender name ie 'My Site Office'
-     * Default(string): SITE_DOMAIN
+     * Default(string): the requested host without port and leading 'www.' - set it in config/settings.php
      */
     const string DEFAULT_SERVICE_NAME = "DEFAULT_SERVICE_NAME";
     /**
      * Mailer class sender email ie 'office@domain.com'
-     * Default(string): info@SITE_DOMAIN
+     * Default(string): info@ + the requested host without port and leading 'www.'
+     * Deployment: set it in config/settings.php - with PHPMAILER_ENABLED it is also the SMTP login, so it must be
+     * a real mailbox (Hostinger: created in hPanel → Emails)
      */
     const string DEFAULT_SERVICE_EMAIL = "DEFAULT_SERVICE_EMAIL";
     /**
@@ -257,6 +259,12 @@ enum Config
     const string PASSWORD_TYPE = "PASSWORD_TYPE";
     const string PASSWORD_OPTIONS = "PASSWORD_OPTIONS";
 
+    /**
+     * Send mail with PHPMailer over authenticated SMTP (Hostinger) instead of PHP mail().
+     * Requires APP_PATH/config/mailer.php (from dist/mailer.php.dist: host, port, the sender mailbox password) -
+     * a missing file stops every page. SMTP login = DEFAULT_SERVICE_EMAIL.
+     * Default(bool): FALSE
+     */
     const string PHPMAILER_ENABLED = "PHPMAILER_ENABLED";
     const string PHPMAILER_SMTP_HOST = "PHPMAILER_SMTP_HOST";
     const string PHPMAILER_SMTP_PORT = "PHPMAILER_SMTP_PORT";

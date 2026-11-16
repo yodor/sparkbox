@@ -400,16 +400,20 @@ final class Spark {
         Spark::Set(Config::IMAGE_SCALER_OUTPUT_FORMAT, ImageType::TYPE_WEBP->value);
         Spark::Set(Config::IMAGE_SCALER_OUTPUT_QUALITY, 80);
 
+        //mail domain: the requested host without a port and a leading 'www.' (www.domain.com and domain.com send
+        //from the same address). Only a fallback - set DEFAULT_SERVICE_NAME and DEFAULT_SERVICE_EMAIL in
+        //config/settings.php: with PHPMailer the sender is also the SMTP login and must be a real mailbox.
+        $mail_domain = preg_replace("/^www\\./i", "", explode(":", $site_domain)[0]);
         /**
          * Sender Name for emails sent from this site using the Mailer class
-         * Default: SITE_DOMAIN
+         * Default: the mail domain (SITE_DOMAIN without port and 'www.')
          */
-        Spark::Set(Config::DEFAULT_SERVICE_NAME, $site_domain);
+        Spark::Set(Config::DEFAULT_SERVICE_NAME, $mail_domain);
         /**
          * Sender email for emails sent from this site using the Mailer class
-         * Default info@SITE_DOMAIN
+         * Default: info@ + the mail domain
          */
-        Spark::Set(Config::DEFAULT_SERVICE_EMAIL, "info@" . $site_domain);
+        Spark::Set(Config::DEFAULT_SERVICE_EMAIL, "info@" . $mail_domain);
 
         Spark::Set(Config::TRANSLATOR_ENABLED, FALSE);
         Spark::Set(Config::DB_ENABLED, FALSE);

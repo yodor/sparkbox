@@ -2,6 +2,9 @@
 //
 // SMTP settings and credentials - copy to APP_PATH/config/mailer.php and set the password.
 // config/mailer.php is listed in .gitignore - never commit it.
+// Used when config/settings.php sets PHPMAILER_ENABLED. The SMTP login is DEFAULT_SERVICE_EMAIL - set it and
+// DEFAULT_SERVICE_NAME in config/settings.php; the password below is that mailbox's password.
+// Hostinger: smtp.hostinger.com, port 465 (SSL) or 587 (STARTTLS).
 //
 Spark::Set(Config::PHPMAILER_SMTP_HOST, "smtp.host.name");
 Spark::Set(Config::PHPMAILER_SMTP_PORT, 465);
