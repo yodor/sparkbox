@@ -7,6 +7,13 @@ include_once("utils/RequestParameterCondition.php");
 include_once("utils/BeanKeyCondition.php");
 
 
+/**
+ * The module has no path file for the requested path - the page answers 404
+ */
+class TemplatePathNotFound extends Exception
+{
+}
+
 final class Template
 {
 
@@ -189,12 +196,25 @@ final class Template
         //TemplateConfig CTOR set a static instance accessible using the TemplateConfig::Active() method
         $config = TemplateConfig::Active();
         if (is_null($config)) {
-            throw new Exception("TemplateConfig not initialized after searching [$moduleLocation] for [$path.php]");
+            throw new TemplatePathNotFound("TemplateConfig not initialized after searching [$moduleLocation] for [$path.php]");
         }
 
         $config->filename = $path;
 
         //Emit here after all including is done. Allow later included code to register for events or modify config
+        SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, $config));
+    }
+
+    /**
+     * The config of an unknown path - NotFound content (the page answers 404)
+     */
+    public static function NotFoundConfig(): void
+    {
+        $config = TemplateConfig::Factory();
+        $config->contentClass = NotFound::class;
+        $config->title = tr("Page not found");
+        $config->description = tr("The page you are looking for does not exist.");
+        $config->requireAuth = false;
         SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, $config));
     }
 

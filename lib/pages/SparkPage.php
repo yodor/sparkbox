@@ -361,13 +361,14 @@ JS;
     }
 
     /**
-     * Return current working URL for building page parameters.
-     * Default implementation return URL::Current.
+     * The address of this page for its links (paging, sorting, filters, canonical) - default the address the
+     * visitor requested (URL::Requested()): under a module rewrite it is the public address ('/authors'),
+     * not the script that answers it ('/index.php?path=/authors').
      * @return URL
      */
     public function currentURL() : URL
     {
-        return URL::Current();
+        return URL::Requested();
     }
 
     /**

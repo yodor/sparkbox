@@ -31,6 +31,7 @@ class Module
      * Module path folder name
      */
     const string PATH_FOLDER = "path";
+    const string SCRIPTS_FOLDER = "scripts";
 
     const string DEFAULT_NAME = "default";
 
@@ -95,6 +96,19 @@ class Module
      * @var array<string, string>
      */
     protected array $redirects = array();
+
+    /**
+     * Paths answered by a script of their own (addScriptPath()) - path => file
+     * @var array<string, string>
+     */
+    protected array $scriptPaths = array();
+
+    /**
+     * The module paths have no trailing slash: GET /authors/ answers 301 to /authors (the query stays) - for
+     * modules of single pages (main). The module folder itself keeps its slash.
+     * @var bool
+     */
+    public bool $noTrailingSlash = false;
 
     /**
      * Current active Module instance
@@ -259,6 +273,99 @@ class Module
     }
 
     /**
+     * A path answered by a plain script - it does all of its work (headers, page, output) like a script of the
+     * site root did: the home of a site, a file (logo, sitemap.xml), a page script not converted to a content yet.
+     *
+     * By convention a path has its script in templates/modules/<module>/scripts/<path>.php - the site one, else the
+     * store one, else the core one (one file runs, the most specific). The path keeps its dots: /sitemap.xml →
+     * scripts/sitemap.xml.php; the module folder itself is 'home'. addScriptPath() maps a path to another file.
+     *
+     * The script runs after the redirects and the authorization (a public path in a module with login),
+     * instead of the module page.
+     * @param string $path module path ("contacts", "sitemap.xml")
+     * @param string $file script file (include path)
+     * @return void
+     */
+    public function addScriptPath(string $path, string $file) : void
+    {
+        $this->scriptPaths[Module::PathKey($path)] = $file;
+    }
+
+    /**
+     * The script of a path: addScriptPath() or the scripts folder of the module - "" if none
+     * @param string $path
+     * @return string
+     */
+    public function scriptFor(string $path) : string
+    {
+        $key = Module::PathKey($path);
+        if (isset($this->scriptPaths[$key])) return $this->scriptPaths[$key];
+
+        $name = Module::ScriptName($path);
+        if ($name === "") return "";
+        return SparkLoader::Factory(Spark::PathParts($this->getPreifx(), Module::SCRIPTS_FOLDER))->find($name);
+    }
+
+    /**
+     * Run the script of the path - true when the path has one
+     * @param string $path
+     * @return bool
+     */
+    protected function processScript(string $path) : bool
+    {
+        $file = $this->scriptFor($path);
+        if ($file === "") return false;
+
+        Debug::ErrorLog("Module script: $path -> $file");
+        include_once($file);
+        return true;
+    }
+
+    /**
+     * The file name of a path in the scripts folder: lower case segments of letters, digits, '.', '-', '_'
+     * ('Sitemap.xml' → 'sitemap.xml', 'a/b' → 'a/b'); '' is 'home'. "" for anything else.
+     */
+    protected static function ScriptName(string $path) : string
+    {
+        $path = strtolower(trim($path, "/"));
+        if ($path === "") return "home";
+        $segments = explode("/", $path);
+        foreach ($segments as $segment) {
+            if (!preg_match("/^[a-z0-9][a-z0-9._-]*$/", $segment) || str_contains($segment, "..")) return "";
+        }
+        return implode("/", $segments);
+    }
+
+    /**
+     * 301 to the path without its trailing slash (noTrailingSlash)
+     * @return void
+     */
+    protected function processTrailingSlash() : void
+    {
+        if (!$this->noTrailingSlash) return;
+        if (!in_array($_SERVER["REQUEST_METHOD"] ?? "GET", array("GET", "HEAD"))) return;
+
+        $requested = (string)($_SERVER["REQUEST_URI"] ?? "/");
+        $parts = explode("?", $requested, 2);
+        $path = $parts[0];
+        if (!str_ends_with($path, "/") || rtrim($path, "/") === rtrim($this->location, "/")) return;
+
+        $target = rtrim($path, "/") . (isset($parts[1]) ? "?" . $parts[1] : "");
+        Debug::ErrorLog("Module trailing slash: $requested -> $target");
+        header("Location: " . $target, true, 301);
+        exit;
+    }
+
+    /**
+     * The key of a path in the maps of the module - the module folder itself is 'home'
+     */
+    protected static function PathKey(string $path) : string
+    {
+        if (trim($path, "/") === "") $path = "home";
+        return Template::FormatPath($path, "/", true);
+    }
+
+    /**
      * Answer an old address (addRedirect()) with 301 - before anything else of the request
      * @param string $path
      * @return void
@@ -364,6 +471,9 @@ class Module
         //old addresses first
         $config->processRedirect((string)($_GET["path"] ?? ""));
 
+        //addresses without a trailing slash (main module): /authors/ → /authors
+        $config->processTrailingSlash();
+
         //authorize
         $config->authorize();
 
@@ -385,6 +495,9 @@ class Module
         if (!is_null($config->getAuthContext())) {
             $config->processEarlyResponder();
         }
+
+        //paths with a script of their own - after the authorization, like a page
+        if ($config->processScript((string)($_GET["path"] ?? ""))) return;
 
         $pageClass = $config->pageClassFor((string)($_GET["path"] ?? ""));
         if ($pageClass) {

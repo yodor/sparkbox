@@ -72,6 +72,12 @@ trait TemplatePage
                 $this->body->addClassName(Template::FormatPath($this->path, "_", false));
             }
         }
+        catch (TemplatePathNotFound $e) {
+            Debug::ErrorLog("PathConfig: " . $e->getMessage());
+            http_response_code(404);
+            $this->head()->addMeta("robots", "noindex");
+            Template::NotFoundConfig();
+        }
         catch (Exception $e) {
             Debug::ErrorLog("PathConfig failed: " . $e->getMessage());
             $message = $e->getMessage();
