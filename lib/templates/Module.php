@@ -424,6 +424,15 @@ class Module
     }
 
     /**
+     * The ID of the authorized user of this request (the module authClass) - -1 when not authorized
+     * @return int
+     */
+    public function getUserID() : int
+    {
+        return ($this->context instanceof AuthContext) ? $this->context->getID() : -1;
+    }
+
+    /**
      * @return Authenticator|null
      */
     public function getAuthenticator() : ?Authenticator

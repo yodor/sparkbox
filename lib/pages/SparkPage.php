@@ -36,31 +36,6 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
     protected array $parameter_names = array();
 
     /**
-     * Require auth success to access the page
-     * @var bool
-     */
-    protected bool $authorized_access = FALSE;
-
-    /**
-     * Login page redirection on auth fail
-     * @var string
-     */
-    protected string $loginURL = "";
-
-
-    /**
-     * Authenticator to use during authorization
-     * @var Authenticator|null
-     */
-    protected ?Authenticator $auth = NULL;
-
-    /**
-     * Authenticated context data array. is null if not authenticated yet
-     * @var AuthContext|null
-     */
-    protected ?AuthContext $context = NULL;
-
-    /**
      * The Preferred title of this page for rendering into the <TITLE></TITLE> tag
      */
     protected string $preferred_title = "";
@@ -90,22 +65,6 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
     public function setMetaDescription(string $description) : void
     {
         $this->description = $description;
-    }
-
-    /**
-     * @return int The numeric ID as from the Authenticator
-     */
-    public function getUserID() : int
-    {
-        if ($this->context instanceof AuthContext) {
-            return $this->context->getID();
-        }
-        return -1;
-    }
-
-    public function getAuthenticator() : ?Authenticator
-    {
-        return $this->auth;
     }
 
     public function getActions(): ActionCollection
@@ -175,8 +134,6 @@ JS;
 
         self::$instance = $this;
 
-        $this->authorize();
-
         $this->headInitialize();
 
         $this->actions = new ActionCollection();
@@ -190,62 +147,6 @@ JS;
     public function initialize() : void
     {
         //
-    }
-
-    /**
-     * Authorize this page usage if this->auth assigned with Authenticator prior to this method call
-     *
-     * Assign AuthContext to $this->context on successful authorization
-     * If $this->authorized_access is true but authorization failed
-     *  send JSONResponse with message if this is JSONRequest request and exits script execution
-     *  redirects to the loginURL if it is set and exits script execution
-     *  else  throws Exception
-     * @return void
-     * @throws Exception
-     */
-    protected function authorize(): void
-    {
-        if (!($this->auth instanceof Authenticator)) {
-            Debug::ErrorLog("Authenticator is not set");
-            return;
-        }
-
-        Debug::ErrorLog("Using Authenticator: " . get_class($this->auth));
-
-        $this->context = $this->auth->authorize();
-
-        if ($this->context instanceof AuthContext) {
-
-            Debug::ErrorLog("Authorization success");
-            return;
-        }
-
-        if (!$this->authorized_access) {
-            Debug::ErrorLog("Authorization is not required");
-            return;
-        }
-
-        Debug::ErrorLog("Authorization failed");
-
-        if (Spark::isJSONRequest()) {
-            $response = new JSONResponse("RequestController");
-            $message = tr("Your session has expired.");
-            $message.= "<BR>";
-            $message.= tr("Please log into your profile again.");
-            $message.= "<BR>";
-            $response->message = $message;
-            $response->send();
-            exit;
-        }
-
-        if (strlen($this->loginURL) > 0) {
-
-            Debug::ErrorLog("Redirecting to login page URL: " . $this->loginURL);
-            header("Location: $this->loginURL");
-            exit;
-        }
-
-        throw new Exception("Authorization failed");
     }
 
     /**

@@ -32,8 +32,6 @@ class SparkTemplateAdminPage extends SparkTemplatePage
     public function __construct()
     {
 
-        $this->context = Module::Active()->getAuthContext();
-
         parent::__construct();
 
         //control gets here only if authorized
