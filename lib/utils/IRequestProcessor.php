@@ -1,8 +1,9 @@
 <?php
 
 /**
- * Interface IRequestProcessor
- * Implemented from objects that handle Request/Get/Post variables
+ * Implemented by objects that handle the request variables (Request / Get / Post): forms, filters, contents -
+ * and the pages that answer their module path themselves (the product pages): the module engine calls their
+ * processInput() instead of loading a content into them.
  */
 interface IRequestProcessor
 {

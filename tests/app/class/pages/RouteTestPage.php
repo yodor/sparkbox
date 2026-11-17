@@ -1,11 +1,11 @@
 <?php
 include_once("pages/SparkPage.php");
-include_once("pages/ISelfProcessingPage.php");
+include_once("utils/IRequestProcessor.php");
 
 /**
- * Test page answering its path itself (ISelfProcessingPage) - does its own work (initialize, processInput, render)
+ * Test page answering its path itself (IRequestProcessor) - does its own work (initialize, processInput, render)
  */
-class RouteTestPage extends SparkPage implements ISelfProcessingPage
+class RouteTestPage extends SparkPage implements IRequestProcessor
 {
     protected string $log = "";
 
@@ -17,6 +17,11 @@ class RouteTestPage extends SparkPage implements ISelfProcessingPage
     public function processInput() : void
     {
         $this->log .= "processInput:" . (int)($_GET["itemID"] ?? 0) . ";";
+    }
+
+    public function isProcessed() : bool
+    {
+        return true;
     }
 
     public function startRender() : void

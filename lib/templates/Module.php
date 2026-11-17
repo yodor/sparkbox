@@ -1,5 +1,5 @@
 <?php
-include_once("pages/ISelfProcessingPage.php");
+include_once("utils/IRequestProcessor.php");
 
 class Module
 {
@@ -117,6 +117,7 @@ class Module
      */
     protected array $pageClasses = array();
     protected array $pageCSS = array();
+    protected array $pageMeta = array();
 
     /**
      * Current active Module instance
@@ -243,7 +244,7 @@ class Module
 
     /**
      * Page class for a path of the module (and the paths below it) instead of pageClass - modules whose paths need
-     * different pages (products: list, details). A page that implements ISelfProcessingPage does its own work:
+     * different pages (products: list, details). A page that is an IRequestProcessor does its own work:
      * initialize(), processInput(), render(); any other page is a frame for the content of the path.
      * @param string $path module path ("details")
      * @param string $pageClass
@@ -495,6 +496,17 @@ class Module
     }
 
     /**
+     * A meta tag of every page of this module (the module look - set in its init.php; replaces the page default)
+     * @param string $name
+     * @param string $content
+     * @return void
+     */
+    public function addPageMeta(string $name, string $content) : void
+    {
+        $this->pageMeta[$name] = $content;
+    }
+
+    /**
      * The content of the module path for the frame '$page': the path config (Template::PathConfig - 404 for an
      * unknown path, an error page for a failing one) and its content (Template::LoadContent: setup, initialize,
      * processInput)
@@ -621,10 +633,11 @@ class Module
                 //the module look
                 foreach ($config->pageClasses as $className) $page->body()->addClassName($className);
                 foreach ($config->pageCSS as $href) $page->head()->addCSS($href);
+                foreach ($config->pageMeta as $name => $content) $page->head()->addMeta($name, $content);
 
                 $page->initialize();
 
-                if ($page instanceof ISelfProcessingPage) {
+                if ($page instanceof IRequestProcessor) {
                     //a page that answers the path itself (the product pages)
                     $page->processInput();
                 }
