@@ -1,5 +1,6 @@
 <?php
-include_once("pages/SparkTemplatePage.php");
+include_once("pages/SparkPage.php");
+include_once("templates/Template.php");
 include_once("components/MenuBar.php");
 include_once("components/TextComponent.php");
 include_once("utils/Navigation.php");
@@ -7,7 +8,7 @@ include_once("utils/Navigation.php");
 include_once("dialogs/json/JSONFormDialog.php");
 include_once("responders/json/TemplateHelpResponder.php");
 
-class SparkTemplateAdminPage extends SparkTemplatePage
+class SparkTemplateAdminPage extends SparkPage implements IObserver
 {
 
     /**
@@ -100,11 +101,6 @@ class SparkTemplateAdminPage extends SparkTemplatePage
     }
 
 
-
-    public function initialize() : void
-    {
-        parent::initialize();
-    }
 
     protected function createSidePane() : Container
     {
@@ -208,8 +204,9 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
     protected function updateNavigation(): void
     {
-        $selectedPath = $this->menu_bar->getMenu()->selectPath($this->path);
-        Debug::ErrorLog("Location: $this->path | Matched: ", $selectedPath);
+        $path = Module::Active()->getPath();
+        $selectedPath = $this->menu_bar->getMenu()->selectPath($path);
+        Debug::ErrorLog("Location: $path | Matched: ", $selectedPath);
 
         $name = $this->getName();
 
@@ -266,7 +263,7 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
         $help_action = new Action();
         $help_action->setAction(SparkTemplateAdminPage::ACTION_HELP);
-        $help_action->setAttribute("path", $this->path);
+        $help_action->setAttribute("path", Module::Active()->getPath());
         $help_action->setAttribute("sink", "helpPane");
         $help_action->setAttribute("onClick", "javascript:document.templateHelp.fetch(this)");
         $actions_title->items()->append($help_action);
@@ -284,9 +281,14 @@ class SparkTemplateAdminPage extends SparkTemplatePage
         $title->setContents($this->getName());
     }
 
-    public function update(TemplateContent $content) : void
+    /**
+     * The content in the main pane: title, caption, page actions and filters, navigation
+     * @param TemplateContent $content
+     * @return void
+     */
+    public function setContent(TemplateContent $content) : void
     {
-        parent::update($content);
+        $this->pageContent = $content;
 
         $this->setName($content->config()->title);
 
@@ -314,9 +316,6 @@ class SparkTemplateAdminPage extends SparkTemplatePage
 
     public function onEvent(SparkEvent $event): void
     {
-        //handle Template::LoadContent
-        parent::onEvent($event);
-
         if ($event->isEvent(TemplateMenuEvent::CREATED)) {
 
             //Debug::ErrorLog("MenuItemList top level count: ". SparkTemplateAdminPage::$Menu->count());

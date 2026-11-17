@@ -10,10 +10,10 @@
 //  - path files (templates/modules/main/path): contents in the site page
 //  - redirects (Module::addRedirect): the old root scripts → their paths (301)
 //
-include_once("pages/SparkModulePage.php");
+include_once("pages/SparkPage.php");
 
 $module = Module::Active();
-if (!$module->pageClass) $module->pageClass = SparkModulePage::class;
+if (!$module->pageClass) $module->pageClass = SparkPage::class;
 //public pages - no authClass
 //single pages: /contacts, not /contacts/
 $module->noTrailingSlash = true;

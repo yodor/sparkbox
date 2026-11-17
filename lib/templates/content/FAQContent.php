@@ -182,7 +182,7 @@ class FAQContent extends TemplateContent
     protected function setPageURL(URL $url, array $canonicalParameters) : void
     {
         $page = SparkPage::Instance();
-        if (method_exists($page, "setContentURL")) $page->setContentURL($url);
+        $page->setContentURL($url);
         $page->head()->addCanonicalParameter(...$canonicalParameters);
     }
 

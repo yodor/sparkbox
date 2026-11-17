@@ -89,7 +89,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
     /**
      * The page finalized its head (title, description) - the content adds what depends on them
      * (ex. the prev / next links and the page number of a paged list: AbstractResultView::AppendHeadLinks).
-     * Called by the pages of the TemplatePage trait.
+     * Called by SparkPage::headFinalize() of the frame it is in.
      * @param SparkPage $page
      * @return void
      */

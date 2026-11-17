@@ -1,4 +1,5 @@
 <?php
+include_once("pages/ISelfProcessingPage.php");
 
 class Module
 {
@@ -109,6 +110,13 @@ class Module
      * @var bool
      */
     public bool $noTrailingSlash = false;
+
+    /**
+     * The look of the module pages: css classes of the body and stylesheets (addPageClass, addPageCSS)
+     * @var array<string>
+     */
+    protected array $pageClasses = array();
+    protected array $pageCSS = array();
 
     /**
      * Current active Module instance
@@ -235,8 +243,8 @@ class Module
 
     /**
      * Page class for a path of the module (and the paths below it) instead of pageClass - modules whose paths need
-     * different pages (products: list, details). A page without the TemplatePage trait does its own work:
-     * initialize(), processInput() (when it has one), render().
+     * different pages (products: list, details). A page that implements ISelfProcessingPage does its own work:
+     * initialize(), processInput(), render(); any other page is a frame for the content of the path.
      * @param string $path module path ("details")
      * @param string $pageClass
      * @param string $include file of the class (include path) - included when the path is requested
@@ -455,6 +463,67 @@ class Module
      * The ID of the authorized user of this request (the module authClass) - -1 when not authorized
      * @return int
      */
+    /**
+     * The module path of this request in the module format ('/orders/details'); 'home' for the module folder itself
+     * @return string
+     */
+    public function getPath() : string
+    {
+        $path = (string)($_GET["path"] ?? "");
+        if (trim($path, "/") === "") return "home";
+        return Template::FormatPath($path, "/", true);
+    }
+
+    /**
+     * A css class of the body of every page of this module (the module look - set in its init.php)
+     * @param string $className
+     * @return void
+     */
+    public function addPageClass(string $className) : void
+    {
+        $this->pageClasses[] = $className;
+    }
+
+    /**
+     * A stylesheet of every page of this module (the module look - set in its init.php)
+     * @param string $href
+     * @return void
+     */
+    public function addPageCSS(string $href) : void
+    {
+        $this->pageCSS[] = $href;
+    }
+
+    /**
+     * The content of the module path for the frame '$page': the path config (Template::PathConfig - 404 for an
+     * unknown path, an error page for a failing one) and its content (Template::LoadContent: setup, initialize,
+     * processInput)
+     * @param SparkPage $page
+     * @return TemplateContent
+     * @throws Exception
+     */
+    protected function loadContent(SparkPage $page) : TemplateContent
+    {
+        $path = $this->getPath();
+        try {
+            Template::PathConfig($path);
+            $page->body()->setAttribute("path", $path);
+        }
+        catch (TemplatePathNotFound $e) {
+            Debug::ErrorLog("PathConfig: " . $e->getMessage());
+            http_response_code(404);
+            $page->head()->addMeta("robots", "noindex");
+            Template::NotFoundConfig();
+        }
+        catch (Exception $e) {
+            Debug::ErrorLog("PathConfig failed: " . $e->getMessage());
+            $message = $e->getMessage();
+            if (Debug::IsEnabled()) $message .= " - " . $e->getTraceAsString();
+            Template::ErrorConfig("Error:$path", $message);
+        }
+        return Template::LoadContent();
+    }
+
     public function getUserID() : int
     {
         return ($this->context instanceof AuthContext) ? $this->context->getID() : -1;
@@ -549,12 +618,19 @@ class Module
 
             $page = SparkLoader::Factory(SparkLoader::PREFIX_PAGES)->instance($pageClass, SparkPage::class);
             if ($page instanceof SparkPage) {
-                //handle path parameters , load module content from module path folder
+                //the module look
+                foreach ($config->pageClasses as $className) $page->body()->addClassName($className);
+                foreach ($config->pageCSS as $href) $page->head()->addCSS($href);
+
                 $page->initialize();
 
-                //a page that does its own work (no TemplatePage trait): its input, as its own script did
-                if (method_exists($page, "processInput")) {
+                if ($page instanceof ISelfProcessingPage) {
+                    //a page that answers the path itself (the product pages)
                     $page->processInput();
+                }
+                else {
+                    //the frame gets the content of the path
+                    $page->setContent($config->loadContent($page));
                 }
 
                 //the request: responders created by the page and its content, the session alert, session closed

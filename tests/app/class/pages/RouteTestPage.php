@@ -1,10 +1,11 @@
 <?php
 include_once("pages/SparkPage.php");
+include_once("pages/ISelfProcessingPage.php");
 
 /**
- * Test page without the TemplatePage trait - does its own work (initialize, processInput, render)
+ * Test page answering its path itself (ISelfProcessingPage) - does its own work (initialize, processInput, render)
  */
-class RouteTestPage extends SparkPage
+class RouteTestPage extends SparkPage implements ISelfProcessingPage
 {
     protected string $log = "";
 

@@ -44,7 +44,7 @@ class DynamicPageContent extends TemplateContent
         //one address per page: an old slug or the script address → 301
         $page = SparkPage::Instance();
         Module::RedirectCanonical($url);
-        if (method_exists($page, "setContentURL")) $page->setContentURL($url);
+        $page->setContentURL($url);
         //the canonical link - the page address (currentURL)
         $page->head()->addCanonicalParameter("dpID", "item_title");
 

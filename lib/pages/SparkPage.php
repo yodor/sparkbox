@@ -62,6 +62,19 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
      */
     protected array $canonical_params = array();
 
+    /**
+     * The content of the module path (the module engine - setContent())
+     * @var TemplateContent|null
+     */
+    protected ?TemplateContent $pageContent = null;
+
+    /**
+     * The address of this page set by its content (a page with its own URL - /pages/<id>/<slug>/): canonical and
+     * language links use it
+     * @var URL|null
+     */
+    protected ?URL $contentURL = null;
+
     public function setMetaDescription(string $description) : void
     {
         $this->description = $description;
@@ -150,6 +163,41 @@ JS;
     }
 
     /**
+     * The module engine puts the content of the path into this frame (after the content processed its input):
+     * the title of its config and its component - appended to the page here; a frame puts it where its main part is
+     * @param TemplateContent $content
+     * @return void
+     */
+    public function setContent(TemplateContent $content) : void
+    {
+        $this->pageContent = $content;
+
+        $config = $content->config();
+        if ($config->title) $this->setTitle($config->title);
+
+        $this->items()->append($content->component());
+    }
+
+    /**
+     * The content of the module path - null for a page without one
+     * @return TemplateContent|null
+     */
+    public function getContent() : ?TemplateContent
+    {
+        return $this->pageContent;
+    }
+
+    /**
+     * The content's own address - canonical and language links
+     * @param URL $url
+     * @return void
+     */
+    public function setContentURL(URL $url) : void
+    {
+        $this->contentURL = $url;
+    }
+
+    /**
      * Set the contents of the TITLE tag
      * @param string $text
      */
@@ -200,6 +248,9 @@ JS;
 
         $meta_description = Spark::MetaDescription($this->description);
         $this->head()->addMeta("description", $meta_description);
+
+        //the content adds what depends on the final title (TemplateContent::finalizeHead)
+        if ($this->pageContent instanceof TemplateContent) $this->pageContent->finalizeHead($this);
     }
 
     /**
@@ -256,12 +307,17 @@ JS;
     /**
      * The address of this page for its links (paging, sorting, filters, canonical) - default the address the
      * visitor requested (URL::Requested()): under a module rewrite it is the public address ('/authors'),
-     * not the script that answers it ('/index.php?path=/authors').
+     * not the script that answers it ('/index.php?path=/authors'); the content's own address when it set one
+     * (setContentURL).
      * @return URL
      */
     public function currentURL() : URL
     {
-        return URL::Requested();
+        if ($this->contentURL instanceof URL) return clone $this->contentURL;
+        $url = URL::Requested();
+        //a request of a module script itself (index.php?path=...) as its module path address
+        if ($url->contains("path") && class_exists("Module", false) && Module::HasActive()) return Module::PathURL("", $url);
+        return $url;
     }
 
     public function addParameterName(string $name) : void
