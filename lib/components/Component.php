@@ -366,10 +366,33 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
     }
 
+    /**
+     * The page cache key of this component: the requested address, the language, the class and the name
+     * (result views add their query). The address and not the script: under the modules every page is the
+     * module index.php, and the rendered links (pager, letters) follow the address.
+     * @return string
+     */
     public function getCacheName() : string
     {
-        return basename($_SERVER["SCRIPT_FILENAME"])."-".get_class($this)."-".$this->getName();
-        //return basename(currentURL())."-".get_class($this)."-".$this->getName();
+        return Component::CacheAddress()."-".get_class($this)."-".$this->getName();
+    }
+
+    /**
+     * The requested path and query (without tracking parameters: utm_*, fbclid, gclid, msclkid), and the active
+     * language - the part of the page cache key that identifies the page
+     * @return string
+     */
+    public static function CacheAddress() : string
+    {
+        $parts = explode("?", (string)($_SERVER["REQUEST_URI"] ?? "/"), 2);
+        $query = array();
+        if (isset($parts[1])) parse_str($parts[1], $query);
+        foreach (array_keys($query) as $name) {
+            if (str_starts_with((string)$name, "utm_") || in_array($name, array("fbclid", "gclid", "msclkid"))) unset($query[$name]);
+        }
+        ksort($query);
+        $language = class_exists("Translator", false) ? Translator::Instance()->activeCodeISO2() : "";
+        return $parts[0] . "?" . http_build_query($query) . "|" . $language;
     }
 
     public function getCaption() : string

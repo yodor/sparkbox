@@ -34,6 +34,12 @@ trait TemplatePage
     protected ?URL $contentURL = null;
 
     /**
+     * The content of this request - after it processed its input
+     * @var TemplateContent|null
+     */
+    protected ?TemplateContent $templateContent = null;
+
+    /**
      * Register for the template events and read the path parameter
      * @return void
      */
@@ -100,6 +106,7 @@ trait TemplatePage
         else if ($event->isEvent(TemplateEvent::CONTENT_INPUT_PROCESSED)) {
             $content = $event->getSource();
             if (!($content instanceof TemplateContent)) throw new Exception("Incorrect event source - expecting TemplateContent");
+            $this->templateContent = $content;
             $this->update($content);
         }
     }
@@ -112,14 +119,27 @@ trait TemplatePage
     abstract public function update(TemplateContent $content) : void;
 
     /**
-     * The address of this page when the content has its own URL (setContentURL()), otherwise the current URL as
-     * a module path URL
+     * The address of this page when the content has its own URL (setContentURL()), otherwise the requested address
+     * (SparkPage::currentURL - the module path: /authors?letter=А); a request of the module script itself
+     * (index.php?path=...) as its module path address
      * @return URL
      */
     public function currentURL() : URL
     {
         if ($this->contentURL instanceof URL) return clone $this->contentURL;
-        return Module::PathURL("", parent::currentURL());
+        $url = parent::currentURL();
+        if ($url->contains("path")) return Module::PathURL("", $url);
+        return $url;
+    }
+
+    /**
+     * The page head is final (title, description) - the content adds its part (TemplateContent::finalizeHead)
+     * @return void
+     */
+    protected function headFinalize() : void
+    {
+        parent::headFinalize();
+        if ($this->templateContent instanceof TemplateContent) $this->templateContent->finalizeHead($this);
     }
 
     /**

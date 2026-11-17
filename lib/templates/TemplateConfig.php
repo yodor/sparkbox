@@ -211,6 +211,13 @@ class TemplateConfig extends SparkObject
     public ?array $searchField = null;
 
     /**
+     * Settings of the content set by the path file - the same content class on several paths
+     * (ex. array("attribute" => "Author") - the authors index); the content documents its keys
+     * @var array
+     */
+    public array $data = array();
+
+    /**
      * Used in TableView to set the visible columns
      * @var array|null
      */

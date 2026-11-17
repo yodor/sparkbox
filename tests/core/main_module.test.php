@@ -58,3 +58,14 @@ test("an unknown path answers 404 with a plain page - main and the other modules
         assertTrue(!str_contains($body, "TemplateConfig not initialized"), "$uri: no internal message");
     }
 });
+
+test("page cache key: the requested address without tracking parameters, sorted query, the language", function () {
+    include_once("components/Component.php");
+    $_SERVER["REQUEST_URI"] = "/authors?utm_source=x&page=2&letter=A&fbclid=1";
+    $a = Component::CacheAddress();
+    $_SERVER["REQUEST_URI"] = "/authors?letter=A&page=2";
+    assertSame($a, Component::CacheAddress(), "tracking parameters and the order do not matter");
+    $_SERVER["REQUEST_URI"] = "/publishers?letter=A&page=2";
+    assertTrue($a !== Component::CacheAddress(), "another address");
+    assertTrue(str_starts_with($a, "/authors?letter=A&page=2|"), $a);
+});
