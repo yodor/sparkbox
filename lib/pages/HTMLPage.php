@@ -38,6 +38,13 @@ class HTMLPage extends Container
         $script_name = $_SERVER["SCRIPT_NAME"];
         $sname = str_replace(".php", "", basename($script_name));
         $pname = basename(dirname($script_name));
+        //a module request: the module name and its path ('main partners', 'main home', 'account orders_details')
+        //instead of the module index.php - the classes the page scripts had before ('partners', 'home')
+        if (class_exists("Module", false) && Module::HasActive()) {
+            $pname = Module::Active()->getName();
+            $path = trim((string)($_GET["path"] ?? ""), "/");
+            $sname = ($path === "") ? "home" : Template::FormatPath($path, "_", false);
+        }
         return get_class($this) . " " . $pname . " " . $sname;
     }
 

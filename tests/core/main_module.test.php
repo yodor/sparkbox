@@ -13,6 +13,7 @@ test("main: the home of the module (core default), a script path, a file name pa
     [$status, , $body] = mainRequest("", "/");
     assertSame(200, $status, "home");
     assertTrue(str_contains($body, "<html") && !str_contains($body, "Page not found"), "home page");
+    assertTrue((bool)preg_match("#<body[^>]*class='[^']*\\bmain home\\b#", $body), "body class: the module and its path");
 
     [$status, $headers, $body] = mainRequest("path=%2Fhello", "/hello");
     assertSame(200, $status, "script path");

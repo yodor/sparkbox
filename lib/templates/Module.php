@@ -161,6 +161,14 @@ class Module
         Module::Response();
     }
 
+    /**
+     * True when a module answers this request (Module::Run())
+     */
+    public static function HasActive() : bool
+    {
+        return !is_null(Module::$instance);
+    }
+
     public static function Active() : Module
     {
         if (is_null(Module::$instance)) throw new Exception("Module is not initialized");
