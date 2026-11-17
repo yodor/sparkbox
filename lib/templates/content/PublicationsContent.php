@@ -40,7 +40,7 @@ class PublicationsContent extends TemplateContent
             if (!is_array($row)) $this->moduleHome(tr("Publication not found"));
             $url = clone $itemURL;
             $url->setData(array($key => (int)$_GET[$key], "item_title" => (string)$row["item_title"]));
-            $page->redirectCanonical($url);
+            Module::RedirectCanonical($url);
             $this->setPageURL($url, array($key, "item_title"));
             $this->config->title = (string)$row["item_title"];
             $page->setMetaDescription(Spark::MetaDescription((string)$row["content"], 150));
@@ -52,7 +52,7 @@ class PublicationsContent extends TemplateContent
             if ($year < 1900 || $month < 1 || $month > 12) $this->moduleHome();
             $url = clone $archiveURL;
             $url->setData(array("year" => $year, "month" => $month));
-            $page->redirectCanonical($url);
+            Module::RedirectCanonical($url);
             $this->setPageURL($url, array("year", "month", Paginator::KEY_PAGE));
             $this->config->title = $this->listTitle() . " - " . DatedBean::MonthName($month) . " " . $year;
         }

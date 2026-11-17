@@ -55,7 +55,7 @@ class FAQContent extends TemplateContent
                 exit;
             }
             $url = FAQSectionURL::Section($selected, $list[$selected]);
-            $page->redirectCanonical($url);
+            Module::RedirectCanonical($url);
             $this->setPageURL($url, array($key, "section_name"));
             $this->config->title = $list[$selected] . " - " . tr("Frequently Asked Questions");
         }

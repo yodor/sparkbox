@@ -424,6 +424,34 @@ class Module
     }
 
     /**
+     * Answer a request for any other address of the page with a 301 to '$canonical' - one URL per page
+     * (wrong or old slugs, a missing trailing slash, the script address of a slug page).
+     * Only the path is compared; the query string of the request is kept, except parameters that
+     * '$canonical' already carries (in its path or query). GET and HEAD requests only, no JSON requests.
+     * @param URL $canonical
+     * @return void
+     */
+    public static function RedirectCanonical(URL $canonical) : void
+    {
+        if (!in_array($_SERVER["REQUEST_METHOD"] ?? "GET", array("GET", "HEAD"), true)) return;
+        include_once("responders/RequestController.php");
+        if (RequestController::isJSONRequest()) return;
+
+        $requested = URL::Requested();
+        $target = new URL($canonical->toString());
+        if (strcmp(rawurldecode($requested->getScriptName()), rawurldecode($target->getScriptName())) === 0) return;
+
+        foreach ($requested->getParameterNames() as $name) {
+            if ($canonical->contains($name) || $target->contains($name)) continue;
+            $target->add($requested->get($name));
+        }
+
+        Debug::ErrorLog("Canonical redirect: " . $requested->toString() . " -> " . $target->toString());
+        header("Location: " . $target->toString(), true, 301);
+        exit;
+    }
+
+    /**
      * The ID of the authorized user of this request (the module authClass) - -1 when not authorized
      * @return int
      */
@@ -529,9 +557,9 @@ class Module
                     $page->processInput();
                 }
 
-                //responders created by the page and its content
+                //the request: responders created by the page and its content, the session alert, session closed
                 include_once("responders/RequestController.php");
-                RequestController::Process();
+                RequestController::Respond();
 
                 $page->render();
             }

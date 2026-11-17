@@ -79,6 +79,36 @@ class RequestController
         return isset(self::$responders[$name]);
     }
 
+    /**
+     * The request step before a page renders - once per request: the responders (Process()), the session alert
+     * of the page (SessionAlertScript) and the session closed for writing. Module::Response() calls it after the
+     * content is ready; SparkPage::startRender() calls it for the plain scripts (then it does nothing for the
+     * module pages).
+     * @return void
+     * @throws Exception
+     */
+    public static function Respond() : void
+    {
+        if (self::$responded) return;
+        self::$responded = true;
+
+        //JSON responders exit; others can add page components or redirect
+        RequestController::Process();
+
+        //the alert of the session (Session::SetAlert) - shown by the page
+        include_once("components/SessionAlertScript.php");
+        new SessionAlertScript();
+
+        //responders wrote the session (uploads ...) - nothing writes it while rendering
+        Session::Close();
+    }
+
+    /**
+     * Respond() runs once per request
+     * @var bool
+     */
+    protected static bool $responded = false;
+
     public static function Process() : void
     {
         if (self::$processed) return;

@@ -176,10 +176,11 @@ JS;
      */
     protected function applyTitleDescription() : void
     {
+        //the site default: the SEO settings of the admin (config section 'seo')
         if (!$this->description) {
             $config = ConfigBean::Factory();
-            $config->setSection("store_config");
-            $this->description = $config->get("meta_description");
+            $config->setSection("seo");
+            $this->description = (string)$config->get("meta_description");
         }
     }
 
@@ -212,18 +213,9 @@ JS;
         //head output buffer
         ob_start();
 
-        //TODO: handle inside module
-        //JSONReponders exit execution
-        //can create IPageComponents
-        //can set header to redirect
-        RequestController::Process();
-
-        //process session alerts
-        new SessionAlertScript();
-
-        //close write after responders are processed, Upload responders etc
-        Session::Close();
-        ///
+        //the request step (responders, session alert, session closed) - done by the module engine for the module
+        //pages, here for the plain scripts
+        RequestController::Respond();
 
         //assign values to preferred_title and description properties
         $this->applyTitleDescription();
@@ -270,33 +262,6 @@ JS;
     public function currentURL() : URL
     {
         return URL::Requested();
-    }
-
-    /**
-     * Answer a request for any other address of this page with a 301 to '$canonical' - one URL per page
-     * (wrong or old slugs, a missing trailing slash, the script address of a slug page).
-     * Only the path is compared; the query string of the request is kept, except parameters that
-     * '$canonical' already carries (in its path or query). GET and HEAD requests only, no JSON requests.
-     * @param URL $canonical
-     * @return void
-     */
-    public function redirectCanonical(URL $canonical) : void
-    {
-        if (!in_array($_SERVER["REQUEST_METHOD"] ?? "GET", array("GET", "HEAD"), true)) return;
-        if (RequestController::isJSONRequest()) return;
-
-        $requested = URL::Requested();
-        $target = new URL($canonical->toString());
-        if (strcmp(rawurldecode($requested->getScriptName()), rawurldecode($target->getScriptName())) === 0) return;
-
-        foreach ($requested->getParameterNames() as $name) {
-            if ($canonical->contains($name) || $target->contains($name)) continue;
-            $target->add($requested->get($name));
-        }
-
-        Debug::ErrorLog("Canonical redirect: " . $requested->toString() . " -> " . $target->toString());
-        header("Location: " . $target->toString(), true, 301);
-        exit;
     }
 
     public function addParameterName(string $name) : void
