@@ -1,0 +1,21 @@
+@layer core {
+
+/* the help pane of the admin frame (AdminHelpPane) - from SparkTemplateAdminPage.css */
+
+.base .helpPane {
+        
+        border:1px dashed green;
+        display: none;
+        margin-bottom:1em;
+    }
+
+.base .helpPane .summary {
+
+        font-style:italic;
+    }
+
+.base .helpPane .error {
+
+    }
+
+}

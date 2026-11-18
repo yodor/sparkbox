@@ -6,6 +6,8 @@ include_once("templates/IContentActions.php");
 include_once("components/MenuBar.php");
 include_once("components/TextComponent.php");
 include_once("utils/Navigation.php");
+include_once("components/admin/AdminSidePane.php");
+include_once("components/admin/AdminMainPane.php");
 
 include_once("dialogs/json/JSONFormDialog.php");
 include_once("responders/json/TemplateHelpResponder.php");
@@ -30,6 +32,10 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
     protected Container $base;
 
+    protected AdminSidePane $sidePane;
+
+    protected AdminMainPane $mainPane;
+
     protected static ?MenuItemList $Menu = null;
 
     public function __construct()
@@ -44,9 +50,6 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $this->menu_bar->setClassName("admin_menu");
         $this->menu_bar->setAttribute("noattach");
 
-        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/SparkTemplateAdminPage.css");
-        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminMenu.css");
-
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/TemplateHelp.js");
 
         $this->body()->addClassName("admin_layout");
@@ -59,17 +62,20 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $basePane->setComponentClass("basePane");
         $this->items()->append($basePane);
 
-            $sidePane = $this->createSidePane();
-            $sidePane->setComponentClass("sidePane");
-            $basePane->items()->append($sidePane);
+        $this->sidePane = $this->createSidePane();
+        $basePane->items()->append($this->sidePane);
 
-            $mainPane = $this->createMainPane();
-            $mainPane->setComponentClass("mainPane");
-            $basePane->items()->append($mainPane);
+        $this->mainPane = $this->createMainPane();
+        $basePane->items()->append($this->mainPane);
+        $this->filters = $this->mainPane->filters();
+        $this->base = $this->mainPane->base();
 
-//            $helpPane = $this->createHelpPane();
-//            $helpPane->setComponentClass("helpPane");
-//            $basePane->items()->append($helpPane);
+        //the frame css, the css of its panes, the admin menu last
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/SparkTemplateAdminPage.css");
+        foreach (array_merge($this->sidePane->stylesheets(), $this->mainPane->stylesheets()) as $href) {
+            $this->head()->addCSS($href);
+        }
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/AdminMenu.css");
 
         $footerPane = new Container(false);
         $footerPane->setComponentClass("footerPane");
@@ -104,78 +110,27 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
 
 
-    protected function createSidePane() : Container
+    /**
+     * The side pane: the administrator, logout, the admin menu
+     * @return AdminSidePane
+     */
+    protected function createSidePane() : AdminSidePane
     {
-        $sidePane = new Container(false);
-        $sidePane->setComponentClass("sidePane");
-
-        $adminData = new Container(false);
-        $adminData->setComponentClass("user_data");
-        $sidePane->items()->append($adminData);
-
-        $authContext = Module::Active()->getAuthContext();
-        if (!is_null($authContext)) {
-            $username = $authContext->getData()->get(AuthContext::FULLNAME);
-            if ($username) {
-                $adminName = new TextComponent($username);
-                $adminName->setComponentClass("username");
-                $adminData->items()->append($adminName);
-            }
-
-            $buttonLogout = Button::LocationButton("Logout", Module::PathURL("logout"));
-            $adminData->items()->append($buttonLogout);
-        }
-
-
-        $sidePane->items()->append($this->menu_bar);
-
-        return $sidePane;
+        return new AdminSidePane($this->menu_bar);
     }
 
-    protected function createMainPane() : Container
+    /**
+     * The main pane: page actions, title, filters, the help pane and the content
+     * @return AdminMainPane
+     */
+    protected function createMainPane() : AdminMainPane
     {
-        $mainPane = new Container(false);
-        $mainPane->setComponentClass("mainPane");
-
-        $header = new Container(false);
-        $header->setComponentClass("header");
-        $mainPane->items()->append($header);
-
-            $caption = new Container(false);
-            $caption->setComponentClass("actions_title");
-            $header->items()->append($caption);
-
-                $actions = new Container(false);
-                $actions->setComponentClass("actions");
-                $caption->items()->append($actions);
-
-                $title = new Container(false);
-                $title->setComponentClass("title");
-                $caption->items()->append($title);
-
-            $this->filters = new Container(false);
-            $this->filters->setComponentClass("filters");
-            $header->items()->append($this->filters);
-
-        $this->base = new Container(false);
-        $this->base->setComponentClass("base");
-        $mainPane->items()->append($this->base);
-
-        $helpPane = $this->createHelpPane();
-        $helpPane->setComponentClass("helpPane");
-        $this->base->items()->append($helpPane);
-
-        $footer = new Container(false);
-        $footer->setComponentClass("footer");
-        $mainPane->items()->append($footer);
-
-        return $mainPane;
+        return new AdminMainPane();
     }
-    protected function createHelpPane() : Container
+
+    public function getMainPane() : AdminMainPane
     {
-        $helpPane = new Container(false);
-        $helpPane->setComponentClass("helpPane");
-        return $helpPane;
+        return $this->mainPane;
     }
 
     public function navigation() : Navigation
@@ -239,14 +194,8 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
     protected function setPageActions(): void
     {
 
-        $actions_title = $this->items()
-            ->getByContainerClass("basePane")->items()
-            ->getByContainerClass("mainPane")->items()
-            ->getByContainerClass("header")->items()
-            ->getByContainerClass("actions_title");
-
-        $actions = $actions_title->items()
-            ->getByContainerClass("actions");
+        $actions_title = $this->mainPane->actionsTitle();
+        $actions = $this->mainPane->actions();
 
         $this->navigation->end();
         $this->navigation->prev();
@@ -273,14 +222,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
     protected function setPageTitle() : void
     {
-        $title = $this->items()
-            ->getByContainerClass("basePane")->items()
-            ->getByContainerClass("mainPane")->items()
-            ->getByContainerClass("header")->items()
-            ->getByContainerClass("actions_title")->items()
-            ->getByContainerClass("title");
-
-        $title->setContents($this->getName());
+        $this->mainPane->title()->setContents($this->getName());
     }
 
     /**

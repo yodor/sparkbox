@@ -1,7 +1,7 @@
 @layer core {
 
-/* kept from the lower layers: their more specific rules won over the rules of this file before the cascade
-   layers - restated so they still win where they did (remove when this file is reworked) */
+/* the menu bar component's own hover color - the admin item color of this file ('.MenuBar > .ItemList > .Item')
+   would override it */
 .MenuBar .ItemList .Item.Hover { color: white; }
 
 .MenuBar {

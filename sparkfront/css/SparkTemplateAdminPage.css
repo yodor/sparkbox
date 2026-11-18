@@ -21,206 +21,17 @@
         flex-grow: 1;
     }
 
-.basePane .sidePane {
-        display: flex;
-        flex-direction: column;
-
-        width: 200px;
-        min-width: 200px;
-
-        box-sizing: border-box;
-        border-right:2px solid  var(--theme-accent);
-
-        background-image: url(../images/admin/admin_header.png);
-        background-attachment: fixed;
-    }
-
-.basePane .sidePane .user_data {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        color: white;
-        padding:1em;
-
-        background-color: #464646;
-    }
-
-.basePane .sidePane .admin_menu {
-        position: sticky;
-        top: 0;
-    }
-
-.basePane .mainPane {
-        flex-grow: 1;
-        position: relative;
-    }
-
-.basePane .mainPane .header {
-        display: flex;
-        flex-direction: column;
-
-        position: sticky;
-        top: 0;
-
-        border-bottom:1px solid #aaaaaa;
-
-        z-index: 10;
-
-        background-color: white;
-
-        gap:0.5em;
-        padding:0.5em;
-
-        background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent white */
-        backdrop-filter: blur(10px); /* Blur the background behind the element */
-        -webkit-backdrop-filter: blur(10px); /* Required for Safari support */
-
-    }
-
-.basePane .mainPane .header .actions_title {
-        display: flex;
-        flex-direction: row;
-        /*margin:0.5em;*/
-        gap:0.5em;
-    }
-
-.basePane .mainPane .header .actions_title .actions {
-        display: flex;
-        flex-direction: row;
-
-        gap:0.5em;
-    }
-
-.basePane .mainPane .header .actions_title .title {
-        font-size: 1.5em;
-        flex-grow: 1;
-    }
-
-.basePane .mainPane .header .filters {
-        display: flex;
-        flex-direction: row;
-        /*margin:0.5em;*/
-    }
-
-.basePane .mainPane .base {
-        padding-left:1em;
-        padding-top:1em;
-    }
-
-.basePane .mainPane .header .actions_title .Action {
-        width: 2em;
-        height: 2em;
-
-        background-size: cover;
-        background-repeat: no-repeat;
-        border: 1px solid green;
-        border-radius: 2em;
-    }
-
-.actions_title .Action[action]:not([action=""]) {
-        background-repeat: no-repeat;
-        /*   content: attr(title) ": ";  */
-        color: transparent;
-    }
-
-.actions_title .Action[action="Add"] {
-        background-image: url("../images/page_actions/green_plus.png");
-    }
-
-.actions_title .Action[action="Multi-Add"] {
-        background-image: url("../images/page_actions/green_multi_plus.png");
-    }
-
-.actions_title .Action[action="Back"] {
-        background-image: url("../images/page_actions/green_left.png");
-    }
-
-.actions_title .Action[action="Help"] {
-        background-image: url("../images/dialog/question.svg");
-    }
-
-.base .helpPane {
-        
-        border:1px dashed green;
-        display: none;
-        margin-bottom:1em;
-    }
-
-.base .helpPane .summary {
-
-        font-style:italic;
-    }
-
-.base .helpPane .error {
-
-    }
-
 /* wide content (long lists) scrolls inside the main pane - the page itself never scrolls sideways */
 
-.basePane .mainPane {
-        min-width: 0;
-    }
-
-.basePane .mainPane .base {
-        overflow-x: auto;
-    }
-
 /* many page actions or filters wrap instead of widening the header */
-
-.basePane .mainPane .header .actions_title,
-    .basePane .mainPane .header .actions_title .actions,
-    .basePane .mainPane .header .filters,
-    .basePane .mainPane .header .filters FORM {
-        flex-wrap: wrap;
-    }
 
 /* phones and narrow windows: the side pane goes on top, the menu folds behind its toggle */
 
 @container (max-width: 700px) {
-
-        .basePane {
+    .basePane {
             flex-direction: column;
         }
-
-        .basePane .sidePane {
-            width: auto;
-            min-width: 0;
-            border-right: none;
-            border-bottom: 2px solid var(--theme-accent);
-        }
-
-        .basePane .sidePane .user_data {
-            flex-direction: row;
-            justify-content: space-between;
-            padding: 0.5em 1em;
-        }
-
-        .basePane .sidePane .admin_menu {
-            position: static;
-        }
-
-        .basePane .sidePane .admin_menu .toggle {
-            display: block;
-        }
-
-        .basePane .sidePane .admin_menu > .ItemList {
-            display: none;
-        }
-
-        .basePane .sidePane .admin_menu[open] > .ItemList {
-            display: flex;
-        }
-
-        .basePane .mainPane .base {
-            padding-left: 0.5em;
-            padding-right: 0.5em;
-        }
-
-        .basePane .mainPane .header .actions_title .title {
-            font-size: 1.2em;
-        }
-    }
+}
 
 /* forms - carried over from the old admin (sparkbox and sparkstore AdminPage_base.css) */
 
@@ -241,37 +52,6 @@
 
 /* same width as the old admin config editor (600px grid column) */
 
-.basePane .mainPane .FormRenderer[name$="ConfigForm"] {
-        width: 37.5em;
-        max-width: 100%;
-    }
-
-.basePane .mainPane .FormRenderer[name$="ConfigForm"] .InputField.TextField INPUT,
-    .basePane .mainPane .FormRenderer[name$="ConfigForm"] .InputField.TextArea TEXTAREA {
-        width: 100%;
-    }
-
-.basePane .mainPane .FormRenderer[name$="ConfigForm"] .InputField.TextArea TEXTAREA {
-        min-height: 6em;
-    }
-
-.basePane .mainPane .TextComponent.help.summary {
-        display: block;
-        padding-top: 1em;
-        padding-bottom: 1em;
-        font-style: italic;
-    }
-
 /* list images */
-
-.basePane .mainPane .TableView .viewport .ImageList {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-.basePane .mainPane .TableView .viewport .ImageList IMG {
-        max-height: 64px;
-    }
 
 }
