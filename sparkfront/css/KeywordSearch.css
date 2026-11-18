@@ -1,20 +1,28 @@
+@layer components {
 
 .FormRenderer.KeywordSearch {
     display:inline-flex !important;
 }
+
 .FormRenderer.KeywordSearch .InputComponent {
     align-self: flex-end;
 }
-.FormRenderer.KeywordSearch .InputComponent[field='keyword'] .InputLabel {
+
+.FormRenderer.KeywordSearch .InputComponent[field="keyword"] .InputLabel {
     display: none;
 }
+
 .FormRenderer.KeywordSearch .Container.TextSpace {
     display: none;
 }
+
 .FormRenderer.KeywordSearch button {
     cursor: pointer;
 }
+
 .FormRenderer.KeywordSearch input:focus, .KeywordSearch button:focus {
     outline: 1px solid var(--theme-accent);
     /*outline-offset: 1px;*/
+}
+
 }

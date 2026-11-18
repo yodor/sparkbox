@@ -1,8 +1,4 @@
-:root {
-    /*--spark-tooltip-background: rgba(5, 32, 55, 0.9);*/
-    --spark-tooltip-background: rgba(0,0,0, 0.85);
-    --spark-tooltip-color: white;
-}
+@layer base {
 
 * {
     font-family: "Exo 2", "sans-serif";
@@ -22,13 +18,24 @@ A IMG INPUT {
     border: none;
 
 }
+
 H1 {
     margin:0;
 }
+
+}
+
+@layer core {
+
+:root {
+    /*--spark-tooltip-background: rgba(5, 32, 55, 0.9);*/
+    --spark-tooltip-background: rgba(0,0,0, 0.85);
+    --spark-tooltip-color: white;
+}
+
 .clear {
     clear: both;
 }
-
 
 .TooltipPanel {
     /*background-color: black;*/
@@ -45,5 +52,7 @@ H1 {
     z-Index: 200;
 
     display: none;
+
+}
 
 }

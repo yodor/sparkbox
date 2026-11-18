@@ -1,6 +1,9 @@
+@layer components {
+
 .GalleryView .viewport {
     gap:0.5em;
 }
+
 .GalleryViewItem {
 
     display: flex;
@@ -29,7 +32,6 @@
 
 }
 
-
 .GalleryViewItem .image_slot {
     position: relative;
     width:256px;
@@ -56,9 +58,11 @@
     padding-bottom:0.5em;
 
 }
+
 .GalleryViewItem .trailer .reposition_action {
 
 }
+
 .GalleryViewItem .trailer [action] {
     width:1.5em;
     height:1.5em;
@@ -68,6 +72,7 @@
     background-position: center center;
 
 }
+
 .GalleryViewItem .trailer [action="First"] {
     background-image: url("../images/list_actions/item_move_top.png");
 }
@@ -82,4 +87,6 @@
 
 .GalleryViewItem .trailer [action="Next"] {
     background-image: url("../images/list_actions/item_move_right.png");
+}
+
 }

@@ -1,5 +1,6 @@
+@layer core {
 
-    .admin_layout {
+.admin_layout {
         display: flex;
         flex-direction: column;
 
@@ -14,13 +15,13 @@
         container-type: inline-size;
     }
 
-    .basePane {
+.basePane {
         display: flex;
         flex-direction: row;
         flex-grow: 1;
     }
 
-    .basePane .sidePane {
+.basePane .sidePane {
         display: flex;
         flex-direction: column;
 
@@ -33,7 +34,8 @@
         background-image: url(../images/admin/admin_header.png);
         background-attachment: fixed;
     }
-    .basePane .sidePane .user_data {
+
+.basePane .sidePane .user_data {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -43,17 +45,18 @@
 
         background-color: #464646;
     }
-    .basePane .sidePane .admin_menu {
+
+.basePane .sidePane .admin_menu {
         position: sticky;
         top: 0;
     }
 
-    .basePane .mainPane {
+.basePane .mainPane {
         flex-grow: 1;
         position: relative;
     }
 
-    .basePane .mainPane .header {
+.basePane .mainPane .header {
         display: flex;
         flex-direction: column;
 
@@ -75,39 +78,37 @@
 
     }
 
-    .basePane .mainPane .header .actions_title {
+.basePane .mainPane .header .actions_title {
         display: flex;
         flex-direction: row;
         /*margin:0.5em;*/
         gap:0.5em;
     }
 
-    .basePane .mainPane .header .actions_title .actions {
+.basePane .mainPane .header .actions_title .actions {
         display: flex;
         flex-direction: row;
 
         gap:0.5em;
     }
 
-    .basePane .mainPane .header .actions_title .title {
+.basePane .mainPane .header .actions_title .title {
         font-size: 1.5em;
         flex-grow: 1;
     }
 
-    .basePane .mainPane .header .filters {
+.basePane .mainPane .header .filters {
         display: flex;
         flex-direction: row;
         /*margin:0.5em;*/
     }
 
-    .basePane .mainPane .base {
+.basePane .mainPane .base {
         padding-left:1em;
         padding-top:1em;
     }
 
-
-
-    .basePane .mainPane .header .actions_title .Action {
+.basePane .mainPane .header .actions_title .Action {
         width: 2em;
         height: 2em;
 
@@ -117,63 +118,66 @@
         border-radius: 2em;
     }
 
-    .actions_title .Action[action]:not([action='']) {
+.actions_title .Action[action]:not([action=""]) {
         background-repeat: no-repeat;
         /*   content: attr(title) ": ";  */
         color: transparent;
     }
 
-    .actions_title .Action[action='Add'] {
+.actions_title .Action[action="Add"] {
         background-image: url("../images/page_actions/green_plus.png");
     }
 
-    .actions_title .Action[action='Multi-Add'] {
+.actions_title .Action[action="Multi-Add"] {
         background-image: url("../images/page_actions/green_multi_plus.png");
     }
 
-    .actions_title .Action[action='Back'] {
+.actions_title .Action[action="Back"] {
         background-image: url("../images/page_actions/green_left.png");
     }
 
-    .actions_title .Action[action='Help'] {
+.actions_title .Action[action="Help"] {
         background-image: url("../images/dialog/question.svg");
     }
 
-    .base .helpPane {
+.base .helpPane {
         
         border:1px dashed green;
         display: none;
         margin-bottom:1em;
     }
 
-
-    .base .helpPane .summary {
+.base .helpPane .summary {
 
         font-style:italic;
     }
 
-    .base .helpPane .error {
+.base .helpPane .error {
 
     }
 
-    /* wide content (long lists) scrolls inside the main pane - the page itself never scrolls sideways */
-    .basePane .mainPane {
+/* wide content (long lists) scrolls inside the main pane - the page itself never scrolls sideways */
+
+.basePane .mainPane {
         min-width: 0;
     }
-    .basePane .mainPane .base {
+
+.basePane .mainPane .base {
         overflow-x: auto;
     }
 
-    /* many page actions or filters wrap instead of widening the header */
-    .basePane .mainPane .header .actions_title,
+/* many page actions or filters wrap instead of widening the header */
+
+.basePane .mainPane .header .actions_title,
     .basePane .mainPane .header .actions_title .actions,
     .basePane .mainPane .header .filters,
     .basePane .mainPane .header .filters FORM {
         flex-wrap: wrap;
     }
 
-    /* phones and narrow windows: the side pane goes on top, the menu folds behind its toggle */
-    @container (max-width: 700px) {
+/* phones and narrow windows: the side pane goes on top, the menu folds behind its toggle */
+
+@container (max-width: 700px) {
 
         .basePane {
             flex-direction: column;
@@ -218,46 +222,56 @@
         }
     }
 
+/* forms - carried over from the old admin (sparkbox and sparkstore AdminPage_base.css) */
 
-    /* forms - carried over from the old admin (sparkbox and sparkstore AdminPage_base.css) */
-    /* every admin form - page editors and the forms in dialogs */
-    .FormRenderer[layout="VBox"][name] {
+/* every admin form - page editors and the forms in dialogs */
+
+.FormRenderer[layout="VBox"][name] {
         gap: 1em;
     }
-    .FormRenderer[name] .InputLabel {
+
+.FormRenderer[name] .InputLabel {
         font-style: oblique;
         font-weight: 600;
         font-size: 120%;
         margin-bottom: 0.2em;
     }
 
-    /* configuration editors use the width for their text */
-    /* same width as the old admin config editor (600px grid column) */
-    .basePane .mainPane .FormRenderer[name$="ConfigForm"] {
+/* configuration editors use the width for their text */
+
+/* same width as the old admin config editor (600px grid column) */
+
+.basePane .mainPane .FormRenderer[name$="ConfigForm"] {
         width: 37.5em;
         max-width: 100%;
     }
-    .basePane .mainPane .FormRenderer[name$="ConfigForm"] .InputField.TextField INPUT,
+
+.basePane .mainPane .FormRenderer[name$="ConfigForm"] .InputField.TextField INPUT,
     .basePane .mainPane .FormRenderer[name$="ConfigForm"] .InputField.TextArea TEXTAREA {
         width: 100%;
     }
-    .basePane .mainPane .FormRenderer[name$="ConfigForm"] .InputField.TextArea TEXTAREA {
+
+.basePane .mainPane .FormRenderer[name$="ConfigForm"] .InputField.TextArea TEXTAREA {
         min-height: 6em;
     }
 
-    .basePane .mainPane .TextComponent.help.summary {
+.basePane .mainPane .TextComponent.help.summary {
         display: block;
         padding-top: 1em;
         padding-bottom: 1em;
         font-style: italic;
     }
 
-    /* list images */
-    .basePane .mainPane .TableView .viewport .ImageList {
+/* list images */
+
+.basePane .mainPane .TableView .viewport .ImageList {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
-    .basePane .mainPane .TableView .viewport .ImageList IMG {
+
+.basePane .mainPane .TableView .viewport .ImageList IMG {
         max-height: 64px;
     }
+
+}

@@ -1,4 +1,4 @@
-
+@layer components {
 
 .ResultViewHeader {
     color: black;
@@ -11,11 +11,13 @@
     gap:0.5em;
 
 }
+
 .ResultViewHeader .view_mode {
     display: flex;
     flex-direction: row;
     align-items: center;
 }
+
 .ResultViewHeader .view_mode .icon {
     background-repeat: no-repeat;
     width: 1.7em;
@@ -43,6 +45,7 @@
     flex-grow:1;
     justify-content: flex-end;
 }
+
 .ResultViewHeader .sort_fields .InputLabel {
     align-self:center;
 }
@@ -74,6 +77,7 @@
 .ResultViewHeader .sort_fields .direction[direction="ASC"] {
     background-image:url(../images/icon_sort_asc.svg)
 }
+
 .ResultViewHeader .sort_fields .direction[direction="DESC"] {
     background-image:url(../images/icon_sort_desc.svg)
 }
@@ -89,11 +93,13 @@
     flex-wrap:wrap;
     gap:0.5em;
 }
+
 @media screen and (max-width: 640px) {
-    .ResultViewFooter {
+.ResultViewFooter {
         justify-content: center;
     }
 }
+
 .ResultViewFooter .page_info {
 
 }
@@ -128,4 +134,6 @@
 .ResultViewFooter .results_info .label:after {
     content: ":";
     margin-right: 0.5em;
+}
+
 }

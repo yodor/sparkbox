@@ -1,3 +1,5 @@
+@layer components {
+
 .TreeView {
     display: inline-block;
     /*   max-width:220px; */
@@ -44,6 +46,7 @@
     width: 32px;
     height: 32px;
 }
+
 .TreeView .Node .Icon {
 
     box-sizing: border-box;
@@ -51,6 +54,7 @@
     height:32px;
     max-height:32px;
 }
+
 .TreeView .Node .Icon IMG {
 
     width:100%;
@@ -72,25 +76,24 @@
     filter: invert(.5);
 }
 
-.TreeView .Node[branch_type='opened'] + .NodeChilds {
+.TreeView .Node[branch_type="opened"] + .NodeChilds {
     display: auto;
 }
 
-.TreeView .Node[branch_type='closed'] + .NodeChilds {
+.TreeView .Node[branch_type="closed"] + .NodeChilds {
     display: none;
 }
 
-
-.TreeView .Node[branch_type='opened'] .Handle .Button {
-    background-image: url('../images/tree_node_close.svg');
+.TreeView .Node[branch_type="opened"] .Handle .Button {
+    background-image: url("../images/tree_node_close.svg");
 }
 
-.TreeView .Node[branch_type='closed'] .Handle .Button {
-    background-image: url('../images/tree_node_open.svg');
+.TreeView .Node[branch_type="closed"] .Handle .Button {
+    background-image: url("../images/tree_node_open.svg");
 }
 
-.TreeView .Node[branch_type='leaf'] .Handle .Button {
-    background-image: url('../images/tree_node_leaf.svg');
+.TreeView .Node[branch_type="leaf"] .Handle .Button {
+    background-image: url("../images/tree_node_leaf.svg");
     background-size:12%;
 }
 
@@ -126,7 +129,6 @@
 
 }
 
-
 .TreeView .Node .Control {
     display: block;
 
@@ -144,7 +146,10 @@
     display:inline-block;
 
 }
+
 .TreeView .node_checkbox INPUT {
     height:32px;
     width:auto;
+}
+
 }

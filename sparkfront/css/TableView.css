@@ -1,12 +1,16 @@
+@layer components {
+
 .TableView {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
+
 .TableView .viewport {
     display: inline-grid;
     /*grid-template-columns: auto;*/
 }
+
 .TableView .viewport .Cell {
     border: 0.1em solid #aeaeae;
     align-items: center;
@@ -15,7 +19,9 @@
 
     padding:0.3em;
 }
+
 /*alternating columns*/
+
 .TableView .viewport > .Cell:nth-child(odd) {
     /*background-color: #f3f6fb; !* light gray *!*/
 }
@@ -24,10 +30,11 @@
     /*background-color: red; !* gray *!*/
 }
 
-.TableView .viewport .Cell[parity='even'] {
+.TableView .viewport .Cell[parity="even"] {
 
 }
-.TableView .viewport .Cell[parity='odd'] {
+
+.TableView .viewport .Cell[parity="odd"] {
     background-color: #f3f6fb;
 }
 
@@ -39,15 +46,19 @@
     color: #537689;
     font-weight:bold;
 }
+
 .TableView .viewport .Header A {
     color: inherit;
 }
+
 .TableView .viewport .Cell.center {
     text-align:center;
 }
+
 .TableView .viewport .Cell.left {
     text-align:left;
 }
+
 .TableView .viewport .Cell.right {
     text-align:right;
 }
@@ -77,6 +88,7 @@
 .TableView .viewport .Header .direction[direction="ASC"] {
     background-image:url(../images/icon_sort_asc.svg)
 }
+
 .TableView .viewport .Header .direction[direction="DESC"] {
     background-image:url(../images/icon_sort_desc.svg)
 }
@@ -86,5 +98,7 @@
 }
 
 .TableView .viewport .ActionsCellRenderer .actions_list>* {
+
+}
 
 }

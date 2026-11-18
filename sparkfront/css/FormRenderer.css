@@ -1,4 +1,7 @@
+@layer components {
+
 /* FormRendererHBox.css */
+
 .FormRenderer[layout="HBox"] {
     display:inline-grid;
     grid-template-columns: auto auto;
@@ -53,7 +56,9 @@
 
     gap:0.5em;
 }
+
 /* FormRendererVBox.css */
+
 .FormRenderer[layout="VBox"] {
     display: inline-flex;
     flex-direction: column;
@@ -107,11 +112,11 @@
     min-width:0;
     white-space: wrap;
 }
+
 .FormRenderer * {
     min-width:0;
     white-space: wrap;
 }
-
 
 .InputComponent {
     box-sizing: border-box;
@@ -120,9 +125,11 @@
 .InputComponent.Hidden {
     display:none;
 }
+
 .InputComponent.Hidden * {
     display: none;
 }
+
 .InputComponent.Hidden * {
     display: none;
 }
@@ -149,9 +156,13 @@
 .FormValueList {
 
 }
+
 .FormValueList .item .label {
 
 }
+
 .FormValueList .item .label:after {
     content: ": ";
+}
+
 }

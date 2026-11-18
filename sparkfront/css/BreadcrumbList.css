@@ -1,3 +1,5 @@
+@layer components {
+
 .BreadcrumbList {
     display:inline-flex;
     flex-wrap: wrap;
@@ -15,7 +17,6 @@
     text-transform: capitalize ;
 
 }
-
 
 .BreadcrumbList .BreadcrumbListItem .Action {
     font-weight: normal;
@@ -37,5 +38,7 @@
 
 .BreadcrumbList .BreadcrumbListItem:last-child:after {
     display: none;
+
+}
 
 }

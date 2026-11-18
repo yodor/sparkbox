@@ -1,3 +1,5 @@
+@layer components {
+
 .InputField.SessionUpload .FieldElements {
 
     flex-direction: column;
@@ -13,7 +15,7 @@
     white-space: nowrap;
 }
 
-.InputField.SessionUpload .Details .Limits  {
+.InputField.SessionUpload .Details .Limits {
     display: inline-block;
     font-size: 80%;
 }
@@ -22,18 +24,17 @@
     content: ": ";
 }
 
-.InputField.SessionUpload .Details .Limits [field='max_post_size'] {
+.InputField.SessionUpload .Details .Limits [field="max_post_size"] {
     display: none;
 }
 
-.InputField.SessionUpload .Details .Limits [field='memory_limit'] {
+.InputField.SessionUpload .Details .Limits [field="memory_limit"] {
     display: none;
 }
 
-.InputField.SessionUpload .Details .Limits [field='accept_mimes'] {
+.InputField.SessionUpload .Details .Limits [field="accept_mimes"] {
     display: none;
 }
-
 
 .InputField.SessionUpload .Controls {
 
@@ -41,16 +42,15 @@
 
 }
 
-.InputField.SessionUpload .Controls [type='button'] {
+.InputField.SessionUpload .Controls [type="button"] {
     cursor:pointer;
 }
 
-.InputField.SessionUpload .Controls [action='browse'] {
+.InputField.SessionUpload .Controls [action="browse"] {
     position:relative;
     box-sizing:border-box;
     overflow:clip;
 }
-
 
 .InputField.SessionUpload .Controls INPUT[type="file"] {
     display:none;
@@ -70,7 +70,7 @@
     height:100%;
 }
 
-.InputField.SessionUpload .Controls[working] [action='browse'] {
+.InputField.SessionUpload .Controls[working] [action="browse"] {
     background-color: transparent;
     color:transparent;
     box-shadow: none;
@@ -104,7 +104,6 @@
 
 }
 
-
 .InputField.SessionUpload .ArrayContents {
     display:inline-flex;
     flex-direction: row;
@@ -126,6 +125,7 @@
 
 
 }
+
 .InputField.SessionUpload .ArrayContents .Element .info {
     display: flex;
     flex-direction: column;
@@ -137,15 +137,19 @@
     flex-direction: row;
     gap:0.5em;
 }
+
 .InputField.SessionUpload .ArrayContents .Element .info .item .label:after {
     content: ": ";
 }
+
 .InputField.SessionUpload .ArrayContents .Element .info .item .label {
     display: none;
 }
 
 /*.InputField.SessionUpload .ArrayContents .Element .info .item.filename {*/
+
 /*    display: none;*/
+
 /*}*/
 
 .InputField.SessionUpload .ArrayContents .Element .remove_button {
@@ -182,7 +186,6 @@
 
 }
 
-
 .InputField.SessionUpload.SessionFile .ArrayContents .Element .thumbnail {
     margin-right: 0;
 
@@ -199,4 +202,6 @@
 .InputField.SessionUpload.SessionFile .ArrayContents .Element .filesize {
     display: block;
     font-size: 70%;
+}
+
 }

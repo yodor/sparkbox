@@ -1,3 +1,5 @@
+@layer components {
+
 .MenuBar {
     /*left align the toggle*/
     justify-content: flex-start;
@@ -9,11 +11,13 @@
 }
 
 /*hide the menu component by default*/
+
 .MenuBar > .ItemList {
     display: none;
 }
 
 /*hamburger menu is open - have class .normal have attribute open */
+
 .MenuBar[open] > .ItemList {
     display: flex;
 
@@ -56,6 +60,7 @@
 }
 
 /*only active items' submenu is visible*/
+
 .MenuBar[open] .Item[active="1"] > .Submenu {
 
     position: relative;
@@ -72,20 +77,29 @@
 
     /*margin-top:0.5em;*/
 }
+
 .MenuBar[open] .Item[active="1"] > .Submenu > .Item {
     padding-left:0em;
     color:white;
 }
+
 .MenuBar[open] .Item[active="1"] > .Submenu {
     margin-top:0.5em;
 }
+
 /*.MenuBar[open] .Item[active="1"] > .Submenu .Item:first-of-type {*/
+
 /*    padding-top:1.5em;*/
+
 /*}*/
+
 .MenuBar[open] .Item {
     color: black;
     /*border-top: 1px dotted gray;*/
 }
+
 .MenuBar[open] .Item:first-of-type {
     border-top: none;
+}
+
 }

@@ -1,3 +1,4 @@
+@layer components {
 
 .GalleryTape .contents {
 
@@ -31,7 +32,6 @@
 .GalleryTape .contents .button.right {
     background-image: url("../images/gallery_tape_right.png");
 }
-
 
 .GalleryTape .contents .viewport {
     display: table-cell;
@@ -72,4 +72,6 @@
 .GalleryTape .contents .viewport .slots .slot IMG {
     /*border: 1px solid #dcdedb;*/
     display: block;
+}
+
 }

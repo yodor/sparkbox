@@ -13,12 +13,19 @@ class HTMLHead extends Container implements IObserver
 {
 
     /**
-     * The cascade layers by origin, the later wins whatever the specificity: core (sparkfront/css), store
-     * (storefront/css), site (the css of the site). Each stylesheet wraps its rules in its layer -
-     * '@layer core { ... }'; a stylesheet without a layer wins over all of them (the site css until it moves to
-     * '@layer site').
+     * The cascade layers, the later wins whatever the specificity:
+     *  - base: the element rules of every stylesheet (selectors of elements only - body, h1, img, nav ul ...):
+     *    they never win over a class rule, so they stay below the components
+     *  - components: the building blocks of the core - one stylesheet per component class (Action, ColorButton,
+     *    FormRenderer, InputField, TableView, TreeView, MenuBar, the dialogs ...), their plain look
+     *  - core: the core frames and module contents (SparkPage, SparkTemplateAdminPage, faq, news)
+     *  - store: the store frame, the store components and modules (sparkstore storefront/css)
+     *  - site: the css of the site
+     * Each stylesheet wraps its rules in its layer - '@layer components { ... }', its element rules in
+     * '@layer base { ... }'. A building block is a default:
+     * a frame, a module or a site adjusts it without a more specific selector.
      */
-    protected static string $cssLayers = "@layer core, store, site;";
+    protected static string $cssLayers = "@layer base, components, core, store, site;";
 
     protected static ?HTMLHead $instance = null;
 

@@ -1,8 +1,10 @@
+@layer components {
 
 .PhraseTranslationDialog .Contents .Text {
     width:100%;
     height:100%;
 }
+
 .PhraseTranslationDialog .Contents TABLE {
 
     width:100%;
@@ -32,18 +34,20 @@
     resize: none;
 }
 
-.PhraseTranslationDialog .Contents TEXTAREA[name='phrase'] {
+.PhraseTranslationDialog .Contents TEXTAREA[name="phrase"] {
 
 }
 
-.PhraseTranslationDialog .Contents TEXTAREA[name='translation'] {
+.PhraseTranslationDialog .Contents TEXTAREA[name="translation"] {
 
 }
 
-.PhraseTranslationDialog .Contents .Container.Buttons [action='Translate'] {
+.PhraseTranslationDialog .Contents .Container.Buttons [action="Translate"] {
     float: left;
 }
 
-.PhraseTranslationDialog .Contents .Container.Buttons [action='Close'] {
+.PhraseTranslationDialog .Contents .Container.Buttons [action="Close"] {
     float: right;
+}
+
 }

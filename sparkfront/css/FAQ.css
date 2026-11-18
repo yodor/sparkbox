@@ -1,22 +1,32 @@
+@layer core {
+
 /* frequently asked questions (faq module) - the base look; a layer or a site styles over it */
+
 .faq_sections .menu_links .item {
     display: block;
     padding: 0.4em 0;
 }
+
 .faq_sections .menu_links .item.selected {
     font-weight: bold;
 }
+
 .column.qa .faq_section {
     margin-bottom: 1.5em;
 }
+
 .column.qa details.item {
     border-bottom: 1px solid #dddddd;
     padding: 0.6em 0;
 }
+
 .column.qa summary.question {
     cursor: pointer;
     font-weight: bold;
 }
+
 .column.qa .answer {
     padding: 0.6em 0 0.2em 1em;
+}
+
 }

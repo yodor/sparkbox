@@ -1,3 +1,5 @@
+@layer components {
+
 :root {
     --spark-button-background-color: #506266;
     --spark-button-border-color: var(--spark-button-background-color);
@@ -22,7 +24,6 @@
     --spark-submit-button-font-weight: var(--spark-button-font-weight);
     --spark-submit-button-font-size: var(--spark-button-font-weight);
 }
-
 
 .ColorButton {
     display: inline-flex;
@@ -71,7 +72,7 @@
 
 }
 
-.ColorButton[action="submit"] , .ColorButton[type="submit"]  {
+.ColorButton[action="submit"] , .ColorButton[type="submit"] {
     color: var(--spark-submit-button-text-color);
     border: 1px solid var(--spark-submit-button-border-color);
     background-color: var(--spark-submit-button-background-color);
@@ -84,6 +85,9 @@
     text-decoration: var(--spark-submit-button-text-decoration);
     text-transform: var(--spark-submit-button-text-transfrom);
 }
-.ColorButton[action="submit"]:hover , .ColorButton[type="submit"]:hover  {
+
+.ColorButton[action="submit"]:hover , .ColorButton[type="submit"]:hover {
     box-shadow: 0 0 0.1em 0.1em var(--spark-submit-button-background-color);
+}
+
 }

@@ -1,3 +1,5 @@
+@layer components {
+
 .Marquee {
 
     display: flex ;
@@ -6,6 +8,7 @@
     width: calc(100%) ;
 
 }
+
 .Marquee * {
     animation-duration: 20s ;
     animation-iteration-count: infinite ;
@@ -27,6 +30,7 @@
 * And, once each of them has translated to -100%, they will both snap back into
 * place, making it seem as if they are continuously scrolling.
 */
+
 @keyframes marquee-content {
     from {
         transform: translateX( 0% );
@@ -34,4 +38,6 @@
     to {
         transform: translateX( -100% );
     }
+}
+
 }

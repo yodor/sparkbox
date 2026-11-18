@@ -1,3 +1,4 @@
+@layer components {
 
 .Dialog.MCEImageBrowserDialog .Inner .Content {
     flex-direction:column;
@@ -26,7 +27,6 @@
     border: 1px solid black;
 }
 
-
 .MCEImageBrowserDialog .ImageStorage .Element .remove_button {
     display: block;
     width: 25px;
@@ -48,7 +48,6 @@
     cursor: pointer;
 }
 
-
 .ImageDimensionComponent .preview {
     display: inline-block;
     vertical-align: top;
@@ -58,4 +57,6 @@
 .ImageDimensionComponent .dimension {
     display: inline-block;
     vertical-align: top;
+}
+
 }

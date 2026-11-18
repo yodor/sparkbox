@@ -1,4 +1,7 @@
+@layer core {
+
 /*latest news*/
+
 .Publications.latest {
     display:block;
 }
@@ -43,7 +46,6 @@
     font-style: italic;
 }
 
-
 /*archive items*/
 
 .DatedArchive {
@@ -75,7 +77,7 @@
     display: grid;
 }
 
-.DatedArchive .year .months  {
+.DatedArchive .year .months {
     display: none;
     grid-template-rows: auto;
     grid-template-columns: 1fr 1fr 1fr;
@@ -100,19 +102,24 @@
     text-decoration: underline;
 
 }
+
 /**/
-.DatedItem  {
+
+.DatedItem {
     display:flex;
     flex-direction: column;
 }
+
 .DatedItem .title {
     display:block;
     /*padding-right:1em;*/
 }
+
 .DatedItem .date {
     font-style: italic;
     margin-bottom:1em;
 }
+
 .DatedItem .thumbnail {
     display:block;
 
@@ -127,4 +134,6 @@
 .DatedItem .content {
     font-style: italic;
     padding-right:1em;
+}
+
 }

@@ -1,3 +1,5 @@
+@layer components {
+
 .ImagePopup {
     cursor:pointer;
 }
@@ -30,6 +32,7 @@
     z-index:101;
 
 }
+
 .ImagePopupPane .Button {
     filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.95));
 }
@@ -63,6 +66,7 @@
 
 
 }
+
 .ImagePopupPane .Header .Button[action="CloseImage"] {
     background-image: url("../images/close.png");
 
@@ -111,7 +115,7 @@
 
 }
 
-.ImagePopupPane .Footer  {
+.ImagePopupPane .Footer {
     height:50px;
 }
 
@@ -120,14 +124,14 @@
     to {transform:rotate(360deg);}
 }
 
-
 .ImagePopupPane[loading] .Button {
     display:none;
 
 }
+
 .ImagePopupPane[loading] .Contents:after {
 
-    content:'';
+    content:"";
 
     /*display:block;*/
     position:absolute;
@@ -158,4 +162,6 @@
 
 .ImagePopupPane[zoom] .Contents .Button {
     display:none;
+}
+
 }

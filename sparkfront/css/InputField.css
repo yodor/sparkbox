@@ -1,3 +1,21 @@
+@layer base {
+
+TEXTAREA {
+    outline: 0;
+    margin: 0;
+    padding: 0.2em;
+
+    background-color: white;
+
+    border-top: 1px solid #b7b7b7;
+    border-left: 1px solid #b7b7b7;
+    border-right: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+}
+
+@layer components {
 
 .InputLabel {
     align-self:flex-start;
@@ -11,7 +29,6 @@
 .InputLabel[error] {
     color: rgb(255, 0, 170);
 }
-
 
 .InputField {
 
@@ -39,7 +56,7 @@
     padding: 5px;
  }
 
-.InputField INPUT, TEXTAREA {
+.InputField INPUT {
     outline: 0;
     margin: 0;
     padding: 0.2em;
@@ -84,7 +101,9 @@
     align-items: center;
 }
 
-.InputField INPUT[type='checkbox'], INPUT[type='radio'] {
+.InputField INPUT[type="checkbox"], INPUT[type="radio"] {
     width: 1.2em;
     height: 1.2em;
+}
+
 }

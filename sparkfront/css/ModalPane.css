@@ -1,3 +1,5 @@
+@layer components {
+
 .ModalPane {
     background-color: rgba(0,0,0,0.9);
     position: fixed;
@@ -11,4 +13,6 @@
     grid-template-rows: auto;
     align-items: center;
     justify-items: center;
+}
+
 }

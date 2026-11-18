@@ -1,11 +1,19 @@
+@layer core {
+
+/* kept from the lower layers: their more specific rules won over the rules of this file before the cascade
+   layers - restated so they still win where they did (remove when this file is reworked) */
+.MenuBar .ItemList .Item.Hover { color: white; }
+
 .MenuBar {
     flex-flow: column wrap;
     align-items: normal;
 
 }
+
 .MenuBar .toggle {
     filter: invert(1);
 }
+
 .MenuBar .ItemList {
 
     flex-direction: column;
@@ -13,6 +21,7 @@
 }
 
 /*all items*/
+
 .MenuBar .ItemList .Item {
     border-top: 1px solid  #b9b3a3;
     flex-direction: column;
@@ -21,22 +30,26 @@
     white-space: break-spaces;
     word-break: break-all;
 }
+
 .MenuBar .ItemList .Item .Link {
     padding:0.5em;
 }
 
 /*top level items only*/
+
 .MenuBar > .ItemList > .Item {
     color:#517688;
 }
 
 /*top level selected item only*/
+
 .MenuBar > .ItemList > .Item[active="1"] {
     background-color: #b9b3a3;
     color: white;
 }
 
 /*only active items' submenu is visible*/
+
 .MenuBar .Item[active="1"] > .Submenu {
     display:flex;
     position:relative;
@@ -45,6 +58,7 @@
 }
 
 /*visible submenu items padded */
+
 .MenuBar .Item[active="1"] > .Submenu > .Item {
 
     padding-left:0.5em;
@@ -65,14 +79,10 @@
 }
 
 /*sub items of the active item*/
+
 .MenuBar .Item[active="1"] > .Submenu > .Item[active="1"] .Item {
     border:0;
     /*color:red;*/
 }
 
-
-
-
-
-
-
+}

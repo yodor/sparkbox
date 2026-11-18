@@ -1,3 +1,5 @@
+@layer components {
+
 .ArrayField {
 
     background-color: transparent !important;
@@ -9,7 +11,6 @@
 .ArrayField .ArrayControls {
     margin-bottom: 0.3em;
 }
-
 
 .ArrayField .ElementSource {
     display: none;
@@ -30,5 +31,4 @@
     display:inline-block;
 }
 
-
-
+}

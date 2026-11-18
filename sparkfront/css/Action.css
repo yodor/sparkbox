@@ -1,15 +1,18 @@
+@layer components {
+
 .Action {
-    color: #50a9f9;
+    /* the link color of the actions - a theme sets --spark-action-color */
+    color: var(--spark-action-color, #50a9f9);
     text-decoration: none;
     cursor:pointer;
 }
 
-.Action[action='Pipe'] {
+.Action[action="Pipe"] {
     color: #cccccc;
     cursor: auto;
 }
 
-.Action[action='Row'] {
+.Action[action="Row"] {
     display: block;
     cursor: auto;
 }
@@ -43,13 +46,15 @@
     background-size:contain;
     align-self: flex-start;
 }
+
 .Action[action="Clear"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/item_delete.png");
     background-repeat: no-repeat;
     background-position:left center;
 }
-.Action[action='inline-new'] {
+
+.Action[action="inline-new"] {
     padding-left: 12px;
     background-image: url("../images/list_actions/inline-new.png");
     background-repeat: no-repeat;
@@ -83,12 +88,12 @@
     background-repeat: no-repeat;
 }
 
-
-
-.ColorButton + .Action[action='inline-new'] {
+.ColorButton + .Action[action="inline-new"] {
     margin-left: 5px;
 }
 
 [action="TranslateBeanField"] {
     cursor: pointer;
+}
+
 }
