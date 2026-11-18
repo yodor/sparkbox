@@ -11,7 +11,7 @@ include_once("components/renderers/cells/ActionsCell.php");
 
 if (URL::Current()->contains("editID")) {
 
-    $config = TemplateConfig::Editor(AdminUsersBean::class, AdminUserForm::class);
+    $config = BeanEditor::Configure(AdminUsersBean::class, AdminUserForm::class);
     $config->title = tr("Administrator");
 
     $config->observer = function (TemplateEvent $event) {
@@ -43,7 +43,7 @@ else {
     $query = $bean->query("userID", "email", "fullname", "access_level", "date_created", "last_active", "counter", "suspend");
     $query->stmt->alias("(SELECT group_concat(ac.role SEPARATOR '; ') FROM admin_access ac WHERE ac.userID=admin_users.userID)", "roles");
 
-    $config = TemplateConfig::List(AdminUsersBean::class);
+    $config = BeanList::Configure(AdminUsersBean::class);
     $config->title = tr("Administrators");
     $config->iterator = $query;
     $config->listFields = array("email" => "Email", "fullname" => "Full Name", "date_created" => "Date Created",

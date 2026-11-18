@@ -10,9 +10,9 @@ class Plain extends TemplateContent
      * @param string $description
      * @return TemplateConfig
      */
-    public static function Configure(string $title, string $description) : TemplateConfig
+    public static function Configure(string $title = "", string $description = "") : TemplateConfig
     {
-        $config = TemplateConfig::Content(static::class);
+        $config = parent::Configure();
         $config->title = $title;
         $config->description = $description;
         return $config;

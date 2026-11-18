@@ -23,9 +23,10 @@ class BeanEditor extends TemplateContent
      * @param string $formClass
      * @return BeanConfig
      */
-    public static function Configure(string $beanClass, string $formClass) : BeanConfig
+    public static function Configure(string $beanClass = "", string $formClass = "") : BeanConfig
     {
-        $config = BeanConfig::Content(static::class, $beanClass);
+        $config = parent::Configure();
+        $config->beanClass = $beanClass;
         $config->formClass = $formClass;
         return $config;
     }

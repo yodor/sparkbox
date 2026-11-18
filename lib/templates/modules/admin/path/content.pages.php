@@ -25,10 +25,10 @@ function DynamicPagesChooserURL() : ?URL
 }
 
 if (URL::Current()->contains("editID")) {
-    $config = TemplateConfig::Editor(DynamicPagesBean::class, DynamicPageForm::class);
+    $config = BeanEditor::Configure(DynamicPagesBean::class, DynamicPageForm::class);
 }
 else {
-    $config = TemplateConfig::List(DynamicPagesBean::class);
+    $config = BeanList::Configure(DynamicPagesBean::class);
     $config->title = tr("Dynamic Pages");
     $config->listFields = array("position" => "#", "item_photo" => "Photo", "item_title" => "Title",
         "item_date" => "Date", "visible" => "Visible", "keywords" => "Keywords");

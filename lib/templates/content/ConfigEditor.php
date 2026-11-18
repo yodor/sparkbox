@@ -22,9 +22,9 @@ class ConfigEditor extends TemplateContent
      * @param string $formClass
      * @return BeanConfig
      */
-    public static function Configure(string $section, string $formClass) : BeanConfig
+    public static function Configure(string $section = "", string $formClass = "") : BeanConfig
     {
-        $config = BeanConfig::Content(static::class);
+        $config = parent::Configure();
         $config->configSection = $section;
         $config->formClass = $formClass;
         return $config;

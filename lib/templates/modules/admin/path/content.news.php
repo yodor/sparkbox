@@ -5,10 +5,10 @@ include_once("components/renderers/cells/ImageCell.php");
 include_once("components/renderers/cells/DateCell.php");
 
 if (URL::Current()->contains("editID")) {
-    $config = TemplateConfig::Editor(NewsItemsBean::class, NewsItemInputForm::class);
+    $config = BeanEditor::Configure(NewsItemsBean::class, NewsItemInputForm::class);
 }
 else {
-    $config = TemplateConfig::List(NewsItemsBean::class);
+    $config = BeanList::Configure(NewsItemsBean::class);
     $config->title = tr("News Items");
     $config->listFields = array("item_photo" => "Photo", "item_title" => "Title", "item_date" => "Date");
     $config->searchField = array("item_title");

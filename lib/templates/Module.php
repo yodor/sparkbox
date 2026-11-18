@@ -194,7 +194,26 @@ class Module
     public function initialize() : void
     {
         Module::$instance = $this;
+        Module::RegisterContentLoader();
         SparkLoader::Factory(Module::Active()->getPreifx())->include(Module::INIT_NAME, true);
+    }
+
+    /**
+     * The content classes are loaded when used - a path file calls BeanList::Configure(...) without an include:
+     * the content folder of the active module (site, store, core), else the shared contents (contentLoader())
+     * @return void
+     */
+    protected static function RegisterContentLoader() : void
+    {
+        static $registered = false;
+        if ($registered) return;
+        $registered = true;
+
+        spl_autoload_register(function (string $className) : void {
+            if (!Module::HasActive() || !Spark::ValidClassName($className)) return;
+            $file = Module::Active()->contentLoader($className)->find($className);
+            if ($file !== "") include_once($file);
+        });
     }
 
 

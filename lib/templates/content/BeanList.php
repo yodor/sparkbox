@@ -20,13 +20,16 @@ class BeanList extends TemplateContent
         return BeanConfig::class;
     }
     /**
-     * The config of a list of the bean '$beanClass' (BeanConfig: listFields, searchField, iterator ...)
+     * The config of a list of the bean '$beanClass' (BeanConfig: listFields, searchField, iterator ...) - also for
+     * the subclasses (BeanTree, BeanGallery, the store lists)
      * @param string $beanClass
      * @return BeanConfig
      */
-    public static function Configure(string $beanClass) : BeanConfig
+    public static function Configure(string $beanClass = "") : BeanConfig
     {
-        return BeanConfig::Content(static::class, $beanClass);
+        $config = parent::Configure();
+        $config->beanClass = $beanClass;
+        return $config;
     }
 
 

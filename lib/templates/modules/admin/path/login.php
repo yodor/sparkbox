@@ -1,2 +1,2 @@
 <?php
-$config = TemplateConfig::Login();
+$config = Login::Configure();

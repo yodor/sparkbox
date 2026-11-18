@@ -4,7 +4,7 @@ include_once("forms/MenuItemForm.php");
 
 if (URL::Current()->contains("editID")) {
     //MenuItemForm needs the bean - set when the content is set up
-    $config = TemplateConfig::Editor(MenuItemsBean::class, "");
+    $config = BeanEditor::Configure(MenuItemsBean::class, "");
     $config->title = tr("Menu Item");
     $config->observer = function (TemplateEvent $event) {
         if (!$event->isEvent(TemplateEvent::CONTENT_SETUP)) return;
@@ -16,7 +16,7 @@ if (URL::Current()->contains("editID")) {
     };
 }
 else {
-    $config = TemplateConfig::Tree(MenuItemsBean::class);
+    $config = BeanTree::Configure(MenuItemsBean::class);
     $config->title = tr("Main Menu");
     //label of the tree items
     $config->listFields = array("menu_title" => "Menu Title");

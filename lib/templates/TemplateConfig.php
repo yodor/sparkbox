@@ -10,60 +10,13 @@ class TemplateConfigEvent extends SparkEvent
 /**
  * The configuration of a module path for its content - the context passed to the content: the content class,
  * title, description, authorization, the content settings (data) and an observer of the template events.
- * A path file creates it (TemplateConfig::Factory(), or the factory of the content: BeanList::Configure() ...); the
+ * A path file creates it (the factory of its content: BeanList::Configure() ..., or TemplateConfig::Factory()); the
  * last one created is the active one. Contents with more settings have their own config class (BeanConfig).
  */
 class TemplateConfig extends SparkObject
 {
 
     protected static ?TemplateConfig $Active = null;
-
-    /**
-     * Transition wrappers - the content owns its config factory now (BeanList::Configure(), BeanEditor::Configure() ...)
-     * @deprecated
-     */
-    public static function List(string $beanClass): BeanConfig
-    {
-        return BeanConfig::Content(BeanList::class, $beanClass);
-    }
-
-    /** @deprecated BeanTree::Configure() */
-    public static function Tree(string $beanClass): BeanConfig
-    {
-        return BeanConfig::Content(BeanTree::class, $beanClass);
-    }
-
-    /** @deprecated BeanGallery::Configure() */
-    public static function Gallery(string $beanClass): BeanConfig
-    {
-        return BeanConfig::Content(BeanGallery::class, $beanClass);
-    }
-
-    /** @deprecated BeanEditor::Configure() */
-    public static function Editor(string $beanClass, string $formClass): BeanConfig
-    {
-        $config = BeanConfig::Content(BeanEditor::class, $beanClass);
-        $config->formClass = $formClass;
-        return $config;
-    }
-
-    /** @deprecated ConfigEditor::Configure() */
-    public static function Config(string $section, string $formClass) : BeanConfig
-    {
-        $config = BeanConfig::Content(ConfigEditor::class);
-        $config->configSection = $section;
-        $config->formClass = $formClass;
-        return $config;
-    }
-
-    /** @deprecated Plain::Configure() */
-    public static function Plain(string $title, string $description) : TemplateConfig
-    {
-        $config = TemplateConfig::Content(Plain::class);
-        $config->title = $title;
-        $config->description = $description;
-        return $config;
-    }
 
     /**
      * A config of this class with the generic settings of '$other' - Template::LoadContent() converts the config
@@ -120,23 +73,6 @@ class TemplateConfig extends SparkObject
         $config->filename = "";
         $config->clearNavigation = false;
         $config->requireAuth = true;
-    }
-
-    /** @deprecated Login::Configure() */
-    public static function Login() : TemplateConfig
-    {
-        $config = TemplateConfig::Content(Login::class);
-        $config->requireAuth = false;
-        $config->clearNavigation = true;
-        return $config;
-    }
-
-    /** @deprecated Password::Configure() */
-    public static function Password() : TemplateConfig
-    {
-        $config = TemplateConfig::Content(Password::class);
-        $config->requireAuth = false;
-        return $config;
     }
 
     public static function WrapObserver(Closure $current, ?Closure $parent = null): Closure

@@ -227,7 +227,7 @@ final class Template
 
     public static function ErrorConfig(string $title, string $message): void
     {
-        $config = TemplateConfig::Plain($title, $message);
+        $config = Plain::Configure($title, $message);
         $config->requireAuth = false;
         //Emit here
         SparkEventManager::emit(new TemplateConfigEvent(TemplateConfigEvent::UPDATE, $config));

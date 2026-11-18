@@ -1,3 +1,3 @@
 <?php
-$config = TemplateConfig::Plain("Route Home", "");
+$config = Plain::Configure("Route Home", "");
 $config->requireAuth = false;

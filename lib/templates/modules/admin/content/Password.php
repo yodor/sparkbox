@@ -13,7 +13,7 @@ class Password extends TemplateContent
      */
     public static function Configure() : TemplateConfig
     {
-        $config = TemplateConfig::Content(static::class);
+        $config = parent::Configure();
         $config->requireAuth = false;
         return $config;
     }

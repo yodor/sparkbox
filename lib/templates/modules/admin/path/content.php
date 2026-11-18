@@ -1,3 +1,3 @@
 <?php
-$config = TemplateConfig::Plain("Content", tr("Content Management"));
+$config = Plain::Configure("Content", tr("Content Management"));
 $config->clearNavigation = true;
