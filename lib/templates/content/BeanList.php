@@ -1,4 +1,5 @@
 <?php
+include_once("templates/BeanConfig.php");
 include_once("templates/TemplateContent.php");
 include_once("components/KeywordSearch.php");
 include_once("components/TableView.php");
@@ -9,6 +10,25 @@ include_once("responders/ToggleFieldResponder.php");
 
 class BeanList extends TemplateContent
 {
+
+    /**
+     * Works on a bean - BeanConfig
+     * @return string
+     */
+    public static function ConfigClass() : string
+    {
+        return BeanConfig::class;
+    }
+    /**
+     * The config of a list of the bean '$beanClass' (BeanConfig: listFields, searchField, iterator ...)
+     * @param string $beanClass
+     * @return BeanConfig
+     */
+    public static function Configure(string $beanClass) : BeanConfig
+    {
+        return BeanConfig::Content(static::class, $beanClass);
+    }
+
 
     /**
      * @var array

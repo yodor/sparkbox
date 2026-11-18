@@ -110,6 +110,12 @@ final class Template
         $cmp = SparkLoader::Factory(Template::PREFIX_CONTENT)->instance($config->contentClass, TemplateContent::class);
         if (!($cmp instanceof TemplateContent)) throw new Exception("Content class not instance of TemplateContent");
 
+        //the config class of the content (BeanConfig ...) - a path file may have created a plain one
+        $configClass = $cmp::ConfigClass();
+        if (!($config instanceof $configClass)) {
+            $config = $configClass::From($config);
+        }
+
         //register here - allow modification during PathConfig inclusion
         if (!is_null($config->observer)) {
             SparkEventManager::register(TemplateEvent::class, new SparkObserver($config->observer));

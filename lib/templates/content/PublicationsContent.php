@@ -1,4 +1,5 @@
 <?php
+include_once("templates/BeanConfig.php");
 include_once("templates/TemplateContent.php");
 include_once("components/Publications.php");
 include_once("utils/url/PublicationURL.php");
@@ -16,6 +17,15 @@ include_once("beans/NewsItemsBean.php");
  */
 class PublicationsContent extends TemplateContent
 {
+
+    /**
+     * Works on a bean - BeanConfig
+     * @return string
+     */
+    public static function ConfigClass() : string
+    {
+        return BeanConfig::class;
+    }
     /**
      * Module folder of the site (the publications module link) - item and archive addresses
      * @var string

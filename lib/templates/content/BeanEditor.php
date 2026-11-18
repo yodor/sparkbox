@@ -1,4 +1,5 @@
 <?php
+include_once("templates/BeanConfig.php");
 include_once("templates/TemplateContent.php");
 include_once("components/BeanFormEditor.php");
 /**
@@ -7,6 +8,28 @@ include_once("components/BeanFormEditor.php");
  */
 class BeanEditor extends TemplateContent
 {
+
+    /**
+     * Works on a bean - BeanConfig
+     * @return string
+     */
+    public static function ConfigClass() : string
+    {
+        return BeanConfig::class;
+    }
+    /**
+     * The config of an editor of the bean '$beanClass' with the form '$formClass'
+     * @param string $beanClass
+     * @param string $formClass
+     * @return BeanConfig
+     */
+    public static function Configure(string $beanClass, string $formClass) : BeanConfig
+    {
+        $config = BeanConfig::Content(static::class, $beanClass);
+        $config->formClass = $formClass;
+        return $config;
+    }
+
 
     /**
      * @var InputForm|null

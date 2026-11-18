@@ -7,6 +7,17 @@ include_once("forms/processors/FormProcessor.php");
 
 class Password extends TemplateContent
 {
+    /**
+     * The config of the password reset of the module authenticator - public
+     * @return TemplateConfig
+     */
+    public static function Configure() : TemplateConfig
+    {
+        $config = TemplateConfig::Content(static::class);
+        $config->requireAuth = false;
+        return $config;
+    }
+
 
     public function __construct()
     {

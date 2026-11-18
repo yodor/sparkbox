@@ -1,4 +1,5 @@
 <?php
+include_once("templates/BeanConfig.php");
 include_once("templates/TemplateContent.php");
 include_once("beans/ConfigBean.php");
 include_once("forms/processors/ConfigFormProcessor.php");
@@ -6,6 +7,29 @@ include_once("forms/renderers/FormRenderer.php");
 
 class ConfigEditor extends TemplateContent
 {
+
+    /**
+     * Works on a bean - BeanConfig
+     * @return string
+     */
+    public static function ConfigClass() : string
+    {
+        return BeanConfig::class;
+    }
+    /**
+     * The config of an editor of the ConfigBean section '$section' with the form '$formClass'
+     * @param string $section
+     * @param string $formClass
+     * @return BeanConfig
+     */
+    public static function Configure(string $section, string $formClass) : BeanConfig
+    {
+        $config = BeanConfig::Content(static::class);
+        $config->configSection = $section;
+        $config->formClass = $formClass;
+        return $config;
+    }
+
 
     /**
      * @var ConfigFormProcessor

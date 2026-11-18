@@ -1,5 +1,5 @@
 <?php
-$config = TemplateConfig::Factory();
+$config = BeanConfig::Factory();
 $config->contentClass = PublicationsContent::class;
 $config->beanClass = NewsItemsBean::class;
 $config->requireAuth = false;

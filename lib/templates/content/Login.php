@@ -6,6 +6,18 @@ include_once("forms/renderers/LoginFormRenderer.php");
 
 class Login extends TemplateContent
 {
+    /**
+     * The config of the login of the module authenticator - public, a new navigation
+     * @return TemplateConfig
+     */
+    public static function Configure() : TemplateConfig
+    {
+        $config = TemplateConfig::Content(static::class);
+        $config->requireAuth = false;
+        $config->clearNavigation = true;
+        return $config;
+    }
+
 
     public function __construct()
     {

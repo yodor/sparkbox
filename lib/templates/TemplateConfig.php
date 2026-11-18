@@ -7,88 +7,103 @@ class TemplateConfigEvent extends SparkEvent
 
 }
 
+/**
+ * The configuration of a module path for its content - the context passed to the content: the content class,
+ * title, description, authorization, the content settings (data) and an observer of the template events.
+ * A path file creates it (TemplateConfig::Factory(), or the factory of the content: BeanList::Configure() ...); the
+ * last one created is the active one. Contents with more settings have their own config class (BeanConfig).
+ */
 class TemplateConfig extends SparkObject
 {
 
     protected static ?TemplateConfig $Active = null;
 
-    public static function List(string $beanClass): TemplateConfig
-    {
-        $config = TemplateConfig::Factory();
-        $config->beanClass = $beanClass;
-        $config->contentClass = BeanList::class;
-        return $config;
-    }
-
-    public static function Tree(string $beanClass): TemplateConfig
-    {
-        $config = TemplateConfig::Factory();
-        $config->contentClass = BeanTree::class;
-
-        $config->beanClass = $beanClass;
-        return $config;
-    }
-
-    public static function Gallery(string $beanClass): TemplateConfig
-    {
-        $config = TemplateConfig::Factory();
-        $config->contentClass = BeanGallery::class;
-
-        $config->beanClass = $beanClass;
-        return $config;
-    }
-
     /**
-     * Create TemplateConfig for loading BeanEditor TemplateContent
-     *
-     * @param string $beanClass
-     * @param string $formClass
-     * @return TemplateConfig
+     * Transition wrappers - the content owns its config factory now (BeanList::Configure(), BeanEditor::Configure() ...)
+     * @deprecated
      */
-    public static function Editor(string $beanClass, string $formClass): TemplateConfig
+    public static function List(string $beanClass): BeanConfig
     {
-        $config = TemplateConfig::Factory();
-        $config->contentClass = BeanEditor::class;
+        return BeanConfig::Content(BeanList::class, $beanClass);
+    }
 
-        $config->beanClass = $beanClass;
+    /** @deprecated BeanTree::Configure() */
+    public static function Tree(string $beanClass): BeanConfig
+    {
+        return BeanConfig::Content(BeanTree::class, $beanClass);
+    }
+
+    /** @deprecated BeanGallery::Configure() */
+    public static function Gallery(string $beanClass): BeanConfig
+    {
+        return BeanConfig::Content(BeanGallery::class, $beanClass);
+    }
+
+    /** @deprecated BeanEditor::Configure() */
+    public static function Editor(string $beanClass, string $formClass): BeanConfig
+    {
+        $config = BeanConfig::Content(BeanEditor::class, $beanClass);
         $config->formClass = $formClass;
         return $config;
     }
 
-    /**
-     * Create TemplateConfig for loading Plain TemplateContent
-     * @param string $title
-     * @param string $description
-     * @return TemplateConfig
-     */
-    /**
-     * ConfigEditor for config section '$section' using form '$formClass'
-     * @param string $section ConfigBean section name
-     * @param string $formClass
-     * @return TemplateConfig
-     */
-    public static function Config(string $section, string $formClass) : TemplateConfig
+    /** @deprecated ConfigEditor::Configure() */
+    public static function Config(string $section, string $formClass) : BeanConfig
     {
-        $config = TemplateConfig::Factory();
-        $config->contentClass = ConfigEditor::class;
+        $config = BeanConfig::Content(ConfigEditor::class);
         $config->configSection = $section;
         $config->formClass = $formClass;
         return $config;
     }
 
+    /** @deprecated Plain::Configure() */
     public static function Plain(string $title, string $description) : TemplateConfig
     {
-        $config = TemplateConfig::Factory();
-        $config->contentClass = Plain::class;
+        $config = TemplateConfig::Content(Plain::class);
         $config->title = $title;
         $config->description = $description;
-
         return $config;
     }
 
-    public static function Factory() : TemplateConfig
+    /**
+     * A config of this class with the generic settings of '$other' - Template::LoadContent() converts the config
+     * of a path to the config class of its content (TemplateContent::ConfigClass())
+     * @param TemplateConfig $other
+     * @return static
+     */
+    public static function From(TemplateConfig $other) : static
     {
-        return new TemplateConfig();
+        $config = static::Factory();
+        $config->title = $other->title;
+        $config->description = $other->description;
+        $config->contentClass = $other->contentClass;
+        $config->observer = $other->observer;
+        $config->filename = $other->filename;
+        $config->clearNavigation = $other->clearNavigation;
+        $config->requireAuth = $other->requireAuth;
+        $config->data = $other->data;
+        return $config;
+    }
+
+    /**
+     * A config of the content class '$contentClass' - the factories of the contents start with it
+     * @param string $contentClass
+     * @return static
+     */
+    public static function Content(string $contentClass) : static
+    {
+        $config = static::Factory();
+        $config->contentClass = $contentClass;
+        return $config;
+    }
+
+    /**
+     * A new config - the active one (TemplateConfig::Active()); BeanConfig::Factory() a BeanConfig
+     * @return static
+     */
+    public static function Factory() : static
+    {
+        return new static();
     }
 
     /**
@@ -102,36 +117,25 @@ class TemplateConfig extends SparkObject
         $config->description = "";
         $config->contentClass = "";
         $config->observer = null;
-        $config->beanClass = "";
-        $config->formClass = "";
-        $config->configSection = "";
-        $config->searchField = null;
-        $config->listFields = null;
-        $config->iterator = null;
         $config->filename = "";
         $config->clearNavigation = false;
         $config->requireAuth = true;
-        $config->useCondition = false;
     }
-    /**
-     * Create TemplateConfig for loading Plain TemplateContent
-     * @return TemplateConfig
-     */
+
+    /** @deprecated Login::Configure() */
     public static function Login() : TemplateConfig
     {
-        $config = TemplateConfig::Factory();
-        $config->contentClass = Login::class;
+        $config = TemplateConfig::Content(Login::class);
         $config->requireAuth = false;
         $config->clearNavigation = true;
         return $config;
     }
 
+    /** @deprecated Password::Configure() */
     public static function Password() : TemplateConfig
     {
-        $config = TemplateConfig::Factory();
-        $config->contentClass = Password::class;
+        $config = TemplateConfig::Content(Password::class);
         $config->requireAuth = false;
-        $config->clearNavigation = false;
         return $config;
     }
 
@@ -157,7 +161,8 @@ class TemplateConfig extends SparkObject
     {
         if (!is_null(TemplateConfig::$Active) && TemplateConfig::$Active->observer) {
             Debug::ErrorLog("Removing previous TemplateConfig::observer");
-            SparkEventManager::unregisterClosure(TemplateConfigEvent::class, TemplateConfig::$Active->observer);
+            //Template::LoadContent() registers it for the TemplateEvents
+            SparkEventManager::unregisterClosure(TemplateEvent::class, TemplateConfig::$Active->observer);
         }
         TemplateConfig::$Active = null;
     }
@@ -192,23 +197,8 @@ class TemplateConfig extends SparkObject
      */
     public ?Closure $observer = null;
 
-    /**
-     * DBTableBean class name for BeanList and BeanEditor
-     * @var string
-     */
-    public string $beanClass = "";
 
-    /**
-     * InputForm class name for BeanEditor
-     * @var string
-     */
-    public string $formClass = "";
 
-    /**
-     * Set the KeywordSearch columns
-     * @var array|null
-     */
-    public ?array $searchField = null;
 
     /**
      * Settings of the content set by the path file - the same content class on several paths
@@ -217,16 +207,7 @@ class TemplateConfig extends SparkObject
      */
     public array $data = array();
 
-    /**
-     * Used in TableView to set the visible columns
-     * @var array|null
-     */
-    public ?array $listFields = null;
 
-    /**
-     * @var SelectQuery|null
-     */
-    public ?SelectQuery $iterator = null;
 
     /**
      * Current configuration filename
@@ -246,20 +227,7 @@ class TemplateConfig extends SparkObject
      */
     public bool $requireAuth = true;
 
-    /**
-     * Using Template::Condition to filter bean data of BeanEditor/GalleryView
-     *
-     * Signal TemplateContent to use Template::Condition data during setup() call to add match() on the default bean->select,
-     * by doing so subsequent query() calls of the bean would return filtered data for the iterators
-     *
-     * Signal BeanEditor to use Template::Condition data during initialize() call to assign insert value to the transactor
-     * @var bool
-     */
-    public bool $useCondition = false;
 
-    /**
-     * ConfigBean section edited by ConfigEditor
-     * @var string
-     */
-    public string $configSection = "";
 }
+
+include_once("templates/BeanConfig.php");

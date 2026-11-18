@@ -56,7 +56,7 @@ class SparkEventManager
 
     public static function unregisterClosure(string $event_class, Closure $closure): void
     {
-        foreach (self::$subscribers[$event_class] as $index => $subscriber) {
+        foreach (self::$subscribers[$event_class] ?? array() as $index => $subscriber) {
             if ($subscriber instanceof SparkObserver) {
                 if ($subscriber->getCallback() === $closure) {
                     Debug::ErrorLog("Unregistering closure from observing $event_class");

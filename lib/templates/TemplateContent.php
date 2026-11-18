@@ -24,7 +24,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
         $this->bean = $bean;
 
         //match reference bean from condition if set
-        if (Template::Condition() && $this->config->useCondition) {
+        if (Template::Condition() && $this->config instanceof BeanConfig && $this->config->useCondition) {
             //copy keyID
             $keyID = Template::Condition()->getID();
             $keyName = Template::Condition()->getBean()->key();
@@ -112,7 +112,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
     }
 
     /**
-     * Create instance of $config->beanClass using SparkLoader and set $this->bean to it
+     * The config of this content; a BeanConfig: create its beanClass (SparkLoader) as $this->bean
      * Set default title using getContentTitle and the bean class if is set
      *
      * @param TemplateConfig $config
@@ -124,7 +124,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
 
         $this->config = $config;
 
-        if ($config->beanClass) {
+        if ($config instanceof BeanConfig && $config->beanClass) {
             $this->setBean(SparkLoader::Factory("beans")->instance($config->beanClass, DBTableBean::class));
         }
 
@@ -133,6 +133,16 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
             if (!is_null($this->bean)) $config->title .= ": " . get_class($this->bean);
         }
 
+    }
+
+    /**
+     * The config class of this content - a content with more settings than TemplateConfig names its own
+     * (BeanConfig); Template::LoadContent() converts the config of the path to it
+     * @return string
+     */
+    public static function ConfigClass() : string
+    {
+        return TemplateConfig::class;
     }
 
     public function config(): TemplateConfig
