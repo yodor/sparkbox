@@ -1,5 +1,5 @@
 <?php
-include_once("templates/content/SiteTextsList.php");
+include_once("templates/modules/admin/content/SiteTextsList.php");
 
 $config = TemplateConfig::Factory();
 $config->contentClass = SiteTextsList::class;

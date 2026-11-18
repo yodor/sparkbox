@@ -107,7 +107,8 @@ final class Template
 
         if (!$config->contentClass) throw new Exception("TemplateConfig contentClass is empty");
 
-        $cmp = SparkLoader::Factory(Template::PREFIX_CONTENT)->instance($config->contentClass, TemplateContent::class);
+        //the content folder of the module, else the shared contents
+        $cmp = Module::Active()->contentLoader($config->contentClass)->instance($config->contentClass, TemplateContent::class);
         if (!($cmp instanceof TemplateContent)) throw new Exception("Content class not instance of TemplateContent");
 
         //the config class of the content (BeanConfig ...) - a path file may have created a plain one

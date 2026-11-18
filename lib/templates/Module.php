@@ -33,6 +33,7 @@ class Module
      */
     const string PATH_FOLDER = "path";
     const string SCRIPTS_FOLDER = "scripts";
+    const string CONTENT_FOLDER = "content";
 
     const string DEFAULT_NAME = "default";
 
@@ -321,6 +322,20 @@ class Module
         $name = Module::ScriptName($path);
         if ($name === "") return "";
         return SparkLoader::Factory(Spark::PathParts($this->getPreifx(), Module::SCRIPTS_FOLDER))->find($name);
+    }
+
+    /**
+     * The loader of the content class '$className': the content folder of this module
+     * (templates/modules/<module>/content - site, plugins, store, core), else the shared contents
+     * (templates/content: Plain, NotFound, the Bean* contents, ConfigEditor)
+     * @param string $className
+     * @return SparkLoader
+     */
+    public function contentLoader(string $className) : SparkLoader
+    {
+        $loader = SparkLoader::Factory(Spark::PathParts($this->getPreifx(), Module::CONTENT_FOLDER));
+        if (Spark::ValidClassName($className) && $loader->find($className) !== "") return $loader;
+        return SparkLoader::Factory(Template::PREFIX_CONTENT);
     }
 
     /**
