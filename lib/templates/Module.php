@@ -106,6 +106,12 @@ class Module
     protected array $scriptPaths = array();
 
     /**
+     * Paths answered as another path (addPathAlias()) - path key => module path
+     * @var array<string, string>
+     */
+    protected array $pathAliases = array();
+
+    /**
      * The module paths have no trailing slash: GET /authors/ answers 301 to /authors (the query stays) - for
      * modules of single pages (main). The module folder itself keeps its slash.
      * @var bool
@@ -284,7 +290,7 @@ class Module
      */
     public function pageClassFor(string $path) : string
     {
-        $path = Template::FormatPath($path, "/", true);
+        $path = Template::FormatPath($this->resolvePath($path), "/", true);
         while (true) {
             if (isset($this->pagePaths[$path])) {
                 [$class, $include] = $this->pagePaths[$path];
@@ -295,6 +301,30 @@ class Module
             $path = rtrim(dirname($path), "/") ?: "/";
         }
         return $this->pageClass;
+    }
+
+    /**
+     * The path '$path' is answered as the module path '$target' - its page class and its path file - without a
+     * redirect: an old address whose content redirects itself in one step (details.php?prodID= → the product
+     * address by the product's canonical 301)
+     * @param string $path old path ("details.php")
+     * @param string $target module path ("details")
+     * @return void
+     */
+    public function addPathAlias(string $path, string $target) : void
+    {
+        $this->pathAliases[Template::FormatPath($path, "/", true)] = $target;
+    }
+
+    /**
+     * The module path that answers '$path' (addPathAlias())
+     * @param string $path
+     * @return string
+     */
+    protected function resolvePath(string $path) : string
+    {
+        $key = Template::FormatPath($path, "/", true);
+        return $this->pathAliases[$key] ?? $path;
     }
 
     /**
@@ -504,7 +534,7 @@ class Module
      */
     public function getPath() : string
     {
-        $path = (string)($_GET["path"] ?? "");
+        $path = $this->resolvePath((string)($_GET["path"] ?? ""));
         if (trim($path, "/") === "") return "home";
         return Template::FormatPath($path, "/", true);
     }

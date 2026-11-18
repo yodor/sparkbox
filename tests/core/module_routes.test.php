@@ -29,3 +29,12 @@ test("module routes: old addresses answer 301 to their path with the query", fun
     assertSame(301, $status, "item.php");
     assertSame("/routetest/item?itemID=7", $headers["location"] ?? "", "to the item path");
 });
+
+test("module routes: a path alias answers as its target path - no redirect", function () {
+    [$status, , $body] = routeRequest("path=%2Fhome.php", "/routetest/home.php");
+    assertSame(200, $status, "home.php");
+    assertTrue(str_contains($body, "<title>Route Home"), "the path file of the target");
+    [$status, , $body] = routeRequest("path=%2Fshow.php&itemID=9", "/routetest/show.php?itemID=9");
+    assertSame(200, $status, "show.php");
+    assertTrue(str_contains($body, "<div class='route_test'>initialize;processInput:9;</div>"), "the page class of the target");
+});
