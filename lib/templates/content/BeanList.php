@@ -7,6 +7,7 @@ include_once("components/TableView.php");
 include_once("responders/ChangePositionResponder.php");
 include_once("responders/DeleteItemResponder.php");
 include_once("responders/ToggleFieldResponder.php");
+include_once("pages/SparkTemplateAdminPage.php");
 
 class BeanList extends TemplateBeanContent
 {

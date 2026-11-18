@@ -3,6 +3,9 @@ include_once("beans/NewsItemsBean.php");
 include_once("forms/NewsItemInputForm.php");
 include_once("components/renderers/cells/ImageCell.php");
 include_once("components/renderers/cells/DateCell.php");
+include_once("templates/content/BeanEditor.php");
+include_once("templates/content/BeanList.php");
+include_once("objects/events/TemplateEvent.php");
 
 if (URL::Current()->contains("editID")) {
     $config = BeanEditor::Configure(NewsItemsBean::class, NewsItemInputForm::class);

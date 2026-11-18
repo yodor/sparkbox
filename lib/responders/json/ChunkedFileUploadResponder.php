@@ -2,6 +2,7 @@
 include_once("responders/json/ChunkedUploadControlResponder.php");
 include_once("input/validators/FileUploadValidator.php");
 include_once("input/renderers/InputField.php");
+include_once("components/Image.php");
 
 class ChunkedFileUploadResponder extends ChunkedUploadControlResponder
 {

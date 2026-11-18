@@ -1,4 +1,5 @@
 <?php
+include_once("input/validators/IInputValidator.php");
 
 class ArrayInputValidator implements IInputValidator
 {

@@ -1,4 +1,5 @@
 <?php
+include_once("input/processors/InputProcessor.php");
 
 class DataObjectInput extends InputProcessor
 {

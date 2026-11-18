@@ -6,6 +6,7 @@ include_once("objects/ActionCollection.php");
 include_once("components/ClosureComponent.php");
 include_once("components/Action.php");
 include_once("input/renderers/Input.php");
+include_once("components/Image.php");
 
 class TextTreeItem extends NestedSetItem implements IActionCollection
 {

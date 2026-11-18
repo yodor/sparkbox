@@ -1,5 +1,6 @@
 <?php
 include_once("responders/json/JSONResponder.php");
+include_once("beans/CurrencyRatesBean.php");
 
 class CurrencyRateResponder extends JSONResponder
 {

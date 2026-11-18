@@ -1,6 +1,7 @@
 <?php
 include_once("components/Container.php");
 include_once("objects/IObserver.php");
+include_once("components/HTMLTemplate.php");
 
 class HTMLBody extends Container implements IObserver
 {

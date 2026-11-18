@@ -1,5 +1,6 @@
 <?php
 include_once("dialogs/ConfirmMessageDialog.php");
+include_once("responders/RequestResponder.php");
 
 class JSONDialog extends ConfirmMessageDialog
 {

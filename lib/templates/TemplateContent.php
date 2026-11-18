@@ -74,7 +74,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
      * The config of this content for a path file - a new active config of ConfigClass() with this content class.
      * Contents with settings override it with optional parameters and call parent::Configure() first
      * (BeanList::Configure($beanClass), BeanEditor::Configure($beanClass, $formClass), Plain::Configure($title ...)).
-     * The module loads its content classes itself - a path file needs no include.
+     * A path file includes its content class (include_once) before it calls Configure().
      * @return TemplateConfig
      */
     public static function Configure() : TemplateConfig

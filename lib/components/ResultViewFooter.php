@@ -1,5 +1,8 @@
 <?php
 include_once("components/Container.php");
+include_once("components/LabelSpan.php");
+include_once("pages/SparkPage.php");
+include_once("components/Action.php");
 
 class ResultViewFooter extends Container
 {

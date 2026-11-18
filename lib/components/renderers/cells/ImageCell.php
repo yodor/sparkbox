@@ -3,6 +3,7 @@ include_once("components/renderers/cells/TableCell.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/TableColumn.php");
 include_once("storage/StorageItem.php");
+include_once("components/ImagePopup.php");
 
 class ImageCell extends TableCell implements IPhotoRenderer
 {

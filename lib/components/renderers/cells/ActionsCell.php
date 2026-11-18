@@ -2,6 +2,7 @@
 include_once("components/renderers/cells/TableCell.php");
 include_once("components/Action.php");
 include_once("objects/ActionCollection.php");
+include_once("utils/IActionCollection.php");
 
 class ActionsCell extends TableCell implements IActionCollection
 {

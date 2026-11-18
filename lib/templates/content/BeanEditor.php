@@ -2,6 +2,7 @@
 include_once("templates/BeanConfig.php");
 include_once("templates/TemplateBeanContent.php");
 include_once("components/BeanFormEditor.php");
+include_once("templates/Template.php");
 /**
  * If request condition is BeanKeyCondition will use it to set where filter on the view bean and add field to the transactor
  * Class BeanEditorPage

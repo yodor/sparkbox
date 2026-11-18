@@ -4,6 +4,7 @@ include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/ItemView.php");
 include_once("components/Action.php");
 include_once("components/ClosureComponent.php");
+include_once("components/ImagePopup.php");
 
 /**
  * One photo of a GalleryView (admin galleries):

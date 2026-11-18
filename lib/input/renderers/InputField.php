@@ -2,6 +2,7 @@
 include_once("components/Container.php");
 include_once("input/renderers/IErrorRenderer.php");
 include_once("components/renderers/IDataIteratorRenderer.php");
+include_once("components/TextComponent.php");
 
 /**
  * Class InputField

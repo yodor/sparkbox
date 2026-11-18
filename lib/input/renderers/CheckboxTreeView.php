@@ -2,6 +2,7 @@
 include_once ("input/renderers/InputField.php");
 include_once ("components/renderers/items/TextTreeItem.php");
 include_once ("components/NestedSetTreeView.php");
+include_once("input/renderers/DataIteratorField.php");
 
 class CheckboxTreeView extends DataIteratorField
 {

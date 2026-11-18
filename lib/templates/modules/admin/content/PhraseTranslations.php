@@ -3,6 +3,7 @@ include_once("templates/content/BeanList.php");
 include_once("beans/TranslationPhrasesBean.php");
 include_once("dialogs/json/PhraseTranslationDialog.php");
 include_once("components/InlineScript.php");
+include_once("templates/Template.php");
 
 class PhraseTranslatorInit extends InlineScript implements IPageComponent
 {

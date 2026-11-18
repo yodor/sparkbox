@@ -8,6 +8,10 @@ include_once("responders/ToggleFieldResponder.php");
 include_once("components/renderers/cells/DateCell.php");
 include_once("components/renderers/cells/NumericCell.php");
 include_once("components/renderers/cells/ActionsCell.php");
+include_once("templates/content/BeanEditor.php");
+include_once("objects/events/TemplateEvent.php");
+include_once("pages/SparkTemplateAdminPage.php");
+include_once("templates/content/BeanList.php");
 
 if (URL::Current()->contains("editID")) {
 

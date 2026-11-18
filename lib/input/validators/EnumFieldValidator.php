@@ -1,6 +1,7 @@
 <?php
 include_once("input/validators/IInputValidator.php");
 include_once("input/DataInput.php");
+include_once("iterators/DBEnumIterator.php");
 
 class EnumFieldValidator implements IInputValidator
 {

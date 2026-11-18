@@ -1,6 +1,7 @@
 <?php
 include_once("dialogs/json/JSONDialog.php");
 include_once("responders/json/MCEImageBrowserResponder.php");
+include_once("components/InputComponent.php");
 
 
 class MCEImageBrowserDialog extends JSONDialog

@@ -5,6 +5,7 @@ include_once("components/InlineScript.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/renderers/items/DataIteratorItem.php");
 include_once("components/renderers/IDataIteratorRenderer.php");
+include_once("components/ImagePopup.php");
 
 class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 {

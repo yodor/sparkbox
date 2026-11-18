@@ -8,6 +8,8 @@ include_once("components/renderers/cells/ImageCell.php");
 include_once("components/renderers/cells/DateCell.php");
 
 include_once("components/renderers/IPhotoRenderer.php");
+include_once("responders/DeleteItemResponder.php");
+include_once("responders/ChangePositionResponder.php");
 
 class GalleryView extends Container
 {

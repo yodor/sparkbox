@@ -2,6 +2,8 @@
 include_once("templates/TemplateContent.php");
 include_once("templates/BeanConfig.php");
 include_once("templates/IContentActions.php");
+include_once("templates/Template.php");
+include_once("templates/Module.php");
 
 /**
  * A content working on a bean (DBTableBean) - its config is a BeanConfig: setup() creates the bean of beanClass

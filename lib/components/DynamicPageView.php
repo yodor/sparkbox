@@ -1,5 +1,6 @@
 <?php
 include_once("components/Container.php");
+include_once("storage/StorageItem.php");
 
 class DynamicPageView extends Container implements IRequestProcessor
 {

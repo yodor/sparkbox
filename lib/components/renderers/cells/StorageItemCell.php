@@ -1,6 +1,7 @@
 <?php
 include_once("components/renderers/cells/TableCell.php");
 include_once("components/Action.php");
+include_once("storage/StorageItem.php");
 
 class StorageItemCell extends TableCell
 {

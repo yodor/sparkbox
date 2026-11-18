@@ -4,6 +4,7 @@ include_once("forms/InputForm.php");
 include_once("forms/renderers/FormRenderer.php");
 include_once("mailers/ForgotPasswordMailer.php");
 include_once("forms/processors/FormProcessor.php");
+include_once("pages/SparkPage.php");
 
 class Password extends TemplateContent
 {

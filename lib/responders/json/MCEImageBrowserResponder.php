@@ -6,6 +6,7 @@ include_once("beans/MCEImagesBean.php");
 include_once("input/validators/ImageUploadValidator.php");
 include_once("forms/InputForm.php");
 include_once("iterators/ArrayDataIterator.php");
+include_once("forms/renderers/FormRenderer.php");
 
 class ImageDimensionForm extends InputForm
 {

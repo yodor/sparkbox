@@ -1,5 +1,6 @@
 <?php
 include_once("responders/json/JSONResponder.php");
+include_once("templates/Template.php");
 
 class TemplateHelpResponder extends JSONResponder
 {

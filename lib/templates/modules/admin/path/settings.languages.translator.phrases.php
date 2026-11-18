@@ -1,6 +1,8 @@
 <?php
 include_once("beans/LanguagesBean.php");
 include_once("templates/modules/admin/content/PhraseTranslations.php");
+include_once("templates/Template.php");
+include_once("utils/BeanKeyCondition.php");
 
 Template::Condition(new BeanKeyCondition(new LanguagesBean(), Module::PathURL("/settings/languages/translator"), array("language")));
 

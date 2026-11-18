@@ -2,6 +2,10 @@
 include_once("beans/DynamicPagesBean.php");
 include_once("beans/DynamicPagePhotosBean.php");
 include_once("forms/PhotoForm.php");
+include_once("templates/Template.php");
+include_once("utils/BeanKeyCondition.php");
+include_once("templates/content/BeanEditor.php");
+include_once("templates/content/BeanGallery.php");
 
 Template::Condition(new BeanKeyCondition(new DynamicPagesBean(), Module::PathURL("/content/pages"), array("item_title")));
 

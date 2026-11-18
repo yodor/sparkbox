@@ -7,6 +7,7 @@ include_once("utils/script/LDJsonScript.php");
 include_once("objects/data/LinkedData.php");
 include_once("utils/Paginator.php");
 include_once("beans/NewsItemsBean.php");
+include_once("pages/SparkPage.php");
 
 /**
  * Publications of a DatedBean (TemplateConfig beanClass - news: NewsItemsBean) at their module addresses:

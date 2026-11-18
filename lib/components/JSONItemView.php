@@ -1,4 +1,8 @@
 <?php
+include_once("responders/json/JSONResponder.php");
+include_once("components/ItemView.php");
+include_once("components/Button.php");
+include_once("components/AbstractResultView.php");
 include ("components/ItemView.php");
 
 class ItemViewResponder extends JSONResponder

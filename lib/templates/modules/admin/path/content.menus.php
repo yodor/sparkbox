@@ -1,6 +1,9 @@
 <?php
 include_once("beans/MenuItemsBean.php");
 include_once("forms/MenuItemForm.php");
+include_once("templates/content/BeanEditor.php");
+include_once("objects/events/TemplateEvent.php");
+include_once("templates/content/BeanTree.php");
 
 if (URL::Current()->contains("editID")) {
     //MenuItemForm needs the bean - set when the content is set up

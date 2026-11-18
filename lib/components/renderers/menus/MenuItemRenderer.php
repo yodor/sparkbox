@@ -1,5 +1,6 @@
 <?php
 include_once("components/Component.php");
+include_once("components/renderers/menus/MenuListRenderer.php");
 
 class MenuItemRenderer extends Container
 {

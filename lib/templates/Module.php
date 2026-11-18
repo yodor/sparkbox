@@ -1,5 +1,7 @@
 <?php
 include_once("utils/IRequestProcessor.php");
+include_once("templates/Template.php");
+include_once("pages/SparkPage.php");
 
 class Module
 {
@@ -27,6 +29,13 @@ class Module
      * Module init file name without prefix
      */
     const string INIT_NAME = "init";
+
+    /**
+     * The site init of every module request: templates/init.php of each layer (core, store, the site's class/),
+     * before the init.php of the module - the setup of the site that does not belong to a frame (the products
+     * query, the cart discount, the default item renderers ...)
+     */
+    const string SITE_PREFIX = "templates";
 
     /**
      * Module path folder name
@@ -200,28 +209,22 @@ class Module
     public function initialize() : void
     {
         Module::$instance = $this;
-        Module::RegisterContentLoader();
+        Module::SiteInit();
         SparkLoader::Factory(Module::Active()->getPreifx())->include(Module::INIT_NAME, true);
     }
 
     /**
-     * The content classes are loaded when used - a path file calls BeanList::Configure(...) without an include:
-     * the content folder of the active module (site, store, core), else the shared contents (contentLoader())
+     * The site init: templates/init.php of every layer, core first, the site last - once per request
      * @return void
+     * @throws Exception
      */
-    protected static function RegisterContentLoader() : void
+    public static function SiteInit() : void
     {
-        static $registered = false;
-        if ($registered) return;
-        $registered = true;
-
-        spl_autoload_register(function (string $className) : void {
-            if (!Module::HasActive() || !Spark::ValidClassName($className)) return;
-            $file = Module::Active()->contentLoader($className)->find($className);
-            if ($file !== "") include_once($file);
-        });
+        static $done = false;
+        if ($done) return;
+        $done = true;
+        SparkLoader::Factory(Module::SITE_PREFIX)->include(Module::INIT_NAME, true);
     }
-
 
     /**
      * Get the active module SparkLoader prefix:
@@ -572,7 +575,7 @@ class Module
 
     /**
      * The content of the module path for the frame '$page': the path config (Template::PathConfig - 404 for an
-     * unknown path, an error page for a failing one) and its content (Template::LoadContent: setup, initialize,
+     * unknown path, an error page for a failing path file or content) and its content (Template::LoadContent: setup, initialize,
      * processInput)
      * @param SparkPage $page
      * @return TemplateContent
@@ -597,7 +600,19 @@ class Module
             if (Debug::IsEnabled()) $message .= " - " . $e->getTraceAsString();
             Template::ErrorConfig("Error:$path", $message);
         }
-        return Template::LoadContent();
+
+        try {
+            return Template::LoadContent();
+        }
+        catch (Exception $e) {
+            //a content that fails (an unknown row ...) - the error content of the path instead of an uncaught error
+            Debug::ErrorLog("Content failed: " . $e->getMessage());
+            $page->head()->addMeta("robots", "noindex");
+            $message = $e->getMessage();
+            if (Debug::IsEnabled()) $message .= " - " . $e->getTraceAsString();
+            Template::ErrorConfig("Error:$path", $message);
+            return Template::LoadContent();
+        }
     }
 
     public function getUserID() : int

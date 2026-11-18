@@ -1,6 +1,7 @@
 <?php
 include_once("input/renderers/InputFieldTag.php");
 include_once("components/DataList.php");
+include_once("components/LabelSpan.php");
 
 class SliderField extends InputFieldTag
 {

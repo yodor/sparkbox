@@ -1,5 +1,6 @@
 <?php
 include_once("input/renderers/InputFieldTag.php");
+include_once("input/renderers/Input.php");
 
 class ColorCodeField extends InputFieldTag
 {

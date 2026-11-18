@@ -1,6 +1,8 @@
 <?php
 include_once("beans/FAQItemsBean.php");
 include_once("forms/FAQItemInputForm.php");
+include_once("templates/content/BeanEditor.php");
+include_once("templates/content/BeanList.php");
 
 if (URL::Current()->contains("editID")) {
     $config = BeanEditor::Configure(FAQItemsBean::class, FAQItemInputForm::class);

@@ -1,6 +1,7 @@
 <?php
 include_once("input/renderers/DataIteratorField.php");
 include_once("input/renderers/SelectItem.php");
+include_once("input/renderers/Input.php");
 
 class SelectField extends DataIteratorField
 {

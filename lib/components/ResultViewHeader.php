@@ -4,6 +4,7 @@ include_once("components/TextComponent.php");
 include_once("components/LabelSpan.php");
 include_once("components/InputComponent.php");
 include_once("iterators/ArrayDataIterator.php");
+include_once("pages/SparkPage.php");
 
 
 class ResultViewHeader extends Container

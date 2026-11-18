@@ -2,6 +2,8 @@
 include_once("utils/url/URL.php");
 include_once("components/InlineScript.php");
 include_once("dialogs/ConfirmMessageDialog.php");
+include_once("components/Form.php");
+include_once("components/Action.php");
 
 class ConfirmResponderScript extends InlineScript implements IPageComponent
 {

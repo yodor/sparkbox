@@ -1,5 +1,6 @@
 <?php
 include_once("objects/SparkObject.php");
+include_once("objects/events/TemplateEvent.php");
 
 class TemplateConfigEvent extends SparkEvent
 {

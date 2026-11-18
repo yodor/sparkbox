@@ -1,6 +1,7 @@
 <?php
 include_once("input/ArrayDataInput.php");
 include_once("input/DataInput.php");
+include_once("input/renderers/ColorCodeField.php");
 
 enum InputType : int {
     case TEXT = 1;

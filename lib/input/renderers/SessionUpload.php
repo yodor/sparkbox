@@ -3,6 +3,10 @@ include_once("components/LabelSpan.php");
 include_once("input/renderers/ArrayField.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/TextComponent.php");
+include_once("input/renderers/InputField.php");
+include_once("input/renderers/Input.php");
+include_once("components/Button.php");
+include_once("responders/RequestResponder.php");
 
 abstract class SessionUpload extends InputField
 {

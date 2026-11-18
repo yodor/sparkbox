@@ -5,6 +5,8 @@ include_once("beans/FAQItemsBean.php");
 include_once("utils/url/FAQSectionURL.php");
 include_once("utils/script/LDJsonScript.php");
 include_once("objects/data/LinkedData.php");
+include_once("pages/SparkPage.php");
+include_once("templates/Module.php");
 
 /**
  * Frequently asked questions:

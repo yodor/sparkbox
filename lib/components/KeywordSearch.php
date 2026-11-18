@@ -5,6 +5,7 @@ include_once("utils/IQueryFilter.php");
 include_once("utils/IRequestProcessor.php");
 include_once("forms/renderers/FormRenderer.php");
 include_once("components/TextComponent.php");
+include_once("pages/SparkPage.php");
 
 class KeywordSearch extends FormRenderer implements IRequestProcessor
 {

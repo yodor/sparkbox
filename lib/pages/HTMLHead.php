@@ -7,6 +7,7 @@ include_once("components/Link.php");
 include_once("components/Script.php");
 include_once("objects/IObserver.php");
 include_once("components/ClosureComponent.php");
+include_once("pages/SparkPage.php");
 
 class HTMLHead extends Container implements IObserver
 {

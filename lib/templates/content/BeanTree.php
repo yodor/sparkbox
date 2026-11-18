@@ -4,6 +4,11 @@
 include_once("BeanList.php");
 include_once("components/NestedSetTreeView.php");
 include_once("components/renderers/items/TextTreeItem.php");
+include_once("templates/content/BeanList.php");
+include_once("responders/ChangePositionResponder.php");
+include_once("responders/DeleteItemResponder.php");
+include_once("templates/TemplateBeanContent.php");
+include_once("pages/SparkTemplateAdminPage.php");
 
 class BeanTree extends BeanList
 {

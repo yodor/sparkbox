@@ -1,5 +1,6 @@
 <?php
 include_once("input/renderers/InputField.php");
+include_once("input/renderers/Input.php");
 
 class TextArea extends InputField
 {

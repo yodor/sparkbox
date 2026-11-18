@@ -2,6 +2,7 @@
 include_once("utils/IDataResultConsumer.php");
 include_once("components/renderers/items/DataIteratorItem.php");
 include_once("beans/DatedBean.php");
+include_once("components/ImageStorage.php");
 
 class DatedItem extends DataIteratorItem implements IDataResultConsumer
 {

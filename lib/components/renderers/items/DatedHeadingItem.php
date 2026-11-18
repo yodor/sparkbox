@@ -3,6 +3,7 @@ include_once("components/Action.php");
 include_once("beans/DatedBean.php");
 include_once("components/LabelSpan.php");
 include_once("components/ImageStorage.php");
+include_once("utils/IDataResultConsumer.php");
 
 class DatedHeadingItem extends Action implements IDataResultConsumer
 {

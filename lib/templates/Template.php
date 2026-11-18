@@ -5,6 +5,9 @@ include_once("objects/events/TemplateEvent.php");
 include_once("objects/SparkObserver.php");
 include_once("utils/RequestParameterCondition.php");
 include_once("utils/BeanKeyCondition.php");
+include_once("templates/Module.php");
+include_once("templates/content/NotFound.php");
+include_once("templates/content/Plain.php");
 
 
 /**

@@ -1,6 +1,8 @@
 <?php
 include_once("dialogs/json/JSONDialog.php");
 include_once("responders/json/TranslatePhraseResponder.php");
+include_once("input/DataInputFactory.php");
+include_once("components/InputComponent.php");
 
 
 

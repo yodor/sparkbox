@@ -3,6 +3,8 @@ include_once("templates/TemplateContent.php");
 include_once("beans/DynamicPagesBean.php");
 include_once("utils/url/DynamicPageURL.php");
 include_once("storage/StorageItem.php");
+include_once("pages/SparkPage.php");
+include_once("templates/Module.php");
 
 /**
  * A dynamic page (?dpID= - /pages/<dpID>/<slug>/): its title, photo and content, and the local menu of its group.

@@ -3,6 +3,7 @@ include_once("templates/TemplateContent.php");
 include_once("responders/AuthenticatorResponder.php");
 include_once("forms/LoginForm.php");
 include_once("forms/renderers/LoginFormRenderer.php");
+include_once("pages/SparkPage.php");
 
 class Login extends TemplateContent
 {

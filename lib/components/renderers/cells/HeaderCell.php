@@ -1,5 +1,7 @@
 <?php
 include_once("components/renderers/cells/TableCell.php");
+include_once("components/Action.php");
+include_once("pages/SparkPage.php");
 
 class HeaderCell extends TableCell implements IGETConsumer
 {

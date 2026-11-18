@@ -1,5 +1,6 @@
 <?php
 include_once("components/Component.php");
+include_once("components/renderers/IPhotoRenderer.php");
 
 class Image extends Component implements IPhotoRenderer
 {

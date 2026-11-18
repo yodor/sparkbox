@@ -45,3 +45,10 @@ test("module routes: a content without a title gets its fallback title; finalize
     assertTrue(str_contains($body, "<title>Route Fallback</title>"), "the fallback title of the content");
     assertTrue(str_contains($body, "content='Route Fallback|Route description'"), "finalizeHead after the head of the frame");
 });
+
+test("module routes: a failing content shows the error content of the path, not an uncaught error", function () {
+    [$status, , $body] = routeRequest("path=%2Ffailing", "/routetest/failing");
+    assertTrue(!str_contains($body, "Uncaught") && !str_contains($body, "Fatal error"), "uncaught error");
+    assertTrue(str_contains($body, "<title>Error:/failing</title>"), "the error content of the path");
+    assertTrue(str_contains($body, "<meta name='robots' content='noindex"), "not indexed");
+});

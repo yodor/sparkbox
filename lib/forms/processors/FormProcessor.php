@@ -2,6 +2,7 @@
 include_once("forms/processors/IFormProcessor.php");
 include_once("beans/IBeanEditor.php");
 include_once("utils/SessionData.php");
+include_once("forms/renderers/FormRenderer.php");
 
 class FormProcessor implements IFormProcessor, IBeanEditor
 {

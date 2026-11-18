@@ -1,5 +1,6 @@
 <?php
 include_once("input/renderers/InputField.php");
+include_once("input/renderers/TextField.php");
 
 class TextCaptchaField extends TextField
 {

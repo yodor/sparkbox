@@ -5,6 +5,10 @@ include_once("components/renderers/cells/BooleanCell.php");
 include_once("components/renderers/cells/ImageCell.php");
 include_once("components/renderers/cells/DateCell.php");
 include_once("utils/url/DynamicPageURL.php");
+include_once("templates/content/BeanEditor.php");
+include_once("templates/content/BeanList.php");
+include_once("objects/events/TemplateEvent.php");
+include_once("templates/TemplateBeanContent.php");
 
 /**
  * Chooser mode (?chooser=<base64 of an admin address> - the menu item editor): each page gets 'Choose Page', back to

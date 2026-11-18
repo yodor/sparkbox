@@ -1,6 +1,9 @@
 <?php
 include_once("components/Component.php");
 include_once("components/Action.php");
+include_once("input/renderers/InputField.php");
+include_once("components/Button.php");
+include_once("input/DataInput.php");
 
 class ArrayField extends InputField
 {

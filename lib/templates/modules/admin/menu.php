@@ -28,6 +28,7 @@ $settings->append($languages);
 
 //one translator entry per language - its phrases
 include_once("beans/LanguagesBean.php");
+include_once("pages/SparkTemplateAdminPage.php");
 $languagesBean = new LanguagesBean();
 $query = $languagesBean->query($languagesBean->key(), "lang_code");
 $query->exec();

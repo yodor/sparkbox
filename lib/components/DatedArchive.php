@@ -1,4 +1,5 @@
 <?php
+include_once("beans/DatedBean.php");
 class DatedArchiveInitScript extends InlineScript implements IPageComponent
 {
 
