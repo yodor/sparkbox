@@ -12,7 +12,13 @@ include_once("pages/SparkPage.php");
 class HTMLHead extends Container implements IObserver
 {
 
-    protected static string $cssLayers = "@layer reset, base, theme, components, utilities;";
+    /**
+     * The cascade layers by origin, the later wins whatever the specificity: core (sparkfront/css), store
+     * (storefront/css), site (the css of the site). Each stylesheet wraps its rules in its layer -
+     * '@layer core { ... }'; a stylesheet without a layer wins over all of them (the site css until it moves to
+     * '@layer site').
+     */
+    protected static string $cssLayers = "@layer core, store, site;";
 
     protected static ?HTMLHead $instance = null;
 
@@ -305,11 +311,14 @@ class HTMLHead extends Container implements IObserver
     /**
      * Add a CSS link to this head CSS links collection
      * @param string $url The url of the CSS script.
+     * @param bool $prepend first in the head
+     * @param string $media the media query of the link ('(max-width: 1024px)') - the stylesheet applies only there
      */
-    public function addCSS(string $url, bool $prepend=false) : void
+    public function addCSS(string $url, bool $prepend=false, string $media="") : void
     {
         $cssLink = new Link();
         $cssLink->setHref(HTMLHead::Versioned($url));
+        if ($media !== "") $cssLink->setAttribute("media", $media);
         //overwrite first
         $this->cssLinks[$url] = $cssLink;
 

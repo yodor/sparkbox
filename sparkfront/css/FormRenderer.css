@@ -1,5 +1,107 @@
-@import url("FormRendererHBox.css");
-@import url("FormRendererVBox.css");
+/* FormRendererHBox.css */
+.FormRenderer[layout="HBox"] {
+    display:inline-grid;
+    grid-template-columns: auto auto;
+    column-gap: 0.25em;
+    row-gap: 0.5em;
+
+    align-items: center;
+    justify-items: flex-start;
+
+}
+
+.FormRenderer[layout="HBox"] .InputComponent {
+    display: contents;
+}
+
+.FormRenderer[layout="HBox"] .InputLabel {
+
+    text-align: right;
+    justify-self: flex-end;
+    align-self: center;
+}
+
+.FormRenderer[layout="HBox"] .SubmitLine {
+    grid-column: 1/-1;
+
+    display:flex;
+    justify-self: stretch;
+
+    gap:0.5em;
+}
+
+.FormRenderer[layout="HBox"]  .SubmitLine .TextSpace {
+
+    display:inline-flex;
+    flex-direction: row;
+    flex-wrap:wrap;
+    flex-grow:1;
+
+    align-items:flex-start;
+
+    gap:0.5em;
+
+}
+
+.FormRenderer[layout="HBox"]  .SubmitLine .Buttons {
+
+    display:inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    align-items:flex-end;
+
+    gap:0.5em;
+}
+/* FormRendererVBox.css */
+.FormRenderer[layout="VBox"] {
+    display: inline-flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap:0.5em;
+    align-items:flex-start;
+
+}
+
+.FormRenderer[layout="VBox"] .InputComponent {
+    display: inline-flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 0.1em;
+    align-self:stretch;
+}
+
+.FormRenderer[layout="VBox"] .SubmitLine {
+
+    display:flex;
+    flex-direction: row;
+
+    gap:1em;
+
+    align-self: stretch;
+}
+
+.FormRenderer[layout="VBox"]  .SubmitLine .TextSpace {
+    flex-grow:1;
+
+    display:inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    justify-items: flex-start;
+    align-items: center;
+
+}
+
+.FormRenderer[layout="VBox"]  .SubmitLine .Buttons {
+
+    display:inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    align-items: flex-end;
+    gap:0.5em;
+}
 
 .FormRenderer {
     min-width:0;
@@ -53,4 +155,3 @@
 .FormValueList .item .label:after {
     content: ": ";
 }
-
