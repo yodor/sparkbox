@@ -26,14 +26,14 @@ class SiteTextsList extends BeanList
         $query = $languages->query("langID", "lang_code");
         $query->exec();
         while ($row = $query->next()) {
-            $action = TemplateContent::CreateAction("translate_" . $row["langID"], mb_strtoupper($row["lang_code"]), "phrases");
+            $action = TemplateBeanContent::CreateAction("translate_" . $row["langID"], mb_strtoupper($row["lang_code"]), "phrases");
             $action->getURL()->add(new URLParameter("langID", (string)$row["langID"]));
             $action->setTooltip(tr("Translations"));
             $collection->append($action);
         }
         $query->free();
 
-        $rehash = TemplateContent::CreateAction(SiteTextsList::KEY_REHASH, tr("Rehash"));
+        $rehash = TemplateBeanContent::CreateAction(SiteTextsList::KEY_REHASH, tr("Rehash"));
         $rehash->getURL()->add(new URLParameter(SiteTextsList::KEY_REHASH, "1"));
         $rehash->setTooltip("Rehash using xxh3");
         $collection->append($rehash);

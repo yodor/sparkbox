@@ -68,7 +68,7 @@ else {
         }
 
         $actions->append(Action::RowSeparator());
-        $gallery = TemplateContent::CreateAction("Photo Gallery", tr("Photo Gallery"), "gallery/");
+        $gallery = TemplateBeanContent::CreateAction("Photo Gallery", tr("Photo Gallery"), "gallery/");
         $gallery->getURL()->add(new DataParameter($content->getBean()->key()));
         $actions->append($gallery);
     };

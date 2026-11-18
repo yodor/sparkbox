@@ -66,4 +66,16 @@ class BeanConfig extends TemplateConfig
         $config->beanClass = $beanClass;
         return $config;
     }
+
+    /**
+     * A new bean of beanClass (SparkLoader 'beans') - null without one
+     * @return DBTableBean|null
+     * @throws Exception
+     */
+    public function createBean() : ?DBTableBean
+    {
+        if ($this->beanClass === "") return null;
+        $bean = SparkLoader::Factory("beans")->instance($this->beanClass, DBTableBean::class);
+        return ($bean instanceof DBTableBean) ? $bean : null;
+    }
 }

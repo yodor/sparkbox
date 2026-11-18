@@ -1,22 +1,14 @@
 <?php
 include_once("templates/BeanConfig.php");
-include_once("templates/TemplateContent.php");
+include_once("templates/TemplateBeanContent.php");
 include_once("components/BeanFormEditor.php");
 /**
  * If request condition is BeanKeyCondition will use it to set where filter on the view bean and add field to the transactor
  * Class BeanEditorPage
  */
-class BeanEditor extends TemplateContent
+class BeanEditor extends TemplateBeanContent
 {
 
-    /**
-     * Works on a bean - BeanConfig
-     * @return string
-     */
-    public static function ConfigClass() : string
-    {
-        return BeanConfig::class;
-    }
     /**
      * The config of an editor of the bean '$beanClass' with the form '$formClass'
      * @param string $beanClass

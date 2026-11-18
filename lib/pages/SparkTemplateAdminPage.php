@@ -1,6 +1,8 @@
 <?php
 include_once("pages/SparkPage.php");
 include_once("templates/Template.php");
+include_once("templates/TemplateBeanContent.php");
+include_once("templates/IContentActions.php");
 include_once("components/MenuBar.php");
 include_once("components/TextComponent.php");
 include_once("utils/Navigation.php");
@@ -301,8 +303,10 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
             $this->base->addClassName($name);
         }
 
-        $content->fillPageActions($this->getActions());
-        $content->fillPageFilters($this->filters);
+        if ($content instanceof IContentActions) {
+            $content->fillPageActions($this->getActions());
+            $content->fillPageFilters($this->filters);
+        }
 
         if ($content->config()->clearNavigation) {
             $this->navigation->clear();

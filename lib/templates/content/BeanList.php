@@ -1,6 +1,6 @@
 <?php
 include_once("templates/BeanConfig.php");
-include_once("templates/TemplateContent.php");
+include_once("templates/TemplateBeanContent.php");
 include_once("components/KeywordSearch.php");
 include_once("components/TableView.php");
 
@@ -8,17 +8,9 @@ include_once("responders/ChangePositionResponder.php");
 include_once("responders/DeleteItemResponder.php");
 include_once("responders/ToggleFieldResponder.php");
 
-class BeanList extends TemplateContent
+class BeanList extends TemplateBeanContent
 {
 
-    /**
-     * Works on a bean - BeanConfig
-     * @return string
-     */
-    public static function ConfigClass() : string
-    {
-        return BeanConfig::class;
-    }
     /**
      * The config of a list of the bean '$beanClass' (BeanConfig: listFields, searchField, iterator ...) - also for
      * the subclasses (BeanTree, BeanGallery, the store lists)
@@ -211,7 +203,7 @@ class BeanList extends TemplateContent
     {
         if (!$this->addEnabled) return;
 
-        $actionCreate = TemplateContent::CreateAction(SparkTemplateAdminPage::ACTION_ADD, SparkTemplateAdminPage::ACTION_ADD);
+        $actionCreate = TemplateBeanContent::CreateAction(SparkTemplateAdminPage::ACTION_ADD, SparkTemplateAdminPage::ACTION_ADD);
         $actionCreate->getURL()->add(new URLParameter("editID", -1));
         $actionCreate->setTooltip("Add new element to this collection");
 
@@ -239,7 +231,7 @@ class BeanList extends TemplateContent
     {
 
         if ($this->editEnabled) {
-            $editAction = TemplateContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, SparkTemplateAdminPage::ACTION_EDIT);
+            $editAction = TemplateBeanContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, SparkTemplateAdminPage::ACTION_EDIT);
             $editAction->setTooltip(tr("Edit element"));
             $editAction->getURL()->add(new DataParameter("editID", $this->getIterator()->key()));
 
@@ -267,7 +259,7 @@ class BeanList extends TemplateContent
             //
             $act->append(Action::RowSeparator());
 
-            $actionPrev = TemplateContent::CreateAction("previous", tr("Previous"));
+            $actionPrev = TemplateBeanContent::CreateAction("previous", tr("Previous"));
             $paramType->setValue($actionPrev->getAction());
             $actionPrev->getURL()->add($paramCmd);
             $actionPrev->getURL()->add(clone $paramType);
@@ -277,7 +269,7 @@ class BeanList extends TemplateContent
 
             $act->append(Action::PipeSeparator());
 
-            $actionNext = TemplateContent::CreateAction("next", tr("Next"));
+            $actionNext = TemplateBeanContent::CreateAction("next", tr("Next"));
             $paramType->setValue($actionNext->getAction());
             $actionNext->getURL()->add($paramCmd);
             $actionNext->getURL()->add(clone $paramType);
@@ -287,7 +279,7 @@ class BeanList extends TemplateContent
 
             $act->append(Action::RowSeparator());
 
-            $actionFirst = TemplateContent::CreateAction("first", tr("First"));
+            $actionFirst = TemplateBeanContent::CreateAction("first", tr("First"));
             $paramType->setValue($actionFirst->getAction());
             $actionFirst->getURL()->add($paramCmd);
             $actionFirst->getURL()->add(clone $paramType);
@@ -297,7 +289,7 @@ class BeanList extends TemplateContent
 
             $act->append(Action::PipeSeparator());
 
-            $actionLast = TemplateContent::CreateAction("last", tr("Last"));
+            $actionLast = TemplateBeanContent::CreateAction("last", tr("Last"));
             $paramType->setValue($actionLast->getAction());
             $actionLast->getURL()->add($paramCmd);
             $actionLast->getURL()->add(clone $paramType);
@@ -307,7 +299,7 @@ class BeanList extends TemplateContent
 
             $act->append(Action::RowSeparator());
 
-            $actionPos = TemplateContent::CreateAction("fixed", tr("Set Position"));
+            $actionPos = TemplateBeanContent::CreateAction("fixed", tr("Set Position"));
             $paramType->setValue($actionPos->getAction());
             $actionPos->getURL()->add($paramCmd);
             $actionPos->getURL()->add(clone $paramType);

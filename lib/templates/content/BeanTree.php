@@ -31,7 +31,7 @@ class BeanTree extends BeanList
         $act->append($actionUp);
         $act->append($actionDown);
 
-        $editAction = TemplateContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, tr(SparkTemplateAdminPage::ACTION_EDIT));
+        $editAction = TemplateBeanContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, tr(SparkTemplateAdminPage::ACTION_EDIT));
         $editAction->getURL()->add(new DataParameter("editID", $this->bean->key()));
         $act->append($editAction);
 

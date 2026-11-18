@@ -1,6 +1,6 @@
 <?php
 include_once("templates/BeanConfig.php");
-include_once("templates/TemplateContent.php");
+include_once("templates/TemplateBeanContent.php");
 include_once("components/Publications.php");
 include_once("utils/url/PublicationURL.php");
 include_once("utils/script/LDJsonScript.php");
@@ -15,17 +15,9 @@ include_once("beans/NewsItemsBean.php");
  *  - archive (?year=&month=): the items of a month - <folder>archive/<year>/<month>/
  * Markup: aside.column (latest, archive), main.column (the items) - styled by the layer or the site.
  */
-class PublicationsContent extends TemplateContent
+class PublicationsContent extends TemplateBeanContent
 {
 
-    /**
-     * Works on a bean - BeanConfig
-     * @return string
-     */
-    public static function ConfigClass() : string
-    {
-        return BeanConfig::class;
-    }
     /**
      * Module folder of the site (the publications module link) - item and archive addresses
      * @var string
