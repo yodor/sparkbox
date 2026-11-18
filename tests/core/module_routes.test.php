@@ -38,3 +38,10 @@ test("module routes: a path alias answers as its target path - no redirect", fun
     assertSame(200, $status, "show.php");
     assertTrue(str_contains($body, "<div class='route_test'>initialize;processInput:9;</div>"), "the page class of the target");
 });
+
+test("module routes: a content without a title gets its fallback title; finalizeHead sees the final head", function () {
+    [$status, , $body] = routeRequest("path=%2Ffallback", "/routetest/fallback");
+    assertSame(200, $status, "fallback");
+    assertTrue(str_contains($body, "<title>Route Fallback</title>"), "the fallback title of the content");
+    assertTrue(str_contains($body, "content='Route Fallback|Route description'"), "finalizeHead after the head of the frame");
+});

@@ -46,7 +46,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
     /**
      * The page finalized its head (title, description) - the content adds what depends on them
      * (ex. the prev / next links and the page number of a paged list: AbstractResultView::AppendHeadLinks).
-     * Called by SparkPage::headFinalize() of the frame it is in.
+     * Called by SparkPage::startRender() of the frame it is in, after its headFinalize().
      * @param SparkPage $page
      * @return void
      */
@@ -96,6 +96,16 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
     public function config(): TemplateConfig
     {
         return $this->config;
+    }
+
+    /**
+     * The title of the page when neither the content nor the frame set one (ex. the selected menu item) -
+     * none by default
+     * @return string
+     */
+    public function fallbackTitle(): string
+    {
+        return "";
     }
 
     protected function getContentTitle(): string

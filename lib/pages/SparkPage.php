@@ -80,6 +80,15 @@ class SparkPage extends HTMLPage implements IActionCollection, IGETConsumer
         $this->description = $description;
     }
 
+    /**
+     * The meta description of the page (final after applyTitleDescription() - from the render on)
+     * @return string
+     */
+    public function getMetaDescription() : string
+    {
+        return $this->description;
+    }
+
     public function getActions(): ActionCollection
     {
         return $this->actions;
@@ -217,13 +226,18 @@ JS;
 
     /**
      * Assign values to preferred_title and description.
-     * Default implementation assign value of meta_description from config seo
-     * section to the description property if it is not already assigned value
+     * Default implementation: the fallback title of the content when no title is set, the meta_description of
+     * the config seo section when no description is set
      *
      * @return void
      */
     protected function applyTitleDescription() : void
     {
+        //no title from the content or the frame: the default title of the content
+        if (!$this->preferred_title && $this->pageContent instanceof TemplateContent) {
+            $this->preferred_title = $this->pageContent->fallbackTitle();
+        }
+
         //the site default: the SEO settings of the admin (config section 'seo')
         if (!$this->description) {
             $config = ConfigBean::Factory();
@@ -248,9 +262,6 @@ JS;
 
         $meta_description = Spark::MetaDescription($this->description);
         $this->head()->addMeta("description", $meta_description);
-
-        //the content adds what depends on the final title (TemplateContent::finalizeHead)
-        if ($this->pageContent instanceof TemplateContent) $this->pageContent->finalizeHead($this);
     }
 
     /**
@@ -274,6 +285,9 @@ JS;
         //do any final changes to the head contents
         //transfer preferred_title and description to the head section
         $this->headFinalize();
+
+        //the content adds what depends on the final head of the frame (TemplateContent::finalizeHead)
+        if ($this->pageContent instanceof TemplateContent) $this->pageContent->finalizeHead($this);
 
         parent::startRender();
         //<body> is in output buffer now
