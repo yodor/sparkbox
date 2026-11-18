@@ -23,7 +23,7 @@
 /*all items*/
 
 .MenuBar .ItemList .Item {
-    border-top: 1px solid  #b9b3a3;
+    border-top: 1px solid  var(--theme-accent);
     flex-direction: column;
     padding:0;
 
@@ -44,7 +44,7 @@
 /*top level selected item only*/
 
 .MenuBar > .ItemList > .Item[active="1"] {
-    background-color: #b9b3a3;
+    background-color: var(--theme-accent);
     color: white;
 }
 
@@ -74,7 +74,7 @@
     font-weight:bold;
 
     border:0;
-    border-top:1px solid #b9b3a3;
+    border-top:1px solid var(--theme-accent);
 
 }
 

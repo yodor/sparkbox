@@ -115,7 +115,7 @@
 }
 
 .ResultViewFooter .pager A {
-    color: #537689;
+    color: var(--theme-accent-dark);
     padding: 0.7em;
     display: inline-block;
     text-decoration: none;
@@ -123,7 +123,7 @@
 
 .ResultViewFooter .pager A.selected {
     color: black;
-    border: 1px solid #537689;
+    border: 1px solid var(--theme-accent-dark);
     font-weight: bold;
 }
 

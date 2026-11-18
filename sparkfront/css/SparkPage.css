@@ -1,7 +1,7 @@
 @layer base {
 
 * {
-    font-family: "Exo 2", "sans-serif";
+    font-family: var(--theme-font-family);
 }
 
 HTML {

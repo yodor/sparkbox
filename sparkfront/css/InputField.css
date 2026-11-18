@@ -22,12 +22,12 @@ TEXTAREA {
 }
 
 .InputLabel .required {
-    color: rgb(255, 0, 170);
+    color: var(--theme-error);
     font-weight: bold;
 }
 
 .InputLabel[error] {
-    color: rgb(255, 0, 170);
+    color: var(--theme-error);
 }
 
 .InputField {

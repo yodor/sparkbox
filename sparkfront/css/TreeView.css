@@ -37,7 +37,7 @@
 }
 
 .TreeView .Node:hover {
-    background-color: #f3f6fb;
+    background-color: var(--theme-surface);
 }
 
 .TreeView .Node .Handle {
@@ -124,7 +124,7 @@
 
 .TreeView .Node .node_actions .Action {
 
-    color: #50a9f9;
+    color: var(--theme-link);
     text-decoration: none;
 
 }

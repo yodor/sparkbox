@@ -1,8 +1,8 @@
 @layer components {
 
 .Action {
-    /* the link color of the actions - a theme sets --spark-action-color */
-    color: var(--spark-action-color, #50a9f9);
+    /* the link color of the actions: the theme link color, or --spark-action-color */
+    color: var(--spark-action-color, var(--theme-link));
     text-decoration: none;
     cursor:pointer;
 }
