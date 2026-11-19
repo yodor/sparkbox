@@ -155,15 +155,19 @@ Each layer's `init.php` gets `Module::Active()` and sets it up. The core part se
 The products module (store) as an example:
 
 ```php
+include_once("store/pages/StorePage.php");
+
 $module = Module::Active();
-$module->pageClass = "StorePage";
+$module->pageClass = StorePage::class;
 $module->addPathAlias("details.php", "details");
 $module->addRedirect("list.php", "");
 $module->addRedirect("promo.php", "promos");
 ```
 
-The page class is given **by name**, so a site can give the module a page class of its own
-(`class/pages/<Name>.php`, found first).
+Classes are always named with `::class` (the page class, the content class, the authenticator), and the file of
+the class is included first: the IDE knows the class and jumps to it, and the strict includes check sees it. A
+site gives a module a page class of its own the same way (`include_once("class/pages/MyPage.php")`,
+`$module->pageClass = MyPage::class;`).
 
 
 Path files
@@ -182,13 +186,13 @@ include_once("class/templates/modules/products/content/BookshopProductList.php")
 $config = BookshopProductList::Configure();
 ```
 
-or a plain config with settings:
+or the factory with settings:
 
 ```php
 <?php
 //the Автори index - the values of the attribute 'Автор' (store AttributeIndex)
-$config = TemplateConfig::Factory();
-$config->contentClass = "AttributeIndex";
+include_once("store/templates/modules/main/content/AttributeIndex.php");
+$config = AttributeIndex::Configure();
 $config->title = "Автори";
 $config->data = array("attribute" => "Автор", "letter" => "Буква", "placeholder" => "Търси автор ...");
 $config->requireAuth = false;
