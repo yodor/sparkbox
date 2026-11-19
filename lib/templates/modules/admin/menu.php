@@ -1,7 +1,7 @@
 <?php
 //
 // admin module - core menu. Store and site menu.php run after it and extend
-// SparkTemplateAdminPage::Menu() (prepend / append / insert) or disable paths.
+// SparkAdminPage::Menu() (prepend / append / insert) or disable paths.
 //
 include_once("utils/menu/MenuItem.php");
 
@@ -28,7 +28,7 @@ $settings->append($languages);
 
 //one translator entry per language - its phrases
 include_once("beans/LanguagesBean.php");
-include_once("pages/SparkTemplateAdminPage.php");
+include_once("pages/SparkAdminPage.php");
 $languagesBean = new LanguagesBean();
 $query = $languagesBean->query($languagesBean->key(), "lang_code");
 $query->exec();
@@ -40,4 +40,4 @@ while ($row = $query->next()) {
 }
 $query->free();
 
-SparkTemplateAdminPage::SetMenu($menu);
+SparkAdminPage::SetMenu($menu);

@@ -7,7 +7,7 @@ include_once("components/TableView.php");
 include_once("responders/ChangePositionResponder.php");
 include_once("responders/DeleteItemResponder.php");
 include_once("responders/ToggleFieldResponder.php");
-include_once("pages/SparkTemplateAdminPage.php");
+include_once("pages/SparkAdminPage.php");
 
 class BeanList extends TemplateBeanContent
 {
@@ -204,7 +204,7 @@ class BeanList extends TemplateBeanContent
     {
         if (!$this->addEnabled) return;
 
-        $actionCreate = TemplateBeanContent::CreateAction(SparkTemplateAdminPage::ACTION_ADD, SparkTemplateAdminPage::ACTION_ADD);
+        $actionCreate = TemplateBeanContent::CreateAction(SparkAdminPage::ACTION_ADD, SparkAdminPage::ACTION_ADD);
         $actionCreate->getURL()->add(new URLParameter("editID", -1));
         $actionCreate->setTooltip("Add new element to this collection");
 
@@ -232,7 +232,7 @@ class BeanList extends TemplateBeanContent
     {
 
         if ($this->editEnabled) {
-            $editAction = TemplateBeanContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, SparkTemplateAdminPage::ACTION_EDIT);
+            $editAction = TemplateBeanContent::CreateAction(SparkAdminPage::ACTION_EDIT, SparkAdminPage::ACTION_EDIT);
             $editAction->setTooltip(tr("Edit element"));
             $editAction->getURL()->add(new DataParameter("editID", $this->getIterator()->key()));
 

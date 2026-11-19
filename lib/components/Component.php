@@ -351,7 +351,9 @@ class Component extends SparkObject implements IRenderer, IHeadContents, ICachea
 
         }
         catch (Exception $e) {
-            echo $e->getMessage();
+            //the error in place of the rest of the component - escaped, and always in the error log
+            error_log("Render failed [" . get_class($this) . "]: " . $e->getMessage() . " (" . $e->getFile() . ":" . $e->getLine() . ")");
+            echo "<span class='RenderError'>" . htmlspecialchars($e->getMessage()) . "</span>";
             $haveError = true;
         }
 

@@ -10,7 +10,7 @@ include_once("components/renderers/cells/NumericCell.php");
 include_once("components/renderers/cells/ActionsCell.php");
 include_once("templates/content/BeanEditor.php");
 include_once("objects/events/TemplateEvent.php");
-include_once("pages/SparkTemplateAdminPage.php");
+include_once("pages/SparkAdminPage.php");
 include_once("templates/content/BeanList.php");
 
 if (URL::Current()->contains("editID")) {
@@ -25,7 +25,7 @@ if (URL::Current()->contains("editID")) {
         if ($event->isEvent(TemplateEvent::CONTENT_SETUP)) {
             //roles = top level menu sections
             $roles = array();
-            foreach (SparkTemplateAdminPage::LoadMenu()?->toArray() ?? array() as $item) {
+            foreach (SparkAdminPage::LoadMenu()?->toArray() ?? array() as $item) {
                 if ($item instanceof MenuItem) $roles[] = $item->getName();
             }
             $form = $content->getForm();

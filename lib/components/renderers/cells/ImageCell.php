@@ -173,7 +173,7 @@ class ImageCell extends TableCell implements IPhotoRenderer
             $this->constructItems($data);
         }
         catch (Exception $e) {
-            $this->setContents($e->getMessage());
+            $this->setContents(htmlspecialchars($e->getMessage()));
             $this->imageList->setRenderEnabled(false);
             return;
         }

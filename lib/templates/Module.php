@@ -241,16 +241,6 @@ class Module
     }
 
     /**
-     * The old misspelled name of getPrefix() - kept until the sites stop calling it
-     * @deprecated use getPrefix()
-     * @return string
-     */
-    public function getPreifx(): string
-    {
-        return $this->getPrefix();
-    }
-
-    /**
      * Active module absolute path from DOCUMENT_ROOT
      * @return string
      */
@@ -608,7 +598,8 @@ class Module
             Debug::ErrorLog("PathConfig failed: " . $e->getMessage());
             $message = $e->getMessage();
             if (Debug::IsEnabled()) $message .= " - " . $e->getTraceAsString();
-            Template::ErrorConfig("Error:$path", $message);
+            //the error content shows it as text (it can carry the requested values)
+            Template::ErrorConfig("Error:$path", htmlspecialchars($message));
         }
 
         try {
@@ -620,7 +611,8 @@ class Module
             $page->head()->addMeta("robots", "noindex");
             $message = $e->getMessage();
             if (Debug::IsEnabled()) $message .= " - " . $e->getTraceAsString();
-            Template::ErrorConfig("Error:$path", $message);
+            //the error content shows it as text (it can carry the requested values)
+            Template::ErrorConfig("Error:$path", htmlspecialchars($message));
             return Template::LoadContent();
         }
     }

@@ -12,7 +12,7 @@ include_once("components/admin/AdminMainPane.php");
 include_once("dialogs/json/JSONFormDialog.php");
 include_once("responders/json/TemplateHelpResponder.php");
 
-class SparkTemplateAdminPage extends SparkPage implements IObserver
+class SparkAdminPage extends SparkPage implements IObserver
 {
 
     /**
@@ -71,7 +71,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $this->base = $this->mainPane->base();
 
         //the frame css, the css of its panes, the admin menu last
-        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/SparkTemplateAdminPage.css");
+        $this->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/SparkAdminPage.css");
         foreach (array_merge($this->sidePane->stylesheets(), $this->mainPane->stylesheets()) as $href) {
             $this->head()->addCSS($href);
         }
@@ -92,17 +92,17 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
 
         //authorized already
         if (Module::Active()->getAuthContext()) {
-            SparkTemplateAdminPage::LoadMenu();
+            SparkAdminPage::LoadMenu();
             $this->filterMenu();
         }
 
-        if (SparkTemplateAdminPage::$Menu instanceof MenuItemList) {
+        if (SparkAdminPage::$Menu instanceof MenuItemList) {
 
             //register late after all inclusions are to allow their event registration if there is
             SparkEventManager::register(TemplateMenuEvent::class, $this);
 
             //fire TemplateEvent::MENU_CREATED
-            SparkEventManager::emit(new TemplateMenuEvent(TemplateMenuEvent::CREATED, SparkTemplateAdminPage::$Menu));
+            SparkEventManager::emit(new TemplateMenuEvent(TemplateMenuEvent::CREATED, SparkAdminPage::$Menu));
         }
 
         //TODO: check menu access
@@ -202,7 +202,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         $url = $this->navigation->current();
         if ($url instanceof URL) {
             $back_action = new Action();
-            $back_action->setAction(SparkTemplateAdminPage::ACTION_BACK);
+            $back_action->setAction(SparkAdminPage::ACTION_BACK);
             $back_action->setURL(Module::PathURL("", $url));
             $actions->items()->append($back_action);
         }
@@ -213,7 +213,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         }
 
         $help_action = new Action();
-        $help_action->setAction(SparkTemplateAdminPage::ACTION_HELP);
+        $help_action->setAction(SparkAdminPage::ACTION_HELP);
         $help_action->setAttribute("path", Module::Active()->getPath());
         $help_action->setAttribute("sink", "helpPane");
         $help_action->setAttribute("onClick", "javascript:document.templateHelp.fetch(this)");
@@ -264,12 +264,12 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
     {
         if ($event->isEvent(TemplateMenuEvent::CREATED)) {
 
-            //Debug::ErrorLog("MenuItemList top level count: ". SparkTemplateAdminPage::$Menu->count());
+            //Debug::ErrorLog("MenuItemList top level count: ". SparkAdminPage::$Menu->count());
             foreach (Template::DisabledPaths() as $idx=>$disabledPath) {
-                SparkTemplateAdminPage::$Menu->removePath($disabledPath);
+                SparkAdminPage::$Menu->removePath($disabledPath);
             }
 
-            $this->menu_bar->setMenu(SparkTemplateAdminPage::$Menu);
+            $this->menu_bar->setMenu(SparkAdminPage::$Menu);
 
         }
 
@@ -290,10 +290,10 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         static $loaded = false;
         if (!$loaded) {
             $loaded = true;
-            SparkTemplateAdminPage::$Menu = null;
+            SparkAdminPage::$Menu = null;
             SparkLoader::Factory(Module::Active()->getPrefix())->include("menu", true);
         }
-        return SparkTemplateAdminPage::$Menu;
+        return SparkAdminPage::$Menu;
     }
 
     /**
@@ -302,7 +302,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
      */
     protected function filterMenu() : void
     {
-        $menu = SparkTemplateAdminPage::$Menu;
+        $menu = SparkAdminPage::$Menu;
         if (!($menu instanceof MenuItemList)) return;
         foreach ($menu->toArray() as $item) {
             if (!($item instanceof MenuItem)) continue;
@@ -318,13 +318,13 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
      */
     public static function Menu() : ?MenuItemList
     {
-        return SparkTemplateAdminPage::$Menu;
+        return SparkAdminPage::$Menu;
     }
 
     public static function SetMenu(MenuItemList $menu) : void
     {
         //TODO: unregister listeners ?
-        SparkTemplateAdminPage::$Menu = $menu;
+        SparkAdminPage::$Menu = $menu;
 
     }
 }

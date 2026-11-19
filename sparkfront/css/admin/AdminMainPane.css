@@ -1,6 +1,6 @@
 @layer core {
 
-/* the main pane of the admin frame (AdminMainPane) - from SparkTemplateAdminPage.css */
+/* the main pane of the admin frame (AdminMainPane) - from SparkAdminPage.css */
 
 .basePane .mainPane {
         flex-grow: 1;

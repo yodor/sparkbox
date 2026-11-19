@@ -18,7 +18,7 @@ class HTMLHead extends Container implements IObserver
      *    they never win over a class rule, so they stay below the components
      *  - components: the building blocks of the core - one stylesheet per component class (Action, ColorButton,
      *    FormRenderer, InputField, TableView, TreeView, MenuBar, the dialogs ...), their plain look
-     *  - core: the core frames and module contents (SparkPage, SparkTemplateAdminPage, faq, news)
+     *  - core: the core frames and module contents (SparkPage, SparkAdminPage, faq, news)
      *  - store: the store frame, the store components and modules (sparkstore storefront/css)
      *  - site: the css of the site
      * Each stylesheet wraps its rules in its layer - '@layer components { ... }', its element rules in

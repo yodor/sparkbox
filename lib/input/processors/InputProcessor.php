@@ -39,14 +39,6 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
     public array $bean_copy_fields = array();
 
     /**
-     * Copy data from the renderer iterator of the DataInput.
-     * Will query the iterator with fields set to the contents of this array and match by the DataInput name and value
-     * @var array
-     */
-    public array $renderer_source_copy_fields = array();
-
-
-    /**
      * The primary key values for each result loaded from the 'transact_bean' during load bean data
      * @var array
      */
@@ -302,26 +294,6 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
 
         $transactor->appendValue($this->transact_column, $value);
 
-        //transacts additional values from renderer data source
-        //matching by 'this' field name and its value posted. do not copy on empty 'value'
-        if (count($this->renderer_source_copy_fields) > 0 && $value) {
-            Debug::ErrorLog("renderer_source_copy_fields ... using renderer iterator to query additional values");
-            $iterator = $this->input->getRenderer()->getIterator();
-            if (!($iterator instanceof SelectQuery)) throw new Exception("Unsupported iterator");
-            $iterator->stmt->columns()->reset();
-            $iterator->stmt->columns(...$this->renderer_source_copy_fields);
-            $iterator->stmt->where()->match($name, $value);
-            $iterator->stmt->limit(1);
-            $iterator->exec();
-
-            if ($data = $iterator->next()) {
-                foreach ($this->renderer_source_copy_fields as $idx => $key) {
-                    $transactor->appendValue($key, $data[$key]);
-                }
-            }
-            $iterator->free();
-        }
-
     }
 
     /**
@@ -391,27 +363,6 @@ class InputProcessor implements IBeanPostProcessor, IDBFieldTransactor
         }
 
         Debug::ErrorLog("Transact-bean values loaded #".count($values));
-        $position = -1;
-        foreach ($values as $id=>$item) {
-            $position++;
-            @$obj = unserialize($item);
-
-            if ($obj === FALSE) {
-                $type = gettype($item);
-                Debug::ErrorLog("#$position - Type($type) - ID($id) - Value('$item')");
-            }
-            else {
-                $type = get_class($obj);
-                if ($obj instanceof StorageObject) {
-                    Debug::ErrorLog("#$position - Type($type) - ID($id) - UID({$obj->UID()})");
-                }
-                //other class type
-                else {
-                    Debug::ErrorLog("#$position - Type($type) - ID($id) - Value('$item')");
-                }
-
-            }
-        }
 
         return $values;
     }

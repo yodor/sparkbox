@@ -2,11 +2,11 @@
 //
 // admin module - core part, included first (store and site init.php run after it and may override)
 //
-include_once("pages/SparkTemplateAdminPage.php");
+include_once("pages/SparkAdminPage.php");
 include_once("auth/AdminAuthenticator.php");
 
 $module = Module::Active();
-if (!$module->pageClass) $module->pageClass = SparkTemplateAdminPage::class;
+if (!$module->pageClass) $module->pageClass = SparkAdminPage::class;
 if (!$module->authClass) $module->authClass = AdminAuthenticator::class;
 
 //reachable without login - every other path redirects to login before its path file runs
@@ -26,7 +26,7 @@ $module->accessCheck = function (string $path) use ($module) : bool {
     $roles = $context->getData()->get(AdminAuthenticator::SESSION_DATA_ENABLED_ROLES);
     if (!is_array($roles)) $roles = array();
 
-    $menu = SparkTemplateAdminPage::LoadMenu();
+    $menu = SparkAdminPage::LoadMenu();
     if ($menu instanceof MenuItemList) {
         foreach ($menu->toArray() as $item) {
             if ($item instanceof MenuItem && strcmp($item->getHref(), $section) === 0) {

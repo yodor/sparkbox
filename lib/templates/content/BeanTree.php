@@ -8,7 +8,7 @@ include_once("templates/content/BeanList.php");
 include_once("responders/ChangePositionResponder.php");
 include_once("responders/DeleteItemResponder.php");
 include_once("templates/TemplateBeanContent.php");
-include_once("pages/SparkTemplateAdminPage.php");
+include_once("pages/SparkAdminPage.php");
 
 class BeanTree extends BeanList
 {
@@ -36,7 +36,7 @@ class BeanTree extends BeanList
         $act->append($actionUp);
         $act->append($actionDown);
 
-        $editAction = TemplateBeanContent::CreateAction(SparkTemplateAdminPage::ACTION_EDIT, tr(SparkTemplateAdminPage::ACTION_EDIT));
+        $editAction = TemplateBeanContent::CreateAction(SparkAdminPage::ACTION_EDIT, tr(SparkAdminPage::ACTION_EDIT));
         $editAction->getURL()->add(new DataParameter("editID", $this->bean->key()));
         $act->append($editAction);
 

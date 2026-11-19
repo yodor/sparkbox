@@ -1,6 +1,6 @@
 @layer core {
 
-/* the side pane of the admin frame (AdminSidePane) - from SparkTemplateAdminPage.css */
+/* the side pane of the admin frame (AdminSidePane) - from SparkAdminPage.css */
 
 .basePane .sidePane {
         display: flex;

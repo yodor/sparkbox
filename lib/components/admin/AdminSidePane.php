@@ -6,7 +6,7 @@ include_once("components/TextComponent.php");
 include_once("templates/Module.php");
 
 /**
- * The side pane of the admin frame (SparkTemplateAdminPage): the logged administrator (name, logout) and the
+ * The side pane of the admin frame (SparkAdminPage): the logged administrator (name, logout) and the
  * admin menu
  */
 class AdminSidePane extends Container
