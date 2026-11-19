@@ -1,0 +1,80 @@
+/*
+ * The frame of a core site (SparkSitePage): the page, the header, the main menu, the content, the footer.
+ * A plain look - the site css sets its own (layer site).
+ */
+@layer core {
+
+.frame {
+    max-width: 1124px;
+    margin: 0 auto;
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--theme-background);
+}
+
+.site_header {
+    padding: 24px;
+}
+
+.site_header .home {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    color: var(--theme-text);
+    text-decoration: none;
+}
+
+.site_header .logo {
+    display: block;
+    max-height: 120px;
+    width: auto;
+}
+
+.site_header .names .name {
+    font-size: 2em;
+    line-height: 1.2;
+}
+
+.site_header .names .line {
+    font-size: 1.1em;
+}
+
+.site_menu {
+    border-top: 1px solid var(--theme-surface);
+    border-bottom: 1px solid var(--theme-surface);
+}
+
+.site_menu .MenuBar > .ItemList > .Item[active="1"] > .Link {
+    font-weight: bold;
+}
+
+.site_main {
+    flex: 1;
+    padding: 24px;
+}
+
+.site_footer {
+    padding: 12px 24px;
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
+@media (max-width: 700px) {
+    .site_header {
+        padding: 16px;
+    }
+    .site_header .logo {
+        max-height: 72px;
+    }
+    .site_menu .MenuBar > .ItemList {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .site_main {
+        padding: 16px;
+    }
+}
+
+}

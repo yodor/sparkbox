@@ -7,7 +7,7 @@
  * these - a site sets a component token only where that component differs from the theme.
  */
 :root {
-    --theme-font-family: "Exo 2", "sans-serif";
+    --theme-font-family: "Exo 2", sans-serif;
 
     --theme-text: #000000;
     --theme-background: #ffffff;
