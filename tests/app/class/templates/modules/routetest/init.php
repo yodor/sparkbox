@@ -7,5 +7,6 @@ $module->pageClass = SparkPage::class;
 $module->addPagePath("item", "RouteTestPage", "class/pages/RouteTestPage.php");
 $module->addRedirect("list.php", "");
 $module->addRedirect("item.php", "item");
+$module->addRedirect("folder.php", "item/");
 $module->addPathAlias("home.php", "home");
 $module->addPathAlias("show.php", "item");

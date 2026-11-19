@@ -462,6 +462,8 @@ class Module
 
         $target = $this->redirects[$key];
         $url = ($target === "") ? new URL(rtrim($this->location, "/") . "/") : Module::PathURL($target);
+        //a target with a trailing slash keeps it (a folder like address of the module: section/1/software/)
+        if ($target !== "" && str_ends_with($target, "/")) $url->setScriptName(rtrim($url->getScriptName(), "/") . "/");
         foreach ($_GET as $name => $value) {
             if ($name === "path" || !is_scalar($value)) continue;
             $url->add(new URLParameter((string)$name, (string)$value));

@@ -8,6 +8,8 @@ include_once("templates/Module.php");
 
 /**
  * A dynamic page (?dpID= - /pages/<dpID>/<slug>/): its title, photo and content, and the local menu of its group.
+ * A path file of another module can show one page at its own address (the home, /contacts): config data 'dpID'
+ * (TemplateConfig::$data) - no canonical redirect to the pages module then.
  *
  * The group of a page: its keywords levels without the last ('footer_page;terms;' → footer_page). The menu lists
  * the visible pages of the group (admin position, then the newest) when there is more than one.
@@ -23,7 +25,9 @@ class DynamicPageContent extends TemplateContent
     public function initialize() : void
     {
         $this->pages = new DynamicPagesBean();
-        $dpID = (int)($_GET["dpID"] ?? 0);
+        //the page of the path (config data) - else the page of the address
+        $fixedID = (int)($this->config->data["dpID"] ?? 0);
+        $dpID = ($fixedID > 0) ? $fixedID : (int)($_GET["dpID"] ?? 0);
 
         $query = $this->pages->query($this->pages->key(), "item_title", "content", "keywords", "item_date");
         $query->stmt->alias("(photo IS NOT NULL)", "have_photo");
@@ -43,12 +47,14 @@ class DynamicPageContent extends TemplateContent
         $title = (string)$this->result->get("item_title");
         $url = DynamicPageURL::Page($dpID, $title);
 
-        //one address per page: an old slug or the script address → 301
         $page = SparkPage::Instance();
-        Module::RedirectCanonical($url);
-        $page?->setContentURL($url);
-        //the canonical link - the page address (currentURL)
-        $page?->head()->addCanonicalParameter("dpID", "item_title");
+        if ($fixedID < 1) {
+            //one address per page: an old slug or the script address → 301
+            Module::RedirectCanonical($url);
+            $page?->setContentURL($url);
+            //the canonical link - the page address (currentURL)
+            $page?->head()->addCanonicalParameter("dpID", "item_title");
+        }
 
         $this->config->title = $title;
         $page?->setMetaDescription(Spark::MetaDescription((string)$this->result->get("content"), 150));

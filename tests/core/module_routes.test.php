@@ -28,6 +28,9 @@ test("module routes: old addresses answer 301 to their path with the query", fun
     [$status, $headers] = routeRequest("path=%2Fitem.php&itemID=7", "/routetest/item.php?itemID=7");
     assertSame(301, $status, "item.php");
     assertSame("/routetest/item?itemID=7", $headers["location"] ?? "", "to the item path");
+    [$status, $headers] = routeRequest("path=%2Ffolder.php", "/routetest/folder.php");
+    assertSame(301, $status, "folder.php");
+    assertSame("/routetest/item/", $headers["location"] ?? "", "a target with a trailing slash keeps it");
 });
 
 test("module routes: a path alias answers as its target path - no redirect", function () {
