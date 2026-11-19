@@ -101,6 +101,12 @@ class JSONRequest extends SparkObject {
         this.parameters = new URLSearchParams();
 
         /**
+         * The address the request goes to - empty: the current page
+         * @type {string}
+         */
+        this.url = "";
+
+        /**
          *
          * @type {string}
          */
@@ -131,12 +137,20 @@ class JSONRequest extends SparkObject {
         this.onError(requestError);
     }
     /**
+     * Send the request to '$url' (another page of the site) instead of the current page
+     * @param url {string}
+     */
+    setURL(url) {
+        this.url = url;
+    }
+
+    /**
      * Returns the complete URL including the responder, function, and function parameters
      * @returns {URL}
      */
     getURL() {
 
-        const url = new URL(window.location.href);
+        const url = new URL(this.url || window.location.href, window.location.href);
         url.searchParams.set(JSONRequest.KEY_JSONREQUEST, "1");
         url.searchParams.set(JSONRequest.KEY_RESPONDER, this.responder);
         url.searchParams.set(JSONRequest.KEY_FUNCTION, this.function);

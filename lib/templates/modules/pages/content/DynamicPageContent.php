@@ -46,12 +46,12 @@ class DynamicPageContent extends TemplateContent
         //one address per page: an old slug or the script address → 301
         $page = SparkPage::Instance();
         Module::RedirectCanonical($url);
-        $page->setContentURL($url);
+        $page?->setContentURL($url);
         //the canonical link - the page address (currentURL)
-        $page->head()->addCanonicalParameter("dpID", "item_title");
+        $page?->head()->addCanonicalParameter("dpID", "item_title");
 
         $this->config->title = $title;
-        $page->setMetaDescription(Spark::MetaDescription((string)$this->result->get("content"), 150));
+        $page?->setMetaDescription(Spark::MetaDescription((string)$this->result->get("content"), 150));
 
         $levels = DynamicPagesBean::Levels((string)$this->result->get("keywords"));
         $css = Spark::AttributeValue(implode(" ", $levels));
@@ -83,7 +83,7 @@ class DynamicPageContent extends TemplateContent
             $img->setAttribute("alt", $title);
             $image->items()->append($img);
             $column->items()->append($image);
-            $page->head()->addOGTag("image", $photo->hrefImage()->fullURL()->toString());
+            $page?->head()->addOGTag("image", $photo->hrefImage()->fullURL()->toString());
         }
 
         $summary = new Component(false);

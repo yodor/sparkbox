@@ -131,6 +131,7 @@ JS;
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/JSONRequest.js");
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/JSONComponent.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/ContentFragment.js");
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/Tooltip.js");
 

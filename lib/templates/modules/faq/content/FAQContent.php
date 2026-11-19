@@ -6,6 +6,7 @@ include_once("utils/url/FAQSectionURL.php");
 include_once("utils/script/LDJsonScript.php");
 include_once("objects/data/LinkedData.php");
 include_once("pages/SparkPage.php");
+include_once("pages/HTMLHead.php");
 include_once("templates/Module.php");
 
 /**
@@ -30,7 +31,7 @@ class FAQContent extends TemplateContent
 
     public function initialize() : void
     {
-        SparkPage::Instance()->head()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/FAQ.css");
+        HTMLHead::Instance()->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/FAQ.css");
 
         $this->sections = new FAQSectionsBean();
         $this->items = new FAQItemsBean();
@@ -93,11 +94,11 @@ class FAQContent extends TemplateContent
             $data->setArray("mainEntity", ...$this->entities);
             $script = new LDJsonScript();
             $script->setLinkedData($data);
-            $page->head()->addScript($script);
+            $page?->head()->addScript($script);
         }
 
         if (count($questions) > 0) {
-            $page->setMetaDescription(Spark::MetaDescription(implode(" ", array_slice($questions, 0, 5)), 150));
+            $page?->setMetaDescription(Spark::MetaDescription(implode(" ", array_slice($questions, 0, 5)), 150));
         }
     }
 
@@ -184,8 +185,8 @@ class FAQContent extends TemplateContent
     protected function setPageURL(URL $url, array $canonicalParameters) : void
     {
         $page = SparkPage::Instance();
-        $page->setContentURL($url);
-        $page->head()->addCanonicalParameter(...$canonicalParameters);
+        $page?->setContentURL($url);
+        $page?->head()->addCanonicalParameter(...$canonicalParameters);
     }
 
     public function component() : Component

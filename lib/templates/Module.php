@@ -7,7 +7,8 @@ class Module
 {
 
     /**
-     * Page class to use during Module::Response()
+     * Page class to use during Module::Response() - the frame of the contents of the module paths.
+     * Empty: a module without a frame - every path answers its content as a fragment (ContentFragmentResponder).
      * Can be overwritten from module init.php
      * @var string
      */
@@ -577,17 +578,17 @@ class Module
      * @return TemplateContent
      * @throws Exception
      */
-    protected function loadContent(SparkPage $page) : TemplateContent
+    protected function loadContent(?SparkPage $page) : TemplateContent
     {
         $path = $this->getPath();
         try {
             Template::PathConfig($path);
-            $page->body()->setAttribute("path", $path);
+            $page?->body()->setAttribute("path", $path);
         }
         catch (TemplatePathNotFound $e) {
             Debug::ErrorLog("PathConfig: " . $e->getMessage());
             http_response_code(404);
-            $page->head()->addMeta("robots", "noindex");
+            Module::NoIndex($page);
             Template::NotFoundConfig();
         }
         catch (Exception $e) {
@@ -604,7 +605,7 @@ class Module
         catch (Exception $e) {
             //a content that fails (an unknown row ...) - the error content of the path instead of an uncaught error
             Debug::ErrorLog("Content failed: " . $e->getMessage());
-            $page->head()->addMeta("robots", "noindex");
+            Module::NoIndex($page);
             $message = $e->getMessage();
             if (Debug::IsEnabled()) $message .= " - " . $e->getTraceAsString();
             //the error content shows it as text (it can carry the requested values)
@@ -617,6 +618,21 @@ class Module
      * The ID of the authorized user of this request (the module authClass) - -1 when not authorized
      * @return int
      */
+    /**
+     * Not indexed: the robots meta of the page - the X-Robots-Tag header without a page (a fragment)
+     * @param SparkPage|null $page
+     * @return void
+     */
+    protected static function NoIndex(?SparkPage $page) : void
+    {
+        if ($page instanceof SparkPage) {
+            $page->head()->addMeta("robots", "noindex");
+        }
+        else if (!headers_sent()) {
+            header("X-Robots-Tag: noindex");
+        }
+    }
+
     public function getUserID() : int
     {
         return ($this->context instanceof AuthContext) ? $this->context->getID() : -1;
@@ -706,37 +722,71 @@ class Module
         //paths with a script of their own - after the authorization, like a page
         if ($config->processScript((string)($_GET["path"] ?? ""))) return;
 
+        include_once("responders/json/ContentFragmentResponder.php");
+        //a fragment asked for (JSON): the head and the body collect what its components need
+        $fragment = ContentFragmentResponder::IsRequested();
+        if ($fragment) ContentFragmentResponder::CollectHead();
+
         $pageClass = $config->pageClassFor((string)($_GET["path"] ?? ""));
-        if ($pageClass) {
+        if (!$pageClass) {
+            //a module without a frame - the content of the path is the answer
+            $config->respondFragment();
+            return;
+        }
 
-            $page = SparkLoader::Factory(SparkLoader::PREFIX_PAGES)->instance($pageClass, SparkPage::class);
-            if ($page instanceof SparkPage) {
-                //the module look
-                foreach ($config->pageClasses as $className) $page->body()->addClassName($className);
-                foreach ($config->pageCSS as $href) $page->head()->addCSS($href);
-                foreach ($config->pageMeta as $name => $content) $page->head()->addMeta($name, $content);
+        $page = SparkLoader::Factory(SparkLoader::PREFIX_PAGES)->instance($pageClass, SparkPage::class);
+        if ($page instanceof SparkPage) {
+            //the module look
+            foreach ($config->pageClasses as $className) $page->body()->addClassName($className);
+            foreach ($config->pageCSS as $href) $page->head()->addCSS($href);
+            foreach ($config->pageMeta as $name => $content) $page->head()->addMeta($name, $content);
 
-                $page->initialize();
+            $page->initialize();
 
-                if ($page instanceof IRequestProcessor) {
-                    //a page that answers the path itself (the product pages)
-                    $page->processInput();
-                }
-                else {
-                    //the frame gets the content of the path
-                    $page->setContent($config->loadContent($page));
-                }
-
-                //the request: responders created by the page and its content, the session alert, session closed
-                include_once("responders/RequestController.php");
-                RequestController::Respond();
-
-                $page->render();
+            if ($page instanceof IRequestProcessor) {
+                //a page that answers the path itself (the product pages)
+                $page->processInput();
             }
             else {
-                throw new Exception("Module pageClass object is not instance of SparkPage");
+                //the frame gets the content of the path
+                $page->setContent($config->loadContent($page));
+                //the content alone, built in its frame (the frame gives it its context) - answered as JSON
+                if ($fragment) new ContentFragmentResponder($page->getContent());
             }
+
+            //the request: responders created by the page and its content, the session alert, session closed
+            include_once("responders/RequestController.php");
+            RequestController::Respond();
+
+            $page->render();
         }
+        else {
+            throw new Exception("Module pageClass object is not instance of SparkPage");
+        }
+    }
+
+    /**
+     * The answer of a module without a frame (pageClass empty): the content of the path as a fragment - JSON for a
+     * JSON request (ContentFragmentResponder), else the HTML of the content with the stylesheets and scripts its
+     * components need. Not indexed.
+     * @return void
+     * @throws Exception
+     */
+    protected function respondFragment() : void
+    {
+        ContentFragmentResponder::CollectHead();
+        Module::NoIndex(null);
+        //the module look: its stylesheets
+        foreach ($this->pageCSS as $href) HTMLHead::Instance()->addCSS($href);
+
+        $content = $this->loadContent(null);
+        if (ContentFragmentResponder::IsRequested()) new ContentFragmentResponder($content);
+
+        //JSON responders answer and exit, forms redirect
+        include_once("responders/RequestController.php");
+        RequestController::Respond();
+
+        ContentFragmentResponder::RenderHTML($content);
     }
 
     /**

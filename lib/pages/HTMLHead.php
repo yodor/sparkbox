@@ -339,6 +339,32 @@ class HTMLHead extends Container implements IObserver
     }
 
     /**
+     * The addresses of the stylesheets of this head, in their order (versioned) - for a fragment (ContentFragmentResponder)
+     * @return array<string>
+     */
+    public function stylesheetURLs() : array
+    {
+        $result = array();
+        foreach ($this->cssLinks as $link) {
+            if ($link instanceof Link) $result[] = $link->getHref();
+        }
+        return $result;
+    }
+
+    /**
+     * The addresses of the script files of this head, in their order - for a fragment (ContentFragmentResponder)
+     * @return array<string>
+     */
+    public function scriptURLs() : array
+    {
+        $result = array();
+        foreach ($this->scripts as $script) {
+            if ($script instanceof Script && $script->getSrc() !== "") $result[] = $script->getSrc();
+        }
+        return $result;
+    }
+
+    /**
      * Add a JavaScript Script to this head JavaScript scripts collection
      * @param Script $object
      * @return void

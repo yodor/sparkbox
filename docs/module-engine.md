@@ -14,6 +14,7 @@ for writing a module, a content, or a site on top of the core and the store laye
 - [Contents and their config](#contents-and-their-config)
 - [Events: patching a path from a later layer](#events-patching-a-path-from-a-later-layer)
 - [Frames](#frames)
+- [Fragments: a content without its frame](#fragments-a-content-without-its-frame)
 - [Errors](#errors)
 - [Strict includes](#strict-includes)
 - [CSS: layers, tokens, one stylesheet per part](#css-layers-tokens-one-stylesheet-per-part)
@@ -91,7 +92,8 @@ The request, step by step
    3. **Early responders**: for an authorized JSON request, a responder whose `EarlyProcessing()` is true is
       created by name (`responders/json/<Name>.php`) and answers before any page exists.
    4. **Script**: a path with a script (see [Scripts](#scripts)) runs it, and the request is done.
-   5. **Page**: `pageClassFor($path)` gives the page class, which is created through the `pages` loader. The
+   5. **Page**: without a page class the content alone is the answer (see
+      [Fragments](#fragments-a-content-without-its-frame)). Otherwise `pageClassFor($path)` gives the page class, which is created through the `pages` loader. The
       module look is applied (`addPageClass`, `addPageCSS`, `addPageMeta`), then `initialize()`.
    6. **Content**: a page that is an `IRequestProcessor` handles the path itself (`processInput()`). Any other
       page is a frame: `loadContent()` includes the path files (`Template::PathConfig`), creates the content
@@ -138,7 +140,7 @@ Each layer's `init.php` gets `Module::Active()` and sets it up. The core part se
 
 | Setting | Meaning |
 |---|---|
-| `pageClass` | the frame (or the whole page) of the module paths: `SparkPage`, `StorePage`, `SparkAdminPage`, a site class |
+| `pageClass` | the frame (or the whole page) of the module paths: `SparkPage`, `StorePage`, `SparkAdminPage`, a site class; empty: no frame (see [Fragments](#fragments-a-content-without-its-frame)) |
 | `authClass` | the authenticator; empty means a public module |
 | `addPublicPath("login", ...)` | paths reachable without authorization |
 | `loginPath`, `loginAlert` | where an unauthorized request goes, and the alert it sees (empty: none, e.g. the checkout cashier) |
@@ -336,6 +338,44 @@ A page that implements **`IRequestProcessor`** is not a frame: the engine calls 
 it renders the path itself.
 
 
+Fragments: a content without its frame
+--------------------------------------
+
+The content of any module path can be answered alone, as a fragment, by `ContentFragmentResponder`:
+
+- **A module without a frame** (`pageClass` empty). Every path answers its content with no page around it.
+  A plain request gets HTML: the `<link>`s and `<script>`s its components need, the content, then the page
+  components (dialog templates, inline scripts). A JSON request gets the same as JSON. The answer is
+  `X-Robots-Tag: noindex`, and the module stylesheets (`addPageCSS`) come with it.
+- **A framed module, on request**. A JSON request with `responder=ContentFragmentResponder&function=render`
+  builds the page as usual (the frame gives the content its context: the client, the search) and answers
+  only the content. The HTML page of the same path does not change.
+
+The JSON response:
+
+| Field | What |
+|---|---|
+| `contents` | the HTML of the content component (one element) |
+| `styles` | the stylesheets of the head, in their order (versioned addresses) |
+| `scripts` | the script files of the head |
+| `page` | the page components: dialog templates, inline scripts |
+
+In the browser, `ContentFragment` (`sparkfront/js/ContentFragment.js`, on every page) loads one:
+
+```js
+new ContentFragment("/products/promos/").load(document.querySelector(".promos"))
+    .then((element) => { ... });
+```
+
+It adds the stylesheets and scripts the page does not have yet (the scripts in their order), appends the
+content, adds the page components (a template already in the page is not added again), and notifies
+`ContentFragment.EVENT_LOADED`. An unknown path (404) or an error rejects the promise.
+
+A content that can run without a frame adds its css and js through `HTMLHead::Instance()` (it exists without
+a page). It reaches the page only through `SparkPage::Instance()?->` (title, description, canonical, og tags),
+or `instanceof StorePage` for what the store frame gives. The core contents of news, faq and pages do this.
+
+
 Errors
 ------
 
@@ -420,8 +460,6 @@ store, with `modules/<name>/` holding its entry.
 Planned
 -------
 
-- **Frameless modules**: an empty `pageClass` answers the content as an HTML fragment or JSON (with the
-  css / js its components need); a framed module answers one path as a fragment on request.
 - **Plugins**: an optional piece installed on one deployment and not another. It is one more location
   between the store and the site, registered in that site's config, with its public files, a manifest
   and an init order. A site's own module is not a plugin.

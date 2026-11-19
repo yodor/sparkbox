@@ -47,11 +47,21 @@ class HTMLBody extends Container implements IObserver
         }
     }
 
-    public function finishRender(): void
+    /**
+     * The page components (dialog templates, inline scripts) - before the end of the body, or after the content of a
+     * fragment (ContentFragmentResponder)
+     * @return void
+     */
+    public function renderPageComponents(): void
     {
         foreach ($this->page_components as $idx => $cmp) {
             $cmp->render();
         }
+    }
+
+    public function finishRender(): void
+    {
+        $this->renderPageComponents();
 
         parent::finishRender();
     }

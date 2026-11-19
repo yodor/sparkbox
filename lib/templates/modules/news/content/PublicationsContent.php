@@ -46,7 +46,7 @@ class PublicationsContent extends TemplateBeanContent
             Module::RedirectCanonical($url);
             $this->setPageURL($url, array($key, "item_title"));
             $this->config->title = (string)$row["item_title"];
-            $page->setMetaDescription(Spark::MetaDescription((string)$row["content"], 150));
+            $page?->setMetaDescription(Spark::MetaDescription((string)$row["content"], 150));
             $this->linkedData($url, $row, (int)$_GET[$key]);
         }
         else if (strcmp($mode, "archive") === 0) {
@@ -73,7 +73,7 @@ class PublicationsContent extends TemplateBeanContent
                 $url->setData(array("year" => (int)$_GET["year"], "month" => (int)$_GET["month"]));
                 $this->redirect($url, 301);
             }
-            $page->head()->addCanonicalParameter(Paginator::KEY_PAGE);
+            $page?->head()->addCanonicalParameter(Paginator::KEY_PAGE);
             $this->config->title = $this->listTitle();
         }
 
@@ -107,8 +107,8 @@ class PublicationsContent extends TemplateBeanContent
     protected function setPageURL(URL $url, array $canonicalParameters) : void
     {
         $page = SparkPage::Instance();
-        $page->setContentURL($url);
-        $page->head()->addCanonicalParameter(...$canonicalParameters);
+        $page?->setContentURL($url);
+        $page?->head()->addCanonicalParameter(...$canonicalParameters);
     }
 
     /**
@@ -122,10 +122,10 @@ class PublicationsContent extends TemplateBeanContent
         $data->set("url", $url->fullURL()->toString());
         $image = StorageItem::Image($id, get_class($this->bean))->fullURL()->toString();
         $data->set("image", $image);
-        SparkPage::Instance()->head()->addOGTag("image", $image);
+        SparkPage::Instance()?->head()->addOGTag("image", $image);
         $script = new LDJsonScript();
         $script->setLinkedData($data);
-        SparkPage::Instance()->head()->addScript($script);
+        SparkPage::Instance()?->head()->addScript($script);
     }
 
     protected function redirect(URL $url, int $code) : never
