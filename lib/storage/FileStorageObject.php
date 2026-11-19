@@ -38,6 +38,6 @@ class FileStorageObject extends StorageObject
     public function __unserialize(array $data): void
     {
         parent::__unserialize($data);
-        $this->filename = (string)$data[$this->keyName("filename")];
+        $this->filename = (string)$data["filename"];
     }
 }

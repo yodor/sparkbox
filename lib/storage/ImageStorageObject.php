@@ -79,7 +79,7 @@ class ImageStorageObject extends FileStorageObject
     {
         parent::__unserialize($data);
 
-        $this->width = (int)$data[$this->keyName("width")];
-        $this->height = (int)$data[$this->keyName("height")];
+        $this->width = (int)$data["width"];
+        $this->height = (int)$data["height"];
     }
 }

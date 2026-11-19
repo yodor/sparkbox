@@ -96,15 +96,4 @@ class PasswordHash
         $server_hmac = hash_hmac('sha256', $token, hash("sha256", $this->password, false),false);
         return hash_equals($server_hmac, $client_hmac);
     }
-
-    /**
-     * Verify legacy MD5 hash, compute md5 on $this->password and return hash_equals with $storedHash
-     * @param string $storedHash
-     * @return bool
-     */
-    public function digestVerify(string $storedHash): bool
-    {
-        $computed = hash("md5", $this->password, false);
-        return hash_equals($computed, $storedHash);
-    }
 }

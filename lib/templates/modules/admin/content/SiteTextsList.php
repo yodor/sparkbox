@@ -4,13 +4,10 @@ include_once("beans/SiteTextsBean.php");
 include_once("beans/LanguagesBean.php");
 
 /**
- * Site texts (phrases) used with tr(). Page actions: one per language - its translations, and
- * 'Rehash' - converts the old MD5 hash values to Spark::Hash() (xxh3).
+ * Site texts (phrases) used with tr(). Page actions: one per language - its translations.
  */
 class SiteTextsList extends BeanList
 {
-    const string KEY_REHASH = "rehash";
-
     public function setup(TemplateConfig $config): void
     {
         $config->beanClass = SiteTextsBean::class;
@@ -32,39 +29,6 @@ class SiteTextsList extends BeanList
             $collection->append($action);
         }
         $query->free();
-
-        $rehash = TemplateBeanContent::CreateAction(SiteTextsList::KEY_REHASH, tr("Rehash"));
-        $rehash->getURL()->add(new URLParameter(SiteTextsList::KEY_REHASH, "1"));
-        $rehash->setTooltip("Rehash using xxh3");
-        $collection->append($rehash);
-    }
-
-    public function processInput(): void
-    {
-        if (!isset($_GET[SiteTextsList::KEY_REHASH])) {
-            parent::processInput();
-            return;
-        }
-
-        $query = $this->bean->queryFull();
-        $query->exec();
-        $updates = array();
-        while ($result = $query->nextResult()) {
-            //only the old 32 character MD5 values
-            if (strlen((string)$result->get("hash_value")) != 32) continue;
-            $updates[(int)$result->get($this->bean->key())] = (string)$result->get("value");
-        }
-        $query->free();
-
-        foreach ($updates as $textID => $value) {
-            $this->bean->update($textID, array("value" => $value, "hash_value" => Spark::Hash($value)));
-        }
-
-        Session::SetAlert("Rehash complete: " . count($updates));
-        $url = Module::PathURL("", URL::Current());
-        $url->remove(SiteTextsList::KEY_REHASH);
-        header("Location: " . $url);
-        exit;
     }
 
     protected function getContentTitle(): string

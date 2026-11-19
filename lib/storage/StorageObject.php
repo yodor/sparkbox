@@ -17,8 +17,6 @@ class StorageObject implements ISparkSeal, ISerializable, IUnserializable
 
     protected DataBuffer $buffer;
 
-    protected bool $compatUnserialize = false;
-
     public function __construct()
     {
         $this->dataKey = "data";
@@ -150,34 +148,23 @@ class StorageObject implements ISparkSeal, ISerializable, IUnserializable
         return $result;
     }
 
+    /**
+     * The format of __serialize() only - the format before 'Serial' (protected property names, a date string
+     * timestamp) is upgraded with tools/storage_upgrade.php
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
     public function __unserialize(array $data): void
     {
         if (!array_key_exists("Serial", $data)) {
-            $this->compatUnserialize = true;
-            Debug::ErrorLog("Using compatibility key names");
+            throw new Exception("StorageObject of the old format - run tools/storage_upgrade.php on the database");
         }
 
         $this->buffer = new DataBuffer();
-
-        $this->buffer->setData((string)$data[$this->keyName("data")]);
-        $value = $data[$this->keyName("timestamp")];
-        $timestamp = strtotime($value);
-        if ($timestamp === FALSE) {
-            $timestamp = intVal($value);
-        }
-        $this->timestamp = $timestamp;
-
-        $this->uid = (string)$data[$this->keyName("uid")];
-    }
-
-    protected function keyName(string $keyName) : string
-    {
-        if ($this->compatUnserialize) {
-            return "\0*\0".$keyName;
-        }
-        else {
-            return $keyName;
-        }
+        $this->buffer->setData((string)$data["data"]);
+        $this->timestamp = (int)$data["timestamp"];
+        $this->uid = (string)$data["uid"];
     }
 
     public function wrap(): ISparkUnseal

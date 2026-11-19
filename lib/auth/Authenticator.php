@@ -218,22 +218,12 @@ abstract class Authenticator
         $userID     = $row[$this->bean->key()];
         $storedHash = $row["password"];
 
-        // 3. Try legacy verification + upgrade on success
-        if ($hash->digestVerify($storedHash)) {
-            Debug::ErrorLog("MD5 digest detected and authenticated. Migrating userID: $userID");
-            // Legacy hash matched → login successful → upgrade immediately
-            // $storedHash is already verified to be old use skip_needRehash = true
-            $this->upgradePassword($userID, $hash, $storedHash, true);
-            // Proceed to success path
-        } else {
-            // Not legacy → normal modern hash verification
-            if (!$hash->verify($storedHash)) {
-                throw new Exception(tr("Username or password not recognized"));
-            }
-            Debug::ErrorLog("Password verification successful for userID: $userID");
-            //Still check whether upgrade is needed (parameters changed)
-            $this->upgradePassword($userID, $hash, $storedHash, false);
+        // 3. Password verification - a hash of older parameters is upgraded (password_needs_rehash)
+        if (!$hash->verify($storedHash)) {
+            throw new Exception(tr("Username or password not recognized"));
         }
+        Debug::ErrorLog("Password verification successful for userID: $userID");
+        $this->upgradePassword($userID, $hash, $storedHash);
 
         // 4. Account status checks
         if (isset($row["confirmed"]) && (int)$row["confirmed"] < 1) {
@@ -251,24 +241,23 @@ abstract class Authenticator
         $this->updateLastSeen($userID);
     }
 
-    protected function upgradePassword(int $userID, PasswordHash $hash, string $storedHash, bool $skip_needRehash) : void
+    /**
+     * Store the password again when its hash has older parameters (Config::PASSWORD_TYPE, PASSWORD_OPTIONS)
+     * @param int $userID
+     * @param PasswordHash $hash the verified password
+     * @param string $storedHash
+     * @return void
+     */
+    protected function upgradePassword(int $userID, PasswordHash $hash, string $storedHash) : void
     {
-
+        if (!$hash->needRehash($storedHash)) return;
         try {
-            //old hash is already verified use skip_needRehash = true
-            if ($skip_needRehash || $hash->needRehash($storedHash)) {
-                $this->bean->checkPasswordColumn();
-                $update = array("password" => $hash->getValue());
-                $this->bean->update($userID, $update);
-
-                Debug::ErrorLog("Migrated password for userID: $userID");
-            }
-            else {
-                Debug::ErrorLog("No migration performed for userID: $userID");
-            }
+            $this->bean->checkPasswordColumn();
+            $this->bean->update($userID, array("password" => $hash->getValue()));
+            Debug::ErrorLog("Password rehashed for userID: $userID");
         }
         catch (Exception $e) {
-            Debug::ErrorLog("Failed migrating password for userID: $userID - " . $e->getMessage());
+            Debug::ErrorLog("Failed rehashing password for userID: $userID - " . $e->getMessage());
         }
     }
 
