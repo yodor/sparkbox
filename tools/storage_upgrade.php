@@ -3,9 +3,13 @@
  * Storage upgrade - the stored photos and files (StorageObject, FileStorageObject, ImageStorageObject) of the format
  * before 'Serial' to the current format. Run it once on every site before the core without the old format support.
  *
- * Usage: php storage_upgrade.php <site root> [--write]
+ * Usage: php storage_upgrade.php <site root> [--list] [--write]
  *   <site root>  the folder with config/dbconfig.php (the database of the site)
+ *   --list       every value to upgrade: table, key, class, the stored time (the old format kept the upload date
+ *                as a date string - all of them are before 2024-08-24, when 'Serial' came), file name, data size
  *   --write      store the upgraded values - without it only counts (dry run)
+ *
+ * An old object without data (nothing to keep) is reported and left as it is.
  *
  * Every blob column of the database is scanned. A value with an old format object (no 'Serial' - protected property
  * names, a date string timestamp) is rebuilt in the current format: Serial, data, timestamp (unix time), uid,
@@ -70,7 +74,13 @@ class StorageObject
             $values[$key] = $value;
         }
         $this->values = $values;
-        if ($this->old) Upgrade::$found++;
+        if (!$this->old) return;
+        Upgrade::$found++;
+        if (!isset($values["data"]) || !is_string($values["data"]) || $values["data"] === "") Upgrade::$empty++;
+        Upgrade::$details[] = static::class . " time=" . (is_scalar($values["timestamp"] ?? null) ? $values["timestamp"] : "?")
+            . " file=" . (is_scalar($values["filename"] ?? null) ? $values["filename"] : "-")
+            . " data=" . strlen((string)($values["data"] ?? "")) . "B"
+            . " keys=" . implode(",", array_keys($values));
     }
 
     public function __serialize() : array
@@ -117,6 +127,10 @@ class Upgrade
 
     //old format objects in the value being read
     public static int $found = 0;
+    //old format objects without data
+    public static int $empty = 0;
+    //what was found (--list)
+    public static array $details = array();
 
     public static function Timestamp(mixed $value) : int
     {
@@ -133,15 +147,20 @@ class Upgrade
     public static function Value(string $stored) : ?string
     {
         Upgrade::$found = 0;
+        Upgrade::$empty = 0;
+        Upgrade::$details = array();
         $value = @unserialize($stored, array("allowed_classes" => Upgrade::CLASSES));
         if ($value === false && $stored !== serialize(false)) return null;
         if (Upgrade::$found < 1) return null;
+        if (Upgrade::$empty > 0) throw new Exception("an old object without data - left as it is");
+        $details = Upgrade::$details;
 
         $result = serialize($value);
         //the check: the new value reads back without an old object
         Upgrade::$found = 0;
         unserialize($result, array("allowed_classes" => Upgrade::CLASSES));
         if (Upgrade::$found > 0) throw new Exception("The upgraded value still has an old format object");
+        Upgrade::$details = $details;
         return $result;
     }
 }
@@ -149,6 +168,7 @@ class Upgrade
 //run --------------------------------------------------------------------------------------------------------------
 $root = rtrim((string)($argv[1] ?? ""), "/");
 $write = in_array("--write", $argv, true);
+$list = in_array("--list", $argv, true);
 if ($root === "" || !is_file($root . "/config/dbconfig.php")) {
     fwrite(STDERR, "Usage: php storage_upgrade.php <site root> [--write]\n");
     exit(1);
@@ -193,9 +213,18 @@ foreach (DBManager::$configs as $name => $config) {
             $read->closeCursor();
             if (!is_string($stored)) continue;
 
-            $value = Upgrade::Value($stored);
+            try {
+                $value = Upgrade::Value($stored);
+            }
+            catch (Exception $e) {
+                echo "  $table.$field $key=$id: skipped - " . $e->getMessage() . "\n";
+                continue;
+            }
             if (is_null($value)) continue;
             $count++;
+            if ($list) {
+                foreach (Upgrade::$details as $detail) echo "    $table $key=$id $detail\n";
+            }
             if ($write) $update->execute(array($value, $id));
         }
         if ($count > 0) echo "  $table.$field: $count" . ($write ? " upgraded" : " to upgrade") . "\n";
