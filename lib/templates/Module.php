@@ -345,7 +345,7 @@ class Module
 
     /**
      * A path answered by a plain script - it does all of its work (headers, page, output) like a script of the
-     * site root did: the home of a site, a file (logo, sitemap.xml), a page script not converted to a content yet.
+     * site root did: the home of a site, a file (logo, sitemap.xml).
      *
      * By convention a path has its script in templates/modules/<module>/scripts/<path>.php - the site one, else the
      * store one, else the core one (one file runs, the most specific). The path keeps its dots: /sitemap.xml →
@@ -839,7 +839,7 @@ class Module
      * If $path parameter is present it overwrites the source path parameter
      * If $path parameter is relative - path is appended to $sourceURL path
      * If $path parameter is absolute (starting with '/') - path is replaced with $path
-     * Resulting url path is absolute Template::$ModuleLocation + $path
+     * Resulting url path is absolute: the location of the active module + $path
      *
      * @param string $path
      * @param URL|null $sourceURL

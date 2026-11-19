@@ -638,15 +638,6 @@ class InputForm extends SparkObject implements IBeanEditor
     }
 
     /**
-     * Print the input values as a label / value list
-     * @deprecated use CreatePlainRenderer() - a component that can be placed in any container
-     */
-    public function renderPlain(): void
-    {
-        $this->CreatePlainRenderer()->render();
-    }
-
-    /**
      * The input values as a label / value list (order details, confirmation e-mails):
      * <div class='FormValueList' name='<form>'><div class='item'><span class='label'>..</span><span>..</span></div>..
      * Values are shown as text - tags removed, HTML escaped, line breaks kept.

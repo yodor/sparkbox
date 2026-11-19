@@ -67,8 +67,8 @@ abstract class TemplateBeanContent extends TemplateContent implements IContentAc
     }
 
     /**
-     * Create new Action object using Template::PathURL and URL::Current as sourceURL for its href.
-     * $usePath can be relative or absolute (to the Template::ModuleLocation).
+     * Create new Action object using Module::PathURL and URL::Current as sourceURL for its href.
+     * $usePath can be relative or absolute (to the location of the active module).
      * Returned url does not contain pagination parameters.
      * @param string $action
      * @param string|null $contents

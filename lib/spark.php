@@ -620,23 +620,6 @@ final class Spark {
     {
         return preg_replace('/[^\w\-:]/', '', $name);
     }
-    /**
-     * Reverses custom escaping of backslashes, quotes, and control characters.
-     * Returns empty string if input is null.
-     *
-     * @param string|null $input   Input string to unescape
-     * @param int         $checkbr Unused parameter (kept for compatibility)
-     * @return string              Unescaped string
-     */
-    final static public function Unescape(?string $input, $checkbr = 0) : string
-    {
-        if (!is_null($input)) {
-            $search = array("\\\\", "\\0", "\\n", "\\r", "\Z", "\'", '\"');
-            $replace = array("\\", "\0", "\n", "\r", "\x1a", "'", '"');
-            return str_replace($search, $replace, $input);
-        }
-        return "";
-    }
     final static public function ReplaceTags(string $text, string $replacement=" ") : string
     {
 

@@ -180,7 +180,7 @@ final class Template
     }
 
     /**
-     * Includes '$path' file from all SparkLoader enabled locations using prefix Template::ModuleLocation()
+     * Includes the path file of '$path' from all SparkLoader locations (templates/modules/<module>/path - core, store, site)
      * Calls TemplateConfig::Deactivate() to clear any old config
      * Emits TemplateConfigEvent::UPDATE if TemplateConfig::Active() is not null
      * @param string $path

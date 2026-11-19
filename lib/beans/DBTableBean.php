@@ -424,22 +424,6 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
     }
 
     /**
-     * Retrieve single result row where $column = '$value' , additional '$columns' are used if specified
-     * @deprecated use getResult() - it returns null instead of throwing
-     * @param string $column
-     * @param int $value
-     * @param string ...$columns
-     * @return array
-     * @throws Exception "No such Ref" when there is no matching row
-     */
-    public function getByRef(string $column, int $value, string ...$columns): array
-    {
-        $result = $this->getResult($column, (string)$value, ...$columns);
-        if (!is_array($result)) throw new Exception("No such Ref");
-        return $result;
-    }
-
-    /**
      * Handle code specified in Closure $code wrapped inside transaction/commit
      * Start new transaction only if $db parameter is NULL
      * @param Closure $code Code to execute in transaction
