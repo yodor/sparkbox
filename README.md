@@ -60,9 +60,13 @@ How a request works
 ![Anatomy of a request](docs/anatomy-of-a-request.svg)
 
 Every request is short lived: `sparkboot.php` → `sparkbox.php` bootstrap → configuration → either a
-**storage request** (images and files, answered from the storage cache and exits) or a **page**:
-the page object authorizes, the page script builds components, forms process their input,
-and `SparkPage::render()` writes the HTML. The `<head>` is sent before the body is built.
+**storage request** (images and files, answered from the storage cache and exits) or a **module**: the
+module folder's `index.php` runs `Module::Run()`, which authorizes, takes the path file of the requested
+path, creates its content in the frame (the page class of the module), processes the input and renders.
+The `<head>` is sent before the body is built.
+
+The module engine (layers, init files, path files, contents, frames, the CSS layers) is described in
+[docs/module-engine.md](docs/module-engine.md).
 
 
 Pages and components
@@ -134,12 +138,14 @@ Storage and caching
 - Rows with an `auth_context` column are authorized on every request and sent `private, no-cache`.
 
 
-Admin and modules
------------------
+Modules
+-------
 
-The admin is being reworked into modules (`admin2`): a module maps a linear list of path files
-(`path/store.products.gallery.php`) to templates, so menus and sub-pages are plain files in one folder.
-The same structure is planned for checkout. Work in progress.
+Every page of a site belongs to a module: one top-level folder (`/admin`, `/products`, `/news`, the site
+root is `main`) with a linear list of path files (`path/store.products.gallery.php`) that configure the
+contents of its paths. The core has the admin, main, pages, news and faq modules; the store adds products,
+account, checkout and its admin parts; a site adds or patches paths in its `class/templates/modules`.
+See [docs/module-engine.md](docs/module-engine.md).
 
 
 Tests

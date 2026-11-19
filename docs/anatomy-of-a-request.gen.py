@@ -32,7 +32,7 @@ def poly(pts,color=None,dash=False,label=None,lx=0,ly=0,lanchor="start"):
 # ---- bands
 band(90,130,"#f5f7fa","Entry",0)
 band(220,310,C["boot"],"Bootstrap — sparkbox.php",1)
-band(550,220,C["page"],"Page construction",2)
+band(550,220,C["page"],"Module → frame + content",2)
 band(770,340,"#e3f0e6","Input (POST → transaction → redirect)",3)
 band(1110,640,C["render"],"Render — SparkPage::render()",4)
 band(1750,190,C["shut"],"Shutdown",5)
@@ -43,8 +43,8 @@ t(24,72,"One HTTP request, top to bottom. Every request is short-lived: DB conne
 
 MX=420  # main column x
 # entry
-box(MX,110,360,80,"Browser request",["page script · admin2/ (path=…) · storage.php · JSON"])
-box(MX+460,110,310,80,"Apache / .htaccess",["admin2: RewriteRule → index.php?path=/…","mod_expires off for storage"],fill="#ffffff")
+box(MX,110,360,80,"Browser request",["a module folder (path=…) · /assets/ storage · JSON"])
+box(MX+460,110,310,80,"Apache / .htaccess",["module .htaccess → index.php?path=/…","/assets/ → storage request"],fill="#ffffff")
 arrow(MX+360,150,MX+460,150)
 
 # bootstrap
@@ -74,8 +74,8 @@ arrow(SX+215,875,SX+215,930,C["caches"],dash=True)
 
 # page construction
 arrow(MX+180,532,MX+180,580)
-box(MX,580,360,170,"new XPage()  (site class/pages)",["SparkPage::__construct()","  authorize(): Authenticator → AuthContext","    fail + authorized_access → redirect loginURL","    (JSON request → JSONResponse 'session expired')","  headInitialize()","page script builds the component tree:","  views, iterators (SelectQuery), forms"])
-box(60,580,310,170,"admin2 / Module flow",["Module::Factory('admin','admin2/')","  → templates/modules/admin/init.php","Module::Response(): authorize()","SparkTemplatePage::initialize()","  Template::PathConfig(path)","    path/store.products.php → TemplateConfig","  LoadContent(): requireAuth → TemplateContent"],fill="#e0f2f1",stroke=C["adm"])
+box(MX,580,360,170,"Module::Run(name)",["initialize(): site init, module init.php (each layer)","Response(): redirects · authorize → login path","  access check · early JSON responders","  the script of the path → runs it, done","  page = pageClass (the frame) → initialize()","  path files → TemplateConfig → LoadContent():","  setup → initialize → processInput → setContent()"])
+box(60,580,310,170,"The layers (SparkLoader)",["include(): core → store → site, every file","  init.php · path files · menu.php","find(): site → store → core, the first file","  scripts · contents · pages · beans","frames: SparkPage · StorePage (StoreFrame)","  SparkAdminPage (side and main panes)","see docs/module-engine.md"],fill="#e0f2f1",stroke=C["adm"])
 arrow(370,665,MX,665,C["adm"],dash=True)
 
 # input processing
@@ -91,14 +91,14 @@ arrow(370,1000,MX,1000,C["dbs"],dash=True)
 
 # render
 arrow(MX+180,1090,MX+180,1150)
-box(MX,1150,360,200,"startRender()",["ob_start() — head buffer","RequestController::Process()","  first responder whose accept() is true","  JSON request → JSONResponse, exit","  page responder → process, maybe redirect","SessionAlertScript · Session::Close()","headFinalize(): title, meta description","ob_end_flush()  → <head> sent early"])
+box(MX,1150,360,200,"startRender()",["ob_start() — head buffer","RequestController::Respond() (once, before):","  JSON request → JSONResponse, exit","  page responder → process, maybe redirect","  SessionAlertScript · Session::Close()","headFinalize(): title, meta description","content->finalizeHead(page)","ob_end_flush()  → <head> sent early"])
 box(MX,1370,360,210,"renderImpl() — component tree",["for each Component::render():","  CacheFactory::CacheEntryOutput()","    PageCache hit & TTL ok → echo, skip","  startRender / renderImpl / finishRender","  miss → store buffer to PageCache","result views: IDataIterator (SelectQuery)","  each row → DataIteratorItem renderer","  tr() → 2nd DB connection"])
 arrow(MX+180,1350,MX+180,1370)
 box(MX,1600,360,80,"finishRender()",["</body></html>","ob_end_flush() → response complete"])
 arrow(MX+180,1580,MX+180,1600)
-box(60,1150,310,120,"JSON requests",["_REQUEST['JSONRequest'] is set","page + components are still built,","RequestController picks a JSONResponder","→ JSONResponse → exit"],fill="#f3e5f5",stroke=C["json"])
+box(60,1150,310,120,"JSON requests",["_REQUEST['JSONRequest'] is set","early responders: before any page","others: page + content are built,","RequestController picks a JSONResponder","→ JSONResponse → exit"],fill="#f3e5f5",stroke=C["json"])
 arrow(370,1210,MX,1210,C["json"],dash=True)
-box(60,1370,310,210,"PageCache",["CACHE_PATH/PageCache/<Class>-<hash>","key: script basename + class + name","  + iterator SQL hash (result views)","PAGE_CACHE_TTL (default 86400 s)","PAGE_CACHE_ENABLED (default off)","component->setCacheable(true)","FileCacheEntry: flock SH/EX"],fill=C["cache"],stroke=C["caches"])
+box(60,1370,310,210,"PageCache",["CACHE_PATH/PageCache/<Class>-<hash>","key: requested address + language","  + class + name (+ query of result views)","PAGE_CACHE_TTL (default 86400 s)","PAGE_CACHE_ENABLED (default off)","component->setCacheable(true)","FileCacheEntry: flock SH/EX"],fill=C["cache"],stroke=C["caches"])
 arrow(370,1460,MX,1460,C["caches"],dash=True)
 box(SX,1150,430,160,"HTML output",["<head> flushed before the body is built:","  browser fetches CSS / JS in parallel","body buffered in 4 KB chunks","images → storage.php URLs","  (hrefImage / hrefThumb / hrefCrop)"])
 arrow(MX+360,1250,SX,1250,dash=True)
@@ -111,11 +111,11 @@ box(MX,1790,360,120,"Shutdown",["register_shutdown_function:","  CleanupPageCach
 # legend
 LY=1975
 t(24,LY,"Legend",16,"bold")
-items=[(C["line"],False,"main flow"),(C["accent"],False,"exit / redirect"),(C["json"],True,"storage & JSON"),(C["dbs"],True,"database"),(C["caches"],True,"cache"),(C["adm"],True,"admin2 module")]
+items=[(C["line"],False,"main flow"),(C["accent"],False,"exit / redirect"),(C["json"],True,"storage & JSON"),(C["dbs"],True,"database"),(C["caches"],True,"cache"),(C["adm"],True,"module engine")]
 for i,(c,d,l) in enumerate(items):
     x=24+i*250
     arrow(x,LY+30,x+60,LY+30,c,dash=d); t(x+72,LY+35,l,13,fill=C["muted"])
-t(24,LY+80,"sparkbox core (lib/)  →  sparkstore (lib/store, module 'store/')  →  site (class/, config/)",13,fill=C["muted"])
+t(24,LY+80,"sparkbox core (lib/)  →  sparkstore (lib/store, prefix 'store')  →  site (class/, config/)",13,fill=C["muted"])
 t(W-24,LY+80,"generated for the SparkBox README — edit freely in Inkscape",12,fill=C["muted"],anchor="end",italic=True)
 
 defs="".join(f'<marker id="m{k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="{v}"/></marker>' for k,v in dict(a=C["line"],r=C["accent"],p=C["json"],b=C["caches"],y=C["dbs"],g=C["adm"]).items())
