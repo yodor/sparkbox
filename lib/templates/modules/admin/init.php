@@ -20,7 +20,7 @@ $module->accessCheck = function (string $path) use ($module) : bool {
     $level = $context->getData()->get(AdminAuthenticator::SESSION_DATA_ACCESS_LEVEL);
     if (strcmp((string)$level, AdminAuthenticator::ACCESS_LIMITED) !== 0) return true;
 
-    $section = explode("/", Template::FormatPath($path, "/", false))[0] ?? "";
+    $section = explode("/", Module::FormatPath($path, "/", false))[0] ?? "";
     if (in_array($section, array("", "home", "login", "logout", "password"))) return true;
 
     $roles = $context->getData()->get(AdminAuthenticator::SESSION_DATA_ENABLED_ROLES);

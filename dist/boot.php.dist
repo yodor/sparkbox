@@ -5,6 +5,9 @@
 //
 
 //define("DEBUG_LEVEL", 1);
-define("REQUEST_THROTTLE_USERAGENT", "meta-externalagent|facebookexternalhit|SemrushBot|Barkrowler|bingbot|AwarioBot|link");
-define("REQUEST_THROTTLE_SECONDS", 30);
-define("REQUEST_THROTTLE_CONNCOUNT", 5);
+
+//crawler rate limit (off by default) - the crawlers by user agent, the window in seconds, the requests in the window
+//(lib/ratelimit.php). Mind the search engines: a 429 to Googlebot or bingbot slows the indexing of the site.
+//define("REQUEST_THROTTLE_USERAGENT", "meta-externalagent|facebookexternalhit|SemrushBot|Barkrowler|AwarioBot");
+//define("REQUEST_THROTTLE_SECONDS", 30);
+//define("REQUEST_THROTTLE_CONNCOUNT", 5);

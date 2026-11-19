@@ -71,7 +71,7 @@ class Module
     protected ?Authenticator $authenticator = null;
 
     /**
-     * Paths reachable without authorization (login, password) - keys in Template::FormatPath() form "/login"
+     * Paths reachable without authorization (login, password) - keys in Module::PathKey() form "/login"
      * @var array<string, bool>
      */
     protected array $publicPaths = array();
@@ -268,7 +268,7 @@ class Module
     public function addPublicPath(string ...$paths) : void
     {
         foreach ($paths as $path) {
-            $this->publicPaths[Template::FormatPath($path, "/", true)] = true;
+            $this->publicPaths[Module::PathKey($path)] = true;
         }
     }
 
@@ -283,7 +283,7 @@ class Module
      */
     public function addPagePath(string $path, string $pageClass, string $include = "") : void
     {
-        $this->pagePaths[Template::FormatPath($path, "/", true)] = array($pageClass, $include);
+        $this->pagePaths[Module::PathKey($path)] = array($pageClass, $include);
     }
 
     /**
@@ -294,7 +294,7 @@ class Module
      */
     public function pageClassFor(string $path) : string
     {
-        $path = Template::FormatPath($this->resolvePath($path), "/", true);
+        $path = Module::PathKey($this->resolvePath($path));
         while (true) {
             if (isset($this->pagePaths[$path])) {
                 [$class, $include] = $this->pagePaths[$path];
@@ -317,7 +317,7 @@ class Module
      */
     public function addPathAlias(string $path, string $target) : void
     {
-        $this->pathAliases[Template::FormatPath($path, "/", true)] = $target;
+        $this->pathAliases[Module::PathKey($path)] = $target;
     }
 
     /**
@@ -327,7 +327,7 @@ class Module
      */
     protected function resolvePath(string $path) : string
     {
-        $key = Template::FormatPath($path, "/", true);
+        $key = Module::PathKey($path);
         return $this->pathAliases[$key] ?? $path;
     }
 
@@ -340,7 +340,7 @@ class Module
      */
     public function addRedirect(string $path, string $target) : void
     {
-        $this->redirects[Template::FormatPath($path, "/", true)] = $target;
+        $this->redirects[Module::PathKey($path)] = $target;
     }
 
     /**
@@ -442,12 +442,42 @@ class Module
     }
 
     /**
-     * The key of a path in the maps of the module - the module folder itself is 'home'
+     * The path of the request as the module .htaccess passed it (?path=) - not normalized
+     * @return string
      */
-    protected static function PathKey(string $path) : string
+    public static function RequestPath() : string
+    {
+        return is_string($_GET["path"] ?? null) ? $_GET["path"] : "";
+    }
+
+    /**
+     * The key of a path in the maps of the module ('/orders/details') - the module folder itself is '/home'
+     * @param string $path
+     * @return string
+     */
+    public static function PathKey(string $path) : string
     {
         if (trim($path, "/") === "") $path = "home";
-        return Template::FormatPath($path, "/", true);
+        return Module::FormatPath($path, "/", true);
+    }
+
+    /**
+     * A module path in the form of '$separator': lower case, the segments of letters only (anything else is dropped -
+     * no dots, no '..'): '/Orders/Details/' → 'orders.details' ('.' - the path file), '/orders/details' ('/' with the
+     * root - the keys), 'orders_details' ('_' - the body class)
+     * @param string $path
+     * @param string $separator
+     * @param bool $prependRoot the separator before the result
+     * @return string
+     */
+    public static function FormatPath(string $path, string $separator, bool $prependRoot) : string
+    {
+        $parts = array();
+        foreach (Spark::Split(strtolower($path), "/") as $part) {
+            $part = Spark::AsciiLetters($part);
+            if ($part !== "") $parts[] = $part;
+        }
+        return ($prependRoot ? $separator : "") . implode($separator, $parts);
     }
 
     /**
@@ -457,7 +487,7 @@ class Module
      */
     protected function processRedirect(string $path) : void
     {
-        $key = Template::FormatPath($path, "/", true);
+        $key = Module::PathKey($path);
         if (!isset($this->redirects[$key])) return;
 
         $target = $this->redirects[$key];
@@ -479,7 +509,7 @@ class Module
      */
     public function isPublicPath(string $path) : bool
     {
-        return isset($this->publicPaths[Template::FormatPath($path, "/", true)]);
+        return isset($this->publicPaths[Module::PathKey($path)]);
     }
 
     /**
@@ -536,9 +566,9 @@ class Module
      */
     public function getPath() : string
     {
-        $path = $this->resolvePath((string)($_GET["path"] ?? ""));
+        $path = $this->resolvePath(Module::RequestPath());
         if (trim($path, "/") === "") return "home";
-        return Template::FormatPath($path, "/", true);
+        return Module::FormatPath($path, "/", true);
     }
 
     /**
@@ -694,7 +724,10 @@ class Module
         $config = Module::Active();
 
         //old addresses first
-        $config->processRedirect((string)($_GET["path"] ?? ""));
+        //the path of the request - every step below works on it
+        $path = Module::RequestPath();
+
+        $config->processRedirect($path);
 
         //addresses without a trailing slash (main module): /authors/ → /authors
         $config->processTrailingSlash();
@@ -703,13 +736,12 @@ class Module
         $config->authorize();
 
         if ($config->authClass && is_null($config->getAuthContext())) {
-            $path = (string)($_GET["path"] ?? "");
             if (!$config->isPublicPath($path)) {
                 $config->loginRedirect("path '$path'");
             }
         }
 
-        if (!is_null($config->getAuthContext()) && !$config->canAccess((string)($_GET["path"] ?? ""))) {
+        if (!is_null($config->getAuthContext()) && !$config->canAccess($path)) {
             Session::SetAlert(tr("Access denied"));
             Debug::ErrorLog("Access denied by the module access check");
             header("Location: " . Module::PathURL("home"));
@@ -722,14 +754,14 @@ class Module
         }
 
         //paths with a script of their own - after the authorization, like a page
-        if ($config->processScript((string)($_GET["path"] ?? ""))) return;
+        if ($config->processScript($path)) return;
 
         include_once("responders/json/ContentFragmentResponder.php");
         //a fragment asked for (JSON): the head and the body collect what its components need
         $fragment = ContentFragmentResponder::IsRequested();
         if ($fragment) ContentFragmentResponder::CollectHead();
 
-        $pageClass = $config->pageClassFor((string)($_GET["path"] ?? ""));
+        $pageClass = $config->pageClassFor($path);
         if (!$pageClass) {
             //a module without a frame - the content of the path is the answer
             $config->respondFragment();

@@ -30,43 +30,6 @@ final class Template
     {
     }
 
-    public static function AsciiOnly(string $value): string
-    {
-        return preg_replace('/[^A-Za-z]/', '', $value);
-    }
-
-    /**
-     * Reformat or clean path string
-     * ex with separator '.' : /some/module/path -> some.module.path
-     * ex with separator '/' : //some/..//module/ -> /some/module
-     *
-     * @param string $path Path string ex '/some/module/option'
-     * @param string $separator Separator char to use in reformating
-     * @param bool $prependRoot Prepend the separator char to the result
-     * @return string
-     */
-    public static function FormatPath(string $path, string $implodeSeparator, bool $prependRoot): string
-    {
-
-        $path = strtolower($path);
-        $path = str_replace(".", "", $path);
-        $path = str_replace("..", "", $path);
-
-        $parts = Spark::Split($path, "/");
-        //filter ascii only
-        array_walk($parts, function (string &$value, string|int $key): void {
-            $value = Template::AsciiOnly($value);
-        });
-
-        $path = implode($implodeSeparator, $parts);
-
-        if ($prependRoot) {
-            $path = $implodeSeparator.$path;
-        }
-
-        return $path;
-    }
-
     public static function Condition(?BeanKeyCondition $condition = null): ?BeanKeyCondition
     {
         if (!is_null($condition)) {
@@ -194,7 +157,7 @@ final class Template
         Debug::ErrorLog("Using path: ".$path);
 
         //convert //some/path/ to some.path
-        $path = Template::FormatPath($path, ".", false);
+        $path = Module::FormatPath($path, ".", false);
 
         $moduleLocation = Spark::PathParts(Module::Active()->getPrefix(), Module::PATH_FOLDER);
 

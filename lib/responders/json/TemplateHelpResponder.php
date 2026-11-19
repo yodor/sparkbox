@@ -1,6 +1,6 @@
 <?php
 include_once("responders/json/JSONResponder.php");
-include_once("templates/Template.php");
+include_once("templates/Module.php");
 
 class TemplateHelpResponder extends JSONResponder
 {
@@ -22,7 +22,7 @@ class TemplateHelpResponder extends JSONResponder
     protected function parseParams(): void
     {
         parent::parseParams();
-        if (!isset($_GET["path"])) throw new Exception("No path specified");
+        if (Module::RequestPath() === "") throw new Exception("No path specified");
     }
 
     /**
@@ -31,7 +31,7 @@ class TemplateHelpResponder extends JSONResponder
      */
     public function _fetch(JSONResponse $response) : void
     {
-        $path = Template::FormatPath($_GET["path"], ".", false);
+        $path = Module::FormatPath(Module::RequestPath(), ".", false);
 
         $language = "bgn";
         $prefix = Module::Active()->getPrefix() . "/help/" . $language;

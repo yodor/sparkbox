@@ -244,6 +244,7 @@ final class Marshall {
 
         return (bool) $value;
     }
+
     final static public function Float(mixed $value): float
     {
         if (is_numeric($value)) {
@@ -464,6 +465,7 @@ final class Spark {
             throw new Exception("Static '$name' already assigned");
         }
     }
+
     final static public function SetObject(string $name, object|array|null $object, bool $isStatic=false) : void
     {
         Spark::CheckStatic($name);
@@ -472,6 +474,7 @@ final class Spark {
             Spark::$constDefines[$name] = true;
         }
     }
+
     final static public function GetObject(string $name, object|array|null $default=null) : object|array|null
     {
         return Spark::$defines[$name] ?? $default;
@@ -499,34 +502,31 @@ final class Spark {
         return Spark::$defines[$name] ?? $default;
 
     }
+
     final static public function GetBoolean(string $name) : bool
     {
         $result = Spark::Get($name);
         return Marshall::Boolean($result);
     }
+
     final static public function GetString(string $name) : string
     {
         $result = Spark::Get($name);
         return Marshall::String($result);
     }
+
     final static public function GetInteger(string $name) : int
     {
         $result = Spark::Get($name);
         return Marshall::Integer($result);
     }
+
     final static public function GetFloat(string $name) : float
     {
         $result = Spark::Get($name);
         return Marshall::Float($result);
     }
 
-    final static public function Dump() : void
-    {
-        foreach (Spark::$defines as $key => $val) {
-            echo $key . "=>" . $val;
-            echo "<BR>";
-        }
-    }
 
     /**
      * True if '$className' is a plain PHP class name (letters, digits, underscore, not starting with a digit).
@@ -594,10 +594,6 @@ final class Spark {
         return $text;
     }
 
-    final static public function IsEmptyPassword($password) : bool
-    {
-        return (strcmp($password, "d41d8cd98f00b204e9800998ecf8427e") === 0);
-    }
 
     /**
      * Escapes a string to be safe for HTML attribute values and element content.
@@ -620,6 +616,7 @@ final class Spark {
     {
         return preg_replace('/[^\w\-:]/', '', $name);
     }
+
     final static public function ReplaceTags(string $text, string $replacement=" ") : string
     {
 
@@ -637,6 +634,7 @@ final class Spark {
         return $text;
 
     }
+
     final static public function MetaDescription(string $value, int $max_length = -1) : string
     {
 
@@ -681,11 +679,6 @@ final class Spark {
 
         return date("j F Y $tm", strtotime($date));
     }
-    final static public function MicroTime() : float
-    {
-        list($usec, $sec) = explode(" ", microtime());
-        return ((float)$usec + (float)$sec);
-    }
 
     /**
      * Check if key '$key' of the associative array '$arr' is set and have value equal to '$val'.
@@ -701,40 +694,6 @@ final class Spark {
         return (isset($arr[$key]) && (strcmp($arr[$key], $val) === 0));
     }
 
-    final static public function HtmlStrip(string $data_str, string $allowable_tags = "<center><p><span><div><br><a>", array $allowable_attrs = array('href','src','alt','title')) : string
-    {
-        // define allowable tags
-        // define allowable attributes
-
-        // strip collector
-        $strip_arr = array();
-
-        // load XHTML with SimpleXML
-        $data_sxml = simplexml_load_string('<root>'. $data_str .'</root>', 'SimpleXMLElement', LIBXML_NOERROR | LIBXML_NOXMLDECL);
-
-        if ($data_sxml instanceof SimpleXMLElement) {
-            // loop all elements with an attribute
-            foreach ($data_sxml->xpath('descendant::*[@*]') as $tag) {
-                // loop attributes
-                foreach ($tag->attributes() as $name=>$value) {
-                    // check for allowable attributes
-                    if (!in_array($name, $allowable_attrs)) {
-                        // set attribute value to empty string
-                        $tag->attributes()->$name = '';
-                        // collect attribute patterns to be stripped
-                        $strip_arr[$name] = '/ '. $name .'=""/';
-                    }
-                }
-            }
-
-            // strip unallowed attributes and root tag
-            return strip_tags(preg_replace($strip_arr,array(''),$data_sxml->asXML()), $allowable_tags);
-        }
-        else {
-            return $data_str;
-        }
-
-    }
 
     final static public function SanitizeInput(array|string $value, bool $allowHTML = false) : array|string
     {
@@ -782,24 +741,6 @@ final class Spark {
 
     }
 
-    static private function EscapeHelper(string $unescaped_string): string
-    {
-        $replacementMap = [
-            "\0" => "\\0",
-            "\n" => "\\n",
-            "\r" => "\\r",
-            "\t" => "\\t",
-            chr(26) => "\\Z",
-            chr(8) => "\\b",
-            '"' => '\"',
-            "'" => "\'",
-            '_' => "\_",
-            "%" => "\%",
-            '\\' => '\\\\'
-        ];
-
-        return strtr($unescaped_string, $replacementMap);
-    }
 
     final static public function ByteLabel($size) : string
     {
@@ -852,6 +793,16 @@ final class Spark {
             : 'unknown';
     }
 
+    /**
+     * '$value' with the ASCII letters only ('Orders-2' → 'Orders')
+     * @param string $value
+     * @return string
+     */
+    final static public function AsciiLetters(string $value) : string
+    {
+        return preg_replace('/[^A-Za-z]/', '', $value);
+    }
+
     final static public function Split(string $text, string $separator="/"): array
     {
         // Split by / and filter out empty elements
@@ -872,6 +823,7 @@ final class Spark {
         $class_chain[] = get_class($object);
         return $class_chain;
     }
+
     final static public function Benchmark(Closure $closure) : float
     {
         $start = microtime(true);
@@ -880,28 +832,4 @@ final class Spark {
         //execution time
         return (float)number_format($end - $start, 4);
     }
-    //static public function parse_signed_request($signed_request, $secret)
-    //{
-    //    list($encoded_sig, $payload) = explode('.', $signed_request, 2);
-    //
-    //    // decode the data
-    //    $sig = base64_url_decode($encoded_sig);
-    //    $data = json_decode(base64_url_decode($payload), TRUE);
-    //
-    //    if (strtoupper($data['algorithm']) !== 'HMAC-SHA256') {
-    //        // 	  error_log('Unknown algorithm. Expected HMAC-SHA256');
-    //        throw new Exception('Unknown algorithm. Expected HMAC-SHA256');
-    //        // 	  return null;
-    //    }
-    //
-    //    // check sig
-    //    $expected_sig = hash_hmac('sha256', $payload, $secret, $raw = TRUE);
-    //    if ($sig !== $expected_sig) {
-    //        //     error_log('Bad Signed JSON signature!');
-    //        throw new Exception("Bad Signed JSNO signature!");
-    //        //     return null;
-    //    }
-    //
-    //    return $data;
-    //}
 }

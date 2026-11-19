@@ -1,143 +1,120 @@
 <?php
 
 /**
- * RateLimiter Class
- * Static properties and methods use PascalCase.
- * Local variables and parameters use camelCase.
- * English comments included for professional standard.
+ * Rate limit of crawlers - off by default. A site turns it on in its config/boot.php:
+ *
+ *   define("REQUEST_THROTTLE_USERAGENT", "meta-externalagent|facebookexternalhit|SemrushBot");
+ *   define("REQUEST_THROTTLE_SECONDS", 30);     //the window (default 30)
+ *   define("REQUEST_THROTTLE_CONNCOUNT", 5);    //the requests of a crawler in the window (default 5)
+ *
+ * A crawler is the part of the user agent the pattern matches ('semrushbot') - all its requests share one counter
+ * per installation (a file in the temp folder). An empty user agent counts as the crawler 'emptyua'. Over the limit
+ * the answer is 429 with Retry-After; regular browsers never load this file (sparkbox.php checks the pattern first).
+ * Mind the search engines: a 429 to Googlebot or bingbot slows the indexing of the site.
  */
 class RateLimiter
 {
-    // Static configuration properties (PascalCase)
     public static int $ThrottleSeconds = 30;
     public static int $MaxConnections = 5;
     public static string $UserAgentPattern = "";
-    public static bool $EnableDebug = true;
+
+    //log every counted request (the blocked ones are logged always)
+    public static bool $EnableDebug = false;
 
     private const int PACKET_SIZE = 12;
 
-    public static function Check(): void
+    /**
+     * The check of the request with the REQUEST_THROTTLE_* settings
+     * @return void
+     */
+    public static function Boot() : void
     {
-        $botName = self::IdentifyBot();
-
-        if ($botName !== null) {
-            $installId = hash('xxh3', APP_PATH);
-            $tmpFile = sys_get_temp_dir() . "/ratelimit-{$botName}-{$installId}";
-
-            if (self::$EnableDebug) {
-                error_log("RateLimiter::Check() - Target: $botName | File: $tmpFile");
-            }
-
-            self::Process($tmpFile);
-        }
+        RateLimiter::$UserAgentPattern = (string)REQUEST_THROTTLE_USERAGENT;
+        if (defined("REQUEST_THROTTLE_SECONDS")) RateLimiter::$ThrottleSeconds = (int)REQUEST_THROTTLE_SECONDS;
+        if (defined("REQUEST_THROTTLE_CONNCOUNT")) RateLimiter::$MaxConnections = (int)REQUEST_THROTTLE_CONNCOUNT;
+        RateLimiter::Check();
     }
 
-    private static function IdentifyBot(): ?string
+    public static function Check() : void
     {
-        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? "";
+        $botName = RateLimiter::IdentifyBot();
+        if ($botName === null) return;
 
-        if (empty(trim($userAgent))) {
-            return "EmptyUA";
-        }
+        $installId = hash("xxh3", APP_PATH);
+        $file = sys_get_temp_dir() . "/ratelimit-" . preg_replace("/[^a-z0-9_-]/", "", $botName) . "-" . $installId;
+        if (RateLimiter::$EnableDebug) error_log("RateLimiter: $botName - $file");
 
-        if (empty(self::$UserAgentPattern)) return null;
+        RateLimiter::Process($file, $botName);
+    }
 
-        $pattern = '/' . self::$UserAgentPattern . '/i';
-        if (preg_match($pattern, $userAgent, $matches)) {
+    private static function IdentifyBot() : ?string
+    {
+        $userAgent = trim((string)($_SERVER["HTTP_USER_AGENT"] ?? ""));
+        if ($userAgent === "") return "emptyua";
+        if (RateLimiter::$UserAgentPattern === "") return null;
+
+        if (preg_match("/" . RateLimiter::$UserAgentPattern . "/i", $userAgent, $matches)) {
             return strtolower($matches[0]);
         }
-
         return null;
     }
 
-    private static function Process(string $tmpFile): void
+    private static function Process(string $file, string $botName) : void
     {
-        $fh = fopen($tmpFile, 'c+');
-        if (!$fh) {
-            header($_SERVER["SERVER_PROTOCOL"] . ' 500 Internal Error', true, 500);
+        //no counter file - the request goes on (the limit never stops a site)
+        $fh = @fopen($file, "c+");
+        if (!$fh) return;
+
+        if (!flock($fh, LOCK_EX)) {
+            fclose($fh);
+            return;
+        }
+
+        list($lastTime, $count) = RateLimiter::ReadPacket($fh);
+        $now = microtime(true);
+        $elapsed = $now - $lastTime;
+
+        if ($count >= RateLimiter::$MaxConnections && $elapsed < RateLimiter::$ThrottleSeconds) {
+            flock($fh, LOCK_UN);
+            fclose($fh);
+
+            error_log("RateLimiter blocked: $botName ($count requests in " . RateLimiter::$ThrottleSeconds . "s)");
+            header(($_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1") . " 429 Too Many Requests", true, 429);
+            header("Retry-After: " . max(1, (int)ceil(RateLimiter::$ThrottleSeconds - $elapsed)));
             exit;
         }
 
-        if (flock($fh, LOCK_EX)) {
-            $data = self::ReadPacket($fh);
-
-            $lastTime  = (float)$data[0];
-            $connCount = (int)$data[1];
-            $timeNow   = microtime(true);
-
-            if (self::ShouldThrottle($lastTime, $connCount, $timeNow)) {
-                flock($fh, LOCK_UN);
-                fclose($fh);
-
-                if (self::$EnableDebug) {
-                    error_log("RateLimiter Blocked: $tmpFile (Count: $connCount)");
-                }
-
-                header($_SERVER["SERVER_PROTOCOL"] . ' 429 Too Many Requests', true, 429);
-                exit;
-            }
-
-            $timeDiff = $timeNow - $lastTime;
-
-            if ($timeDiff > self::$ThrottleSeconds) {
-                $updateData = [$timeNow, 1];
-            } else {
-                $updateData = [$lastTime, $connCount + 1];
-            }
-
-            self::StorePacket($fh, $updateData);
-            flock($fh, LOCK_UN);
+        if ($elapsed > RateLimiter::$ThrottleSeconds) {
+            RateLimiter::StorePacket($fh, $now, 1);
         }
+        else {
+            RateLimiter::StorePacket($fh, $lastTime, $count + 1);
+        }
+        flock($fh, LOCK_UN);
         fclose($fh);
     }
 
-    private static function ShouldThrottle(float $lastTime, int $connCount, float $currentTime): bool
-    {
-        $timeDiff = $currentTime - $lastTime;
-        return ($connCount >= self::$MaxConnections && $timeDiff < self::$ThrottleSeconds);
-    }
-
-    private static function ReadPacket($fh): array
+    /**
+     * The window start and the request count - 0, 0 for a new or unreadable file
+     */
+    private static function ReadPacket($fh) : array
     {
         rewind($fh);
-        $packet = fread($fh, self::PACKET_SIZE);
+        $packet = fread($fh, RateLimiter::PACKET_SIZE);
+        if (!is_string($packet) || strlen($packet) < RateLimiter::PACKET_SIZE) return array(0.0, 0);
 
-        if (empty($packet) || strlen($packet) < self::PACKET_SIZE) {
-            if (self::$EnableDebug) {
-                error_log("RateLimiter::ReadPacket() - Initializing new data");
-            }
-            return [0.0, 0];
-        }
+        $data = @unpack("dt/Lc", $packet);
+        if (!is_array($data) || !isset($data["t"], $data["c"])) return array(0.0, 0);
 
-        // Using named keys 't' for time and 'c' for count to avoid index confusion
-        $unpacked = @unpack('dt/Lc', $packet);
-
-        if ($unpacked === false || !isset($unpacked['t'], $unpacked['c'])) {
-            if (self::$EnableDebug) {
-                error_log("RateLimiter::ReadPacket() - Failed to unpack data");
-            }
-            return [0.0, 0];
-        }
-
-        if (self::$EnableDebug) {
-            error_log("RateLimiter::ReadPacket() - Loaded: Time=" . $unpacked['t'] . ", Count=" . $unpacked['c']);
-        }
-
-        return [(float)$unpacked['t'], (int)$unpacked['c']];
+        if (RateLimiter::$EnableDebug) error_log("RateLimiter: window " . $data["t"] . ", count " . $data["c"]);
+        return array((float)$data["t"], (int)$data["c"]);
     }
 
-    private static function StorePacket($fh, array $data): void
+    private static function StorePacket($fh, float $time, int $count) : void
     {
         rewind($fh);
-        // Pack into binary: d (double), L (unsigned long 32-bit)
-        $binaryContent = pack('dL', (float)$data[0], (int)$data[1]);
-
         ftruncate($fh, 0);
-        fwrite($fh, $binaryContent);
+        fwrite($fh, pack("dL", $time, $count));
         fflush($fh);
-
-        if (self::$EnableDebug) {
-            error_log("RateLimiter::StorePacket() - Saved: Time=" . $data[0] . ", Count=" . $data[1]);
-        }
     }
 }

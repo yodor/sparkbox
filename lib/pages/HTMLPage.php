@@ -42,14 +42,14 @@ class HTMLPage extends Container
         //instead of the module index.php - the classes the page scripts had before ('partners', 'home')
         if (class_exists("Module", false) && Module::HasActive()) {
             $pname = Module::Active()->getName();
-            $path = trim((string)($_GET["path"] ?? ""), "/");
+            $path = trim(Module::RequestPath(), "/");
             //the root path: 'home' is the home page of the site (the main module) - the other modules get 'index',
             //as their index.php gave before ('.home' in a site css means the home page, not the products list)
             if ($path === "" || $path === "home") {
                 $sname = ($pname === "main") ? "home" : "index";
             }
             else {
-                $sname = Template::FormatPath($path, "_", false);
+                $sname = Module::FormatPath($path, "_", false);
             }
         }
         return get_class($this) . " " . $pname . " " . $sname;
