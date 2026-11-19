@@ -196,7 +196,7 @@ final class Template
         //convert //some/path/ to some.path
         $path = Template::FormatPath($path, ".", false);
 
-        $moduleLocation = Spark::PathParts(Module::Active()->getPreifx(), Module::PATH_FOLDER);
+        $moduleLocation = Spark::PathParts(Module::Active()->getPrefix(), Module::PATH_FOLDER);
 
         TemplateConfig::Deactivate();
 

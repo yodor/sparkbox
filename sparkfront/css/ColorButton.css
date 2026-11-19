@@ -8,7 +8,7 @@
 
     --spark-button-text-color: #ffffff;
 
-    --spark-button-text-transfrom: none;
+    --spark-button-text-transform: none;
     --spark-button-text-decoration: none;
     --spark-button-font-weight: normal;
     --spark-button-font-size: 100%;
@@ -19,7 +19,7 @@
 
     --spark-submit-button-text-color: var(--spark-button-text-color);
 
-    --spark-submit-button-text-transfrom: var(--spark-button-text-transfrom);
+    --spark-submit-button-text-transform: var(--spark-button-text-transform);
     --spark-submit-button-text-decoration: var(--spark-button-text-decoration);
     --spark-submit-button-font-weight: var(--spark-button-font-weight);
     --spark-submit-button-font-size: var(--spark-button-font-weight);
@@ -56,7 +56,7 @@
     font-weight: var(--spark-button-font-weight);
 
     text-decoration: var(--spark-button-text-decoration);
-    text-transform: var(--spark-button-text-transfrom);
+    text-transform: var(--spark-button-text-transform);
 
     color: var(--spark-button-text-color);
     border: 1px solid var(--spark-button-border-color);
@@ -83,7 +83,7 @@
     font-weight: var(--spark-submit-button-font-weight);
 
     text-decoration: var(--spark-submit-button-text-decoration);
-    text-transform: var(--spark-submit-button-text-transfrom);
+    text-transform: var(--spark-submit-button-text-transform);
 }
 
 .ColorButton[action="submit"]:hover , .ColorButton[type="submit"]:hover {

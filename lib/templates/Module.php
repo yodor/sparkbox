@@ -210,7 +210,7 @@ class Module
     {
         Module::$instance = $this;
         Module::SiteInit();
-        SparkLoader::Factory(Module::Active()->getPreifx())->include(Module::INIT_NAME, true);
+        SparkLoader::Factory(Module::Active()->getPrefix())->include(Module::INIT_NAME, true);
     }
 
     /**
@@ -235,9 +235,19 @@ class Module
      *
      * @return string
      */
-    public function getPreifx(): string
+    public function getPrefix(): string
     {
         return Module::PREFIX . "/" . $this->name;
+    }
+
+    /**
+     * The old misspelled name of getPrefix() - kept until the sites stop calling it
+     * @deprecated use getPrefix()
+     * @return string
+     */
+    public function getPreifx(): string
+    {
+        return $this->getPrefix();
     }
 
     /**
@@ -373,7 +383,7 @@ class Module
 
         $name = Module::ScriptName($path);
         if ($name === "") return "";
-        return SparkLoader::Factory(Spark::PathParts($this->getPreifx(), Module::SCRIPTS_FOLDER))->find($name);
+        return SparkLoader::Factory(Spark::PathParts($this->getPrefix(), Module::SCRIPTS_FOLDER))->find($name);
     }
 
     /**
@@ -385,7 +395,7 @@ class Module
      */
     public function contentLoader(string $className) : SparkLoader
     {
-        $loader = SparkLoader::Factory(Spark::PathParts($this->getPreifx(), Module::CONTENT_FOLDER));
+        $loader = SparkLoader::Factory(Spark::PathParts($this->getPrefix(), Module::CONTENT_FOLDER));
         if (Spark::ValidClassName($className) && $loader->find($className) !== "") return $loader;
         return SparkLoader::Factory(Template::PREFIX_CONTENT);
     }

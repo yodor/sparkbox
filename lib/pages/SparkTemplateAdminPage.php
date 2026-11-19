@@ -291,7 +291,7 @@ class SparkTemplateAdminPage extends SparkPage implements IObserver
         if (!$loaded) {
             $loaded = true;
             SparkTemplateAdminPage::$Menu = null;
-            SparkLoader::Factory(Module::Active()->getPreifx())->include("menu", true);
+            SparkLoader::Factory(Module::Active()->getPrefix())->include("menu", true);
         }
         return SparkTemplateAdminPage::$Menu;
     }

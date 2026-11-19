@@ -34,7 +34,7 @@ class TemplateHelpResponder extends JSONResponder
         $path = Template::FormatPath($_GET["path"], ".", false);
 
         $language = "bgn";
-        $prefix = Module::Active()->getPreifx() . "/help/" . $language;
+        $prefix = Module::Active()->getPrefix() . "/help/" . $language;
         $file = SparkLoader::Factory($prefix)->find($path, "html");
 
         if ($file !== "") {
