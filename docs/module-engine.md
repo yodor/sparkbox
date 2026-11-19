@@ -57,34 +57,49 @@ A module answers one top-level folder of the site (`/admin`, `/products`, `/news
 `main` module). There are no sub-modules. Its parts:
 
 ```
-modules/<name>/index.php                       the entry: Module::Run("<name>")
-modules/<name>/.htaccess                       rewrites the addresses to index.php?path=/<path>
-templates/modules/<name>/init.php              the module settings (each layer)
+config/routes.php (site)                       the modules of the site by folder: Module::AddRoute("admin")
+templates/modules/<name>/init.php              the module settings (each layer); addPattern() for the
+                                               addresses that carry values
 templates/modules/<name>/path/<a.b.c>.php      one file per path: creates the config of its content (each layer)
 templates/modules/<name>/content/<Class>.php   the contents of the module (most specific)
 templates/modules/<name>/scripts/<path>.php    paths answered by a plain script (most specific)
 templates/modules/<name>/menu.php              admin only: the menu (each layer)
 ```
 
-The site links the module folder into its document root under any name. `Module::Run()` takes the
-location from the requested script, so the same module works from `/admin2/` or `/admin/`. The module
-`.htaccess` maps pretty addresses to `?path=` and the parameters they carry; the products module, for
-example, maps `/<prodID>/<slug>/` to `path=/details&prodID=`.
+**The front controller.** Every address that is not a file of the site goes to the root `index.php`
+(`sparkbox/modules/main/index.php`, `Module::Route()`). `sparkbox/modules/main/root.htaccess` goes into the
+site root `.htaccess`: an address that is not a file or a folder goes to `index.php`, missing static files keep
+the plain server 404, and the code folders `class/` and `config/` are refused (the server would run their files
+before any rewrite - the engine never sees those requests).
 
-The `main` module is the site root. `sparkbox/modules/main/root.htaccess` goes into the site's root
-`.htaccess`: an address that is not a file or a folder goes to the root `index.php` as its path, and the
-code folders `class/` and `config/` are refused.
+`Module::Route()` reads the site `config/routes.php` (sample: `dist/routes.php.dist`). The first folder of the
+address picks the module: with `Module::AddRoute("admin")`, `/admin/settings` is the admin module, path
+`/settings`; `Module::AddRoute("manage", "admin")` serves the same module at `/manage/`. Anything else is the
+`main` module. A module is public only when it is listed - the core and store modules exist on every site.
+The request is then the same as through a module folder of its own (`SCRIPT_NAME` `/admin/index.php`, `?path=`),
+and `Module::Run()` takes the location from it. `/admin` answers 301 to `/admin/`, as the server does for a
+folder; `/admin/index.php?path=/settings` keeps working.
+
+**Addresses with values.** `$module->addPattern("([0-9]+)(/.*)?", "view", "dpID")` in the module `init.php`:
+`/pages/12/about/` is the path `/view` with `dpID=12`. The pattern is a regular expression of the path without
+its leading slash, anchored at both ends; its groups become the request parameters in their order. Patterns
+apply first in the response, before the redirects.
+
+**Module folders (before the front controller).** `modules/<name>/index.php` (`Module::Run("<name>")`) and its
+`.htaccess` (the same rewrites as the patterns) linked into the document root still work: the server serves an
+existing folder before the root rewrite, so a site can move one module at a time (remove the link, add the
+route).
 
 
 The request, step by step
 -------------------------
 
-`Module::Run($name)`:
+`Module::Route()` (the root `index.php`) picks the module, then `Module::Run($name)`:
 
 1. **`initialize()`** sets the active module, runs the **site init** once per request (`templates/init.php`
    of every layer), then the module `init.php` of every layer.
 2. **`Module::Response()`**:
-   1. **Redirects**: an old address of the module (`addRedirect`) answers 301 and stops. Then the trailing
+   1. **Patterns, redirects**: an address with values (`addPattern`) becomes its path and parameters. An old address of the module (`addRedirect`) answers 301 and stops. Then the trailing
       slash: with `noTrailingSlash`, `/authors/` answers 301 to `/authors`.
    2. **Authorize**: with an `authClass`, the authenticator gives the context. A path that is not public
       redirects to `loginPath` before any path file runs. An authorized request then goes through
@@ -450,9 +465,9 @@ nothing new:
    `class/templates/modules/admin/path/<item>.php` files configure the shared contents:
    `BeanList::Configure()`, `BeanEditor::Configure()` with an `InputForm` in `class/forms/`,
    `BeanGallery` for photos with `useCondition`.
-3. **Frontend**: a module folder in the document root (`modules/<name>/index.php` with
-   `Module::Run("<name>")` and its `.htaccess`); `class/templates/modules/<name>/init.php` (page class, page
-   css); path files for the list and the details; contents in `content/` (a list on an `ItemView` of the
+3. **Frontend**: the route of the module (`Module::AddRoute("<name>")` in `config/routes.php`);
+   `class/templates/modules/<name>/init.php` (page class, page css, `addPattern()` for the addresses with
+   ids); path files for the list and the details; contents in `content/` (a list on an `ItemView` of the
    bean's query, a details view of one row).
 4. **SEO**: a table whose rows are pages has the columns `seo_title` and `seo_description`; its form adds
    them with `SEOInputGroup::AddTo($this)`, and the content gives the page `SEOData::Title($row, $name)` (the
@@ -462,7 +477,7 @@ nothing new:
 6. **Checks**: `php tests/check_includes.php <site>` and a smoke test of the new paths.
 
 A new module for every site goes into a layer instead: `templates/modules/<name>/` in the core or the
-store, with `modules/<name>/` holding its entry.
+store; each site that serves it adds its route.
 
 
 Planned

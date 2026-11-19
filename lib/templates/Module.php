@@ -104,6 +104,18 @@ class Module
     protected array $pagePaths = array();
 
     /**
+     * Addresses with values in them (addPattern()) - pattern => array(module path, parameter names)
+     * @var array<string, array>
+     */
+    protected array $patterns = array();
+
+    /**
+     * The modules of the site by their address folder (AddRoute(), config/routes.php) - folder => module name
+     * @var array<string, string>
+     */
+    protected static array $routes = array();
+
+    /**
      * Old addresses of the module (addRedirect()) - path => module path
      * @var array<string, string>
      */
@@ -164,6 +176,85 @@ class Module
     public static function Factory(string $name, string $location) : Module
     {
         return new Module($name, $location);
+    }
+
+    /**
+     * The module of the address folder '$folder' ('admin' - /admin/...) is '$name' (default: the folder name).
+     * Called by the site config/routes.php - the root index.php (Route()) answers the addresses of the modules.
+     * @param string $folder
+     * @param string $name
+     * @return void
+     */
+    public static function AddRoute(string $folder, string $name = "") : void
+    {
+        $folder = trim($folder, "/");
+        if ($folder === "" || str_contains($folder, "/")) throw new Exception("Module route: one folder name - '$folder'");
+        Module::$routes[$folder] = ($name !== "") ? $name : $folder;
+    }
+
+    /**
+     * The modules of the site by their address folder (AddRoute)
+     * @return array<string, string>
+     */
+    public static function Routes() : array
+    {
+        return Module::$routes;
+    }
+
+    /**
+     * Entry point of the site root (its index.php - the front controller): the first folder of the address picks
+     * the module of the site config/routes.php (AddRoute), anything else is the main module. The request is then
+     * the same as through a module folder of its own (/admin/index.php?path=/settings) - SCRIPT_NAME, ?path= -
+     * and the module runs (Run()). A module folder of the site still works on its own (the server serves it before
+     * the root rewrite).
+     * @return void
+     * @throws Exception
+     */
+    public static function Route() : void
+    {
+        $routes = APP_PATH . "/config/routes.php";
+        if (is_file($routes)) include_once($routes);
+
+        $local = rtrim((string)Spark::Get(Config::LOCAL), "/");
+        $uri = (string)($_SERVER["REQUEST_URI"] ?? "/");
+        $uriPath = rawurldecode((string)(parse_url($uri, PHP_URL_PATH) ?? "/"));
+        $query = (string)(parse_url($uri, PHP_URL_QUERY) ?? "");
+        if ($local !== "" && str_starts_with($uriPath, $local)) $uriPath = substr($uriPath, strlen($local));
+        if ($uriPath === "") $uriPath = "/";
+
+        $name = "main";
+        $folder = "";
+        $rest = $uriPath;
+        $parts = explode("/", ltrim($uriPath, "/"), 2);
+        if ($parts[0] !== "" && isset(Module::$routes[$parts[0]])) {
+            $folder = $parts[0];
+            $name = Module::$routes[$folder];
+            //the module folder itself: with its slash (as the server does for a folder)
+            if (count($parts) < 2) {
+                header("Location: " . $local . "/" . $folder . "/" . (($query !== "") ? "?" . $query : ""), true, 301);
+                exit;
+            }
+            $rest = "/" . $parts[1];
+        }
+
+        //the query of the client - not the ?path= of the root rewrite
+        $get = array();
+        parse_str($query, $get);
+        //the folder or its index.php: the path of the client query (/admin/index.php?path=/settings)
+        if ($rest === "/" || $rest === "/index.php") {
+            if (isset($get["path"]) && !is_string($get["path"])) unset($get["path"]);
+        }
+        else {
+            $get["path"] = $rest;
+        }
+
+        $_GET = $get;
+        $_REQUEST = array_merge($get, $_POST);
+        $_SERVER["QUERY_STRING"] = http_build_query($get, "", "&", PHP_QUERY_RFC3986);
+        $_SERVER["SCRIPT_NAME"] = $local . (($folder !== "") ? "/" . $folder : "") . "/index.php";
+        $_SERVER["PHP_SELF"] = $_SERVER["SCRIPT_NAME"];
+
+        Module::Run($name);
     }
 
     /**
@@ -341,6 +432,45 @@ class Module
     public function addRedirect(string $path, string $target) : void
     {
         $this->redirects[Module::PathKey($path)] = $target;
+    }
+
+    /**
+     * An address with values in it: '$pattern' (a regular expression of the module path without its leading slash,
+     * anchored at both ends) answers as the module path '$path', its groups become the request parameters '$names'
+     * in their order - addPattern("([0-9]+)(/.*)?", "view", "dpID"): /pages/12/about/ → path /view, dpID=12.
+     * Applied before anything else of the request. (The rewrite rules of the module .htaccess did this.)
+     * @param string $pattern
+     * @param string $path
+     * @param string ...$names
+     * @return void
+     */
+    public function addPattern(string $pattern, string $path, string ...$names) : void
+    {
+        $this->patterns[$pattern] = array($path, $names);
+    }
+
+    /**
+     * The module path of '$path' after the patterns (addPattern) - their values set as request parameters
+     * @param string $path
+     * @return string
+     */
+    protected function processPatterns(string $path) : string
+    {
+        $subject = ltrim($path, "/");
+        foreach ($this->patterns as $pattern => [$target, $names]) {
+            if (!preg_match("#^(?:" . $pattern . ")$#i", $subject, $matches)) continue;
+            foreach ($names as $index => $name) {
+                if (!isset($matches[$index + 1])) continue;
+                $_GET[$name] = $matches[$index + 1];
+                $_REQUEST[$name] = $matches[$index + 1];
+            }
+            $target = "/" . ltrim($target, "/");
+            $_GET["path"] = $target;
+            $_REQUEST["path"] = $target;
+            Debug::ErrorLog("Module pattern: $path -> $target");
+            return $target;
+        }
+        return $path;
     }
 
     /**
@@ -723,9 +853,8 @@ class Module
     {
         $config = Module::Active();
 
-        //old addresses first
-        //the path of the request - every step below works on it
-        $path = Module::RequestPath();
+        //the path of the request - every step below works on it (addresses with values first: addPattern)
+        $path = $config->processPatterns(Module::RequestPath());
 
         $config->processRedirect($path);
 

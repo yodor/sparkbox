@@ -1,0 +1,22 @@
+<?php
+//
+//SparkBox modules of the site - read by the root index.php (Module::Route)
+//Location: APP_PATH/config/routes.php
+//
+//The first folder of an address picks the module: /admin/settings → module admin, path /settings. Everything
+//else is the main module (the site root). A module is served only when it is listed here - the core and store
+//modules (news, faq, pages, products ...) are not public on their own. The folder name is free:
+//Module::AddRoute("manage", "admin") serves the admin module at /manage/.
+//
+//No module folders (links) in the site root are needed any more - a folder that still exists is served by the
+//server itself (its own index.php and .htaccess) and wins over the route.
+//
+
+Module::AddRoute("admin");
+//Module::AddRoute("pages");
+//Module::AddRoute("news");
+//Module::AddRoute("faq");
+//store sites
+//Module::AddRoute("products");
+//Module::AddRoute("account");
+//Module::AddRoute("checkout");

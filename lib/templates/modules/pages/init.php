@@ -6,5 +6,8 @@
 include_once("pages/SparkPage.php");
 
 $module = Module::Active();
+
+//the addresses with values in them (before: the rewrite rules of the module .htaccess)
+$module->addPattern("([0-9]+)(/.*)?", "view", "dpID");
 if (!$module->pageClass) $module->pageClass = SparkPage::class;
 //public pages - no authClass

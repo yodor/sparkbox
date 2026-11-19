@@ -43,6 +43,20 @@ class Translator implements IRequestProcessor, IGETConsumer
     protected ?BeanTranslationsBean $translated_beans = null;
 
     /**
+     * The phrases of the active language, loaded once per request at the first tr(): hash => the translation,
+     * null when the phrase has none (captured, not translated)
+     * @var array|null
+     */
+    protected ?array $phraseMap = null;
+
+    /**
+     * The bean translations of the active language, per "table.field", loaded at the first trbean() of each:
+     * bean id => the translation
+     * @var array
+     */
+    protected array $beanMaps = array();
+
+    /**
      * Available languages
      * @var LanguagesBean|null
      */
@@ -141,11 +155,9 @@ class Translator implements IRequestProcessor, IGETConsumer
     public function initialize() : void
     {
         Debug::ErrorLog("Initializing translator...");
-        $this->phrases = new SiteTextsBean();
         $this->languages = new LanguagesBean();
 
         $this->translated_phrases = new TranslationPhrasesBean();
-        $this->translated_beans = new BeanTranslationsBean();
 
         //prefer cookie langID
         $langID = -1;
@@ -178,11 +190,15 @@ class Translator implements IRequestProcessor, IGETConsumer
             Translator::KEY_CHANGE_LANGUAGE);
     }
 
+    /**
+     * The active language in the cookie - only when it changes (no Set-Cookie on every page)
+     * @return void
+     */
     protected function storeLanguage() : void
     {
-        Debug::ErrorLog("Storing langID: ".$this->langID. " in cookies");
-        Session::SetCookie("langID", $this->langID);
-        //Session::Set("langID", $this->langID);
+        if (Session::GetCookie(Translator::KEY_LANGUAGE_ID) === (string)$this->langID) return;
+        Debug::ErrorLog("Storing langID: " . $this->langID . " in cookies");
+        Session::SetCookie(Translator::KEY_LANGUAGE_ID, (string)$this->langID);
     }
 
     public function processInput(): void
@@ -207,7 +223,8 @@ class Translator implements IRequestProcessor, IGETConsumer
                 Debug::ErrorLog("Error: ".$e->getMessage());
             }
 
-            $url = URL::Current();
+            //back to the address of the page (not the script of the module)
+            $url = URL::Requested();
 
             $url->remove(Translator::KEY_CHANGE_LANGUAGE);
             $url->remove(Translator::KEY_LANGUAGE_ID);
@@ -265,111 +282,144 @@ class Translator implements IRequestProcessor, IGETConsumer
 
     }
 
+    /**
+     * The language of the site config (Config::DEFAULT_LANGUAGE_ISO3 - its lang_code), else the first language
+     * @return void
+     * @throws Exception
+     */
     protected function loadDefaultLanguage() : void
     {
-        Debug::ErrorLog("Loading default configured language");
+        $code = (string)Spark::Get(Config::DEFAULT_LANGUAGE_ISO3);
+        Debug::ErrorLog("Loading the default language: $code");
 
-        if (defined("DEFAULT_LANGUAGE")) {
-            //query default language from define
-            $query = $this->languages->queryField("language", DEFAULT_LANGUAGE, 1, "lang_code");
-            if ($query->count() == 0) throw new Exception("Configured DEFAULT_LANGUAGE is not available in LanguagesBean");
-        }
-        else {
-            //query the first language
-            $query = $this->languages->queryFull();
-            $query->stmt->limit(1);
-            $query->stmt->order($this->languages->key(), OrderDirection::ASC);
-            if ($query->count() == 0) throw new Exception("TRANSLATOR_ENABLED is set in config but LanguagesBean is empty");
-        }
+        $data = null;
+        if ($code !== "") $data = $this->firstLanguage("lang_code", $code);
+        if (is_null($data)) $data = $this->firstLanguage();
+        if (is_null($data)) throw new Exception("TRANSLATOR_ENABLED is set in config but LanguagesBean is empty");
 
-        $query->exec();
-        if ($data = $query->next()) {
-            $this->language = $data;
-            $this->langID = $data[$this->languages->key()];
-        }
-        $query->free();
-
+        $this->language = $data;
+        $this->langID = (int)$data[$this->languages->key()];
         $this->storeLanguage();
+    }
 
+    /**
+     * The first language (by its ID) - matching '$column' = '$value' when given; null for none
+     * @throws Exception
+     */
+    protected function firstLanguage(string $column = "", string $value = "") : ?array
+    {
+        $query = $this->languages->queryFull();
+        if ($column !== "") $query->stmt->where()->match($column, $value);
+        $query->stmt->order($this->languages->key(), OrderDirection::ASC);
+        $query->stmt->limit(1);
+        $query->exec();
+        $data = $query->next();
+        $query->free();
+        return $data;
     }
 
 
+    /**
+     * The translation of the field '$field_name' of the row '$id' of '$tableName' into '$data' (when there is one) -
+     * the translations of the table field load with one query, at its first use in the request
+     * @param int $id
+     * @param string $field_name
+     * @param array $data
+     * @param string $tableName
+     * @return void
+     */
     public function translateBean(int $id, string $field_name, array &$data, string $tableName) : void
     {
+        if ($id < 1 || $field_name === "" || $tableName === "") return;
 
+        $mapKey = $tableName . "." . $field_name;
         try {
-            if ($id<1 || empty($field_name) || empty($tableName)) throw new Exception("ID, field_name and table name required parameters");
-
-            $qry = $this->translated_beans->query("translated");
-
-            $where = $qry->stmt->where();
-            $where->match("langID", $this->langID);
-            $where->match("field_name", $field_name);
-            $where->match("table_name", $tableName);
-            $where->match("bean_id", $id);
-
-            $qry->stmt->limit(1);
-
-            $qry->exec();
-            if ($result = $qry->next()) {
-                $data[$field_name] = $result["translated"];
-            }
-            $qry->free();
+            if (!isset($this->beanMaps[$mapKey])) $this->beanMaps[$mapKey] = $this->loadBeanMap($tableName, $field_name);
         }
         catch (Exception $e) {
-            Debug::ErrorLog("Unable to translate: ".$e->getMessage());
+            Debug::ErrorLog("Unable to load the translations of $mapKey: " . $e->getMessage());
+            $this->beanMaps[$mapKey] = array();
         }
 
+        if (isset($this->beanMaps[$mapKey][$id])) $data[$field_name] = $this->beanMaps[$mapKey][$id];
     }
 
+    /**
+     * bean id => translation of the field of the table in the active language
+     * @throws Exception
+     */
+    protected function loadBeanMap(string $tableName, string $field_name) : array
+    {
+        $map = array();
+        if (is_null($this->translated_beans)) $this->translated_beans = new BeanTranslationsBean();
+        $qry = $this->translated_beans->query("bean_id", "translated");
+        $where = $qry->stmt->where();
+        $where->match("langID", $this->langID);
+        $where->match("table_name", $tableName);
+        $where->match("field_name", $field_name);
+        $qry->exec();
+        while ($row = $qry->next()) {
+            $map[(int)$row["bean_id"]] = (string)$row["translated"];
+        }
+        $qry->free();
+        return $map;
+    }
+
+    /**
+     * The translation of '$phrase' in the active language - the phrase itself when it has none. A phrase seen for
+     * the first time is captured (site_texts) for the translators of the admin.
+     * @param string $phrase
+     * @return string
+     */
     public function translatePhrase(string $phrase): string
     {
-
-        if (strlen(trim($phrase)) == 0) return $phrase;
-
-        $translated = $phrase;
+        if (trim($phrase) === "") return $phrase;
 
         try {
+            if (is_null($this->phraseMap)) $this->loadPhrases();
 
-            $phrase_hash = Spark::Hash($phrase);
-
-            $qry = $this->translated_phrases->queryPhrase($this->langID);
-            $qry->stmt->where()->match("hash_value", $phrase_hash);
-            $qry->stmt->limit(1);
-
-            if ($qry->count() == 0) {
-                $qry->free();
-                $this->capturePhrase($phrase, $phrase_hash);
+            $hash = Spark::Hash($phrase);
+            if (!array_key_exists($hash, $this->phraseMap)) {
+                //once per request, also when the capture fails
+                $this->phraseMap[$hash] = null;
+                $this->capturePhrase($phrase, $hash);
                 return $phrase;
             }
-            $qry->exec();
-
-            if ($data = $qry->nextResult()) {
-                //translation is done for $this->langID ?
-                if ((int)$data->get("trID")>0) {
-                    //return translated version
-                    $translated = $data->get("translation");
-                }
-            }
-            $qry->free();
-
+            $translation = $this->phraseMap[$hash];
+            return is_null($translation) ? $phrase : $translation;
         }
         catch (Exception $e) {
-            Debug::ErrorLog("Error: ".$e->getMessage());
+            Debug::ErrorLog("Error: " . $e->getMessage());
         }
+        return $phrase;
+    }
 
-        return $translated;
+    /**
+     * All phrases with their translation in the active language - one query
+     * @throws Exception
+     */
+    protected function loadPhrases() : void
+    {
+        $this->phraseMap = array();
+        $qry = $this->translated_phrases->queryPhrase($this->langID);
+        $qry->exec();
+        while ($row = $qry->next()) {
+            $this->phraseMap[(string)$row["hash"]] = ((int)$row["trID"] > 0) ? (string)$row["translation"] : null;
+        }
+        $qry->free();
+        Debug::ErrorLog("Translator: " . count($this->phraseMap) . " phrases loaded for langID: " . $this->langID);
     }
 
     protected function capturePhrase(string $phrase, string $phrase_hash) : void
     {
         try {
-            $phrase_data = array("value"=>$phrase, "hash_value"=>$phrase_hash);
-            $trID = $this->phrases->insert($phrase_data);
-            Debug::ErrorLog("Captured new phrase with trID: $trID");
+            if (is_null($this->phrases)) $this->phrases = new SiteTextsBean();
+            $trID = $this->phrases->insert(array("value" => $phrase, "hash_value" => $phrase_hash));
+            Debug::ErrorLog("Captured new phrase with textID: $trID");
         }
         catch (Exception $ex) {
-            throw new Exception("Failed capturing new phrase [$phrase_hash]: ". $ex->getMessage());
+            //captured by a parallel request meanwhile (the hash is unique) - nothing lost
+            Debug::ErrorLog("Phrase not captured [$phrase_hash]: " . $ex->getMessage());
         }
     }
 

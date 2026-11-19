@@ -142,6 +142,12 @@ class Session
 
         $_COOKIE[$key] = $val;
 
+        //output started - the cookie can not be sent any more (this request still sees the value)
+        if (headers_sent()) {
+            Debug::ErrorLog("Cookie '$key' not sent - headers already sent");
+            return;
+        }
+
         setcookie(
             $key,
             $val,
@@ -157,7 +163,10 @@ class Session
     {
         $cookiePath = Spark::Get(Config::LOCAL) ?: "/";
 
-        setcookie(
+        if (headers_sent()) {
+            Debug::ErrorLog("Cookie '$key' not cleared - headers already sent");
+        }
+        else setcookie(
             $key,
             "",
             1,
