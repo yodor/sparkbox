@@ -1,5 +1,6 @@
 <?php
 include_once("beans/DBTableBean.php");
+include_once("sql/RawSQLSelect.php");
 
 class ConfigBean extends DBTableBean
 {
@@ -51,44 +52,62 @@ class ConfigBean extends DBTableBean
     }
 
 
-    protected function getKeyID(string $key) : int
+    /**
+     * The values of a section up to this size are loaded with the section, larger ones (an image) when asked for
+     */
+    const int INLINE_SIZE = 16384;
+
+    /**
+     * The keys of the sections read in this request (one query per section): section => key => [cfgID, value
+     * (null: larger than INLINE_SIZE, not loaded yet)]
+     * @var array<string, array<string, array>>
+     */
+    protected static array $sections = array();
+
+    /**
+     * The keys of the active section - loaded at its first use in the request
+     * @return array<string, array>
+     * @throws Exception
+     */
+    protected function sectionKeys() : array
     {
         $this->assert_section();
+        if (isset(ConfigBean::$sections[$this->section])) return ConfigBean::$sections[$this->section];
 
-        $query = $this->query($this->key(), "config_key", "section");
-        $query->stmt->where()->match("section", $this->section);
-        $query->stmt->where()->match("config_key", $key);
-        $query->stmt->limit(1);
-        $keyID = -1;
-        if ($query->count() == 0) return $keyID;
-
+        $select = new RawSQLSelect("SELECT cfgID, config_key, IF(LENGTH(config_val) <= " . ConfigBean::INLINE_SIZE
+            . ", config_val, NULL) AS config_val, LENGTH(config_val) > " . ConfigBean::INLINE_SIZE . " AS large"
+            . " FROM config WHERE section = :section ORDER BY cfgID ASC");
+        $select->bind(":section", $this->section);
+        $query = new SelectQuery($select, "cfgID", "config");
+        $keys = array();
         $query->exec();
-        if ($result = $query->next()) {
-            $keyID = (int)$result[$this->key()];
+        while ($row = $query->next()) {
+            //the first of a duplicate key, as the LIMIT 1 lookup gave
+            if (isset($keys[$row["config_key"]])) continue;
+            $keys[$row["config_key"]] = array((int)$row["cfgID"], ((int)$row["large"] > 0) ? null : $row["config_val"]);
         }
         $query->free();
+        ConfigBean::$sections[$this->section] = $keys;
+        return $keys;
+    }
 
-        return $keyID;
+    protected function getKeyID(string $key) : int
+    {
+        $keys = $this->sectionKeys();
+        return isset($keys[$key]) ? $keys[$key][0] : -1;
     }
 
     protected function getValueKey(string $key) : mixed
     {
-        $this->assert_section();
+        $keys = $this->sectionKeys();
+        if (!isset($keys[$key])) return null;
+        [$keyID, $value] = $keys[$key];
+        if (!is_null($value)) return $value;
 
-        $query = $this->query($this->key(), "config_key", "config_val", "section");
-        $query->stmt->where()->match("section", $this->section);
-        $query->stmt->where()->match("config_key", $key);
-        $query->stmt->limit(1);
-
-        if ($query->count() == 0) return null;
-
-        $value = null;
-        $query->exec();
-        if ($result = $query->next()) {
-            $value = $result["config_val"];
-        }
-        $query->free();
-
+        //a large value - loaded now, once
+        $row = $this->getByID($keyID, "config_val");
+        $value = $row["config_val"] ?? "";
+        ConfigBean::$sections[$this->section][$key][1] = $value;
         return $value;
     }
 
@@ -117,8 +136,10 @@ class ConfigBean extends DBTableBean
 
     public function clear(string $key) : void
     {
-        $this->assert_section();
-        $this->deleteRef("config_key", $key);
+        //the key of this section only (other sections may have a key of the same name)
+        $keyID = $this->getKeyID($key);
+        if ($keyID > 0) $this->delete($keyID);
+        unset(ConfigBean::$sections[$this->section]);
 
     }
 
@@ -155,6 +176,7 @@ class ConfigBean extends DBTableBean
             //do insert
             $this->insert($data, $driver);
         }
+        unset(ConfigBean::$sections[$this->section]);
 
 
     }
