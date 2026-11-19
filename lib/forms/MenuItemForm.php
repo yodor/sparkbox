@@ -1,5 +1,6 @@
 <?php
 include_once("forms/InputForm.php");
+include_once("forms/SEOInputGroup.php");
 include_once("beans/MenuItemsBean.php");
 include_once("beans/DynamicPagesBean.php");
 include_once("utils/url/DynamicPageURL.php");
@@ -40,19 +41,7 @@ class MenuItemForm extends InputForm
 
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(InputType::TEXTAREA, "seo_title", "SEO Title (max 60 characters)", 0);
-        $field->enableTranslator(true);
-        $field->getRenderer()->input()->setAttribute("maxLength","60");
-        $field->getRenderer()->input()->setAttribute("rows","3");
-        $field->getRenderer()->input()->setAttribute("cols","60");
-        $this->addInput($field);
-
-        $field = DataInputFactory::Create(InputType::TEXTAREA, "seo_description", "SEO Description (max 150 characters)", 0);
-        $field->enableTranslator(true);
-        $field->getRenderer()->input()->setAttribute("maxLength","150");
-        $field->getRenderer()->input()->setAttribute("rows","3");
-        $field->getRenderer()->input()->setAttribute("cols","60");
-        $this->addInput($field);
+        SEOInputGroup::AddTo($this);
 
         $this->load();
     }

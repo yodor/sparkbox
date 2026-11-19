@@ -450,8 +450,12 @@ nothing new:
    `Module::Run("<name>")` and its `.htaccess`); `class/templates/modules/<name>/init.php` (page class, page
    css); path files for the list and the details; contents in `content/` (a list on an `ItemView` of the
    bean's query, a details view of one row).
-4. **Look**: the module stylesheet in the `site` layer, using the theme tokens.
-5. **Checks**: `php tests/check_includes.php <site>` and a smoke test of the new paths.
+4. **SEO**: a table whose rows are pages has the columns `seo_title` and `seo_description`; its form adds
+   them with `SEOInputGroup::AddTo($this)`, and the content gives the page `SEOData::Title($row, $name)` (the
+   `<title>`) and `SEOData::Description($row, $text)`. The heading of the page keeps the name. The default
+   description of the site is Settings > SEO.
+5. **Look**: the module stylesheet in the `site` layer, using the theme tokens.
+6. **Checks**: `php tests/check_includes.php <site>` and a smoke test of the new paths.
 
 A new module for every site goes into a layer instead: `templates/modules/<name>/` in the core or the
 store, with `modules/<name>/` holding its entry.
