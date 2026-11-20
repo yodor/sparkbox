@@ -1,13 +1,78 @@
+/**
+ * Google tag (gtag.js) with Consent Mode v2.
+ *
+ * Loaded before gtag.js and the 'config' commands: every consent signal starts 'denied' (no analytics or ad
+ * cookies before a choice), and the visitor's stored choice (SparkCookies) is applied at once - before the
+ * first page view is sent. A choice made on the page is sent by SparkCookies as a 'consent' 'update'.
+ *
+ * Other scripts send gtag commands as SparkEvent.GTM_EVENT with event.gtm = {command, type, parameters}.
+ */
 class SparkGTM {
+
+    /**
+     * Before a choice: nothing stored, nothing sent for ads; Google models the rest
+     */
     static DefaultConsent = {
-        "ad_user_data": "denied", //Whether user data can be sent to Google for advertising purposes
-        "ad_personalization": "denied", //Whether data can be used for ad personalization
-        "ad_storage": "granted", //Whether ad cookies can be read/written
-        "analytics_storage": "granted" //Whether analytics cookies can be read/written
+        "ad_storage": "denied",          //ad cookies
+        "ad_user_data": "denied",        //user data sent to Google for ads
+        "ad_personalization": "denied",  //ad personalization (remarketing)
+        "analytics_storage": "denied"    //analytics cookies
+    };
+
+    /**
+     * The name of the cookie holding the visitor's choice (SparkCookies writes it)
+     */
+    static CONSENT_COOKIE = "cookie_consent";
+
+    /**
+     * The stored choice as gtag consent signals, or null when the visitor has not chosen yet
+     * @returns {Object|null}
+     */
+    static StoredConsent() {
+        const match = document.cookie.match(new RegExp("(?:^|; )" + SparkGTM.CONSENT_COOKIE + "=([^;]*)"));
+        if (!match) return null;
+        try {
+            const stored = JSON.parse(decodeURIComponent(match[1]));
+            return SparkGTM.ConsentSignals(!!stored.analytics, !!stored.ads);
+        }
+        catch (e) {
+            return null;
+        }
     }
+
+    /**
+     * The gtag consent signals of a choice
+     * @param analytics {boolean} analytics cookies allowed
+     * @param ads {boolean} ad cookies and ad data allowed
+     * @returns {Object}
+     */
+    static ConsentSignals(analytics, ads) {
+        const value = (allowed) => allowed ? "granted" : "denied";
+        return {
+            "ad_storage": value(ads),
+            "ad_user_data": value(ads),
+            "ad_personalization": value(ads),
+            "analytics_storage": value(analytics)
+        };
+    }
+
+    /**
+     * Ad / marketing cookies allowed by the stored choice (the Facebook pixel reads it too)
+     * @returns {boolean}
+     */
+    static AdsGranted() {
+        const consent = SparkGTM.StoredConsent();
+        return !!consent && consent.ad_storage === "granted";
+    }
+
     constructor() {
 
-        gtag('consent', 'default', SparkGTM.DefaultConsent);
+        gtag('consent', 'default', Object.assign({}, SparkGTM.DefaultConsent, {"wait_for_update": 500}));
+
+        const stored = SparkGTM.StoredConsent();
+        if (stored) {
+            gtag('consent', 'update', stored);
+        }
 
         gtag('js', new Date());
 

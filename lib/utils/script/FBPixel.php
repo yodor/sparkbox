@@ -29,6 +29,8 @@ class FBPixel extends Script
                 s = b.getElementsByTagName(e)[0];
                 s.parentNode.insertBefore(t, s)
             }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+            //no ad tracking before the visitor allows it (SparkGTM / SparkCookies)
+            fbq('consent', (typeof SparkGTM !== 'undefined' && SparkGTM.AdsGranted()) ? 'grant' : 'revoke');
             fbq('init', '{$this->pixelID}');
             fbq('track', 'PageView');
 JS;
