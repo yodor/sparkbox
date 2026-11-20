@@ -174,7 +174,13 @@ say("\n3. config/routes.php");
 //the module folders of the root: links (or folders) with an index.php that runs a module
 $moduleLinks = array();
 foreach (scandir($root) as $entry) {
-    if ($entry[0] === "." || !is_dir("$root/$entry")) continue;
+    if ($entry[0] === ".") continue;
+    //a link to a module entry folder - also when its target is gone (.../modules/<name>)
+    if (is_link("$root/$entry") && preg_match('#modules/([a-z0-9_]+)/?$#', (string)readlink("$root/$entry"), $m)) {
+        $moduleLinks[$entry] = $m[1];
+        continue;
+    }
+    if (!is_dir("$root/$entry")) continue;
     $entryIndex = "$root/$entry/index.php";
     if (!is_file($entryIndex)) continue;
     if (preg_match('/Module::Run\("([a-z0-9_]+)"\)/', (string)file_get_contents($entryIndex), $m)) $moduleLinks[$entry] = $m[1];
@@ -209,6 +215,7 @@ say("\n4. links");
 foreach ($moduleLinks as $folder => $name) {
     if (!isset($routes[$folder])) continue;
     $path = "$root/$folder";
+    if (!is_link($path) && !is_dir($path)) continue;
     if (!is_link($path)) {
         say("  $folder/ - a real folder (not a link): left; remove it by hand when the route works");
         continue;
@@ -224,7 +231,7 @@ foreach ($moduleLinks as $folder => $name) {
 }
 //a dangling link (its target gone)
 foreach (scandir($root) as $entry) {
-    if ($entry[0] !== "." && is_link("$root/$entry") && !file_exists("$root/$entry")) warn("'$entry' is a link to nothing (" . readlink("$root/$entry") . ")");
+    if ($entry[0] !== "." && is_link("$root/$entry") && !file_exists("$root/$entry") && !isset($moduleLinks[$entry])) warn("'$entry' is a link to nothing (" . readlink("$root/$entry") . ")");
 }
 $store = false;
 foreach ($routes as $name) {

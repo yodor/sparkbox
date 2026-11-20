@@ -85,10 +85,10 @@ folder; `/admin/index.php?path=/settings` keeps working.
 its leading slash, anchored at both ends; its groups become the request parameters in their order. Patterns
 apply first in the response, before the redirects.
 
-**Module folders (before the front controller).** `modules/<name>/index.php` (`Module::Run("<name>")`) and its
-`.htaccess` (the same rewrites as the patterns) linked into the document root still work: the server serves an
-existing folder before the root rewrite, so a site can move one module at a time (remove the link, add the
-route).
+**Module folders (before the front controller).** A module folder of its own in the document root still works:
+the server serves an existing folder before the root rewrite. `modules/admin/` (`index.php` with
+`Module::Run("admin")` and its `.htaccess`) is kept for a site that is not on the main module (max-electric links
+it); the other module entry folders are gone - their addresses are routes.
 
 
 The request, step by step

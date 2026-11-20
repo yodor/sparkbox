@@ -1,6 +1,6 @@
 <?php
 /**
- * The pages module (tests/app/pages -> modules/pages): dynamic pages, their group menu, the module addresses.
+ * The pages module (the route pages of tests/app/config/routes.php): dynamic pages, their group menu, the module addresses.
  * Adds pages to the test database and removes them.
  */
 include_once(__DIR__ . "/../harness/http.php");

@@ -13,6 +13,14 @@ function httpRequest(string $script, string $query = "", array $headers = array(
     //options: root (document root, default tests/app), include_path and prepend (php-cgi -d values).
     //Site tests pass only 'root' - the site .user.ini then sets include_path and auto_prepend_file.
     $app = $options["root"] ?? realpath(TESTS_PATH . "/app");
+    //a module folder the document root does not have: the root index.php answers it, as the server does for the
+    //front controller - Module::Route() takes the module from the address (REQUEST_URI)
+    //(a site in a folder of the document root too: app/admin/index.php -> app/index.php)
+    if (!isset($options["script_file"]) && !is_file("$app/$script") && preg_match("#^((?:[^/]+/)*)[a-z0-9_-]+/index\.php$#i", $script, $m)
+        && is_file("$app/{$m[1]}index.php")) {
+        if ($requestURI === "") $requestURI = "/$script" . (($query !== "") ? "?$query" : "");
+        $script = $m[1] . "index.php";
+    }
     $lib = realpath(TESTS_PATH . "/../lib");
     $isTestApp = !isset($options["root"]);
     $env = array(

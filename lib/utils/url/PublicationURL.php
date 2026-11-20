@@ -4,7 +4,7 @@ include_once("utils/url/PathParameter.php");
 
 /**
  * Address of a publication (DatedBean - news): <LOCAL><folder><id>/<title slug>/ - data keys: the bean key,
- * item_title. The publications module of the folder (modules/news) rewrites it to its 'view' path.
+ * item_title. The news module answers it as its 'view' path (addPattern in its init.php).
  */
 class PublicationURL extends URL
 {

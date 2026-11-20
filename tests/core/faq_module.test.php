@@ -1,6 +1,6 @@
 <?php
 /**
- * The faq module (tests/app/faq -> modules/faq). Adds sections and questions and removes them.
+ * The faq module (the route faq of tests/app/config/routes.php). Adds sections and questions and removes them.
  */
 include_once(__DIR__ . "/../harness/http.php");
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * The news module (tests/app/news -> modules/news): publications of NewsItemsBean. Adds items and removes them.
+ * The news module (the route news of tests/app/config/routes.php): publications of NewsItemsBean. Adds items and removes them.
  */
 include_once(__DIR__ . "/../harness/http.php");
 

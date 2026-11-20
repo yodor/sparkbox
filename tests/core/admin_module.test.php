@@ -93,7 +93,7 @@ test("content sections render (lists and add forms) without the store", function
 test("early responder answers without creating the page", function () {
     //the pages gallery path file redirects without a page ID - an early responder answers before it runs
     [$status, , $body] = httpRequest("admin/index.php", "path=%2Fcontent%2Fpages%2Fgallery&JSONRequest=1&responder=TemplateHelpResponder&type=fetch",
-        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fcontent%2Fpages%2Fgallery");
+        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fcontent%2Fpages%2Fgallery&JSONRequest=1&responder=TemplateHelpResponder&type=fetch");
     assertSame(200, $status);
     assertTrue(json_decode($body) !== null, "not JSON: " . substr($body, 0, 120));
 });
@@ -101,7 +101,7 @@ test("early responder answers without creating the page", function () {
 test("responders that are not early still go through the page", function () {
     //DeleteItemResponder is not a JSON responder - the path file runs and redirects (no page ID)
     [$status] = httpRequest("admin/index.php", "path=%2Fcontent%2Fpages%2Fgallery&JSONRequest=1&responder=MCEImageBrowserResponder&type=find",
-        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fcontent%2Fpages%2Fgallery");
+        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fcontent%2Fpages%2Fgallery&JSONRequest=1&responder=MCEImageBrowserResponder&type=find");
     assertSame(302, $status, "MCE browser must not be processed early");
 });
 

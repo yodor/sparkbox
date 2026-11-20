@@ -237,12 +237,15 @@ class Module
             $rest = "/" . $parts[1];
         }
 
-        //the query of the client - not the ?path= of the root rewrite
-        $get = array();
-        parse_str($query, $get);
-        //the folder or its index.php: the path of the client query (/admin/index.php?path=/settings)
+        //the parameters of the request as PHP read them (the root rewrite adds ?path=/<address> in front of the
+        //client query) - only the path is set again: from the address, or the client's own ?path= for the folder
+        //itself or its index.php (/admin/index.php?path=/settings)
+        $get = $_GET;
+        unset($get["path"]);
+        $client = array();
+        parse_str($query, $client);
         if ($rest === "/" || $rest === "/index.php") {
-            if (isset($get["path"]) && !is_string($get["path"])) unset($get["path"]);
+            if (isset($client["path"]) && is_string($client["path"])) $get["path"] = $client["path"];
         }
         else {
             $get["path"] = $rest;
