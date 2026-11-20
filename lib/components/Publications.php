@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("components/ItemView.php");
 include_once("beans/DatedBean.php");
 include_once("components/renderers/items/DatedItem.php");
@@ -60,7 +61,7 @@ class Publications
         $this->latest->setItemsPerPage(0);
 
         $rendererShort = new DatedHeadingItem($this->bean, $itemURL ?? $this->url);
-        $rendererShort->getThumbnail()->image()->setPhotoSize(64, 64);
+        $rendererShort->getThumbnail()->image()->setPhotoSize(ImageSize::Tiny, ImageSize::Tiny);
         $this->latest->setItemRenderer($rendererShort);
 
         //all news items?

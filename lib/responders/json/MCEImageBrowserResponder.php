@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("responders/json/ImageUploadResponder.php");
 include_once("utils/IStorageSection.php");
 include_once("beans/MCEImagesBean.php");
@@ -67,7 +68,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         parent::__construct();
 
         //do not require thumbnail. just create the imagestorage of the upload data
-        $this->setPhotoSize(128, -1);
+        $this->setPhotoSize(ImageSize::Small);
     }
 
     public function setSection(string $section_name, string $section_key): void
@@ -231,7 +232,7 @@ class MCEImageBrowserResponder extends ImageUploadResponder implements IStorageS
         echo "<div class='ImageDimensionComponent'>";
 
         echo "<div class='preview'>";
-        $img_href = StorageItem::Image($imageID, "MCEImagesBean", 240, -1);
+        $img_href = StorageItem::Image($imageID, "MCEImagesBean", ImageSize::Thumbnail->value);
         echo "<img src='$img_href'>";
         echo "</div>";
 

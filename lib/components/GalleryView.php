@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("beans/DBTableBean.php");
 include_once("components/TableView.php");
 include_once("components/ItemView.php");
@@ -74,7 +75,7 @@ class GalleryView extends Container
             $view->addClassName("GridMode");
 
             $renderer = new GalleryViewItem($this);
-            $renderer->setPhotoSize(256, -1);
+            $renderer->setPhotoSize(ImageSize::Thumbnail);
 
             $this->actions = $renderer->getActions();
 

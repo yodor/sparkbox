@@ -3,11 +3,16 @@ include_once("storage/DataBuffer.php");
 include_once("storage/SparkWatermark.php");
 include_once("utils/ImageType.php");
 
+/**
+ * Scales an image to bounds, keeping its proportions: each positive number is an upper limit - width 640: at most
+ * 640 wide; height 640: at most 640 high; both: fits inside the box; none: the image as it is. Nothing is cut; an
+ * image smaller than the bounds is not enlarged (unless setUpscaleEnabled - Config::IMAGE_SCALER_UPSCALE).
+ * The output: the configured format and quality, the watermark and the gray filter when enabled.
+ */
 class ImageScaler
 {
 
     const array SupportedMimes = array(ImageType::TYPE_JPG->value, ImageType::TYPE_JPEG->value, ImageType::TYPE_PNG->value, ImageType::TYPE_WEBP->value);
-
 
     /**
      * Default Output Format
@@ -17,36 +22,43 @@ class ImageScaler
 
     protected int $output_quality = 60;
 
-    protected ScaleMode $mode = ScaleMode::MODE_FULL;
-
+    //the bounds - 0: no limit on that side
     protected int $width = 0;
     protected int $height = 0;
+
+    protected bool $upscaleEnabled = false;
 
     protected bool $grayFilterEnabled = false;
 
     protected SparkWatermark $watermark;
 
-    //resulting image width and height
+    /**
+     * @param int $width the most width (0 or less: no limit)
+     * @param int $height the most height (0 or less: no limit)
+     */
     public function __construct(int $width, int $height)
     {
-        if ($width < 1) $width = 0;
-        if ($height < 1) $height = 0;
+        $this->width = max(0, $width);
+        $this->height = max(0, $height);
 
-        $this->width = $width;
-        $this->height = $height;
-
-        if ($this->width > 0 || $this->height > 0) {
-            $this->mode = ScaleMode::MODE_CROP;
-
-            if ($this->width == $this->height) {
-                $this->mode = ScaleMode::MODE_THUMB;
-            }
-        }
         $this->setOutputQuality(Spark::Get(Config::IMAGE_SCALER_OUTPUT_QUALITY));
         $this->setOutputFormat(Spark::Get(Config::IMAGE_SCALER_OUTPUT_FORMAT));
+        $this->upscaleEnabled = Spark::GetBoolean(Config::IMAGE_SCALER_UPSCALE);
 
         $this->watermark = new SparkWatermark();
+    }
 
+    /**
+     * Enlarge an image smaller than the bounds (default Config::IMAGE_SCALER_UPSCALE)
+     */
+    public function setUpscaleEnabled(bool $mode) : void
+    {
+        $this->upscaleEnabled = $mode;
+    }
+
+    public function isUpscaleEnabled() : bool
+    {
+        return $this->upscaleEnabled;
     }
 
     public function setGrayFilterEnabled(bool $mode): void
@@ -64,7 +76,6 @@ class ImageScaler
         return $this->watermark;
     }
 
-
     /**
      * Set output compression quality percentage
      * @param int $output_quality
@@ -79,7 +90,6 @@ class ImageScaler
     {
         return $this->output_quality;
     }
-
 
     /**
      * Set output format mime type. Throws exception if the required format is not supported
@@ -105,35 +115,66 @@ class ImageScaler
         return $this->output_format;
     }
 
-    public function getMode(): ScaleMode
-    {
-        return $this->mode;
-    }
-
+    /**
+     * The width bound - 0: no limit
+     */
     public function getWidth(): int
     {
         return $this->width;
     }
 
+    /**
+     * The height bound - 0: no limit
+     */
     public function getHeight(): int
     {
         return $this->height;
     }
 
+    /**
+     * The size of an image of '$imageWidth' x '$imageHeight' inside the bounds - proportions kept, at least 1x1
+     * @return array{int, int}
+     */
+    public function targetSize(int $imageWidth, int $imageHeight) : array
+    {
+        $ratio = INF;
+        if ($this->width > 0) $ratio = min($ratio, $this->width / $imageWidth);
+        if ($this->height > 0) $ratio = min($ratio, $this->height / $imageHeight);
+        if ($ratio === INF) return array($imageWidth, $imageHeight);
+        if (!$this->upscaleEnabled) $ratio = min($ratio, 1.0);
+        return array(max(1, (int)round($imageWidth * $ratio)), max(1, (int)round($imageHeight * $ratio)));
+    }
+
+    /**
+     * The image of the buffer inside the bounds - the buffer gets the result
+     * @param DataBuffer $buffer Source/Destination of the image data
+     * @return void
+     * @throws Exception
+     */
     public function process(DataBuffer $buffer): void
     {
-
-        if ($this->mode === ScaleMode::MODE_CROP) {
-            Debug::ErrorLog("Using CROP mode");
-            $this->processCrop($buffer);
-        } else if ($this->mode === ScaleMode::MODE_THUMB) {
-            Debug::ErrorLog("Using THUMB mode");
-            $this->processThumb($buffer);
-        } else {
-            //as is
-            Debug::ErrorLog("Using as-is mode");
-            $this->processFull($buffer);
+        //no bounds, no filter, no watermark: the image as it is
+        if ($this->width < 1 && $this->height < 1 && !$this->watermark->isEnabled() && !$this->grayFilterEnabled) {
+            Debug::ErrorLog("Image as it is");
+            return;
         }
+
+        $h_source = $this->imageFromBuffer($buffer);
+        $image_width = imagesx($h_source);
+        $image_height = imagesy($h_source);
+
+        [$width, $height] = $this->targetSize($image_width, $image_height);
+        Debug::ErrorLog("Image [$image_width x $image_height] bounds [$this->width x $this->height] -> [$width x $height]");
+
+        if ($width === $image_width && $height === $image_height) {
+            $this->setImageData($buffer, $h_source);
+            return;
+        }
+
+        $h_scaled = $this->createImage($width, $height);
+        imagecopyresampled($h_scaled, $h_source, 0, 0, 0, 0, $width, $height, $image_width, $image_height);
+        $h_source = null;
+        $this->setImageData($buffer, $h_scaled);
     }
 
     protected function imageFromBuffer(DataBuffer $buffer): GdImage
@@ -143,100 +184,6 @@ class ImageScaler
             throw new Exception("Image can not be created from this input data");
         }
         return $h_source;
-    }
-
-    /**
-     * Return the full image without scaling
-     * If watermark is enabled it is applied otherways does nothing with the buffer
-     *
-     * @param DataBuffer $buffer Source/Destination of the image data
-     * @return void
-     * @throws Exception
-     */
-    protected function processFull(DataBuffer $buffer): void
-    {
-        if ($this->watermark->isEnabled()) {
-            $h_source = $this->imageFromBuffer($buffer);
-            $this->setImageData($buffer, $h_source);
-            $h_source = null;
-        }
-
-    }
-
-    /**
-     * Create resized version (CROP to square) of the image found in the DataBuffer
-     *
-     * @param DataBuffer $buffer Source/Destination of the image data
-     * @return void
-     * @throws Exception
-     */
-    protected function processCrop(DataBuffer $buffer): void
-    {
-        $h_source = $this->imageFromBuffer($buffer);
-
-        $image_width = imagesx($h_source);
-        $image_height = imagesy($h_source);
-
-        //1264x720
-        //449x256
-        $ratio = 0;
-
-        if ($this->height > 0) {
-            //scale to height , width auto
-            $ratio = $image_height / $this->height;
-            $this->width = (int)($image_width / $ratio);
-
-            Debug::ErrorLog("Using fit to height");
-        } else if ($this->width > 0) {
-            $ratio = $image_width / $this->width;
-            $this->height = (int)($image_height / $ratio);
-
-            Debug::ErrorLog("Using fit to width");
-        }
-
-
-        Debug::ErrorLog("Output size: [$this->width, $this->height]");
-        $h_crop = $this->createImage($this->width, $this->height);
-
-        // Resize
-        imagecopyresampled($h_crop, $h_source, 0, 0, 0, 0, $this->width, $this->height, $image_width, $image_height);
-        $h_source = null;
-
-        $this->setImageData($buffer, $h_crop);
-
-        $h_crop = null;
-
-    }
-
-    /**
-     * Create resized version (SCALE-CROP to square) of the image found in the DataBuffer
-     *
-     * @param DataBuffer $buffer Source/Destination of the image data
-     * @return void
-     * @throws Exception
-     */
-    protected function processThumb(DataBuffer $buffer): void
-    {
-
-        $h_source = $this->imageFromBuffer($buffer);
-
-        $image_width = imagesx($h_source);
-        $image_height = imagesy($h_source);
-        $image_size = min($image_width, $image_height);
-
-        $h_crop = imagecrop($h_source, ['x' => ($image_width - $image_size) / 2,
-            'y' => ($image_height - $image_size) / 2, 'width' => $image_size,
-            'height' => $image_size]);
-        $h_source = null;
-
-        $h_thumbnail = $this->createImage($this->width, $this->width);
-
-        imagecopyresampled($h_thumbnail, $h_crop, 0, 0, 0, 0, $this->width, $this->width, $image_size, $image_size);
-        $h_crop = null;
-
-        $this->setImageData($buffer, $h_thumbnail);
-
-        $h_thumbnail = null;
     }
 
     /**

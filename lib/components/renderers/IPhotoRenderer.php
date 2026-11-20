@@ -1,8 +1,9 @@
 <?php
+include_once("utils/ImageSizes.php");
 
 interface IPhotoRenderer
 {
-    public function setPhotoSize(int $width, int $height): void;
+    public function setPhotoSize(int|IImageSize $width, int|IImageSize $height = 0) : void;
 
     public function getPhotoWidth(): int;
 

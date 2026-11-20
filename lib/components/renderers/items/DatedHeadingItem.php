@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("components/Action.php");
 include_once("beans/DatedBean.php");
 include_once("components/LabelSpan.php");
@@ -41,7 +42,7 @@ class DatedHeadingItem extends Action implements IDataResultConsumer
         $this->thumbnail->setComponentClass("thumbnail");
 
         $this->thumbnail->image()->getStorageItem()->className = get_class($bean);
-        $this->thumbnail->image()->setPhotoSize(64,64);
+        $this->thumbnail->image()->setPhotoSize(ImageSize::Tiny, ImageSize::Tiny);
 
         $this->details = new LabelSpan();
         $this->details->setComponentClass("details");

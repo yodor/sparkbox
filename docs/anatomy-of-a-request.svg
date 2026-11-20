@@ -186,7 +186,7 @@
 <text x="1147" y="1209" xml:space="preserve" style="font-family:'DejaVu Sans',Arial,sans-serif;font-size:12.5px;font-weight:normal;fill:#52606d" text-anchor="start">  browser fetches CSS / JS in parallel</text>
 <text x="1147" y="1226" xml:space="preserve" style="font-family:'DejaVu Sans',Arial,sans-serif;font-size:12.5px;font-weight:normal;fill:#52606d" text-anchor="start">body buffered in 4 KB chunks</text>
 <text x="1147" y="1243" xml:space="preserve" style="font-family:'DejaVu Sans',Arial,sans-serif;font-size:12.5px;font-weight:normal;fill:#52606d" text-anchor="start">images → storage.php URLs</text>
-<text x="1147" y="1260" xml:space="preserve" style="font-family:'DejaVu Sans',Arial,sans-serif;font-size:12.5px;font-weight:normal;fill:#52606d" text-anchor="start">  (hrefImage / hrefThumb / hrefCrop)</text>
+<text x="1147" y="1260" xml:space="preserve" style="font-family:'DejaVu Sans',Arial,sans-serif;font-size:12.5px;font-weight:normal;fill:#52606d" text-anchor="start">  (hrefImage: the enabled sizes)</text>
 <line x1="780" y1="1250" x2="1135" y2="1250" stroke="#3e4c59" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ma)"/>
 <polyline points="1565,1230 1583,1230 1583,215 1120,215 1120,190" fill="none" stroke="#7b1fa2" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#mp)"/>
 <text x="1335" y="1335" xml:space="preserve" style="font-family:'DejaVu Sans',Arial,sans-serif;font-size:12px;font-weight:normal;fill:#7b1fa2" text-anchor="middle">image URLs → new storage requests</text>

@@ -69,9 +69,14 @@
     /*   float:left; */
 }
 
+/* the photos: the height of the tape - auto: the size the storage sends; a site sets e.g.
+   '.project .GalleryTape { --tape-photo-height: 240px; }' and gets the same look whatever size it asks for */
 .GalleryTape .contents .viewport .slots .slot IMG {
-    /*border: 1px solid #dcdedb;*/
     display: block;
+}
+/* no specificity: a site rule on the tape photos still wins */
+:where(.GalleryTape .slot) IMG {
+    height: var(--tape-photo-height, auto);
 }
 
 }

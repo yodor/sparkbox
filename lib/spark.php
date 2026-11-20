@@ -400,6 +400,11 @@ final class Spark {
         //force output to webp
         Spark::Set(Config::IMAGE_SCALER_OUTPUT_FORMAT, ImageType::TYPE_WEBP->value);
         Spark::Set(Config::IMAGE_SCALER_OUTPUT_QUALITY, 80);
+        Spark::Set(Config::IMAGE_SCALER_UPSCALE, FALSE);
+
+        //the image sizes the storage answers - the core ones (the store and the site add theirs: ImageSizes)
+        include_once("utils/ImageSizes.php");
+        ImageSizes::Enable(...ImageSize::cases());
 
         //mail domain: the requested host without a port and a leading 'www.' (www.domain.com and domain.com send
         //from the same address). Only a fallback - set DEFAULT_SERVICE_NAME and DEFAULT_SERVICE_EMAIL in

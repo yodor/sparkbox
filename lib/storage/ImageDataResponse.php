@@ -2,6 +2,7 @@
 include_once("storage/BeanDataResponse.php");
 include_once("storage/ImageStorageObject.php");
 include_once("utils/ImageScaler.php");
+include_once("utils/ImageSizes.php");
 
 class ImageDataResponse extends BeanDataResponse
 {
@@ -16,31 +17,26 @@ class ImageDataResponse extends BeanDataResponse
 
     protected ImageScaler $scaler;
 
-    const int MAX_DIMENSION = 3840; // 4K
-    const int MIN_DIMENSION = 64;
+    /**
+     * The allowed size when the asked one is not enabled (ImageSizes) - answered with a 301 to its address
+     * @var array<string, int>
+     */
+    protected array $allowedSize = array();
 
     public function __construct(int $id, string $className)
     {
-        $width = 0;
-        $height = 0;
+        $width = max(0, (int)($_GET[ImageDataResponse::KEY_WIDTH] ?? 0));
+        $height = max(0, (int)($_GET[ImageDataResponse::KEY_HEIGHT] ?? 0));
 
-        if (isset($_GET[ImageDataResponse::KEY_WIDTH])) {
-            $width = (int)$_GET[ImageDataResponse::KEY_WIDTH];
-            if ($width > 0) {
-                //clamp to [64, 3840]
-                $width = max(ImageDataResponse::MIN_DIMENSION, min($width, ImageDataResponse::MAX_DIMENSION));
-            }
+        //each number is a bound of the enabled sizes (ImageSizes); two numbers only as a square box - else the width
+        $allowedWidth = ImageSizes::Allowed($width);
+        $allowedHeight = ImageSizes::Allowed($height);
+        if ($allowedWidth > 0 && $allowedHeight > 0 && $allowedWidth !== $allowedHeight) $allowedHeight = 0;
+        if ($allowedWidth !== $width || $allowedHeight !== $height) {
+            $this->allowedSize = array(ImageDataResponse::KEY_WIDTH => $allowedWidth, ImageDataResponse::KEY_HEIGHT => $allowedHeight);
         }
 
-        if (isset($_GET[ImageDataResponse::KEY_HEIGHT])) {
-            $height = (int)$_GET[ImageDataResponse::KEY_HEIGHT];
-            if ($height > 0) {
-                //clamp to [64, 3840]
-                $height = max(ImageDataResponse::MIN_DIMENSION, min($height, ImageDataResponse::MAX_DIMENSION));
-            }
-        }
-
-        $this->scaler = new ImageScaler($width, $height);
+        $this->scaler = new ImageScaler($allowedWidth, $allowedHeight);
 
         if (isset($_GET[ImageDataResponse::KEY_FILTER])) {
             if (str_contains($_GET[ImageDataResponse::KEY_FILTER],self::FILTER_GRAY)) {
@@ -49,6 +45,23 @@ class ImageDataResponse extends BeanDataResponse
         }
         //call last - cache entry needs cacheName
         parent::__construct($id, $className, BeanDataResponse::FIELD_PHOTO);
+    }
+
+    /**
+     * A size that is not enabled: 301 to the address of the allowed one (one address per size for the browsers
+     * and the CDN, the cache holds only the enabled sizes)
+     */
+    public function send() : void
+    {
+        if (count($this->allowedSize) > 0 && $this->request) {
+            $location = $this->request->parameterURL($this->allowedSize);
+            if ($location !== "") {
+                Debug::ErrorLog("Image size not enabled - redirecting to: $location");
+                $this->sendRedirect($location, 301, SparkHTTPResponse::MAX_AGE_WEEK);
+                exit;
+            }
+        }
+        parent::send();
     }
 
     protected function process(): void
@@ -89,7 +102,6 @@ class ImageDataResponse extends BeanDataResponse
         $parts[] = BeanDataResponse::FIELD_PHOTO;
         $parts[] = $this->scaler->getWidth();
         $parts[] = $this->scaler->getHeight();
-        $parts[] = $this->scaler->getMode()->value;
         if ($this->scaler->isGrayFilterEnabled()) {
             $parts[] = ImageDataResponse::FILTER_GRAY;
         }

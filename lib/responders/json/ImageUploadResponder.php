@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("responders/json/UploadControlResponder.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("utils/ImageScaler.php");
@@ -12,10 +13,10 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
     protected int $width = -1;
     protected int $height = -1;
 
-    public function setPhotoSize(int $width, int $height): void
+    public function setPhotoSize(int|IImageSize $width, int|IImageSize $height = 0) : void
     {
-        $this->width = $width;
-        $this->height = $height;
+        $this->width = ImageSizes::Pixels($width);
+        $this->height = ImageSizes::Pixels($height);
     }
 
     public function getPhotoWidth(): int
@@ -33,7 +34,7 @@ class ImageUploadResponder extends UploadControlResponder implements IPhotoRende
         parent::__construct();
 
         //default thumbnail size
-        $this->setPhotoSize(0, 64);
+        $this->setPhotoSize(0, ImageSize::Tiny);
 
     }
 

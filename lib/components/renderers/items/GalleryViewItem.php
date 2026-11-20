@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("components/renderers/items/DataIteratorItem.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/ItemView.php");
@@ -128,7 +129,7 @@ class GalleryViewItem extends DataIteratorItem implements IActionCollection, IPh
 
     }
 
-    public function setPhotoSize(int $width, int $height): void
+    public function setPhotoSize(int|IImageSize $width, int|IImageSize $height = 0) : void
     {
         $this->image_popup->image()->setPhotoSize($width, $height);
     }

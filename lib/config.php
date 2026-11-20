@@ -127,6 +127,13 @@ enum Config
      * Default(string): image/webp
      */
     const string IMAGE_SCALER_OUTPUT_FORMAT = "IMAGE_SCALER_OUTPUT_FORMAT";
+
+    /**
+     * Enlarge an image smaller than the size it is asked for (the storage of a photo at a size - ImageScaler).
+     * The upload has its own (IMAGE_UPLOAD_UPSCALE).
+     * Default(bool): false
+     */
+    const string IMAGE_SCALER_UPSCALE = "IMAGE_SCALER_UPSCALE";
     /**
      * Storage backend image output quality
      * Default(int): 80

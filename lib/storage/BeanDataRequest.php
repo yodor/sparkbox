@@ -54,6 +54,12 @@ class BeanDataRequest
      */
     protected string $slugName = "";
 
+    /**
+     * The parameters read from the slug route, in their order (cmd, class, id, then the response ones)
+     * @var array<string>
+     */
+    protected static array $RouteParameters = array();
+
     public static function ConsumeRoute(bool $required, string ...$parameters) : void
     {
         if (!isset($_GET[BeanDataRequest::KEY_ROUTE])) return;
@@ -63,6 +69,7 @@ class BeanDataRequest
         foreach ($parameters as $param) {
             if (!empty($parts)) {
                 $_GET[$param] = array_shift($parts);
+                BeanDataRequest::$RouteParameters[] = $param;
             }
             else {
                 if ($required) throw new Exception("Parameter[$param] not found in route");
@@ -215,6 +222,52 @@ class BeanDataRequest
         }
 
         return $path . ($query !== "" ? "?" . $query : "");
+    }
+
+    /**
+     * The URL of this request with the parameters '$values' (name => value) - the route segments of a slug request,
+     * the query parameters of a query request (the image size the storage answers instead of the asked one).
+     * Always a local absolute path; empty when a slug segment is not found.
+     * @param array<string, string|int> $values
+     * @return string
+     */
+    public function parameterURL(array $values) : string
+    {
+        $uri = (string)($_SERVER["REQUEST_URI"] ?? "");
+        if ($uri === "") return "";
+
+        $pos = strpos($uri, "?");
+        $path = "/" . ltrim(($pos === false) ? $uri : substr($uri, 0, $pos), "/");
+        $query = ($pos === false) ? "" : substr($uri, $pos + 1);
+
+        $params = array();
+        parse_str($query, $params);
+        $segments = explode("/", $path);
+        //the route in the path: the segments of cmd / class / id, then the response parameters
+        $start = -1;
+        if (in_array(BeanDataRequest::KEY_CMD, BeanDataRequest::$RouteParameters, true)) {
+            $route = array((string)($_GET[BeanDataRequest::KEY_CMD] ?? ""), (string)($_GET[BeanDataRequest::KEY_CLASS] ?? ""), (string)($_GET[BeanDataRequest::KEY_ID] ?? ""));
+            for ($i = 0; $i + 2 < count($segments); $i++) {
+                if (array_slice($segments, $i, 3) === $route) {
+                    $start = $i;
+                    break;
+                }
+            }
+        }
+
+        foreach ($values as $name => $value) {
+            $index = array_search($name, BeanDataRequest::$RouteParameters, true);
+            if ($index !== false && $start >= 0) {
+                if (!isset($segments[$start + $index])) return "";
+                $segments[$start + $index] = (string)$value;
+            }
+            else {
+                $params[$name] = (string)$value;
+            }
+        }
+
+        $query = http_build_query($params, "", "&", PHP_QUERY_RFC3986);
+        return implode("/", $segments) . (($query !== "") ? "?" . $query : "");
     }
 
 }

@@ -41,48 +41,31 @@ class StorageItem extends DataObject implements JsonSerializable
         //$this->use_external = $mode;
     }
 
+    /**
+     * The address of the image - each positive number an upper limit, the proportions kept (width: at most that wide,
+     * height: at most that high, both equal: fits inside the square; none: the stored image). The storage answers
+     * only the enabled sizes (ImageSizes) - another size gets a 301 to the next larger one.
+     */
     public function hrefImage(int $width = 0, int $height = 0) : URL
     {
-        if ($width < 0) $width = 0;
-        if ($height < 0) $height = 0;
-
-        if ($width > 0 || $height > 0) {
-
-            if ($width == $height) {
-                return $this->hrefThumb($width);
-            }
-            return $this->hrefCrop($width, $height);
-        }
-        //full version
-        return $this->hrefCrop(0, 0);
-    }
-
-    public function hrefFull() : URL
-    {
-          return $this->hrefCrop(0, 0);
-    }
-    public function hrefThumb(int $width) : URL
-    {
-        return $this->hrefCrop($width, $width);
-    }
-
-    public function hrefCrop(int $width, int $height) : URL
-    {
-        if ($width < 0) $width = 0;
-        if ($height < 0) $height = 0;
-
         $this->setType(StorageItem::TYPE_IMAGE);
         $this->buildURL();
 
-        $this->url->add(new URLParameter("width", $width));
-        $this->url->add(new URLParameter("height", $height));
+        $this->url->add(new URLParameter("width", max(0, $width)));
+        $this->url->add(new URLParameter("height", max(0, $height)));
 
         if (Spark::GetBoolean(Config::STORAGE_ITEM_SLUG)) {
             return $this->SlugURL();
         }
-        else {
-            return $this->url;
-        }
+        return $this->url;
+    }
+
+    /**
+     * The stored image as it is
+     */
+    public function hrefFull() : URL
+    {
+        return $this->hrefImage();
     }
 
     private function SlugURL() : URL

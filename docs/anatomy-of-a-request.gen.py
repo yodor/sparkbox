@@ -100,7 +100,7 @@ box(60,1150,310,120,"JSON requests",["_REQUEST['JSONRequest'] is set","early res
 arrow(370,1210,MX,1210,C["json"],dash=True)
 box(60,1370,310,210,"PageCache",["CACHE_PATH/PageCache/<Class>-<hash>","key: requested address + language","  + class + name (+ query of result views)","PAGE_CACHE_TTL (default 86400 s)","PAGE_CACHE_ENABLED (default off)","component->setCacheable(true)","FileCacheEntry: flock SH/EX"],fill=C["cache"],stroke=C["caches"])
 arrow(370,1460,MX,1460,C["caches"],dash=True)
-box(SX,1150,430,160,"HTML output",["<head> flushed before the body is built:","  browser fetches CSS / JS in parallel","body buffered in 4 KB chunks","images → storage.php URLs","  (hrefImage / hrefThumb / hrefCrop)"])
+box(SX,1150,430,160,"HTML output",["<head> flushed before the body is built:","  browser fetches CSS / JS in parallel","body buffered in 4 KB chunks","images → storage.php URLs","  (hrefImage: the enabled sizes)"])
 arrow(MX+360,1250,SX,1250,dash=True)
 poly([(SX+430,1230),(SX+448,1230),(SX+448,215),(MX+700,215),(MX+700,190)],C["json"],dash=True,label="image URLs → new storage requests",lx=SX+200,ly=1335,lanchor="middle")
 

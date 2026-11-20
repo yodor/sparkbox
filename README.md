@@ -157,6 +157,17 @@ Storage and caching
   is written through its bean (`StorageVersion` marker files next to the bean cache). Responses with
   the current token are cached by browsers for a year (`immutable`), outdated tokens get a 301 to the
   current URL, URLs without a token get one day.
+- **Image sizes.** Each positive number is an upper limit and the proportions are kept: width 640 — at most
+  640 wide; height 640 — at most 640 high; both (equal only) — fits inside the square; none — the stored image.
+  Nothing is cut and nothing is enlarged (`IMAGE_SCALER_UPSCALE`, default off). Fit or crop into a box is
+  the page's CSS (`object-fit: contain | cover`; the store reads `--store-photo-fit`, the tape
+  `--tape-photo-height`).
+- The storage answers only the **enabled sizes** (`ImageSizes`): the core enables `ImageSize` Tiny 64,
+  Small 128, Thumbnail 256, the store `StoreImageSize` Item 275, Large 640. Any other size gets a 301 to the
+  next larger enabled one (the largest above them all), so the cache holds only those sizes. A site adds or
+  removes sizes in `config/settings.php` (`ImageSizes::Enable(680)`, `ImageSizes::Disable(ImageSize::Tiny)`;
+  a disabled size stays disabled). Code asks by name: `setPhotoSize(ImageSize::Small)`,
+  `setPhotoSize(0, StoreImageSize::Large)`. Uploads are fitted inside `IMAGE_UPLOAD_DEFAULT_WIDTH/HEIGHT`.
 - Generated images and files are cached in `CACHE_PATH/<BeanClass>/<id>/` (`STORAGE_CACHE_ENABLED`);
   writes through the bean clear them after commit.
 - Rows with an `auth_context` column are authorized on every request and sent `private, no-cache`.

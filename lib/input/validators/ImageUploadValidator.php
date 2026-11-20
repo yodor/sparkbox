@@ -83,28 +83,23 @@ class ImageUploadValidator extends UploadDataValidator
             return;
         }
 
+        //the stored original fits inside the box (IMAGE_UPLOAD_DEFAULT_WIDTH x HEIGHT), proportions kept: a larger
+        //image is made smaller (IMAGE_UPLOAD_DOWNSCALE), a smaller one larger (IMAGE_UPLOAD_UPSCALE)
         $width = $object->getWidth();
         $height = $object->getHeight();
+        $larger = ($this->resize_width > 0 && $width > $this->resize_width) || ($this->resize_height > 0 && $height > $this->resize_height);
+        $smaller = ($this->resize_width < 1 || $width < $this->resize_width) && ($this->resize_height < 1 || $height < $this->resize_height);
+        $downscale = Spark::GetBoolean(Config::IMAGE_UPLOAD_DOWNSCALE) && $larger;
+        $upscale = Spark::GetBoolean(Config::IMAGE_UPLOAD_UPSCALE) && $smaller;
+        if (!$downscale && !$upscale) return;
 
-        if (Spark::GetBoolean(Config::IMAGE_UPLOAD_UPSCALE)) {
-            if ($object->getWidth() < $this->resize_width || $object->getHeight() < $this->resize_height) {
-                $width = $this->resize_width;
-                $height = $this->resize_height;
-            }
-        }
-        if (Spark::GetBoolean(Config::IMAGE_UPLOAD_DOWNSCALE)) {
-            if ($object->getWidth() > $this->resize_width || $object->getHeight() > $this->resize_height) {
-                $width = $this->resize_width;
-                $height = $this->resize_height;
-            }
-        }
         //final image that goes to DB
-        if ($width != $object->getWidth() || $height != $object->getHeight()) {
-            $scaler = new ImageScaler($width, $height);
-            $scaler->setOutputQuality(Spark::GetInteger(Config::IMAGE_UPLOAD_STORE_QUALITY));
-            $scaler->process($object->buffer());
-        }
-
+        $scaler = new ImageScaler($this->resize_width, $this->resize_height);
+        $scaler->setUpscaleEnabled($upscale);
+        $scaler->setOutputQuality(Spark::GetInteger(Config::IMAGE_UPLOAD_STORE_QUALITY));
+        $scaler->process($object->buffer());
+        //the width and height of the stored image (the object kept the uploaded ones)
+        $object->setData($object->buffer()->data());
     }
 
 }

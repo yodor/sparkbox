@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("components/Container.php");
 include_once("components/ClosureComponent.php");
 include_once("components/InlineScript.php");
@@ -22,7 +23,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
         $this->setComponentClass("slot");
 
         $this->image_popup = new ImagePopup();
-        $this->image_popup->image()->setPhotoSize(-1, 128);
+        $this->image_popup->image()->setPhotoSize(0, ImageSize::Small);
 
         $this->items()->append($this->image_popup);
     }
@@ -64,7 +65,7 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
         $this->image_popup->setRelation($name);
     }
 
-    public function setPhotoSize(int $width, int $height): void
+    public function setPhotoSize(int|IImageSize $width, int|IImageSize $height = 0) : void
     {
         $this->image_popup->image()->setPhotoSize($width, $height);
     }

@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("components/Component.php");
 include_once("components/renderers/IPhotoRenderer.php");
 
@@ -92,10 +93,10 @@ class Image extends Component implements IPhotoRenderer
         $this->setAttribute("alt", $text);
     }
 
-    public function setPhotoSize(int $width, int $height) : void
+    public function setPhotoSize(int|IImageSize $width, int|IImageSize $height = 0) : void
     {
-        $this->width = $width;
-        $this->height = $height;
+        $this->width = ImageSizes::Pixels($width);
+        $this->height = ImageSizes::Pixels($height);
     }
 
     public function getPhotoWidth() : int

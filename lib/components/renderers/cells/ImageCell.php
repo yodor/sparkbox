@@ -1,4 +1,5 @@
 <?php
+include_once("utils/ImageSizes.php");
 include_once("components/renderers/cells/TableCell.php");
 include_once("components/renderers/IPhotoRenderer.php");
 include_once("components/TableColumn.php");
@@ -23,8 +24,9 @@ class ImageCell extends TableCell implements IPhotoRenderer
 
     protected ImagePopup $image_popup;
 
+    //the admin lists: a small width (ImageSize::Small)
     protected static int $DefaultWidth = 128;
-    protected static int $DefaultHeight = -1;
+    protected static int $DefaultHeight = 0;
 
     protected bool $sortable = FALSE;
 
@@ -32,18 +34,20 @@ class ImageCell extends TableCell implements IPhotoRenderer
 
     protected ClosureComponent $imageList;
 
-    public static function SetDefaultPhotoSize(int $width, int $height): void
+    public static function SetDefaultPhotoSize(int|IImageSize $width, int|IImageSize $height = 0): void
     {
-        ImageCell::$DefaultWidth = $width;
-        ImageCell::$DefaultHeight = $height;
+        ImageCell::$DefaultWidth = ImageSizes::Pixels($width);
+        ImageCell::$DefaultHeight = ImageSizes::Pixels($height);
     }
 
-    public function __construct(int $width = -1, int $height = -1)
+    public function __construct(int|IImageSize $width = 0, int|IImageSize $height = 0)
     {
         parent::__construct();
 
         $this->list_limit = 1;
 
+        $width = ImageSizes::Pixels($width);
+        $height = ImageSizes::Pixels($height);
         if ($width < 1 && $height < 1) {
             $width = ImageCell::$DefaultWidth;
             $height = ImageCell::$DefaultHeight;
@@ -79,7 +83,7 @@ class ImageCell extends TableCell implements IPhotoRenderer
         $this->blob_field = $blob_field;
     }
 
-    public function setPhotoSize(int $width, int $height): void
+    public function setPhotoSize(int|IImageSize $width, int|IImageSize $height = 0) : void
     {
         $this->image_popup->image()->setPhotoSize($width, $height);
     }
