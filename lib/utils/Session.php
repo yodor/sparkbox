@@ -47,6 +47,8 @@ class Session
             header("Cache-Control: private, must-revalidate, max-age=0");
 
             Session::$Started = true;
+            //the session exists from now on - reads later in this request (after Close) see it
+            $_COOKIE[session_name()] = session_id();
 
             Debug::ErrorLog("Starting session ID: " . session_id());
             SparkEventManager::emit(new SessionEvent(SessionEvent::STARTED));
@@ -108,6 +110,9 @@ class Session
     public static function Contains(string $key) : bool
     {
         if (!Session::$Started) {
+            //no session cookie - nothing is stored for this visitor: a read does not start a session (no session
+            //cookie for the visitors who only read - the public pages stay cacheable); a write (Set) starts it
+            if (!Session::HaveCookie(session_name())) return false;
             Session::Start();
         }
         return isset($_SESSION[$key]);
@@ -127,6 +132,19 @@ class Session
             Session::Start();
         }
         $_SESSION[$key] = $val;
+    }
+
+    /**
+     * Set '$key' only for a visitor who has a session already - a value that matters only next to other session
+     * data (the page to go back to from the cart): it does not start a session for a visitor who only reads
+     * @param string $key
+     * @param mixed $val
+     * @return void
+     */
+    public static function SetIfActive(string $key, mixed $val) : void
+    {
+        if (!Session::$Started && !Session::HaveCookie(session_name())) return;
+        Session::Set($key, $val);
     }
 
     public static function Remove(string $key) : void

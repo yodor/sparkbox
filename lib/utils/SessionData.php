@@ -30,8 +30,8 @@ class SessionData implements IObserver
         $this->name = $name;
 
         if (!Session::Contains($name)) {
+            //stored at the first change (sync) - an empty one does not start a session
             Debug::ErrorLog("SessionData [$this->name] initializing empty data.");
-            Session::Set($name, []);
         }
         else {
             $sessionData = Session::Get($name);
@@ -79,6 +79,9 @@ class SessionData implements IObserver
         }
         $this->data[$key] = $result;
         $this->need_sync = true;
+        //the first value of a visitor without a session: stored now (it starts the session while the headers can
+        //still be sent - the close of the session syncs the later changes)
+        if (!Session::IsStarted()) $this->sync();
     }
 
     public function sync() : void
