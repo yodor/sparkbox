@@ -1,29 +1,38 @@
+# BEGIN SparkBox
+# The SparkBox part of the site root .htaccess - written by tools/site_deploy.php from sparkbox/dist/htaccess.dist
+# (lines outside BEGIN / END are the site's own and stay as they are; this block is written again on each deploy)
 #
-# SparkBox site .htaccess - template for the document root
-#   cp dist/htaccess.dist <document root>/.htaccess  and replace the _PLACEHOLDERS_
-#
-# PHP settings: web servers running PHP as a module (Apache mod_php, LiteSpeed - e.g. Hostinger) read
-# them from here. PHP-FPM / CGI servers ignore these lines and use .user.ini instead (dist/user.ini.dist).
-#
-
+# PHP settings: servers running PHP as a module (Apache mod_php, LiteSpeed - e.g. Hostinger) read them from here.
+# PHP-FPM / CGI servers ignore these lines and use .user.ini instead (dist/user.ini.dist).
 <IfModule mod_php.c>
-    php_value include_path "_ABSOLUTE_SPARKBOX_PATH_/lib"
-    php_value auto_prepend_file "_ABSOLUTE_APP_PATH_/sparkboot.php"
+    php_value include_path "_SPARKBOX_LIB_"
+    php_value auto_prepend_file "_APP_PATH_/sparkboot.php"
 </IfModule>
 
 <IfModule mod_rewrite.c>
     Options +FollowSymLinks
     RewriteEngine On
 
-    # storage: images and files of beans - /assets/<route> is answered by sparkbox (storage.php logic)
+    # storage: images and files of beans - /assets/<route> is answered by sparkbox at boot
     RewriteRule ^assets/(.*)$ sparkboot.php?StorageRequest=1&route=$1 [E=IS_SPARK_ASSET:1,QSA,L]
 
-    # versioned CSS / JS (?v=<file time>, added by HTMLHead): the URL changes whenever the file changes,
-    # so browsers and the CDN may keep each version for a year without asking again
+    # versioned CSS / JS (?v=<file time>, added by HTMLHead): cached for a year, the URL changes with the file
     RewriteCond %{QUERY_STRING} (^|&)v=
     RewriteRule \.(css|js)$ - [E=SPARK_VERSIONED:1]
+
+    # the code and configuration folders are not served (the server would run their files directly)
+    RewriteRule ^(class|config)(/|$) - [F,L]
+
+    # the front controller: an address that is not a file or a folder goes to index.php (Module::Route - the
+    # modules of config/routes.php by their folder, anything else the main module); missing static files stay
+    # a plain 404
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !\.(css|js|mjs|map|png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|otf|eot)$ [NC]
+    RewriteRule ^(.*)$ index.php?path=/$1 [QSA,L]
 </IfModule>
 
 <IfModule mod_headers.c>
     Header set Cache-Control "public, max-age=31536000, immutable" env=SPARK_VERSIONED
 </IfModule>
+# END SparkBox

@@ -33,17 +33,18 @@ Requirements
 Setting up a site
 -----------------
 
-1. Copy `dist/htaccess.dist` to the document root as `.htaccess`. It holds the storage rewrite, the
-   long caching of versioned CSS / JS, and — for PHP running as a server module (Apache mod_php,
-   LiteSpeed) — `include_path` (SparkBox `lib`) and `auto_prepend_file` (the site `sparkboot.php`).
-   PHP-FPM / CGI servers read these two from `.user.ini` instead: copy `dist/user.ini.dist`.
-   Add the rules of `modules/main/root.htaccess` (the front controller: every address that is not a file
-   goes to `index.php`; `class/` and `config/` are refused; missing static files stay a plain 404).
-2. Copy `dist/sparkboot.php.dist` to the document root as `sparkboot.php`. It defines `APP_PATH` and loads
+1. Copy `dist/sparkboot.php.dist` to the document root as `sparkboot.php`. It defines `APP_PATH` and loads
    `sparkbox.php` — every request goes through it.
-   Copy `modules/main/index.php` to the document root as `index.php` (`Module::Route()`).
-   Link the public files: `sparkfront` -> `sparkbox/sparkfront` (and `storefront` -> `sparkstore/storefront`
-   for a store site) - without them the pages are unstyled.
+2. Run `php tools/site_deploy.php <document root>` (a dry run: it prints what it would change), then again with
+   `--write`. It writes the SparkBox block of the root `.htaccess` from `dist/htaccess.dist` (the
+   `include_path` and `auto_prepend_file` of PHP running as a server module - Apache mod_php, LiteSpeed; the
+   storage rewrite; the long caching of versioned CSS / JS; `class/` and `config/` refused; the front controller)
+   and keeps the site's own lines outside the block; it puts the front controller `index.php` in place
+   (`Module::Route()`), writes `config/routes.php` from the module links of the root when there is none, removes
+   those links with `--remove-links`, and checks the `sparkfront` (and `storefront`) links - without them the
+   pages are unstyled. `--sparkbox=` and `--app=` give the paths as the web server sees them.
+   PHP-FPM / CGI servers read `include_path` and `auto_prepend_file` from `.user.ini` instead
+   (`dist/user.ini.dist`).
 3. Create the configuration files in `APP_PATH/config/` (all optional except `dbconfig.php` when the
    database is enabled). They are loaded in this order:
 
@@ -190,6 +191,8 @@ Tools
 - `php tests/check_includes.php <site root>` - every class a file uses is reachable through its own
   `include_once` chain (no autoloader).
 - `php tools/storage_upgrade.php <site root> [--list] [--write]` - stored photos / files of the old format.
+- `php tools/site_deploy.php <site root> [--write] [--remove-links]` - the SparkBox part of a site root
+  (`.htaccess` block, front controller, routes, links); a dry run without `--write`.
 
 
 Tests

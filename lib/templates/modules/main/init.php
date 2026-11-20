@@ -2,7 +2,7 @@
 //
 // main module - the site root (core part, included first; store and site init.php run after it).
 // The root index.php runs it (sparkbox/modules/main/index.php) and the root .htaccess sends the addresses that are
-// not files or folders to it (sparkbox/modules/main/root.htaccess). A path without a path file or a script answers 404.
+// not files or folders to it (sparkbox/dist/htaccess.dist). A path without a path file or a script answers 404.
 //
 // The layers and the site add:
 //  - scripts (templates/modules/main/scripts/<path>.php - the most specific one runs, Module::scriptFor): the home

@@ -67,8 +67,8 @@ templates/modules/<name>/menu.php              admin only: the menu (each layer)
 ```
 
 **The front controller.** Every address that is not a file of the site goes to the root `index.php`
-(`sparkbox/modules/main/index.php`, `Module::Route()`). `sparkbox/modules/main/root.htaccess` goes into the
-site root `.htaccess`: an address that is not a file or a folder goes to `index.php`, missing static files keep
+(`sparkbox/modules/main/index.php`, `Module::Route()`). The SparkBox block of the site root `.htaccess`
+(`dist/htaccess.dist`, written by `tools/site_deploy.php`): an address that is not a file or a folder goes to `index.php`, missing static files keep
 the plain server 404, and the code folders `class/` and `config/` are refused (the server would run their files
 before any rewrite - the engine never sees those requests).
 
