@@ -193,7 +193,7 @@ class ImagePopup extends SparkObject {
 
         document.body.appendChild(this.popup);
 
-        const sparkEvent = new SparkEvent(ImagePopup.OPENED, this)
+        const sparkEvent = new SparkEvent(ImagePopup.EVENT_OPENED, this)
         this.notify(sparkEvent);
         document.dispatchEvent(sparkEvent);
 

@@ -160,8 +160,13 @@ Storage and caching
 - **Image sizes.** Each positive number is an upper limit and the proportions are kept: width 640 — at most
   640 wide; height 640 — at most 640 high; both (equal only) — fits inside the square; none — the stored image.
   Nothing is cut and nothing is enlarged (`IMAGE_SCALER_UPSCALE`, default off). Fit or crop into a box is
-  the page's CSS (`object-fit: contain | cover`; the store reads `--store-photo-fit`, the tape
-  `--tape-photo-height`).
+  the page's CSS (`object-fit: contain | cover`; the store reads `--store-photo-fit`).
+- **Photo galleries** are one component, `ImageSlider` (`lib/components/ImageSlider.php`, `sparkfront/js|css/ImageSlider`):
+  photos from StorageItems or a query (`addImage`, `addRows`), each opening the ImagePopup of its slider or a link;
+  slide or fade, arrows, dots (none, plain, or photo dots at `ImageSize::Small`), autoplay; after the last photo it
+  returns to the first. CSS: `--slider-per-view`, `--slider-gap`; `setStrip(true)` shows the photos in their own
+  widths at `--slider-photo-height` (a tape). The store's product gallery (`SellableImageGallery`) and home banners
+  (`NavigationListItem`) are built on it.
 - The storage answers only the **enabled sizes** (`ImageSizes`): the core enables `ImageSize` Tiny 64,
   Small 128, Thumbnail 256, the store `StoreImageSize` Item 275, Large 640. Any other size gets a 301 to the
   next larger enabled one (the largest above them all), so the cache holds only those sizes. A site adds or

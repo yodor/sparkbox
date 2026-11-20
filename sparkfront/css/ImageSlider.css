@@ -1,0 +1,154 @@
+@layer components {
+
+/*
+ * ImageSlider - photos in a row (lib/components/ImageSlider.php, js/ImageSlider.js)
+ *   --slider-per-view    photos in view (default 1)
+ *   --slider-gap         space between the photos
+ *   --slider-photo-height the photo height of a strip (.strip - the photos in their own widths)
+ * The size and the fit of the photos (object-fit) belong to the page: the slider shows what the storage sends.
+ */
+
+.ImageSlider {
+    --slider-per-view: 1;
+    --slider-gap: 0px;
+    position: relative;
+    overflow: hidden;
+    /* the width of its place, never of its photos (a flex or grid parent would stretch it) */
+    min-width: 0;
+    max-width: 100%;
+}
+
+.ImageSlider .viewport {
+    position: relative;
+    display: flex;
+    gap: var(--slider-gap);
+    transition: transform 0.5s ease-in-out;
+    user-select: none;
+}
+
+/* following the finger / the mouse */
+.ImageSlider .viewport.sliding {
+    transition: none;
+}
+
+.ImageSlider .viewport .item {
+    display: block;
+    box-sizing: border-box;
+    flex: 0 0 calc((100% - (var(--slider-per-view) - 1) * var(--slider-gap)) / var(--slider-per-view));
+}
+
+.ImageSlider .viewport .item IMG {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* a strip: the photos in their own widths at one height (the former GalleryTape) */
+.ImageSlider.strip {
+    --slider-gap: 4px;
+}
+
+.ImageSlider.strip .viewport .item {
+    flex: 0 0 auto;
+    padding: 5px;
+    border: 1px solid #dcdedb;
+    border-radius: 3px;
+}
+
+.ImageSlider.strip .viewport .item IMG {
+    width: auto;
+    height: var(--slider-photo-height, auto);
+}
+
+/* fade: the photos stacked, the current one shown */
+.ImageSlider.fade .viewport {
+    display: grid;
+}
+
+.ImageSlider.fade .viewport .item {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.ImageSlider.fade .viewport .item.active,
+.ImageSlider.fade:not(.ready) .viewport .item:first-child {
+    opacity: 1;
+    z-index: 1;
+}
+
+/* the arrows */
+.ImageSlider .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 1.67em;
+    line-height: 1.67em;
+    font-size: 2em;
+    text-align: center;
+    color: white;
+    background: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s;
+}
+
+.ImageSlider .nav-arrow:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.ImageSlider .nav-arrow.prev {
+    left: 0;
+    border-radius: 0 10px 10px 0;
+}
+
+.ImageSlider .nav-arrow.next {
+    right: 0;
+    border-radius: 10px 0 0 10px;
+}
+
+/* the dots - plain or small photos */
+.ImageSlider .dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1em;
+}
+
+.ImageSlider .dots .dot {
+    box-sizing: border-box;
+    width: 12px;
+    height: 12px;
+    border: 1px solid black;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.ImageSlider .dots .dot.active {
+    background: var(--theme-accent);
+}
+
+.ImageSlider .dots .dot.image {
+    width: 64px;
+    height: 64px;
+    border: 1px solid #cccccc;
+    border-radius: 0;
+    background: none;
+}
+
+.ImageSlider .dots .dot.image.active {
+    border-color: var(--theme-accent);
+}
+
+.ImageSlider .dots .dot IMG {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+}
