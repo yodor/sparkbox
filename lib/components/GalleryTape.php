@@ -24,6 +24,8 @@ class GalleryTapeItem extends DataIteratorItem implements IPhotoRenderer
 
         $this->image_popup = new ImagePopup();
         $this->image_popup->image()->setPhotoSize(0, ImageSize::Small);
+        //a tape can hold many photos, most of them outside its viewport - the browser loads them when shown
+        $this->image_popup->image()->setAttribute("loading", "lazy");
 
         $this->items()->append($this->image_popup);
     }
