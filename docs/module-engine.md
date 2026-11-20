@@ -228,8 +228,8 @@ below it, and the admin menu drops them.
 Scripts
 -------
 
-A path can be answered by a plain script that does all of its own work (headers, output). This is for the
-site home, files (`sitemap.xml`, a logo), and page scripts not yet converted to contents. The script of a
+A path can be answered by a plain script that does all of its own work (headers, output). This is for
+files (`sitemap.xml`, `robots.txt`, a logo) and a home that is not a content. The script of a
 path is `templates/modules/<module>/scripts/<path>.php` (the path keeps its dots: `sitemap.xml.php`; the
 module folder is `home.php`). The most specific one runs, or the file given with `addScriptPath()`. It runs
 after the redirects and the authorization, instead of the page.
