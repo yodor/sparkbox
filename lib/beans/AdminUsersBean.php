@@ -36,7 +36,9 @@ class AdminUsersBean extends UsersBean
 
     public function update(int $id, array $row, ?DBDriver $db = NULL) : int
     {
+        //the root administrator (userID 1): not suspended, not limited
         if ($id == 1 && (isset($row["suspend"]) && $row["suspend"] > 0)) throw new Exception("Root admin user is protected");
+        if ($id == 1 && isset($row["access_level"]) && strcmp((string)$row["access_level"], "Full Access") !== 0) throw new Exception("Root admin user is protected");
         return parent::update($id, $row, $db);
 
     }

@@ -1031,8 +1031,10 @@ class Module
         //fix/reformat
         $pathParam->setValue(Spark::PathParts($pathValue));
 
-        //absolute path from document root
+        //absolute path from document root - the module root is its folder with the slash (/admin/: the front controller
+        //answers /admin with a 301 to it)
         $script = Spark::PathParts(Module::Active()->getLocation(), $pathParam->value());
+        if (trim($pathParam->value(), "/") === "") $script = rtrim($script, "/") . "/";
         $result->remove("path");
         $result->setScriptName($script);
         return $result;

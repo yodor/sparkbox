@@ -68,7 +68,7 @@ templates/modules/<name>/menu.php              admin only: the menu (each layer)
 
 **The front controller.** Every address that is not a file of the site goes to the root `index.php`
 (`sparkbox/modules/main/index.php`, `Module::Route()`). The SparkBox block of the site root `.htaccess`
-(`dist/htaccess.dist`, written by `tools/site_deploy.php`): an address that is not a file or a folder goes to `index.php`, missing static files keep
+(`dist/htaccess.dist`, written by `tools/deploy.php`): an address that is not a file or a folder goes to `index.php`, missing static files keep
 the plain server 404, and the code folders `class/` and `config/` are refused (the server would run their files
 before any rewrite - the engine never sees those requests).
 
@@ -85,10 +85,11 @@ folder; `/admin/index.php?path=/settings` keeps working.
 its leading slash, anchored at both ends; its groups become the request parameters in their order. Patterns
 apply first in the response, before the redirects.
 
-**Module folders (before the front controller).** A module folder of its own in the document root still works:
-the server serves an existing folder before the root rewrite. `modules/admin/` (`index.php` with
-`Module::Run("admin")` and its `.htaccess`) is kept for a site that is not on the main module (max-electric links
-it); the other module entry folders are gone - their addresses are routes.
+**Module folders of a site.** A folder of its own in the document root still works: the server serves an existing
+folder before the root rewrite. A site that is not on the main module (its root is its own scripts) runs a module
+from such a folder: `admin/index.php` with `Module::Run("admin")` and an `.htaccess` that sends the addresses of
+the folder to it (`RewriteRule ^(.*)$ index.php?path=/$1 [QSA,L]` for what is not a file or folder). The core
+ships no module folders - `modules/main/index.php` is the front controller of the site root.
 
 
 The request, step by step
@@ -442,7 +443,7 @@ A frame, a module or a site adjusts a building block with a plain selector; it d
 specific one. `!important` reverses the order between layers (an earlier layer's important wins), so it is
 not used to override.
 
-**Theme tokens** (`sparkfront/css/theme.css`, loaded on every page) are the palette and the font:
+**Theme tokens** (`sparkfront/css/themes/<theme>.css` - `Config::THEME`, default `light` - loaded on every page) are the palette and the font:
 `--theme-font-family`, `--theme-text`, `--theme-background`, `--theme-accent`, `--theme-accent-light`,
 `--theme-accent-dark`, `--theme-link`, `--theme-surface`, `--theme-error`. The store and the site set them in
 their `:root`. **Component tokens** (`--spark-button-*`, `--spark-dialog-*`, `--spark-action-color`) belong to

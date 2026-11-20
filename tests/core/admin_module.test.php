@@ -1,6 +1,6 @@
 <?php
 /**
- * The admin module without sparkstore - core part only (tests/app/admin -> modules/admin)
+ * The admin module without sparkstore - core part only (the route admin of tests/app/config/routes.php)
  */
 include_once(__DIR__ . "/../harness/http.php");
 

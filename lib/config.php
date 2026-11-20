@@ -248,6 +248,11 @@ enum Config
     const string TIMEZONE = "TIMEZONE";
 
     /**
+     * The theme of the site: the tokens of sparkfront/css/themes/<THEME>.css (default "light")
+     */
+    const string THEME = "THEME";
+
+    /**
      * App/Site Title
      * Default(string): Default SparkBox Site
      */

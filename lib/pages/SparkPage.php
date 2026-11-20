@@ -239,8 +239,8 @@ JS;
             $this->preferred_title = $this->pageContent->fallbackTitle();
         }
 
-        //the site default: the SEO settings of the admin (config section 'seo')
-        if (!$this->description) {
+        //the site default: the SEO settings of the admin (config section 'seo') - a site with a database
+        if (!$this->description && Spark::GetBoolean(Config::DB_ENABLED)) {
             $config = ConfigBean::Factory();
             $config->setSection("seo");
             $this->description = (string)$config->get("meta_description");

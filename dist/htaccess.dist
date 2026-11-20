@@ -1,5 +1,5 @@
 # BEGIN SparkBox
-# The SparkBox part of the site root .htaccess - written by tools/site_deploy.php from sparkbox/dist/htaccess.dist
+# The SparkBox part of the site root .htaccess - written by tools/deploy.php from sparkbox/dist/htaccess.dist
 # (lines outside BEGIN / END are the site's own and stay as they are; this block is written again on each deploy)
 #
 # PHP settings: servers running PHP as a module (Apache mod_php, LiteSpeed - e.g. Hostinger) read them from here.

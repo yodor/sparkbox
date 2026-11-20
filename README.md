@@ -33,20 +33,35 @@ Requirements
 Setting up a site
 -----------------
 
-1. Copy `dist/sparkboot.php.dist` to the document root as `sparkboot.php`. It defines `APP_PATH` and loads
-   `sparkbox.php` — every request goes through it.
-2. Run `php tools/site_deploy.php <document root>` (a dry run: it prints what it would change), then again with
-   `--write`. It writes the SparkBox block of the root `.htaccess` from `dist/htaccess.dist` (the
-   `include_path` and `auto_prepend_file` of PHP running as a server module - Apache mod_php, LiteSpeed; the
-   storage rewrite; the long caching of versioned CSS / JS; `class/` and `config/` refused; the front controller)
-   and keeps the site's own lines outside the block; it puts the front controller `index.php` in place
-   (`Module::Route()`), writes `config/routes.php` from the module links of the root when there is none, removes
-   those links with `--remove-links`, and checks the `sparkfront` (and `storefront`) links - without them the
-   pages are unstyled. `--sparkbox=` and `--app=` give the paths as the web server sees them.
-   PHP-FPM / CGI servers read `include_path` and `auto_prepend_file` from `.user.ini` instead
-   (`dist/user.ini.dist`).
-3. Create the configuration files in `APP_PATH/config/` (all optional except `dbconfig.php` when the
-   database is enabled). They are loaded in this order:
+**A new site** - from the checkout on the server (SSH), into an empty folder; the web root of the domain is then
+pointed to it (public_html as a link):
+
+```
+php sparkbox/tools/deploy.php --title="My Site" --folder=/home/<user>/sites/mysite \
+    --db=<name>:<password> --admin=<email>:<password>          # a core site
+php sparkstore/tools/deploy.php --title="My Shop" --folder=/home/<user>/sites/myshop \
+    --db=<name>:<password> --admin=<email>:<password>          # a store site (sparkbox next to sparkstore)
+```
+
+It writes the site: `sparkboot.php`, the front controller `index.php` (`Module::Route()`), the SparkBox block of
+`.htaccess` (`dist/htaccess.dist` with the paths of the server), `config/` (boot, settings, dbconfig, routes; a
+store site also include and store), the frame of the site (a core site: `class/pages/<Name>Page.php` on
+`SparkSitePage`; a store site: the `StoreFrame` setup in `class/templates/init.php`), `css/site.css` (the site
+layer), `robots.txt`, `.gitignore`; it links `sparkfront` (and `storefront` - with `symlink()`, else `ln -s`, else
+it prints the command); it creates every table of the beans and the root administrator (userID 1 - it can not be
+deleted, suspended or limited). The database name is also its user (`--dbhost=` for another host). Options:
+`--theme=light`, `--language=english:eng`, `--locale=en-us`, `--timezone=Europe/Sofia`; run it without arguments
+for the list.
+
+**An existing site** - the SparkBox part again (the `.htaccess` block, the front controller, `config/routes.php`
+from the module links, the links): `php tools/deploy.php --update --folder=<site root>` is a dry run, `--write`
+applies it, `--remove-links` removes the module links the routes answer. The site's own `.htaccess` lines stay;
+changed files keep a copy (`<file>.before-deploy`). `--sparkbox=` and `--app=` give the paths as the web server
+sees them. PHP-FPM / CGI servers read `include_path` and `auto_prepend_file` from `.user.ini` instead
+(`dist/user.ini.dist`).
+
+**The configuration files** in `APP_PATH/config/` (deploy writes them; all optional except `dbconfig.php` when the
+database is enabled). They are loaded in this order:
 
 | File | Purpose |
 |---|---|
@@ -191,8 +206,8 @@ Tools
 - `php tests/check_includes.php <site root>` - every class a file uses is reachable through its own
   `include_once` chain (no autoloader).
 - `php tools/storage_upgrade.php <site root> [--list] [--write]` - stored photos / files of the old format.
-- `php tools/site_deploy.php <site root> [--write] [--remove-links]` - the SparkBox part of a site root
-  (`.htaccess` block, front controller, routes, links); a dry run without `--write`.
+- `php tools/deploy.php` - a new site, or `--update` the SparkBox part of an existing one (see Setting up a site);
+  sparkstore has its own for a store site.
 
 
 Tests

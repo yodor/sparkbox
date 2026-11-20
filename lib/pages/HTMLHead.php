@@ -122,9 +122,10 @@ class HTMLHead extends Container implements IObserver
         $css = new ClosureComponent($this->renderCSS(...), false);
         $this->items()->append($css);
 
-        //the theme tokens - the palette and the font every component reads (sparkfront/css/theme.css); their layer
-        //decides, not the order: the store and the site set them in later layers
-        $this->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/theme.css");
+        //the theme tokens - the palette and the font every component reads (sparkfront/css/themes/<THEME>.css); their
+        //layer decides, not the order: the store and the site set them in later layers
+        $theme = preg_replace("/[^a-z0-9_-]/", "", strtolower((string)Spark::Get(Config::THEME))) ?: "light";
+        $this->addCSS(Spark::Get(Config::SPARK_LOCAL) . "/css/themes/" . $theme . ".css");
 
         $script = new ClosureComponent($this->renderScripts(...), false);
         $this->items()->append($script);

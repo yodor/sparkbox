@@ -1,7 +1,8 @@
 @layer components {
 
 /*
- * The theme tokens - the palette and the font of the site. The core gives the plain theme here; the store and the
+ * The theme 'light' - the tokens of the palette and the font (Config::THEME selects the file of
+ * sparkfront/css/themes/; another theme, 'dark' for example, is one more file with the same tokens). The store and the
  * site set their own in their stylesheet (':root { --theme-accent: ... }'), every component follows.
  * A component has its own tokens (--spark-button-*, --spark-dialog-*, --spark-action-color ...) that default to
  * these - a site sets a component token only where that component differs from the theme.
