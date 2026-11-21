@@ -372,7 +372,8 @@ final class Spark {
 
         Spark::Set(Config::SITE_URL, $locationURL->fullURL()->toString() , true);
 
-        Spark::Set(Config::COOKIE_DOMAIN, ".".$site_domain, true); // or .domain.com
+        //a cookie domain has no port (a site on a dev port: localhost:8080 - the browser drops the cookie)
+        Spark::Set(Config::COOKIE_DOMAIN, "." . preg_replace("/:\\d+$/", "", (string)$site_domain), true);
 
         //$umf = Marshall::FromByteLabel(ini_get("upload_max_filesize"));
         Spark::Set(Config::UPLOAD_MAX_SIZE, Marshall::FromByteLabel(ini_get("post_max_size")), true);
