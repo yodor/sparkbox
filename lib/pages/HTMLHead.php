@@ -297,6 +297,19 @@ class HTMLHead extends Container implements IObserver
     }
 
     /**
+     * A meta property tag by its full name, next to the Open Graph tags (e.g. 'product:price:amount')
+     * @param string $property the full property name
+     * @param string $value the contents of this tag
+     */
+    public function addPropertyTag(string $property, string $value) : void
+    {
+        $meta = new Meta();
+        $meta->setProperty($property);
+        $meta->setContent($value);
+        $this->opengraph["property:$property"] = $meta;
+    }
+
+    /**
      * Adds a JavaScript code reference by URL to the javascript collection
      * @param string $url The url of the javascript code
      */

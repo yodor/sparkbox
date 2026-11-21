@@ -261,7 +261,8 @@ JS;
         $title = strip_tags($this->preferred_title);
         $this->head()->setTitle($title);
 
-        $meta_description = Spark::MetaDescription($this->description);
+        //search engines show about 155-160 characters
+        $meta_description = Spark::MetaDescription($this->description, 160);
         $this->head()->addMeta("description", $meta_description);
     }
 

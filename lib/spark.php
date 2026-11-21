@@ -647,7 +647,11 @@ final class Spark {
 
         $value = str_replace("\\r\\n", " ", $value);
         $value = Spark::ReplaceTags($value);
-        $value = preg_replace("/[^\wA-Za-z0-9\-\%\?\!\;\:\.\, ]/u", "",$value);
+        //the text of the entities ('&quot;' was left as 'quot;') - the attribute escapes it again when written
+        $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, "UTF-8");
+        //control and format characters out, the spaces as one
+        $value = preg_replace("/[\p{Cc}\p{Cf}]+/u", " ", $value);
+        $value = preg_replace("/\s+/u", " ", $value);
 
         $value = trim($value);
         //longer than max_length: cut to the size, then back to the last space (when there is one)
