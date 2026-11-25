@@ -5,8 +5,8 @@
  * Google (consent 'update') and the Facebook pixel (consent grant / revoke) when it is made; SparkGTM applies the
  * stored choice on every later page before anything is sent. Nothing is sent before a choice.
  *
- * The panel (the store frame: StoreCookies) is the element '.section.cookies': attribute accepted="false" shows it,
- * "true" hides it; attribute settings="true" shows the choices (checkboxes name='analytics' / name='ads').
+ * The panel (CookiesPanel; in the store frame StoreCookies) is the element '.section.cookies': attribute
+ * accepted="false" shows it, "true" hides it; attribute settings="true" shows the choices (checkboxes name='analytics' / name='ads').
  * Its buttons call acceptAll(), rejectAll(), showSettings(), saveSettings(); open() shows it again (the footer).
  */
 class SparkCookies extends SparkObject

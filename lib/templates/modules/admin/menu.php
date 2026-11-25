@@ -22,6 +22,7 @@ $menu->append($settings);
 
 $settings->append(new MenuItem("Admins", "admins"));
 $settings->append(new MenuItem("SEO", "seo"));
+$settings->append(new MenuItem("Marketing", "marketing"));
 $languages = new MenuItem("Languages", "languages");
 $translator = new MenuItem("Translator", "translator");
 $languages->append($translator);

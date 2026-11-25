@@ -8,6 +8,9 @@ include_once("utils/menu/MenuItemList.php");
 include_once("utils/menu/BeanMenuFactory.php");
 include_once("utils/menu/IMenuAddresses.php");
 include_once("templates/TemplateContent.php");
+include_once("components/CookiesPanel.php");
+include_once("utils/script/Marketing.php");
+include_once("objects/data/GTMQueue.php");
 
 /**
  * The frame of a core site: the header (logo, name, a line under it), the main menu, the content, the footer.
@@ -17,8 +20,10 @@ include_once("templates/TemplateContent.php");
  * Markup: div.frame > header.site_header > a.home > img.logo, .names > .name, .line
  *                   > nav.site_menu > .MenuBar
  *                   > main.site_main > the content
- *                   > footer.site_footer
+ *                   > footer.site_footer (> a.cookies when the site tracks)
+ *         aside.section.cookies - the consent panel (CookiesPanel), when the site tracks
  * The main menu selects the item of the requested address, else of the addresses the content names (IMenuAddresses).
+ * The tracking of Settings > Marketing (Marketing) and the queued events (GTMQueue) go into the head.
  */
 class SparkSitePage extends SparkPage
 {
@@ -53,10 +58,37 @@ class SparkSitePage extends SparkPage
         $this->main->setComponentClass("site_main");
         $this->frame->items()->append($this->main);
 
+        $tracking = Marketing::Enabled();
+
         $footer = $this->createFooter();
+        if ($footer instanceof Container && $tracking) {
+            //the consent can be changed at any time
+            $link = new Component(false);
+            $link->setTagName("a");
+            $link->setComponentClass("cookies");
+            $link->setAttribute("href", CookiesPanel::OPEN_URL);
+            $link->setText(tr("Бисквитки"));
+            $footer->items()->append($link);
+        }
         if ($footer instanceof Component) $this->frame->items()->append($footer);
 
         $this->items()->append($this->frame);
+
+        if ($tracking) $this->items()->append(new CookiesPanel());
+    }
+
+    protected function headInitialize() : void
+    {
+        parent::headInitialize();
+        //the tracking of the site (Settings > Marketing) - after the consent defaults of SparkGTM.js
+        Marketing::AddTo($this->head());
+    }
+
+    protected function headFinalize() : void
+    {
+        parent::headFinalize();
+        //the events of the previous request (a POST that redirected here)
+        GTMQueue::Flush($this->head());
     }
 
     /**
@@ -137,12 +169,12 @@ class SparkSitePage extends SparkPage
     }
 
     /**
-     * The footer: '© <year> <site title>' - null for none
+     * The footer: '© <year> <site title>' (its text; the cookies link is appended to a Container) - null for none
      * @return Component|null
      */
     protected function createFooter() : ?Component
     {
-        $footer = new Component(false);
+        $footer = new Container(false);
         $footer->setTagName("footer");
         $footer->setComponentClass("site_footer");
         $footer->setText("© " . date("Y") . " " . Spark::Get(Config::SITE_TITLE));

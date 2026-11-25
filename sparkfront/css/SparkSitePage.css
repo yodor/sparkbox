@@ -61,6 +61,12 @@
     opacity: 0.8;
 }
 
+/* the cookie settings (the consent panel again) - when the site tracks */
+.site_footer .cookies {
+    margin-left: 1em;
+    color: inherit;
+}
+
 @media (max-width: 700px) {
     .site_header {
         padding: 16px;

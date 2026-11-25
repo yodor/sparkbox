@@ -1,0 +1,73 @@
+@layer components {
+
+/* the cookie consent panel (lib/components/CookiesPanel.php, js SparkCookies) - shown until a choice */
+
+.section.cookies {
+    position: fixed;
+    z-index: 11;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: none;
+}
+
+.section.cookies[accepted="false"] {
+    display: grid;
+}
+
+.section.cookies .content {
+    padding: 2em;
+}
+
+.section.cookies .content .info {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.section.cookies .content .info .text A {
+    color: white;
+    text-decoration: underline;
+}
+
+/* the choices - shown by 'Settings' */
+.section.cookies .content .info .choices {
+    display: none;
+    flex-wrap: wrap;
+    gap: 1.5em;
+}
+
+.section.cookies[settings="true"] .content .info .choices {
+    display: flex;
+}
+
+.section.cookies .content .info .choices label {
+    cursor: pointer;
+}
+
+.section.cookies .content .info .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: flex-end;
+}
+
+/* Accept all and Reject look the same (an equal choice) */
+.section.cookies .content .info .buttons .ColorButton {
+    min-width: 10em;
+    text-align: center;
+}
+
+.section.cookies .content .info .buttons .save,
+.section.cookies[settings="true"] .content .info .buttons .settings {
+    display: none;
+}
+
+.section.cookies[settings="true"] .content .info .buttons .save {
+    display: inline-block;
+}
+
+}

@@ -4,6 +4,8 @@ include_once("forms/ContactRequestForm.php");
 include_once("mailers/ContactRequestMailer.php");
 include_once("objects/data/GTMConversionCommand.php");
 include_once("objects/data/GTMCommand.php");
+include_once("objects/data/GTMConvParam.php");
+include_once("utils/script/Marketing.php");
 
 /**
  * Contact enquiry in a JSONFormDialog - passed through to the owner by e-mail, nothing is stored.
@@ -70,12 +72,16 @@ class ContactRequestFormResponder extends JSONFormResponder
     }
 
     /**
-     * Marketing conversion sent to the page after the enquiry was sent - none here (the store reads its marketing config)
-     * @return GTMConversionCommand|null
+     * The Google Ads conversion of the enquiry (Settings > Marketing) - sent to the page after the enquiry was sent
+     */
+    protected GTMConvParam $conversionParam = GTMConvParam::CONTACT_REQUEST;
+
+    /**
+     * @return GTMConversionCommand|null the conversion of conversionParam, null when it is not set
      */
     protected function conversion() : ?GTMConversionCommand
     {
-        return null;
+        return Marketing::Conversion($this->conversionParam);
     }
 
     /**
