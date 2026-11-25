@@ -82,7 +82,7 @@ enum Config
 
     /**
      * Prefix of the SparkBox cookie names (Session: the session 'sb_session', the logins, the language) - the
-     * cookies of another application or of an older SparkBox (PHPSESSID) do not collide with them.
+     * cookies of another application on the same host do not collide with them.
      * Default 'sb_'
      * (string)
      */

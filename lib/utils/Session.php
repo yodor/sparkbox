@@ -8,12 +8,6 @@ class Session
     const string ALERT = "alert";
 
     /**
-     * The session cookie of the PHP default (before the SparkBox names) - a session found under it is carried over
-     * once to the SparkBox name (Start)
-     */
-    const string LEGACY_SESSION = "PHPSESSID";
-
-    /**
      * The name of the session cookie: the cookie prefix + 'session' (Config::COOKIE_PREFIX)
      */
     public static function Name() : string
@@ -22,11 +16,11 @@ class Session
     }
 
     /**
-     * The visitor has a session cookie (the SparkBox one, or the legacy one to carry over)
+     * The visitor has a session cookie
      */
     protected static function HaveSessionCookie() : bool
     {
-        return isset($_COOKIE[Session::Name()]) || isset($_COOKIE[Session::LEGACY_SESSION]);
+        return isset($_COOKIE[Session::Name()]);
     }
 
     /**
@@ -53,13 +47,6 @@ class Session
             }
 
             session_name(Session::Name());
-            //a session of the legacy cookie (PHPSESSID - before the SparkBox names): carried over once. The strict
-            //mode below starts a new session for an id this site does not know (another site's cookie). Two or more
-            //PHPSESSID cookies (a parent domain site's and this one's) - which is ours is unknown: none is taken.
-            $legacy = (!isset($_COOKIE[Session::Name()]) && isset($_COOKIE[Session::LEGACY_SESSION]))
-                ? (string)$_COOKIE[Session::LEGACY_SESSION] : "";
-            $sent = preg_match_all("/(?:^|;)\\s*" . Session::LEGACY_SESSION . "=/", (string)($_SERVER["HTTP_COOKIE"] ?? ""));
-            if ($legacy !== "" && $sent === 1 && preg_match("/^[a-zA-Z0-9,-]{22,256}$/", $legacy)) session_id($legacy);
 
             // Grouped cookie parameters - this replaces individual ini_set calls for cookies
             session_set_cookie_params([
@@ -81,16 +68,6 @@ class Session
 
             SparkEventManager::emit(new SessionEvent(SessionEvent::STARTING));
             session_start();
-
-            if ($legacy !== "") {
-                //session_start sent the cookie under the SparkBox name (the request had none); the legacy cookie
-                //removed - the host-only one and the one of the old '.host' domain
-                $params = session_get_cookie_params();
-                setcookie(Session::LEGACY_SESSION, "", 1, $params["path"], "", true, true);
-                $host = (string)preg_replace("/:\\d+$/", "", (string)($_SERVER["HTTP_HOST"] ?? ""));
-                if ($host !== "") setcookie(Session::LEGACY_SESSION, "", 1, $params["path"], "." . $host, true, true);
-                unset($_COOKIE[Session::LEGACY_SESSION]);
-            }
 
             // 2. Rule the headers
             header("Cache-Control: private, must-revalidate, max-age=0");

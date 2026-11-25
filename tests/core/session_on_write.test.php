@@ -54,32 +54,10 @@ test("the session cookie is the site's own: the SparkBox name, no Domain attribu
     assertTrue(!preg_match("#;\\s*domain=#i", $line), "host-only (a parent / sub domain site does not get it): " . $line);
 });
 
-test("a session of the legacy PHPSESSID cookie is carried over once; an unknown one is not taken", function () {
-    [, $headers] = httpRequest("admin/index.php", "path=%2Flogin", array(), "/admin/login");
+test("a PHPSESSID cookie (another application's, or of the SparkBox before 198) is not read", function () {
+    [, $headers] = httpRequest("index.php", "", array("Cookie" => "PHPSESSID=" . str_repeat("a1b2c3d4", 4)), "/");
+    assertSame(0, sessionCookies($headers), "no session for a public page");
+    [, $headers] = httpRequest("admin/index.php", "path=%2Flogin", array("Cookie" => "PHPSESSID=" . str_repeat("a1b2c3d4", 4)), "/admin/login");
     $id = setCookieValue($headers, Session::Name());
-    assertTrue($id !== "", "a session");
-
-    //the same session under the old name: kept, moved to the SparkBox name, the old cookie removed
-    [, $headers] = httpRequest("admin/index.php", "path=%2Flogin", array("Cookie" => "PHPSESSID=$id"), "/admin/login");
-    assertSame($id, setCookieValue($headers, Session::Name()), "carried over with its id");
-    $sent = array_filter($headers["set-cookie"], fn($c) => str_starts_with((string)$c, Session::Name() . "="));
-    assertSame(1, count($sent), "one session cookie");
-    $removed = array();
-    foreach ((array)($headers["set-cookie-raw"] ?? array()) as $line) {
-        if (!preg_match("#^PHPSESSID=deleted;.*expires=#i", (string)$line)) continue;
-        $removed[] = preg_match("#;\\s*domain=([^;]+)#i", (string)$line, $m) ? strtolower(trim($m[1])) : "host-only";
-    }
-    sort($removed);
-    assertSame(array(".localhost", "host-only"), $removed, "the PHPSESSID cookies removed: host-only and the old '.host' one");
-
-    //an id this site does not know (another site's cookie): a new session, not that id
-    $foreign = str_repeat("a1b2c3d4", 4);
-    [, $headers] = httpRequest("admin/index.php", "path=%2Flogin", array("Cookie" => "PHPSESSID=$foreign"), "/admin/login");
-    $new = setCookieValue($headers, Session::Name());
-    assertTrue($new !== "" && $new !== $foreign, "a new session: " . $new);
-
-    //two PHPSESSID cookies (a parent domain site's and this site's): which one is ours is unknown - a new session
-    [, $headers] = httpRequest("admin/index.php", "path=%2Flogin", array("Cookie" => "PHPSESSID=$id; PHPSESSID=$foreign"), "/admin/login");
-    $new = setCookieValue($headers, Session::Name());
-    assertTrue($new !== "" && $new !== $id, "a new session for two legacy cookies: " . $new);
+    assertTrue($id !== "" && $id !== str_repeat("a1b2c3d4", 4), "a new session of its own: " . $id);
 });

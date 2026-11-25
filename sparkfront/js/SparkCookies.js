@@ -19,8 +19,6 @@ class SparkCookies extends SparkObject
             secure: location.protocol === "https:",
             sameSite: 'Lax'
         };
-        //the cookies of the earlier panel (consent by continuing to browse) - not a valid choice, asked again
-        SparkCookies.OLD_COOKIES = ["accept_cookies", "consent_user"];
 
         onPageLoad(() => this.updateCookiesPanel());
     }
@@ -68,7 +66,6 @@ class SparkCookies extends SparkObject
      * @param ads {boolean}
      */
     choose(analytics, ads) {
-        SparkCookies.OLD_COOKIES.forEach((name) => Cookies.remove(name, {path: SparkCookies.COOKIE_ATTRIBUTES.path}));
         Cookies.set(SparkGTM.CONSENT_COOKIE, JSON.stringify({analytics: analytics, ads: ads}), SparkCookies.COOKIE_ATTRIBUTES);
 
         let consent = new SparkEvent(SparkEvent.GTM_EVENT, null);
