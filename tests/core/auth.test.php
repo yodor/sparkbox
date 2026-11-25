@@ -15,3 +15,13 @@ test("RandomToken: requested length, hex, not repeating", function () {
     for ($i = 0; $i < 200; $i++) $tokens[] = Authenticator::RandomToken(16);
     assertSame(200, count(array_unique($tokens)), "repeated tokens");
 });
+
+test("logout finds the context cookies under the SparkBox prefix (Session::CookieKeys)", function () {
+    $saved = $_COOKIE;
+    $_COOKIE = array("sb_AdminContext_hash" => "h", "sb_AdminContext_id" => "1", "AdminContext_hash" => "other site", "sb_UserContext_id" => "2");
+    $keys = Session::CookieKeys("AdminContext");
+    sort($keys);
+    assertSame(array("AdminContext_hash", "AdminContext_id"), $keys);
+    assertSame("h", Session::GetCookie("AdminContext_hash"));
+    $_COOKIE = $saved;
+});

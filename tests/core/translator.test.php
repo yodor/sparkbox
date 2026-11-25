@@ -27,14 +27,14 @@ $pdo->exec("INSERT INTO translation_beans (table_name, field_name, bean_id, tran
 
 //enabled with its data in place - language.php starts the translator when it is included (as at boot)
 Spark::Set(Config::TRANSLATOR_ENABLED, true);
-unset($_COOKIE[Translator::KEY_LANGUAGE_ID]);
+Session::ClearCookie(Translator::KEY_LANGUAGE_ID);
 include_once("utils/language.php");
 
 test("the default language is the configured one, not the first", function () {
     assertTrue(Translator::Instance()->isEnabled(), "translator enabled");
     assertSame(2, Translator::Instance()->activeID());
     assertSame("bgn", Translator::Instance()->activeCode());
-    assertSame("2", $_COOKIE[Translator::KEY_LANGUAGE_ID] ?? "", "the language cookie");
+    assertSame("2", Session::GetCookie(Translator::KEY_LANGUAGE_ID), "the language cookie");
 });
 
 test("phrases: translated, untranslated and new from one map", function () use ($pdo) {

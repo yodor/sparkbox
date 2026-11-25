@@ -7,6 +7,36 @@ class Session
 
     const string ALERT = "alert";
 
+    /**
+     * The session cookie of the PHP default (before the SparkBox names) - a session found under it is carried over
+     * once to the SparkBox name (Start)
+     */
+    const string LEGACY_SESSION = "PHPSESSID";
+
+    /**
+     * The name of the session cookie: the cookie prefix + 'session' (Config::COOKIE_PREFIX)
+     */
+    public static function Name() : string
+    {
+        return Spark::Get(Config::COOKIE_PREFIX, "sb_") . "session";
+    }
+
+    /**
+     * The visitor has a session cookie (the SparkBox one, or the legacy one to carry over)
+     */
+    protected static function HaveSessionCookie() : bool
+    {
+        return isset($_COOKIE[Session::Name()]) || isset($_COOKIE[Session::LEGACY_SESSION]);
+    }
+
+    /**
+     * The name of a SparkBox cookie: the cookie prefix + '$key'
+     */
+    protected static function CookieName(string $key) : string
+    {
+        return Spark::Get(Config::COOKIE_PREFIX, "sb_") . $key;
+    }
+
     private function __construct()
     {
 
@@ -21,6 +51,15 @@ class Session
             if (headers_sent($filename, $line)) {
                 throw new Exception("Headers have already been sent: " . $filename. " : ". $line);
             }
+
+            session_name(Session::Name());
+            //a session of the legacy cookie (PHPSESSID - before the SparkBox names): carried over once. The strict
+            //mode below starts a new session for an id this site does not know (another site's cookie). Two or more
+            //PHPSESSID cookies (a parent domain site's and this one's) - which is ours is unknown: none is taken.
+            $legacy = (!isset($_COOKIE[Session::Name()]) && isset($_COOKIE[Session::LEGACY_SESSION]))
+                ? (string)$_COOKIE[Session::LEGACY_SESSION] : "";
+            $sent = preg_match_all("/(?:^|;)\\s*" . Session::LEGACY_SESSION . "=/", (string)($_SERVER["HTTP_COOKIE"] ?? ""));
+            if ($legacy !== "" && $sent === 1 && preg_match("/^[a-zA-Z0-9,-]{22,256}$/", $legacy)) session_id($legacy);
 
             // Grouped cookie parameters - this replaces individual ini_set calls for cookies
             session_set_cookie_params([
@@ -42,6 +81,16 @@ class Session
 
             SparkEventManager::emit(new SessionEvent(SessionEvent::STARTING));
             session_start();
+
+            if ($legacy !== "") {
+                //session_start sent the cookie under the SparkBox name (the request had none); the legacy cookie
+                //removed - the host-only one and the one of the old '.host' domain
+                $params = session_get_cookie_params();
+                setcookie(Session::LEGACY_SESSION, "", 1, $params["path"], "", true, true);
+                $host = (string)preg_replace("/:\\d+$/", "", (string)($_SERVER["HTTP_HOST"] ?? ""));
+                if ($host !== "") setcookie(Session::LEGACY_SESSION, "", 1, $params["path"], "." . $host, true, true);
+                unset($_COOKIE[Session::LEGACY_SESSION]);
+            }
 
             // 2. Rule the headers
             header("Cache-Control: private, must-revalidate, max-age=0");
@@ -112,7 +161,7 @@ class Session
         if (!Session::$Started) {
             //no session cookie - nothing is stored for this visitor: a read does not start a session (no session
             //cookie for the visitors who only read - the public pages stay cacheable); a write (Set) starts it
-            if (!Session::HaveCookie(session_name())) return false;
+            if (!Session::HaveSessionCookie()) return false;
             Session::Start();
         }
         return isset($_SESSION[$key]);
@@ -143,7 +192,7 @@ class Session
      */
     public static function SetIfActive(string $key, mixed $val) : void
     {
-        if (!Session::$Started && !Session::HaveCookie(session_name())) return;
+        if (!Session::$Started && !Session::HaveSessionCookie()) return;
         Session::Set($key, $val);
     }
 
@@ -154,9 +203,14 @@ class Session
         }
     }
 
+    /**
+     * A SparkBox cookie '$key' (the name gets Config::COOKIE_PREFIX) - secure, http only, the site's own
+     * (Config::COOKIE_DOMAIN)
+     */
     public static function SetCookie(string $key, string $val, $expire = 0) : void
     {
         $cookiePath = Spark::Get(Config::LOCAL) ?: "/";
+        $key = Session::CookieName($key);
 
         $_COOKIE[$key] = $val;
 
@@ -180,6 +234,7 @@ class Session
     public static function ClearCookie(string $key) : void
     {
         $cookiePath = Spark::Get(Config::LOCAL) ?: "/";
+        $key = Session::CookieName($key);
 
         if (headers_sent()) {
             Debug::ErrorLog("Cookie '$key' not cleared - headers already sent");
@@ -199,14 +254,29 @@ class Session
         }
     }
 
+    /**
+     * The keys (without Config::COOKIE_PREFIX) of the SparkBox cookies of this request starting with '$start'
+     * @return string[]
+     */
+    public static function CookieKeys(string $start = "") : array
+    {
+        $prefix = Session::CookieName("");
+        $keys = array();
+        foreach (array_keys($_COOKIE) as $name) {
+            $name = (string)$name;
+            if (str_starts_with($name, $prefix . $start)) $keys[] = substr($name, strlen($prefix));
+        }
+        return $keys;
+    }
+
     public static function GetCookie(string $key, string $default = "") : string
     {
-        return $_COOKIE[$key] ?? $default;
+        return $_COOKIE[Session::CookieName($key)] ?? $default;
     }
 
     public static function HaveCookie(string $key) : bool
     {
-        return isset($_COOKIE[$key]);
+        return isset($_COOKIE[Session::CookieName($key)]);
     }
 
     public static function SetAlert(string $msg) : void

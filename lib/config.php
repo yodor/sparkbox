@@ -73,10 +73,20 @@ enum Config
 
     /**
      * Domain for cookies.
-     * Default '.SITE_DOMAIN'
-     * Static(string)
+     * Default '' - the site's own cookies (host-only, no Domain attribute): a parent domain site and its
+     * subdomain sites never see each other's session or login. '.example.com' in config/settings.php shares the
+     * cookies with every subdomain of example.com.
+     * (string)
      */
     const string COOKIE_DOMAIN = "COOKIE_DOMAIN";
+
+    /**
+     * Prefix of the SparkBox cookie names (Session: the session 'sb_session', the logins, the language) - the
+     * cookies of another application or of an older SparkBox (PHPSESSID) do not collide with them.
+     * Default 'sb_'
+     * (string)
+     */
+    const string COOKIE_PREFIX = "COOKIE_PREFIX";
 
     /**
      * App/Site current full absolute URL ending slash '/'

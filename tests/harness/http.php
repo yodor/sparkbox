@@ -1,7 +1,8 @@
 <?php
 /**
  * Run a request of the test application (tests/app) through php-cgi and the real sparkbox.php bootstrap.
- * Returns array(status, headers (lower case names), body). headers["set-cookie"] is a list of "name=value".
+ * Returns array(status, headers (lower case names), body). headers["set-cookie"] is a list of "name=value",
+ * headers["set-cookie-raw"] the whole Set-Cookie lines (with the attributes).
  * Options: root, include_path, prepend, script_file (absolute path of a script outside the document root),
  * post (array of fields - sends a POST request with them).
  */
@@ -63,14 +64,15 @@ function httpRequest(string $script, string $query = "", array $headers = array(
     $body = ($split === false) ? "" : substr($output, $split + 4);
 
     $status = 200;
-    $parsed = array("set-cookie" => array());
+    $parsed = array("set-cookie" => array(), "set-cookie-raw" => array());
     foreach (explode("\r\n", $head) as $line) {
         if (!str_contains($line, ":")) continue;
         [$name, $value] = array_map("trim", explode(":", $line, 2));
         $name = strtolower($name);
         if ($name === "status") $status = (int)$value;
         if ($name === "set-cookie") {
-            //cookie name=value only - for sending back with the 'Cookie' header
+            //cookie name=value only - for sending back with the 'Cookie' header; the whole lines in 'set-cookie-raw'
+            $parsed["set-cookie-raw"][] = $value;
             $parsed["set-cookie"][] = explode(";", $value, 2)[0];
             continue;
         }

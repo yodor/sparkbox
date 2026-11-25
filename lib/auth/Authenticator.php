@@ -51,10 +51,8 @@ abstract class Authenticator
     public function logout() : void
     {
         $this->session->destroy();
-        foreach ($_COOKIE as $key => $val) {
-            if (str_starts_with($key, $this->session->name())) {
-                Session::ClearCookie($key);
-            }
+        foreach (Session::CookieKeys($this->session->name()) as $key) {
+            Session::ClearCookie($key);
         }
         Session::Destroy();
     }
