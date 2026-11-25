@@ -67,7 +67,7 @@ class SparkSitePage extends SparkPage
             $link->setTagName("a");
             $link->setComponentClass("cookies");
             $link->setAttribute("href", CookiesPanel::OPEN_URL);
-            $link->setText(tr("Бисквитки"));
+            $link->setText(tr("Cookies"));
             $footer->items()->append($link);
         }
         if ($footer instanceof Component) $this->frame->items()->append($footer);

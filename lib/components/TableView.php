@@ -24,7 +24,7 @@ class TableView extends AbstractResultView implements IHeadContents
         parent::__construct($itr);
 
         $this->header->setRenderEnabled(false);
-        $this->list_empty->setContents("No elements in this collection yet");
+        $this->list_empty->setContents(tr("No elements in this collection yet"));
 
     }
 

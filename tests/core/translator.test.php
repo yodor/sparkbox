@@ -70,3 +70,20 @@ test("a new languages table: English (the code) and the language of the site, tw
     $rows = $pdo->query("SELECT lang_code, language FROM languages ORDER BY langID")->fetchAll(PDO::FETCH_NUM);
     assertSame(array(array("en", "english"), array("bg", "bulgarian")), $rows);
 });
+
+test("the texts of the scripts: HTMLHead::addTexts gives the page their translations (document.Spark.texts)", function () {
+    include_once("pages/HTMLHead.php");
+    $head = HTMLHead::Instance();
+    $head->addTexts("Clear", "Offices: %s", "Not translated text", "");
+    $texts = $head->texts();
+    assertSame("Изчисти", $texts["Clear"] ?? null);
+    assertSame("Офиси: %s", $texts["Offices: %s"] ?? null, "a format stays a format - the JS tr() fills it");
+    assertSame("Not translated text", $texts["Not translated text"] ?? null);
+    assertTrue(!isset($texts[""]), "no empty text");
+    $render = new ReflectionMethod(HTMLHead::class, "renderTexts");
+    ob_start();
+    $render->invoke($head);
+    $html = (string)ob_get_clean();
+    assertTrue(str_contains($html, "(document.Spark = document.Spark || {}).texts = {"), $html);
+    assertTrue(str_contains($html, '"Clear":"Изчисти"'), $html);
+});

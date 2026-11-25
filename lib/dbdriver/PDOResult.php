@@ -63,7 +63,7 @@ class PDOResult extends DBResult
             return $record;
 
         } catch (PDOException $e) {
-            $this->free(); // Затваряме и при грешка, за да не "забие" драйвера
+            $this->free(); // closed on an error too, so the driver is not left blocked
             throw new Exception("PDO Fetch Error: " . $e->getMessage());
         }
 

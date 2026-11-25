@@ -78,8 +78,8 @@ class OptionFinder extends Container
         $this->hint->setComponentClass("hint");
         $this->items()->append($this->hint);
 
-        $this->hintEmpty = tr("Въведете първите букви");
-        $this->hintNone = tr("Няма намерени");
+        $this->hintEmpty = tr("Type the first letters");
+        $this->hintNone = tr("Nothing found");
     }
 
     public function requiredStyle(): array

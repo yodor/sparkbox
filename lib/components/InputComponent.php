@@ -26,7 +26,7 @@ class InputComponent extends Container
         $this->items()->append($this->closure);
 
         $this->translator = new Action("TranslateBeanField");
-        $this->translator->setContents("Translate");
+        $this->translator->setContents(tr("Translate"));
         $this->translator->setRenderEnabled(false);
         $this->items()->append($this->translator);
 
@@ -84,7 +84,7 @@ class InputComponent extends Container
         //stays: the sort select of ResultViewHeader)
         $input = $this->dataInput->getRenderer()->input();
         if ($input instanceof Input && !($this->dataInput->getRenderer() instanceof HiddenField) && $input->getAttribute("aria-label") === "") {
-            $caption = trim(html_entity_decode(strip_tags($this->dataInput->getLabel()), ENT_QUOTES | ENT_HTML5, "UTF-8"));
+            $caption = trim(html_entity_decode(strip_tags(tr($this->dataInput->getLabel())), ENT_QUOTES | ENT_HTML5, "UTF-8"));
             if ($caption !== "") $input->setAttribute("aria-label", $caption);
         }
 

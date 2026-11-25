@@ -74,7 +74,8 @@ class InputLabel extends LabelSpan implements IErrorRenderer
         parent::finalize();
         $this->processErrorAttributes();
 
-        $this->label->setContents($this->dataInput->getLabel());
+        //the label is an English text of the code (a key of the language packs) or a text of the site
+        $this->label->setContents(tr($this->dataInput->getLabel()));
 
         if ($this->dataInput->isRequired()) {
             if ($this->dataInput->getForm() && $this->dataInput->getForm()->star_required) {

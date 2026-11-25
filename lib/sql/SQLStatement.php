@@ -138,7 +138,7 @@ abstract class SQLStatement implements ISQLGet, IBindingCollection, IBindingModi
 
         $name = trim($name);
 
-        //Cover cases like "node.catID", "user-name" или "table alias.field"
+        //Cover cases like "node.catID", "user-name" or "table alias.field"
         $safeName = preg_replace('/[^a-zA-Z0-9_]/', '_', $name);
 
         //No starting digit (PDO requirement) - append "p_"

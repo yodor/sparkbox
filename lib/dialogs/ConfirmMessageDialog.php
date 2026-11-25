@@ -20,13 +20,13 @@ class ConfirmMessageDialog extends MessageDialog
     protected function initButtons() : void
     {
         $btn_ok = new Button();
-        $btn_ok->setContents("OK");
+        $btn_ok->setContents(tr("OK"));
         $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
         $btn_ok->setAttribute("default_action", 1);
         $this->buttonsBar->items()->append($btn_ok);
 
         $btn_cancel = new Button();
-        $btn_cancel->setContents("Cancel");
+        $btn_cancel->setContents(tr("Cancel"));
         $btn_cancel->setAttribute("action", MessageDialog::BUTTON_ACTION_CANCEL);
         $this->buttonsBar->items()->append($btn_cancel);
     }

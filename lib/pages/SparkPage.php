@@ -121,6 +121,8 @@ JS;
         $this->head()->addScript($sparkJS);
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkObject.js");
+        //tr() of the scripts - the translations of their texts (HTMLHead::addTexts)
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/Translate.js");
         //boot scripts (not deferred in bundles): the inline code of a page calls onPageLoad() and gtag() as it is parsed
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkEvent.js", true);
 

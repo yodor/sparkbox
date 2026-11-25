@@ -25,7 +25,7 @@ class ResultViewFooter extends Container
         $pager = new ClosureComponent($this->renderPageSelector(...));
         $pager->setComponentClass("pager");
         $pager->setTagName("nav");
-        $pager->setAttribute("aria-label", "Product listing pagination");
+        $pager->setAttribute("aria-label", tr("Pages of the list"));
         $this->items()->append($pager);
 
         $this->resultsInfo = new LabelSpan(tr("Results"), "0");

@@ -45,7 +45,7 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
 
         $title = new Component(false);
         $title->setComponentClass("Title");
-        $title->setContents("Message");
+        $title->setContents(tr("Message"));
         $header->items()->append($title);
         $this->title = $title;
 
@@ -135,7 +135,7 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
     protected function initButtons() : void
     {
         $btn_ok = new Button();
-        $btn_ok->setContents("OK");
+        $btn_ok->setContents(tr("OK"));
         $btn_ok->setAttribute("action", MessageDialog::BUTTON_ACTION_CONFIRM);
         $btn_ok->setAttribute("default_action", 1);
         $this->buttonsBar->items()->append($btn_ok);

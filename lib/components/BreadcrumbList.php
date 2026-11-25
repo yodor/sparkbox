@@ -28,7 +28,7 @@ class BreadcrumbList extends Container implements IHeadContents
         parent::__construct(false);
         $this->setTagName("ul");
 
-        $this->setAttribute("aria-label", "Breadcrumb");
+        $this->setAttribute("aria-label", tr("Breadcrumb"));
 
         $this->setAttribute("itemscope");
         $this->setAttribute("itemtype", "https://schema.org/BreadcrumbList");

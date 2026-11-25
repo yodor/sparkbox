@@ -103,6 +103,12 @@ class HTMLHead extends Container implements IObserver
      */
     protected array $bundled = array();
 
+    /**
+     * The texts the scripts of the page show (addTexts) - English text => translation, for the JS tr()
+     * @var array<string, string>
+     */
+    protected array $texts = array();
+
 
     private function __construct()
     {
@@ -245,6 +251,7 @@ class HTMLHead extends Container implements IObserver
             foreach ($this->scripts as $object) {
                 if ($object instanceof Script) $object->render();
             }
+            $this->renderTexts();
             return;
         }
 
@@ -287,6 +294,41 @@ class HTMLHead extends Container implements IObserver
         $list = new Script();
         $list->setCode("(document.Spark = document.Spark || {}).bundled = " . json_encode($this->bundled, JSON_UNESCAPED_SLASHES) . ";");
         $list->render();
+
+        $this->renderTexts();
+    }
+
+    /**
+     * The translations of the texts of the scripts (addTexts): document.Spark.texts - the JS tr() reads them
+     */
+    protected function renderTexts() : void
+    {
+        if (count($this->texts) === 0) return;
+        $script = new Script();
+        $script->setCode("(document.Spark = document.Spark || {}).texts = " . json_encode($this->texts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) . ";");
+        $script->render();
+    }
+
+    /**
+     * The texts (English, the keys of the language packs) the scripts of the page show with tr("...") - their
+     * translations are given to the page (document.Spark.texts). A component adds the texts of its script when it is
+     * created, before the head renders.
+     * @param string ...$texts
+     */
+    public function addTexts(string ...$texts) : void
+    {
+        foreach ($texts as $text) {
+            if ($text === "" || isset($this->texts[$text])) continue;
+            $this->texts[$text] = tr($text);
+        }
+    }
+
+    /**
+     * @return array<string, string> the texts of the scripts of the page and their translations (addTexts)
+     */
+    public function texts() : array
+    {
+        return $this->texts;
     }
 
     protected function renderCanonical(): void

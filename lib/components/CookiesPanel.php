@@ -26,7 +26,7 @@ class CookiesPanel extends PageSection
         $this->addClassName("cookies");
         //a div: role 'dialog' is not allowed on an aside
         $this->setTagName("div");
-        $this->setAttribute("aria-label", "Cookie Consent");
+        $this->setAttribute("aria-label", tr("Cookie Consent"));
         $this->setAttribute("role", "dialog");
         $this->setAttribute("tabindex", "0");
         $this->content->items()->append(CookiesPanel::InfoPanel());
@@ -75,8 +75,8 @@ class CookiesPanel extends PageSection
 
         $terms = DynamicPageURL::Group("terms")->toString();
         $text = new TextComponent(
-            $esc(tr("Използваме бисквитки, необходими за работата на сайта. С Ваше съгласие използваме и бисквитки за анализ на посещенията и за реклама. Можете да промените избора си по всяко време от иконата 'бисквитки' в долната част на страницата.")) .
-            " <a href='" . $esc($terms) . "'>" . $esc(tr("Общи условия")) . "</a>");
+            $esc(tr("We use the cookies the site needs to work. With your consent we also use cookies to analyse the visits and for advertising. You can change your choice at any time from the 'cookies' icon at the bottom of the page.")) .
+            " <a href='" . $esc($terms) . "'>" . $esc(tr("Terms and Conditions")) . "</a>");
         $text->setComponentClass("text");
         $container->items()->append($text);
 
@@ -85,19 +85,19 @@ class CookiesPanel extends PageSection
             return "<label class='choice $name'><input type='checkbox' name='$name'$attributes> " . $esc($label) . "</label>";
         };
         $choices = new TextComponent(
-            $choice("necessary", tr("Необходими (винаги активни)"), true) .
-            $choice("analytics", tr("Анализ на посещенията")) .
-            $choice("ads", tr("Реклама и маркетинг")));
+            $choice("necessary", tr("Necessary (always active)"), true) .
+            $choice("analytics", tr("Visit analytics")) .
+            $choice("ads", tr("Advertising and marketing")));
         $choices->setComponentClass("choices");
         $container->items()->append($choices);
 
         $buttons = new Container(false);
         $buttons->setComponentClass("buttons");
         foreach (array(
-                     "accept" => array(tr("Приемам всички"), "acceptAll"),
-                     "reject" => array(tr("Отказвам"), "rejectAll"),
-                     "settings" => array(tr("Настройки"), "showSettings"),
-                     "save" => array(tr("Запази избора"), "saveSettings"),
+                     "accept" => array(tr("Accept all"), "acceptAll"),
+                     "reject" => array(tr("Reject"), "rejectAll"),
+                     "settings" => array(tr("Settings"), "showSettings"),
+                     "save" => array(tr("Save my choice"), "saveSettings"),
                  ) as $name => [$label, $method]) {
             $button = Button::Action($label, "javascript:document.sparkCookies.$method()");
             $button->setComponentClass("ColorButton");

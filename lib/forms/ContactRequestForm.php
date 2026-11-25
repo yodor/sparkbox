@@ -11,16 +11,16 @@ class ContactRequestForm extends InputForm
     {
         parent::__construct();
 
-        $field = DataInputFactory::Create(InputType::TEXT, "fullname", "Име", 1);
+        $field = DataInputFactory::Create(InputType::TEXT, "fullname", "Name", 1);
         $this->addInput($field);
 
         $field = DataInputFactory::Create(InputType::EMAIL, "email", "Email", 1);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(InputType::TEXT, "phone", "Телефон", 0);
+        $field = DataInputFactory::Create(InputType::TEXT, "phone", "Phone", 0);
         $this->addInput($field);
 
-        $field = DataInputFactory::Create(InputType::TEXTAREA, "query", "Запитване", 1);
+        $field = DataInputFactory::Create(InputType::TEXTAREA, "query", "Query", 1);
         $this->addInput($field);
     }
 }

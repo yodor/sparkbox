@@ -26,7 +26,7 @@ class ContactRequestFormResponder extends JSONFormResponder
      * Shown to the visitor after the enquiry was sent
      * @var string
      */
-    protected string $acceptedMessage = "Заявката Ви беше изпратена успешно";
+    protected string $acceptedMessage = "Your enquiry was sent";
 
     /**
      * Mail subject
@@ -123,7 +123,7 @@ class ContactRequestFormResponder extends JSONFormResponder
         if (!$mailer->send()) {
             //nothing is stored - the visitor must know the enquiry did not go out
             Debug::ErrorLog("Contact enquiry could not be sent to: " . $this->recipient());
-            throw new Exception(tr("Изпращането не беше успешно. Моля, опитайте отново по-късно или ни се обадете."));
+            throw new Exception(tr("The enquiry was not sent. Please try again later or call us."));
         }
 
         $resp->message = tr($this->acceptedMessage);

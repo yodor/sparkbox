@@ -7,7 +7,8 @@
  * Lists the texts of the code (core, the store, the site class/ - in that order) that the merged packs of '<code>'
  * do not translate, with the layer whose pack should have them (the first layer that uses the text). With --unused:
  * also the pack entries no code of the layers uses. A text is found where the code writes it as a literal:
- * tr("..."), new MenuItem("..."), the label of DataInputFactory::Create(...), setTitle / setContentTitle("...").
+ * tr("..."), new MenuItem("..."), the label of DataInputFactory::Create(...), setTitle / setContentTitle("...") - and
+ * tr("...") of the scripts (sparkfront/js, storefront/js: their texts come from HTMLHead::addTexts).
  * Texts built at run time (data, column names) are not seen - their entries are not reported unused if they are
  * there on purpose; check before removing one.
  */
@@ -29,11 +30,11 @@ if ($code === "") {
     exit(2);
 }
 
-//the layers: name => array(code folder, pack file)
+//the layers: name => array(code folders, pack file)
 $core = realpath(__DIR__ . "/../lib");
-$layers = array("core" => array($core, "$core/lang/$code.php"));
-if ($options["store"] !== "") $layers["store"] = array($options["store"] . "/store", $options["store"] . "/store/lang/$code.php");
-if ($options["site"] !== "") $layers["site"] = array($options["site"] . "/class", $options["site"] . "/class/lang/$code.php");
+$layers = array("core" => array(array($core, dirname($core) . "/sparkfront/js"), "$core/lang/$code.php"));
+if ($options["store"] !== "") $layers["store"] = array(array($options["store"] . "/store", dirname($options["store"]) . "/storefront/js"), $options["store"] . "/store/lang/$code.php");
+if ($options["site"] !== "") $layers["site"] = array(array($options["site"] . "/class"), $options["site"] . "/class/lang/$code.php");
 
 /**
  * The texts the PHP and JS files of '$folder' write as literals of the known calls
@@ -48,10 +49,23 @@ function codeTexts(string $folder) : array
         "/DataInputFactory::Create\\([^,]+,[^,]+,\\s*(['\"])((?:\\\\.|(?!\\1).)*)\\1/s",
         "/->set(?:Content)?Title\\(\\s*(['\"])((?:\\\\.|(?!\\1).)*)\\1/s",
     );
+    if (!is_dir($folder)) return $texts;
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder, FilesystemIterator::SKIP_DOTS));
     foreach ($iterator as $file) {
         $path = $file->getPathname();
-        if (!preg_match("/\\.php$/", $path) || str_contains($path, "/PHPMailer/") || str_contains($path, "/lang/")) continue;
+        if (str_contains($path, "/PHPMailer/") || str_contains($path, "/lang/") || str_contains($path, "/tiny_mce/")) continue;
+        if (preg_match("/\\.js$/", $path) && !preg_match("/\\.min\\.js$/", $path)) {
+            //a script: its tr("...") - the code without its comments
+            $source = (string)preg_replace("#/\\*.*?\\*/|(?<![:\"'])//[^\\n]*#s", "", (string)file_get_contents($path));
+            if (preg_match_all($patterns[0], $source, $m, PREG_SET_ORDER)) {
+                foreach ($m as $match) {
+                    $text = stripcslashes($match[2]);
+                    if ($text !== "" && !isset($texts[$text])) $texts[$text] = $path;
+                }
+            }
+            continue;
+        }
+        if (!preg_match("/\\.php$/", $path)) continue;
         //the code without its comments (an example in a comment is not a text of the code)
         $source = "";
         foreach (token_get_all((string)file_get_contents($path)) as $token) {
@@ -73,9 +87,11 @@ function codeTexts(string $folder) : array
 
 $used = array();
 $packs = array();
-foreach ($layers as $name => [$folder, $pack]) {
-    foreach (codeTexts($folder) as $text => $file) {
-        if (!isset($used[$text])) $used[$text] = array($name, $file);
+foreach ($layers as $name => [$folders, $pack]) {
+    foreach ($folders as $folder) {
+        foreach (codeTexts($folder) as $text => $file) {
+            if (!isset($used[$text])) $used[$text] = array($name, $file);
+        }
     }
     $packs[$name] = is_file($pack) ? (array)(include $pack) : array();
 }

@@ -43,7 +43,7 @@ class BeanTranslationDialog extends JSONDialog implements IPageComponent
     {
         parent::__construct();
 
-        $this->setTitle("Translate");
+        $this->setTitle(tr("Translate"));
         $this->setType(MessageDialog::TYPE_PLAIN);
 
         $this->content->items()->clear();

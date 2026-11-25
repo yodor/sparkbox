@@ -24,7 +24,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
         $this->form = new KeywordSearchForm();
 
         $input = $this->form->getInput("keyword");
-        $input->getRenderer()->input()?->setAttribute("placeholder", $input->getLabel());
+        $input->getRenderer()->input()?->setAttribute("placeholder", tr($input->getLabel()));
 
         parent::__construct($this->form);
 
@@ -39,7 +39,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
         $submit_search = new Button();
         $submit_search->setType(Button::TYPE_SUBMIT);
-        $submit_search->setContents("Search");
+        $submit_search->setContents(tr("Search"));
         $submit_search->setName(KeywordSearch::SUBMIT_KEY);
         $submit_search->setValue(KeywordSearch::ACTION_SEARCH);
         $submit_search->setAttribute("action", KeywordSearch::ACTION_SEARCH);
@@ -47,7 +47,7 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
         $submit_clear = new Button();
         $submit_clear->setType(Button::TYPE_SUBMIT);
-        $submit_clear->setContents("Clear");
+        $submit_clear->setContents(tr("Clear"));
         $submit_clear->setName(KeywordSearch::SUBMIT_KEY);
         $submit_clear->setValue(KeywordSearch::ACTION_CLEAR);
         $submit_clear->setAttribute("action", KeywordSearch::ACTION_CLEAR);

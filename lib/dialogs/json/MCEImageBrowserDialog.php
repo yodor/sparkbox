@@ -18,7 +18,7 @@ class MCEImageBrowserDialog extends JSONDialog
     {
         parent::__construct();
 
-        $this->setTitle("MCE Image Browser");
+        $this->setTitle(tr("MCE Image Browser"));
         $this->setType(MessageDialog::TYPE_PLAIN);
 
         $this->setSingleInstance(true);

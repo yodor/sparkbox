@@ -83,5 +83,5 @@ test("enquiry about an item: the item is linked with its details", function () {
 test("a mail that cannot be sent is an error for the visitor, the form stays", function () {
     $json = enquiry("FailingContactFormResponder", array("fullname" => "A", "email" => "a@example.com", "query" => "q"));
     assertSame("error", $json["status"] ?? "", "status: " . json_encode($json));
-    assertTrue(str_contains($json["message"] ?? "", "опитайте отново"), "message: " . ($json["message"] ?? ""));
+    assertTrue(str_contains($json["message"] ?? "", "try again later"), "message: " . ($json["message"] ?? ""));
 });
