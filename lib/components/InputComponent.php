@@ -80,6 +80,14 @@ class InputComponent extends Container
             $this->addClassName("Hidden");
         }
 
+        //the caption is a span, not a <label> - the input is named by its text for screen readers (a name set before
+        //stays: the sort select of ResultViewHeader)
+        $input = $this->dataInput->getRenderer()->input();
+        if ($input instanceof Input && !($this->dataInput->getRenderer() instanceof HiddenField) && $input->getAttribute("aria-label") === "") {
+            $caption = trim(html_entity_decode(strip_tags($this->dataInput->getLabel()), ENT_QUOTES | ENT_HTML5, "UTF-8"));
+            if ($caption !== "") $input->setAttribute("aria-label", $caption);
+        }
+
         // Logic for child component visibility
         if (Spark::GetBoolean(Config::TRANSLATOR_ENABLED) && $this->dataInput->translatorEnabled()) {
             $this->translator->setRenderEnabled(true);

@@ -19,7 +19,7 @@ class MenuItemRenderer extends Container
         $this->linkTag = new Component(false);
         $this->linkTag->setTagName("a");
         $this->linkTag->setComponentClass("Link");
-        $this->linkTag->setAttribute("role", "menuitem");
+        //plain links of a navigation landmark (MenuBar is a nav) - not role 'menuitem': it needs a 'menu' parent
 
         $this->items()->append($this->linkTag);
 
