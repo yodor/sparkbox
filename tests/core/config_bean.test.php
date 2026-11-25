@@ -50,3 +50,27 @@ test("config: a value larger than INLINE_SIZE is loaded when asked for", functio
         $pdo->exec("DELETE FROM config WHERE section = 'l$tag'");
     }
 });
+
+test("config: loadForm sets the stored values, a field never saved keeps the form's default", function () use ($pdo, $tag) {
+    include_once("forms/InputForm.php");
+    include_once("input/DataInputFactory.php");
+    $pdo->prepare("INSERT INTO config (config_key, config_val, section) VALUES ('saved', 'stored', ?)")->execute(array("f$tag"));
+    try {
+        $form = new InputForm();
+        $saved = DataInputFactory::Create(InputType::TEXT, "saved", "Saved", false);
+        $saved->setValue("default");
+        $form->addInput($saved);
+        $fresh = DataInputFactory::Create(InputType::TEXT, "fresh", "Fresh", false);
+        $fresh->setValue("14");
+        $form->addInput($fresh);
+
+        $config = new ConfigBean();
+        $config->setSection("f$tag");
+        $config->loadForm($form);
+        assertSame("stored", $saved->getValue());
+        assertSame("14", $fresh->getValue(), "the default of a field never saved");
+    }
+    finally {
+        $pdo->exec("DELETE FROM config WHERE section = 'f$tag'");
+    }
+});

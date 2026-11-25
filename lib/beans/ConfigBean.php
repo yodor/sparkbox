@@ -186,10 +186,14 @@ class ConfigBean extends DBTableBean
      * @param InputForm $form
      * @return void
      */
+    /**
+     * The stored values into the fields of '$form' - a field never saved keeps the value the form gave it (its default)
+     */
     public function loadForm(InputForm $form) : void
     {
         foreach ($form->inputs() as $field_name => $field) {
-            $stored_value = $this->get($field_name);
+            $stored_value = $this->get($field_name, null);
+            if (is_null($stored_value)) continue;
             $field->setValue($stored_value);
         }
     }
