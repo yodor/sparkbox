@@ -95,11 +95,13 @@ class JSONFormDialog extends JSONDialog {
             showAlert(response.message);
         }
         else {
-            //send conversion event if gtm is present
+            //the gtag commands of the response (a command or a list of them - an event and a conversion)
             if (response.gtm) {
-                let sparkEvent = new SparkEvent(SparkEvent.GTM_EVENT);
-                sparkEvent.gtm = response.gtm;
-                document.dispatchEvent(sparkEvent);
+                [].concat(response.gtm).forEach((gtm) => {
+                    let sparkEvent = new SparkEvent(SparkEvent.GTM_EVENT);
+                    sparkEvent.gtm = gtm;
+                    document.dispatchEvent(sparkEvent);
+                });
             }
             this.remove();
             showAlert(response.message);

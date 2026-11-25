@@ -69,6 +69,8 @@ test("accepted enquiry: mailed to the owner, Reply-To the visitor, text escaped,
     assertTrue(!str_contains($mail, "<b>it</b>"), "visitor text not escaped");
     assertSame(1, substr_count(strtolower($mail), "<html"), "template applied twice");
     assertTrue(!(bool)TestPDO()->query("SHOW TABLES LIKE 'contact_requests'")->fetch(), "a contact_requests table was created");
+    //GA4: the gtag commands for the page - generate_lead (a command, not the component properties)
+    assertSame(array(array("command" => "event", "type" => "generate_lead", "parameters" => array("lead_type" => "contact"))), $json["gtm"] ?? null, "gtm: " . json_encode($json["gtm"] ?? null));
 });
 
 test("enquiry about an item: the item is linked with its details", function () {

@@ -3,6 +3,7 @@ include_once("responders/json/JSONFormResponder.php");
 include_once("forms/ContactRequestForm.php");
 include_once("mailers/ContactRequestMailer.php");
 include_once("objects/data/GTMConversionCommand.php");
+include_once("objects/data/GTMCommand.php");
 
 /**
  * Contact enquiry in a JSONFormDialog - passed through to the owner by e-mail, nothing is stored.
@@ -77,6 +78,19 @@ class ContactRequestFormResponder extends JSONFormResponder
         return null;
     }
 
+    /**
+     * The GA4 'generate_lead' of a sent enquiry - lead_type tells the enquiries apart (contact, product_query ...)
+     */
+    protected string $leadType = "contact";
+
+    protected function leadEvent() : GTMCommand
+    {
+        $event = new GTMCommand(GTMCommand::COMMAND_EVENT);
+        $event->setType("generate_lead");
+        $event->addParameter("lead_type", $this->leadType);
+        return $event;
+    }
+
     protected function onProcessSuccess(JSONResponse $resp): void
     {
         parent::onProcessSuccess($resp);
@@ -108,9 +122,7 @@ class ContactRequestFormResponder extends JSONFormResponder
 
         $resp->message = tr($this->acceptedMessage);
 
-        $conversion = $this->conversion();
-        if ($conversion) {
-            $resp->gtm = $conversion;
-        }
+        //GA4 generate_lead, and the Ads conversion when the site has one
+        $resp->gtm = array_values(array_filter(array($this->leadEvent(), $this->conversion())));
     }
 }

@@ -1,7 +1,11 @@
 <?php
 include_once("components/InlineScript.php");
 
-class GTMCommand extends InlineScript
+/**
+ * A gtag() command - rendered as an inline script, or sent in a JSON response (JSONResponse 'gtm', a command or a
+ * list of them: {command, type, parameters}) for the page script to run (SparkGTM)
+ */
+class GTMCommand extends InlineScript implements JsonSerializable
 {
     const string COMMAND_CONFIG = "config";
     const string COMMAND_SET = "set";
@@ -16,6 +20,17 @@ class GTMCommand extends InlineScript
     {
         parent::__construct();
         $this->command = $command;
+    }
+
+    /**
+     * The command for the page script (a JSON response) - before this only the component properties were encoded,
+     * so the commands of the JSON dialogs never reached gtag
+     */
+    public function jsonSerialize() : array
+    {
+        $result = array("command" => $this->command, "type" => $this->type);
+        if (count($this->parameters) > 0) $result["parameters"] = $this->parameters;
+        return $result;
     }
 
     public function setCommand(string $command): void
