@@ -45,7 +45,7 @@ abstract class DataIteratorField extends InputField
             $this->item->setKey(-1);
 
             $this->item->setValue($this->default_value);
-            $this->item->setLabel($this->default_label);
+            $this->item->setLabel(tr($this->default_label));
 
             //'null' default value
             if (strcmp($this->default_value, "null")===0 && !$this->dataInput->getValue()) {

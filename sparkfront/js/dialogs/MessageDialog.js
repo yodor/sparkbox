@@ -121,7 +121,7 @@ function showAlert(text) {
 
     const dialog = new MessageDialog();
     dialog.setText(text);
-    dialog.setTitle("Alert!");
+    dialog.setTitle(tr("Message"));
 
     dialog.buttonAction = function(action) {
         dialog.remove();

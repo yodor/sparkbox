@@ -3,6 +3,7 @@ include_once("components/Component.php");
 include_once("components/renderers/IPageComponent.php");
 include_once("components/Button.php");
 include_once("components/renderers/ITemplate.php");
+include_once("pages/HTMLHead.php");
 
 class MessageDialog extends Container implements IPageComponent, ITemplate
 {
@@ -34,6 +35,8 @@ class MessageDialog extends Container implements IPageComponent, ITemplate
 
         parent::__construct(false);
         $this->addClassName("Dialog");
+        //the title of showAlert() (MessageDialog.js)
+        HTMLHead::Instance()->addTexts("Message");
 
         $inner = new Container("false");
         $inner->setComponentClass("Inner");

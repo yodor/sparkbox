@@ -41,7 +41,7 @@ class KeywordSearch extends Component {
             const query = this.element.keyword.value;
             const minChars = parseInt(this.element.keyword.getAttribute("min-chars"));
 
-            if (submitter.value === "search" && query.length < minChars) throw "Input search term";
+            if (submitter.value === "search" && query.length < minChars) throw tr("Enter a search term");
             if (submitter.value === "clear" && query.length < 1) throw "";
 
         }

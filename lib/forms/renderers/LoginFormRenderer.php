@@ -1,14 +1,21 @@
 <?php
 include_once("forms/renderers/FormRenderer.php");
 include_once("components/InlineScript.php");
+include_once("pages/HTMLHead.php");
 
 class LoginFormScript extends InlineScript implements IPageComponent
 {
     protected LoginForm $form;
 
+    /**
+     * The texts of LoginForm.js
+     */
+    const array SCRIPT_TEXTS = array("Enter your password to continue.", "The password needs at least 6 characters.", "Enter your email", "Please enter a valid email address.");
+
     public function __construct(LoginForm $form)
     {
         parent::__construct();
+        HTMLHead::Instance()->addTexts(...LoginFormScript::SCRIPT_TEXTS);
 
         $this->enableOnPageLoad();
         $this->form = $form;

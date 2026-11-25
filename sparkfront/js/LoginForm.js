@@ -68,8 +68,8 @@ class LoginForm extends Component {
         //store trimmed password back to the form
         this.form.password.value = password;
 
-        if (password < 1) throw "Input your password to continue.";
-        if (password < 6) throw "Minimum password of 6 symbols required.";
+        if (password < 1) throw tr("Enter your password to continue.");
+        if (password < 6) throw tr("The password needs at least 6 characters.");
 
         const token = formData.get("token").trim();
         if (token.length!==32) throw "Token length wrong: "+ token.length;
@@ -132,12 +132,12 @@ class LoginForm extends Component {
         this.form.email.value = this.form.email.value.trim();
 
         if (this.form.email.value.length < 1) {
-            throw "Input your email";
+            throw tr("Enter your email");
         }
         const emailFilter = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
         if (!emailFilter.test(this.form.email.value)) {              //test email for illegal
-            throw "Please enter a valid email address.";
+            throw tr("Please enter a valid email address.");
         }
 
     }

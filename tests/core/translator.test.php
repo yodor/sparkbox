@@ -87,3 +87,9 @@ test("the texts of the scripts: HTMLHead::addTexts gives the page their translat
     assertTrue(str_contains($html, "(document.Spark = document.Spark || {}).texts = {"), $html);
     assertTrue(str_contains($html, '"Clear":"Изчисти"'), $html);
 });
+
+test("dates of the lists: the month in the language of the site (DateCell)", function () {
+    include_once("components/renderers/cells/DateCell.php");
+    assertSame("ноември", DateCell::MonthName((int)strtotime("2026-11-25 10:00:00")));
+    assertSame("януари", DateCell::MonthName((int)strtotime("2027-01-02 10:00:00")));
+});

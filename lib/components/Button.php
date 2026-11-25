@@ -21,7 +21,7 @@ class Button extends Input
 
     public static function SubmitButton(string $submit_name) : Button
     {
-        $button = Button::TextButton("Submit", "submit");
+        $button = Button::TextButton(tr("Submit"), "submit");
         $button->setType(self::TYPE_SUBMIT);
         $button->setName($submit_name);
         return $button;

@@ -20,6 +20,8 @@ class KeywordSearch extends FormRenderer implements IRequestProcessor
 
     public function __construct()
     {
+        //the texts of KeywordSearch.js
+        HTMLHead::Instance()->addTexts("Enter a search term");
 
         $this->form = new KeywordSearchForm();
 
