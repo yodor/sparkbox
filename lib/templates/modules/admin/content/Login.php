@@ -55,7 +55,7 @@ class Login extends TemplateContent
 
     public function getContentTitle(): string
     {
-        return "Login - ".Spark::Get(Config::SITE_TITLE);
+        return tr("Login") . " - " . Spark::Get(Config::SITE_TITLE);
     }
 
 }

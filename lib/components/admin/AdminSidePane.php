@@ -28,7 +28,7 @@ class AdminSidePane extends Container
                 $adminName->setComponentClass("username");
                 $adminData->items()->append($adminName);
             }
-            $adminData->items()->append(Button::LocationButton("Logout", Module::PathURL("logout")));
+            $adminData->items()->append(Button::LocationButton(tr("Logout"), Module::PathURL("logout")));
         }
 
         $this->items()->append($menu);

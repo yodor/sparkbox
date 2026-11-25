@@ -65,11 +65,12 @@ class LoginForm extends Component {
         const formData = new FormData(this.form);
         const password = formData.get("password");
 
-        //store trimmed password back to the form
+        //the password is sent as typed: a stored password may have spaces (registration trims - RegisterForm)
         this.form.password.value = password;
 
-        if (password < 1) throw tr("Enter your password to continue.");
-        if (password < 6) throw tr("The password needs at least 6 characters.");
+        //the length of the password - a login accepts any stored password, a new one needs 6 characters at least
+        if (password.length < 1) throw tr("Enter your password to continue.");
+        if (this.mode === LoginForm.MODE_REGISTER && password.length < 6) throw tr("The password needs at least 6 characters.");
 
         const token = formData.get("token").trim();
         if (token.length!==32) throw "Token length wrong: "+ token.length;

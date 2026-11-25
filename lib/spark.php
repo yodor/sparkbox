@@ -789,7 +789,9 @@ final class Spark {
         $title = array();
         foreach ($path as $key => $item) {
             if ($item instanceof MenuItem) {
-                $title[] = mb_convert_case(strip_tags($item->getName()), MB_CASE_TITLE, "UTF-8");
+                //a menu of the code: its translation as written (title case is English - 'ЧЗВ', 'Офиси на куриерите')
+                if ($item->needTranslate()) $title[] = strip_tags(tr($item->getName()));
+                else $title[] = mb_convert_case(strip_tags($item->getName()), MB_CASE_TITLE, "UTF-8");
             }
             else {
                 $title[] = mb_convert_case($item, MB_CASE_TITLE, "UTF-8");

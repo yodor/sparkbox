@@ -44,11 +44,14 @@ class MenuItemRenderer extends Container
         $this->linkTag->removeAttribute("href");
         $this->linkTag->setContents("");
 
+        //the name in the language of the page (a menu of the code is an English text, a menu of the site is data)
+        $title = $item->needTranslate() ? tr($item->getName()) : $item->getName();
+
         if ($item->getTooltip()) {
             $this->linkTag->setTooltip($item->getTooltip());
         }
         else {
-            $this->linkTag->setAttribute("title", $item->getName());
+            $this->linkTag->setAttribute("title", $title);
         }
 
         if ($item->getTarget()) {
@@ -61,8 +64,7 @@ class MenuItemRenderer extends Container
             $this->linkTag->setAttribute("itemprop","url");
         }
 
-        $name = $item->needTranslate() ? tr($item->getName()) : $item->getName();
-        $name = Spark::AttributeValue($name);
+        $name = Spark::AttributeValue($title);
         $this->linkTag->setContents("<meta itemprop='name' content='$name'>" . $name);
 
         if ($item->count() > 0) {

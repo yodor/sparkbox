@@ -204,7 +204,7 @@ class BeanList extends TemplateBeanContent
     {
         if (!$this->addEnabled) return;
 
-        $actionCreate = TemplateBeanContent::CreateAction(SparkAdminPage::ACTION_ADD, SparkAdminPage::ACTION_ADD);
+        $actionCreate = TemplateBeanContent::CreateAction(SparkAdminPage::ACTION_ADD, tr(SparkAdminPage::ACTION_ADD));
         $actionCreate->getURL()->add(new URLParameter("editID", -1));
         $actionCreate->setTooltip("Add new element to this collection");
 
@@ -232,7 +232,7 @@ class BeanList extends TemplateBeanContent
     {
 
         if ($this->editEnabled) {
-            $editAction = TemplateBeanContent::CreateAction(SparkAdminPage::ACTION_EDIT, SparkAdminPage::ACTION_EDIT);
+            $editAction = TemplateBeanContent::CreateAction(SparkAdminPage::ACTION_EDIT, tr(SparkAdminPage::ACTION_EDIT));
             $editAction->setTooltip(tr("Edit element"));
             $editAction->getURL()->add(new DataParameter("editID", $this->getIterator()->key()));
 

@@ -13,8 +13,9 @@ class Plain extends TemplateContent
     public static function Configure(string $title = "", string $description = "") : TemplateConfig
     {
         $config = parent::Configure();
-        $config->title = $title;
-        $config->description = $description;
+        //English texts of the code (keys of the language packs) or texts of the site
+        $config->title = tr($title);
+        $config->description = tr($description);
         return $config;
     }
 

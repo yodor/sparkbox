@@ -66,7 +66,7 @@ abstract class TemplateContent extends SparkObject implements IRequestProcessor
         $this->config = $config;
 
         if (!$config->title) {
-            $config->title = $this->getContentTitle();
+            $config->title = tr($this->getContentTitle());
         }
     }
 

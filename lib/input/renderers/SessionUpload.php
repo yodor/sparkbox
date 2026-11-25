@@ -37,9 +37,9 @@ abstract class SessionUpload extends InputField
         $this->fillDetails($details);
         $field_elements->items()->append($details);
 
-        $button = Button::TextButton("Browse","browse");
+        $button = Button::TextButton(tr("Browse"),"browse");
         $button->setTagName("LABEL");
-        $button->setTooltip("Select file(s) for upload");
+        $button->setTooltip(tr("Select file(s) for upload"));
         $button->setAttribute("for", $this->input->getName());
         $button->items()->append($this->input);
         $progress = new TextComponent();
@@ -148,11 +148,11 @@ abstract class SessionUpload extends InputField
         $memory_limit->setAttribute("field", "memory_limit");
         $limits->items()->append($memory_limit);
 
-        $accept_mimes = new LabelSpan("Accept MIMEs", $this->input->getAttribute("accept"));
+        $accept_mimes = new LabelSpan(tr("Accept MIMEs"), $this->input->getAttribute("accept"));
         $accept_mimes->setAttribute("field", "accept_mimes");
         $limits->items()->append($accept_mimes);
 
-        $max_slots = new LabelSpan("Available Slots", -1);
+        $max_slots = new LabelSpan(tr("Available Slots"), -1);
         $max_slots->setAttribute("field", "max_slots");
         $limits->items()->append($max_slots);
 

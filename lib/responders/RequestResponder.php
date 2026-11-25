@@ -240,7 +240,9 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
     {
         $url = URL::Current();
         $url->add(new URLParameter(RequestResponder::KEY_COMMAND, $this->getName()));
+        //the action stays the English title (getByAction), the text is translated
         $action = new Action($title);
+        $action->setContents(tr($title));
         $action->setURL($url);
         return $action;
     }
@@ -249,8 +251,8 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
     {
         //will be added as IPageComponent
         $md = new ConfirmResponderDialog();
-        $md->setText($this->confirm_dialog_text);
-        $md->setTitle($this->confirm_dialog_title);
+        $md->setText(tr($this->confirm_dialog_text));
+        $md->setTitle(tr($this->confirm_dialog_title));
 
         $script = new ConfirmResponderScript();
         $script->setCancelURL($this->cancel_url);

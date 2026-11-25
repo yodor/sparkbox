@@ -18,7 +18,7 @@ class SessionChunkedFile extends SessionUpload
         $limits->setComponentClass("Limits");
         $details->items()->append($limits);
 
-        $max_slots = new LabelSpan("Available Slots", -1);
+        $max_slots = new LabelSpan(tr("Available Slots"), -1);
         $max_slots->setAttribute("field", "max_slots");
         $limits->items()->append($max_slots);
 

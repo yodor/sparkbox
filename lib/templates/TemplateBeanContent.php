@@ -61,8 +61,8 @@ abstract class TemplateBeanContent extends TemplateContent implements IContentAc
         if ($bean instanceof DBTableBean) $this->setBean($bean);
 
         if (!$config->title) {
-            $config->title = $this->getContentTitle();
-            if (!is_null($this->bean)) $config->title .= ": " . get_class($this->bean);
+            //the default title of the content: its kind ('Editor', 'List' ...) in the language of the page
+            $config->title = tr($this->getContentTitle());
         }
     }
 

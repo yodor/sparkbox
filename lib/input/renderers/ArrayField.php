@@ -40,11 +40,12 @@ class ArrayField extends InputField
         $button_add->setType(Button::TYPE_BUTTON);
         $button_add->setName(ArrayField::DEFAULT_CONTROL_NAME);
         $button_add->setAttribute("action", ArrayField::DEFAULT_CONTROL_ACTION);
-        $button_add->setContents(ArrayField::DEFAULT_CONTROL_TEXT);
+        $button_add->setContents(tr(ArrayField::DEFAULT_CONTROL_TEXT));
 
         $this->controls->items()->append($button_add);
 
         $this->remove_action = new Action("Remove");
+        $this->remove_action->setContents(tr("Remove"));
 
         $this->element_controls = new Container(false);
         $this->element_controls->setComponentClass("Controls");

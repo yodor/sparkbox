@@ -133,6 +133,7 @@ class GalleryView extends Container
         $url = URL::Current();
         $url->add(new DataParameter("editID", $this->bean->key()));
         $action_edit = new Action("Edit");
+        $action_edit->setContents(tr("Edit"));
         $action_edit->setURL($url);
         $this->actions->append($action_edit);
 
@@ -142,6 +143,7 @@ class GalleryView extends Container
         $url->add(new URLParameter(RequestResponder::KEY_COMMAND, DeleteItemResponder::class));
         $url->add(new DataParameter("item_id", $this->bean->key()));
         $delete_action = new Action("Delete");
+        $delete_action->setContents(tr("Delete"));
         $delete_action->setURL($url);
         $this->actions->append($delete_action);
 
@@ -156,6 +158,7 @@ class GalleryView extends Container
             $url->add(new DataParameter("#" . get_class($this->bean) . ".%{$this->bean->key()}%", $this->bean->key()));
 
             $action = new Action("First");
+            $action->setContents(tr("First"));
             $action->setURL(clone $url);
             $action->getURL()->add(new URLParameter("type", "first"));
             $this->actions->append($action);
@@ -163,6 +166,7 @@ class GalleryView extends Container
             $this->actions->append(Action::PipeSeparator());
 
             $action = new Action("Last");
+            $action->setContents(tr("Last"));
             $action->setURL(clone $url);
             $action->getURL()->add(new URLParameter("type", "last"));
             $this->actions->append($action);
@@ -170,6 +174,7 @@ class GalleryView extends Container
             $this->actions->append(Action::RowSeparator());
 
             $action = new Action("Previous");
+            $action->setContents(tr("Previous"));
             $action->setURL(clone $url);
             $action->getURL()->add(new URLParameter("type", "previous"));
             $this->actions->append($action);
@@ -177,6 +182,7 @@ class GalleryView extends Container
             $this->actions->append(Action::PipeSeparator());
 
             $action = new Action("Next");
+            $action->setContents(tr("Next"));
             $action->setURL(clone $url);
             $action->getURL()->add(new URLParameter("type", "next"));
             $this->actions->append($action);
@@ -184,6 +190,7 @@ class GalleryView extends Container
             $this->actions->append(Action::RowSeparator());
 
             $action = new Action("Fixed");
+            $action->setContents(tr("Fixed"));
             $action->setURL(clone $url);
             $action->getURL()->add(new URLParameter("type", "fixed"));
             $this->actions->append($action);
