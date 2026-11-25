@@ -46,7 +46,8 @@ test("pages: a page at its address - title, content, the group menu (whole level
         assertTrue(str_contains($body, "<title>First Page"), "title");
         assertTrue(str_contains($body, "<p>Content of First Page</p>"), "content");
         assertTrue((bool)preg_match("#<link rel='canonical' href='[^']*//localhost/pages/$id/first-page/'>#", $body), "canonical address");
-        assertTrue((bool)preg_match("#hreflang='x-default'[^>]*|href='[^']*/pages/$id/first-page/'[^>]*hreflang#", $body), "language links");
+        //one language: no hreflang alternates (they come with the language in the address)
+        assertTrue(!str_contains($body, "hreflang") && !str_contains($body, "change_language"), "language links");
         assertTrue(str_contains($body, "page_menu test_footer $tag first"), "menu with the page levels");
         //the group of the page: test_footer;<tag> - the Other Group (<tag>x) is not a whole level match, hidden is not listed
         preg_match_all("#<a class='item[^']*' href='/pages/(\\d+)/#", $body, $m);

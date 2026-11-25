@@ -185,9 +185,9 @@ enum Config
      */
     const string EMAIL_DOMAIN_CHECK = "EMAIL_DOMAIN_CHECK";
     /**
-     * Enable or disable Automatic language translations
-     * Used in tr() and trbean()
-     * Default(bool): false
+     * More than one language: the visitor may choose a language of the 'languages' table, and the content
+     * translations (translation_beans - trbean(), the admin 'Translate' of the fields) are read. The texts of the code
+     * are translated anyway (the language packs - Translator). Default(bool): false
      */
     const string TRANSLATOR_ENABLED = "TRANSLATOR_ENABLED";
     /**
@@ -197,17 +197,18 @@ enum Config
     const string DB_ENABLED = "DB_ENABLED";
 
     /**
-     * Language of site - should match DEFAULT_LANGUAGE_ISO3
+     * The name of the language of the site ('languages' row of a new table)
      * Default(string): english
      */
     const string DEFAULT_LANGUAGE = "DEFAULT_LANGUAGE";
     /**
-     * Language of site ISO3 code should match DEFAULT_LANGUAGE
-     * Default(string): eng
+     * Not used - the language of the site is the language of DEFAULT_LOCALE (two-letter code). Kept for the settings
+     * of the existing sites.
      */
     const string DEFAULT_LANGUAGE_ISO3 = "DEFAULT_LANGUAGE_ISO3";
     /**
-     * Locale of site
+     * Locale of the site - its language ('bg-bg' - 'bg') is the language of the site: the language packs
+     * (<layer>/lang/<code>.php), the 'lang' of the pages
      * Default(string): en-us
      */
     const string DEFAULT_LOCALE = "DEFAULT_LOCALE";

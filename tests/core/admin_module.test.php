@@ -145,10 +145,9 @@ function loginCookies(string $email, string $password) : string
 }
 
 test("settings sections render", function () {
-    TestPDO()->exec("INSERT IGNORE INTO languages (langID, lang_code, language) VALUES (1, 'bgn', 'Bulgarian')");
-    foreach (array("/settings/admins", "/settings/languages", "/settings/languages/translator") as $path) {
+    TestPDO()->exec("INSERT IGNORE INTO languages (langID, lang_code, language) VALUES (1, 'bg', 'Bulgarian')");
+    foreach (array("/settings/admins", "/settings/languages") as $path) {
         foreach (array("", "&editID=-1") as $edit) {
-            if ($edit && str_ends_with($path, "translator")) continue;
             [$status, $headers, $body] = httpRequest("admin/index.php", "path=" . urlencode($path) . $edit,
                 array("Cookie" => coreAdminCookies()), "/admin/index.php?path=" . urlencode($path) . $edit);
             assertSame(200, $status, $path . $edit . (isset($headers["location"]) ? " → " . $headers["location"] : ""));
@@ -157,10 +156,10 @@ test("settings sections render", function () {
             }
         }
     }
-    [$status, , $body] = httpRequest("admin/index.php", "path=%2Fsettings%2Flanguages%2Ftranslator%2Fphrases&langID=1",
-        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fsettings%2Flanguages%2Ftranslator%2Fphrases&langID=1");
-    assertSame(200, $status, "phrases");
-    assertTrue(!str_contains($body, "Fatal error") && !str_contains($body, "<b>Warning</b>"), "phrases has errors");
+    //the phrase translator is gone (the language packs) - its address answers 404
+    [$status] = httpRequest("admin/index.php", "path=%2Fsettings%2Flanguages%2Ftranslator",
+        array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fsettings%2Flanguages%2Ftranslator");
+    assertSame(404, $status, "the phrase translator");
 });
 
 test("new administrator: password stored as hash, can log in, suspended cannot", function () {
@@ -200,16 +199,15 @@ test("limited access administrator sees and opens only the sections of its roles
     assertTrue(str_ends_with($headers["location"] ?? "", "/admin/home"), $headers["location"] ?? "");
 
     //early responders are behind the same check
-    [$status] = httpRequest("admin/index.php", "path=%2Fsettings%2Flanguages%2Ftranslator&JSONRequest=1&responder=TemplateHelpResponder&type=fetch",
-        array("Cookie" => $cookies), "/admin/index.php?path=%2Fsettings%2Flanguages%2Ftranslator");
+    [$status] = httpRequest("admin/index.php", "path=%2Fsettings%2Flanguages&JSONRequest=1&responder=TemplateHelpResponder&type=fetch",
+        array("Cookie" => $cookies), "/admin/index.php?path=%2Fsettings%2Flanguages");
     assertSame(302, $status, "early responder bypassed the access check");
 });
 
-test("translator menu lists the languages", function () {
-    TestPDO()->exec("INSERT IGNORE INTO languages (langID, lang_code, language) VALUES (1, 'bgn', 'Bulgarian')");
+test("the settings menu: languages without the phrase translator", function () {
     [, , $body] = httpRequest("admin/index.php", "path=%2Fhome", array("Cookie" => coreAdminCookies()), "/admin/index.php?path=%2Fhome");
-    assertTrue(str_contains($body, "/admin/settings/languages/translator/phrases?langID=1"), "language link missing");
-    assertTrue(str_contains($body, ">BGN<"), "language code missing");
+    assertTrue(str_contains($body, "/admin/settings/languages'"), "languages link missing");
+    assertTrue(!str_contains($body, "/admin/settings/languages/translator"), "the phrase translator in the menu");
 });
 
 test("forgot password works without the store and does not reveal registered emails", function () {

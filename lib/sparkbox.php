@@ -98,6 +98,8 @@ if (!Spark::isStorageRequest()) {
     }
 
     include_once("utils/language.php");
+    //a change of the language redirects - before any output (the translator starts at its first use otherwise)
+    if (isset($_GET[Translator::KEY_CHANGE_LANGUAGE])) Translator::Instance();
 
     if (!Spark::isJSONRequest()) {
         include_once("objects/SparkEventManager.php");

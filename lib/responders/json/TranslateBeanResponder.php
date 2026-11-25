@@ -1,5 +1,4 @@
 <?php
-include_once("beans/SiteTextsBean.php");
 include_once("beans/BeanTranslationsBean.php");
 include_once("responders/json/JSONResponder.php");
 

@@ -23,23 +23,9 @@ $menu->append($settings);
 $settings->append(new MenuItem("Admins", "admins"));
 $settings->append(new MenuItem("SEO", "seo"));
 $settings->append(new MenuItem("Marketing", "marketing"));
-$languages = new MenuItem("Languages", "languages");
-$translator = new MenuItem("Translator", "translator");
-$languages->append($translator);
-$settings->append($languages);
+//the languages of the site (the content translations) - the texts of the code come from the language packs
+$settings->append(new MenuItem("Languages", "languages"));
 
-//one translator entry per language - its phrases
-include_once("beans/LanguagesBean.php");
 include_once("pages/SparkAdminPage.php");
-$languagesBean = new LanguagesBean();
-$query = $languagesBean->query($languagesBean->key(), "lang_code");
-$query->exec();
-while ($row = $query->next()) {
-    $code = strtoupper((string)$row["lang_code"]);
-    $item = new MenuItem($code, "phrases?langID=" . (int)$row[$languagesBean->key()]);
-    $item->enableTranslation(false);
-    $translator->append($item);
-}
-$query->free();
 
 SparkAdminPage::SetMenu($menu);

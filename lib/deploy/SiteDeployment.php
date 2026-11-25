@@ -30,8 +30,10 @@ class SiteDeployment
     public string $adminPass = "";
     public string $theme = "light";
     public string $language = "english";
-    public string $languageISO3 = "eng";
+    //two-letter (ISO 639-1) - the locale follows it unless --locale is given
+    public string $languageCode = "en";
     public string $locale = "en-us";
+    protected bool $localeGiven = false;
     public string $timezone = "Europe/Sofia";
 
     //the paths as the web server sees them (default: this checkout, the folder)
@@ -65,7 +67,7 @@ class SiteDeployment
         $tool = $this->layer() . "/tools/deploy.php";
         return "Usage:\n"
             . "  php $tool --title=\"Site Title\" --folder=<empty folder> [--db=<name>:<password>] [--dbhost=<host>[:<port>]]\n"
-            . "        [--admin=<email>:<password>] [--theme=light] [--language=english:eng] [--locale=en-us]\n"
+            . "        [--admin=<email>:<password>] [--theme=light] [--language=english:en] [--locale=en-us]\n"
             . "        [--timezone=Europe/Sofia] [--sparkbox=<path>] [--app=<path>]\n"
             . "      a new site in an empty (or new) folder - the database name is also its user\n"
             . "  php $tool --update --folder=<site root> [--write] [--remove-links] [--force] [--sparkbox=<path>] [--app=<path>]\n"
@@ -116,8 +118,13 @@ class SiteDeployment
                 if (!filter_var($this->adminEmail, FILTER_VALIDATE_EMAIL)) throw new Exception("--admin: not an email address");
                 break;
             case "theme": $this->theme = (string)$value; break;
-            case "language": [$this->language, $this->languageISO3] = $pair($value, "language"); break;
-            case "locale": $this->locale = (string)$value; break;
+            case "language":
+                [$this->language, $this->languageCode] = $pair($value, "language");
+                $this->languageCode = strtolower($this->languageCode);
+                if (!preg_match("/^[a-z]{2}$/", $this->languageCode)) throw new Exception("--language: <name>:<two-letter code> (bulgarian:bg)");
+                if (!$this->localeGiven) $this->locale = $this->languageCode . "-" . $this->languageCode;
+                break;
+            case "locale": $this->locale = (string)$value; $this->localeGiven = true; break;
             case "timezone": $this->timezone = (string)$value; break;
             case "sparkbox": $this->sparkboxPath = rtrim((string)$value, "/"); break;
             case "app": $this->appPath = rtrim((string)$value, "/"); break;
@@ -315,7 +322,6 @@ class SiteDeployment
             "Spark::Set(Config::DB_ENABLED, " . (($this->dbName !== "") ? "TRUE" : "FALSE") . ");",
             "Spark::Set(Config::TRANSLATOR_ENABLED, FALSE);",
             "Spark::Set(Config::DEFAULT_LANGUAGE, " . var_export($this->language, true) . ");",
-            "Spark::Set(Config::DEFAULT_LANGUAGE_ISO3, " . var_export($this->languageISO3, true) . ");",
             "Spark::Set(Config::DEFAULT_LOCALE, " . var_export($this->locale, true) . ");",
             "Spark::Set(Config::TIMEZONE, " . var_export($this->timezone, true) . ");",
             "Spark::Set(Config::PHPMAILER_ENABLED, FALSE);",
@@ -457,9 +463,9 @@ class SiteDeployment
      */
     protected function createTables() : void
     {
-        //the values a table creation reads (the default language row)
+        //the values a table creation reads (the languages: English and the language of the site)
         Spark::Set(Config::DEFAULT_LANGUAGE, $this->language);
-        Spark::Set(Config::DEFAULT_LANGUAGE_ISO3, $this->languageISO3);
+        Spark::Set(Config::DEFAULT_LOCALE, $this->locale);
 
         //one file per bean class - a later layer replaces a bean of the same name (the store FAQItemsBean)
         $beans = array();

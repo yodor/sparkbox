@@ -86,7 +86,8 @@ abstract class DBTableBean implements IDBDriverAccess, ISerializable, IUnseriali
             if (strlen($this->createString) < 1) {
                 throw new Exception("Table '$this->table' was not found in the active connection and no create string is set to recreate the table");
             }
-            DBTableBean::CreateTable($this->createString);
+            //static: a bean that fills its new table runs its own (LanguagesBean - the languages)
+            static::CreateTable($this->createString);
             DBTableBean::ForgetColumnTypes($this->table);
         }
 

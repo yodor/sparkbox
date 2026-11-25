@@ -1,5 +1,6 @@
 <?php
 include_once("beans/DBTableBean.php");
+include_once("utils/Translator.php");
 
 class LanguagesBean extends DBTableBean
 {
@@ -20,25 +21,38 @@ CREATE TABLE `languages` (
         parent::__construct("languages");
     }
 
+    /**
+     * The new table has English (the language of the code) and the language of the site (Config::DEFAULT_LANGUAGE,
+     * the code of Config::DEFAULT_LOCALE) - two-letter codes
+     */
     protected static function CreateTable(string $createText) : void
     {
         parent::CreateTable($createText);
 
+        $rows = array("en" => "english");
+        $code = Translator::LocaleLanguage((string)Spark::Get(Config::DEFAULT_LOCALE));
+        if ($code !== "en") {
+            //the configured name, else the English name of the code ('bg' - 'bulgarian')
+            $name = strtolower(trim((string)Spark::Get(Config::DEFAULT_LANGUAGE)));
+            if ($name === "" || $name === "english") $name = strtolower((string)Locale::getDisplayLanguage($code, "en"));
+            $rows[$code] = ($name !== "") ? $name : $code;
+        }
+
         $query = new DBQuery();
         try {
-            $insert = SQLInsert::Table("languages");
-            $insert->set("language", Spark::Get(Config::DEFAULT_LANGUAGE));
-            $insert->set("lang_code", Spark::Get(Config::DEFAULT_LANGUAGE_ISO3));
-
-            $query->exec($insert);
+            foreach ($rows as $langCode => $language) {
+                $insert = SQLInsert::Table("languages");
+                $insert->set("language", $language);
+                $insert->set("lang_code", $langCode);
+                $query->exec($insert);
+            }
         }
         catch (Exception $ex) {
-            Debug::ErrorLog("Unable to insert default language: ".$ex->getMessage());
+            Debug::ErrorLog("Unable to insert the languages: ".$ex->getMessage());
             throw $ex;
         }
         finally {
             $query->free();
         }
-
     }
 }

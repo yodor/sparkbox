@@ -146,6 +146,21 @@ final class SparkLoader
      * @return void
      * @throws Exception
      */
+    /**
+     * Every '$fileName' of the search locations, in their order (core, store, the site) - the language packs
+     * @return array<string>
+     */
+    public function findAll(string $fileName, string $extension = "php") : array
+    {
+        $files = array();
+        if (!$fileName) return $files;
+        foreach (SparkLoader::$locations as $includePath => $includePrefix) {
+            $file = Spark::PathParts($includePath, $includePrefix, $this->prefix, $fileName . "." . $extension);
+            if (is_file($file)) $files[] = $file;
+        }
+        return $files;
+    }
+
     public function include(string $fileName, bool $includeAll) : void
     {
 
