@@ -3,6 +3,7 @@ include_once("components/PageSection.php");
 include_once("components/Container.php");
 include_once("components/Button.php");
 include_once("components/TextComponent.php");
+include_once("components/InlineScript.php");
 include_once("utils/url/DynamicPageURL.php");
 
 /**
@@ -12,7 +13,7 @@ include_once("utils/url/DynamicPageURL.php");
  * Nothing but the necessary cookies before a choice. Accept all and Reject are equal buttons; Settings shows the
  * two choices (analytics, ads) and Save. A 'cookies' link of the footer opens the panel again (sparkCookies.open()).
  *
- *   aside.section.cookies[accepted][settings] > .content > .info
+ *   div.section.cookies[role=dialog][accepted][settings] > .content > .info
  *     .text (+ the terms link), .choices > label > input[name=analytics|ads], .buttons > a.ColorButton
  */
 class CookiesPanel extends PageSection
@@ -23,7 +24,8 @@ class CookiesPanel extends PageSection
     {
         parent::__construct();
         $this->addClassName("cookies");
-        $this->setTagName("aside");
+        //a div: role 'dialog' is not allowed on an aside
+        $this->setTagName("div");
         $this->setAttribute("aria-label", "Cookie Consent");
         $this->setAttribute("role", "dialog");
         $this->setAttribute("tabindex", "0");
@@ -35,6 +37,24 @@ class CookiesPanel extends PageSection
         $ret = parent::requiredStyle();
         $ret[] = CookiesPanel::Stylesheet();
         return $ret;
+    }
+
+    public function finishRender() : void
+    {
+        parent::finishRender();
+        CookiesPanel::RenderState();
+    }
+
+    /**
+     * Show or hide the panel (the element just before this script) as the page is parsed - by the stored choice
+     * (SparkGTM, a boot script). The page is the same for every visitor (the CDN keeps it), so the choice is read
+     * here and not by the server; SparkCookies takes over the panel when the page is parsed.
+     */
+    public static function RenderState() : void
+    {
+        $script = new InlineScript();
+        $script->setCode("(function (panel) { if (panel && typeof SparkGTM === 'function') panel.setAttribute('accepted', SparkGTM.StoredConsent() ? 'true' : 'false'); })(document.currentScript && document.currentScript.previousElementSibling);");
+        $script->render();
     }
 
     public static function Stylesheet() : string

@@ -84,6 +84,12 @@ class ImageSlider extends Component {
         });
 
         window.addEventListener("resize", () => this.update());
+        //a strip measures its photos - again as each one loads (the slider starts when the page is parsed)
+        if (this.element.classList.contains("strip")) {
+            this.viewport.querySelectorAll("img").forEach((image) => {
+                if (!image.complete) image.addEventListener("load", () => this.update(), {once: true});
+            });
+        }
 
         this.element.classList.add("ready");
         this.update();

@@ -64,6 +64,8 @@ class ResultViewHeader extends Container
         $dataInput->getRenderer()->setIterator(new ArrayDataIterator());
         $dataInput->getRenderer()->input()->setAttribute("onChange", "updateList(this)");
         $dataInput->getRenderer()->input()->setAttribute("key", Paginator::KEY_ORDER_BY);
+        //its caption is not a <label> - the name of the select for screen readers
+        $dataInput->getRenderer()->input()->setAttribute("aria-label", tr("Sort By"));
         $this->sort = new InputComponent($dataInput);
         $this->sort->setComponentClass("sort_fields");
 
@@ -72,6 +74,9 @@ class ResultViewHeader extends Container
         $this->sortDir->setComponentClass("direction");
         $this->sortDir->setAttribute("key", Paginator::KEY_ORDER_DIR);
         $this->sortDir->setAttribute("onClick", "updateList(this)");
+        //an icon button - its name for screen readers
+        $this->sortDir->setAttribute("aria-label", tr("Sort direction"));
+        $this->sortDir->setTitle(tr("Sort direction"));
 
         $this->sort->items()->append($this->sortDir);
         $this->items()->append($this->sort);

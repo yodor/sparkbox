@@ -2,7 +2,14 @@ class CallStack {
 
     constructor() {
         this.functions = Array();
-        //const onLoad = this.execute.bind(this);
+        //once the page is parsed - the deferred scripts have run, the stylesheets are loaded (the images may not be:
+        //the code that measures images updates on their 'load' - ImageSlider); 'load' runs what came after it
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", (event)=>this.execute());
+        }
+        else {
+            setTimeout(()=>this.execute(), 0);
+        }
         window.addEventListener("load", (event)=>this.execute());
         document.addEventListener(SparkEvent.DOM_UPDATED, (event)=>this.execute());
     }
@@ -53,9 +60,9 @@ class OnLoadFunction {
 document.sparkCallStack = new CallStack();
 
 /**
- * Append function to the window 'onLoad' event call stack.
+ * Append function to the call stack run when the page is parsed (DOMContentLoaded - not after the images).
  * It is called usually just before finishRender() of the php component where initialization of javascript side code is needed after page is finished loading
- * @param func {Function} the function to call after window 'load' is fired
+ * @param func {Function} the function to call when the page is parsed (or the content updated - DOM_UPDATED)
  * @param persistent {boolean} flag to specify this function should stay in the call stack after executing (only tooltip processTooltipContent uses this flag = true for now)
  *
  */

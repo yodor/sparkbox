@@ -51,7 +51,7 @@ class MenuBar extends Container
 
         $this->setAttribute("itemscope");
         $this->setAttribute("itemtype","https://schema.org/SiteNavigationElement");
-        $this->setAttribute("role", "menu");
+        //a navigation landmark (nav) - not role 'menu': that role is for application menus and needs menuitem children
 
         $this->toggle = new Component(false);
         $this->toggle->setTagName("SPAN");

@@ -34,5 +34,17 @@
 
 <IfModule mod_headers.c>
     Header set Cache-Control "public, max-age=31536000, immutable" env=SPARK_VERSIONED
+
+    # security headers of every answer:
+    #  - HTTPS only for a year (HSTS - the browser does not try http first; this host only, not its subdomains)
+    #  - the pages are framed only by the site itself (clickjacking)
+    #  - a file is used as its declared type, the address of a page is not sent to other sites (only the origin)
+    #  - a page opened by another site's window can not reach it (COOP) - popups the site opens keep working
+    #    (payment and credit windows)
+    Header always set Strict-Transport-Security "max-age=31536000"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
 </IfModule>
 # END SparkBox

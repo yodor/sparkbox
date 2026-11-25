@@ -21,7 +21,7 @@ include_once("objects/data/GTMQueue.php");
  *                   > nav.site_menu > .MenuBar
  *                   > main.site_main > the content
  *                   > footer.site_footer (> a.cookies when the site tracks)
- *         aside.section.cookies - the consent panel (CookiesPanel), when the site tracks
+ *         div.section.cookies - the consent panel (CookiesPanel), when the site tracks
  * The main menu selects the item of the requested address, else of the addresses the content names (IMenuAddresses).
  * The tracking of Settings > Marketing (Marketing) and the queued events (GTMQueue) go into the head.
  */
