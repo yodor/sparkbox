@@ -8,6 +8,7 @@ include_once("components/Script.php");
 include_once("objects/IObserver.php");
 include_once("components/ClosureComponent.php");
 include_once("pages/SparkPage.php");
+include_once("utils/AssetBundle.php");
 
 class HTMLHead extends Container implements IObserver
 {
@@ -82,6 +83,25 @@ class HTMLHead extends Container implements IObserver
      * @var array
      */
     protected array $canonical_params = array();
+
+    /**
+     * The local stylesheets and scripts in bundles (AssetBundle) - the public frames enable it (Config::ASSET_BUNDLES)
+     */
+    protected bool $bundles = false;
+
+    /**
+     * The scripts that run before the page is parsed (the src of addJS(..., true)) - in bundles: one bundle in the
+     * place of the first of them; the other local scripts are one deferred bundle at the end of the head
+     * @var array<string, bool>
+     */
+    protected array $bootScripts = array();
+
+    /**
+     * The addresses of the files the bundles have - for the page (document.Spark.bundled: ContentFragment does not
+     * load them again)
+     * @var array<string>
+     */
+    protected array $bundled = array();
 
 
     private function __construct()
@@ -168,13 +188,53 @@ class HTMLHead extends Container implements IObserver
         }
     }
 
+    /**
+     * Bundle the local stylesheets into one and the local scripts into two (the boot ones, the deferred rest) -
+     * AssetBundle. For the public pages: the inline code of the page must not need a deferred script before the
+     * page is loaded (onPageLoad() - CallStack.js is a boot script).
+     */
+    public function enableBundles(bool $enabled = true) : void
+    {
+        $this->bundles = $enabled;
+    }
+
+    public function isBundled() : bool
+    {
+        return $this->bundles;
+    }
+
+    /**
+     * The URL path of a local file address ('/sparkfront/css/Action.css?v=x' - '/sparkfront/css/Action.css'), ""
+     * for an address of another host or a missing file
+     */
+    protected static function LocalPath(string $href) : string
+    {
+        if (!str_starts_with($href, "/") || str_starts_with($href, "//")) return "";
+        $path = (string)parse_url($href, PHP_URL_PATH);
+        $root = (string)($_SERVER["DOCUMENT_ROOT"] ?? "");
+        return ($root !== "" && is_file($root . $path)) ? $path : "";
+    }
+
     protected function renderCSS(): void
     {
         echo "<!-- CSS Files Start -->\n";
 
+        $files = array();
         foreach ($this->cssLinks as $href => $cssLink) {
             if (!($cssLink instanceof Link)) continue;
-            $cssLink->render();
+            $path = $this->bundles ? HTMLHead::LocalPath($cssLink->getHref()) : "";
+            if ($path === "") {
+                $cssLink->render();
+                continue;
+            }
+            $media = $cssLink->getAttribute("media");
+            $files[] = $path . (($media !== "") ? "@" . $media : "");
+            $this->bundled[] = $cssLink->getHref();
+        }
+        if (count($files) > 0) {
+            $bundle = new Link();
+            $bundle->setHref(AssetBundle::Href(AssetBundle::TYPE_CSS, $files));
+            $bundle->render();
         }
 
         echo "<!-- CSS Files End -->\n";
@@ -183,11 +243,52 @@ class HTMLHead extends Container implements IObserver
 
     protected function renderScripts(): void
     {
+        if (!$this->bundles) {
+            foreach ($this->scripts as $object) {
+                if ($object instanceof Script) $object->render();
+            }
+            return;
+        }
+
+        $boot = array();
+        $deferred = array();
         foreach ($this->scripts as $object) {
-            if ($object instanceof Script) {
+            if (!($object instanceof Script) || $object->getSrc() === "") continue;
+            $path = HTMLHead::LocalPath($object->getSrc());
+            if ($path === "") continue;
+            if (isset($this->bootScripts[$object->getSrc()])) $boot[] = $path;
+            else $deferred[] = $path;
+            $this->bundled[] = $object->getSrc();
+        }
+
+        $bootRendered = false;
+        foreach ($this->scripts as $object) {
+            if (!($object instanceof Script)) continue;
+            $local = ($object->getSrc() !== "") && (HTMLHead::LocalPath($object->getSrc()) !== "");
+            if (!$local) {
                 $object->render();
+                continue;
+            }
+            //the boot bundle in the place of the first boot script
+            if (!$bootRendered && isset($this->bootScripts[$object->getSrc()])) {
+                $script = new Script();
+                $script->setSrc(AssetBundle::Href(AssetBundle::TYPE_JS, $boot));
+                $script->render();
+                $bootRendered = true;
             }
         }
+
+        if (count($deferred) > 0) {
+            $script = new Script();
+            $script->setSrc(AssetBundle::Href(AssetBundle::TYPE_JS, $deferred));
+            $script->setAttribute("defer");
+            $script->render();
+        }
+
+        //the files of the bundles - a fragment does not load them again (ContentFragment)
+        $list = new Script();
+        $list->setCode("(document.Spark = document.Spark || {}).bundled = " . json_encode($this->bundled, JSON_UNESCAPED_SLASHES) . ";");
+        $list->render();
     }
 
     protected function renderCanonical(): void
@@ -312,12 +413,15 @@ class HTMLHead extends Container implements IObserver
     /**
      * Adds a JavaScript code reference by URL to the javascript collection
      * @param string $url The url of the javascript code
+     * @param bool $boot needed by the inline code of the page as it is parsed - not deferred in bundles
      */
-    public function addJS(string $url) : void
+    public function addJS(string $url, bool $boot = false) : void
     {
         $js = new Script();
         $js->setSrc(HTMLHead::Versioned($url));
         $this->addScript($js);
+        //runs before the page is parsed also in bundles (enableBundles)
+        if ($boot) $this->bootScripts[$js->getSrc()] = true;
     }
 
     /**

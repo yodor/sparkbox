@@ -121,9 +121,10 @@ JS;
         $this->head()->addScript($sparkJS);
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkObject.js");
-        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkEvent.js");
+        //boot scripts (not deferred in bundles): the inline code of a page calls onPageLoad() and gtag() as it is parsed
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkEvent.js", true);
 
-        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/CallStack.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/CallStack.js", true);
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/TemplateFactory.js");
 
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/Component.js");
@@ -139,7 +140,7 @@ JS;
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/js.cookie.min.js");
 
         //gtm
-        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkGTM.js");
+        $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkGTM.js", true);
 
         //use gtm
         $this->head()->addJS(Spark::Get(Config::SPARK_LOCAL) . "/js/SparkCookies.js");

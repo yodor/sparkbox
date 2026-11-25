@@ -448,6 +448,7 @@ final class Spark {
         Spark::Set(Config::TIMEZONE, "Europe/Sofia");
 
         Spark::Set(Config::THEME, "light");
+        Spark::Set(Config::ASSET_BUNDLES, true);
 
         Spark::Set(Config::SITE_TITLE, "Default SparkBox Site");
     }

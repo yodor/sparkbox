@@ -89,3 +89,20 @@ function TestMailLog() : string
 {
     return TestCachePath() . "/mail.log";
 }
+
+/**
+ * The files of the bundles of a page (HTMLHead::enableBundles - AssetBundle addresses), in their order:
+ * array('css' => [URL paths], 'js' => [URL paths]) - a stylesheet with a media query is '<path>@<media>'
+ */
+function pageBundles(string $html) : array
+{
+    $result = array("css" => array(), "js" => array());
+    preg_match_all("#/assets/bundle/[0-9a-f]{16}\.(css|js)\?f=([A-Za-z0-9_-]+)#", $html, $m, PREG_SET_ORDER);
+    foreach ($m as [, $type, $files]) {
+        $list = (string)@gzinflate((string)base64_decode(strtr($files, "-_", "+/")));
+        foreach (explode("|", $list) as $file) {
+            if ($file !== "") $result[$type][] = $file;
+        }
+    }
+    return $result;
+}

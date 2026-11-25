@@ -82,6 +82,9 @@ class ContentFragment extends SparkObject {
      */
     static HasAddress(selector, attribute, url) {
         const href = new URL(url, window.location.href).href;
+        //the files the page has in its bundles (HTMLHead::enableBundles)
+        const bundled = (document.Spark && document.Spark.bundled) || [];
+        if (bundled.some((address) => new URL(address, window.location.href).href === href)) return true;
         return Array.from(document.querySelectorAll(selector)).some((element) => {
             return new URL(element.getAttribute(attribute), window.location.href).href === href;
         });

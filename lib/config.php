@@ -270,6 +270,13 @@ enum Config
     const string THEME = "THEME";
 
     /**
+     * The public frames (SparkSitePage, StorePage) send their local stylesheets and scripts in bundles - three
+     * requests in place of tens (HTMLHead::enableBundles, AssetBundle). Default true; false in config/settings.php
+     * sends the files one by one (debugging a stylesheet or a script)
+     */
+    const string ASSET_BUNDLES = "ASSET_BUNDLES";
+
+    /**
      * App/Site Title
      * Default(string): Default SparkBox Site
      */

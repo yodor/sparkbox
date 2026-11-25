@@ -80,6 +80,8 @@ class SparkSitePage extends SparkPage
     protected function headInitialize() : void
     {
         parent::headInitialize();
+        //the css and the js in bundles - fewer requests before the page renders
+        $this->head()->enableBundles(Spark::GetBoolean(Config::ASSET_BUNDLES));
         //the tracking of the site (Settings > Marketing) - after the consent defaults of SparkGTM.js
         Marketing::AddTo($this->head());
     }
