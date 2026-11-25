@@ -22,8 +22,8 @@ CREATE TABLE `languages` (
     }
 
     /**
-     * The new table has English (the language of the code) and the language of the site (Config::DEFAULT_LANGUAGE,
-     * the code of Config::DEFAULT_LOCALE) - two-letter codes
+     * The new table has English (the language of the code) and the language of the site (the language of
+     * Config::DEFAULT_LOCALE, its English name: 'bg' - 'bulgarian') - two-letter codes
      */
     protected static function CreateTable(string $createText) : void
     {
@@ -32,9 +32,8 @@ CREATE TABLE `languages` (
         $rows = array("en" => "english");
         $code = Translator::LocaleLanguage((string)Spark::Get(Config::DEFAULT_LOCALE));
         if ($code !== "en") {
-            //the configured name, else the English name of the code ('bg' - 'bulgarian')
-            $name = strtolower(trim((string)Spark::Get(Config::DEFAULT_LANGUAGE)));
-            if ($name === "" || $name === "english") $name = strtolower((string)Locale::getDisplayLanguage($code, "en"));
+            //the English name of the code ('bg' - 'bulgarian')
+            $name = strtolower((string)Locale::getDisplayLanguage($code, "en"));
             $rows[$code] = ($name !== "") ? $name : $code;
         }
 

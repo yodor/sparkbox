@@ -50,7 +50,7 @@ store site also include and store), the frame of the site (a core site: `class/p
 layer), `robots.txt`, `.gitignore`; it links `sparkfront` (and `storefront` - with `symlink()`, else `ln -s`, else
 it prints the command); it creates every table of the beans and the root administrator (userID 1 - it can not be
 deleted, suspended or limited). The database name is also its user (`--dbhost=` for another host). Options:
-`--theme=light`, `--language=english:eng`, `--locale=en-us`, `--timezone=Europe/Sofia`; run it without arguments
+`--theme=light`, `--language=en` (two-letter; the locale follows it), `--locale=en-us`, `--timezone=Europe/Sofia`; run it without arguments
 for the list.
 
 **An existing site** - the SparkBox part again (the `.htaccess` block, the front controller, `config/routes.php`

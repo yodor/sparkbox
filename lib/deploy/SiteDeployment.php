@@ -29,7 +29,6 @@ class SiteDeployment
     public string $adminEmail = "";
     public string $adminPass = "";
     public string $theme = "light";
-    public string $language = "english";
     //two-letter (ISO 639-1) - the locale follows it unless --locale is given
     public string $languageCode = "en";
     public string $locale = "en-us";
@@ -67,7 +66,7 @@ class SiteDeployment
         $tool = $this->layer() . "/tools/deploy.php";
         return "Usage:\n"
             . "  php $tool --title=\"Site Title\" --folder=<empty folder> [--db=<name>:<password>] [--dbhost=<host>[:<port>]]\n"
-            . "        [--admin=<email>:<password>] [--theme=light] [--language=english:en] [--locale=en-us]\n"
+            . "        [--admin=<email>:<password>] [--theme=light] [--language=en] [--locale=en-us]\n"
             . "        [--timezone=Europe/Sofia] [--sparkbox=<path>] [--app=<path>]\n"
             . "      a new site in an empty (or new) folder - the database name is also its user\n"
             . "  php $tool --update --folder=<site root> [--write] [--remove-links] [--force] [--sparkbox=<path>] [--app=<path>]\n"
@@ -119,9 +118,10 @@ class SiteDeployment
                 break;
             case "theme": $this->theme = (string)$value; break;
             case "language":
-                [$this->language, $this->languageCode] = $pair($value, "language");
-                $this->languageCode = strtolower($this->languageCode);
-                if (!preg_match("/^[a-z]{2}$/", $this->languageCode)) throw new Exception("--language: <name>:<two-letter code> (bulgarian:bg)");
+                //the two-letter code ('bg'; the earlier '<name>:<code>' form is understood)
+                $parts = explode(":", (string)$value);
+                $this->languageCode = strtolower(trim((string)end($parts)));
+                if (!preg_match("/^[a-z]{2}$/", $this->languageCode)) throw new Exception("--language: a two-letter code (bg)");
                 if (!$this->localeGiven) $this->locale = $this->languageCode . "-" . $this->languageCode;
                 break;
             case "locale": $this->locale = (string)$value; $this->localeGiven = true; break;
@@ -321,7 +321,6 @@ class SiteDeployment
             "Spark::Set(Config::THEME, " . var_export($this->theme, true) . ");",
             "Spark::Set(Config::DB_ENABLED, " . (($this->dbName !== "") ? "TRUE" : "FALSE") . ");",
             "Spark::Set(Config::TRANSLATOR_ENABLED, FALSE);",
-            "Spark::Set(Config::DEFAULT_LANGUAGE, " . var_export($this->language, true) . ");",
             "Spark::Set(Config::DEFAULT_LOCALE, " . var_export($this->locale, true) . ");",
             "Spark::Set(Config::TIMEZONE, " . var_export($this->timezone, true) . ");",
             "Spark::Set(Config::PHPMAILER_ENABLED, FALSE);",
@@ -464,7 +463,6 @@ class SiteDeployment
     protected function createTables() : void
     {
         //the values a table creation reads (the languages: English and the language of the site)
-        Spark::Set(Config::DEFAULT_LANGUAGE, $this->language);
         Spark::Set(Config::DEFAULT_LOCALE, $this->locale);
 
         //one file per bean class - a later layer replaces a bean of the same name (the store FAQItemsBean)

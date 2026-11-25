@@ -197,18 +197,19 @@ enum Config
     const string DB_ENABLED = "DB_ENABLED";
 
     /**
-     * The name of the language of the site ('languages' row of a new table)
-     * Default(string): english
+     * Deprecated - not read: the language of the site is the language of DEFAULT_LOCALE. Remove it from settings.php;
+     * the constant goes in a later release.
      */
     const string DEFAULT_LANGUAGE = "DEFAULT_LANGUAGE";
     /**
-     * Not used - the language of the site is the language of DEFAULT_LOCALE (two-letter code). Kept for the settings
-     * of the existing sites.
+     * Deprecated - not read: the language of the site is the language of DEFAULT_LOCALE. Remove it from settings.php;
+     * the constant goes in a later release.
      */
     const string DEFAULT_LANGUAGE_ISO3 = "DEFAULT_LANGUAGE_ISO3";
     /**
-     * Locale of the site - its language ('bg-bg' - 'bg') is the language of the site: the language packs
-     * (<layer>/lang/<code>.php), the 'lang' of the pages
+     * The locale of the site - the one language setting: its language ('bg-bg' - 'bg') is the language of the site
+     * (the language packs <layer>/lang/<code>.php, the 'lang' of the pages, the language of a new 'languages' table),
+     * the rest formats the dates and numbers (intl). A site in another language than English must set it.
      * Default(string): en-us
      */
     const string DEFAULT_LOCALE = "DEFAULT_LOCALE";

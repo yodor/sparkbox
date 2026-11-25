@@ -441,8 +441,6 @@ final class Spark {
         Spark::Set(Config::TRANSLATOR_ENABLED, FALSE);
         Spark::Set(Config::DB_ENABLED, FALSE);
 
-        Spark::Set(Config::DEFAULT_LANGUAGE, "english");
-        Spark::Set(Config::DEFAULT_LANGUAGE_ISO3, "eng");
         Spark::Set(Config::DEFAULT_LOCALE, "en-us");
 
         Spark::Set(Config::STORAGE_CACHE_ENABLED, TRUE);
