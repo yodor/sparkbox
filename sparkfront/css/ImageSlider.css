@@ -77,35 +77,61 @@
     z-index: 1;
 }
 
-/* the arrows */
+/* the arrows - tabs at the edges of the photo, the glyph centered. A page or a site changes them with the tokens
+   (on :root, or on its slider: .SellableImageGallery { --spark-slider-arrow-top: ... }) */
+:root {
+    --spark-slider-arrow-size: 3.2rem;
+    --spark-slider-arrow-font-size: 1.9rem;
+    --spark-slider-arrow-color: #ffffff;
+    --spark-slider-arrow-background: rgba(0, 0, 0, 0.2);
+    --spark-slider-arrow-background-hover: rgba(0, 0, 0, 0.8);
+    --spark-slider-arrow-radius: 10px;
+    /* from the side edges, and the middle of the arrow from the top */
+    --spark-slider-arrow-offset: 0px;
+    --spark-slider-arrow-top: 50%;
+}
+
+@media (max-width: 640px) {
+    :root {
+        --spark-slider-arrow-size: 2.4rem;
+        --spark-slider-arrow-font-size: 1.4rem;
+    }
+}
+
 .ImageSlider .nav-arrow {
     position: absolute;
-    top: 50%;
+    top: var(--spark-slider-arrow-top);
     transform: translateY(-50%);
     z-index: 2;
-    width: 1.67em;
-    line-height: 1.67em;
-    font-size: 2em;
-    text-align: center;
-    color: white;
-    background: rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--spark-slider-arrow-size);
+    height: var(--spark-slider-arrow-size);
+    padding: 0;
+    font-family: monospace;
+    font-size: var(--spark-slider-arrow-font-size);
+    line-height: 1;
+    color: var(--spark-slider-arrow-color);
+    background: var(--spark-slider-arrow-background);
     cursor: pointer;
     user-select: none;
     transition: background 0.3s;
 }
 
 .ImageSlider .nav-arrow:hover {
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--spark-slider-arrow-background-hover);
 }
 
 .ImageSlider .nav-arrow.prev {
-    left: 0;
-    border-radius: 0 10px 10px 0;
+    left: var(--spark-slider-arrow-offset);
+    border-radius: 0 var(--spark-slider-arrow-radius) var(--spark-slider-arrow-radius) 0;
 }
 
 .ImageSlider .nav-arrow.next {
-    right: 0;
-    border-radius: 10px 0 0 10px;
+    right: var(--spark-slider-arrow-offset);
+    border-radius: var(--spark-slider-arrow-radius) 0 0 var(--spark-slider-arrow-radius);
 }
 
 /* the dots - plain or small photos */
