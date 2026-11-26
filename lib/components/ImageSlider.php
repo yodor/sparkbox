@@ -78,6 +78,9 @@ class ImageSlider extends Container implements IPhotoRenderer
     {
         parent::__construct();
 
+        //the buttons of the popup of its photos (ImagePopup.js)
+        HTMLHead::Instance()->addTexts(...ImagePopup::SCRIPT_TEXTS);
+
         $this->dotSize = ImageSize::Small->value;
 
         $this->viewport = new Container(false);

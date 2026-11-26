@@ -1,5 +1,6 @@
 <?php
 include_once("utils/url/URL.php");
+include_once("utils/language.php");
 include_once("utils/url/FileVersion.php");
 include_once("components/Container.php");
 include_once("components/Meta.php");

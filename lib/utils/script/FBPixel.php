@@ -51,10 +51,5 @@ JS;
         $this->buffer()->append($fbq);
     }
 
-    public function addTrackObject(FBTrackObject $fbtrack) : void
-    {
-        $this->addTrackEvent($fbtrack->getEvent(), $fbtrack->getParameters());
-    }
-
 
 }

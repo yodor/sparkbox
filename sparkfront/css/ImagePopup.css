@@ -35,6 +35,16 @@
 
 .ImagePopupPane .Button {
     filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.95));
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
+}
+
+.ImagePopupPane .Button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
 }
 
 .ImagePopupPane .Header {
@@ -47,72 +57,63 @@
 }
 
 .ImagePopupPane .Header .Button {
-
     width:50px;
     height:50px;
-
-    /*max-width:50px;*/
-    /*max-height:50px;*/
-
-    text-decoration: none;
-
     background-repeat: no-repeat;
     background-color: transparent;
     background-size: contain;
-
-    cursor: pointer;
-
-    /*box-shadow: 0px 0px 5px 1px rgba(255,255,255,0.8);*/
-
-
 }
 
 .ImagePopupPane .Header .Button[action="CloseImage"] {
     background-image: url("../images/close.png");
-
 }
 
 .ImagePopupPane .Header .Button[action="ZoomImage"] {
     background-image: url("../images/zoom.png");
-
 }
 
+/* the photo area - the arrows at its sides, centered (the tabs of ImageSlider: the --spark-slider-arrow-* tokens) */
 .ImagePopupPane .Contents {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
+    position: relative;
     flex-grow:1;
 }
 
-.ImagePopupPane .Contents .Button {
-
-    background-color: transparent;
-    background-size: 50px 50px;
-
-    background-repeat: no-repeat;
-
-    text-decoration: none;
-
-    color: gray;
-
-    cursor: pointer;
-
-    width:50px;
+.ImagePopupPane .Contents .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--spark-slider-arrow-size, 3.2rem);
+    height: var(--spark-slider-arrow-size, 3.2rem);
+    font-family: monospace;
+    font-size: var(--spark-slider-arrow-font-size, 1.9rem);
+    line-height: 1;
+    color: var(--spark-slider-arrow-color, #ffffff);
+    background: var(--spark-slider-arrow-background, rgba(0, 0, 0, 0.2));
+    user-select: none;
+    transition: background 0.3s;
 }
 
-.ImagePopupPane .Contents .Button[action="PrevImage"] {
-
-    background-image: url("../images/gallery_left.png");
-    background-position:left center;
-
+.ImagePopupPane .Contents .nav-arrow:hover {
+    background: var(--spark-slider-arrow-background-hover, rgba(0, 0, 0, 0.8));
 }
 
-.ImagePopupPane .Contents .Button[action="NextImage"] {
+.ImagePopupPane .Contents .nav-arrow.prev {
+    left: 0;
+    border-radius: 0 var(--spark-slider-arrow-radius, 10px) var(--spark-slider-arrow-radius, 10px) 0;
+}
 
-    background-image: url("../images/gallery_right.png");
-    background-position:right center;
+.ImagePopupPane .Contents .nav-arrow.next {
+    right: 0;
+    border-radius: var(--spark-slider-arrow-radius, 10px) 0 0 var(--spark-slider-arrow-radius, 10px);
+}
 
+/* one photo: no arrows */
+.ImagePopupPane[single] .Contents .nav-arrow {
+    display: none;
 }
 
 .ImagePopupPane .Footer {
@@ -124,7 +125,7 @@
     to {transform:rotate(360deg);}
 }
 
-.ImagePopupPane[loading] .Button {
+.ImagePopupPane[loading] .Contents .Button {
     display:none;
 
 }

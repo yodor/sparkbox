@@ -33,6 +33,11 @@ class JSONFormDialog extends JSONDialog {
         this.request.setFunction("render");
 
         this.request.onSuccess = this.processRenderResult.bind(this);
+        //a form that can not be shown: the dialog closes, the message is shown
+        this.request.onError = (error) => {
+            this.remove();
+            showAlert(error.description);
+        };
 
         this.request.start();
     }
@@ -58,10 +63,15 @@ class JSONFormDialog extends JSONDialog {
      */
     submitForm()  {
 
-        //console.log("Submitting form");
-        this.request.setFunction("submit");
-
+        //not while a request runs (a second click would send the form twice) or before the form is shown
+        if (this.element.hasAttribute("loading")) return;
         const form = this.element.querySelector("FORM");
+        if (!form) return;
+
+        this.request.setFunction("submit");
+        //an error of the submit: the message, the form stays
+        this.request.onError = this.onError.bind(this);
+
         const name = form.getAttribute("name");
 
         this.request.setPostParameter("SubmitForm", name);
@@ -131,6 +141,14 @@ class JSONFormDialog extends JSONDialog {
 
         this.content.innerHTML = "";
         document.templateFactory.appendContent(this.content, contents);
+
+        //Enter in a field sends the form through the dialog (not as a page request)
+        this.content.querySelector("FORM")?.addEventListener("submit", (event) => {
+            event.preventDefault();
+            this.submitForm();
+        });
+        //the first field gets the focus - with a mouse only (on a phone it would open the keyboard at once)
+        if (window.matchMedia("(pointer: fine)").matches) this.content.querySelector("FORM input:not([type='hidden']), FORM textarea, FORM select")?.focus();
 
     }
 

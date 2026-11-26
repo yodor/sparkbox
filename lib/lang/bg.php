@@ -146,6 +146,7 @@ return array(
     'News' => 'Новини',
     'News Items' => 'Новини',
     'Next' => 'Следващ',
+    'Next photo' => 'Следваща снимка',
     'No' => 'Не',
     'No bean translation found for clearing' => 'Няма превод за изтриване',
     'No elements in this collection yet' => 'Няма елементи в тази колекция',
@@ -176,6 +177,7 @@ return array(
     'Prev' => 'Предишен',
     'Preview' => 'Преглед',
     'Previous' => 'Предишен',
+    'Previous photo' => 'Предишна снимка',
     'Publication not found' => 'Публикацията не е намерена',
     'Query' => 'Запитване',
     'Question' => 'Въпрос',
@@ -249,4 +251,5 @@ return array(
     'Your administrator account has no e-mail address' => 'Профилът Ви на администратор няма имейл адрес',
     'Your enquiry was sent' => 'Заявката Ви беше изпратена успешно',
     'Your new password is' => 'Вашата нова парола е',
+    'Zoom' => 'Увеличи',
 );

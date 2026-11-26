@@ -62,6 +62,12 @@ class ImagePopup extends SparkObject {
         this.buttonZoom.addEventListener("click", (event)=>this.zoomImage());
         this.buttonClose.addEventListener("click", (event)=>this.closeImage());
 
+        //the focus before the popup opened - it goes back there when the popup closes
+        this.returnFocus = null;
+        //the swipe of a finger (not zoomed): its start
+        this.swipeStart = null;
+        this.onKeyDown = this.keyDownHandler.bind(this);
+
         /**
          * Zoom data
          * @type {ZoomData}
@@ -78,17 +84,29 @@ class ImagePopup extends SparkObject {
             this.popup.removeAttribute("loading");
 
         });
+        //a photo that does not load - no endless spinner
+        this.image.addEventListener("error", (event)=>{
+            if (this.image.getAttribute("src")) this.popup.removeAttribute("loading");
+        });
 
         this.popup.addEventListener("mousedown", (event)=> this.mouseDownHandler(event));
         this.popup.addEventListener("touchstart", (event)=> this.mouseDownHandler(event), {passive: true});
+        this.popup.addEventListener("touchstart", (event)=> this.swipeStartHandler(event), {passive: true});
 
         this.popup.addEventListener("mouseup", (event) => this.mouseUpHandler(event));
         this.popup.addEventListener("touchend", (event) => this.mouseUpHandler(event));
+        this.popup.addEventListener("touchend", (event) => this.swipeEndHandler(event));
 
         this.popup.addEventListener("mousemove", (event) => this.mouseMoveHandler(event));
         this.popup.addEventListener("touchmove", (event) => this.mouseMoveHandler(event), {passive: true});
 
-        window.addEventListener("load", (event) => this.assignListeners(document));
+        //the popups of the page (the script is deferred - the page may be parsed already)
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", (event) => this.assignListeners(document));
+        }
+        else {
+            this.assignListeners(document);
+        }
         window.addEventListener("resize", (event)=> this.setupZoom());
 
         document.addEventListener(SparkEvent.DOM_UPDATED, (event) => this.assignListeners(event.source));
@@ -123,15 +141,19 @@ class ImagePopup extends SparkObject {
     }
 
     /**
-     *  Return the html to be shown inside a ModalPane
+     *  The html of the popup pane (its buttons - the photo is its background)
      * @returns {string}
      */
     createPopupContents() {
+        //the texts of the buttons - the page gives their translations (ImagePopup.php - HTMLHead::addTexts)
+        const label = (text) => ((typeof tr === "function") ? tr(text) : text).replace(/&/g, "&amp;").replace(/'/g, "&#39;").replace(/</g, "&lt;");
         let html = "";
-        html += "<div class='ImagePopupPane'>";
-        html += "<div class='Header'><a class='Button' action='ZoomImage'></a><a class='Button' action='CloseImage' default_action></a></div>";
+        html += "<div class='ImagePopupPane' role='dialog' aria-modal='true'>";
+        html += "<div class='Header'><button type='button' class='Button' action='ZoomImage' aria-label='" + label("Zoom") + "'></button>";
+        html += "<button type='button' class='Button' action='CloseImage' default_action aria-label='" + label("Close") + "'></button></div>";
         html += "<div class='Contents'>";
-        html += "<a class='Button' action='PrevImage'></a><a class='Button' action='NextImage'></a>";
+        html += "<button type='button' class='Button nav-arrow prev' action='PrevImage' aria-label='" + label("Previous photo") + "'>&#10094;</button>";
+        html += "<button type='button' class='Button nav-arrow next' action='NextImage' aria-label='" + label("Next photo") + "'>&#10095;</button>";
         html += "</div>";
         html += "<div class='Footer'></div>";
         html += "</div>";
@@ -155,6 +177,7 @@ class ImagePopup extends SparkObject {
             return;
         }
 
+        this.returnFocus = document.activeElement;
         document.body.style.overflow = "hidden";
 
         this.popup.setAttribute("loading","");
@@ -191,7 +214,13 @@ class ImagePopup extends SparkObject {
             }
         }
 
+        //one photo: no arrows
+        if (this.collection.length < 2) this.popup.setAttribute("single", "");
+        else this.popup.removeAttribute("single");
+
         document.body.appendChild(this.popup);
+        document.addEventListener("keydown", this.onKeyDown);
+        this.buttonClose.focus();
 
         const sparkEvent = new SparkEvent(ImagePopup.EVENT_OPENED, this)
         this.notify(sparkEvent);
@@ -224,13 +253,16 @@ class ImagePopup extends SparkObject {
 
         let caption = current.getAttribute("title");
 
+        //the title as text (a title may have '<' - it is not HTML)
         let footer = this.popup.querySelector(".Footer");
+        footer.innerHTML = "";
         if (caption) {
-            footer.innerHTML = "<h1 class='Caption'>" + caption + "</h1>";
+            const heading = document.createElement("h1");
+            heading.className = "Caption";
+            heading.textContent = caption;
+            footer.appendChild(heading);
         }
-        else {
-            footer.innerHTML = "";
-        }
+        this.popup.setAttribute("aria-label", caption || "");
 
         //trigger on load
         this.image.src = url.href;
@@ -302,8 +334,12 @@ class ImagePopup extends SparkObject {
         this.popup.removeAttribute("loading");
         this.popup.removeAttribute("zoom");
         this.popup.remove();
+        document.removeEventListener("keydown", this.onKeyDown);
 
-        document.body.style.overflow = "auto";
+        //the overflow of the page as the page had it
+        document.body.style.overflow = "";
+        if (this.returnFocus instanceof HTMLElement && document.contains(this.returnFocus)) this.returnFocus.focus();
+        this.returnFocus = null;
 
         const sparkEvent = new SparkEvent(ImagePopup.EVENT_CLOSED,this);
         this.notify(sparkEvent);
@@ -353,11 +389,69 @@ class ImagePopup extends SparkObject {
         this.popup.style.backgroundPositionY = this.zoom.position.y + "px";
     }
 
+    /**
+     * Escape closes, the arrows show the previous / the next photo
+     * @param event {KeyboardEvent}
+     */
+    keyDownHandler(event) {
+        if (!this.popup.isConnected) return;
+        if (event.key === "Escape") {
+            event.preventDefault();
+            if (this.popup.hasAttribute("zoom")) this.zoomImage();
+            else this.closeImage();
+        }
+        else if (event.key === "ArrowRight" && !this.popup.hasAttribute("single")) {
+            event.preventDefault();
+            this.nextImage();
+        }
+        else if (event.key === "ArrowLeft" && !this.popup.hasAttribute("single")) {
+            event.preventDefault();
+            this.prevImage();
+        }
+    }
+
+    swipeStartHandler(event) {
+        if (this.popup.hasAttribute("zoom") || event.touches.length !== 1) {
+            this.swipeStart = null;
+            return;
+        }
+        this.swipeStart = {x: event.touches[0].clientX, y: event.touches[0].clientY};
+    }
+
+    /**
+     * A horizontal swipe (not zoomed) shows the next / the previous photo
+     */
+    swipeEndHandler(event) {
+        if (!this.swipeStart || this.popup.hasAttribute("single") || event.changedTouches.length < 1) return;
+        const dx = event.changedTouches[0].clientX - this.swipeStart.x;
+        const dy = event.changedTouches[0].clientY - this.swipeStart.y;
+        this.swipeStart = null;
+        if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        if (dx < 0) this.nextImage();
+        else this.prevImage();
+    }
+
+    /**
+     * The popup photos of '$parentNode' open the popup - by click, or by Enter / Space (they are buttons)
+     * @param parentNode {ParentNode}
+     */
     assignListeners(parentNode) {
 
+        if (!parentNode || typeof parentNode.querySelectorAll !== "function") return;
         parentNode.querySelectorAll(".ImagePopup:not([href])").forEach( (element) => {
 
+            //once per element (the page and its updates may pass it again)
+            if (element.hasAttribute("popup-ready")) return;
+            element.setAttribute("popup-ready", "");
+            if (!element.hasAttribute("tabindex")) element.setAttribute("tabindex", "0");
+            if (!element.hasAttribute("role")) element.setAttribute("role", "button");
+
             element.addEventListener("click", (event)=>document.imagePopup.show(element));
+            element.addEventListener("keydown", (event) => {
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                document.imagePopup.show(element);
+            });
 
         });
     }

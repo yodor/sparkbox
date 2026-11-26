@@ -6,7 +6,32 @@ class MessageDialog extends TemplateComponent {
     static TYPE_QUESTION = "Question";
 
 
+    /**
+     * The index of the last dialog shown - each dialog its own (the selector of a dialog has it)
+     */
     static indexCounter = -1;
+
+    /**
+     * The dialogs shown, the top one last - Escape answers the top one, the z-index follows the order
+     * @type {MessageDialog[]}
+     */
+    static openDialogs = [];
+
+    /**
+     * Escape: the 'cancel' action of the top dialog when it has one, else its default action
+     * @param event {KeyboardEvent}
+     */
+    static onKeyDown(event) {
+        if (event.key !== "Escape" || MessageDialog.openDialogs.length < 1) return;
+        const dialog = MessageDialog.openDialogs[MessageDialog.openDialogs.length - 1];
+        const buttons = dialog.element.querySelector(".Footer .Buttons");
+        let action = "";
+        if (buttons?.querySelector("[action='cancel']")) action = "cancel";
+        else action = buttons?.querySelector("[default_action]")?.getAttribute("action") || "";
+        event.preventDefault();
+        if (action) dialog.buttonAction(action);
+        else dialog.remove();
+    }
 
     /**
      * Create a DOM element selector for MessageDialog popups
@@ -71,12 +96,21 @@ class MessageDialog extends TemplateComponent {
 
         this.shown = true;
 
-        //increment the global index counter
+        //an index of its own - never reused while the page is open (two dialogs with one index share a selector)
         MessageDialog.indexCounter++;
-        //set this selector index
         this.index = MessageDialog.indexCounter;
 
         this.element.setAttribute("index", this.index);
+
+        //a dialog for assistive technology, named by its title; above the dialogs shown before it
+        this.element.setAttribute("role", "dialog");
+        this.element.setAttribute("aria-modal", "true");
+        const title = this.header?.querySelector(".Title")?.textContent?.trim();
+        if (title) this.element.setAttribute("aria-label", title);
+        MessageDialog.openDialogs.push(this);
+        this.element.style.zIndex = String(100 + MessageDialog.openDialogs.length);
+        //the focus goes back where it was when the dialog closes
+        this.returnFocus = document.activeElement;
 
         const buttons = this.element.querySelector(".Footer .Buttons");
 
@@ -96,8 +130,10 @@ class MessageDialog extends TemplateComponent {
 
     remove() {
         super.remove();
-        MessageDialog.indexCounter--;
+        MessageDialog.openDialogs = MessageDialog.openDialogs.filter((dialog) => dialog !== this);
         this.shown = false;
+        if (this.returnFocus instanceof HTMLElement && document.contains(this.returnFocus)) this.returnFocus.focus();
+        this.returnFocus = null;
     }
 
     /**
@@ -128,7 +164,8 @@ function showAlert(text) {
     };
 
     dialog.show();
-    dialog.element.style.zIndex = 100 + parseInt(dialog.index);
     return dialog;
 
 }
+
+document.addEventListener("keydown", (event) => MessageDialog.onKeyDown(event));

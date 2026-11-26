@@ -104,7 +104,7 @@ abstract class RequestResponder extends SparkObject implements IGETConsumer
     {
         parent::__construct();
 
-        //allow name override ex JSONComponentResponder
+        //allow a name override (a responder of a given name)
         if (!$this->getName()) {
             $this->setName(get_class($this));
         }

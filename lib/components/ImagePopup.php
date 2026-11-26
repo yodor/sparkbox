@@ -1,8 +1,13 @@
 <?php
 include_once("components/ImageStorage.php");
+include_once("pages/HTMLHead.php");
 
 class ImagePopup extends ImageStorage
 {
+    /**
+     * The texts of ImagePopup.js (the labels of its buttons)
+     */
+    const array SCRIPT_TEXTS = array("Zoom", "Close", "Previous photo", "Next photo");
 
     public function __construct(?StorageItem $storageItem = null)
     {
@@ -10,6 +15,8 @@ class ImagePopup extends ImageStorage
         $this->setComponentClass("ImagePopup");
         //force A
         $this->setTagName("a");
+        //the buttons of the popup (ImagePopup.js)
+        HTMLHead::Instance()->addTexts(...ImagePopup::SCRIPT_TEXTS);
     }
 
     public function requiredStyle(): array
