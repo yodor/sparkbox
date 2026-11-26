@@ -61,6 +61,32 @@ abstract class Mailer
         $this->body = MailView::Render($name, $data, $this->subject);
     }
 
+    /**
+     * The recipient - a preview sends the mail to another address (MailPreviews, the admin Settings > Mails)
+     */
+    public function setRecipient(string $email) : void
+    {
+        $this->to = $email;
+    }
+
+    public function getRecipient() : string
+    {
+        return $this->to;
+    }
+
+    public function getSubject() : string
+    {
+        return $this->subject;
+    }
+
+    /**
+     * The HTML document of the mail - what send() sends
+     */
+    public function document() : string
+    {
+        return $this->templateMessage($this->body);
+    }
+
     public function send() : bool
     {
         if (!$this->to) throw new Exception("Recipient missing.");

@@ -55,3 +55,71 @@
 /* list images */
 
 }
+
+/* Settings > Mails (MailPreviewsContent) */
+
+.MailPreviews {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.MailPreviews .list {
+    display: flex;
+    flex-direction: column;
+    min-width: 260px;
+    max-width: 320px;
+}
+
+.MailPreviews .list .item {
+    padding: 8px 12px;
+    border-left: 3px solid transparent;
+    color: inherit;
+    text-decoration: none;
+}
+
+.MailPreviews .list .item[selected] {
+    border-left-color: var(--theme-accent);
+    font-weight: bold;
+}
+
+.MailPreviews .view {
+    flex: 1;
+    min-width: 0;
+}
+
+.MailPreviews .view .head > div {
+    padding: 2px 0;
+}
+
+.MailPreviews .view .head .label:after {
+    content: ": ";
+}
+
+.MailPreviews .view .head .test {
+    margin: 12px 0;
+}
+
+.MailPreviews .view .mail {
+    display: block;
+    width: 100%;
+    max-width: 700px;
+    height: 720px;
+    border: 1px solid #d0d5db;
+    background: #f2f4f6;
+}
+
+.MailPreviews .view .plain pre {
+    white-space: pre-wrap;
+    max-width: 700px;
+}
+
+.MailPreviews .view .error {
+    color: #b00020;
+}
+
+@media (max-width: 800px) {
+    .MailPreviews {
+        flex-direction: column;
+    }
+}

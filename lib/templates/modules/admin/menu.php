@@ -23,6 +23,7 @@ $menu->append($settings);
 $settings->append(new MenuItem("Admins", "admins"));
 $settings->append(new MenuItem("SEO", "seo"));
 $settings->append(new MenuItem("Marketing", "marketing"));
+$settings->append(new MenuItem("Mails", "mails"));
 //the languages of the site (the content translations) - the texts of the code come from the language packs
 $settings->append(new MenuItem("Languages", "languages"));
 

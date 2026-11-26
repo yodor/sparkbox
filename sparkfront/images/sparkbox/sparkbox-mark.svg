@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="SparkBox"><title>SparkBox</title><defs>
+<linearGradient id="gTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFC857"/><stop offset="1" stop-color="#FF7A59"/></linearGradient>
+<linearGradient id="gLeft" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#F0477A"/><stop offset="1" stop-color="#7C4DFF"/></linearGradient>
+<linearGradient id="gRight" x1="1" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#2EE6B0"/><stop offset="1" stop-color="#1E88FF"/></linearGradient>
+<radialGradient id="gGlow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.85"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+</defs><path d="M64.00,8.61 L111.62,35.00 L64.00,61.39 L16.38,35.00Z" fill="url(#gTop)"/><path d="M15.08,37.26 L61.74,65.31 L62.70,119.74 L16.03,91.69Z" fill="url(#gLeft)"/><path d="M66.26,65.31 L112.92,37.26 L111.97,91.69 L65.31,119.74Z" fill="url(#gRight)"/><circle cx="64" cy="64" r="17.40" fill="url(#gGlow)" opacity="0.55"/><path d="M64.00,25.72 Q65.00,61.59 76.30,51.70 Q66.41,63.00 102.28,64.00 Q66.41,65.00 76.30,76.30 Q65.00,66.41 64.00,102.28 Q63.00,66.41 51.70,76.30 Q61.59,65.00 25.72,64.00 Q61.59,63.00 51.70,51.70 Q63.00,61.59 64.00,25.72Z" fill="#FFFFFF"/></svg>

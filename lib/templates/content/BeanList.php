@@ -96,9 +96,18 @@ class BeanList extends TemplateBeanContent
 
         if ($this->search->isProcessed()) {
 
-            //HAVING - the columns of the select list (aliases too); the values of the clauses are bound to the statement
+            //WHERE when the search columns are columns of the tables (filtered before the select list is computed);
+            //HAVING only for an alias of the select list (an expression - a subquery, CONCAT ...). The values of the
+            //clauses are bound to the statement.
             $clauses = $this->search->getForm()->prepareClauseCollection("OR");
-            $this->query->stmt->having($clauses->getSQL());
+            $sql = $clauses->getSQL();
+            if ($sql === "") return;
+            if ($this->searchNeedsHaving()) {
+                $this->query->stmt->having($sql);
+            }
+            else {
+                $this->query->stmt->where()->expression("(" . $sql . ")");
+            }
             foreach ($clauses->getBindings() as $key => $value) {
                 $this->query->stmt->bind($key, $value);
             }
@@ -109,6 +118,20 @@ class BeanList extends TemplateBeanContent
     public function isProcessed(): bool
     {
         return $this->search->isProcessed();
+    }
+
+    /**
+     * A search column is an alias of the select list (an expression) - only HAVING can read it
+     */
+    protected function searchNeedsHaving() : bool
+    {
+        $columns = $this->query->stmt->columns();
+        if (!($columns instanceof SQLColumnSet)) return true;
+        foreach ($this->search->getForm()->getColumns() as $name) {
+            $column = $columns->get((string)$name);
+            if ($column instanceof SQLColumn && $column->getExpression() !== "") return true;
+        }
+        return false;
     }
 
     /**

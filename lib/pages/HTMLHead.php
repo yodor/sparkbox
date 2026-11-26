@@ -130,10 +130,19 @@ class HTMLHead extends Container implements IObserver
         $charset->setAttribute("charset", "utf-8");
         $this->items()->append($charset);
 
-        //default favicon
+        //the favicon of the site (favicon.ico in its root), else the SparkBox icon (sparkfront/images/sparkbox)
         $this->favicon = new Link();
-        $this->favicon->setRelation("shortcut icon");
-        $this->favicon->setHref("//" . Spark::Get(Config::SITE_DOMAIN) . Spark::Get(Config::LOCAL) . "/favicon.ico");
+        $this->favicon->setRelation("icon");
+        if (is_file(Spark::Get(Config::APP_PATH) . "/favicon.ico")) {
+            $this->favicon->setHref(Spark::Get(Config::LOCAL) . "/favicon.ico");
+        }
+        else {
+            $this->favicon->setHref(Spark::Get(Config::SPARK_LOCAL) . "/images/sparkbox/favicon.ico");
+            $touchIcon = new Link();
+            $touchIcon->setRelation("apple-touch-icon");
+            $touchIcon->setHref(Spark::Get(Config::SPARK_LOCAL) . "/images/sparkbox/apple-touch-icon.png");
+            $this->items()->append($touchIcon);
+        }
         $this->items()->append($this->favicon);
 
         $cssLayers = new Component(false);
