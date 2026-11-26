@@ -196,8 +196,11 @@ class SelectQuery extends DBQuery implements IDataIterator,  ICacheIdentifier
         // 2. OPTIMIZATION: Clear all heavy columns from the INNER query.
         // Using a constant '1' prevents the execution of heavy subqueries (photos, attributes, etc.)
         // inside the VIEW or SELECT list, which are irrelevant for counting rows.
-        $innerStmt->columns()->reset();
-        $innerStmt->alias("1", "temp");
+        // A HAVING clause reads the columns of the select list (the keyword search of the admin lists) - they stay.
+        if (!$innerStmt->haveHaving()) {
+            $innerStmt->columns()->reset();
+            $innerStmt->alias("1", "temp");
+        }
 
         // 3. Remove ORDER BY from the inner query as sorting is resource-intensive and unnecessary for counting
         $innerStmt->orderClear();

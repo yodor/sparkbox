@@ -96,9 +96,12 @@ class BeanList extends TemplateBeanContent
 
         if ($this->search->isProcessed()) {
 
+            //HAVING - the columns of the select list (aliases too); the values of the clauses are bound to the statement
             $clauses = $this->search->getForm()->prepareClauseCollection("OR");
-            //$clauses->copyTo($this->query->select->where());
             $this->query->stmt->having($clauses->getSQL());
+            foreach ($clauses->getBindings() as $key => $value) {
+                $this->query->stmt->bind($key, $value);
+            }
 
         }
     }

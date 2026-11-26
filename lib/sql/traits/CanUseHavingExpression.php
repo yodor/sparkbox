@@ -18,6 +18,14 @@ trait CanUseHavingExpression
      * @return HavingExpression Return the HavingExpression itself
      * @throws Exception
      */
+    /**
+     * The statement has a HAVING clause (it reads the columns of the select list)
+     */
+    public function haveHaving() : bool
+    {
+        return !$this->_having->isEmpty();
+    }
+
     public function having(string $expr) : HavingExpression
     {
         if (strlen(trim($expr))>0) return $this->_having->and($expr);

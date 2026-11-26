@@ -89,6 +89,16 @@ class MailView
     }
 
     /**
+     * The output of another template of the layers with the values of this mail - a part several mails share
+     * (the order summary)
+     * @throws Exception
+     */
+    public function part(string $name) : string
+    {
+        return $this->template($name);
+    }
+
+    /**
      * A value of the mail ('' when not set)
      */
     public function get(string $key) : mixed
@@ -140,6 +150,30 @@ class MailView
     public function paragraph(string $html) : string
     {
         return "<p style='margin:0 0 16px 0;'>" . $html . "</p>\n";
+    }
+
+    /**
+     * A table of label => value rows - the values are HTML (escape the texts with e()); empty values are left out
+     * @param array<string, string> $rows
+     */
+    public function details(array $rows) : string
+    {
+        $html = "";
+        foreach ($rows as $label => $value) {
+            if (trim((string)$value) === "") continue;
+            $html .= "<tr><td style='padding:4px 12px 4px 0;color:#6b7280;vertical-align:top;white-space:nowrap;'>" . $this->e($label) . ":</td>"
+                . "<td style='padding:4px 0;vertical-align:top;'>" . $value . "</td></tr>\n";
+        }
+        if ($html === "") return "";
+        return "<table role='presentation' cellpadding='0' cellspacing='0' border='0' style='margin:0 0 16px 0;'>\n" . $html . "</table>\n";
+    }
+
+    /**
+     * A heading of a part of the mail
+     */
+    public function heading(string $text) : string
+    {
+        return "<h2 style='margin:24px 0 8px 0;font-size:17px;color:#222222;'>" . $this->e($text) . "</h2>\n";
     }
 
     /**

@@ -116,3 +116,27 @@ test("session time_zone follows PHP", function () {
     if ($row["tz"] !== $zone) skip("time zone tables not loaded - server keeps '{$row['tz']}'");
     assertSame($zone, $row["tz"]);
 });
+
+test("the count of a list with a keyword search (HAVING on its columns, bound values) - the admin lists", function () {
+    include_once("iterators/SelectQuery.php");
+    $bean = new ContactsBean();
+    $bean->insert(array("fullname" => "Having search zq1"));
+    $bean->insert(array("fullname" => "Having search zq2"));
+    $bean->insert(array("fullname" => "Other name"));
+    try {
+        $query = $bean->queryFull();
+        $clauses = new ClauseCollection();
+        $clauses->match("fullname", "%search zq%", "LIKE");
+        $query->stmt->having($clauses->getSQL());
+        foreach ($clauses->getBindings() as $key => $value) $query->stmt->bind($key, $value);
+        assertSame(2, $query->count(), "the count");
+        $query->exec();
+        $rows = 0;
+        while ($query->next()) $rows++;
+        $query->free();
+        assertSame(2, $rows, "the rows");
+    }
+    finally {
+        TestPDO()->exec("DELETE FROM contacts WHERE fullname LIKE 'Having search zq%' OR fullname = 'Other name'");
+    }
+});

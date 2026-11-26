@@ -4,7 +4,8 @@ include_once("utils/url/URL.php");
 
 /**
  * Passes a visitor's enquiry to the owner: the labelled form values, optionally what it is about (a product
- * with a link and a few details), Reply-To the visitor. Visitor text is escaped.
+ * with a link and a few details), Reply-To the visitor - the mail template mails/contact_request.php (it escapes
+ * the visitor's text).
  */
 class ContactRequestMailer extends Mailer
 {
@@ -27,7 +28,7 @@ class ContactRequestMailer extends Mailer
     {
         parent::__construct();
         $this->to = $recipient;
-        $this->subject = "Запитване от сайта " . Spark::Get(Config::SITE_DOMAIN);
+        $this->subject = tr("Enquiry from %s", Spark::Get(Config::SITE_DOMAIN));
     }
 
     public function setSubject(string $subject) : void
@@ -64,29 +65,12 @@ class ContactRequestMailer extends Mailer
      */
     public function prepareMessage() : void
     {
-        $e = fn(string $text) => Spark::AttributeValue($text);
-
-        $message = "";
-        foreach ($this->values as $label => $value) {
-            if (trim($value) === "") continue;
-            $message .= "<b>" . $e($label) . ":</b> " . nl2br($e($value)) . "<br>";
-        }
-
-        if ($this->aboutURL instanceof URL) {
-            $href = $e($this->aboutURL->fullURL()->toString());
-            $message .= "<br><b>" . $e(tr("Относно")) . ":</b> <a href='$href'>" . $e($this->aboutTitle) . "</a><br>";
-            foreach ($this->aboutDetails as $label => $value) {
-                $message .= $e($label) . ": " . $e($value) . "<br>";
-            }
-        }
-
-        $message .= "<br>";
-        //Reply-To is set when the visitor gave an e-mail
-        if ($this->reply_to) {
-            $message .= $e(tr("Отговорете на това писмо, за да пишете на клиента.")) . "<br>";
-        }
-        $message .= $e(Spark::Get(Config::SITE_DOMAIN));
-
-        $this->body = $message;
+        $this->useTemplate("contact_request", array(
+            "values" => $this->values,
+            "about_title" => $this->aboutTitle,
+            "about_url" => ($this->aboutURL instanceof URL) ? (string)$this->aboutURL->fullURL() : "",
+            "about_details" => $this->aboutDetails,
+            "reply" => ($this->reply_to !== ""),
+        ));
     }
 }
