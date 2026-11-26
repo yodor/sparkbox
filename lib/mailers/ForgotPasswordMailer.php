@@ -1,6 +1,9 @@
 <?php
 include_once("mailers/Mailer.php");
 
+/**
+ * The new password of an administrator (the admin 'forgot password') - the mail template mails/forgot_password.php
+ */
 class ForgotPasswordMailer extends Mailer
 {
 
@@ -18,23 +21,10 @@ class ForgotPasswordMailer extends Mailer
 
         $this->to = $email;
 
-        $message = tr("Hello") . ",\r\n";
-        $message .= "\r\n";
-        $message .= tr("This email is sent in relation to your forgot password request at") . " - ".Spark::Get(Config::SITE_TITLE) . "\r\n";
-        $message .= "\r\n";
-        $message .= tr("Your new password is").": ".$random_pass."\r\n";
-        $message .= "\r\n";
-        if ($login_url) {
-            $message .= tr("Use the following link to log into your account").": "."\r\n";
-            $message .= "<a href='{$login_url->fullURL()}'>{$login_url->fullURL()}</a>\r\n";
-            $message .= "\r\n";
-        }
-        $message .= tr("Sincerely").",\r\n";
-        $message .= Spark::Get(Config::SITE_TITLE)."\r\n";
-        $message .= "\r\n";
-        $message .= "<a href='".Spark::Get(Config::SITE_URL)."'>".Spark::Get(Config::SITE_URL)."</a>";
-
-        $this->body = $message; //send() wraps it in the HTML document
+        $this->useTemplate("forgot_password", array(
+            "password" => $random_pass,
+            "login" => $login_url ? (string)$login_url->fullURL() : "",
+        ));
 
     }
 

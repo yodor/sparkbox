@@ -5,6 +5,9 @@
  */
 include_once("mailers/Mailer.php");
 
+//the layers of the loader as at boot (the mail templates of the core)
+SparkLoader::AddLocation(realpath(TESTS_PATH . "/../lib"), "");
+
 class TestMailer extends Mailer
 {
     public function __construct(string $body = "Hello\r\n<a href='https://example.com/x?a=1&amp;b=2'>the link</a>")
@@ -24,10 +27,48 @@ class TestMailer extends Mailer
     }
 }
 
-test("the message is wrapped in the HTML document once", function () {
+test("the message is wrapped in the frame of the mails once", function () {
     $html = (new TestMailer())->document();
-    assertSame(1, substr_count($html, "<html>"), "wrapped twice");
+    assertSame(1, substr_count($html, "<html"), "wrapped twice");
     assertTrue(str_contains($html, "Hello<BR><a href="), "line breaks");
+    assertTrue(str_contains($html, "max-width:600px"), "the frame");
+});
+
+class TemplateMailer extends Mailer
+{
+    public function __construct(array $data)
+    {
+        parent::__construct();
+        $this->to = "client@example.com";
+        $this->subject = "Reset <b>";
+        $this->useTemplate("forgot_password", $data);
+    }
+    public function document() : string
+    {
+        return $this->templateMessage($this->body);
+    }
+}
+
+test("a mail template of the layers in the frame: values escaped, the subject as the preview, plain text", function () {
+    Spark::Set(Config::SITE_TITLE, "Test <Site>");
+    Spark::Set(Config::MAIL_ACCENT_COLOR, "#123456");
+    $html = (new TemplateMailer(array("password" => "<script>x</script>", "login" => "https://example.com/admin/login?a=1&b=2")))->document();
+    assertSame(1, substr_count($html, "<html"), "one document");
+    assertTrue(str_contains($html, "&lt;script&gt;x&lt;/script&gt;") && !str_contains($html, "<script>x"), "the value escaped");
+    assertTrue(str_contains($html, "href='https://example.com/admin/login?a=1&amp;b=2'"), "the button address");
+    assertTrue(str_contains($html, "Test &lt;Site&gt;"), "the site title escaped");
+    assertTrue(str_contains($html, "background:#123456"), "the accent colour");
+    assertTrue(str_contains($html, "<title>Reset &lt;b&gt;</title>"), "the subject");
+    $text = Mailer::PlainText($html);
+    assertTrue(str_starts_with($text, "Test <Site>"), $text);
+    assertTrue(str_contains($text, "<script>x</script>") && str_contains($text, "(https://example.com/admin/login?a=1&b=2)"), $text);
+    assertTrue(!str_contains($text, "Reset <b>"), "no hidden preview text in the plain text");
+});
+
+test("the colours of the frame are checked (a style attribute), a missing template is an error", function () {
+    Spark::Set(Config::MAIL_ACCENT_COLOR, "red;background:url(x)");
+    assertSame("#333333", (new MailView())->accent());
+    assertThrows(fn() => MailView::Render("no_such_mail"), "Mail template not found");
 });
 
 test("headers: From, Reply-To with a MIME encoded name, no header injection", function () {
@@ -47,7 +88,7 @@ test("headers: From, Reply-To with a MIME encoded name, no header injection", fu
 
 test("plain text part: line breaks, links with their address, entities decoded", function () {
     $text = Mailer::PlainText((new TestMailer())->document());
-    assertSame("Hello\nthe link (https://example.com/x?a=1&b=2)", $text);
+    assertTrue(str_contains($text, "\n\nHello\nthe link (https://example.com/x?a=1&b=2)\n\n"), $text);
     $text = Mailer::PlainText("<html><body>a<br>b<a href='https://e.com/'>https://e.com/</a><table><tr><td>x</td><td>y</td></tr></table></body></html>");
     assertSame("a\nbhttps://e.com/x\ty", $text);
 });

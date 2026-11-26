@@ -432,6 +432,8 @@ final class Spark {
          * Default: the mail domain (SITE_DOMAIN without port and 'www.')
          */
         Spark::Set(Config::DEFAULT_SERVICE_NAME, $mail_domain);
+        Spark::Set(Config::MAIL_ACCENT_COLOR, "#333333");
+        Spark::Set(Config::MAIL_HEADER_BACKGROUND, "#ffffff");
         /**
          * Sender email for emails sent from this site using the Mailer class
          * Default: info@ + the mail domain

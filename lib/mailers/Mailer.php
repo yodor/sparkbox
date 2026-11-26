@@ -1,8 +1,10 @@
 <?php
+include_once("mailers/MailView.php");
 
 /**
- * Base of all mails. A subclass sets $to, $subject and $body (the message HTML - send() wraps it in the HTML
- * document once, "\r\n" become line breaks).
+ * Base of all mails. A subclass sets $to, $subject and the message: useTemplate() - a mail template of the layers
+ * (<layer>/mails/<name>.php, MailView) in the frame of the mails - or $body, a message HTML the frame wraps once
+ * ("\r\n" become line breaks).
  *
  * Sender: Config::DEFAULT_SERVICE_EMAIL / DEFAULT_SERVICE_NAME.
  * Transport: PHPMailer over authenticated SMTP when Config::PHPMAILER_ENABLED (the SMTP login is the sender,
@@ -47,6 +49,16 @@ abstract class Mailer
         }
         $this->reply_to = $email;
         $this->reply_to_name = Mailer::HeaderText($name);
+    }
+
+    /**
+     * The message: the mail template '$name' of the layers with '$data' in the frame (MailView) - set the subject
+     * first (the preview text of the frame)
+     * @throws Exception
+     */
+    protected function useTemplate(string $name, array $data = array()) : void
+    {
+        $this->body = MailView::Render($name, $data, $this->subject);
     }
 
     public function send() : bool
@@ -169,23 +181,16 @@ abstract class Mailer
     }
 
     /**
-     * The message HTML wrapped in the HTML document, "\r\n" as line breaks.
-     * A message that is already a document (starts with <html>) is returned unchanged - wrapped once.
+     * The message HTML in the frame of the mails (MailView), "\r\n" as line breaks.
+     * A message that is already a document (a template - starts with <!DOCTYPE or <html>) is returned unchanged.
      * @param string $message
      * @return string
      */
     protected function templateMessage(string $message) : string
     {
-        if (str_starts_with(ltrim($message), "<html")) return $message;
-
-        $str = "<html>";
-        $str .= "<head>";
-        $str .= "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
-        $str .= "</head>";
-        $str .= "<body>" . $message . "</body>";
-        $str .= "</html>";
-        $str = str_replace("\r\n", "<BR>", $str);
-        return $str;
+        $start = strtolower(substr(ltrim($message), 0, 9));
+        if (str_starts_with($start, "<!doctype") || str_starts_with($start, "<html")) return $message;
+        return MailView::Frame(str_replace("\r\n", "<BR>", $message), $this->subject);
     }
 
     /**
@@ -205,12 +210,15 @@ abstract class Mailer
      */
     public static function PlainText(string $html) : string
     {
-        //only the body
+        //only the body, without the hidden preview text of the frame
         if (preg_match("/<body[^>]*>(.*)<\/body>/is", $html, $match)) $html = $match[1];
+        $html = preg_replace("/<div style=\"display:none[^>]*>.*?<\/div>/is", "", $html);
 
         //links: 'text (url)' - only the url when the text is the url
         $html = preg_replace_callback("/<a\s[^>]*href=['\"]([^'\"]*)['\"][^>]*>(.*?)<\/a>/is", function (array $m) : string {
             $text = trim(strip_tags($m[2]));
+            //a linked image (the logo): its alt text
+            if ($text === "" && preg_match("/<img\s[^>]*alt=['\"]([^'\"]*)['\"]/i", $m[2], $alt)) $text = trim($alt[1]);
             $url = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, "UTF-8");
             if ($text === "" || strcmp(html_entity_decode($text, ENT_QUOTES | ENT_HTML5, "UTF-8"), $url) === 0) return $url;
             return $text . " (" . $url . ")";

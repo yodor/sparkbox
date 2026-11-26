@@ -173,6 +173,16 @@ enum Config
      */
     const string DEFAULT_SERVICE_NAME = "DEFAULT_SERVICE_NAME";
     /**
+     * The colour of the mail frame - the line above the logo, the buttons, the links (MailView; the site theme accent)
+     * Default(string): #333333
+     */
+    const string MAIL_ACCENT_COLOR = "MAIL_ACCENT_COLOR";
+    /**
+     * The background of the logo band of the mail frame - for a logo made for a dark header ('#000000')
+     * Default(string): #ffffff
+     */
+    const string MAIL_HEADER_BACKGROUND = "MAIL_HEADER_BACKGROUND";
+    /**
      * Mailer class sender email ie 'office@domain.com'
      * Default(string): info@ + the requested host without port and leading 'www.'
      * Deployment: set it in config/settings.php - with PHPMAILER_ENABLED it is also the SMTP login, so it must be
