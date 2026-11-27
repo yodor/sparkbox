@@ -1,0 +1,28 @@
+# robots.txt of a SparkBox site - tools/deploy.php writes it into a new site root. The sitemap line: the address of the
+# site in place of {SITE_URL} (https://example.com), then remove the '#' (a store site answers /sitemap.xml)
+User-agent: *
+# the administration and the client pages (a store site: the account and the checkout)
+Disallow: /admin/
+Disallow: /account/
+Disallow: /checkout/
+# the search results (also noindex)
+Disallow: /products/search
+
+# the same lists with other sorting, filters or a keyword
+Disallow: /*?*orderby=
+Disallow: /*?*orderdir=
+Disallow: /*?*keyword=
+Disallow: /*?*filter=
+Disallow: /*?*SubmitForm=
+
+# SEO crawlers - bandwidth only
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+# Sitemap: {SITE_URL}/sitemap.xml

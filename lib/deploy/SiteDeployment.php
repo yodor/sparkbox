@@ -246,7 +246,7 @@ class SiteDeployment
         $files["sparkboot.php"] = (string)file_get_contents($this->sparkboxPath . "/dist/sparkboot.php.dist");
         $files["index.php"] = (string)file_get_contents($this->sparkboxPath . "/modules/main/index.php");
         $files[".htaccess"] = $this->htaccessBlock() . "\n";
-        $files["robots.txt"] = "User-agent: *\nDisallow: /admin/\n";
+        $files["robots.txt"] = (string)file_get_contents($this->sparkboxPath . "/dist/robots.txt.dist");
         $files[".gitignore"] = implode("\n", $this->gitIgnore()) . "\n";
         $files["config/boot.php"] = (string)file_get_contents($this->sparkboxPath . "/dist/boot.php.dist");
         $files["config/settings.php"] = $this->settingsFile();
@@ -555,6 +555,7 @@ class SiteDeployment
         $this->say("Site: $root" . ($this->write ? "" : "   (dry run - nothing is changed; --write to apply)"));
         $this->say("  " . $this->pathsLine());
         if (!is_file("$root/sparkboot.php")) $this->warn("no sparkboot.php in the site root - copy dist/sparkboot.php.dist");
+        if (!is_file("$root/robots.txt")) $this->warn("no robots.txt in the site root - copy dist/robots.txt.dist (the sitemap line: the address of the site)");
 
         //a site with its own root script (not the main module) does not get the front controller
         $index = is_file("$root/index.php") ? (string)file_get_contents("$root/index.php") : "";

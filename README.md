@@ -47,7 +47,7 @@ It writes the site: `sparkboot.php`, the front controller `index.php` (`Module::
 `.htaccess` (`dist/htaccess.dist` with the paths of the server), `config/` (boot, settings, dbconfig, routes; a
 store site also include and store), the frame of the site (a core site: `class/pages/<Name>Page.php` on
 `SparkSitePage`; a store site: the `StoreFrame` setup in `class/templates/init.php`), `css/site.css` (the site
-layer), `robots.txt`, `.gitignore`; it links `sparkfront` (and `storefront` - with `symlink()`, else `ln -s`, else
+layer), `robots.txt` (`dist/robots.txt.dist` - set the sitemap line to the address of the site), `.gitignore`; it links `sparkfront` (and `storefront` - with `symlink()`, else `ln -s`, else
 it prints the command); it creates every table of the beans and the root administrator (userID 1 - it can not be
 deleted, suspended or limited). The database name is also its user (`--dbhost=` for another host). Options:
 `--theme=light`, `--language=en` (two-letter; the locale follows it), `--locale=en-us`, `--timezone=Europe/Sofia`; run it without arguments
