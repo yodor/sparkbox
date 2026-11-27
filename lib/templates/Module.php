@@ -2,6 +2,7 @@
 include_once("utils/IRequestProcessor.php");
 include_once("templates/Template.php");
 include_once("pages/SparkPage.php");
+include_once("features/Features.php");
 
 class Module
 {
@@ -193,12 +194,42 @@ class Module
     }
 
     /**
-     * The modules of the site by their address folder (AddRoute)
+     * The modules of the site by their address folder: AddRoute() of config/routes.php, then the modules of the
+     * enabled features (Features) - a route of the site wins
      * @return array<string, string>
      */
     public static function Routes() : array
     {
-        return Module::$routes;
+        return Module::$routes + Features::Routes();
+    }
+
+    /**
+     * The address of '$path' of the module '$name' - null when the site has no such module (not routed and no module
+     * folder of its own). The main module is the site root.
+     *   Module::URL("account", "/orders/details")  ->  <LOCAL>/account/orders/details
+     */
+    public static function URL(string $name, string $path = "") : ?URL
+    {
+        $folder = null;
+        if ($name === "main") {
+            $folder = "";
+        }
+        else {
+            $found = array_search($name, Module::Routes(), true);
+            if (is_string($found)) {
+                $folder = $found;
+            }
+            //a module folder of the site (the old module folders - max-electric admin/)
+            else if (defined("APP_PATH") && preg_match("/^[a-z0-9_]+$/", $name) && is_file(APP_PATH . "/" . $name . "/index.php")) {
+                $folder = $name;
+            }
+        }
+        if (is_null($folder)) return null;
+
+        $local = rtrim((string)Spark::Get(Config::LOCAL), "/");
+        $path = ltrim($path, "/");
+        $address = $local . "/" . (($folder !== "") ? $folder . "/" : "") . $path;
+        return new URL($address);
     }
 
     /**
@@ -226,9 +257,10 @@ class Module
         $folder = "";
         $rest = $uriPath;
         $parts = explode("/", ltrim($uriPath, "/"), 2);
-        if ($parts[0] !== "" && isset(Module::$routes[$parts[0]])) {
+        $routes = Module::Routes();
+        if ($parts[0] !== "" && isset($routes[$parts[0]])) {
             $folder = $parts[0];
-            $name = Module::$routes[$folder];
+            $name = $routes[$folder];
             //the module folder itself: with its slash (as the server does for a folder)
             if (count($parts) < 2) {
                 header("Location: " . $local . "/" . $folder . "/" . (($query !== "") ? "?" . $query : ""), true, 301);

@@ -129,15 +129,17 @@ final class Template
      *
      * @param string $path
      * @return void
-     * @throws Exception Throws if path is present in the disabled paths
+     * @throws TemplatePathNotFound the path or a path above it is disabled - the page answers 404
      */
     private static function PathAccess(string $path) : void
     {
         Debug::ErrorLog("Checking path access for path: $path");
 
+        $path = rtrim(strtolower($path), "/");
         foreach (Template::$DisabledPaths as $disablePath => $enabled) {
-            if (str_starts_with($path, $disablePath)) {
-                throw new Exception("PathAccess Denied");
+            //the path itself or below it (not '/ordersx' for '/orders')
+            if ($path === $disablePath || str_starts_with($path, $disablePath . "/")) {
+                throw new TemplatePathNotFound("Path disabled: $path");
             }
         }
     }

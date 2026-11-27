@@ -123,7 +123,8 @@ if (!Spark::isStorageRequest()) {
 }
 
 
-//other libs initialization - allow searching app path last
+//other libs initialization - allow searching app path last; the features of the site are enabled there (Features)
+include_once("features/Features.php");
 if (is_file(APP_PATH."/config/include.php")) include_once(APP_PATH."/config/include.php");
 
 //add app include path under class/ folder

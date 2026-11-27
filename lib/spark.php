@@ -106,6 +106,14 @@ final class SparkLoader
     }
 
     /**
+     * True when a search location of the prefix '$prefix' was added ("store" - the store layer, "class" - the site)
+     */
+    public static function HasPrefix(string $prefix) : bool
+    {
+        return in_array(trim($prefix, " /"), SparkLoader::$locations, true);
+    }
+
+    /**
      * Setup Class loader to search all enabled locations and using current search prefix - $prefix
      *
      * @param string $prefix

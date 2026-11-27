@@ -16,6 +16,23 @@ class MenuItemList extends SparkList
         }
     }
 
+    /**
+     * Insert '$item' after the item of this list with the address '$href' (its last part - "store") - at the end
+     * when there is none. A feature puts its sections next to the ones of its layer (Orders after Store).
+     */
+    public function insertAfter(string $href, MenuItem $item) : void
+    {
+        $index = -1;
+        foreach ($this->toArray() as $idx => $current) {
+            if ($current instanceof MenuItem && strcasecmp($current->getHref(), $href) === 0) $index = (int)$idx;
+        }
+        if ($index < 0) {
+            $this->append($item);
+            return;
+        }
+        $this->insert($item, $index + 1);
+    }
+
     protected function matchPath(int &$idx, array $matchPath, array &$matched) : void
     {
         if ($idx > count($matchPath)-1) return;

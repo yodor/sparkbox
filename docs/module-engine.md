@@ -19,6 +19,7 @@ for writing a module, a content, or a site on top of the core and the store laye
 - [Strict includes](#strict-includes)
 - [CSS: layers, tokens, one stylesheet per part](#css-layers-tokens-one-stylesheet-per-part)
 - [Adding a module to a site](#adding-a-module-to-a-site)
+- [Features](#features)
 - [Planned](#planned)
 
 
@@ -220,7 +221,7 @@ A later layer's file of the same name either **replaces** the config (it calls a
 This is how a site customizes a store admin page without copying it.
 
 `Template::DisablePath("/content/news")` (from `menu.php` or `init.php`) refuses a path and the paths
-below it, and the admin menu drops them.
+below it (they answer 404), and the admin menu drops them.
 
 `Template::Condition()` carries the parent row of nested admin lists (a product's photos): a content with
 `BeanConfig::$useCondition` filters its bean by it.
@@ -481,9 +482,56 @@ A new module for every site goes into a layer instead: `templates/modules/<name>
 store; each site that serves it adds its route.
 
 
+Features
+--------
+
+A **feature** is a part of a deployment that a site switches on as a whole: its own modules, admin pages,
+mails and texts. The store ships `shop` (checkout, account, orders, clients, couriers) and `fast_order`;
+the catalog is the store layer itself.
+
+A feature is a folder laid out like a layer, with a `feature.php` returning its descriptor (data only):
+
+```php
+return new Feature(
+    id: "shop",
+    title: "Shop",
+    layer: "store",                         // the layer it needs
+    requires: array(),                      // the features enabled before it
+    routes: array("checkout", "account"),   // its modules, routed at the folder of their name
+    admin: array("orders", "clients"),      // the admin paths it owns
+);
+```
+
+- **Registering.** A layer registers the features it ships (`Features::Register(<folder>)` in `sparkstore.php`).
+- **Enabling.** The site enables the features it has in `config/include.php`, after its layers. This must happen
+  before the site location is added, so `routes.php` is too late, and `Enable()` refuses to run there:
+
+  ```php
+  include_once("sparkstore.php");
+  Features::Enable("shop", "fast_order");
+  ```
+
+**What enabling does.** `Enable()` checks the layer and the required features (in the order given), adds the
+folder as a loader location between the layers and the site, and adds the routes of its modules
+(`Module::Routes()`; a route of the site's `routes.php` wins). Nothing else is new: the module `init.php` and path
+files, the admin `menu.php`, the site init `templates/init.php`, the mails, the mail previews and the language packs
+of the feature are found like those of a layer.
+
+**Overrides.** A site file replaces a feature file the usual way. A feature adds files. It does not replace the
+files of another feature; it asks `Features::Enabled("<id>")` instead.
+
+**A feature that is off** is registered but not enabled. Its modules are not routed (404), and its admin paths are
+not found even when the site has its own copy of them (`Template::DisablePath()`, which also removes their menu
+items).
+
+**Addresses between modules.** `Module::URL("account", "/orders/details")` is the address of a path of another
+module, or `null` when the site has no such module. The admin menu of a feature puts its sections next to the
+others with `MenuItemList::insertAfter("store", $item)`.
+
+
 Planned
 -------
 
-- **Plugins**: an optional piece installed on one deployment and not another. It is one more location
-  between the store and the site, registered in that site's config, with its public files, a manifest
-  and an init order. A site's own module is not a plugin.
+- **Plugins**: a feature from outside the layers (`plugins/<name>`) that brings its own code - the credit buttons,
+  Stripe. Registered and enabled like a built-in feature; its public files linked into the site root by the
+  deploy tool. A site's own module is not a plugin.

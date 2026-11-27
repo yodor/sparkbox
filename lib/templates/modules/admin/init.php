@@ -4,10 +4,17 @@
 //
 include_once("pages/SparkAdminPage.php");
 include_once("auth/AdminAuthenticator.php");
+include_once("features/Features.php");
+include_once("templates/Template.php");
 
 $module = Module::Active();
 if (!$module->pageClass) $module->pageClass = SparkAdminPage::class;
 if (!$module->authClass) $module->authClass = AdminAuthenticator::class;
+
+//the admin pages of a feature that is off are not found (a site copy of them neither) - their menu items go too
+foreach (Features::Disabled() as $feature) {
+    foreach ($feature->admin as $adminPath) Template::DisablePath("/" . trim($adminPath, "/"));
+}
 
 //reachable without login - every other path redirects to login before its path file runs
 $module->addPublicPath("login", "password");

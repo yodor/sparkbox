@@ -38,6 +38,7 @@ unexpected output (warnings, deprecations, fatal errors). Exit code 0 means ever
 | `core/sql_builder.test.php` | late lookup order, clause identity (ranges), clone isolation, join detection |
 | `core/files_cache.test.php` | atomic cache writes under concurrent reads, `SparkFile` path rules |
 | `core/storage_http.test.php` | `storage.php` end to end: versions, 304, 301, slug URLs, file names, class validation |
+| `core/features.test.php` | `Features`: enable order and requirements, the routes and files of a feature, a site file over it, a feature that is off (not routed, admin paths 404), `Module::URL()` |
 
 The HTTP tests run `tests/app/*.php` through php-cgi and the real `sparkbox.php` bootstrap.
 
