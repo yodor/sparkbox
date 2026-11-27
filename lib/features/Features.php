@@ -12,7 +12,7 @@ include_once("features/Feature.php");
  * pages, menu.php, templates/init.php, mails and lang packs are found like those of a layer, and the site replaces
  * any of them with its own copy. A feature adds files - it does not replace the files of another feature.
  * Its modules are routed only while it is enabled (Module::Routes()); its admin paths are not found while it is
- * registered but off (the admin init.php).
+ * registered but off (the admin init.php). A layer also names the modules every one of its sites has (LayerRoutes()).
  */
 class Features
 {
@@ -25,6 +25,11 @@ class Features
      * @var array<string, bool> enabled feature ids, in their order
      */
     protected static array $enabled = array();
+
+    /**
+     * @var array<string, string> the modules a layer routes by default: folder => module name (LayerRoutes())
+     */
+    protected static array $layerRoutes = array();
 
     private function __construct()
     {
@@ -105,12 +110,24 @@ class Features
     }
 
     /**
-     * The routes of the enabled features: folder => module name
+     * The modules every site of a layer has, routed at the folder of their name - sparkstore.php: admin, pages,
+     * products (the catalog). The site config/routes.php adds the optional ones (news, faq); a route of its own wins.
+     */
+    public static function LayerRoutes(string ...$modules) : void
+    {
+        foreach ($modules as $module) {
+            if (!preg_match("/^[a-z0-9_]+$/", $module)) throw new Exception("Layer route: a module name - '$module'");
+            Features::$layerRoutes[$module] = $module;
+        }
+    }
+
+    /**
+     * The routes of the layers and of the enabled features: folder => module name
      * @return array<string, string>
      */
     public static function Routes() : array
     {
-        $result = array();
+        $result = Features::$layerRoutes;
         foreach (array_keys(Features::$enabled) as $id) {
             $result += Features::$registered[$id]->routeMap();
         }

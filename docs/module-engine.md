@@ -524,6 +524,10 @@ files of another feature; it asks `Features::Enabled("<id>")` instead.
 not found even when the site has its own copy of them (`Template::DisablePath()`, which also removes their menu
 items).
 
+**The modules of a layer.** A layer names the modules every one of its sites has:
+`Features::LayerRoutes("admin", "pages", "products")` in `sparkstore.php`. A store site's `routes.php` then lists only
+the optional modules (news, faq) and its own.
+
 **Addresses between modules.** `Module::URL("account", "/orders/details")` is the address of a path of another
 module, or `null` when the site has no such module. The admin menu of a feature puts its sections next to the
 others with `MenuItemList::insertAfter("store", $item)`.

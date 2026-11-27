@@ -195,7 +195,8 @@ class Module
 
     /**
      * The modules of the site by their address folder: AddRoute() of config/routes.php, then the modules of the
-     * enabled features (Features) - a route of the site wins
+     * layers (Features::LayerRoutes() - the store: admin, pages, products) and of the enabled features - a route of
+     * the site wins
      * @return array<string, string>
      */
     public static function Routes() : array

@@ -2,7 +2,7 @@
 /**
  * Features: the registry (enable order, requirements, the site location), the routes and the files of an enabled
  * feature, a site file replacing a feature file, a feature that is off (its modules not routed, its admin pages not
- * found - a site copy neither), Module::URL(), MenuItemList::insertAfter() - tests/app/features, tests/app/config/include.php
+ * found - a site copy neither), the routes of a layer, Module::URL(), MenuItemList::insertAfter() - tests/app/features, tests/app/config/include.php
  */
 include_once(__DIR__ . "/../harness/http.php");
 include_once("features/Features.php");
@@ -73,6 +73,9 @@ test("features: registered, enabled in order, the layer and the required feature
     assertTrue(Features::Enabled("base") && Features::Enabled("needs") && !Features::Enabled("layered"), "enabled");
     assertSame(array("layered"), array_keys(Features::Disabled()), "disabled");
     assertSame(array("basemod" => "basemod", "nd" => "needsmod"), Features::Routes(), "routes: folder => module");
+    Features::LayerRoutes("layermod");
+    assertSame(array("layermod" => "layermod", "basemod" => "basemod", "nd" => "needsmod"), Features::Routes(), "with the routes of a layer");
+    featureThrows(fn() => Features::LayerRoutes("Bad/Name"), "Layer route");
 
     //the site location searches first - a feature after it would replace the site files
     SparkLoader::AddLocation(APP_PATH, "class");
@@ -86,6 +89,9 @@ test("features: Module::URL - a route of the site, a route of a feature, the mai
     //'needsmod' of the feature 'needs' (enabled by the test above) at its folder 'nd'
     assertSame("/nd/orders/details", Module::URL("needsmod", "orders/details")?->toString(), "feature route");
     assertSame("/", Module::URL("main")?->toString(), "main");
+    assertSame("/layermod/", Module::URL("layermod", "/")?->toString(), "layer route");
+    Module::AddRoute("layermod", "admin");
+    assertSame("admin", Module::Routes()["layermod"], "a route of the site wins over a layer route");
     assertSame(null, Module::URL("nosuchmodule"), "not routed");
 });
 
