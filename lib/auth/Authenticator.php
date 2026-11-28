@@ -115,40 +115,6 @@ abstract class Authenticator
         return new AuthContext($token->getID(), $this->session);
     }
 
-    /**
-     * Set a random password to user with email '$email'
-     * Creates 'random string' using Authenticator::RandomToken(8)
-     * Password is stored as PasswordHash (Config::PASSWORD_TYPE)
-     * @param string $email
-     * @return string The 'random string' that can be used on the login forms or emailed back to the user
-     * @throws Exception If email is not found
-     */
-    public function setRandomPassword(string $email): string
-    {
-        try {
-
-            $userID = $this->bean->email2id($email);
-            if ($userID < 1) {
-                throw new Exception(tr("This user is not registered with us"));
-            }
-
-            $result = Authenticator::RandomToken(8);
-
-            //Debug::ErrorLog("Password: ".$result);
-
-            $this->bean->checkPasswordColumn();
-            $hash = new PasswordHash($result);
-            $update["password"] = $hash->getValue();
-            if (!$this->bean->update($userID, $update)) throw new Exception($this->bean->getDB()->getError());
-
-            return $result;
-        } catch (Exception $e) {
-            Debug::ErrorLog("Password change failed: " . $e->getMessage());
-            throw $e;
-        } finally {
-            sleep(3);
-        }
-    }
 
     public function login(string $email, string $password_plain, string $client_hmac): void
     {

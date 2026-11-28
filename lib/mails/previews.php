@@ -2,7 +2,8 @@
 /**
  * The core mails for the admin preview (MailPreviews) - sample data
  */
-include_once("mailers/ForgotPasswordMailer.php");
+include_once("mailers/PasswordResetMailer.php");
+include_once("utils/url/URLParameter.php");
 include_once("mailers/ContactRequestMailer.php");
 include_once("utils/url/URL.php");
 include_once("mailers/MailPreviews.php");
@@ -17,8 +18,10 @@ MailPreviews::SetAddress("transport", tr("Sent with"), Spark::GetBoolean(Config:
 MailPreviews::SetAddress("enquiries", tr("Enquiries (the contact form)"), $senderEmail, "config/settings.php: DEFAULT_SERVICE_EMAIL");
 
 return array(
-    "forgot_password" => array(tr("Admin - new password"), function () : Mailer {
-        return new ForgotPasswordMailer("admin@example.com", "kT7#pq2Lm", new URL(Spark::Get(Config::LOCAL) . "/admin/login"));
+    "admin_password_reset" => array(tr("Password reset - to an administrator"), function () : Mailer {
+        $url = new URL(Spark::Get(Config::LOCAL) . "/admin/password/reset");
+        $url->add(new URLParameter("token", str_repeat("0", 64)));
+        return new PasswordResetMailer("admin@example.com", $url);
     }),
     "contact_request" => array(tr("Enquiry from the site"), function () : Mailer {
         $mailer = new ContactRequestMailer((string)Spark::Get(Config::DEFAULT_SERVICE_EMAIL));

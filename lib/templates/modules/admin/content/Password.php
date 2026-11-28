@@ -2,10 +2,20 @@
 include_once("templates/TemplateContent.php");
 include_once("forms/InputForm.php");
 include_once("forms/renderers/FormRenderer.php");
-include_once("mailers/ForgotPasswordMailer.php");
 include_once("forms/processors/FormProcessor.php");
+include_once("forms/processors/IFormProcessor.php");
+include_once("mailers/PasswordResetMailer.php");
+include_once("beans/AdminUsersBean.php");
+include_once("beans/AdminPasswordResetsBean.php");
 include_once("pages/SparkPage.php");
+include_once("utils/url/URLParameter.php");
 
+/**
+ * The admin 'forgot password': the e-mail of an administrator gets a one-time link (AdminPasswordResetsBean,
+ * valid 1 hour) to the path password/reset (PasswordReset) - the password changes only there. The same answer for
+ * every e-mail (the page does not tell which are registered); no link for a suspended administrator, no new link
+ * within AdminPasswordResetsBean::THROTTLE seconds.
+ */
 class Password extends TemplateContent
 {
     /**
@@ -19,13 +29,6 @@ class Password extends TemplateContent
         return $config;
     }
 
-
-    public function __construct()
-    {
-        parent::__construct();
-
-    }
-
     public function initialize(): void
     {
         SparkPage::Instance()->setTitle($this->getContentTitle());
@@ -35,10 +38,8 @@ class Password extends TemplateContent
         $form->addInput(DataInputFactory::Create(InputType::EMAIL, "email", tr("Input your registered email"), 1));
 
         $frend = new FormRenderer($form);
-        $frend->getSubmitButton()->setContents("Send");
+        $frend->getSubmitButton()->setContents(tr("Send"));
         $frend->addClassName("LoginFormRenderer");
-
-        //$frend->setCaption(Spark::Get(Config::SITE_TITLE) . "<BR><small>" . tr("Administration") . "</small>");
 
         $this->cmp = $frend;
     }
@@ -52,37 +53,40 @@ class Password extends TemplateContent
         $proc = new FormProcessor();
         $proc->process($form);
 
+        if ($proc->getStatus() === IFormProcessor::STATUS_ERROR) {
+            Session::SetAlert($proc->getMessage());
+            return;
+        }
+        if ($proc->getStatus() !== IFormProcessor::STATUS_OK) return;
 
-
-        if ($proc->getStatus() === IFormProcessor::STATUS_OK) {
-
-            try {
-                $email = $form->getInput("email")->getValue();
-                if (!$email) throw new Exception("Empty email");
-
-                $authenticator = Module::Active()->getAuthenticator();
-                $loginURL = Module::PathURL("login");
-                try {
-                    $random_pass = $authenticator->setRandomPassword($email);
-                    $fpm = new ForgotPasswordMailer($email, $random_pass, $loginURL);
-                    $fpm->send();
-                    Debug::ErrorLog("Password reset successful: " . $email);
+        $email = trim((string)$form->getInput("email")->getValue());
+        try {
+            $admins = new AdminUsersBean();
+            $userID = ($email !== "") ? $admins->email2id($email) : -1;
+            if ($userID > 0 && !(int)$admins->getValue($userID, "suspend")) {
+                $token = (new AdminPasswordResetsBean())->create($userID);
+                if (is_null($token)) {
+                    Debug::ErrorLog("Admin password reset: a link was sent to '$email' less than " . AdminPasswordResetsBean::THROTTLE . "s ago - no new link");
                 }
-                catch (Exception $e) {
-                    //the same answer for unknown emails - the page does not tell which emails are registered
-                    Debug::ErrorLog("Password reset failed for email '$email': " . $e->getMessage());
+                else {
+                    $url = Module::PathURL("password/reset");
+                    $url->add(new URLParameter("token", $token));
+                    if (!(new PasswordResetMailer($email, $url))->send()) {
+                        Debug::ErrorLog("Admin password reset: the mail to '$email' was not sent");
+                    }
                 }
-                Session::SetAlert(tr("If this email is registered, a new password was sent to it"));
-                header("Location: " . $loginURL);
-                exit;
             }
-            catch (Exception $e) {
-                Session::SetAlert(tr("Password reset failed"));
+            else {
+                Debug::ErrorLog("Admin password reset: no active administrator '$email'");
             }
         }
-        else {
-            Session::setAlert($proc->getMessage());
+        catch (Exception $e) {
+            Debug::ErrorLog("Admin password reset failed for '$email': " . $e->getMessage());
         }
+        //the same answer for every e-mail
+        Session::SetAlert(tr("If this email is registered, a link to change the password was sent to it"));
+        header("Location: " . Module::PathURL("login"));
+        exit;
     }
 
     public function component(): Component
@@ -92,12 +96,12 @@ class Password extends TemplateContent
 
     public function getContentTitle(): string
     {
-        return "Forgot Password - ".Spark::Get(Config::SITE_TITLE);
+        return tr("Forgotten password") . " - " . Spark::Get(Config::SITE_TITLE);
     }
 
     public function form(): InputForm
     {
-        if (!($this->cmp instanceof FormRenderer)) throw new Exception("Incorrect component class - expecting FromRenderer");
+        if (!($this->cmp instanceof FormRenderer)) throw new Exception("Incorrect component class - expecting FormRenderer");
         return $this->cmp->getForm();
     }
 

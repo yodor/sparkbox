@@ -5,8 +5,9 @@
  *   php sparkbox/tools/lang.php <code> [--store=<sparkstore lib>] [--site=<site root>] [--unused]
  *
  * Lists the texts of the code (core, the store, the store features - lib/store/features/<feature> with its own pack,
- * the site class/ - in that order) that the merged packs of '<code>'
- * do not translate, with the layer whose pack should have them (the first layer that uses the text). With --unused:
+ * the site class/ - in that order) that the packs a layer can count on do not translate, with the layer whose pack
+ * should have them: the core its own pack, the store the core and store packs, a feature those and its own (the
+ * other features may be off), the site all of them. With --unused:
  * also the pack entries no code of the layers uses. A text is found where the code writes it as a literal:
  * tr("..."), new MenuItem("..."), the label of DataInputFactory::Create(...), setTitle / setContentTitle("...") - and
  * tr("...") of the scripts (sparkfront/js, storefront/js: their texts come from HTMLHead::addTexts).
@@ -94,25 +95,49 @@ function codeTexts(string $folder) : array
     return $texts;
 }
 
+//the texts of each layer, and the first layer that uses a text
 $used = array();
+$layerTexts = array();
 $packs = array();
 foreach ($layers as $name => [$folders, $pack]) {
+    $layerTexts[$name] = array();
     foreach ($folders as $folder) {
         foreach (codeTexts($folder) as $text => $file) {
+            if (!isset($layerTexts[$name][$text])) $layerTexts[$name][$text] = $file;
             if (!isset($used[$text])) $used[$text] = array($name, $file);
         }
     }
     $packs[$name] = is_file($pack) ? (array)(include $pack) : array();
 }
-$merged = array();
-foreach ($packs as $pack) $merged = array_replace($merged, $pack);
+
+//the packs a layer can count on: core - its own; the store - core and store; a feature - core, store and its own
+//(the other features may be off); the site - all of them (it knows its features)
+$available = function (string $layer) use ($packs) : array {
+    $merged = array();
+    foreach ($packs as $name => $pack) {
+        $isFeature = str_starts_with($name, "feature ");
+        $take = match (true) {
+            $layer === "core" => ($name === "core"),
+            $layer === "store" => in_array($name, array("core", "store"), true),
+            str_starts_with($layer, "feature ") => in_array($name, array("core", "store", $layer), true),
+            default => true,
+        };
+        if ($take) $merged = array_replace($merged, $pack);
+    }
+    return $merged;
+};
 
 $missing = array();
-foreach ($used as $text => [$layer, $file]) {
-    if (isset($merged[$text])) continue;
-    //a text already in the language of the pack (not English) is not a key to translate
-    if ($code !== "en" && preg_match("/[\\x{0400}-\\x{04FF}\\x{0370}-\\x{03FF}]/u", $text)) continue;
-    $missing[$layer][] = array($text, $file);
+$reported = array();
+foreach ($layerTexts as $layer => $texts) {
+    $merged = $available($layer);
+    foreach ($texts as $text => $file) {
+        if (isset($merged[$text]) || isset($reported[$text])) continue;
+        //a text already in the language of the pack (not English) is not a key to translate
+        if ($code !== "en" && preg_match("/[\\x{0400}-\\x{04FF}\\x{0370}-\\x{03FF}]/u", $text)) continue;
+        $missing[$layer][] = array($text, $file);
+        $reported[$text] = true;
+    }
 }
 
 $total = 0;

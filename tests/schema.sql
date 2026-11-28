@@ -1,6 +1,6 @@
 -- Tables used by the core tests - recreated on every run
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS contacts, photos, items, cats, docs, pics, ranges, admin_access, admin_users;
+DROP TABLE IF EXISTS contacts, photos, items, cats, docs, pics, ranges, admin_access, admin_password_resets, admin_users;
 -- content tables are created by their beans - dropped so every run starts like a fresh install
 DROP TABLE IF EXISTS faq_items, faq_sections, page_photos, dynamic_pages, news_items, menu_items, config, translation_phrases, site_texts, languages;
 SET FOREIGN_KEY_CHECKS = 1;

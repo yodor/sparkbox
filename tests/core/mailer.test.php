@@ -41,7 +41,7 @@ class TemplateMailer extends Mailer
         parent::__construct();
         $this->to = "client@example.com";
         $this->subject = "Reset <b>";
-        $this->useTemplate("forgot_password", $data);
+        $this->useTemplate("password_reset", $data);
     }
     public function document() : string
     {
@@ -52,7 +52,7 @@ class TemplateMailer extends Mailer
 test("a mail template of the layers in the frame: values escaped, the subject as the preview, plain text", function () {
     Spark::Set(Config::SITE_TITLE, "Test <Site>");
     Spark::Set(Config::MAIL_ACCENT_COLOR, "#123456");
-    $html = (new TemplateMailer(array("password" => "<script>x</script>", "login" => "https://example.com/admin/login?a=1&b=2")))->document();
+    $html = (new TemplateMailer(array("site" => "<script>x</script>", "link" => "https://example.com/admin/login?a=1&b=2")))->document();
     assertSame(1, substr_count($html, "<html"), "one document");
     assertTrue(str_contains($html, "&lt;script&gt;x&lt;/script&gt;") && !str_contains($html, "<script>x"), "the value escaped");
     assertTrue(str_contains($html, "href='https://example.com/admin/login?a=1&amp;b=2'"), "the button address");

@@ -17,7 +17,7 @@ foreach (Features::Disabled() as $feature) {
 }
 
 //reachable without login - every other path redirects to login before its path file runs
-$module->addPublicPath("login", "password");
+$module->addPublicPath("login", "password", "password/reset");
 
 //limited access administrators: only the top level menu sections of their roles
 $module->accessCheck = function (string $path) use ($module) : bool {
