@@ -7,15 +7,19 @@ include_once("pages/SparkPage.php");
 include_once("auth/AuthContext.php");
 include_once("utils/url/URL.php");
 include_once("utils/url/URLParameter.php");
+include_once("beans/AdminUsersBean.php");
+include_once("objects/OrderColumn.php");
 
 /**
  * Settings > Mails: every mail of the layers (MailPreviews) as it is sent - the subject, the HTML in a frame, the
- * plain text part - and a test send to the address of the administrator.
+ * plain text part - and a test send to an administrator of the site (the one logged in by default; a shop owner who
+ * is an administrator sees the mails in his own mailbox). Only the addresses of the active administrators.
  */
 class MailPreviewsContent extends TemplateContent
 {
     const string KEY_MAIL = "mail";
     const string KEY_SEND = "send_test";
+    const string KEY_RECIPIENT = "recipient";
 
     /**
      * @var array<string, array{0: string, 1: Closure}>
@@ -48,13 +52,37 @@ class MailPreviewsContent extends TemplateContent
         return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : "";
     }
 
+    /**
+     * The active administrators with an e-mail address: e-mail => their name and e-mail (the choices of the test send)
+     * @return array<string, string>
+     */
+    protected function adminRecipients() : array
+    {
+        $recipients = array();
+        $admins = new AdminUsersBean();
+        $query = $admins->query($admins->key(), "email", "fullname");
+        $query->stmt->where()->expression("(suspend IS NULL OR suspend = 0)");
+        $query->stmt->order("fullname", OrderDirection::ASC);
+        $query->exec();
+        while ($row = $query->nextResult()) {
+            $email = trim((string)$row->get("email"));
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) continue;
+            $name = trim((string)$row->get("fullname"));
+            $recipients[$email] = ($name !== "") ? "$name <$email>" : $email;
+        }
+        return $recipients;
+    }
+
     public function processInput(): void
     {
         parent::processInput();
         if (($_SERVER["REQUEST_METHOD"] ?? "") !== "POST" || !isset($_POST[MailPreviewsContent::KEY_SEND])) return;
 
         $name = (string)$_POST[MailPreviewsContent::KEY_SEND];
+        //the chosen administrator - only an address of an active administrator, else the one logged in
         $email = $this->adminEmail();
+        $chosen = trim((string)($_POST[MailPreviewsContent::KEY_RECIPIENT] ?? ""));
+        if ($chosen !== "" && isset($this->adminRecipients()[$chosen])) $email = $chosen;
         try {
             if ($email === "") throw new Exception(tr("Your administrator account has no e-mail address"));
             $mailer = MailPreviews::Create($name);
@@ -110,12 +138,20 @@ class MailPreviewsContent extends TemplateContent
             $e = fn(string $text) : string => Spark::AttributeValue($text);
 
             $email = $this->adminEmail();
+            $recipients = $this->adminRecipients();
+            if ($email !== "" && !isset($recipients[$email])) $recipients = array($email => $email) + $recipients;
+            $options = "";
+            foreach ($recipients as $address => $label) {
+                $options .= "<option value='" . $e($address) . "'" . (($address === $email) ? " selected" : "") . ">" . $e($label) . "</option>";
+            }
             $head = new TextComponent("", "head");
             $head->setTagName("div");
             $head->setContents("<div class='subject'><span class='label'>" . $e(tr("Subject")) . "</span> " . $e($mailer->getSubject()) . "</div>"
                 . "<div class='recipient'><span class='label'>" . $e(tr("Recipient")) . "</span> " . $e($mailer->getRecipient()) . "</div>"
-                . "<form method='post' class='test'><button type='submit' class='ColorButton' name='" . MailPreviewsContent::KEY_SEND . "' value='" . $e($this->selected) . "'"
-                . (($email === "") ? " disabled" : "") . ">" . $e(tr("Send a test to %s", ($email !== "") ? $email : "-")) . "</button></form>");
+                . "<form method='post' class='test'><label>" . $e(tr("Send a test to")) . " <select name='" . MailPreviewsContent::KEY_RECIPIENT . "'"
+                . ((count($recipients) < 1) ? " disabled" : "") . ">" . $options . "</select></label> "
+                . "<button type='submit' class='ColorButton' name='" . MailPreviewsContent::KEY_SEND . "' value='" . $e($this->selected) . "'"
+                . ((count($recipients) < 1) ? " disabled" : "") . ">" . $e(tr("Send")) . "</button></form>");
             $view->items()->append($head);
 
             //the mail in a sandboxed frame (no scripts, no forms) - srcdoc escaped fully (the entities of the mail too)

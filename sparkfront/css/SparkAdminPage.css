@@ -98,6 +98,15 @@
 
 .MailPreviews .view .head .test {
     margin: 12px 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.MailPreviews .view .head .test select {
+    margin-left: 4px;
+    max-width: 100%;
 }
 
 .MailPreviews .view .mail {

@@ -87,7 +87,8 @@ function httpRequest(string $script, string $query = "", array $headers = array(
  */
 function TestMailLog() : string
 {
-    return TestCachePath() . "/mail.log";
+    //one log per test process: the files may run at the same time (run.php --jobs)
+    return TestCachePath() . "/mail-" . getmypid() . ".log";
 }
 
 /**

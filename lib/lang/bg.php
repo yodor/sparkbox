@@ -197,7 +197,7 @@ return array(
     'Sections' => 'Секции',
     'Select file(s) for upload' => 'Изберете файл(ове) за качване',
     'Send' => 'Изпрати',
-    'Send a test to %s' => 'Изпрати тест до %s',
+    'Send a test to' => 'Изпрати тест до',
     'SEO' => 'SEO',
     'SEO Description (up to 150 characters)' => 'SEO описание (до 150 знака)',
     'SEO Title (up to 60 characters)' => 'SEO заглавие (до 60 знака)',
