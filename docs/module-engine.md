@@ -517,6 +517,13 @@ folder as a loader location between the layers and the site, and adds the routes
 files, the admin `menu.php`, the site init `templates/init.php`, the mails, the mail previews and the language packs
 of the feature are found like those of a layer.
 
+**Its classes and texts.** The classes only the feature uses live in its folder, laid out as in the layer
+(`<feature>/forms`, `mailers`, `responders/json`, `components`) and included by their path
+(`include_once("store/features/shop/mailers/OrderStatusMailer.php")`); a JSON responder is found by name in an
+enabled feature like in a layer. Its texts are in its own pack (`<feature>/lang/<code>.php`), loaded while it is
+enabled - `tools/lang.php` checks each feature as a layer of its own. The beans stay in the layer (the deployment
+creates every table of the layer).
+
 **Overrides.** A site file replaces a feature file the usual way. A feature adds files. It does not replace the
 files of another feature; it asks `Features::Enabled("<id>")` instead.
 

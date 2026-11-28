@@ -4,7 +4,8 @@
  *
  *   php sparkbox/tools/lang.php <code> [--store=<sparkstore lib>] [--site=<site root>] [--unused]
  *
- * Lists the texts of the code (core, the store, the site class/ - in that order) that the merged packs of '<code>'
+ * Lists the texts of the code (core, the store, the store features - lib/store/features/<feature> with its own pack,
+ * the site class/ - in that order) that the merged packs of '<code>'
  * do not translate, with the layer whose pack should have them (the first layer that uses the text). With --unused:
  * also the pack entries no code of the layers uses. A text is found where the code writes it as a literal:
  * tr("..."), new MenuItem("..."), the label of DataInputFactory::Create(...), setTitle / setContentTitle("...") - and
@@ -33,7 +34,13 @@ if ($code === "") {
 //the layers: name => array(code folders, pack file)
 $core = realpath(__DIR__ . "/../lib");
 $layers = array("core" => array(array($core, dirname($core) . "/sparkfront/js"), "$core/lang/$code.php"));
-if ($options["store"] !== "") $layers["store"] = array(array($options["store"] . "/store", dirname($options["store"]) . "/storefront/js"), $options["store"] . "/store/lang/$code.php");
+if ($options["store"] !== "") {
+    $layers["store"] = array(array($options["store"] . "/store", dirname($options["store"]) . "/storefront/js"), $options["store"] . "/store/lang/$code.php");
+    //the features: a layer each (their texts in their own pack, loaded while the feature is enabled)
+    foreach (glob($options["store"] . "/store/features/*", GLOB_ONLYDIR) ?: array() as $feature) {
+        $layers["feature " . basename($feature)] = array(array($feature), "$feature/lang/$code.php");
+    }
+}
 if ($options["site"] !== "") $layers["site"] = array(array($options["site"] . "/class"), $options["site"] . "/class/lang/$code.php");
 
 /**
@@ -54,6 +61,8 @@ function codeTexts(string $folder) : array
     foreach ($iterator as $file) {
         $path = $file->getPathname();
         if (str_contains($path, "/PHPMailer/") || str_contains($path, "/lang/") || str_contains($path, "/tiny_mce/")) continue;
+        //the features are layers of their own
+        if (str_contains($path, "/store/features/") && !str_contains($folder, "/store/features/")) continue;
         if (preg_match("/\\.js$/", $path) && !preg_match("/\\.min\\.js$/", $path)) {
             //a script: its tr("...") - the code without its comments
             $source = (string)preg_replace("#/\\*.*?\\*/|(?<![:\"'])//[^\\n]*#s", "", (string)file_get_contents($path));
