@@ -60,8 +60,57 @@
 
 .MailPreviews {
     display: flex;
+    flex-wrap: wrap;
     gap: 24px;
     align-items: flex-start;
+}
+
+/* the addresses of the mails above the list - information only */
+.MailPreviews .addresses {
+    flex: 1 1 100%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border: 1px solid #d0d5db;
+    background: #f7f8fa;
+}
+
+.MailPreviews .addresses {
+    display: grid;
+    grid-template-columns: max-content max-content 1fr;
+    column-gap: 1.5em;
+    row-gap: 4px;
+    align-items: baseline;
+}
+
+/* one row of the grid: the title, the address, where it is set */
+.MailPreviews .addresses .address {
+    display: contents;
+}
+
+.MailPreviews .addresses .label {
+    font-weight: bold;
+}
+
+.MailPreviews .addresses .label:after {
+    content: ":";
+}
+
+.MailPreviews .addresses .set_in {
+    color: #6b7280;
+    font-size: 0.85em;
+}
+
+@container (max-width: 700px) {
+    .MailPreviews .addresses {
+        grid-template-columns: 1fr;
+    }
+    .MailPreviews .addresses .set_in {
+        margin-bottom: 6px;
+    }
+}
+
+.MailPreviews .addresses .missing {
+    color: #b42318;
 }
 
 .MailPreviews .list {

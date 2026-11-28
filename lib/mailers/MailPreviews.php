@@ -9,9 +9,35 @@ include_once("mailers/Mailer.php");
  *
  * A closure builds the mailer only (no send, no database change); the data of a recent row (the last order) or
  * samples.
+ *
+ * A previews.php also tells the addresses its mails use (SetAddress) - the page shows them above the mails: the
+ * sender, where the enquiries, the orders ... go. A later layer replaces a key (the store: the enquiries go to the
+ * shop's address).
  */
 class MailPreviews
 {
+    /**
+     * @var array<string, array{0: string, 1: string, 2: string}> key => array(title, address, where it is set)
+     */
+    protected static array $addresses = array();
+
+    /**
+     * An address the mails of a layer use, for the page: its title, the address (empty - not set) and where it is set
+     */
+    public static function SetAddress(string $key, string $title, string $address, string $setIn = "") : void
+    {
+        MailPreviews::$addresses[$key] = array($title, trim($address), $setIn);
+    }
+
+    /**
+     * The addresses of the layers (after All() - the previews files set them)
+     * @return array<string, array{0: string, 1: string, 2: string}>
+     */
+    public static function Addresses() : array
+    {
+        return MailPreviews::$addresses;
+    }
+
     /**
      * @return array<string, array{0: string, 1: Closure}> name => array(title, closure)
      */

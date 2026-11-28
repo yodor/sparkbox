@@ -204,9 +204,10 @@ OPcache, about a third of it in the database).
   session file. `SessionData` stores at its first value.
 - **Configuration values** (`ConfigBean`): a section is read with one query per request, values over 16 KB
   (an image) when asked for. Reading a missing key is free - ask for what you need.
-- **Translation** (`tr()`, `trbean()`): the phrases of the active language load with one query per
-  request (a map); a new phrase is captured once. `trbean()` loads one query per table field. The default
-  language is `Config::DEFAULT_LANGUAGE_ISO3`; the language cookie is sent only when it changes.
+- **Translation** (`tr()`, `trbean()`): the texts of the code come from the language packs
+  (`<layer>/lang/<code>.php`, read once per request); `trbean()` (content translations, with
+  `Config::TRANSLATOR_ENABLED`) loads one query per table field. The language of the site is the language of
+  `Config::DEFAULT_LOCALE` ('bg-bg' - 'bg'); the language cookie is sent only when it changes.
 - **Table checks**: a bean checks its table once per request (`DESCRIBE`, shared by the beans of a table)
   - about 5 ms a page. A cache of the column types across requests is measured and planned (it took a page
   set from 101 to 74 ms), not built yet.

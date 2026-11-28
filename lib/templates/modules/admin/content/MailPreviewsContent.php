@@ -11,7 +11,8 @@ include_once("beans/AdminUsersBean.php");
 include_once("objects/OrderColumn.php");
 
 /**
- * Settings > Mails: every mail of the layers (MailPreviews) as it is sent - the subject, the HTML in a frame, the
+ * Settings > Mails: the addresses of the mails (the sender, where the enquiries and the orders go - MailPreviews
+ * ::Addresses, information only), then every mail of the layers (MailPreviews) as it is sent - the subject, the HTML in a frame, the
  * plain text part - and a test send to an administrator of the site (the one logged in by default; a shop owner who
  * is an administrator sees the mails in his own mailbox). Only the addresses of the active administrators.
  */
@@ -112,6 +113,22 @@ class MailPreviewsContent extends TemplateContent
     {
         $this->cmp = new Container(false);
         $this->cmp->setComponentClass("MailPreviews");
+
+        //the addresses: the sender, the recipients of the site's mails - where each is set
+        $addresses = MailPreviews::Addresses();
+        if (count($addresses) > 0) {
+            $e = fn(string $text) : string => Spark::AttributeValue($text);
+            $rows = "";
+            foreach ($addresses as $key => [$title, $address, $setIn]) {
+                $value = ($address !== "") ? $e($address) : "<span class='missing'>" . $e(tr("not set")) . "</span>";
+                $rows .= "<div class='address " . $e($key) . "'><span class='label'>" . $e($title) . "</span> <span class='value'>$value</span>"
+                    . (($setIn !== "") ? " <span class='set_in'>" . $e($setIn) . "</span>" : "") . "</div>";
+            }
+            $info = new TextComponent("", "addresses");
+            $info->setTagName("div");
+            $info->setContents($rows);
+            $this->cmp->items()->append($info);
+        }
 
         //the list of the mails
         $list = new Container(false);
